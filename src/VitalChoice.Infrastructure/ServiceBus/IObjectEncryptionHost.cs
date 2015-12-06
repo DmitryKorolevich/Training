@@ -18,10 +18,16 @@ namespace VitalChoice.Infrastructure.ServiceBus
         byte[] RsaDecrypt(byte[] data, RSA rsa);
         byte[] RsaEncrypt(byte[] data, RSA rsa);
 #endif
-        bool RsaCheckSignWithConvert<T>(PlainCommandData obj, out T result);
-        PlainCommandData RsaSignWithConvert(object obj);
-        T AesDecrypt<T>(SymmetricEncryptedCommandData data, Guid session);
-        SymmetricEncryptedCommandData AesEncrypt(object obj, Guid session);
+
+        bool RsaVerifyWithConvert<T>(TransportCommandData command, out T result)
+            where T : ServiceBusCommandBase;
+
+        TransportCommandData RsaSignWithConvert(ServiceBusCommandBase command);
+
+        T AesDecryptVerify<T>(TransportCommandData data, Guid session)
+            where T : ServiceBusCommandBase;
+
+        TransportCommandData AesEncryptSign(ServiceBusCommandBase command, Guid session);
         bool SessionExist(Guid session);
         bool RegisterSession(Guid session, string hostName, byte[] keyCombined);
         KeyExchange GetSessionWithReset(Guid session);

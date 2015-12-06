@@ -6,8 +6,13 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
 #if DNX451 || NET451
     [Serializable]
 #endif
-    public class PlainCommandData
+    public class TransportCommandData
     {
+        public TransportCommandData(byte[] data)
+        {
+            Data = data;
+        }
+
         public X509Certificate2 Certificate { get; set; }
 
         public byte[] Data { get; set; }
@@ -23,13 +28,5 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
         public byte[] Key { get; set; }
 
         public byte[] IV { get; set; }
-    }
-
-#if DNX451 || NET451
-    [Serializable]
-#endif
-    public class SymmetricEncryptedCommandData
-    {
-        public byte[] Data { get; set; }
     }
 }

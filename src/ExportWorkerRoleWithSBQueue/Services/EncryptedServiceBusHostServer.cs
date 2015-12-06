@@ -19,7 +19,7 @@ namespace ExportWorkerRoleWithSBQueue.Services
     {
         private readonly ILifetimeScope _rootScope;
         private readonly RSACryptoServiceProvider _keyExchangeProvider;
-        protected override string LocalHostName => ServerHostName;
+        public override string LocalHostName => ServerHostName;
 
         public EncryptedServiceBusHostServer(IOptions<AppOptions> appOptions, ILogger logger, ILifetimeScope rootScope, IObjectEncryptionHost encryptionHost) : base(appOptions, logger, encryptionHost)
         {
@@ -28,7 +28,7 @@ namespace ExportWorkerRoleWithSBQueue.Services
             _keyExchangeProvider = new RSACryptoServiceProvider(4096);
         }
 
-        protected override async Task<bool> ProcessPlainCommand(ServiceBusCommand command)
+        protected override async Task<bool> ProcessPlainCommand(ServiceBusCommandBase command)
         {
             switch (command.CommandName)
             {
@@ -37,7 +37,7 @@ namespace ExportWorkerRoleWithSBQueue.Services
                     await SendPlainCommand(new ServiceBusCommandBase(command, publicKey));
                     break;
                 case ServiceBusCommandConstants.SetSessionKey:
-                    var keyCombined = (byte[]) command.Result;
+                    var keyCombined = (byte[]) command.Data;
                     await SendPlainCommand(new ServiceBusCommandBase(command,
                         EncryptionHost.RegisterSession(command.SessionId, command.Source, EncryptionHost.RsaDecrypt(keyCombined, _keyExchangeProvider))));
                     break;
@@ -50,7 +50,7 @@ namespace ExportWorkerRoleWithSBQueue.Services
             return true;
         }
 
-        protected override async Task<bool> ProcessEncryptedCommand(ServiceBusCommand command)
+        protected override async Task<bool> ProcessEncryptedCommand(ServiceBusCommandBase command)
         {
             switch (command.CommandName)
             {
@@ -65,9 +65,9 @@ namespace ExportWorkerRoleWithSBQueue.Services
             }
         }
 
-        private async Task<bool> ProcessUpdateCustomerPayments(ServiceBusCommand command)
+        private async Task<bool> ProcessUpdateCustomerPayments(ServiceBusCommandBase command)
         {
-            var customerPaymentInfo = command.Result as CustomerPaymentMethodDynamic[];
+            var customerPaymentInfo = command.Data as CustomerPaymentMethodDynamic[];
             if (customerPaymentInfo == null)
             {
                 await SendCommand(new ServiceBusCommandBase(command, false));
@@ -91,9 +91,9 @@ namespace ExportWorkerRoleWithSBQueue.Services
             return true;
         }
 
-        private async Task<bool> ProcessUpdateOrderPayment(ServiceBusCommand command)
+        private async Task<bool> ProcessUpdateOrderPayment(ServiceBusCommandBase command)
         {
-            var orderPaymentInfo = command.Result as OrderPaymentMethodDynamic;
+            var orderPaymentInfo = command.Data as OrderPaymentMethodDynamic;
             if (orderPaymentInfo == null)
             {
                 await SendCommand(new ServiceBusCommandBase(command, false));
@@ -117,9 +117,9 @@ namespace ExportWorkerRoleWithSBQueue.Services
             return true;
         }
 
-        private async Task<bool> ProcessExportOrders(ServiceBusCommand command)
+        private async Task<bool> ProcessExportOrders(ServiceBusCommandBase command)
         {
-            var exportData = command.Result as OrderExportData;
+            var exportData = command.Data as OrderExportData;
             if (exportData == null)
             {
                 return false;
@@ -157,7 +157,7 @@ namespace ExportWorkerRoleWithSBQueue.Services
 
         private void OnSessionRemoved(Guid session, string hostName)
         {
-            SendPlainCommand(new ServiceBusCommandBase(session, ServiceBusCommandConstants.SessionExpired, hostName,
+            SendPlainCommand(new ServiceBusCommandBase(session, ServiceBusCommandConstants.SessionExpired, hostName, LocalHostName,
                 ttl: TimeSpan.FromHours(1))).Wait();
         }
 

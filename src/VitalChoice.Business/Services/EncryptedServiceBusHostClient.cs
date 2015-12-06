@@ -9,11 +9,10 @@ using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus;
 using VitalChoice.Interfaces.Services;
 using System.Linq;
-using VitalChoice.Ecommerce.Domain.Exceptions;
 
 namespace VitalChoice.Business.Services
 {
-    public class EncryptedServiceBusHostClient : EncryptedServiceBusHost, IEncryptedServiceBusHostClient
+    public sealed class EncryptedServiceBusHostClient : EncryptedServiceBusHost, IEncryptedServiceBusHostClient
     {
         private readonly RSACryptoServiceProvider _keyExchangeProvider;
         private volatile Task<RSAParameters> _publicKey;
@@ -21,7 +20,7 @@ namespace VitalChoice.Business.Services
         public EncryptedServiceBusHostClient(IOptions<AppOptions> appOptions, ILoggerProviderExtended loggerProvider, IObjectEncryptionHost encryptionHost)
             : base(appOptions, loggerProvider.CreateLoggerDefault(), encryptionHost)
         {
-            _publicKey = ExecutePlainCommand<RSAParameters>(new ServiceBusCommand(Guid.NewGuid(), ServiceBusCommandConstants.GetPublicKey, ServerHostName));
+            _publicKey = ExecutePlainCommand<RSAParameters>(new ServiceBusCommandWithResult(Guid.NewGuid(), ServiceBusCommandConstants.GetPublicKey, ServerHostName, LocalHostName));
             _keyExchangeProvider = new RSACryptoServiceProvider();
         }
 
@@ -42,8 +41,8 @@ namespace VitalChoice.Business.Services
                         else
                         {
                             _publicKey =
-                                ExecutePlainCommand<RSAParameters>(new ServiceBusCommand(Guid.NewGuid(),
-                                    ServiceBusCommandConstants.GetPublicKey, ServerHostName));
+                                ExecutePlainCommand<RSAParameters>(new ServiceBusCommandWithResult(Guid.NewGuid(),
+                                    ServiceBusCommandConstants.GetPublicKey, ServerHostName, LocalHostName));
                             return null;
                         }
                     }
@@ -54,19 +53,22 @@ namespace VitalChoice.Business.Services
 
         public async Task<bool> AuthenticateClient(Guid sessionId)
         {
+            var keyExchangeProvider = KeyExchangeProvider;
+            if (keyExchangeProvider == null)
+                return false;
             var keys = EncryptionHost.CreateSession(sessionId);
             if (keys == null)
             {
-                if (await ExecutePlainCommand<bool>(new ServiceBusCommand(sessionId, ServiceBusCommandConstants.CheckSessionKey, ServerHostName)))
+                if (await ExecutePlainCommand<bool>(new ServiceBusCommandWithResult(sessionId, ServiceBusCommandConstants.CheckSessionKey, ServerHostName, LocalHostName)))
                     return true;
                 keys = EncryptionHost.GetSessionWithReset(sessionId);
             }
             var keyCombined = new byte[keys.IV.Length + keys.Key.Length];
             Array.Copy(keys.IV, keyCombined, keys.IV.Length);
             Array.Copy(keys.Key, 0, keyCombined, keys.IV.Length, keys.Key.Length);
-            return await ExecutePlainCommand<bool>(new ServiceBusCommand(sessionId, ServiceBusCommandConstants.SetSessionKey, ServerHostName)
+            return await ExecutePlainCommand<bool>(new ServiceBusCommandWithResult(sessionId, ServiceBusCommandConstants.SetSessionKey, ServerHostName, LocalHostName)
             {
-                Data = EncryptionHost.RsaEncrypt(keyCombined, KeyExchangeProvider)
+                Data = EncryptionHost.RsaEncrypt(keyCombined, keyExchangeProvider)
             });
         }
 
@@ -75,11 +77,11 @@ namespace VitalChoice.Business.Services
             EncryptionHost.RemoveSession(sessionId);
         }
 
-        protected override Task<bool> ProcessPlainCommand(ServiceBusCommand command)
+        protected override Task<bool> ProcessPlainCommand(ServiceBusCommandBase command)
         {
             if (command.CommandName == ServiceBusCommandConstants.SessionExpired)
             {
-                var session = (Guid) command.Result;
+                var session = (Guid) command.Data;
                 if (EncryptionHost.RemoveSession(session))
                 {
                     return Task.FromResult(true);

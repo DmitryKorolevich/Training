@@ -34,8 +34,8 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         protected readonly IObjectEncryptionHost EncryptionHost;
         protected readonly ILogger Logger;
-        protected virtual string LocalHostName { get; }
-        protected string ServerHostName { get; }
+        public virtual string LocalHostName { get; }
+        public string ServerHostName { get; }
 
         protected EncryptedServiceBusHost(IOptions<AppOptions> appOptions, ILogger logger, IObjectEncryptionHost encryptionHost)
         {
@@ -70,7 +70,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
         }
 
-        protected async Task<T> ExecutePlainCommand<T>(ServiceBusCommand command)
+        protected async Task<T> ExecutePlainCommand<T>(ServiceBusCommandWithResult command)
         {
             command.OnComplete = CommandComplete;
             TrackCommand(command);
@@ -105,7 +105,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
         }
 
-        public async Task<T> ExecuteCommand<T>(ServiceBusCommand command)
+        public async Task<T> ExecuteCommand<T>(ServiceBusCommandWithResult command)
         {
             command.OnComplete = CommandComplete;
             TrackCommand(command);
@@ -150,37 +150,30 @@ namespace VitalChoice.Infrastructure.ServiceBus
 #if NET451 || DNX451
         protected virtual BrokeredMessage CreatePlainCommand(ServiceBusCommandBase command)
         {
-            return new BrokeredMessage(EncryptionHost.RsaSignWithConvert(command.Data))
+            return new BrokeredMessage(EncryptionHost.RsaSignWithConvert(command))
             {
-                ContentType = command.CommandName,
-                SessionId = command.SessionId.ToString(),
-                MessageId = command.CommandId.ToString(),
                 TimeToLive = command.TimeToLeave,
-                Label = LocalHostName,
                 CorrelationId = command.Destination
             };
         }
 
         protected virtual BrokeredMessage CreateEncryptedMessage(ServiceBusCommandBase command)
         {
-            return new BrokeredMessage(EncryptionHost.AesEncrypt(command.Data, command.SessionId))
+            return new BrokeredMessage(EncryptionHost.AesEncryptSign(command, command.SessionId))
             {
-                ContentType = command.CommandName,
                 SessionId = command.SessionId.ToString(),
-                MessageId = command.CommandId.ToString(),
                 TimeToLive = command.TimeToLeave,
-                Label = LocalHostName,
                 CorrelationId = command.Destination
             };
         }
 #endif
 
-        protected virtual Task<bool> ProcessEncryptedCommand(ServiceBusCommand command)
+        protected virtual Task<bool> ProcessEncryptedCommand(ServiceBusCommandBase command)
         {
             return Task.FromResult(false);
         }
 
-        protected virtual Task<bool> ProcessPlainCommand(ServiceBusCommand command)
+        protected virtual Task<bool> ProcessPlainCommand(ServiceBusCommandBase command)
         {
             return Task.FromResult(false);
         }
@@ -189,7 +182,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
         {
             lock (_commands)
             {
-                var commandItem = new CommandItem(command.CommandId, command.CommandName);
+                CommandItem commandItem = command;
                 if (_commands.ContainsKey(commandItem))
                 {
                     _commands.Remove(commandItem);
@@ -221,38 +214,41 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 if (_plainRunningCount == 1)
                     _readyToDisposeEncrypted.Reset();
 
+                var remoteCommand = EncryptionHost.AesDecryptVerify<ServiceBusCommandBase>(message.GetBody<TransportCommandData>(),
+                    Guid.Parse(message.SessionId));
+
+                if (remoteCommand == null)
+                {
+                    Logger.LogInformation($"Invalid sign. Session: {message.SessionId}");
+                    return;
+                }
                 WeakReference<ServiceBusCommandBase> commandReference;
                 lock (_commands)
                 {
-                    _commands.TryGetValue(new CommandItem(Guid.Parse(message.MessageId), message.ContentType),
-                        out commandReference);
+                    _commands.TryGetValue(remoteCommand, out commandReference);
                 }
                 if (commandReference != null)
                 {
                     ServiceBusCommandBase command;
                     if (commandReference.TryGetTarget(out command))
                     {
-                        Logger.LogInformation($"{command.CommandName} intercepting ({command.CommandId})");
-                        var body = EncryptionHost.AesDecrypt<object>(message.GetBody<SymmetricEncryptedCommandData>(), command.SessionId);
-                        command.RequestAcqureAction?.Invoke(command, body);
+                        Logger.LogInformation($"{command.CommandName} answer received ({command.CommandId})");
+                        command.RequestAcqureAction?.Invoke(command, remoteCommand.Data);
                     }
                     await message.CompleteAsync();
                 }
                 else
                 {
-                    var incomingCommand = CreateIncomingCommand(message);
-                    Logger.LogInformation($"{incomingCommand.CommandName} received ({incomingCommand.CommandId})");
+                    Logger.LogInformation($"{remoteCommand.CommandName} received ({remoteCommand.CommandId})");
 
-                    var body = EncryptionHost.AesDecrypt<object>(message.GetBody<SymmetricEncryptedCommandData>(), incomingCommand.SessionId);
-                    incomingCommand.RequestAcqureAction?.Invoke(incomingCommand, body);
-                    if (await ProcessEncryptedCommand(incomingCommand))
+                    if (await ProcessEncryptedCommand(remoteCommand))
                     {
                         await message.CompleteAsync();
-                        Logger.LogInformation($"{incomingCommand.CommandName} processing success ({incomingCommand.CommandId})");
+                        Logger.LogInformation($"{remoteCommand.CommandName} processing success ({remoteCommand.CommandId})");
                     }
                     else
                     {
-                        Logger.LogWarning($"{incomingCommand.CommandName} processing failed ({incomingCommand.CommandId})");
+                        Logger.LogWarning($"{remoteCommand.CommandName} processing failed ({remoteCommand.CommandId})");
                     }
                 }
             }
@@ -283,40 +279,37 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 _encryptedRunningCount++;
                 if (_encryptedRunningCount == 1)
                     _readyToDisposePlain.Reset();
+                ServiceBusCommandBase remoteCommand;
+                if (EncryptionHost.RsaVerifyWithConvert(message.GetBody<TransportCommandData>(), out remoteCommand))
+                {
+                    WeakReference<ServiceBusCommandBase> commandReference;
+                    lock (_commands)
+                    {
+                        _commands.TryGetValue(remoteCommand,
+                            out commandReference);
+                    }
 
-                WeakReference<ServiceBusCommandBase> commandReference;
-                lock (_commands)
-                {
-                    _commands.TryGetValue(new CommandItem(Guid.Parse(message.MessageId), message.ContentType),
-                        out commandReference);
-                }
-                object body;
-                if (EncryptionHost.RsaCheckSignWithConvert(message.GetBody<PlainCommandData>(), out body))
-                {
-                    Logger.LogInformation($"{message.ContentType} incoming command identity validate sucess.");
                     if (commandReference != null)
                     {
                         ServiceBusCommandBase command;
                         if (commandReference.TryGetTarget(out command))
                         {
-                            Logger.LogInformation($"{command.CommandName} intercepting ({command.CommandId})");
-                            command.RequestAcqureAction?.Invoke(command, body);
+                            Logger.LogInformation($"{command.CommandName} answer received ({command.CommandId})");
+                            command.RequestAcqureAction?.Invoke(command, remoteCommand.Data);
                         }
                         await message.CompleteAsync();
                     }
                     else
                     {
-                        var incomingCommand = CreateIncomingCommand(message);
-                        Logger.LogInformation($"{incomingCommand.CommandName} received ({incomingCommand.CommandId})");
-                        incomingCommand.RequestAcqureAction?.Invoke(incomingCommand, body);
-                        if (await ProcessPlainCommand(incomingCommand))
+                        Logger.LogInformation($"{remoteCommand.CommandName} received ({remoteCommand.CommandId})");
+                        if (await ProcessPlainCommand(remoteCommand))
                         {
                             await message.CompleteAsync();
-                            Logger.LogInformation($"{incomingCommand.CommandName} processing success ({incomingCommand.CommandId})");
+                            Logger.LogInformation($"{remoteCommand.CommandName} processing success ({remoteCommand.CommandId})");
                         }
                         else
                         {
-                            Logger.LogWarning($"{incomingCommand.CommandName} processing failed ({incomingCommand.CommandId})");
+                            Logger.LogWarning($"{remoteCommand.CommandName} processing failed ({remoteCommand.CommandId})");
                         }
                     }
                 }
@@ -336,14 +329,6 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 if (_encryptedRunningCount == 0)
                     _readyToDisposePlain.Set();
             }
-        }
-
-        protected virtual ServiceBusCommand CreateIncomingCommand(BrokeredMessage message)
-        {
-            return new ServiceBusCommand(Guid.Parse(message.SessionId), message.ContentType, message.CorrelationId, Guid.Parse(message.MessageId))
-            {
-                Source = message.Label
-            };
         }
 
         private Task<bool> SendEncryptedAsync(ServiceBusCommandBase command)
@@ -396,21 +381,21 @@ namespace VitalChoice.Infrastructure.ServiceBus
         {
             lock (_commands)
             {
-                _commands.Add(new CommandItem(command.CommandId, command.CommandName), new WeakReference<ServiceBusCommandBase>(command));
+                _commands.Add(command, new WeakReference<ServiceBusCommandBase>(command));
             }
         }
 
         private struct CommandItem : IEquatable<CommandItem>
         {
-            public CommandItem(Guid commandId, string commandName)
+            private CommandItem(Guid commandId, Guid sessionId)
             {
                 _commandId = commandId;
-                _commandName = commandName;
+                _sessionId = sessionId;
             }
 
             public bool Equals(CommandItem other)
             {
-                return string.Equals(_commandName, other._commandName) && _commandId.Equals(other._commandId);
+                return string.Equals(_sessionId, other._sessionId) && _commandId.Equals(other._commandId);
             }
 
             public override bool Equals(object obj)
@@ -423,11 +408,18 @@ namespace VitalChoice.Infrastructure.ServiceBus
             {
                 unchecked
                 {
-                    return (_commandName.GetHashCode() * 397) ^ _commandId.GetHashCode();
+                    return (_sessionId.GetHashCode() * 397) ^ _commandId.GetHashCode();
                 }
             }
 
-            private readonly string _commandName;
+            public static implicit operator CommandItem(ServiceBusCommandBase command)
+            {
+                if (command == null)
+                    throw new ArgumentNullException(nameof(command));
+                return new CommandItem(command.CommandId, command.SessionId);
+            }
+
+            private readonly Guid _sessionId;
             private readonly Guid _commandId;
         }
     }

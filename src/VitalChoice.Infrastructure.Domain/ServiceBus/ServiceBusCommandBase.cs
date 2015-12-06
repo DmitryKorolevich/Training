@@ -1,37 +1,53 @@
 using System;
+using System.Runtime.Serialization;
 
 namespace VitalChoice.Infrastructure.Domain.ServiceBus
 {
     public delegate void CommandCompleteEventHandler(ServiceBusCommandBase command);
 
+    [DataContract]
     public class ServiceBusCommandBase : IDisposable
     {
-        public ServiceBusCommandBase(Guid sessionId, string commandName, string destination, Guid? commandId = null, TimeSpan? ttl = null)
+        public ServiceBusCommandBase(Guid sessionId, string commandName, string destination, string source, Guid? commandId = null, TimeSpan? ttl = null)
         {
             CommandName = commandName;
             SessionId = sessionId;
             CommandId = commandId ?? Guid.NewGuid();
             Destination = destination;
+            Source = source;
             TimeToLeave = ttl ?? TimeSpan.FromSeconds(30);
         }
 
-        public ServiceBusCommandBase(ServiceBusCommandBase initialCommand, object data)
+        public ServiceBusCommandBase(ServiceBusCommandBase remoteCommand, object data)
         {
-            CommandName = initialCommand.CommandName;
-            SessionId = initialCommand.SessionId;
-            CommandId = initialCommand.CommandId;
-            TimeToLeave = initialCommand.TimeToLeave;
-            Destination = initialCommand.Source;
-            Source = initialCommand.Destination;
+            CommandName = remoteCommand.CommandName;
+            SessionId = remoteCommand.SessionId;
+            CommandId = remoteCommand.CommandId;
+            TimeToLeave = remoteCommand.TimeToLeave;
+            Destination = remoteCommand.Source;
+            Source = remoteCommand.Destination;
             Data = data;
         }
 
-        public Guid SessionId { get; }
-        public Guid CommandId { get; }
-        public TimeSpan TimeToLeave { get; }
-        public string CommandName { get; }
+        [DataMember]
+        public Guid SessionId { get; set; }
+
+        [DataMember]
+        public Guid CommandId { get; set; }
+
+        [DataMember]
+        public TimeSpan TimeToLeave { get; set; }
+
+        [DataMember]
+        public string CommandName { get; set; }
+
+        [DataMember]
         public string Destination { get; set; }
+
+        [DataMember]
         public string Source { get; set; }
+
+        [DataMember]
         public object Data { get; set; }
 
         public Action<ServiceBusCommandBase, object> RequestAcqureAction { get; set; }

@@ -164,85 +164,34 @@ namespace VitalChoice.Infrastructure.ServiceBus
         }
 
 
-        public bool RsaCheckSignWithConvert<T>(PlainCommandData obj, out T result)
+        public bool RsaVerifyWithConvert<T>(TransportCommandData command, out T result)
+            where T: ServiceBusCommandBase
         {
-            if (obj == null) throw new ArgumentNullException(nameof(obj));
-
-            if (obj.Data.Length > 0)
+            if (command == null) throw new ArgumentNullException(nameof(command));
+            if (command.Data?.Length > 0)
             {
-                result = (T)ObjectSerializer.Deserialize(obj.Data);
+                if (RsaVerifyCommandSign(command))
+                {
+                    result = (T) ObjectSerializer.Deserialize(command.Data);
+                    return true;
+                }
             }
-            else
-            {
-                result = default(T);
-            }
-#if DNX451 || NET451
-            var rsa = new RSACryptoServiceProvider();
-            rsa.ImportParameters(((RSACryptoServiceProvider) obj.Certificate.PublicKey.Key).ExportParameters(false));
-#else
-            var rsa = obj.Certificate.GetRSAPublicKey();
-#endif
-            X509Certificate2 serverCert, clientCert;
-            if (_sessionExpires)
-            {
-                clientCert = obj.Certificate;
-                serverCert = LocalCert;
-            }
-            else
-            {
-                serverCert = obj.Certificate;
-                clientCert = LocalCert;
-            }
-            if (!ValidateClientCertificate(serverCert, clientCert))
-            {
-                _logger.LogWarning($"Invalid certificate: Server Thumbprint: {serverCert.Thumbprint}, Client Thumbprint: {clientCert.Thumbprint}");
-                return false;
-            }
-#if DNX451 || NET451
-            if (!rsa.VerifyData(obj.Data, CryptoConfig.MapNameToOID("SHA256"), obj.Sign))
-#else
-            if (!rsa.VerifyData(obj.Data, obj.Sign, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1))
-#endif
-            {
-                _logger.LogWarning(
-                    $"Invalid sign: Remote Certificate Thumbprint: {obj.Certificate.Thumbprint}, " +
-                    $"Sign value: {string.Join("", obj.Sign.Select(b => b.ToString("X")))}, " +
-                    $"Data value: {string.Join("", obj.Data.Select(b => b.ToString("X")))}");
-                return false;
-            }
-            return true;
+            result = default(T);
+            return false;
         }
 
-        public PlainCommandData RsaSignWithConvert(object obj)
+        public TransportCommandData RsaSignWithConvert(ServiceBusCommandBase command)
         {
-            if (obj == null)
-                obj = new object();
-            var result = new PlainCommandData {Data = ObjectSerializer.Serialize(obj)};
-#if NET451 || DNX451
-            result.Sign = _signProvider.SignData(result.Data, CryptoConfig.MapNameToOID("SHA256"));
-#else
-            result.Sign = _signProvider.SignData(result.Data, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-#endif
-            result.Certificate = LocalCert;
-            //Verify Self
-#if DNX451 || NET451
-            var rsa = new RSACryptoServiceProvider();
-            rsa.ImportParameters(((RSACryptoServiceProvider)result.Certificate.PublicKey.Key).ExportParameters(false));
-#else
-            var rsa = result.Certificate.GetRSAPublicKey();
-#endif
-#if DNX451 || NET451
-            if (!rsa.VerifyData(result.Data, CryptoConfig.MapNameToOID("SHA256"), result.Sign))
-#else
-            if (!rsa.VerifyData(result.Data, result.Sign, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1))
-#endif
-            {
-                throw new CryptographicException("Cannot verify self signature");
-            }
+            if (command == null)
+                throw new ArgumentNullException(nameof(command));
+
+            var result = new TransportCommandData(ObjectSerializer.Serialize(command));
+            RsaSignCommand(result);
             return result;
         }
 
-        public T AesDecrypt<T>(SymmetricEncryptedCommandData data, Guid session)
+        public T AesDecryptVerify<T>(TransportCommandData data, Guid session)
+            where T: ServiceBusCommandBase
         {
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
@@ -254,54 +203,60 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 if (!_sessions.TryGetValue(session, out encryption))
                     return default(T);
             }
-            encryption.Expiration = DateTime.Now.AddHours(1);
-            byte[] plainData = null;
-            try
+            if (RsaVerifyCommandSign(data))
             {
-                using (var memory = new MemoryStream())
+                encryption.Expiration = DateTime.Now.AddHours(1);
+                byte[] plainData = null;
+                try
                 {
-                    using (var decryptor = encryption.Aes.CreateDecryptor())
+                    using (var memory = new MemoryStream())
                     {
-                        using (CryptoStream cs = new CryptoStream(memory, decryptor, CryptoStreamMode.Write))
+                        using (var decryptor = encryption.Aes.CreateDecryptor())
                         {
-                            cs.Write(data.Data, 0, data.Data.Length);
-                            cs.FlushFinalBlock();
-                            plainData = memory.ToArray();
-                            return (T)ObjectSerializer.Deserialize(plainData);
+                            using (CryptoStream cs = new CryptoStream(memory, decryptor, CryptoStreamMode.Write))
+                            {
+                                cs.Write(data.Data, 0, data.Data.Length);
+                                cs.FlushFinalBlock();
+                                plainData = memory.ToArray();
+                                return (T) ObjectSerializer.Deserialize(plainData);
+                            }
                         }
                     }
                 }
-            }
-            catch (SerializationException)
-            {
-                if (plainData != null)
+                catch (SerializationException)
                 {
-                    _logger.LogError($"Cannot deserialize object \r\n{Encoding.UTF8.GetString(plainData)}");
+                    if (plainData != null)
+                    {
+                        _logger.LogError($"Cannot deserialize object \r\n{Encoding.UTF8.GetString(plainData)}");
+                    }
                 }
-            }
-            catch (CryptographicException e)
-            {
-                _logger.LogError(e.Message, e);
+                catch (CryptographicException e)
+                {
+                    _logger.LogError(e.Message, e);
+                }
             }
             return default(T);
         }
 
-        public SymmetricEncryptedCommandData AesEncrypt(object obj, Guid session)
+        public TransportCommandData AesEncryptSign(ServiceBusCommandBase command, Guid session)
         {
-            if (obj == null)
-                return new SymmetricEncryptedCommandData();
+            if (command == null)
+                return new TransportCommandData(null);
             SessionInfo encryption;
             lock (_sessions)
             {
                 if (!_sessions.TryGetValue(session, out encryption))
-                    return new SymmetricEncryptedCommandData();
+                {
+                    _logger.LogWarning($"Session doesn't exist {session}");
+                    return new TransportCommandData(null);
+                }
             }
             encryption.Expiration = DateTime.Now.AddHours(1);
             try
             {
                 using (var encryptor = encryption.Aes.CreateEncryptor())
                 {
-                    var plainData = ObjectSerializer.Serialize(obj);
+                    var plainData = ObjectSerializer.Serialize(command);
                     using (var memory = new MemoryStream())
                     {
                         using (CryptoStream cs = new CryptoStream(memory, encryptor, CryptoStreamMode.Write))
@@ -309,10 +264,9 @@ namespace VitalChoice.Infrastructure.ServiceBus
                             cs.Write(plainData, 0, plainData.Length);
                             cs.FlushFinalBlock();
                             var encryptedData = memory.ToArray();
-                            return new SymmetricEncryptedCommandData
-                            {
-                                Data = encryptedData
-                            };
+                            var result = new TransportCommandData(encryptedData);
+                            RsaSignCommand(result);
+                            return result;
                         }
                     }
                 }
@@ -323,9 +277,9 @@ namespace VitalChoice.Infrastructure.ServiceBus
             }
             catch (SerializationException)
             {
-                _logger.LogError($"Cannot serialize object {obj}");
+                _logger.LogError($"Cannot serialize object {command}");
             }
-            return new SymmetricEncryptedCommandData();
+            return new TransportCommandData(null);
         }
 
         public bool SessionExist(Guid session)
@@ -478,6 +432,61 @@ namespace VitalChoice.Infrastructure.ServiceBus
             return aes;
         }
 
+        private bool RsaVerifyCommandSign(TransportCommandData commandData)
+        {
+            if (commandData == null)
+                throw new ArgumentNullException(nameof(commandData));
+#if DNX451 || NET451
+            var rsa = new RSACryptoServiceProvider();
+            rsa.ImportParameters(((RSACryptoServiceProvider)commandData.Certificate.PublicKey.Key).ExportParameters(false));
+#else
+            var rsa = commandData.Certificate.GetRSAPublicKey();
+#endif
+            X509Certificate2 serverCert, clientCert;
+            if (_sessionExpires)
+            {
+                clientCert = commandData.Certificate;
+                serverCert = LocalCert;
+            }
+            else
+            {
+                serverCert = commandData.Certificate;
+                clientCert = LocalCert;
+            }
+            if (!ValidateClientCertificate(serverCert, clientCert))
+            {
+                _logger.LogWarning($"Invalid certificate: Server Thumbprint: {serverCert.Thumbprint}, Client Thumbprint: {clientCert.Thumbprint}");
+                return false;
+            }
+#if DNX451 || NET451
+            if (!rsa.VerifyData(commandData.Data, CryptoConfig.MapNameToOID("SHA256"), commandData.Sign))
+#else
+            if (!rsa.VerifyData(commandData.Data, commandData.Sign, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1))
+#endif
+            {
+                _logger.LogWarning($"Invalid sign. Remote Certificate Thumbprint: {commandData.Certificate.Thumbprint}, ");
+                return false;
+            }
+            return true;
+        }
+
+        private void RsaSignCommand(TransportCommandData commandData)
+        {
+#if NET451 || DNX451
+            commandData.Sign = _signProvider.SignData(commandData.Data, CryptoConfig.MapNameToOID("SHA256"));
+#else
+            commandData.Sign = _signProvider.SignData(commandData.Data, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+#endif
+            commandData.Certificate = LocalCert;
+            //Verify Self
+#if DNX451 || NET451
+            var rsa = new RSACryptoServiceProvider();
+            rsa.ImportParameters(((RSACryptoServiceProvider)commandData.Certificate.PublicKey.Key).ExportParameters(false));
+#else
+            var rsa = commandData.Certificate.GetRSAPublicKey();
+#endif
+        }
+
         private byte[] Take(byte[] data, int length)
         {
             var result = new byte[length];
@@ -508,6 +517,8 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 return sha.ComputeHash(memory);
             }
         }
+
+        
 
         private byte[] GetPublicKeyHash()
         {
