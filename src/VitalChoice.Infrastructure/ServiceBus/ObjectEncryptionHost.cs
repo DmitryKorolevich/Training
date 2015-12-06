@@ -62,7 +62,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 if (rootCerts.Count == 0)
                     throw new InvalidOperationException(
                         $"Cannot find Certificate in Store with thumbprint <{options.Value.ExportService.RootThumbprint}>");
-                RootCert = rootCerts[0];
+                RootCert = new X509Certificate2(rootCerts[0].Export(X509ContentType.Cert));
                 if (!ValidateClientCertificate(LocalCert))
                 {
                     throw new InvalidOperationException("Client and/or root certificates doesn't valid.");
