@@ -15,7 +15,7 @@ namespace VitalChoice.Business.Services.Orders
 {
     public class EncryptedOrderExportService : EncryptedServiceBusClient, IEncryptedOrderExportService
     {
-        public EncryptedOrderExportService(IEncryptedServiceBusHostClient encryptedBusHost, IOptions<AppOptions> options) : base(encryptedBusHost, options)
+        public EncryptedOrderExportService(IEncryptedServiceBusHostClient encryptedBusHost) : base(encryptedBusHost)
         {
         }
 
@@ -24,7 +24,7 @@ namespace VitalChoice.Business.Services.Orders
             Dictionary<int, ManualResetEvent> awaitItems = exportData.ExportInfo.ToDictionary(o => o.Id, o => new ManualResetEvent(false));
             return Task.Run(() =>
             {
-                SendCommand(new ServiceBusCommandBase(SessionId, OrderExportServiceCommandConstants.ExportOrder, ServerHostName) { Data = exportData },
+                SendCommand(new ServiceBusCommandBase(SessionId, OrderExportServiceCommandConstants.ExportOrder, ServerHostName, LocalHostName) { Data = exportData },
                     (command, o) =>
                     {
                         var exportResult = (OrderExportItemResult)o;
@@ -41,7 +41,7 @@ namespace VitalChoice.Business.Services.Orders
             List<OrderExportItemResult> results = new List<OrderExportItemResult>();
             return Task.Run(() =>
             {
-                SendCommand(new ServiceBusCommandBase(SessionId, OrderExportServiceCommandConstants.ExportOrder, ServerHostName) { Data = exportData },
+                SendCommand(new ServiceBusCommandBase(SessionId, OrderExportServiceCommandConstants.ExportOrder, ServerHostName, LocalHostName) { Data = exportData },
                     (command, o) =>
                     {
                         var exportResult = (OrderExportItemResult)o;
@@ -56,7 +56,7 @@ namespace VitalChoice.Business.Services.Orders
         public Task<bool> UpdateOrderPaymentMethodAsync(OrderPaymentMethodDynamic orderPaymentMethod)
         {
             return
-                SendCommand<bool>(new ServiceBusCommand(SessionId, OrderExportServiceCommandConstants.UpdateOrderPayment, ServerHostName)
+                SendCommand<bool>(new ServiceBusCommandWithResult(SessionId, OrderExportServiceCommandConstants.UpdateOrderPayment, ServerHostName, LocalHostName)
                 {
                     Data = orderPaymentMethod
                 });
@@ -65,7 +65,7 @@ namespace VitalChoice.Business.Services.Orders
         public Task<bool> UpdateCustomerPaymentMethodsAsync(IEnumerable<CustomerPaymentMethodDynamic> paymentMethods)
         {
             return
-                SendCommand<bool>(new ServiceBusCommand(SessionId, OrderExportServiceCommandConstants.UpdateCustomerPayment, ServerHostName)
+                SendCommand<bool>(new ServiceBusCommandWithResult(SessionId, OrderExportServiceCommandConstants.UpdateCustomerPayment, ServerHostName, LocalHostName)
                 {
                     Data = paymentMethods.ToArray()
                 });

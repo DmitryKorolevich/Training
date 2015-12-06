@@ -13,17 +13,17 @@ namespace VitalChoice.Business.Services
     {
         private readonly IEncryptedServiceBusHostClient _encryptedBusHost;
         private bool IsAuthenticated =>_encryptedBusHost.IsAuthenticatedClient(SessionId);
-        protected readonly string ServerHostName;
+        public string ServerHostName => _encryptedBusHost.ServerHostName;
+        public string LocalHostName => _encryptedBusHost.LocalHostName;
 
-        protected EncryptedServiceBusClient(IEncryptedServiceBusHostClient encryptedBusHost, IOptions<AppOptions> options)
+        protected EncryptedServiceBusClient(IEncryptedServiceBusHostClient encryptedBusHost)
         {
-            ServerHostName = options.Value.ExportService.ServerHostName;
             _encryptedBusHost = encryptedBusHost;
         }
 
         public Guid SessionId { get; } = Guid.NewGuid();
 
-        protected async Task<T> SendCommand<T>(ServiceBusCommand command)
+        protected async Task<T> SendCommand<T>(ServiceBusCommandWithResult command)
         {
             if (!IsAuthenticated)
             {
