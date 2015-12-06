@@ -20,6 +20,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
     public class ObjectEncryptionHost : IDisposable, IObjectEncryptionHost
     {
         private readonly ILogger _logger;
+        public X509Certificate2 RootCert { get; }
         public X509Certificate2 LocalCert { get; }
 #if DNX451 || NET451
         private readonly RSACryptoServiceProvider _signProvider;
@@ -28,7 +29,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 #endif
         private readonly Aes _localAes;
         private readonly bool _sessionExpires;
-        private readonly Dictionary<Guid, SessionInfo> _sessions = new Dictionary<Guid, ObjectEncryptionHost.SessionInfo>();
+        private readonly Dictionary<Guid, SessionInfo> _sessions = new Dictionary<Guid, SessionInfo>();
         private readonly ManualResetEvent _disposeEvent;
 
         /// <summary>
@@ -37,24 +38,35 @@ namespace VitalChoice.Infrastructure.ServiceBus
         public ObjectEncryptionHost(IOptions<AppOptions> options, ILogger logger)
         {
             _logger = logger;
+#if NET451 || DNX451
+            var certStore = new X509Store(StoreLocation.LocalMachine);
+#else
+            var certStore = new X509Store("My", StoreLocation.LocalMachine);
+#endif
+            var caRootStore = new X509Store(StoreName.Root, StoreLocation.LocalMachine);
             try
             {
-#if NET451 || DNX451
-                var certStore = new X509Store(StoreLocation.LocalMachine);
-#else
-                var certStore = new X509Store();
-#endif
                 certStore.Open(OpenFlags.ReadOnly);
-                var certificates = certStore.Certificates.Find(X509FindType.FindByThumbprint, options.Value.ExportService.CertThumbprint,
-                    false);
-                if (certificates.Count == 0)
+                caRootStore.Open(OpenFlags.ReadOnly);
+                var localCerts = certStore.Certificates.Find(X509FindType.FindByThumbprint, options.Value.ExportService.CertThumbprint, true);
+                if (localCerts.Count == 0)
                     throw new InvalidOperationException(
                         $"Cannot find Certificate in Store with thumbprint <{options.Value.ExportService.CertThumbprint}>");
 
-                var cert = certificates[0];
+                var cert = localCerts[0];
                 LocalCert = new X509Certificate2(cert.Export(X509ContentType.Cert));
                 if (!cert.HasPrivateKey)
                     throw new InvalidOperationException("Certificate has no private key imported.");
+                var rootCerts = caRootStore.Certificates.Find(X509FindType.FindByThumbprint, options.Value.ExportService.RootThumbprint,
+                    true);
+                if (rootCerts.Count == 0)
+                    throw new InvalidOperationException(
+                        $"Cannot find Certificate in Store with thumbprint <{options.Value.ExportService.RootThumbprint}>");
+                RootCert = rootCerts[0];
+                if (!ValidateClientCertificate(LocalCert))
+                {
+                    throw new InvalidOperationException("Client and/or root certificates doesn't valid.");
+                }
 #if DNX451 || NET451
                 _signProvider = new RSACryptoServiceProvider();
                 _signProvider.ImportParameters(((RSACryptoServiceProvider) cert.PrivateKey).ExportParameters(true));
@@ -67,16 +79,21 @@ namespace VitalChoice.Infrastructure.ServiceBus
                     new Thread(SessionExpirationLookup).Start();
                     _sessionExpires = true;
                 }
-#if DNX451 || NET451
-                certStore.Close();
-#else
-                certStore.Dispose();
-#endif
                 _localAes = GetLocalAes();
             }
             catch (Exception e)
             {
                 logger.LogCritical(e.Message, e);
+            }
+            finally
+            {
+#if DNX451 || NET451
+                certStore.Close();
+                caRootStore.Close();
+#else
+                certStore.Dispose();
+                caRootStore.Dispose();
+#endif
             }
         }
 
@@ -114,7 +131,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             }
         }
 
-        public bool ValidateClientCertificate(X509Certificate2 rootCert, X509Certificate2 clientCert)
+        public bool ValidateClientCertificate(X509Certificate2 clientCert)
         {
             X509Chain validationChain = new X509Chain
             {
@@ -122,12 +139,12 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 {
                     RevocationMode = X509RevocationMode.NoCheck,
                     RevocationFlag = X509RevocationFlag.EntireChain,
-                    VerificationFlags = X509VerificationFlags.AllowUnknownCertificateAuthority,
+                    VerificationFlags = X509VerificationFlags.NoFlag,
                     VerificationTime = DateTime.Now,
                     UrlRetrievalTimeout = TimeSpan.Zero
                 }
             };
-            validationChain.ChainPolicy.ExtraStore.Add(rootCert);
+            validationChain.ChainPolicy.ExtraStore.Add(RootCert);
             var valid = validationChain.Build(clientCert);
             return valid;
         }
@@ -143,7 +160,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 #if DNX451 || NET451
             var objectData = rsa.Decrypt(data, true);
 #else
-            var objectData = rsa.Decrypt(data, RSAEncryptionPadding.OaepSHA256);
+            var objectData = rsa.Decrypt(data, RSAEncryptionPadding.OaepSHA512);
 #endif
             return objectData;
         }
@@ -159,7 +176,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 #if DNX451 || NET451
             return rsa.Encrypt(data, true);
 #else
-            return rsa.Encrypt(data, RSAEncryptionPadding.OaepSHA256);
+            return rsa.Encrypt(data, RSAEncryptionPadding.OaepSHA512);
 #endif
         }
 
@@ -390,7 +407,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
         public void Dispose()
         {
             _disposeEvent?.Dispose();
-            _signProvider.Dispose();
+            _signProvider?.Dispose();
             lock (_sessions)
             {
                 foreach (var session in _sessions)
@@ -442,26 +459,16 @@ namespace VitalChoice.Infrastructure.ServiceBus
 #else
             var rsa = commandData.Certificate.GetRSAPublicKey();
 #endif
-            X509Certificate2 serverCert, clientCert;
-            if (_sessionExpires)
+            if (!ValidateClientCertificate(commandData.Certificate))
             {
-                clientCert = commandData.Certificate;
-                serverCert = LocalCert;
-            }
-            else
-            {
-                serverCert = commandData.Certificate;
-                clientCert = LocalCert;
-            }
-            if (!ValidateClientCertificate(serverCert, clientCert))
-            {
-                _logger.LogWarning($"Invalid certificate: Server Thumbprint: {serverCert.Thumbprint}, Client Thumbprint: {clientCert.Thumbprint}");
+                _logger.LogWarning(
+                    $"Invalid certificate:\n Server Thumbprint: {RootCert.Thumbprint}\n Client Thumbprint: {commandData.Certificate.Thumbprint}");
                 return false;
             }
 #if DNX451 || NET451
-            if (!rsa.VerifyData(commandData.Data, CryptoConfig.MapNameToOID("SHA256"), commandData.Sign))
+            if (!rsa.VerifyData(commandData.Data, CryptoConfig.MapNameToOID("SHA512"), commandData.Sign))
 #else
-            if (!rsa.VerifyData(commandData.Data, commandData.Sign, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1))
+            if (!rsa.VerifyData(commandData.Data, commandData.Sign, HashAlgorithmName.SHA512, RSASignaturePadding.Pkcs1))
 #endif
             {
                 _logger.LogWarning($"Invalid sign. Remote Certificate Thumbprint: {commandData.Certificate.Thumbprint}, ");
@@ -472,19 +479,14 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         private void RsaSignCommand(TransportCommandData commandData)
         {
+            if (_signProvider == null)
+                return;
 #if NET451 || DNX451
-            commandData.Sign = _signProvider.SignData(commandData.Data, CryptoConfig.MapNameToOID("SHA256"));
+            commandData.Sign = _signProvider.SignData(commandData.Data, CryptoConfig.MapNameToOID("SHA512"));
 #else
-            commandData.Sign = _signProvider.SignData(commandData.Data, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+            commandData.Sign = _signProvider.SignData(commandData.Data, HashAlgorithmName.SHA512, RSASignaturePadding.Pkcs1);
 #endif
             commandData.Certificate = LocalCert;
-            //Verify Self
-#if DNX451 || NET451
-            var rsa = new RSACryptoServiceProvider();
-            rsa.ImportParameters(((RSACryptoServiceProvider)commandData.Certificate.PublicKey.Key).ExportParameters(false));
-#else
-            var rsa = commandData.Certificate.GetRSAPublicKey();
-#endif
         }
 
         private byte[] Take(byte[] data, int length)

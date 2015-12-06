@@ -22,7 +22,8 @@
       "ConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=9bCmTJyWrS2//GpvV5A3+bsPHdyph0ndE8tE14gsD24=",
       "PlainQueueName": "PlainQueue",
       "EncryptedQueueName": "EncryptedQueue",
-      "CertThumbprint": "DA049AD9A5823D685AE1DD5F679EE22DB2B38F8F",
+      "CertThumbprint": "E2603D85F0E4B59448FD3D380FEFF740B28B3215",
+      "RootThumbprint": "89735BE3169BE34AB67B65C7D9EFFD2C230A9D98",
       "EncryptionHostSessionExpire": false,
       "ServerHostName": "export-server"
     },

@@ -188,6 +188,7 @@ namespace VitalChoice.Core.DependencyInjection
                     EncryptedQueueName = configuration.GetSection("App:ExportService:EncryptedQueueName").Value,
                     PlainQueueName = configuration.GetSection("App:ExportService:PlainQueueName").Value,
                     CertThumbprint = configuration.GetSection("App:ExportService:CertThumbprint").Value,
+                    RootThumbprint = configuration.GetSection("App:ExportService:RootThumbprint").Value,
                     EncryptionHostSessionExpire = Convert.ToBoolean(configuration.GetSection("App:ExportService:EncryptionHostSessionExpire").Value),
                     ServerHostName = configuration.GetSection("App:ExportService:ServerHostName").Value
                 };
