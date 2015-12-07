@@ -2,7 +2,7 @@
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 
-namespace VitalChoice.Business.Queries.Product
+namespace VitalChoice.Business.Queries.Products
 {
     public class ProductReviewQuery : QueryObject<ProductReview>
     {

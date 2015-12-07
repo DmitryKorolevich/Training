@@ -81,8 +81,10 @@ namespace VC.Public.AppConfig
 				name: "Products_Product",
 				template: "product/{url}",
 				defaults: new { controller = "Product", action = "Product" });
-
-
+			routeBuilder.MapRoute(
+				name: "Products_Reviews",
+				template: "reviews/{url}/{pageNumber?}",
+				defaults: new { controller = "Product", action = "FullReviews" });
 			routeBuilder.MapRoute(
                 name: "ContentItem_Edit",
                 template: "recipe/edit/{id}",

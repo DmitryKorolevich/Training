@@ -1,0 +1,83 @@
+﻿@using System.Linq
+@using System.Threading.Tasks
+@using Microsoft.AspNet.Mvc.Rendering
+@using VitalChoice.Interfaces.Services
+@model  VC.Public.Models.Product.FullReviewsModel
+
+@section PageScripts {
+	<script>
+		var productPublicId = "@Model.ProductPublicId";
+	</script>
+	<script src="@Url.Content("/app/modules/product/productReview.js")"></script>
+	<script src="https://www.google.com/recaptcha/api.js"></script>
+}
+
+<div class="working-area-holder full-reviews-page">
+	<h4 class="full-reviews-heading">Product Reviews</h4>
+	<h5 class="full-reviews-title">@Model.ProductTitle @Model.ProductSubTitle</h5>
+	<p class="full-reviews-navs">
+		<a class="write-review-link" href="#">Write your own review</a>
+		|
+		<a href="/product/@Model.ProductUrl">Return to product details >></a>
+	</p>
+	<span>Average Ratings:</span>
+	<div class="full-reviews-average">
+	@for (int i = 1; i <= 5; i++)
+	{
+		if (i <= Model.AverageRatings)
+		{
+			<img src="/assets/images/fullstar.gif"/>
+		}
+		else
+		{
+			<img src="/assets/images/emptystar.gif"/>
+		}
+	}
+	</div>
+	<span class="full-reviews-average-number">@Model.AverageRatings</span>
+	<hr/>
+		<label>Rate this product:&nbsp;&nbsp;<input class="write-review-link yellow" type="button" value="Rate it" /></label>
+	<hr/>
+	@if (Model.Reviews.Items.Any())
+	{
+		foreach (var item in Model.Reviews.Items)
+		{
+			<div class="full-reviews-item">
+				<span class="reviews-item-title">"@item.Title"</span>
+				<span class="reviews-item-author">@item.CustomerName on @item.DateCreated.ToString("g")</span>
+				<span class="reviews-item-rating">Rating:</span>
+				<div class="reviews-item-stars">
+					
+					@for (int i = 1; i <= 5; i++)
+					{
+						if (i <= item.Rating)
+						{
+							<img src="/assets/images/fullstar.gif"/>
+						}
+						else
+						{
+							<img src="/assets/images/emptystar.gif"/>
+						}
+					}
+				</div>
+				<span class="full-reviews-text"><b>Review:</b> @item.Review</span>
+			</div>
+			<hr />
+		}
+	}
+	else
+	{
+		<span>No Reviews Found</span>
+		<hr />
+	}
+
+	<div>
+		<cs-pager cs-paging-pagenumber="@Model.Reviews.Index"
+		          cs-paging-pagesize="@BaseAppConstants.DEFAULT_LIST_TAKE_COUNT"
+		          cs-paging-totalitems="@Model.Reviews.Count"
+		          cs-pagenumber-param="pageNumber"
+		          asp-controller="Product"
+		          asp-action="FullReviews"></cs-pager>
+	</div>
+	<a href="/product/@Model.ProductUrl">Return to product details >></a>
+</div>
