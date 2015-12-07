@@ -6,5 +6,7 @@
         public const string AFFILIATE_CUSTOMERS_REPORT = "AffiliateCustomersReport_{0}.csv";
         public const string CATALOG_REQUESTS_REPORT = "CatalogRequests_{0}.csv";
         public const string PRODUCT_CATEGORY_STATISTIC = "Category_Sales_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
+        public const string REGIONAL_SALES_STATISTIC = "Regional_Sales_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
+        public const string REGIONAL_SALES_DETAILS_STATISTIC = "Regional_Sales_Detail_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
     }
 }

@@ -229,4 +229,13 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\SPGetSkusInProductCategoryStatistic.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetOrdersRegionStatistic.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetOrdersZipStatistic.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VOrderWithRegionInfoItems.sql" />
+  </ItemGroup>
 </Project>

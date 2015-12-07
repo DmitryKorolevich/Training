@@ -2,7 +2,8 @@
     <div class="well">
         <span class="legend">Out of Stock Requests</span>
         <div class="form-group btn-line">
-            <button data-ng-click="send();" class="btn btn-primary pull-right">Send Emails</button>
+            <button data-ng-click="delete();" class="btn btn-danger pull-right">Delete Emails</button>
+            <button data-ng-click="send();" class="btn btn-primary pull-right margin-right-25px">Send Emails</button>
         </div>
         <spinner-overlay data-loading="refreshTracker.active()">
             <table class="table table-striped">

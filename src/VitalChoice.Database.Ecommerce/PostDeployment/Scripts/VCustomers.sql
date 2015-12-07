@@ -29,9 +29,9 @@ SELECT
 	options.[Phone],
 	options.[Zip],
 	ISNULL(st.[StateCode], ad.[County]) AS StateOrCounty,
-	(SELECT count(*) FROM Orders o WHERE cu.Id=o.IdCustomer AND o.StatusCode!=3) AS TotalOrders,
-	(SELECT TOP 1 o.DateCreated FROM Orders o WHERE cu.Id=o.IdCustomer AND o.StatusCode!=3 ORDER BY o.DateCreated DESC) AS LastOrderPlaced,
-	(SELECT TOP 1 o.DateCreated FROM Orders o WHERE cu.Id=o.IdCustomer AND o.StatusCode!=3 ORDER BY o.DateCreated ASC) AS FirstOrderPlaced
+	(SELECT count(*) FROM Orders o WHERE cu.Id=o.IdCustomer AND o.StatusCode!=3 AND o.OrderStatus IN (2,3,5) AND o.IdObjectType!=6) AS TotalOrders,
+	(SELECT TOP 1 o.DateCreated FROM Orders o WHERE cu.Id=o.IdCustomer AND o.StatusCode!=3 AND o.OrderStatus IN (2,3,5) AND o.IdObjectType!=6 ORDER BY o.DateCreated DESC) AS LastOrderPlaced,
+	(SELECT TOP 1 o.DateCreated FROM Orders o WHERE cu.Id=o.IdCustomer AND o.StatusCode!=3 AND o.OrderStatus IN (2,3,5) AND o.IdObjectType!=6 ORDER BY o.DateCreated ASC) AS FirstOrderPlaced
 FROM [dbo].[Customers] AS cu
 LEFT OUTER JOIN [dbo].[Addresses] AS ad ON cu.IdProfileAddress = ad.Id
 LEFT OUTER JOIN (SELECT

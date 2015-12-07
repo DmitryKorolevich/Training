@@ -52,13 +52,15 @@ namespace VitalChoice.Interfaces.Services.Products
 
         #region ProductOutOfStockRequests
 
-        Task<ICollection<ProductOutOfStockContainer>> GetProductOutOfStockContainers();
+        Task<ICollection<ProductOutOfStockContainer>> GetProductOutOfStockContainersAsync();
 
-        Task<ProductOutOfStockRequest> AddProductOutOfStockRequest(ProductOutOfStockRequest model);
+        Task<ProductOutOfStockRequest> AddProductOutOfStockRequestAsync(ProductOutOfStockRequest model);
 
-        Task<bool> SendProductOutOfStockRequests(ICollection<int> ids);
+        Task<bool> SendProductOutOfStockRequestsAsync(ICollection<int> ids);
 
-		Task<PagedList<VCustomerFavoriteFull>> GetCustomerFavoritesAsync(VCustomerFavoritesFilter filter);
+        Task<bool> DeleteProductOutOfStockRequestsAsync(ICollection<int> ids);
+
+        Task<PagedList<VCustomerFavoriteFull>> GetCustomerFavoritesAsync(VCustomerFavoritesFilter filter);
 
         #endregion
 

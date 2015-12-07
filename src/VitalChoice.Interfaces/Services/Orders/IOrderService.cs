@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Transfer;
@@ -27,6 +28,18 @@ namespace VitalChoice.Interfaces.Services.Orders
         #region HealthWiseOrders
 
         Task<bool> UpdateHealthwiseOrderAsync(int orderId, bool isHealthwise);
+
+        #endregion
+
+        #region OrdersStatistic
+
+        Task<ICollection<OrdersRegionStatisticItem>> GetOrdersRegionStatisticAsync(OrderRegionFilter filter);
+
+        Task<ICollection<OrdersZipStatisticItem>> GetOrdersZipStatisticAsync(OrderRegionFilter filter);
+
+        Task<PagedList<VOrderWithRegionInfoItem>> GetOrderWithRegionInfoItemsAsync(OrderRegionFilter filter);
+
+        Task<decimal> GetOrderWithRegionInfoAmountAsync(OrderRegionFilter filter);
 
         #endregion
     }

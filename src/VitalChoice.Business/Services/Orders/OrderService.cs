@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNet.Http;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -50,7 +51,9 @@ namespace VitalChoice.Business.Services.Orders
     public class OrderService : ExtendedEcommerceDynamicService<OrderDynamic, Order, OrderOptionType, OrderOptionValue>,
         IOrderService
     {
+        private readonly OrderRepository _orderRepository;
         private readonly IEcommerceRepositoryAsync<VOrder> _vOrderRepository;
+        private readonly IEcommerceRepositoryAsync<VOrderWithRegionInfoItem> _vOrderWithRegionInfoItemRepository;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly IEcommerceRepositoryAsync<ProductOptionType> _productOptionTypesRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skusRepository;
@@ -64,9 +67,11 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IEcommerceRepositoryAsync<HealthwisePeriod> _healthwisePeriodRepositoryAsync;
         private readonly IAppInfrastructureService _appInfrastructureService;
         private readonly IEncryptedOrderExportService _encryptedOrderExportService;
+        private readonly SPEcommerceRepository _sPEcommerceRepository;
 
         public OrderService(
             IEcommerceRepositoryAsync<VOrder> vOrderRepository,
+            IEcommerceRepositoryAsync<VOrderWithRegionInfoItem> vOrderWithRegionInfoItemRepository,
             OrderRepository orderRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
             OrderMapper mapper,
@@ -83,12 +88,17 @@ namespace VitalChoice.Business.Services.Orders
             DynamicExpressionVisitor queryVisitor,
             IEcommerceRepositoryAsync<HealthwiseOrder> healthwiseOrderRepositoryAsync,
             IEcommerceRepositoryAsync<HealthwisePeriod> healthwisePeriodRepositoryAsync,
-            IAppInfrastructureService appInfrastructureService, IEncryptedOrderExportService encryptedOrderExportService, OrderPaymentMethodMapper paymentMethodMapper)
+            IAppInfrastructureService appInfrastructureService,
+            IEncryptedOrderExportService encryptedOrderExportService,
+            OrderPaymentMethodMapper paymentMethodMapper,
+            SPEcommerceRepository sPEcommerceRepository)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor)
         {
+            _orderRepository = orderRepository;
             _vOrderRepository = vOrderRepository;
+            _vOrderWithRegionInfoItemRepository = vOrderWithRegionInfoItemRepository;
             _adminProfileRepository = adminProfileRepository;
             _productOptionTypesRepository = productOptionTypesRepository;
             _productMapper = productMapper;
@@ -102,6 +112,7 @@ namespace VitalChoice.Business.Services.Orders
             _healthwisePeriodRepositoryAsync = healthwisePeriodRepositoryAsync;
             _appInfrastructureService = appInfrastructureService;
             _encryptedOrderExportService = encryptedOrderExportService;
+            _sPEcommerceRepository = sPEcommerceRepository;
         }
 
         protected override IQueryLite<Order> BuildQuery(IQueryLite<Order> query)
@@ -466,69 +477,6 @@ namespace VitalChoice.Business.Services.Orders
             }
         }
 
-        public async Task<bool> UpdateHealthwiseOrderAsync(int orderId, bool isHealthwise)
-        {
-            var order = await this.SelectAsync(orderId);
-            if(order==null)
-            {
-                throw new AppValidationException("Invalid order #");
-            }
-            if (order==null || !(order.OrderStatus == OrderStatus.Processed || order.OrderStatus == OrderStatus.Exported || 
-                order.OrderStatus == OrderStatus.Shipped))
-            {
-                throw new AppValidationException("The given order can'be flagged");
-            }
-            if(!order.DictionaryData.ContainsKey("OrderType") || order.Data.OrderType!= (int?)SourceOrderType.Web)
-            {
-                throw new AppValidationException("The given order can'be flagged");
-            }
-
-            if (!isHealthwise)
-            {
-                _healthwiseOrderRepositoryAsync.Delete(orderId);
-            }
-            else
-            {
-                HealthwiseOrder healthwiseOrder = (await _healthwiseOrderRepositoryAsync.Query(p => p.Id == orderId).SelectAsync(false)).FirstOrDefault();
-                if (healthwiseOrder == null)
-                {
-                    var maxCount = _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount;
-                    var orderCreatedDate = order.DateCreated;
-                    var periods = (await _healthwisePeriodRepositoryAsync.Query(p => p.IdCustomer == order.Customer.Id &&
-                        orderCreatedDate >= p.StartDate && orderCreatedDate < p.EndDate && !p.PaidDate.HasValue).
-                        Include(p => p.HealthwiseOrders).SelectAsync(false)).ToList();
-                    bool addedToPeriod = false;
-                    foreach (var period in periods)
-                    {
-                        if (period.HealthwiseOrders.Count < maxCount)
-                        {
-                            healthwiseOrder = new HealthwiseOrder()
-                            {
-                                Id = orderId,
-                                IdHealthwisePeriod = period.Id
-                            };
-                            _healthwiseOrderRepositoryAsync.Insert(healthwiseOrder);
-                            addedToPeriod = true;
-                            break;
-                        }
-                    }
-                    if (!addedToPeriod)
-                    {
-                        var period = new HealthwisePeriod();
-                        period.IdCustomer = order.Customer.Id;
-                        period.StartDate = orderCreatedDate;
-                        period.EndDate = period.StartDate.AddYears(1);
-                        period.HealthwiseOrders = new List<HealthwiseOrder>()
-                        {
-                            new HealthwiseOrder() { Id=orderId }
-                        };
-                        _healthwisePeriodRepositoryAsync.InsertGraph(period);
-                    }
-                }
-            }
-            return true;
-        }
-
         public async Task<PagedList<VOrder>> GetOrdersAsync(VOrderFilter filter)
         {
             var conditions = new VOrderQuery();
@@ -735,6 +683,130 @@ namespace VitalChoice.Business.Services.Orders
             }
 
             return toReturn;
+        }
+
+        #endregion
+
+        #region HealthWiseOrders
+
+        public async Task<bool> UpdateHealthwiseOrderAsync(int orderId, bool isHealthwise)
+        {
+            var order = await this.SelectAsync(orderId);
+            if (order == null)
+            {
+                throw new AppValidationException("Invalid order #");
+            }
+            if (order == null || !(order.OrderStatus == OrderStatus.Processed || order.OrderStatus == OrderStatus.Exported ||
+                order.OrderStatus == OrderStatus.Shipped))
+            {
+                throw new AppValidationException("The given order can'be flagged");
+            }
+            if (!order.DictionaryData.ContainsKey("OrderType") || order.Data.OrderType != (int?)SourceOrderType.Web)
+            {
+                throw new AppValidationException("The given order can'be flagged");
+            }
+
+            if (!isHealthwise)
+            {
+                _healthwiseOrderRepositoryAsync.Delete(orderId);
+            }
+            else
+            {
+                HealthwiseOrder healthwiseOrder = (await _healthwiseOrderRepositoryAsync.Query(p => p.Id == orderId).SelectAsync(false)).FirstOrDefault();
+                if (healthwiseOrder == null)
+                {
+                    var maxCount = _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount;
+                    var orderCreatedDate = order.DateCreated;
+                    var periods = (await _healthwisePeriodRepositoryAsync.Query(p => p.IdCustomer == order.Customer.Id &&
+                        orderCreatedDate >= p.StartDate && orderCreatedDate < p.EndDate && !p.PaidDate.HasValue).
+                        Include(p => p.HealthwiseOrders).SelectAsync(false)).ToList();
+                    bool addedToPeriod = false;
+                    foreach (var period in periods)
+                    {
+                        if (period.HealthwiseOrders.Count < maxCount)
+                        {
+                            healthwiseOrder = new HealthwiseOrder()
+                            {
+                                Id = orderId,
+                                IdHealthwisePeriod = period.Id
+                            };
+                            _healthwiseOrderRepositoryAsync.Insert(healthwiseOrder);
+                            addedToPeriod = true;
+                            break;
+                        }
+                    }
+                    if (!addedToPeriod)
+                    {
+                        var period = new HealthwisePeriod();
+                        period.IdCustomer = order.Customer.Id;
+                        period.StartDate = orderCreatedDate;
+                        period.EndDate = period.StartDate.AddYears(1);
+                        period.HealthwiseOrders = new List<HealthwiseOrder>()
+                        {
+                            new HealthwiseOrder() { Id=orderId }
+                        };
+                        _healthwisePeriodRepositoryAsync.InsertGraph(period);
+                    }
+                }
+            }
+            return true;
+        }
+
+        #endregion
+
+        #region OrdersStatistic
+
+        public async Task<ICollection<OrdersRegionStatisticItem>> GetOrdersRegionStatisticAsync(OrderRegionFilter filter)
+        {
+            return await _sPEcommerceRepository.GetOrdersRegionStatisticAsync(filter);
+        }
+
+        public async Task<ICollection<OrdersZipStatisticItem>> GetOrdersZipStatisticAsync(OrderRegionFilter filter)
+        {
+            return await _sPEcommerceRepository.GetOrdersZipStatisticAsync(filter);
+        }
+
+        public async Task<PagedList<VOrderWithRegionInfoItem>> GetOrderWithRegionInfoItemsAsync(OrderRegionFilter filter)
+        {
+            VOrderWithRegionInfoItemQuery conditions = new VOrderWithRegionInfoItemQuery().WithDates(filter.From, filter.To).
+                WithIdCustomerType(filter.IdCustomerType).WithIdOrderType(filter.IdOrderType).WithRegion(filter.Region).WithZip(filter.Zip);
+            Func<IQueryable<VOrderWithRegionInfoItem>, IOrderedQueryable<VOrderWithRegionInfoItem>> sortable = p => p.OrderByDescending(x => x.Id);
+
+            var query = _vOrderWithRegionInfoItemRepository.Query(conditions).OrderBy(sortable);
+            PagedList<VOrderWithRegionInfoItem> toReturn = null;
+            if (filter.Paging != null)
+            {
+                toReturn = await query.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            }
+            else
+            {
+                var items = await query.SelectAsync(false);
+                toReturn = new PagedList<VOrderWithRegionInfoItem>(items, items.Count);
+            }
+
+            if (toReturn.Count > 0)
+            {
+                var customerConditions = new VCustomerQuery().NotDeleted().WithIds(toReturn.Items.Select(p => p.IdCustomer).Distinct().ToList());
+                var customers = (await _vCustomerRepositoryAsync.Query(customerConditions).SelectAsync(false));
+
+                foreach (var item in toReturn.Items)
+                {
+                    var customer = customers.FirstOrDefault(p => p.Id == item.IdCustomer);
+                    if (customer != null)
+                    {
+                        item.CustomerFirstName = customer.FirstName;
+                        item.CustomerLastName = customer.LastName;
+                        item.CustomerOrdersCount = customer.TotalOrders;
+                    }
+                }
+            }
+
+            return toReturn;
+        }
+
+        public async Task<decimal> GetOrderWithRegionInfoAmountAsync(OrderRegionFilter filter)
+        {
+            return await _orderRepository.GetOrderWithRegionInfoAmountAsync(filter);
         }
 
         #endregion

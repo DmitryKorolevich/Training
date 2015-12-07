@@ -68,6 +68,13 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("VProductSkus");
             });
 
+            builder.Entity<VProductsWithReview>(entity =>
+            {
+                entity.HasKey(p => p.IdProduct);
+                entity.Ignore(x => x.Id);
+                entity.ToTable("VProductsWithReviews");
+            });
+
             builder.Entity<ProductCategoryStatisticItem>(entity =>
             {
                 entity.HasKey(p => p.Id);
@@ -90,6 +97,27 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(t => t.Id);
                 entity.ToTable("VOrders");
                 entity.Ignore(t => t.EditedByAgentId);
+            });
+
+            builder.Entity<VOrderWithRegionInfoItem>(entity =>
+            {
+                entity.HasKey(t => t.Id);
+                entity.ToTable("VOrderWithRegionInfoItems");
+                entity.Ignore(p => p.CustomerFirstName);
+                entity.Ignore(p => p.CustomerLastName);
+                entity.Ignore(p => p.CustomerOrdersCount);
+            });
+
+            builder.Entity<OrdersRegionStatisticItem>(entity =>
+            {
+                entity.HasKey(p => p.Region);
+                entity.Ignore(p => p.Id);
+            });
+
+            builder.Entity<OrdersZipStatisticItem>(entity =>
+            {
+                entity.HasKey(p => p.Zip);
+                entity.Ignore(p => p.Id);
             });
 
             builder.Entity<VAffiliate>(entity =>
