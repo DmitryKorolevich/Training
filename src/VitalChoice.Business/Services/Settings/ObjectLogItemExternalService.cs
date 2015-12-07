@@ -8,6 +8,7 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.Data.Services;
 using Newtonsoft.Json;
 using System.Reflection;
+using Newtonsoft.Json.Serialization;
 using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -18,6 +19,17 @@ namespace VitalChoice.Business.Services.Settings
 {
     public class ObjectLogItemExternalService : IObjectLogItemExternalService
     {
+        //private class PublicPropertiesResolver : DefaultContractResolver
+        //{
+        //    protected override List<MemberInfo> GetSerializableMembers(Type objectType)
+        //    {
+        //        return objectType.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+        //            .Where(p => p.GetIndexParameters().Length == 0)
+        //            .Cast<MemberInfo>()
+        //            .ToList();
+        //    }
+        //}
+
         private readonly IEcommerceRepositoryAsync<ObjectHistoryLogItem> _objectHistoryLogItemRepository;
         private readonly ILogger _logger;
 
@@ -59,6 +71,7 @@ namespace VitalChoice.Business.Services.Settings
                         {
                             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                             NullValueHandling = NullValueHandling.Ignore,
+                            //ContractResolver = new PublicPropertiesResolver()
                         };
                         item.DataItem.Data = JsonConvert.SerializeObject(model, settings);
                     }

@@ -28,7 +28,6 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
 
         public ICollection<GiftCertificateInOrder> GiftCertificates { get; set; }
 
-        [NotLoggedInfo]
         public OrderPaymentMethodDynamic PaymentMethod { get; set; }
 
         public AddressDynamic ShippingAddress { get; set; }

@@ -11,6 +11,7 @@ using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using System.Threading;
+using VitalChoice.DynamicData.Delegates;
 using VitalChoice.Ecommerce.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
@@ -329,7 +330,7 @@ namespace VitalChoice.DynamicData.Base
                 var data = dynamic.DictionaryData;
                 foreach (var pair in model)
                 {
-                    if (!dynamicCache.ContainsKey(pair.Key))
+                    if (!dynamicCache.Properties.ContainsKey(pair.Key))
                     {
                         var value = TypeConverter.ConvertFromModelObject(pair.Value.GetType(), pair.Value);
                         if (value != null)
@@ -371,10 +372,10 @@ namespace VitalChoice.DynamicData.Base
                 var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ModelTypeMappingCache, modelType);
                 var dynamicCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType,
                     true);
-                foreach (var pair in cache)
+                foreach (var pair in cache.Properties)
                 {
                     var mappingName = pair.Value.Map?.Name ?? pair.Key;
-                    if (!dynamicCache.ContainsKey(mappingName))
+                    if (!dynamicCache.Properties.ContainsKey(mappingName))
                     {
                         object dynamicValue;
                         if (data.TryGetValue(mappingName, out dynamicValue))
@@ -404,10 +405,10 @@ namespace VitalChoice.DynamicData.Base
                 var dynamicCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType,
                     true);
                 var data = dynamic.DictionaryData;
-                foreach (var pair in cache)
+                foreach (var pair in cache.Properties)
                 {
                     var mappingName = pair.Value.Map?.Name ?? pair.Key;
-                    if (!dynamicCache.ContainsKey(mappingName))
+                    if (!dynamicCache.Properties.ContainsKey(mappingName))
                     {
                         var value = TypeConverter.ConvertFromModelObject(pair.Value.PropertyType,
                             pair.Value.Get?.Invoke(model));
@@ -418,6 +419,47 @@ namespace VitalChoice.DynamicData.Base
                     }
                 }
             }
+        }
+
+        protected override bool IsObjectSecuredInternal(object obj, HashSet<object> processedObjectsSet)
+        {
+            MappedObject mappedObj = obj as MappedObject;
+            if (mappedObj != null)
+            {
+                var outerCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, obj.GetType(), true);
+                foreach (var masker in outerCache.MaskProperties)
+                {
+                    object value;
+                    if (mappedObj.DictionaryData.TryGetValue(masker.Key, out value))
+                    {
+                        if (!masker.Value.IsMasked(value as string))
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return base.IsObjectSecuredInternal(obj, processedObjectsSet);
+        }
+
+        protected override void SecureObjectInternal(object obj, HashSet<object> processedObjectsSet)
+        {
+            MappedObject mappedObj = obj as MappedObject;
+            if (mappedObj != null)
+            {
+                var outerCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, obj.GetType(), true);
+                foreach (var masker in outerCache.MaskProperties)
+                {
+                    object value;
+                    if (mappedObj.DictionaryData.TryGetValue(masker.Key, out value))
+                    {
+                        var maskedValue = masker.Value.MaskValue(value as string);
+                        if (maskedValue != null)
+                            mappedObj.DictionaryData[masker.Key] = maskedValue;
+                    }
+                }
+            }
+            base.SecureObjectInternal(obj, processedObjectsSet);
         }
 
         private static void UpdateEntityItem(TDynamic dynamic, TEntity entity)

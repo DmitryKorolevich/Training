@@ -21,6 +21,5 @@ namespace VitalChoice.DynamicData.Delegates
         public Func<object, object> Get { get; set; }
         public Action<object, object> Set { get; set; }
         public MapAttribute Map { get; set; }
-        public bool NotLoggedInfo { get; set; }
     }
 }

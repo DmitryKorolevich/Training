@@ -38,7 +38,6 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
 
 		public ICollection<CustomerNoteDynamic> CustomerNotes { get; set; }
 
-        [NotLoggedInfo]
         public ICollection<CustomerPaymentMethodDynamic> CustomerPaymentMethods { get; set; }
 
 	    public ICollection<CustomerFile> Files { get; set; }

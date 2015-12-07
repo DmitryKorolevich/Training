@@ -166,6 +166,10 @@ namespace VitalChoice.DynamicData.Base
 
         protected virtual async Task<List<TEntity>> InsertRangeAsync(ICollection<TDynamic> models, IUnitOfWorkAsync uow)
         {
+            foreach (var model in models)
+            {
+                Mapper.SecureObject(model);
+            }
             (await ValidateCollection(models)).Raise();
             var productRepository = uow.RepositoryAsync<TEntity>();
             var toInsert =
@@ -188,6 +192,7 @@ namespace VitalChoice.DynamicData.Base
 
         protected virtual async Task<TEntity> InsertAsync(TDynamic model, IUnitOfWorkAsync uow)
         {
+            Mapper.SecureObject(model);
             (await ValidateAsync(model)).Raise();
             var optionTypes = Mapper.FilterByType(model.IdObjectType);
             var entity = await Mapper.ToEntityAsync(model, optionTypes);
@@ -205,6 +210,10 @@ namespace VitalChoice.DynamicData.Base
 
         protected virtual async Task<List<TEntity>> UpdateRangeAsync(ICollection<TDynamic> models, IUnitOfWorkAsync uow)
         {
+            foreach (var model in models)
+            {
+                Mapper.SecureObject(model);
+            }
             (await ValidateCollection(models)).Raise();
             var mainRepository = uow.RepositoryAsync<TEntity>();
             var valueRepository = uow.RepositoryAsync<TOptionValue>();
@@ -241,6 +250,7 @@ namespace VitalChoice.DynamicData.Base
 
         protected virtual async Task<TEntity> UpdateAsync(TDynamic model, IUnitOfWorkAsync uow)
         {
+            Mapper.SecureObject(model);
             (await ValidateAsync(model)).Raise();
             var mainRepository = uow.RepositoryAsync<TEntity>();
             var valueRepository = uow.RepositoryAsync<TOptionValue>();

@@ -2,11 +2,12 @@
 using VC.Admin.Validators.Product;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Attributes;
-using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 using System;
+using VC.Admin.Models.Products;
+using VitalChoice.Ecommerce.Domain.Attributes;
 
 namespace VC.Admin.Models.Product
 {

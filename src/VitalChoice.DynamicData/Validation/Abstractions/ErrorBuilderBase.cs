@@ -29,10 +29,10 @@ namespace VitalChoice.DynamicData.Validation.Abstractions
 
         internal static string GetModelName(string dynamicName, Type modelType)
         {
-            Dictionary<string, GenericProperty> cache;
+            TypeCache cache;
             if (modelType != null && DynamicTypeCache.ModelTypeMappingCache.TryGetValue(modelType, out cache))
             {
-                return cache.FirstOrDefault(m => (m.Value.Map?.Name ?? m.Key) == dynamicName).Key;
+                return cache.Properties.FirstOrDefault(m => (m.Value.Map?.Name ?? m.Key) == dynamicName).Key;
             }
             return dynamicName;
         }

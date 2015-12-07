@@ -31,7 +31,6 @@ namespace VitalChoice.DynamicData.Base
     {
         private readonly ITypeConverter _typeConverter;
         private readonly IModelConverterService _converterService;
-        private HashSet<object> _processedObjectsSet;
 
         protected virtual bool UseMapAttribute => true;
 
@@ -52,14 +51,129 @@ namespace VitalChoice.DynamicData.Base
             FromDictionaryInternal(obj, model, typeof(TObject), caseSense);
         }
 
-        public virtual void SecureObject(object obj)
+        public bool IsObjectSecured(object obj)
         {
-            _processedObjectsSet = new HashSet<object>();
-            var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, typeof(TObject), true);
-            foreach (var pair in cache)
+            var processedObjectsSet = new HashSet<object>();
+            return IsObjectSecuredInternal(obj, processedObjectsSet);
+        }
+
+        public void SecureObject(object obj)
+        {
+            var processedObjectsSet = new HashSet<object>();
+            SecureObjectInternal(obj, processedObjectsSet);
+        }
+
+        protected virtual bool IsObjectSecuredInternal(object obj, HashSet<object> processedObjectsSet)
+        {
+            if (obj == null)
+                return true;
+            if (!processedObjectsSet.Contains(obj))
             {
-                GenericProperty dynamicProperty = pair.Value;
-                SecureProperty(dynamicProperty, obj);
+                processedObjectsSet.Add(obj);
+                var outerCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, obj.GetType(), true);
+                foreach (var masker in outerCache.MaskProperties)
+                {
+                    GenericProperty property;
+                    if (outerCache.Properties.TryGetValue(masker.Key, out property))
+                    {
+                        if (!masker.Value.IsMasked(property.Get(obj) as string))
+                            return false;
+                    }
+                }
+                foreach (
+                    var propertyPair in
+                        outerCache.Properties.Where(
+                            p =>
+                                !outerCache.MaskProperties.ContainsKey(p.Key) && !IsSystemValueType(p.Value.PropertyType) &&
+                                p.Value.PropertyType != typeof (string) && p.Value.PropertyType != typeof (Type)))
+                {
+                    GenericProperty property = propertyPair.Value;
+                    if (property.PropertyType == typeof (string) || IsSystemValueType(property.PropertyType))
+                        continue;
+
+                    Type elementType = property.PropertyType.TryGetElementType(typeof (IEnumerable<>));
+                    if (elementType != null)
+                    {
+                        if (elementType == typeof (string) || IsSystemValueType(elementType))
+                            continue;
+                        var items = (IEnumerable) property.Get?.Invoke(obj);
+                        if (items != null)
+                        {
+                            if (items.Cast<object>().Any(item => !IsObjectSecuredInternal(item, processedObjectsSet)))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (IsSystemValueType(property.PropertyType))
+                        {
+                            continue;
+                        }
+                        var item = property.Get?.Invoke(obj);
+                        if (item != null)
+                        {
+                            if (!IsObjectSecuredInternal(item, processedObjectsSet))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        protected virtual void SecureObjectInternal(object obj, HashSet<object> processedObjectsSet)
+        {
+            if (obj == null)
+                return;
+            if (!processedObjectsSet.Contains(obj))
+            {
+                processedObjectsSet.Add(obj);
+                var outerCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, obj.GetType(), true);
+                foreach (var masker in outerCache.MaskProperties)
+                {
+                    GenericProperty property;
+                    if (outerCache.Properties.TryGetValue(masker.Key, out property))
+                    {
+                        var maskedValue = masker.Value.MaskValue(property.Get(obj) as string);
+                        if (maskedValue != null)
+                            property.Set(obj, maskedValue);
+                    }
+                }
+                foreach (
+                    var propertyPair in
+                        outerCache.Properties.Where(
+                            p =>
+                                !outerCache.MaskProperties.ContainsKey(p.Key) && !IsSystemValueType(p.Value.PropertyType) &&
+                                p.Value.PropertyType != typeof (string) && p.Value.PropertyType != typeof(Type)))
+                {
+                    GenericProperty property = propertyPair.Value;
+                    Type elementType = property.PropertyType.TryGetElementType(typeof (IEnumerable<>));
+                    if (elementType != null)
+                    {
+                        if (elementType == typeof (string) || IsSystemValueType(elementType))
+                            continue;
+                        var items = (IEnumerable) property.Get?.Invoke(obj);
+                        if (items != null)
+                        {
+                            foreach (var item in items)
+                            {
+                                SecureObjectInternal(item, processedObjectsSet);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var item = property.Get?.Invoke(obj);
+                        if (item != null)
+                        {
+                            SecureObjectInternal(item, processedObjectsSet);
+                        }
+                    }
+                }
             }
         }
 
@@ -213,68 +327,6 @@ namespace VitalChoice.DynamicData.Base
             converter?.ModelToDynamic(model, obj);
         }
 
-        protected virtual void SecureProperty(GenericProperty property, object obj)
-        {
-            if (obj == null || property.PropertyType == typeof(Type))
-            {
-                return;
-            }
-            if (!property.NotLoggedInfo)
-            {
-                if (property.PropertyType == typeof (string) || IsSystemValueType(property.PropertyType))
-                    return;
-
-                Type elementType = property.PropertyType.TryGetElementType(typeof (IEnumerable<>));
-                if (elementType != null)
-                {
-                    if (elementType == typeof (string) || IsSystemValueType(elementType))
-                        return;
-                    var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, elementType, true);
-                    var items = (IEnumerable) property.Get?.Invoke(obj);
-                    if (items != null)
-                    {
-                        foreach (var item in items)
-                        {
-                            _processedObjectsSet.Add(item);
-                            foreach (var pair in cache)
-                            {
-                                GenericProperty dynamicProperty = pair.Value;
-                                SecureProperty(dynamicProperty, item);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    var item = property.Get?.Invoke(obj);
-                    if (item != null)
-                    {
-                        if (IsSystemValueType(item.GetType()))
-                        {
-                            return;
-                        }
-                        if (_processedObjectsSet.Contains(item))
-                        {
-                            return;
-                        }
-                        _processedObjectsSet.Add(item);
-                        var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache,
-                            property.PropertyType, true);
-                        foreach (var pair in cache)
-                        {
-                            GenericProperty dynamicProperty = pair.Value;
-                            SecureProperty(dynamicProperty, item);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                var value = GetDefaultValue(property.PropertyType);
-                property.Set?.Invoke(obj, value);
-            }
-        }
-
         private static bool IsSystemValueType(Type type)
         {
             var typeCode = type.GetTypeCode();
@@ -302,7 +354,7 @@ namespace VitalChoice.DynamicData.Base
                 model = model.ToDictionary(m => m.Key, m => m.Value, StringComparer.OrdinalIgnoreCase);
             }
             var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
-            foreach (var pair in objectCache)
+            foreach (var pair in objectCache.Properties)
             {
                 GenericProperty dynamicProperty = pair.Value;
                 object modelValue;
@@ -330,7 +382,7 @@ namespace VitalChoice.DynamicData.Base
                 return;
 
             var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
-            foreach (var pair in objectCache)
+            foreach (var pair in objectCache.Properties)
             {
                 GenericProperty dynamicProperty = pair.Value;
                 if (!model.ContainsKey(pair.Key))
@@ -352,11 +404,11 @@ namespace VitalChoice.DynamicData.Base
                 : DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, modelType, true);
 
             var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
-            foreach (var pair in modelCache)
+            foreach (var pair in modelCache.Properties)
             {
                 var mappingName = pair.Value.Map?.Name ?? pair.Key;
                 GenericProperty dynamicProperty;
-                if (objectCache.TryGetValue(mappingName, out dynamicProperty))
+                if (objectCache.Properties.TryGetValue(mappingName, out dynamicProperty))
                 {
                     var value = _typeConverter.ConvertFromModel(pair.Value.PropertyType, dynamicProperty.PropertyType,
                         pair.Value.Get?.Invoke(model));
@@ -381,11 +433,11 @@ namespace VitalChoice.DynamicData.Base
                 : DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, modelType, true);
 
             var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
-            foreach (var pair in modelCache)
+            foreach (var pair in modelCache.Properties)
             {
                 var mappingName = pair.Value.Map?.Name ?? pair.Key;
                 GenericProperty dynamicProperty;
-                if (objectCache.TryGetValue(mappingName, out dynamicProperty))
+                if (objectCache.Properties.TryGetValue(mappingName, out dynamicProperty))
                 {
                     var value = _typeConverter.ConvertToModel(dynamicProperty.PropertyType, pair.Value.PropertyType,
                         dynamicProperty.Get?.Invoke(obj));

@@ -318,6 +318,11 @@ namespace VitalChoice.Business.Services.Orders
 
         protected override async Task<Order> UpdateAsync(OrderDynamic model, IUnitOfWorkAsync uow)
         {
+            if (!Mapper.IsObjectSecured(model.PaymentMethod) && !await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(model.PaymentMethod))
+            {
+                throw new ApiException("Cannot update order payment info on remote.");
+            }
+
             using (var transaction = uow.BeginTransaction())
             {
                 try
@@ -327,9 +332,9 @@ namespace VitalChoice.Business.Services.Orders
                     await UpdateAffiliateOrderPayment(model, uow);
                     await UpdateHealthwiseOrder(model, uow);
                     model.PaymentMethod.IdOrder = model.Id;
-                    await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(model.PaymentMethod);
                     transaction.Commit();
                     return entity;
+
                 }
                 catch (Exception e)
                 {
@@ -345,6 +350,14 @@ namespace VitalChoice.Business.Services.Orders
             {
                 try
                 {
+                    foreach (var model in models)
+                    {
+                        if (!Mapper.IsObjectSecured(model.PaymentMethod) &&
+                            !await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(model.PaymentMethod))
+                        {
+                            throw new ApiException("Cannot update order payment info on remote.");
+                        }
+                    }
                     var entities = await base.UpdateRangeAsync(models, uow);
                     foreach (var model in models)
                     {
@@ -353,7 +366,6 @@ namespace VitalChoice.Business.Services.Orders
                         {
                             model.IdAddedBy = entity.IdAddedBy;
                             model.PaymentMethod.IdOrder = model.Id;
-                            await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(model.PaymentMethod);
                         }
                         await UpdateAffiliateOrderPayment(model, uow);
                         await UpdateHealthwiseOrder(model, uow);

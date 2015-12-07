@@ -1,8 +1,8 @@
-﻿using VitalChoice.Validation.Models;
-using VitalChoice.Ecommerce.Domain.Attributes;
+﻿using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
+using VitalChoice.Validation.Models;
 
-namespace VC.Admin.Models.Product
+namespace VC.Admin.Models.Products
 {
     public class SKUManageModel : BaseModel 
     {

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNet.Mvc.Rendering;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Validation.Models;
 

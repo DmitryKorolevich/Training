@@ -1,4 +1,5 @@
 ﻿using VC.Admin.Models.Product;
+using VC.Admin.Models.Products;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Dynamic;

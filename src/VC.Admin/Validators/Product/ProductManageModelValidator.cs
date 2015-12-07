@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using VC.Admin.Models.Product;
+using VC.Admin.Models.Products;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;

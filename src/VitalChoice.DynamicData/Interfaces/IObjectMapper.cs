@@ -14,6 +14,7 @@ namespace VitalChoice.DynamicData.Interfaces
         object FromDictionary(IDictionary<string, object> model, bool caseSense = true);
         void UpdateObject(object obj, IDictionary<string, object> model, bool caseSense = true);
         void SecureObject(object obj);
+        bool IsObjectSecured(object obj);
     }
 
     public interface IObjectMapper<TObject> : IObjectMapper

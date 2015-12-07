@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using VC.Admin.Validators.Product;
+using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Attributes;
-using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Products;

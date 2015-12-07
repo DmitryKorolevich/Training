@@ -12,6 +12,7 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 namespace VitalChoice.Ecommerce.Domain.Dynamic
 {
     [DataContract]
+    [JsonObject(MemberSerialization.OptOut)]
     public abstract class MappedObject: IModelType
     {
         protected MappedObject()

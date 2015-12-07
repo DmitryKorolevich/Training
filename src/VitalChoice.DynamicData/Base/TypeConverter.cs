@@ -168,7 +168,7 @@ namespace VitalChoice.DynamicData.Base
             _objects.Add(obj, result);
 
             var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
-            foreach (var pair in objectCache)
+            foreach (var pair in objectCache.Properties)
             {
                 Type propertyElementType = pair.Value.PropertyType.TryGetElementType(typeof(ICollection<>));
                 if (pair.Value.PropertyTypeInfo.IsSubclassOf(baseTypeToMemberwiseClone))
