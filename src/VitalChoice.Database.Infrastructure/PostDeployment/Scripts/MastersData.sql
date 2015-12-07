@@ -2157,7 +2157,7 @@ END
 
 GO
 
-IF NOT EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like '%<span class="facts-bottom-hint">%' AND [Name] = 'Product page')
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like '%<a class="read-more-reviews" href="/reviews/@(@chained)">%' AND [Name] = 'Product page')
 BEGIN
 	UPDATE [dbo].[MasterContentItems]
 	SET [Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage}}
@@ -2365,7 +2365,7 @@ BEGIN
 	            }}  
 	        }}
 	    }}
-	    @(ReviewsTab){{
+	    @(ReviewsTab):param(Url){{
             @if(){{
                 @if(@model.ReviewsCount > 0){{
                     <div id="tabs-reviews">
@@ -2391,7 +2391,7 @@ BEGIN
 				            </div>
 				            <hr />
                         }}
-				        <a class="read-more-reviews" href="#">
+				        <a class="read-more-reviews" href="/reviews/@(@chained)">
 					        Read more reviews >
 				        </a>
     			    </div>
@@ -2540,7 +2540,7 @@ BEGIN
 		<span class="product-accessories-title">Try one of these delicious recipes</span>
 		<div class="accessories-container">
 		    @list(YoutubeVideos) {{
-                <a class="product-related-link" target="_blank" href="@(Video)" data-video-id="@(VideoId)">
+                <a class="product-related-link" href="javascript:function(){return false;}" data-video-id="@(VideoId)">
 				    <img src="@(Image)">
 			    	@(Text)
 			    </a>

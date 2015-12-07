@@ -4,16 +4,23 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.OptionsModel;
+using Microsoft.Net.Http.Server;
 using VC.Public.Controllers.Content;
 using VC.Public.Models;
 using VC.Public.Models.Product;
+using VC.Public.Models.Profile;
 using VitalChoice.Core.Infrastructure.Helpers.ReCaptcha;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
+using VitalChoice.Ecommerce.Domain.Entities.Users;
+using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services.Products;
+using System.Linq;
 
 namespace VC.Public.Controllers
 {
@@ -42,6 +49,30 @@ namespace VC.Public.Controllers
 			ViewBag.Name = productTransfer.ProductDynamic.Name;
 			ViewBag.SubTitle = productTransfer.ProductDynamic.Data.SubTitle;
 		}
+
+	    private async Task<PagedListEx<ReviewListItemModel>> GetReviewsModel(ProductReviewFilter filter)
+	    {
+			filter.Sorting.SortOrder = SortOrder.Desc;
+		    filter.Sorting.Path = ProductReviewSortPath.DateCreated;
+
+			var productReviews = await _productReviewService.GetProductReviewsAsync(filter);
+
+			var reviewsModel = new PagedListEx<ReviewListItemModel>
+			{
+				Items = productReviews.Items.Select(p => new ReviewListItemModel()
+				{
+					DateCreated = p.DateCreated,
+					Title = p.Title,
+					Review = p.Description,
+					CustomerName = p.CustomerName,
+					Rating = p.Rating,
+				}).ToList(),
+				Count = productReviews.Count,
+				Index = filter.Paging.PageIndex
+			};
+
+		    return reviewsModel;
+	    }
 
 	    private IList<CustomerTypeCode> GetCategoryMenuAvailability()
 	    {
@@ -123,5 +154,32 @@ namespace VC.Public.Controllers
 
 			return PartialView("_AddReviewInner", model);
 		}
+
+	    [HttpGet]
+	    public async Task<IActionResult> FullReviews(string url, int pageNumber = 1)
+	    {
+		    var transfer = await _productService.SelectTransferAsync(url, true);
+
+		    var reviewsModel = await GetReviewsModel(new ProductReviewFilter()
+		    {
+			    IdProduct = transfer.ProductDynamic.Id,
+			    Paging = new Paging()
+			    {
+				    PageIndex = pageNumber,
+				    PageItemCount = BaseAppConstants.DEFAULT_LIST_TAKE_COUNT
+			    },
+			    StatusCode = RecordStatusCode.Active
+		    });
+
+		    return View(new FullReviewsModel()
+		    {
+				ProductPublicId = transfer.ProductDynamic.PublicId,
+				ProductTitle = transfer.ProductDynamic.Name,
+				ProductSubTitle = transfer.ProductDynamic.Data.SubTitle,
+				ProductUrl = transfer.ProductContent.Url,
+				Reviews = reviewsModel,
+				AverageRatings = await _productReviewService.GetApprovedAverageRatingsAsync(transfer.ProductDynamic.Id)
+			});
+	    }
 	}
 }

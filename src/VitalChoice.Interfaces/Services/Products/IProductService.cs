@@ -72,6 +72,8 @@ namespace VitalChoice.Interfaces.Services.Products
 
 		Task<ProductContentTransferEntity> SelectTransferAsync(Guid id, bool withDefaults = false);
 
+		Task<ProductContentTransferEntity> SelectTransferAsync(string url, bool withDefaults = false);
+
         Task<ICollection<ProductContent>> SelectProductContents(ICollection<int> ids);
 
         #endregion

@@ -59,7 +59,7 @@ namespace VitalChoice.Business.Services.Products
 			return (await _productContentRepository.Query(p => p.Id == id).Include(p => p.ContentItem).SelectAsync(false)).FirstOrDefault();
 		}
 
-        public async Task<ICollection<ProductContent>> SelectProductContents(ICollection<int> ids)
+	    public async Task<ICollection<ProductContent>> SelectProductContents(ICollection<int> ids)
         {
             return (await _productContentRepository.Query(p => ids.Contains(p.Id)).Include(p => p.ContentItem).SelectAsync(false)).ToList();
         }
@@ -818,7 +818,21 @@ namespace VitalChoice.Business.Services.Products
 			return toReturn;
 		}
 
-	    public async Task<int> GetProductInternalIdAsync(Guid productId)
+		public async Task<ProductContentTransferEntity> SelectTransferAsync(string url, bool withDefaults = false)
+		{
+			var productContent = (await _productContentRepository.Query(p => p.Url.Equals(url)).Include(p => p.ContentItem).SelectAsync(false)).FirstOrDefault();
+
+			var toReturn = new ProductContentTransferEntity
+			{
+				ProductDynamic = productContent != null ? await Mapper.FromEntityAsync(
+					await
+						SelectEntityFirstAsync(o => o.Id == productContent.Id && o.StatusCode != (int)RecordStatusCode.Deleted), withDefaults) : null,
+				ProductContent = productContent
+			};
+			return toReturn;
+		}
+
+		public async Task<int> GetProductInternalIdAsync(Guid productId)
 	    {
 			var productQuery = new ProductQuery().WithPublicId(productId).NotDeleted();
 

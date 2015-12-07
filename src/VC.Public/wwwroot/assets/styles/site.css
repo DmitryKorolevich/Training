@@ -2119,3 +2119,67 @@ a.product-recipe-link:hover {
   float: right;
   margin-left: 10px;
 }
+.working-area-holder.full-reviews-page {
+  color: #333333;
+  font-family: Arial;
+  line-height: 14px;
+  padding-bottom: 40px;
+}
+.working-area-holder.full-reviews-page hr {
+  margin: 10px 0 10px 0;
+}
+.working-area-holder.full-reviews-page .full-reviews-heading {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0px 0px 5px 0px;
+  padding: 10px 5px 0px 5px;
+  text-align: left;
+  height: 20px;
+  color: #333;
+}
+.working-area-holder.full-reviews-page .full-reviews-title {
+  background-color: #F5F5F5;
+  font-size: 15px;
+  margin: 0 0 5px 0;
+  padding: 5px;
+}
+.working-area-holder.full-reviews-page .full-reviews-navs {
+  text-align: right;
+}
+.working-area-holder.full-reviews-page .full-reviews-navs a {
+  margin-right: 5px;
+  margin-left: 5px;
+}
+.working-area-holder.full-reviews-page .full-reviews-average {
+  display: inline-block;
+  line-height: 14px;
+}
+.working-area-holder.full-reviews-page .full-reviews-average img {
+  vertical-align: top;
+}
+.working-area-holder.full-reviews-page .full-reviews-average :first-child {
+  margin-left: 5px;
+}
+.working-area-holder.full-reviews-page .full-reviews-average-number {
+  margin-left: 5px;
+}
+.full-reviews-item {
+  margin: 10px 0 0 0;
+}
+.full-reviews-item span {
+  display: block;
+}
+.full-reviews-item .reviews-item-title {
+  font-weight: bold;
+}
+.full-reviews-item .reviews-item-rating {
+  display: inline-block;
+}
+.full-reviews-item .reviews-item-stars {
+  margin: 8px 0 8px 400px;
+  display: inline-block;
+  line-height: 14px;
+}
+.full-reviews-item .reviews-item-stars img {
+  vertical-align: top;
+}
