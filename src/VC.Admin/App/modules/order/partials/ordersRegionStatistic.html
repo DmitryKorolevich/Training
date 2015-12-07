@@ -1,6 +1,6 @@
-﻿<div class="container-fluid product-categories-statistic">
+﻿<div class="container-fluid orders-region-statistic">
     <div class="well">
-        <span class="legend">Category Sales Report</span>
+        <span class="legend">Regional Sales Summary Information</span>
         <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted}" novalidate>
             <fieldset>
                 <div class="row form-group">
@@ -20,51 +20,45 @@
                             </span>
                         </p>
                     </div>
+                    <div class="col-md-3">
+                        <select class="form-control" placeholder="Customer Type" data-ng-model="filter.IdCustomerType" data-ng-options="item.Key as item.Text for item in customerTypes" data-ng-change="filterChanged();"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control" placeholder="Order Type" data-ng-model="filter.IdOrderType" data-ng-options="item.Key as item.Text for item in orderTypes" data-ng-change="filterChanged();"></select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-control" placeholder="Region Type" data-ng-model="filter.RegionType" data-ng-options="item.Key as item.Text for item in regionTypes" data-ng-change="filterChanged();"></select>
+                    </div>
                 </div>
             </fieldset>
         </form>
         <div class="row form-group">
             <div class="col-md-12">
-                <button class="btn btn-info" data-ng-click="filterCategories();" type="button">Filter</button>
+                <button class="btn btn-info" data-ng-click="filterItems();" type="button">Filter</button>
                 <a target="_self" class="btn btn-primary pull-right" data-ng-href={{options.exportUrl}}>Export</a>
             </div>
         </div>
-        <spinner-overlay data-loading="refreshCategoriesTracker.active()">
-            <div class="categories full-lines margin-bottom-15px">
-                <span>&nbsp;</span>
-                <button data-ng-if="!categoriesExpanded" data-ng-click="updateCategoriesCollapsed(true);" class="btn btn-primary btn-xs expand-button">Expand All</button>
-                <button data-ng-if="categoriesExpanded" data-ng-click="updateCategoriesCollapsed(false);" class="btn btn-primary btn-xs expand-button">Collapse All</button>
-                <div ui-tree data-drag-enabled="false" class="ya-treeview">
-                    <ol ui-tree-nodes data-ng-model="rootCategory.SubItems">
-                        <li ng-repeat="item in rootCategory.SubItems" collapsed="true" ui-tree-node data-ng-include="'app/modules/product/partials/productCategoriesStatisticTreeItem.html'">
-                        </li>
-                    </ol>
-                </div>
-            </div>
-        </spinner-overlay>
-        <span data-ng-if="items" class="legend">Skus Statistic</span>
-        <spinner-overlay data-loading="refreshSkusTracker.active()">
+        <spinner-overlay data-loading="refreshTracker.active()">
             <table data-ng-if="items" class="table table-striped">
                 <thead>
                     <tr>
-                        <th>Product SKU</th>
-                        <th>Product Name</th>
-                        <th>Category</th>
-                        <th>Subcategory</th>
-                        <th>Item Price</th>
-                        <th>Quantity Sold</th>
-                        <th>Sales Amount</th>
+                        <th data-ng-if="options.RegionType==1">State/Province</th>
+                        <th data-ng-if="options.RegionType==2">Zip</th>
+                        <th>Sales</th>
+                        <th>Orders</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr data-ng-repeat="item in items">
-                        <td>{{::item.Code}}</td>
-                        <td>{{::item.ProductName}}</td>
-                        <td>{{::item.ParentCategory}}</td>
-                        <td>{{::item.Category}}</td>
-                        <td>{{::item.Price | currency}} / {{::item.WholesalePrice | currency}}</td>
-                        <td>{{::item.Quantity}}</td>
+                        <td data-ng-if="options.RegionType==1">
+                            <a ui-sref="index.oneCol.ordersRegionStatisticDetail({region:item.Region})">{{::item.Region}}</a>
+                        </td>
+                        <td data-ng-if="options.RegionType==2">
+                            <a ui-sref="index.oneCol.ordersRegionStatisticDetail({zip:item.Zip})">{{::item.Zip}}</a>
+                        </td>
                         <td>{{::item.Amount | currency}}</td>
+                        <td>{{::item.Count}}</td>
+                        </td>
                 </tbody>
             </table>
         </spinner-overlay>

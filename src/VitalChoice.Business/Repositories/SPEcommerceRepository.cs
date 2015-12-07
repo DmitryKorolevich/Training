@@ -14,6 +14,7 @@ using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Infrastructure.Domain.Entities.Products;
+using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 
 namespace VitalChoice.Data.Repositories.Customs
 {
@@ -33,6 +34,20 @@ namespace VitalChoice.Data.Repositories.Customs
         public async Task<ICollection<SkusInProductCategoryStatisticItem>> GetSkusInProductCategoryStatisticAsync(DateTime from,DateTime to, int idCategory)
         {
             var toReturn = await Context.Set<SkusInProductCategoryStatisticItem>().FromSql("[dbo].[SPGetSkusInProductCategoryStatistic] @from={0}, @to={1}, @idcategory={2}", from,to, idCategory).ToListAsync();
+            return toReturn;
+        }
+
+        public async Task<ICollection<OrdersRegionStatisticItem>> GetOrdersRegionStatisticAsync(OrderRegionFilter filter)
+        {
+            var toReturn = await Context.Set<OrdersRegionStatisticItem>().FromSql("[dbo].[SPGetOrdersRegionStatistic] @from={0}, @to={1}, @IdCustomerType={2}, @IdOrderType={3}",
+                filter.From, filter.To, filter.IdCustomerType, filter.IdOrderType).ToListAsync();
+            return toReturn;
+        }
+
+        public async Task<ICollection<OrdersZipStatisticItem>> GetOrdersZipStatisticAsync(OrderRegionFilter filter)
+        {
+            var toReturn = await Context.Set<OrdersZipStatisticItem>().FromSql("[dbo].[SPGetOrdersZipStatistic] @from={0}, @to={1}, @IdCustomerType={2}, @IdOrderType={3}",
+                filter.From, filter.To, filter.IdCustomerType, filter.IdOrderType).ToListAsync();
             return toReturn;
         }
     }

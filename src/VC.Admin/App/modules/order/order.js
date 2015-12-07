@@ -6,6 +6,7 @@ angular.module('app.modules.order',[
 	'app.modules.order.controllers.orderStatusUpdateController',
 	'app.modules.order.controllers.moveOrderController',
 	'app.modules.order.controllers.customerOrdersController',
+	'app.modules.order.controllers.ordersRegionStatisticController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -36,6 +37,21 @@ angular.module('app.modules.order',[
 		            url: '/tools/move-order',
 		            templateUrl: 'app/modules/order/partials/moveOrderForm.html',
 		            controller: 'moveOrderController'
+		        })
+		        .state('index.oneCol.ordersRegionStatistic', {
+		            url: '/report/regional-sales',
+		            templateUrl: 'app/modules/order/partials/ordersRegionStatistic.html',
+		            controller: 'ordersRegionStatisticController'
+		        })
+		        .state('index.oneCol.ordersRegionStatisticDetailByRegion', {
+		            url: '/report/regional-sales-details?{region:string}',
+		            templateUrl: 'app/modules/order/partials/ordersRegionStatisticDetail.html',
+		            controller: 'ordersRegionStatisticDetailController'
+		        })
+		        .state('index.oneCol.ordersRegionStatisticDetailByZip', {
+		            url: '/report/regional-sales-details?{zip:string}',
+		            templateUrl: 'app/modules/order/partials/ordersRegionStatisticDetail.html',
+		            controller: 'ordersRegionStatisticDetailController'
 		        });
 		}
 ]);

@@ -471,7 +471,7 @@ namespace VitalChoice.Business.Services.Products
 
         #region ProductOutOfStockRequests
 
-        public async Task<ICollection<ProductOutOfStockContainer>> GetProductOutOfStockContainers()
+        public async Task<ICollection<ProductOutOfStockContainer>> GetProductOutOfStockContainersAsync()
         {
             var items = await _productOutOfStockRequestRepository.Query().SelectAsync(false);
             var productIds = items.Select(p => p.IdProduct).Distinct().ToArray();
@@ -533,14 +533,14 @@ namespace VitalChoice.Business.Services.Products
             return containers;
         }
 
-        public async Task<ProductOutOfStockRequest> AddProductOutOfStockRequest(ProductOutOfStockRequest model)
+        public async Task<ProductOutOfStockRequest> AddProductOutOfStockRequestAsync(ProductOutOfStockRequest model)
         {
             model.DateCreated = DateTime.Now;
             await _productOutOfStockRequestRepository.InsertAsync(model);
             return model;
         }
 
-        public async Task<bool> SendProductOutOfStockRequests(ICollection<int> ids)
+        public async Task<bool> SendProductOutOfStockRequestsAsync(ICollection<int> ids)
         {
             if (ids.Count > 0)
             {
@@ -578,7 +578,16 @@ namespace VitalChoice.Business.Services.Products
             return true;
         }
 
-	    public async Task<PagedList<VCustomerFavoriteFull>> GetCustomerFavoritesAsync(VCustomerFavoritesFilter filter)
+        public async Task<bool> DeleteProductOutOfStockRequestsAsync(ICollection<int> ids)
+        {
+            if (ids.Count > 0)
+            {
+                await _productOutOfStockRequestRepository.DeleteAllAsync(ids);
+            }
+            return true;
+        }
+
+        public async Task<PagedList<VCustomerFavoriteFull>> GetCustomerFavoritesAsync(VCustomerFavoritesFilter filter)
 	    {
 		    var temp = 
 			    await

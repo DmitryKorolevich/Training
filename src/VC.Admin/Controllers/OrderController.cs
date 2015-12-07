@@ -26,6 +26,9 @@ using System.Linq;
 using VC.Admin.Models.Orders;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Business.CsvExportMaps.Orders;
+using VitalChoice.Infrastructure.Domain.Constants;
+using Microsoft.Net.Http.Headers;
 
 namespace VC.Admin.Controllers
 {
@@ -37,19 +40,29 @@ namespace VC.Admin.Controllers
         private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
         private readonly ICustomerService _customerService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
+        private readonly ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> _ordersRegionStatisticItemCSVExportService;
+        private readonly ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> _ordersZipStatisticItemCSVExportService;
+        private readonly ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> _vOrderWithRegionInfoItemCSVExportService;
         private readonly ILogger logger;
 
         public OrderController(
             IOrderService orderService,
             ILoggerProviderExtended loggerProvider,
-            IDynamicMapper<OrderDynamic, Order> mapper, ICustomerService customerService,
+            IDynamicMapper<OrderDynamic, Order> mapper,
+            ICustomerService customerService,
             IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
+            ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> ordersRegionStatisticItemCSVExportService,
+            ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> ordersZipStatisticItemCSVExportService,
+            ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> vOrderWithRegionInfoItemCSVExportService,
             IObjectHistoryLogService objectHistoryLogService)
         {
             _orderService = orderService;
             _mapper = mapper;
             _customerService = customerService;
             _addressMapper = addressMapper;
+            _ordersRegionStatisticItemCSVExportService = ordersRegionStatisticItemCSVExportService;
+            _ordersZipStatisticItemCSVExportService = ordersZipStatisticItemCSVExportService;
+            _vOrderWithRegionInfoItemCSVExportService = vOrderWithRegionInfoItemCSVExportService;
             _objectHistoryLogService = objectHistoryLogService;
             this.logger = loggerProvider.CreateLoggerDefault();
         }
@@ -281,6 +294,112 @@ namespace VC.Admin.Controllers
                 });
             }
 
+            return toReturn;
+        }
+
+        [HttpPost]
+        public async Task<Result<ICollection<OrdersRegionStatisticItem>>> GetOrdersRegionStatistic([FromBody]OrderRegionFilter filter)
+        {
+            var toReturn = await _orderService.GetOrdersRegionStatisticAsync(filter);
+            return toReturn.ToList();
+        }
+
+        [HttpGet]
+        public async Task<FileResult> GetOrdersRegionStatisticReportFile([FromQuery]DateTime from, [FromQuery]DateTime to, 
+            [FromQuery]int? idcustomertype=null, [FromQuery]int? idordertype=null)
+        {
+            OrderRegionFilter filter = new OrderRegionFilter()
+            {
+                From=from,
+                To=to,
+                IdCustomerType= idcustomertype,
+                IdOrderType= idordertype,
+            };
+
+            var items = await _orderService.GetOrdersRegionStatisticAsync(filter);
+
+            var data = _ordersRegionStatisticItemCSVExportService.ExportToCsv(items);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.REGIONAL_SALES_STATISTIC, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(data, "text/csv");
+        }
+
+        [HttpPost]
+        public async Task<Result<ICollection<OrdersZipStatisticItem>>> GetOrdersZipStatistic([FromBody]OrderRegionFilter filter)
+        {
+            var toReturn = await _orderService.GetOrdersZipStatisticAsync(filter);
+            return toReturn.ToList();
+        }
+
+        [HttpGet]
+        public async Task<FileResult> GetOrdersZipStatisticReportFile([FromQuery]DateTime from, [FromQuery]DateTime to,
+            [FromQuery]int? idcustomertype=null, [FromQuery]int? idordertype=null)
+        {
+            OrderRegionFilter filter = new OrderRegionFilter()
+            {
+                From = from,
+                To = to,
+                IdCustomerType = idcustomertype,
+                IdOrderType = idordertype,
+            };
+
+            var items = await _orderService.GetOrdersZipStatisticAsync(filter);
+
+            var data = _ordersZipStatisticItemCSVExportService.ExportToCsv(items);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.REGIONAL_SALES_STATISTIC, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(data, "text/csv");
+        }
+
+
+        [HttpPost]
+        public async Task<Result<PagedList<VOrderWithRegionInfoItem>>> GetOrderWithRegionInfoItems([FromBody]OrderRegionFilter filter)
+        {
+            var toReturn = await _orderService.GetOrderWithRegionInfoItemsAsync(filter);
+            return toReturn;
+        }
+
+        [HttpGet]
+        public async Task<FileResult> GetOrderWithRegionInfoItemsReportFile([FromQuery]DateTime from, [FromQuery]DateTime to,
+            [FromQuery]int? idcustomertype=null, [FromQuery]int? idordertype=null, [FromQuery]string region=null, [FromQuery]string zip=null)
+        {
+            OrderRegionFilter filter = new OrderRegionFilter()
+            {
+                From = from,
+                To = to,
+                IdCustomerType = idcustomertype,
+                IdOrderType = idordertype,
+                Region = region,
+                Zip=zip,
+            };
+
+            var items = await _orderService.GetOrderWithRegionInfoItemsAsync(filter);
+
+            var data = _vOrderWithRegionInfoItemCSVExportService.ExportToCsv(items.Items);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.REGIONAL_SALES_DETAILS_STATISTIC, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(data, "text/csv");
+        }
+
+        [HttpPost]
+        public async Task<Result<decimal>> GetOrderWithRegionInfoAmount([FromBody]OrderRegionFilter filter)
+        {
+            var toReturn = await _orderService.GetOrderWithRegionInfoAmountAsync(filter);
             return toReturn;
         }
     }

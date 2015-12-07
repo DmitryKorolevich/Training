@@ -46,5 +46,38 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    {
 	        return $http.post(baseUrl + 'GetHistoryReport', filter, getConfig(tracker));
 	    },
+
+	    //orders region sales statistic
+	    getOrdersRegionStatistic: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetOrdersRegionStatistic', filter, getConfig(tracker));
+	    },
+	    getOrdersRegionStatisticReportFile: function (filter, buildNumber)
+	    {
+	        return baseUrl + 'GetOrdersRegionStatisticReportFile?from={0}&to={1}&idcustomertype={2}&idordertype={3}&buildNumber={4}'
+                .format(filter.From, filter.To, filter.IdCustomerType, filter.IdOrderType, buildNumber);
+	    },
+	    getOrdersZipStatistic: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetOrdersZipStatistic', filter, getConfig(tracker));
+	    },
+	    getOrdersZipStatisticReportFile: function (filter, buildNumber)
+	    {
+	        return baseUrl + 'GetOrdersZipStatisticReportFile?from={0}&to={1}&idcustomertype={2}&idordertype={3}&buildNumber={4}'
+                .format(filter.From, filter.To, filter.IdCustomerType, filter.IdOrderType, buildNumber);
+	    },
+	    getOrderWithRegionInfoItems: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetOrderWithRegionInfoItems', filter, getConfig(tracker));
+	    },
+	    getOrderWithRegionInfoItemsReportFile: function (filter, buildNumber)
+	    {
+	        return baseUrl + 'GetOrderWithRegionInfoItemsReportFile?from={0}&to={1}&idcustomertype={2}&idordertype={3}&region={4}&zip={5}&buildNumber={6}'
+                .format(filter.From, filter.To, filter.IdCustomerType, filter.IdOrderType, buildNumber);
+	    },
+	    getOrderWithRegionInfoAmount: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetOrderWithRegionInfoAmount', filter, getConfig(tracker));
+	    },
 	};
 }]);

@@ -119,5 +119,9 @@ angular.module('app.core.dataAccess.services.productService', [])
 	    {
 	        return $http.post(baseUrl + 'SendProductOutOfStockRequests', ids, getConfig(tracker));
 	    },
+	    deleteProductOutOfStockRequests: function (ids, tracker)
+	    {
+	        return $http.post(baseUrl + 'DeleteProductOutOfStockRequests', ids, getConfig(tracker));
+	    },
 	};
 }]);

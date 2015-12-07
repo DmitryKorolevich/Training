@@ -527,14 +527,20 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<ICollection<ProductOutOfStockContainerListItemModel>>> GetProductOutOfStockContainers([FromBody] object model)
         {
-            var toReturn = await productService.GetProductOutOfStockContainers();
+            var toReturn = await productService.GetProductOutOfStockContainersAsync();
             return toReturn.Select(p => new ProductOutOfStockContainerListItemModel(p)).ToList();
         }
 
         [HttpPost]
         public async Task<Result<bool>> SendProductOutOfStockRequests([FromBody]ICollection<int> ids)
         {
-            return await productService.SendProductOutOfStockRequests(ids);
+            return await productService.SendProductOutOfStockRequestsAsync(ids);
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> DeleteProductOutOfStockRequests([FromBody]ICollection<int> ids)
+        {
+            return await productService.DeleteProductOutOfStockRequestsAsync(ids);
         }
 
         #endregion

@@ -29,3 +29,6 @@ Post-Deployment Script Template
 :r .\Scripts\VSkus.sql
 :r .\Scripts\VAffiliateNotPaidCommissions.sql
 :r .\Scripts\VHealthwisePeriods.sql
+:r .\Scripts\VOrderWithRegionInfoItems.sql
+:r .\Scripts\SPGetOrdersRegionStatistic.sql
+:r .\Scripts\SPGetOrdersZipStatistic.sql

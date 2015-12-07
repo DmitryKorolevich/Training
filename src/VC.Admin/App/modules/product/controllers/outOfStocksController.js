@@ -54,17 +54,8 @@
         {
             confirmUtil.confirm(function ()
             {
-                var ids = [];
-                $.each($scope.items, function (index, container)
-                {
-                    $.each(container.Requests, function (index, item)
-                    {
-                        if (item.IsSelected)
-                        {
-                            ids.push(item.Id);
-                        }
-                    });
-                });
+                
+                var ids = getIds();
                 productService.sendProductOutOfStockRequests(ids, $scope.deleteTracker)
                     .success(function (result)
                     {
@@ -82,6 +73,46 @@
                         errorHandler(result);
                     });
             }, 'Are you sure you want to send these emails?');
+        };
+
+        $scope.delete = function ()
+        {
+            confirmUtil.confirm(function ()
+            {
+                var ids = getIds();
+                productService.deleteProductOutOfStockRequests(ids, $scope.deleteTracker)
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            toaster.pop('success', "Success!", "Successfully deleted.");
+                            refreshItems();
+                        } else
+                        {
+                            errorHandler(result);
+                        }
+                    })
+                    .error(function (result)
+                    {
+                        errorHandler(result);
+                    });
+            }, 'Are you sure you want to delete these requests?');
+        };
+
+        var getIds = function ()
+        {
+            var ids = [];
+            $.each($scope.items, function (index, container)
+            {
+                $.each(container.Requests, function (index, item)
+                {
+                    if (item.IsSelected)
+                    {
+                        ids.push(item.Id);
+                    }
+                });
+            });
+            return ids;
         };
 
         $scope.containerIsSelectedChanged = function (container)
