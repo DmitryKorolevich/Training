@@ -163,10 +163,13 @@ namespace VitalChoice.DynamicData.Base
 
             UpdateEntityItem(dynamic, entity);
             await UpdateEntityInternalAsync(dynamic, entity);
-            foreach (var value in entity.OptionValues)
-            {
-                SetObjectReferenceId(value, dynamic.Id);
-            }
+            //if (dynamic.Id != 0)
+            //{
+            //    foreach (var value in entity.OptionValues)
+            //    {
+            //        SetObjectReferenceId(value, dynamic.Id);
+            //    }
+            //}
         }
 
 		public void UpdateEntity(TDynamic dynamic, TEntity entity)
@@ -236,16 +239,18 @@ namespace VitalChoice.DynamicData.Base
             }
 
             await UpdateEntityRangeInternalAsync(items);
-            items.ForEach(item =>
-            {
-                var entity = item.Entity;
-                var dynamic = item.Dynamic;
-
-                foreach (var value in entity.OptionValues)
-                {
-                    SetObjectReferenceId(value, dynamic.Id);
-                }
-            });
+            //items.ForEach(item =>
+            //{
+            //    var entity = item.Entity;
+            //    var dynamic = item.Dynamic;
+            //    if (dynamic.Id != 0)
+            //    {
+            //        foreach (var value in entity.OptionValues)
+            //        {
+            //            SetObjectReferenceId(value, dynamic.Id);
+            //        }
+            //    }
+            //});
         }
 
         public async Task<List<TEntity>> ToEntityRangeAsync(ICollection<TDynamic> items,
