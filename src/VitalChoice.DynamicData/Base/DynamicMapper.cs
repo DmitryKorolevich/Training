@@ -194,8 +194,7 @@ namespace VitalChoice.DynamicData.Base
                 optionTypes = FilterByType(dynamic.IdObjectType);
             }
             var entity = new TEntity { OptionValues = new List<TOptionValue>(), OptionTypes = optionTypes };
-            var optionTypesCache = optionTypes.ToDictionary(o => o.Name, o => o);
-            FillEntityOptions(dynamic, optionTypesCache, entity);
+            FillEntityOptions(dynamic, optionTypes, entity);
             entity.Id = dynamic.Id;
             entity.DateCreated = DateTime.Now;
             entity.DateEdited = DateTime.Now;
@@ -424,9 +423,7 @@ namespace VitalChoice.DynamicData.Base
             {
                 throw new ApiException($"UpdateEntityItem<{typeof(TEntity)}> have no OptionTypes, are you forgot to pass them?");
             }
-            var optionTypesCache = entity.OptionTypes.ToDictionary(o => o.Name, o => o);
-
-            FillEntityOptions(dynamic, optionTypesCache, entity);
+            FillEntityOptions(dynamic, entity.OptionTypes, entity);
             entity.DateCreated = entity.DateCreated;
             entity.DateEdited = DateTime.Now;
             entity.StatusCode = dynamic.StatusCode;
@@ -443,8 +440,7 @@ namespace VitalChoice.DynamicData.Base
                 throw new ApiException($"ToEntityItem<{typeof(TEntity)}> have no OptionTypes, are you forgot to pass them?");
             }
             var entity = new TEntity { OptionValues = new List<TOptionValue>(), OptionTypes = optionTypes };
-            var optionTypesCache = optionTypes.ToDictionary(o => o.Name, o => o);
-            FillEntityOptions(dynamic, optionTypesCache, entity);
+            FillEntityOptions(dynamic, optionTypes, entity);
             entity.Id = dynamic.Id;
             entity.DateCreated = DateTime.Now;
             entity.DateEdited = DateTime.Now;
@@ -505,33 +501,33 @@ namespace VitalChoice.DynamicData.Base
             UpdateEntityItem(pair.Dynamic, pair.Entity);
         }
 
-        private static void FillEntityOptions(TDynamic obj, Dictionary<string, TOptionType> optionTypesCache, TEntity entity)
+        private static void FillEntityOptions(TDynamic obj, ICollection<TOptionType> optionTypes, TEntity entity)
         {
+            HashSet<int> optionTypeIds = new HashSet<int>(optionTypes.Select(o => o.Id));
+            entity.OptionValues.RemoveAll(o => !optionTypeIds.Contains(o.IdOptionType));
             Dictionary<int, TOptionValue> optionValues = entity.OptionValues.ToDictionary(v => v.IdOptionType);
-            foreach (var data in obj.DynamicData)
+            foreach (var optionType in optionTypes)
             {
-                TOptionType optionType;
-
-                if (!optionTypesCache.TryGetValue(data.Key, out optionType)) continue;
-
+                object value;
+                obj.DictionaryData.TryGetValue(optionType.Name, out value);
                 TOptionValue option;
                 if (optionValues.TryGetValue(optionType.Id, out option))
                 {
-                    if (data.Value == null)
+                    if (value == null)
                     {
                         entity.OptionValues.Remove(option);
                         continue;
                     }
-                    MapperTypeConverter.ConvertToOption<TOptionValue, TOptionType>(option, data.Value,
+                    MapperTypeConverter.ConvertToOption<TOptionValue, TOptionType>(option, value,
                         (FieldType)optionType.IdFieldType);
                 }
                 else
                 {
-                    if (data.Value == null)
+                    if (value == null)
                         continue;
 
                     option = new TOptionValue();
-                    MapperTypeConverter.ConvertToOption<TOptionValue, TOptionType>(option, data.Value,
+                    MapperTypeConverter.ConvertToOption<TOptionValue, TOptionType>(option, value,
                         (FieldType)optionType.IdFieldType);
                     option.IdOptionType = optionType.Id;
                     entity.OptionValues.Add(option);

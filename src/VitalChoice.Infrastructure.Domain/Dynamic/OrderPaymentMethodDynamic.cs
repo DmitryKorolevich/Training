@@ -6,7 +6,6 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
     [DataContract]
     public sealed class OrderPaymentMethodDynamic : MappedObject
     {
-        [DataMember]
         public AddressDynamic Address { get; set; }
 
         [DataMember]

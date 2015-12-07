@@ -30,7 +30,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
         TransportCommandData AesEncryptSign(ServiceBusCommandBase command, Guid session);
         bool SessionExist(Guid session);
         bool RegisterSession(Guid session, string hostName, byte[] keyCombined);
-        KeyExchange GetSessionWithReset(Guid session);
+        bool RegisterSession(Guid session, KeyExchange keyCombined);
         KeyExchange CreateSession(Guid session);
         bool RemoveSession(Guid session);
         event SessionExpiredEventHandler OnSessionExpired;

@@ -479,7 +479,7 @@ namespace VitalChoice.Core.DependencyInjection
                 .WithParameter((pi, cc) => pi.ParameterType == typeof (ILogger),
                     (pi, cc) => cc.Resolve<ILoggerProviderExtended>().CreateLogger(typeof (ObjectEncryptionHost)))
                 .SingleInstance();
-            builder.RegisterType<EncryptedOrderExportService>().As<IEncryptedOrderExportService>().SingleInstance();
+            builder.RegisterType<EncryptedOrderExportService>().As<IEncryptedOrderExportService>();
             FinishCustomRegistrations(builder);
 
             var container = builder.Build();

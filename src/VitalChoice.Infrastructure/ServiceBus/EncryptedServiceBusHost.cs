@@ -339,7 +339,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 {
                     lock (_encryptedClient)
                     {
-                        _encryptedClient.Send(CreateEncryptedMessage(command));
+                        _encryptedClient.SendAsync(CreateEncryptedMessage(command)).Wait();
                     }
                     return true;
                 }
@@ -355,7 +355,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 {
                     lock (_plainClient)
                     {
-                        _plainClient.Send(CreatePlainCommand(command));
+                        _plainClient.SendAsync(CreatePlainCommand(command)).Wait();
                     }
                     return true;
                 }

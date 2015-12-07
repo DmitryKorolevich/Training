@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -38,41 +39,24 @@ namespace VitalChoice.Infrastructure.ServiceBus
         public ObjectEncryptionHost(IOptions<AppOptions> options, ILogger logger)
         {
             _logger = logger;
-#if NET451 || DNX451
-            var certStore = new X509Store(StoreLocation.LocalMachine);
-#else
-            var certStore = new X509Store("My", StoreLocation.LocalMachine);
-#endif
-            var caRootStore = new X509Store(StoreName.Root, StoreLocation.LocalMachine);
             try
             {
-                certStore.Open(OpenFlags.ReadOnly);
-                caRootStore.Open(OpenFlags.ReadOnly);
-                var localCerts = certStore.Certificates.Find(X509FindType.FindByThumbprint, options.Value.ExportService.CertThumbprint, true);
-                if (localCerts.Count == 0)
-                    throw new InvalidOperationException(
-                        $"Cannot find Certificate in Store with thumbprint <{options.Value.ExportService.CertThumbprint}>");
+                _signProvider = new RSACryptoServiceProvider();
+                LocalCert = GetPublicCertificate(StoreName.My, options.Value.ExportService.CertThumbprint, _signProvider);
+                if (LocalCert == null)
+                {
+                    _signProvider.Dispose();
+                    _signProvider = null;
+                }
 
-                var cert = localCerts[0];
-                LocalCert = new X509Certificate2(cert.Export(X509ContentType.Cert));
-                if (!cert.HasPrivateKey)
-                    throw new InvalidOperationException("Certificate has no private key imported.");
-                var rootCerts = caRootStore.Certificates.Find(X509FindType.FindByThumbprint, options.Value.ExportService.RootThumbprint,
-                    true);
-                if (rootCerts.Count == 0)
-                    throw new InvalidOperationException(
-                        $"Cannot find Certificate in Store with thumbprint <{options.Value.ExportService.RootThumbprint}>");
-                RootCert = new X509Certificate2(rootCerts[0].Export(X509ContentType.Cert));
+                RootCert = GetPublicCertificate(StoreName.Root, options.Value.ExportService.RootThumbprint);
+                if (RootCert == null)
+                    return;
+
                 if (!ValidateClientCertificate(LocalCert))
                 {
-                    throw new InvalidOperationException("Client and/or root certificates doesn't valid.");
+                    throw new InvalidOperationException("Client and/or root certificate(s) doesn't valid.");
                 }
-#if DNX451 || NET451
-                _signProvider = new RSACryptoServiceProvider();
-                _signProvider.ImportParameters(((RSACryptoServiceProvider) cert.PrivateKey).ExportParameters(true));
-#else
-                _signProvider = cert.GetRSAPrivateKey();
-#endif
                 if (options.Value.ExportService.EncryptionHostSessionExpire)
                 {
                     _disposeEvent = new ManualResetEvent(false);
@@ -84,16 +68,6 @@ namespace VitalChoice.Infrastructure.ServiceBus
             catch (Exception e)
             {
                 logger.LogCritical(e.Message, e);
-            }
-            finally
-            {
-#if DNX451 || NET451
-                certStore.Close();
-                caRootStore.Close();
-#else
-                certStore.Dispose();
-                caRootStore.Dispose();
-#endif
             }
         }
 
@@ -133,6 +107,9 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         public bool ValidateClientCertificate(X509Certificate2 clientCert)
         {
+            if (clientCert == null)
+                throw new ArgumentNullException(nameof(clientCert));
+
             X509Chain validationChain = new X509Chain
             {
                 ChainPolicy =
@@ -309,8 +286,6 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         public bool RegisterSession(Guid session, string hostName, byte[] keyCombined)
         {
-            if (!_sessionExpires)
-                throw new InvalidOperationException("Cannot register session, as it's state not controlled by session expiration.");
             Aes aes = Aes.Create();
             if (aes == null)
                 throw new InvalidOperationException("Cannot initialize AES encryption");
@@ -338,24 +313,28 @@ namespace VitalChoice.Infrastructure.ServiceBus
             return true;
         }
 
-        public KeyExchange GetSessionWithReset(Guid session)
+        public bool RegisterSession(Guid session, KeyExchange keyCombined)
         {
-            if (_sessionExpires)
-                throw new InvalidOperationException("Cannot get/reset client sessions as it's state controlled by expiration.");
+            Aes aes = Aes.Create();
+            if (aes == null)
+                throw new InvalidOperationException("Cannot initialize AES encryption");
+            aes.KeySize = 256;
+            aes.Key = keyCombined.Key;
+            aes.IV = keyCombined.IV;
+            aes.Padding = PaddingMode.PKCS7;
+            SessionInfo encryption = new SessionInfo
+            {
+                Aes = aes,
+                Expiration = DateTime.Now.AddHours(1)
+            };
             lock (_sessions)
             {
-                SessionInfo aes;
-                if (_sessions.TryGetValue(session, out aes))
-                {
-                    aes.Expiration = DateTime.Now.AddHours(1);
-                    return new KeyExchange
-                    {
-                        Key = aes.Aes.Key,
-                        IV = aes.Aes.IV
-                    };
-                }
-                return null;
+                if (_sessions.ContainsKey(session))
+                    _sessions[session] = encryption;
+                else
+                    _sessions.Add(session, encryption);
             }
+            return true;
         }
 
         public KeyExchange CreateSession(Guid session)
@@ -373,12 +352,6 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 aes.GenerateKey();
                 aes.GenerateIV();
                 aes.Padding = PaddingMode.PKCS7;
-                SessionInfo encryption = new SessionInfo
-                {
-                    Aes = aes,
-                    Expiration = DateTime.Now.AddHours(1)
-                };
-                _sessions.Add(session, encryption);
                 return new KeyExchange
                 {
                     Key = aes.Key,
@@ -415,6 +388,47 @@ namespace VitalChoice.Infrastructure.ServiceBus
                     session.Value.Dispose();
                 }
                 _sessions.Clear();
+            }
+        }
+
+#if DNX451 || NET451
+        private X509Certificate2 GetPublicCertificate(StoreName storeName, string thumbprint, RSACryptoServiceProvider signProvider = null)
+#else
+        private X509Certificate2 GetPublicCertificate(StoreName storeName, string thumbprint, RSA signProvider = null)
+#endif
+        {
+            var certStore = new X509Store(storeName, StoreLocation.LocalMachine);
+            certStore.Open(OpenFlags.ReadOnly);
+            try
+            {
+                var localCerts = certStore.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, true);
+                if (localCerts.Count == 0)
+                {
+                    _logger.LogCritical(
+                        $"Cannot find Certificate in Store <{certStore.Name}:{certStore.Location}> with thumbprint <{thumbprint}>");
+                    return null;
+                }
+                var cert = localCerts[0];
+                if (signProvider != null)
+                {
+                    if (!cert.HasPrivateKey)
+                        throw new InvalidOperationException("Certificate has no private key imported.");
+#if DNX451 || NET451
+                    signProvider.ImportParameters(((RSACryptoServiceProvider) cert.PrivateKey).ExportParameters(true));
+#else
+                    signProvider = cert.GetRSAPrivateKey();
+#endif
+                }
+
+                return new X509Certificate2(cert.Export(X509ContentType.Cert));
+            }
+            finally
+            {
+#if DNX451 || NET451
+                certStore.Close();
+#else
+                certStore.Dispose();
+#endif
             }
         }
 

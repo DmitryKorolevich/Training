@@ -59,17 +59,28 @@ namespace VitalChoice.Business.Services
             var keys = EncryptionHost.CreateSession(sessionId);
             if (keys == null)
             {
-                if (await ExecutePlainCommand<bool>(new ServiceBusCommandWithResult(sessionId, ServiceBusCommandConstants.CheckSessionKey, ServerHostName, LocalHostName)))
+                if (
+                    await
+                        ExecutePlainCommand<bool>(new ServiceBusCommandWithResult(sessionId, ServiceBusCommandConstants.CheckSessionKey,
+                            ServerHostName, LocalHostName)))
                     return true;
-                keys = EncryptionHost.GetSessionWithReset(sessionId);
+                EncryptionHost.RemoveSession(sessionId);
+                keys = EncryptionHost.CreateSession(sessionId);
             }
             var keyCombined = new byte[keys.IV.Length + keys.Key.Length];
             Array.Copy(keys.IV, keyCombined, keys.IV.Length);
             Array.Copy(keys.Key, 0, keyCombined, keys.IV.Length, keys.Key.Length);
-            return await ExecutePlainCommand<bool>(new ServiceBusCommandWithResult(sessionId, ServiceBusCommandConstants.SetSessionKey, ServerHostName, LocalHostName)
+            if (
+                await
+                    ExecutePlainCommand<bool>(new ServiceBusCommandWithResult(sessionId, ServiceBusCommandConstants.SetSessionKey,
+                        ServerHostName, LocalHostName)
+                    {
+                        Data = EncryptionHost.RsaEncrypt(keyCombined, keyExchangeProvider)
+                    }))
             {
-                Data = EncryptionHost.RsaEncrypt(keyCombined, keyExchangeProvider)
-            });
+                return EncryptionHost.RegisterSession(sessionId, keys);
+            }
+            return false;
         }
 
         public void RemoveClient(Guid sessionId)

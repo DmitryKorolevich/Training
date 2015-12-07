@@ -12,9 +12,36 @@ namespace VitalChoice.CertImport
     {
         public static void Main(string[] args)
         {
-            //var certStore = new X509Store(StoreLocation.LocalMachine);
-            //certStore.Open(OpenFlags.MaxAllowed);
-            //if (certStore.Certificates.Find(X509FindType.FindBySubjectName, "CN=VC Root", false).Count == 0)
+            var certStore = new X509Store(StoreLocation.LocalMachine);
+            certStore.Open(OpenFlags.ReadOnly);
+            try
+            {
+                var localCerts = certStore.Certificates.Find(X509FindType.FindByThumbprint, "505BDC22499CF0F4692CF18D69CDC32F0F285545", true);
+                if (localCerts.Count == 0)
+                {
+                    localCerts = certStore.Certificates.Find(X509FindType.FindByThumbprint, "‎505BDC22499CF0F4692CF18D69CDC32F0F285545", false);
+                    if (localCerts.Count == 0)
+                        Console.WriteLine("Not found.");
+                    else
+                    {
+                        Console.WriteLine("Invlid.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Found");
+                }
+                //Console.WriteLine(
+                //    certStore.Certificates.Find(X509FindType.FindByThumbprint, "‎‎505BDC22499CF0F4692CF18D69CDC32F0F285545", false)[0]?
+                //        .Subject);
+                //Console.WriteLine(
+                //    certStore.Certificates.Find(X509FindType.FindByThumbprint, "505BDC22499CF0F4692CF18D69CDC32F0F285545", true)[0]?
+                //        .Subject);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
             //{
             //    if (args[0] == "--server")
             //    {
@@ -35,8 +62,9 @@ namespace VitalChoice.CertImport
             //        certStore.Add(clientCertificate);
             //    }
             //}
-            //certStore.Close();
-            EventLog.CreateEventSource("ExportService", "Application");
+            certStore.Close();
+            Console.ReadKey();
+            //EventLog.CreateEventSource("ExportService", "Application");
         }
     }
 }
