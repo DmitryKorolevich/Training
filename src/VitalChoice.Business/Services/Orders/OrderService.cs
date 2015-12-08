@@ -709,30 +709,59 @@ namespace VitalChoice.Business.Services.Orders
 
         #region HealthWiseOrders
 
-        public async Task<bool> UpdateHealthwiseOrderAsync(int orderId, bool isHealthwise)
+        public ICollection<MessageInfo> ValidateUpdateHealthwiseOrder(OrderDynamic order)
         {
-            var order = await this.SelectAsync(orderId);
+            List<MessageInfo> toReturn = new List<MessageInfo>();
             if (order == null)
             {
-                throw new AppValidationException("Invalid order #");
+                toReturn.Add(new MessageInfo() { Message= "Invalid order #" });
             }
             if (order == null || !(order.OrderStatus == OrderStatus.Processed || order.OrderStatus == OrderStatus.Exported ||
                 order.OrderStatus == OrderStatus.Shipped))
             {
+                toReturn.Add(new MessageInfo() { Message = "The given order can'be flagged" });
                 throw new AppValidationException("The given order can'be flagged");
             }
             if (!order.DictionaryData.ContainsKey("OrderType") || order.Data.OrderType != (int?)SourceOrderType.Web)
             {
-                throw new AppValidationException("The given order can'be flagged");
+                toReturn.Add(new MessageInfo() { Message = "The given order can'be flagged" });
+            }
+            return toReturn;
+        }
+
+        public async Task<bool> UpdateHealthwiseOrderWithValidationAsync(int orderId, bool isHealthwise)
+        {
+            var order = await this.SelectAsync(orderId);
+            var messages = ValidateUpdateHealthwiseOrder(order);
+            if(messages.Count>0)
+            {
+                throw new AppValidationException(messages);
             }
 
+            return await UpdateHealthwiseOrderInnerAsync(order, isHealthwise);
+        }
+
+        public async Task<bool> UpdateHealthwiseOrderAsync(int orderId, bool isHealthwise)
+        {
+            var order = await this.SelectAsync(orderId);
+            var messages = ValidateUpdateHealthwiseOrder(order);
+            if (messages.Count > 0)
+            {
+                return false;
+            }
+
+            return await UpdateHealthwiseOrderInnerAsync(order, isHealthwise);
+        }
+
+        private async Task<bool> UpdateHealthwiseOrderInnerAsync(OrderDynamic order, bool isHealthwise)
+        {
             if (!isHealthwise)
             {
-                _healthwiseOrderRepositoryAsync.Delete(orderId);
+                _healthwiseOrderRepositoryAsync.Delete(order.Id);
             }
             else
             {
-                HealthwiseOrder healthwiseOrder = (await _healthwiseOrderRepositoryAsync.Query(p => p.Id == orderId).SelectAsync(false)).FirstOrDefault();
+                HealthwiseOrder healthwiseOrder = (await _healthwiseOrderRepositoryAsync.Query(p => p.Id == order.Id).SelectAsync(false)).FirstOrDefault();
                 if (healthwiseOrder == null)
                 {
                     var maxCount = _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount;
@@ -747,7 +776,7 @@ namespace VitalChoice.Business.Services.Orders
                         {
                             healthwiseOrder = new HealthwiseOrder()
                             {
-                                Id = orderId,
+                                Id = order.Id,
                                 IdHealthwisePeriod = period.Id
                             };
                             _healthwiseOrderRepositoryAsync.Insert(healthwiseOrder);
@@ -763,12 +792,13 @@ namespace VitalChoice.Business.Services.Orders
                         period.EndDate = period.StartDate.AddYears(1);
                         period.HealthwiseOrders = new List<HealthwiseOrder>()
                         {
-                            new HealthwiseOrder() { Id=orderId }
+                            new HealthwiseOrder() { Id=order.Id }
                         };
                         _healthwisePeriodRepositoryAsync.InsertGraph(period);
                     }
                 }
             }
+
             return true;
         }
 

@@ -135,7 +135,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<bool>> MarkOrder(int id, [FromBody] object model)
         {
-            return await _orderService.UpdateHealthwiseOrderAsync(id, true);
+            return await _orderService.UpdateHealthwiseOrderWithValidationAsync(id, true);
         }
 
         [HttpPost]
