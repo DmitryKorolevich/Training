@@ -18,13 +18,13 @@ using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Content.ContentProcessors
 {
-    public class ProductCategoryParameters : ProcessorModel<ProductCategoryContent>
+    public class ProductCategoryParameters
     {
         public IList<CustomerTypeCode> CustomerTypeCodes { get; set; }
         public bool Preview { get; set; }
     }
 
-    public class ProductCategoryProcessor : ContentProcessor<TtlCategoryModel, ProductCategoryParameters>
+    public class ProductCategoryProcessor : ContentProcessor<TtlCategoryModel, ProductCategoryParameters, ProductCategoryContent>
     {
         private readonly IProductCategoryService _productCategoryService;
         private readonly IRepositoryAsync<ProductCategoryContent> _productCategoryRepository;
@@ -46,17 +46,17 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             _productRepository = productRepository;
         }
 
-        public override async Task<TtlCategoryModel> ExecuteAsync(ProductCategoryParameters model)
+        protected override async Task<TtlCategoryModel> ExecuteAsync(ProcessorViewContext viewContext)
         {
-            if (model?.Model == null)
+            if (viewContext.Entity == null)
             {
                 throw new ApiException("Invalid category");
             }
 
             var targetStatuses = new List<RecordStatusCode>() { RecordStatusCode.Active };
-            if (model.Model.StatusCode == RecordStatusCode.NotActive)
+            if (viewContext.Entity.StatusCode == RecordStatusCode.NotActive)
             {
-                if (!model.Preview)
+                if (!viewContext.Parameters.Preview)
                 {
 					throw new ApiException("Category not found", HttpStatusCode.NotFound);
 				}
@@ -70,7 +70,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                         Statuses = targetStatuses
                     });
 
-            var subCategories = FindTargetCategory(rootCategory, model.Model.Id).SubCategories;
+            var subCategories = FindTargetCategory(rootCategory, viewContext.Entity.Id).SubCategories;
 
             var subCategoriesContent = new List<ProductCategoryContent>();
             foreach (var subCategory in subCategories)
@@ -84,7 +84,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
 
             var productIds =
                 (await
-                    _productToCategoryEcommerceRepository.Query(x => x.IdCategory == model.Model.Id).SelectAsync(false))
+                    _productToCategoryEcommerceRepository.Query(x => x.IdCategory == viewContext.Entity.Id).SelectAsync(false))
                     .Select(x => x.IdProduct).ToList();
 
             IList<VProductSku> products = null;
@@ -101,11 +101,11 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             var rootNavCategory =
                 await _productCategoryService.GetLiteCategoriesTreeAsync(rootCategory, new ProductCategoryLiteFilter()
                 {
-                    Visibility = model.CustomerTypeCodes,
+                    Visibility = viewContext.Parameters.CustomerTypeCodes,
                     Statuses = targetStatuses
                 });
 
-            return PopulateCategoryTemplateModel(model.Model, subCategoriesContent, products, productContents, rootNavCategory);
+            return PopulateCategoryTemplateModel(viewContext.Entity, subCategoriesContent, products, productContents, rootNavCategory);
         }
 
         private ProductCategory FindTargetCategory(ProductCategory root, int idToFind)

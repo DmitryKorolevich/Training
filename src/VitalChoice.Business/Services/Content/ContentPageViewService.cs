@@ -26,12 +26,11 @@ using VitalChoice.Interfaces.Services.Content;
 
 namespace VitalChoice.Business.Services.Content
 {
-	public class ContentPageViewService : ContentViewService<ContentPage>, IContentPageViewService
+	public class ContentPageViewService : ContentViewService<ContentPage, ContentServiceModel>, IContentPageViewService
     {
         public ContentPageViewService(ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider,
-	        IContentProcessor<ContentPage, ProcessorModel> defaultProcessor,
-	        IContentProcessorService processorService)
-	        : base(templatesCache, loggerProvider, defaultProcessor, processorService)
+            IContentProcessorService processorService, IRepositoryAsync<ContentPage> contentRepository,
+            IObjectMapper<ContentServiceModel> mapper) : base(templatesCache, loggerProvider, processorService, contentRepository, mapper)
         {
         }
 

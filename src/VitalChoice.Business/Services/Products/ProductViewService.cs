@@ -1,17 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 using System.Threading.Tasks;
-using VitalChoice.Business.Services.Content.ContentProcessors;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.ContentProcessing.Interfaces;
-using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Data.Repositories.Customs;
-using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Infrastructure.Cache;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -19,36 +11,61 @@ using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
-using Microsoft.Extensions.Logging;
-using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VitalChoice.Business.Services.Products
 {
-	public class ProductViewService : ContentViewService<ProductContent>, IProductViewService
-	{
+    public class ProductViewForCustomerModel : ContentServiceModel
+    {
+        public IList<CustomerTypeCode> CustomerTypeCodes { get; set; }
+    }
+
+    public class ProductViewService : ContentViewService<ProductContent, ProductViewForCustomerModel>, IProductViewService
+    {
+        private readonly IProductService _productService;
+
         public ProductViewService(ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider,
-	        IContentProcessor<ProductContent, ProcessorModel> defaultProcessor,
-	        IContentProcessorService processorService)
-	        : base(templatesCache, loggerProvider, defaultProcessor, processorService)
+            IContentProcessorService processorService, IRepositoryAsync<ProductContent> contentRepository,
+            IObjectMapper<ProductViewForCustomerModel> mapper, IProductService productService)
+            : base(templatesCache, loggerProvider, processorService, contentRepository, mapper)
         {
+            _productService = productService;
         }
 
-	    #region Public
+        protected override ContentViewModel CreateResult(string generatedHtml, ContentViewContext<ProductContent> viewContext)
+        {
+            var result = base.CreateResult(generatedHtml, viewContext);
+            var title = viewContext.Entity.ContentItem.Title;
+            ProductDynamic productDynamic = viewContext.Parameters.Product;
+            if (productDynamic != null)
+            {
+                result.Title = !string.IsNullOrWhiteSpace(title)
+                    ? title
+                    : $"{productDynamic.Name} | {productDynamic.Data.SubTitle}";
+            }
+            return result;
+        }
 
-	    public Task<ContentViewModel> GetProductPageContentAsync(IList<CustomerTypeCode> customerTypeCodes,
-	        Dictionary<string, object> parameters)
-	    {
-	        var paramProperty =
-	            typeof (ProductCategoryParameters)
-	                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-	                .FirstOrDefault(p => p.PropertyType == typeof (IList<CustomerTypeCode>));
-	        if (paramProperty != null)
-	        {
-	            parameters.Add(paramProperty.Name, customerTypeCodes);
-	        }
-	        return GetContentAsync(parameters);
-	    }
+        protected override async Task<ContentViewContext<ProductContent>> GetDataInternal(ProductViewForCustomerModel model,
+            IDictionary<string, object> queryData)
+        {
+            var viewContext = await base.GetDataInternal(model, queryData);
+            
+            //NOTE: Set Parameters for processors and CreateResult here.
+            viewContext.Parameters.Product = _productService.SelectAsync(viewContext.Entity.Id, true);
 
-		#endregion
+            return viewContext;
+        }
+
+        #region Public
+
+        public Task<ContentViewModel> GetProductPageContentAsync(IList<CustomerTypeCode> customerTypeCodes,
+            Dictionary<string, object> parameters)
+        {
+            parameters.Add("CustomerTypeCodes", customerTypeCodes);
+            return GetContentAsync(parameters);
+        }
+
+        #endregion
     }
 }

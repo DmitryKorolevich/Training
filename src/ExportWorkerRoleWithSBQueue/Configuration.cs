@@ -328,7 +328,6 @@ namespace ExportWorkerRoleWithSBQueue
                 .AsSelf()
                 .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>());
             builder.RegisterProcessors(typeof(IContentProcessor).GetTypeInfo().Assembly);
-            builder.RegisterProcessors(typeof(ProductCategoryDefaultProcessor).GetTypeInfo().Assembly);
             builder.RegisterType<TaxService>().As<ITaxService>();
             builder.RegisterType<AddressService>().As<IAddressService>();
             builder.RegisterType<AvalaraTax>().As<IAvalaraTax>();

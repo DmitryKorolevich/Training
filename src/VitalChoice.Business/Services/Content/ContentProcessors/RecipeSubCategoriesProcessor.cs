@@ -19,11 +19,11 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             _contentCategoryRepositoryAsync = contentCategoryRepositoryAsync;
         }
 
-        public override Task<List<ContentCategory>> ExecuteAsync(RecipeParameters model)
+        protected override Task<List<ContentCategory>> ExecuteAsync(ProcessorViewContext viewContext)
         {
             return
                 _contentCategoryRepositoryAsync.Query(
-                    p => p.ParentId == model.IdCategory && p.StatusCode == RecordStatusCode.Active)
+                    p => p.ParentId == viewContext.Parameters.IdCategory && p.StatusCode == RecordStatusCode.Active)
                     .OrderBy(query => query.OrderBy(p => p.Order))
                     .SelectAsync(false);
         }

@@ -11,7 +11,6 @@ namespace VitalChoice.ContentProcessing.Helpers
     {
         public static ContainerBuilder RegisterContentBase(this ContainerBuilder builder)
         {
-            builder.RegisterGeneric(typeof(GetContentProcessor<,>)).As(typeof(IContentProcessor<,>));
             builder.RegisterType<ContentProcessorService>().As<IContentProcessorService>();
             return builder;
         }

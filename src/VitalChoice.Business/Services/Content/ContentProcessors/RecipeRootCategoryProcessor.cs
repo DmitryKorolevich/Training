@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.ContentProcessing.Base;
@@ -10,16 +11,22 @@ using VitalChoice.Infrastructure.Domain.Content.Base;
 
 namespace VitalChoice.Business.Services.Content.ContentProcessors
 {
-    public class RecipeRootCategoryProcessor : ContentProcessor<ContentCategory, ProcessorModel>
+    public class RecipeRootModel
+    {
+
+    }
+
+    public class RecipeRootCategoryProcessor : ContentProcessor<ContentCategory, RecipeRootModel>
     {
         private readonly IReadRepositoryAsync<ContentCategory> _contentRepositoryAsync;
 
-        public RecipeRootCategoryProcessor(IObjectMapper<ProcessorModel> mapper, IReadRepositoryAsync<ContentCategory> contentRepositoryAsync) : base(mapper)
+        public RecipeRootCategoryProcessor(IObjectMapper<RecipeRootModel> mapper,
+            IReadRepositoryAsync<ContentCategory> contentRepositoryAsync) : base(mapper)
         {
             _contentRepositoryAsync = contentRepositoryAsync;
         }
 
-        public override async Task<ContentCategory> ExecuteAsync(ProcessorModel model)
+        protected override async Task<ContentCategory> ExecuteAsync(ProcessorViewContext viewContext)
         {
             var recipeCategories =
                 await

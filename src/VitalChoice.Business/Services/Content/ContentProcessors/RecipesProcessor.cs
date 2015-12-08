@@ -4,11 +4,12 @@ using VitalChoice.ContentProcessing.Base;
 using VitalChoice.Data.Repositories;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Content.Recipes;
 
 namespace VitalChoice.Business.Services.Content.ContentProcessors
 {
-    public class RecipeParameters : ProcessorModel
+    public class RecipeParameters
     {
         public int IdCategory { get; set; }
     }
@@ -23,10 +24,10 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             _recipeToContentCategoryRepositoryAsync = recipeToContentCategoryRepositoryAsync;
         }
 
-        public override Task<List<Recipe>> ExecuteAsync(RecipeParameters model)
+        protected override Task<List<Recipe>> ExecuteAsync(ProcessorViewContext viewContext)
         {
             return
-                _recipeToContentCategoryRepositoryAsync.Query(p => p.ContentCategoryId == model.IdCategory)
+                _recipeToContentCategoryRepositoryAsync.Query(p => p.ContentCategoryId == viewContext.Parameters.IdCategory)
                     .Include(p => p.Recipe)
                     .Where(p => p.Recipe.StatusCode == RecordStatusCode.Active)
                     .SelectAsync(item => item.Recipe, false);

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Autofac.Features.Indexed;
 using VitalChoice.ContentProcessing.Interfaces;
+using VitalChoice.Infrastructure.Domain.Content.Base;
 
 namespace VitalChoice.ContentProcessing.Base
 {
@@ -24,20 +25,20 @@ namespace VitalChoice.ContentProcessing.Base
             return null;
         }
 
-        public async Task<IDictionary<string, object>> ExecuteAsync(string processorName, IDictionary<string, object> queryData)
+        public async Task<IDictionary<string, object>> ExecuteAsync(string processorName, ContentViewContext viewContext)
         {
             var modelContainer = new Dictionary<string, object>();
-            await ExecuteAsync(processorName, queryData, modelContainer);
+            await ExecuteAsync(processorName, viewContext, modelContainer);
             return modelContainer;
         }
 
         public async Task ExecuteAsync(string processorName,
-            IDictionary<string, object> queryData, IDictionary<string, object> modelContainer)
+            ContentViewContext viewContext, IDictionary<string, object> modelContainer)
         {
             var processor = GetContentProcessorByName(processorName);
             if (processor != null)
             {
-                var processorResult = await processor.ExecuteUntypedAsync(queryData);
+                var processorResult = await processor.ExecuteUntypedAsync(viewContext);
                 lock (modelContainer)
                 {
                     if (modelContainer.ContainsKey(processor.ResultName))

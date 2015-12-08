@@ -22,52 +22,62 @@ using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
 using Microsoft.Extensions.Logging;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Business.Services.Products
 {
-	public class CategoryViewService : ContentViewService<ProductCategoryContent>, ICategoryViewService
+    public class CategoryViewService : ContentViewService<ProductCategoryContent, ProductViewForCustomerModel>, ICategoryViewService
 	{
+
+        private readonly IEcommerceRepositoryAsync<ProductCategory> _productCategoryEcommerceRepository;
+
         public CategoryViewService(ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider,
-	        ProductCategoryDefaultProcessor defaultProcessor,
-	        IContentProcessorService processorService)
-	        : base(templatesCache, loggerProvider, defaultProcessor, processorService)
+            IContentProcessorService processorService, IRepositoryAsync<ProductCategoryContent> contentRepository,
+            IObjectMapper<ProductViewForCustomerModel> mapper, IEcommerceRepositoryAsync<ProductCategory> productCategoryEcommerceRepository)
+            : base(templatesCache, loggerProvider, processorService, contentRepository, mapper)
         {
+            _productCategoryEcommerceRepository = productCategoryEcommerceRepository;
         }
 
-	    #region Public
+        #region Public
 
-	    protected override async Task<ProductCategoryContent> GetData(IDictionary<string, object> queryData)
-	    {
-	        var productCategory = await base.GetData(queryData);
-            if (productCategory == null)
+        protected override async Task<ContentViewContext<ProductCategoryContent>> GetDataInternal(ProductViewForCustomerModel model,
+            IDictionary<string, object> parameters)
+        {
+            if (!string.IsNullOrWhiteSpace(model.Url))
             {
-                Logger.LogInformation("The category could not be found {" + queryData.FormatDictionary() + "}");
-                //return explicitly null to see the real result of operation and don't look over code above regarding the real value
-                return null;
+                var baseContext = await base.GetDataInternal(model, parameters);
+                if (baseContext != null)
+                {
+                    baseContext.Entity.ProductCategory =
+                        await
+                            _productCategoryEcommerceRepository.Query(c => c.Id == baseContext.Entity.Id)
+                                .SelectFirstOrDefaultAsync(false);
+                }
+                return baseContext;
             }
-            if (productCategory.ContentItem == null)
-            {
-                Logger.LogError("The category {0} have no template", productCategory.Url);
-                return null;
-            }
-            return productCategory;
-	    }
 
-	    public Task<ContentViewModel> GetProductCategoryContentAsync(IList<CustomerTypeCode> customerTypeCodes,
+            var categoryEcommerce = await
+                _productCategoryEcommerceRepository.Query(p => !p.ParentId.HasValue)
+                    .SelectFirstOrDefaultAsync(false);
+            if (categoryEcommerce == null)
+                return null;
+            var productCategory =
+                await
+                    BuildQuery(ContentRepository.Query(p => p.Id == categoryEcommerce.Id))
+                        .SelectFirstOrDefaultAsync(false);
+            productCategory.ProductCategory = categoryEcommerce;
+            return new ContentViewContext<ProductCategoryContent>(parameters, productCategory);
+        }
+
+        public Task<ContentViewModel> GetProductCategoryContentAsync(IList<CustomerTypeCode> customerTypeCodes,
 	        Dictionary<string, object> parameters)
 	    {
-	        var paramProperty =
-	            typeof (ProductCategoryParameters)
-	                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-	                .FirstOrDefault(p => p.PropertyType == typeof (IList<CustomerTypeCode>));
-	        if (paramProperty != null)
-	        {
-	            parameters.Add(paramProperty.Name, customerTypeCodes);
-	        }
+	        parameters.Add("CustomerTypeCodes", customerTypeCodes);
 	        return GetContentAsync(parameters);
 	    }
 
-		#endregion
-    }
+	    #endregion
+	}
 }

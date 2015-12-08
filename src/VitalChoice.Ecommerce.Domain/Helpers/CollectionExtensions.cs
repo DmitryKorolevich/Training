@@ -177,7 +177,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             return left.Where(m => searchIn.Contains(leftKeySelector(m)));
         }
 
-        public static void CopyTo<T1, T2>(this IDictionary<T1, T2> src, IDictionary<T1, T2> dest)
+        public static void CopyToDictionary<T1, T2>(this IDictionary<T1, T2> src, IDictionary<T1, T2> dest)
         {
             foreach (var pair in src)
             {
