@@ -82,7 +82,7 @@ using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Business.Services.Healthwise;
 using VitalChoice.Interfaces.Services.Healthwise;
 using Microsoft.Extensions.Logging;
-using VitalChoice.Infrastructure.Ecommerce;
+using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Infrastructure.ServiceBus;
 
 namespace VitalChoice.Core.DependencyInjection
@@ -292,6 +292,7 @@ namespace VitalChoice.Core.DependencyInjection
                 LoggerService.Build(applicationEnvironment.ApplicationBasePath,
                     configuration.GetSection("App:LogPath").Value))
                 .As<ILoggerProviderExtended>().SingleInstance();
+            builder.Register(cc => cc.Resolve<ILoggerProviderExtended>().Factory).As<ILoggerFactory>();
 
             //TODO: omit ILogger override in config parameter
             //builder.Register((cc, pp) => cc.Resolve<ILoggerProviderExtended>().CreateLogger("Root")).As<ILogger>();

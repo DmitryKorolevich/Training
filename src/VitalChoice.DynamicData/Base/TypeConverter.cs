@@ -11,14 +11,14 @@ namespace VitalChoice.DynamicData.Base
 {
     public class TypeConverter : ITypeConverter
     {
+        private readonly IObjectMapperFactory _mapperFactory;
         private readonly IIndex<Type, IObjectMapper> _mappers;
-        private readonly IModelConverterService _converterService;
         private readonly Dictionary<object, object> _objects = new Dictionary<object, object>();
 
         public TypeConverter(IIndex<Type, IObjectMapper> mappers, IModelConverterService converterService)
         {
             _mappers = mappers;
-            _converterService = converterService;
+            _mapperFactory = new ObjectMapperFactory(this, converterService);
         }
 
         public static object ConvertFromModelObject(Type sourceType, object obj)
@@ -50,9 +50,9 @@ namespace VitalChoice.DynamicData.Base
             {
                 return Enum.Parse(unwrappedDest, obj.ToString());
             }
-            if (sourceType == typeof(long) && (destType == typeof(int) || destType == typeof(int?)))
+            if (sourceType == typeof (long) && (destType == typeof (int) || destType == typeof (int?)))
             {
-                return (int)((long)obj);
+                return (int) ((long) obj);
             }
 
             var unwrappedSrc = sourceType.UnwrapNullable();
@@ -94,8 +94,15 @@ namespace VitalChoice.DynamicData.Base
                 }
                 return results;
             }
-            var mapper = ObjectMapper.CreateObjectMapper(this, _converterService, destType);
-            return mapper?.FromModel(sourceType, obj);
+            try
+            {
+                var mapper = _mapperFactory.CreateMapper(destType);
+                return mapper.FromModel(sourceType, obj);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public object ConvertToModel(Type sourceType, Type destType, object obj)
@@ -112,9 +119,9 @@ namespace VitalChoice.DynamicData.Base
             {
                 return Enum.Parse(unwrappedDest, obj.ToString());
             }
-            if (sourceType == typeof(long) && (destType==typeof(int) || destType == typeof(int?)))
+            if (sourceType == typeof (long) && (destType == typeof (int) || destType == typeof (int?)))
             {
-                return (int)((long)obj);
+                return (int) ((long) obj);
             }
 
             IObjectMapper objectMapper;
@@ -135,22 +142,29 @@ namespace VitalChoice.DynamicData.Base
                 }
                 else if (_mappers.TryGetValue(srcElementType, out itemMapper))
                 {
-                    foreach (var item in (IEnumerable)obj)
+                    foreach (var item in (IEnumerable) obj)
                     {
                         results.Add(itemMapper.ToModel(item, destElementType));
                     }
                 }
                 else
                 {
-                    foreach (var item in (IEnumerable)obj)
+                    foreach (var item in (IEnumerable) obj)
                     {
                         results.Add(ConvertToModel(srcElementType, destElementType, item));
                     }
                 }
                 return results;
             }
-            var mapper = ObjectMapper.CreateObjectMapper(this, _converterService, sourceType);
-            return mapper?.ToModel(obj, destType);
+            try
+            {
+                var mapper = _mapperFactory.CreateMapper(sourceType);
+                return mapper.ToModel(obj, destType);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public object Clone(object obj, Type objectType, Type baseTypeToMemberwiseClone)
@@ -170,7 +184,7 @@ namespace VitalChoice.DynamicData.Base
             var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
             foreach (var pair in objectCache.Properties)
             {
-                Type propertyElementType = pair.Value.PropertyType.TryGetElementType(typeof(ICollection<>));
+                Type propertyElementType = pair.Value.PropertyType.TryGetElementType(typeof (ICollection<>));
                 if (pair.Value.PropertyTypeInfo.IsSubclassOf(baseTypeToMemberwiseClone))
                 {
                     var value = Clone(pair.Value.Get?.Invoke(obj), pair.Value.PropertyType, baseTypeToMemberwiseClone);

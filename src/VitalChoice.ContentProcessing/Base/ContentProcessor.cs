@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using VitalChoice.ContentProcessing.Interfaces;
 using VitalChoice.DynamicData.Interfaces;
@@ -10,14 +11,16 @@ namespace VitalChoice.ContentProcessing.Base
     {
         protected class ProcessorViewContext
         {
-            public ProcessorViewContext(TModel parameters, ContentDataItem entity)
+            public ProcessorViewContext(TModel parameters, ContentDataItem entity, ClaimsPrincipal user)
             {
                 Parameters = parameters;
                 Entity = entity;
+                User = user;
             }
 
             public TModel Parameters { get; }
             public ContentDataItem Entity { get; }
+            public ClaimsPrincipal User { get; }
         }
 
         private readonly IObjectMapper<TModel> _mapper;
@@ -32,7 +35,7 @@ namespace VitalChoice.ContentProcessing.Base
         public Task<TResult> ExecuteAsync(ContentViewContext viewContext)
         {
             return
-                ExecuteAsync(new ProcessorViewContext((TModel) _mapper.FromDictionary(viewContext.Parameters, false), viewContext.BaseEntity));
+                ExecuteAsync(new ProcessorViewContext((TModel) _mapper.FromDictionary(viewContext.Parameters, false), viewContext.BaseEntity, viewContext.User));
         }
 
         public async Task<object> ExecuteUntypedAsync(ContentViewContext viewContext)
@@ -40,7 +43,7 @@ namespace VitalChoice.ContentProcessing.Base
             return
                 await
                     ExecuteAsync(new ProcessorViewContext((TModel) _mapper.FromDictionary(viewContext.Parameters, false),
-                        viewContext.BaseEntity));
+                        viewContext.BaseEntity, viewContext.User));
         }
 
         public abstract string ResultName { get; }
@@ -51,14 +54,16 @@ namespace VitalChoice.ContentProcessing.Base
     {
         protected class ProcessorViewContext
         {
-            public ProcessorViewContext(TModel parameters, TEntity entity)
+            public ProcessorViewContext(TModel parameters, TEntity entity, ClaimsPrincipal user)
             {
                 Parameters = parameters;
                 Entity = entity;
+                User = user;
             }
 
             public TModel Parameters { get; }
             public TEntity Entity { get; }
+            public ClaimsPrincipal User { get; }
         }
 
         private readonly IObjectMapper<TModel> _mapper;
@@ -74,7 +79,7 @@ namespace VitalChoice.ContentProcessing.Base
         {
             return
                 ExecuteAsync(new ProcessorViewContext((TModel) _mapper.FromDictionary(viewContext.Parameters, false),
-                    (TEntity) viewContext.BaseEntity));
+                    (TEntity) viewContext.BaseEntity, viewContext.User));
         }
 
         public async Task<object> ExecuteUntypedAsync(ContentViewContext viewContext)
@@ -82,7 +87,7 @@ namespace VitalChoice.ContentProcessing.Base
             return
                 await
                     ExecuteAsync(new ProcessorViewContext((TModel) _mapper.FromDictionary(viewContext.Parameters, false),
-                        (TEntity) viewContext.BaseEntity));
+                        (TEntity) viewContext.BaseEntity, viewContext.User));
         }
 
         public abstract string ResultName { get; }

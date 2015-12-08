@@ -6,9 +6,10 @@ using Microsoft.Extensions.Logging;
 using Templates;
 using Templates.Exceptions;
 using VitalChoice.ContentProcessing.Interfaces;
-using VitalChoice.Interfaces.Services;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Claims;
+using Microsoft.AspNet.Mvc;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.DynamicData.Interfaces;
@@ -27,77 +28,33 @@ namespace VitalChoice.ContentProcessing.Base
         private readonly IContentProcessorService _processorService;
         protected readonly IRepositoryAsync<TEntity> ContentRepository;
         private readonly IObjectMapper<TParametersModel> _mapper;
+        private readonly IObjectMapperFactory _mapperFactory;
         protected readonly ILogger Logger;
 
         protected ContentViewService(
-            ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider, IContentProcessorService processorService,
-            IRepositoryAsync<TEntity> contentRepository, IObjectMapper<TParametersModel> mapper)
+            ITtlGlobalCache templatesCache, ILogger logger, IContentProcessorService processorService,
+            IRepositoryAsync<TEntity> contentRepository, IObjectMapper<TParametersModel> mapper, IObjectMapperFactory mapperFactory)
         {
             _templatesCache = templatesCache;
             _processorService = processorService;
             ContentRepository = contentRepository;
             _mapper = mapper;
-            Logger = loggerProvider.CreateLoggerDefault();
+            Logger = logger;
+            _mapperFactory = mapperFactory;
         }
 
         public virtual string DefaultModelName => "Model";
 
-        protected virtual Expression<Func<TEntity, bool>> FilterExpression(TParametersModel model) =>
-            p => p.Url == model.Url && p.StatusCode != RecordStatusCode.Deleted;
-
-        protected virtual IQueryFluent<TEntity> BuildQuery(IQueryFluent<TEntity> query)
+        public async Task<ContentViewModel> GetContentAsync(ActionContext context, ActionBindingContext bindingContext, ClaimsPrincipal user,
+            object additionalParameters)
         {
-            return query.Include(p => p.MasterContentItem)
-                .ThenInclude(p => p.MasterContentItemToContentProcessors)
-                .ThenInclude(p => p.ContentProcessor)
-                .Include(p => p.ContentItem)
-                .ThenInclude(p => p.ContentItemToContentProcessors)
-                .ThenInclude(p => p.ContentProcessor);
-        }
-
-        protected virtual async Task<ContentViewContext<TEntity>> GetDataInternal(TParametersModel model,
-            IDictionary<string, object> parameters)
-        {
-            if (!string.IsNullOrEmpty(model.Url))
+            IDictionary<string, object> parameters = null;
+            if (additionalParameters != null)
             {
-                var entity = await BuildQuery(ContentRepository.Query(FilterExpression(model))).SelectFirstOrDefaultAsync(false);
-                return new ContentViewContext<TEntity>(parameters, entity);
+                var mapper = _mapperFactory.CreateMapper(additionalParameters.GetType());
+                parameters = mapper.ToDictionary(additionalParameters);
             }
-            return new ContentViewContext<TEntity>(parameters, null);
-        }
-
-        protected async Task<ContentViewContext<TEntity>> GetData(IDictionary<string, object> queryData)
-        {
-            var viewContext = await GetDataInternal((TParametersModel) _mapper.FromDictionary(queryData, false), queryData);
-            if (viewContext.Entity == null)
-            {
-                Logger.LogInformation("The item could not be found {" + queryData.FormatDictionary() + "}");
-                //return explicitly null to see the real result of operation and don't look over code above regarding the real value
-                return null;
-            }
-            if (viewContext.Entity.ContentItem == null)
-            {
-                Logger.LogError("The item have no template.");
-                return null;
-            }
-            return viewContext;
-        }
-
-        protected virtual ContentViewModel CreateResult(string generatedHtml, ContentViewContext<TEntity> viewContext)
-        {
-            var entity = viewContext.Entity;
-            return new ContentViewModel
-            {
-                Body = generatedHtml,
-                Title = entity.ContentItem.Title,
-                MetaDescription = entity.ContentItem.MetaDescription,
-                MetaKeywords = entity.ContentItem.MetaKeywords,
-            };
-        }
-
-        public async Task<ContentViewModel> GetContentAsync(IDictionary<string, object> queryData)
-        {
-            var viewContext = await GetData(queryData);
+            var viewContext = await GetData(GetParameters(context, bindingContext, parameters), user);
             var contentEntity = viewContext.Entity;
             ITtlTemplate template;
             try
@@ -142,6 +99,82 @@ namespace VitalChoice.ContentProcessing.Base
             var generatedHtml = template.Generate(templatingModel);
 
             return CreateResult(generatedHtml, viewContext);
+        }
+
+        protected virtual Expression<Func<TEntity, bool>> FilterExpression(TParametersModel model) =>
+            p => p.Url == model.Url && p.StatusCode != RecordStatusCode.Deleted;
+
+        protected virtual IQueryFluent<TEntity> BuildQuery(IQueryFluent<TEntity> query)
+        {
+            return query.Include(p => p.MasterContentItem)
+                .ThenInclude(p => p.MasterContentItemToContentProcessors)
+                .ThenInclude(p => p.ContentProcessor)
+                .Include(p => p.ContentItem)
+                .ThenInclude(p => p.ContentItemToContentProcessors)
+                .ThenInclude(p => p.ContentProcessor);
+        }
+
+        protected virtual async Task<ContentViewContext<TEntity>> GetDataInternal(TParametersModel model,
+            IDictionary<string, object> parameters, ClaimsPrincipal user)
+        {
+            if (!string.IsNullOrEmpty(model.Url))
+            {
+                var entity = await BuildQuery(ContentRepository.Query(FilterExpression(model))).SelectFirstOrDefaultAsync(false);
+                return new ContentViewContext<TEntity>(parameters, entity, user);
+            }
+            return new ContentViewContext<TEntity>(parameters, null, user);
+        }
+
+        protected async Task<ContentViewContext<TEntity>> GetData(IDictionary<string, object> queryData, ClaimsPrincipal user)
+        {
+            var viewContext = await GetDataInternal((TParametersModel) _mapper.FromDictionary(queryData, false), queryData, user);
+            if (viewContext.Entity == null)
+            {
+                Logger.LogInformation("The item could not be found {" + queryData.FormatDictionary() + "}");
+                //return explicitly null to see the real result of operation and don't look over code above regarding the real value
+                return null;
+            }
+            if (viewContext.Entity.ContentItem == null)
+            {
+                Logger.LogError("The item have no template.");
+                return null;
+            }
+            return viewContext;
+        }
+
+        protected virtual ContentViewModel CreateResult(string generatedHtml, ContentViewContext<TEntity> viewContext)
+        {
+            var entity = viewContext.Entity;
+            return new ContentViewModel
+            {
+                Body = generatedHtml,
+                Title = entity.ContentItem.Title,
+                MetaDescription = entity.ContentItem.MetaDescription,
+                MetaKeywords = entity.ContentItem.MetaKeywords,
+            };
+        }
+
+        protected virtual IDictionary<string, object> GetParameters(ActionContext context, ActionBindingContext bindingContext,
+            IDictionary<string, object> parameters = null)
+        {
+            if (parameters == null)
+                parameters = new Dictionary<string, object>();
+            foreach (var actionParam in context.ActionDescriptor.Parameters)
+            {
+                var values = bindingContext.ValueProvider.GetValue(actionParam.Name).Values;
+                foreach (var stringValue in values)
+                {
+                    parameters.Add(actionParam.Name, stringValue);
+                }
+            }
+            foreach (var queryParam in context.HttpContext.Request.Query)
+            {
+                if (!parameters.ContainsKey(queryParam.Key))
+                {
+                    parameters.Add(queryParam.Key, queryParam.Value.FirstOrDefault());
+                }
+            }
+            return parameters;
         }
     }
 }

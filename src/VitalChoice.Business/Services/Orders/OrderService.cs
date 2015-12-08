@@ -8,6 +8,7 @@ using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Business.Queries.Orders;
 using VitalChoice.Business.Repositories;
 using VitalChoice.Business.Services.Dynamic;
+using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Customs;
@@ -39,7 +40,6 @@ using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
-using VitalChoice.Infrastructure.Ecommerce;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Affiliates;
 using VitalChoice.Interfaces.Services.Customers;
@@ -280,17 +280,20 @@ namespace VitalChoice.Business.Services.Orders
             {
                 try
                 {
+                    if (!await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(model.PaymentMethod))
+                    {
+                        throw new ApiException("Cannot update order payment info on remote.");
+                    }
                     var entity = await base.InsertAsync(model, uow);
                     model.IdAddedBy = model.IdEditedBy;
                     await UpdateAffiliateOrderPayment(model, uow);
                     await UpdateHealthwiseOrder(model, uow);
                     model.PaymentMethod.IdOrder = model.Id;
-                    await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(model.PaymentMethod);
 
                     transaction.Commit();
                     return entity;
                 }
-                catch (Exception e)
+                catch
                 {
                     transaction.Rollback();
                     throw;
@@ -304,6 +307,13 @@ namespace VitalChoice.Business.Services.Orders
             {
                 try
                 {
+                    foreach (var model in models)
+                    {
+                        if (!await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(model.PaymentMethod))
+                        {
+                            throw new ApiException("Cannot update order payment info on remote.");
+                        }
+                    }
                     var entities = await base.InsertRangeAsync(models, uow);
                     foreach (var model in models)
                     {
@@ -312,14 +322,12 @@ namespace VitalChoice.Business.Services.Orders
                         await UpdateHealthwiseOrder(model, uow);
 
                         model.PaymentMethod.IdOrder = model.Id;
-                        await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(model.PaymentMethod);
-
                     }
 
                     transaction.Commit();
                     return entities;
                 }
-                catch (Exception e)
+                catch
                 {
                     transaction.Rollback();
                     throw;
@@ -347,7 +355,7 @@ namespace VitalChoice.Business.Services.Orders
                     return entity;
 
                 }
-                catch (Exception e)
+                catch
                 {
                     transaction.Rollback();
                     throw;
@@ -385,7 +393,7 @@ namespace VitalChoice.Business.Services.Orders
                     transaction.Commit();
                     return entities;
                 }
-                catch (Exception e)
+                catch
                 {
                     transaction.Rollback();
                     throw;

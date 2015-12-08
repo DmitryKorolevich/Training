@@ -11,21 +11,6 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.DynamicData.Base
 {
-    public static class ObjectMapper
-    {
-        public static IObjectMapper CreateObjectMapper(ITypeConverter typeConverter, IModelConverterService converterService,
-            Type objectType)
-        {
-            if (!objectType.GetTypeInfo().IsClass ||
-                objectType.GetConstructors().All(c => c.GetParameters().Length != 0))
-            {
-                return null;
-            }
-            var mapperType = typeof(ObjectMapper<>).MakeGenericType(objectType);
-            return (IObjectMapper)Activator.CreateInstance(mapperType, typeConverter, converterService);
-        }
-    }
-
     public class ObjectMapper<TObject> : IObjectMapper<TObject>
         where TObject : class, new()
     {

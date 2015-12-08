@@ -87,7 +87,7 @@ namespace VC.Public.Controllers
 	    [HttpGet]
         public async Task<IActionResult> Categories()
         {
-            var toReturn = await _categoryViewService.GetProductCategoryContentAsync(GetCategoryMenuAvailability(), GetParameters());
+            var toReturn = await _categoryViewService.GetContentAsync(ActionContext, BindingContext, User);
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
@@ -98,7 +98,7 @@ namespace VC.Public.Controllers
         [HttpGet]
         public async Task<IActionResult> Category(string url)
         {
-            var toReturn = await _categoryViewService.GetProductCategoryContentAsync(GetCategoryMenuAvailability(), GetParameters());
+            var toReturn = await _categoryViewService.GetContentAsync(ActionContext, BindingContext, User);
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
@@ -109,8 +109,8 @@ namespace VC.Public.Controllers
 		[HttpGet]
 		public async Task<IActionResult> Product(string url)
 		{
-			var toReturn = await _productViewService.GetProductPageContentAsync(GetCategoryMenuAvailability(), GetParameters());
-			if (toReturn != null)
+			var toReturn = await _productViewService.GetContentAsync(ActionContext, BindingContext, User);
+            if (toReturn != null)
 			{
 				return View("~/Views/Content/ProductPage.cshtml", new ContentPageViewModel(toReturn));
 			}

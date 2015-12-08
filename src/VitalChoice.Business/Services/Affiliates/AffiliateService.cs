@@ -19,6 +19,7 @@ using VitalChoice.Business.Queries.Customer;
 using VitalChoice.DynamicData.Helpers;
 using System.Globalization;
 using VitalChoice.Business.Queries.Affiliates;
+using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
@@ -35,7 +36,6 @@ using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
-using VitalChoice.Infrastructure.Ecommerce;
 
 namespace VitalChoice.Business.Services.Affiliates
 {
@@ -268,7 +268,7 @@ namespace VitalChoice.Business.Services.Affiliates
                     transaction.Commit();
                     return toReturn;
                 }
-                catch (Exception e)
+                catch
                 {
                     transaction.Rollback();
                     throw;
@@ -343,7 +343,7 @@ namespace VitalChoice.Business.Services.Affiliates
 
                     return affiliate;
                 }
-                catch (Exception e)
+                catch
                 {
                     if (appUser.Id > 0)
                     {
@@ -551,7 +551,7 @@ namespace VitalChoice.Business.Services.Affiliates
 
                         transaction.Commit();
                     }
-                    catch (Exception e)
+                    catch
                     {
                         transaction.Rollback();
                         throw;

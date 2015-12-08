@@ -4,7 +4,7 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 
-namespace VitalChoice.Infrastructure.Ecommerce
+namespace VitalChoice.Business.Services.Ecommerce
 {
     public class EcommerceDynamicServiceDecorator<TDynamic, TEntity> : EcommerceDynamicReadServiceDecorator<TDynamic, TEntity>,
         IDynamicServiceAsync<TDynamic, TEntity>

@@ -15,7 +15,6 @@ using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Domain.Transfer;
-using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Infrastructure.ServiceBus
 {

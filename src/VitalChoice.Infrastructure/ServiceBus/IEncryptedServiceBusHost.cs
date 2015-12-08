@@ -1,9 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
-using VitalChoice.Infrastructure.Domain.Transfer;
 
-namespace VitalChoice.Interfaces.Services
+namespace VitalChoice.Infrastructure.ServiceBus
 {
     public interface IEncryptedServiceBusHost : IDisposable
     {

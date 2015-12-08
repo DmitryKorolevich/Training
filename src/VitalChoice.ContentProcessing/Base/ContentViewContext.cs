@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Security.Claims;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Content.Base;
@@ -11,7 +12,7 @@ namespace VitalChoice.ContentProcessing.Base
     {
         private readonly ExpandoObject _parameters;
 
-        public ContentViewContext(IDictionary<string, object> parameters, ContentDataItem entity)
+        public ContentViewContext(IDictionary<string, object> parameters, ContentDataItem entity, ClaimsPrincipal user)
         {
             if (parameters == null)
                 throw new ArgumentNullException(nameof(parameters));
@@ -19,17 +20,19 @@ namespace VitalChoice.ContentProcessing.Base
             _parameters = new ExpandoObject();
             parameters.CopyToDictionary(_parameters);
             BaseEntity = entity;
+            User = user;
         }
 
         public dynamic Parameters => _parameters;
 
         public ContentDataItem BaseEntity { get; protected set; }
+        public ClaimsPrincipal User { get; }
     }
 
     public class ContentViewContext<T> : ContentViewContext
         where T : ContentDataItem
     {
-        public ContentViewContext(IDictionary<string, object> parameters, T entity) : base(parameters, entity)
+        public ContentViewContext(IDictionary<string, object> parameters, T entity, ClaimsPrincipal user) : base(parameters, entity, user)
         {
         }
 

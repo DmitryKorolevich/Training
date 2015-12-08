@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Interfaces.Services;
@@ -19,7 +20,6 @@ using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Data.Services;
 using VitalChoice.DynamicData.Helpers;
-using VitalChoice.Infrastructure.Ecommerce;
 
 namespace VitalChoice.Business.Services.Settings
 {

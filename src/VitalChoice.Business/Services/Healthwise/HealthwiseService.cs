@@ -157,7 +157,7 @@ namespace VitalChoice.Business.Services.Healthwise
                             transaction.Commit();
                         }
                     }
-                    catch (Exception e)
+                    catch
                     {
                         transaction.Rollback();
                         throw;
@@ -222,7 +222,6 @@ namespace VitalChoice.Business.Services.Healthwise
 
         public async Task<bool> MoveHealthwiseOrdersAsync(int idPeriod, ICollection<int> ids)
         {
-            bool toReturn = true;
             var period = (await _vHealthwisePeriodRepository.Query(p => p.Id == idPeriod).SelectAsync(false)).FirstOrDefault();
             if (period != null && !period.PaidDate.HasValue)
             {
@@ -262,7 +261,7 @@ namespace VitalChoice.Business.Services.Healthwise
                             await uow.SaveChangesAsync();
                             transaction.Commit();
                         }
-                        catch (Exception e)
+                        catch
                         {
                             transaction.Rollback();
                             throw;
@@ -270,7 +269,7 @@ namespace VitalChoice.Business.Services.Healthwise
                     }
                 }
             }
-            return toReturn;
+            return true;
         }
 
         public async Task<HealthwisePeriod> AddPeriodAsync(int idCustomer)

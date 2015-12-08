@@ -77,7 +77,7 @@ namespace VC.Public.Controllers
                     throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
                 }
             }
-            catch(AffiliatePendingException ex)
+            catch(AffiliatePendingException)
             {
                 return View("Pending");
             }

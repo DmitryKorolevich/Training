@@ -8,10 +8,11 @@
   "dependencies": {
     "VitalChoice.Infrastructure.Domain": "",
     "VitalChoice.DynamicData": "",
-    "VitalChoice.Interfaces": "",
     "VitalChoice.Infrastructure": "",
     "VitalChoice.Data": "",
-    "Autofac": "4.0.0-*"
+    "Autofac": "4.0.0-*",
+    "Microsoft.AspNet.Mvc.Abstractions": "6.0.0-*",
+    "Microsoft.AspNet.Mvc.Core": "6.0.0-*"
   },
   "frameworks": {
     "dnx451": { },

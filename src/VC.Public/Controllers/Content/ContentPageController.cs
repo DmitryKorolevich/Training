@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using VC.Public.Models;
 using VitalChoice.Infrastructure.Domain.Content.Base;
@@ -29,23 +30,25 @@ namespace VC.Public.Controllers.Content
 	    [HttpGet]
         public async Task<IActionResult> Categories()
         {
-            var toReturn = await _contentService.GetCategoryContentAsync(ContentType.ContentPageCategory, GetParameters());
-            if (toReturn != null)
-            {
-                return BaseView(new ContentPageViewModel(toReturn));
-            }
-            return BaseNotFoundView();
+            throw new NotImplementedException();
+            //var toReturn = await _contentService.GetCategoryContentAsync(ContentType.ContentPageCategory, GetParameters());
+            //if (toReturn != null)
+            //{
+            //    return BaseView(new ContentPageViewModel(toReturn));
+            //}
+            //return BaseNotFoundView();
         }
 
         [HttpGet]
         public async Task<IActionResult> Category(string url)
         {
-            var toReturn = await _contentService.GetCategoryContentAsync(ContentType.ContentPageCategory, GetParameters(), url);
-            if (toReturn != null)
-            {
-                return BaseView(new ContentPageViewModel(toReturn));
-            }
-            return BaseNotFoundView();
+            throw new NotImplementedException();
+            //var toReturn = await _contentService.GetCategoryContentAsync(ContentType.ContentPageCategory, GetParameters(), url);
+            //if (toReturn != null)
+            //{
+            //    return BaseView(new ContentPageViewModel(toReturn));
+            //}
+            //return BaseNotFoundView();
         }
 
         [HttpGet]
@@ -53,7 +56,7 @@ namespace VC.Public.Controllers.Content
         {
             //var result = await RenderPartialViewToString("~/Views/Help/ContactCustomerService.cshtml", null);
 
-            var toReturn = await _contentPageViewService.GetContentAsync(GetParameters());
+            var toReturn = await _contentPageViewService.GetContentAsync(ActionContext, BindingContext, User);
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));

@@ -19,34 +19,37 @@ namespace VC.Public.Controllers.Content
 	    [HttpGet]
         public async Task<IActionResult> Categories()
         {
-            var toReturn = await _contentService.GetCategoryContentAsync(ContentType.RecipeCategory, GetParameters());
-            if (toReturn != null)
-            {
-                return BaseView(new ContentPageViewModel(toReturn));
-            }
-            return BaseNotFoundView();
+            throw new NotImplementedException();
+            //var toReturn = await _contentService.GetCategoryContentAsync(ContentType.RecipeCategory, GetParameters());
+            //if (toReturn != null)
+            //{
+            //    return BaseView(new ContentPageViewModel(toReturn));
+            //}
+            //return BaseNotFoundView();
         }
 
         [HttpGet]
         public async Task<IActionResult> Category(string url)
         {
-            var toReturn = await _contentService.GetCategoryContentAsync(ContentType.RecipeCategory, GetParameters(), url);
-            if (toReturn != null)
-            {
-                return BaseView(new ContentPageViewModel(toReturn));
-            }
-            return BaseNotFoundView();
+            throw new NotImplementedException();
+            //var toReturn = await _contentService.GetCategoryContentAsync(ContentType.RecipeCategory, GetParameters(), url);
+            //if (toReturn != null)
+            //{
+            //    return BaseView(new ContentPageViewModel(toReturn));
+            //}
+            //return BaseNotFoundView();
         }
 
         [HttpGet]
         public async Task<IActionResult> Recipe(string url)
         {
-            var toReturn = await _contentService.GetContentItemContentAsync(ContentType.Recipe, GetParameters(), url);
-            if (toReturn != null)
-            {
-                return BaseView(new ContentPageViewModel(toReturn));
-            }
-            return BaseNotFoundView();
+            throw new NotImplementedException();
+            //var toReturn = await _contentService.GetContentItemContentAsync(ContentType.Recipe, GetParameters(), url);
+            //if (toReturn != null)
+            //{
+            //    return BaseView(new ContentPageViewModel(toReturn));
+            //}
+            //return BaseNotFoundView();
         }
 
         [HttpGet]

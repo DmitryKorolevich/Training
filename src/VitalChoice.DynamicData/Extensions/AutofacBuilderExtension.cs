@@ -17,6 +17,7 @@ namespace VitalChoice.DynamicData.Extensions
             builder.RegisterType<TypeConverter>().As<ITypeConverter>();
             builder.RegisterType<ModelConverterService>().As<IModelConverterService>();
             builder.RegisterGeneric(typeof (DirectMapper<>)).AsSelf();
+            builder.RegisterType<ObjectMapperFactory>().As<IObjectMapperFactory>();
             return builder;
         }
 

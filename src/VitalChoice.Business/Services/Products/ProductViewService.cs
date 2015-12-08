@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.ContentProcessing.Interfaces;
@@ -12,6 +13,7 @@ using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Identity;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -26,10 +28,20 @@ namespace VitalChoice.Business.Services.Products
 
         public ProductViewService(ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider,
             IContentProcessorService processorService, IRepositoryAsync<ProductContent> contentRepository,
-            IObjectMapper<ProductViewForCustomerModel> mapper, IProductService productService)
-            : base(templatesCache, loggerProvider, processorService, contentRepository, mapper)
+            IObjectMapper<ProductViewForCustomerModel> mapper, IObjectMapperFactory mapperFactory, IProductService productService)
+            : base(templatesCache, loggerProvider.CreateLoggerDefault(), processorService, contentRepository, mapper, mapperFactory)
         {
             _productService = productService;
+        }
+
+        private static IList<CustomerTypeCode> GetCategoryMenuAvailability(ClaimsPrincipal user)
+        {
+            return user.Identity.IsAuthenticated
+                ? (user.IsInRole(IdentityConstants.WholesaleCustomer)
+                    ? new List<CustomerTypeCode>() { CustomerTypeCode.Wholesale, CustomerTypeCode.All }
+                    : new List<CustomerTypeCode>() { CustomerTypeCode.Retail, CustomerTypeCode.All })
+                : new List<CustomerTypeCode>() { CustomerTypeCode.Retail, CustomerTypeCode.All };
+            //todo: refactor when authentication mechanism gets ready
         }
 
         protected override ContentViewModel CreateResult(string generatedHtml, ContentViewContext<ProductContent> viewContext)
@@ -47,25 +59,15 @@ namespace VitalChoice.Business.Services.Products
         }
 
         protected override async Task<ContentViewContext<ProductContent>> GetDataInternal(ProductViewForCustomerModel model,
-            IDictionary<string, object> queryData)
+            IDictionary<string, object> queryData, ClaimsPrincipal user)
         {
-            var viewContext = await base.GetDataInternal(model, queryData);
-            
+            var viewContext = await base.GetDataInternal(model, queryData, user);
+
             //NOTE: Set Parameters for processors and CreateResult here.
+            viewContext.Parameters.CustomerTypeCodes = GetCategoryMenuAvailability(user);
             viewContext.Parameters.Product = _productService.SelectAsync(viewContext.Entity.Id, true);
 
             return viewContext;
         }
-
-        #region Public
-
-        public Task<ContentViewModel> GetProductPageContentAsync(IList<CustomerTypeCode> customerTypeCodes,
-            Dictionary<string, object> parameters)
-        {
-            parameters.Add("CustomerTypeCodes", customerTypeCodes);
-            return GetContentAsync(parameters);
-        }
-
-        #endregion
     }
 }

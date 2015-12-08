@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Mvc;
 using VitalChoice.Business.Services.Content.ContentProcessors;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.ContentProcessing.Interfaces;
@@ -26,16 +27,23 @@ using VitalChoice.Interfaces.Services.Content;
 
 namespace VitalChoice.Business.Services.Content
 {
-	public class ContentPageViewService : ContentViewService<ContentPage, ContentServiceModel>, IContentPageViewService
+    public class ContentPageViewService : ContentViewService<ContentPage, ContentServiceModel>, IContentPageViewService
     {
-        public ContentPageViewService(ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider,
-            IContentProcessorService processorService, IRepositoryAsync<ContentPage> contentRepository,
-            IObjectMapper<ContentServiceModel> mapper) : base(templatesCache, loggerProvider, processorService, contentRepository, mapper)
-        {
-        }
 
         #region Public
 
         #endregion
+
+        public ContentPageViewService(ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider,
+            IContentProcessorService processorService, IRepositoryAsync<ContentPage> contentRepository,
+            IObjectMapper<ContentServiceModel> mapper, IObjectMapperFactory mapperFactory)
+            : base(templatesCache, loggerProvider.CreateLoggerDefault(), processorService, contentRepository, mapper, mapperFactory)
+        {
+        }
+
+        public Task<ContentViewModel> GetContentAsync(ActionContext actionContext, ActionBindingContext bindingContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -9,27 +9,6 @@ namespace VC.Public.Controllers.Content
     public class BaseContentController : BaseMvcController
 	{
         //Get params fron action params and all aditional query params
-        protected Dictionary<string, object> GetParameters()
-        {
-            Dictionary<string, object> result = new Dictionary<string, object>();
-            foreach (var actionParam in ActionContext.ActionDescriptor.Parameters)
-            {
-                var values = BindingContext.ValueProvider.GetValue(actionParam.Name).Values;
-                foreach (var stringValue in values)
-                {
-                    result.Add(actionParam.Name, stringValue);
-                }
-            }
-            foreach (var queryParam in Request.Query)
-            {
-                if (!result.ContainsKey(queryParam.Key))
-                {
-                    result.Add(queryParam.Key, queryParam.Value.FirstOrDefault());
-                }
-            }
-            return result;
-        }
-
         public virtual ViewResult BaseView(ContentPageViewModel model)
         {
             return View("~/Views/Content/ContentPage.cshtml", model);

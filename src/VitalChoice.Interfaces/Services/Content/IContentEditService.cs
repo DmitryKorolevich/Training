@@ -6,9 +6,9 @@ namespace VitalChoice.Interfaces.Services.Content
 {
 	public interface IContentEditService
     {
-        Task<ContentViewModel> GetCategoryContentAsync(ContentType type, Dictionary<string, object> parameters, string categoryUrl = null);
+        //Task<ContentViewModel> GetCategoryContentAsync(ContentType type, Dictionary<string, object> parameters, string categoryUrl = null);
 
-        Task<ContentViewModel> GetContentItemContentAsync(ContentType type, Dictionary<string, object> parameters, string contentDataItemUrl);
+        //Task<ContentViewModel> GetContentItemContentAsync(ContentType type, Dictionary<string, object> parameters, string contentDataItemUrl);
 
 	    Task<ContentItem> UpdateContentItemAsync(ContentItem itemToUpdate);
 
