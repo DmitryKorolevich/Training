@@ -125,12 +125,12 @@ namespace VitalChoice.ContentProcessing.Base
             {
                 Logger.LogInformation("The item could not be found {" + queryData.FormatDictionary() + "}");
                 //return explicitly null to see the real result of operation and don't look over code above regarding the real value
-                return null;
+                return viewContext;
             }
             if (viewContext.Entity.ContentItem == null)
             {
                 Logger.LogError("The item have no template.");
-                return null;
+                return viewContext;
             }
             return viewContext;
         }

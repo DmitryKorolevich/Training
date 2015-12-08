@@ -171,131 +171,129 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
                 });
             }
 
-            var toReturn = new TtlProductPageModel
+            var toReturn = new TtlProductPageModel();
+            toReturn.ProductPublicId = eProduct.PublicId;
+            toReturn.Name = eProduct.Name;
+            toReturn.SubTitle = eProduct.SafeData.SubTitle;
+            toReturn.Url = productContent.Url;
+            toReturn.Image = eProduct.SafeData.MainProductImage;
+            toReturn.ShortDescription = eProduct.SafeData.ShortDescription;
+            toReturn.SpecialIcon = eProduct.SafeData.SpecialIcon;
+            toReturn.SubProductGroupName = eProduct.SafeData.SubProductGroupName;
+            toReturn.BreadcrumbOrderedItems = breadcrumbItems;
+            toReturn.Skus = eProduct.Skus.Where(x => !x.Hidden).OrderBy(x => x.Order).Select(x => new TtlProductPageSkuModel()
             {
-                ProductPublicId = eProduct.PublicId,
-                Name = eProduct.Name,
-                SubTitle = eProduct.Data.SubTitle,
-                Url = productContent.Url,
-                Image = eProduct.Data.MainProductImage,
-                ShortDescription = eProduct.Data.ShortDescription,
-                SpecialIcon = eProduct.Data.SpecialIcon,
-                SubProductGroupName = eProduct.Data.SubProductGroupName,
-                BreadcrumbOrderedItems = breadcrumbItems,
-                Skus = eProduct.Skus.Where(x => !x.Hidden).OrderBy(x => x.Order).Select(x => new TtlProductPageSkuModel()
+                Code = x.Code,
+                SalesText = x.SafeData.SalesText,
+                Price = viewContext.Parameters.Role == RoleType.Retail ? x.Price : x.WholesalePrice,
+                PortionsCount = x.SafeData.QTY
+            }).ToList();
+            toReturn.YoutubeVideos = new List<TtlRelatedYoutubeVideoModel>()
+            {
+                new TtlRelatedYoutubeVideoModel()
                 {
-                    Code = x.Code,
-                    SalesText = x.Data.SalesText,
-                    Price = viewContext.Parameters.Role == RoleType.Retail ? x.Price : x.WholesalePrice,
-                    PortionsCount = x.Data.QTY
-                }).ToList(),
-                YoutubeVideos = new List<TtlRelatedYoutubeVideoModel>()
-                {
-                    new TtlRelatedYoutubeVideoModel()
-                    {
-                        Image = eProduct.Data.YouTubeImage1,
-                        Text = eProduct.Data.YouTubeText1,
-                        Video = string.Format(ProductPageParameters.YoutubeVideoFormat, eProduct.Data.YouTubeVideo1),
-                        VideoId = eProduct.Data.YouTubeVideo1
-                    },
-                    new TtlRelatedYoutubeVideoModel()
-                    {
-                        Image = eProduct.Data.YouTubeImage2,
-                        Text = eProduct.Data.YouTubeText2,
-                        Video = string.Format(ProductPageParameters.YoutubeVideoFormat, eProduct.Data.YouTubeVideo2),
-                        VideoId = eProduct.Data.YouTubeVideo2
-                    },
-                    new TtlRelatedYoutubeVideoModel()
-                    {
-                        Image = eProduct.Data.YouTubeImage3,
-                        Text = eProduct.Data.YouTubeText3,
-                        Video = string.Format(ProductPageParameters.YoutubeVideoFormat, eProduct.Data.YouTubeVideo3),
-                        VideoId = eProduct.Data.YouTubeVideo3
-                    },
-                    new TtlRelatedYoutubeVideoModel()
-                    {
-                        Image = eProduct.Data.YouTubeImage4,
-                        Text = eProduct.Data.YouTubeText4,
-                        Video = string.Format(ProductPageParameters.YoutubeVideoFormat, eProduct.Data.YouTubeVideo4),
-                        VideoId = eProduct.Data.YouTubeVideo4
-                    }
+                    Image = eProduct.SafeData.YouTubeImage1,
+                    Text = eProduct.SafeData.YouTubeText1,
+                    Video = string.Format(ProductPageParameters.YoutubeVideoFormat, eProduct.SafeData.YouTubeVideo1),
+                    VideoId = eProduct.SafeData.YouTubeVideo1
                 },
-                CrossSells = new List<TtlCrossSellProductModel>()
+                new TtlRelatedYoutubeVideoModel()
                 {
-                    new TtlCrossSellProductModel()
-                    {
-                        Image = eProduct.Data.CrossSellImage1,
-                        Url = eProduct.Data.CrossSellUrl1,
-                    },
-                    new TtlCrossSellProductModel()
-                    {
-                        Image = eProduct.Data.CrossSellImage2,
-                        Url = eProduct.Data.CrossSellUrl2,
-                    },
-                    new TtlCrossSellProductModel()
-                    {
-                        Image = eProduct.Data.CrossSellImage3,
-                        Url = eProduct.Data.CrossSellUrl3,
-                    },
-                    new TtlCrossSellProductModel()
-                    {
-                        Image = eProduct.Data.CrossSellImage4,
-                        Url = eProduct.Data.CrossSellUrl4,
-                    }
+                    Image = eProduct.SafeData.YouTubeImage2,
+                    Text = eProduct.SafeData.YouTubeText2,
+                    Video = string.Format(ProductPageParameters.YoutubeVideoFormat, eProduct.SafeData.YouTubeVideo2),
+                    VideoId = eProduct.SafeData.YouTubeVideo2
                 },
-                DescriptionTab = new TtlProductPageTabModel()
+                new TtlRelatedYoutubeVideoModel()
                 {
-                    TitleOverride = eProduct.Data.DescriptionTitleOverride,
-                    Content = eProduct.Data.Description,
-                    Hidden = eProduct.Data.DescriptionHide
+                    Image = eProduct.SafeData.YouTubeImage3,
+                    Text = eProduct.SafeData.YouTubeText3,
+                    Video = string.Format(ProductPageParameters.YoutubeVideoFormat, eProduct.SafeData.YouTubeVideo3),
+                    VideoId = eProduct.SafeData.YouTubeVideo3
                 },
-                ReviewsTab = new TtlProductReviewsTabModel()
+                new TtlRelatedYoutubeVideoModel()
                 {
-                    AverageRatings = ratingsAverage,
-                    ReviewsCount = reviewsCount,
-                    Reviews = lastProductReviews.Items?.Select(x => new TtlProductReviewModel()
-                    {
-                        CustomerName = x.CustomerName,
-                        DateCreated = x.DateCreated,
-                        Review = x.Description,
-                        Title = x.Title,
-                        Rating = x.Rating
-                    }).ToList()
+                    Image = eProduct.SafeData.YouTubeImage4,
+                    Text = eProduct.SafeData.YouTubeText4,
+                    Video = string.Format(ProductPageParameters.YoutubeVideoFormat, eProduct.SafeData.YouTubeVideo4),
+                    VideoId = eProduct.SafeData.YouTubeVideo4
                 }
+            };
+            toReturn.CrossSells = new List<TtlCrossSellProductModel>()
+            {
+                new TtlCrossSellProductModel()
+                {
+                    Image = eProduct.SafeData.CrossSellImage1,
+                    Url = eProduct.SafeData.CrossSellUrl1,
+                },
+                new TtlCrossSellProductModel()
+                {
+                    Image = eProduct.SafeData.CrossSellImage2,
+                    Url = eProduct.SafeData.CrossSellUrl2,
+                },
+                new TtlCrossSellProductModel()
+                {
+                    Image = eProduct.SafeData.CrossSellImage3,
+                    Url = eProduct.SafeData.CrossSellUrl3,
+                },
+                new TtlCrossSellProductModel()
+                {
+                    Image = eProduct.SafeData.CrossSellImage4,
+                    Url = eProduct.SafeData.CrossSellUrl4,
+                }
+            };
+            toReturn.DescriptionTab = new TtlProductPageTabModel()
+            {
+                TitleOverride = eProduct.SafeData.DescriptionTitleOverride,
+                Content = eProduct.SafeData.Description,
+                Hidden = eProduct.SafeData.DescriptionHide
+            };
+            toReturn.ReviewsTab = new TtlProductReviewsTabModel()
+            {
+                AverageRatings = ratingsAverage,
+                ReviewsCount = reviewsCount,
+                Reviews = lastProductReviews.Items?.Select(x => new TtlProductReviewModel()
+                {
+                    CustomerName = x.CustomerName,
+                    DateCreated = x.DateCreated,
+                    Review = x.Description,
+                    Title = x.Title,
+                    Rating = x.Rating
+                }).ToList()
             };
 
             if (eProduct.DictionaryData.ContainsKey("IngredientsTitleOverride"))
             {
                 toReturn.IngredientsTab = new TtlProductIngredientsTabModel()
                 {
-                    TitleOverride = eProduct.Data.IngredientsTitleOverride,
-                    Content = eProduct.Data.Ingredients,
-                    Hidden = eProduct.Data.IngredientsHide,
-                    NutritionalTitle = eProduct.Data.NutritionalTitle,
-                    IngredientsTitle = eProduct.Data.IngredientsTitle,
-                    ServingSize = eProduct.Data.ServingSize,
-                    Servings = eProduct.Data.Servings,
-                    Calories = eProduct.Data.Calories,
-                    CaloriesFromFat = eProduct.Data.CaloriesFromFat,
-                    TotalFat = eProduct.Data.TotalFat,
-                    TotalFatPercent = eProduct.Data.TotalFatPercent,
-                    SaturatedFat = eProduct.Data.SaturatedFat,
-                    SaturatedFatPercent = eProduct.Data.SaturatedFatPercent,
-                    TransFat = eProduct.Data.TransFat,
-                    TransFatPercent = eProduct.Data.TransFatPercent,
-                    Cholesterol = eProduct.Data.Cholesterol,
-                    CholesterolPercent = eProduct.Data.CholesterolPercent,
-                    Sodium = eProduct.Data.Sodium,
-                    SodiumPercent = eProduct.Data.SodiumPercent,
-                    TotalCarbohydrate = eProduct.Data.TotalCarbohydrate,
-                    TotalCarbohydratePercent = eProduct.Data.TotalCarbohydratePercent,
-                    DietaryFiber = eProduct.Data.DietaryFiber,
-                    DietaryFiberPercent = eProduct.Data.DietaryFiberPercent,
-                    Sugars = eProduct.Data.Sugars,
-                    SugarsPercent = eProduct.Data.SugarsPercent,
-                    Protein = eProduct.Data.Protein,
-                    ProteinPercent = eProduct.Data.ProteinPercent,
-                    AdditionalNotes = eProduct.Data.AdditionalNotes?.Replace("\n", "<br/>")
+                    TitleOverride = eProduct.SafeData.IngredientsTitleOverride,
+                    Content = eProduct.SafeData.Ingredients,
+                    Hidden = eProduct.SafeData.IngredientsHide,
+                    NutritionalTitle = eProduct.SafeData.NutritionalTitle,
+                    IngredientsTitle = eProduct.SafeData.IngredientsTitle,
+                    ServingSize = eProduct.SafeData.ServingSize,
+                    Servings = eProduct.SafeData.Servings,
+                    Calories = eProduct.SafeData.Calories,
+                    CaloriesFromFat = eProduct.SafeData.CaloriesFromFat,
+                    TotalFat = eProduct.SafeData.TotalFat,
+                    TotalFatPercent = eProduct.SafeData.TotalFatPercent,
+                    SaturatedFat = eProduct.SafeData.SaturatedFat,
+                    SaturatedFatPercent = eProduct.SafeData.SaturatedFatPercent,
+                    TransFat = eProduct.SafeData.TransFat,
+                    TransFatPercent = eProduct.SafeData.TransFatPercent,
+                    Cholesterol = eProduct.SafeData.Cholesterol,
+                    CholesterolPercent = eProduct.SafeData.CholesterolPercent,
+                    Sodium = eProduct.SafeData.Sodium,
+                    SodiumPercent = eProduct.SafeData.SodiumPercent,
+                    TotalCarbohydrate = eProduct.SafeData.TotalCarbohydrate,
+                    TotalCarbohydratePercent = eProduct.SafeData.TotalCarbohydratePercent,
+                    DietaryFiber = eProduct.SafeData.DietaryFiber,
+                    DietaryFiberPercent = eProduct.SafeData.DietaryFiberPercent,
+                    Sugars = eProduct.SafeData.Sugars,
+                    SugarsPercent = eProduct.SafeData.SugarsPercent,
+                    Protein = eProduct.SafeData.Protein,
+                    ProteinPercent = eProduct.SafeData.ProteinPercent,
+                    AdditionalNotes = eProduct.SafeData.AdditionalNotes?.Replace("\n", "<br/>")
                 };
             }
 
@@ -305,9 +303,9 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 
                 toReturn.RecipesTab = new TtlProductRecipesTabModel()
                 {
-                    TitleOverride = eProduct.Data.RecipesTitleOverride,
-                    Content = eProduct.Data.Recipes,
-                    Hidden = eProduct.Data.RecipesHide,
+                    TitleOverride = eProduct.SafeData.RecipesTitleOverride,
+                    Content = eProduct.SafeData.Recipes,
+                    Hidden = eProduct.SafeData.RecipesHide,
                     Recipes = recipes.Items.Select(x => new TtlProductRecipeModel()
                     {
                         Name = x.Name,
@@ -320,9 +318,9 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             {
                 toReturn.ServingTab = new TtlProductPageTabModel()
                 {
-                    TitleOverride = eProduct.Data.ServingTitleOverride,
-                    Content = eProduct.Data.Serving,
-                    Hidden = eProduct.Data.ServingHide
+                    TitleOverride = eProduct.SafeData.ServingTitleOverride,
+                    Content = eProduct.SafeData.Serving,
+                    Hidden = eProduct.SafeData.ServingHide
                 };
             }
 
@@ -330,9 +328,9 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             {
                 toReturn.ShippingTab = new TtlProductPageTabModel()
                 {
-                    TitleOverride = eProduct.Data.ShippingTitleOverride,
-                    Content = eProduct.Data.Shipping,
-                    Hidden = eProduct.Data.ShippingHide
+                    TitleOverride = eProduct.SafeData.ShippingTitleOverride,
+                    Content = eProduct.SafeData.Shipping,
+                    Hidden = eProduct.SafeData.ShippingHide
                 };
             }
 
