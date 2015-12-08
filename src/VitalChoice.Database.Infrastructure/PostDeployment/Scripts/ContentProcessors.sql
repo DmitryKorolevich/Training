@@ -30,14 +30,22 @@ END
 
 GO
 
-IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentProcessors] WHERE [Type] = N'ProductPageProcessor')
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentProcessors] WHERE [Type] = N'ArticleCategoriesProcessor')
 BEGIN
 	INSERT INTO [dbo].[ContentProcessors]
 	(Id, [Type], Name, Description)
 	VALUES
-	(5, N'ProductPageProcessor', N'Product page processor', N'Processor to manage product page')
+	(7, N'ArticleCategoriesProcessor', N'Article categories processor', N'Tree view of article categories')
+	INSERT INTO [dbo].[ContentProcessors]
+	(Id, [Type], Name, Description)
+	VALUES
+	(8, N'ArticlesProcessor', N'Articles processor', N'Articles with paging by category id')
 
 	INSERT INTO [dbo].[MasterContentItemsToContentProcessors]
 	([MasterContentItemId],[ContentProcessorId])
-	SELECT [Id], 5 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Product page'
+	SELECT [Id], 7 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Article sub categories'
+	INSERT INTO [dbo].[MasterContentItemsToContentProcessors]
+	([MasterContentItemId],[ContentProcessorId])
+	SELECT [Id], 8 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Article sub categories'
 END
+

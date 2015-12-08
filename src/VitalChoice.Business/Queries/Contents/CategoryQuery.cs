@@ -46,5 +46,12 @@ namespace VitalChoice.Business.Queries.Content
 
             return this;
         }
+
+        public CategoryQuery RootCategory()
+        {
+            Add(x => !x.ParentId.HasValue);
+
+            return this;
+        }
     }
 }
