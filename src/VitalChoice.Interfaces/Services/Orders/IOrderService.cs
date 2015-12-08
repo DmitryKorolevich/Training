@@ -27,6 +27,8 @@ namespace VitalChoice.Interfaces.Services.Orders
 
         #region HealthWiseOrders
 
+        Task<bool> UpdateHealthwiseOrderWithValidationAsync(int orderId, bool isHealthwise);
+
         Task<bool> UpdateHealthwiseOrderAsync(int orderId, bool isHealthwise);
 
         #endregion

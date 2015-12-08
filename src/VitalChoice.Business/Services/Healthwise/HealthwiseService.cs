@@ -185,14 +185,7 @@ namespace VitalChoice.Business.Services.Healthwise
             orders = orders.OrderBy(p => p.DateCreated).ToList();
             foreach (var order in orders)
             {
-                try
-                {
-                    await _orderService.UpdateHealthwiseOrderAsync(order.Id, true);
-                }
-                catch(AppValidationException ex)
-                {
-
-                }
+                await _orderService.UpdateHealthwiseOrderAsync(order.Id, true);
             }
             return true;
         }
