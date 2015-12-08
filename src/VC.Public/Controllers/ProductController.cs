@@ -88,7 +88,7 @@ namespace VC.Public.Controllers
         public async Task<IActionResult> Categories()
         {
             var toReturn = await _categoryViewService.GetContentAsync(ActionContext, BindingContext, User);
-            if (toReturn != null)
+            if (toReturn?.Body != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
             }
