@@ -82,7 +82,7 @@
             var currentDate = new Date();
             currentDate.setHours(0, 0, 0, 0);
             $scope.filter = {
-                To: currentDate.shiftDate('+1y'),
+                To: currentDate.shiftDate('+1d'),
                 From: currentDate.shiftDate('-1m'),
                 IdCustomerType: null,
                 IdOrderType: null,
@@ -125,6 +125,55 @@
             {
                 $scope.options.exportUrl = orderService.getOrdersZipStatisticReportFile(data, $rootScope.buildNumber);
             }
+        };
+
+        $scope.openByRegion = function (region)
+        {
+            if (!$scope.forms.form.$valid)
+            {
+                $scope.forms.submitted = true;
+                return;
+            }
+            var data = prepareStateParams();
+            data.region = region;
+            $state.go('index.oneCol.ordersRegionStatisticDetail', data);
+        };
+
+        $scope.openByZip = function (zip)
+        {
+            if (!$scope.forms.form.$valid)
+            {
+                $scope.forms.submitted = true;
+                return;
+            }
+            var data = prepareStateParams();
+            data.zip = zip;
+            $state.go('index.oneCol.ordersRegionStatisticDetail', data);
+        };
+
+        function prepareStateParams()
+        {
+            var data = {
+                from: $scope.filter.From,
+                to: $scope.filter.To,
+            };
+            if (data.from)
+            {
+                data.from = data.from.toQueryParamDateTime();
+            }
+            if (data.to)
+            {
+                data.to = data.to.toQueryParamDateTime();
+            }
+            if ($scope.filter.IdCustomerType)
+            {
+                data.idordertype = $scope.filter.IdCustomerType;
+            }
+            if ($scope.filter.IdOrderType)
+            {
+                data.idordertype = $scope.filter.IdOrderType;
+            }
+            return data;
         };
 
         initialize();

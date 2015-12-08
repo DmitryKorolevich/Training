@@ -43,6 +43,7 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> _ordersRegionStatisticItemCSVExportService;
         private readonly ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> _ordersZipStatisticItemCSVExportService;
         private readonly ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> _vOrderWithRegionInfoItemCSVExportService;
+        private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly ILogger logger;
 
         public OrderController(
@@ -64,6 +65,7 @@ namespace VC.Admin.Controllers
             _ordersZipStatisticItemCSVExportService = ordersZipStatisticItemCSVExportService;
             _vOrderWithRegionInfoItemCSVExportService = vOrderWithRegionInfoItemCSVExportService;
             _objectHistoryLogService = objectHistoryLogService;
+            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             this.logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -382,10 +384,15 @@ namespace VC.Admin.Controllers
                 Region = region,
                 Zip=zip,
             };
+            filter.Paging = null;
 
-            var items = await _orderService.GetOrderWithRegionInfoItemsAsync(filter);
+            var data = await _orderService.GetOrderWithRegionInfoItemsAsync(filter);
+            foreach(var item in data.Items)
+            {
+                item.DateCreated = TimeZoneInfo.ConvertTime(item.DateCreated, TimeZoneInfo.Local, _pstTimeZoneInfo);
+            }
 
-            var data = _vOrderWithRegionInfoItemCSVExportService.ExportToCsv(items.Items);
+            var result = _vOrderWithRegionInfoItemCSVExportService.ExportToCsv(data.Items);
 
             var contentDisposition = new ContentDispositionHeaderValue("attachment")
             {
@@ -393,7 +400,7 @@ namespace VC.Admin.Controllers
             };
 
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
-            return File(data, "text/csv");
+            return File(result, "text/csv");
         }
 
         [HttpPost]

@@ -146,6 +146,11 @@ Date.prototype.toServerDateTime = function () {
     return Date.doPlaceDate("{yyyy}-{MM}-{DD}T{HH}:{MN}:{SS}.000Z", this);
 };
 
+Date.prototype.toQueryParamDateTime = function ()
+{
+    return Date.doPlaceDate("{yyyy}-{MM}-{DD}T{HH}:{MN}:{SS}", this);
+};
+
 Date.parseDateTime = function (fDateString, fUTC)
 {
     if (!String.isString(fDateString))

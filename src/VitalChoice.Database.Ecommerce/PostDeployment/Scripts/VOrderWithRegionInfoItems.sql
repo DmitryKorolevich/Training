@@ -21,7 +21,6 @@ AS
 		LEFT JOIN OrderAddressOptionValues AS acval ON acval.IdOrderAddress = pad.Id AND acval.IdOptionType = acopt.Id
 		LEFT JOIN States s ON pad.IdState=s.Id
 		WHERE o.StatusCode!=3 AND o.OrderStatus IN (2,3,5) AND (pad.IdState IS NOT NULL OR pad.County IS NOT NULL)
-		AND aval.Value IS NOT NULL
 
 GO
 

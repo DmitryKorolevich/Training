@@ -24,7 +24,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 
         public int IdCustomerType { get; set; }
 
-        public int? OrderType { get; set; }
+        public string OrderType { get; set; }
 
         public string CustomerFirstName { get; set; }
 
