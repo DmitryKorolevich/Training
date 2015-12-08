@@ -20,7 +20,7 @@ namespace VitalChoice.Business.Queries.Orders
         {
             if (idOrderType.HasValue)
             {
-                Add(x => x.OrderType == idOrderType.Value);
+                Add(x => x.OrderType == idOrderType.Value.ToString());
             }
             return this;
         }

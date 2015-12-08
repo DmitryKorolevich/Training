@@ -933,7 +933,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             {
                 productErrorsExist = true;
             }
-            $scope.order.IgnoneMinimumPerishableThreshold = $scope.productsPerishableThresholdIssue && $scope.options.ignoneMinimumPerishableThreshold;
+            if ($scope.productsPerishableThresholdIssue)
+            {
+                $scope.order.IgnoneMinimumPerishableThreshold = $scope.productsPerishableThresholdIssue && $scope.options.ignoneMinimumPerishableThreshold;
+            }
             angular.forEach($scope.order.SkuOrdereds, function (skuOrdered, index)
             {
                 if (skuOrdered.Messages && skuOrdered.Messages.length != 0)

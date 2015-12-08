@@ -73,7 +73,7 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    getOrderWithRegionInfoItemsReportFile: function (filter, buildNumber)
 	    {
 	        return baseUrl + 'GetOrderWithRegionInfoItemsReportFile?from={0}&to={1}&idcustomertype={2}&idordertype={3}&region={4}&zip={5}&buildNumber={6}'
-                .format(filter.From, filter.To, filter.IdCustomerType, filter.IdOrderType, buildNumber);
+                .format(filter.From, filter.To, filter.IdCustomerType, filter.IdOrderType, filter.Region, filter.Zip, buildNumber);
 	    },
 	    getOrderWithRegionInfoAmount: function (filter, tracker)
 	    {

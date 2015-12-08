@@ -51,14 +51,14 @@
                 <tbody>
                     <tr data-ng-repeat="item in items">
                         <td data-ng-if="options.RegionType==1">
-                            <a ui-sref="index.oneCol.ordersRegionStatisticDetail({region:item.Region})">{{::item.Region}}</a>
+                            <a data-ng-click="openByRegion(item.Region);">{{::item.Region}}</a>
                         </td>
                         <td data-ng-if="options.RegionType==2">
-                            <a ui-sref="index.oneCol.ordersRegionStatisticDetail({zip:item.Zip})">{{::item.Zip}}</a>
+                            <a data-ng-click="openByZip(item.Zip);">{{::item.Zip}}</a>
                         </td>
                         <td>{{::item.Amount | currency}}</td>
                         <td>{{::item.Count}}</td>
-                        </td>
+                     </tr>
                 </tbody>
             </table>
         </spinner-overlay>
