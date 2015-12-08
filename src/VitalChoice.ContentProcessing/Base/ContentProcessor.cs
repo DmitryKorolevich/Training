@@ -35,15 +35,19 @@ namespace VitalChoice.ContentProcessing.Base
         public Task<TResult> ExecuteAsync(ContentViewContext viewContext)
         {
             return
-                ExecuteAsync(new ProcessorViewContext((TModel) _mapper.FromDictionary(viewContext.Parameters, false), viewContext.BaseEntity, viewContext.User));
+                ExecuteAsync(
+                    new ProcessorViewContext((TModel) _mapper.FromDictionary(viewContext.Parameters as IDictionary<string, object>, false),
+                        viewContext.BaseEntity, viewContext.User));
         }
 
         public async Task<object> ExecuteUntypedAsync(ContentViewContext viewContext)
         {
             return
                 await
-                    ExecuteAsync(new ProcessorViewContext((TModel) _mapper.FromDictionary(viewContext.Parameters, false),
-                        viewContext.BaseEntity, viewContext.User));
+                    ExecuteAsync(
+                        new ProcessorViewContext(
+                            (TModel) _mapper.FromDictionary(viewContext.Parameters as IDictionary<string, object>, false),
+                            viewContext.BaseEntity, viewContext.User));
         }
 
         public abstract string ResultName { get; }
@@ -78,16 +82,19 @@ namespace VitalChoice.ContentProcessing.Base
         public Task<TResult> ExecuteAsync(ContentViewContext viewContext)
         {
             return
-                ExecuteAsync(new ProcessorViewContext((TModel) _mapper.FromDictionary(viewContext.Parameters, false),
-                    (TEntity) viewContext.BaseEntity, viewContext.User));
+                ExecuteAsync(
+                    new ProcessorViewContext((TModel) _mapper.FromDictionary(viewContext.Parameters as IDictionary<string, object>, false),
+                        (TEntity) viewContext.BaseEntity, viewContext.User));
         }
 
         public async Task<object> ExecuteUntypedAsync(ContentViewContext viewContext)
         {
             return
                 await
-                    ExecuteAsync(new ProcessorViewContext((TModel) _mapper.FromDictionary(viewContext.Parameters, false),
-                        (TEntity) viewContext.BaseEntity, viewContext.User));
+                    ExecuteAsync(
+                        new ProcessorViewContext(
+                            (TModel) _mapper.FromDictionary(viewContext.Parameters as IDictionary<string, object>, false),
+                            (TEntity) viewContext.BaseEntity, viewContext.User));
         }
 
         public abstract string ResultName { get; }

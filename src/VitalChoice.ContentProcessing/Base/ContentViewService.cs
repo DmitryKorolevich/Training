@@ -77,21 +77,14 @@ namespace VitalChoice.ContentProcessing.Base
             {
                 {DefaultModelName, contentEntity}
             };
-
-            await
-                Task.WhenAll(
-                    contentEntity.MasterContentItem.MasterContentItemToContentProcessors.Select(
-                        p =>
-                            _processorService.ExecuteAsync(
-                                //ReSharper disable once AccessToModifiedClosure 
-                                //We syncronize model inside service
-                                p.ContentProcessor.Type, viewContext, model)));
-            await Task.WhenAll(contentEntity.ContentItem.ContentItemToContentProcessors.Select(
-                p =>
-                    _processorService.ExecuteAsync(
-                        //ReSharper disable once AccessToModifiedClosure 
-                        //We syncronize model inside service
-                        p.ContentProcessor.Type, viewContext, model)));
+            foreach (var p in contentEntity.MasterContentItem.MasterContentItemToContentProcessors)
+            {
+                await _processorService.ExecuteAsync(p.ContentProcessor.Type, viewContext, model);
+            }
+            foreach (var p in contentEntity.ContentItem.ContentItemToContentProcessors)
+            {
+                await _processorService.ExecuteAsync(p.ContentProcessor.Type, viewContext, model);
+            }
 
             var templatingModel = new ExpandoObject();
             model.CopyToDictionary(templatingModel);
