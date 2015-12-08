@@ -101,7 +101,7 @@ namespace VitalChoice.Core.Services
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            _logFactory.Dispose();
         }
     }
 #endif

@@ -172,6 +172,8 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<ContentCategory>(entity =>
             {
                 entity.HasKey(p => p.Id);
+                entity.Ignore(c => c.User);
+                entity.Ignore(c => c.UserId);
                 entity.ToTable("ContentCategories");
                 entity
                     .HasOne(p => p.MasterContentItem)
