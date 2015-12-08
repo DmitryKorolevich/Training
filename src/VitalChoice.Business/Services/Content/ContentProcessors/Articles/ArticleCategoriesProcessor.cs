@@ -22,7 +22,7 @@ using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
 {
-    public class ArticleCategoriesProcessor : ContentProcessor<TtlArticleCategoryModel, ArticleCategoryParameters, ContentCategory>
+    public class ArticleCategoriesProcessor : ContentProcessor<TtlArticleCategoriesModel, ArticleCategoryParameters, ContentCategory>
     {
         private readonly ICategoryService _categoryService;
 
@@ -32,7 +32,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
             _categoryService = categoryService;
         }
 
-        protected override async Task<TtlArticleCategoryModel> ExecuteAsync(ProcessorViewContext viewContext)
+        protected override async Task<TtlArticleCategoriesModel> ExecuteAsync(ProcessorViewContext viewContext)
         {
             if (viewContext.Entity == null)
             {
@@ -54,7 +54,12 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
                         Type=ContentType.ArticleCategory,
                     });
 
-            return PopulateCategoryTemplateModel(viewContext.Entity);
+            var data = PopulateCategoryTemplateModel(rootCategory);
+
+            TtlArticleCategoriesModel toReturn = new TtlArticleCategoriesModel();
+            toReturn.Categories = data.SubCategories;
+            toReturn.IdCategory = viewContext.Parameters.IdCategory;
+            return toReturn;
         }
 
 

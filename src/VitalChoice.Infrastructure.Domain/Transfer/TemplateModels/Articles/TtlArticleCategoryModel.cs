@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.Articles
 {
-    public class TtlShortArticleModel
+    public class TtlArticleCategoryModel
     {
-	    public TtlShortArticleModel()
+	    public TtlArticleCategoryModel()
 	    {
+			SubCategories = new List<TtlArticleCategoryModel>();
         }
 
 	    public string Name { get; set; }
 
 		public string Url { get; set; }
 
-        public DateTime? PublishedDate { get; set; }
+	    public IList<TtlArticleCategoryModel> SubCategories { get; set; }
     }
 }
