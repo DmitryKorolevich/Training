@@ -15,6 +15,7 @@ namespace VitalChoice.Interfaces.Services.Content
         /// <returns></returns>
         Task<bool> UpdateCategoriesTreeAsync(ContentCategory category);
         Task<ContentCategory> GetCategoryAsync(int id);
+        Task<int?> GetIdRootCategoryAsync(ContentType type);
         Task<ContentCategory> UpdateCategoryAsync(ContentCategory category);
         Task<bool> DeleteCategoryAsync(int id);
     }

@@ -404,7 +404,8 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<CountryService>().As<ICountryService>();
             builder.RegisterType<SettingService>().As<ISettingService>();
             builder.RegisterType<FileService>().As<IFileService>();
-            
+            builder.RegisterType<ArticleCategoryViewService>().As<IArticleCategoryViewService>();
+
             builder.RegisterType<EmailSender>()
                 .As<IEmailSender>()
                 .WithParameter((pi, cc) => pi.Name == "options", (pi, cc) => cc.Resolve<IOptions<AppOptions>>())
