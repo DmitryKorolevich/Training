@@ -7,7 +7,7 @@
     "Microsoft.AspNet.Mvc": "6.0.0-*",
     "Microsoft.Extensions.Logging": "1.0.0-*",
     "Microsoft.Extensions.Logging.Console": "1.0.0-*",
-    "Templates": "2.5.3-rc1",
+    "Templates": "2.5.5-rc1",
     "Autofac.Extensions.DependencyInjection": "4.0.0-*",
     "Avalara.Avatax.Rest": "1.0.0-*",
     "CsvHelper": "2.13.2-*",
