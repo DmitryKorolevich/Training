@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.product.controllers.productManageController', [])
-.controller('productManageController', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', 'productService', 'toaster', 'confirmUtil', 'promiseTracker',
-    function ($scope, $rootScope, $state, $stateParams, $timeout, $modal, productService, toaster, confirmUtil, promiseTracker) {
+.controller('productManageController', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', 'productService', 'toaster', 'confirmUtil', 'promiseTracker', 'contentService',
+    function ($scope, $rootScope, $state, $stateParams, $timeout, $modal, productService, toaster, confirmUtil, promiseTracker, contentService) {
         $scope.refreshTracker = promiseTracker("get");
 
         var sellerFieldName = 'Seller';
@@ -33,6 +33,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 toaster.pop('success', "Success!", "Successfully saved.");
                 $scope.product.Id = result.Data.Id;
                 $scope.previewUrl = $scope.basePreviewUrl.format($scope.product.Url);
+                $scope.product.MasterContentItemId = result.Data.MasterContentItemId;
                 refreshPossiableProductTypes();
                 refreshHistory();
             } else {
@@ -147,11 +148,32 @@ angular.module('app.modules.product.controllers.productManageController', [])
             loadLookups();
             loadCategories();
             loadInventoryCategories();
+			refreshMasters();
+        };
+
+        function refreshMasters() {
+        	contentService.getMasterContentItems({ Type: 10 })//product
+                .success(function (result) {
+                	if (result.Success) {
+                		$scope.masters = result.Data;
+                		$.each($scope.masters, function (index, master) {
+                			if (master.IsDefault) {
+                				$scope.MasterContentItemId = master.Id;
+                			};
+                		});
+                		allowLoadProduct();
+                	} else {
+                		errorHandler(result);
+                	}
+                })
+                .error(function (result) {
+                	errorHandler(result);
+                });
         };
 
         function allowLoadProduct()
         {
-            if ($scope.lookups && $scope.defaults && $scope.rootCategory && $scope.rootInventoryCategory)
+        	if ($scope.lookups && $scope.defaults && $scope.rootCategory && $scope.rootInventoryCategory && $scope.masters)
             {
                 loadProduct();
             };
@@ -222,6 +244,9 @@ angular.module('app.modules.product.controllers.productManageController', [])
 			            {
 			                $scope.previewUrl = $scope.basePreviewUrl.format($scope.product.Url);
 			            }
+			            if (!$scope.product.MasterContentItemId) {
+			            	$scope.product.MasterContentItemId = $scope.MasterContentItemId;
+			            };
 			            refreshHistory();
 			            setSelected($scope.rootCategory, $scope.product.CategoryIds);
 			            setInventorySelected($scope.rootInventoryCategory, $scope.product.InventoryCategoryId);
@@ -568,6 +593,10 @@ angular.module('app.modules.product.controllers.productManageController', [])
             skus.splice(index, 1);
             $scope.product.SKUs = [];
             $scope.product.SKUs = skus;
+        };
+
+        $scope.goToMaster = function (id) {
+        	$state.go('index.oneCol.masterDetail', { id: id });
         };
 
         $scope.addSKU = function () {

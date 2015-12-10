@@ -924,9 +924,6 @@
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
                                     <span class="legend">Cross Sell Products</span>
-                                    <!--<div class="form-group">
-                                        <button data-ng-click="addCross();" class="btn btn-info">Add New Cross Sell Product</button>
-                                    </div>-->
                                     <form name="forms.CrossSellProducts" data-ng-submit="save()" data-ng-class="{submitted: forms.crossessubmitted}" novalidate unsaved-warning-form>
                                         <div class="panel-group sortable-accordion">
                                             <div ui-sortable="sortableOptions" data-ng-model="product.CrossSellProducts">
@@ -936,15 +933,9 @@
                                                             <div class="panel-heading">
                                                                 <h4 class="panel-title">
                                                                     <div class="accordion-toggle">
-                                                                        <!--ng-click="toggleOpen(crossSellProduct, $event)">-->
-                                                                        <div class="form-horizontal">
+                                                                       <div class="form-horizontal">
                                                                             <div class="row">
-                                                                                <!--<div class="col-md-1" data-ng-click="$event.stopPropagation()">
-                                                                                    <div class="sortable-move btn btn-info">
-                                                                                        <i class="glyphicon glyphicon-sort"></i>
-                                                                                    </div>
-                                                                                </div>-->
-                                                                                <div class="col-md-12">
+                                                                               <div class="col-md-12">
                                                                                     <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
                                                                                         <label class="control-label">Cross Sell Image</label>
                                                                                         <div class="col-md-1" data-ng-if="crossSellProduct.ImageUse">
@@ -965,8 +956,6 @@
                                                                                 </div>
                                                                             </div>
                                                                             <div class="row">
-                                                                                <!--<div class="col-md-1" data-ng-click="$event.stopPropagation()">
-                                                                                </div>-->
                                                                                 <div class="col-md-11">
                                                                                     <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
                                                                                         <label class="control-label">URL Cross Sell</label>
@@ -1003,10 +992,7 @@
                                     </form>
 
                                     <span class="legend">YouTube Videos</span>
-                                    <!--<div class="form-group">
-                                        <button data-ng-click="addVideo();" class="btn btn-info">Add New YouTube Video</button>
-                                    </div>-->
-                                    <form name="forms.Videos" data-ng-submit="save()" data-ng-class="{submitted: forms.videossubmitted}" novalidate unsaved-warning-form>
+                                   <form name="forms.Videos" data-ng-submit="save()" data-ng-class="{submitted: forms.videossubmitted}" novalidate unsaved-warning-form>
                                         <div class="panel-group sortable-accordion">
                                             <div ui-sortable="sortableOptions" data-ng-model="product.Videos">
                                                 <div data-ng-repeat="video in product.Videos" class="panel panel-default">
@@ -1015,14 +1001,8 @@
                                                             <div class="panel-heading">
                                                                 <h4 class="panel-title">
                                                                     <div class="accordion-toggle">
-                                                                        <!--ng-click="toggleOpen(video, $event)">-->
-                                                                        <div class="form-horizontal">
+                                                                       <div class="form-horizontal">
                                                                             <div class="row">
-                                                                                <!--<div class="col-md-1" data-ng-click="$event.stopPropagation()">
-                                                                                    <div class="sortable-move btn btn-info">
-                                                                                        <i class="glyphicon glyphicon-sort"></i>
-                                                                                    </div>
-                                                                                </div>-->
                                                                                 <div class="col-md-12">
                                                                                     <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
                                                                                         <label class="control-label">YouTube Video</label>
@@ -1046,8 +1026,6 @@
                                                                                 </div>
                                                                             </div>
                                                                             <div class="row">
-                                                                                <!--<div class="col-md-1" data-ng-click="$event.stopPropagation()">
-                                                                                </div>-->
                                                                                 <div class="col-md-12">
                                                                                     <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
                                                                                         <label class="control-label">YouTube Image</label>
@@ -1065,9 +1043,7 @@
                                                                                 </div>
                                                                             </div>
                                                                             <div class="row">
-                                                                                <!--<div class="col-md-1" data-ng-click="$event.stopPropagation()">
-                                                                                </div>-->
-                                                                                <div class="col-md-12">
+                                                                               <div class="col-md-12">
                                                                                     <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
                                                                                         <label class="control-label">YouTube Text</label>
                                                                                         <div class="col-md-1" data-ng-if="video.TextUse">
@@ -1105,23 +1081,60 @@
                             </div>
                         </div>
                     </tab>
-                    <tab heading="Sales Category" active="salesCategoriesTab.active">
-                        <div class="container container-left">
-                            <div class="well row categories sales">
-                                <spinner-overlay data-loading="refreshTracker.active()">
-                                    <span class="legend">Sales Category</span>
-                                    <button data-ng-if="!salesCategoriesExpanded" data-ng-click="updateSalesCategoriesCollapsed(true);" class="btn btn-primary btn-xs expand-button">Expand All</button>
-                                    <button data-ng-if="salesCategoriesExpanded" data-ng-click="updateSalesCategoriesCollapsed(false);" class="btn btn-primary btn-xs expand-button">Collapse All</button>
-                                    <div ui-tree data-drag-enabled="false" class="ya-treeview">
-                                        <ol ui-tree-nodes="" data-ng-model="rootInventoryCategory.SubItems">
-                                            <li ng-repeat="item in rootInventoryCategory.SubItems" ui-tree-node collapsed="true" data-ng-include="'app/modules/product/partials/inventoryCategoriesAssign.html'">
-                                            </li>
-                                        </ol>
-                                    </div>
-                                </spinner-overlay>
-                            </div>
-                        </div>
-                    </tab>
+                <tab heading="Sales Category" active="salesCategoriesTab.active">
+	                <div class="container container-left">
+		                <div class="well row categories sales">
+			                <spinner-overlay data-loading="refreshTracker.active()">
+				                <span class="legend">Sales Category</span>
+				                <button data-ng-if="!salesCategoriesExpanded" data-ng-click="updateSalesCategoriesCollapsed(true);" class="btn btn-primary btn-xs expand-button">Expand All</button>
+				                <button data-ng-if="salesCategoriesExpanded" data-ng-click="updateSalesCategoriesCollapsed(false);" class="btn btn-primary btn-xs expand-button">Collapse All</button>
+				                <div ui-tree data-drag-enabled="false" class="ya-treeview">
+					                <ol ui-tree-nodes="" data-ng-model="rootInventoryCategory.SubItems">
+						                <li ng-repeat="item in rootInventoryCategory.SubItems" ui-tree-node collapsed="true" data-ng-include="'app/modules/product/partials/inventoryCategoriesAssign.html'">
+						                </li>
+					                </ol>
+				                </div>
+			                </spinner-overlay>
+		                </div>
+	                </div>
+                </tab>
+					<tab heading="Template">
+						<div class="container container-left">
+							<div class="well row">
+								<spinner-overlay data-loading="refreshTracker.active()">
+									<form class="form-horizontal">
+										<fieldset>
+											<div data-ng-if="validatePermission(7)" class="form-group">
+												<label for="masterTemplate" class="col-md-3 control-label">Master Template</label>
+												<div class="col-md-9">
+													<select class="form-control" name="MasterTemplate" data-ng-model="product.MasterContentItemId" ng-options="master.Id as master.Name for master in masters"></select>
+												</div>
+											</div>
+											<button class="btn btn-info width-200px margin-bottom-10px" data-ng-if="validatePermission(7) && product.MasterContentItemId!=0" data-ng-click="goToMaster(product.MasterContentItemId);">Manage Master Template</button>
+											<span class="legend">Manage Template</span>
+											<div class="form-group">
+												<div class="col-md-12">
+													<div data-ng-model="product.Template" ui-ace="{
+				                                require: ['ace/ext/language_tools'],
+				                                advanced: {
+					                                enableSnippets: true,
+					                                enableBasicAutocompletion: true,
+					                                enableLiveAutocompletion: true
+				                                },
+				                                theme:'cobalt',
+				                                mode: 'ttl',
+				                                onLoad: aceLoaded,
+				                                onChange: aceChanged
+		                                }">
+													</div>
+												</div>
+											</div>
+										</fieldset>
+									</form>
+								</spinner-overlay>
+							</div>
+						</div>
+					</tab>
                 </tabset>
             </div>
         </div>

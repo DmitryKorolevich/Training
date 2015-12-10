@@ -6,10 +6,10 @@ using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
-using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Attributes;
+using VitalChoice.Validation.Models;
 
-namespace VC.Admin.Models.Product
+namespace VC.Admin.Models.Products
 {
     [ApiValidator(typeof(ProductCategoryManageModelValidator))]
     public class ProductCategoryManageModel : BaseModel
