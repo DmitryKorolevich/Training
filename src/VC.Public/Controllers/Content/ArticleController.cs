@@ -10,9 +10,11 @@ namespace VC.Public.Controllers.Content
 {
     public class ArticleController : BaseContentController
     {
-	    public ArticleController(IContentEditService contentService)
+        private readonly IArticleCategoryViewService _articleCategoryViewService;
+
+        public ArticleController(IArticleCategoryViewService articleCategoryViewService)
 	    {
-            _contentService = contentService;
+            _articleCategoryViewService = articleCategoryViewService;
 	    }
 
         private readonly IContentEditService _contentService;
@@ -20,25 +22,23 @@ namespace VC.Public.Controllers.Content
         [HttpGet]
         public async Task<IActionResult> Categories()
         {
-            throw new NotImplementedException();
-            //var toReturn = await _contentService.GetCategoryContentAsync(ContentType.ArticleCategory, GetParameters());
-            //if (toReturn != null)
-            //{
-            //    return BaseView(new ContentPageViewModel(toReturn));
-            //}
-            //return BaseNotFoundView();
+            var toReturn = await _articleCategoryViewService.GetContentAsync(ActionContext, BindingContext, User);
+            if (toReturn != null)
+            {
+                return BaseView(new ContentPageViewModel(toReturn));
+            }
+            return BaseNotFoundView();
         }
 
         [HttpGet]
         public async Task<IActionResult> Category(string url)
         {
-            throw new NotImplementedException();
-            //var toReturn = await _contentService.GetCategoryContentAsync(ContentType.ArticleCategory, GetParameters(), url);
-            //if (toReturn != null)
-            //{
-            //    return BaseView(new ContentPageViewModel(toReturn));
-            //}
-            //return BaseNotFoundView();
+            var toReturn = await _articleCategoryViewService.GetContentAsync(ActionContext, BindingContext, User);
+            if (toReturn != null)
+            {
+                return BaseView(new ContentPageViewModel(toReturn));
+            }
+            return BaseNotFoundView();
         }
 
         [HttpGet]

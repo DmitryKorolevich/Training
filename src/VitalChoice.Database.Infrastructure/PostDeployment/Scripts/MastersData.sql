@@ -2586,3 +2586,21 @@ BEGIN
 WHERE [Name] = 'Product page'
 
 END
+
+GO 
+
+IF ((SELECT TOP 1 MasterContentItemId FROM ContentCategories WHERE Type=3 AND ParentID IS NULL)
+=(SELECT TOP 1 Id FROM MasterContentItems WHERE Name='Article root categories'))
+BEGIN
+
+UPDATE ContentCategories
+SET  MasterContentItemId=(SELECT TOP 1 Id FROM MasterContentItems WHERE Name='Article sub categories')
+WHERE Type=3 AND ParentID IS NULL
+
+UPDATE ContentItems
+SET Template=''
+WHERE Id=(SELECT TOP 1 ContentItemId FROM ContentCategories WHERE Type=3 AND ParentID IS NULL)
+
+END
+
+GO

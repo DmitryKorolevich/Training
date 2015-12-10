@@ -11,6 +11,7 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.ContentManagement;
@@ -39,16 +40,6 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
                 throw new ApiException("Invalid category");
             }
 
-            var targetStatuses = new List<RecordStatusCode>() { RecordStatusCode.Active };
-            if (viewContext.Entity.StatusCode == RecordStatusCode.NotActive)
-            {
-                if (!viewContext.Parameters.Preview)
-                {
-					throw new ApiException("Category not found", HttpStatusCode.NotFound);
-				}
-                targetStatuses.Add(RecordStatusCode.NotActive);
-            }
-
             var rootCategory = await _categoryService.GetCategoriesTreeAsync(new CategoryTreeFilter
                     {
                         Type=ContentType.ArticleCategory,
@@ -58,7 +49,10 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
 
             TtlArticleCategoriesModel toReturn = new TtlArticleCategoriesModel();
             toReturn.Categories = data.SubCategories;
-            toReturn.IdCategory = viewContext.Parameters.IdCategory;
+            if(viewContext.Entity.ParentId.HasValue)
+            {
+                toReturn.ShowAllLink = ContentConstants.ARTICLE_CATEGORY_BASE_URL;
+            }
             return toReturn;
         }
 
@@ -68,7 +62,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
             var toReturn = new TtlArticleCategoryModel
             {
                 Name = categoryContent.Name,
-                Url = ArticleCategoryParameters.ArticleCategoryBaseUrl + categoryContent.Url,
+                Url = ContentConstants.ARTICLE_CATEGORY_BASE_URL + categoryContent.Url,
                 SubCategories = categoryContent.SubCategories?.Select(x => PopulateCategoryTemplateModel(x)).ToList(),
             };
 

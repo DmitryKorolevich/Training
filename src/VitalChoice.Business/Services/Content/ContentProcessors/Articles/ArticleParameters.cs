@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 
 namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
 {
-    public class ArticleCategoryParameters
+    public class ArticleParameters
     {
-        public int? ArticlesPageIndex { get; set; }
+        public const string ArticleBaseUrl = "/article/";
+        public const string ArticleCategoryBaseUrl = "/articles/";
 
         public bool BPreview { get; set; }
 

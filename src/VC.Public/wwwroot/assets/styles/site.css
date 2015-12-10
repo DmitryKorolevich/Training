@@ -964,6 +964,12 @@ footer {
   text-align: left;
   color: #086bfc;
 }
+.working-area-holder h2 {
+  color: #2B6C82;
+  font-size: 24px;
+  font-weight: bold;
+  font-style: italic;
+}
 .working-area-holder input[type=submit],
 .working-area-holder input[type=button],
 .working-area-holder a.button {
@@ -1007,14 +1013,14 @@ footer {
   vertical-align: top;
   margin-right: 0px;
 }
-.working-area-holder .left-content-pane {
+.working-area-holder.content-page .left-content-pane {
   display: inline-block;
   vertical-align: top;
   width: 200px;
   padding: 10px 15px 0 0;
   min-height: 325px;
 }
-.working-area-holder .center-content-pane {
+.working-area-holder.content-page .center-content-pane {
   display: inline-block;
   vertical-align: top;
   width: 482px;
@@ -1024,12 +1030,49 @@ footer {
   border-left: 1px solid #e3e3e3;
   border-right: 1px solid #e3e3e3;
 }
-.working-area-holder .right-content-pane {
+.working-area-holder.content-page .right-content-pane {
   display: inline-block;
   vertical-align: top;
   width: 200px;
   padding: 10px 0 0 15px;
   min-height: 325px;
+}
+.working-area-holder.article-categories-page .header-block img {
+  margin-top: 20px;
+}
+.working-area-holder.article-categories-page .header-block h2 {
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.working-area-holder.article-categories-page .left-content-pane {
+  display: inline-block;
+  vertical-align: top;
+  width: 472px;
+  padding: 10px 15px 0 0;
+}
+.working-area-holder.article-categories-page .left-content-pane .article-line .date {
+  float: right;
+}
+.working-area-holder.article-categories-page .center-content-pane {
+  display: inline-block;
+  vertical-align: top;
+  width: 200px;
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-top: 10px;
+  min-height: 550px;
+  border-left: 1px solid #e3e3e3;
+  border-right: 1px solid #e3e3e3;
+}
+.working-area-holder.article-categories-page .right-content-pane {
+  display: inline-block;
+  vertical-align: top;
+  width: 210px;
+  padding: 10px 0 0 15px;
+}
+.working-area-holder.article-categories-page .right-content-pane .right-wrapper {
+  margin-bottom: 20px;
 }
 .form-group {
   margin-bottom: 15px;

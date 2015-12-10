@@ -13,8 +13,10 @@ using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Content.Articles;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Content.Products;
+using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.ContentManagement;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.TemplateModels;
@@ -24,7 +26,7 @@ using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
 {
-    public class ArticlesProcessor : ContentProcessor<PagedList<TtlShortArticleModel>, ArticleCategoryParameters, ContentCategory>
+    public class ArticlesProcessor : ContentProcessor<TtlShortArticleListModel, ArticleCategoryParameters, ContentCategory>
     {
         private readonly IArticleService _articleService;
 
@@ -34,23 +36,53 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
             _articleService = articleService;
         }
 
-        protected override async Task<PagedList<TtlShortArticleModel>> ExecuteAsync(ProcessorViewContext viewContext)
+        protected override async Task<TtlShortArticleListModel> ExecuteAsync(ProcessorViewContext viewContext)
         {
+            if (viewContext.Entity == null)
+            {
+                throw new ApiException("Invalid category");
+            }
+
             ArticleItemListFilter filter = new ArticleItemListFilter();
-            filter.CategoryId = viewContext.Parameters.IdCategory;
+            filter.CategoryId = viewContext.Entity.ParentId.HasValue ? (int?)viewContext.Entity.Id : null;
             if (viewContext.Parameters.ArticlesPageIndex.HasValue)
             {
                 filter.Paging.PageIndex = viewContext.Parameters.ArticlesPageIndex.Value;
             }
             filter.Paging.PageItemCount = ContentConstants.ARTICLES_LIST_TAKE_COUNT;
+            filter.Sorting.Path = ArticleSortPath.PublishedDate;
+            filter.Sorting.SortOrder = SortOrder.Desc;
             var data = await _articleService.GetArticlesAsync(filter);
 
-            PagedList<TtlShortArticleModel> toReturn = new PagedList<TtlShortArticleModel>(data.Items.Select(p=>new TtlShortArticleModel()
+            TtlShortArticleListModel toReturn = new TtlShortArticleListModel()
             {
-                Name=p.Name,
-                Url= ArticleCategoryParameters.ArticleBaseUrl+ p.Url,
-                PublishedDate=p.PublishedDate,
-            }).ToList(), data.Count);
+                Items = data.Items.Select(p => new TtlShortArticleModel()
+                {
+                    Name = p.Name,
+                    Url = ContentConstants.ARTICLE_BASE_URL + p.Url,
+                    PublishedDate = p.PublishedDate,
+                }).ToList(),
+                Count = data.Count,
+            };
+            var page = viewContext.Parameters.ArticlesPageIndex.HasValue ? viewContext.Parameters.ArticlesPageIndex.Value : 1;
+            if (page > 1)
+            {
+                toReturn.PreviousLink = String.Format("{0}{1}?{2}={3}", ContentConstants.ARTICLE_CATEGORY_BASE_URL, viewContext.Parameters.Url,
+                    QueryStringConstants.PAGE, page-1);
+                if(viewContext.Parameters.BPreview)
+                {
+                    toReturn.PreviousLink += String.Format("&{0}=true", QueryStringConstants.PREVIEW);
+                }
+            }
+            if (toReturn.Count> page* ContentConstants.ARTICLES_LIST_TAKE_COUNT)
+            {
+                toReturn.NextLink = String.Format("{0}{1}?{2}={3}", ContentConstants.ARTICLE_CATEGORY_BASE_URL, viewContext.Parameters.Url,
+                    QueryStringConstants.PAGE, page+1);
+                if (viewContext.Parameters.BPreview)
+                {
+                    toReturn.NextLink += String.Format("&{0}=true", QueryStringConstants.PREVIEW);
+                }
+            }
 
             return toReturn;
         }
