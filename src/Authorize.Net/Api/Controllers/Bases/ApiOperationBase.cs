@@ -42,8 +42,6 @@ namespace Authorize.Net.Api.Controllers.Bases
 
             _responseClass = typeof (TS);
             SetApiRequest(apiRequest);
-
-            Validate();
         }
 
         public Environment RunEnvironment { get; set; }
@@ -67,6 +65,7 @@ namespace Authorize.Net.Api.Controllers.Bases
 
         public async Task Execute(Environment environment = null)
         {
+            Validate();
             BeforeExecute();
 
             if (null == environment)

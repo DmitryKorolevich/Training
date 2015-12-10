@@ -57,6 +57,11 @@
       "CompanyCode": "VC001",
       "TurnOffCommit": true
     },
+    "AuthorizeNet": {
+      "ApiLogin": "7G6Ux97Sqyst",
+      "ApiKey": "76kf798S7RtqEyxQ",
+      "TestEnv": false
+    },
     "AzureStorage": {
       "StorageConnectionString": "DefaultEndpointsProtocol=https;AccountName=vcdatabases;AccountKey=ERNr+5Hrxekm8nRWhgs8zXhPNyzBoU8KAJ1JyUe6nX4zSvUoSVFLhYa/Fk1jVxkUCXvG8riZdMVGbGutVugdrg==",
       "CustomerContainerName": "customer-files",

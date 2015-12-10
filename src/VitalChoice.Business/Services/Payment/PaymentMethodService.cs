@@ -3,16 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Authorize.Net.Api.Contracts.V1;
+using Authorize.Net.Api.Controllers;
 using Microsoft.AspNet.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Business.Queries.Payment;
 using VitalChoice.Business.Queries.User;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Transaction;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Context;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer.PaymentMethod;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Payments;
@@ -26,19 +33,25 @@ namespace VitalChoice.Business.Services.Payment
 		private readonly EcommerceContext _context;
 		private readonly IEcommerceRepositoryAsync<PaymentMethodToCustomerType> _paymentMethodToCustomerTypeRepository;
 		private readonly IHttpContextAccessor _contextAccessor;
-		private readonly ILogger _logger;
+	    private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _mapper;
+	    private readonly IOptions<AppOptions> _options;
+	    private readonly ICountryNameCodeResolver _countryNameCode;
+	    private readonly ILogger _logger;
 
 	    public PaymentMethodService(IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository,
 	        IHttpContextAccessor contextAccessor, IRepositoryAsync<AdminProfile> adminProfileRepository,
 	        EcommerceContext context,
 	        IEcommerceRepositoryAsync<PaymentMethodToCustomerType> paymentMethodToCustomerTypeRepository,
-	        ILoggerProviderExtended loggerProvider)
+	        ILoggerProviderExtended loggerProvider, IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> mapper, IOptions<AppOptions> options, ICountryNameCodeResolver countryNameCode)
 	    {
 	        _paymentMethodRepository = paymentMethodRepository;
 	        _contextAccessor = contextAccessor;
 	        _adminProfileRepository = adminProfileRepository;
 	        _context = context;
 	        _paymentMethodToCustomerTypeRepository = paymentMethodToCustomerTypeRepository;
+	        _mapper = mapper;
+	        _options = options;
+	        _countryNameCode = countryNameCode;
 	        _logger = loggerProvider.CreateLoggerDefault();
 	    }
 
@@ -149,6 +162,119 @@ namespace VitalChoice.Business.Services.Payment
 
 			return creditCard;
 		}
+
+        public async Task<List<MessageInfo>> AuthorizeCreditCard(OrderPaymentMethodDynamic paymentMethod)
+        {
+            List<MessageInfo> result = new List<MessageInfo>();
+
+            if (_options.Value.AuthorizeNet.TestEnv || paymentMethod.IdObjectType != (int)PaymentMethodType.CreditCard ||
+                _mapper.IsObjectSecured(paymentMethod))
+                return result;
+
+            var creditCard = new creditCardType
+            {
+                cardNumber = paymentMethod.Data.CardNumber,
+                expirationDate = ((DateTime)paymentMethod.Data.ExpDate).ToString("MMyy")
+            };
+
+            var paymentType = new paymentType { Item = creditCard };
+
+            var transactionRequest = new transactionRequestType
+            {
+                transactionType = transactionTypeEnum.authOnlyTransaction.ToString(), // authorize only
+                amount = 1,
+                payment = paymentType,
+                order = new orderType
+                {
+                    invoiceNumber = $"{paymentMethod.Id}_{DateTime.Now.ToString("hmmss")}"
+                },
+                billTo = new customerAddressType
+                {
+                    address = paymentMethod.Address.Data.Address1,
+                    city = paymentMethod.Address.Data.City,
+                    company = paymentMethod.Address.SafeData.Company,
+                    country = _countryNameCode.GetCountryCode(paymentMethod.Address),
+                    email = paymentMethod.Address.SafeData.Email,
+                    faxNumber = paymentMethod.Address.SafeData.Fax,
+                    firstName = paymentMethod.Address.Data.FirstName,
+                    lastName = paymentMethod.Address.Data.LastName,
+                    phoneNumber = paymentMethod.Address.Data.Phone,
+                    state = _countryNameCode.GetRegionOrStateCode(paymentMethod.Address),
+                    zip = paymentMethod.Address.Data.Zip
+                }
+            };
+
+            var request = new createTransactionRequest
+            {
+                transactionRequest = transactionRequest
+            };
+
+            var controller = new createTransactionController(request)
+            {
+                RunEnvironment = Authorize.Net.Environment.Production,
+                MerchantAuthentication = new merchantAuthenticationType()
+                {
+                    name = _options.Value.AuthorizeNet.ApiLogin,
+                    ItemElementName = ItemChoiceType.transactionKey,
+                    Item = _options.Value.AuthorizeNet.ApiKey
+                }
+            };
+            await controller.Execute();
+
+            var response = controller.GetApiResponse();
+            ParseErrors(result, response);
+            if (response.messages.resultCode == messageTypeEnum.Ok)
+            {
+                if (response.transactionResponse != null)
+                {
+                    var voidTransactionRequest = new transactionRequestType
+                    {
+                        transactionType = transactionTypeEnum.voidTransaction.ToString(),
+                        refTransId = response.transactionResponse.transId
+                    };
+
+                    request = new createTransactionRequest
+                    {
+                        transactionRequest = voidTransactionRequest
+                    };
+
+                    controller = new createTransactionController(request)
+                    {
+                        RunEnvironment = Authorize.Net.Environment.Production,
+                        MerchantAuthentication = new merchantAuthenticationType()
+                        {
+                            name = _options.Value.AuthorizeNet.ApiLogin,
+                            ItemElementName = ItemChoiceType.transactionKey,
+                            Item = _options.Value.AuthorizeNet.ApiKey
+                        }
+                    };
+                    await controller.Execute();
+
+                    response = controller.GetApiResponse();
+                    ParseErrors(result, response);
+                    if (response.messages.resultCode == messageTypeEnum.Ok)
+                    {
+                        return result;
+                    }
+                    return result;
+                }
+            }
+            return result;
+        }
+
+	    private static void ParseErrors(List<MessageInfo> result, createTransactionResponse response)
+	    {
+	        result.AddRange(response?.messages?.message?.Select(m => new MessageInfo()
+	        {
+	            Field = "CardNumber",
+	            Message = $"[{m.code}] {m.text}"
+	        }) ?? Enumerable.Empty<MessageInfo>());
+	        result.AddRange(response?.transactionResponse?.errors?.Select(m => new MessageInfo()
+	        {
+	            Field = "CardNumber",
+	            Message = $"[{m.errorCode}] {m.errorText}"
+	        }) ?? Enumerable.Empty<MessageInfo>());
+	    }
 	}
 }
 

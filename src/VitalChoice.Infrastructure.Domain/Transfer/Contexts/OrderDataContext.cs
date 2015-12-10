@@ -37,14 +37,6 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
 
     public class OrderDataContext : ComputableDataContext
     {
-        public Dictionary<string, int> Coutries { get; set; }
-
-        public Dictionary<string, Dictionary<string, int>> States { get; set; }
-
-        public Dictionary<int, Ecommerce.Domain.Entities.Addresses.Country> CoutryCodes { get; set; }
-
-        public Dictionary<int, Dictionary<int, State>> StateCodes { get; set; }
-
         public List<PromotionDynamic> Promotions { get; set; }
 
         public OrderDataContext()
@@ -99,45 +91,5 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
         public SplitInfo SplitInfo { get; set; }
 
         public bool AllowHealthWise { get; set; }
-
-        //public int GetCountryId(string countryCode)
-        //{
-        //    return _coutries.GetCountryId(countryCode);
-        //}
-
-        //public int GetStateId(string countryCode, string stateCode)
-        //{
-        //    return _states.GetStateId(countryCode, stateCode);
-        //}
-
-        public bool IsState(AddressDynamic address, string countryCode, string stateCode)
-        {
-            return States.GetStateId(countryCode, stateCode) == address.IdState;
-        }
-
-        public bool IsCountry(AddressDynamic address, string countryCode)
-        {
-            return Coutries.GetCountryId(countryCode) == address.IdCountry;
-        }
-
-        public string GetCountryCode(int idCountry)
-        {
-            return CoutryCodes.GetCountry(idCountry)?.CountryCode;
-        }
-
-        public string GetStateCode(int idCountry, int idState)
-        {
-            return StateCodes.GetState(idCountry, idState)?.StateCode;
-        }
-
-        public string GetCountryCode(AddressDynamic address)
-        {
-            return CoutryCodes.GetCountry(address.IdCountry)?.CountryCode;
-        }
-
-        public string GetRegionOrStateCode(AddressDynamic address)
-        {
-            return StateCodes.GetState(address.IdCountry, address.IdState ?? 0)?.StateCode ?? address.County;
-        }
     }
 }

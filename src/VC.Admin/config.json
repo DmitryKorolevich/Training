@@ -8,6 +8,7 @@
       "BuildNumber": 1
     },
     "LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
+    "LogLevel": "Warning",
     "FilesPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\files",
     "FilesRelativePath": "/files",
     "DefaultCacheExpirationTermMinutes": 1440,
@@ -26,6 +27,11 @@
       "RootThumbprint": "89735BE3169BE34AB67B65C7D9EFFD2C230A9D98",
       "EncryptionHostSessionExpire": false,
       "ServerHostName": "export-server"
+    },
+    "AuthorizeNet": {
+      "ApiLogin": "36qq5ECXB",
+      "ApiKey": "4r5Zv38R56BY6tLW",
+      "TestEnv": false
     },
     "PublicHost": "http://staging.g2-dg.com/",
     "AdminHost": "http://admin.staging.g2-dg.com/",

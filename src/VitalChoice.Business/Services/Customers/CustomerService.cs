@@ -63,10 +63,11 @@ namespace VitalChoice.Business.Services.Customers
         private readonly IOptions<AppOptions> _appOptions;
         private readonly AddressOptionValueRepository _addressOptionValueRepositoryAsync;
         private readonly CustomerAddressMapper _customerAddressMapper;
+        private readonly ICountryNameCodeResolver _countryNameCode;
 
         private static string _customerContainerName;
 
-	    public CustomerService(IEcommerceRepositoryAsync<OrderNote> orderNoteRepositoryAsync,
+        public CustomerService(IEcommerceRepositoryAsync<OrderNote> orderNoteRepositoryAsync,
             IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepositoryAsync,
             OrderRepository orderRepository,
             CustomerRepository customerRepositoryAsync,
@@ -75,30 +76,33 @@ namespace VitalChoice.Business.Services.Customers
             IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<CustomerOptionValue> customerOptionValueRepositoryAsync,
-			IBlobStorageClient storageClient,
-			IOptions<AppOptions> appOptions,
-			IStorefrontUserService storefrontUserService,
-			IEcommerceRepositoryAsync<User> userRepositoryAsync,
+            IBlobStorageClient storageClient,
+            IOptions<AppOptions> appOptions,
+            IStorefrontUserService storefrontUserService,
+            IEcommerceRepositoryAsync<User> userRepositoryAsync,
             IEcommerceRepositoryAsync<Affiliate> affiliateRepositoryAsync,
-            ILoggerProviderExtended loggerProvider, DirectMapper<Customer> directMapper, DynamicExpressionVisitor queryVisitor, AddressOptionValueRepository addressOptionValueRepositoryAsync, CustomerAddressMapper customerAddressMapper)
+            ILoggerProviderExtended loggerProvider, DirectMapper<Customer> directMapper, DynamicExpressionVisitor queryVisitor,
+            AddressOptionValueRepository addressOptionValueRepositoryAsync, CustomerAddressMapper customerAddressMapper, ICountryNameCodeResolver countryNameCode)
             : base(
                 customerMapper, customerRepositoryAsync,
-                customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor)
+                customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectLogItemExternalService, loggerProvider, directMapper,
+                queryVisitor)
         {
             _orderNoteRepositoryAsync = orderNoteRepositoryAsync;
             _paymentMethodRepositoryAsync = paymentMethodRepositoryAsync;
             _orderRepository = orderRepository;
             _customerRepositoryAsync = customerRepositoryAsync;
             _vCustomerRepositoryAsync = vCustomerRepositoryAsync;
-		    _adminProfileRepository = adminProfileRepository;
-		    _storageClient = storageClient;
-		    _storefrontUserService = storefrontUserService;
-		    _customerContainerName = appOptions.Value.AzureStorage.CustomerContainerName;
-		    _appOptions = appOptions;
-		    _userRepositoryAsync = userRepositoryAsync;
+            _adminProfileRepository = adminProfileRepository;
+            _storageClient = storageClient;
+            _storefrontUserService = storefrontUserService;
+            _customerContainerName = appOptions.Value.AzureStorage.CustomerContainerName;
+            _appOptions = appOptions;
+            _userRepositoryAsync = userRepositoryAsync;
             _affiliateRepositoryAsync = affiliateRepositoryAsync;
-	        _addressOptionValueRepositoryAsync = addressOptionValueRepositoryAsync;
-	        _customerAddressMapper = customerAddressMapper;
+            _addressOptionValueRepositoryAsync = addressOptionValueRepositoryAsync;
+            _customerAddressMapper = customerAddressMapper;
+            _countryNameCode = countryNameCode;
         }
 
         protected override IQueryLite<Customer> BuildQuery(IQueryLite<Customer> query)
@@ -352,8 +356,8 @@ namespace VitalChoice.Business.Services.Customers
                     sortDynamic =
                         (x) =>
                             sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.ProfileAddress.Country.CountryCode)
-                                : x.OrderByDescending(y => y.ProfileAddress.Country.CountryCode);
+                                ? x.OrderBy(y => _countryNameCode.GetCountryCode(y.ProfileAddress))
+                                : x.OrderByDescending(y => _countryNameCode.GetCountryCode(y.ProfileAddress));
                     break;
                 case VCustomerSortPath.City:
                     sortDynamic =
@@ -366,8 +370,8 @@ namespace VitalChoice.Business.Services.Customers
                     sortDynamic =
                         (x) =>
                             sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.ProfileAddress.State.StateCode).ThenBy(y => y.ProfileAddress.County)
-                                : x.OrderByDescending(y => y.ProfileAddress.State.StateCode).ThenByDescending(y => y.ProfileAddress.County);
+                                ? x.OrderBy(y => _countryNameCode.GetRegionOrStateCode(y.ProfileAddress)).ThenBy(y => y.ProfileAddress.County)
+                                : x.OrderByDescending(y => _countryNameCode.GetRegionOrStateCode(y.ProfileAddress)).ThenByDescending(y => y.ProfileAddress.County);
                     break;
                 case VCustomerSortPath.Status:
                     sortable =
@@ -389,10 +393,7 @@ namespace VitalChoice.Business.Services.Customers
                         includes =>
                             includes.Include(c => c.ProfileAddress)
                                 .ThenInclude(c => c.OptionValues)
-                                .Include(c => c.ProfileAddress)
-                                .ThenInclude(a => a.Country)
-                                .Include(c => c.ProfileAddress)
-                                .ThenInclude(a => a.State), orderBy: sortable, withDefaults: true);
+                                .Include(c => c.ProfileAddress), orderBy: sortable, withDefaults: true);
 
             var adminProfileCondition =
                 new AdminProfileQuery().IdInRange(
@@ -416,10 +417,10 @@ namespace VitalChoice.Business.Services.Customers
                     LastName = x.ProfileAddress.Data.LastName,
                     DateEdited = x.DateEdited,
                     IdObjectType = (CustomerType) x.IdObjectType,
-                    CountryCode = x.ProfileAddress.Country.CountryCode,
-                    StateCode = x.ProfileAddress.State?.StateCode,
-                    StateName = x.ProfileAddress.State?.StateName,
-                    CountryName = x.ProfileAddress.Country.CountryCode,
+                    CountryCode = _countryNameCode.GetCountryCode(x.ProfileAddress),
+                    StateCode = _countryNameCode.GetStateCode(x.ProfileAddress),
+                    StateName = _countryNameCode.GetStateName(x.ProfileAddress),
+                    CountryName = _countryNameCode.GetCountryName(x.ProfileAddress),
                     City = x.ProfileAddress.Data.City,
                     Company = x.ProfileAddress.Data.Company,
                     Id = x.Id,
@@ -429,7 +430,7 @@ namespace VitalChoice.Business.Services.Customers
                     Phone = x.ProfileAddress.Data.Phone,
                     Zip = x.ProfileAddress.Data.Zip,
                     County = x.ProfileAddress.County,
-                    StateOrCounty = x.ProfileAddress.County ?? x.ProfileAddress.State?.StateCode,
+                    StateOrCounty = _countryNameCode.GetRegionOrStateCode(x.ProfileAddress),
                     StatusCode = x.StatusCode,
                 }).ToList(),
                 Count = customers.Count

@@ -18,7 +18,8 @@
     "VitalChoice.Workflow": "",
     "VitalChoice.Interfaces": "",
     "VitalChoice.DynamicData": "",
-    "VitalChoice.ContentProcessing": ""
+    "VitalChoice.ContentProcessing": "",
+    "Authorize.Net": ""
   },
 
   "frameworks": {

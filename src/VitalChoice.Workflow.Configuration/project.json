@@ -6,10 +6,6 @@
   "projectUrl": "",
   "licenseUrl": "",
 
-  "compilationOptions": {
-    "emitEntryPoint": true
-  },
-
   "dependencies": {
     "Autofac.Extensions.DependencyInjection": "4.0.0-*",
     "Microsoft.Extensions.Configuration.Json": "1.0.0-*",
@@ -22,7 +18,7 @@
   },
 
   "commands": {
-    "VitalChoice.Workflow.Configuration": "VitalChoice.Workflow.Configuration"
+    "VitalChoice.Workflow.Configuration": "run"
   },
 
   "frameworks": {
