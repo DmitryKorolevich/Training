@@ -11,8 +11,8 @@ snippet if\n\
 	@if(${1}) {{\n\
 \n\
 	}}\n\
-# else\n\
-snippet else\n\
+# ifnot\n\
+snippet ifnot\n\
 	@else(${1}) {{\n\
 \n\
 	}}";
