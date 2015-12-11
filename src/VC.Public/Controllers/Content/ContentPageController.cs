@@ -81,6 +81,7 @@ namespace VC.Public.Controllers.Content
                 ViewEngineResult viewResult = engine.FindPartialView(actionContext, viewName);
 
                 ViewContext viewContext = new ViewContext(actionContext, viewResult.View, viewData, tempData, sw, new HtmlHelperOptions());
+                
 
                 await viewResult.View.RenderAsync(viewContext);
 

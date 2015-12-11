@@ -57,12 +57,19 @@ namespace VitalChoice.ContentProcessing.Base
             var viewContext = await GetData(GetParameters(context, bindingContext, parameters), user);
             var contentEntity = viewContext.Entity;
             ITtlTemplate template;
+            var templateCacheOptions = new TemplateCacheParam
+            {
+                IdMaster = contentEntity.MasterContentItemId,
+                IdTemplate = contentEntity.ContentItem.Id,
+                Template = contentEntity.MasterContentItem.Template,
+                Master = contentEntity.MasterContentItem.Template,
+                TemplateUpdateDate = contentEntity.ContentItem.Updated,
+                MasterUpdateDate = contentEntity.MasterContentItem.Updated,
+                ActionContext = context
+            };
             try
             {
-                template = _templatesCache.GetOrCreateTemplate(contentEntity.MasterContentItem.Template,
-                    contentEntity.ContentItem.Template, contentEntity.ContentItem.Updated,
-                    contentEntity.MasterContentItem.Updated,
-                    contentEntity.MasterContentItemId, contentEntity.ContentItem.Id);
+                template = _templatesCache.GetOrCreateTemplate(templateCacheOptions);
             }
             catch (Exception e)
             {
@@ -89,7 +96,7 @@ namespace VitalChoice.ContentProcessing.Base
             var templatingModel = new ExpandoObject();
             model.CopyToDictionary(templatingModel);
 
-            var generatedHtml = template.Generate(templatingModel);
+            var generatedHtml = template.Generate(templatingModel, context);
 
             return CreateResult(generatedHtml, viewContext);
         }

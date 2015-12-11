@@ -9,7 +9,6 @@ namespace VitalChoice.ContentProcessing.Cache
     {
         Task RemoveFromCache(int idMaster, int idContent);
 
-        ITtlTemplate GetOrCreateTemplate(string masterTemplate, string template, DateTime dateUpdated,
-            DateTime masterDateUpdated, int idMaster, int idContent);
+        ITtlTemplate GetOrCreateTemplate(TemplateCacheParam cacheParams);
     }
 }

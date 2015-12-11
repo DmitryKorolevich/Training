@@ -100,19 +100,19 @@ namespace VitalChoice.Business.Services.Content
                 _logger.LogError("The category {0} have no template", categoryUrl);
                 return null;
             }
-            ITtlTemplate template;
-            try {
-                template = _templatesCache.GetOrCreateTemplate(category.MasterContentItem.Template,
-                category.ContentItem.Template, category.ContentItem.Updated, category.MasterContentItem.Updated,
-                category.MasterContentItemId, category.ContentItem.Id);
-            }
-            catch (Exception e) {
-                _logger.LogError(e.ToString());
-                return new ContentViewModel
-                {
-                    Body = (e as TemplateCompileException)?.ToString()
-                };
-            }
+            //ITtlTemplate template;
+            //try {
+            //    template = _templatesCache.GetOrCreateTemplate(category.MasterContentItem.Template,
+            //    category.ContentItem.Template, category.ContentItem.Updated, category.MasterContentItem.Updated,
+            //    category.MasterContentItemId, category.ContentItem.Id);
+            //}
+            //catch (Exception e) {
+            //    _logger.LogError(e.ToString());
+            //    return new ContentViewModel
+            //    {
+            //        Body = (e as TemplateCompileException)?.ToString()
+            //    };
+            //}
             dynamic model = new ExpandoObject();
             model.BodyHtml = category.ContentItem.Description;
             parameters.Add(ContentConstants.CATEGORY_ID, category.Id);
@@ -127,11 +127,11 @@ namespace VitalChoice.Business.Services.Content
             //    model = await processor.ExecuteAsync(model, parameters);
             //}
 
-            var generatedHtml = template.Generate(model);
+            //var generatedHtml = template.Generate(model);
 
             var toReturn = new ContentViewModel
             {
-                Body = generatedHtml,
+                Body = null,//generatedHtml,
                 Title = category.ContentItem.Title,
                 MetaDescription = category.ContentItem.MetaDescription,
                 MetaKeywords = category.ContentItem.MetaKeywords,
@@ -187,21 +187,21 @@ namespace VitalChoice.Business.Services.Content
                 _logger.LogError("The content item {0} have no template", contentDataItemUrl);
                 return null;
             }
-            ITtlTemplate template;
-            try
-            {
-                template = _templatesCache.GetOrCreateTemplate(contentDataItem.MasterContentItem.Template,
-                    contentDataItem.ContentItem.Template, contentDataItem.ContentItem.Updated,
-                    contentDataItem.MasterContentItem.Updated,
-                    contentDataItem.MasterContentItemId, contentDataItem.ContentItemId);
-            }
-            catch (Exception e) {
-                _logger.LogError(e.ToString());
-                return new ContentViewModel
-                {
-                    Body = (e as TemplateCompileException)?.ToString()
-                };
-            }
+            //ITtlTemplate template;
+            //try
+            //{
+            //    template = _templatesCache.GetOrCreateTemplate(contentDataItem.MasterContentItem.Template,
+            //        contentDataItem.ContentItem.Template, contentDataItem.ContentItem.Updated,
+            //        contentDataItem.MasterContentItem.Updated,
+            //        contentDataItem.MasterContentItemId, contentDataItem.ContentItemId);
+            //}
+            //catch (Exception e) {
+            //    _logger.LogError(e.ToString());
+            //    return new ContentViewModel
+            //    {
+            //        Body = (e as TemplateCompileException)?.ToString()
+            //    };
+            //}
             dynamic model = new ExpandoObject();
             model.BodyHtml = contentDataItem.ContentItem.Description;
             //foreach (var masterContentItemsToContentItemProcessor in contentDataItem.MasterContentItem.MasterContentItemToContentProcessors)
@@ -215,11 +215,11 @@ namespace VitalChoice.Business.Services.Content
             //    model = await processor.ExecuteAsync(model, parameters);
             //}
 
-            var generatedHtml = template.Generate(model);
+            //var generatedHtml = template.Generate(model);
 
             var toReturn = new ContentViewModel
             {
-                Body = generatedHtml,
+                Body = null,//generatedHtml,
                 Title = contentDataItem.ContentItem.Title,
                 MetaDescription = contentDataItem.ContentItem.MetaDescription,
                 MetaKeywords = contentDataItem.ContentItem.MetaKeywords,

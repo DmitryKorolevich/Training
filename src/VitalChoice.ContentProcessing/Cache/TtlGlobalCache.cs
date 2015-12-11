@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Templates;
 using Templates.Data;
 using Templates.Exceptions;
@@ -10,7 +11,21 @@ namespace VitalChoice.ContentProcessing.Cache
 {
     public class TtlGlobalCache : ITtlGlobalCache
     {
-        private readonly Dictionary<IdPair, ITtlTemplate> _cache = new Dictionary<IdPair, ITtlTemplate>();
+        private readonly ILogger _logger;
+
+        public TtlGlobalCache(ILoggerFactory loggerFactory)
+        {
+            _logger = loggerFactory.CreateLogger<TtlGlobalCache>();
+        }
+
+        private class CachedTemplate
+        {
+            public ITtlTemplate Template { get; set; }
+            public DateTime MasterDate { get; set; }
+            public DateTime TemplateDate { get; set; }
+        }
+
+        private readonly Dictionary<IdPair, CachedTemplate> _cache = new Dictionary<IdPair, CachedTemplate>();
         private readonly object _lockObject = new object();
 
         private struct IdPair : IEquatable<IdPair>
@@ -61,7 +76,7 @@ namespace VitalChoice.ContentProcessing.Cache
                 {
                     var ttlTemplate = _cache[searchValue];
                     _cache.Remove(searchValue);
-                    ttlTemplate.Dispose();
+                    ttlTemplate.Template.Dispose();
                 }
             }
         }
@@ -72,52 +87,68 @@ namespace VitalChoice.ContentProcessing.Cache
             return Task.Delay(0);
         }
 
-        public ITtlTemplate GetOrCreateTemplate(string masterTemplate, string template, DateTime dateUpdated,
-            DateTime masterDateUpdated, int idMaster, int idContent)
+        public ITtlTemplate GetOrCreateTemplate(TemplateCacheParam cacheParams)
         {
-            ITtlTemplate result;
-            var searchValue = new IdPair(idMaster, string.IsNullOrEmpty(template) ? 0 : idContent);
+            CachedTemplate cache;
+            var searchValue = new IdPair(cacheParams.IdMaster, string.IsNullOrWhiteSpace(cacheParams.Template) ? 0 : cacheParams.IdTemplate);
             lock (_lockObject)
             {
-                if (_cache.TryGetValue(searchValue, out result))
+                if (_cache.TryGetValue(searchValue, out cache))
                 {
-                    if (result.DateCreated != dateUpdated || result.MasterDateCreated != masterDateUpdated)
+                    if (cache.TemplateDate < cacheParams.TemplateUpdateDate || cache.MasterDate < cacheParams.MasterUpdateDate)
                     {
                         if (
-                            !result.Recompile(masterTemplate + template,
-                                new CompileContext(new TemplateOptions {AllowCSharp = true, ForceRemoveWhitespace = true})).Success)
+                            !cache.Template.Recompile(cacheParams.WholeTemplate,
+                                new CompileContext(new TemplateOptions
+                                {
+                                    AllowCSharp = true,
+                                    ForceRemoveWhitespace = true,
+                                    Data = cacheParams.ActionContext
+                                })).Success)
                         {
                             //Update dates so old template using in runtime next request ok
-                            result.MasterDateCreated = masterDateUpdated;
-                            result.DateCreated = dateUpdated;
-                            throw new TemplateCompileException(result.CompileResult.ErrorList);
+                            cache.MasterDate = cacheParams.MasterUpdateDate;
+                            cache.TemplateDate = cacheParams.TemplateUpdateDate;
+                            _logger.LogError("Template recompilation error",
+                                new TemplateCompileException(cache.Template.CompileResult.ErrorList));
                         }
-                        result.MasterDateCreated = masterDateUpdated;
-                        result.DateCreated = dateUpdated;
+                        cache.MasterDate = cacheParams.MasterUpdateDate;
+                        cache.TemplateDate = cacheParams.TemplateUpdateDate;
                     }
-                    return result;
+                    return cache.Template;
                 }
             }
-            result = new TtlTemplate(masterTemplate + template,
-                new CompileContext(new TemplateOptions {AllowCSharp = true, ForceRemoveWhitespace = true}));
-            if (!result.CompileResult.Success)
-                throw new TemplateCompileException(result.CompileResult.ErrorList);
-            result.MasterDateCreated = masterDateUpdated;
-            result.DateCreated = dateUpdated;
+            cache = new CachedTemplate
+            {
+                Template = new TtlTemplate(cacheParams.WholeTemplate,
+                    new CompileContext(new TemplateOptions
+                    {
+                        AllowCSharp = true,
+                        ForceRemoveWhitespace = true,
+                        Data = cacheParams.ActionContext
+                    })),
+                MasterDate = cacheParams.MasterUpdateDate,
+                TemplateDate = cacheParams.TemplateUpdateDate
+            };
+            if (!cache.Template.CompileResult.Success)
+                throw new TemplateCompileException(cache.Template.CompileResult.ErrorList);
+            cache.MasterDate = cacheParams.MasterUpdateDate;
+            cache.TemplateDate = cacheParams.TemplateUpdateDate;
             lock (_lockObject)
             {
-                ITtlTemplate cachedResult;
+                CachedTemplate cachedResult;
                 if (_cache.TryGetValue(searchValue, out cachedResult))
                 {
-                    result.Dispose();
-                    return cachedResult;
+                    cache.Template.Dispose();
+                    return cachedResult.Template;
                 }
-                _cache.Add(searchValue, result);
+                _cache.Add(searchValue, cache);
             }
-            return result;
+            return cache.Template;
         }
 
         #region IDisposable
+
         private volatile bool _disposed;
 
         protected virtual void Dispose(bool disposing)
@@ -145,6 +176,7 @@ namespace VitalChoice.ContentProcessing.Cache
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
         #endregion
     }
 }
