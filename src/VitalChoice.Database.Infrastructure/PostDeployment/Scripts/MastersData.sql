@@ -2590,11 +2590,11 @@ END
 GO 
 
 IF ((SELECT TOP 1 MasterContentItemId FROM ContentCategories WHERE Type=3 AND ParentID IS NULL)
-=(SELECT TOP 1 Id FROM MasterContentItems WHERE Name='Article root categories'))
+=(SELECT TOP 1 Id FROM MasterContentItems WHERE Name='Article Root Category'))
 BEGIN
 
 UPDATE ContentCategories
-SET  MasterContentItemId=(SELECT TOP 1 Id FROM MasterContentItems WHERE Name='Article sub categories')
+SET  MasterContentItemId=(SELECT TOP 1 Id FROM MasterContentItems WHERE Name='Article Sub Category')
 WHERE Type=3 AND ParentID IS NULL
 
 UPDATE ContentItems
@@ -2605,7 +2605,7 @@ END
 
 GO
 
-IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Name='Article sub categories' AND Updated<'2015-12-10 00:00:00.000')
+IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Name='Article Sub Category' AND Updated<'2015-12-10 00:00:00.000')
 BEGIN
 	UPDATE [dbo].[MasterContentItems]
 	SET 
@@ -2712,13 +2712,13 @@ BEGIN
 	</div>
 }}
 %>'
-WHERE Name='Article sub categories'
+WHERE Name='Article Sub Category'
 
 END
 
 GO
 
-IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Name='Article master template' AND Updated<'2015-12-10 00:00:00.000')
+IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Name='Article Individual' AND Updated<'2015-12-10 00:00:00.000')
 BEGIN
 	UPDATE [dbo].[MasterContentItems]
 	SET 
@@ -2893,7 +2893,7 @@ BEGIN
 	</div>
 }}
 %>'
-WHERE Name='Article master template'
+WHERE Name='Article Individual'
 
 END
 

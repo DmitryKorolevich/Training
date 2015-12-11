@@ -43,10 +43,10 @@ BEGIN
 
 	INSERT INTO [dbo].[MasterContentItemsToContentProcessors]
 	([MasterContentItemId],[ContentProcessorId])
-	SELECT [Id], 7 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Article sub categories'
+	SELECT [Id], 7 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Article Sub Category'
 	INSERT INTO [dbo].[MasterContentItemsToContentProcessors]
 	([MasterContentItemId],[ContentProcessorId])
-	SELECT [Id], 8 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Article sub categories'
+	SELECT [Id], 8 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Article Sub Category'
 END
 
 GO
@@ -68,13 +68,13 @@ BEGIN
 
 	INSERT INTO [dbo].[MasterContentItemsToContentProcessors]
 	([MasterContentItemId],[ContentProcessorId])
-	SELECT [Id], 9 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Article master template'
+	SELECT [Id], 9 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Article Individual'
 	INSERT INTO [dbo].[MasterContentItemsToContentProcessors]
 	([MasterContentItemId],[ContentProcessorId])
-	SELECT [Id], 10 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Article master template'
+	SELECT [Id], 10 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Article Individual'
 	INSERT INTO [dbo].[MasterContentItemsToContentProcessors]
 	([MasterContentItemId],[ContentProcessorId])
-	SELECT [Id], 11 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Article master template'
+	SELECT [Id], 11 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Article Individual'
 END
 
 GO
