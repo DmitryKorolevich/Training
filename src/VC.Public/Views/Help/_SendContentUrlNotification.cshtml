@@ -1,0 +1,14 @@
+﻿@using System.Threading.Tasks
+@using Microsoft.Extensions.OptionsModel
+@using VC.Public.Helpers
+@using VitalChoice.Infrastructure.Domain.Options
+@model VC.Public.Models.Help.SendContentUrlNotificationModel
+@inject IOptions<AppOptions> appOptions;
+
+<div id="sendContentDialog" title="Email Article">
+	<script>
+		var captchaSiteKey = "@appOptions.Value.GoogleCaptcha.PublicKey";
+	</script>
+	<span class="title">@Model.Name</span>
+	@{ await Html.RenderPartialAsync("_SendContentUrlNotificationInner", Model); }
+</div>

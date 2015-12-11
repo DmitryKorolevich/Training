@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.ContentProcessing.Interfaces;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Infrastructure.Cache;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Content.Base;
@@ -14,6 +13,7 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Content.Articles;
+using VitalChoice.ContentProcessing.Cache;
 
 namespace VitalChoice.Business.Services.Content
 {

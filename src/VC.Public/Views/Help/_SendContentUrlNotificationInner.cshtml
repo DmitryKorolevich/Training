@@ -1,0 +1,53 @@
+﻿@using System.Threading.Tasks
+@using Microsoft.Extensions.OptionsModel
+@using VC.Public.Helpers
+@using VitalChoice.Infrastructure.Domain.Options
+@model VC.Public.Models.Help.SendContentUrlNotificationModel
+@inject IOptions<AppOptions> appOptions;
+
+<div id="sendContentDialogInner" title="Send Article">
+	<script>
+		successMessage = '@ViewBag.SuccessMessage';
+	</script>
+	<form asp-controller="Help" asp-action="SendContentUrlNotification" data-ajax-success="articleSubmitSuccess" data-ajax-failure="articleSubmitError" data-ajax="true" data-method="post" data-ajax-mode="replace" data-ajax-update="#sendContentDialogInner" class="form-regular medium-small">
+		@Html.HiddenFor(x => x.Name)
+        @Html.HiddenFor(x => x.Url)
+		@Html.ValidationSummary(true, "")
+		<div class="form-group">
+			@Html.LabelFor(m => m.YourName, new {@class = "control-label"})
+			<div class="input-group">
+				@Html.TextBoxFor(m => m.YourName, new {@class = "form-control bigger"})
+				@Html.ValidationMessageFor(m => m.YourName)
+			</div>
+		</div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.YourEmail, new { @class = "control-label" })
+            <div class="input-group">
+                @Html.TextBoxFor(m => m.YourEmail, new { @class = "form-control bigger" })
+                @Html.ValidationMessageFor(m => m.YourEmail)
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.RecipentName, new { @class = "control-label" })
+            <div class="input-group">
+                @Html.TextBoxFor(m => m.RecipentName, new { @class = "form-control bigger" })
+                @Html.ValidationMessageFor(m => m.RecipentName)
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.RecipentEmail, new { @class = "control-label" })
+            <div class="input-group">
+                @Html.TextBoxFor(m => m.RecipentEmail, new { @class = "form-control bigger" })
+                @Html.ValidationMessageFor(m => m.RecipentEmail)
+            </div>
+        </div>
+		<div class="form-group">
+			@Html.LabelFor(m => m.Message, new {@class = "control-label"})
+			<div class="input-group">
+				@Html.TextAreaFor(m => m.Message, new {@class = "form-control bigger", rows = 7})
+				@Html.ValidationMessageFor(m => m.Message)
+			</div>
+		</div>
+		<div class="form-group google-captcha margin-top-medium" id="googleCaptcha"></div>
+	</form>
+</div>
