@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.ModelBinding;
@@ -40,21 +41,29 @@ namespace VitalChoice.ContentProcessing.Extensions
             {
                 throw new TemplateProcessingException("ActionContext not found in chained data");
             }
-            var result = _viewEngine.FindPartialView(actionContext, GetInnerResult(parent, chained));
-            result.EnsureSuccessful();
-            ViewDataDictionary viewData =
-                new ViewDataDictionary(
-                    new ViewDataDictionary(
-                        new DefaultModelMetadataProvider(
-                            actionContext.HttpContext.RequestServices.GetRequiredService<ICompositeMetadataDetailsProvider>()),
-                        actionContext.ModelState), data);
-            ITempDataDictionary tempData = actionContext.HttpContext.RequestServices.GetRequiredService<ITempDataDictionary>();
-            using (var writer = new StringWriter())
+            try
             {
-                ViewContext viewContext = new ViewContext(actionContext, result.View, viewData, tempData, writer, new HtmlHelperOptions());
-                result.View.RenderAsync(viewContext).Wait();
-                writer.Flush();
-                return writer.ToString();
+                var result = _viewEngine.FindPartialView(actionContext, GetInnerResult(parent, chained));
+                result.EnsureSuccessful();
+                ViewDataDictionary viewData =
+                    new ViewDataDictionary(
+                        new ViewDataDictionary(
+                            new DefaultModelMetadataProvider(
+                                actionContext.HttpContext.RequestServices.GetRequiredService<ICompositeMetadataDetailsProvider>()),
+                            actionContext.ModelState), data);
+                ITempDataDictionary tempData = actionContext.HttpContext.RequestServices.GetRequiredService<ITempDataDictionary>();
+                using (var writer = new StringWriter())
+                {
+                    ViewContext viewContext = new ViewContext(actionContext, result.View, viewData, tempData, writer,
+                        new HtmlHelperOptions());
+                    result.View.RenderAsync(viewContext).Wait();
+                    writer.Flush();
+                    return writer.ToString();
+                }
+            }
+            catch (Exception e)
+            {
+                return e.Message + "\r\n" + (e.InnerException?.Message ?? string.Empty);
             }
         }
     }

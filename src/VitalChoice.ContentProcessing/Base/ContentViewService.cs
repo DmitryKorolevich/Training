@@ -69,10 +69,10 @@ namespace VitalChoice.ContentProcessing.Base
             {
                 IdMaster = contentEntity.MasterContentItemId,
                 IdTemplate = contentEntity.ContentItem.Id,
-                Template = contentEntity.MasterContentItem.Template,
                 Master = contentEntity.MasterContentItem.Template,
-                TemplateUpdateDate = contentEntity.ContentItem.Updated,
+                Template = contentEntity.ContentItem.Template,
                 MasterUpdateDate = contentEntity.MasterContentItem.Updated,
+                TemplateUpdateDate = contentEntity.ContentItem.Updated,
                 ActionContext = context
             };
             try
