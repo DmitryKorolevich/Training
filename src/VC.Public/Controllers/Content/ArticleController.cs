@@ -11,11 +11,15 @@ namespace VC.Public.Controllers.Content
     public class ArticleController : BaseContentController
     {
         private readonly IArticleCategoryViewService _articleCategoryViewService;
+        private readonly IArticleViewService _articleViewService;
 
-        public ArticleController(IArticleCategoryViewService articleCategoryViewService)
+        public ArticleController(
+            IArticleCategoryViewService articleCategoryViewService,
+            IArticleViewService articleViewService)
 	    {
             _articleCategoryViewService = articleCategoryViewService;
-	    }
+            _articleViewService = articleViewService;
+        }
 
         private readonly IContentEditService _contentService;
 
@@ -23,7 +27,7 @@ namespace VC.Public.Controllers.Content
         public async Task<IActionResult> Categories()
         {
             var toReturn = await _articleCategoryViewService.GetContentAsync(ActionContext, BindingContext, User);
-            if (toReturn != null)
+            if (toReturn?.Body != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
             }
@@ -34,7 +38,7 @@ namespace VC.Public.Controllers.Content
         public async Task<IActionResult> Category(string url)
         {
             var toReturn = await _articleCategoryViewService.GetContentAsync(ActionContext, BindingContext, User);
-            if (toReturn != null)
+            if (toReturn?.Body != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
             }
@@ -44,13 +48,12 @@ namespace VC.Public.Controllers.Content
         [HttpGet]
         public async Task<IActionResult> Article(string url)
         {
-            throw new NotImplementedException();
-            //var toReturn = await _contentService.GetContentItemContentAsync(ContentType.Article, GetParameters(), url);
-            //if (toReturn != null)
-            //{
-            //    return BaseView(new ContentPageViewModel(toReturn));
-            //}
-            //return BaseNotFoundView();
+            var toReturn = await _articleViewService.GetContentAsync(ActionContext, BindingContext, User);
+            if (toReturn?.Body != null)
+            {
+                return BaseView(new ContentPageViewModel(toReturn));
+            }
+            return BaseNotFoundView();
         }
     }
 }

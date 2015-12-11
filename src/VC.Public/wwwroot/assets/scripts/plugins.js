@@ -41,7 +41,19 @@
 
     $(document).ready(function ()
     {
-        $( ".date-picker" ).datepicker();
+        $(".date-picker").datepicker();
+
+        $('.drop-menu a.trigger').click(function(e)
+        {
+            $(this).parent().find('> ul').slideToggle();
+            e.preventDefault();
+        });
+
+        $('.print-button').click(function (e)
+        {
+            window.print();
+            e.preventDefault();
+        });
     });
 })(jQuery);
 

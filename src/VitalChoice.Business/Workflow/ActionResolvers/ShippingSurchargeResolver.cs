@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
+using VitalChoice.Interfaces.Services;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Core;
 
@@ -23,12 +24,13 @@ namespace VitalChoice.Business.Workflow.ActionResolvers
         {
             if (dataContext.Order.ShippingAddress == null)
                 return Task.FromResult((int) SurchargeType.None);
-            if (dataContext.IsState(dataContext.Order.ShippingAddress, "us", "hi") ||
-                dataContext.IsState(dataContext.Order.ShippingAddress, "us", "ak"))
+            var countryNameCode = executionContext.Resolve<ICountryNameCodeResolver>();
+            if (countryNameCode.IsState(dataContext.Order.ShippingAddress, "us", "hi") ||
+                countryNameCode.IsState(dataContext.Order.ShippingAddress, "us", "ak"))
             {
                 return Task.FromResult((int) SurchargeType.AlaskaHawaii);
             }
-            if (dataContext.IsCountry(dataContext.Order.ShippingAddress, "ca"))
+            if (countryNameCode.IsCountry(dataContext.Order.ShippingAddress, "ca"))
             {
                 return Task.FromResult((int) SurchargeType.Canada);
             }

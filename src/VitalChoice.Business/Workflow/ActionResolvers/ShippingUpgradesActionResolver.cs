@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
+using VitalChoice.Interfaces.Services;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Core;
 
@@ -21,8 +22,9 @@ namespace VitalChoice.Business.Workflow.ActionResolvers
         {
             if (dataContext.Order.ShippingAddress == null)
                 return Task.FromResult((int) ShippingUpgradeGroup.None);
-            if (dataContext.IsCountry(dataContext.Order.ShippingAddress, "us") ||
-                dataContext.IsCountry(dataContext.Order.ShippingAddress, "ca"))
+            var countryNameCode = executionContext.Resolve<ICountryNameCodeResolver>();
+            if (countryNameCode.IsCountry(dataContext.Order.ShippingAddress, "us") ||
+                countryNameCode.IsCountry(dataContext.Order.ShippingAddress, "ca"))
             {
                 return Task.FromResult((int)ShippingUpgradeGroup.UsCa);
             }

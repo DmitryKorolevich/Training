@@ -6,6 +6,9 @@ using System.IO;
 using System.Xml;
 using Antlr4.Runtime.Misc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.PlatformAbstractions;
+using VitalChoice.Infrastructure.Domain.Options;
 #if !DOTNET5_4
 using NLog;
 #endif
@@ -114,8 +117,10 @@ namespace VitalChoice.Core.Services
 
         public ILoggerFactory Factory => _factory;
 
-        internal LoggerProviderExtended(string basePath, string logPath)
+        public LoggerProviderExtended(IOptions<AppOptions> options, IApplicationEnvironment env)
         {
+            string basePath = env.ApplicationBasePath;
+            string logPath = options.Value.LogPath;
             _factory = new LoggerFactory();
 #if !DOTNET5_4
             int backLevelCount = 0;

@@ -194,22 +194,6 @@ namespace VitalChoice.Ecommerce.Domain.Dynamic
                 var value = Value as SafeExpandoObject;
                 return value?._dictObj.Keys ?? Enumerable.Empty<string>();
             }
-
-            /// <summary> 
-            /// Returns our Expression converted to our known LimitType
-            /// </summary> 
-            private Expression GetLimitedSelf()
-            {
-#if DNX451 || NET451
-                if (Expression.Type == LimitType || Expression.Type.IsEquivalentTo(LimitType))
-#else
-                if (Expression.Type == LimitType)
-#endif
-                {
-                    return Expression;
-                }
-                return Expression.Convert(Expression, LimitType);
-            }
         }
 
         #endregion

@@ -26,11 +26,11 @@ using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
 {
-    public class ArticlesProcessor : ContentProcessor<TtlShortArticleListModel, ArticleCategoryParameters, ContentCategory>
+    public class ArticlesProcessor : ContentProcessor<TtlShortArticleListModel, ArticleParameters, ContentCategory>
     {
         private readonly IArticleService _articleService;
 
-        public ArticlesProcessor(IObjectMapper<ArticleCategoryParameters> mapper,
+        public ArticlesProcessor(IObjectMapper<ArticleParameters> mapper,
             IArticleService articleService) : base(mapper)
         {
             _articleService = articleService;
@@ -69,7 +69,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
             {
                 toReturn.PreviousLink = String.Format("{0}{1}?{2}={3}", ContentConstants.ARTICLE_CATEGORY_BASE_URL, viewContext.Parameters.Url,
                     QueryStringConstants.PAGE, page-1);
-                if(viewContext.Parameters.BPreview)
+                if(viewContext.Parameters.Preview)
                 {
                     toReturn.PreviousLink += String.Format("&{0}=true", QueryStringConstants.PREVIEW);
                 }
@@ -78,7 +78,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
             {
                 toReturn.NextLink = String.Format("{0}{1}?{2}={3}", ContentConstants.ARTICLE_CATEGORY_BASE_URL, viewContext.Parameters.Url,
                     QueryStringConstants.PAGE, page+1);
-                if (viewContext.Parameters.BPreview)
+                if (viewContext.Parameters.Preview)
                 {
                     toReturn.NextLink += String.Format("&{0}=true", QueryStringConstants.PREVIEW);
                 }

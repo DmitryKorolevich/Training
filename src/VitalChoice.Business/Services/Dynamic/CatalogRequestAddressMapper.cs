@@ -32,8 +32,6 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.IdCountry = entity.IdCountry;
                 dynamic.County = entity.County;
                 dynamic.IdState = entity.IdState;
-                dynamic.State = entity.State;
-                dynamic.Country = entity.Сountry;
             });
             return Task.Delay(0);
         }

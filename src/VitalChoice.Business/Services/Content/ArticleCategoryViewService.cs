@@ -55,14 +55,6 @@ namespace VitalChoice.Business.Services.Content
 
             if (context != null)
             {
-                if (parameters.ContainsKey(QueryStringConstants.PREVIEW) && parameters[QueryStringConstants.PREVIEW] is string)
-                {
-                    bool preview = false;
-                    if(Boolean.TryParse((string)parameters[QueryStringConstants.PREVIEW], out preview))
-                    {
-                        context.Parameters.BPreview = preview;
-                    }
-                }
                 if (parameters.ContainsKey(QueryStringConstants.PAGE) && parameters[QueryStringConstants.PAGE] is string)
                 {
                     int id = 0;
@@ -76,7 +68,8 @@ namespace VitalChoice.Business.Services.Content
             var targetStatuses = new List<RecordStatusCode>() { RecordStatusCode.Active };
             if (context.Entity!=null && context.Entity.StatusCode == RecordStatusCode.NotActive)
             {
-                if (!context.Parameters.BPreview)
+                if (context.ParametersDictionary.ContainsKey(QueryStringConstants.CPREVIEW) &&
+                    !context.Parameters.Preview)
                 {
                     throw new ApiException("Category not found", HttpStatusCode.NotFound);
                 }

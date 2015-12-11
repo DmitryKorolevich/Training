@@ -193,11 +193,14 @@ namespace VC.Admin.Controllers
 
             var item = await productService.SelectTransferAsync(id);
             
-            ProductManageModel toReturn = _mapper.ToModel<ProductManageModel>(item!=null ? item.ProductDynamic : null);
+            ProductManageModel toReturn = _mapper.ToModel<ProductManageModel>(item?.ProductDynamic);
             if (item.ProductContent != null)
             {
                 toReturn.Url = item.ProductContent.Url;
                 toReturn.MasterContentItemId = item.ProductContent.MasterContentItemId;
+	            toReturn.Template = item.ProductContent.ContentItem.Template;
+                toReturn.MetaTitle = item.ProductContent.ContentItem.Title;
+                toReturn.MetaDescription = item.ProductContent.ContentItem.MetaDescription;
             }
             if (toReturn.CrossSellProducts != null)
             {
@@ -235,10 +238,11 @@ namespace VC.Admin.Controllers
             content.Id = model.Id;
             content.Url = model.Url;
             content.ContentItem = new ContentItem();
-            content.ContentItem.Template = String.Empty;
-            content.ContentItem.Description = String.Empty;
+            content.ContentItem.Template = model.Template ?? string.Empty;
+            content.ContentItem.Description = model.Description ?? string.Empty;
 	        content.ContentItem.Title = model.MetaTitle;
 	        content.ContentItem.MetaDescription = model.MetaDescription;
+	        content.MasterContentItemId = model.MasterContentItemId;
             transferEntity.ProductContent = content;
             transferEntity.ProductDynamic = item;
 
@@ -251,7 +255,9 @@ namespace VC.Admin.Controllers
 			}
 
 			ProductManageModel toReturn = _mapper.ToModel<ProductManageModel>(item);
-            return toReturn;
+	        toReturn.MasterContentItemId = transferEntity.ProductContent.MasterContentItemId;
+
+			return toReturn;
         }
 
         [HttpPost]

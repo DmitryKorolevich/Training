@@ -77,7 +77,7 @@ namespace VitalChoice.Business.Services.Products
                 _productCategoryEcommerceRepository.Query(p => !p.ParentId.HasValue)
                     .SelectFirstOrDefaultAsync(false);
             if (categoryEcommerce == null)
-                return null;
+                return new ContentViewContext<ProductCategoryContent>(parameters, null, user);
             var productCategory =
                 await
                     BuildQuery(ContentRepository.Query(p => p.Id == categoryEcommerce.Id))

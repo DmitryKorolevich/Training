@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.PlatformAbstractions;
+using VitalChoice.Infrastructure.Domain.Options;
 
 namespace VitalChoice.Core.Services
 {
@@ -32,9 +35,9 @@ namespace VitalChoice.Core.Services
             return _loggerProviderExtended?.CreateLogger(type);
         }
 
-        public static LoggerProviderExtended Build(string rootPath, string logPath)
+        public static LoggerProviderExtended Build(IOptions<AppOptions> options, IApplicationEnvironment env)
         {
-            return _loggerProviderExtended ?? (_loggerProviderExtended = new LoggerProviderExtended(rootPath, logPath));
+            return _loggerProviderExtended ?? (_loggerProviderExtended = new LoggerProviderExtended(options, env));
         }
     }
 

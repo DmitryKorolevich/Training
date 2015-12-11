@@ -1,15 +1,13 @@
 ﻿using System.Collections.Generic;
 using VC.Admin.Validators.Product;
-using VitalChoice.Validation.Models;
-using VitalChoice.Validation.Attributes;
+using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
-using System;
-using VC.Admin.Models.Products;
-using VitalChoice.Ecommerce.Domain.Attributes;
+using VitalChoice.Validation.Attributes;
+using VitalChoice.Validation.Models;
 
-namespace VC.Admin.Models.Product
+namespace VC.Admin.Models.Products
 {
     public class CrossSellProductModel
     {
@@ -48,6 +46,8 @@ namespace VC.Admin.Models.Product
         [Map]
         [Localized(GeneralFieldNames.Name)]
         public string Name { get; set; }
+
+		public string Template { get; set; }
 
 		[Map]
 		public string SubTitle { get; set; }

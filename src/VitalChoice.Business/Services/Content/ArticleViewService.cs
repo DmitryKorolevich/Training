@@ -40,18 +40,6 @@ namespace VitalChoice.Business.Services.Content
         {
             ContentViewContext<Article> context = await base.GetDataInternal(model, parameters, user);        
 
-            if (context != null)
-            {
-                if (parameters.ContainsKey(QueryStringConstants.PREVIEW) && parameters[QueryStringConstants.PREVIEW] is string)
-                {
-                    bool preview = false;
-                    if(Boolean.TryParse((string)parameters[QueryStringConstants.PREVIEW], out preview))
-                    {
-                        context.Parameters.BPreview = preview;
-                    }
-                }
-            }
-
             return context;
         }
 

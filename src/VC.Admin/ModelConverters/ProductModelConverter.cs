@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using VC.Admin.Models.Product;
+using VC.Admin.Models.Products;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;

@@ -23,11 +23,11 @@ using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
 {
-    public class ArticleCategoriesProcessor : ContentProcessor<TtlArticleCategoriesModel, ArticleCategoryParameters, ContentCategory>
+    public class ArticleCategoriesProcessor : ContentProcessor<TtlArticleCategoriesModel, ArticleParameters, ContentCategory>
     {
         private readonly ICategoryService _categoryService;
 
-        public ArticleCategoriesProcessor(IObjectMapper<ArticleCategoryParameters> mapper,
+        public ArticleCategoriesProcessor(IObjectMapper<ArticleParameters> mapper,
             ICategoryService categoryService) : base(mapper)
         {
             _categoryService = categoryService;

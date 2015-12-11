@@ -60,6 +60,6 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
             return toReturn;
         }
 
-        public override string ResultName => "RecentArticles";
+        public override string ResultName => "RecentRecipes";
     }
 }

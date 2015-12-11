@@ -7,10 +7,9 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
 {
     public class ArticleParameters
     {
-        public const string ArticleBaseUrl = "/article/";
-        public const string ArticleCategoryBaseUrl = "/articles/";
+        public int? ArticlesPageIndex { get; set; }
 
-        public bool BPreview { get; set; }
+        public bool Preview { get; set; }
 
         public string Url { get; set; }
     }

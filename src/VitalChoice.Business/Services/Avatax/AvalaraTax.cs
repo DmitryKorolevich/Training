@@ -25,6 +25,7 @@ namespace VitalChoice.Business.Services.Avatax
     {
         private readonly ITaxService _taxService;
         private readonly IDynamicMapper<AddressDynamic, OrderAddress> _mapper;
+        private readonly ICountryNameCodeResolver _countryNameCode;
         private readonly ILogger _logger;
         private readonly string _accountName;
         private readonly string _profileName;
@@ -34,10 +35,11 @@ namespace VitalChoice.Business.Services.Avatax
         internal const string ShippingTaxCode = "FR020100";
 
         public AvalaraTax(ITaxService taxService, IOptions<AppOptions> options, ILoggerProviderExtended loggerProvider,
-            IDynamicMapper<AddressDynamic, OrderAddress> mapper)
+            IDynamicMapper<AddressDynamic, OrderAddress> mapper, ICountryNameCodeResolver countryNameCode)
         {
             _taxService = taxService;
             _mapper = mapper;
+            _countryNameCode = countryNameCode;
             _accountName = options.Value.Avatax.AccountName;
             _profileName = options.Value.Avatax.ProfileName;
             _companyCode = options.Value.Avatax.CompanyCode;
@@ -88,8 +90,8 @@ namespace VitalChoice.Business.Services.Avatax
 
         public async Task<decimal> GetTax(OrderDataContext context, TaxGetType taxGetType = TaxGetType.UseBoth)
         {
-            if (!context.IsState(context.Order.ShippingAddress, "us", "va") &&
-                !context.IsState(context.Order.ShippingAddress, "us", "wa"))
+            if (!_countryNameCode.IsState(context.Order.ShippingAddress, "us", "va") &&
+                !_countryNameCode.IsState(context.Order.ShippingAddress, "us", "wa"))
                 return 0;
 
             taxGetType = CommitProtect(taxGetType);
@@ -163,8 +165,8 @@ namespace VitalChoice.Business.Services.Avatax
             };
             destinationAddress = _mapper.ToModel<Address>(orderDataContext.Order.ShippingAddress);
             destinationAddress.AddressCode = "02";
-            destinationAddress.Country = orderDataContext.GetCountryCode(orderDataContext.Order.ShippingAddress);
-            destinationAddress.Region = orderDataContext.GetRegionOrStateCode(orderDataContext.Order.ShippingAddress);
+            destinationAddress.Country = _countryNameCode.GetCountryCode(orderDataContext.Order.ShippingAddress);
+            destinationAddress.Region = _countryNameCode.GetRegionOrStateCode(orderDataContext.Order.ShippingAddress);
         }
 
         private TaxGetType CommitProtect(TaxGetType taxGetType)

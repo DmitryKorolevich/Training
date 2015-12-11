@@ -14,6 +14,7 @@ using VitalChoice.Core.Infrastructure;
 using Microsoft.Extensions.PlatformAbstractions;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Ecommerce.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
@@ -22,7 +23,7 @@ namespace VitalChoice.Workflow.Configuration
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public void Main(string[] args)
         {
             try
             {
@@ -58,21 +59,20 @@ namespace VitalChoice.Workflow.Configuration
 
         private static IContainer BuildContainer()
         {
-            var applicationEnvironment =
-                (IApplicationEnvironment)
-                    CallContextServiceLocator.Locator.ServiceProvider.GetService(typeof (IApplicationEnvironment));
             var configurationBuilder = new ConfigurationBuilder()
-                .SetBasePath(applicationEnvironment.ApplicationBasePath)
-                .AddJsonFile("config.json");
+                .AddJsonFile("config.json")
+                .AddJsonFile("config.local.json", true);
 
-            var path = PathResolver.ResolveAppRelativePath("config.local.json");
-            if (File.Exists(path))
-            {
-                configurationBuilder.AddJsonFile("config.local.json");
-            }
+            //var path = PathResolver.ResolveAppRelativePath("config.local.json");
+            //if (File.Exists(path))
+            //{
+            //    configurationBuilder.AddJsonFile("config.local.json");
+            //}
             var configuration = configurationBuilder.Build();
 
+            var provider = CallContextServiceLocator.Locator.ServiceProvider;
             var services = new ServiceCollection();
+            services.AddInstance(typeof (IApplicationEnvironment), provider.GetService<IApplicationEnvironment>());
 
             services.AddEntityFramework()
                 .AddSqlServer();
@@ -103,10 +103,11 @@ namespace VitalChoice.Workflow.Configuration
             var builder = new ContainerBuilder();
             builder.Populate(services);
             builder.RegisterInstance(configuration).As<IConfiguration>();
-            builder.RegisterInstance(
-                LoggerService.Build(applicationEnvironment.ApplicationBasePath,
-                    configuration.GetSection("App:LogPath").Value))
-                .As<ILoggerProviderExtended>().SingleInstance();
+            builder.RegisterType<LoggerProviderExtended>()
+                .As<ILoggerProviderExtended>()
+                .As<ILoggerProvider>()
+                .SingleInstance();
+            builder.Register(cc => cc.Resolve<ILoggerProviderExtended>().Factory).As<ILoggerFactory>();
 
             builder.Register((cc, pp) => cc.Resolve<ILoggerProviderExtended>().CreateLogger("Root")).As<ILogger>();
             builder.RegisterGeneric(typeof(Logger<>))
@@ -115,6 +116,7 @@ namespace VitalChoice.Workflow.Configuration
                 .As(typeof(ILogger<>));
 
             var container = new AdminDependencyConfig().BuildContainer(typeof (Program).GetTypeInfo().Assembly, builder);
+            LoggerService.Build(container.Resolve<IOptions<AppOptions>>(), container.Resolve<IApplicationEnvironment>());
             return container;
         }
     }

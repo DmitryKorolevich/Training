@@ -874,3 +874,18 @@ BEGIN
 	UNION
 	SELECT NULL, 4, 4, N'IngredientsTitle'
 END
+
+GO
+
+IF EXISTS(SELECT * FROM ProductOptionTypes WHERE Name='MetaDescription')
+BEGIN
+	
+	DELETE ProductOptionValues
+	WHERE IdOptionType IN
+	(SELECT Id FROM ProductOptionTypes  WHERE Name='MetaDescription' OR Name='MetaTitle')
+
+	DELETE ProductOptionTypes  WHERE Name='MetaDescription' OR Name='MetaTitle'
+
+END
+
+GO

@@ -132,6 +132,7 @@ namespace VitalChoice.Core.DependencyInjection
             services.Configure<AppOptionsBase>(options =>
             {
                 options.LogPath = configuration.GetSection("App:LogPath").Value;
+                options.LogLevel = configuration.GetSection("App:LogLevel").Value;
                 options.Connection = new Connection
                 {
                     UserName = configuration.GetSection("App:Connection:UserName").Value,
@@ -155,6 +156,7 @@ namespace VitalChoice.Core.DependencyInjection
                             : configuration.GetSection("App:Versioning:BuildNumber").Value
                 };
                 options.LogPath = configuration.GetSection("App:LogPath").Value;
+                options.LogLevel = configuration.GetSection("App:LogLevel").Value;
                 options.DefaultCacheExpirationTermMinutes =
                     Convert.ToInt32(configuration.GetSection("App:DefaultCacheExpirationTermMinutes").Value);
                 options.ActivationTokenExpirationTermDays =
@@ -226,6 +228,12 @@ namespace VitalChoice.Core.DependencyInjection
 					SecretKey = configuration.GetSection("App:GoogleCaptcha:SecretKey").Value,
 					VerifyUrl = configuration.GetSection("App:GoogleCaptcha:VerifyUrl").Value
                 };
+                options.AuthorizeNet = new AuthorizeNet
+                {
+                    ApiKey = configuration.GetSection("App:AuthorizeNet:ApiKey").Value,
+                    ApiLogin = configuration.GetSection("App:AuthorizeNet:ApiLogin").Value,
+                    TestEnv = Convert.ToBoolean(configuration.GetSection("App:AuthorizeNet:TestEnv").Value)
+                };
             });
 
             services.Configure<MvcOptions>(o =>
@@ -287,11 +295,10 @@ namespace VitalChoice.Core.DependencyInjection
 
             builder.Populate(services);
             builder.RegisterInstance(configuration).As<IConfiguration>();
-            var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
-            builder.RegisterInstance(
-                LoggerService.Build(applicationEnvironment.ApplicationBasePath,
-                    configuration.GetSection("App:LogPath").Value))
-                .As<ILoggerProviderExtended>().SingleInstance();
+            builder.RegisterType<LoggerProviderExtended>()
+                .As<ILoggerProviderExtended>()
+                .As<ILoggerProvider>()
+                .SingleInstance();
             builder.Register(cc => cc.Resolve<ILoggerProviderExtended>().Factory).As<ILoggerFactory>();
 
             //TODO: omit ILogger override in config parameter
@@ -313,7 +320,7 @@ namespace VitalChoice.Core.DependencyInjection
             AutofacExecutionContext.Configure(container);
 
             UnitOfWorkBase.SetOptions(container.Resolve<IOptions<AppOptionsBase>>());
-
+            LoggerService.Build(container.Resolve<IOptions<AppOptions>>(), container.Resolve<IApplicationEnvironment>());
             return container.Resolve<IServiceProvider>();
             //}
             //return null;
@@ -475,6 +482,9 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<ObjectHistoryLogService>().As<IObjectHistoryLogService>();
             builder.RegisterType<ObjectLogItemExternalService>().As<IObjectLogItemExternalService>();
             builder.RegisterType<ReCaptchaValidator>().AsSelf();
+            builder.RegisterType<CountryNameCodeResolver>().As<ICountryNameCodeResolver>()
+                //little optimization on instance count, since it's self hosted data
+                .InstancePerLifetimeScope();
             builder.RegisterType<EncryptedServiceBusHostClient>().As<IEncryptedServiceBusHostClient>().SingleInstance();
             builder.RegisterType<ObjectEncryptionHost>()
                 .As<IObjectEncryptionHost>()

@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
+using VitalChoice.Interfaces.Services;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Core;
 
@@ -18,17 +19,18 @@ namespace VitalChoice.Business.Workflow.ActionResolvers
                 return Task.FromResult(0);
             if (dataContext.Order.ShippingAddress == null)
                 return Task.FromResult(0);
+            var countryNameCode = executionContext.Resolve<ICountryNameCodeResolver>();
             if (dataContext.Order.Customer.IdObjectType == (int) CustomerType.Wholesale)
             {
-                if (dataContext.IsCountry(dataContext.Order.ShippingAddress, "us"))
+                if (countryNameCode.IsCountry(dataContext.Order.ShippingAddress, "us"))
                 {
                     return Task.FromResult((int) CustomerType.Wholesale);
                 }
             }
             if (dataContext.Order.Customer.IdObjectType == (int) CustomerType.Retail)
             {
-                if (dataContext.IsCountry(dataContext.Order.ShippingAddress, "us") ||
-                    dataContext.IsCountry(dataContext.Order.ShippingAddress, "ca"))
+                if (countryNameCode.IsCountry(dataContext.Order.ShippingAddress, "us") ||
+                    countryNameCode.IsCountry(dataContext.Order.ShippingAddress, "ca"))
                 {
                     return Task.FromResult((int) CustomerType.Retail);
                 }

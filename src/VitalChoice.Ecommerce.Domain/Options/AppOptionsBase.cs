@@ -4,5 +4,6 @@
     {
         public Connection Connection { get; set; }
         public string LogPath { get; set; }
+        public string LogLevel { get; set; }
     }
 }

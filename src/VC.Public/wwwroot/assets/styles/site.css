@@ -495,7 +495,7 @@ footer {
   top: auto;
 }
 .top-nav ul li .col_1 {
-  border-right: none!important;
+  border-right: none !important;
 }
 .col_1,
 .col_2,
@@ -656,10 +656,10 @@ footer {
   float: none;
   text-align: left;
   width: 182px;
-  border: none!important;
+  border: none !important;
 }
 .right {
-  width: 199px!important;
+  width: 199px !important;
 }
 .top-nav ul li ul li:hover {
   background: none;
@@ -1013,6 +1013,12 @@ footer {
   vertical-align: top;
   margin-right: 0px;
 }
+.working-area-holder.content-page .title {
+  color: #323232;
+  font-size: 18px;
+  font-weight: bold;
+  height: 20px;
+}
 .working-area-holder.content-page .left-content-pane {
   display: inline-block;
   vertical-align: top;
@@ -1023,7 +1029,7 @@ footer {
 .working-area-holder.content-page .center-content-pane {
   display: inline-block;
   vertical-align: top;
-  width: 482px;
+  width: 472px;
   padding-left: 15px;
   padding-right: 15px;
   min-height: 325px;
@@ -1033,9 +1039,12 @@ footer {
 .working-area-holder.content-page .right-content-pane {
   display: inline-block;
   vertical-align: top;
-  width: 200px;
+  width: 210px;
   padding: 10px 0 0 15px;
   min-height: 325px;
+}
+.working-area-holder.content-page .right-content-pane .right-wrapper {
+  margin-bottom: 20px;
 }
 .working-area-holder.article-categories-page .header-block img {
   margin-top: 20px;
@@ -1073,6 +1082,125 @@ footer {
 }
 .working-area-holder.article-categories-page .right-content-pane .right-wrapper {
   margin-bottom: 20px;
+}
+.working-area-holder.content-page.article-page .header-block img {
+  margin-bottom: 20px;
+}
+.working-area-holder.content-page.article-page .center-content-pane {
+  min-height: 780px;
+}
+.working-area-holder.content-page.article-page .center-content-pane .icons-bar {
+  border-top: 1px solid #e3e3e3;
+  border-bottom: 1px solid #e3e3e3;
+  margin-top: 15px;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  padding-top: 5px;
+}
+.working-area-holder.content-page.article-page .center-content-pane .icons-bar a {
+  text-decoration: none;
+  cursor: pointer;
+  color: black;
+}
+.working-area-holder.content-page.article-page .center-content-pane .icons-bar a img {
+  width: 14px;
+  height: 14px;
+}
+.working-area-holder.content-page.article-page .center-content-pane .icons-bar a span {
+  font-size: 11px;
+  vertical-align: middle;
+}
+.working-area-holder.content-page.article-page .center-content-pane .icons-bar .margin-right-medium {
+  margin-right: 14px;
+}
+.working-area-holder.content-page.article-page .center-content-pane .author {
+  font-style: italic;
+  margin-left: 30px;
+}
+.working-area-holder.content-page.article-page .center-content-pane .body .main-img {
+  float: left;
+  padding: 0 10px 10px 0px;
+  max-width: 472px;
+}
+.drop-menu {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.drop-menu a {
+  display: block;
+  padding: 6px 2px 6px 0;
+}
+.drop-menu a,
+.drop-menu a:visited,
+.drop-menu a:link {
+  color: black;
+}
+.drop-menu a:hover {
+  color: #F34D20;
+}
+.drop-menu.sub-menu {
+  padding-left: 10px;
+}
+.drop-menu.collapsed {
+  display: none;
+}
+@media print {
+  .separator-top,
+  header,
+  footer,
+  .content-bottom {
+    display: none !important;
+  }
+  .main {
+    width: 700px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+  .working-area-holder {
+    padding: 0px;
+  }
+  .content .working-area-holder.content-page > *,
+  .working-area-holder .not-printable {
+    display: none;
+  }
+  .working-area-holder.content-page > .printable {
+    display: block;
+    padding: 0;
+    border: none;
+    width: 100%;
+  }
+  body {
+    background-image: none;
+  }
+}
+.newsletter-block .header {
+  text-align: center;
+  color: white;
+  background-color: #F25125;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  font-style: italic;
+  font-weight: bold;
+  font-size: 14px;
+}
+.newsletter-block .body {
+  border: 1px solid #e3e3e3;
+  text-align: center;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+.newsletter-block .body .input-wrapper {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.newsletter-block .body .input-wrapper input[type=text] {
+  width: 115px;
+  margin-right: 5px;
+}
+.newsletter-block .body .input-wrapper input[type=button] {
+  padding: 2px 8px;
+  vertical-align: top;
 }
 .form-group {
   margin-bottom: 15px;
@@ -1947,7 +2075,7 @@ footer {
   border-radius: 20px;
   box-shadow: 0 0 20px #000;
   height: 350px !important;
-  padding: 20px ;
+  padding: 20px;
   border: none;
   width: 485px !important;
   position: fixed !important;
