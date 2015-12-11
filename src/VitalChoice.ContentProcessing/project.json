@@ -12,7 +12,8 @@
     "VitalChoice.Data": "",
     "Autofac": "4.0.0-*",
     "Microsoft.AspNet.Mvc.Abstractions": "6.0.0-*",
-    "Microsoft.AspNet.Mvc.Core": "6.0.0-*"
+    "Microsoft.AspNet.Mvc.Core": "6.0.0-*",
+    "Templates": "2.5.8-rc1"
   },
   "frameworks": {
     "dnx451": { },

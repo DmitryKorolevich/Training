@@ -6,7 +6,7 @@ using Templates.Data;
 using Templates.Exceptions;
 using Templates.Runtime;
 
-namespace VitalChoice.Infrastructure.Cache
+namespace VitalChoice.ContentProcessing.Cache
 {
     public class TtlGlobalCache : ITtlGlobalCache
     {

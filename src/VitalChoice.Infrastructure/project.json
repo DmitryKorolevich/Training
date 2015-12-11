@@ -10,8 +10,7 @@
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
     "VitalChoice.Infrastructure.Domain": "1.0.0-*",
     "VitalChoice.Ecommerce": "",
-    "WindowsAzure.Storage": "6.1.1-*",
-    "Templates": "2.5.6-rc1"
+    "WindowsAzure.Storage": "6.1.1-*"
   },
 
   "frameworks": {

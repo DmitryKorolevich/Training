@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Templates;
 
-namespace VitalChoice.Infrastructure.Cache
+namespace VitalChoice.ContentProcessing.Cache
 {
     public interface ITtlGlobalCache : IDisposable
 

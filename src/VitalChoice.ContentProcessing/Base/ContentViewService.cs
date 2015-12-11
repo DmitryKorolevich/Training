@@ -10,12 +10,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using Microsoft.AspNet.Mvc;
+using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Helpers;
-using VitalChoice.Infrastructure.Cache;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 
 namespace VitalChoice.ContentProcessing.Base
