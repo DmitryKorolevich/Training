@@ -13,6 +13,8 @@ using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using System.Net;
 
 namespace VitalChoice.Business.Services.Content
 {
@@ -35,7 +37,7 @@ namespace VitalChoice.Business.Services.Content
         #region Public
 
         protected override Expression<Func<ContentCategory, bool>> FilterExpression(CategoryContentServiceModel model) =>
-            p => (p.Url == model.Url || (model.IdRootCategory.HasValue && p.Id==model.IdRootCategory.Value)) && p.StatusCode != RecordStatusCode.Deleted && p.Type==ContentType.ArticleCategory;
+            p => p.Url == model.Url && p.StatusCode != RecordStatusCode.Deleted && p.Type==ContentType.ArticleCategory;
 
         protected override async Task<ContentViewContext<ContentCategory>> GetDataInternal(CategoryContentServiceModel model,
             IDictionary<string, object> parameters, ClaimsPrincipal user)
@@ -45,20 +47,14 @@ namespace VitalChoice.Business.Services.Content
             {
                 context = await base.GetDataInternal(model, parameters, user);
             }
-
-            model.IdRootCategory = await _categoryService.GetIdRootCategoryAsync(ContentType.ArticleCategory);
-            context = await base.GetDataInternal(model, parameters, user);
+            else
+            {
+                var rootCategory = await BuildQuery(ContentRepository.Query(p => !p.ParentId.HasValue && p.Type == ContentType.ArticleCategory)).SelectFirstOrDefaultAsync(false);
+                context = new ContentViewContext<ContentCategory>(parameters, rootCategory, user);
+            }            
 
             if (context != null)
             {
-                if (parameters.ContainsKey(QueryStringConstants.ID_CATEGORY) && parameters[QueryStringConstants.ID_CATEGORY] is string)
-                {
-                    int id = 0;
-                    if(Int32.TryParse((string)parameters[QueryStringConstants.ID_CATEGORY], out id))
-                    {
-                        context.Parameters.IdCategory = id;
-                    }
-                }
                 if (parameters.ContainsKey(QueryStringConstants.PAGE) && parameters[QueryStringConstants.PAGE] is string)
                 {
                     int id = 0;
@@ -67,6 +63,17 @@ namespace VitalChoice.Business.Services.Content
                         context.Parameters.ArticlesPageIndex = id;
                     }
                 }
+            }
+
+            var targetStatuses = new List<RecordStatusCode>() { RecordStatusCode.Active };
+            if (context.Entity!=null && context.Entity.StatusCode == RecordStatusCode.NotActive)
+            {
+                if (context.ParametersDictionary.ContainsKey(QueryStringConstants.CPREVIEW) &&
+                    !context.Parameters.Preview)
+                {
+                    throw new ApiException("Category not found", HttpStatusCode.NotFound);
+                }
+                targetStatuses.Add(RecordStatusCode.NotActive);
             }
 
             return context;

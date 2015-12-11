@@ -33,7 +33,7 @@ namespace VitalChoice.Business.Queries.Content
 
         public ArticleQuery NotWithIds(ICollection<int> ids)
         {
-            if (ids.Count > 0)
+            if (ids!=null && ids.Count > 0)
             {
                 And(x => !ids.Contains(x.Id));
             }

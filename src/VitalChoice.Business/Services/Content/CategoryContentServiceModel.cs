@@ -8,6 +8,5 @@ namespace VitalChoice.Business.Services.Content
 {
     public class CategoryContentServiceModel : ContentServiceModel
     {
-        public int? IdRootCategory { get; set; }
     }
 }

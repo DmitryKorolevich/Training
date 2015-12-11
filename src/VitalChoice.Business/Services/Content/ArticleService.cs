@@ -87,7 +87,7 @@ namespace VitalChoice.Business.Services.Content
                     query = query.NotWithIds(ids);
                 }
             }
-            query=query.WithName(filter.Name).NotDeleted();
+            query=query.WithName(filter.Name).NotDeleted().NotWithIds(filter.ExcludeIds);
 
 			Func<IQueryable<Article>, IOrderedQueryable<Article>> sortable = x => x.OrderBy(y => y.Name);
 			var sortOrder = filter.Sorting.SortOrder;
@@ -108,15 +108,20 @@ namespace VitalChoice.Business.Services.Content
 						        : x.OrderByDescending(y => y.Url);
 			        break;
 		        case ArticleSortPath.Updated:
-			        //_articleRepository.EarlyRead = true; //added temporarly till ef 7 becomes stable
-
 			        sortable =
 				        (x) =>
 					        sortOrder == SortOrder.Asc
 						        ? x.OrderBy(y => y.ContentItem.Updated)
 						        : x.OrderByDescending(y => y.ContentItem.Updated);
 			        break;
-	        }
+                case ArticleSortPath.PublishedDate:
+                    sortable =
+                        (x) =>
+                            sortOrder == SortOrder.Asc
+                                ? x.OrderBy(y => y.PublishedDate)
+                                : x.OrderByDescending(y => y.PublishedDate);
+                    break;
+            }
 
 	        var toReturn = await _articleRepository.Query(query).Include(p=>p.ContentItem).Include(p => p.ArticlesToContentCategories).ThenInclude(p => p.ContentCategory).OrderBy(sortable).
                 Include(p => p.User).ThenInclude(p => p.Profile).

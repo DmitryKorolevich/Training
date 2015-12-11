@@ -30,5 +30,7 @@ namespace VitalChoice.Business.Mail
         Task SendCustomerServiceEmailAsync(string email, CustomerServiceEmail model);
 
         Task SendGCNotificationEmailAsyn(string email, GCNotificationEmail model);
+
+        Task SendContentUrlNotificationAsync(string email, ContentUrlNotificationEmail model);
     }
 }

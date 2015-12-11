@@ -17,9 +17,16 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Content.Base;
+using VitalChoice.Infrastructure.Domain.Constants;
+using Microsoft.AspNet.Http.Extensions;
 
 namespace VitalChoice.ContentProcessing.Base
 {
+    public class ContentRequest
+    {
+        public string AbsoluteUrl { get; set; }
+    }
+
     public abstract class ContentViewService<TEntity, TParametersModel> : IContentViewService
         where TEntity : ContentDataItem
         where TParametersModel : ContentServiceModel
@@ -44,6 +51,7 @@ namespace VitalChoice.ContentProcessing.Base
         }
 
         public virtual string DefaultModelName => "Model";
+        public virtual string DefaultRequestName => "Request";
 
         public async Task<ContentViewModel> GetContentAsync(ActionContext context, ActionBindingContext bindingContext, ClaimsPrincipal user,
             object additionalParameters)
@@ -79,10 +87,15 @@ namespace VitalChoice.ContentProcessing.Base
                     Body = (e as TemplateCompileException)?.ToString()
                 };
             }
-
+            
             Dictionary<string, object> model = new Dictionary<string, object>
             {
-                {DefaultModelName, contentEntity}
+                {DefaultModelName, contentEntity},
+                {DefaultRequestName, new ContentRequest()
+                    {
+                        AbsoluteUrl = viewContext.Parameters.AbsoluteUrl
+                    }
+                },
             };
             foreach (var p in contentEntity.MasterContentItem.MasterContentItemToContentProcessors)
             {
@@ -127,7 +140,7 @@ namespace VitalChoice.ContentProcessing.Base
 
         protected async Task<ContentViewContext<TEntity>> GetData(IDictionary<string, object> queryData, ClaimsPrincipal user)
         {
-            var viewContext = await GetDataInternal((TParametersModel) _mapper.FromDictionary(queryData, false), queryData, user);
+            var viewContext = await GetDataInternal((TParametersModel)_mapper.FromDictionary(queryData, false), queryData, user);
             if (viewContext.Entity == null)
             {
                 Logger.LogInformation("The item could not be found {" + queryData.FormatDictionary() + "}");
@@ -171,9 +184,22 @@ namespace VitalChoice.ContentProcessing.Base
             {
                 if (!parameters.ContainsKey(queryParam.Key))
                 {
-                    parameters.Add(queryParam.Key, queryParam.Value.FirstOrDefault());
+                    if (queryParam.Key == QueryStringConstants.PREVIEW)
+                    {
+                        bool result = false;
+                        if (Boolean.TryParse(queryParam.Value.FirstOrDefault(), out result))
+                        {
+                            parameters.Add(QueryStringConstants.CPREVIEW, result);
+                        }
+                    }
+                    else
+                    {
+                        parameters.Add(queryParam.Key, queryParam.Value.FirstOrDefault());
+                    }
                 }
             }
+            var absoluteUrl = context.HttpContext.Request.GetDisplayUrl();
+            parameters.Add(QueryStringConstants.ABSOLUTE_URL, absoluteUrl);
             return parameters;
         }
     }

@@ -199,6 +199,8 @@ namespace VC.Admin.Controllers
                 toReturn.Url = item.ProductContent.Url;
                 toReturn.MasterContentItemId = item.ProductContent.MasterContentItemId;
 	            toReturn.Template = item.ProductContent.ContentItem.Template;
+                toReturn.MetaTitle = item.ProductContent.ContentItem.Title;
+                toReturn.MetaDescription = item.ProductContent.ContentItem.MetaDescription;
             }
             if (toReturn.CrossSellProducts != null)
             {

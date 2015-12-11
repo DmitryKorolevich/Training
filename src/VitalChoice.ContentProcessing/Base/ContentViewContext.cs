@@ -25,6 +25,8 @@ namespace VitalChoice.ContentProcessing.Base
 
         public dynamic Parameters => _parameters;
 
+        public IDictionary<string, object> ParametersDictionary => _parameters as IDictionary<string, object>;
+
         public ContentDataItem BaseEntity { get; protected set; }
         public ClaimsPrincipal User { get; }
     }

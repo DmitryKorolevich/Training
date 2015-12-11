@@ -2586,3 +2586,315 @@ BEGIN
 WHERE [Name] = 'Product page'
 
 END
+
+GO 
+
+IF ((SELECT TOP 1 MasterContentItemId FROM ContentCategories WHERE Type=3 AND ParentID IS NULL)
+=(SELECT TOP 1 Id FROM MasterContentItems WHERE Name='Article Root Category'))
+BEGIN
+
+UPDATE ContentCategories
+SET  MasterContentItemId=(SELECT TOP 1 Id FROM MasterContentItems WHERE Name='Article Sub Category')
+WHERE Type=3 AND ParentID IS NULL
+
+UPDATE ContentItems
+SET Template=''
+WHERE Id=(SELECT TOP 1 ContentItemId FROM ContentCategories WHERE Type=3 AND ParentID IS NULL)
+
+END
+
+GO
+
+IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Name='Article Sub Category' AND Updated<'2015-12-10 00:00:00.000')
+BEGIN
+	UPDATE [dbo].[MasterContentItems]
+	SET 
+	[Updated]=GETDATE(),
+	[Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.Articles}}
+@model() {{dynamic}}
+
+<%
+    
+<left>
+{{
+	<div class="left-content-pane">
+	    @if(@(model.Model.ParentId))
+	    {{
+	        <strong>@(@model.Model.Name)</strong>
+	    }}
+	    @ifnot(@(model.Model.ParentId)) {{
+	        <strong>Articles by Date</strong>
+	    }}
+		<br/>
+		<br/>
+		@list(@(model.Articles.Items))
+        {{
+            <div class="article-line">
+                @if(PublishedDate)
+	            {{
+                <div class="date">
+                @date(PublishedDate) {{MM''/''dd''/''yyyy}}
+                </div>
+                }}
+                <a href="@(Url)">@(Name)</a>
+            </div>
+    		<br/>
+        }}
+        @if(@!string.IsNullOrEmpty(model.Articles.PreviousLink))
+	    {{
+	        <a href="@(@model.Articles.PreviousLink)"><< View the previous 50 articles</a>
+	    }}
+	    @if(@!string.IsNullOrEmpty(model.Articles.NextLink))
+	    {{
+	        <a class="pull-right" href="@(@model.Articles.NextLink)">View the next 50 articles >></a>
+	    }}
+	</div>
+}}
+
+<center>
+{{
+	<div class="center-content-pane">
+		<span>
+		    <strong>ARTICLES BY TOPIC</strong>&nbsp;
+	        @if(@!string.IsNullOrEmpty(model.ShowAllLink)) {{
+		    <a href="@(ShowAllLink)">Show all</a>
+		    }}
+		</span>
+		<br/>
+		<br/>
+		@list(Categories)
+        {{
+            <strong>@(Name)</strong><br/>
+            @if(SubCategories)
+            {{
+                @list(SubCategories)
+                {{
+                    <a href="@(Url)">@(Name)</a><br/>
+                }}
+            }}
+            <br/>
+        }}
+	</div>
+}} :: TtlArticleCategoriesModel
+
+<rightwrapper>
+{{
+    <div class="right-wrapper">
+        @out()
+    </div>
+}}
+
+<right>
+{{
+	<div class="right-content-pane">
+	    @rightwrapper(){{
+		    <a href="#"><img src="/assets/images/news-baby-spot-8-29-13a-210x157px.png"></a>
+		}}
+	    @rightwrapper(){{
+		    <a href="#"><img src="/assets/images/bonus-tile-10-30-12A.jpg"></a>
+		}}
+	    @rightwrapper(){{
+		    <a href="#"><img src="/assets/images/guarantee-spot-8-29-13-210px.jpg"></a>
+		}}
+	</div>
+}}
+
+<default> -> ()
+{{
+    <div class="working-area-holder article-categories-page">
+        <div class="header-block">
+            <img src="/assets/images/article-master-header-10-25-13A.png">
+            <h2>Vital Choices Newsletter Article Archive: find articles by date or topic</h4>
+        </div>
+        @left()
+    	@center(ArticleCategories)
+    	@right()
+	</div>
+}}
+%>'
+WHERE Name='Article Sub Category'
+
+END
+
+GO
+
+IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Name='Article Individual' AND Updated<'2015-12-10 00:00:00.000')
+BEGIN
+	UPDATE [dbo].[MasterContentItems]
+	SET 
+	[Updated]=GETDATE(),
+	[Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.Articles}}
+@using() {{System.Collections.Generic}}
+@model() {{dynamic}}
+
+<%
+    
+<category>
+{{
+    @if(@model.SubCategories.Count>0)
+    {{
+        <ul class="drop-menu sub-menu collapsed">
+        @list(@model.SubCategories)
+        {{
+            <li>
+                @if(@model.SubCategories.Count>0)
+                {{
+                <a class="trigger" href="#">@(Name)</a>
+                }}
+                @if(@model.SubCategories.Count==0)
+                {{
+                <a href="@(Url)">@(Name)</a>
+                }}
+                @category()
+            </li>
+        }}
+        </ul>
+    }}
+}}
+    
+<left>
+{{
+	<div class="left-content-pane">
+	    <strong>ARTICLES BY TOPIC</strong>
+        <br/>
+        <br/>
+        <ul class="drop-menu">
+            @list()
+            {{
+                <li>
+                    <a class="trigger" href="#">@(Name)</a>
+                    @category()
+                </li>
+            }}
+        </ul>
+	</div>
+}}
+
+<center>
+{{
+	<div class="center-content-pane article printable">
+            <strong class="title">@(@model.Model.Name)</strong>
+            <br/>
+            <strong>@(@model.Model.SubTitle)</strong>
+            <br/>
+            <br/>
+            <span class="date">@date(@model.Model.PublishedDate) {{MM''/''dd''/''yyyy}}</span>
+            <span class="author">@(@model.Model.Author)</span>
+            <div class="icons-bar not-printable">
+    	        <a target="_blank" href="http://www.facebook.com/sharer.php?u=@(@model.Request.AbsoluteUrl)&t=@(@model.Model.Name)" class="margin-right-medium">
+                    <img src="/assets/images/icons/fb.png">
+                    <span>FACEBOOK</span>
+                </a>
+                <a target="_blank" href="http://twitter.com/share?text=@(@model.Model.Name)&url=@(@model.Request.AbsoluteUrl)" class="margin-right-medium">
+                    <img src="/assets/images/icons/fb.png">
+                    <span>TWITTER</span>
+                </a>
+                <a target="_blank" href="https://plus.google.com/share?url=@(@model.Request.AbsoluteUrl)" class="margin-right-medium">
+                    <img src="/assets/images/icons/fb.png">
+                    <span>GOOGLE+</span>
+                </a>
+                <a href="#" data-content-name="@(@model.Model.Name)" data-absolute-url="@(@model.Request.AbsoluteUrl)" class="margin-right-medium email-button">
+                    <img src="/assets/images/icons/fb.png">
+                    <span>E-MAIL</span>
+                </a>
+                <a target="_blank" href="http://www.addthis.com/bookmark.php?v=300&pubid=xa-509854151b0dec32" class="margin-right-medium">
+                    <img src="/assets/images/icons/fb.png">
+                    <span>SHARE</span>
+                </a>
+                <a href="#" class="print-button">
+                    <img src="/assets/images/icons/fb.png">
+                    <span>PRINT</span>
+                </a>
+            </div>
+            <div class="body">
+                <img class="main-img" src="@(@model.Model.FileUrl)"/>
+                @(@model.Model.ContentItem.Description)
+            </div>
+	</div>
+}}
+
+<right_top>
+{{
+    <div class="right-wrapper newsletter-block">
+        <div class="header">Vital Choices Newsletter</div>
+        <div class="body">
+            <strong>Special Offers • Recipes<br>
+                Nutrition &amp; Eco News
+            </strong>
+            <br>
+            <div class="input-wrapper">
+                <input type="text" autocomplete="off" placeholder="Enter email here">
+                <input class="yellow" type="button" value="Go">
+            </div>
+            <a href="#">View a recent issue</a>
+        </div>
+    </div>
+    <div class="right-wrapper">
+	    <a href="#"><img src="/assets/images//bonus-tile-10-30-12A.jpg"></a>
+    </div>
+}}
+
+<right_recent_articles>
+{{
+    <strong>RECENT ARTICLES</strong>
+    <br/>
+    <br/>
+    @list(@model)
+    {{
+        <a href="@(Url)">@(Name)</a>
+        <br/>
+        <br/>
+    }}
+}}
+
+<right_recent_recipes>
+{{
+    @list(@model)
+    {{
+        <a href="@(Url)">@(Name)</a>
+        <br/>
+        <br/>
+    }}
+}}
+
+<right_bottom>
+{{
+    <div class="right-wrapper">
+	    <a href="#"><img src="/assets/images//Top-sellers-sidebar-tile-12-27-12-296px-A.jpg"></a>
+    </div>
+}}
+
+<right>
+{{
+	<div class="right-content-pane">
+    	@right_top()
+    	@right_recent_articles(RecentArticles)
+    	@right_recent_recipes(RecentRecipes)
+    	@right_bottom()
+	</div>
+}}
+
+<default> -> ()
+{{
+    <script>
+        window.addEventListener("load", function() {
+            var element = document.createElement("script");
+            element.src = "/app/modules/help/sendContentUrlNotification.js";
+            document.body.appendChild(element);
+        }, false);
+    </script>
+    <div class="working-area-holder content-page article-page">
+        <div class="header-block">
+            <img src="/assets/images/article-master-header-10-25-13A.png">
+        </div>
+        @left(ArticleCategories)
+    	@center()
+    	@right()
+	</div>
+}}
+%>'
+WHERE Name='Article Individual'
+
+END
+
+GO

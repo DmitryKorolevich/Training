@@ -10,47 +10,50 @@ namespace VC.Public.Controllers.Content
 {
     public class ArticleController : BaseContentController
     {
-	    public ArticleController(IContentEditService contentService)
+        private readonly IArticleCategoryViewService _articleCategoryViewService;
+        private readonly IArticleViewService _articleViewService;
+
+        public ArticleController(
+            IArticleCategoryViewService articleCategoryViewService,
+            IArticleViewService articleViewService)
 	    {
-            _contentService = contentService;
-	    }
+            _articleCategoryViewService = articleCategoryViewService;
+            _articleViewService = articleViewService;
+        }
 
         private readonly IContentEditService _contentService;
 
         [HttpGet]
         public async Task<IActionResult> Categories()
         {
-            throw new NotImplementedException();
-            //var toReturn = await _contentService.GetCategoryContentAsync(ContentType.ArticleCategory, GetParameters());
-            //if (toReturn != null)
-            //{
-            //    return BaseView(new ContentPageViewModel(toReturn));
-            //}
-            //return BaseNotFoundView();
+            var toReturn = await _articleCategoryViewService.GetContentAsync(ActionContext, BindingContext, User);
+            if (toReturn?.Body != null)
+            {
+                return BaseView(new ContentPageViewModel(toReturn));
+            }
+            return BaseNotFoundView();
         }
 
         [HttpGet]
         public async Task<IActionResult> Category(string url)
         {
-            throw new NotImplementedException();
-            //var toReturn = await _contentService.GetCategoryContentAsync(ContentType.ArticleCategory, GetParameters(), url);
-            //if (toReturn != null)
-            //{
-            //    return BaseView(new ContentPageViewModel(toReturn));
-            //}
-            //return BaseNotFoundView();
+            var toReturn = await _articleCategoryViewService.GetContentAsync(ActionContext, BindingContext, User);
+            if (toReturn?.Body != null)
+            {
+                return BaseView(new ContentPageViewModel(toReturn));
+            }
+            return BaseNotFoundView();
         }
 
         [HttpGet]
         public async Task<IActionResult> Article(string url)
         {
-            throw new NotImplementedException();
-            //var toReturn = await _contentService.GetContentItemContentAsync(ContentType.Article, GetParameters(), url);
-            //if (toReturn != null)
-            //{
-            //    return BaseView(new ContentPageViewModel(toReturn));
-            //}
-            //return BaseNotFoundView();
+            var toReturn = await _articleViewService.GetContentAsync(ActionContext, BindingContext, User);
+            if (toReturn?.Body != null)
+            {
+                return BaseView(new ContentPageViewModel(toReturn));
+            }
+            return BaseNotFoundView();
         }
     }
 }

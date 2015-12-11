@@ -43,9 +43,41 @@ BEGIN
 
 	INSERT INTO [dbo].[MasterContentItemsToContentProcessors]
 	([MasterContentItemId],[ContentProcessorId])
-	SELECT [Id], 7 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Article sub categories'
+	SELECT [Id], 7 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Article Sub Category'
 	INSERT INTO [dbo].[MasterContentItemsToContentProcessors]
 	([MasterContentItemId],[ContentProcessorId])
-	SELECT [Id], 8 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Article sub categories'
+	SELECT [Id], 8 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Article Sub Category'
 END
+
+GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentProcessors] WHERE [Type] = N'RecentArticlesProcessor')
+BEGIN
+	INSERT INTO [dbo].[ContentProcessors]
+	(Id, [Type], Name, Description)
+	VALUES
+	(9, N'RecentArticlesProcessor', N'Recent articles processor', N'5 recent articles by date')
+	INSERT INTO [dbo].[ContentProcessors]
+	(Id, [Type], Name, Description)
+	VALUES
+	(10, N'RecentRecipesProcessor', N'Recent recipes processor', N'1 recent recips by date')
+	INSERT INTO [dbo].[ContentProcessors]
+	(Id, [Type], Name, Description)
+	VALUES
+	(11, N'ArticleCategoriesForArticleProcessor', N'Article categories processor', N'Tree view of article categories')
+
+	INSERT INTO [dbo].[MasterContentItemsToContentProcessors]
+	([MasterContentItemId],[ContentProcessorId])
+	SELECT [Id], 9 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Article Individual'
+	INSERT INTO [dbo].[MasterContentItemsToContentProcessors]
+	([MasterContentItemId],[ContentProcessorId])
+	SELECT [Id], 10 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Article Individual'
+	INSERT INTO [dbo].[MasterContentItemsToContentProcessors]
+	([MasterContentItemId],[ContentProcessorId])
+	SELECT [Id], 11 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Article Individual'
+END
+
+GO
+
+
 

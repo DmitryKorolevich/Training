@@ -148,5 +148,46 @@ namespace VC.Public.Controllers
 
             return RedirectToAction("ContactCustomerService");
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> SendContentUrlNotification(string name, string url)
+        {
+            ViewBag.Url = url;
+            ViewBag.Name = name;
+
+            return PartialView("_SendContentUrlNotification", new SendContentUrlNotificationModel {
+                Url = url,
+                Name=name,
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SendContentUrlNotification(SendContentUrlNotificationModel model)
+        {
+            if (Validate(model))
+            {
+                if (!await _reCaptchaValidator.Validate(Request.Form[ReCaptchaValidator.DefaultPostParamName]))
+                {
+                    ModelState.AddModelError(string.Empty, ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.WrongCaptcha]);
+                }
+                else
+                {
+                    ContentUrlNotificationEmail emailModel = new ContentUrlNotificationEmail();
+                    emailModel.FromEmail = model.YourEmail;
+                    emailModel.FromName = model.YourName;
+                    emailModel.RecipentName = model.RecipentName;
+                    emailModel.Url = model.Url;
+                    emailModel.Name = model.Name;
+                    emailModel.Message = model.Message;
+                    await _notificationService.SendContentUrlNotificationAsync(model.RecipentEmail, emailModel);
+
+                    ViewBag.SuccessMessage = InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullySent];
+                    return PartialView("_SendContentUrlNotificationInner", model);
+                }
+            }
+
+            return PartialView("_SendContentUrlNotificationInner", model);
+        }
     }
 }

@@ -7,6 +7,6 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.Articles
     {
 	    public ICollection<TtlArticleCategoryModel> Categories { get; set; }
 
-		public int? IdCategory { get; set; }
+        public string ShowAllLink { get; set; }
     }
 }

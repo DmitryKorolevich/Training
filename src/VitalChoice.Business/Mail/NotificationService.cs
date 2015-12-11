@@ -174,5 +174,16 @@ namespace VitalChoice.Business.Mail
 
             await emailSender.SendEmailAsync(email, subject, body, toDisplayName: model.FirstName+" "+model.LastName);
         }
+
+        public async Task SendContentUrlNotificationAsync(string email, ContentUrlNotificationEmail model)
+        {
+            var body = $"<p>Dear {model.RecipentName},</p>";
+            body += $"<p>{model.FromName} ({model.FromEmail}) has recommended you read this article from Vital Choice: <a href='{model.Url}' target='_blank'>{model.Name}</a></p>";
+            body += $"<p>Personal message from {model.FromName}: {model.Message}</p>";
+
+            var subject = $"Check out this article I found on Vital Choice: {model.Name}";
+
+            await emailSender.SendEmailAsync(email, subject, body,fromDisplayName: model.FromName, fromEmail: model.FromEmail, toDisplayName: model.RecipentName);
+        }
     }
 }

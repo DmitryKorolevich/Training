@@ -12,6 +12,7 @@ using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Content.Articles;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.ContentManagement;
@@ -23,17 +24,17 @@ using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
 {
-    public class ArticleCategoriesProcessor : ContentProcessor<TtlArticleCategoriesModel, ArticleParameters, ContentCategory>
+    public class ArticleCategoriesForArticleProcessor : ContentProcessor<ICollection<TtlArticleCategoryModel>, ArticleParameters, Article>
     {
         private readonly ICategoryService _categoryService;
 
-        public ArticleCategoriesProcessor(IObjectMapper<ArticleParameters> mapper,
+        public ArticleCategoriesForArticleProcessor(IObjectMapper<ArticleParameters> mapper,
             ICategoryService categoryService) : base(mapper)
         {
             _categoryService = categoryService;
         }
 
-        protected override async Task<TtlArticleCategoriesModel> ExecuteAsync(ProcessorViewContext viewContext)
+        protected override async Task<ICollection<TtlArticleCategoryModel>> ExecuteAsync(ProcessorViewContext viewContext)
         {
             if (viewContext.Entity == null)
             {
@@ -47,13 +48,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
 
             var data = PopulateCategoryTemplateModel(rootCategory);
 
-            TtlArticleCategoriesModel toReturn = new TtlArticleCategoriesModel();
-            toReturn.Categories = data.SubCategories;
-            if(viewContext.Entity.ParentId.HasValue)
-            {
-                toReturn.ShowAllLink = ContentConstants.ARTICLE_CATEGORY_BASE_URL;
-            }
-            return toReturn;
+            return data.SubCategories;
         }
 
 
