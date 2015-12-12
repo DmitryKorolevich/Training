@@ -1,26 +1,39 @@
-﻿$(function() {
-	getCountries(function(result) {
-		$.each(result.Data, function(countryIndex, country) {
-			$("#ddCountry").append($('<option></option>').val(country.Id).html(country.CountryName));
-		});
-
-		var idCountry = $("#hdCountry").val();
-		if (idCountry && idCountry != 0) {
-			$("#ddCountry").val(idCountry);
-		} else {
-			$("#ddCountry").val(appSettings.DefaultCountryId);
-		}
-
-		populateStates(result.Data);
-
-		$("#ddCountry").on("change", function () {
-			populateStates(result.Data);
-		});
-
-	}, function(errorResult) {
-		//todo: handle result
-	});
+﻿$(function ()
+{
+    refreshCountries();
 });
+
+function refreshCountries()
+{
+    getCountries(function (result)
+    {
+        $.each(result.Data, function (countryIndex, country)
+        {
+            $("#ddCountry").append($('<option></option>').val(country.Id).html(country.CountryName));
+        });
+
+        var idCountry = $("#hdCountry").val();
+        if (idCountry && idCountry != 0)
+        {
+            $("#ddCountry").val(idCountry);
+        } else
+        {
+            $("#ddCountry").val(appSettings.DefaultCountryId);
+        }
+
+
+        populateStates(result.Data);
+
+        $("#ddCountry").on("change", function ()
+        {
+            populateStates(result.Data);
+        });
+
+    }, function (errorResult)
+    {
+        //todo: handle result
+    });
+};
 
 function populateStates(result) {
 	var selectedCountry = $.grep(result, function (country, countryIndex) {

@@ -69,9 +69,9 @@ namespace VC.Public.Controllers
         }
 
         [HttpGet]
-        public Task<IActionResult> RequestCatalog()
+        public IActionResult RequestCatalog()
         {
-            return Task.FromResult<IActionResult>(View("_RequestCatalog"));
+            return View("_RequestCatalog");
         }
 
         [HttpPost]
@@ -79,20 +79,21 @@ namespace VC.Public.Controllers
         {
             if (!Validate(model))
             {
-                return View("_RequestCatalog", model);
+                return PartialView("_RequestCatalog", model);
             }
             if (!await _reCaptchaValidator.Validate(Request.Form[ReCaptchaValidator.DefaultPostParamName]))
             {
                 ModelState.AddModelError(string.Empty, ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.WrongCaptcha]);
-                return View("_RequestCatalog", model);
+                return PartialView("_RequestCatalog", model);
             }
 
             var address = _catalogRequestAddressMapper.FromModel(model);
             address.IdObjectType = (int)AddressType.Shipping;
             address = await _catalogRequestAddressService.InsertAsync(address);
             //TODO: - add sign up for newsletter(SignUpNewsletter)
-            ViewBag.SuccessMessage= InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullyAdded];
-            return RedirectToAction("_RequestCatalog");
+            ViewBag.SuccessMessage= InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullySent];
+            ModelState.Clear();
+            return PartialView("_RequestCatalog");
         }
 
         [HttpGet]
