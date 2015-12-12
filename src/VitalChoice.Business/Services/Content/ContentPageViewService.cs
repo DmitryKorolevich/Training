@@ -24,12 +24,12 @@ using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Content.ContentPages;
 using VitalChoice.Interfaces.Services.Content;
+using System.Security.Claims;
 
 namespace VitalChoice.Business.Services.Content
 {
     public class ContentPageViewService : ContentViewService<ContentPage, ContentServiceModel>, IContentPageViewService
     {
-
         #region Public
 
         #endregion
@@ -41,9 +41,12 @@ namespace VitalChoice.Business.Services.Content
         {
         }
 
-        public Task<ContentViewModel> GetContentAsync(ActionContext actionContext, ActionBindingContext bindingContext)
+        protected override async Task<ContentViewContext<ContentPage>> GetDataInternal(ContentServiceModel model,
+            IDictionary<string, object> parameters, ClaimsPrincipal user)
         {
-            throw new NotImplementedException();
+            ContentViewContext<ContentPage> context = await base.GetDataInternal(model, parameters, user);
+
+            return context;
         }
     }
 }

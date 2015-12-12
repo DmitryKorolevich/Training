@@ -54,8 +54,56 @@
             window.print();
             e.preventDefault();
         });
+
+        $('form.content-ajax-form').on("click", ".content-form-submit-button", function (e) {
+            var jForm = $(this).closest('form');
+            reparseElementValidators($(this).closest('form'));
+            jForm.validate()
+            if (jForm.valid())
+            {
+                jForm.submit();
+            }
+            e.preventDefault();
+        });
     });
 })(jQuery);
+
+function onloadRecaptchaCallback()
+{
+    if ($('form.content-ajax-form .google-captcha').length > 0 && captchaSiteKey)
+    {
+        $.each($('form.content-ajax-form .google-captcha'), function (key, item)
+        {
+            grecaptcha.render(item, {
+                'sitekey': captchaSiteKey
+            });
+        });
+    };
+};
+
+function ajaxFormSubmitSuccess(e)
+{
+    if (successMessage)
+    {
+        notifySuccess(successMessage);
+    } else
+    {
+        //if ($('form.content-ajax-form .google-captcha').length > 0 && captchaSiteKey)
+        //{
+        //    $.each($('form.content-ajax-form .google-captcha'), function (key, item)
+        //    {
+        //        grecaptcha.render(item, {
+        //            'sitekey': captchaSiteKey
+        //        });
+        //    });
+        //};
+    }
+}
+
+function ajaxFormSubmitError(e)
+{
+    notifyError("Server error occured");
+}
 
 var successMessage;
 var defaultModalSize = 461;
