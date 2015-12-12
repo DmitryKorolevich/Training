@@ -34,7 +34,7 @@ namespace VitalChoice.ContentProcessing.Extensions
             return base.InitStart(initContext, parent, chainedType, null);
         }
 
-        public override object ProcessData(object data, object chained, object parent)
+        public override object ProcessData(object data, object chained, object parent, Func<object, object, string> getInnerResult)
         {
             var actionContext = chained as ActionContext;
             if (actionContext == null)
@@ -43,7 +43,7 @@ namespace VitalChoice.ContentProcessing.Extensions
             }
             try
             {
-                var result = _viewEngine.FindPartialView(actionContext, GetInnerResult(parent, chained));
+                var result = _viewEngine.FindPartialView(actionContext, getInnerResult(parent, chained));
                 result.EnsureSuccessful();
                 ViewDataDictionary viewData =
                     new ViewDataDictionary(
