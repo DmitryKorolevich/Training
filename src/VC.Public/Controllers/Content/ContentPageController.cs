@@ -54,10 +54,8 @@ namespace VC.Public.Controllers.Content
         [HttpGet]
         public async Task<IActionResult> ContentPage(string url)
         {
-            //var result = await RenderPartialViewToString("~/Views/Help/ContactCustomerService.cshtml", null);
-
             var toReturn = await _contentPageViewService.GetContentAsync(ActionContext, BindingContext, User);
-            if (toReturn != null)
+            if (toReturn?.Body != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
             }

@@ -33,8 +33,6 @@ namespace VitalChoice.Business.Services.Content
             _articleService = articleService;
         }
 
-        #region Public
-
         protected override async Task<ContentViewContext<Article>> GetDataInternal(ContentServiceModel model,
             IDictionary<string, object> parameters, ClaimsPrincipal user)
         {
@@ -42,7 +40,5 @@ namespace VitalChoice.Business.Services.Content
 
             return context;
         }
-
-	    #endregion
 	}
 }

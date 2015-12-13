@@ -71,22 +71,7 @@ namespace VC.Public.Controllers
         [HttpGet]
         public Task<IActionResult> RequestCatalog()
         {
-            if (TempData.ContainsKey(RequestCatalogTempData))
-            {
-                ViewBag.SuccessMessage = TempData[RequestCatalogTempData];
-            }
-            return Task.FromResult<IActionResult>(View(GetCatalogRequestAddressPrototype()));
-        }
-
-        [NonAction]
-        private CatalogRequestAddressModel GetCatalogRequestAddressPrototype()
-        {
-            CatalogRequestAddressModel model = new CatalogRequestAddressModel();
-            if (_appInfrastructureService.Get().DefaultCountry != null)
-            {
-                model.IdCountry = _appInfrastructureService.Get().DefaultCountry.Id;
-            }
-            return model;
+            return Task.FromResult<IActionResult>(View("_RequestCatalog"));
         }
 
         [HttpPost]
@@ -94,20 +79,20 @@ namespace VC.Public.Controllers
         {
             if (!Validate(model))
             {
-                return View(model);
+                return View("_RequestCatalog", model);
             }
             if (!await _reCaptchaValidator.Validate(Request.Form[ReCaptchaValidator.DefaultPostParamName]))
             {
                 ModelState.AddModelError(string.Empty, ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.WrongCaptcha]);
-                return View(model);
+                return View("_RequestCatalog", model);
             }
 
             var address = _catalogRequestAddressMapper.FromModel(model);
             address.IdObjectType = (int)AddressType.Shipping;
             address = await _catalogRequestAddressService.InsertAsync(address);
             //TODO: - add sign up for newsletter(SignUpNewsletter)
-            TempData[RequestCatalogTempData] = InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullyAdded];
-            return RedirectToAction("RequestCatalog");
+            ViewBag.SuccessMessage= InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullyAdded];
+            return RedirectToAction("_RequestCatalog");
         }
 
         [HttpGet]
