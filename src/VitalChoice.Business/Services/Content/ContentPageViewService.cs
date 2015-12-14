@@ -25,6 +25,9 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Content.ContentPages;
 using VitalChoice.Interfaces.Services.Content;
 using System.Security.Claims;
+using VitalChoice.Infrastructure.Identity;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using System.Net;
 
 namespace VitalChoice.Business.Services.Content
 {
@@ -39,6 +42,39 @@ namespace VitalChoice.Business.Services.Content
             IObjectMapper<ContentParametersModel> mapper, IObjectMapperFactory mapperFactory)
             : base(templatesCache, loggerProvider.CreateLoggerDefault(), processorService, contentRepository, mapper, mapperFactory)
         {
+        }
+
+        protected override async Task<ContentPage> GetDataInternal(ContentParametersModel model, ContentViewContext viewContext)
+        {
+            ContentPage entity = await base.GetDataInternal(model, viewContext);
+
+            if (entity!=null && viewContext != null)
+            {
+                if (entity.StatusCode == RecordStatusCode.NotActive)
+                {
+                    if (!model.Preview)
+                    {
+                        throw new ApiException("Content page not found", HttpStatusCode.NotFound);
+                    }
+                }
+
+                var customerTypes = GetItemAvailability(viewContext.User);
+                if(!customerTypes.Contains(entity.Assigned))
+                {
+                    throw new ApiException("Content page not found", HttpStatusCode.NotFound);
+                }
+            }
+            return entity;
+        }
+
+        private static IList<CustomerTypeCode> GetItemAvailability(ClaimsPrincipal user)
+        {
+            return user.Identity.IsAuthenticated
+                ? (user.IsInRole(IdentityConstants.WholesaleCustomer)
+                    ? new List<CustomerTypeCode>() { CustomerTypeCode.Wholesale, CustomerTypeCode.All }
+                    : new List<CustomerTypeCode>() { CustomerTypeCode.Retail, CustomerTypeCode.All })
+                : new List<CustomerTypeCode>() { CustomerTypeCode.Retail, CustomerTypeCode.All };
+            //todo: refactor when authentication mechanism gets ready
         }
     }
 }

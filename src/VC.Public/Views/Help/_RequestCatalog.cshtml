@@ -9,12 +9,6 @@
     var infrastructure = appInfrastructureService.Get();
 }
 
-@section PageScripts {
-    <script src="https://www.google.com/recaptcha/api.js?onload=onloadRecaptchaCallback&render=explicit" async defer></script>
-    <script src="@Url.Content("/app/common/dataAccess.js")"></script>
-    <script src="@Url.Content("/app/modules/auth/registration.js")"></script>
-}
-
 <div class="content-ajax-form-wrapper">
     <div id="requestCatalogFormWrapperInner">
         <script>
@@ -91,7 +85,10 @@
                     @Html.ValidationMessageFor(m => m.PostalCode)
                 </div>
             </div>
-            <div class="form-group google-captcha margin-top-medium" id="googleCaptcha"></div>
+            <div class="form-group">
+                <label class="control-label"></label>
+                <div class="google-captcha pull-left" id="googleCaptcha"></div>
+            </div>
             <div class="form-group">
                 <label class="control-label" for="SignUpOnNewsletters"></label>
                 <div class="input-group">

@@ -63,8 +63,11 @@ namespace VitalChoice.Business.Services.Products
             var entity = await base.GetDataInternal(model, viewContext);
 
             //NOTE: Set Parameters for processors and CreateResult here.
-            viewContext.Parameters.CustomerTypeCodes = GetCategoryMenuAvailability(viewContext.User);
-            viewContext.Parameters.Product = await _productService.SelectAsync(entity.Id, true);
+            if (entity != null)
+            {
+                viewContext.Parameters.CustomerTypeCodes = GetCategoryMenuAvailability(viewContext.User);
+                viewContext.Parameters.Product = await _productService.SelectAsync(entity.Id, true);
+            }
 
             return entity;
         }

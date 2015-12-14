@@ -1400,6 +1400,9 @@ footer {
 .pull-right {
   float: right;
 }
+.pull-left {
+  float: left;
+}
 .validation-summary-errors {
   color: red;
 }

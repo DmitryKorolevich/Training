@@ -69,18 +69,18 @@
     });
 })(jQuery);
 
-//function onloadRecaptchaCallback()
-//{
-//    if ($('.content-ajax-form-wrapper .google-captcha').length > 0 && captchaSiteKey)
-//    {
-//        $.each($('.content-ajax-form-wrapper .google-captcha'), function (key, item)
-//        {
-//            grecaptcha.render(item, {
-//                'sitekey': captchaSiteKey
-//            });
-//        });
-//    };
-//};
+function onloadRecaptchaCallback()
+{
+    if ($('.content-ajax-form-wrapper .google-captcha').length > 0 && captchaSiteKey)
+    {
+        $.each($('.content-ajax-form-wrapper .google-captcha'), function (key, item)
+        {
+            grecaptcha.render(item, {
+                'sitekey': captchaSiteKey
+            });
+        });
+    };
+};
 
 function ajaxFormSubmitSuccess(data)
 {
