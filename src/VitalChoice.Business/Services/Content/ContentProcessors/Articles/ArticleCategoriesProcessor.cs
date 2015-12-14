@@ -47,8 +47,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
 
             var data = PopulateCategoryTemplateModel(rootCategory);
 
-            TtlArticleCategoriesModel toReturn = new TtlArticleCategoriesModel();
-            toReturn.Categories = data.SubCategories;
+            TtlArticleCategoriesModel toReturn = new TtlArticleCategoriesModel {Categories = data.SubCategories};
             if(viewContext.Entity.ParentId.HasValue)
             {
                 toReturn.ShowAllLink = ContentConstants.ARTICLE_CATEGORY_BASE_URL;
@@ -63,7 +62,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
             {
                 Name = categoryContent.Name,
                 Url = ContentConstants.ARTICLE_CATEGORY_BASE_URL + categoryContent.Url,
-                SubCategories = categoryContent.SubCategories?.Select(x => PopulateCategoryTemplateModel(x)).ToList(),
+                SubCategories = categoryContent.SubCategories?.Select(PopulateCategoryTemplateModel).ToList(),
             };
 
             return toReturn;

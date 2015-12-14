@@ -17,7 +17,7 @@ using VitalChoice.Infrastructure.Identity;
 
 namespace VitalChoice.Business.Services.Products
 {
-    public class ProductViewForCustomerModel : ContentServiceModel
+    public class ProductViewForCustomerModel : ContentParametersModel
     {
         public IList<CustomerTypeCode> CustomerTypeCodes { get; set; }
     }
@@ -38,9 +38,9 @@ namespace VitalChoice.Business.Services.Products
         {
             return user.Identity.IsAuthenticated
                 ? (user.IsInRole(IdentityConstants.WholesaleCustomer)
-                    ? new List<CustomerTypeCode>() { CustomerTypeCode.Wholesale, CustomerTypeCode.All }
-                    : new List<CustomerTypeCode>() { CustomerTypeCode.Retail, CustomerTypeCode.All })
-                : new List<CustomerTypeCode>() { CustomerTypeCode.Retail, CustomerTypeCode.All };
+                    ? new List<CustomerTypeCode>() {CustomerTypeCode.Wholesale, CustomerTypeCode.All}
+                    : new List<CustomerTypeCode>() {CustomerTypeCode.Retail, CustomerTypeCode.All})
+                : new List<CustomerTypeCode>() {CustomerTypeCode.Retail, CustomerTypeCode.All};
             //todo: refactor when authentication mechanism gets ready
         }
 
@@ -58,16 +58,15 @@ namespace VitalChoice.Business.Services.Products
             return result;
         }
 
-        protected override async Task<ContentViewContext<ProductContent>> GetDataInternal(ProductViewForCustomerModel model,
-            IDictionary<string, object> queryData, ClaimsPrincipal user)
+        protected override async Task<ProductContent> GetDataInternal(ProductViewForCustomerModel model, ContentViewContext viewContext)
         {
-            var viewContext = await base.GetDataInternal(model, queryData, user);
+            var entity = await base.GetDataInternal(model, viewContext);
 
             //NOTE: Set Parameters for processors and CreateResult here.
-            viewContext.Parameters.CustomerTypeCodes = GetCategoryMenuAvailability(user);
-            viewContext.Parameters.Product = await _productService.SelectAsync(viewContext.Entity.Id, true);
+            viewContext.Parameters.CustomerTypeCodes = GetCategoryMenuAvailability(viewContext.User);
+            viewContext.Parameters.Product = await _productService.SelectAsync(entity.Id, true);
 
-            return viewContext;
+            return entity;
         }
     }
 }

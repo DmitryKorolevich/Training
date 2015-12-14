@@ -28,7 +28,7 @@ using System.Security.Claims;
 
 namespace VitalChoice.Business.Services.Content
 {
-    public class ContentPageViewService : ContentViewService<ContentPage, ContentServiceModel>, IContentPageViewService
+    public class ContentPageViewService : ContentViewService<ContentPage, ContentParametersModel>, IContentPageViewService
     {
         #region Public
 
@@ -36,17 +36,9 @@ namespace VitalChoice.Business.Services.Content
 
         public ContentPageViewService(ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider,
             IContentProcessorService processorService, IRepositoryAsync<ContentPage> contentRepository,
-            IObjectMapper<ContentServiceModel> mapper, IObjectMapperFactory mapperFactory)
+            IObjectMapper<ContentParametersModel> mapper, IObjectMapperFactory mapperFactory)
             : base(templatesCache, loggerProvider.CreateLoggerDefault(), processorService, contentRepository, mapper, mapperFactory)
         {
-        }
-
-        protected override async Task<ContentViewContext<ContentPage>> GetDataInternal(ContentServiceModel model,
-            IDictionary<string, object> parameters, ClaimsPrincipal user)
-        {
-            ContentViewContext<ContentPage> context = await base.GetDataInternal(model, parameters, user);
-
-            return context;
         }
     }
 }

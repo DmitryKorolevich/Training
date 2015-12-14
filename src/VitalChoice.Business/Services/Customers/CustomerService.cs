@@ -300,24 +300,6 @@ namespace VitalChoice.Business.Services.Customers
 
         public async Task<PagedList<ExtendedVCustomer>> GetCustomersAsync(CustomerFilter filter)
         {
-
-
-            //        var condition =
-            //new VCustomerQuery().NotDeleted()
-            //                .WithIdContains(filter.IdContains)
-            //                .WithId(filter.SearchText)
-            //                .WithIdAffiliate(filter.IdAffiliate, filter.IdAffiliateRequired)
-            //                .WithEmail(filter.Email)
-            //                .WithAddress1(filter.Address1)
-            //                .WithAddress2(filter.Address2)
-            //                .WithCity(filter.City)
-            //                .WithCompany(filter.Company)
-            //                .WithCountry(filter.Country)
-            //                .WithFirstName(filter.FirstName)
-            //                .WithLastName(filter.LastName)
-            //                .WithPhone(filter.Phone)
-            //                .WithState(filter.State)
-            //                .WithZip(filter.Zip);
             Func<IQueryable<Customer>, IOrderedQueryable<Customer>> sortable = x => x.OrderByDescending(y => y.DateEdited);
             Func<IEnumerable<CustomerDynamic>, IOrderedEnumerable<CustomerDynamic>> sortDynamic = null;
             var sortOrder = filter.Sorting.SortOrder;
@@ -392,8 +374,7 @@ namespace VitalChoice.Business.Services.Customers
                             .FilterAddress(filter.Address),
                         includes =>
                             includes.Include(c => c.ProfileAddress)
-                                .ThenInclude(c => c.OptionValues)
-                                .Include(c => c.ProfileAddress), orderBy: sortable, withDefaults: true);
+                                .ThenInclude(c => c.OptionValues), orderBy: sortable, withDefaults: true);
 
             var adminProfileCondition =
                 new AdminProfileQuery().IdInRange(

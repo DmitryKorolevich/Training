@@ -15,10 +15,11 @@ using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using System.Net;
+using Microsoft.AspNet.Mvc;
 
 namespace VitalChoice.Business.Services.Content
 {
-    public class ArticleCategoryViewService : ContentViewService<ContentCategory, CategoryContentServiceModel>, IArticleCategoryViewService
+    public class ArticleCategoryViewService : ContentViewService<ContentCategory, CategoryContentParametersModel>, IArticleCategoryViewService
     {
         private readonly ICategoryService _categoryService;
 
@@ -26,7 +27,7 @@ namespace VitalChoice.Business.Services.Content
             ILoggerProviderExtended loggerProvider,
             IContentProcessorService processorService,
             IRepositoryAsync<ContentCategory> contentRepository,
-            IObjectMapper<CategoryContentServiceModel> mapper,
+            IObjectMapper<CategoryContentParametersModel> mapper,
             IObjectMapperFactory mapperFactory,
             ICategoryService categoryService)
             : base(templatesCache, loggerProvider.CreateLoggerDefault(), processorService, contentRepository, mapper, mapperFactory)
@@ -36,49 +37,40 @@ namespace VitalChoice.Business.Services.Content
 
         #region Public
 
-        protected override Expression<Func<ContentCategory, bool>> FilterExpression(CategoryContentServiceModel model) =>
+        protected override Expression<Func<ContentCategory, bool>> FilterExpression(CategoryContentParametersModel model) =>
             p => p.Url == model.Url && p.StatusCode != RecordStatusCode.Deleted && p.Type==ContentType.ArticleCategory;
 
-        protected override async Task<ContentViewContext<ContentCategory>> GetDataInternal(CategoryContentServiceModel model,
-            IDictionary<string, object> parameters, ClaimsPrincipal user)
+        protected override async Task<ContentCategory> GetDataInternal(CategoryContentParametersModel model, ContentViewContext viewContext)
         {
-            ContentViewContext<ContentCategory> context;
+            ContentCategory entity;
+
             if (!string.IsNullOrWhiteSpace(model.Url))
             {
-                context = await base.GetDataInternal(model, parameters, user);
+                entity = await base.GetDataInternal(model, viewContext);
             }
             else
             {
-                var rootCategory = await BuildQuery(ContentRepository.Query(p => !p.ParentId.HasValue && p.Type == ContentType.ArticleCategory)).SelectFirstOrDefaultAsync(false);
-                context = new ContentViewContext<ContentCategory>(parameters, rootCategory, user);
-            }            
+                entity =
+                    await
+                        BuildQuery(ContentRepository.Query(p => !p.ParentId.HasValue && p.Type == ContentType.ArticleCategory))
+                            .SelectFirstOrDefaultAsync(false);
+            }
 
-            if (context != null)
+            if (viewContext != null)
             {
-                if (parameters.ContainsKey(QueryStringConstants.PAGE) && parameters[QueryStringConstants.PAGE] is string)
+                var targetStatuses = new List<RecordStatusCode> {RecordStatusCode.Active};
+                if (entity != null && entity.StatusCode == RecordStatusCode.NotActive)
                 {
-                    int id = 0;
-                    if (Int32.TryParse((string)parameters[QueryStringConstants.PAGE], out id))
+                    if (!model.Preview)
                     {
-                        context.Parameters.ArticlesPageIndex = id;
+                        throw new ApiException("Category not found", HttpStatusCode.NotFound);
                     }
+                    targetStatuses.Add(RecordStatusCode.NotActive);
                 }
             }
-
-            var targetStatuses = new List<RecordStatusCode>() { RecordStatusCode.Active };
-            if (context.Entity!=null && context.Entity.StatusCode == RecordStatusCode.NotActive)
-            {
-                if (context.ParametersDictionary.ContainsKey(QueryStringConstants.CPREVIEW) &&
-                    !context.Parameters.Preview)
-                {
-                    throw new ApiException("Category not found", HttpStatusCode.NotFound);
-                }
-                targetStatuses.Add(RecordStatusCode.NotActive);
-            }
-
-            return context;
+            return entity;
         }
 
-	    #endregion
+        #endregion
 	}
 }

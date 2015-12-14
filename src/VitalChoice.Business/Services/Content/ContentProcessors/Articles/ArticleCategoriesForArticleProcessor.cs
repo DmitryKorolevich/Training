@@ -58,7 +58,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
             {
                 Name = categoryContent.Name,
                 Url = ContentConstants.ARTICLE_CATEGORY_BASE_URL + categoryContent.Url,
-                SubCategories = categoryContent.SubCategories?.Select(x => PopulateCategoryTemplateModel(x)).ToList(),
+                SubCategories = categoryContent.SubCategories?.Select(PopulateCategoryTemplateModel).ToList(),
             };
 
             return toReturn;

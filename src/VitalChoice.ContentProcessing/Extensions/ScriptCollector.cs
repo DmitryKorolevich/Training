@@ -1,0 +1,33 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Templates.Attributes;
+using Templates.Core;
+using Templates.Data;
+using Templates.Strings;
+using VitalChoice.ContentProcessing.Base;
+using VitalChoice.ContentProcessing.Extensions;
+
+[assembly: ExportExtensions(typeof(ScriptCollector))]
+
+namespace VitalChoice.ContentProcessing.Extensions
+{
+    [ExtensionName("script")]
+    public class ScriptCollector : AbstractExtension
+    {
+        public override object ProcessData(Scope scope)
+        {
+            var viewContext = scope.CallerData as ContentViewContext;
+            string scripts = GetInnerResult(scope);
+            if (viewContext != null)
+            {
+                viewContext.AppendScript(scripts);
+
+                //Consumed to collector
+                return null;
+            }
+            return scripts;
+        }
+    }
+}

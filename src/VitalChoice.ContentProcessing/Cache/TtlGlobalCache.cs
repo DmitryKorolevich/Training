@@ -103,7 +103,7 @@ namespace VitalChoice.ContentProcessing.Cache
                                 {
                                     AllowCSharp = true,
                                     ForceRemoveWhitespace = true,
-                                    Data = cacheParams.ActionContext
+                                    Data = cacheParams.ViewContext
                                 })).Success)
                         {
                             //Update dates so old template using in runtime next request ok
@@ -125,7 +125,7 @@ namespace VitalChoice.ContentProcessing.Cache
                     {
                         AllowCSharp = true,
                         ForceRemoveWhitespace = true,
-                        Data = cacheParams.ActionContext
+                        Data = cacheParams.ViewContext
                     })),
                 MasterDate = cacheParams.MasterUpdateDate,
                 TemplateDate = cacheParams.TemplateUpdateDate
