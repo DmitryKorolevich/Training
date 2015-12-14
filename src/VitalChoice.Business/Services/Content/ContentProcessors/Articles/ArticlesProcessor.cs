@@ -45,10 +45,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
 
             ArticleItemListFilter filter = new ArticleItemListFilter();
             filter.CategoryId = viewContext.Entity.ParentId.HasValue ? (int?)viewContext.Entity.Id : null;
-            if (viewContext.Parameters.ArticlesPageIndex.HasValue)
-            {
-                filter.Paging.PageIndex = viewContext.Parameters.ArticlesPageIndex.Value;
-            }
+            filter.Paging.PageIndex = viewContext.Parameters.Page;
             filter.Paging.PageItemCount = ContentConstants.ARTICLES_LIST_TAKE_COUNT;
             filter.Sorting.Path = ArticleSortPath.PublishedDate;
             filter.Sorting.SortOrder = SortOrder.Desc;
@@ -64,7 +61,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
                 }).ToList(),
                 Count = data.Count,
             };
-            var page = viewContext.Parameters.ArticlesPageIndex.HasValue ? viewContext.Parameters.ArticlesPageIndex.Value : 1;
+            var page = viewContext.Parameters.Page;
             if (page > 1)
             {
                 toReturn.PreviousLink = String.Format("{0}{1}?{2}={3}", ContentConstants.ARTICLE_CATEGORY_BASE_URL, viewContext.Parameters.Url,

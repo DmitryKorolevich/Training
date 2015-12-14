@@ -346,7 +346,7 @@ namespace VitalChoice.DynamicData.Base
                 if (model.TryGetValue(pair.Key, out modelValue) && modelValue != null)
                 {
                     var valueType = modelValue.GetType();
-                    var value = _typeConverter.ConvertFromModel(valueType, dynamicProperty.PropertyType, modelValue);
+                    var value = _typeConverter.ConvertFromModel(valueType, dynamicProperty.PropertyType, modelValue, dynamicProperty.Converter);
                     if (value != null)
                     {
                         MapperTypeConverter.ThrowIfNotValid(model.GetType(), objectType, value, pair.Key, dynamicProperty,
@@ -396,7 +396,7 @@ namespace VitalChoice.DynamicData.Base
                 if (objectCache.Properties.TryGetValue(mappingName, out dynamicProperty))
                 {
                     var value = _typeConverter.ConvertFromModel(pair.Value.PropertyType, dynamicProperty.PropertyType,
-                        pair.Value.Get?.Invoke(model));
+                        pair.Value.Get?.Invoke(model), dynamicProperty.Converter);
                     if (value != null)
                     {
                         MapperTypeConverter.ThrowIfNotValid(modelType, objectType, value, mappingName, dynamicProperty,
@@ -425,7 +425,7 @@ namespace VitalChoice.DynamicData.Base
                 if (objectCache.Properties.TryGetValue(mappingName, out dynamicProperty))
                 {
                     var value = _typeConverter.ConvertToModel(dynamicProperty.PropertyType, pair.Value.PropertyType,
-                        dynamicProperty.Get?.Invoke(obj));
+                        dynamicProperty.Get?.Invoke(obj), dynamicProperty.Converter);
                     if (value != null)
                     {
                         MapperTypeConverter.ThrowIfNotValid(modelType, objectType, value, pair.Key, pair.Value, true);
@@ -433,15 +433,6 @@ namespace VitalChoice.DynamicData.Base
                     }
                 }
             }
-        }
-
-        private static object GetDefaultValue(Type type)
-        {
-            if (type.GetTypeInfo().IsValueType)
-            {
-                return Activator.CreateInstance(type);
-            }
-            return null;
         }
     }
 }

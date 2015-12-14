@@ -1,4 +1,5 @@
-﻿using VitalChoice.Data.Helpers;
+﻿using System.Linq;
+using VitalChoice.Data.Helpers;
 using VitalChoice.DynamicData.Extensions;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;

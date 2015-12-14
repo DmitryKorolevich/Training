@@ -83,29 +83,26 @@ namespace VC.Admin.ModelConverters
             if (dynamic.PaymentMethod != null)
             {
                 model.IdPaymentMethodType = dynamic.PaymentMethod.IdObjectType;
-                if (dynamic.PaymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
+                switch (dynamic.PaymentMethod.IdObjectType)
                 {
-                    model.CreditCard = _paymentMethodMapper.ToModel<CreditCardModel>(dynamic.PaymentMethod);
-                }
-                if (dynamic.PaymentMethod.IdObjectType == (int) PaymentMethodType.Oac)
-                {
-                    model.Oac = _paymentMethodMapper.ToModel<OacPaymentModel>(dynamic.PaymentMethod);
-                }
-                if (dynamic.PaymentMethod.IdObjectType == (int) PaymentMethodType.Check)
-                {
-                    model.Check = _paymentMethodMapper.ToModel<CheckPaymentModel>(dynamic.PaymentMethod);
-                }
-                if (dynamic.PaymentMethod.IdObjectType == (int)PaymentMethodType.WireTransfer)
-                {
-                    model.WireTransfer = _paymentMethodMapper.ToModel<WireTransferPaymentModel>(dynamic.PaymentMethod);
-                }
-                if (dynamic.PaymentMethod.IdObjectType == (int)PaymentMethodType.Marketing)
-                {
-                    model.Marketing = _paymentMethodMapper.ToModel<MarketingPaymentModel>(dynamic.PaymentMethod);
-                }
-                if (dynamic.PaymentMethod.IdObjectType == (int)PaymentMethodType.VCWellnessEmployeeProgram)
-                {
-                    model.VCWellness = _paymentMethodMapper.ToModel<VCWellnessEmployeeProgramPaymentModel>(dynamic.PaymentMethod);
+                    case (int) PaymentMethodType.CreditCard:
+                        model.CreditCard = _paymentMethodMapper.ToModel<CreditCardModel>(dynamic.PaymentMethod);
+                        break;
+                    case (int) PaymentMethodType.Oac:
+                        model.Oac = _paymentMethodMapper.ToModel<OacPaymentModel>(dynamic.PaymentMethod);
+                        break;
+                    case (int) PaymentMethodType.Check:
+                        model.Check = _paymentMethodMapper.ToModel<CheckPaymentModel>(dynamic.PaymentMethod);
+                        break;
+                    case (int) PaymentMethodType.WireTransfer:
+                        model.WireTransfer = _paymentMethodMapper.ToModel<WireTransferPaymentModel>(dynamic.PaymentMethod);
+                        break;
+                    case (int) PaymentMethodType.Marketing:
+                        model.Marketing = _paymentMethodMapper.ToModel<MarketingPaymentModel>(dynamic.PaymentMethod);
+                        break;
+                    case (int) PaymentMethodType.VCWellnessEmployeeProgram:
+                        model.VCWellness = _paymentMethodMapper.ToModel<VCWellnessEmployeeProgramPaymentModel>(dynamic.PaymentMethod);
+                        break;
                 }
             }
         }
@@ -289,33 +286,29 @@ namespace VC.Admin.ModelConverters
             {
                 if (model.IdPaymentMethodType.HasValue)
                 {
-                    if (model.IdPaymentMethodType.Value == (int) PaymentMethodType.CreditCard)
+                    switch (model.IdPaymentMethodType.Value)
                     {
-                        dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.CreditCard);
-                    }
-                    else if (model.IdPaymentMethodType.Value == (int) PaymentMethodType.Oac)
-                    {
-                        dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Oac);
-                    }
-                    else if (model.IdPaymentMethodType.Value == (int) PaymentMethodType.Check)
-                    {
-                        dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Check);
-                    }
-                    else if (model.IdPaymentMethodType.Value == (int)PaymentMethodType.WireTransfer)
-                    {
-                        dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.WireTransfer);
-                    }
-                    else if (model.IdPaymentMethodType.Value == (int)PaymentMethodType.Marketing)
-                    {
-                        dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Marketing);
-                    }
-                    else if (model.IdPaymentMethodType.Value == (int)PaymentMethodType.VCWellnessEmployeeProgram)
-                    {
-                        dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.VCWellness);
-                    }
-                    else
-                    {
-                        dynamic.PaymentMethod = new OrderPaymentMethodDynamic();
+                        case (int) PaymentMethodType.CreditCard:
+                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.CreditCard);
+                            break;
+                        case (int) PaymentMethodType.Oac:
+                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Oac);
+                            break;
+                        case (int) PaymentMethodType.Check:
+                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Check);
+                            break;
+                        case (int)PaymentMethodType.WireTransfer:
+                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.WireTransfer);
+                            break;
+                        case (int)PaymentMethodType.Marketing:
+                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Marketing);
+                            break;
+                        case (int)PaymentMethodType.VCWellnessEmployeeProgram:
+                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.VCWellness);
+                            break;
+                        default:
+                            dynamic.PaymentMethod = new OrderPaymentMethodDynamic();
+                            break;
                     }
                     if (dynamic.PaymentMethod != null)
                     {
@@ -327,42 +320,38 @@ namespace VC.Admin.ModelConverters
             {
                 if (model.IdPaymentMethodType.HasValue)
                 {
-                    if (model.IdPaymentMethodType.Value == (int) PaymentMethodType.CreditCard)
+                    switch (model.IdPaymentMethodType.Value)
                     {
-                        var card = model.Customer?.CreditCards.FirstOrDefault(p => p.IsSelected);
-                        if (card != null)
-                        {
-                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(card);
-                        }
-                    }
-                    else if (model.IdPaymentMethodType.Value == (int) PaymentMethodType.Oac)
-                    {
-                        if (model.Customer != null)
-                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Customer.Oac);
-                    }
-                    else if (model.IdPaymentMethodType.Value == (int) PaymentMethodType.Check)
-                    {
-                        if (model.Customer != null)
-                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Customer.Check);
-                    }
-                    else if (model.IdPaymentMethodType.Value == (int)PaymentMethodType.WireTransfer)
-                    {
-                        if (model.Customer != null)
-                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Customer.WireTransfer);
-                    }
-                    else if (model.IdPaymentMethodType.Value == (int)PaymentMethodType.Marketing)
-                    {
-                        if (model.Customer != null)
-                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Customer.Marketing);
-                    }
-                    else if (model.IdPaymentMethodType.Value == (int)PaymentMethodType.VCWellnessEmployeeProgram)
-                    {
-                        if (model.Customer != null)
-                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Customer.VCWellness);
-                    }
-                    else
-                    {
-                        dynamic.PaymentMethod = new OrderPaymentMethodDynamic();
+                        case (int) PaymentMethodType.CreditCard:
+                            var card = model.Customer?.CreditCards.FirstOrDefault(p => p.IsSelected);
+                            if (card != null)
+                            {
+                                dynamic.PaymentMethod = _paymentMethodMapper.FromModel(card);
+                            }
+                            break;
+                        case (int) PaymentMethodType.Oac:
+                            if (model.Customer != null)
+                                dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Customer.Oac);
+                            break;
+                        case (int) PaymentMethodType.Check:
+                            if (model.Customer != null)
+                                dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Customer.Check);
+                            break;
+                        case (int)PaymentMethodType.WireTransfer:
+                            if (model.Customer != null)
+                                dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Customer.WireTransfer);
+                            break;
+                        case (int)PaymentMethodType.Marketing:
+                            if (model.Customer != null)
+                                dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Customer.Marketing);
+                            break;
+                        case (int)PaymentMethodType.VCWellnessEmployeeProgram:
+                            if (model.Customer != null)
+                                dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Customer.VCWellness);
+                            break;
+                        default:
+                            dynamic.PaymentMethod = new OrderPaymentMethodDynamic();
+                            break;
                     }
                     if (dynamic.PaymentMethod != null)
                     {

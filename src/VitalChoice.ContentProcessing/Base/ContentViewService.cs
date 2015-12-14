@@ -22,14 +22,9 @@ using Microsoft.AspNet.Http.Extensions;
 
 namespace VitalChoice.ContentProcessing.Base
 {
-    public class ContentRequest
-    {
-        public string AbsoluteUrl { get; set; }
-    }
-
     public abstract class ContentViewService<TEntity, TParametersModel> : IContentViewService
         where TEntity : ContentDataItem
-        where TParametersModel : ContentServiceModel
+        where TParametersModel : ContentParametersModel
     {
         private readonly ITtlGlobalCache _templatesCache;
         private readonly IContentProcessorService _processorService;
@@ -50,8 +45,8 @@ namespace VitalChoice.ContentProcessing.Base
             _mapperFactory = mapperFactory;
         }
 
+        public virtual string ViewContextName => "ViewContext";
         public virtual string DefaultModelName => "Model";
-        public virtual string DefaultRequestName => "Request";
 
         public async Task<ContentViewModel> GetContentAsync(ActionContext context, ActionBindingContext bindingContext, ClaimsPrincipal user,
             object additionalParameters)
@@ -62,7 +57,7 @@ namespace VitalChoice.ContentProcessing.Base
                 var mapper = _mapperFactory.CreateMapper(additionalParameters.GetType());
                 parameters = mapper.ToDictionary(additionalParameters);
             }
-            var viewContext = await GetData(GetParameters(context, bindingContext, parameters), user);
+            var viewContext = await GetData(GetParameters(context, bindingContext, parameters), user, context);
             var contentEntity = viewContext.Entity;
             ITtlTemplate template;
             var templateCacheOptions = new TemplateCacheParam
@@ -73,7 +68,7 @@ namespace VitalChoice.ContentProcessing.Base
                 Template = contentEntity.ContentItem.Template,
                 MasterUpdateDate = contentEntity.MasterContentItem.Updated,
                 TemplateUpdateDate = contentEntity.ContentItem.Updated,
-                ActionContext = context
+                ViewContext = viewContext
             };
             try
             {
@@ -91,12 +86,7 @@ namespace VitalChoice.ContentProcessing.Base
             Dictionary<string, object> model = new Dictionary<string, object>
             {
                 {DefaultModelName, contentEntity},
-                {
-                    DefaultRequestName, new ContentRequest()
-                    {
-                        AbsoluteUrl = viewContext.Parameters.AbsoluteUrl
-                    }
-                },
+                {ViewContextName, viewContext}
             };
             foreach (var p in contentEntity.MasterContentItem.MasterContentItemToContentProcessors)
             {
@@ -110,7 +100,7 @@ namespace VitalChoice.ContentProcessing.Base
             var templatingModel = new ExpandoObject();
             model.CopyToDictionary(templatingModel);
 
-            var generatedHtml = template.Generate(templatingModel, callerData: new {Context = context});
+            var generatedHtml = template.Generate(templatingModel, callerData: viewContext);
 
             return CreateResult(generatedHtml, viewContext);
         }
@@ -128,20 +118,22 @@ namespace VitalChoice.ContentProcessing.Base
                 .ThenInclude(p => p.ContentProcessor);
         }
 
-        protected virtual async Task<ContentViewContext<TEntity>> GetDataInternal(TParametersModel model,
-            IDictionary<string, object> parameters, ClaimsPrincipal user)
+        protected virtual async Task<TEntity> GetDataInternal(TParametersModel parameters, ContentViewContext viewContext)
         {
-            if (!string.IsNullOrEmpty(model.Url))
+            if (!string.IsNullOrEmpty(parameters.Url))
             {
-                var entity = await BuildQuery(ContentRepository.Query(FilterExpression(model))).SelectFirstOrDefaultAsync(false);
-                return new ContentViewContext<TEntity>(parameters, entity, user);
+                var entity = await BuildQuery(ContentRepository.Query(FilterExpression(parameters))).SelectFirstOrDefaultAsync(false);
+                return entity;
             }
-            return new ContentViewContext<TEntity>(parameters, null, user);
+            return null;
         }
 
-        protected async Task<ContentViewContext<TEntity>> GetData(IDictionary<string, object> queryData, ClaimsPrincipal user)
+        protected async Task<ContentViewContext<TEntity>> GetData(IDictionary<string, object> queryData, ClaimsPrincipal user,
+            ActionContext context)
         {
-            var viewContext = await GetDataInternal((TParametersModel)_mapper.FromDictionary(queryData, false), queryData, user);
+            var viewContext = new ContentViewContext<TEntity>(queryData, null, user, context);
+            viewContext.Entity = await GetDataInternal((TParametersModel) _mapper.FromDictionary(queryData, false), viewContext);
+            
             if (viewContext.Entity == null)
             {
                 Logger.LogInformation("The item could not be found {" + queryData.FormatDictionary() + "}");
@@ -165,6 +157,7 @@ namespace VitalChoice.ContentProcessing.Base
                 Title = entity.ContentItem.Title,
                 MetaDescription = entity.ContentItem.MetaDescription,
                 MetaKeywords = entity.ContentItem.MetaKeywords,
+                Scripts = viewContext.Scripts
             };
         }
 
@@ -185,22 +178,9 @@ namespace VitalChoice.ContentProcessing.Base
             {
                 if (!parameters.ContainsKey(queryParam.Key))
                 {
-                    if (queryParam.Key == QueryStringConstants.PREVIEW)
-                    {
-                        bool result = false;
-                        if (Boolean.TryParse(queryParam.Value.FirstOrDefault(), out result))
-                        {
-                            parameters.Add(QueryStringConstants.CPREVIEW, result);
-                        }
-                    }
-                    else
-                    {
-                        parameters.Add(queryParam.Key, queryParam.Value.FirstOrDefault());
-                    }
+                    parameters.Add(queryParam.Key, queryParam.Value.FirstOrDefault());
                 }
             }
-            var absoluteUrl = context.HttpContext.Request.GetDisplayUrl();
-            parameters.Add(QueryStringConstants.ABSOLUTE_URL, absoluteUrl);
             return parameters;
         }
     }

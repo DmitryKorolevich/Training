@@ -17,7 +17,7 @@ using VitalChoice.ContentProcessing.Cache;
 
 namespace VitalChoice.Business.Services.Content
 {
-    public class ArticleViewService : ContentViewService<Article, ContentServiceModel>, IArticleViewService
+    public class ArticleViewService : ContentViewService<Article, ContentParametersModel>, IArticleViewService
     {
         private readonly IArticleService _articleService;
 
@@ -25,20 +25,12 @@ namespace VitalChoice.Business.Services.Content
             ILoggerProviderExtended loggerProvider,
             IContentProcessorService processorService,
             IRepositoryAsync<Article> contentRepository,
-            IObjectMapper<ContentServiceModel> mapper,
+            IObjectMapper<ContentParametersModel> mapper,
             IObjectMapperFactory mapperFactory,
             IArticleService articleService)
             : base(templatesCache, loggerProvider.CreateLoggerDefault(), processorService, contentRepository, mapper, mapperFactory)
         {
             _articleService = articleService;
-        }
-
-        protected override async Task<ContentViewContext<Article>> GetDataInternal(ContentServiceModel model,
-            IDictionary<string, object> parameters, ClaimsPrincipal user)
-        {
-            ContentViewContext<Article> context = await base.GetDataInternal(model, parameters, user);        
-
-            return context;
         }
 	}
 }

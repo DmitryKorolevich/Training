@@ -2,17 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Security.Claims;
+using Microsoft.AspNet.Mvc;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Content.Base;
+using Microsoft.AspNet.Http.Extensions;
+using Templates.Strings;
 
 namespace VitalChoice.ContentProcessing.Base
 {
     public class ContentViewContext
     {
         private readonly ExpandoObject _parameters;
+        private readonly ExStringBuilder _scriptStringBuilder = new ExStringBuilder();
 
-        public ContentViewContext(IDictionary<string, object> parameters, ContentDataItem entity, ClaimsPrincipal user)
+        public ContentViewContext(IDictionary<string, object> parameters, ContentDataItem entity, ClaimsPrincipal user,
+            ActionContext actionContext)
         {
             if (parameters == null)
                 throw new ArgumentNullException(nameof(parameters));
@@ -21,6 +26,8 @@ namespace VitalChoice.ContentProcessing.Base
             parameters.CopyToDictionary(_parameters);
             BaseEntity = entity;
             User = user;
+            ActionContext = actionContext;
+            AbsoluteUrl = actionContext.HttpContext.Request.GetDisplayUrl();
         }
 
         public dynamic Parameters => _parameters;
@@ -29,12 +36,23 @@ namespace VitalChoice.ContentProcessing.Base
 
         public ContentDataItem BaseEntity { get; protected set; }
         public ClaimsPrincipal User { get; }
+        public ActionContext ActionContext { get; }
+
+        public string Scripts => _scriptStringBuilder.ToString();
+
+        public string AbsoluteUrl { get; }
+
+        public void AppendScript(string scripts)
+        {
+            _scriptStringBuilder.Append(scripts);
+        }
     }
 
     public class ContentViewContext<T> : ContentViewContext
         where T : ContentDataItem
     {
-        public ContentViewContext(IDictionary<string, object> parameters, T entity, ClaimsPrincipal user) : base(parameters, entity, user)
+        public ContentViewContext(IDictionary<string, object> parameters, T entity, ClaimsPrincipal user, ActionContext actionContext)
+            : base(parameters, entity, user, actionContext)
         {
         }
 

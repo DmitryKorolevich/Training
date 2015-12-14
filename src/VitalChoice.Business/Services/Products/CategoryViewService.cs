@@ -56,38 +56,37 @@ namespace VitalChoice.Business.Services.Products
             //todo: refactor when authentication mechanism gets ready
         }
 
-        protected override async Task<ContentViewContext<ProductCategoryContent>> GetDataInternal(ProductViewForCustomerModel model,
-            IDictionary<string, object> parameters, ClaimsPrincipal user)
+        protected override async Task<ProductCategoryContent> GetDataInternal(ProductViewForCustomerModel model,
+            ContentViewContext viewContext)
         {
+            ProductCategoryContent entity;
             if (!string.IsNullOrWhiteSpace(model.Url))
             {
-                var baseContext = await base.GetDataInternal(model, parameters, user);
-                baseContext.Parameters.CustomerTypeCode = GetCategoryMenuAvailability(user);
-                if (baseContext.Entity != null)
+                entity = await base.GetDataInternal(model, viewContext);
+                viewContext.Parameters.CustomerTypeCode = GetCategoryMenuAvailability(viewContext.User);
+                if (entity != null)
                 {
-                    baseContext.Entity.ProductCategory =
+                    entity.ProductCategory =
                         await
-                            _productCategoryEcommerceRepository.Query(c => c.Id == baseContext.Entity.Id)
+                            _productCategoryEcommerceRepository.Query(c => c.Id == entity.Id)
                                 .SelectFirstOrDefaultAsync(false);
                 }
-                return baseContext;
+                return entity;
             }
 
             var categoryEcommerce = await
                 _productCategoryEcommerceRepository.Query(p => !p.ParentId.HasValue)
                     .SelectFirstOrDefaultAsync(false);
             if (categoryEcommerce == null)
-                return new ContentViewContext<ProductCategoryContent>(parameters, null, user);
-            var productCategory =
+                return null;
+            entity =
                 await
                     BuildQuery(ContentRepository.Query(p => p.Id == categoryEcommerce.Id))
                         .SelectFirstOrDefaultAsync(false);
-            productCategory.ProductCategory = categoryEcommerce;
-            var context = new ContentViewContext<ProductCategoryContent>(parameters, productCategory, user);
-            context.Parameters.CustomerTypeCode = GetCategoryMenuAvailability(user);
-            return context;
+            viewContext.Parameters.CustomerTypeCode = GetCategoryMenuAvailability(viewContext.User);
+            return entity;
         }
 
-	    #endregion
+        #endregion
 	}
 }

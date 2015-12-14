@@ -380,7 +380,7 @@ namespace VitalChoice.DynamicData.Base
                         object dynamicValue;
                         if (data.TryGetValue(mappingName, out dynamicValue))
                         {
-                            var value = _typeConverter.ConvertToModel(dynamicValue?.GetType(), pair.Value.PropertyType, dynamicValue);
+                            var value = _typeConverter.ConvertToModel(dynamicValue?.GetType(), pair.Value.PropertyType, dynamicValue, pair.Value.Converter);
                             if (value != null)
                             {
                                 MapperTypeConverter.ThrowIfNotValid(modelType, objectType, value, pair.Key, pair.Value,

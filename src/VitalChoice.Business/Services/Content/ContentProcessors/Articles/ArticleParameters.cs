@@ -7,7 +7,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
 {
     public class ArticleParameters
     {
-        public int? ArticlesPageIndex { get; set; }
+        public int Page { get; set; }
 
         public bool Preview { get; set; }
 

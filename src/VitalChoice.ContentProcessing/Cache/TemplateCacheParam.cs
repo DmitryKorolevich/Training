@@ -1,5 +1,6 @@
 using Microsoft.AspNet.Mvc;
 using System;
+using VitalChoice.ContentProcessing.Base;
 
 namespace VitalChoice.ContentProcessing.Cache
 {
@@ -12,6 +13,6 @@ namespace VitalChoice.ContentProcessing.Cache
         public DateTime MasterUpdateDate { get; set; }
         public int IdMaster { get; set; }
         public int IdTemplate { get; set; }
-        public ActionContext ActionContext { get; set; }
+        public ContentViewContext ViewContext { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using System.Reflection;
 using Autofac.Features.Indexed;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Services;
+using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.DynamicData.Base
@@ -14,6 +15,7 @@ namespace VitalChoice.DynamicData.Base
         private readonly IObjectMapperFactory _mapperFactory;
         private readonly IIndex<Type, IObjectMapper> _mappers;
         private readonly Dictionary<object, object> _objects = new Dictionary<object, object>();
+        private static readonly Dictionary<Type, IFieldTypeConverter> TypeConverters = new Dictionary<Type, IFieldTypeConverter>();
 
         public TypeConverter(IIndex<Type, IObjectMapper> mappers, IModelConverterService converterService)
         {
@@ -36,8 +38,11 @@ namespace VitalChoice.DynamicData.Base
             return obj;
         }
 
-        public object ConvertFromModel(Type sourceType, Type destType, object obj)
+        public object ConvertFromModel(Type sourceType, Type destType, object obj, ConvertWithAttribute convertWith = null)
         {
+            if (convertWith != null)
+                return ConvertObject(convertWith, obj);
+
             if (obj == null)
                 return null;
 
@@ -105,8 +110,11 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        public object ConvertToModel(Type sourceType, Type destType, object obj)
+        public object ConvertToModel(Type sourceType, Type destType, object obj, ConvertWithAttribute convertWith = null)
         {
+            if (convertWith?.ConverterType != null)
+                return ConvertObject(convertWith, obj);
+
             if (obj == null || sourceType == null)
                 return null;
 
@@ -217,6 +225,22 @@ namespace VitalChoice.DynamicData.Base
                 }
             }
             return result;
+        }
+
+        private static object ConvertObject(ConvertWithAttribute convertWith, object obj)
+        {
+            IFieldTypeConverter converter;
+            lock (TypeConverters)
+            {
+                if (!TypeConverters.TryGetValue(convertWith.ConverterType, out converter))
+                {
+                    converter = (IFieldTypeConverter) Activator.CreateInstance(convertWith.ConverterType);
+                    TypeConverters.Add(convertWith.ConverterType, converter);
+                }
+            }
+            if (obj == null)
+                return convertWith.Default ?? converter.DefaultValue;
+            return converter.ConvertFrom(obj);
         }
     }
 }
