@@ -30,29 +30,33 @@ namespace VitalChoice.DynamicData.Services
             bool ignoreMapAttribute = false)
         {
             TypeCache result;
-            if (!cache.TryGetValue(objectType, out result))
+            lock (cache)
             {
-                var resultProperties = new TypeCache(objectType, objectType.GetTypeInfo().GetCustomAttributes<MaskPropertyAttribute>());
-
-                foreach (
-                    var property in
-                        objectType.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.GetIndexParameters().Length == 0)
-                    )
+                if (!cache.TryGetValue(objectType, out result))
                 {
-                    var mapAttribute = property.GetCustomAttribute<MapAttribute>(true);
-                    if (mapAttribute != null || ignoreMapAttribute)
+                    var resultProperties = new TypeCache(objectType, objectType.GetTypeInfo().GetCustomAttributes<MaskPropertyAttribute>());
+
+                    foreach (
+                        var property in
+                            objectType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                                .Where(p => p.GetIndexParameters().Length == 0)
+                        )
                     {
-                        resultProperties.Properties.Add(property.Name, new GenericProperty
+                        var mapAttribute = property.GetCustomAttribute<MapAttribute>(true);
+                        if (mapAttribute != null || ignoreMapAttribute)
                         {
-                            Get = property.GetMethod?.CompileAccessor<object, object>(),
-                            Set = property.SetMethod?.CompileVoidAccessor<object, object>(),
-                            Map = mapAttribute,
-                            PropertyType = property.PropertyType
-                        });
+                            resultProperties.Properties.Add(property.Name, new GenericProperty
+                            {
+                                Get = property.GetMethod?.CompileAccessor<object, object>(),
+                                Set = property.SetMethod?.CompileVoidAccessor<object, object>(),
+                                Map = mapAttribute,
+                                PropertyType = property.PropertyType
+                            });
+                        }
                     }
+                    cache.Add(objectType, resultProperties);
+                    return resultProperties;
                 }
-                cache.Add(objectType, resultProperties);
-                return resultProperties;
             }
             return result;
         }
