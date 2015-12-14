@@ -245,7 +245,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             toReturn.DescriptionTab = new TtlProductPageTabModel()
             {
                 TitleOverride = eProduct.SafeData.DescriptionTitleOverride,
-                Content = eProduct.SafeData.Description,
+                Content = productContent.ContentItem.Description,
                 Hidden = eProduct.SafeData.DescriptionHide
             };
             toReturn.ReviewsTab = new TtlProductReviewsTabModel()
