@@ -104,7 +104,7 @@ namespace VitalChoice.DynamicData.Base
                 var mapper = _mapperFactory.CreateMapper(destType);
                 return mapper.FromModel(sourceType, obj);
             }
-            catch
+            catch(Exception e)
             {
                 return null;
             }

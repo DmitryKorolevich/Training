@@ -12,12 +12,15 @@ namespace VC.Public.Models
 
         public string MetaDescription { get; set; }
 
+        public string Scripts { get; set; }
+
         public ContentPageViewModel(ContentViewModel data)
         {
             HTML = data.Body;
             Title = data.Title;
             MetaKeywords = data.MetaKeywords;
             MetaDescription = data.MetaDescription;
+            Scripts = data.Scripts;
         }
     }
 }

@@ -68,44 +68,26 @@ namespace VC.Public.Controllers
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
-        [HttpGet]
-        public Task<IActionResult> RequestCatalog()
-        {
-            return Task.FromResult<IActionResult>(View("_RequestCatalog"));
-        }
-
         [HttpPost]
         public async Task<IActionResult> RequestCatalog(CatalogRequestAddressModel model)
         {
             if (!Validate(model))
             {
-                return View("_RequestCatalog", model);
+                return PartialView("_RequestCatalog", model);
             }
             if (!await _reCaptchaValidator.Validate(Request.Form[ReCaptchaValidator.DefaultPostParamName]))
             {
                 ModelState.AddModelError(string.Empty, ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.WrongCaptcha]);
-                return View("_RequestCatalog", model);
+                return PartialView("_RequestCatalog", model);
             }
 
             var address = _catalogRequestAddressMapper.FromModel(model);
             address.IdObjectType = (int)AddressType.Shipping;
             address = await _catalogRequestAddressService.InsertAsync(address);
             //TODO: - add sign up for newsletter(SignUpNewsletter)
-            ViewBag.SuccessMessage= InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullyAdded];
-            return RedirectToAction("_RequestCatalog");
-        }
-
-        [HttpGet]
-        public Task<IActionResult> ContactCustomerService()
-        {
-            if (TempData.ContainsKey(ContactServiceTempData))
-            {
-                ViewBag.SuccessMessage = TempData[ContactServiceTempData];
-            }
-
-            CustomerServiceRequestModel model = new CustomerServiceRequestModel();
-
-            return Task.FromResult<IActionResult>(View(model));
+            ViewBag.SuccessMessage= InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullySent];
+            ModelState.Clear();
+            return PartialView("_RequestCatalog");
         }
 
         [HttpPost]
@@ -113,12 +95,12 @@ namespace VC.Public.Controllers
         {
             if (!Validate(model))
             {
-                return View(model);
+                return PartialView("_ContactCustomerService", model);
             }
             if (!await _reCaptchaValidator.Validate(Request.Form[ReCaptchaValidator.DefaultPostParamName]))
             {
                 ModelState.AddModelError(string.Empty, ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.WrongCaptcha]);
-                return View(model);
+                return PartialView("_ContactCustomerService", model);
             }
 
             CustomerServiceEmail emailData = new CustomerServiceEmail();
@@ -129,9 +111,9 @@ namespace VC.Public.Controllers
                 _options.Value.CustomerFeedbackToEmail;
             await _notificationService.SendCustomerServiceEmailAsync(toEmail, emailData);
 
-            TempData[ContactServiceTempData] = InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullySent];
-
-            return RedirectToAction("ContactCustomerService");
+            ViewBag.SuccessMessage = InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullySent];
+            ModelState.Clear();
+            return PartialView("_ContactCustomerService");
         }
 
 

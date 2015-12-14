@@ -43,6 +43,7 @@ namespace VitalChoice.DynamicData.Services
                         )
                     {
                         var mapAttribute = property.GetCustomAttribute<MapAttribute>(true);
+                        var convertWithAttribute = property.GetCustomAttribute<ConvertWithAttribute>(true);
                         if (mapAttribute != null || ignoreMapAttribute)
                         {
                             resultProperties.Properties.Add(property.Name, new GenericProperty
@@ -50,7 +51,8 @@ namespace VitalChoice.DynamicData.Services
                                 Get = property.GetMethod?.CompileAccessor<object, object>(),
                                 Set = property.SetMethod?.CompileVoidAccessor<object, object>(),
                                 Map = mapAttribute,
-                                PropertyType = property.PropertyType
+                                PropertyType = property.PropertyType,
+                                Converter=convertWithAttribute,
                             });
                         }
                     }

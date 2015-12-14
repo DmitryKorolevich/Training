@@ -9,104 +9,103 @@
     var infrastructure = appInfrastructureService.Get();
 }
 
-@section PageScripts {
-    <script src="https://www.google.com/recaptcha/api.js?onload=onloadRecaptchaCallback&render=explicit" async defer></script>
-    <script src="@Url.Content("/app/common/dataAccess.js")"></script>
-    <script src="@Url.Content("/app/modules/auth/registration.js")"></script>
-}
-
-<div class="requestCatalogFormWrapper">
-    <script>
-        successMessage = '@ViewBag.SuccessMessage';
-        var captchaSiteKey = "@appOptions.Value.GoogleCaptcha.PublicKey";
-    </script>
-    <form asp-controller="Help" asp-action="RequestCatalog" data-ajax-success="ajaxFormSubmitSuccess" data-ajax-failure="ajaxFormSubmitError" data-ajax="true" data-method="post" data-ajax-mode="replace" data-ajax-update="#requestCatalogFormWrapper" class="form-regular medium-small content-ajax-form">
-        <input id="hdCountry" value="@Html.DisplayForEx(x=>x.IdCountry)" type="hidden">
-        <input id="hdState" value="@Html.DisplayForEx(x=>x.IdState)" type="hidden">
-        @Html.AntiForgeryToken()
-        @Html.ValidationSummary(true, "")
-        <div class="form-group">
-            @Html.LabelFor(m => m.PersonTitle, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.DropDownListFor(m => m.PersonTitle, infrastructure.PersonTitles.Select(p => new SelectListItem() { Text = p.Text, Value = p.Key, }).ToList(), "None", new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.PersonTitle, "")
+<div class="content-ajax-form-wrapper">
+    <div id="requestCatalogFormWrapperInner">
+        <script>
+            successMessage = '@ViewBag.SuccessMessage';
+            var captchaSiteKey = "@appOptions.Value.GoogleCaptcha.PublicKey";
+        </script>
+        <form asp-controller="Help" asp-action="RequestCatalog" data-ajax-success="ajaxFormSubmitSuccess" data-ajax-failure="ajaxFormSubmitError" data-ajax="true" data-method="post" data-ajax-mode="replace" data-ajax-update="#requestCatalogFormWrapperInner" class="form-regular medium-small content-ajax-form">
+            <input id="hdCountry" value="@Html.DisplayForEx(x=>x.IdCountry)" type="hidden">
+            <input id="hdState" value="@Html.DisplayForEx(x=>x.IdState)" type="hidden">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "")
+            <div class="form-group">
+                @Html.LabelFor(m => m.PersonTitle, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.DropDownListFor(m => m.PersonTitle, infrastructure.PersonTitles.Select(p => new SelectListItem() { Text = p.Text, Value = p.Key, }).ToList(), "None", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.PersonTitle, "")
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.FirstName, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.FirstName)
+            <div class="form-group">
+                @Html.LabelFor(m => m.FirstName, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.FirstName)
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.LastName, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.LastName)
+            <div class="form-group">
+                @Html.LabelFor(m => m.LastName, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.LastName)
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.Address1, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.Address1, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.Address1)
+            <div class="form-group">
+                @Html.LabelFor(m => m.Address1, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Address1, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Address1)
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.City, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.City, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.City)
+            <div class="form-group">
+                @Html.LabelFor(m => m.City, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.City, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.City)
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.IdCountry, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.DropDownListFor(m => m.IdCountry, new List<SelectListItem>(), new { @class = "form-control", @id = "ddCountry" })
-                @Html.ValidationMessageFor(m => m.IdCountry)
+            <div class="form-group">
+                @Html.LabelFor(m => m.IdCountry, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.DropDownListFor(m => m.IdCountry, new List<SelectListItem>(), new { @class = "form-control", @id = "ddCountry" })
+                    @Html.ValidationMessageFor(m => m.IdCountry)
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <!--todo-->
-            @Html.LabelFor(m => m.IdState, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.DropDownListFor(m => m.IdState, new List<SelectListItem>(), new { @class = "form-control", @id = "ddState" })
-                @Html.ValidationMessageFor(m => m.IdState)
+            <div class="form-group">
+                <!--todo-->
+                @Html.LabelFor(m => m.IdState, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.DropDownListFor(m => m.IdState, new List<SelectListItem>(), new { @class = "form-control", @id = "ddState" })
+                    @Html.ValidationMessageFor(m => m.IdState)
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <!--todo-->
-            @Html.LabelFor(m => m.County, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.County, new { @class = "form-control", @id = "txtState" })
-                @Html.ValidationMessageFor(m => m.County)
+            <div class="form-group">
+                <!--todo-->
+                @Html.LabelFor(m => m.County, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.County, new { @class = "form-control", @id = "txtState" })
+                    @Html.ValidationMessageFor(m => m.County)
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.PostalCode, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.PostalCode, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.PostalCode)
+            <div class="form-group">
+                @Html.LabelFor(m => m.PostalCode, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.PostalCode, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.PostalCode)
+                </div>
             </div>
-        </div>
-        <div class="form-group google-captcha margin-top-medium" id="googleCaptcha"></div>
-        <div class="form-group">
-            <label class="control-label" for="SignUpOnNewsletters"></label>
-            <div class="input-group">
-                @Html.CheckBoxFor(m => m.SignUpOnNewsletters, new { @class = "form-control" })
-                <label for="SignUpOnNewsletters">Also sign me up to receive your newsletter.</label>
+            <div class="form-group">
+                <label class="control-label"></label>
+                <div class="google-captcha pull-left" id="googleCaptcha"></div>
             </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.Email, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.Email)
+            <div class="form-group">
+                <label class="control-label" for="SignUpOnNewsletters"></label>
+                <div class="input-group">
+                    @Html.CheckBoxFor(m => m.SignUpOnNewsletters, new { @class = "form-control" })
+                    <label for="SignUpOnNewsletters">Also sign me up to receive your newsletter.</label>
+                </div>
             </div>
-        </div>
-        <div class="form-buttons-group">
-            <input class="yellow content-form-submit-button" type="button" value="Sign Up"/>
-        </div>
-    </form>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Email)
+                </div>
+            </div>
+            <div class="form-buttons-group">
+                <input class="yellow content-form-submit-button" type="button" value="Sign Up" />
+            </div>
+        </form>
+    </div>
 </div>

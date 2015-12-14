@@ -45,3 +45,4 @@ Post-Deployment Script Template
 :r .\Scripts\UpdateIdentityWithStorefront.sql
 
 :r .\Scripts\Products.sql
+:r .\Scripts\ContentPagesData.sql
