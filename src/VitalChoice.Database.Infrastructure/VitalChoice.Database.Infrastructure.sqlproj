@@ -160,4 +160,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\Products.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\ContentPagesData.sql" />
+  </ItemGroup>
 </Project>
