@@ -34,23 +34,23 @@ namespace VitalChoice.ContentProcessing.Extensions
             return base.InitStart(initContext, parent, chainedType, null);
         }
 
-        public override object ProcessData(object data, object chained, object parent, Func<object, object, string> getInnerResult)
+        public override object ProcessData(Scope scope)
         {
-            var actionContext = chained as ActionContext;
+            var actionContext = scope.CallerData?.Context as ActionContext;
             if (actionContext == null)
             {
                 throw new TemplateProcessingException("ActionContext not found in chained data");
             }
             try
             {
-                var result = _viewEngine.FindPartialView(actionContext, getInnerResult(parent, chained));
+                var result = _viewEngine.FindPartialView(actionContext, GetInnerResult(scope.Parent()));
                 result.EnsureSuccessful();
                 ViewDataDictionary viewData =
                     new ViewDataDictionary(
                         new ViewDataDictionary(
                             new DefaultModelMetadataProvider(
                                 actionContext.HttpContext.RequestServices.GetRequiredService<ICompositeMetadataDetailsProvider>()),
-                            actionContext.ModelState), data);
+                            actionContext.ModelState), scope.ModelData);
                 ITempDataDictionary tempData = actionContext.HttpContext.RequestServices.GetRequiredService<ITempDataDictionary>();
                 using (var writer = new StringWriter())
                 {

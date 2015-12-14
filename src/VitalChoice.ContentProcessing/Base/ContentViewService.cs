@@ -87,11 +87,12 @@ namespace VitalChoice.ContentProcessing.Base
                     Body = (e as TemplateCompileException)?.ToString()
                 };
             }
-            
+
             Dictionary<string, object> model = new Dictionary<string, object>
             {
                 {DefaultModelName, contentEntity},
-                {DefaultRequestName, new ContentRequest()
+                {
+                    DefaultRequestName, new ContentRequest()
                     {
                         AbsoluteUrl = viewContext.Parameters.AbsoluteUrl
                     }
@@ -109,7 +110,7 @@ namespace VitalChoice.ContentProcessing.Base
             var templatingModel = new ExpandoObject();
             model.CopyToDictionary(templatingModel);
 
-            var generatedHtml = template.Generate(templatingModel, context);
+            var generatedHtml = template.Generate(templatingModel, callerData: new {Context = context});
 
             return CreateResult(generatedHtml, viewContext);
         }
