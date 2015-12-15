@@ -8,6 +8,8 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.DynamicData.TypeConverters;
+using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -21,6 +23,8 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
     public class ProductCategoryParameters
     {
         public IList<CustomerTypeCode> CustomerTypeCodes { get; set; }
+
+        [ConvertWith(typeof(StringToBoolConverter))]
         public bool Preview { get; set; }
     }
 
