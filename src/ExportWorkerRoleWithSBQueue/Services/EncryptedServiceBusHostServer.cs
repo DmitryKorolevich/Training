@@ -158,7 +158,7 @@ namespace ExportWorkerRoleWithSBQueue.Services
         private void OnSessionRemoved(Guid session, string hostName)
         {
             SendPlainCommand(new ServiceBusCommandBase(session, ServiceBusCommandConstants.SessionExpired, hostName, LocalHostName,
-                ttl: TimeSpan.FromHours(1)));
+                ttl: TimeSpan.FromMinutes(10)));
         }
 
         public override void Dispose()

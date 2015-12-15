@@ -11,7 +11,8 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 	$scope.resendTracker = promiseTracker("resend");
 
     function successSaveHandler(result)
-    {
+	{
+        processLoadingOrder(result);
         if (result.Success)
         {
             toaster.pop('success', "Success!", "Successfully saved.");
@@ -248,61 +249,54 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         loadOrder();
     };
 
+    var processLoadingOrder = function (result) {
+        if (result.Success) {
+            $scope.order = result.Data;
+
+            if ($scope.order.ShipDelayDate) {
+                $scope.order.ShipDelayDate = Date.parseDateTime($scope.order.ShipDelayDate);
+            }
+            if ($scope.order.ShipDelayDateP) {
+                $scope.order.ShipDelayDateP = Date.parseDateTime($scope.order.ShipDelayDateP);
+            }
+            if ($scope.order.ShipDelayDateNP) {
+                $scope.order.ShipDelayDateNP = Date.parseDateTime($scope.order.ShipDelayDateNP);
+            }
+            if ($scope.order.IgnoneMinimumPerishableThreshold) {
+                $scope.options.ignoneMinimumPerishableThreshold = $scope.order.IgnoneMinimumPerishableThreshold;
+            }
+
+            customerEditService.initBase($scope);
+            if ($scope.id) {
+                $scope.idCustomer = $scope.order.IdCustomer;
+                customerEditService.initOrderEditCustomerParts($scope);
+            }
+            else {
+                if ($scope.idCustomer == 0) {
+                    $state.go('index.oneCol.manageCustomers', {});
+                    return;
+                }
+                $scope.order.UpdateShippingAddressForCustomer = true;
+                customerEditService.initCustomerEdit($scope);
+            }
+
+            if ($scope.idOrderSource) {
+                loadOrderSource();
+            }
+            else {
+                loadReferencedData();
+            }
+        } else {
+            errorHandler(result);
+        }
+    };
+
     var loadOrder = function ()
     {
         orderService.getOrder($scope.id, $scope.addEditTracker)
             .success(function (result)
             {
-                if (result.Success)
-                {
-                    $scope.order = result.Data;
-
-                    if ($scope.order.ShipDelayDate)
-                    {
-                        $scope.order.ShipDelayDate = Date.parseDateTime($scope.order.ShipDelayDate);
-                    }
-                    if ($scope.order.ShipDelayDateP)
-                    {
-                        $scope.order.ShipDelayDateP = Date.parseDateTime($scope.order.ShipDelayDateP);
-                    }
-                    if ($scope.order.ShipDelayDateNP)
-                    {
-                        $scope.order.ShipDelayDateNP = Date.parseDateTime($scope.order.ShipDelayDateNP);
-                    }
-                    if ($scope.order.IgnoneMinimumPerishableThreshold)
-                    {
-                        $scope.options.ignoneMinimumPerishableThreshold = $scope.order.IgnoneMinimumPerishableThreshold;
-                    }
-
-                    customerEditService.initBase($scope);
-                    if ($scope.id)
-                    {
-                        $scope.idCustomer = $scope.order.IdCustomer;
-                        customerEditService.initOrderEditCustomerParts($scope);
-                    }
-                    else
-                    {
-                        if ($scope.idCustomer == 0)
-                        {
-                            $state.go('index.oneCol.manageCustomers', {});
-                            return;
-                        }
-                        $scope.order.UpdateShippingAddressForCustomer = true;
-                        customerEditService.initCustomerEdit($scope);
-                    }
-
-                    if ($scope.idOrderSource)
-                    {
-                        loadOrderSource();
-                    }
-                    else
-                    {
-                        loadReferencedData();
-                    }
-                } else
-                {
-                    errorHandler(result);
-                }
+                processLoadingOrder(result);
             })
             .error(function (result)
             {

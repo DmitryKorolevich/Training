@@ -112,6 +112,15 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             {
                 main.UpdateKeyed(toAdd, leftKeySelector, rightKeySelector, updateAction);
                 main.MergeKeyedAdd(toAdd, leftKeySelector, rightKeySelector, projection);
+            }
+        }
+
+        public static void MergeUpdateWithDeleteKeyed<T1, T2, TKey>(this ICollection<T1> main, ICollection<T2> toAdd,
+            Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T2, T1> projection, Action<T1, T2> updateAction)
+        {
+            if (main != null && toAdd != null)
+            {
+                MergeUpdateKeyed(main, toAdd, leftKeySelector, rightKeySelector, projection, updateAction);
                 main.RemoveAll(main.ExceptKeyedWith(toAdd, leftKeySelector, rightKeySelector).ToArray());
             }
         }

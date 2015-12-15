@@ -23,6 +23,64 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			    }
 			}
 
+			function processCustomerLoad(result)
+			{
+			    if (result.Success) {
+			        $scope.currentCustomer = result.Data;
+			        $scope.options.DBStatusCode = $scope.currentCustomer.StatusCode;
+			        $scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
+			        $scope.paymentInfoTab.PaymentMethodType = $scope.currentCustomer.DefaultPaymentMethod;
+			        $scope.paymentInfoTab.Address = {};
+			        angular.forEach($scope.currentCustomer.Shipping, function (shippingItem, index) {
+			            customerEditService.syncCountry($scope, shippingItem);
+			            if (shippingItem.Default) {
+			                $scope.shippingAddressTab.AddressIndex = index.toString();
+			            }
+			        });
+
+			        customerEditService.syncCountry($scope, $scope.currentCustomer.ProfileAddress);
+
+			        angular.forEach($scope.currentCustomer.CreditCards, function (creditCard) {
+			            creditCard.formName = 'card';
+			            customerEditService.syncCountry($scope, creditCard.Address);
+			        });
+
+			        if ($scope.currentCustomer.CreditCards && $scope.currentCustomer.CreditCards[0])
+			            $scope.paymentInfoTab.CreditCardIndex = "0";
+
+			        if ($scope.currentCustomer.Oac) {
+			            $scope.currentCustomer.Oac.formName = 'oac';
+			            customerEditService.syncCountry($scope, $scope.currentCustomer.Oac.Address);
+			        }
+			        if ($scope.currentCustomer.Check) {
+			            $scope.currentCustomer.Check.formName = 'check';
+			            customerEditService.syncCountry($scope, $scope.currentCustomer.Check.Address);
+			        }
+			        if ($scope.currentCustomer.WireTransfer) {
+			            $scope.currentCustomer.WireTransfer.formName = 'wiretransfer';
+			            customerEditService.syncCountry($scope, $scope.currentCustomer.WireTransfer.Address);
+			        }
+			        if ($scope.currentCustomer.Marketing) {
+			            $scope.currentCustomer.Marketing.formName = 'marketing';
+			            customerEditService.syncCountry($scope, $scope.currentCustomer.Marketing.Address);
+			        }
+			        if ($scope.currentCustomer.VCWellness) {
+			            $scope.currentCustomer.VCWellness.formName = 'vcwellness';
+			            customerEditService.syncCountry($scope, $scope.currentCustomer.VCWellness.Address);
+			        }
+
+			        customerEditService.syncDefaultPaymentMethod($scope);
+			        customerEditService.showHighPriNotes($scope);
+
+			        refreshHistory();
+			        initCustomerFiles();
+			        initCustomerNotes();
+			        initOrdersList();
+			    } else {
+			        toaster.pop('error', 'Error!', "Can't load customer");
+			    }
+			}
+
 			function initialize() {
 				$scope.editMode = $stateParams.id != null;
 
@@ -96,63 +154,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 						} else {
 							customerService.getExistingCustomer($stateParams.id, $scope.addEditTracker)
 								.success(function(result) {
-									if (result.Success) {
-									    $scope.currentCustomer = result.Data;
-									    $scope.options.DBStatusCode = $scope.currentCustomer.StatusCode;
-										$scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
-										$scope.paymentInfoTab.PaymentMethodType = $scope.currentCustomer.DefaultPaymentMethod;
-										$scope.paymentInfoTab.Address = {};
-										angular.forEach($scope.currentCustomer.Shipping, function(shippingItem, index) {
-											customerEditService.syncCountry($scope, shippingItem);
-											if (shippingItem.Default) {
-											    $scope.shippingAddressTab.AddressIndex = index.toString();
-											}
-										});
-
-										customerEditService.syncCountry($scope, $scope.currentCustomer.ProfileAddress);
-
-										angular.forEach($scope.currentCustomer.CreditCards, function (creditCard) {
-											creditCard.formName = 'card';
-											customerEditService.syncCountry($scope, creditCard.Address);
-										});
-
-										if ($scope.currentCustomer.CreditCards && $scope.currentCustomer.CreditCards[0])
-											$scope.paymentInfoTab.CreditCardIndex = "0";
-
-										if ($scope.currentCustomer.Oac) {
-											$scope.currentCustomer.Oac.formName = 'oac';
-											customerEditService.syncCountry($scope, $scope.currentCustomer.Oac.Address);
-										}
-										if ($scope.currentCustomer.Check) {
-											$scope.currentCustomer.Check.formName = 'check';
-											customerEditService.syncCountry($scope, $scope.currentCustomer.Check.Address);
-										}
-										if ($scope.currentCustomer.WireTransfer)
-										{
-										    $scope.currentCustomer.WireTransfer.formName = 'wiretransfer';
-										    customerEditService.syncCountry($scope, $scope.currentCustomer.WireTransfer.Address);
-										}
-										if ($scope.currentCustomer.Marketing)
-										{
-										    $scope.currentCustomer.Marketing.formName = 'marketing';
-										    customerEditService.syncCountry($scope, $scope.currentCustomer.Marketing.Address);
-										}
-										if ($scope.currentCustomer.VCWellness)
-										{
-										    $scope.currentCustomer.VCWellness.formName = 'vcwellness';
-										    customerEditService.syncCountry($scope, $scope.currentCustomer.VCWellness.Address);
-										}
-
-										customerEditService.syncDefaultPaymentMethod($scope);
-										customerEditService.showHighPriNotes($scope);
-                                        
-										refreshHistory();
-										initCustomerFiles();
-										initCustomerNotes();
-										initOrdersList();
-									} else {
-										toaster.pop('error', 'Error!', "Can't load customer");
-									}
+								    processCustomerLoad(result);
 								}).
 								error(function(result) {
 									toaster.pop('error', "Error!", "Server error ocurred");
@@ -230,6 +232,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			};
 
 			function successHandler(result) {
+			    processCustomerLoad(result);
 			    if (result.Success)
 			    {
 			        if (!$scope.currentCustomer.Id)

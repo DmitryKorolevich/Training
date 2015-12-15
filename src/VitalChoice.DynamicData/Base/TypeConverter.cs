@@ -282,7 +282,7 @@ namespace VitalChoice.DynamicData.Base
 
         private static bool IsImplementBase(Type instanceType, Type baseTypeToMemberwiseClone)
         {
-            return instanceType.GetTypeInfo().IsSubclassOf(baseTypeToMemberwiseClone) ||
+            return instanceType == baseTypeToMemberwiseClone || instanceType.GetTypeInfo().IsSubclassOf(baseTypeToMemberwiseClone) ||
                    baseTypeToMemberwiseClone.GetTypeInfo().IsInterface &&
                    instanceType.IsImplement(baseTypeToMemberwiseClone);
         }
