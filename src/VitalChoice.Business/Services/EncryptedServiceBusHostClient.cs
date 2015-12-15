@@ -15,45 +15,37 @@ namespace VitalChoice.Business.Services
     public sealed class EncryptedServiceBusHostClient : EncryptedServiceBusHost, IEncryptedServiceBusHostClient
     {
         private readonly RSACryptoServiceProvider _keyExchangeProvider;
-        private volatile Task<RSAParameters> _publicKey;
 
         public EncryptedServiceBusHostClient(IOptions<AppOptions> appOptions, ILoggerProviderExtended loggerProvider, IObjectEncryptionHost encryptionHost)
             : base(appOptions, loggerProvider.CreateLoggerDefault(), encryptionHost)
         {
-            _publicKey = ExecutePlainCommand<RSAParameters>(new ServiceBusCommandWithResult(Guid.NewGuid(), ServiceBusCommandConstants.GetPublicKey, ServerHostName, LocalHostName));
             _keyExchangeProvider = new RSACryptoServiceProvider();
         }
 
-        private RSACryptoServiceProvider KeyExchangeProvider
+        private async Task<RSACryptoServiceProvider> GetKeyExchangeProvider()
         {
-            get
+            if (!_keyExchangeProvider.PublicOnly)
             {
-                lock (_keyExchangeProvider)
+                var publicKey =
+                    await
+                        ExecutePlainCommand<RSAParameters>(new ServiceBusCommandWithResult(Guid.NewGuid(),
+                            ServiceBusCommandConstants.GetPublicKey, ServerHostName, LocalHostName));
+                var validKey = publicKey.Modulus != null && !publicKey.Modulus.All(b => b == 0);
+                if (validKey)
                 {
-                    if (!_keyExchangeProvider.PublicOnly)
-                    {
-                        var publicKey = _publicKey.Result;
-                        var validKey = publicKey.Modulus != null && !publicKey.Modulus.All(b => b == 0);
-                        if (validKey)
-                        {
-                            _keyExchangeProvider.ImportParameters(publicKey);
-                        }
-                        else
-                        {
-                            _publicKey =
-                                ExecutePlainCommand<RSAParameters>(new ServiceBusCommandWithResult(Guid.NewGuid(),
-                                    ServiceBusCommandConstants.GetPublicKey, ServerHostName, LocalHostName));
-                            return null;
-                        }
-                    }
-                    return _keyExchangeProvider;
+                    _keyExchangeProvider.ImportParameters(publicKey);
+                }
+                else
+                {
+                    return null;
                 }
             }
+            return _keyExchangeProvider;
         }
 
         public async Task<bool> AuthenticateClient(Guid sessionId)
         {
-            var keyExchangeProvider = KeyExchangeProvider;
+            var keyExchangeProvider = await GetKeyExchangeProvider();
             if (keyExchangeProvider == null)
                 return false;
             var keys = EncryptionHost.CreateSession(sessionId);
@@ -88,23 +80,23 @@ namespace VitalChoice.Business.Services
             EncryptionHost.RemoveSession(sessionId);
         }
 
-        protected override Task<bool> ProcessPlainCommand(ServiceBusCommandBase command)
+        protected override bool ProcessPlainCommand(ServiceBusCommandBase command)
         {
             if (command.CommandName == ServiceBusCommandConstants.SessionExpired)
             {
                 var session = (Guid) command.Data;
                 if (EncryptionHost.RemoveSession(session))
                 {
-                    return Task.FromResult(true);
+                    return true;
                 }
             }
-            return Task.FromResult(false);
+            return false;
         }
 
         public override void Dispose()
         {
             base.Dispose();
-            KeyExchangeProvider?.Dispose();
+            _keyExchangeProvider?.Dispose();
         }
     }
 }

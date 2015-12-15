@@ -1,6 +1,8 @@
 using System;
 using System.Runtime.Serialization;
 using System.Threading;
+using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Ecommerce.Domain.Helpers.Async;
 using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VitalChoice.Infrastructure.Domain.ServiceBus
@@ -10,7 +12,7 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
     {
         public ServiceBusCommandWithResult(Guid sessionId, string commandName, string destination, string source, Guid? commandId = null) : base(sessionId, commandName, destination, source, commandId)
         {
-            ReadyEvent = new ManualResetEvent(false);
+            ReadyEvent = new AsyncManualResetEvent(false);
             RequestAcqureAction = (command, result) =>
             {
                 var currentCommand = (ServiceBusCommandWithResult) command;
@@ -21,7 +23,7 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
 
         public ServiceBusCommandWithResult(ServiceBusCommandBase remoteCommand, object data) : base(remoteCommand, data)
         {
-            ReadyEvent = new ManualResetEvent(false);
+            ReadyEvent = new AsyncManualResetEvent(false);
             RequestAcqureAction = (command, result) =>
             {
                 var currentCommand = (ServiceBusCommandWithResult)command;
@@ -30,7 +32,7 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
             };
         }
 
-        public ManualResetEvent ReadyEvent { get; }
+        public AsyncManualResetEvent ReadyEvent { get; }
         public object Result { get; set; }
     }
 }

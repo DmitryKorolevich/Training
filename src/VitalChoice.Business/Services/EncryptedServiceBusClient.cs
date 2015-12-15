@@ -46,7 +46,7 @@ namespace VitalChoice.Business.Services
                 }
             }
 
-            await _encryptedBusHost.ExecuteCommand(command, requestAcqureAction);
+            _encryptedBusHost.ExecuteCommand(command, requestAcqureAction);
         }
 
         protected void Dispose(bool disposing)

@@ -19,38 +19,41 @@ namespace VitalChoice.Business.Services.Orders
         {
         }
 
-        public Task ExportOrdersAsync(OrderExportData exportData, Action<OrderExportItemResult> exportedAction)
+        public async Task ExportOrdersAsync(OrderExportData exportData, Action<OrderExportItemResult> exportedAction)
         {
             Dictionary<int, ManualResetEvent> awaitItems = exportData.ExportInfo.ToDictionary(o => o.Id, o => new ManualResetEvent(false));
-            return Task.Run(() =>
-            {
-                SendCommand(new ServiceBusCommandBase(SessionId, OrderExportServiceCommandConstants.ExportOrder, ServerHostName, LocalHostName) { Data = exportData },
-                    (command, o) =>
-                    {
-                        var exportResult = (OrderExportItemResult)o;
-                        exportedAction(exportResult);
-                        awaitItems[exportResult.Id].Set();
-                    }).Wait();
-                WaitHandle.WaitAll(awaitItems.Values.Cast<WaitHandle>().ToArray());
-            });
+            await SendCommand(
+                new ServiceBusCommandBase(SessionId, OrderExportServiceCommandConstants.ExportOrder, ServerHostName, LocalHostName)
+                {
+                    Data = exportData
+                },
+                (command, o) =>
+                {
+                    var exportResult = (OrderExportItemResult) o;
+                    exportedAction(exportResult);
+                    awaitItems[exportResult.Id].Set();
+                });
+            WaitHandle.WaitAll(awaitItems.Values.Cast<WaitHandle>().ToArray());
         }
 
-        public Task<List<OrderExportItemResult>> ExportOrdersAsync(OrderExportData exportData)
+        public async Task<List<OrderExportItemResult>> ExportOrdersAsync(OrderExportData exportData)
         {
             Dictionary<int, ManualResetEvent> awaitItems = exportData.ExportInfo.ToDictionary(o => o.Id, o => new ManualResetEvent(false));
             List<OrderExportItemResult> results = new List<OrderExportItemResult>();
-            return Task.Run(() =>
-            {
-                SendCommand(new ServiceBusCommandBase(SessionId, OrderExportServiceCommandConstants.ExportOrder, ServerHostName, LocalHostName) { Data = exportData },
+            await
+                SendCommand(
+                    new ServiceBusCommandBase(SessionId, OrderExportServiceCommandConstants.ExportOrder, ServerHostName, LocalHostName)
+                    {
+                        Data = exportData
+                    },
                     (command, o) =>
                     {
-                        var exportResult = (OrderExportItemResult)o;
+                        var exportResult = (OrderExportItemResult) o;
                         results.Add(exportResult);
                         awaitItems[exportResult.Id].Set();
-                    }).Wait();
-                WaitHandle.WaitAll(awaitItems.Values.Cast<WaitHandle>().ToArray());
-                return results;
-            });
+                    });
+            WaitHandle.WaitAll(awaitItems.Values.Cast<WaitHandle>().ToArray());
+            return results;
         }
 
         public Task<bool> UpdateOrderPaymentMethodAsync(OrderPaymentMethodDynamic orderPaymentMethod)

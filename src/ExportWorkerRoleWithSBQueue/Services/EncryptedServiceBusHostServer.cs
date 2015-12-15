@@ -28,21 +28,21 @@ namespace ExportWorkerRoleWithSBQueue.Services
             _keyExchangeProvider = new RSACryptoServiceProvider(4096);
         }
 
-        protected override async Task<bool> ProcessPlainCommand(ServiceBusCommandBase command)
+        protected override bool ProcessPlainCommand(ServiceBusCommandBase command)
         {
             switch (command.CommandName)
             {
                 case ServiceBusCommandConstants.GetPublicKey:
                     RSAParameters publicKey = _keyExchangeProvider.ExportParameters(false);
-                    await SendPlainCommand(new ServiceBusCommandBase(command, publicKey));
+                    SendPlainCommand(new ServiceBusCommandBase(command, publicKey));
                     break;
                 case ServiceBusCommandConstants.SetSessionKey:
                     var keyCombined = (byte[]) command.Data;
-                    await SendPlainCommand(new ServiceBusCommandBase(command,
+                    SendPlainCommand(new ServiceBusCommandBase(command,
                         EncryptionHost.RegisterSession(command.SessionId, command.Source, EncryptionHost.RsaDecrypt(keyCombined, _keyExchangeProvider))));
                     break;
                 case ServiceBusCommandConstants.CheckSessionKey:
-                    await SendPlainCommand(new ServiceBusCommandBase(command, EncryptionHost.SessionExist(command.SessionId)));
+                    SendPlainCommand(new ServiceBusCommandBase(command, EncryptionHost.SessionExist(command.SessionId)));
                     break;
                 default:
                     return false;
@@ -50,27 +50,27 @@ namespace ExportWorkerRoleWithSBQueue.Services
             return true;
         }
 
-        protected override async Task<bool> ProcessEncryptedCommand(ServiceBusCommandBase command)
+        protected override bool ProcessEncryptedCommand(ServiceBusCommandBase command)
         {
             switch (command.CommandName)
             {
                 case OrderExportServiceCommandConstants.ExportOrder:
-                    return await ProcessExportOrders(command);
+                    return ProcessExportOrders(command);
                 case OrderExportServiceCommandConstants.UpdateOrderPayment:
-                    return await ProcessUpdateOrderPayment(command);
+                    return ProcessUpdateOrderPayment(command);
                 case OrderExportServiceCommandConstants.UpdateCustomerPayment:
-                    return await ProcessUpdateCustomerPayments(command);
+                    return ProcessUpdateCustomerPayments(command);
                 default:
                     return false;
             }
         }
 
-        private async Task<bool> ProcessUpdateCustomerPayments(ServiceBusCommandBase command)
+        private bool ProcessUpdateCustomerPayments(ServiceBusCommandBase command)
         {
             var customerPaymentInfo = command.Data as CustomerPaymentMethodDynamic[];
             if (customerPaymentInfo == null)
             {
-                await SendCommand(new ServiceBusCommandBase(command, false));
+                SendCommand(new ServiceBusCommandBase(command, false));
                 return false;
             }
             using (var scope = _rootScope.BeginLifetimeScope())
@@ -78,25 +78,25 @@ namespace ExportWorkerRoleWithSBQueue.Services
                 var exportService = scope.Resolve<IOrderExportService>();
                 try
                 {
-                    await exportService.UpdatePaymentMethods(customerPaymentInfo);
+                    exportService.UpdatePaymentMethods(customerPaymentInfo).GetAwaiter().GetResult();
                 }
                 catch (Exception e)
                 {
                     Logger.LogError(e.Message, e);
-                    await SendCommand(new ServiceBusCommandBase(command, false));
+                    SendCommand(new ServiceBusCommandBase(command, false));
                     return true;
                 }
             }
-            await SendCommand(new ServiceBusCommandBase(command, true));
+            SendCommand(new ServiceBusCommandBase(command, true));
             return true;
         }
 
-        private async Task<bool> ProcessUpdateOrderPayment(ServiceBusCommandBase command)
+        private bool ProcessUpdateOrderPayment(ServiceBusCommandBase command)
         {
             var orderPaymentInfo = command.Data as OrderPaymentMethodDynamic;
             if (orderPaymentInfo == null)
             {
-                await SendCommand(new ServiceBusCommandBase(command, false));
+                SendCommand(new ServiceBusCommandBase(command, false));
                 return false;
             }
             using (var scope = _rootScope.BeginLifetimeScope())
@@ -104,27 +104,27 @@ namespace ExportWorkerRoleWithSBQueue.Services
                 var exportService = scope.Resolve<IOrderExportService>();
                 try
                 {
-                    await exportService.UpdatePaymentMethod(orderPaymentInfo);
+                    exportService.UpdatePaymentMethod(orderPaymentInfo).GetAwaiter().GetResult();
                 }
                 catch(Exception e)
                 {
                     Logger.LogError(e.Message, e);
-                    await SendCommand(new ServiceBusCommandBase(command, false));
+                    SendCommand(new ServiceBusCommandBase(command, false));
                     return true;
                 }
             }
-            await SendCommand(new ServiceBusCommandBase(command, true));
+            SendCommand(new ServiceBusCommandBase(command, true));
             return true;
         }
 
-        private async Task<bool> ProcessExportOrders(ServiceBusCommandBase command)
+        private bool ProcessExportOrders(ServiceBusCommandBase command)
         {
             var exportData = command.Data as OrderExportData;
             if (exportData == null)
             {
                 return false;
             }
-            await Task.Run(() => Parallel.ForEach(exportData.ExportInfo, async e =>
+            Parallel.ForEach(exportData.ExportInfo, async e =>
             {
                 using (var scope = _rootScope.BeginLifetimeScope())
                 {
@@ -144,21 +144,21 @@ namespace ExportWorkerRoleWithSBQueue.Services
                         errors.Add(ex.Message);
                         success = false;
                     }
-                    await SendCommand(new ServiceBusCommandBase(command, new OrderExportItemResult
+                    SendCommand(new ServiceBusCommandBase(command, new OrderExportItemResult
                     {
                         Id = e.Id,
                         Success = success,
                         Errors = errors
                     }));
                 }
-            }));
+            });
             return true;
         }
 
         private void OnSessionRemoved(Guid session, string hostName)
         {
             SendPlainCommand(new ServiceBusCommandBase(session, ServiceBusCommandConstants.SessionExpired, hostName, LocalHostName,
-                ttl: TimeSpan.FromHours(1))).Wait();
+                ttl: TimeSpan.FromHours(1)));
         }
 
         public override void Dispose()
