@@ -21,6 +21,7 @@ using VitalChoice.Data.Services;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Helpers;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
@@ -74,6 +75,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IEncryptedOrderExportService _encryptedOrderExportService;
         private readonly SPEcommerceRepository _sPEcommerceRepository;
         private readonly IPaymentMethodService _paymentMethodService;
+        private readonly IObjectMapper<OrderPaymentMethodDynamic> _paymentMapper;
 
         public OrderService(
             IEcommerceRepositoryAsync<VOrder> vOrderRepository,
@@ -95,7 +97,7 @@ namespace VitalChoice.Business.Services.Orders
             IEcommerceRepositoryAsync<HealthwisePeriod> healthwisePeriodRepositoryAsync,
             IAppInfrastructureService appInfrastructureService,
             IEncryptedOrderExportService encryptedOrderExportService,
-            SPEcommerceRepository sPEcommerceRepository, IPaymentMethodService paymentMethodService)
+            SPEcommerceRepository sPEcommerceRepository, IPaymentMethodService paymentMethodService, IObjectMapper<OrderPaymentMethodDynamic> paymentMapper)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor)
@@ -116,6 +118,7 @@ namespace VitalChoice.Business.Services.Orders
             _encryptedOrderExportService = encryptedOrderExportService;
             _sPEcommerceRepository = sPEcommerceRepository;
             _paymentMethodService = paymentMethodService;
+            _paymentMapper = paymentMapper;
         }
 
         protected override IQueryLite<Order> BuildQuery(IQueryLite<Order> query)
@@ -291,15 +294,17 @@ namespace VitalChoice.Business.Services.Orders
             {
                 try
                 {
-                    (await _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod)).Raise();
-
+                    model.PaymentMethod.IdOrder = model.Id;
+                    var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
+                    var paymentCopy = _paymentMapper.Clone<IDictionary<string, object>>(model.PaymentMethod);
+                    (await authTask).Raise();
                     entity = await base.InsertAsync(model, uow);
                     model.IdAddedBy = entity.IdEditedBy;
                     await UpdateAffiliateOrderPayment(model, uow);
                     await UpdateHealthwiseOrder(model, uow);
                     model.PaymentMethod.IdOrder = model.Id;
 
-                    remoteUpdateTask = _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(model.PaymentMethod);
+                    remoteUpdateTask = _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy);
 
                     transaction.Commit();
                 }
@@ -316,18 +321,19 @@ namespace VitalChoice.Business.Services.Orders
             return entity;
         }
 
+        /// <summary>
+        /// We don't do card authorize on collection inserts and also don't make a send to export service
+        /// </summary>
+        /// <param name="models"></param>
+        /// <param name="uow"></param>
+        /// <returns></returns>
         protected override async Task<List<Order>> InsertRangeAsync(ICollection<OrderDynamic> models, IUnitOfWorkAsync uow)
         {
-            IEnumerable<Task<bool>> remoteUpdateTasks;
             List<Order> entities;
             using (var transaction = uow.BeginTransaction())
             {
                 try
                 {
-                    foreach (var model in models)
-                    {
-                        (await _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod)).Raise();
-                    }
                     entities = await base.InsertRangeAsync(models, uow);
                     foreach (var model in models)
                     {
@@ -340,7 +346,6 @@ namespace VitalChoice.Business.Services.Orders
                         await UpdateHealthwiseOrder(model, uow);
                         model.PaymentMethod.IdOrder = model.Id;
                     }
-                    remoteUpdateTasks = models.Select(model => _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(model.PaymentMethod));
                     transaction.Commit();
                 }
                 catch
@@ -348,10 +353,6 @@ namespace VitalChoice.Business.Services.Orders
                     transaction.Rollback();
                     throw;
                 }
-            }
-            if (!(await Task.WhenAll(remoteUpdateTasks)).All(r => r))
-            {
-                throw new ApiException("Cannot update order payment info on remote.");
             }
             return entities;
         }
@@ -364,14 +365,16 @@ namespace VitalChoice.Business.Services.Orders
             {
                 try
                 {
-                    (await _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod)).Raise();
+                    model.PaymentMethod.IdOrder = model.Id;
+                    var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
+                    var paymentCopy = _paymentMapper.Clone<IDictionary<string, object>>(model.PaymentMethod);
+                    (await authTask).Raise();
                     entity = await base.UpdateAsync(model, uow);
                     model.IdAddedBy = entity.IdAddedBy;
                     await UpdateAffiliateOrderPayment(model, uow);
                     await UpdateHealthwiseOrder(model, uow);
 
-                    model.PaymentMethod.IdOrder = model.Id;
-                    remoteUpdateTask = _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(model.PaymentMethod);
+                    remoteUpdateTask = _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy);
 
                     transaction.Commit();
                 }
@@ -388,18 +391,19 @@ namespace VitalChoice.Business.Services.Orders
             return entity;
         }
 
+        /// <summary>
+        /// We don't do card authorize on collection updates and also don't make a send to export service
+        /// </summary>
+        /// <param name="models"></param>
+        /// <param name="uow"></param>
+        /// <returns></returns>
         protected override async Task<List<Order>> UpdateRangeAsync(ICollection<OrderDynamic> models, IUnitOfWorkAsync uow)
         {
-            IEnumerable<Task<bool>> remoteUpdateTasks;
             List<Order> entities;
             using (var transaction = uow.BeginTransaction())
             {
                 try
                 {
-                    foreach (var model in models)
-                    {
-                        (await _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod)).Raise();
-                    }
                     entities = await base.UpdateRangeAsync(models, uow);
                     foreach (var model in models)
                     {
@@ -412,7 +416,6 @@ namespace VitalChoice.Business.Services.Orders
                         await UpdateAffiliateOrderPayment(model, uow);
                         await UpdateHealthwiseOrder(model, uow);
                     }
-                    remoteUpdateTasks = models.Select(model => _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(model.PaymentMethod));
 
                     transaction.Commit();
                 }
@@ -421,10 +424,6 @@ namespace VitalChoice.Business.Services.Orders
                     transaction.Rollback();
                     throw;
                 }
-            }
-            if (!(await Task.WhenAll(remoteUpdateTasks)).All(r => r))
-            {
-                throw new ApiException("Cannot update order payment info on remote.");
             }
             return entities;
         }

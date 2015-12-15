@@ -15,6 +15,6 @@ namespace VitalChoice.Interfaces.Services.Payments
 
 	    Task<PaymentMethod> GetStorefrontDefaultPaymentMenthod();
 
-        Task<List<MessageInfo>> AuthorizeCreditCard(OrderPaymentMethodDynamic paymentMethod);
+        Task<List<MessageInfo>> AuthorizeCreditCard(PaymentMethodDynamic paymentMethod);
     }
 }

@@ -163,7 +163,7 @@ namespace VitalChoice.Business.Services.Payment
 			return creditCard;
 		}
 
-        public async Task<List<MessageInfo>> AuthorizeCreditCard(OrderPaymentMethodDynamic paymentMethod)
+        public async Task<List<MessageInfo>> AuthorizeCreditCard(PaymentMethodDynamic paymentMethod)
         {
             List<MessageInfo> result = new List<MessageInfo>();
 

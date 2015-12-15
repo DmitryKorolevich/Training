@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using Autofac.Features.Indexed;
+using VitalChoice.DynamicData.Delegates;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Services;
 using VitalChoice.Ecommerce.Domain.Attributes;
@@ -193,7 +194,7 @@ namespace VitalChoice.DynamicData.Base
             foreach (var pair in objectCache.Properties)
             {
                 Type propertyElementType = pair.Value.PropertyType.TryGetElementType(typeof (ICollection<>));
-                if (pair.Value.PropertyTypeInfo.IsSubclassOf(baseTypeToMemberwiseClone))
+                if (IsImplementBase(pair.Value.PropertyTypeInfo, baseTypeToMemberwiseClone))
                 {
                     var value = Clone(pair.Value.Get?.Invoke(obj), pair.Value.PropertyType, baseTypeToMemberwiseClone);
                     if (value != null)
@@ -201,7 +202,7 @@ namespace VitalChoice.DynamicData.Base
                         pair.Value.Set?.Invoke(result, value);
                     }
                 }
-                else if (propertyElementType != null && propertyElementType.GetTypeInfo().IsSubclassOf(baseTypeToMemberwiseClone))
+                else if (propertyElementType != null && IsImplementBase(propertyElementType.GetTypeInfo(), baseTypeToMemberwiseClone))
                 {
                     var collection = pair.Value.Get?.Invoke(obj);
                     if (collection != null)
@@ -225,6 +226,13 @@ namespace VitalChoice.DynamicData.Base
                 }
             }
             return result;
+        }
+
+        private static bool IsImplementBase(TypeInfo instanceType, Type baseTypeToMemberwiseClone)
+        {
+            return instanceType.IsSubclassOf(baseTypeToMemberwiseClone) ||
+                   baseTypeToMemberwiseClone.GetTypeInfo().IsInterface &&
+                   instanceType.IsImplement(baseTypeToMemberwiseClone);
         }
 
         private static object ConvertObject(ConvertWithAttribute convertWith, object obj)

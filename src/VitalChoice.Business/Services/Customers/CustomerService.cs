@@ -23,7 +23,10 @@ using DynamicExpressionVisitor = VitalChoice.DynamicData.Helpers.DynamicExpressi
 using VitalChoice.Business.Queries.Affiliate;
 using VitalChoice.Business.Repositories;
 using VitalChoice.Business.Services.Ecommerce;
+using VitalChoice.Data.Extensions;
 using VitalChoice.DynamicData.Base;
+using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.DynamicData.Validation;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
@@ -44,6 +47,8 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Azure;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 using VitalChoice.Infrastructure.Domain.Entities.Customers;
+using VitalChoice.Interfaces.Services.Orders;
+using VitalChoice.Interfaces.Services.Payments;
 
 namespace VitalChoice.Business.Services.Customers
 {
@@ -51,11 +56,9 @@ namespace VitalChoice.Business.Services.Customers
         ICustomerService
     {
 	    private readonly IEcommerceRepositoryAsync<OrderNote> _orderNoteRepositoryAsync;
-	    private readonly IEcommerceRepositoryAsync<User> _userRepositoryAsync;
         private readonly IEcommerceRepositoryAsync<PaymentMethod> _paymentMethodRepositoryAsync;
         private readonly OrderRepository _orderRepository;
         private readonly CustomerRepository _customerRepositoryAsync;
-	    private readonly IEcommerceRepositoryAsync<VCustomer> _vCustomerRepositoryAsync;
 	    private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
 	    private readonly IBlobStorageClient _storageClient;
 	    private readonly IStorefrontUserService _storefrontUserService;
@@ -64,6 +67,9 @@ namespace VitalChoice.Business.Services.Customers
         private readonly AddressOptionValueRepository _addressOptionValueRepositoryAsync;
         private readonly CustomerAddressMapper _customerAddressMapper;
         private readonly ICountryNameCodeResolver _countryNameCode;
+        private readonly IEncryptedOrderExportService _encryptedOrderExportService;
+        private readonly IObjectMapper<CustomerPaymentMethodDynamic> _paymentMapper;
+        private readonly IPaymentMethodService _paymentMethodService;
 
         private static string _customerContainerName;
 
@@ -73,16 +79,16 @@ namespace VitalChoice.Business.Services.Customers
             CustomerRepository customerRepositoryAsync,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, CustomerMapper customerMapper,
             IObjectLogItemExternalService objectLogItemExternalService,
-            IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<CustomerOptionValue> customerOptionValueRepositoryAsync,
             IBlobStorageClient storageClient,
             IOptions<AppOptions> appOptions,
             IStorefrontUserService storefrontUserService,
-            IEcommerceRepositoryAsync<User> userRepositoryAsync,
             IEcommerceRepositoryAsync<Affiliate> affiliateRepositoryAsync,
             ILoggerProviderExtended loggerProvider, DirectMapper<Customer> directMapper, DynamicExpressionVisitor queryVisitor,
-            AddressOptionValueRepository addressOptionValueRepositoryAsync, CustomerAddressMapper customerAddressMapper, ICountryNameCodeResolver countryNameCode)
+            AddressOptionValueRepository addressOptionValueRepositoryAsync, CustomerAddressMapper customerAddressMapper,
+            ICountryNameCodeResolver countryNameCode, IEncryptedOrderExportService encryptedOrderExportService,
+            IObjectMapper<CustomerPaymentMethodDynamic> paymentMapper, IPaymentMethodService paymentMethodService)
             : base(
                 customerMapper, customerRepositoryAsync,
                 customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectLogItemExternalService, loggerProvider, directMapper,
@@ -92,17 +98,18 @@ namespace VitalChoice.Business.Services.Customers
             _paymentMethodRepositoryAsync = paymentMethodRepositoryAsync;
             _orderRepository = orderRepository;
             _customerRepositoryAsync = customerRepositoryAsync;
-            _vCustomerRepositoryAsync = vCustomerRepositoryAsync;
             _adminProfileRepository = adminProfileRepository;
             _storageClient = storageClient;
             _storefrontUserService = storefrontUserService;
             _customerContainerName = appOptions.Value.AzureStorage.CustomerContainerName;
             _appOptions = appOptions;
-            _userRepositoryAsync = userRepositoryAsync;
             _affiliateRepositoryAsync = affiliateRepositoryAsync;
             _addressOptionValueRepositoryAsync = addressOptionValueRepositoryAsync;
             _customerAddressMapper = customerAddressMapper;
             _countryNameCode = countryNameCode;
+            _encryptedOrderExportService = encryptedOrderExportService;
+            _paymentMapper = paymentMapper;
+            _paymentMethodService = paymentMethodService;
         }
 
         protected override IQueryLite<Customer> BuildQuery(IQueryLite<Customer> query)
@@ -527,20 +534,27 @@ namespace VitalChoice.Business.Services.Customers
             appUser.FirstName = profileAddress.Data.FirstName;
             appUser.LastName = profileAddress.Data.LastName;
 
-            //FIXED: Investigate transaction read issues (new transaction allocated with any read on the same connection with overwrite/close current
+            Task<bool> updatePaymentsTask;
+            Customer entity;
             using (var transaction = uow.BeginTransaction())
             {
                 try
                 {
-                    var customer = await base.UpdateAsync(model, uow);
+
+                    var authTasks = model.CustomerPaymentMethods.Select(method => _paymentMethodService.AuthorizeCreditCard(method)).ToArray();
+                    var paymentCopies = model.CustomerPaymentMethods.Select(method => _paymentMapper.Clone<IDictionary<string, object>>(method)).ToArray();
+                    await authTasks.ForEachAsync(async _ => (await _).Raise());
+
+                    entity = await base.UpdateAsync(model, uow);
 
                     var roles = MapCustomerTypeToRole(model);
 
                     await _storefrontUserService.UpdateAsync(appUser, roles, password);
 
+                    updatePaymentsTask = _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(paymentCopies);
+
                     transaction.Commit();
 
-                    return customer;
                 }
                 catch
                 {
@@ -548,6 +562,11 @@ namespace VitalChoice.Business.Services.Customers
                     throw;
                 }
             }
+            if (!await updatePaymentsTask)
+            {
+                throw new ApiException("Cannot update order payment info on remote.");
+            }
+            return entity;
         }
 
         private async Task<Customer> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow, string password)
@@ -571,6 +590,9 @@ namespace VitalChoice.Business.Services.Customers
 
             var suspendedCustomer = (int)CustomerStatus.Suspended;
 
+            Task<bool> updatePaymentsTask;
+            Customer entity;
+
             using (var transaction = uow.BeginTransaction())
             {
                 try
@@ -592,16 +614,20 @@ namespace VitalChoice.Business.Services.Customers
                     model.Id = appUser.Id;
                     //model.User.Id = appUser.Id;
 
-                    var customer = await base.InsertAsync(model, uow);
+                    var authTasks = model.CustomerPaymentMethods.Select(method => _paymentMethodService.AuthorizeCreditCard(method)).ToArray();
+                    var paymentCopies = model.CustomerPaymentMethods.Select(method => _paymentMapper.Clone<IDictionary<string, object>>(method)).ToArray();
+                    await authTasks.ForEachAsync(async _ => (await _).Raise());
+
+                    entity = await base.InsertAsync(model, uow);
 
                     if (string.IsNullOrWhiteSpace(password) && model.StatusCode != suspendedCustomer)
                     {
                         await _storefrontUserService.SendActivationAsync(model.Email);
                     }
 
-                    transaction.Commit();
+                    updatePaymentsTask = _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(paymentCopies);
 
-                    return customer;
+                    transaction.Commit();
                 }
                 catch
                 {
@@ -614,6 +640,11 @@ namespace VitalChoice.Business.Services.Customers
                     throw;
                 }
             }
+            if (!await updatePaymentsTask)
+            {
+                throw new ApiException("Cannot update order payment info on remote.");
+            }
+            return entity;
         }
     }
 }

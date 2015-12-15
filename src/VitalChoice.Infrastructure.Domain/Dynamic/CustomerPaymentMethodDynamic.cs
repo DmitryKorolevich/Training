@@ -9,10 +9,8 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
     [DataContract]
     [MaskProperty("CardNumber", typeof(CreditCardMasker))]
     [JsonObject(MemberSerialization.OptOut)]
-    public class CustomerPaymentMethodDynamic : MappedObject
+    public class CustomerPaymentMethodDynamic : PaymentMethodDynamic
     {
-        public AddressDynamic Address { get; set; }
-
         [DataMember]
         public int IdCustomer { get; set; }
     }
