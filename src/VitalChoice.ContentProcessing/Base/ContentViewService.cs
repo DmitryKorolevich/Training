@@ -132,8 +132,8 @@ namespace VitalChoice.ContentProcessing.Base
             ActionContext context)
         {
             var viewContext = new ContentViewContext<TEntity>(queryData, null, user, context);
-            viewContext.Entity = await GetDataInternal((TParametersModel) _mapper.FromDictionary(queryData, false), viewContext);
-            
+            viewContext.Entity = await GetDataInternal((TParametersModel)_mapper.FromDictionary(queryData, false), viewContext);
+
             if (viewContext.Entity == null)
             {
                 Logger.LogInformation("The item could not be found {" + queryData.FormatDictionary() + "}");

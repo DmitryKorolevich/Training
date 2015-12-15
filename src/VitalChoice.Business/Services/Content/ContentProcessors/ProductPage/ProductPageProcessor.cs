@@ -5,6 +5,8 @@ using System.Net;
 using System.Threading.Tasks;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.DynamicData.TypeConverters;
+using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -30,8 +32,10 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
         public const string RecipeBaseUrl = "/recipe/";
 
         public RoleType Role { get; set; }
+
         public ProductDynamic Product { get; set; }
 
+        [ConvertWith(typeof(StringToBoolConverter))]
         public bool Preview { get; set; }
     }
 
