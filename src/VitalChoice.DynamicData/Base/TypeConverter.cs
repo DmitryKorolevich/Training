@@ -194,7 +194,7 @@ namespace VitalChoice.DynamicData.Base
             foreach (var pair in objectCache.Properties)
             {
                 Type propertyElementType = pair.Value.PropertyType.TryGetElementType(typeof (ICollection<>));
-                if (IsImplementBase(pair.Value.PropertyTypeInfo, baseTypeToMemberwiseClone))
+                if (IsImplementBase(pair.Value.PropertyType, baseTypeToMemberwiseClone))
                 {
                     var value = Clone(pair.Value.Get?.Invoke(obj), pair.Value.PropertyType, baseTypeToMemberwiseClone);
                     if (value != null)
@@ -202,7 +202,7 @@ namespace VitalChoice.DynamicData.Base
                         pair.Value.Set?.Invoke(result, value);
                     }
                 }
-                else if (propertyElementType != null && IsImplementBase(propertyElementType.GetTypeInfo(), baseTypeToMemberwiseClone))
+                else if (propertyElementType != null && IsImplementBase(propertyElementType, baseTypeToMemberwiseClone))
                 {
                     var collection = pair.Value.Get?.Invoke(obj);
                     if (collection != null)
@@ -228,9 +228,9 @@ namespace VitalChoice.DynamicData.Base
             return result;
         }
 
-        private static bool IsImplementBase(TypeInfo instanceType, Type baseTypeToMemberwiseClone)
+        private static bool IsImplementBase(Type instanceType, Type baseTypeToMemberwiseClone)
         {
-            return instanceType.IsSubclassOf(baseTypeToMemberwiseClone) ||
+            return instanceType.GetTypeInfo().IsSubclassOf(baseTypeToMemberwiseClone) ||
                    baseTypeToMemberwiseClone.GetTypeInfo().IsInterface &&
                    instanceType.IsImplement(baseTypeToMemberwiseClone);
         }

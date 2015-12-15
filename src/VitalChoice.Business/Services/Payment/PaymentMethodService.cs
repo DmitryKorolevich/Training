@@ -165,16 +165,17 @@ namespace VitalChoice.Business.Services.Payment
 
         public async Task<List<MessageInfo>> AuthorizeCreditCard(PaymentMethodDynamic paymentMethod)
         {
-            List<MessageInfo> result = new List<MessageInfo>();
+            List<MessageInfo> errors = new List<MessageInfo>();
 
             if (_options.Value.AuthorizeNet.TestEnv || paymentMethod.IdObjectType != (int)PaymentMethodType.CreditCard ||
                 _mapper.IsObjectSecured(paymentMethod))
-                return result;
+                return errors;
 
             var creditCard = new creditCardType
             {
                 cardNumber = paymentMethod.Data.CardNumber,
-                expirationDate = ((DateTime)paymentMethod.Data.ExpDate).ToString("MMyy")
+                expirationDate = ((DateTime)paymentMethod.Data.ExpDate).ToString("MMyy"),
+                isPaymentToken = false
             };
 
             var paymentType = new paymentType { Item = creditCard };
@@ -222,8 +223,8 @@ namespace VitalChoice.Business.Services.Payment
             await controller.Execute();
 
             var response = controller.GetApiResponse();
-            ParseErrors(result, response);
-            if (response.messages.resultCode == messageTypeEnum.Ok)
+            ParseErrors(errors, response);
+            if (response.messages.resultCode == messageTypeEnum.Ok && !errors.Any())
             {
                 if (response.transactionResponse != null)
                 {
@@ -251,20 +252,20 @@ namespace VitalChoice.Business.Services.Payment
                     await controller.Execute();
 
                     response = controller.GetApiResponse();
-                    ParseErrors(result, response);
+                    ParseErrors(errors, response);
                     if (response.messages.resultCode == messageTypeEnum.Ok)
                     {
-                        return result;
+                        return errors;
                     }
-                    return result;
+                    return errors;
                 }
             }
-            return result;
+            return errors;
         }
 
 	    private static void ParseErrors(List<MessageInfo> result, createTransactionResponse response)
 	    {
-	        result.AddRange(response?.messages?.message?.Select(m => new MessageInfo()
+	        result.AddRange(response?.messages?.message?.Where(m => m.code?.ToLower() != "i00001").Select(m => new MessageInfo()
 	        {
 	            Field = "CardNumber",
 	            Message = $"[{m.code}] {m.text}"
@@ -274,6 +275,19 @@ namespace VitalChoice.Business.Services.Payment
 	            Field = "CardNumber",
 	            Message = $"[{m.errorCode}] {m.errorText}"
 	        }) ?? Enumerable.Empty<MessageInfo>());
+	        if (response?.transactionResponse?.avsResultCode == "N")
+	        {
+	            result.Add(new MessageInfo
+	            {
+	                Field = "Zip",
+                    Message = "Street address and postal code do not match."
+                });
+                result.Add(new MessageInfo
+                {
+                    Field = "Address1",
+                    Message = "Street address and postal code do not match."
+                });
+            }
 	    }
 	}
 }
