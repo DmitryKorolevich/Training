@@ -15,7 +15,9 @@ namespace VitalChoice.Core.GlobalFilters
 	{
 		public override void OnException(ExceptionContext context)
 		{
-			var acceptHeader = context.HttpContext.Request.Headers["Accept"];
+		    var logger = LoggerService.GetDefault();
+		    logger.LogError(context.Exception.Message, context.Exception);
+            var acceptHeader = context.HttpContext.Request.Headers["Accept"];
             if (acceptHeader.Any() && acceptHeader.First().Contains("application/json"))
 			{
 				new ApiExceptionFilterAttribute().OnException(context);

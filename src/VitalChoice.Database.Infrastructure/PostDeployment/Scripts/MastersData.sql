@@ -2589,6 +2589,441 @@ END
 
 GO 
 
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE [Name] = 'Product page' AND Updated < '2015-12-15')
+BEGIN
+	UPDATE [dbo].[MasterContentItems]
+	SET [Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage}}
+@using() {{System.Linq}}
+@model() {{dynamic}}
+
+<%
+<review_rating>{{
+    @if(@model == 0){{
+         <img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+    }}
+    @if(@model == 1){{
+         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+    }}
+    @if(@model == 2){{
+         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+    }}
+    @if(@model == 3){{
+         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+    }}
+    @if(@model == 4){{
+         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+    }}
+    @if(@model == 5){{
+         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif" /><img class="rating-last-child" src="/assets/images/fullstar.gif" />
+    }}
+}}    
+    
+<product_breadcrumb>
+{{
+    <div class="category-breadcrumb">
+	    @list(@model.BreadcrumbOrderedItems.Take(model.BreadcrumbOrderedItems.Count - 1)) {{
+            <a href="@(Url)" title="@(Label)">@(Label)</a>
+            <img src="/assets/images/breadarrow2.jpg">
+        }}
+        @if(@model.BreadcrumbOrderedItems.Any())
+        {{
+            <span>@(@model.BreadcrumbOrderedItems.Last().Label)</span>
+        }}
+	</div>
+}}
+
+<product_introduction>
+{{
+    <img class="product-intro-image" alt="@(Name)" src="@(Image)"/>
+	<div class="product-intro-info">
+		<div class="product-intro-main">
+			<div class="product-intro-headers">
+				<h1>@(Name)</h1>
+				@if(SubTitle) {{
+				    <h2>@(SubTitle)</h2>
+				}}
+				@if(@model.Skus.Any()){{
+				    <h3 id="hSelectedCode">Product #@(@model.Skus.First().Code)</h3>
+				}}
+			</div>
+			@if(@model.SpecialIcon == 1){{
+			    <img title="MSC" src="/assets/images/specialIcons/msc-atc.jpg"/>
+			}}
+			@if(@model.SpecialIcon == 2){{
+			    <img title="USDA" src="/assets/images/specialIcons/usda-atc.jpg"/>
+			}}
+			@if(@model.SpecialIcon == 3){{
+			   <img title="ASMI" src="/assets/images/specialIcons/alaskaseafoodicon.jpg"/>
+			}}
+			@if(@model.SpecialIcon == 4){{
+			   <img title="USDA + Fair Trade" src="/assets/images/specialIcons/usda-fairtrade-atc.jpg"/>
+			}}
+			@if(@model.SpecialIcon == 5){{
+			    <img title="Certified Humane" src="/assets/images/specialIcons/humane-atc.jpg"/>
+			}}
+			@if(@model.SpecialIcon == 6){{
+			    <img title="ASMI-W" src="/assets/images/specialIcons/ASMI-W.jpg"/>
+			}}
+		</div>
+		<div class="product-intro-sub">
+		    <div class="product-stars-container">
+			    @review_rating(@model.ReviewsTab.AverageRatings)
+			</div>
+			@if(@model.ReviewsTab.ReviewsCount > 0){{
+			    <span class="product-reviews-count">[@(@model.ReviewsTab.ReviewsCount)]</span>
+			    <a href="#tabs-reviews" id="lnkReviewsTab">
+				    Read <strong>@(@model.ReviewsTab.ReviewsCount)</strong> reviews
+			    </a>
+			}}
+			<a class="write-review-link" href="#">
+				Write a Review
+			</a>
+		</div>
+		<div class="product-intro-description">
+			@(ShortDescription)
+		</div>
+		@(DescriptionTab) {{
+		    @if(){{
+		        @ifnot(Hidden){{
+		            <a class="product-intro-more" href="#tabs-details" id="lnkDescriptionTab">Read more ></a>
+		        }}
+		    }}
+		}}
+		<div class="product-action-bar">
+			<div class="product-action-left">
+				@if(SubProductGroupName){{
+					<span class="action-left-header">@(SubProductGroupName)</span>
+				}}
+				@ifnot(SubProductGroupName){{
+					<span class="action-left-header">Number of Portions:</span>
+				}}
+				@list(Skus) {{
+				    <label class="product-portion-line">
+					    <input name="sku" type="radio" value="@(Code)" data-price="@money(Price)"/>
+					    @(PortionsCount) - @money(Price)
+					    @if(SalesText) {{
+					        <span class="product-best-value">@(SalesText)</span>
+					    }}
+				    </label>
+				}}
+			</div>
+			<div class="product-action-right">
+			    @if(@model.Skus.Any()){{
+				    <span id="spSelectedPrice" class="product-selected-price">Selected Price @money(@model.Skus.First().Price)</span>
+				}}
+				<a href="#">
+					<img src="/assets/images/addtocartorange-2015.jpg"/>
+				</a>
+			</div>
+		</div>
+	</div>
+}}
+
+<product_details>
+{{
+    <div class="tabs-control">
+		<ul>
+		    @(DescriptionTab) {{
+		        @if(){{
+		            @ifnot(Hidden){{
+		                @if(TitleOverride){{
+		                   <li><a href="#tabs-details">@(TitleOverride)</a></li>
+	                    }}
+	                    @ifnot(TitleOverride){{
+	                    <li><a href="#tabs-details">Details</a></li>
+                        }}
+	                }}
+	            }}
+            }}
+            @(ReviewsTab){{
+                @if(){{
+                    @if(@model.ReviewsCount > 0){{
+                        <li><a href="#tabs-reviews">Reviews</a></li>
+                    }}
+                }}
+            }}
+		    @(IngredientsTab) {{
+		        @if(){{
+		            @ifnot(Hidden){{
+		                @if(TitleOverride){{
+		                   <li><a href="#tabs-nutrition">@(TitleOverride)</a></li>
+	                    }}
+	                    @ifnot(TitleOverride){{
+	                       <li><a href="#tabs-nutrition">Nutrition & Ingredients</a></li>
+                        }}
+	                }}
+	            }}
+            }}
+            @(RecipesTab) {{
+                @if(){{
+		            @ifnot(Hidden){{
+		                @if(TitleOverride){{
+		                    <li><a href="#tabs-recipes">@(TitleOverride)</a></li>
+	                    }}
+	                    @ifnot(TitleOverride){{
+	                        <li><a href="#tabs-recipes">Recipes</a></li>
+                        }}
+	                }}
+	            }}
+            }}
+		    @(ServingTab) {{
+		        @if(){{
+		            @ifnot(Hidden){{
+		                @if(TitleOverride){{
+		                    <li><a href="#tabs-serving">@(TitleOverride)</a></li>
+	                    }}
+	                    @ifnot(TitleOverride){{
+	                        <li><a href="#tabs-serving">Serving/Care</a></li>
+                        }}
+	                }}
+	            }}
+            }}
+		    @(ShippingTab) {{
+		        @if(){{
+		            @ifnot(Hidden){{
+		                @if(TitleOverride){{
+		                    <li><a href="#tabs-shipping">@(TitleOverride)</a></li>
+	                    }}
+	                    @ifnot(TitleOverride){{
+	                        <li><a href="#tabs-shipping">Shipping</a></li>
+                        }}
+	                }}
+	            }}
+            }}
+		</ul>
+		@(DescriptionTab) {{
+		    @if(){{
+		        @ifnot(Hidden){{
+		            <div id="tabs-details">
+    		            @(Content)
+    			    </div>
+	            }}  
+	        }}
+	    }}
+	    @(ReviewsTab):param(Url){{
+            @if(){{
+                @if(@model.ReviewsCount > 0){{
+                    <div id="tabs-reviews">
+    		            <p class="product-reviews-overall">
+    		                Average Ratings:
+    		                @review_rating(AverageRatings)  
+    		                @(AverageRatings)
+    		            </p>
+				        <a class="write-review-link" href="#">
+					        Write a Review
+				        </a>
+				        <hr/>
+				        @list(Reviews) {{
+                            <div class="product-reviews-item">
+					            <div class="reviews-item-rating">
+						            @review_rating(Rating)  
+						        </div>
+					            <div class="reviews-item-info">
+						            <span class="reviews-item-title">"@(Title)"</span>
+						            <span class="reviews-item-author">@(CustomerName) on @time(DateCreated){{g}}</span>
+						            <span class="reviews-item-text"><b>Review:</b> @(Review)</span>
+					            </div>
+				            </div>
+				            <hr />
+                        }}
+				        <a class="read-more-reviews" href="/reviews/@(@chained)">
+					        Read more reviews >
+				        </a>
+    			    </div>
+                }}
+            }}
+        }}
+		@(IngredientsTab) {{
+		    @if(){{
+		        @ifnot(Hidden){{
+		            <div id="tabs-nutrition">
+    		            @(Content)
+    		            
+    		            @if(@model.NutritionalTitle != null){{
+    		                @if(@model.Content != null){{
+    		                    <span class="ingredients-section-begin margin-top-medium">Ingredients:</span>
+    		                }}
+    		                @if(@model.Content == null){{
+    		                    <span class="ingredients-section-begin">Ingredients:</span>
+    		                }}
+				            <span class="ingredients-product-title">@(IngredientsTitle)</span>
+				            <hr/>
+				            <div class="ingredients-nutrition-facts">
+					            <div class="nutrition-facts-line">
+						            <span class="facts-static-title">Nutrition Facts</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-nutrition-title">@(NutritionalTitle)</span>
+					            </div>
+					            @if(@model.ServingSize != null){{
+					                <div class="nutrition-facts-line">
+					        	        <span class="facts-nutrition-line">Serving Size @(ServingSize)</span>
+					                </div>
+					            }}
+					            @if(@model.Servings != null){{
+					                <div class="nutrition-facts-line">
+						                <span class="facts-nutrition-line">Number of servings: @(Servings)</span>
+					                </div>
+					            }}
+					            <hr/>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-hint-line">Amount Per Serving</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-subtitle">Calories</span>
+						            <span class="facts-info-line">@(Calories)</span>
+						            <span class="facts-info-value">Calories from Fat @(CaloriesFromFat)</span>
+					            </div>
+					            <hr/>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-hint-value">% Daily Value*</span>
+				        	    </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-subtitle">Total Fat</span>
+						            <span class="facts-info-line">@(TotalFat)</span>
+						            <span class="facts-info-value">@(TotalFatPercent)</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-indent facts-info-line">Saturated Fat @(SaturatedFat)</span>
+					        	    <span class="facts-info-value">@(SaturatedFatPercent)</span>
+				        	    </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-indent facts-info-line">Trans Fat @(TransFat)</span>
+						             <span class="facts-info-value">@(TransFatPercent)</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-subtitle">Cholesterol</span>
+						            <span class="facts-info-line">@(Cholesterol)</span>
+						            <span class="facts-info-value">@(CholesterolPercent)</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+					        	    <span class="facts-info-subtitle">Sodium</span>
+						            <span class="facts-info-line">@(Sodium)</span>
+						            <span class="facts-info-value">@(SodiumPercent)</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-subtitle">Total Carbohydrate</span>
+						            <span class="facts-info-line">@(TotalCarbohydrate)</span>
+						            <span class="facts-info-value">@(TotalCarbohydratePercent)</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-indent facts-info-line">Dietary Fiber @(DietaryFiber)</span>
+					                <span class="facts-info-value">@(DietaryFiberPercent)</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-indent facts-info-line">Sugars @(Sugars)</span>
+						            <span class="facts-info-value">@(SugarsPercent)</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+					        	    <span class="facts-info-subtitle">Protein</span>
+					        	    <span class="facts-info-line">@(Protein)</span>
+					        	    <span class="facts-info-value">@(ProteinPercent)</span>
+					            </div>
+				        	    <hr/>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-line">@(AdditionalNotes)</span>
+				        	    </div>
+				        	    <div class="nutrition-facts-line">
+						            <span class="facts-bottom-hint">* Percent Daily Values are based on a 2,000 calorie diet. Your daily values may be higher or lower depending on your calorie needs.</span>
+				        	    </div>
+			        	    </div>
+			        	}}
+    			    </div>
+	            }}
+	        }}
+	    }}
+		@(RecipesTab) {{
+		    @if(){{
+		        @ifnot(Hidden){{
+		            <div id="tabs-recipes">
+    		            @(Content)
+    		            @if(@model.Recipes.Count > 0){{
+    		                <div class="margin-top-medium">
+    		                    @list(Recipes){{
+    		                        <a class="product-recipe-link" title="@(Name)" href="@(Url)">@(Name)</a>
+    		                    }}
+    		                </div>
+    		            }}
+    			    </div>
+    			}}
+	        }}
+	    }}
+		@(ServingTab) {{
+		    @if(){{
+		        @ifnot(Hidden){{
+		            <div id="tabs-serving">
+    		            @(Content)
+    			    </div>
+    			}}
+	        }}
+	    }}
+		@(ShippingTab) {{
+		    @if(){{
+		        @ifnot(Hidden){{
+		            <div id="tabs-shipping">
+    		            @(Content)
+    			    </div>
+    			}}
+	        }}
+	    }}
+	</div>
+}}
+	
+<product_accessories>
+{{
+    <div class="product-related-accessories">
+		<span class="product-accessories-title">Try one of these delicious recipes</span>
+		<div class="accessories-container">
+		    @list(YoutubeVideos) {{
+                <a class="product-related-link" href="javascript:function(){return false;}" data-video-id="@(VideoId)">
+				    <img src="@(Image)">
+			    	@(Text)
+			    </a>
+            }}
+		</div>
+	</div>
+	<div class="product-related-accessories accessories-top-margin">
+		<span class="product-accessories-title">Discover these customer favorites ... satisfaction 100% Guaranteed!</span>
+		<div class="accessories-container">
+		    @list(CrossSells) {{
+                <a class="product-related-link" target="_blank" href="@(Url)">
+				    <img src="@(Image)">
+			    </a>
+            }}
+		</div>
+	</div>
+}}	
+
+<scripts>
+{{
+    <script>
+		var productPublicId = "@(ProductPublicId)";
+    </script>
+}}
+	
+<layout> -> (ProductPage)
+{{
+    <div class="product-main">
+        @product_breadcrumb()
+        <section class="product-intro-container">
+	        @product_introduction()    
+	    </section>
+	    <section class="product-detais">
+	        @product_details()
+	    </section>
+	    <section class="product-accessories">
+	        @product_accessories()
+	    </section>
+    </div>
+    @scripts()
+}}:: TtlProductPageModel 
+%>'
+WHERE [Name] = 'Product page'
+
+END
+
+GO
+
 IF ((SELECT TOP 1 MasterContentItemId FROM ContentCategories WHERE Type=3 AND ParentID IS NULL)
 =(SELECT TOP 1 Id FROM MasterContentItems WHERE Name='Article Root Category'))
 BEGIN

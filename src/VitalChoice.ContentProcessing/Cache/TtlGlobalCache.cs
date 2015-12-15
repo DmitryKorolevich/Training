@@ -46,7 +46,7 @@ namespace VitalChoice.ContentProcessing.Cache
 
             public override int GetHashCode()
             {
-                return _idTemplate.GetHashCode();
+                return _idTemplate.GetHashCode() ^ _idMaster.GetHashCode() * 347;
             }
 
             public override bool Equals(object obj)

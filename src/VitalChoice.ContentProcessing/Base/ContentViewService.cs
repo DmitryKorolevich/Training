@@ -63,7 +63,7 @@ namespace VitalChoice.ContentProcessing.Base
             var templateCacheOptions = new TemplateCacheParam
             {
                 IdMaster = contentEntity.MasterContentItemId,
-                IdTemplate = contentEntity.ContentItem.Id,
+                IdTemplate = contentEntity.ContentItemId,
                 Master = contentEntity.MasterContentItem.Template,
                 Template = contentEntity.ContentItem.Template,
                 MasterUpdateDate = contentEntity.MasterContentItem.Updated,
