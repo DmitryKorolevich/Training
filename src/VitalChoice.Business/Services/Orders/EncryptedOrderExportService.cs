@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.OptionsModel;
+using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Options;
@@ -15,8 +17,15 @@ namespace VitalChoice.Business.Services.Orders
 {
     public class EncryptedOrderExportService : EncryptedServiceBusClient, IEncryptedOrderExportService
     {
-        public EncryptedOrderExportService(IEncryptedServiceBusHostClient encryptedBusHost) : base(encryptedBusHost)
+        private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _orderPaymentMapper;
+        private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _customerPaymentMapper;
+
+        public EncryptedOrderExportService(IEncryptedServiceBusHostClient encryptedBusHost,
+            IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMapper,
+            IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> customerPaymentMapper) : base(encryptedBusHost)
         {
+            _orderPaymentMapper = orderPaymentMapper;
+            _customerPaymentMapper = customerPaymentMapper;
         }
 
         public async Task ExportOrdersAsync(OrderExportData exportData, Action<OrderExportItemResult> exportedAction)
@@ -58,20 +67,29 @@ namespace VitalChoice.Business.Services.Orders
 
         public Task<bool> UpdateOrderPaymentMethodAsync(OrderPaymentMethodDynamic orderPaymentMethod)
         {
-            return
-                SendCommand<bool>(new ServiceBusCommandWithResult(SessionId, OrderExportServiceCommandConstants.UpdateOrderPayment, ServerHostName, LocalHostName)
-                {
-                    Data = orderPaymentMethod
-                });
+            if (!_orderPaymentMapper.IsObjectSecured(orderPaymentMethod))
+                return
+                    SendCommand<bool>(new ServiceBusCommandWithResult(SessionId, OrderExportServiceCommandConstants.UpdateOrderPayment,
+                        ServerHostName, LocalHostName)
+                    {
+                        Data = orderPaymentMethod
+                    });
+            return Task.FromResult(true);
         }
 
-        public Task<bool> UpdateCustomerPaymentMethodsAsync(IEnumerable<CustomerPaymentMethodDynamic> paymentMethods)
+        public Task<bool> UpdateCustomerPaymentMethodsAsync(ICollection<CustomerPaymentMethodDynamic> paymentMethods)
         {
-            return
-                SendCommand<bool>(new ServiceBusCommandWithResult(SessionId, OrderExportServiceCommandConstants.UpdateCustomerPayment, ServerHostName, LocalHostName)
-                {
-                    Data = paymentMethods.ToArray()
-                });
+            var paymentsToUpdate = paymentMethods.Where(p => !_customerPaymentMapper.IsObjectSecured(p)).ToArray();
+            if (paymentsToUpdate.Any())
+            {
+                return
+                    SendCommand<bool>(new ServiceBusCommandWithResult(SessionId, OrderExportServiceCommandConstants.UpdateCustomerPayment,
+                        ServerHostName, LocalHostName)
+                    {
+                        Data = paymentsToUpdate
+                    });
+            }
+            return Task.FromResult(true);
         }
     }
 }

@@ -25,5 +25,6 @@ namespace VitalChoice.DynamicData.Interfaces
         TObject FromModel<TModel>(TModel model);
         void UpdateObject<TModel>(TModel model, TObject obj);
         TObject Clone<TBase>(TObject obj);
+        TObject Clone<TBase>(TObject obj, Func<TBase, TBase> cloneBaseFunc);
     }
 }

@@ -231,6 +231,11 @@ namespace VitalChoice.DynamicData.Base
             return (TObject)_typeConverter.Clone(obj, typeof(TObject), typeof(TBase));
         }
 
+        public TObject Clone<TBase>(TObject obj, Func<TBase, TBase> cloneBaseFunc)
+        {
+            return (TObject) _typeConverter.Clone(obj, typeof (TObject), typeof (TBase), o => cloneBaseFunc((TBase) o));
+        }
+
         public object FromDictionary(IDictionary<string, object> model, bool caseSense = true)
         {
             if (model == null)

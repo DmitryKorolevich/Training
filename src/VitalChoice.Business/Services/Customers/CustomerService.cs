@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 #if DNX451
@@ -36,6 +37,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Entities.Users;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -542,7 +544,12 @@ namespace VitalChoice.Business.Services.Customers
                 {
 
                     var authTasks = model.CustomerPaymentMethods.Select(method => _paymentMethodService.AuthorizeCreditCard(method)).ToArray();
-                    var paymentCopies = model.CustomerPaymentMethods.Select(method => _paymentMapper.Clone<IDictionary<string, object>>(method)).ToArray();
+                    var paymentCopies = model.CustomerPaymentMethods.Select(method => _paymentMapper.Clone<ExpandoObject>(method, o =>
+                    {
+                        var result = new ExpandoObject();
+                        result.AddRange(o);
+                        return result;
+                    })).ToArray();
                     await authTasks.ForEachAsync(async _ => (await _).Raise());
 
                     entity = await base.UpdateAsync(model, uow);
@@ -615,7 +622,12 @@ namespace VitalChoice.Business.Services.Customers
                     //model.User.Id = appUser.Id;
 
                     var authTasks = model.CustomerPaymentMethods.Select(method => _paymentMethodService.AuthorizeCreditCard(method)).ToArray();
-                    var paymentCopies = model.CustomerPaymentMethods.Select(method => _paymentMapper.Clone<IDictionary<string, object>>(method)).ToArray();
+                    var paymentCopies = model.CustomerPaymentMethods.Select(method => _paymentMapper.Clone<ExpandoObject>(method, o =>
+                    {
+                        var result = new ExpandoObject();
+                        result.AddRange(o);
+                        return result;
+                    })).ToArray();
                     await authTasks.ForEachAsync(async _ => (await _).Raise());
 
                     entity = await base.InsertAsync(model, uow);

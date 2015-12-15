@@ -228,6 +228,58 @@ namespace VitalChoice.DynamicData.Base
             return result;
         }
 
+        public object Clone(object obj, Type objectType, Type baseTypeToMemberwiseClone, Func<object, object> cloneBase)
+        {
+            if (obj == null)
+                return null;
+
+            object result;
+
+            if (_objects.TryGetValue(obj, out result))
+                return result;
+
+            result = Activator.CreateInstance(objectType);
+
+            _objects.Add(obj, result);
+
+            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+            foreach (var pair in objectCache.Properties)
+            {
+                Type propertyElementType = pair.Value.PropertyType.TryGetElementType(typeof(ICollection<>));
+                if (IsImplementBase(pair.Value.PropertyType, baseTypeToMemberwiseClone))
+                {
+                    var value = cloneBase(pair.Value.Get?.Invoke(obj));
+                    if (value != null)
+                    {
+                        pair.Value.Set?.Invoke(result, value);
+                    }
+                }
+                else if (propertyElementType != null && IsImplementBase(propertyElementType, baseTypeToMemberwiseClone))
+                {
+                    var collection = pair.Value.Get?.Invoke(obj);
+                    if (collection != null)
+                    {
+                        var results = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(propertyElementType));
+                        foreach (var item in (IEnumerable)collection)
+                        {
+                            var value = cloneBase(item);
+                            results.Add(value);
+                        }
+                        pair.Value.Set?.Invoke(result, results);
+                    }
+                    else
+                    {
+                        pair.Value.Set?.Invoke(result, null);
+                    }
+                }
+                else
+                {
+                    pair.Value.Set?.Invoke(result, pair.Value.Get?.Invoke(obj));
+                }
+            }
+            return result;
+        }
+
         private static bool IsImplementBase(Type instanceType, Type baseTypeToMemberwiseClone)
         {
             return instanceType.GetTypeInfo().IsSubclassOf(baseTypeToMemberwiseClone) ||

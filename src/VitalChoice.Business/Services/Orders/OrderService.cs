@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using Authorize.Net.Api.Contracts.V1;
@@ -296,7 +297,12 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     model.PaymentMethod.IdOrder = model.Id;
                     var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
-                    var paymentCopy = _paymentMapper.Clone<IDictionary<string, object>>(model.PaymentMethod);
+                    var paymentCopy = _paymentMapper.Clone<ExpandoObject>(model.PaymentMethod, o =>
+                    {
+                        var result = new ExpandoObject();
+                        result.AddRange(o);
+                        return result;
+                    });
                     (await authTask).Raise();
                     entity = await base.InsertAsync(model, uow);
                     model.IdAddedBy = entity.IdEditedBy;
@@ -367,7 +373,12 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     model.PaymentMethod.IdOrder = model.Id;
                     var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
-                    var paymentCopy = _paymentMapper.Clone<IDictionary<string, object>>(model.PaymentMethod);
+                    var paymentCopy = _paymentMapper.Clone<ExpandoObject>(model.PaymentMethod, o =>
+                    {
+                        var result = new ExpandoObject();
+                        result.AddRange(o);
+                        return result;
+                    });
                     (await authTask).Raise();
                     entity = await base.UpdateAsync(model, uow);
                     model.IdAddedBy = entity.IdAddedBy;
