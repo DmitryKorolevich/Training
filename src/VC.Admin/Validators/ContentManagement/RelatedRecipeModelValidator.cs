@@ -35,10 +35,8 @@ namespace VC.Admin.Validators.ContentManagement
 					.Cascade(CascadeMode.StopOnFirstFailure)
 					.NotEmpty()
 					.WithMessage(model => model.Url, ValidationMessages.FieldRequired)
-					.Matches(ValidationPatterns.ContentUrlPattern)
-					.WithMessage(model => model.Url, ValidationMessages.FieldContentUrlInvalidFormat)
 					.Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE)
-				   .WithMessage(model => model.Title, ValidationMessages.FieldLength,
+				    .WithMessage(model => model.Title, ValidationMessages.FieldLength,
 					   BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
 			}
 		}

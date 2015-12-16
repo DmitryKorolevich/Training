@@ -5,7 +5,8 @@
     "jQuery": "~1.11.3",
     "normalize.css": "~3.0.3",
     "nivoslider": "*",
-    "jquery.scrollTo": "~2.1.2"
+    "jquery.scrollTo": "~2.1.2",
+    "tooltipster": "~3.3.0"
   },
   "exportsOverride": {
     "jQuery": {

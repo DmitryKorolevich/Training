@@ -3333,3 +3333,450 @@ WHERE Name='Article Individual'
 END
 
 GO
+
+IF ((SELECT TOP 1 MasterContentItemId FROM ContentCategories WHERE Type=1 AND ParentID IS NULL)
+=(SELECT TOP 1 Id FROM MasterContentItems WHERE Name='Recipe Root Category'))
+BEGIN
+
+UPDATE ContentCategories
+SET  MasterContentItemId=(SELECT TOP 1 Id FROM MasterContentItems WHERE Name='Recipe Sub Category')
+WHERE Type=1 AND ParentID IS NULL
+
+UPDATE ContentItems
+SET Template=''
+WHERE Id=(SELECT TOP 1 ContentItemId FROM ContentCategories WHERE Type=1 AND ParentID IS NULL)
+
+END
+
+GO
+
+IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Name='Recipe Sub Category' AND Updated<'2015-12-16 00:00:00.000')
+BEGIN
+	UPDATE [dbo].[MasterContentItems]
+	SET 
+	[Updated]=GETDATE(),
+	[Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.Recipes}}
+@model() {{dynamic}}
+
+<%
+    
+<category>
+{{
+    @if(@model.SubCategories.Count>0)
+    {{
+        <ul class="drop-menu sub-menu collapsed">
+        @list(@model.SubCategories)
+        {{
+            <li>
+                @if(@model.SubCategories.Count>0)
+                {{
+                <a class="trigger" href="#">@(Name)</a>
+                }}
+                @if(@model.SubCategories.Count==0)
+                {{
+                <a href="@(Url)">@(Name)</a>
+                }}
+                @category()
+            </li>
+        }}
+        </ul>
+    }}
+}}
+    
+<left_bottom>
+{{
+    <div>
+        <a href="#">
+            <img src="/assets/images/newsletter-recipes-spot-4-2-14-214px-b.png">
+        </a>
+	</div>
+}}
+    
+<left>
+{{
+	<div class="left-content-pane">
+		    <div class="panel left-wrapper">
+        	<div class="sub-title">Chef Recipe Videos</div>
+            <ul class="drop-menu">
+                @list(ChefCategories)
+                {{
+                    <li>
+                        <a class="trigger" href="#">@(Name)</a>
+                        <ul class="drop-menu sub-menu collapsed">
+                        @list(Recipes)
+                        {{
+                            <li>
+                                <a href="@(Url)">@(Name)</a>
+                            </li>
+                        }}
+                        </ul>
+                    </li>
+                }}
+            </ul>
+	    </div>
+	    <div class="panel left-wrapper">
+        	<div class="sub-title">Recipes by Category</div>
+            <ul class="drop-menu">
+                @list(AllCategories)
+                {{
+                    <li>
+                        <a class="trigger" href="#">@(Name)</a>
+                        @category()
+                    </li>
+                }}
+            </ul>
+	    </div>
+        @left_bottom()
+	</div>
+}} :: TtlRecipeCategoriesModel
+
+<center>
+{{
+	<div class="center-content-pane">
+        <strong class="title">
+        @if(@model.Model.ParentId) {{
+		    @(Model.Name)
+		}}
+		@ifnot(@model.Model.ParentId) {{
+		    Recipes by Category
+		}}
+        </strong>
+        <br/>
+        <div class="clear margin-bottom-small"></div>
+        @ifnot(@model.Model.ParentId) {{
+            @list(RecipeCategories.AllCategories){{
+                <div class="categories-group margin-bottom-small">
+    	            <div class="sub-title">@(Name)</div>
+                    @list(SubCategories){{
+                        <a href="@(Url)">@(Name)</a><br/>
+                    }}
+                </div>
+            }}
+        }}
+		@if(@model.Model.ParentId) {{
+		    @if(@model.RecipeCategories.SubCategories.Count>0){{
+		        @list(RecipeCategories.SubCategories){{
+                    <div class="categories-group margin-bottom-small">
+                        <a href="@(Url)">@(Name)</a><br/>
+                    </div>
+                }}
+		    }}
+		    @if(@model.RecipeCategories.SubCategories.Count==0){{
+		        @list(Recipes){{
+		            <div class="margin-bottom-small">
+                        <a href="@(Url)">@(Name)</a><br/>
+                    </div>
+		        }}
+		    }}
+		}}
+	</div>
+}}
+
+
+<right>
+{{
+	<div class="right-content-pane">
+    	<div class="right-wrapper">
+            <a href="#">
+                <img src="/assets/images/return-to-itk-banner-6-13-2014-blue.png">
+            </a>
+    	</div>
+    	<div class="right-wrapper panel panel-border">
+    	    <div class="sub-title">Seafood Basics</div><br/>
+    	    <div class="seafood-basics">
+    	        <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="#" class="tooltip-v tooltipstered" data-tooltip-title="How to Broil Salmon" data-tooltip-body="Many don&#8217;t realize how incredibly simple it is to broil wild Alaskan silver salmon perfectly, until seeing this short guide by Chef Becky Selengut.">
+        	                <img src="/assets/images/broiling-salmon-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">
+    	                How to Broil Silver Salmon
+    	            </div>
+    	        </div>
+    	        <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="#" class="tooltip-v tooltipstered" data-tooltip-title="How to Saut&eacute; Salmon" data-tooltip-body="Using only seafood marinade and organic olive oil, Chef Becky Selengut shows just how simple it is to cook salmon beautifully in a frying pan.">
+        	                <img src="/assets/images/saute-sockeye-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">
+    	                How to Sauté Sockeye Salmon
+    	            </div>
+    	        </div>
+    	        <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="#" class="tooltip-v tooltipstered" data-tooltip-title="Steamed Wild Halibut" data-tooltip-body="A remarkably simple yet highly sophisticated recipe for wild Alaskan halibut using caviar, spinach, carrots and sesame seeds, by Chef Becky Selengut.">
+        	                <img src="/assets/images/steam-halibut-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">
+    	                How to Steam Halibut
+    	            </div>
+    	        </div>
+    	        <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="#" class="tooltip-v tooltipstered" data-tooltip-title="How to Saut&eacute; Salmon" data-tooltip-body="Chef Becky Selengut demystifies the process of cleaning spot prawns, demonstrating how to de-vein and shell these delicacies for cooking.">
+        	                <img src="/assets/images/clean-prawns-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">
+    	                How to Clean Spot Prawns
+    	            </div>
+    	        </div>
+    	    </div>
+    	    <div class="clear"></div>
+        </div>
+    	<div class="right-wrapper">
+	        <a href="#"><img src="/assets/images/new-king-salmon-banner-288px-a.jpg"></a>
+        </div>
+	</div>
+}}
+
+<default> -> ()
+{{
+    <div class="working-area-holder content-page recipe-categories-page">
+        <div class="header-block">
+            <img src="/assets/images/in-the-kitchen-header-4-24-14a.png">
+        </div>
+        @left(RecipeCategories)
+    	@center()
+    	@right()
+	</div>
+}}
+%>'
+WHERE Name='Recipe Sub Category'
+
+END
+
+GO
+
+IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Name='Recipe Individual' AND Updated<'2015-12-16 00:00:00.000')
+BEGIN
+	UPDATE [dbo].[MasterContentItems]
+	SET 
+	[Updated]=GETDATE(),
+	[Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.Recipes}}
+@model() {{dynamic}}
+
+<%
+    
+<category>
+{{
+    @if(@model.SubCategories.Count>0)
+    {{
+        <ul class="drop-menu sub-menu collapsed">
+        @list(@model.SubCategories)
+        {{
+            <li>
+                @if(@model.SubCategories.Count>0)
+                {{
+                <a class="trigger" href="#">@(Name)</a>
+                }}
+                @if(@model.SubCategories.Count==0)
+                {{
+                <a href="@(Url)">@(Name)</a>
+                }}
+                @category()
+            </li>
+        }}
+        </ul>
+    }}
+}}
+    
+<left_bottom>
+{{
+    <div>
+        <a href="#">
+            <img src="/assets/images/newsletter-recipes-spot-4-2-14-214px-b.png">
+        </a>
+	</div>
+}}
+    
+<left>
+{{
+	<div class="left-content-pane">
+		    <div class="panel left-wrapper">
+        	<div class="sub-title">Chef Recipe Videos</div>
+            <ul class="drop-menu">
+                @list(ChefCategories)
+                {{
+                    <li>
+                        <a class="trigger" href="#">@(Name)</a>
+                        <ul class="drop-menu sub-menu collapsed">
+                        @list(Recipes)
+                        {{
+                            <li>
+                                <a href="@(Url)">@(Name)</a>
+                            </li>
+                        }}
+                        </ul>
+                    </li>
+                }}
+            </ul>
+	    </div>
+	    <div class="panel left-wrapper">
+        	<div class="sub-title">Recipes by Category</div>
+            <ul class="drop-menu">
+                @list(AllCategories)
+                {{
+                    <li>
+                        <a class="trigger" href="#">@(Name)</a>
+                        @category()
+                    </li>
+                }}
+            </ul>
+	    </div>
+        @left_bottom()
+	</div>
+}} :: TtlRecipeCategoriesModel
+
+<center>
+{{
+	<div class="center-content-pane printable">
+        <strong class="title">@(@model.Model.Name)</strong>
+        <br/>
+        <span class="sub-title-italic">@(@model.Model.Subtitle)</span>
+        <br/>
+        <br/>
+        <div class="icons-bar not-printable">
+    	    <a target="_blank" href="http://www.facebook.com/sharer.php?u=@(@model.ViewContext.AbsoluteUrl)&t=@(@model.Model.Name)" class="margin-right-medium">
+                <img src="/assets/images/icons/fb.png">
+                <span>FACEBOOK</span>
+            </a>
+            <a target="_blank" href="http://twitter.com/share?text=@(@model.Model.Name)&url=@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium">
+                <img src="/assets/images/icons/fb.png">
+                <span>TWITTER</span>
+            </a>
+            <a target="_blank" href="https://plus.google.com/share?url=@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium">
+                <img src="/assets/images/icons/fb.png">
+                <span>GOOGLE+</span>
+            </a>
+            <a href="#" data-content-name="@(@model.Model.Name)" data-absolute-url="@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium email-button">
+                <img src="/assets/images/icons/fb.png">
+                <span>E-MAIL</span>
+            </a>
+            <a target="_blank" href="http://www.addthis.com/bookmark.php?v=300&pubid=xa-509854151b0dec32" class="margin-right-medium">
+                <img src="/assets/images/icons/fb.png">
+                <span>SHARE</span>
+            </a>
+            <a href="#" class="print-button">
+                <img src="/assets/images/icons/fb.png">
+                <span>PRINT</span>
+            </a>
+        </div>
+        <div class="body">
+            <div class="margin-bottom-medium">
+                <div class="video margin-right-small not-printable">
+                @if(@model.Model.YoutubeVideo)
+                {{
+                <iframe width="470" height="265" src="http://www.youtube.com/embed/@(@model.Model.YoutubeVideo)?rel=0&amp;enablejsapi=1" frameborder="0"></iframe>
+                }}
+                </div>
+                @if(@!string.IsNullOrEmpty(model.Model.AboutChef))
+                {{
+                <div class="panel panel-border chef">
+                    @(Model.AboutChef)
+                </div>
+                }}
+            </div>
+            <div>
+                @(@model.Model.ContentItem.Description)
+            </div>
+            @if(@!string.IsNullOrEmpty(model.Model.Ingredients))
+            {{
+            <div class="part-sub-title margin-bottom-medium margin-top-medium">
+                <div class="text">
+                    Ingredients
+                </div>
+                <div class="hr-wrapper">
+                    <hr/>
+                </div>
+            </div>
+            <div class="clear"></div>
+            @if(@model.Model.CrossSells.Count>0)
+            {{
+            <div class="cross-sell-products-wrapper">
+                <div class="cross-sell-products">
+                    <div class="header">Shop for Key Ingredients</div>
+                    <hr/>
+                    @list(Model.CrossSells){{
+                    <div class="item-line">
+        	            <div class="left-part">
+            	            <a href="@(Url)">
+            	                <img src="@(Image)">
+            	            </a>
+        	            </div>
+        	            <div class="right-part">
+        	                <span class="cross-sell-title">@(Title)</span><br/>
+        	                <span class="cross-sell-sub-title">@(Subtitle)</span>
+        	            </div>
+    	            </div>
+    	            }}
+                </div>
+            </div>
+            <div class="cross-sell-products-left-part">
+            }}
+            @ifnot(@model.Model.CrossSells.Count>0)
+            {{
+            <div class="">
+            }}
+                @(@model.Model.Ingredients)
+            </div>
+            }}
+            @if(@model.Model.CrossSells.Count>0)
+            {{
+            <div class="clear"></div>
+            }}
+            @if(@!string.IsNullOrEmpty(model.Model.Directions))
+            {{
+            <div class="part-sub-title margin-bottom-medium margin-top-medium">
+                <div class="text">
+                    Directions
+                </div>
+                <div class="hr-wrapper">
+                    <hr/>
+                </div>
+            </div>
+            <div class="clear"></div>
+            <div>
+                @(@model.Model.Directions)
+            </div>
+            }}
+            <div class="part-sub-title margin-bottom-medium margin-top-medium">
+                <div class="text">
+                    Check out these customer favorites
+                </div>
+                <div class="hr-wrapper">
+                    <hr/>
+                </div>
+            </div>
+            <div class="clear"></div>
+            <div class="customer-favorites-section">
+                @list(Model.RelatedRecipes){{
+                    <div class="item">
+                        <a href="@(Url)">
+                            <img src="@(Image)"/>
+                            <div class="item-title">@(Title)</div>
+                        </a>
+                    </div>
+                }}
+            </div>
+        </div>
+	</div>
+}}
+
+<default> -> ()
+{{
+    <div class="working-area-holder content-page recipe-page">
+        <div class="header-block">
+            <img src="/assets/images/in-the-kitchen-header-4-24-14a.png" />
+        </div>
+        @left(RecipeCategories)
+    	@center()
+	</div>
+}}
+%>'
+WHERE Name='Recipe Individual'
+
+END

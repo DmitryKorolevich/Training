@@ -226,3 +226,31 @@ IF OBJECT_ID(N'[dbo].[RecipeVideos]', N'U') IS NOT NULL
 BEGIN
 	DROP TABLE [dbo].[RecipeVideos]
 END
+
+GO
+
+IF EXISTS (SELECT [Id] FROM [dbo].[RecipeDefaultSettings] WHERE [Key] LIKE 'CrossSell%')
+BEGIN
+	UPDATE [dbo].[RecipeDefaultSettings]
+	SET Value=''
+	WHERE [Key] LIKE 'CrossSell%'
+
+	UPDATE RecipeDefaultSettings
+	SET Value='/assets/images/itk-salmon-broil-170x116.jpg'
+	WHERE [Key]='RelatedRecipeImage1'
+
+	UPDATE RecipeDefaultSettings
+	SET Value='/assets/images/itk-salmon-saute-170x116.jpg'
+	WHERE [Key]='RelatedRecipeImage2'
+
+	UPDATE RecipeDefaultSettings
+	SET Value='/assets/images/itk-steamed-halibut-170x116.jpg'
+	WHERE [Key]='RelatedRecipeImage3'
+
+	UPDATE RecipeDefaultSettings
+	SET Value='/assets/images/itk-skillet-170x116.jpg'
+	WHERE [Key]='RelatedRecipeImage4'
+
+END
+
+GO

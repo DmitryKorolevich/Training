@@ -70,6 +70,7 @@ namespace VitalChoice.Business.Services.Content
 
         public async Task<PagedList<Recipe>> GetRecipesAsync(RecipeListFilter filter)
         {
+            PagedList<Recipe> toReturn;
             RecipeQuery query = new RecipeQuery();
             List<int> ids = null;
             if (filter.CategoryId.HasValue)
@@ -129,10 +130,19 @@ namespace VitalChoice.Business.Services.Content
                     break;
             }
 
-            var toReturn = await recipeRepository.Query(query).Include(x=>x.RecipesToProducts).Include(p => p.ContentItem).Include(p => p.RecipesToContentCategories).ThenInclude(p => p.ContentCategory).
+
+            var resultQuery = recipeRepository.Query(query).Include(x => x.RecipesToProducts).Include(p => p.ContentItem).Include(p => p.RecipesToContentCategories).ThenInclude(p => p.ContentCategory).
                 Include(p => p.User).ThenInclude(p => p.Profile).
-                OrderBy(sortable).
-                SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+                OrderBy(sortable);
+            if (filter.Paging != null)
+            {
+                toReturn = await resultQuery.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            }
+            else
+            {
+                var items = await resultQuery.SelectAsync(false);
+                toReturn = new PagedList<Recipe>(items,items.Count);
+            }
 
             return toReturn;
         }

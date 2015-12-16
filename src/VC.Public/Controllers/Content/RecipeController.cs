@@ -9,47 +9,51 @@ namespace VC.Public.Controllers.Content
 {
     public class RecipeController : BaseContentController
     {
+        private readonly IRecipeCategoryViewService _recipeCategoryViewService;
+        private readonly IRecipeViewService _recipeViewService;
         private readonly IContentEditService _contentService;
 
-        public RecipeController(IContentEditService contentService)
+        public RecipeController(
+            IRecipeCategoryViewService recipeCategoryViewService,
+            IRecipeViewService recipeViewService,
+            IContentEditService contentService)
 	    {
-		    _contentService = contentService;
-	    }
+            _recipeCategoryViewService = recipeCategoryViewService;
+            _recipeViewService = recipeViewService;
+            _contentService = contentService;
+        }
 
-	    [HttpGet]
+        [HttpGet]
         public async Task<IActionResult> Categories()
         {
-            throw new NotImplementedException();
-            //var toReturn = await _contentService.GetCategoryContentAsync(ContentType.RecipeCategory, GetParameters());
-            //if (toReturn != null)
-            //{
-            //    return BaseView(new ContentPageViewModel(toReturn));
-            //}
-            //return BaseNotFoundView();
+            var toReturn = await _recipeCategoryViewService.GetContentAsync(ActionContext, BindingContext, User);
+            if (toReturn?.Body != null)
+            {
+                return BaseView(new ContentPageViewModel(toReturn));
+            }
+            return BaseNotFoundView();
         }
 
         [HttpGet]
         public async Task<IActionResult> Category(string url)
         {
-            throw new NotImplementedException();
-            //var toReturn = await _contentService.GetCategoryContentAsync(ContentType.RecipeCategory, GetParameters(), url);
-            //if (toReturn != null)
-            //{
-            //    return BaseView(new ContentPageViewModel(toReturn));
-            //}
-            //return BaseNotFoundView();
+            var toReturn = await _recipeCategoryViewService.GetContentAsync(ActionContext, BindingContext, User);
+            if (toReturn?.Body != null)
+            {
+                return BaseView(new ContentPageViewModel(toReturn));
+            }
+            return BaseNotFoundView();
         }
 
         [HttpGet]
         public async Task<IActionResult> Recipe(string url)
         {
-            throw new NotImplementedException();
-            //var toReturn = await _contentService.GetContentItemContentAsync(ContentType.Recipe, GetParameters(), url);
-            //if (toReturn != null)
-            //{
-            //    return BaseView(new ContentPageViewModel(toReturn));
-            //}
-            //return BaseNotFoundView();
+            var toReturn = await _recipeViewService.GetContentAsync(ActionContext, BindingContext, User);
+            if (toReturn?.Body != null)
+            {
+                return BaseView(new ContentPageViewModel(toReturn));
+            }
+            return BaseNotFoundView();
         }
 
         [HttpGet]

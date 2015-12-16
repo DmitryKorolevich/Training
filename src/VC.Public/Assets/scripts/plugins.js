@@ -66,6 +66,58 @@
             }
             e.preventDefault();
         });
+
+        //tooltips
+        var settingsVertical = {
+            content: undefined,
+            contentAsHTML: true,
+            animation: 'grow',
+            delay: 0,
+            theme: 'tooltipster-default',
+            touchDevices: false,
+            trigger: 'hover',
+            interactive: 'true',
+            position: 'right',
+            offsetY: 0,
+            fixedWidth: 250,
+            maxWidth: 250,
+            onlyOne: true
+        };
+
+        var settingsHorizontal = {
+            content: undefined,
+            contentAsHTML: true,
+            animation: 'grow',
+            delay: 0,
+            theme: 'tooltipster-default',
+            touchDevices: false,
+            trigger: 'hover',
+            interactive: 'true',
+            position: 'top',
+            offsetY: 60,
+            fixedWidth: 250,
+            maxWidth: 250,
+            onlyOne: true
+        };
+        var getBaseHtml = function (title, body)
+        {
+            var toReturn = '<span class="default"><strong class="title">{0}</strong><br><br>{1}</span>'.format(title, body);
+            return toReturn;
+        };
+        $('.tooltip-v').each(function ()
+        {
+            var title = $(this).data("tooltip-title");
+            var body = $(this).data("tooltip-body");
+            settingsVertical.content = getBaseHtml(title, body);
+            $(this).tooltipster(settingsVertical);
+        });
+        $('.tooltip-h').each(function ()
+        {
+            var title = $(this).data("tooltip-title");
+            var body = $(this).data("tooltip-body");
+            settingsHorizontal.content = getBaseHtml(title,body);
+            $(this).tooltipster(settingsHorizontal);
+        });
     });
 })(jQuery);
 
