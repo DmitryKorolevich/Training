@@ -67,7 +67,7 @@ namespace VitalChoice.Business.Mail
         public async Task SendNewBugTicketAddingForSuperAdminAsync(BugTicketEmail bugTicketEmail)
         {
             var body =
-                $"<p>New bug ticket was added - {_adminHost}help/bugs/{bugTicketEmail.Id}</p>";
+                $"<p>New bug ticket was added - https://{_adminHost}/help/bugs/{bugTicketEmail.Id}</p>";
 
             var subject = $"Vital Choice - new bug ticket was added #{bugTicketEmail.Id}";
 

@@ -56,7 +56,7 @@ namespace VitalChoice.Business.Services.Users
 			{
 				FirstName = dbUser.FirstName,
 				LastName = dbUser.LastName,
-				Link = $"{Options.PublicHost}affiliateaccount/activate/{dbUser.ConfirmationToken}"
+				Link = $"https://{Options.PublicHost}/affiliateaccount/activate/{dbUser.ConfirmationToken}"
 			});
 		}
 
@@ -66,7 +66,7 @@ namespace VitalChoice.Business.Services.Users
 			{
 				FirstName = dbUser.FirstName,
 				LastName = dbUser.LastName,
-				Link = $"{Options.PublicHost}affiliateaccount/resetpassword/{token}"
+				Link = $"https://{Options.PublicHost}/affiliateaccount/resetpassword/{token}"
 			});
 		}
 
@@ -76,7 +76,7 @@ namespace VitalChoice.Business.Services.Users
             {
                 FirstName = dbUser.FirstName,
                 LastName = dbUser.LastName,
-                Link = $"{Options.PublicHost}affiliateaccount/resetpassword/{token}"
+                Link = $"https://{Options.PublicHost}/affiliateaccount/resetpassword/{token}"
             });
         }
 
@@ -127,7 +127,7 @@ namespace VitalChoice.Business.Services.Users
 			{
 				FirstName = firstName,
 				LastName = lastName,
-				ProfileLink = $"{Options.PublicHost}affiliateprofile/index"
+				ProfileLink = $"https://{Options.PublicHost}/affiliateprofile/index"
 			});
 		}
 	}

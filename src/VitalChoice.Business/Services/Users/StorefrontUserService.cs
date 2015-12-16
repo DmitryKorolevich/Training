@@ -40,7 +40,7 @@ namespace VitalChoice.Business.Services.Users
 			{
 				FirstName = dbUser.FirstName,
 				LastName = dbUser.LastName,
-				Link = $"{Options.PublicHost}account/activate/{dbUser.ConfirmationToken}"
+				Link = $"https://{Options.PublicHost}/account/activate/{dbUser.ConfirmationToken}"
 			});
 		}
 
@@ -52,7 +52,7 @@ namespace VitalChoice.Business.Services.Users
 					{
 						FirstName = dbUser.FirstName,
 						LastName = dbUser.LastName,
-						Link = $"{Options.PublicHost}account/resetpassword/{token}"
+						Link = $"https://{Options.PublicHost}/account/resetpassword/{token}"
 					});
 		}
 
@@ -64,7 +64,7 @@ namespace VitalChoice.Business.Services.Users
 					{
 						FirstName = dbUser.FirstName,
 						LastName = dbUser.LastName,
-						Link = $"{Options.PublicHost}account/resetpassword/{token}"
+						Link = $"https://{Options.PublicHost}/account/resetpassword/{token}"
 					});
 		}
 
@@ -99,7 +99,7 @@ namespace VitalChoice.Business.Services.Users
 			{
 				FirstName = firstName,
 				LastName = lastName,
-				ProfileLink = $"{Options.PublicHost}profile/index"
+				ProfileLink = $"https://{Options.PublicHost}/profile/index"
 			});
 		}
 

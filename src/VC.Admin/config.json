@@ -33,8 +33,8 @@
       "ApiKey": "4r5Zv38R56BY6tLW",
       "TestEnv": false
     },
-    "PublicHost": "http://staging.g2-dg.com/",
-    "AdminHost": "http://admin.staging.g2-dg.com/",
+    "PublicHost": "staging.g2-dg.com",
+    "AdminHost": "admin.staging.g2-dg.com",
     "CustomerServiceToEmail": "gary@g2designgroup.com",
     "CustomerFeedbackToEmail": "gary@g2designgroup.com",
     "MainSuperAdminEmail": "gary@g2designgroup.com",
