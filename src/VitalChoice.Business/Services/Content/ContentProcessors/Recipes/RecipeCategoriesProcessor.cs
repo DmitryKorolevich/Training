@@ -29,7 +29,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Recipes
     public class RecipeCategoriesProcessor : ContentProcessor<TtlRecipeCategoriesModel, RecipeParameters, ContentCategory>
     {
         public const string RecipeVideosChefCategoryName= "Recipe Videos by Chef";
-        public const string RecipeVideosChefOtherCategoryName = "Other";
+        public const string RecipeVideosChefOtherCategoryName = "Others";
 
         private readonly ICategoryService _categoryService;
         private readonly IRecipeService _recipeService;

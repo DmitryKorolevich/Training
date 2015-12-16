@@ -1270,6 +1270,9 @@ footer {
   display: inline-block;
   vertical-align: middle;
 }
+.working-area-holder.content-page.recipe-page .center-content-pane .cross-sell-products-wrapper .cross-sell-products .item-line .right-part a:hover {
+  text-decoration: none;
+}
 .working-area-holder.content-page.recipe-page .center-content-pane .cross-sell-products-wrapper .cross-sell-products .item-line .right-part .cross-sell-title {
   color: #2b6c82;
   font-size: 12px;

@@ -3551,11 +3551,13 @@ END
 
 GO
 
-IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Name='Recipe Individual' AND Updated<'2015-12-16 00:00:00.000')
-BEGIN
-	UPDATE [dbo].[MasterContentItems]
-	SET 
-	[Updated]=GETDATE(),
+IF EXISTS (SELECT
+	[Id]
+FROM [dbo].[MasterContentItems]
+WHERE Name = 'Recipe Individual'
+AND Updated < '2015-12-16 00:00:00.000') BEGIN
+UPDATE [dbo].[MasterContentItems]
+SET	[Updated] = GETDATE(),
 	[Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.Recipes}}
 @model() {{dynamic}}
 
@@ -3708,8 +3710,10 @@ BEGIN
             	            </a>
         	            </div>
         	            <div class="right-part">
-        	                <span class="cross-sell-title">@(Title)</span><br/>
-        	                <span class="cross-sell-sub-title">@(Subtitle)</span>
+							<a href="@(Url)">
+        						<span class="cross-sell-title">@(Title)</span><br/>
+        						<span class="cross-sell-sub-title">@(Subtitle)</span>
+							</a>
         	            </div>
     	            </div>
     	            }}
@@ -3777,6 +3781,6 @@ BEGIN
 	</div>
 }}
 %>'
-WHERE Name='Recipe Individual'
+WHERE Name = 'Recipe Individual'
 
 END
