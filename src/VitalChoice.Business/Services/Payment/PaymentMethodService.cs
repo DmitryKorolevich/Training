@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Authorize.Net.Api.Contracts.V1;
 using Authorize.Net.Api.Controllers;
@@ -16,6 +17,7 @@ using VitalChoice.Data.Transaction;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
@@ -167,8 +169,20 @@ namespace VitalChoice.Business.Services.Payment
         {
             List<MessageInfo> errors = new List<MessageInfo>();
 
-            if (_options.Value.AuthorizeNet.TestEnv || paymentMethod.IdObjectType != (int)PaymentMethodType.CreditCard ||
-                _mapper.IsObjectSecured(paymentMethod))
+            if (_mapper.IsObjectSecured(paymentMethod))
+                return errors;
+
+            if (!ValidateCreditCard(paymentMethod))
+            {
+                errors.Add(new MessageInfo
+                {
+                    Field = "CardNumber",
+                    Message = "Invalid credit card number. Please try to change card type or fix the number"
+                });
+                return errors;
+            }
+
+            if (_options.Value.AuthorizeNet.TestEnv || paymentMethod.IdObjectType != (int)PaymentMethodType.CreditCard)
                 return errors;
 
             var creditCard = new creditCardType
@@ -263,31 +277,65 @@ namespace VitalChoice.Business.Services.Payment
             return errors;
         }
 
+	    public bool ValidateCreditCard(PaymentMethodDynamic paymentMethod)
+	    {
+	        if (paymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
+	        {
+	            string cardNumber = paymentMethod.Data.CardNumber;
+	            switch ((CreditCardType) paymentMethod.Data.CardType)
+	            {
+	                case CreditCardType.MasterCard:
+	                    if (!PaymentValidationExpressions.MasterCardRegex.IsMatch(cardNumber))
+	                    {
+	                        return false;
+	                    }
+	                    break;
+	                case CreditCardType.Visa:
+	                    if (!PaymentValidationExpressions.VisaRegex.IsMatch(cardNumber))
+	                    {
+	                        return false;
+	                    }
+	                    break;
+	                case CreditCardType.AmericanExpress:
+	                    if (!PaymentValidationExpressions.AmericanExpressRegex.IsMatch(cardNumber))
+	                    {
+	                        return false;
+	                    }
+	                    break;
+	                case CreditCardType.Discover:
+	                    if (!PaymentValidationExpressions.DiscoverRegex.IsMatch(cardNumber))
+	                    {
+	                        return false;
+	                    }
+	                    break;
+	                default:
+	                    return true;
+	            }
+	        }
+	        return true;
+	    }
+
 	    private static void ParseErrors(List<MessageInfo> result, createTransactionResponse response)
 	    {
 	        result.AddRange(response?.messages?.message?.Where(m => m.code?.ToLower() != "i00001").Select(m => new MessageInfo()
 	        {
-	            Field = "CardNumber",
-	            Message = $"[{m.code}] {m.text}"
+	            Field = "CardNumber", Message = $"[{m.code}] {m.text}"
 	        }) ?? Enumerable.Empty<MessageInfo>());
 	        result.AddRange(response?.transactionResponse?.errors?.Select(m => new MessageInfo()
 	        {
-	            Field = "CardNumber",
-	            Message = $"[{m.errorCode}] {m.errorText}"
+	            Field = "CardNumber", Message = $"[{m.errorCode}] {m.errorText}"
 	        }) ?? Enumerable.Empty<MessageInfo>());
 	        if (response?.transactionResponse?.avsResultCode == "N")
 	        {
 	            result.Add(new MessageInfo
 	            {
-	                Field = "Zip",
-                    Message = "Street address and postal code do not match."
-                });
-                result.Add(new MessageInfo
-                {
-                    Field = "Address1",
-                    Message = "Street address and postal code do not match."
-                });
-            }
+	                Field = "Zip", Message = "Street address and postal code do not match."
+	            });
+	            result.Add(new MessageInfo
+	            {
+	                Field = "Address1", Message = "Street address and postal code do not match."
+	            });
+	        }
 	    }
 	}
 }

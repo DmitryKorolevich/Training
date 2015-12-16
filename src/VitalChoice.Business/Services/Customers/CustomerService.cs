@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 #if DNX451
 #endif
 using Microsoft.Extensions.OptionsModel;
@@ -166,6 +167,10 @@ namespace VitalChoice.Business.Services.Customers
                 {
                     throw new AppValidationException("IdAffiliate",ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InvalidIdAffiliate]);
                 }
+            }
+            foreach (var paymentMethod in model.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard))
+            {
+                
             }
 
 			return errors;
@@ -571,7 +576,7 @@ namespace VitalChoice.Business.Services.Customers
             }
             if (!await updatePaymentsTask)
             {
-                throw new ApiException("Cannot update order payment info on remote.");
+                Logger.LogError("Cannot update order payment info on remote.");
             }
             return entity;
         }
@@ -654,7 +659,7 @@ namespace VitalChoice.Business.Services.Customers
             }
             if (!await updatePaymentsTask)
             {
-                throw new ApiException("Cannot update order payment info on remote.");
+                Logger.LogError("Cannot update order payment info on remote.");
             }
             return entity;
         }
