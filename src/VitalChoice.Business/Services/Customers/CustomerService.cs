@@ -168,6 +168,10 @@ namespace VitalChoice.Business.Services.Customers
                     throw new AppValidationException("IdAffiliate",ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InvalidIdAffiliate]);
                 }
             }
+            foreach (var paymentMethod in model.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard))
+            {
+                
+            }
 
 			return errors;
 		}
