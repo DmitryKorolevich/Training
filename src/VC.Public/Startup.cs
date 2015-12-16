@@ -78,6 +78,18 @@ namespace VC.Public
                 x.ReturnUrlParameter = "returnUrl";
                 x.CookieName = "VitalChoice.Public";
             });
+            app.Use(async (context, next) =>
+            {
+                if (context.Request.IsHttps)
+                {
+                    await next();
+                }
+                else
+                {
+                    var withHttps = "https://" + context.Request.Host + context.Request.Path;
+                    context.Response.Redirect(withHttps);
+                }
+            });
         }
     }
 }
