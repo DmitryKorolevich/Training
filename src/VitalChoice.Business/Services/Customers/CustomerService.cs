@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 #if DNX451
 #endif
 using Microsoft.Extensions.OptionsModel;
@@ -571,7 +572,7 @@ namespace VitalChoice.Business.Services.Customers
             }
             if (!await updatePaymentsTask)
             {
-                throw new ApiException("Cannot update order payment info on remote.");
+                Logger.LogError("Cannot update order payment info on remote.");
             }
             return entity;
         }
@@ -654,7 +655,7 @@ namespace VitalChoice.Business.Services.Customers
             }
             if (!await updatePaymentsTask)
             {
-                throw new ApiException("Cannot update order payment info on remote.");
+                Logger.LogError("Cannot update order payment info on remote.");
             }
             return entity;
         }

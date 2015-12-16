@@ -54,6 +54,7 @@ using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.Workflow.Core;
+using Microsoft.Extensions.Logging;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -322,7 +323,7 @@ namespace VitalChoice.Business.Services.Orders
             }
             if (!await remoteUpdateTask)
             {
-                throw new ApiException("Cannot update order payment info on remote.");
+                Logger.LogError("Cannot update order payment info on remote.");
             }
             return entity;
         }
@@ -397,7 +398,7 @@ namespace VitalChoice.Business.Services.Orders
             }
             if (!await remoteUpdateTask)
             {
-                throw new ApiException("Cannot update order payment info on remote.");
+                Logger.LogError("Cannot update order payment info on remote.");
             }
             return entity;
         }

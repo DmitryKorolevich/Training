@@ -290,29 +290,46 @@ namespace VC.Public.Controllers
 
             if (model.Id > 0)
             {
-                var creditCardToUpdate = currentCustomer.CustomerPaymentMethods.Single(x => x.IdObjectType == (int)PaymentMethodType.CreditCard && x.Id == model.Id);
+                var creditCardToUpdate =
+                    currentCustomer.CustomerPaymentMethods.Single(
+                        x => x.IdObjectType == (int) PaymentMethodType.CreditCard && x.Id == model.Id);
                 currentCustomer.CustomerPaymentMethods.Remove(creditCardToUpdate);
             }
 
             var customerPaymentMethod = _paymentMethodConverter.FromModel(model);
-            customerPaymentMethod.IdObjectType = (int)PaymentMethodType.CreditCard;
+            customerPaymentMethod.IdObjectType = (int) PaymentMethodType.CreditCard;
 
             customerPaymentMethod.Address = _addressConverter.FromModel(model);
-            customerPaymentMethod.Address.IdObjectType = (int)AddressType.Billing;
+            customerPaymentMethod.Address.IdObjectType = (int) AddressType.Billing;
 
             currentCustomer.CustomerPaymentMethods.Add(customerPaymentMethod);
 
-            currentCustomer = await _customerService.UpdateAsync(currentCustomer);
+            try
+            {
+                currentCustomer = await _customerService.UpdateAsync(currentCustomer);
+            }
+            catch (AppValidationException e)
+            {
+                foreach (var message in e.Messages)
+                {
+                    ModelState.AddModelError(message.Field, message.Message);
+                }
+                return View(PopulateCreditCard(currentCustomer, model.Id));
+            }
 
             ViewBag.SuccessMessage = model.Id > 0
                 ? InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullyUpdated]
                 : InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullyAdded];
 
+            ModelState.Clear();
             if (model.Id == 0)
             {
-                ModelState["Id"].RawValue = model.Id = currentCustomer.CustomerPaymentMethods.Last(x => x.IdObjectType == (int)PaymentMethodType.CreditCard).Id;
+                ModelState.Add("Id", new ModelStateEntry
+                {
+                    RawValue =
+                        model.Id = currentCustomer.CustomerPaymentMethods.Last(x => x.IdObjectType == (int) PaymentMethodType.CreditCard).Id
+                });
             }
-
             return View(PopulateCreditCard(currentCustomer, model.Id));
         }
 
