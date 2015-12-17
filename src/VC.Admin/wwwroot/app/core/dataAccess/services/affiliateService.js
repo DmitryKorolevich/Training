@@ -79,5 +79,9 @@ angular.module('app.core.dataAccess.services.affiliateService', [])
 	    {
 	        return $http.get(baseUrl + 'GetUnpaidOrdersForLastPeriod/' + id, getConfig(tracker));
 	    },
+	    getLoginAsAffiliateUrl: function (id, buildNumber)
+	    {
+	        return baseUrl + 'LoginAsAffiliate/{0}?&buildNumber={1}'.format(id, buildNumber);
+	    },
 	};
 }]);
