@@ -141,6 +141,7 @@ function setChangedData(selectedCreditCard) {
 
 	$("#ddCardType").val(selectedCreditCard.CardType);
 	$("input[name=CardNumber]").val(selectedCreditCard.CardNumber);
+	$("input[name=SecurityCode]").val('');
 	$("input[name=NameOnCard]").val(selectedCreditCard.NameOnCard);
 	$("input[name=ExpirationDateMonth]").val(selectedCreditCard.ExpirationDateMonth);
 	$("input[name=ExpirationDateYear]").val(selectedCreditCard.ExpirationDateYear);

@@ -36,6 +36,10 @@ namespace VC.Public.Models.Profile
 		[Map]
 		public int CardType { get; set; }
 
+        [Required]
+        [Display(Name = "Security Code")]
+        public string SecurityCode { get; set; }
+
 		public bool IsSelected { get; set; }
 	}
 }

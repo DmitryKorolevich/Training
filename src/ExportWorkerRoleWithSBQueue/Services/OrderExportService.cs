@@ -51,7 +51,8 @@ namespace ExportWorkerRoleWithSBQueue.Services
         {
             using (var uow = new UnitOfWork(_context))
             {
-                if (DynamicMapper.IsValuesMasked(paymentMethod) && paymentMethod.IdCustomerPaymentMethod > 0 && paymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
+                if (DynamicMapper.IsValuesMasked(paymentMethod) && paymentMethod.IdCustomerPaymentMethod > 0 &&
+                    paymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
                 {
                     var customerRep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
                     var customerData =
