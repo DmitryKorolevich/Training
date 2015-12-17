@@ -18,7 +18,7 @@
 
         public const string PasswordResetPurpose = "ResetPassword";
 
-        public const string CustomerLoginPurpose = "CustomerLoginPurpose";
+        public const string LoginFromAdminPurpose = "LoginFromAdminPurpose";
 
         public const string TokenProviderName = "Default";
     }

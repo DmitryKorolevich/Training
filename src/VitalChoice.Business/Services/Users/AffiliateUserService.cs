@@ -18,6 +18,7 @@ using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Infrastructure.Identity;
 
 namespace VitalChoice.Business.Services.Users
 {
@@ -130,5 +131,17 @@ namespace VitalChoice.Business.Services.Users
 				ProfileLink = $"https://{Options.PublicHost}/affiliateprofile/index"
 			});
 		}
-	}
+
+        public async Task<string> GenerateLoginTokenAsync(int id)
+        {
+            var user = await GetAsync(id);
+
+            var token =
+                await
+                    UserManager.GenerateUserTokenAsync(user, IdentityConstants.TokenProviderName,
+                        IdentityConstants.LoginFromAdminPurpose);
+
+            return token;
+        }
+    }
 }
