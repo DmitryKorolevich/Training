@@ -34,7 +34,7 @@ namespace VitalChoice.Ecommerce.Domain.Attributes
 
         public virtual bool IsMasked(string value)
         {
-            return value?.Contains(MaskCharacter.ToString()) ?? true;
+            return value?.ToUpper().Contains(MaskCharacter.ToString().ToUpper()) ?? true;
         }
     }
 
