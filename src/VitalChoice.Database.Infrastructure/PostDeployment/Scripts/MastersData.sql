@@ -3672,7 +3672,7 @@ SET	[Updated] = GETDATE(),
                 <div class="video margin-right-small not-printable">
                 @if(@model.Model.YoutubeVideo)
                 {{
-                <iframe width="470" height="265" src="http://www.youtube.com/embed/@(@model.Model.YoutubeVideo)?rel=0&amp;enablejsapi=1" frameborder="0"></iframe>
+                <iframe width="470" height="265" src="https://www.youtube.com/embed/@(@model.Model.YoutubeVideo)?rel=0&amp;enablejsapi=1" frameborder="0"></iframe>
                 }}
                 </div>
                 @if(@!string.IsNullOrEmpty(model.Model.AboutChef))
