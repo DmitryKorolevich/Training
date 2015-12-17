@@ -37,6 +37,7 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
                 $scope.affiliate.Email = result.Data.Email;
                 $scope.affiliate.StatusCode = result.Data.StatusCode;
                 $scope.affiliate.ActivatePending = false;
+                $scope.options.LoginAsAffiliateUrl = affiliateService.getLoginAsAffiliateUrl($scope.affiliate.Id, $rootScope.buildNumber);
                 refreshHistory();
             } else
             {
@@ -152,6 +153,7 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
                     {
                         $scope.affiliate = result.Data;
                         $scope.affiliate.ActivatePending = false;
+                        $scope.options.LoginAsAffiliateUrl = affiliateService.getLoginAsAffiliateUrl($scope.affiliate.Id, $rootScope.buildNumber);
                         refreshHistory();
                     } else
                     {

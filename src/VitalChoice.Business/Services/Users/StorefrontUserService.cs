@@ -110,7 +110,7 @@ namespace VitalChoice.Business.Services.Users
 			var token =
 				await
 					UserManager.GenerateUserTokenAsync(user, IdentityConstants.TokenProviderName,
-						IdentityConstants.CustomerLoginPurpose);
+						IdentityConstants.LoginFromAdminPurpose);
 
 			return token;
 		}

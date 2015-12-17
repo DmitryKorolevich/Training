@@ -1341,6 +1341,9 @@ footer {
   .content-bottom {
     display: none !important;
   }
+  a[href]:after {
+    content: initial;
+  }
   .main {
     width: 700px;
     padding-top: 20px;

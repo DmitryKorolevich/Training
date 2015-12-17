@@ -283,6 +283,27 @@ namespace VC.Public.Controllers
             return View("Pending");
         }
 
+        [HttpGet]
+        public async Task<IActionResult> LoginAsAffiliate(Guid id)
+        {
+            var result = await _userService.GetByTokenAsync(id);
+            if (result == null)
+            {
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindLogin]);
+            }
+
+            result.ConfirmationToken = Guid.Empty;
+            await _userService.UpdateAsync(result);
+
+            result = await _userService.SignInAsync(result);
+            if (result == null)
+            {
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+            }
+
+            return RedirectToAction("ChangeProfile", "AffiliateProfile");
+        }
+
         private void InitRegisterModel(AffiliateManageModel model,bool refresh=false)
         {
             var settings = HttpContext.RequestServices.GetService<IAppInfrastructureService>().Get();

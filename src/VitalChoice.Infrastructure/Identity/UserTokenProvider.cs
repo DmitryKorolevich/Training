@@ -21,7 +21,7 @@ namespace VitalChoice.Infrastructure.Identity
 	    public async Task<string> GenerateAsync(string purpose, UserManager<ApplicationUser> manager, ApplicationUser user)
 	    {
 		    user.TokenExpirationDate = DateTime.Now.AddDays(appOptions.Value.ActivationTokenExpirationTermDays);
-			if (purpose != IdentityConstants.ForgotPasswordResetPurpose && purpose != IdentityConstants.CustomerLoginPurpose)
+			if (purpose != IdentityConstants.ForgotPasswordResetPurpose && purpose != IdentityConstants.LoginFromAdminPurpose)
 			{
 				user.IsConfirmed = false;
 			}
@@ -41,7 +41,7 @@ namespace VitalChoice.Infrastructure.Identity
 		    var valid = user.ConfirmationToken.Equals(Guid.Parse(token)) &&
 		                user.TokenExpirationDate.Subtract(DateTime.Now).Days > 0;
 
-		    if (purpose != IdentityConstants.ForgotPasswordResetPurpose && purpose != IdentityConstants.PasswordResetPurpose && purpose != IdentityConstants.CustomerLoginPurpose)
+		    if (purpose != IdentityConstants.ForgotPasswordResetPurpose && purpose != IdentityConstants.PasswordResetPurpose && purpose != IdentityConstants.LoginFromAdminPurpose)
 		    {
 				valid = valid && !user.IsConfirmed;
 		    }

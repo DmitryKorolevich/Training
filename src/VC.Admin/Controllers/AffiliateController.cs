@@ -30,6 +30,8 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using VitalChoice.Infrastructure.Domain.Transfer.Settings;
+using Microsoft.Extensions.OptionsModel;
+using VitalChoice.Infrastructure.Domain.Options;
 
 namespace VC.Admin.Controllers
 {
@@ -45,6 +47,7 @@ namespace VC.Admin.Controllers
         private readonly IOrderService _orderService;
         private readonly ICountryService _countryService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
+        private readonly IOptions<AppOptions> _appOptions;
         private readonly ILogger logger;
 
         public AffiliateController(
@@ -56,6 +59,7 @@ namespace VC.Admin.Controllers
             ICsvExportService<AffiliateOrderListItemModel, AffiliateOrderListItemModelCsvMap> csvExportAffiliateOrderListItemService,
             IOrderService orderService,
             ICountryService countryService,
+            IOptions<AppOptions> appOptions,
             IObjectHistoryLogService objectHistoryLogService)
         {
             _affiliateService = affiliateService;
@@ -67,6 +71,7 @@ namespace VC.Admin.Controllers
             _orderService = orderService;
             _countryService = countryService;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
+            _appOptions = appOptions;
             logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -250,6 +255,15 @@ namespace VC.Admin.Controllers
             await _affiliateUserService.SendResetPasswordAsync(id);
 
             return true;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> LoginAsAffiliate(int id)
+        {
+            var token = await _affiliateUserService.GenerateLoginTokenAsync(id);
+            var url = _appOptions.Value.PublicHost + "AffiliateAccount/LoginAsAffiliate/" + token;
+
+            return Redirect(url);
         }
 
         [HttpPost]
