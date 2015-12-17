@@ -24,6 +24,7 @@ namespace VC.Admin.ModelConverters
                 DateTime exp = new DateTime(model.ExpirationDateYear.Value + 2000, model.ExpirationDateMonth.Value, 1);
                 dynamic.Data.ExpDate = exp;
             }
+            dynamic.IdCustomerPaymentMethod = model.IdCustomerPaymentMethod;
         }
     }
 }

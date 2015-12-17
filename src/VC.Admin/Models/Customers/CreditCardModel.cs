@@ -81,6 +81,8 @@ namespace VC.Admin.Models.Customer
         public CreditCardType CardType { get; set; }
 
         public bool IsSelected { get; set; }
+
+        public int? IdCustomerPaymentMethod { get; set; }
     }
 
     public class WireTransferPaymentModel : BaseModel

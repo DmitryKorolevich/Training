@@ -15,6 +15,7 @@ namespace VC.Admin.ModelConverters
                 model.ExpirationDateMonth = exp.Month;
                 model.ExpirationDateYear = exp.Year%2000;
             }
+            model.IdCustomerPaymentMethod = model.Id;
         }
 
         public override void ModelToDynamic(CreditCardModel model, CustomerPaymentMethodDynamic dynamic)
