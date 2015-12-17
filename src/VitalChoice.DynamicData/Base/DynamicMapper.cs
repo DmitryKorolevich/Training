@@ -40,7 +40,7 @@ namespace VitalChoice.DynamicData.Base
                     }
                 }
             }
-            return ObjectMapper.GetIsMaskedValues(obj);
+            return ObjectMapper.IsValuesMasked(obj);
         }
     }
 
