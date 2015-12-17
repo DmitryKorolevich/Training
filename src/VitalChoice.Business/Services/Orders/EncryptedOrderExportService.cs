@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.OptionsModel;
+using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Infrastructure.Domain.Constants;
@@ -17,15 +18,8 @@ namespace VitalChoice.Business.Services.Orders
 {
     public class EncryptedOrderExportService : EncryptedServiceBusClient, IEncryptedOrderExportService
     {
-        private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _orderPaymentMapper;
-        private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _customerPaymentMapper;
-
-        public EncryptedOrderExportService(IEncryptedServiceBusHostClient encryptedBusHost,
-            IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMapper,
-            IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> customerPaymentMapper) : base(encryptedBusHost)
+        public EncryptedOrderExportService(IEncryptedServiceBusHostClient encryptedBusHost) : base(encryptedBusHost)
         {
-            _orderPaymentMapper = orderPaymentMapper;
-            _customerPaymentMapper = customerPaymentMapper;
         }
 
         public async Task ExportOrdersAsync(OrderExportData exportData, Action<OrderExportItemResult> exportedAction)
@@ -67,7 +61,7 @@ namespace VitalChoice.Business.Services.Orders
 
         public Task<bool> UpdateOrderPaymentMethodAsync(OrderPaymentMethodDynamic orderPaymentMethod)
         {
-            if (!_orderPaymentMapper.IsObjectSecured(orderPaymentMethod))
+            if (!DynamicMapper.IsValuesMasked(orderPaymentMethod))
                 return
                     SendCommand<bool>(new ServiceBusCommandWithResult(SessionId, OrderExportServiceCommandConstants.UpdateOrderPayment,
                         ServerHostName, LocalHostName)
@@ -79,7 +73,7 @@ namespace VitalChoice.Business.Services.Orders
 
         public Task<bool> UpdateCustomerPaymentMethodsAsync(ICollection<CustomerPaymentMethodDynamic> paymentMethods)
         {
-            var paymentsToUpdate = paymentMethods.Where(p => !_customerPaymentMapper.IsObjectSecured(p)).ToArray();
+            var paymentsToUpdate = paymentMethods.Where(p => !DynamicMapper.IsValuesMasked(p)).ToArray();
             if (paymentsToUpdate.Any())
             {
                 return

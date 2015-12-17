@@ -20,6 +20,30 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.DynamicData.Base
 {
+    public static class DynamicMapper
+    {
+        public static bool IsValuesMasked(MappedObject obj)
+        {
+            var outerCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, obj.GetType(), true);
+
+            if (!outerCache.MaskProperties.Any())
+                return false;
+
+            foreach (var masker in outerCache.MaskProperties)
+            {
+                object value;
+                if (obj.DictionaryData.TryGetValue(masker.Key, out value))
+                {
+                    if (!masker.Value.IsMasked(value as string))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return ObjectMapper.GetIsMaskedValues(obj);
+        }
+    }
+
     public abstract class DynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> : ObjectMapper<TDynamic>, IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue>
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>, new()
         where TOptionType : OptionType, new()

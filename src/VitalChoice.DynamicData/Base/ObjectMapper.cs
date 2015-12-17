@@ -11,6 +11,28 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.DynamicData.Base
 {
+    public static class ObjectMapper
+    {
+        public static bool GetIsMaskedValues(object obj)
+        {
+            var outerCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, obj.GetType(), true);
+
+            if (!outerCache.MaskProperties.Any())
+                return false;
+
+            foreach (var masker in outerCache.MaskProperties)
+            {
+                GenericProperty property;
+                if (outerCache.Properties.TryGetValue(masker.Key, out property))
+                {
+                    if (!masker.Value.IsMasked(property.Get(obj) as string))
+                        return false;
+                }
+            }
+            return true;
+        }
+    }
+
     public class ObjectMapper<TObject> : IObjectMapper<TObject>
         where TObject : class, new()
     {
@@ -73,18 +95,16 @@ namespace VitalChoice.DynamicData.Base
                                 p.Value.PropertyType != typeof (string) && p.Value.PropertyType != typeof (Type)))
                 {
                     GenericProperty property = propertyPair.Value;
-                    if (property.PropertyType == typeof (string) || IsSystemValueType(property.PropertyType))
-                        continue;
-
                     Type elementType = property.PropertyType.TryGetElementType(typeof (IEnumerable<>));
                     if (elementType != null)
                     {
-                        if (elementType == typeof (string) || IsSystemValueType(elementType))
+                        if (elementType == typeof (string) || elementType == typeof(Type) || IsSystemValueType(elementType))
                             continue;
                         var items = (IEnumerable) property.Get?.Invoke(obj);
                         if (items != null)
                         {
-                            if (items.Cast<object>().Any(item => !IsObjectSecuredInternal(item, processedObjectsSet)))
+                            var list = items.Cast<object>().ToArray();
+                            if (list.Any(item => !IsObjectSecuredInternal(item, processedObjectsSet)))
                             {
                                 return false;
                             }
@@ -92,10 +112,6 @@ namespace VitalChoice.DynamicData.Base
                     }
                     else
                     {
-                        if (IsSystemValueType(property.PropertyType))
-                        {
-                            continue;
-                        }
                         var item = property.Get?.Invoke(obj);
                         if (item != null)
                         {
@@ -139,7 +155,7 @@ namespace VitalChoice.DynamicData.Base
                     Type elementType = property.PropertyType.TryGetElementType(typeof (IEnumerable<>));
                     if (elementType != null)
                     {
-                        if (elementType == typeof (string) || IsSystemValueType(elementType))
+                        if (elementType == typeof (string) || elementType == typeof(Type) || IsSystemValueType(elementType))
                             continue;
                         var items = (IEnumerable) property.Get?.Invoke(obj);
                         if (items != null)

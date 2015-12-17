@@ -14,6 +14,7 @@ using VitalChoice.Business.Queries.User;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Transaction;
+using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -35,7 +36,6 @@ namespace VitalChoice.Business.Services.Payment
 		private readonly EcommerceContext _context;
 		private readonly IEcommerceRepositoryAsync<PaymentMethodToCustomerType> _paymentMethodToCustomerTypeRepository;
 		private readonly IHttpContextAccessor _contextAccessor;
-	    private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _mapper;
 	    private readonly IOptions<AppOptions> _options;
 	    private readonly ICountryNameCodeResolver _countryNameCode;
 	    private readonly ILogger _logger;
@@ -44,14 +44,13 @@ namespace VitalChoice.Business.Services.Payment
 	        IHttpContextAccessor contextAccessor, IRepositoryAsync<AdminProfile> adminProfileRepository,
 	        EcommerceContext context,
 	        IEcommerceRepositoryAsync<PaymentMethodToCustomerType> paymentMethodToCustomerTypeRepository,
-	        ILoggerProviderExtended loggerProvider, IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> mapper, IOptions<AppOptions> options, ICountryNameCodeResolver countryNameCode)
+	        ILoggerProviderExtended loggerProvider, IOptions<AppOptions> options, ICountryNameCodeResolver countryNameCode)
 	    {
 	        _paymentMethodRepository = paymentMethodRepository;
 	        _contextAccessor = contextAccessor;
 	        _adminProfileRepository = adminProfileRepository;
 	        _context = context;
 	        _paymentMethodToCustomerTypeRepository = paymentMethodToCustomerTypeRepository;
-	        _mapper = mapper;
 	        _options = options;
 	        _countryNameCode = countryNameCode;
 	        _logger = loggerProvider.CreateLoggerDefault();
@@ -169,7 +168,7 @@ namespace VitalChoice.Business.Services.Payment
         {
             List<MessageInfo> errors = new List<MessageInfo>();
 
-            if (_mapper.IsObjectSecured(paymentMethod))
+            if (DynamicMapper.IsValuesMasked(paymentMethod))
                 return errors;
 
             if (!ValidateCreditCard(paymentMethod))

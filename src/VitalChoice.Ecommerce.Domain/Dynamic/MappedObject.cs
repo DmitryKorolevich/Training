@@ -11,6 +11,7 @@ using System.Runtime.Serialization;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
 using Remotion.Linq.Parsing;
+using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.History;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -24,7 +25,7 @@ namespace VitalChoice.Ecommerce.Domain.Dynamic
     {
         protected MappedObject()
         {
-            StatusCode = (int)RecordStatusCode.Active;
+            StatusCode = (int) RecordStatusCode.Active;
             DynamicData = new ExpandoObject();
         }
 

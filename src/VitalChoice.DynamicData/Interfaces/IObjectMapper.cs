@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using VitalChoice.DynamicData.Base;
 
 namespace VitalChoice.DynamicData.Interfaces
 {
