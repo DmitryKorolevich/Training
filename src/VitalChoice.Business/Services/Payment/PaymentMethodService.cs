@@ -168,8 +168,26 @@ namespace VitalChoice.Business.Services.Payment
         {
             List<MessageInfo> errors = new List<MessageInfo>();
 
-            if (DynamicMapper.IsValuesMasked(paymentMethod))
-                return errors;
+            string securityCode = paymentMethod.SafeData.SecurityCode;
+
+            if (securityCode == null)
+            {
+                if (DynamicMapper.IsValuesMasked(paymentMethod))
+                {
+                    return errors;
+                }
+            }
+            else
+            {
+                if (DynamicMapper.IsValuesMasked(paymentMethod))
+                {
+                    errors.Add(new MessageInfo
+                    {
+                        Field = "CardNumber",
+                        Message = "Please provide all credit card details to add or update card"
+                    });
+                }
+            }
 
             if (!ValidateCreditCard(paymentMethod))
             {
@@ -184,12 +202,26 @@ namespace VitalChoice.Business.Services.Payment
             if (_options.Value.AuthorizeNet.TestEnv || paymentMethod.IdObjectType != (int)PaymentMethodType.CreditCard)
                 return errors;
 
-            var creditCard = new creditCardType
+            creditCardType creditCard;
+            if (securityCode != null)
             {
-                cardNumber = paymentMethod.Data.CardNumber,
-                expirationDate = ((DateTime)paymentMethod.Data.ExpDate).ToString("MMyy"),
-                isPaymentToken = false
-            };
+                creditCard = new creditCardType
+                {
+                    cardNumber = paymentMethod.Data.CardNumber,
+                    expirationDate = ((DateTime)paymentMethod.Data.ExpDate).ToString("MMyy"),
+                    isPaymentToken = false,
+                    cardCode = securityCode
+                };
+            }
+            else
+            {
+                creditCard = new creditCardType
+                {
+                    cardNumber = paymentMethod.Data.CardNumber,
+                    expirationDate = ((DateTime)paymentMethod.Data.ExpDate).ToString("MMyy"),
+                    isPaymentToken = false
+                };
+            }
 
             var paymentType = new paymentType { Item = creditCard };
 

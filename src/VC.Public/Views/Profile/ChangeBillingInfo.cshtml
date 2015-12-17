@@ -22,166 +22,167 @@
 	<div class="left-pane clean-border">
 		@await Component.InvokeAsync("ProfileSidebar")
 	</div>
-	<div class="right-pane clean-indent">
-		@using (Html.BeginForm("ChangeBillingInfo", "Profile", null, FormMethod.Post, new { @class = "form-regular medium-small border-form-left", role = "form" }))
-		{
-			<input id="hdCountry" value="@Html.DisplayForEx(x=>x.IdCountry)" type="hidden">
-			<input id="hdState" value="@Html.DisplayForEx(x=>x.IdState)" type="hidden">
-			<input id="hdCardType" value="@Html.DisplayForEx(x=>x.CardType)" type="hidden">
-			@Html.HiddenFor(m => m.Id, new { @id = "hdCreditCard" })
-			@Html.AntiForgeryToken()
-			<h4>Manage Billing Addresses</h4>
-			<div class="form-group">
-				<div class="input-group control-label-indent">
-					<input id="addNew" class="yellow inline-button" type="button" value="Add New" />
-				</div>
-			</div>
-			<div class="form-group">
-				@Html.Label("SavedCards", "Saved Cards", new {@class = "control-label"})
-				<div class="input-group">
-					<select class="form-control" id="ddCreditCardsSelection"></select>
-					<input id="delSelected" class="red left-indent-small inline-button" type="button" value="Delete Card" />
-				</div>
-			</div>
-			<div class="form-group">
-				<hr />
-			</div>
-			@Html.ValidationSummary(true, "")
-			<div class="form-group">
-				@Html.LabelFor(m => m.CardType, new {@class = "control-label"})
-				<div class="input-group">
-					@Html.DropDownListFor(m => m.CardType, new List<SelectListItem>(), new {@class = "form-control", @id = "ddCardType"})
-					@Html.ValidationMessageFor(m => m.CardType)
-				</div>
-			</div>
-		    <div class="form-group">
-		        @Html.LabelFor(m => m.CardNumber, new {@class = "control-label"})
-		        <div class="input-group">
-		            @Html.TextBoxFor(m => m.CardNumber, new {@class = "form-control", maxlength = "16"})
-		            @Html.ValidationMessageFor(m => m.CardNumber)
-		        </div>
-		    </div>
+    <div class="right-pane clean-indent">
+        @using (Html.BeginForm("ChangeBillingInfo", "Profile", null, FormMethod.Post, new {@class = "form-regular medium-small border-form-left", role = "form"}))
+        {
+            <input id="hdCountry" value="@Html.DisplayForEx(x => x.IdCountry)" type="hidden">
+            <input id="hdState" value="@Html.DisplayForEx(x => x.IdState)" type="hidden">
+            <input id="hdCardType" value="@Html.DisplayForEx(x => x.CardType)" type="hidden">
+            @Html.HiddenFor(m => m.Id, new {@id = "hdCreditCard"})
+            @Html.AntiForgeryToken()
+            <h4>Manage Billing Addresses</h4>
+            <span class="form-control-important-info">You must provide all credit card details to add or update any saved credit card billing information.</span>
             <div class="form-group">
-                @Html.LabelFor(m => m.SecurityCode, new { @class = "control-label" })
+                <div class="input-group control-label-indent">
+                    <input id="addNew" class="yellow inline-button" type="button" value="Add New"/>
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.Label("SavedCards", "Saved Cards", new {@class = "control-label"})
                 <div class="input-group">
-                    @Html.TextBoxFor(m => m.SecurityCode, new { @class = "form-control", maxlength = "4" })
+                    <select class="form-control" id="ddCreditCardsSelection"></select>
+                    <input id="delSelected" class="red left-indent-small inline-button" type="button" value="Delete Card"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <hr/>
+            </div>
+            @Html.ValidationSummary(true, "")
+            <div class="form-group">
+                @Html.LabelFor(m => m.CardType, new {@class = "control-label"})
+                <div class="input-group">
+                    @Html.DropDownListFor(m => m.CardType, new List<SelectListItem>(), new {@class = "form-control", @id = "ddCardType"})
+                    @Html.ValidationMessageFor(m => m.CardType)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.CardNumber, new {@class = "control-label"})
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.CardNumber, new {@class = "form-control", maxlength = "16"})
+                    @Html.ValidationMessageFor(m => m.CardNumber)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.SecurityCode, new {@class = "control-label"})
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.SecurityCode, new {@class = "form-control small-form-control", maxlength = "4"})
                     @Html.ValidationMessageFor(m => m.SecurityCode)
                 </div>
             </div>
-			<div class="form-group">
-				@Html.LabelFor(m => m.NameOnCard, new {@class = "control-label"})
-				<div class="input-group">
-					@Html.TextBoxFor(m => m.NameOnCard, new {@class = "form-control"})
-					@Html.ValidationMessageFor(m => m.NameOnCard)
-				</div>
-			</div>
-			<div class="form-group form-control-container">
-				@Html.Label("ExpirationDate", "Expiration Date", new {@class = "control-label"})
-				<div class="input-group">
-					@Html.TextBoxFor(m => m.ExpirationDateMonth, new {@class = "form-control small-form-control", maxlength = "2" })
-					<span>/</span>
-					@Html.TextBoxFor(m => m.ExpirationDateYear, new {@class = "form-control small-form-control", maxlength = "2" })
-					@Html.ValidationMessageFor(m => m.ExpirationDateMonth)
-					@Html.ValidationMessageFor(m => m.ExpirationDateYear)
-				</div>
-			</div>
-			<div class="form-group">
-				<hr/>
-			</div>
-			<div class="form-two-column">
-				<div class="form-group">
-					@Html.LabelFor(m => m.FirstName, new {@class = "control-label"})
-					<div class="input-group">
-						@Html.TextBoxFor(m => m.FirstName, new {@class = "form-control"})
-						@Html.ValidationMessageFor(m => m.FirstName)
-					</div>
-				</div>
-				<div class="form-group">
-					@Html.LabelFor(m => m.LastName, new {@class = "control-label"})
-					<div class="input-group">
-						@Html.TextBoxFor(m => m.LastName, new {@class = "form-control"})
-						@Html.ValidationMessageFor(m => m.LastName)
-					</div>
-				</div>
-				<div class="form-group">
-					@Html.LabelFor(m => m.Company, new {@class = "control-label"})
-					<div class="input-group">
-						@Html.TextBoxFor(m => m.Company, new {@class = "form-control"})
-						@Html.ValidationMessageFor(m => m.Company)
-					</div>
-				</div>
-				<div class="form-group">
-					@Html.LabelFor(m => m.IdCountry, new {@class = "control-label"})
-					<div class="input-group">
-						@Html.DropDownListFor(m => m.IdCountry, new List<SelectListItem>(), new {@class = "form-control", @id = "ddCountry"})
-						@Html.ValidationMessageFor(m => m.IdCountry)
-					</div>
-				</div>
-				<div class="form-group">
-					@Html.LabelFor(m => m.Address1, new {@class = "control-label"})
-					<div class="input-group">
-						@Html.TextBoxFor(m => m.Address1, new {@class = "form-control"})
-						@Html.ValidationMessageFor(m => m.Address1)
-					</div>
-				</div>
-				<div class="form-group">
-					<label class="control-label"></label>
-					<div class="input-group">
-						@Html.TextBoxFor(m => m.Address2, new {@class = "form-control"})
-						@Html.ValidationMessageFor(m => m.Address2)
-					</div>
-				</div>
-			</div>
-			<div class="form-two-column">
-				<div class="form-group">
-					@Html.LabelFor(m => m.City, new {@class = "control-label"})
-					<div class="input-group">
-						@Html.TextBoxFor(m => m.City, new {@class = "form-control"})
-						@Html.ValidationMessageFor(m => m.City)
-					</div>
-				</div>
-				<div class="form-group">
-					<!--todo-->
-					@Html.LabelFor(m => m.IdState, new {@class = "control-label"})
-					<div class="input-group">
-						@Html.DropDownListFor(m => m.IdState, new List<SelectListItem>(), new {@class = "form-control", @id = "ddState"})
-						@Html.ValidationMessageFor(m => m.IdState)
-					</div>
-				</div>
-				<div class="form-group">
-					<!--todo-->
-					@Html.LabelFor(m => m.County, new {@class = "control-label"})
-					<div class="input-group">
-						@Html.TextBoxFor(m => m.County, new {@class = "form-control", @id = "txtState"})
-						@Html.ValidationMessageFor(m => m.County)
-					</div>
-				</div>
-				<div class="form-group">
-					@Html.LabelFor(m => m.PostalCode, new {@class = "control-label"})
-					<div class="input-group">
-						@Html.TextBoxFor(m => m.PostalCode, new {@class = "form-control"})
-						@Html.ValidationMessageFor(m => m.PostalCode)
-					</div>
-				</div>
-				<div class="form-group">
-					@Html.LabelFor(m => m.Phone, new {@class = "control-label"})
-					<div class="input-group">
-						@Html.TextBoxFor(m => m.Phone, new {@class = "form-control phone-mask"})
-						@Html.ValidationMessageFor(m => m.Phone)
-					</div>
-				</div>
-				<div class="form-group">
-					@Html.LabelFor(m => m.Fax, new {@class = "control-label"})
-					<div class="input-group">
-						@Html.TextBoxFor(m => m.Fax, new {@class = "form-control phone-mask"})
-						@Html.ValidationMessageFor(m => m.Fax)
-					</div>
-				</div>
-			</div>
-			<div class="form-buttons-group">
-				<input data-back-button="@Url.Action("TopFavoriteItems","Profile")" type="button" value="Back"/>
-				<input class="yellow" type="submit" value="Save"/>
-			</div>
-		}
-	</div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.NameOnCard, new {@class = "control-label"})
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.NameOnCard, new {@class = "form-control"})
+                    @Html.ValidationMessageFor(m => m.NameOnCard)
+                </div>
+            </div>
+            <div class="form-group form-control-container">
+                @Html.Label("ExpirationDate", "Expiration Date", new {@class = "control-label"})
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.ExpirationDateMonth, new {@class = "form-control small-form-control", maxlength = "2"})
+                    <span>/</span>
+                    @Html.TextBoxFor(m => m.ExpirationDateYear, new {@class = "form-control small-form-control", maxlength = "2"})
+                    @Html.ValidationMessageFor(m => m.ExpirationDateMonth)
+                    @Html.ValidationMessageFor(m => m.ExpirationDateYear)
+                </div>
+            </div>
+            <div class="form-group">
+                <hr/>
+            </div>
+            <div class="form-two-column">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.FirstName, new {@class = "control-label"})
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.FirstName, new {@class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.FirstName)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.LastName, new {@class = "control-label"})
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.LastName, new {@class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.LastName)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Company, new {@class = "control-label"})
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.Company, new {@class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.Company)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.IdCountry, new {@class = "control-label"})
+                    <div class="input-group">
+                        @Html.DropDownListFor(m => m.IdCountry, new List<SelectListItem>(), new {@class = "form-control", @id = "ddCountry"})
+                        @Html.ValidationMessageFor(m => m.IdCountry)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Address1, new {@class = "control-label"})
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.Address1, new {@class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.Address1)
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label"></label>
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.Address2, new {@class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.Address2)
+                    </div>
+                </div>
+            </div>
+            <div class="form-two-column">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.City, new {@class = "control-label"})
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.City, new {@class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.City)
+                    </div>
+                </div>
+                <div class="form-group">
+                    <!--todo-->
+                    @Html.LabelFor(m => m.IdState, new {@class = "control-label"})
+                    <div class="input-group">
+                        @Html.DropDownListFor(m => m.IdState, new List<SelectListItem>(), new {@class = "form-control", @id = "ddState"})
+                        @Html.ValidationMessageFor(m => m.IdState)
+                    </div>
+                </div>
+                <div class="form-group">
+                    <!--todo-->
+                    @Html.LabelFor(m => m.County, new {@class = "control-label"})
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.County, new {@class = "form-control", @id = "txtState"})
+                        @Html.ValidationMessageFor(m => m.County)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.PostalCode, new {@class = "control-label"})
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.PostalCode, new {@class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.PostalCode)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Phone, new {@class = "control-label"})
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.Phone, new {@class = "form-control phone-mask"})
+                        @Html.ValidationMessageFor(m => m.Phone)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Fax, new {@class = "control-label"})
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.Fax, new {@class = "form-control phone-mask"})
+                        @Html.ValidationMessageFor(m => m.Fax)
+                    </div>
+                </div>
+            </div>
+            <div class="form-buttons-group">
+                <input data-back-button="@Url.Action("TopFavoriteItems", "Profile")" type="button" value="Back"/>
+                <input class="yellow" type="submit" value="Save"/>
+            </div>
+        }
+    </div>
 </div>

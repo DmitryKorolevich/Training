@@ -1,11 +1,10 @@
 {
   "App": {
     "GenerateLowercaseUrls": true,
-    "EnableBundlingAndMinification": false,
+    "EnableBundlingAndMinification": true,
     "Versioning": {
       "EnableStaticContentVersioning": true,
-      "AutoGenerateBuildNumber": true,
-      "BuildNumber": 1
+      "AutoGenerateBuildNumber": true
     },
     "LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
     "ActivationTokenExpirationTermDays": 3,

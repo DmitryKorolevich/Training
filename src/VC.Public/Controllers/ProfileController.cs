@@ -298,12 +298,12 @@ namespace VC.Public.Controllers
 
             var customerPaymentMethod = _paymentMethodConverter.FromModel(model);
             customerPaymentMethod.IdObjectType = (int) PaymentMethodType.CreditCard;
+            customerPaymentMethod.Data.SecurityCode = model.SecurityCode;
 
             customerPaymentMethod.Address = _addressConverter.FromModel(model);
             customerPaymentMethod.Address.IdObjectType = (int) AddressType.Billing;
 
             currentCustomer.CustomerPaymentMethods.Add(customerPaymentMethod);
-
             try
             {
                 currentCustomer = await _customerService.UpdateAsync(currentCustomer);
