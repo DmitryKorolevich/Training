@@ -1,0 +1,72 @@
+﻿<div class="container-fluid">
+    <div class="well">
+        <span class="legend">Manage Master Templates</span>
+        <div class="row form-group">
+            <div class="col-md-4">
+                <select class="form-control" data-ng-model="filter.Type" ng-options="type.Key as type.Text for type in types"></select>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-md-4">
+                <button class="btn btn-info" data-ng-click="filterMasters();" type="button">Filter</button>
+            </div>
+        </div>
+        <hr />
+        <div class="form-group">
+            <button data-ng-click="open();" class="btn btn-primary">Add New Master Template</button>
+        </div>
+        <spinner-overlay data-loading="refreshTracker.active()">
+            <table class="table table-striped table-hover ">
+                <thead>
+                <tr>
+                    <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Name')">
+                        <span>Name</span>
+                        <span data-ng-if="filter.Sorting.Path == 'Name'">
+                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                        </span>
+                    </th>
+                    <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Type')">
+                        <span>Type</span>
+                        <span data-ng-if="filter.Sorting.Path == 'Type'">
+                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                        </span>
+                    </th>
+                    <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Updated')">
+                        <span>Updated</span>
+                        <span data-ng-if="filter.Sorting.Path == 'Updated'">
+                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                        </span>
+                    </th>
+                    <th>Is Default</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr data-ng-repeat="master in masters">
+                    <td>{{master.Name}}</td>
+                    <td>{{master.TypeName}}</td>
+                    <td>{{master.Updated | date:"MM/dd/yy"}}<br />{{master.Updated | date:"h:mm a"}}<br />{{master.AgentId}}</td>
+                    <td>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" data-ng-checked="{{master.IsDefault}}" disabled>
+                            </label>
+                        </div>
+                    </td>
+                    <td>
+                        <button title="Edit" class="btn btn-default btn-success btn-xs" data-ng-click="open(master.Id);">
+                            <i class="glyphicon glyphicon-edit"></i>
+                        </button>
+                        <button title="Delete" class="btn btn-default btn-danger btn-xs" ladda="deleteTracker.active()" data-ng-click="delete(master.Id);">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </spinner-overlay>
+    </div>
+</div>

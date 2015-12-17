@@ -1,0 +1,40 @@
+﻿<div class="modal-header">
+	<h3 class="modal-title">Add New Product SKU</h3>
+</div>
+<div class="modal-body">
+	<div class="form-horizontal">
+		<div class="form-group">
+			<div class="col-md-12">
+				<div class="fixed-accordion-row extra-spacing" data-ng-click="$event.stopPropagation()">
+					<label class="control-label">SKU</label>
+					<input type="text" class="form-control" placeholder="" data-ng-model="subSku.SKU">
+				</div>
+				<div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">
+					<label for="lblActive{{subSku.Id}}" class="control-label">Active</label>
+					<div class="checkbox">
+						<label>
+							<input id="lblActive{{subSku.Id}}" type="checkbox" data-ng-model="subSku.Active">
+						</label>
+					</div>
+				</div>
+				<div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">
+					<label for="lblHide{{subSku.Id}}" class="control-label">Hide in Storefront</label>
+					<div class="checkbox">
+						<label>
+							<input id="lblHide{{subSku.Id}}" type="checkbox" data-ng-model="subSku.HideInStorefront">
+						</label>
+					</div>
+				</div>
+				<div class="fixed-accordion-row pull-right" data-ng-click="$event.stopPropagation()">
+					<label class="control-label">Order</label>
+					<input type="text" class="form-control half-size-input" placeholder="" data-ng-model="subSku.Order">
+				</div>
+			</div>
+		</div>
+		<div data-ng-include="'app/modules/demo/partials/subProductBody.html'"></div>
+	</div>
+</div>
+<div class="modal-footer">
+	<button class="btn btn-success" data-ng-click="ok()">Save</button>
+	<button class="btn btn-default" data-ng-click="cancel()">Cancel</button>
+</div>

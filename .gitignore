@@ -179,7 +179,7 @@ project.lock.json
 config.local.json
 node_modules/
 /src/VC.Public/wwwroot/files
-/src/VC.Admin/wwwroot
+/src/VC.Admin/wwwroot/files
 /.vs
 artifacts
 /src/files

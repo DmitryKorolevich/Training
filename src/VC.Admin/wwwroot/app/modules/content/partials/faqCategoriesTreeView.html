@@ -1,0 +1,36 @@
+﻿<div class="container-fluid">
+    <div class="left-pane-controls">
+        <div class="well container-fluid">
+            <div>
+                <button class="btn btn-success width-160px" ladda="editTracker.active()" data-ng-click="save()">Save</button>
+            </div>
+            <div class="btn-group margin-top-10px">
+                <button class="btn btn-default width-160px" data-ng-click="cancel()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <div class="right-pane-main">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="container container-left">
+                    <div class="well row categories">
+                        <spinner-overlay data-loading="refreshTracker.active()">
+                            <span class="legend">Manage FAQ Categories</span>
+                            <a class="btn btn-success btn-xs" title="Add" nodrag data-ng-click="add(rootCategory.Id)">
+                                <i class="glyphicon glyphicon-plus"></i>
+                            </a>
+                            <button data-ng-if="!categoriesExpanded" data-ng-click="updateCategoriesCollapsed(true);" class="btn btn-primary btn-xs expand-button">Expand All</button>
+                            <button data-ng-if="categoriesExpanded" data-ng-click="updateCategoriesCollapsed(false);" class="btn btn-primary btn-xs expand-button">Collapse All</button>
+                            <div ui-tree class="ya-treeview">
+                                <ol ui-tree-nodes data-ng-model="rootCategory.SubItems">
+                                    <li ng-repeat="item in rootCategory.SubItems" ui-tree-node data-ng-include="'app/modules/content/partials/contentCategoriesReordering.html'">
+                                    </li>
+                                </ol>
+                            </div>
+                        </spinner-overlay>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq.Expressions;
 using System.Reflection;
 using Autofac.Features.Indexed;
 using VitalChoice.DynamicData.Delegates;
@@ -39,7 +41,7 @@ namespace VitalChoice.DynamicData.Base
             return obj;
         }
 
-        public object ConvertFromModel(Type sourceType, Type destType, object obj, ConvertWithAttribute convertWith = null)
+        public virtual object ConvertFromModel(Type sourceType, Type destType, object obj, ConvertWithAttribute convertWith = null)
         {
             if (convertWith != null)
                 return ConvertObject(convertWith, obj);
@@ -56,10 +58,13 @@ namespace VitalChoice.DynamicData.Base
             {
                 return Enum.Parse(unwrappedDest, obj.ToString());
             }
-            if (sourceType == typeof (long) && (destType == typeof (int) || destType == typeof (int?)))
-            {
-                return (int) ((long) obj);
-            }
+            var directResult = TryDirectConvert(obj, destType);
+            if (directResult != null)
+                return directResult;
+            //if (sourceType == typeof (long) && (destType == typeof (int) || destType == typeof (int?)))
+            //{
+            //    return (int) ((long) obj);
+            //}
 
             var unwrappedSrc = sourceType.UnwrapNullable();
             var enumType = unwrappedSrc.TryUnwrapEnum();
@@ -105,13 +110,13 @@ namespace VitalChoice.DynamicData.Base
                 var mapper = _mapperFactory.CreateMapper(destType);
                 return mapper.FromModel(sourceType, obj);
             }
-            catch(Exception e)
+            catch
             {
                 return null;
             }
         }
 
-        public object ConvertToModel(Type sourceType, Type destType, object obj, ConvertWithAttribute convertWith = null)
+        public virtual object ConvertToModel(Type sourceType, Type destType, object obj, ConvertWithAttribute convertWith = null)
         {
             if (convertWith?.ConverterType != null)
                 return ConvertObject(convertWith, obj);
@@ -128,10 +133,13 @@ namespace VitalChoice.DynamicData.Base
             {
                 return Enum.Parse(unwrappedDest, obj.ToString());
             }
-            if (sourceType == typeof (long) && (destType == typeof (int) || destType == typeof (int?)))
-            {
-                return (int) ((long) obj);
-            }
+            var directResult = TryDirectConvert(obj, destType);
+            if (directResult != null)
+                return directResult;
+            //if (sourceType == typeof (long) && (destType == typeof (int) || destType == typeof (int?)))
+            //{
+            //    return (int) (long) obj;
+            //}
 
             IObjectMapper objectMapper;
             if (_mappers.TryGetValue(sourceType, out objectMapper))
@@ -176,7 +184,7 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        public object Clone(object obj, Type objectType, Type baseTypeToMemberwiseClone)
+        public virtual object Clone(object obj, Type objectType, Type baseTypeToMemberwiseClone)
         {
             if (obj == null)
                 return null;
@@ -228,7 +236,7 @@ namespace VitalChoice.DynamicData.Base
             return result;
         }
 
-        public object Clone(object obj, Type objectType, Type baseTypeToMemberwiseClone, Func<object, object> cloneBase)
+        public virtual object Clone(object obj, Type objectType, Type baseTypeToMemberwiseClone, Func<object, object> cloneBase)
         {
             if (obj == null)
                 return null;
@@ -301,6 +309,58 @@ namespace VitalChoice.DynamicData.Base
             if (obj == null)
                 return convertWith.Default ?? converter.DefaultValue;
             return converter.ConvertFrom(obj);
+        }
+
+        private static object TryDirectConvert(object obj, Type destination)
+        {
+            try
+            {
+                var destTypeCode = destination.GetTypeCode();
+                var convertible = obj as IConvertible;
+                if (convertible != null)
+                {
+                    switch (destTypeCode)
+                    {
+                        case TypeCode.Boolean:
+                            return convertible.ToBoolean(CultureInfo.InvariantCulture);
+                        case TypeCode.Char:
+                            return convertible.ToChar(CultureInfo.InvariantCulture);
+                        case TypeCode.SByte:
+                            return convertible.ToSByte(CultureInfo.InvariantCulture);
+                        case TypeCode.Byte:
+                            return convertible.ToByte(CultureInfo.InvariantCulture);
+                        case TypeCode.Int16:
+                            return convertible.ToInt16(CultureInfo.InvariantCulture);
+                        case TypeCode.UInt16:
+                            return convertible.ToUInt16(CultureInfo.InvariantCulture);
+                        case TypeCode.Int32:
+                            return convertible.ToInt32(CultureInfo.InvariantCulture);
+                        case TypeCode.UInt32:
+                            return convertible.ToUInt32(CultureInfo.InvariantCulture);
+                        case TypeCode.Int64:
+                            return convertible.ToInt64(CultureInfo.InvariantCulture);
+                        case TypeCode.UInt64:
+                            return convertible.ToUInt64(CultureInfo.InvariantCulture);
+                        case TypeCode.Single:
+                            return convertible.ToSingle(CultureInfo.InvariantCulture);
+                        case TypeCode.Double:
+                            return convertible.ToDouble(CultureInfo.InvariantCulture);
+                        case TypeCode.Decimal:
+                            return convertible.ToDecimal(CultureInfo.InvariantCulture);
+                        case TypeCode.DateTime:
+                            return convertible.ToDateTime(CultureInfo.InvariantCulture);
+                        case TypeCode.String:
+                            return convertible.ToString(CultureInfo.InvariantCulture);
+                        default:
+                            return null;
+                    }
+                }
+            }
+            catch
+            {
+                return null;
+            }
+            return null;
         }
     }
 }

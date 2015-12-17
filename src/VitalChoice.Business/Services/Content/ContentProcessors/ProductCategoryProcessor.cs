@@ -24,7 +24,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
     {
         public IList<CustomerTypeCode> CustomerTypeCodes { get; set; }
 
-        [ConvertWith(typeof(StringToBoolConverter))]
+        //[ConvertWith(typeof(StringToBoolConverter))]
         public bool Preview { get; set; }
     }
 

@@ -1,0 +1,100 @@
+﻿<div class="container-fluid orders-region-statistic">
+    <div class="well">
+        <span class="legend">Regional Sales Detail</span>
+        <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted}" novalidate>
+            <fieldset>
+                <div class="row form-group">
+                    <div class="col-md-2">
+                        <p class="input-group">
+                            <input type="text" name="From" class="form-control" placeholder="From" datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" data-ng-change="filterChanged();" required />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-2">
+                        <p class="input-group">
+                            <input type="text" name="To" class="form-control" placeholder="To" datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" data-ng-change="filterChanged();" required />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control" placeholder="Customer Type" data-ng-model="filter.IdCustomerType" data-ng-options="item.Key as item.Text for item in customerTypes" data-ng-change="filterChanged();"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control" placeholder="Order Type" data-ng-model="filter.IdOrderType" data-ng-options="item.Key as item.Text for item in orderTypes" data-ng-change="filterChanged();"></select>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div data-ng-if="filter.RegionType==1" class="col-md-2">
+                        <input type="text" class="form-control" placeholder="State/Province" data-ng-model="filter.Region" autocomplete="false" data-ng-change="filterChanged();" required>
+                    </div>
+                    <div data-ng-if="filter.RegionType==2" class="col-md-2">
+                        <input type="text" class="form-control" placeholder="Zip" data-ng-model="filter.Zip" autocomplete="false" data-ng-change="filterChanged();" required>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-control" placeholder="Region Type" data-ng-model="filter.RegionType" data-ng-options="item.Key as item.Text for item in regionTypes" data-ng-change="filterChanged();"></select>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+        <div class="row form-group">
+            <div class="col-md-6 inline-form-group">
+                <button class="btn btn-info" data-ng-click="filterItems();" type="button">Filter</button>
+                <div class="form-control-static">
+                    <span data-ng-if="options.Total">Orders Total: <strong>{{items.length}}</strong></span>
+                    <span data-ng-if="options.Total">Sales Total: <strong>{{options.Total | currency}}</strong></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <a target="_self" class="btn btn-primary pull-right" data-ng-href={{options.exportUrl}}>Export</a>
+            </div>
+        </div>
+        <spinner-overlay data-loading="refreshTracker.active()">
+            <table data-ng-if="items" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Order Date</th>
+                        <th>Order Amount</th>
+                        <th>State/Province</th>
+                        <th>City</th>
+                        <th>Zip</th>
+                        <th>Customer #</th>
+                        <th>Customer Last Name</th>
+                        <th>Repeat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="item in items">
+                        <td>
+                            <a ui-sref="index.oneCol.orderDetail({id:item.Id})">{{::item.Id}}</a>
+                        </td>
+                        <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>
+                        <td>{{::item.Total | currency}}</td>
+                        <td>{{::item.Region}}</td>
+                        <td>{{::item.City}}</td>
+                        <td>{{::item.Zip}}</td>
+                        <td>
+                            <a ui-sref="index.oneCol.customerDetail({id:item.IdCustomer})">{{::item.IdCustomer}}</a>
+                        </td>
+                        <td>{{::item.CustomerLastName}}</td>
+                        <td>{{::item.CustomerOrdersCount}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </spinner-overlay>
+        <pagination boundary-links="true"
+                    total-items="options.TotalItems"
+                    items-per-page="filter.Paging.PageItemCount"
+                    data-ng-model="filter.Paging.PageIndex"
+                    previous-text="&lsaquo;"
+                    next-text="&rsaquo;"
+                    first-text="&laquo;"
+                    last-text="&raquo;"
+                    data-ng-change="pageChanged()">
+        </pagination>
+    </div>
+</div>

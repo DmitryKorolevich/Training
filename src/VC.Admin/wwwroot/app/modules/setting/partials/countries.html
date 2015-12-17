@@ -1,0 +1,77 @@
+﻿<div class="container-fluid">
+    <div class="left-pane-controls">
+        <div class="well container-fluid">
+            <div>
+                <button class="btn btn-success width-160px" ladda="editTracker.active()" data-ng-click="save()">Save</button>
+            </div>
+        </div>
+    </div>
+    <div class="right-pane-main">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="container container-left">
+                    <div class="well row categories">
+                        <spinner-overlay data-loading="refreshTracker.active()">
+                            <span class="legend">Manage Countries, States / Provinces</span>
+                            <a class="btn btn-success btn-xs" title="Add" nodrag data-ng-click="addCountry()">
+                                <i class="glyphicon glyphicon-plus"></i>
+                            </a>
+                            <button data-ng-if="!categoriesExpanded" data-ng-click="updateCategoriesCollapsed(true);" class="btn btn-primary btn-xs expand-button">Expand All</button>
+                            <button data-ng-if="categoriesExpanded" data-ng-click="updateCategoriesCollapsed(false);" class="btn btn-primary btn-xs expand-button">Collapse All</button>
+                            <div ui-tree="treeOptions" class="ya-treeview">
+                                <ol ui-tree-nodes data-ng-model="countries" data-type="country">
+                                    <li ng-repeat="country in countries" collapsed="true" ui-tree-node>
+                                        <div data-ng-if="country.States && country.States.length > 0">
+                                            <a class="btn btn-link pull-left" nodrag data-ng-click="toggle(this)">
+                                                <i class="glyphicon" ng-class="{'glyphicon-chevron-right': collapsed, 'glyphicon-chevron-down': !collapsed}"></i>
+                                            </a>
+                                        </div>
+                                        <div ui-tree-handle>
+                                            <div class="ya-treeview-content clearfix">
+                                                <div class="line">
+                                                    <label>{{country.CountryName}} - <strong>{{country.CountryCode}}</strong></label>
+                                                    <span data-ng-if="country.StatusCode == 1" class="label label-warning category-status">Hidden</span>
+                                                </div>
+                                                <div class="ya-treview-buttons" data-nodrag>
+                                                    <a class="btn btn-success btn-xs" title="Add" nodrag data-ng-click="addState(country.CountryCode, country.Id)">
+                                                        <i class="glyphicon glyphicon-plus"></i>
+                                                    </a>
+                                                    <a class="btn btn-info btn-xs" title="Edit" nodrag data-ng-click="editCountry(country)">
+                                                        <i class="glyphicon glyphicon-edit"></i>
+                                                    </a>
+                                                    <a class="btn btn-danger btn-xs" title="Delete" nodrag ladda="deleteTracker.active()" data-ng-if="!country.States || country.States.length == 0" data-ng-click="deleteCountry(country.Id)">
+                                                        <i class="glyphicon glyphicon-remove"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <ol ui-tree-nodes data-ng-model="country.States" data-ng-class="{hidden: collapsed}" data-type="{{country.CountryCode}}">
+                                            <li ng-repeat="state in country.States" ui-tree-node>
+                                                <div ui-tree-handle>
+                                                    <div class="ya-treeview-content clearfix">
+                                                        <div class="line">
+                                                            <label>{{state.StateName}} - <strong>{{state.StateCode}}</strong></label>
+                                                            <span data-ng-if="state.StatusCode == 1" class="label label-warning category-status">Hidden</span>
+                                                        </div>
+                                                        <div class="ya-treview-buttons" data-nodrag>
+                                                            <a class="btn btn-info btn-xs" title="Edit" nodrag data-ng-click="editState(country.Id, state)">
+                                                                <i class="glyphicon glyphicon-edit"></i>
+                                                            </a>
+                                                            <a class="btn btn-danger btn-xs" title="Delete" nodrag ladda="deleteTracker.active()" data-ng-click="deleteState(country.Id, state.Id)">
+                                                                <i class="glyphicon glyphicon-remove"></i>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ol>
+                                    </li>
+                                </ol>
+                            </div>
+                        </spinner-overlay>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

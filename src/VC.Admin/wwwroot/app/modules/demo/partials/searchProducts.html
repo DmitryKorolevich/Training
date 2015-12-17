@@ -1,0 +1,31 @@
+﻿<div class="container container-left small-container">
+	<div class="well">
+		<form class="form-horizontal">
+			<fieldset>
+				<legend>Find Product</legend>
+				<div class="form-group">
+					<label for="sku" class="col-md-3 control-label">SKU</label>
+					<div class="col-md-9">
+						<input type="text" class="form-control" id="sku" placeholder="SKU">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="key" class="col-md-3 control-label">Keyword(s)</label>
+					<div class="col-md-9">
+						<input type="text" class="form-control" id="key" placeholder="Keyword(s)">
+						<div class="checkbox">
+							<label>
+								<input type="checkbox"> Search on exact phrase
+							</label>
+						</div>
+					</div>
+				</div>
+			</fieldset>
+			<div class="margin-top-20px">
+				<a ui-sref="index.oneCol.productsList" class="btn btn-primary btn-lg">Search</a>
+				<a class="btn btn-info btn-lg">Reset</a>
+			</div>
+		</form>
+	</div>
+</div>
+

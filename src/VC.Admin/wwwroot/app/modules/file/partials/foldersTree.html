@@ -1,0 +1,26 @@
+﻿<div data-ng-if="item.Directories && item.Directories.length > 0">
+    <a class="btn btn-link pull-left" data-nodrag data-ng-click="toggle(this)">
+        <i class="glyphicon" ng-class="{'glyphicon-chevron-right': collapsed, 'glyphicon-chevron-down': !collapsed}"></i>
+    </a>
+</div>
+<div ui-tree-handle ng-class="{'selected': item.selected}" ng-click="selectDirectory(item.FullRelativeName)">
+    <div class="ya-treeview-content clearfix">
+        <div class="line">
+            <label>{{item.Name}}</label>
+        </div>
+        <div class="wrapper-ya-treview-buttons">
+            <div class="ya-treview-buttons" data-nodrag>
+                <a class="btn btn-success btn-xs" title="Add" nodrag data-ng-click="addDirectory(item.FullRelativeName); $event.stopPropagation();">
+                    <i class="glyphicon glyphicon-plus"></i>
+                </a>
+                <a class="btn btn-danger btn-xs" title="Delete" nodrag data-ng-if="item.FullRelativeName!='/' && (!item.Directories || item.Directories.length == 0)" ladda="deleteTracker.active()" data-ng-click="deleteDirectory(item); $event.stopPropagation();">
+                    <i class="glyphicon glyphicon-remove"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<ol ui-tree-nodes="" data-ng-model="item.Directories" data-ng-class="{hidden: collapsed}">
+    <li ng-repeat="item in item.Directories" collapsed="true" ui-tree-node data-ng-include="'app/modules/file/partials/foldersTree.html'">
+    </li>
+</ol>

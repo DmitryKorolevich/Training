@@ -9,7 +9,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Recipes
 {
     public class RecipeParameters
     {
-        [ConvertWith(typeof(StringToBoolConverter))]
+        //[ConvertWith(typeof(StringToBoolConverter))]
         public bool Preview { get; set; }
         
         public string Url { get; set; }

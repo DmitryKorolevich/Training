@@ -12,7 +12,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
         [ConvertWith(typeof(StringToIntConverter), 1)]
         public int Page { get; set; }
 
-        [ConvertWith(typeof(StringToBoolConverter))]
+        //[ConvertWith(typeof(StringToBoolConverter))]
         public bool Preview { get; set; }
         
         public string Url { get; set; }

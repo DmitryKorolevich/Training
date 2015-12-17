@@ -1,0 +1,25 @@
+﻿<div data-ng-if="item.children && item.children.length > 0">
+	<a class="btn btn-link pull-left" nodrag data-ng-click="toggle(this)">
+		<i class="glyphicon" ng-class="{'glyphicon-chevron-right': collapsed, 'glyphicon-chevron-down': !collapsed}"></i>
+	</a>
+</div>
+<div ui-tree-handle>
+	<div class="ya-treeview-content clearfix">
+		<div class="checkbox">
+			<label><input data-ng-checked="item.checked" type="checkbox">{{item.label}}</label>
+			<span data-ng-if="item.status == 2" class="label label-warning category-status">Hidden</span>
+		</div>
+		<div class="ya-treview-buttons" data-nodrag>
+			<a class="btn btn-success btn-xs" title="Edit" nodrag data-ng-click="testEdit()">
+				<i class="glyphicon glyphicon-edit"></i>
+			</a>
+			<a class="btn btn-danger btn-xs" title="Delete" nodrag data-ng-click="testDelete()">
+				<i class="glyphicon glyphicon-remove"></i>
+			</a>
+		</div>
+	</div>
+</div>
+<ol ui-tree-nodes="" data-ng-model="item.children" data-ng-class="{hidden: collapsed}" data-type="category2">
+	<li ng-repeat="item in item.children" ui-tree-node data-ng-include="'app/modules/demo/partials/recipesCategories.html'">
+	</li>
+</ol>

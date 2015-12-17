@@ -1,0 +1,443 @@
+﻿<div class="container-fluid">
+    <div class="left-pane-controls">
+        <div class="well container-fluid">
+            <div>
+                <button class="btn btn-success width-160px" ladda="editTracker.active()" data-ng-click="save()">Save</button>
+            </div>
+            <div class="btn-group margin-top-10px">
+                <a target="_blank" href="{{previewUrl}}" data-ng-if="previewUrl" class="btn btn-info width-80px">Preview</a>
+                <a data-ng-if="!previewUrl" class="btn btn-info width-80px">Preview</a>
+                <button cancel-button-default-state="index.oneCol.manageRecipes" cancel-button class="btn btn-default width-80px">Cancel</button>
+            </div>
+            <div class="margin-top-10px">
+                <button class="btn btn-primary width-160px" ui-sref="index.oneCol.manageRecipes">Manage All</button>
+            </div>
+        </div>
+    </div>
+    <div class="right-pane-main">
+        <div class="container-fluid">
+            <div class="row">
+                <tabset>
+                    <tab heading="Details" active="detailsTab.active">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <spinner-overlay data-loading="refreshTracker.active()">
+                                    <form class="form-horizontal" name="forms.recipeForm" data-ng-submit="save()" data-ng-class="{submitted: forms.recipeForm.submitted}" novalidate>
+                                        <fieldset>
+                                            <span class="legend">Recipe Details</span>
+                                            <div class="form-group">
+                                                <label for="title" class="col-md-3 control-label">Title</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="Name" class="form-control" placeholder="Title" data-ng-model="recipe.Name" required>
+                                                    <div class="error-container" ng-show="forms.recipeForm.submitted && forms.recipeForm.Name.$invalid">
+                                                        <small class="error" ng-show="forms.recipeForm.Name.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Title")}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="subtitle" class="col-md-3 control-label">Subtitle</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="Subtitle" class="form-control" placeholder="Subtitle" data-ng-model="recipe.Subtitle" required>
+                                                    <div class="error-container" ng-show="forms.recipeForm.submitted && forms.recipeForm.Subtitle.$invalid">
+                                                        <small class="error" ng-show="forms.recipeForm.Subtitle.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Subtitle")}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="url" class="col-md-3 control-label">URL</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="Url" class="form-control" placeholder="URL" data-ng-model="recipe.Url" ng-pattern='/^[A-Za-z0-9]{1}[A-Za-z0-9-_]{3}[A-Za-z0-9-_]*$/' required>
+                                                    <div class="error-container" ng-show="forms.recipeForm.submitted && forms.recipeForm.Url.$invalid">
+                                                        <small class="error" ng-show="forms.recipeForm.Url.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Url")}}</small>
+                                                        <small class="error" ng-show="forms.recipeForm.Url.$error.pattern">{{getValidationMessage("ValidationMessages.FieldContentUrlInvalidFormat","GeneralFieldNames.Url")}}</small>
+                                                        <small class="error" ng-show="forms.recipeForm.Url.$error.server">{{serverMessages.GetMessage('Url')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label  col-md-3">Video Image</label>
+                                                <div class="col-md-9">
+                                                    <filefield name="YoutubeImage" placeholder="Video Image" ng-model="recipe.YoutubeImage" required></filefield>
+                                                    <div class="error-container" ng-show="forms.recipeForm.submitted && forms.recipeForm.YoutubeImage.$invalid">
+                                                        <small class="error" ng-show="forms.recipeForm.YoutubeImage.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Video Image")}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-3">Video</label>
+                                                <div class="col-md-9">
+                                                    <div class="input-group">
+                                                        <input type="text" name="YoutubeVideo" class="form-control" placeholder="Video" data-ng-model="recipe.YoutubeVideo" required>
+                                                        <span class="input-group-btn">
+                                                            <a target="_blank" data-ng-href="{{recipe.YoutubeVideo ? youTubeBaseUrl.format(recipe.YoutubeVideo) : ''}}" class="btn btn-default"><i class="glyphicon glyphicon-eye-open"></i></a>
+                                                        </span>
+                                                    </div>
+                                                        <div class="error-container" ng-show="forms.recipeForm.submitted && forms.recipeForm.YoutubeVideo.$invalid">
+                                                            <small class="error" ng-show="forms.recipeForm.YoutubeVideo.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Video")}}</small>
+                                                            <small class="error" ng-show="forms.recipeForm.YoutubeVideo.$error.server">{{serverMessages.GetMessage('YoutubeVideo')}}</small>
+                                                        </div>
+                                                    </div>
+                                            </div>
+                                           <div class="form-group">
+                                                <label for="description" class="col-md-3 control-label">Description</label>
+                                                <div class="col-md-9">
+                                                    <div class="input-group" data-ng-show="!descriptionExpanded">
+                                                        <input type="text" name="Description" class="form-control" id="short" placeholder="Description" disabled data-ng-model="recipe.Description" required>
+                                                        <span class="input-group-btn">
+                                                            <a data-ng-click="toogleEditorState('descriptionExpanded')" class="btn btn-default">Expand</a>
+                                                        </span>
+                                                    </div>
+                                                    <div class="toogle-editor" data-ng-show="descriptionExpanded">
+                                                        <a data-ng-click="toogleEditorState('descriptionExpanded')" class="btn btn-default">Hide</a>
+                                                    </div>
+                                                    <div data-ng-show="descriptionExpanded" text-angular data-ng-model="recipe.Description"></div>
+                                                    <div class="error-container" ng-show="forms.recipeForm.submitted && forms.recipeForm.Description.$invalid">
+                                                        <small class="error" ng-show="forms.recipeForm.Description.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Description")}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                           <div class="form-group">
+                                                <label for="AboutChef" class="col-md-3 control-label">About Chef</label>
+                                                <div class="col-md-9">
+                                                    <div class="input-group" data-ng-show="!AboutChefExpanded">
+                                                        <input type="text" name="AboutChef" class="form-control" placeholder="About Chef" disabled data-ng-model="recipe.AboutChef">
+                                                        <span class="input-group-btn">
+                                                            <a data-ng-click="toogleEditorState('AboutChefExpanded')" class="btn btn-default">Expand</a>
+                                                        </span>
+                                                    </div>
+                                                    <div class="toogle-editor" data-ng-show="AboutChefExpanded">
+                                                        <a data-ng-click="toogleEditorState('AboutChefExpanded')" class="btn btn-default">Hide</a>
+                                                    </div>
+                                                    <div data-ng-show="AboutChefExpanded" text-angular data-ng-model="recipe.AboutChef"></div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="Ingredients" class="col-md-3 control-label">Ingredients</label>
+                                                <div class="col-md-9">
+                                                    <div class="input-group" data-ng-show="!IngredientsExpanded">
+                                                        <input type="text" name="Ingredients" class="form-control" placeholder="Ingredients" disabled data-ng-model="recipe.Ingredients">
+                                                        <span class="input-group-btn">
+                                                            <a data-ng-click="toogleEditorState('IngredientsExpanded')" class="btn btn-default">Expand</a>
+                                                        </span>
+                                                    </div>
+                                                    <div class="toogle-editor" data-ng-show="IngredientsExpanded">
+                                                        <a data-ng-click="toogleEditorState('IngredientsExpanded')" class="btn btn-default">Hide</a>
+                                                    </div>
+                                                    <div data-ng-show="IngredientsExpanded" text-angular data-ng-model="recipe.Ingredients"></div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="Directions" class="col-md-3 control-label">Directions</label>
+                                                <div class="col-md-9">
+                                                    <div class="input-group" data-ng-show="!DirectionsExpanded">
+                                                        <input type="text" name="Directions" class="form-control" placeholder="Directions" disabled data-ng-model="recipe.Directions">
+                                                        <span class="input-group-btn">
+                                                            <a data-ng-click="toogleEditorState('DirectionsExpanded')" class="btn btn-default">Expand</a>
+                                                        </span>
+                                                    </div>
+                                                    <div class="toogle-editor" data-ng-show="DirectionsExpanded">
+                                                        <a data-ng-click="toogleEditorState('DirectionsExpanded')" class="btn btn-default">Hide</a>
+                                                    </div>
+                                                    <div data-ng-show="DirectionsExpanded" text-angular data-ng-model="recipe.Directions"></div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="Image" class="col-md-3 control-label">Image</label>
+                                                <div class="col-md-9">
+                                                    <filefield Name="Image" placeholder="Image" ng-model="recipe.FileUrl"></filefield>
+                                                </div>
+                                            </div>
+                                            <span class="legend">SEO</span>
+                                            <div class="form-group">
+                                                <label for="meta_title" class="col-md-3 control-label">Meta Title</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" class="form-control" placeholder="Meta Title" data-ng-model="recipe.Title">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="meta_description" class="col-md-3 control-label">Meta Description</label>
+                                                <div class="col-md-9">
+                                                    <textarea type="text" class="form-control" placeholder="Meta Description" rows="10" data-ng-model="recipe.MetaDescription"></textarea>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </form>
+                                </spinner-overlay>
+                            </div>
+                        </div>
+                    </tab>
+                    <tab heading="Categories">
+                        <div class="container container-left">
+                            <div class="well row categories">
+                                <spinner-overlay data-loading="refreshTracker.active()">
+                                    <span class="legend">Categories</span>
+                                    <button class="btn btn-info width-160px margin-bottom-10px" ui-sref="index.oneCol.manageRecipeCategories({mode:'edit', id: id})">Manage Categories</button>
+                                    <button data-ng-if="!categoriesExpanded" data-ng-click="updateCategoriesCollapsed(true);" class="btn btn-primary btn-xs expand-button">Expand All</button>
+                                    <button data-ng-if="categoriesExpanded" data-ng-click="updateCategoriesCollapsed(false);" class="btn btn-primary btn-xs expand-button">Collapse All</button>
+                                    <div ui-tree data-drag-enabled="false" class="ya-treeview">
+                                        <ol ui-tree-nodes="" data-ng-model="rootCategory.SubItems">
+                                            <li ng-repeat="item in rootCategory.SubItems" ui-tree-node collapsed="true" data-ng-include="'app/modules/content/partials/contentCategories.html'">
+                                            </li>
+                                        </ol>
+                                    </div>
+                                </spinner-overlay>
+                            </div>
+                        </div>
+                    </tab>
+                    <tab heading="Products">
+                        <div class="container container-left big-container">
+                            <div class="well row">
+                                <spinner-overlay data-loading="refreshTracker.active()">
+                                    <span class="legend">Assigned Products</span>
+
+                                    <table class="table table-striped table-hover ">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr data-ng-repeat="item in recipe.RecipesToProducts">
+                                                <td>{{item.ShortProductInfo.ProductName}}</td>
+                                                <td>
+                                                    <button class="btn btn-xs btn-default btn-danger" data-ng-click="deleteRecipesToProducts($index);">Delete</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div ng-controller="productsSearchController" onload="name = 'RecipesToProducts'" data-ng-include="'app/modules/product/partials/productsSearchList.html'"></div>
+                                </spinner-overlay>
+                            </div>
+                        </div>
+                    </tab>
+                    <tab heading="Template">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <spinner-overlay data-loading="refreshTracker.active()">
+                                    <div data-ng-if="validatePermission(7)" class="form-group">
+                                        <label for="masterTemplate" class="col-md-3 control-label">Master Template</label>
+                                        <div class="col-md-9">
+                                            <select class="form-control" name="MasterTemplate" data-ng-model="recipe.MasterContentItemId" ng-options="master.Id as master.Name for master in masters"></select>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-info width-200px margin-bottom-10px" data-ng-if="validatePermission(7) && recipe.MasterContentItemId!=0" data-ng-click="goToMaster(recipe.MasterContentItemId);">Manage Master Template</button>
+                                    <span class="legend">Manage Template</span>
+
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <div data-ng-model="recipe.Template" ui-ace="{
+				                                require: ['ace/ext/language_tools'],
+				                                advanced: {
+					                                enableSnippets: true,
+					                                enableBasicAutocompletion: true,
+					                                enableLiveAutocompletion: true
+				                                },
+				                                theme:'cobalt',
+				                                mode: 'ttl',
+				                                onLoad: aceLoaded,
+				                                onChange: aceChanged
+		                                }">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </spinner-overlay>
+                            </div>
+                        </div>
+                    </tab>
+                    <tab heading="Cross Sell Products & Related Recipes" active="crossSellProductsAndVideosTab.active">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <spinner-overlay data-loading="refreshTracker.active()">
+                                    <span class="legend">Cross Sell Products</span>
+                                    <form name="forms.CrossSellRecipes" data-ng-submit="save()" data-ng-class="{submitted: forms.crossessubmitted}" novalidate>
+                                        <div class="panel-group sortable-accordion">
+                                            <div data-ng-model="recipe.CrossSellRecipes">
+                                                <div data-ng-repeat="crossSellRecipe in recipe.CrossSellRecipes" class="panel panel-default">
+                                                    <div class="form-horizontal" ng-form="i{{$index}}">
+                                                        <fieldset>
+                                                            <div class="panel-heading">
+                                                                <h4 class="panel-title">
+                                                                    <div class="accordion-toggle">
+                                                                        <div class="form-horizontal">
+                                                                            <div class="row">
+                                                                                <div class="col-md-12">
+                                                                                    <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
+                                                                                        <label class="control-label">Image</label>
+                                                                                        <div class="col-md-1" data-ng-if="crossSellRecipe.InUse">
+                                                                                            <filefield name="Image" placeholder="Cross Sell Image" ng-model="crossSellRecipe.Image" required></filefield>
+                                                                                            <div class="error-container" ng-show="forms.crossessubmitted && forms.CrossSellRecipes.i{{$index}}.Image.$invalid">
+                                                                                                <small class="error" ng-show="forms.CrossSellRecipes.i{{$index}}.Image.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Image")}}</small>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-md-1" data-ng-if="!crossSellRecipe.InUse">
+                                                                                            <filefield name="DefaultImage" placeholder="Cross Sell Image" ng-model="recipeDefaults['CrossSellImage'+($index+1)]" disabled></filefield>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="fixed-accordion-row pull-right" data-ng-click="$event.stopPropagation()">
+                                                                                        <button data-ng-if="!crossSellRecipe.InUse" class="btn btn-info width-80px" data-ng-click="setCustom(crossSellRecipe)">Set</button>
+                                                                                        <button data-ng-if="crossSellRecipe.InUse" class="btn btn-info width-80px" data-ng-click="removeCustom(crossSellRecipe)">Remove</button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="row">
+                                                                                <div class="col-md-11">
+                                                                                    <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
+                                                                                        <label class="control-label">Title</label>
+                                                                                        <div class="col-md-1" data-ng-if="crossSellRecipe.InUse">
+                                                                                            <input type="text" name="Title" class="form-control" placeholder="Cross Sell Title" data-ng-model="crossSellRecipe.Title" required>
+                                                                                            <div class="error-container" ng-show="forms.crossessubmitted && forms.CrossSellRecipes.i{{$index}}.Title.$invalid">
+                                                                                                <small class="error" ng-show="forms.CrossSellRecipes.i{{$index}}.Title.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Title")}}</small>
+                                                                                                <small class="error" ng-show="forms.CrossSellRecipes.i{{$index}}.Title.$error.server">{{serverMessages.GetMessage('Title','CrossSellRecipes',$index)}}</small>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-md-1" data-ng-if="!crossSellRecipe.InUse">
+                                                                                            <input type="text" name="DefaultTitle" class="form-control" placeholder="Cross Sell Title" data-ng-model="recipeDefaults['CrossSellTitle'+($index+1)]" readonly>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="row">
+                                                                                <div class="col-md-11">
+                                                                                    <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
+                                                                                        <label class="control-label">Subtitle</label>
+                                                                                        <div class="col-md-1" data-ng-if="crossSellRecipe.InUse">
+                                                                                            <input type="text" name="Subtitle" class="form-control" placeholder="Cross Sell Subtitle" data-ng-model="crossSellRecipe.Subtitle" required>
+                                                                                            <div class="error-container" ng-show="forms.crossessubmitted && forms.CrossSellRecipes.i{{$index}}.Subtitle.$invalid">
+                                                                                                <small class="error" ng-show="forms.CrossSellRecipes.i{{$index}}.Subtitle.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Subtitle")}}</small>
+                                                                                                <small class="error" ng-show="forms.CrossSellRecipes.i{{$index}}.Subtitle.$error.server">{{serverMessages.GetMessage('Subtitle','CrossSellRecipes',$index)}}</small>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-md-1" data-ng-if="!crossSellRecipe.InUse">
+                                                                                            <input type="text" name="DefaultSubtitle" class="form-control" placeholder="Cross Sell Subtitle" data-ng-model="recipeDefaults['CrossSellSubtitle'+($index+1)]" readonly>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="row">
+                                                                                <div class="col-md-11">
+                                                                                    <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
+                                                                                        <label class="control-label">URL</label>
+                                                                                        <div class="col-md-1" data-ng-if="crossSellRecipe.InUse">
+                                                                                            <input type="text" name="Url" class="form-control" placeholder="URL Cross Sell" data-ng-model="crossSellRecipe.Url" required>
+                                                                                            <div class="error-container" ng-show="forms.crossessubmitted && forms.CrossSellRecipes.i{{$index}}.Url.$invalid">
+                                                                                                <small class="error" ng-show="forms.CrossSellRecipes.i{{$index}}.Url.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Url")}}</small>
+                                                                                                <small class="error" ng-show="forms.CrossSellRecipes.i{{$index}}.Url.$error.server">{{serverMessages.GetMessage('Url','CrossSellRecipes',$index)}}</small>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-md-1" data-ng-if="!crossSellRecipe.InUse">
+                                                                                            <input type="text" name="DefaultUrl" class="form-control" placeholder="URL Cross Sell" data-ng-model="recipeDefaults['CrossSellUrl'+($index+1)]" readonly>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </h4>
+                                                            </div>
+                                                            <div class="panel-collapse" data-ng-class="{collapse: !crossSellRecipe.IsOpen}">
+                                                                <div class="panel-body">
+                                                                    <div class="form-horizontal">
+                                                                        <div class="form-group">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </fieldset>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <span class="legend">Related Recipes</span>
+                                    <form name="forms.RelatedRecipes" data-ng-submit="save()" data-ng-class="{submitted: forms.relatedsubmitted}" novalidate>
+                                        <div class="panel-group sortable-accordion">
+                                            <div data-ng-model="recipe.RelatedRecipes">
+                                                <div data-ng-repeat="relatedRecipe in recipe.RelatedRecipes" class="panel panel-default">
+                                                    <div class="form-horizontal" ng-form="i{{$index}}">
+                                                        <fieldset>
+                                                            <div class="panel-heading">
+                                                                <h4 class="panel-title">
+                                                                    <div class="accordion-toggle">
+                                                                        <div class="form-horizontal">
+                                                                            <div class="row">
+                                                                                <div class="col-md-12">
+                                                                                    <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
+                                                                                        <label class="control-label">Image</label>
+                                                                                        <div class="col-md-1" data-ng-if="relatedRecipe.InUse">
+                                                                                            <filefield name="Image" placeholder="Related Recipe Image" ng-model="relatedRecipe.Image" required></filefield>
+                                                                                            <div class="error-container" ng-show="forms.relatedsubmitted && forms.RelatedRecipes.i{{$index}}.Image.$invalid">
+                                                                                                <small class="error" ng-show="forms.RelatedRecipes.i{{$index}}.Image.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Image")}}</small>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-md-1" data-ng-if="!relatedRecipe.InUse">
+                                                                                            <filefield name="DefaultImage" placeholder="Related Recipe Image" ng-model="recipeDefaults['RelatedRecipeImage'+($index+1)]" disabled></filefield>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="fixed-accordion-row pull-right" data-ng-click="$event.stopPropagation()">
+                                                                                        <button data-ng-if="!relatedRecipe.InUse" class="btn btn-info width-80px" data-ng-click="setCustom(relatedRecipe)">Set</button>
+                                                                                        <button data-ng-if="relatedRecipe.InUse" class="btn btn-info width-80px" data-ng-click="removeCustom(relatedRecipe)">Remove</button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="row">
+                                                                                <div class="col-md-11">
+                                                                                    <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
+                                                                                        <label class="control-label">Title</label>
+                                                                                        <div class="col-md-1" data-ng-if="relatedRecipe.InUse">
+                                                                                            <input type="text" name="Title" class="form-control" placeholder="Related Recipe Title" data-ng-model="relatedRecipe.Title" required>
+                                                                                            <div class="error-container" ng-show="forms.relatedsubmitted && forms.RelatedRecipes.i{{$index}}.Title.$invalid">
+                                                                                                <small class="error" ng-show="forms.RelatedRecipes.i{{$index}}.Title.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Title")}}</small>
+                                                                                                <small class="error" ng-show="forms.RelatedRecipes.i{{$index}}.Title.$error.server">{{serverMessages.GetMessage('Title','RelatedRecipes',$index)}}</small>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-md-1" data-ng-if="!relatedRecipe.InUse">
+                                                                                            <input type="text" name="DefaultTitle" class="form-control" placeholder="Related Recipe Title" data-ng-model="recipeDefaults['RelatedRecipeTitle'+($index+1)]" readonly>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="row">
+                                                                                <div class="col-md-11">
+                                                                                    <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
+                                                                                        <label class="control-label">URL</label>
+                                                                                        <div class="col-md-1" data-ng-if="relatedRecipe.InUse">
+                                                                                            <input type="text" name="Url" class="form-control" placeholder="URL Related Recipe" data-ng-model="relatedRecipe.Url" required>
+                                                                                            <div class="error-container" ng-show="forms.relatedsubmitted && forms.RelatedRecipes.i{{$index}}.Url.$invalid">
+                                                                                                <small class="error" ng-show="forms.RelatedRecipes.i{{$index}}.Url.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Url")}}</small>
+                                                                                                <small class="error" ng-show="forms.RelatedRecipes.i{{$index}}.Url.$error.server">{{serverMessages.GetMessage('Url','RelatedRecipes',$index)}}</small>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-md-1" data-ng-if="!relatedRecipe.InUse">
+                                                                                            <input type="text" name="DefaultUrl" class="form-control" placeholder="URL Related Recipe" data-ng-model="recipeDefaults['RelatedRecipeUrl'+($index+1)]" readonly>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </h4>
+                                                            </div>
+                                                            <div class="panel-collapse" data-ng-class="{collapse: !relatedRecipe.IsOpen}">
+                                                                <div class="panel-body">
+                                                                    <div class="form-horizontal">
+                                                                        <div class="form-group">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </fieldset>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </spinner-overlay>
+                            </div>
+                        </div>
+                    </tab>
+                </tabset>
+            </div>
+        </div>
+    </div>
+</div>
