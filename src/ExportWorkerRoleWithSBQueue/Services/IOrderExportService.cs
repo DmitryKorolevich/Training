@@ -8,8 +8,8 @@ namespace ExportWorkerRoleWithSBQueue.Services
 {
     public interface IOrderExportService
     {
-        Task UpdatePaymentMethods(CustomerPaymentMethodDynamic[] paymentMethods);
-        Task UpdatePaymentMethod(OrderPaymentMethodDynamic paymentMethod);
+        Task UpdateCustomerPaymentMethods(CustomerPaymentMethodDynamic[] paymentMethods);
+        Task UpdateOrderPaymentMethod(OrderPaymentMethodDynamic paymentMethod);
         Task<bool> ExportOrder(int idOrder, POrderType orderType, out ICollection<string> errors);
     }
 }

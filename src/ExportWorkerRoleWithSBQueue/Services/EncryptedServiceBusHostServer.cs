@@ -78,7 +78,7 @@ namespace ExportWorkerRoleWithSBQueue.Services
                 var exportService = scope.Resolve<IOrderExportService>();
                 try
                 {
-                    exportService.UpdatePaymentMethods(customerPaymentInfo).GetAwaiter().GetResult();
+                    exportService.UpdateCustomerPaymentMethods(customerPaymentInfo).GetAwaiter().GetResult();
                 }
                 catch (Exception e)
                 {
@@ -104,7 +104,7 @@ namespace ExportWorkerRoleWithSBQueue.Services
                 var exportService = scope.Resolve<IOrderExportService>();
                 try
                 {
-                    exportService.UpdatePaymentMethod(orderPaymentInfo).GetAwaiter().GetResult();
+                    exportService.UpdateOrderPaymentMethod(orderPaymentInfo).GetAwaiter().GetResult();
                 }
                 catch(Exception e)
                 {

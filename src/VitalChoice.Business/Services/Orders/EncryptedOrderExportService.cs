@@ -61,7 +61,7 @@ namespace VitalChoice.Business.Services.Orders
 
         public Task<bool> UpdateOrderPaymentMethodAsync(OrderPaymentMethodDynamic orderPaymentMethod)
         {
-            if (!DynamicMapper.IsValuesMasked(orderPaymentMethod))
+            if (!DynamicMapper.IsValuesMasked(orderPaymentMethod) || orderPaymentMethod.IdCustomerPaymentMethod > 0)
                 return
                     SendCommand<bool>(new ServiceBusCommandWithResult(SessionId, OrderExportServiceCommandConstants.UpdateOrderPayment,
                         ServerHostName, LocalHostName)

@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using ExportWorkerRoleWithSBQueue.Context;
 using ExportWorkerRoleWithSBQueue.Entities;
 using VitalChoice.Data.UnitOfWork;
+using VitalChoice.DynamicData.Base;
+using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
@@ -22,7 +24,7 @@ namespace ExportWorkerRoleWithSBQueue.Services
             _encryptionHost = encryptionHost;
         }
 
-        public async Task UpdatePaymentMethods(CustomerPaymentMethodDynamic[] paymentMethods)
+        public async Task UpdateCustomerPaymentMethods(CustomerPaymentMethodDynamic[] paymentMethods)
         {
             using (var uow = new UnitOfWork(_context))
             {
@@ -45,10 +47,23 @@ namespace ExportWorkerRoleWithSBQueue.Services
             }
         }
 
-        public async Task UpdatePaymentMethod(OrderPaymentMethodDynamic paymentMethod)
+        public async Task UpdateOrderPaymentMethod(OrderPaymentMethodDynamic paymentMethod)
         {
             using (var uow = new UnitOfWork(_context))
             {
+                if (DynamicMapper.IsValuesMasked(paymentMethod) && paymentMethod.IdCustomerPaymentMethod > 0 && paymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
+                {
+                    var customerRep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
+                    var customerData =
+                        await
+                            customerRep.Query(c => c.IdPaymentMethod == paymentMethod.IdCustomerPaymentMethod.Value)
+                                .SelectFirstOrDefaultAsync(false);
+                    var customerPayment = _encryptionHost.LocalDecrypt<CustomerPaymentMethodDynamic>(customerData.CreditCardNumber);
+                    if (customerPayment.IdObjectType == (int) PaymentMethodType.CreditCard)
+                    {
+                        paymentMethod.Data.CardNumber = customerPayment.SafeData.CardNumber;
+                    }
+                }
                 var rep = uow.RepositoryAsync<OrderPaymentMethodExport>();
                 var orderPayment =
                     await rep.Query(o => o.IdOrder == paymentMethod.IdOrder).SelectFirstOrDefaultAsync(true);
