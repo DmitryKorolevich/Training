@@ -1,0 +1,69 @@
+﻿<div class="container container-left small-container">
+	<div class="well">
+		<spinner-overlay data-loading="activationTracker.active()">
+			<form class="form-horizontal" name="userForm" data-ng-submit="activate(userForm)" data-ng-class="{submitted: userForm.submitted}" novalidate>
+				<fieldset>
+					<legend>Activate Your Account</legend>
+					<div class="form-group">
+						<label for="agentId" class="col-md-3 control-label">Agent ID</label>
+						<div class="col-md-9">
+							<input type="text" class="form-control" id="agentId" data-ng-model="user.AgentId" placeholder="Agent Id" disabled="disabled">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">First Name</label>
+						<div class="col-md-9">
+							<input type="text" name="firstName" class="form-control" placeholder="First Name" data-ng-model="user.FirstName" required data-ng-maxlength="100">
+							<div class="error-container" ng-show="userForm.submitted && userForm.firstName.$invalid">
+								<small class="error" ng-show="userForm.firstName.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.FirstName")}}</small>
+								<small class="error" ng-show="userForm.firstName.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.FirstName", "100"])}}</small>
+								<small class="error" ng-show="userForm.firstName.$error.server">{{serverMessages.GetMessage('FirstName')}}</small>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">Last Name</label>
+						<div class="col-md-9">
+							<input type="text" name="lastName" class="form-control" placeholder="Last Name" data-ng-model="user.LastName" required data-ng-maxlength="100">
+							<div class="error-container" ng-show="userForm.submitted && userForm.lastName.$invalid">
+								<small class="error" ng-show="userForm.lastName.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.LastName")}}</small>
+								<small class="error" ng-show="userForm.lastName.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.LastName", "100"])}}</small>
+								<small class="error" ng-show="userForm.lastName.$error.server">{{serverMessages.GetMessage('LastName')}}</small>
+							</div>
+						</div>
+					</div>
+				    <div class="form-group">
+						<label class="col-md-3 control-label">Email</label>
+						<div class="col-md-9 form-control-static">
+							<span>{{user.Email}}</span>
+						</div>
+					</div>
+                    <span class="help-block small color-red">*Must be at least 8 characters long, contain at least 1 numerical digit, 1 capital character and 1 special character.<br/>Example: Dontuse!@1</span>
+					<div class="form-group">
+						<label class="col-md-3 control-label">Password</label>
+						<div class="col-md-9">
+							<input type="password" name="password" class="form-control" data-ng-model="user.Password" placeholder="Password" required>
+							<div class="error-container" ng-show="userForm.submitted && userForm.password.$invalid">
+								<small class="error" ng-show="userForm.password.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Password")}}</small>
+								<small class="error" ng-show="userForm.password.$error.server">{{serverMessages.GetMessage('Password')}}</small>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">Confirm Password</label>
+						<div class="col-md-9">
+							<input type="password" name="confirmPassword" class="form-control" data-ng-model="user.ConfirmPassword" placeholder="Confirm Password" required>
+							<div class="error-container" ng-show="userForm.submitted && userForm.confirmPassword.$invalid">
+								<small class="error" ng-show="userForm.confirmPassword.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ConfirmPassword")}}</small>
+								<small class="error" ng-show="userForm.confirmPassword.$error.server">{{serverMessages.GetMessage('ConfirmPassword')}}</small>
+							</div>
+						</div>
+					</div>
+				</fieldset>
+				<div class="margin-top-20px">
+					<button type="button" data-ng-click="activate(userForm)" ladda="activationTracker.active()" class="btn btn-success">Activate</button>
+				</div>
+			</form>
+		</spinner-overlay>
+	</div>
+</div>

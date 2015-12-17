@@ -1,0 +1,39 @@
+﻿<div class="container-fluid">
+	<div class="well">
+		<table class="table table-striped table-hover">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>City</th>
+					<th>State/Province</th>
+					<th>Last Order Placed</th>
+					<th>Total Orders</th>
+					<th>Last Updated</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr data-ng-repeat="customer in customers">
+					<td>{{customer.Name}}</td>
+					<td>{{customer.City}}</td>
+					<td>{{customer.State}}</td>
+					<td>{{customer.LastOrderPlaced}}</td>
+					<td>{{customer.TotalOrders}}</td>
+					<td>{{customer.LastUpdated}}</td>
+					<td>
+						<button ui-sref="index.oneCol.customerDetail" class="btn btn-default btn-success">Details</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<ul class="pagination">
+			<li class="disabled"><a href="#">«</a></li>
+			<li class="active"><a href="#">1</a></li>
+			<li><a href="#">2</a></li>
+			<li><a href="#">3</a></li>
+			<li><a href="#">4</a></li>
+			<li><a href="#">5</a></li>
+			<li><a href="#">»</a></li>
+		</ul>
+	</div>
+</div>

@@ -1,0 +1,37 @@
+﻿<div class="partial-sku-list">
+    <span class="legend">Search Products</span>
+    <div class="form-horizontal" ng-form="forms.filterForm" data-ng-submit="save()" data-ng-class="{submitted: submitted}" novalidate>
+        <div class="row form-group">
+            <div class="col-md-4">
+                <input type="text" class="form-control" name="SearchText" placeholder="SKU, Product Name" data-ng-model="filter.SearchText" ng-minlength="3" required>
+                <div class="error-container" ng-show="submitted && forms.filterForm.SearchText.$invalid">
+                    <small class="error" ng-show="forms.filterForm.SearchText.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Search Text")}}</small>
+                    <small class="error" ng-show="forms.filterForm.SearchText.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Search Text")}}</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <button class="btn btn-info" data-ng-click="filterSkus();" type="button">Filter</button>
+            </div>
+        </div>
+    </div>
+    <spinner-overlay data-loading="refreshTracker.active()">
+        <table class="table table-striped table-hover ">
+            <thead>
+                <tr>
+                    <th class="sku">SKU</th>
+                    <th>Name</th>
+                    <th class="actions"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-repeat="item in items">
+                    <td>{{item.Code}}</td>
+                    <td>{{item.ProductName}}</td>
+                    <td>
+                        <button class="btn btn-xs btn-default btn-success" data-ng-click="add(item);">Add</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </spinner-overlay>
+</div>

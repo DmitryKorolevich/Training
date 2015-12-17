@@ -1,0 +1,34 @@
+﻿<div class="container container-left small-container">
+	<div class="well">
+			<form class="form-horizontal" name="loginForm" data-ng-submit="signIn(loginForm)" data-ng-class="{submitted: loginForm.submitted}" novalidate>
+				<fieldset>
+					<legend>Login</legend>
+					<div class="form-group">
+						<label class="col-md-3 control-label">Email</label>
+						<div class="col-md-9">
+							<input type="email" name="email" class="form-control" placeholder="Email" data-ng-model="login.Email" required data-ng-maxlength="100">
+							<div class="error-container" ng-show="loginForm.submitted && loginForm.email.$invalid">
+								<small class="error" ng-show="loginForm.email.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Email")}}</small>
+								<small class="error" ng-show="loginForm.email.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","GeneralFieldNames.Email")}}</small>
+								<small class="error" ng-show="loginForm.email.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.Email", "100"])}}</small>
+								<small class="error" ng-show="loginForm.email.$error.server">{{serverMessages.GetMessage('Email')}}</small>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">Password</label>
+						<div class="col-md-9">
+							<input type="password" name="password" class="form-control" data-ng-model="login.Password" placeholder="Password" required>
+							<div class="error-container" ng-show="loginForm.submitted && loginForm.password.$invalid">
+								<small class="error" ng-show="loginForm.password.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Password")}}</small>
+								<small class="error" ng-show="loginForm.password.$error.server">{{serverMessages.GetMessage('Password')}}</small>
+							</div>
+						</div>
+					</div>
+				</fieldset>
+				<div class="margin-top-20px">
+					<button type="button" data-ng-click="signIn(loginForm)" ladda="loginTracker.active()" class="btn btn-success">Login</button>
+				</div>
+			</form>
+	</div>
+</div>

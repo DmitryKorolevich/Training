@@ -1,0 +1,158 @@
+﻿<div class="container-fluid affiliates-list">
+    <div class="well">
+        <span class="legend">Manage Affiliates</span>
+        <div class="row form-group">
+            <div class="col-md-3">
+                <input type="text" class="form-control" placeholder="ID" numbers-only data-ng-model="filter.Id">
+            </div>
+            <div class="col-md-3">
+                <input type="text" class="form-control" placeholder="Name" data-ng-model="filter.Name">
+            </div>
+            <div class="col-md-3">
+                <input type="text" class="form-control" placeholder="Company" data-ng-model="filter.Company">
+            </div>
+            <div class="col-md-3">
+                <select class="form-control" placeholder="Tier" data-ng-model="filter.Tier" data-ng-options="item.Key as item.Text for item in affiliateTiers"></select>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-md-3">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="WithAvailablePayCommision" data-ng-model="filter.WithAvailablePayCommision" />
+                        Show only affiliates with available payments
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-md-4">
+                <button class="btn btn-info" data-ng-click="filterAffiliates();" type="button">Filter</button>
+            </div>
+        </div>
+        <hr />
+        <div class="form-group">
+            <button data-ng-click="open();" class="btn btn-primary">Add New Affiliate</button>
+            <span class="pull-right">* commissions are up until last day of previous month</span>
+        </div>
+        <spinner-overlay data-loading="refreshTracker.active()">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Id')">
+                            <span>ID</span>
+                            <span data-ng-if="filter.Sorting.Path == 'Id'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Name')">
+                            <span>Name</span>
+                            <span data-ng-if="filter.Sorting.Path == 'Name'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Company')">
+                            <span>Company</span>
+                            <span data-ng-if="filter.Sorting.Path == 'Company'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('WebSite')">
+                            <span>Web Site</span>
+                            <span data-ng-if="filter.Sorting.Path == 'WebSite'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('CommissionAll')">
+                            <span>Commission</span>
+                            <span data-ng-if="filter.Sorting.Path == 'CommissionAll'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('StatusCode')">
+                            <span>Status</span>
+                            <span data-ng-if="filter.Sorting.Path == 'StatusCode'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Tier')">
+                            <span>Tier</span>
+                            <span data-ng-if="filter.Sorting.Path == 'Tier'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('CustomersCount')">
+                            <span>Customers</span>
+                            <span data-ng-if="filter.Sorting.Path == 'CustomersCount'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th>Commission Balance*</th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('DateEdited')">
+                            <span>Last Updated</span>
+                            <span data-ng-if="filter.Sorting.Path == 'DateEdited'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="item in items">
+                        <td>
+                            <a ui-sref="index.oneCol.affiliateDetail({id:item.Id})">{{::item.Id}}</a>
+                        </td>
+                        <td>
+                            <a ui-sref="index.oneCol.affiliateDetail({id:item.Id})">{{::item.Name}}</a>
+                        </td>
+                        <td>{{::item.Company}}</td>
+                        <td>{{::item.WebSite}}</td>
+                        <td>{{::item.CommissionFirst | number:2}}% / {{::item.CommissionAll | number:2}}%</td>                        <td>
+                            <span data-ng-if="item.StatusCode == 1" class="label label-warning font-default">{{getReferenceItem(ReferenceData.AffiliateStatuses, item.StatusCode).Text}}</span>
+                            <span data-ng-if="item.StatusCode == 2" class="label label-info font-default">{{getReferenceItem(ReferenceData.AffiliateStatuses, item.StatusCode).Text}}</span>
+                            <span data-ng-if="item.StatusCode == 3" class="label label-danger font-default">{{getReferenceItem(ReferenceData.AffiliateStatuses, item.StatusCode).Text}}</span>
+                            <span data-ng-if="item.StatusCode == 4" class="label label-danger font-default">{{getReferenceItem(ReferenceData.AffiliateStatuses, item.StatusCode).Text}}</span>
+                            <span data-ng-if="item.StatusCode == 5" class="label label-danger font-default">{{getReferenceItem(ReferenceData.AffiliateStatuses, item.StatusCode).Text}}</span>
+                        </td>
+                        <td>{{::item.Tier}}</td>
+                        <td>{{::item.CustomersCount}}</td>
+                        <td>
+                            <span class="margin-right-8px">{{::item.NotPaidCommissionsAmount | currency}}</span>
+                            <button data-ng-if="item.NotPaidCommissionsAmount && item.NotPaidCommissionsAmount>=50" title="Pay" class="btn btn-default btn-primary btn-xs ma" data-ng-click="pay(item.Id);">
+                                Pay
+                            </button>
+                        </td>
+                        <td>{{::item.DateEdited | date:"MM/dd/yy"}}<br />{{::item.DateEdited | date:"h:mm a"}}<br />{{::item.EditedByAgentId}}</td>
+                        <td>
+                            <button title="Edit" class="btn btn-default btn-success btn-xs" data-ng-click="open(item.Id);">
+                                <i class="glyphicon glyphicon-edit"></i>
+                            </button>
+                            <button title="Delete" class="btn btn-default btn-danger btn-xs" ladda="deleteTracker.active()" data-ng-click="delete(item.Id);">
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </spinner-overlay>
+        <pagination boundary-links="true"
+                    total-items="totalItems"
+                    items-per-page="filter.Paging.PageItemCount"
+                    data-ng-model="filter.Paging.PageIndex"
+                    previous-text="&lsaquo;"
+                    next-text="&rsaquo;"
+                    first-text="&laquo;"
+                    last-text="&raquo;"
+                    data-ng-change="pageChanged()">
+        </pagination>
+    </div>
+</div>

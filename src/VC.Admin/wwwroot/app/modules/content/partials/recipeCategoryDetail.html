@@ -1,0 +1,109 @@
+﻿<div class="container-fluid">
+    <div class="left-pane-controls">
+        <div class="well container-fluid">
+            <div>
+                <button class="btn btn-success width-160px" ladda="editTracker.active()" data-ng-click="save()">Save</button>
+            </div>
+            <div class="btn-group margin-top-10px">
+                <a target="_blank" href="{{previewUrl}}" data-ng-if="previewUrl" class="btn btn-info width-80px">Preview</a>
+                <a data-ng-if="!previewUrl" class="btn btn-info width-80px">Preview</a>
+                <button cancel-button-default-state="index.oneCol.manageRecipeCategories" cancel-button class="btn btn-default width-80px">Cancel</button>
+            </div>
+            <div class="margin-top-10px">
+                <button ui-sref="index.oneCol.manageRecipeCategories" class="btn btn-primary width-160px">Manage All</button>
+            </div>
+        </div>
+    </div>
+    <div class="right-pane-main">
+            <div class="container-fluid">
+                <div class="row">
+                    <tabset>
+                        <tab heading="Details" active="detailsTab.active">
+                            <div class="container container-left">
+                                <div class="well row">
+                                    <spinner-overlay data-loading="refreshTracker.active()">
+                                        <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate>
+                                            <fieldset>
+                                                <span class="legend">Recipe Category Details</span>
+                                                <div class="form-group">
+                                                    <label for="name" class="col-md-3 control-label">Name</label>
+                                                    <div class="col-md-9">
+                                                        <input type="text" name="Name" class="form-control" placeholder="Name" data-ng-model="recipeCategory.Name" required>
+                                                        <div class="error-container" ng-show="forms.form.submitted && forms.form.Name.$invalid">
+                                                            <small class="error" ng-show="forms.form.Name.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Name")}}</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="url" class="col-md-3 control-label">URL</label>
+                                                    <div class="col-md-9">
+                                                        <input type="text" name="Url" class="form-control" placeholder="URL" data-ng-model="recipeCategory.Url" ng-pattern='/^[A-Za-z0-9]{1}[A-Za-z0-9-_]{3}[A-Za-z0-9-_]*$/' required>
+                                                        <div class="error-container" ng-show="forms.form.submitted && forms.form.Url.$invalid">
+                                                            <small class="error" ng-show="forms.form.Url.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Url")}}</small>
+                                                            <small class="error" ng-show="forms.form.Url.$error.pattern">{{getValidationMessage("ValidationMessages.FieldContentUrlInvalidFormat","GeneralFieldNames.Url")}}</small>
+                                                            <small class="error" ng-show="forms.form.Url.$error.server">{{serverMessages.GetMessage('Url')}}</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <span class="legend">SEO</span>
+                                                <div class="form-group">
+                                                    <label for="meta_title" class="col-md-3 control-label">Meta Title</label>
+                                                    <div class="col-md-9">
+                                                        <input type="text" class="form-control" placeholder="Meta Title" data-ng-model="recipeCategory.Title">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="meta_description" class="col-md-3 control-label">Meta Description</label>
+                                                    <div class="col-md-9">
+                                                        <textarea type="text" class="form-control" placeholder="Meta Description" rows="10" data-ng-model="recipeCategory.MetaDescription"></textarea>
+                                                    </div>
+                                                </div>
+                                            </fieldset>
+                                        </form>
+                                    </spinner-overlay>
+                                </div>
+                            </div>
+                        </tab>
+                        <tab heading="Template">
+                            <div class="container container-left">
+                                <div class="well row">
+                                    <spinner-overlay data-loading="refreshTracker.active()">
+                                        <form class="form-horizontal">
+                                            <fieldset>
+                                                <div data-ng-if="validatePermission(7)" class="form-group">
+                                                    <label for="masterTemplate" class="col-md-3 control-label">Master Template</label>
+                                                    <div class="col-md-9">
+                                                        <select class="form-control" name="MasterTemplate" data-ng-model="recipeCategory.MasterContentItemId" ng-options="master.Id as master.Name for master in masters"></select>
+                                                    </div>
+                                                </div>
+                                                <button class="btn btn-info width-200px margin-bottom-10px" data-ng-if="validatePermission(7) && recipeCategory.MasterContentItemId!=0" data-ng-click="goToMaster(recipeCategory.MasterContentItemId);">Manage Master Template</button>
+                                                <span class="legend">Manage Template</span>
+                                                <div class="form-group">
+                                                    <div class="col-md-12">
+                                                        <div data-ng-model="recipeCategory.Template" ui-ace="{
+				                                require: ['ace/ext/language_tools'],
+				                                advanced: {
+					                                enableSnippets: true,
+					                                enableBasicAutocompletion: true,
+					                                enableLiveAutocompletion: true
+				                                },
+				                                theme:'cobalt',
+				                                mode: 'ttl',
+				                                onLoad: aceLoaded,
+				                                onChange: aceChanged
+		                                }">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </fieldset>
+                                        </form>
+                                    </spinner-overlay>
+                                </div>
+                            </div>
+                        </tab>
+                    </tabset>
+                </div>
+            </div>
+    </div>
+</div>

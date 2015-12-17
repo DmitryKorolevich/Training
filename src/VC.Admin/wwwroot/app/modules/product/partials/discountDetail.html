@@ -1,0 +1,468 @@
+﻿<div class="container-fluid discount-edit">
+    <div class="left-pane-controls">
+        <div class="well container-fluid">
+            <div>
+                <button data-ng-click="save()" class="btn btn-success width-160px">Save</button>
+            </div>
+            <div class="btn-group margin-top-10px">
+                <button cancel-button-default-state="index.oneCol.manageDiscounts" cancel-button class="btn btn-default width-160px">Cancel</button>
+            </div>
+            <div class="margin-top-10px">
+                <button class="btn btn-primary width-160px" ui-sref="index.oneCol.manageDiscounts">Manage All</button>
+            </div>
+        </div>
+        <div ng-controller="objectHistorySectionController" onload="name = 'History'" data-ng-include="'app/modules/setting/partials/objectHistorySection.html'"></div>
+   </div>
+    <div class="right-pane-main">
+        <div class="container-fluid">
+            <div class="row">
+                <tabset>
+                    <tab heading="Discount Details" active="detailsTab.active">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <spinner-overlay data-loading="refreshTracker.active()">
+                                    <form class="form-horizontal" name="forms.mainForm" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted}" novalidate unsaved-warning-form>
+                                        <fieldset>
+                                            <span class="legend">General Information</span>
+                                            <div class="form-group">
+                                                <label for="type" class="col-md-3 control-label">Customer Type</label>
+                                                <div class="col-md-9">
+                                                    <select class="form-control" name="Assigned" data-ng-model="discount.Assigned" ng-options="assignedCustomerType.Key as assignedCustomerType.Text for assignedCustomerType in assignedCustomerTypes"></select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="url" class="col-md-3 control-label">Description</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="Description" class="form-control" placeholder="Description" data-ng-model="discount.Description" required>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.Description.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.Description.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Description")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Description.$error.server">{{serverMessages.GetMessage('Description')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="url" class="col-md-3 control-label">Code</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="Code" class="form-control" placeholder="Code" data-ng-model="discount.Code" required>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.Code.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.Code.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Code")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Code.$error.server">{{serverMessages.GetMessage('Code')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <span class="legend">Status and Expiration</span>
+                                            <div class="form-group">
+                                                <label for="active" class="col-md-3 control-label">Active</label>
+                                                <div class="col-md-9">
+                                                    <div class="checkbox">
+                                                        <label><input type="checkbox" name="StatusCode" data-ng-model="discount.StatusCode" data-ng-true-value="2" data-ng-false-value="1" /></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="date" class="col-md-3 control-label">Valid From</label>
+                                                <div class="col-md-9">
+                                                    <p class="input-group">
+                                                        <input type="text" name="StartDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="discount.StartDate" is-open="startDateOpened" required />
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); startDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                        </span>
+                                                    </p>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.StartDate.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.StartDate.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Valid From")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.StartDate.$error.server">{{serverMessages.GetMessage('StartDate')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="date" class="col-md-3 control-label">Valid To</label>
+                                                <div class="col-md-9">
+                                                    <p class="input-group">
+                                                        <input type="text" name="ExpirationDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="discount.ExpirationDate" is-open="expirationDateOpened" required />
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); expirationDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                        </span>
+                                                    </p>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.ExpirationDate.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.ExpirationDate.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Valid To")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.ExpirationDate.$error.server">{{serverMessages.GetMessage('ExpirationDate')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <span class="legend">Discount Type</span>
+                                            <div class="form-group">
+                                                <label for="type" class="col-md-3 control-label">Discount Type</label>
+                                                <div class="col-md-9">
+                                                    <select class="form-control" name="DiscountType" data-ng-model="discount.DiscountType" ng-options="discountType.Key as discountType.Text for discountType in discountTypes"></select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" data-ng-hide="discount.DiscountType==3">
+                                                <label for="active" class="col-md-3 control-label">Allow Healthwise</label>
+                                                <div class="col-md-9">
+                                                    <div class="checkbox">
+                                                        <label><input type="checkbox" name="AllowHealthwise" data-ng-model="discount.AllowHealthwise" /></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" data-ng-hide="discount.DiscountType==3">
+                                                <label for="active" class="col-md-3 control-label">Require Minimum Perishable</label>
+                                                <div class="col-md-9">
+                                                    <div class="checkbox">
+                                                        <label><input type="checkbox" name="RequireMinimumPerishable" data-ng-model="discount.RequireMinimumPerishable" /></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" data-ng-if="!(discount.DiscountType==3 || !discount.RequireMinimumPerishable)">
+                                                <label for="type" class="col-md-3 control-label">Require Minimum Perishable Amount</label>
+                                                <div class="col-md-9">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon">$</span>
+                                                        <input type="text" name="RequireMinimumPerishableAmount" class="form-control" placeholder="Require Minimum Perishable Amount" money min="0.01" max="100000" data-ng-model="discount.RequireMinimumPerishableAmount" required>
+                                                    </div>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.RequireMinimumPerishableAmount.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.RequireMinimumPerishableAmount.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","Require Minimum Perishable Amount")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.RequireMinimumPerishableAmount.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Require Minimum Perishable Amount")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.RequireMinimumPerishableAmount.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Require Minimum Perishable Amount",1000000)}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.RequireMinimumPerishableAmount.$error.min">{{getValidationMessage("{0} must be over $0.00","Require Minimum Perishable Amount")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.RequireMinimumPerishableAmount.$error.server">{{serverMessages.GetMessage('RequireMinimumPerishableAmount')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" data-ng-hide="discount.DiscountType==3">
+                                                <label for="active" class="col-md-3 control-label">Free Shipping</label>
+                                                <div class="col-md-9">
+                                                    <div class="checkbox">
+                                                        <label><input type="checkbox" name="FreeShipping" data-ng-model="discount.FreeShipping" /></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="MaxTimesUseMode" class="col-md-3 control-label">Uses Per Customer</label>
+                                                <div class="col-md-9">
+                                                    <select class="form-control" name="MaxTimesUseMode" data-ng-model="options.maxTimesUseMode" ng-options="item.Key as item.Text for item in maxTimesUseModes"></select>
+                                                </div>
+                                            </div>
+                                            <div data-ng-if="options.maxTimesUseMode==3" class="form-group">
+                                                <label for="MaxTimesUse" class="col-md-3 control-label">Count</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="MaxTimesUse" class="form-control" placeholder="Count" data-ng-model="options.maxTimesUse" min="1" max="100000" numbers-only required>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.MaxTimesUse.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.MaxTimesUse.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Count")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.MaxTimesUse.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Count",100000)}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.MaxTimesUse.$error.min">{{getValidationMessage("ValidationMessages.FieldMin","Count",1)}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group" data-ng-if="discount.DiscountType==1">
+                                                <label for="type" class="col-md-3 control-label">Price Discount</label>
+                                                <div class="col-md-9">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon">$</span>
+                                                        <input type="text" name="Amount" class="form-control" placeholder="Price Discount" money min="0.01" max="100000" data-ng-model="discount.Amount" required>
+                                                    </div>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.Amount.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.Amount.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","Price Discount")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Amount.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Price Discount")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Amount.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Price Discount",1000000)}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Amount.$error.min">{{getValidationMessage("{0} must be over $0.00","Price Discount")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Amount.$error.server">{{serverMessages.GetMessage('Amount')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group" data-ng-if="discount.DiscountType==2">
+                                                <label for="type" class="col-md-3 control-label">Percent Discount</label>
+                                                <div class="col-md-9">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon">%</span>
+                                                        <input type="text" name="Percent" class="form-control" placeholder="Percent Discount" money min="0.01" max="100" data-ng-model="discount.Percent" required>
+                                                    </div>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.Percent.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.Percent.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","Percent Discount")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Percent.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Percent Discount")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Percent.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Percent Discount",100)}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Percent.$error.min">{{getValidationMessage("{0} must be over %0.00","Percent Discount")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Percent.$error.server">{{serverMessages.GetMessage('Percent')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group" data-ng-if="discount.DiscountType==4">
+                                                <label for="type" class="col-md-3 control-label">Threshold</label>
+                                                <div class="col-md-9">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon">$</span>
+                                                        <input type="text" name="Threshold" class="form-control" placeholder="Threshold" money min="0.01" max="100000" data-ng-model="discount.Threshold" required>
+                                                    </div>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.Threshold.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.Threshold.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","Threshold")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Threshold.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Threshold.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Threshold",1000000)}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Threshold.$error.min">{{getValidationMessage("{0} must be over $0.00","Threshold")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Threshold.$error.server">{{serverMessages.GetMessage('Threshold')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" data-ng-if="discount.DiscountType==4">
+                                                <label for="url" class="col-md-3 control-label">Product SKU</label>
+                                                <div class="col-md-9">
+                                                    <div class="input-group autocomplete">
+                                                        <input type="text" name="ProductSKU" class="form-control" placeholder="Product SKU" data-ng-model="discount.ProductSKU" required
+                                                               typeahead-min-length="3" typeahead="code for code in getSkus($viewValue)" typeahead-loading="loadingSkus">
+                                                        <span class="input-group-addon">
+                                                            <i ng-show="loadingSkus" class="glyphicon glyphicon-refresh"></i>
+                                                        </span>
+                                                    </div>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.ProductSKU.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.ProductSKU.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Product SKU")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.ProductSKU.$error.server">{{serverMessages.GetMessage('ProductSKU')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </fieldset>
+                                    </form>
+
+                                    <form class="form-horizontal" name="forms.DiscountTiers" data-ng-submit="save()" data-ng-class="{submitted: forms.discountTiersSubmitted}" novalidate>
+                                        <fieldset>
+                                            <div class="panel-group" data-ng-if="discount.DiscountType==5">
+                                                <span class="legend">Tiers</span>
+                                                <div class="form-group">
+                                                    <div class="col-md-12">
+                                                        <button type="button" data-ng-click="addTier();" class="btn btn-info">Add New Tier</button>
+                                                    </div>
+                                                </div>
+
+                                                <div data-ng-repeat="discountTier in discount.DiscountTiers" class="panel panel-default tiers">
+                                                    <div class="panel-heading">
+                                                        <div class="form-horizontal" ng-form="i{{$index}}" novalidate>
+                                                            <div class="form-group">
+                                                                <div class="col-md-12">
+                                                                    <div class="fixed-accordion-row">
+                                                                        <label class="control-label">Tier {{$index+1}}:</label>
+                                                                        <label class="control-label">Min</label>
+                                                                        <div class="col-md-1">
+                                                                            <div class="input-group">
+                                                                                <span class="input-group-addon">$</span>
+                                                                                <input ng-blur="tierToBlur($index)" ng-disabled="$index!=0" type="text" name="From" class="form-control" placeholder="Min" money max="100000" min="0.00" data-ng-model="discountTier.From" required>
+                                                                            </div>
+                                                                            <div class="error-container small-block" ng-show="forms.discountTiersSubmitted && forms.DiscountTiers.i{{$index}}.From.$invalid">
+                                                                                <small class="error" ng-show="forms.DiscountTiers.i{{$index}}.From.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Min")}}</small>
+                                                                                <small class="error" ng-show="forms.DiscountTiers.i{{$index}}.From.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","Min")}}</small>
+                                                                                <small class="error" ng-show="forms.DiscountTiers.i{{$index}}.From.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Min","$1000000")}}</small>
+                                                                                <small class="error" ng-show="forms.DiscountTiers.i{{$index}}.From.$error.min">{{getValidationMessage("{0} must be over $0.00","Min")}}</small>
+                                                                                <small class="error" ng-show="forms.DiscountTiers.i{{$index}}.From.$error.server">{{serverMessages.GetMessage('From','DiscountTiers',$index)}}</small>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="fixed-accordion-row">
+                                                                        <label class="control-label">Max</label>
+                                                                        <div class="col-md-1">
+                                                                            <div class="input-group">
+                                                                                <span class="input-group-addon">$</span>
+                                                                                <input ng-blur="tierFromBlur($index)" type="text" name="To" class="form-control" placeholder="Max" money max="100000" min="0.01" data-ng-model="discountTier.To" data-ng-required="!$last">
+                                                                            </div>
+                                                                            <div class="error-container small-block" ng-show="(forms.discountTiersSubmitted && forms.DiscountTiers.i{{$index}}.To.$invalid) || (lastTierToAddingNewRequired && $last)">
+                                                                                <small class="error" ng-show="forms.DiscountTiers.i{{$index}}.To.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Max")}}</small>
+                                                                                <small class="error" ng-show="forms.DiscountTiers.i{{$index}}.To.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","Max")}}</small>
+                                                                                <small class="error" ng-show="forms.DiscountTiers.i{{$index}}.To.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Max","$1000000")}}</small>
+                                                                                <small class="error" ng-show="forms.DiscountTiers.i{{$index}}.To.$error.min">{{getValidationMessage("{0} must be over $0.00","Max")}}</small>
+                                                                                <small class="error" ng-show="forms.DiscountTiers.i{{$index}}.To.$error.server">{{serverMessages.GetMessage('To','DiscountTiers',$index)}}</small>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div data-ng-if="discountTier.IdDiscountType==1" class="fixed-accordion-row">
+                                                                        <div class="col-md-1">
+                                                                            <div class="input-group">
+                                                                                <span class="input-group-addon">$</span>
+                                                                                <input type="text" name="Amount" class="form-control" placeholder="Amount" money max="100000" min="0.01" data-ng-model="discountTier.Amount" required>
+                                                                            </div>
+                                                                            <div class="error-container small-block" ng-show="forms.discountTiersSubmitted && forms.DiscountTiers.i{{$index}}.Amount.$invalid">
+                                                                                <small class="error" ng-show="forms.DiscountTiers.i{{$index}}.Amount.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Amount")}}</small>
+                                                                                <small class="error" ng-show="forms.DiscountTiers.i{{$index}}.Amount.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","Amount")}}</small>
+                                                                                <small class="error" ng-show="forms.DiscountTiers.i{{$index}}.Amount.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Amount","$1000000")}}</small>
+                                                                                <small class="error" ng-show="forms.DiscountTiers.i{{$index}}.Amount.$error.min">{{getValidationMessage("{0} must be over $0.00","Amount")}}</small>
+                                                                                <small class="error" ng-show="forms.DiscountTiers.i{{$index}}.Amount.$error.server">{{serverMessages.GetMessage('Amount','DiscountTiers',$index)}}</small>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div data-ng-if="discountTier.IdDiscountType==2" class="fixed-accordion-row">
+                                                                        <div class="col-md-1">
+                                                                            <div class="input-group">
+                                                                                <span class="input-group-addon">%</span>
+                                                                                <input type="text" name="Percent" class="form-control" placeholder="Percent" money max="100" min="0.01" data-ng-model="discountTier.Percent" required>
+                                                                            </div>
+                                                                            <div class="error-container small-block" ng-show="forms.discountTiersSubmitted && forms.DiscountTiers.i{{$index}}.Percent.$invalid">
+                                                                                <small class="error" ng-show="forms.DiscountTiers.i{{$index}}.Percent.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Percent")}}</small>
+                                                                                <small class="error" ng-show="forms.DiscountTiers.i{{$index}}.Percent.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","Percent")}}</small>
+                                                                                <small class="error" ng-show="forms.DiscountTiers.i{{$index}}.Percent.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Percent","%100")}}</small>
+                                                                                <small class="error" ng-show="forms.DiscountTiers.i{{$index}}.Percent.$error.min">{{getValidationMessage("{0} must be over %0.00","Percent")}}</small>
+                                                                                <small class="error" ng-show="forms.DiscountTiers.i{{$index}}.Percent.$error.server">{{serverMessages.GetMessage('Percent','DiscountTiers',$index)}}</small>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="fixed-accordion-row">
+                                                                        <label class="control-label">Off</label>
+                                                                        <div class="col-md-1">
+                                                                            <select class="form-control" name="IdDiscountType" data-ng-model="discountTier.IdDiscountType" ng-options="tierDiscountType.Key as tierDiscountType.Text for tierDiscountType in tierDiscountTypes"></select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div data-ng-if="$index+1==discount.DiscountTiers.length" class="fixed-accordion-row pull-right" data-ng-click="$event.stopPropagation()">
+                                                                        <button type="button" class="btn btn-danger" data-ng-click="deleteTier($index)">Delete</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </form>
+
+                                    <div class="form-horizontal">
+                                        <div class="form-group" data-ng-hide="discount.DiscountType==3">
+                                            <label for="active" class="col-md-3 control-label"></label>
+                                            <div class="col-md-9">
+                                                <div class="radio">
+                                                    <label>
+                                                        <input type="radio" data-ng-model="discount.SelectedMode" data-ng-value="1" />
+                                                        <strong>Discount Applies To All Products</strong>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <label for="active" class="col-md-3 control-label"></label>
+                                            <div class="col-md-9">
+                                                <div class="radio">
+                                                    <label>
+                                                        <input type="radio" data-ng-model="discount.SelectedMode" data-ng-value="2" />
+                                                        <strong>Discount Only Applies To These Products</strong>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <label for="active" class="col-md-3 control-label"></label>
+                                            <div class="col-md-9">
+                                                <div class="radio">
+                                                    <label>
+                                                        <input type="radio" data-ng-model="discount.SelectedMode" data-ng-value="3" />
+                                                        <strong>Discount Only Applies To These Categories</strong>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div data-ng-show="discount.DiscountType!=3 && discount.SelectedMode==2">
+                                            <span class="legend">Selected Products</span>
+                                            <table class="table table-striped table-hover ">
+                                                <thead>
+                                                    <tr>
+                                                        <th>SKU</th>
+                                                        <th>Name</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr data-ng-repeat="item in discount.DiscountsToSelectedSkus">
+                                                        <td>{{item.ShortSkuInfo.Code}}</td>
+                                                        <td>{{item.ShortSkuInfo.ProductName}}</td>
+                                                        <td>
+                                                            <button class="btn btn-xs btn-default btn-danger" data-ng-click="deleteDiscountToSelectedSku($index);">Delete</button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <div ng-controller="skusSearchController" onload="name = 'DiscountsToSelectedSkus'" data-ng-include="'app/modules/product/partials/skusSearchList.html'"></div>
+                                        </div>
+                                    </div>
+                                    <div data-ng-show="discount.DiscountType!=3 && discount.SelectedMode==3">
+                                        <span class="legend">Selected Categories</span>
+                                        <div class="applied-categories categories">
+                                            <button data-ng-if="!appliedCategoriesExpanded" data-ng-click="updateAppliedCategoriesCollapsed(true);" class="btn btn-primary btn-xs expand-button">Expand All</button>
+                                            <button data-ng-if="appliedCategoriesExpanded" data-ng-click="updateAppliedCategoriesCollapsed(false);" class="btn btn-primary btn-xs expand-button">Collapse All</button>
+                                            <div ui-tree data-drag-enabled="false" class="ya-treeview">
+                                                <ol ui-tree-nodes="" data-ng-model="rootAppliedCategory.SubItems">
+                                                    <li ng-repeat="item in rootAppliedCategory.SubItems" ui-tree-node collapsed="true" data-ng-include="'app/modules/content/partials/contentCategories.html'">
+                                                    </li>
+                                                </ol>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </spinner-overlay>
+                            </div>
+                        </div>
+                    </tab>
+                    <tab heading="Filter Products">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <spinner-overlay data-loading="refreshTracker.active()">
+                                    <span class="legend">Cart Must Include/Exclude These Products</span>
+                                    <div class="row form-group">
+                                        <div class="col-md-12 inline">
+                                            <div class="radio">
+                                                <label><input type="radio" data-ng-model="discount.ExcludeSkus" data-ng-value="false" name="ExcludeSkus1"> Include selected products</label>
+                                            </div>
+                                            <div class="radio">
+                                                <label><input type="radio" data-ng-model="discount.ExcludeSkus" data-ng-value="true" name="ExcludeSkus2"> Exclude selected products</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span class="legend">Selected Products</span>
+                                    <table class="table table-striped table-hover ">
+                                        <thead>
+                                            <tr>
+                                                <th>SKU</th>
+                                                <th>Name</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr data-ng-repeat="item in discount.DiscountsToSkus">
+                                                <td>{{item.ShortSkuInfo.Code}}</td>
+                                                <td>{{item.ShortSkuInfo.ProductName}}</td>
+                                                <td>
+                                                    <button class="btn btn-xs btn-default btn-danger" data-ng-click="deleteDiscountToSku($index);">Delete</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div ng-controller="skusSearchController" onload="name = 'DiscountsToSkus'" data-ng-include="'app/modules/product/partials/skusSearchList.html'"></div>
+                                </spinner-overlay>
+                            </div>
+                        </div>
+                    </tab>
+                    <tab heading="Filter Categories">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <spinner-overlay data-loading="refreshTracker.active()">
+                                    <span class="legend">Cart Must Include/Exclude These Categories</span>
+                                    <div class="row form-group">
+                                        <div class="col-md-12 inline">
+                                            <div class="radio">
+                                                <label><input type="radio" data-ng-model="discount.ExcludeCategories" data-ng-value="false" name="ExcludeCategories1"> Include selected categories</label>
+                                            </div>
+                                            <div class="radio">
+                                                <label><input type="radio" data-ng-model="discount.ExcludeCategories" data-ng-value="true" name="ExcludeCategories2"> Exclude selected categories</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="filter-categories categories">
+                                        <button data-ng-if="!categoriesExpanded" data-ng-click="updateCategoriesCollapsed(true);" class="btn btn-primary btn-xs expand-button">Expand All</button>
+                                        <button data-ng-if="categoriesExpanded" data-ng-click="updateCategoriesCollapsed(false);" class="btn btn-primary btn-xs expand-button">Collapse All</button>
+                                        <div ui-tree data-drag-enabled="false" class="ya-treeview">
+                                            <ol ui-tree-nodes="" data-ng-model="rootCategory.SubItems">
+                                                <li ng-repeat="item in rootCategory.SubItems" ui-tree-node collapsed="true" data-ng-include="'app/modules/content/partials/contentCategories.html'">
+                                                </li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </spinner-overlay>
+                            </div>
+                        </div>
+                    </tab>
+                </tabset>
+            </div>
+        </div>
+    </div>
+</div>

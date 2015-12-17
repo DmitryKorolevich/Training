@@ -35,7 +35,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 
         public ProductDynamic Product { get; set; }
 
-        [ConvertWith(typeof(StringToBoolConverter))]
+        //[ConvertWith(typeof(StringToBoolConverter))]
         public bool Preview { get; set; }
     }
 

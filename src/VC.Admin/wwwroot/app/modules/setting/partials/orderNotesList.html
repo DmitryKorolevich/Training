@@ -1,0 +1,72 @@
+﻿<div class="container-fluid">
+	<div class="well">
+		<span class="legend">Manage Automatic Order Specific Notes</span>
+		<div class="row form-group">
+			<div class="col-md-4">
+                <input type="text" class="form-control" data-ng-model="filter.SearchText" placeholder="Filter by Label, Order Note">
+			</div>
+		</div>
+        <div class="row form-group">
+            <div class="col-md-4">
+                <button class="btn btn-info" data-ng-click="filterOrderNotes();" type="button">Filter</button>
+            </div>
+        </div>
+        <hr />
+		<div class="form-group">
+			<button data-ng-click="open(false);" ladda="addTracker.active()" class="btn btn-primary">Add New Order Note</button>
+		</div>
+		<spinner-overlay data-loading="refreshTracker.active()">
+			<table class="table table-striped table-hover ">
+				<thead>
+				<tr>
+				    <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Title')">
+				        <span>Label</span>
+				        <span data-ng-if="filter.Sorting.Path == 'Title'">
+                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                        </span>
+				    </th>
+				    <th>Order Note</th>
+                    <th>Retail</th>
+                    <th>Wholesale</th>
+				    <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Updated')">
+				        <span>Updated</span>
+				        <span data-ng-if="filter.Sorting.Path == 'Updated'">
+                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                        </span>
+				    </th>
+                    <th></th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr data-ng-repeat="orderNote in orderNotes">
+					<td>{{orderNote.Title}}</td>
+					<td>{{orderNote.Description}}</td>
+                    <td><input type="checkbox" data-ng-checked="orderNote.CustomerTypes.indexOf(1) > -1" disabled="disabled"></td>
+                    <td><input type="checkbox" data-ng-checked="orderNote.CustomerTypes.indexOf(2) > -1" disabled="disabled"></td>
+                    <td>{{orderNote.DateEdited | date:"MM/dd/yy"}}<br />{{orderNote.DateEdited | date:"h:mm a"}}<br />{{orderNote.EditedBy}}</td>
+					<td>
+						<button title="Edit" class="btn btn-default btn-success btn-xs" ladda="editTracker.active()" data-ng-click="open(true, orderNote.Id);">
+                            <i class="glyphicon glyphicon-edit"></i>
+                        </button>
+						<button title="Delete" class="btn btn-default btn-danger btn-xs" ladda="deleteTracker.active()" data-ng-click="delete(orderNote.Title, orderNote.Id);">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </button>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+            <pagination boundary-links="true"
+                        total-items="totalItems"
+                        items-per-page="filter.Paging.PageItemCount"
+                        data-ng-model="filter.Paging.PageIndex"
+                        previous-text="&lsaquo;"
+                        next-text="&rsaquo;"
+                        first-text="&laquo;"
+                        last-text="&raquo;"
+                        data-ng-change="pageChanged()">
+            </pagination>
+		</spinner-overlay>
+	</div>
+</div>
