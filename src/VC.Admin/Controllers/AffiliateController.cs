@@ -261,7 +261,7 @@ namespace VC.Admin.Controllers
         public async Task<ActionResult> LoginAsAffiliate(int id)
         {
             var token = await _affiliateUserService.GenerateLoginTokenAsync(id);
-            var url = _appOptions.Value.PublicHost + "AffiliateAccount/LoginAsAffiliate/" + token;
+            var url = $"https://{_appOptions.Value.PublicHost}/AffiliateAccount/LoginAsAffiliate/{token}";
 
             return Redirect(url);
         }
