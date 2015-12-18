@@ -10,7 +10,7 @@ $targetNames = GetTargets
 foreach ($target in $targetNames) {
 	CopyTarget -targetName $target
 	GruntTask -taskName "bower-install"
-	GruntTask -taskName "development"
+	GruntTask -taskName "release"
 	DnuAll -deployPath "${RootDeploy}\${target}"
 	RestoreRuntime -deployPath "${RootDeploy}\${target}"
 	#cp "web.config" "${RootDeploy}\${target}\wwwroot\"
