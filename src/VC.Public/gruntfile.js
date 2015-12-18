@@ -5,10 +5,10 @@ module.exports = function (grunt) {
 	var jsConfig = grunt.file.readJSON('AppConfig/scripts/files.json');
 	var cssConfig = grunt.file.readJSON('AppConfig/styles/files.json');
 
-	//var jsFiles = jsConfig.files;
-	//for (var i = 0; i < jsFiles.length; i++) {
-	//	jsFiles[i] = "wwwroot/" + jsFiles[i];
-	//}
+	var jsFiles = jsConfig.files;
+	for (var i = 0; i < jsFiles.length; i++) {
+		jsFiles[i] = "wwwroot/" + jsFiles[i];
+	}
 
 	//var cssFiles = cssConfig.files;
 	//for (var j = 0; j < cssFiles.length; j++) {
@@ -34,7 +34,7 @@ module.exports = function (grunt) {
 				dest: 'temp/css/<%= cssMinifiedFileName %>.css'
 			},
         	js: {
-        	    src: ['wwwroot/assets/scripts/**/*.js', '/wwwroot/lib/**/*.js', '/wwwroot/app/**/*.js'],
+        	    src: jsFiles,
 				dest: 'temp/js/<%= jsMinifiedFileName %>.js'/*dist*/
 			}
         },
