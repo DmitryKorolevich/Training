@@ -92,7 +92,9 @@
                 </thead>
                 <tbody>
                     <tr data-ng-repeat="item in promotions">
-                        <td>{{item.Description}}</td>
+                        <td>
+                            <a ui-sref="index.oneCol.promotionDetail({id:item.Id})">{{::item.Description}}</a>
+                        </td>
                         <td>{{item.PromotionTypeName}}</td>
                         <td>{{getReferenceItem(customerTypes, item.Assigned).Text}}</td>
                         <td>

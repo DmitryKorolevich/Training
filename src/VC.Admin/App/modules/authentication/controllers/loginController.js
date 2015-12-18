@@ -29,7 +29,8 @@ angular.module('app.modules.authentication.controllers.loginController', [])
 
 							infrastructureService.getReferenceData().success(function(res) {
 								if (res.Success) {
-									$rootScope.ReferenceData = res.Data;
+								    $rootScope.ReferenceData = res.Data;
+								    $rootScope.$state.go("index.oneCol.manageOrders");
 								} else {
 									toaster.pop('error', 'Error!', "Unable to refresh reference data");
 								}

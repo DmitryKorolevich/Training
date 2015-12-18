@@ -52,7 +52,9 @@
                 </thead>
                 <tbody>
                     <tr data-ng-repeat="article in articles">
-                        <td>{{article.Name}}</td>
+                        <td>
+                            <a ui-sref="index.oneCol.articleDetail({id:article.Id})">{{::article.Name}}</a>
+                        </td>
                         <td>{{article.Url}}</td>
                         <td>
                             <div data-ng-if="article.Categories && article.Categories.length>0">

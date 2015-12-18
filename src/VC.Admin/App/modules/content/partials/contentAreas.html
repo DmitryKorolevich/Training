@@ -12,7 +12,9 @@
 			    </thead>
 				<tbody>
 				<tr data-ng-repeat="contentArea in contentAreas">
-					<td>{{contentArea.Name}}</td>
+					<td>
+                        <a ui-sref="index.oneCol.manageContentAreaDetail({id:contentArea.Id})">{{::contentArea.Name}}</a>
+                    </td>
 					<td>{{contentArea.Updated | date:"MM/dd/yy"}}<br />{{contentArea.Updated | date:"h:mm a"}}<br />{{contentArea.AgentId}}</td>
 					<td>
 						<button title="Edit" class="btn btn-default btn-success btn-xs" data-ng-click="open(contentArea.Id)">

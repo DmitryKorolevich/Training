@@ -104,7 +104,7 @@
 							{
 								<a href="@Url.Action("RegisterEmail", "Account")">Register</a>
 							}
-							<a class="last-child" href="#">Contact Us</a>
+							<a class="last-child" href="/content/contact-customer-service">Contact Us</a>
 						</div>
 						<div class="cart-work-area">
 							<a class="view-cart" href="#">
@@ -140,9 +140,12 @@
 				</form>
 			</div>
 			@await Component.InvokeAsync("Menu")
-			<div class="nav-shadow"></div>
+			@*<div class="nav-shadow"></div>*@
 		</header>
 		<div class="content">
+            <div class="alert-banner">
+                @await Component.InvokeAsync("Area", "Alert Top Section")
+            </div>
 			<div class="content-dynamic">
 				@RenderBody()
 			</div>
