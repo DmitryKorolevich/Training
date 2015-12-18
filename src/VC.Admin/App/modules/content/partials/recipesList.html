@@ -52,7 +52,9 @@
                 </thead>
                 <tbody>
                 <tr data-ng-repeat="recipe in recipes">
-                    <td>{{recipe.Name}}</td>
+                    <td>
+                        <a ui-sref="index.oneCol.recipeDetail({id:recipe.Id})">{{::recipe.Name}}</a>
+                    </td>
                     <td>{{recipe.Url}}</td>
                     <td>
                         <div data-ng-if="recipe.Categories && recipe.Categories.length>0">

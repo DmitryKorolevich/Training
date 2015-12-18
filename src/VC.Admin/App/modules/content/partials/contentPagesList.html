@@ -59,7 +59,9 @@
                 </thead>
                 <tbody>
                 <tr data-ng-repeat="contentPage in contentPages">
-                    <td>{{contentPage.Name}}</td>
+                    <td>
+                        <a ui-sref="index.oneCol.contentPageDetail({id:contentPage.Id})">{{::contentPage.Name}}</a>
+                    </td>
                     <td>{{contentPage.Url}}</td>
                     <td>
                         <div data-ng-if="contentPage.Categories && contentPage.Categories.length>0">

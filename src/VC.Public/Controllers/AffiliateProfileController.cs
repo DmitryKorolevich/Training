@@ -20,6 +20,9 @@ using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
+using System.Collections.Generic;
+using Microsoft.Extensions.OptionsModel;
+using VitalChoice.Infrastructure.Domain.Options;
 
 namespace VC.Public.Controllers
 {
@@ -30,17 +33,20 @@ namespace VC.Public.Controllers
         private readonly IAffiliateUserService _affiliateUserService;
         private readonly IAffiliateService _affiliateService;
         private readonly IDynamicMapper<AffiliateDynamic, Affiliate> _affiliateMapper;
+        private readonly IOptions<AppOptions> _appOptions;
 
         public AffiliateProfileController(
             IHttpContextAccessor contextAccessor,
             IAffiliateUserService affiliateUserService,
             IAffiliateService affiliateService,
-            IDynamicMapper<AffiliateDynamic, Affiliate> affiliateMapper)
+            IDynamicMapper<AffiliateDynamic, Affiliate> affiliateMapper,
+            IOptions<AppOptions> appOptions)
         {
             _contextAccessor = contextAccessor;
             _affiliateUserService = affiliateUserService;
             _affiliateService = affiliateService;
             _affiliateMapper = affiliateMapper;
+            _appOptions = appOptions;
         }
 
         private int GetInternalAffiliateId()
@@ -73,9 +79,21 @@ namespace VC.Public.Controllers
         #region Affiliates
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            Dictionary<string, string> model = new Dictionary<string, string>();
+            var internalId = GetInternalAffiliateId();
+            var affiliate = await _affiliateService.SelectAsync(internalId);
+            if (affiliate != null)
+            {
+                model.Add("Id", affiliate.Id.ToString());
+                model.Add("Name", affiliate.Name);
+                model.Add("CommissionFirst", affiliate.CommissionFirst.ToString());
+                model.Add("CommissionAll", affiliate.CommissionAll.ToString());
+                model.Add("PublicHost", _appOptions.Value.PublicHost);
+
+            }
+            return View(model);
         }
 
         [HttpGet]

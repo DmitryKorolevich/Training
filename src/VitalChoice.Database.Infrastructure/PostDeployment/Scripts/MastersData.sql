@@ -3784,3 +3784,23 @@ SET	[Updated] = GETDATE(),
 WHERE Name = 'Recipe Individual'
 
 END
+
+GO
+
+IF NOT EXISTS (SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Name = 'Content Individual Empty')
+BEGIN
+
+	INSERT [dbo].[MasterContentItems] ([Name], [TypeId], [Template], [Created], [Updated], [StatusCode], [UserId])
+	VALUES 
+	('Content Individual Empty', 8, N'<%
+<default> -> (Model)
+{{
+    <div class="working-area-holder content-page">
+    	@(@model.ContentItem.Description)
+    </div>
+}} :: dynamic
+%>', GETDATE(), GETDATE(),2, NULL)
+
+END
+
+GO

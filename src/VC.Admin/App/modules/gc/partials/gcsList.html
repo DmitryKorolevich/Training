@@ -67,7 +67,9 @@
                 <tbody>
                 <tr data-ng-repeat="item in items">
                     <td>{{item.ProductName}}</td>
-                    <td>{{item.Code}}</td>
+                    <td>
+                        <a ui-sref="index.oneCol.gcDetail({id:item.Id})">{{::item.Code}}</a>
+                    </td>
                     <td>{{item.Created | date:"MM/dd/yy"}}<br />{{item.Created | date:"h:mm a"}}<br />{{item.AgentId}}</td>
                     <td></td>
                     <td>{{item.RecipientName}}<br />{{item.RecipientEmail}}</td>

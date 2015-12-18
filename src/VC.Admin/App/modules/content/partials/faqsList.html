@@ -52,7 +52,9 @@
                 </thead>
                 <tbody>
                 <tr data-ng-repeat="faq in faqs">
-                    <td>{{faq.Name}}</td>
+                    <td>
+                        <a ui-sref="index.oneCol.faqDetail({id:faq.Id})">{{::faq.Name}}</a>
+                    </td>
                     <td>{{faq.Url}}</td>
                     <td>
                         <div data-ng-if="faq.Categories && faq.Categories.length>0">

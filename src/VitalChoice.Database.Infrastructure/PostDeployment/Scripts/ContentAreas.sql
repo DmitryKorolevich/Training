@@ -661,3 +661,64 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentAreas] WHERE [Name]='Affiliate Landing Area')
+BEGIN
+
+	INSERT INTO [dbo].[ContentAreas]
+	([Name], [Template], [StatusCode], [Created], [Updated])
+	VALUES
+	(N'Affiliate Landing Area', N'<h4>Vital Choice Web Affiliate Program</h4>
+<p>
+    Welcome {Name}, 
+</p>
+<p>
+    Thank you for joining the Vital Choice Web Affiliate Program. We invite you to see the Quick Start Guide below built with your special links for 
+    Vital Choice products, content, and banner ads that contain your affiliate ID: {Id}. These are set up for you to use immediately.
+</p>
+<p>
+    The simplest way to direct your visitors to our products and begin earning commission is to include this HTML code link in your website, 
+    blog and emails: <a href="https://{PublicHost}/?idaffiliate={Id}">https://{PublicHost}/?idaffiliate={Id}</a>
+</p>
+<p>
+    Here is the same link with your affiliate number embedded in the code: <a href="https://{PublicHost}/?idaffiliate={Id}">Vital Choice</a>
+</p>
+<p>
+    When your readers make their first purchase, you will earn {CommissionFirst}% of the sale. From that point on, all additional purchases made by that customer 
+    (by calling us, using vitalchoice.com, or via your product and banner links) earn you {CommissionAll}% of each sale. You also receive a commission when your
+    readers respond to special offers such as our Weekly Bonus Offers promoted through the Vital Choice Newsletter and through occasional Discount Codes.
+    See the Program Overview for more information.
+</p>
+<p>
+    Vital Choice extends this commission and the First Order 10% Discount to your personal purchase, so that you can try our products and share your first-hand experience when reaching out to new customers.
+    To set this, simply click on any of these links, use the Discount Code VCAF10 and make a purchase. As with your customers, you only need to do this once to start earning commissions on all future purchases. 
+</p>
+<p>
+    Vital Choice also offers a Wholesale Program for purchasing larger volumes for your company.
+</p>
+<p>
+    We appreciate your advocacy and interest in promoting wild seafood nutrition. We look forward to working together.
+</p>
+<p>
+    Please feel free to contact us anytime with questions or comments at <a href="mailto:affiliatesupport@vitalchoice.com ">affiliatesupport@vitalchoice.com</a>
+</p>
+<p>
+    Yours in good health,<br/>
+    The Vital Choice Team
+</p>', 2, GETDATE(), GETDATE())
+
+END
+
+GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentAreas] WHERE [Name]='Alert Top Section')
+BEGIN
+
+	INSERT INTO [dbo].[ContentAreas]
+	([Name], [Template], [StatusCode], [Created], [Updated])
+	VALUES
+	(N'Alert Top Section', N'<a href="#"><img src="/Assets/images/holiday-shipping-v3.jpg" alt=""/></a>', 2, GETDATE(), GETDATE())
+
+END
+
+GO

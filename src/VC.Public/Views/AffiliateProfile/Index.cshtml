@@ -1,4 +1,4 @@
-﻿@model VC.Public.Models.Profile.ChangePasswordModel
+﻿@model System.Collections.Generic.Dictionary<string,string>
 
 @section Meta {
     <title>Vital Choice | Vital Choice Web Affiliate Program</title>
@@ -10,7 +10,7 @@
     </div>
     <div class="right-pane clean-indent">
         <div class="border-form-left">
-            <h4>Vital Choice Web Affiliate Program</h4>
+            @await Component.InvokeAsync("Area", "Affiliate Landing Area", Model)
         </div>
     </div>
 </div>

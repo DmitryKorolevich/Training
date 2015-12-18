@@ -46,7 +46,9 @@
                 </thead>
                 <tbody>
                 <tr data-ng-repeat="master in masters">
-                    <td>{{master.Name}}</td>
+                    <td>
+                        <a ui-sref="index.oneCol.masterDetail({id:master.Id})">{{::master.Name}}</a>
+                    </td>
                     <td>{{master.TypeName}}</td>
                     <td>{{master.Updated | date:"MM/dd/yy"}}<br />{{master.Updated | date:"h:mm a"}}<br />{{master.AgentId}}</td>
                     <td>
