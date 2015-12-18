@@ -5,15 +5,15 @@ module.exports = function (grunt) {
 	var jsConfig = grunt.file.readJSON('AppConfig/scripts/files.json');
 	var cssConfig = grunt.file.readJSON('AppConfig/styles/files.json');
 
-	var jsFiles = jsConfig.files;
-	for (var i = 0; i < jsFiles.length; i++) {
-		jsFiles[i] = "wwwroot/" + jsFiles[i];
-	}
+	//var jsFiles = jsConfig.files;
+	//for (var i = 0; i < jsFiles.length; i++) {
+	//	jsFiles[i] = "wwwroot/" + jsFiles[i];
+	//}
 
-	var cssFiles = cssConfig.files;
-	for (var j = 0; j < cssFiles.length; j++) {
-		cssFiles[j] = "wwwroot/" + cssFiles[j];
-	}
+	//var cssFiles = cssConfig.files;
+	//for (var j = 0; j < cssFiles.length; j++) {
+	//	cssFiles[j] = "wwwroot/" + cssFiles[j];
+	//}
 
 	grunt.initConfig({
 		jsMinifiedFileName: jsConfig.minifiedFileName,
@@ -29,13 +29,12 @@ module.exports = function (grunt) {
 		    }
         },
         concat: {
-        	css: {
-				src: cssFiles,
+            css: {
+                src: ['wwwroot/assets/**/*.css', '/wwwroot/lib/**/*.css', 'temp/less/*.css'],
 				dest: 'temp/css/<%= cssMinifiedFileName %>.css'
 			},
         	js: {
-				src: jsFiles,
-				// the location of the resulting JS file
+        	    src: ['wwwroot/assets/scripts/**/*.js', '/wwwroot/lib/**/*.js', '/wwwroot/app/**/*.js'],
 				dest: 'temp/js/<%= jsMinifiedFileName %>.js'/*dist*/
 			}
         },
@@ -50,7 +49,7 @@ module.exports = function (grunt) {
 				        expand: true,
 				        cwd: 'assets/styles/',
 				        src: ['*.less', '!{boot,var,mix}*.less'],
-				        dest: 'temp/css/',
+				        dest: 'temp/less/',
 				        ext: '.css'
 			        }
 		        ]
@@ -68,28 +67,29 @@ module.exports = function (grunt) {
         	}
         },
         clean: {
-        	wwwroot: ["wwwroot/app", "wwwroot/assets"],
+        	wwwroot: ["wwwroot/assets", "wwwroot/app"],
         	wwwrootFull:["wwwroot/*", "!wwwroot/bin"],
 			temp: ["temp"]
         },
         copy: {
-        	development: {
-        		files: [
-					{ expand: true, cwd: 'app/', src: ['**'], dest: 'wwwroot/app/' },
+            development: {
+                files: [
+				    { expand: true, cwd: 'app/', src: ['**'], dest: 'wwwroot/app/' },
 				  { expand: true, cwd: 'assets/scripts/', src: ['**'], dest: 'wwwroot/assets/scripts/' },
 				  { expand: true, cwd: 'temp/css/', src: ['**'], dest: 'wwwroot/assets/styles/' },
 				  { expand: true, cwd: 'assets/images/', src: ['**'], dest: 'wwwroot/assets/images/' },
 				  { expand: true, cwd: 'assets/fonts/', src: ['**'], dest: 'wwwroot/assets/fonts/' },
 				  { expand: true, cwd: 'assets/miscellaneous/', src: ['**'], dest: 'wwwroot/assets/miscellaneous/' },
-        		]
-        	},
+                ]
+            },
         	release: {
-        		files: [
-					{ expand: true, cwd: 'app/', src: ['**'], dest: 'wwwroot/app/' },
+        	    files: [
+                    { expand: true, cwd: 'app/', src: ['**'], dest: 'wwwroot/app/' },
+                    { expand: true, cwd: 'assets/scripts/vendor/jquery-ui/images/', src: ['**'], dest: 'wwwroot/images/' },
 					{ expand: true, cwd: 'temp/js/minified/', src: ['**'], dest: 'wwwroot/' },
 			        { expand: true, cwd: 'temp/css/minified/', src: ['**'], dest: 'wwwroot/' },
 					{ expand: true, cwd: 'assets/images/', src: ['**'], dest: 'wwwroot/assets/images/' },
-					{ expand: true, cwd: 'assets/fonts/', src: ['**'], dest: 'wwwroot/fonts/' },
+					{ expand: true, cwd: 'assets/fonts/', src: ['**'], dest: 'wwwroot/assets/fonts/' },
 					{ expand: true, cwd: 'assets/miscellaneous/', src: ['**'], dest: 'wwwroot/assets/miscellaneous/' }
 		        ]
 	        }

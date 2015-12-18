@@ -37,7 +37,7 @@ angular.module('app.modules.content.controllers.contentPageCategoryManageControl
         function initialize() {
             $scope.id = $stateParams.id ? $stateParams.id : 0;
 
-            $scope.baseUrl = $rootScope.ReferenceData.PublicHost + 'contents/{0}?preview=true';
+            $scope.baseUrl = 'http://' + $rootScope.ReferenceData.PublicHost + '/contents/{0}?preview=true';
             $scope.previewUrl = null;
 
             $scope.detailsTab = {

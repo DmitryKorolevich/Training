@@ -36,7 +36,7 @@
         self.init = function (ngModelCtrl_) {
             ngModelCtrl = ngModelCtrl_;
             if ($rootScope.ReferenceData.PublicHost) {
-                self.baseUrl = $rootScope.ReferenceData.PublicHost.substring(0, $rootScope.ReferenceData.PublicHost.length-1) + '{0}';
+                self.baseUrl = 'https://' + $rootScope.ReferenceData.PublicHost + '{0}';
             }
             $scope.placeHolder = $attrs.placeholder;
 

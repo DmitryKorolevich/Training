@@ -435,7 +435,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 				customerService.loginAsCustomer($scope.currentCustomer.PublicUserId, $scope.loginAsCustomerTracker)
 					.success(function (result) {
 						if (result.Success) {
-							$window.open($rootScope.ReferenceData.PublicHost + "Account/LoginAsCustomer/" + result.Data);
+						    $window.open("https://" + $rootScope.ReferenceData.PublicHost + "/Account/LoginAsCustomer/" + result.Data);
 							return;
 						} else {
 							var messages = "";

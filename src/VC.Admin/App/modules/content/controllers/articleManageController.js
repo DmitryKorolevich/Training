@@ -42,7 +42,7 @@ function ($scope, $rootScope, $state, $stateParams, appBootstrap, modalUtil, con
             $scope[property] = !$scope[property];
         };
 
-        $scope.baseUrl = $rootScope.ReferenceData.PublicHost + 'article/{0}?preview=true';
+        $scope.baseUrl = 'http://' + $rootScope.ReferenceData.PublicHost + '/article/{0}?preview=true';
         $scope.previewUrl = null;
 
         $scope.detailsTab = {

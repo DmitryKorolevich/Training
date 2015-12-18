@@ -35,7 +35,7 @@
         };
 
         function initialize() {
-            self.baseUrl = $rootScope.ReferenceData.PublicHost.substring(0, $rootScope.ReferenceData.PublicHost.length - 1) + '{0}';
+            self.baseUrl = 'https://' + $rootScope.ReferenceData.PublicHost + '{0}';
 
             $scope.filter = {
                 SearchText: '',

@@ -26,7 +26,7 @@ angular.module('app.modules.content.controllers.contentAreaDetailController', []
         };
 
         function initialize() {
-        	$scope.previewUrl = $rootScope.ReferenceData.PublicHost + '?preview=true';
+            $scope.previewUrl = 'http://' + $rootScope.ReferenceData.PublicHost + '/?preview=true';
 
             var id = $stateParams.id ? $stateParams.id : 0;
 

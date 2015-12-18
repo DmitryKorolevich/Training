@@ -27,7 +27,7 @@ angular.module('app.modules.content.controllers.manageStylesController', [])
 
     	function initialize() {
 		    $scope.model = { css: ""};
-		    $scope.previewUrl = $rootScope.ReferenceData.PublicHost + '?preview=true';
+		    $scope.previewUrl = 'http://' + $rootScope.ReferenceData.PublicHost + '/?preview=true';
 
     		manageStylesService.getStyles($scope.refreshTracker)
 		        .success(function (result) {

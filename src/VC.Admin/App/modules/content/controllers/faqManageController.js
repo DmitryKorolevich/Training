@@ -42,7 +42,7 @@ function ($scope, $rootScope, $state, $stateParams, contentService, toaster, con
             $scope[property] = !$scope[property];
         };
 
-        $scope.baseUrl = $rootScope.ReferenceData.PublicHost + 'faq/{0}?preview=true';
+        $scope.baseUrl = 'http://' + $rootScope.ReferenceData.PublicHost + '/faq/{0}?preview=true';
         $scope.previewUrl = null;
 
         $scope.detailsTab = {

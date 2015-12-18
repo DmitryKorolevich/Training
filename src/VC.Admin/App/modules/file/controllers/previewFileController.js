@@ -6,7 +6,7 @@ angular.module('app.modules.file.controllers.previewFileController', [])
 	
     function initialize() {
         if ($rootScope.ReferenceData.PublicHost) {
-            $scope.baseUrl = $rootScope.ReferenceData.PublicHost.substring(0, $rootScope.ReferenceData.PublicHost.length - 1) + '{0}';
+            $scope.baseUrl = 'https://' + $rootScope.ReferenceData.PublicHost + '{0}';
         }
         var fileUrl = data.fileUrl;
 

@@ -38,7 +38,7 @@ function ($scope, $rootScope, $state, $stateParams, contentService, toaster, con
     {
         $scope.id = $stateParams.id ? $stateParams.id : 0;
 
-        $scope.baseUrl = $rootScope.ReferenceData.PublicHost + 'faqs/{0}?preview=true';
+        $scope.baseUrl = 'http://' + $rootScope.ReferenceData.PublicHost + '/faqs/{0}?preview=true';
         $scope.previewUrl = null;
 
         $scope.detailsTab = {

@@ -109,7 +109,10 @@ namespace VC.Public.Controllers
             if (creditCards.Any())
             {
                 model = selectedId > 0 ? creditCards.Single(x => x.Id == selectedId) : creditCards.First();
-                ViewBag.CreditCards = JsonConvert.SerializeObject(creditCards, Formatting.None);
+                ViewBag.CreditCards = JsonConvert.SerializeObject(creditCards, new JsonSerializerSettings()
+                {
+                    StringEscapeHandling = StringEscapeHandling.EscapeHtml
+                });
             }
             else
             {

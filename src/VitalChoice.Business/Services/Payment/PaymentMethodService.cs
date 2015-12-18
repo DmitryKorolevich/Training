@@ -168,7 +168,7 @@ namespace VitalChoice.Business.Services.Payment
         {
             List<MessageInfo> errors = new List<MessageInfo>();
 
-            string securityCode = paymentMethod.SafeData.SecurityCode;
+            var securityCode = paymentMethod.SafeData.SecurityCode;
 
             if (securityCode == null)
             {

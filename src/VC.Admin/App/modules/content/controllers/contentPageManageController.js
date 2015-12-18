@@ -44,7 +44,7 @@ angular.module('app.modules.content.controllers.contentPageManageController', []
 
             $scope.statuses = $rootScope.ReferenceData.ContentItemStatusNames;
 
-            $scope.baseUrl = $rootScope.ReferenceData.PublicHost + 'content/{0}?preview=true';
+            $scope.baseUrl = 'http://' + $rootScope.ReferenceData.PublicHost + '/content/{0}?preview=true';
             $scope.previewUrl = null;
 
             $scope.detailsTab = {

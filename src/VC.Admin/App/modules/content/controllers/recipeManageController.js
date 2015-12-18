@@ -66,7 +66,7 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
                 $scope[property] = !$scope[property];
             };
 
-            $scope.baseUrl = $rootScope.ReferenceData.PublicHost + 'recipe/{0}?preview=true';
+            $scope.baseUrl = 'http://' + $rootScope.ReferenceData.PublicHost + '/recipe/{0}?preview=true';
             $scope.previewUrl = null;
 
             $scope.detailsTab = {

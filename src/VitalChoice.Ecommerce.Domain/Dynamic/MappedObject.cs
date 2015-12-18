@@ -86,11 +86,23 @@ namespace VitalChoice.Ecommerce.Domain.Dynamic
         public dynamic Data => DynamicData;
 
         [JsonIgnore]
-        public dynamic SafeData => _expandoData ?? (_expandoData = new SafeExpandoObject(DynamicData));
+        public dynamic SafeData => _expandoData;
 
-        private SafeExpandoObject _expandoData;
+        private SafeDynamicObject _expandoData;
+        private ExpandoObject _dynamicData;
 
-        public ExpandoObject DynamicData { get; set; }
+        public ExpandoObject DynamicData
+        {
+            get { return _dynamicData; }
+            set
+            {
+                _dynamicData = value;
+                if (_expandoData == null)
+                    _expandoData = new SafeDynamicObject(value);
+                else
+                    _expandoData.Initialize(value);
+            }
+        }
 
         [JsonIgnore]
         public ICollection<ObjectHistoryLogItem> HistoryLogItems { get; set; }

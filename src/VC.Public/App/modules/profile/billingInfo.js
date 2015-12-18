@@ -1,13 +1,9 @@
-﻿var creditCards = null;
-var creditCardTypes = null;
+﻿var creditCardTypes = null;
 
 $(function () {
 	changeSaveButtonLabel($("#hdCreditCard").val());
 
-	creditCards = [];
-	if (creditCardsJson != "") {
-		creditCards = $.parseJSON(creditCardsJson);
-	} else {
+	if (creditCards === undefined || creditCards.length == 0) {
 		$("#delSelected").hide();
 	}
 

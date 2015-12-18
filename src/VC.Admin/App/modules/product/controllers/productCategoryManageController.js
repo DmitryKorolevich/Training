@@ -37,7 +37,7 @@ angular.module('app.modules.product.controllers.productCategoryManageController'
         function initialize() {
             $scope.id = $stateParams.id ? $stateParams.id : 0;
 
-            $scope.baseUrl = $rootScope.ReferenceData.PublicHost + 'products/{0}?preview=true';
+            $scope.baseUrl = 'http://' + $rootScope.ReferenceData.PublicHost + '/products/{0}?preview=true';
             $scope.previewUrl = null;
 
             $scope.statuses = $rootScope.ReferenceData.ProductCategoryStatusNames;

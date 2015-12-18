@@ -97,7 +97,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
 
             $scope.forms = {};
             $scope.youTubeBaseUrl = 'https://www.youtube.com/watch?v={0}'
-            $scope.basePreviewUrl = $rootScope.ReferenceData.PublicHost + 'product/{0}';
+            $scope.basePreviewUrl = 'http://' + $rootScope.ReferenceData.PublicHost + '/product/{0}';
             $scope.previewUrl = null;
             $scope.allTypes = $rootScope.ReferenceData.ProductTypes;
             $scope.googleCategories = [];
