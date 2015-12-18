@@ -118,6 +118,15 @@
             settingsHorizontal.content = getBaseHtml(title,body);
             $(this).tooltipster(settingsHorizontal);
         });
+
+        $('.small-window-open-link').click(function(e){
+            var href= $(this).attr('href');
+            if(href)
+            {
+                window.open(href,'', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');
+                e.preventDefault();
+            }
+        });
     });
 })(jQuery);
 

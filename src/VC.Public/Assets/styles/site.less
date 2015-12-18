@@ -1204,6 +1204,13 @@ footer {
 }
 
 .working-area-holder.content-page {
+    color:#333333;
+    line-height: 14px;
+
+    p{
+        margin: 12px 0;
+    }
+
     .title {
         color: #323232;
         font-size: 24px;
@@ -1231,6 +1238,15 @@ footer {
         font-weight: bold;
         margin: 3px 0 7px 0;
         line-height: 115%;
+    }
+
+    a.content-link{
+        color: black;
+    }
+
+    a.content-link:hover{
+        color: #F34D20;      
+        text-decoration: none;
     }
 
     .panel {
@@ -1483,6 +1499,11 @@ footer {
             height: 243px;
             vertical-align: top;
             overflow:scroll;
+
+            img:first-child{
+                float: left;
+                padding-right: 10px;
+            }
         }
         
         .part-sub-title{
@@ -1497,7 +1518,7 @@ footer {
             .hr-wrapper{
                 width: 100%;
                 box-sizing: border-box;
-                padding-top: 12px;
+                padding-top: 7px;
 
                 hr{
                     margin:0;
@@ -1589,6 +1610,35 @@ footer {
                 .item-title{
                     text-align: center;
                     font-size: 11px;
+                }
+            }
+        }
+
+        .description{
+            font-family: 'Trebuchet MS';
+            line-height: 120%;
+            font-size: 14px;
+        }
+
+        .ingredients{
+            font-size: 14px;
+
+            ul{
+                li{
+                    margin: 0 0 15px 0;
+                    line-height: 17px;
+                }
+            }
+        }
+
+        .directions{
+            font-size: 14px;
+
+            ol{
+                li{
+                    line-height: 17px;
+                    margin-left: -10px;
+                    margin-bottom: 15px;
                 }
             }
         }

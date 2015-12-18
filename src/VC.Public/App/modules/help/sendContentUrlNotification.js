@@ -1,6 +1,6 @@
 ﻿$(function ()
 {
-    var emailButton = $('.article .icons-bar .email-button');
+    var emailButton = $('.icons-bar .email-button');
     emailButton.click(function (e)
     {
         var name = $(this).data('content-name');

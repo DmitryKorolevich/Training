@@ -1021,6 +1021,9 @@ th.sortable-column {
 .table.order-statuses > tbody > tr .pause {
   color: blue;
 }
+.orders .table > thead > tr > th.actions {
+  min-width: 75px;
+}
 .orders .table > tbody > tr > td.order-source {
   color: grey;
 }

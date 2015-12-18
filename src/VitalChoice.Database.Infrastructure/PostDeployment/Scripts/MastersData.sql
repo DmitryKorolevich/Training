@@ -3216,15 +3216,15 @@ BEGIN
             <span class="date">@date(@model.Model.PublishedDate) {{MM''/''dd''/''yyyy}}</span>
             <span class="author">@(@model.Model.Author)</span>
             <div class="icons-bar not-printable">
-    	        <a target="_blank" href="http://www.facebook.com/sharer.php?u=@(@model.Request.AbsoluteUrl)&t=@(@model.Model.Name)" class="margin-right-medium">
+    	        <a target="_blank" href="http://www.facebook.com/sharer.php?u=@(@model.Request.AbsoluteUrl)&t=@(@model.Model.Name)" class="margin-right-medium small-window-open-link">
                     <img src="/assets/images/icons/fb.png">
                     <span>FACEBOOK</span>
                 </a>
-                <a target="_blank" href="http://twitter.com/share?text=@(@model.Model.Name)&url=@(@model.Request.AbsoluteUrl)" class="margin-right-medium">
+                <a target="_blank" href="http://twitter.com/share?text=@(@model.Model.Name)&url=@(@model.Request.AbsoluteUrl)" class="margin-right-medium small-window-open-link">
                     <img src="/assets/images/icons/fb.png">
                     <span>TWITTER</span>
                 </a>
-                <a target="_blank" href="https://plus.google.com/share?url=@(@model.Request.AbsoluteUrl)" class="margin-right-medium">
+                <a target="_blank" href="https://plus.google.com/share?url=@(@model.Request.AbsoluteUrl)" class="margin-right-medium small-window-open-link">
                     <img src="/assets/images/icons/fb.png">
                     <span>GOOGLE+</span>
                 </a>
@@ -3232,7 +3232,7 @@ BEGIN
                     <img src="/assets/images/icons/fb.png">
                     <span>E-MAIL</span>
                 </a>
-                <a target="_blank" href="http://www.addthis.com/bookmark.php?v=300&pubid=xa-509854151b0dec32" class="margin-right-medium">
+                <a target="_blank" href="http://www.addthis.com/bookmark.php?v=300&pubid=xa-509854151b0dec32" class="margin-right-medium small-window-open-link">
                     <img src="/assets/images/icons/fb.png">
                     <span>SHARE</span>
                 </a>
@@ -3537,7 +3537,7 @@ BEGIN
 {{
     <div class="working-area-holder content-page recipe-categories-page">
         <div class="header-block">
-            <img src="/assets/images/in-the-kitchen-header-4-24-14a.png">
+            <img src="/assets/images/itk-header-2015.jpg">
         </div>
         @left(RecipeCategories)
     	@center()
@@ -3642,15 +3642,15 @@ SET	[Updated] = GETDATE(),
         <br/>
         <br/>
         <div class="icons-bar not-printable">
-    	    <a target="_blank" href="http://www.facebook.com/sharer.php?u=@(@model.ViewContext.AbsoluteUrl)&t=@(@model.Model.Name)" class="margin-right-medium">
+    	    <a target="_blank" href="http://www.facebook.com/sharer.php?u=@(@model.ViewContext.AbsoluteUrl)&t=@(@model.Model.Name)" class="margin-right-medium small-window-open-link">
                 <img src="/assets/images/icons/fb.png">
                 <span>FACEBOOK</span>
             </a>
-            <a target="_blank" href="http://twitter.com/share?text=@(@model.Model.Name)&url=@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium">
+            <a target="_blank" href="http://twitter.com/share?text=@(@model.Model.Name)&url=@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium small-window-open-link">
                 <img src="/assets/images/icons/fb.png">
                 <span>TWITTER</span>
             </a>
-            <a target="_blank" href="https://plus.google.com/share?url=@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium">
+            <a target="_blank" href="https://plus.google.com/share?url=@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium small-window-open-link">
                 <img src="/assets/images/icons/fb.png">
                 <span>GOOGLE+</span>
             </a>
@@ -3658,7 +3658,7 @@ SET	[Updated] = GETDATE(),
                 <img src="/assets/images/icons/fb.png">
                 <span>E-MAIL</span>
             </a>
-            <a target="_blank" href="http://www.addthis.com/bookmark.php?v=300&pubid=xa-509854151b0dec32" class="margin-right-medium">
+            <a target="_blank" href="http://www.addthis.com/bookmark.php?v=300&pubid=xa-509854151b0dec32" class="margin-right-medium small-window-open-link">
                 <img src="/assets/images/icons/fb.png">
                 <span>SHARE</span>
             </a>
@@ -3682,7 +3682,7 @@ SET	[Updated] = GETDATE(),
                 </div>
                 }}
             </div>
-            <div>
+            <div class="description"> 
                 @(@model.Model.ContentItem.Description)
             </div>
             @if(@!string.IsNullOrEmpty(model.Model.Ingredients))
@@ -3719,11 +3719,11 @@ SET	[Updated] = GETDATE(),
     	            }}
                 </div>
             </div>
-            <div class="cross-sell-products-left-part">
+            <div class="ingredients cross-sell-products-left-part">
             }}
             @ifnot(@model.Model.CrossSells.Count>0)
             {{
-            <div class="">
+            <div class="ingredients">
             }}
                 @(@model.Model.Ingredients)
             </div>
@@ -3743,7 +3743,7 @@ SET	[Updated] = GETDATE(),
                 </div>
             </div>
             <div class="clear"></div>
-            <div>
+            <div class="directions">
                 @(@model.Model.Directions)
             </div>
             }}
@@ -3759,7 +3759,7 @@ SET	[Updated] = GETDATE(),
             <div class="customer-favorites-section">
                 @list(Model.RelatedRecipes){{
                     <div class="item">
-                        <a href="@(Url)">
+                        <a class="content-link" href="@(Url)">
                             <img src="@(Image)"/>
                             <div class="item-title">@(Title)</div>
                         </a>
@@ -3774,7 +3774,7 @@ SET	[Updated] = GETDATE(),
 {{
     <div class="working-area-holder content-page recipe-page">
         <div class="header-block">
-            <img src="/assets/images/in-the-kitchen-header-4-24-14a.png" />
+            <img src="/assets/images/itk-header-2015.jpg" />
         </div>
         @left(RecipeCategories)
     	@center()
