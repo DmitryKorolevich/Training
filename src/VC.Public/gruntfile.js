@@ -10,10 +10,10 @@ module.exports = function (grunt) {
 		jsFiles[i] = "wwwroot/" + jsFiles[i];
 	}
 
-	//var cssFiles = cssConfig.files;
-	//for (var j = 0; j < cssFiles.length; j++) {
-	//	cssFiles[j] = "wwwroot/" + cssFiles[j];
-	//}
+	var cssFiles = cssConfig.files;
+	for (var j = 0; j < cssFiles.length; j++) {
+		cssFiles[j] = "wwwroot/" + cssFiles[j];
+	}
 
 	grunt.initConfig({
 		jsMinifiedFileName: jsConfig.minifiedFileName,
@@ -30,7 +30,7 @@ module.exports = function (grunt) {
         },
         concat: {
             css: {
-                src: ['wwwroot/assets/**/*.css', '/wwwroot/lib/**/*.css', 'temp/less/*.css'],
+                src: cssFiles,
 				dest: 'temp/css/<%= cssMinifiedFileName %>.css'
 			},
         	js: {
@@ -76,7 +76,7 @@ module.exports = function (grunt) {
                 files: [
 				    { expand: true, cwd: 'app/', src: ['**'], dest: 'wwwroot/app/' },
 				  { expand: true, cwd: 'assets/scripts/', src: ['**'], dest: 'wwwroot/assets/scripts/' },
-				  { expand: true, cwd: 'temp/css/', src: ['**'], dest: 'wwwroot/assets/styles/' },
+				  { expand: true, cwd: 'temp/less/', src: ['**'], dest: 'wwwroot/assets/styles/' },
 				  { expand: true, cwd: 'assets/images/', src: ['**'], dest: 'wwwroot/assets/images/' },
 				  { expand: true, cwd: 'assets/fonts/', src: ['**'], dest: 'wwwroot/assets/fonts/' },
 				  { expand: true, cwd: 'assets/miscellaneous/', src: ['**'], dest: 'wwwroot/assets/miscellaneous/' },
