@@ -6,11 +6,16 @@
     "normalize.css": "~3.0.3",
     "nivoslider": "*",
     "jquery.scrollTo": "~2.1.2",
-    "tooltipster": "~3.3.0"
+    "tooltipster": "~3.3.0",
+    "font-awesome": "~4.5.0"
   },
   "exportsOverride": {
     "jQuery": {
       ".": "dist/jquery.js"
+    },
+    "font-awesome": {
+      ".": "css/*.*",
+      "../fonts": "fonts/*.*"
     },
     "normalize.css": {
       ".": "normalize.css"

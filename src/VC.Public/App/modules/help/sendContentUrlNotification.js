@@ -3,6 +3,7 @@
     var emailButton = $('.icons-bar .email-button');
     emailButton.click(function (e)
     {
+        var title = $(this).data('title');
         var name = $(this).data('content-name');
         var url = $(this).data('absolute-url');
         $.ajax({
@@ -11,6 +12,7 @@
         }).success(function (result)
         {
             $(result).dialog({
+                title: title,
                 resizable: false,
                 modal: true,
                 minWidth: defaultModalSize,
@@ -27,7 +29,7 @@
                 },
                 buttons: [
 					{
-					    text: "Send Article",
+					    text: title,
 					    'class': "main-dialog-button",
 					    click: function ()
 					    {

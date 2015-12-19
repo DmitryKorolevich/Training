@@ -6,6 +6,7 @@
     "lib/nivoslider/nivo-slider.css",
     "lib/nivoslider/themes/default/default.css",
     "lib/tooltipster/tooltipster.css",
+    "lib/font-awesome/font-awesome.css",
     "assets/scripts/vendor/toast/jquery.toast.min.css",
     "assets/styles/main.css",
     "assets/scripts/vendor/jquery-ui/jquery-ui.min.css",
