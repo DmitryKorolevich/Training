@@ -302,11 +302,11 @@ namespace VitalChoice.Core.DependencyInjection
             builder.Register(cc => cc.Resolve<ILoggerProviderExtended>().Factory).As<ILoggerFactory>();
 
             //TODO: omit ILogger override in config parameter
-            //builder.Register((cc, pp) => cc.Resolve<ILoggerProviderExtended>().CreateLogger("Root")).As<ILogger>();
-            //builder.RegisterGeneric(typeof(Logger<>))
-            //    .WithParameter((pi, cc) => pi.ParameterType == typeof(ILoggerFactory),
-            //        (pi, cc) => cc.Resolve<ILoggerProviderExtended>().Factory)
-            //    .As(typeof(ILogger<>));
+            builder.Register((cc, pp) => cc.Resolve<ILoggerProviderExtended>().CreateLogger("Root")).As<ILogger>();
+            builder.RegisterGeneric(typeof(Logger<>))
+                .WithParameter((pi, cc) => pi.ParameterType == typeof(ILoggerFactory),
+                    (pi, cc) => cc.Resolve<ILoggerProviderExtended>().Factory)
+                .As(typeof(ILogger<>));
 
             builder.RegisterType<LocalizationService>()
                 .As<ILocalizationService>()
