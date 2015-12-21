@@ -1,0 +1,14 @@
+﻿@using System.Threading.Tasks
+@using Microsoft.Extensions.OptionsModel
+@using VC.Public.Helpers
+@using VitalChoice.Infrastructure.Domain.Options
+@model VC.Public.Models.Product.AddOutOfStockProductRequestModel
+@inject IOptions<AppOptions> appOptions;
+
+<div id="addOutOfStockProductRequestDialog" title="Submit Out of Stock Request">
+	<script>
+		var captchaSiteKey = "@appOptions.Value.GoogleCaptcha.PublicKey";
+	</script>
+	<span class="title">@Model.Name</span>
+	@{ await Html.RenderPartialAsync("_AddOutOfStockProductRequestInner", Model); }
+</div>

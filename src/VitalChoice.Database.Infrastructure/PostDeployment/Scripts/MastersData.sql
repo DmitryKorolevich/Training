@@ -779,20 +779,42 @@ END
 IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE (Template = N'' OR Template is NULL) AND [Name] = 'Product page')
 BEGIN
 	UPDATE [dbo].[MasterContentItems]
-	SET [Template] = N'@using() {{VitalChoice.Domain.Transfer.TemplateModels.ProductPage}}
+	SET [Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage}}
 @using() {{System.Linq}}
 @model() {{dynamic}}
 
 <%
+<review_rating>{{
+    @if(@model == 0){{
+         <img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+    }}
+    @if(@model == 1){{
+         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+    }}
+    @if(@model == 2){{
+         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+    }}
+    @if(@model == 3){{
+         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+    }}
+    @if(@model == 4){{
+         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+    }}
+    @if(@model == 5){{
+         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif" /><img class="rating-last-child" src="/assets/images/fullstar.gif" />
+    }}
+}}    
+    
 <product_breadcrumb>
 {{
     <div class="category-breadcrumb">
-	    @list(BreadcrumbOrderedItems):param(BreadcrumbOrderedItems)
-        {{
+	    @list(@model.BreadcrumbOrderedItems.Take(model.BreadcrumbOrderedItems.Count - 1)) {{
             <a href="@(Url)" title="@(Label)">@(Label)</a>
-            @if(@model != chained.Last()){{
-                <img src="/assets/images/breadarrow2.jpg">
-            }}
+            <img src="/assets/images/breadarrow2.jpg">
+        }}
+        @if(@model.BreadcrumbOrderedItems.Any())
+        {{
+            <span>@(@model.BreadcrumbOrderedItems.Last().Label)</span>
         }}
 	</div>
 }}
@@ -804,52 +826,88 @@ BEGIN
 		<div class="product-intro-main">
 			<div class="product-intro-headers">
 				<h1>@(Name)</h1>
-				<h2>Skinless/Boneless 6-oz. Portions</h2>
-				<h3>Product #@(@model.Skus.First().Code)</h3>
+				@if(SubTitle) {{
+				    <h2>@(SubTitle)</h2>
+				}}
+				@if(@model.Skus.Any()){{
+				    <h3 id="hSelectedCode">Product #@(@model.Skus.First().Code)</h3>
+				}}
 			</div>
-			<img title="Alaska Seafood" src="/assets/images/products/ASMI-W.jpg"/>
+			@if(@model.SpecialIcon == 1){{
+			    <img title="MSC" src="/assets/images/specialIcons/msc-atc.jpg"/>
+			}}
+			@if(@model.SpecialIcon == 2){{
+			    <img title="USDA" src="/assets/images/specialIcons/usda-atc.jpg"/>
+			}}
+			@if(@model.SpecialIcon == 3){{
+			   <img title="ASMI" src="/assets/images/specialIcons/alaskaseafoodicon.jpg"/>
+			}}
+			@if(@model.SpecialIcon == 4){{
+			   <img title="USDA + Fair Trade" src="/assets/images/specialIcons/usda-fairtrade-atc.jpg"/>
+			}}
+			@if(@model.SpecialIcon == 5){{
+			    <img title="Certified Humane" src="/assets/images/specialIcons/humane-atc.jpg"/>
+			}}
+			@if(@model.SpecialIcon == 6){{
+			    <img title="ASMI-W" src="/assets/images/specialIcons/ASMI-W.jpg"/>
+			}}
 		</div>
 		<div class="product-intro-sub">
-			<div class="product-stars-container">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
+		    <div class="product-stars-container">
+			    @review_rating(@model.ReviewsTab.AverageRatings)
 			</div>
-			<span class="product-reviews-count">[185]</span>
-			<a href="#">
-				Read <strong>185</strong> reviews
-			</a>
-			<a href="#">
+			@if(@model.ReviewsTab.ReviewsCount > 0){{
+			    <span class="product-reviews-count">[@(@model.ReviewsTab.ReviewsCount)]</span>
+			    <a href="#tabs-reviews" id="lnkReviewsTab">
+				    Read <strong>@(@model.ReviewsTab.ReviewsCount)</strong> reviews
+			    </a>
+			}}
+			<a class="write-review-link" href="#">
 				Write a Review
 			</a>
 		</div>
-		<p class="product-intro-description">
-			Rich in flavor, omega-3s, and vitamin D, our most popular salmon is abundant with the antioxidant astaxanthin, the source of its vibrant red hue. Its pure, fresh flavor is what some call the truest salmon taste.
-		</p>
-		<a class="product-intro-more" href="#tabs-details">Read more ></a>
+		<div class="product-intro-description">
+			@(ShortDescription)
+		</div>
+		@(DescriptionTab) {{
+		    @if(){{
+		        @ifnot(Hidden){{
+		            <a class="product-intro-more" href="#tabs-details" id="lnkDescriptionTab">Read more ></a>
+		        }}
+		    }}
+		}}
 		<div class="product-action-bar">
 			<div class="product-action-left">
-				<span class="action-left-header">Number of Portions:</span>
-				<label class="product-portion-line">
-					<input type="radio"/>
-					6 - $79.00
-				</label>
-				<label class="product-portion-line">
-					<input type="radio"/>
-					12 - $138.00
-				</label>
-				<label class="product-portion-line">
-					<input type="radio"/>
-					24 - $239.00 <span class="product-best-value">Best Value!</span>
-				</label>
+				@if(SubProductGroupName){{
+					<span class="action-left-header">@(SubProductGroupName)</span>
+				}}
+				@ifnot(SubProductGroupName){{
+					<span class="action-left-header">Number of Portions:</span>
+				}}
+				@list(Skus) {{
+				    <label class="product-portion-line">
+					    <input name="sku" type="radio" value="@(Code)" data-in-stock="@(@model.InStock.ToString().ToLower())" data-price="@money(Price)"/>
+					    @(PortionsCount) - @money(Price)
+					    @if(SalesText) {{
+					        <span class="product-best-value">@(SalesText)</span>
+					    }}
+				    </label>
+				}}
 			</div>
-			<div class="product-action-right">
-				<span class="product-selected-price">Selected Price $79.00</span>
-				<a href="#">
-					<img src="/assets/images/addtocartorange-2015.jpg"/>
-				</a>
+            <div class="product-action-right">
+			    @if(@model.Skus.Any()){{
+			        <div style="display: none;" class="in-stock">
+    				    <span id="spSelectedPrice" class="product-selected-price">Selected Price @money(@model.Skus.First().Price)</span>
+    				    <a href="#">
+    					    <img src="/assets/images/addtocartorange-2015.jpg"/>
+    				    </a>
+				    </div>
+			        <div style="display: none;" class="out-of-stock">
+			            <a href="#">
+    					    <img src="/assets/images/OOS-graphic.png"/>
+    				    </a>
+			        </div>
+				}}
 			</div>
 		</div>
 	</div>
@@ -858,56 +916,251 @@ BEGIN
 <product_details>
 {{
     <div class="tabs-control">
-			<ul>
-				<li><a href="#tabs-details">Details</a></li>
-				<li><a href="#tabs-reviews">Reviews</a></li>
-				<li><a href="#tabs-nutrition">Nutrition & Ingredients</a></li>
-				<li><a href="#tabs-recipes">Recipes</a></li>
-				<li><a href="#tabs-serving">Serving/Care</a></li>
-				<li><a href="#tabs-shipping">Shipping</a></li>
-			</ul>
-			<div class="tab-container" id="tabs-details">
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-			</div>
-			<div id="tabs-reviews">
-				<p>Morbi tincidunt, dui sit amet facilisis feugiat, odio metus gravida ante, ut pharetra massa metus id nunc. Duis scelerisque molestie turpis. Sed fringilla, massa eget luctus malesuada, metus eros molestie lectus, ut tempus eros massa ut dolor. Aenean aliquet fringilla sem. Suspendisse sed ligula in ligula suscipit aliquam. Praesent in eros vestibulum mi adipiscing adipiscing. Morbi facilisis. Curabitur ornare consequat nunc. Aenean vel metus. Ut posuere viverra nulla. Aliquam erat volutpat. Pellentesque convallis. Maecenas feugiat, tellus pellentesque pretium posuere, felis lorem euismod felis, eu ornare leo nisi vel felis. Mauris consectetur tortor et purus.</p>
-			</div>
-			<div id="tabs-nutrition">
-				<p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
-				<p>Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.</p>
-			</div>
-			<div id="tabs-recipes">
-				<p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
-				<p>Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.</p>
-			</div>
-			<div id="tabs-serving">
-				<p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
-				<p>Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.</p>
-			</div>
-			<div id="tabs-shipping">
-				<p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
-				<p>Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.</p>
-			</div>
-		</div>
+		<ul>
+		    @(DescriptionTab) {{
+		        @if(){{
+		            @ifnot(Hidden){{
+		                @if(TitleOverride){{
+		                   <li><a href="#tabs-details">@(TitleOverride)</a></li>
+	                    }}
+	                    @ifnot(TitleOverride){{
+	                    <li><a href="#tabs-details">Details</a></li>
+                        }}
+	                }}
+	            }}
+            }}
+            @(ReviewsTab){{
+                @if(){{
+                    @if(@model.ReviewsCount > 0){{
+                        <li><a href="#tabs-reviews">Reviews</a></li>
+                    }}
+                }}
+            }}
+		    @(IngredientsTab) {{
+		        @if(){{
+		            @ifnot(Hidden){{
+		                @if(TitleOverride){{
+		                   <li><a href="#tabs-nutrition">@(TitleOverride)</a></li>
+	                    }}
+	                    @ifnot(TitleOverride){{
+	                       <li><a href="#tabs-nutrition">Nutrition & Ingredients</a></li>
+                        }}
+	                }}
+	            }}
+            }}
+            @(RecipesTab) {{
+                @if(){{
+		            @ifnot(Hidden){{
+		                @if(TitleOverride){{
+		                    <li><a href="#tabs-recipes">@(TitleOverride)</a></li>
+	                    }}
+	                    @ifnot(TitleOverride){{
+	                        <li><a href="#tabs-recipes">Recipes</a></li>
+                        }}
+	                }}
+	            }}
+            }}
+		    @(ServingTab) {{
+		        @if(){{
+		            @ifnot(Hidden){{
+		                @if(TitleOverride){{
+		                    <li><a href="#tabs-serving">@(TitleOverride)</a></li>
+	                    }}
+	                    @ifnot(TitleOverride){{
+	                        <li><a href="#tabs-serving">Serving/Care</a></li>
+                        }}
+	                }}
+	            }}
+            }}
+		    @(ShippingTab) {{
+		        @if(){{
+		            @ifnot(Hidden){{
+		                @if(TitleOverride){{
+		                    <li><a href="#tabs-shipping">@(TitleOverride)</a></li>
+	                    }}
+	                    @ifnot(TitleOverride){{
+	                        <li><a href="#tabs-shipping">Shipping</a></li>
+                        }}
+	                }}
+	            }}
+            }}
+		</ul>
+		@(DescriptionTab) {{
+		    @if(){{
+		        @ifnot(Hidden){{
+		            <div id="tabs-details">
+    		            @(Content)
+    			    </div>
+	            }}  
+	        }}
+	    }}
+	    @(ReviewsTab):param(Url){{
+            @if(){{
+                @if(@model.ReviewsCount > 0){{
+                    <div id="tabs-reviews">
+    		            <p class="product-reviews-overall">
+    		                Average Ratings:
+    		                @review_rating(AverageRatings)  
+    		                @(AverageRatings)
+    		            </p>
+				        <a class="write-review-link" href="#">
+					        Write a Review
+				        </a>
+				        <hr/>
+				        @list(Reviews) {{
+                            <div class="product-reviews-item">
+					            <div class="reviews-item-rating">
+						            @review_rating(Rating)  
+						        </div>
+					            <div class="reviews-item-info">
+						            <span class="reviews-item-title">"@(Title)"</span>
+						            <span class="reviews-item-author">@(CustomerName) on @time(DateCreated){{g}}</span>
+						            <span class="reviews-item-text"><b>Review:</b> @(Review)</span>
+					            </div>
+				            </div>
+				            <hr />
+                        }}
+				        <a class="read-more-reviews" href="/reviews/@(@chained)">
+					        Read more reviews >
+				        </a>
+    			    </div>
+                }}
+            }}
+        }}
+		@(IngredientsTab) {{
+		    @if(){{
+		        @ifnot(Hidden){{
+		            <div id="tabs-nutrition">
+    		            @(Content)
+    		            
+    		            @if(@model.NutritionalTitle != null){{
+    		                @if(@model.Content != null){{
+    		                    <span class="ingredients-section-begin margin-top-medium">Ingredients:</span>
+    		                }}
+    		                @if(@model.Content == null){{
+    		                    <span class="ingredients-section-begin">Ingredients:</span>
+    		                }}
+				            <span class="ingredients-product-title">@(IngredientsTitle)</span>
+				            <hr/>
+				            <div class="ingredients-nutrition-facts">
+					            <div class="nutrition-facts-line">
+						            <span class="facts-static-title">Nutrition Facts</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-nutrition-title">@(NutritionalTitle)</span>
+					            </div>
+					            @if(@model.ServingSize != null){{
+					                <div class="nutrition-facts-line">
+					        	        <span class="facts-nutrition-line">Serving Size @(ServingSize)</span>
+					                </div>
+					            }}
+					            @if(@model.Servings != null){{
+					                <div class="nutrition-facts-line">
+						                <span class="facts-nutrition-line">Number of servings: @(Servings)</span>
+					                </div>
+					            }}
+					            <hr/>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-hint-line">Amount Per Serving</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-subtitle">Calories</span>
+						            <span class="facts-info-line">@(Calories)</span>
+						            <span class="facts-info-value">Calories from Fat @(CaloriesFromFat)</span>
+					            </div>
+					            <hr/>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-hint-value">% Daily Value*</span>
+				        	    </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-subtitle">Total Fat</span>
+						            <span class="facts-info-line">@(TotalFat)</span>
+						            <span class="facts-info-value">@(TotalFatPercent)</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-indent facts-info-line">Saturated Fat @(SaturatedFat)</span>
+					        	    <span class="facts-info-value">@(SaturatedFatPercent)</span>
+				        	    </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-indent facts-info-line">Trans Fat @(TransFat)</span>
+						             <span class="facts-info-value">@(TransFatPercent)</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-subtitle">Cholesterol</span>
+						            <span class="facts-info-line">@(Cholesterol)</span>
+						            <span class="facts-info-value">@(CholesterolPercent)</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+					        	    <span class="facts-info-subtitle">Sodium</span>
+						            <span class="facts-info-line">@(Sodium)</span>
+						            <span class="facts-info-value">@(SodiumPercent)</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-subtitle">Total Carbohydrate</span>
+						            <span class="facts-info-line">@(TotalCarbohydrate)</span>
+						            <span class="facts-info-value">@(TotalCarbohydratePercent)</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-indent facts-info-line">Dietary Fiber @(DietaryFiber)</span>
+					                <span class="facts-info-value">@(DietaryFiberPercent)</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-indent facts-info-line">Sugars @(Sugars)</span>
+						            <span class="facts-info-value">@(SugarsPercent)</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+					        	    <span class="facts-info-subtitle">Protein</span>
+					        	    <span class="facts-info-line">@(Protein)</span>
+					        	    <span class="facts-info-value">@(ProteinPercent)</span>
+					            </div>
+				        	    <hr/>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-line">@(AdditionalNotes)</span>
+				        	    </div>
+				        	    <div class="nutrition-facts-line">
+						            <span class="facts-bottom-hint">* Percent Daily Values are based on a 2,000 calorie diet. Your daily values may be higher or lower depending on your calorie needs.</span>
+				        	    </div>
+			        	    </div>
+			        	}}
+    			    </div>
+	            }}
+	        }}
+	    }}
+		@(RecipesTab) {{
+		    @if(){{
+		        @ifnot(Hidden){{
+		            <div id="tabs-recipes">
+    		            @(Content)
+    		            @if(@model.Recipes.Count > 0){{
+    		                <div class="margin-top-medium">
+    		                    @list(Recipes){{
+    		                        <a class="product-recipe-link" title="@(Name)" href="@(Url)">@(Name)</a>
+    		                    }}
+    		                </div>
+    		            }}
+    			    </div>
+    			}}
+	        }}
+	    }}
+		@(ServingTab) {{
+		    @if(){{
+		        @ifnot(Hidden){{
+		            <div id="tabs-serving">
+    		            @(Content)
+    			    </div>
+    			}}
+	        }}
+	    }}
+		@(ShippingTab) {{
+		    @if(){{
+		        @ifnot(Hidden){{
+		            <div id="tabs-shipping">
+    		            @(Content)
+    			    </div>
+    			}}
+	        }}
+	    }}
+	</div>
 }}
 	
 <product_accessories>
@@ -915,42 +1168,32 @@ BEGIN
     <div class="product-related-accessories">
 		<span class="product-accessories-title">Try one of these delicious recipes</span>
 		<div class="accessories-container">
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/video-thumb-wild-salmon.jpg">
-				Vital Choice Wild Salmon
-			</a>
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/video-thumb-salmon-sauteed.jpg">
-				Sauteing Sockeye Salmon
-			</a>
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/video-thumb-becky.jpg">
-				Chef Becky Selengut
-			</a>
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/video-thumb-salmon-broiled.jpg">
-				How to Broil Salmon
-			</a>
+		    @list(YoutubeVideos) {{
+                <a class="product-related-link" href="javascript:function(){return false;}" data-video-id="@(VideoId)">
+				    <img src="@(Image)">
+			    	@(Text)
+			    </a>
+            }}
 		</div>
 	</div>
 	<div class="product-related-accessories accessories-top-margin">
 		<span class="product-accessories-title">Discover these customer favorites ... satisfaction 100% Guaranteed!</span>
 		<div class="accessories-container">
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/Sockeye6oz_218.jpg">
-			</a>
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/FTM606_tuna_med_218.jpg">
-			</a>
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/cwrp_casn_salmon_218.jpg">
-			</a>
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/NCB106_goodfishbook_218.jpg">
-			</a>
+		    @list(CrossSells) {{
+                <a class="product-related-link" target="_blank" href="@(Url)">
+				    <img src="@(Image)">
+			    </a>
+            }}
 		</div>
 	</div>
-}}		
+}}	
+
+<scripts>
+{{
+    <script>
+		var productPublicId = "@(ProductPublicId)";
+    </script>
+}}
 	
 <layout> -> (ProductPage)
 {{
@@ -966,6 +1209,7 @@ BEGIN
 	        @product_accessories()
 	    </section>
     </div>
+    @scripts()
 }}:: TtlProductPageModel 
 %>'
 WHERE [Name] = 'Product page'

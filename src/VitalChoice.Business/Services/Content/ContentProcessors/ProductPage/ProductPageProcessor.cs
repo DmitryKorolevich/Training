@@ -190,7 +190,9 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
                 Code = x.Code,
                 SalesText = x.Data.SalesText,
                 Price = viewContext.Parameters.Role == RoleType.Retail ? x.Price : x.WholesalePrice,
-                PortionsCount = x.Data.QTY
+                PortionsCount = x.Data.QTY,
+                InStock = (x.SafeData.DisregardStock !=null && x.SafeData.DisregardStock == true) || x.SafeData.DisregardStock==null
+                    || x.SafeData.Stock>0
             }).ToList();
             toReturn.YoutubeVideos = new List<TtlRelatedYoutubeVideoModel>()
             {

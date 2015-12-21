@@ -11,5 +11,7 @@
 	    public decimal Price { get; set; }
 
 	    public bool BestValue { get; set; }
+
+        public bool InStock { get; set; }
     }
 }

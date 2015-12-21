@@ -614,7 +614,8 @@ namespace VitalChoice.Business.Services.Products
 					Id = item.Id,
 					IdCustomer = item.Id,
 					ProductName = item.ProductName,
-					ProductThumbnail = item.ProductThumbnail,
+                    ProductSubTitle = item.ProductSubTitle,
+                    ProductThumbnail = item.ProductThumbnail,
 					Quantity = item.Quantity,
 					Url = pairs.Single(x=>x.Key == item.Id).Value
 				});
