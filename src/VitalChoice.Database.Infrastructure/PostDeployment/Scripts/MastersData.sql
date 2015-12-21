@@ -1180,7 +1180,7 @@ BEGIN
 		<span class="product-accessories-title">Discover these customer favorites ... satisfaction 100% Guaranteed!</span>
 		<div class="accessories-container">
 		    @list(CrossSells) {{
-                <a class="product-related-link" target="_blank" href="@(Url)">
+                <a class="product-related-link" href="@(Url)">
 				    <img src="@(Image)">
 			    </a>
             }}
