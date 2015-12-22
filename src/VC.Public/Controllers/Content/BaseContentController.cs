@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.AspNet.Mvc;
 using VC.Public.Models;
 using VitalChoice.Core.Base;
+using VitalChoice.Infrastructure.Domain.Constants;
 
 namespace VC.Public.Controllers.Content
 {
@@ -14,11 +15,9 @@ namespace VC.Public.Controllers.Content
             return View("~/Views/Content/ContentPage.cshtml", model);
         }
 
-        public virtual ViewResult BaseNotFoundView()
+        public virtual IActionResult BaseNotFoundView()
         {
-            var result = View("~/Views/Shared/Error404.cshtml");
-            result.StatusCode = 404;
-            return result;
+            return Redirect("/content/"+ ContentConstants.NOT_FOUND_PAGE_URL);
         }
     }
 }

@@ -18,5 +18,7 @@
         public const string FIELD_NAME_RELATED_RECIPE_IMAGE = "RelatedRecipeImage";
         public const string FIELD_NAME_RELATED_RECIPE_TITLE = "RelatedRecipeTitle";
         public const string FIELD_NAME_RELATED_RECIPE_URL = "RelatedRecipeUrl";
+
+        public const string NOT_FOUND_PAGE_URL = "not-found";
     }
 }

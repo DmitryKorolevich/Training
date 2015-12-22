@@ -11,6 +11,8 @@ using Microsoft.AspNet.Mvc.Abstractions;
 using System.IO;
 using Microsoft.AspNet.Mvc.ViewEngines;
 using Microsoft.AspNet.Mvc.Rendering;
+using VitalChoice.Infrastructure.Domain.Constants;
+using System.Net;
 
 namespace VC.Public.Controllers.Content
 {
@@ -57,6 +59,10 @@ namespace VC.Public.Controllers.Content
             var toReturn = await _contentPageViewService.GetContentAsync(ActionContext, BindingContext, User);
             if (toReturn?.Body != null)
             {
+                if(url ==ContentConstants.NOT_FOUND_PAGE_URL)
+                {
+                    Response.StatusCode = (int)HttpStatusCode.NotFound;
+                }
                 return BaseView(new ContentPageViewModel(toReturn));
             }
             return BaseNotFoundView();

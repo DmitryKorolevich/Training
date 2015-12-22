@@ -33,6 +33,7 @@ using Microsoft.AspNet.Mvc.ViewFeatures;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Routing;
 using Microsoft.AspNet.Mvc.Abstractions;
+using System.Net;
 
 namespace VC.Public.Controllers
 {
@@ -66,6 +67,19 @@ namespace VC.Public.Controllers
             _options = options;
             _notificationService = notificationService;
             _logger = loggerProvider.CreateLoggerDefault();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Error(int id)
+        {
+            if((HttpStatusCode)id==HttpStatusCode.NotFound)
+            {
+                return Redirect("/content/"+ ContentConstants.NOT_FOUND_PAGE_URL);
+            }
+            else
+            {
+                return Redirect("~/Shared/Error");
+            }
         }
 
         [HttpPost]
