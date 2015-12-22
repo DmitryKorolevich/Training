@@ -9,47 +9,48 @@ namespace VC.Public.Controllers.Content
 {
     public class FaqController : BaseContentController
     {
-        private readonly IContentEditService _contentService;
+        private readonly IFAQCategoryViewService _faqCategoryViewService;
+        private readonly IFAQViewService _faqViewService;
 
-        public FaqController(IContentEditService contentService)
+        public FaqController(
+            IFAQCategoryViewService faqCategoryViewService,
+            IFAQViewService faqViewService)
 	    {
-		   _contentService = contentService;
-	    }
+            _faqCategoryViewService = faqCategoryViewService;
+            _faqViewService = faqViewService;
+        }
 
-	    [HttpGet]
+        [HttpGet]
         public async Task<IActionResult> Categories()
         {
-            throw new NotImplementedException();
-            //var toReturn = await _contentService.GetCategoryContentAsync(ContentType.FaqCategory, GetParameters());
-            //if (toReturn != null)
-            //{
-            //    return BaseView(new ContentPageViewModel(toReturn));
-            //}
-            //return BaseNotFoundView();
+            var toReturn = await _faqCategoryViewService.GetContentAsync(ActionContext, BindingContext, User);
+            if (toReturn?.Body != null)
+            {
+                return BaseView(new ContentPageViewModel(toReturn));
+            }
+            return BaseNotFoundView();
         }
 
         [HttpGet]
         public async Task<IActionResult> Category(string url)
         {
-            throw new NotImplementedException();
-            //var toReturn = await _contentService.GetCategoryContentAsync(ContentType.FaqCategory, GetParameters(), url);
-            //if (toReturn != null)
-            //{
-            //    return BaseView(new ContentPageViewModel(toReturn));
-            //}
-            //return BaseNotFoundView();
+            var toReturn = await _faqCategoryViewService.GetContentAsync(ActionContext, BindingContext, User);
+            if (toReturn?.Body != null)
+            {
+                return BaseView(new ContentPageViewModel(toReturn));
+            }
+            return BaseNotFoundView();
         }
 
         [HttpGet]
         public async Task<IActionResult> FAQ(string url)
         {
-            throw new NotImplementedException();
-            //var toReturn = await _contentService.GetContentItemContentAsync(ContentType.Faq, GetParameters(), url);
-            //if (toReturn != null)
-            //{
-            //    return BaseView(new ContentPageViewModel(toReturn));
-            //}
-            //return BaseNotFoundView();
+            var toReturn = await _faqViewService.GetContentAsync(ActionContext, BindingContext, User);
+            if (toReturn?.Body != null)
+            {
+                return BaseView(new ContentPageViewModel(toReturn));
+            }
+            return BaseNotFoundView();
         }
     }
 }

@@ -2104,3 +2104,241 @@ BEGIN
 END
 
 GO
+
+IF ((SELECT TOP 1 MasterContentItemId FROM ContentCategories WHERE Type=5 AND ParentID IS NULL)
+=(SELECT TOP 1 Id FROM MasterContentItems WHERE Name='FAQ Root Category'))
+BEGIN
+
+UPDATE ContentCategories
+SET  MasterContentItemId=(SELECT TOP 1 Id FROM MasterContentItems WHERE Name='FAQ Sub Category')
+WHERE Type=5 AND ParentID IS NULL
+
+UPDATE ContentItems
+SET Template=''
+WHERE Id=(SELECT TOP 1 ContentItemId FROM ContentCategories WHERE Type=5 AND ParentID IS NULL)
+
+END
+
+GO
+
+IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Name='FAQ Sub Category' AND Updated<'2015-12-22 00:00:00.000')
+BEGIN
+	UPDATE [dbo].[MasterContentItems]
+	SET 
+	[Updated]=GETDATE(),
+	[Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.FAQs}}
+@model() {{dynamic}}
+
+<%
+    
+<left_menu>
+{{
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>Customer Care</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="/content/contact-customer-service"><strong>Contact Customer Service</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>Shipping Information</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>Privacy Policy</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>Returns & Exchanges</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>Comments</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="/content/request-catalog"><strong>Request Catalog</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>FAQ</strong></a>
+    </div>
+}}
+    
+<left>
+{{
+	<div class="left-content-pane">
+	    <div class="left-wrapper">
+	        @left_menu()
+		</div>
+		<div class="left-wrapper">
+		    <a href="#"><img src="/assets/images/news-baby-spot-8-29-13a-210x157px.png"></a>
+	    </div>
+	</div>
+}}
+
+<center>
+{{
+	<div class="center-content-pane">
+        <h2>Frequently Asked Questions (FAQs)</h2>
+        @ifnot(@model.Model.ParentId) {{
+            <ol>
+                <li class="margin-bottom-small">Click on a subject category below to view all of the FAQs related to that subject.</li>
+                <li class="margin-bottom-small">If you don''t find your answer among those FAQs, please use the search box below.</li>
+                <li class="margin-bottom-small">If Search does not yield an answer, please send a query from our 
+                    <a href="/content/contact-customer-service">Customer Service page</a>.
+                </li>
+            </ol>
+            <div class="input-wrapper margin-bottom-medium">
+                <input type="text" autocomplete="off" placeholder="Enter your search term here">
+                <input class="yellow" type="button" value="Search FAQs">
+            </div>
+            @list(FAQCategories.AllCategories){{
+                <strong>@(Name)</strong>
+                <ul>
+                    @list(SubCategories){{
+                        <li><a href="@(Url)">@(Name)</a></li>
+                    }}
+                </ul>
+            }}
+        }}
+        @if(@model.Model.ParentId) {{
+            <a href="/faqs">&lt;&lt; Back to Main FAQ Page</a>
+            <br/>
+            <br/>
+            <div class="margin-bottom-medium"><strong>@(Model.Name)</strong></div>
+            @if(@model.FAQCategories.SubCategories.Count>0){{
+		        @list(FAQCategories.SubCategories){{
+                    <div class="margin-bottom-small">
+	                    <a href="@(Url)">@(Name)</a>
+                    </div>
+                }}
+		    }}
+		    @if(@model.FAQCategories.SubCategories.Count==0){{
+		        @list(FAQs){{
+                    <div class="margin-bottom-small">
+	                    <a href="@(Url)">@(Name)</a>
+                    </div>
+                }}
+		    }}
+        }}
+	</div>
+}}
+
+<right>
+{{
+	<div class="right-content-pane">
+	    <div class="right-wrapper">
+		    <a href="#"><img src="/assets/images/guarantee-spot-8-29-13-210px.jpg"></a>
+        </div>
+	    <div class="right-wrapper">
+	        <strong class="centered-horizontal">
+	            <a href="#">Click here to read a letter from Randy, describing the genesis and goals of Vital Choice.</a>
+	        </strong>
+	    </div>
+	</div>
+}}
+
+<default> -> ()
+{{
+    <div class="working-area-holder content-page faq-part faq-categories-page">
+        @left()
+    	@center()
+    	@right()
+	</div>
+}}
+%>'
+WHERE Name='FAQ Sub Category'
+
+END
+
+GO
+
+IF EXISTS (SELECT
+	[Id]
+FROM [dbo].[MasterContentItems]
+WHERE Name = 'FAQ Individual'
+AND Updated < '2015-12-22 00:00:00.000') BEGIN
+UPDATE [dbo].[MasterContentItems]
+SET	[Updated] = GETDATE(),
+	[Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.FAQs}}
+@model() {{dynamic}}
+
+<%
+    
+<left_menu>
+{{
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>Customer Care</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="/content/contact-customer-service"><strong>Contact Customer Service</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>Shipping Information</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>Privacy Policy</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>Returns & Exchanges</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>Comments</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="/content/request-catalog"><strong>Request Catalog</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>FAQ</strong></a>
+    </div>
+}}
+    
+<left>
+{{
+	<div class="left-content-pane">
+	    <div class="left-wrapper">
+	        @left_menu()
+		</div>
+		<div class="left-wrapper">
+		    <a href="#"><img src="/assets/images/news-baby-spot-8-29-13a-210x157px.png"></a>
+	    </div>
+	</div>
+}}
+
+<center>
+{{
+	<div class="center-content-pane">
+        <h2>Frequently Asked Questions (FAQs)</h2>
+        <a href="/faqs">&lt;&lt; Back to Main FAQ Page</a>
+        <br/>
+        <br/>
+        <div class="faq-title margin-bottom-small"><strong>@(Model.Name)</strong></div>
+        <div class="faq-body">
+            @(Model.ContentItem.Description)
+        </div>
+	</div>
+}}
+
+<right>
+{{
+	<div class="right-content-pane">
+	    <div class="right-wrapper">
+		    <a href="#"><img src="/assets/images/guarantee-spot-8-29-13-210px.jpg"></a>
+        </div>
+	    <div class="right-wrapper">
+	        <strong class="centered-horizontal">
+	            <a href="#">Click here to read a letter from Randy, describing the genesis and goals of Vital Choice.</a>
+	        </strong>
+	    </div>
+	</div>
+}}
+
+<default> -> ()
+{{
+    <div class="working-area-holder content-page faq-part faq-page">
+        @left()
+    	@center()
+    	@right()
+	</div>
+}}
+%>'
+WHERE Name = 'FAQ Individual'
+
+END
+
+GO
