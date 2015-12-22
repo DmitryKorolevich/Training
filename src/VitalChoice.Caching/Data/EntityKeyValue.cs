@@ -2,9 +2,9 @@
 
 namespace VitalChoice.Caching.Data
 {
-    internal class EntityKey : IEquatable<EntityKey>
+    internal class EntityKeyValue : IEquatable<EntityKeyValue>
     {
-        public bool Equals(EntityKey other)
+        public bool Equals(EntityKeyValue other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -15,7 +15,7 @@ namespace VitalChoice.Caching.Data
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            var entityKey = obj as EntityKey;
+            var entityKey = obj as EntityKeyValue;
             if (entityKey != null)
                 return Equals(entityKey);
             return false;
@@ -29,17 +29,17 @@ namespace VitalChoice.Caching.Data
             }
         }
 
-        public static bool operator ==(EntityKey left, EntityKey right)
+        public static bool operator ==(EntityKeyValue left, EntityKeyValue right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(EntityKey left, EntityKey right)
+        public static bool operator !=(EntityKeyValue left, EntityKeyValue right)
         {
             return !Equals(left, right);
         }
 
-        public EntityKey(EntityKeyInfo keyInfo, object key)
+        public EntityKeyValue(EntityKeyInfo keyInfo, object key)
         {
             if (keyInfo == null)
                 throw new ArgumentNullException(nameof(keyInfo));

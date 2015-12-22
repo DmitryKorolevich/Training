@@ -9,8 +9,7 @@ namespace VitalChoice.Caching.Data
 {
     internal struct EntityCacheKey
     {
-        public Expression WhereExpression;
+        public Expression QueryExpression;
         public Type EntityType;
-        public ICollection<RelationInfo> IncludedRelations;
     }
 }

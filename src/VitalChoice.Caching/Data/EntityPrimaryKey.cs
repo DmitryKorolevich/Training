@@ -7,9 +7,9 @@ namespace VitalChoice.Caching.Data
 {
     internal class EntityPrimaryKey : IEquatable<EntityPrimaryKey>
     {
-        private readonly IDictionary<string, EntityKey> _keys;
+        private readonly IDictionary<string, EntityKeyValue> _keys;
 
-        public EntityPrimaryKey(ICollection<EntityKey> keys)
+        public EntityPrimaryKey(IEnumerable<EntityKeyValue> keys)
         {
             _keys = keys.ToDictionary(k => k.KeyInfo.Name);
         }
