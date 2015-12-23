@@ -8,6 +8,7 @@ using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain.Entities.Discounts;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Interfaces.Services.Products;
 
@@ -77,16 +78,19 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.ExcludeCategories = dynamic.ExcludeCategories;
                 entity.IdAddedBy = entity.IdAddedBy;
 
-                entity.DiscountsToCategories = dynamic.CategoryIds?.Select(c => new DiscountToCategory
-                {
-                    IdCategory = c,
-                    IdDiscount = dynamic.Id
-                }).ToList();
-                entity.DiscountsToSelectedCategories = dynamic.CategoryIdsAppliedOnlyTo?.Select(c => new DiscountToSelectedCategory
-                {
-                    IdCategory = c,
-                    IdDiscount = dynamic.Id
-                }).ToList();
+                entity.DiscountsToCategories.MergeKeyed(dynamic.CategoryIds, category => category.IdCategory, i => i,
+                    i => new DiscountToCategory
+                    {
+                        IdCategory = i,
+                        IdDiscount = dynamic.Id
+                    });
+
+                entity.DiscountsToSelectedCategories.MergeKeyed(dynamic.CategoryIdsAppliedOnlyTo, category => category.IdCategory, i => i,
+                    i => new DiscountToSelectedCategory
+                    {
+                        IdCategory = i,
+                        IdDiscount = dynamic.Id
+                    });
                 if (dynamic.SkusFilter != null)
                 {
                     foreach (var item in dynamic.SkusFilter)
@@ -94,7 +98,7 @@ namespace VitalChoice.Business.Services.Dynamic
                         item.Id = 0;
                         item.IdDiscount = dynamic.Id;
                     }
-                    entity.DiscountsToSkus = dynamic.SkusFilter.ToList();
+                    entity.DiscountsToSkus.MergeKeyed(dynamic.SkusFilter.ToList(), sku => sku.IdSku);
                 }
                 if (dynamic.SkusAppliedOnlyTo != null)
                 {
@@ -103,7 +107,7 @@ namespace VitalChoice.Business.Services.Dynamic
                         item.Id = 0;
                         item.IdDiscount = dynamic.Id;
                     }
-                    entity.DiscountsToSelectedSkus = dynamic.SkusAppliedOnlyTo.ToList();
+                    entity.DiscountsToSelectedSkus.MergeKeyed(dynamic.SkusAppliedOnlyTo, sku => sku.IdSku);
                 }
                 if (dynamic.DiscountTiers != null)
                 {
