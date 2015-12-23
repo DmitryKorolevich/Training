@@ -93,32 +93,18 @@ namespace VitalChoice.Business.Services.Products
                 if (skuIds.Count > 0)
                 {
                     var shortSkus =
-                        await
+                        (await
                             _skuRepository.Query(
                                 p => skuIds.Contains(p.Id) && p.StatusCode != (int) RecordStatusCode.Deleted)
                                 .Include(p => p.Product)
-                                .SelectAsync(p => new ShortSkuInfo(p), false);
+                                .SelectAsync(false)).Select(p => new ShortSkuInfo(p)).ToDictionary(s => s.Id);
                     foreach (var sku in entity.DiscountsToSelectedSkus)
                     {
-                        foreach (var shortSku in shortSkus)
-                        {
-                            if (sku.IdSku == shortSku.Id)
-                            {
-                                sku.ShortSkuInfo = shortSku;
-                                break;
-                            }
-                        }
+                        sku.ShortSkuInfo = shortSkus[sku.IdSku];
                     }
                     foreach (var sku in entity.DiscountsToSkus)
                     {
-                        foreach (var shortSku in shortSkus)
-                        {
-                            if (sku.IdSku == shortSku.Id)
-                            {
-                                sku.ShortSkuInfo = shortSku;
-                                break;
-                            }
-                        }
+                        sku.ShortSkuInfo = shortSkus[sku.IdSku];
                     }
                 }
                 entity.DiscountTiers = entity.DiscountTiers.OrderBy(p => p.Order).ToArray();
