@@ -495,6 +495,7 @@ namespace VC.Public.Controllers
             var model = favorites.Items.Select(favorite => new FavoriteModel()
             {
                 ProductName = favorite.ProductName,
+                ProductSubTitle = favorite.ProductSubTitle,
                 ProductThumbnail = favorite.ProductThumbnail,
                 Url = ProductBaseUrl + favorite.Url
 			}).ToList();

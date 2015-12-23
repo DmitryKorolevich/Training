@@ -779,1819 +779,6 @@ END
 IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE (Template = N'' OR Template is NULL) AND [Name] = 'Product page')
 BEGIN
 	UPDATE [dbo].[MasterContentItems]
-	SET [Template] = N'@using() {{VitalChoice.Domain.Transfer.TemplateModels.ProductPage}}
-@using() {{System.Linq}}
-@model() {{dynamic}}
-
-<%
-<product_breadcrumb>
-{{
-    <div class="category-breadcrumb">
-	    @list(BreadcrumbOrderedItems):param(BreadcrumbOrderedItems)
-        {{
-            <a href="@(Url)" title="@(Label)">@(Label)</a>
-            @if(@model != chained.Last()){{
-                <img src="/assets/images/breadarrow2.jpg">
-            }}
-        }}
-	</div>
-}}
-
-<product_introduction>
-{{
-    <img class="product-intro-image" alt="@(Name)" src="@(Image)"/>
-	<div class="product-intro-info">
-		<div class="product-intro-main">
-			<div class="product-intro-headers">
-				<h1>@(Name)</h1>
-				<h2>Skinless/Boneless 6-oz. Portions</h2>
-				<h3>Product #@(@model.Skus.First().Code)</h3>
-			</div>
-			<img title="Alaska Seafood" src="/assets/images/products/ASMI-W.jpg"/>
-		</div>
-		<div class="product-intro-sub">
-			<div class="product-stars-container">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
-			</div>
-			<span class="product-reviews-count">[185]</span>
-			<a href="#">
-				Read <strong>185</strong> reviews
-			</a>
-			<a href="#">
-				Write a Review
-			</a>
-		</div>
-		<p class="product-intro-description">
-			Rich in flavor, omega-3s, and vitamin D, our most popular salmon is abundant with the antioxidant astaxanthin, the source of its vibrant red hue. Its pure, fresh flavor is what some call the truest salmon taste.
-		</p>
-		<a class="product-intro-more" href="#tabs-details">Read more ></a>
-		<div class="product-action-bar">
-			<div class="product-action-left">
-				<span class="action-left-header">Number of Portions:</span>
-				<label class="product-portion-line">
-					<input type="radio"/>
-					6 - $79.00
-				</label>
-				<label class="product-portion-line">
-					<input type="radio"/>
-					12 - $138.00
-				</label>
-				<label class="product-portion-line">
-					<input type="radio"/>
-					24 - $239.00 <span class="product-best-value">Best Value!</span>
-				</label>
-			</div>
-			<div class="product-action-right">
-				<span class="product-selected-price">Selected Price $79.00</span>
-				<a href="#">
-					<img src="/assets/images/addtocartorange-2015.jpg"/>
-				</a>
-			</div>
-		</div>
-	</div>
-}}
-
-<product_details>
-{{
-    <div class="tabs-control">
-			<ul>
-				<li><a href="#tabs-details">Details</a></li>
-				<li><a href="#tabs-reviews">Reviews</a></li>
-				<li><a href="#tabs-nutrition">Nutrition & Ingredients</a></li>
-				<li><a href="#tabs-recipes">Recipes</a></li>
-				<li><a href="#tabs-serving">Serving/Care</a></li>
-				<li><a href="#tabs-shipping">Shipping</a></li>
-			</ul>
-			<div class="tab-container" id="tabs-details">
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-			</div>
-			<div id="tabs-reviews">
-				<p>Morbi tincidunt, dui sit amet facilisis feugiat, odio metus gravida ante, ut pharetra massa metus id nunc. Duis scelerisque molestie turpis. Sed fringilla, massa eget luctus malesuada, metus eros molestie lectus, ut tempus eros massa ut dolor. Aenean aliquet fringilla sem. Suspendisse sed ligula in ligula suscipit aliquam. Praesent in eros vestibulum mi adipiscing adipiscing. Morbi facilisis. Curabitur ornare consequat nunc. Aenean vel metus. Ut posuere viverra nulla. Aliquam erat volutpat. Pellentesque convallis. Maecenas feugiat, tellus pellentesque pretium posuere, felis lorem euismod felis, eu ornare leo nisi vel felis. Mauris consectetur tortor et purus.</p>
-			</div>
-			<div id="tabs-nutrition">
-				<p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
-				<p>Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.</p>
-			</div>
-			<div id="tabs-recipes">
-				<p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
-				<p>Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.</p>
-			</div>
-			<div id="tabs-serving">
-				<p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
-				<p>Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.</p>
-			</div>
-			<div id="tabs-shipping">
-				<p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
-				<p>Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.</p>
-			</div>
-		</div>
-}}
-	
-<product_accessories>
-{{
-    <div class="product-related-accessories">
-		<span class="product-accessories-title">Try one of these delicious recipes</span>
-		<div class="accessories-container">
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/video-thumb-wild-salmon.jpg">
-				Vital Choice Wild Salmon
-			</a>
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/video-thumb-salmon-sauteed.jpg">
-				Sauteing Sockeye Salmon
-			</a>
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/video-thumb-becky.jpg">
-				Chef Becky Selengut
-			</a>
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/video-thumb-salmon-broiled.jpg">
-				How to Broil Salmon
-			</a>
-		</div>
-	</div>
-	<div class="product-related-accessories accessories-top-margin">
-		<span class="product-accessories-title">Discover these customer favorites ... satisfaction 100% Guaranteed!</span>
-		<div class="accessories-container">
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/Sockeye6oz_218.jpg">
-			</a>
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/FTM606_tuna_med_218.jpg">
-			</a>
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/cwrp_casn_salmon_218.jpg">
-			</a>
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/NCB106_goodfishbook_218.jpg">
-			</a>
-		</div>
-	</div>
-}}		
-	
-<layout> -> (ProductPage)
-{{
-    <div class="product-main">
-        @product_breadcrumb()
-        <section class="product-intro-container">
-	        @product_introduction()    
-	    </section>
-	    <section class="product-detais">
-	        @product_details()
-	    </section>
-	    <section class="product-accessories">
-	        @product_accessories()
-	    </section>
-    </div>
-}}:: TtlProductPageModel 
-%>'
-WHERE [Name] = 'Product page'
-
-END
-
-GO
-
-IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like '%<div class="tab-container" id="tabs-details">%' AND [Name] = 'Product page')
-BEGIN
-	UPDATE [dbo].[MasterContentItems]
-	SET [Template] = N'@using() {{VitalChoice.Domain.Transfer.TemplateModels.ProductPage}}
-@using() {{System.Linq}}
-@model() {{dynamic}}
-
-<%
-<product_breadcrumb>
-{{
-    <div class="category-breadcrumb">
-	    @list(@model.BreadcrumbOrderedItems.Take(model.BreadcrumbOrderedItems.Count - 1)) {{
-            <a href="@(Url)" title="@(Label)">@(Label)</a>
-            <img src="/assets/images/breadarrow2.jpg">
-        }}
-        <span>@(@model.BreadcrumbOrderedItems.Last().Label)</span>
-	</div>
-}}
-
-<product_introduction>
-{{
-    <img class="product-intro-image" alt="@(Name)" src="@(Image)"/>
-	<div class="product-intro-info">
-		<div class="product-intro-main">
-			<div class="product-intro-headers">
-				<h1>@(Name)</h1>
-				@if(@model.SubTitle != null):param() {{
-				    <h2>@(SubTitle)</h2>
-				}}
-				<h3>Product #@(@model.Skus.First().Code)</h3>
-			</div>
-			@if(@model.SpecialIcon == 1){{
-			    <img title="MSC" src="/assets/images/specialIcons/msc-atc.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 2){{
-			    <img title="USDA" src="/assets/images/specialIcons/usda-atc.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 3){{
-			   <img title="ASMI" src="/assets/images/specialIcons/alaskaseafoodicon.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 4){{
-			   <img title="USDA + Fair Trade" src="/assets/images/specialIcons/usda-fairtrade-atc.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 5){{
-			    <img title="Certified Humane" src="/assets/images/specialIcons/humane-atc.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 6){{
-			    <img title="ASMI-W" src="/assets/images/specialIcons/ASMI-W.jpg"/>
-			}}
-		</div>
-		<div class="product-intro-sub">
-			<div class="product-stars-container">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
-			</div>
-			<span class="product-reviews-count">[185]</span>
-			<a href="#">
-				Read <strong>185</strong> reviews
-			</a>
-			<a href="#">
-				Write a Review
-			</a>
-		</div>
-		<div class="product-intro-description">
-			@(ShortDescription)
-		</div>
-		<a class="product-intro-more" href="#tabs-details">Read more ></a>
-		<div class="product-action-bar">
-			<div class="product-action-left">
-				<span class="action-left-header">Number of Portions:</span>
-				<label class="product-portion-line">
-					<input type="radio"/>
-					6 - $79.00
-				</label>
-				<label class="product-portion-line">
-					<input type="radio"/>
-					12 - $138.00
-				</label>
-				<label class="product-portion-line">
-					<input type="radio"/>
-					24 - $239.00 <span class="product-best-value">Best Value!</span>
-				</label>
-			</div>
-			<div class="product-action-right">
-				<span class="product-selected-price">Selected Price $79.00</span>
-				<a href="#">
-					<img src="/assets/images/addtocartorange-2015.jpg"/>
-				</a>
-			</div>
-		</div>
-	</div>
-}}
-
-<product_details>
-{{
-    <div class="tabs-control">
-			<ul>
-			    @if(@model.DescriptionTab.Hidden == false):param() {{
-			        @if(@model.DescriptionTab.TitleOverride != null):param() {{
-			             <li><a href="#tabs-details">@(@model.DescriptionTab.TitleOverride)</a></li>
-			        }}
-			        @if(@model.DescriptionTab.TitleOverride == null) {{
-			             <li><a href="#tabs-details">Details</a></li>
-			        }}
-			    }}
-			    <!--<li><a href="#tabs-reviews">Reviews</a></li>-->
-			    @if(@model.IngredientsTab.Hidden == false):param() {{
-			        @if(@model.IngredientsTab.TitleOverride != null):param() {{
-			             <li><a href="#tabs-nutrition">@(@model.IngredientsTab.TitleOverride)</a></li>
-			        }}
-			        @if(@model.IngredientsTab.TitleOverride == null) {{
-			             <li><a href="#tabs-nutrition">Nutrition & Ingredients</a></li>
-			        }}
-			    }}
-			    @if(@model.RecipesTab.Hidden == false):param() {{
-			        @if(@model.RecipesTab.TitleOverride != null):param() {{
-			             <li><a href="#tabs-recipes">@(@model.RecipesTab.TitleOverride)</a></li>
-			        }}
-			        @if(@model.RecipesTab.TitleOverride == null) {{
-			             <li><a href="#tabs-recipes">Recipes</a></li>
-			        }}
-			    }}
-			    @if(@model.ServingTab.Hidden == false):param() {{
-			        @if(@model.ServingTab.TitleOverride != null):param() {{
-			             <li><a href="#tabs-serving">@(@model.ServingTab.TitleOverride)</a></li>
-			        }}
-			        @if(@model.ServingTab.TitleOverride == null) {{
-			             <li><a href="#tabs-serving">Serving/Care</a></li>
-			        }}
-			    }}
-			    @if(@model.ShippingTab.Hidden == false):param() {{
-			        @if(@model.ShippingTab.TitleOverride != null):param() {{
-			             <li><a href="#tabs-shipping">@(@model.ShippingTab.TitleOverride)</a></li>
-			        }}
-			        @if(@model.ShippingTab.TitleOverride == null) {{
-			             <li><a href="#tabs-shipping">Shipping</a></li>
-			        }}
-			    }}
-			</ul>
-			@if(@model.DescriptionTab.Hidden == false):param() {{
-			    <div id="tabs-details">
-			        @(@model.DescriptionTab.Content)
-				</div>
-			}}
-			<!--Reviews -->
-			@if(@model.IngredientsTab.Hidden == false):param() {{
-			    <div id="tabs-nutrition">
-			        @(@model.IngredientsTab.Content)
-				</div>
-			}}
-			@if(@model.RecipesTab.Hidden == false):param() {{
-			    <div id="tabs-recipes">
-			        @(@model.RecipesTab.Content)
-				</div>
-			}}
-			@if(@model.ServingTab.Hidden == false):param() {{
-			    <div id="tabs-serving">
-			        @(@model.ServingTab.Content)
-				</div>
-			}}
-			@if(@model.ShippingTab.Hidden == false):param() {{
-			    <div id="tabs-shipping">
-			        @(@model.ShippingTab.Content)
-				</div>
-			}}
-		</div>
-}}
-	
-<product_accessories>
-{{
-    <div class="product-related-accessories">
-		<span class="product-accessories-title">Try one of these delicious recipes</span>
-		<div class="accessories-container">
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/video-thumb-wild-salmon.jpg">
-				Vital Choice Wild Salmon
-			</a>
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/video-thumb-salmon-sauteed.jpg">
-				Sauteing Sockeye Salmon
-			</a>
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/video-thumb-becky.jpg">
-				Chef Becky Selengut
-			</a>
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/video-thumb-salmon-broiled.jpg">
-				How to Broil Salmon
-			</a>
-		</div>
-	</div>
-	<div class="product-related-accessories accessories-top-margin">
-		<span class="product-accessories-title">Discover these customer favorites ... satisfaction 100% Guaranteed!</span>
-		<div class="accessories-container">
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/Sockeye6oz_218.jpg">
-			</a>
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/FTM606_tuna_med_218.jpg">
-			</a>
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/cwrp_casn_salmon_218.jpg">
-			</a>
-			<a class="product-related-link" href="#">
-				<img src="/assets/images/products/NCB106_goodfishbook_218.jpg">
-			</a>
-		</div>
-	</div>
-}}		
-	
-<layout> -> (ProductPage)
-{{
-    <div class="product-main">
-        @product_breadcrumb()
-        <section class="product-intro-container">
-	        @product_introduction()    
-	    </section>
-	    <section class="product-detais">
-	        @product_details()
-	    </section>
-	    <section class="product-accessories">
-	        @product_accessories()
-	    </section>
-    </div>
-}}:: TtlProductPageModel 
-%>'
-WHERE [Name] = 'Product page'
-
-END
-
-GO
-
-IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like '%<span class="product-selected-price">Selected Price $79.00</span>%' AND [Name] = 'Product page')
-BEGIN
-	UPDATE [dbo].[MasterContentItems]
-	SET [Template] = N'@using() {{VitalChoice.Domain.Transfer.TemplateModels.ProductPage}}
-@using() {{System.Linq}}
-@model() {{dynamic}}
-
-<%
-<product_breadcrumb>
-{{
-    <div class="category-breadcrumb">
-	    @list(@model.BreadcrumbOrderedItems.Take(model.BreadcrumbOrderedItems.Count - 1)) {{
-            <a href="@(Url)" title="@(Label)">@(Label)</a>
-            <img src="/assets/images/breadarrow2.jpg">
-        }}
-        <span>@(@model.BreadcrumbOrderedItems.Last().Label)</span>
-	</div>
-}}
-
-<product_introduction>
-{{
-    <img class="product-intro-image" alt="@(Name)" src="@(Image)"/>
-	<div class="product-intro-info">
-		<div class="product-intro-main">
-			<div class="product-intro-headers">
-				<h1>@(Name)</h1>
-				@if(@model.SubTitle != null):param() {{
-				    <h2>@(SubTitle)</h2>
-				}}
-				<h3 id="hSelectedCode">Product #@(@model.Skus.First().Code)</h3>
-			</div>
-			@if(@model.SpecialIcon == 1){{
-			    <img title="MSC" src="/assets/images/specialIcons/msc-atc.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 2){{
-			    <img title="USDA" src="/assets/images/specialIcons/usda-atc.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 3){{
-			   <img title="ASMI" src="/assets/images/specialIcons/alaskaseafoodicon.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 4){{
-			   <img title="USDA + Fair Trade" src="/assets/images/specialIcons/usda-fairtrade-atc.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 5){{
-			    <img title="Certified Humane" src="/assets/images/specialIcons/humane-atc.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 6){{
-			    <img title="ASMI-W" src="/assets/images/specialIcons/ASMI-W.jpg"/>
-			}}
-		</div>
-		<div class="product-intro-sub">
-			<div class="product-stars-container">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
-			</div>
-			<span class="product-reviews-count">[185]</span>
-			<a href="#">
-				Read <strong>185</strong> reviews
-			</a>
-			<a href="#">
-				Write a Review
-			</a>
-		</div>
-		<div class="product-intro-description">
-			@(ShortDescription)
-		</div>
-		<a class="product-intro-more" href="#tabs-details">Read more ></a>
-		<div class="product-action-bar">
-			<div class="product-action-left">
-				<span class="action-left-header">Number of Portions:</span>
-				@list(@model.Skus) {{
-				    <label class="product-portion-line">
-					    <input name="sku" type="radio" value="@(Code)" data-price="@money(Price)"/>
-					    @(PortionsCount) - @money(Price)
-					    @if(@model.BestValue) {{
-					        <span class="product-best-value">Best Value!</span>
-					    }}
-				    </label>
-				}}
-			</div>
-			<div class="product-action-right">
-				<span id="spSelectedPrice" class="product-selected-price">Selected Price @money(@model.Skus.First().Price)</span>
-				<a href="#">
-					<img src="/assets/images/addtocartorange-2015.jpg"/>
-				</a>
-			</div>
-		</div>
-	</div>
-}}
-
-<product_details>
-{{
-    <div class="tabs-control">
-			<ul>
-			    @if(@model.DescriptionTab != null && model.DescriptionTab.Hidden == false):param() {{
-			        @if(@model.DescriptionTab.TitleOverride != null):param() {{
-			             <li><a href="#tabs-details">@(@model.DescriptionTab.TitleOverride)</a></li>
-			        }}
-			        @if(@model.DescriptionTab.TitleOverride == null) {{
-			             <li><a href="#tabs-details">Details</a></li>
-			        }}
-			    }}
-			    <!--<li><a href="#tabs-reviews">Reviews</a></li>-->
-			    @if(@model.IngredientsTab != null && model.IngredientsTab.Hidden == false):param() {{
-			        @if(@model.IngredientsTab.TitleOverride != null):param() {{
-			             <li><a href="#tabs-nutrition">@(@model.IngredientsTab.TitleOverride)</a></li>
-			        }}
-			        @if(@model.IngredientsTab.TitleOverride == null) {{
-			             <li><a href="#tabs-nutrition">Nutrition & Ingredients</a></li>
-			        }}
-			    }}
-			    @if(@model.RecipesTab != null && model.RecipesTab.Hidden == false):param() {{
-			        @if(@model.RecipesTab.TitleOverride != null):param() {{
-			             <li><a href="#tabs-recipes">@(@model.RecipesTab.TitleOverride)</a></li>
-			        }}
-			        @if(@model.RecipesTab.TitleOverride == null) {{
-			             <li><a href="#tabs-recipes">Recipes</a></li>
-			        }}
-			    }}
-			    @if(@model.ServingTab != null && model.ServingTab.Hidden == false):param() {{
-			        @if(@model.ServingTab.TitleOverride != null):param() {{
-			             <li><a href="#tabs-serving">@(@model.ServingTab.TitleOverride)</a></li>
-			        }}
-			        @if(@model.ServingTab.TitleOverride == null) {{
-			             <li><a href="#tabs-serving">Serving/Care</a></li>
-			        }}
-			    }}
-			    @if(@model.ShippingTab != null && model.ShippingTab.Hidden == false):param() {{
-			        @if(@model.ShippingTab.TitleOverride != null):param() {{
-			             <li><a href="#tabs-shipping">@(@model.ShippingTab.TitleOverride)</a></li>
-			        }}
-			        @if(@model.ShippingTab.TitleOverride == null) {{
-			             <li><a href="#tabs-shipping">Shipping</a></li>
-			        }}
-			    }}
-			</ul>
-			@if(@model.DescriptionTab != null && model.DescriptionTab.Hidden == false):param() {{
-			    <div id="tabs-details">
-			        @(@model.DescriptionTab.Content)
-				</div>
-			}}
-			<!--Reviews -->
-			@if(@model.IngredientsTab != null && model.IngredientsTab.Hidden == false):param() {{
-			    <div id="tabs-nutrition">
-			        @(@model.IngredientsTab.Content)
-				</div>
-			}}
-			@if(@model.RecipesTab != null && model.RecipesTab.Hidden == false):param() {{
-			    <div id="tabs-recipes">
-			        @(@model.RecipesTab.Content)
-				</div>
-			}}
-			@if(@model.ServingTab != null && model.ServingTab.Hidden == false):param() {{
-			    <div id="tabs-serving">
-			        @(@model.ServingTab.Content)
-				</div>
-			}}
-			@if(@model.ShippingTab != null && model.ShippingTab.Hidden == false):param() {{
-			    <div id="tabs-shipping">
-			        @(@model.ShippingTab.Content)
-				</div>
-			}}
-		</div>
-}}
-	
-<product_accessories>
-{{
-    <div class="product-related-accessories">
-		<span class="product-accessories-title">Try one of these delicious recipes</span>
-		<div class="accessories-container">
-		    @list(@model.YoutubeVideos) {{
-                <a class="product-related-link" target="_blank" href="@(Video)">
-				    <img src="@(Image)">
-			    	@(Text)
-			    </a>
-            }}
-		</div>
-	</div>
-	<div class="product-related-accessories accessories-top-margin">
-		<span class="product-accessories-title">Discover these customer favorites ... satisfaction 100% Guaranteed!</span>
-		<div class="accessories-container">
-		    @list(@model.CrossSells) {{
-                <a class="product-related-link" target="_blank" href="@(Url)">
-				    <img src="@(Image)">
-			    </a>
-            }}
-		</div>
-	</div>
-}}	
-
-<scripts>
-{{
-    <script>
-   window.addEventListener("load", function(){
-         '+ CHAR(36) + '("input[name=sku]:first").attr("checked", true);
-   
-         '+ CHAR(36) + '("body").on("change", "input[name=sku]", function(){
-            var jChecked =  '+ CHAR(36) + '("input[name=sku]:checked");
-            
-             '+ CHAR(36) + '("#spSelectedPrice").text("Selected Price " + jChecked.attr("data-price"));
-             '+ CHAR(36) + '("#hSelectedCode").text("Product #" + jChecked.val());
-        });
-    }, false);
-    </script>
-}}
-	
-<layout> -> (ProductPage)
-{{
-    <div class="product-main">
-        @product_breadcrumb()
-        <section class="product-intro-container">
-	        @product_introduction()    
-	    </section>
-	    <section class="product-detais">
-	        @product_details()
-	    </section>
-	    <section class="product-accessories">
-	        @product_accessories()
-	    </section>
-    </div>
-    @scripts()
-}}:: TtlProductPageModel 
-%>'
-WHERE [Name] = 'Product page'
-
-END
-
-IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like '%@using() {{VitalChoice.Domain%' AND [Name] = 'Product sub categories')
-BEGIN
-	UPDATE MasterContentItems
-	SET [Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels}}
-	@using() {{System.Linq}}
-	@model() {{dynamic}}
-
-	<%
-	<menu_sidebar>
-	{{
-		<ul class="category-sidebar">
-			@list(SideMenuItems)
-			{{
-				<li>
-					 @if(@model.SubItems.Count > 0) {{
-						<a href="#" title="@(Label)">
-							@(Label)
-						</a>
-						<ul>
-								@list(SubItems)
-								{{
-									<li>
-										<a href="@(Url)" title="@(Label)">
-											@(Label)
-										</a>
-									</li>
-								}}
-						</ul>
-					}}
-					@if(@model.SubItems.Count == 0){{
-						<a href="@(Url)" title="@(Label)">
-							@(Label)
-						</a>
-					}}
-				</li>
-			}}
-			<li><a href="#">Top Sellers</a></li>
-			<li><a href="#">Special Offers</a></li>
-			<li><a href="#">New Products</a></li>
-		</ul>
-	}}
-
-	<category_breadcrumb>
-	{{
-		<div class="category-breadcrumb">
-			@list(@model.BreadcrumbOrderedItems.Take(model.BreadcrumbOrderedItems.Count - 1))
-			{{
-				<a href="@(Url)" title="@(Label)">@(Label)</a>
-				<img src="/assets/images/breadarrow2.jpg">
-			}}
-			@(@model.BreadcrumbOrderedItems.Last())
-			{{
-				<a href="@(Url)" title="@(Label)">@(Label)</a>
-			}}
-		</div>
-	}}
-
-	<category_top>
-	{{
-		@if(@!string.IsNullOrEmpty(model.FileImageLargeUrl)) {{
-			<img src="@(FileImageLargeUrl)">
-			<br>
-		}}
-		@(LongDescription)
-	}}
-
-	<category_article>
-	{{
-		@(LongDescriptionBottom)
-	}}
-
-	<layout> -> (ProductCategory)
-	{{
-	<aside id="menuSidebar" class="category-aside">
-		@menu_sidebar()
-	</aside>
-	<section class="category-main">
-		@category_breadcrumb()
-		<div class="category-top">
-			@category_top()
-		</div>
-		<div class="categories-selection-container">
-			@list(SubCategories)
-			{{
-				<a href="@(Url)" title="@(Name)">
-					<img src="@(FileImageSmallUrl)" alt="@(Name)">@(Name)
-				</a>
-			}}
-			@list(Products)
-			{{
-				<a href="/product/@(Url)" title="@(Name)">
-					<img src="@(Thumbnail)" alt="@(Name)">@(Name)
-				</a>
-			}}
-		</div>
-		<article class="category-article">
-			@category_article()
-		</article>
-	</section>
-	}}:: TtlCategoryModel 
-	%>'
-	WHERE [Name] = 'Product sub categories'
-END
-
-GO
-
-
-IF NOT EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like '%@if(@model.Skus.Any()){{%' AND [Name] = 'Product page')
-BEGIN
-	UPDATE [dbo].[MasterContentItems]
-	SET [Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage}}
-@using() {{System.Linq}}
-@model() {{dynamic}}
-
-<%
-<product_breadcrumb>
-{{
-    <div class="category-breadcrumb">
-	    @list(@model.BreadcrumbOrderedItems.Take(model.BreadcrumbOrderedItems.Count - 1)) {{
-            <a href="@(Url)" title="@(Label)">@(Label)</a>
-            <img src="/assets/images/breadarrow2.jpg">
-        }}
-        <span>@(@model.BreadcrumbOrderedItems.Last().Label)</span>
-	</div>
-}}
-
-<product_introduction>
-{{
-    <img class="product-intro-image" alt="@(Name)" src="@(Image)"/>
-	<div class="product-intro-info">
-		<div class="product-intro-main">
-			<div class="product-intro-headers">
-				<h1>@(Name)</h1>
-				@if(SubTitle) {{
-				    <h2>@(SubTitle)</h2>
-				}}
-				@if(@model.Skus.Any()){{
-				    <h3 id="hSelectedCode">Product #@(@model.Skus.First().Code)</h3>
-				}}
-			</div>
-			@if(@model.SpecialIcon == 1){{
-			    <img title="MSC" src="/assets/images/specialIcons/msc-atc.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 2){{
-			    <img title="USDA" src="/assets/images/specialIcons/usda-atc.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 3){{
-			   <img title="ASMI" src="/assets/images/specialIcons/alaskaseafoodicon.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 4){{
-			   <img title="USDA + Fair Trade" src="/assets/images/specialIcons/usda-fairtrade-atc.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 5){{
-			    <img title="Certified Humane" src="/assets/images/specialIcons/humane-atc.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 6){{
-			    <img title="ASMI-W" src="/assets/images/specialIcons/ASMI-W.jpg"/>
-			}}
-		</div>
-		<div class="product-intro-sub">
-			<div class="product-stars-container">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
-			</div>
-			<span class="product-reviews-count">[185]</span>
-			<a href="#">
-				Read <strong>185</strong> reviews
-			</a>
-			<a href="#">
-				Write a Review
-			</a>
-		</div>
-		<div class="product-intro-description">
-			@(ShortDescription)
-		</div>
-		<a class="product-intro-more" href="#tabs-details">Read more ></a>
-		<div class="product-action-bar">
-			<div class="product-action-left">
-				<span class="action-left-header">Number of Portions:</span>
-				@list(Skus) {{
-				    <label class="product-portion-line">
-					    <input name="sku" type="radio" value="@(Code)" data-price="@money(Price)"/>
-					    @(PortionsCount) - @money(Price)
-					    @if(BestValue) {{
-					        <span class="product-best-value">Best Value!</span>
-					    }}
-				    </label>
-				}}
-			</div>
-			<div class="product-action-right">
-			    @if(@model.Skus.Any()){{
-				    <span id="spSelectedPrice" class="product-selected-price">Selected Price @money(@model.Skus.First().Price)</span>
-				}}
-				<a href="#">
-					<img src="/assets/images/addtocartorange-2015.jpg"/>
-				</a>
-			</div>
-		</div>
-	</div>
-}}
-
-<product_details>
-{{
-    <div class="tabs-control">
-		<ul>
-		    @(DescriptionTab) {{
-		        @if(){{
-		            @ifnot(Hidden){{
-		                @if(TitleOverride){{
-		                   <li><a href="#tabs-details">@(TitleOverride)</a></li>
-	                    }}
-	                    @ifnot(TitleOverride){{
-	                    <li><a href="#tabs-details">Details</a></li>
-                        }}
-	                }}
-	            }}
-            }}
-		    <!--<li><a href="#tabs-reviews">Reviews</a></li>-->
-		    @(IngredientsTab) {{
-		        @if(){{
-		            @ifnot(Hidden){{
-		                @if(TitleOverride){{
-		                   <li><a href="#tabs-nutrition">@(TitleOverride)</a></li>
-	                    }}
-	                    @ifnot(TitleOverride){{
-	                       <li><a href="#tabs-nutrition">Nutrition & Ingredients</a></li>
-                        }}
-	                }}
-	            }}
-            }}
-            @(RecipesTab) {{
-                @if(){{
-		            @ifnot(Hidden){{
-		                @if(TitleOverride){{
-		                    <li><a href="#tabs-recipes">@(TitleOverride)</a></li>
-	                    }}
-	                    @ifnot(TitleOverride){{
-	                        <li><a href="#tabs-recipes">Recipes</a></li>
-                        }}
-	                }}
-	            }}
-            }}
-		    @(ServingTab) {{
-		        @if(){{
-		            @ifnot(Hidden){{
-		                @if(TitleOverride){{
-		                    <li><a href="#tabs-serving">@(TitleOverride)</a></li>
-	                    }}
-	                    @ifnot(TitleOverride){{
-	                        <li><a href="#tabs-serving">Serving/Care</a></li>
-                        }}
-	                }}
-	            }}
-            }}
-		    @(ShippingTab) {{
-		        @if(){{
-		            @ifnot(Hidden){{
-		                @if(TitleOverride){{
-		                    <li><a href="#tabs-shipping">@(TitleOverride)</a></li>
-	                    }}
-	                    @ifnot(TitleOverride){{
-	                        <li><a href="#tabs-shipping">Shipping</a></li>
-                        }}
-	                }}
-	            }}
-            }}
-		</ul>
-		@(DescriptionTab) {{
-		    @if(){{
-		        @ifnot(Hidden){{
-		            <div id="tabs-details">
-    		            @(Content)
-    			    </div>
-	            }}  
-	        }}
-	    }}
-		<!--Reviews -->
-		@(IngredientsTab) {{
-		    @if(){{
-		        @ifnot(Hidden){{
-		            <div id="tabs-nutrition">
-    		            @(Content)
-    			    </div>
-	            }}
-	        }}
-	    }}
-		@(RecipesTab) {{
-		    @if(){{
-		        @ifnot(Hidden){{
-		            <div id="tabs-recipes">
-    		            @(Content)
-    			    </div>
-    			}}
-	        }}
-	    }}
-		@(ServingTab) {{
-		    @if(){{
-		        @ifnot(Hidden){{
-		            <div id="tabs-serving">
-    		            @(Content)
-    			    </div>
-    			}}
-	        }}
-	    }}
-		@(ShippingTab) {{
-		    @if(){{
-		        @ifnot(Hidden){{
-		            <div id="tabs-shipping">
-    		            @(Content)
-    			    </div>
-    			}}
-	        }}
-	    }}
-	</div>
-}}
-	
-<product_accessories>
-{{
-    <div class="product-related-accessories">
-		<span class="product-accessories-title">Try one of these delicious recipes</span>
-		<div class="accessories-container">
-		    @list(YoutubeVideos) {{
-                <a class="product-related-link" target="_blank" href="@(Video)">
-				    <img src="@(Image)">
-			    	@(Text)
-			    </a>
-            }}
-		</div>
-	</div>
-	<div class="product-related-accessories accessories-top-margin">
-		<span class="product-accessories-title">Discover these customer favorites ... satisfaction 100% Guaranteed!</span>
-		<div class="accessories-container">
-		    @list(CrossSells) {{
-                <a class="product-related-link" target="_blank" href="@(Url)">
-				    <img src="@(Image)">
-			    </a>
-            }}
-		</div>
-	</div>
-}}	
-
-<scripts>
-{{
-    <script>
-   window.addEventListener("load", function(){
-          '+ CHAR(36) + '("input[name=sku]:first").attr("checked", true);
-   
-         '+ CHAR(36) + '("body").on("change", "input[name=sku]", function(){
-            var jChecked =  '+ CHAR(36) + '("input[name=sku]:checked");
-            
-             '+ CHAR(36) + '("#spSelectedPrice").text("Selected Price " + jChecked.attr("data-price"));
-             '+ CHAR(36) + '("#hSelectedCode").text("Product #" + jChecked.val());
-        });
-    }, false);
-    </script>
-}}
-	
-<layout> -> (ProductPage)
-{{
-    <div class="product-main">
-        @product_breadcrumb()
-        <section class="product-intro-container">
-	        @product_introduction()    
-	    </section>
-	    <section class="product-detais">
-	        @product_details()
-	    </section>
-	    <section class="product-accessories">
-	        @product_accessories()
-	    </section>
-    </div>
-    @scripts()
-}}:: TtlProductPageModel 
-%>'
-WHERE [Name] = 'Product page'
-
-END
-
-GO
-
-IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like '%@time(DateCreated)</span>%' AND [Name] = 'Product page')
-BEGIN
-	UPDATE [dbo].[MasterContentItems]
-	SET [Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage}}
-@using() {{System.Linq}}
-@model() {{dynamic}}
-
-<%
-<review_rating>{{
-    @if(@model == 0){{
-         <img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
-    }}
-    @if(@model == 1){{
-         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
-    }}
-    @if(@model == 2){{
-         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
-    }}
-    @if(@model == 3){{
-         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
-    }}
-    @if(@model == 4){{
-         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
-    }}
-    @if(@model == 5){{
-         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif" /><img class="rating-last-child" src="/assets/images/fullstar.gif" />
-    }}
-}}    
-    
-<product_breadcrumb>
-{{
-    <div class="category-breadcrumb">
-	    @list(@model.BreadcrumbOrderedItems.Take(model.BreadcrumbOrderedItems.Count - 1)) {{
-            <a href="@(Url)" title="@(Label)">@(Label)</a>
-            <img src="/assets/images/breadarrow2.jpg">
-        }}
-        <span>@(@model.BreadcrumbOrderedItems.Last().Label)</span>
-	</div>
-}}
-
-<product_introduction>
-{{
-    <img class="product-intro-image" alt="@(Name)" src="@(Image)"/>
-	<div class="product-intro-info">
-		<div class="product-intro-main">
-			<div class="product-intro-headers">
-				<h1>@(Name)</h1>
-				@if(SubTitle) {{
-				    <h2>@(SubTitle)</h2>
-				}}
-				@if(@model.Skus.Any()){{
-				    <h3 id="hSelectedCode">Product #@(@model.Skus.First().Code)</h3>
-				}}
-			</div>
-			@if(@model.SpecialIcon == 1){{
-			    <img title="MSC" src="/assets/images/specialIcons/msc-atc.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 2){{
-			    <img title="USDA" src="/assets/images/specialIcons/usda-atc.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 3){{
-			   <img title="ASMI" src="/assets/images/specialIcons/alaskaseafoodicon.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 4){{
-			   <img title="USDA + Fair Trade" src="/assets/images/specialIcons/usda-fairtrade-atc.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 5){{
-			    <img title="Certified Humane" src="/assets/images/specialIcons/humane-atc.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 6){{
-			    <img title="ASMI-W" src="/assets/images/specialIcons/ASMI-W.jpg"/>
-			}}
-		</div>
-		<div class="product-intro-sub">
-		    <div class="product-stars-container">
-			    @review_rating(@model.ReviewsTab.AverageRatings)
-			</div>
-			@if(@model.ReviewsTab.ReviewsCount > 0){{
-			    <span class="product-reviews-count">[@(@model.ReviewsTab.ReviewsCount)]</span>
-			    <a href="#tabs-reviews" id="lnkReviewsTab">
-				    Read <strong>@(@model.ReviewsTab.ReviewsCount)</strong> reviews
-			    </a>
-			}}
-			<a class="write-review-link" href="#">
-				Write a Review
-			</a>
-		</div>
-		<div class="product-intro-description">
-			@(ShortDescription)
-		</div>
-		@(DescriptionTab) {{
-		    @if(){{
-		        @ifnot(Hidden){{
-		            <a class="product-intro-more" href="#tabs-details" id="lnkDescriptionTab">Read more ></a>
-		        }}
-		    }}
-		}}
-		<div class="product-action-bar">
-			<div class="product-action-left">
-				@if(SubProductGroupName){{
-					<span class="action-left-header">@(SubProductGroupName)</span>
-				}}
-				@ifnot(SubProductGroupName){{
-					<span class="action-left-header">Number of Portions:</span>
-				}}
-				@list(Skus) {{
-				    <label class="product-portion-line">
-					    <input name="sku" type="radio" value="@(Code)" data-price="@money(Price)"/>
-					    @(PortionsCount) - @money(Price)
-					    @if(SalesText) {{
-					        <span class="product-best-value">@(SalesText)</span>
-					    }}
-				    </label>
-				}}
-			</div>
-			<div class="product-action-right">
-			    @if(@model.Skus.Any()){{
-				    <span id="spSelectedPrice" class="product-selected-price">Selected Price @money(@model.Skus.First().Price)</span>
-				}}
-				<a href="#">
-					<img src="/assets/images/addtocartorange-2015.jpg"/>
-				</a>
-			</div>
-		</div>
-	</div>
-}}
-
-<product_details>
-{{
-    <div class="tabs-control">
-		<ul>
-		    @(DescriptionTab) {{
-		        @if(){{
-		            @ifnot(Hidden){{
-		                @if(TitleOverride){{
-		                   <li><a href="#tabs-details">@(TitleOverride)</a></li>
-	                    }}
-	                    @ifnot(TitleOverride){{
-	                    <li><a href="#tabs-details">Details</a></li>
-                        }}
-	                }}
-	            }}
-            }}
-            @(ReviewsTab){{
-                @if(){{
-                    @if(@model.ReviewsCount > 0){{
-                        <li><a href="#tabs-reviews">Reviews</a></li>
-                    }}
-                }}
-            }}
-		    @(IngredientsTab) {{
-		        @if(){{
-		            @ifnot(Hidden){{
-		                @if(TitleOverride){{
-		                   <li><a href="#tabs-nutrition">@(TitleOverride)</a></li>
-	                    }}
-	                    @ifnot(TitleOverride){{
-	                       <li><a href="#tabs-nutrition">Nutrition & Ingredients</a></li>
-                        }}
-	                }}
-	            }}
-            }}
-            @(RecipesTab) {{
-                @if(){{
-		            @ifnot(Hidden){{
-		                @if(TitleOverride){{
-		                    <li><a href="#tabs-recipes">@(TitleOverride)</a></li>
-	                    }}
-	                    @ifnot(TitleOverride){{
-	                        <li><a href="#tabs-recipes">Recipes</a></li>
-                        }}
-	                }}
-	            }}
-            }}
-		    @(ServingTab) {{
-		        @if(){{
-		            @ifnot(Hidden){{
-		                @if(TitleOverride){{
-		                    <li><a href="#tabs-serving">@(TitleOverride)</a></li>
-	                    }}
-	                    @ifnot(TitleOverride){{
-	                        <li><a href="#tabs-serving">Serving/Care</a></li>
-                        }}
-	                }}
-	            }}
-            }}
-		    @(ShippingTab) {{
-		        @if(){{
-		            @ifnot(Hidden){{
-		                @if(TitleOverride){{
-		                    <li><a href="#tabs-shipping">@(TitleOverride)</a></li>
-	                    }}
-	                    @ifnot(TitleOverride){{
-	                        <li><a href="#tabs-shipping">Shipping</a></li>
-                        }}
-	                }}
-	            }}
-            }}
-		</ul>
-		@(DescriptionTab) {{
-		    @if(){{
-		        @ifnot(Hidden){{
-		            <div id="tabs-details">
-    		            @(Content)
-    			    </div>
-	            }}  
-	        }}
-	    }}
-	    @(ReviewsTab){{
-            @if(){{
-                @if(@model.ReviewsCount > 0){{
-                    <div id="tabs-reviews">
-    		            <p class="product-reviews-overall">
-    		                Average Ratings:
-    		                @review_rating(AverageRatings)  
-    		                @(AverageRatings)
-    		            </p>
-				        <a class="write-review-link" href="#">
-					        Write a Review
-				        </a>
-				        <hr/>
-				        @list(Reviews) {{
-                            <div class="product-reviews-item">
-					            <div class="reviews-item-rating">
-						            @review_rating(Rating)  
-						        </div>
-					            <div class="reviews-item-info">
-						            <span class="reviews-item-title">"@(Title)"</span>
-						            <span class="reviews-item-author">@(CustomerName) on @time(DateCreated){{g}}</span>
-						            <span class="reviews-item-text"><b>Review:</b> @(Review)</span>
-					            </div>
-				            </div>
-				            <hr />
-                        }}
-				        <a class="read-more-reviews" href="#">
-					        Read more reviews >
-				        </a>
-    			    </div>
-                }}
-            }}
-        }}
-		@(IngredientsTab) {{
-		    @if(){{
-		        @ifnot(Hidden){{
-		            <div id="tabs-nutrition">
-    		            @(Content)
-    			    </div>
-	            }}
-	        }}
-	    }}
-		@(RecipesTab) {{
-		    @if(){{
-		        @ifnot(Hidden){{
-		            <div id="tabs-recipes">
-    		            @(Content)
-    			    </div>
-    			}}
-	        }}
-	    }}
-		@(ServingTab) {{
-		    @if(){{
-		        @ifnot(Hidden){{
-		            <div id="tabs-serving">
-    		            @(Content)
-    			    </div>
-    			}}
-	        }}
-	    }}
-		@(ShippingTab) {{
-		    @if(){{
-		        @ifnot(Hidden){{
-		            <div id="tabs-shipping">
-    		            @(Content)
-    			    </div>
-    			}}
-	        }}
-	    }}
-	</div>
-}}
-	
-<product_accessories>
-{{
-    <div class="product-related-accessories">
-		<span class="product-accessories-title">Try one of these delicious recipes</span>
-		<div class="accessories-container">
-		    @list(YoutubeVideos) {{
-                <a class="product-related-link" target="_blank" href="@(Video)" data-video-id="@(VideoId)">
-				    <img src="@(Image)">
-			    	@(Text)
-			    </a>
-            }}
-		</div>
-	</div>
-	<div class="product-related-accessories accessories-top-margin">
-		<span class="product-accessories-title">Discover these customer favorites ... satisfaction 100% Guaranteed!</span>
-		<div class="accessories-container">
-		    @list(CrossSells) {{
-                <a class="product-related-link" target="_blank" href="@(Url)">
-				    <img src="@(Image)">
-			    </a>
-            }}
-		</div>
-	</div>
-}}	
-
-<scripts>
-{{
-    <script>
-		var productPublicId = "@(ProductPublicId)";
-    </script>
-}}
-	
-<layout> -> (ProductPage)
-{{
-    <div class="product-main">
-        @product_breadcrumb()
-        <section class="product-intro-container">
-	        @product_introduction()    
-	    </section>
-	    <section class="product-detais">
-	        @product_details()
-	    </section>
-	    <section class="product-accessories">
-	        @product_accessories()
-	    </section>
-    </div>
-    @scripts()
-}}:: TtlProductPageModel 
-%>'
-WHERE [Name] = 'Product page'
-
-END
-
-GO
-
-IF NOT EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like '%<a class="read-more-reviews" href="/reviews/@(@chained)">%' AND [Name] = 'Product page')
-BEGIN
-	UPDATE [dbo].[MasterContentItems]
-	SET [Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage}}
-@using() {{System.Linq}}
-@model() {{dynamic}}
-
-<%
-<review_rating>{{
-    @if(@model == 0){{
-         <img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
-    }}
-    @if(@model == 1){{
-         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
-    }}
-    @if(@model == 2){{
-         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
-    }}
-    @if(@model == 3){{
-         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
-    }}
-    @if(@model == 4){{
-         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
-    }}
-    @if(@model == 5){{
-         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif" /><img class="rating-last-child" src="/assets/images/fullstar.gif" />
-    }}
-}}    
-    
-<product_breadcrumb>
-{{
-    <div class="category-breadcrumb">
-	    @list(@model.BreadcrumbOrderedItems.Take(model.BreadcrumbOrderedItems.Count - 1)) {{
-            <a href="@(Url)" title="@(Label)">@(Label)</a>
-            <img src="/assets/images/breadarrow2.jpg">
-        }}
-        <span>@(@model.BreadcrumbOrderedItems.Last().Label)</span>
-	</div>
-}}
-
-<product_introduction>
-{{
-    <img class="product-intro-image" alt="@(Name)" src="@(Image)"/>
-	<div class="product-intro-info">
-		<div class="product-intro-main">
-			<div class="product-intro-headers">
-				<h1>@(Name)</h1>
-				@if(SubTitle) {{
-				    <h2>@(SubTitle)</h2>
-				}}
-				@if(@model.Skus.Any()){{
-				    <h3 id="hSelectedCode">Product #@(@model.Skus.First().Code)</h3>
-				}}
-			</div>
-			@if(@model.SpecialIcon == 1){{
-			    <img title="MSC" src="/assets/images/specialIcons/msc-atc.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 2){{
-			    <img title="USDA" src="/assets/images/specialIcons/usda-atc.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 3){{
-			   <img title="ASMI" src="/assets/images/specialIcons/alaskaseafoodicon.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 4){{
-			   <img title="USDA + Fair Trade" src="/assets/images/specialIcons/usda-fairtrade-atc.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 5){{
-			    <img title="Certified Humane" src="/assets/images/specialIcons/humane-atc.jpg"/>
-			}}
-			@if(@model.SpecialIcon == 6){{
-			    <img title="ASMI-W" src="/assets/images/specialIcons/ASMI-W.jpg"/>
-			}}
-		</div>
-		<div class="product-intro-sub">
-		    <div class="product-stars-container">
-			    @review_rating(@model.ReviewsTab.AverageRatings)
-			</div>
-			@if(@model.ReviewsTab.ReviewsCount > 0){{
-			    <span class="product-reviews-count">[@(@model.ReviewsTab.ReviewsCount)]</span>
-			    <a href="#tabs-reviews" id="lnkReviewsTab">
-				    Read <strong>@(@model.ReviewsTab.ReviewsCount)</strong> reviews
-			    </a>
-			}}
-			<a class="write-review-link" href="#">
-				Write a Review
-			</a>
-		</div>
-		<div class="product-intro-description">
-			@(ShortDescription)
-		</div>
-		@(DescriptionTab) {{
-		    @if(){{
-		        @ifnot(Hidden){{
-		            <a class="product-intro-more" href="#tabs-details" id="lnkDescriptionTab">Read more ></a>
-		        }}
-		    }}
-		}}
-		<div class="product-action-bar">
-			<div class="product-action-left">
-				@if(SubProductGroupName){{
-					<span class="action-left-header">@(SubProductGroupName)</span>
-				}}
-				@ifnot(SubProductGroupName){{
-					<span class="action-left-header">Number of Portions:</span>
-				}}
-				@list(Skus) {{
-				    <label class="product-portion-line">
-					    <input name="sku" type="radio" value="@(Code)" data-price="@money(Price)"/>
-					    @(PortionsCount) - @money(Price)
-					    @if(SalesText) {{
-					        <span class="product-best-value">@(SalesText)</span>
-					    }}
-				    </label>
-				}}
-			</div>
-			<div class="product-action-right">
-			    @if(@model.Skus.Any()){{
-				    <span id="spSelectedPrice" class="product-selected-price">Selected Price @money(@model.Skus.First().Price)</span>
-				}}
-				<a href="#">
-					<img src="/assets/images/addtocartorange-2015.jpg"/>
-				</a>
-			</div>
-		</div>
-	</div>
-}}
-
-<product_details>
-{{
-    <div class="tabs-control">
-		<ul>
-		    @(DescriptionTab) {{
-		        @if(){{
-		            @ifnot(Hidden){{
-		                @if(TitleOverride){{
-		                   <li><a href="#tabs-details">@(TitleOverride)</a></li>
-	                    }}
-	                    @ifnot(TitleOverride){{
-	                    <li><a href="#tabs-details">Details</a></li>
-                        }}
-	                }}
-	            }}
-            }}
-            @(ReviewsTab){{
-                @if(){{
-                    @if(@model.ReviewsCount > 0){{
-                        <li><a href="#tabs-reviews">Reviews</a></li>
-                    }}
-                }}
-            }}
-		    @(IngredientsTab) {{
-		        @if(){{
-		            @ifnot(Hidden){{
-		                @if(TitleOverride){{
-		                   <li><a href="#tabs-nutrition">@(TitleOverride)</a></li>
-	                    }}
-	                    @ifnot(TitleOverride){{
-	                       <li><a href="#tabs-nutrition">Nutrition & Ingredients</a></li>
-                        }}
-	                }}
-	            }}
-            }}
-            @(RecipesTab) {{
-                @if(){{
-		            @ifnot(Hidden){{
-		                @if(TitleOverride){{
-		                    <li><a href="#tabs-recipes">@(TitleOverride)</a></li>
-	                    }}
-	                    @ifnot(TitleOverride){{
-	                        <li><a href="#tabs-recipes">Recipes</a></li>
-                        }}
-	                }}
-	            }}
-            }}
-		    @(ServingTab) {{
-		        @if(){{
-		            @ifnot(Hidden){{
-		                @if(TitleOverride){{
-		                    <li><a href="#tabs-serving">@(TitleOverride)</a></li>
-	                    }}
-	                    @ifnot(TitleOverride){{
-	                        <li><a href="#tabs-serving">Serving/Care</a></li>
-                        }}
-	                }}
-	            }}
-            }}
-		    @(ShippingTab) {{
-		        @if(){{
-		            @ifnot(Hidden){{
-		                @if(TitleOverride){{
-		                    <li><a href="#tabs-shipping">@(TitleOverride)</a></li>
-	                    }}
-	                    @ifnot(TitleOverride){{
-	                        <li><a href="#tabs-shipping">Shipping</a></li>
-                        }}
-	                }}
-	            }}
-            }}
-		</ul>
-		@(DescriptionTab) {{
-		    @if(){{
-		        @ifnot(Hidden){{
-		            <div id="tabs-details">
-    		            @(Content)
-    			    </div>
-	            }}  
-	        }}
-	    }}
-	    @(ReviewsTab):param(Url){{
-            @if(){{
-                @if(@model.ReviewsCount > 0){{
-                    <div id="tabs-reviews">
-    		            <p class="product-reviews-overall">
-    		                Average Ratings:
-    		                @review_rating(AverageRatings)  
-    		                @(AverageRatings)
-    		            </p>
-				        <a class="write-review-link" href="#">
-					        Write a Review
-				        </a>
-				        <hr/>
-				        @list(Reviews) {{
-                            <div class="product-reviews-item">
-					            <div class="reviews-item-rating">
-						            @review_rating(Rating)  
-						        </div>
-					            <div class="reviews-item-info">
-						            <span class="reviews-item-title">"@(Title)"</span>
-						            <span class="reviews-item-author">@(CustomerName) on @time(DateCreated){{g}}</span>
-						            <span class="reviews-item-text"><b>Review:</b> @(Review)</span>
-					            </div>
-				            </div>
-				            <hr />
-                        }}
-				        <a class="read-more-reviews" href="/reviews/@(@chained)">
-					        Read more reviews >
-				        </a>
-    			    </div>
-                }}
-            }}
-        }}
-		@(IngredientsTab) {{
-		    @if(){{
-		        @ifnot(Hidden){{
-		            <div id="tabs-nutrition">
-    		            @(Content)
-    		            
-    		            @if(@model.NutritionalTitle != null){{
-    		                @if(@model.Content != null){{
-    		                    <span class="ingredients-section-begin margin-top-medium">Ingredients:</span>
-    		                }}
-    		                @if(@model.Content == null){{
-    		                    <span class="ingredients-section-begin">Ingredients:</span>
-    		                }}
-				            <span class="ingredients-product-title">@(IngredientsTitle)</span>
-				            <hr/>
-				            <div class="ingredients-nutrition-facts">
-					            <div class="nutrition-facts-line">
-						            <span class="facts-static-title">Nutrition Facts</span>
-					            </div>
-					            <div class="nutrition-facts-line">
-						            <span class="facts-nutrition-title">@(NutritionalTitle)</span>
-					            </div>
-					            @if(@model.ServingSize != null){{
-					                <div class="nutrition-facts-line">
-					        	        <span class="facts-nutrition-line">Serving Size @(ServingSize)</span>
-					                </div>
-					            }}
-					            @if(@model.Servings != null){{
-					                <div class="nutrition-facts-line">
-						                <span class="facts-nutrition-line">Number of servings: @(Servings)</span>
-					                </div>
-					            }}
-					            <hr/>
-					            <div class="nutrition-facts-line">
-						            <span class="facts-hint-line">Amount Per Serving</span>
-					            </div>
-					            <div class="nutrition-facts-line">
-						            <span class="facts-info-subtitle">Calories</span>
-						            <span class="facts-info-line">@(Calories)</span>
-						            <span class="facts-info-value">Calories from Fat @(CaloriesFromFat)</span>
-					            </div>
-					            <hr/>
-					            <div class="nutrition-facts-line">
-						            <span class="facts-hint-value">% Daily Value*</span>
-				        	    </div>
-					            <div class="nutrition-facts-line">
-						            <span class="facts-info-subtitle">Total Fat</span>
-						            <span class="facts-info-line">@(TotalFat)</span>
-						            <span class="facts-info-value">@(TotalFatPercent)</span>
-					            </div>
-					            <div class="nutrition-facts-line">
-						            <span class="facts-info-indent facts-info-line">Saturated Fat @(SaturatedFat)</span>
-					        	    <span class="facts-info-value">@(SaturatedFatPercent)</span>
-				        	    </div>
-					            <div class="nutrition-facts-line">
-						            <span class="facts-info-indent facts-info-line">Trans Fat @(TransFat)</span>
-						             <span class="facts-info-value">@(TransFatPercent)</span>
-					            </div>
-					            <div class="nutrition-facts-line">
-						            <span class="facts-info-subtitle">Cholesterol</span>
-						            <span class="facts-info-line">@(Cholesterol)</span>
-						            <span class="facts-info-value">@(CholesterolPercent)</span>
-					            </div>
-					            <div class="nutrition-facts-line">
-					        	    <span class="facts-info-subtitle">Sodium</span>
-						            <span class="facts-info-line">@(Sodium)</span>
-						            <span class="facts-info-value">@(SodiumPercent)</span>
-					            </div>
-					            <div class="nutrition-facts-line">
-						            <span class="facts-info-subtitle">Total Carbohydrate</span>
-						            <span class="facts-info-line">@(TotalCarbohydrate)</span>
-						            <span class="facts-info-value">@(TotalCarbohydratePercent)</span>
-					            </div>
-					            <div class="nutrition-facts-line">
-						            <span class="facts-info-indent facts-info-line">Dietary Fiber @(DietaryFiber)</span>
-					                <span class="facts-info-value">@(DietaryFiberPercent)</span>
-					            </div>
-					            <div class="nutrition-facts-line">
-						            <span class="facts-info-indent facts-info-line">Sugars @(Sugars)</span>
-						            <span class="facts-info-value">@(SugarsPercent)</span>
-					            </div>
-					            <div class="nutrition-facts-line">
-					        	    <span class="facts-info-subtitle">Protein</span>
-					        	    <span class="facts-info-line">@(Protein)</span>
-					        	    <span class="facts-info-value">@(ProteinPercent)</span>
-					            </div>
-				        	    <hr/>
-					            <div class="nutrition-facts-line">
-						            <span class="facts-info-line">@(AdditionalNotes)</span>
-				        	    </div>
-				        	    <div class="nutrition-facts-line">
-						            <span class="facts-bottom-hint">* Percent Daily Values are based on a 2,000 calorie diet. Your daily values may be higher or lower depending on your calorie needs.</span>
-				        	    </div>
-			        	    </div>
-			        	}}
-    			    </div>
-	            }}
-	        }}
-	    }}
-		@(RecipesTab) {{
-		    @if(){{
-		        @ifnot(Hidden){{
-		            <div id="tabs-recipes">
-    		            @(Content)
-    		            @if(@model.Recipes.Count > 0){{
-    		                <div class="margin-top-medium">
-    		                    @list(Recipes){{
-    		                        <a class="product-recipe-link" title="@(Name)" href="@(Url)">@(Name)</a>
-    		                    }}
-    		                </div>
-    		            }}
-    			    </div>
-    			}}
-	        }}
-	    }}
-		@(ServingTab) {{
-		    @if(){{
-		        @ifnot(Hidden){{
-		            <div id="tabs-serving">
-    		            @(Content)
-    			    </div>
-    			}}
-	        }}
-	    }}
-		@(ShippingTab) {{
-		    @if(){{
-		        @ifnot(Hidden){{
-		            <div id="tabs-shipping">
-    		            @(Content)
-    			    </div>
-    			}}
-	        }}
-	    }}
-	</div>
-}}
-	
-<product_accessories>
-{{
-    <div class="product-related-accessories">
-		<span class="product-accessories-title">Try one of these delicious recipes</span>
-		<div class="accessories-container">
-		    @list(YoutubeVideos) {{
-                <a class="product-related-link" href="javascript:function(){return false;}" data-video-id="@(VideoId)">
-				    <img src="@(Image)">
-			    	@(Text)
-			    </a>
-            }}
-		</div>
-	</div>
-	<div class="product-related-accessories accessories-top-margin">
-		<span class="product-accessories-title">Discover these customer favorites ... satisfaction 100% Guaranteed!</span>
-		<div class="accessories-container">
-		    @list(CrossSells) {{
-                <a class="product-related-link" target="_blank" href="@(Url)">
-				    <img src="@(Image)">
-			    </a>
-            }}
-		</div>
-	</div>
-}}	
-
-<scripts>
-{{
-    <script>
-		var productPublicId = "@(ProductPublicId)";
-    </script>
-}}
-	
-<layout> -> (ProductPage)
-{{
-    <div class="product-main">
-        @product_breadcrumb()
-        <section class="product-intro-container">
-	        @product_introduction()    
-	    </section>
-	    <section class="product-detais">
-	        @product_details()
-	    </section>
-	    <section class="product-accessories">
-	        @product_accessories()
-	    </section>
-    </div>
-    @scripts()
-}}:: TtlProductPageModel 
-%>'
-WHERE [Name] = 'Product page'
-
-END
-
-GO 
-
-IF NOT EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE [Name] = 'Product page' AND Updated < '2015-12-15')
-BEGIN
-	UPDATE [dbo].[MasterContentItems]
 	SET [Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage}}
 @using() {{System.Linq}}
 @model() {{dynamic}}
@@ -2699,7 +886,7 @@ BEGIN
 				}}
 				@list(Skus) {{
 				    <label class="product-portion-line">
-					    <input name="sku" type="radio" value="@(Code)" data-price="@money(Price)"/>
+					    <input name="sku" type="radio" value="@(Code)" data-in-stock="@(@model.InStock.ToString().ToLower())" data-price="@money(Price)"/>
 					    @(PortionsCount) - @money(Price)
 					    @if(SalesText) {{
 					        <span class="product-best-value">@(SalesText)</span>
@@ -2707,13 +894,20 @@ BEGIN
 				    </label>
 				}}
 			</div>
-			<div class="product-action-right">
+            <div class="product-action-right">
 			    @if(@model.Skus.Any()){{
-				    <span id="spSelectedPrice" class="product-selected-price">Selected Price @money(@model.Skus.First().Price)</span>
+			        <div style="display: none;" class="in-stock">
+    				    <span id="spSelectedPrice" class="product-selected-price">Selected Price @money(@model.Skus.First().Price)</span>
+    				    <a href="#">
+    					    <img src="/assets/images/addtocartorange-2015.jpg"/>
+    				    </a>
+				    </div>
+			        <div style="display: none;" class="out-of-stock">
+			            <a href="#">
+    					    <img src="/assets/images/OOS-graphic.png"/>
+    				    </a>
+			        </div>
 				}}
-				<a href="#">
-					<img src="/assets/images/addtocartorange-2015.jpg"/>
-				</a>
 			</div>
 		</div>
 	</div>
@@ -2986,7 +1180,7 @@ BEGIN
 		<span class="product-accessories-title">Discover these customer favorites ... satisfaction 100% Guaranteed!</span>
 		<div class="accessories-container">
 		    @list(CrossSells) {{
-                <a class="product-related-link" target="_blank" href="@(Url)">
+                <a class="product-related-link" href="@(Url)">
 				    <img src="@(Image)">
 			    </a>
             }}
@@ -3020,6 +1214,112 @@ BEGIN
 %>'
 WHERE [Name] = 'Product page'
 
+END
+
+GO
+
+IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like '%@using() {{VitalChoice.Domain%' AND [Name] = 'Product sub categories')
+BEGIN
+	UPDATE MasterContentItems
+	SET [Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels}}
+	@using() {{System.Linq}}
+	@model() {{dynamic}}
+
+	<%
+	<menu_sidebar>
+	{{
+		<ul class="category-sidebar">
+			@list(SideMenuItems)
+			{{
+				<li>
+					 @if(@model.SubItems.Count > 0) {{
+						<a href="#" title="@(Label)">
+							@(Label)
+						</a>
+						<ul>
+								@list(SubItems)
+								{{
+									<li>
+										<a href="@(Url)" title="@(Label)">
+											@(Label)
+										</a>
+									</li>
+								}}
+						</ul>
+					}}
+					@if(@model.SubItems.Count == 0){{
+						<a href="@(Url)" title="@(Label)">
+							@(Label)
+						</a>
+					}}
+				</li>
+			}}
+			<li><a href="#">Top Sellers</a></li>
+			<li><a href="#">Special Offers</a></li>
+			<li><a href="#">New Products</a></li>
+		</ul>
+	}}
+
+	<category_breadcrumb>
+	{{
+		<div class="category-breadcrumb">
+			@list(@model.BreadcrumbOrderedItems.Take(model.BreadcrumbOrderedItems.Count - 1))
+			{{
+				<a href="@(Url)" title="@(Label)">@(Label)</a>
+				<img src="/assets/images/breadarrow2.jpg">
+			}}
+			@(@model.BreadcrumbOrderedItems.Last())
+			{{
+				<a href="@(Url)" title="@(Label)">@(Label)</a>
+			}}
+		</div>
+	}}
+
+	<category_top>
+	{{
+		@if(@!string.IsNullOrEmpty(model.FileImageLargeUrl)) {{
+			<img src="@(FileImageLargeUrl)">
+			<br>
+		}}
+		@(LongDescription)
+	}}
+
+	<category_article>
+	{{
+		@(LongDescriptionBottom)
+	}}
+
+	<layout> -> (ProductCategory)
+	{{
+	<aside id="menuSidebar" class="category-aside">
+		@menu_sidebar()
+	</aside>
+	<section class="category-main">
+		@category_breadcrumb()
+		<div class="category-top">
+			@category_top()
+		</div>
+		<div class="categories-selection-container">
+			@list(SubCategories)
+			{{
+				<a href="@(Url)" title="@(Name)">
+					<img src="@(FileImageSmallUrl)" alt="@(Name)">@(Name)
+				</a>
+			}}
+			@list(Products)
+			{{
+				<a href="/product/@(Url)" title="@(Name)">
+					<img src="@(Thumbnail)" alt="@(Name)">@(Name)
+				</a>
+			}}
+		</div>
+		<article class="category-article">
+			@category_article()
+		</article>
+	</section>
+	}}:: TtlCategoryModel 
+	%>'
+	WHERE [Name] = 'Product sub categories'
 END
 
 GO
@@ -3800,6 +2100,244 @@ BEGIN
     </div>
 }} :: dynamic
 %>', GETDATE(), GETDATE(),2, NULL)
+
+END
+
+GO
+
+IF ((SELECT TOP 1 MasterContentItemId FROM ContentCategories WHERE Type=5 AND ParentID IS NULL)
+=(SELECT TOP 1 Id FROM MasterContentItems WHERE Name='FAQ Root Category'))
+BEGIN
+
+UPDATE ContentCategories
+SET  MasterContentItemId=(SELECT TOP 1 Id FROM MasterContentItems WHERE Name='FAQ Sub Category')
+WHERE Type=5 AND ParentID IS NULL
+
+UPDATE ContentItems
+SET Template=''
+WHERE Id=(SELECT TOP 1 ContentItemId FROM ContentCategories WHERE Type=5 AND ParentID IS NULL)
+
+END
+
+GO
+
+IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Name='FAQ Sub Category' AND Updated<'2015-12-22 00:00:00.000')
+BEGIN
+	UPDATE [dbo].[MasterContentItems]
+	SET 
+	[Updated]=GETDATE(),
+	[Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.FAQs}}
+@model() {{dynamic}}
+
+<%
+    
+<left_menu>
+{{
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>Customer Care</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="/content/contact-customer-service"><strong>Contact Customer Service</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>Shipping Information</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>Privacy Policy</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>Returns & Exchanges</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>Comments</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="/content/request-catalog"><strong>Request Catalog</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>FAQ</strong></a>
+    </div>
+}}
+    
+<left>
+{{
+	<div class="left-content-pane">
+	    <div class="left-wrapper">
+	        @left_menu()
+		</div>
+		<div class="left-wrapper">
+		    <a href="#"><img src="/assets/images/news-baby-spot-8-29-13a-210x157px.png"></a>
+	    </div>
+	</div>
+}}
+
+<center>
+{{
+	<div class="center-content-pane">
+        <h2>Frequently Asked Questions (FAQs)</h2>
+        @ifnot(@model.Model.ParentId) {{
+            <ol>
+                <li class="margin-bottom-small">Click on a subject category below to view all of the FAQs related to that subject.</li>
+                <li class="margin-bottom-small">If you don''t find your answer among those FAQs, please use the search box below.</li>
+                <li class="margin-bottom-small">If Search does not yield an answer, please send a query from our 
+                    <a href="/content/contact-customer-service">Customer Service page</a>.
+                </li>
+            </ol>
+            <div class="input-wrapper margin-bottom-medium">
+                <input type="text" autocomplete="off" placeholder="Enter your search term here">
+                <input class="yellow" type="button" value="Search FAQs">
+            </div>
+            @list(FAQCategories.AllCategories){{
+                <strong>@(Name)</strong>
+                <ul>
+                    @list(SubCategories){{
+                        <li><a href="@(Url)">@(Name)</a></li>
+                    }}
+                </ul>
+            }}
+        }}
+        @if(@model.Model.ParentId) {{
+            <a href="/faqs">&lt;&lt; Back to Main FAQ Page</a>
+            <br/>
+            <br/>
+            <div class="margin-bottom-medium"><strong>@(Model.Name)</strong></div>
+            @if(@model.FAQCategories.SubCategories.Count>0){{
+		        @list(FAQCategories.SubCategories){{
+                    <div class="margin-bottom-small">
+	                    <a href="@(Url)">@(Name)</a>
+                    </div>
+                }}
+		    }}
+		    @if(@model.FAQCategories.SubCategories.Count==0){{
+		        @list(FAQs){{
+                    <div class="margin-bottom-small">
+	                    <a href="@(Url)">@(Name)</a>
+                    </div>
+                }}
+		    }}
+        }}
+	</div>
+}}
+
+<right>
+{{
+	<div class="right-content-pane">
+	    <div class="right-wrapper">
+		    <a href="#"><img src="/assets/images/guarantee-spot-8-29-13-210px.jpg"></a>
+        </div>
+	    <div class="right-wrapper">
+	        <strong class="centered-horizontal">
+	            <a href="#">Click here to read a letter from Randy, describing the genesis and goals of Vital Choice.</a>
+	        </strong>
+	    </div>
+	</div>
+}}
+
+<default> -> ()
+{{
+    <div class="working-area-holder content-page faq-part faq-categories-page">
+        @left()
+    	@center()
+    	@right()
+	</div>
+}}
+%>'
+WHERE Name='FAQ Sub Category'
+
+END
+
+GO
+
+IF EXISTS (SELECT
+	[Id]
+FROM [dbo].[MasterContentItems]
+WHERE Name = 'FAQ Individual'
+AND Updated < '2015-12-22 00:00:00.000') BEGIN
+UPDATE [dbo].[MasterContentItems]
+SET	[Updated] = GETDATE(),
+	[Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.FAQs}}
+@model() {{dynamic}}
+
+<%
+    
+<left_menu>
+{{
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>Customer Care</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="/content/contact-customer-service"><strong>Contact Customer Service</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>Shipping Information</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>Privacy Policy</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>Returns & Exchanges</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>Comments</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="/content/request-catalog"><strong>Request Catalog</strong></a>
+    </div>
+    <div class="margin-bottom-small">
+	    <a href="#"><strong>FAQ</strong></a>
+    </div>
+}}
+    
+<left>
+{{
+	<div class="left-content-pane">
+	    <div class="left-wrapper">
+	        @left_menu()
+		</div>
+		<div class="left-wrapper">
+		    <a href="#"><img src="/assets/images/news-baby-spot-8-29-13a-210x157px.png"></a>
+	    </div>
+	</div>
+}}
+
+<center>
+{{
+	<div class="center-content-pane">
+        <h2>Frequently Asked Questions (FAQs)</h2>
+        <a href="/faqs">&lt;&lt; Back to Main FAQ Page</a>
+        <br/>
+        <br/>
+        <div class="faq-title margin-bottom-small"><strong>@(Model.Name)</strong></div>
+        <div class="faq-body">
+            @(Model.ContentItem.Description)
+        </div>
+	</div>
+}}
+
+<right>
+{{
+	<div class="right-content-pane">
+	    <div class="right-wrapper">
+		    <a href="#"><img src="/assets/images/guarantee-spot-8-29-13-210px.jpg"></a>
+        </div>
+	    <div class="right-wrapper">
+	        <strong class="centered-horizontal">
+	            <a href="#">Click here to read a letter from Randy, describing the genesis and goals of Vital Choice.</a>
+	        </strong>
+	    </div>
+	</div>
+}}
+
+<default> -> ()
+{{
+    <div class="working-area-holder content-page faq-part faq-page">
+        @left()
+    	@center()
+    	@right()
+	</div>
+}}
+%>'
+WHERE Name = 'FAQ Individual'
 
 END
 

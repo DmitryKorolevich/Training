@@ -60,18 +60,18 @@ namespace VitalChoice.ContentProcessing.Base
             var viewContext = await GetData(GetParameters(context, bindingContext, parameters), user, context);
             var contentEntity = viewContext.Entity;
             ITtlTemplate template;
-            var templateCacheOptions = new TemplateCacheParam
-            {
-                IdMaster = contentEntity.MasterContentItemId,
-                IdTemplate = contentEntity.ContentItemId,
-                Master = contentEntity.MasterContentItem.Template,
-                Template = contentEntity.ContentItem.Template,
-                MasterUpdateDate = contentEntity.MasterContentItem.Updated,
-                TemplateUpdateDate = contentEntity.ContentItem.Updated,
-                ViewContext = viewContext
-            };
             try
             {
+                var templateCacheOptions = new TemplateCacheParam
+                {
+                    IdMaster = contentEntity.MasterContentItemId,
+                    IdTemplate = contentEntity.ContentItemId,
+                    Master = contentEntity.MasterContentItem.Template,
+                    Template = contentEntity.ContentItem.Template,
+                    MasterUpdateDate = contentEntity.MasterContentItem.Updated,
+                    TemplateUpdateDate = contentEntity.ContentItem.Updated,
+                    ViewContext = viewContext
+                };
                 template = _templatesCache.GetOrCreateTemplate(templateCacheOptions);
             }
             catch (Exception e)

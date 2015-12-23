@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.OptionsModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,6 +28,7 @@ using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
@@ -53,8 +55,10 @@ namespace VitalChoice.Business.Services.Products
         private readonly INotificationService _notificationService;
         private readonly IRepositoryAsync<ProductContent> _productContentRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> _contentTypeRepository;
+        private readonly IOptions<AppOptions> _options;
 
-		public async Task<ProductContent> SelectContentForTransfer(int id)
+
+        public async Task<ProductContent> SelectContentForTransfer(int id)
 		{
 			return (await _productContentRepository.Query(p => p.Id == id).Include(p => p.ContentItem).SelectAsync(false)).FirstOrDefault();
 		}
@@ -159,6 +163,7 @@ namespace VitalChoice.Business.Services.Products
             INotificationService notificationService,
             IRepositoryAsync<ProductContent> productContentRepository,
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
+            IOptions<AppOptions> options,
             ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<VCustomerFavorite> vCustomerRepositoryAsync,
             DirectMapper<Product> directMapper, DynamicExpressionVisitor queryVisitor)
             : base(
@@ -179,6 +184,7 @@ namespace VitalChoice.Business.Services.Products
             _productContentRepository = productContentRepository;
             _contentTypeRepository = contentTypeRepository;
             _vCustomerFavoriteRepository = vCustomerRepositoryAsync;
+            _options = options;
         }
 
         #region ProductOptions
@@ -553,15 +559,18 @@ namespace VitalChoice.Business.Services.Products
                 var items = await _productOutOfStockRequestRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);
                 var productIds = items.Select(p => p.IdProduct).Distinct().ToArray();
                 var products = await _productRepository.Query(p => productIds.Contains(p.Id)).SelectAsync(false);
+                var contentProducts= await _productContentRepository.Query(p => productIds.Contains(p.Id)).SelectAsync(false);
 
                 foreach (var item in items)
                 {
                     var product = products.FirstOrDefault(p => p.Id == item.IdProduct);
-                    if (product != null)
+                    var contentProduct= contentProducts.FirstOrDefault(p => p.Id == item.IdProduct);
+                    if (product != null && contentProduct!=null)
                     {
+                        var url = $"https://{_options.Value.PublicHost}/product/{contentProduct.Url}";
                         var text = setting.Value.Replace(SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE_CUSTOMER_NAME_HOLDER, item.Name).
-                            Replace(SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE_PRODUCT_NAME_HOLDER, product.Name);
-                        //TODO - add setting for a product url
+                            Replace(SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE_PRODUCT_NAME_HOLDER, product.Name).
+                            Replace(SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE_PRODUCT_URL_HOLDER, url);
 
                         BasicEmail email = new BasicEmail();
                         email.IsHTML = true;
@@ -614,7 +623,8 @@ namespace VitalChoice.Business.Services.Products
 					Id = item.Id,
 					IdCustomer = item.Id,
 					ProductName = item.ProductName,
-					ProductThumbnail = item.ProductThumbnail,
+                    ProductSubTitle = item.ProductSubTitle,
+                    ProductThumbnail = item.ProductThumbnail,
 					Quantity = item.Quantity,
 					Url = pairs.Single(x=>x.Key == item.Id).Value
 				});

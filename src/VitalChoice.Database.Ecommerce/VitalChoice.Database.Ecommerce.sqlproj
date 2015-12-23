@@ -188,9 +188,6 @@
     <None Include="PreDeployment\Scripts\ObjectHistoryLogItems.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PreDeployment\Scripts\CustomerFavoritesView.sql" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="PreDeployment\Scripts\DiscountUpdates.sql" />
   </ItemGroup>
   <ItemGroup>
@@ -237,5 +234,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\Scripts\VOrderWithRegionInfoItems.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VCustomerFavorites.sql" />
   </ItemGroup>
 </Project>

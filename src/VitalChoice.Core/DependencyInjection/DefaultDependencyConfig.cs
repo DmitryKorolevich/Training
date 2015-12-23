@@ -415,6 +415,8 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<ArticleViewService>().As<IArticleViewService>();
             builder.RegisterType<RecipeCategoryViewService>().As<IRecipeCategoryViewService>();
             builder.RegisterType<RecipeViewService>().As<IRecipeViewService>();
+            builder.RegisterType<FAQCategoryViewService>().As<IFAQCategoryViewService>();
+            builder.RegisterType<FAQViewService>().As<IFAQViewService>();
 
             builder.RegisterType<EmailSender>()
                 .As<IEmailSender>()

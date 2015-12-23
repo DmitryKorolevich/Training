@@ -59,6 +59,7 @@ namespace VC.Public
                 // send the request to the following path or controller action.
                 app.UseExceptionHandler("/Shared/Error");
             }
+            app.UseStatusCodePagesWithReExecute("/help/error/{0}");
 
             // Add static files to the request pipeline.
             app.UseStaticFiles();

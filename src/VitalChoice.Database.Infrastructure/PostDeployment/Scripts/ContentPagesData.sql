@@ -221,3 +221,50 @@ INSERT INTO [dbo].[ContentPages]
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentPages] WHERE [Name] = 'Not Found')
+BEGIN
+
+DECLARE @contentItemId int
+
+INSERT INTO [dbo].[ContentItems]
+           ([Created]
+           ,[Updated]
+           ,[Template]
+           ,[Description]
+           ,[Title]
+           ,[MetaKeywords]
+           ,[MetaDescription])
+     VALUES
+           (GETDATE()
+           ,GETDATE()
+           ,''
+           ,'<h4>Page not found</h4>'
+           ,'Page Not Found'
+           ,NULL
+           ,NULL)
+
+SET @contentItemId=@@identity
+
+INSERT INTO [dbo].[ContentPages]
+           ([Url]
+           ,[Name]
+           ,[FileUrl]
+           ,[ContentItemId]
+           ,[MasterContentItemId]
+           ,[StatusCode]
+           ,[Assigned]
+           ,[UserId])
+     VALUES
+           ('not-found'
+           ,'Not Found'
+           ,NULL
+           ,@contentItemId
+           ,(SELECT Id FROM MasterContentItems WHERE Name='Content Individual Empty')
+           ,2
+           ,1
+           ,NULL)
+
+END
+
+GO

@@ -93,32 +93,22 @@ namespace VitalChoice.Business.Services.Products
                 if (skuIds.Count > 0)
                 {
                     var shortSkus =
-                        await
+                        (await
                             _skuRepository.Query(
                                 p => skuIds.Contains(p.Id) && p.StatusCode != (int) RecordStatusCode.Deleted)
                                 .Include(p => p.Product)
-                                .SelectAsync(p => new ShortSkuInfo(p), false);
+                                .SelectAsync(false)).Select(p => new ShortSkuInfo(p)).ToDictionary(s => s.Id);
                     foreach (var sku in entity.DiscountsToSelectedSkus)
                     {
-                        foreach (var shortSku in shortSkus)
-                        {
-                            if (sku.IdSku == shortSku.Id)
-                            {
-                                sku.ShortSkuInfo = shortSku;
-                                break;
-                            }
-                        }
+                        ShortSkuInfo skuInfo;
+                        if (shortSkus.TryGetValue(sku.IdSku, out skuInfo))
+                            sku.ShortSkuInfo = skuInfo;
                     }
                     foreach (var sku in entity.DiscountsToSkus)
                     {
-                        foreach (var shortSku in shortSkus)
-                        {
-                            if (sku.IdSku == shortSku.Id)
-                            {
-                                sku.ShortSkuInfo = shortSku;
-                                break;
-                            }
-                        }
+                        ShortSkuInfo skuInfo;
+                        if (shortSkus.TryGetValue(sku.IdSku, out skuInfo))
+                            sku.ShortSkuInfo = skuInfo;
                     }
                 }
                 entity.DiscountTiers = entity.DiscountTiers.OrderBy(p => p.Order).ToArray();
@@ -144,25 +134,25 @@ namespace VitalChoice.Business.Services.Products
             IUnitOfWorkAsync uow)
         {
             var discountTierRepository = uow.RepositoryAsync<DiscountTier>();
-            var discountToSelectedSkuRepository = uow.RepositoryAsync<DiscountToSelectedSku>();
-            var discountToSkuRepository = uow.RepositoryAsync<DiscountToSku>();
-            var discountToCategoryRepository = uow.RepositoryAsync<DiscountToCategory>();
-            var discountToSelectedCategoryRepository = uow.RepositoryAsync<DiscountToSelectedCategory>();
+            //var discountToSelectedSkuRepository = uow.RepositoryAsync<DiscountToSelectedSku>();
+            //var discountToSkuRepository = uow.RepositoryAsync<DiscountToSku>();
+            //var discountToCategoryRepository = uow.RepositoryAsync<DiscountToCategory>();
+            //var discountToSelectedCategoryRepository = uow.RepositoryAsync<DiscountToSelectedCategory>();
 
-            await discountToSelectedSkuRepository.DeleteAllAsync(
-                initial.DiscountsToSelectedSkus.ExceptKeyedWith(updated.DiscountsToSelectedSkus,
-                    item => item.IdSku));
+            //await discountToSelectedSkuRepository.DeleteAllAsync(
+            //    initial.DiscountsToSelectedSkus.ExceptKeyedWith(updated.DiscountsToSelectedSkus,
+            //        item => item.IdSku));
 
-            await discountToSkuRepository.DeleteAllAsync(initial.DiscountsToSkus.ExceptKeyedWith(updated.DiscountsToSkus,
-                item => item.IdSku));
+            //await discountToSkuRepository.DeleteAllAsync(initial.DiscountsToSkus.ExceptKeyedWith(updated.DiscountsToSkus,
+            //    item => item.IdSku));
 
-            await discountToCategoryRepository.DeleteAllAsync(initial.DiscountsToCategories.ExceptKeyedWith(updated.DiscountsToCategories,
-                item => item.IdCategory));
+            //await discountToCategoryRepository.DeleteAllAsync(initial.DiscountsToCategories.ExceptKeyedWith(updated.DiscountsToCategories,
+            //    item => item.IdCategory));
 
-            await
-                discountToSelectedCategoryRepository.DeleteAllAsync(
-                    initial.DiscountsToSelectedCategories.ExceptKeyedWith(updated.DiscountsToSelectedCategories,
-                        item => item.IdCategory));
+            //await
+            //    discountToSelectedCategoryRepository.DeleteAllAsync(
+            //        initial.DiscountsToSelectedCategories.ExceptKeyedWith(updated.DiscountsToSelectedCategories,
+            //            item => item.IdCategory));
 
             if (updated.IdObjectType == (int) DiscountType.Tiered && updated.DiscountTiers != null && updated.DiscountTiers.Count > 0)
             {

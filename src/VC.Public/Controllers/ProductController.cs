@@ -155,7 +155,42 @@ namespace VC.Public.Controllers
 			return PartialView("_AddReviewInner", model);
 		}
 
-	    [HttpGet]
+        [HttpGet]
+        public async Task<IActionResult> AddOutOfStockProductRequest(Guid id)
+        {
+            await PopulateProductReviewAssets(id);
+
+            return PartialView("_AddOutOfStockProductRequest", new AddOutOfStockProductRequestModel { ProductId = id });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddOutOfStockProductRequest(AddOutOfStockProductRequestModel model)
+        {
+            if (Validate(model))
+            {
+                if (!await _reCaptchaValidator.Validate(Request.Form[ReCaptchaValidator.DefaultPostParamName]))
+                {
+                    ModelState.AddModelError(string.Empty, ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.WrongCaptcha]);
+                }
+                else
+                {
+                    await _productService.AddProductOutOfStockRequestAsync(new ProductOutOfStockRequest()
+                    {
+                        IdProduct = await _productService.GetProductInternalIdAsync(model.ProductId),
+                        Name = model.Name,
+                        Email=model.Email
+                    });
+
+                    ViewBag.SuccessMessage = InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullyAdded];
+                    return PartialView("_AddOutOfStockProductRequestInner", model);
+                }
+            }
+
+            return PartialView("_AddOutOfStockProductRequestInner", model);
+        }
+
+
+        [HttpGet]
 	    public async Task<IActionResult> FullReviews(string url, int pageNumber = 1)
 	    {
 		    var transfer = await _productService.SelectTransferAsync(url, true);

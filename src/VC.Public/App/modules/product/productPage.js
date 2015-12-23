@@ -1,7 +1,28 @@
 ﻿var loaded = false;
 
-window.addEventListener("load", function () {
-	$("input[name=sku]:first").attr("checked", true);
+window.addEventListener("load", function ()
+{
+    var setSelectedSku = function ()
+    {
+        var jChecked = $("input[name=sku]:checked");
+
+        var inStock = jChecked.data("in-stock");
+        if (inStock)
+        {
+            $(".product-action-right .in-stock").show();
+            $(".product-action-right .out-of-stock").hide();
+            $("#spSelectedPrice").text("Selected Price " + jChecked.attr("data-price"));
+            $("#hSelectedCode").text("Product #" + jChecked.val());
+        }
+        else
+        {
+            $(".product-action-right .in-stock").hide();
+            $(".product-action-right .out-of-stock").show();
+        }
+    };
+
+    $("input[name=sku]:first").attr("checked", true);
+    setSelectedSku();
 
 	$("body").on("click", "#lnkReviewsTab", function () {
 		$(".tabs-control").tabs({ "active": 1 });
@@ -16,11 +37,62 @@ window.addEventListener("load", function () {
 		return false;
 	});
 
-	$("body").on("change", "input[name=sku]", function () {
-		var jChecked = $("input[name=sku]:checked");
+	$("body").on("change", "input[name=sku]", setSelectedSku);
 
-		$("#spSelectedPrice").text("Selected Price " + jChecked.attr("data-price"));
-		$("#hSelectedCode").text("Product #" + jChecked.val());
+	$(".product-action-right .out-of-stock a").click(function (e)
+	{
+	    $.ajax({
+	        url: "/Product/AddOutOfStockProductRequest/" + productPublicId,
+	        dataType: "html"
+	    }).success(function (result)
+	    {
+	        $(result).dialog({
+	            resizable: false,
+	            modal: true,
+	            minWidth: defaultModalSize,
+	            dialogClass: "add-out-of-stock-request-dialog",
+	            open: function ()
+	            {
+	                grecaptcha.render('googleCaptcha', {
+	                    'sitekey': captchaSiteKey
+	                });
+	            },
+	            close: function ()
+	            {
+	                $(this).dialog('destroy').remove();
+	            },
+	            buttons: [
+					{
+					    text: "Submit Out of Stock Request",
+					    'class': "main-dialog-button",
+					    click: function ()
+					    {
+					        var selector = "#addOutOfStockProductRequestDialog form";
+					        var jForm = $(selector);
+					        reparseElementValidators(selector);
+					        jForm.validate()
+					        if (jForm.valid())
+					        {
+					            jForm.submit();
+					        }
+					    }
+					},
+					{
+					    text: "Cancel",
+					    click: function ()
+					    {
+					        $(this).dialog("close");
+					    }
+					}
+	            ]
+	        });
+	    }).error(function (result)
+	    {
+	        notifyError();
+	    });
+        
+	    e.preventDefault();
+	    return false;
 	});
 
 	$.each([1, 2, 3, 4], function (index, targetNumber) {
@@ -66,10 +138,19 @@ window.addEventListener("load", function () {
 	});
 
 	var tag = document.createElement('script');
-	tag.src = "http://www.youtube.com/player_api";
+	tag.src = "https://www.youtube.com/player_api";
 	var firstScriptTag = document.getElementsByTagName('script')[0];
 	firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 }, false);
+
+function addOutOfStockProductRequestFormSubmitSuccess(data)
+{
+    ajaxFormSubmitSuccess();
+    if (successMessage)
+    {
+        $("#addOutOfStockProductRequestDialog").dialog("close");
+    }
+}
 
 var players = [];
 

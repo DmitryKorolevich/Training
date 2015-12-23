@@ -122,5 +122,25 @@ END
 
 GO
 
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentProcessors] WHERE [Type] = N'FAQCategoriesProcessor')
+BEGIN
 
+	INSERT INTO [dbo].[ContentProcessors]
+	(Id, [Type], Name, Description)
+	VALUES
+	(17, N'FAQCategoriesProcessor', N'FAQ categories processor', N'Tree view of FAQ categories')
+	INSERT INTO [dbo].[ContentProcessors]
+	(Id, [Type], Name, Description)
+	VALUES
+	(18, N'FAQsProcessor', N'FAQs processor', N'FAQs list by the given category id')
+
+	INSERT INTO [dbo].[MasterContentItemsToContentProcessors]
+	([MasterContentItemId],[ContentProcessorId])
+	SELECT [Id], 17 FROM [dbo].[MasterContentItems] WHERE [Name] = N'FAQ Sub Category'
+	INSERT INTO [dbo].[MasterContentItemsToContentProcessors]
+	([MasterContentItemId],[ContentProcessorId])
+	SELECT [Id], 18 FROM [dbo].[MasterContentItems] WHERE [Name] = N'FAQ Sub Category'
+END
+
+GO
 

@@ -6,7 +6,9 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Products
     {
 	    public string ProductName { get; set; }
 
-	    public string ProductThumbnail { get; set; }
+        public string ProductSubTitle { get; set; }
+
+        public string ProductThumbnail { get; set; }
 
 	    public int IdCustomer { get; set; }
 

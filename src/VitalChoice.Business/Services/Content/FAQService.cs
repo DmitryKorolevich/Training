@@ -80,30 +80,35 @@ namespace VitalChoice.Business.Services.Content
 			var sortOrder = filter.Sorting.SortOrder;
 			switch (filter.Sorting.Path)
 			{
-				case ArticleSortPath.Title:
+				case FAQSortPath.Title:
 					sortable =
 						(x) =>
 							sortOrder == SortOrder.Asc
 								? x.OrderBy(y => y.Name)
 								: x.OrderByDescending(y => y.Name);
 					break;
-				case ArticleSortPath.Url:
+				case FAQSortPath.Url:
 					sortable =
 						(x) =>
 							sortOrder == SortOrder.Asc
 								? x.OrderBy(y => y.Url)
 								: x.OrderByDescending(y => y.Url);
 					break;
-				case ArticleSortPath.Updated:
-					//faqRepository.EarlyRead = true; //added temporarly till ef 7 becomes stable
-
+				case FAQSortPath.Updated:
 					sortable =
 						(x) =>
 							sortOrder == SortOrder.Asc
 								? x.OrderBy(y => y.ContentItem.Updated)
 								: x.OrderByDescending(y => y.ContentItem.Updated);
 					break;
-			}
+                case FAQSortPath.Created:
+                    sortable =
+                        (x) =>
+                            sortOrder == SortOrder.Asc
+                                ? x.OrderBy(y => y.ContentItem.Created)
+                                : x.OrderByDescending(y => y.ContentItem.Created);
+                    break;
+            }
 
 			var toReturn = await faqRepository.Query(query).Include(p=>p.ContentItem).Include(p => p.FAQsToContentCategories).ThenInclude(p => p.ContentCategory).OrderBy(sortable).
                 Include(p => p.User).ThenInclude(p => p.Profile).
