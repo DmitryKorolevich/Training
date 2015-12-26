@@ -11,7 +11,6 @@ using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using System.Threading;
-using VitalChoice.DynamicData.Delegates;
 using VitalChoice.Ecommerce.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Base;

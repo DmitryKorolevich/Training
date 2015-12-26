@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Metadata.Internal;
+using VitalChoice.Caching.Data;
 using VitalChoice.Caching.Interfaces;
-using VitalChoice.DynamicData.Delegates;
 
-namespace VitalChoice.Caching.Data
+namespace VitalChoice.Caching.Services
 {
     internal class EntityInfoStorage : IEntityInfoStorage
     {
@@ -44,6 +43,16 @@ namespace VitalChoice.Caching.Data
                 return new EntityPrimaryKey(keyValues);
             }
             return null;
+        }
+
+        public ICollection<EntityKeyInfo> GetPrimaryKeyInfo<T>()
+        {
+            EntityKeyInfo[] keyInfos;
+            if (_keyCollection.TryGetValue(typeof (T), out keyInfos))
+            {
+                return keyInfos;
+            }
+            return new EntityKeyInfo[0];
         }
     }
 }

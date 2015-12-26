@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Reflection;
 using VitalChoice.Ecommerce.Domain.Attributes;
 
-namespace VitalChoice.DynamicData.Delegates
+namespace VitalChoice.Ecommerce.Domain
 {
     public struct GenericProperty
     {

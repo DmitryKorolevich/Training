@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using VitalChoice.DynamicData.Delegates;
 using VitalChoice.DynamicData.Services;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;

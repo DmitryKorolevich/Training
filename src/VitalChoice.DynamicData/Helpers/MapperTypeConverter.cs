@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 using System.Reflection;
-using VitalChoice.DynamicData.Delegates;
+using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;

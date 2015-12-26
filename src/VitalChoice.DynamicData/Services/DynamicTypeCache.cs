@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using VitalChoice.DynamicData.Delegates;
+using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Helpers;
 

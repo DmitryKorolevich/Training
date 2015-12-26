@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Data.Entity.Metadata.Internal;
-using VitalChoice.DynamicData.Delegates;
 
 namespace VitalChoice.Caching.Data
 {

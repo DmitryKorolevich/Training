@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Caching.Data;
+using VitalChoice.Caching.Expressions;
 
 namespace VitalChoice.Caching.Interfaces
 {

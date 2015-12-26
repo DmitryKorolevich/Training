@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.Data.Entity;
+using VitalChoice.Caching.Expressions.Visitors;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Ecommerce.Domain;
@@ -74,22 +75,25 @@ namespace VitalChoice.Data.Repositories
 			int? pageSize = null,
             bool tracking = true)
 		{
-		    //FIXED: added temporarly till ef 7 becomes stable, remove when it arrives
-			//if (EarlyRead) 
-			//{
-			//	IEnumerable<TEntity> earlyRead = query.ToArray();
-			//	if (orderBy != null)
-			//		earlyRead = orderBy(earlyRead.AsQueryable());
+            //FIXED: added temporarly till ef 7 becomes stable, remove when it arrives
+            //if (EarlyRead) 
+            //{
+            //	IEnumerable<TEntity> earlyRead = query.ToArray();
+            //	if (orderBy != null)
+            //		earlyRead = orderBy(earlyRead.AsQueryable());
 
-			//	if (filter != null)
-			//		earlyRead = earlyRead.Where(filter.CacheCompile());
+            //	if (filter != null)
+            //		earlyRead = earlyRead.Where(filter.CacheCompile());
 
-			//	if (page != null && pageSize != null)
-			//		earlyRead = earlyRead.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
+            //	if (page != null && pageSize != null)
+            //		earlyRead = earlyRead.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
 
-			//	return earlyRead.ToList();
-			//}
-		    return await Select(query, filter, orderBy, page, pageSize, tracking).ToListAsync();
+            //	return earlyRead.ToList();
+            //}
+            QueriableExpressionVisitor<TEntity> visitor = new QueriableExpressionVisitor<TEntity>();
+		    var queryable = Select(query, filter, orderBy, page, pageSize, tracking);
+		    visitor.Visit(queryable.Expression);
+            return await Select(query, filter, orderBy, page, pageSize, tracking).ToListAsync();
 		}
 	}
 }

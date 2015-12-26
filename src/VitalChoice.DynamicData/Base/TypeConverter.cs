@@ -5,7 +5,6 @@ using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 using Autofac.Features.Indexed;
-using VitalChoice.DynamicData.Delegates;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Services;
 using VitalChoice.Ecommerce.Domain.Attributes;

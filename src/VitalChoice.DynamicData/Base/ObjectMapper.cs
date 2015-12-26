@@ -3,10 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using VitalChoice.DynamicData.Delegates;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Services;
+using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.DynamicData.Base
