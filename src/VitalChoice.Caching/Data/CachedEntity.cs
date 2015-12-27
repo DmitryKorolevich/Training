@@ -3,24 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Data.Entity.Metadata;
+using VitalChoice.Caching.Services;
 using VitalChoice.Ecommerce.Domain;
 
 namespace VitalChoice.Caching.Data
 {
-    internal class CachedEntity<TEntity>
-        where TEntity : Entity
+    internal struct CachedEntity<T>
+        where T : Entity
     {
-        public CachedEntity(TEntity entity)
+        public CachedEntity(T entity, ICollection<RelationInstance> relations, ICollection<RelationInfo> relationsInfo)
         {
+            Relations = relations;
+            RelationsInfo = relationsInfo;
             Entity = entity;
         }
 
-        public TEntity Entity { get; }
-        public EntityPrimaryKey PrimaryKey { get; set; }
+        public T Entity { get; }
+        public ICollection<RelationInstance> Relations { get; }
+        public ICollection<RelationInfo> RelationsInfo { get; }
 
-        public static implicit operator TEntity(CachedEntity<TEntity> cached)
+        public static implicit operator T(CachedEntity<T> cached)
         {
-            return cached?.Entity;
+            return cached.Entity;
         }
     }
 }

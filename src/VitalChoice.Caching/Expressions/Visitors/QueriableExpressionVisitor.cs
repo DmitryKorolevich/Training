@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Data.Entity;
+using VitalChoice.Caching.Data;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Expressions.Visitors
@@ -58,15 +59,16 @@ namespace VitalChoice.Caching.Expressions.Visitors
                 var memberExpression = ((node.Arguments[1] as UnaryExpression)?.Operand as LambdaExpression)?.Body as MemberExpression;
                 string name = memberExpression?.Member.Name;
                 Type relationType = memberExpression?.Type;
+                Type ownType = memberExpression?.Expression.Type;
 
                 var elementType = relationType.TryGetElementType(typeof (ICollection<>));
                 relationType = elementType ?? relationType;
 
-                var searchKey = new RelationCacheInfo(name, relationType);
+                var searchKey = new RelationCacheInfo(name, relationType, ownType);
 
                 if (!_relationsUsed.TryGetValue(searchKey, out _currentRelation))
                 {
-                    var relationInfo = new RelationInfo(name, relationType);
+                    var relationInfo = new RelationInfo(name, relationType, ownType);
                     _relationsUsed.Add(searchKey, relationInfo);
 
                     _currentRelation = relationInfo;
@@ -84,12 +86,12 @@ namespace VitalChoice.Caching.Expressions.Visitors
                 if (_currentRelation == null)
                     throw new InvalidOperationException("ThenInclude used before Include, need investigation");
 
-                var searchKey = new RelationCacheInfo(name, relationType);
+                var searchKey = new RelationCacheInfo(name, relationType, _currentRelation.RelationEntityType);
                 RelationInfo newCurrent;
-                if (!_currentRelation.Relations.TryGetValue(searchKey, out newCurrent))
+                if (!_currentRelation.RelationsDict.TryGetValue(searchKey, out newCurrent))
                 {
-                    var relationInfo = new RelationInfo(name, relationType);
-                    _currentRelation.Relations.Add(searchKey, relationInfo);
+                    var relationInfo = new RelationInfo(name, relationType, _currentRelation.RelationEntityType);
+                    _currentRelation.RelationsDict.Add(searchKey, relationInfo);
                     newCurrent = relationInfo;
                 }
                 _currentRelation = newCurrent;

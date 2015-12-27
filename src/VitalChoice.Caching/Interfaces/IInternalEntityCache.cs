@@ -1,26 +1,35 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using VitalChoice.Caching.Data;
 using VitalChoice.Ecommerce.Domain;
 
 namespace VitalChoice.Caching.Interfaces
 {
-    internal interface IInternalEntityCache<TEntity>
-        where TEntity : Entity
+    internal interface IInternalEntityCache
     {
-        bool TryGetCachedFirst(EntityCacheKey key, out TEntity entity);
-        bool TryGetCached(EntityCacheKey key, out List<TEntity> entities);
-        bool TryGetCachedFirst<T>(EntityCacheKey key, Expression<Func<TEntity, T>> selector, out T selectItem);
-        bool TryGetCached<T>(EntityCacheKey key, Expression<Func<TEntity, T>> selector, out List<T> selectList);
+        bool TryGetEntity(EntityPrimaryKey primaryKey, out object entity);
+        bool TryRemove(object entity);
+        bool TryRemove(IEnumerable<object> entities);
+        bool TryRemoveTree(object entity);
+        bool TryRemoveTree(IEnumerable<object> entities);
+        void Update(IEnumerable<object> entities, ICollection<RelationInfo> relations);
+        void Update(object entity, ICollection<RelationInfo> relations);
+        bool Empty { get; }
+    }
 
-        void InvalidateCache(EntityCacheKey key, TEntity entity);
-        void InvalidateCache(EntityCacheKey key, List<TEntity> entity);
-        void InvalidateCache<T>(EntityCacheKey key, Expression<Func<TEntity, T>> selector, T entity);
-        void InvalidateCache<T>(EntityCacheKey key, Expression<Func<TEntity, T>> selector, List<T> entity);
-
-        void PurgeCache(EntityCacheKey key);
+    internal interface IInternalEntityCache<T> : IInternalEntityCache
+        where T : Entity
+    {
+        bool TryGetEntity(EntityPrimaryKey primaryKey, out T entity);
+        ICollection<T> GetWhere(Func<T, bool> whereFunc);
+        ICollection<T> GetWhere(Expression<Func<T, bool>> whereExpression);
+        ICollection<T> GetAll();
+        bool TryRemove(T entity);
+        bool TryRemove(IEnumerable<T> entities);
+        bool TryRemoveTree(T entity);
+        bool TryRemoveTree(IEnumerable<T> entities);
+        void Update(IEnumerable<T> entities, ICollection<RelationInfo> relations);
+        void Update(T entity, ICollection<RelationInfo> relations);
     }
 }

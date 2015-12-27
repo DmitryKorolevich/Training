@@ -8,11 +8,15 @@ using VitalChoice.Ecommerce.Domain;
 namespace VitalChoice.Caching.Interfaces
 {
     public interface IEntityCache<TEntity>
-        where TEntity:Entity
+        where TEntity : Entity
     {
-        Task<List<TEntity>> GetCachedOrReadAsync(IQueryable<TEntity> query);
-        Task<TEntity> GetCachedOrReadFirstOrDefaultAsync(IQueryable<TEntity> query);
-        Task<List<T>> GetCachedOrReadAsync<T>(IQueryable<TEntity> query, Expression<Func<TEntity, T>> selector);
-        Task<T> GetCachedOrReadFirstOrDefaultAsync<T>(IQueryable<TEntity> query, Expression<Func<TEntity, T>> selector);
+        bool TryGetCached(IQueryable<TEntity> query, out List<TEntity> entities);
+        bool TryGetCachedFirstOrDefault(IQueryable<TEntity> query, out TEntity entity);
+        bool TryGetCached<T>(IQueryable<TEntity> query, Expression<Func<TEntity, T>> selector, out List<T> results);
+        bool TryGetCachedFirstOrDefault<T>(IQueryable<TEntity> query, Expression<Func<TEntity, T>> selector, out T result);
+        void Update(IQueryable<TEntity> query, ICollection<TEntity> entities);
+        void Update(IQueryable<TEntity> query, TEntity entity);
+        void Update<T>(IQueryable<TEntity> query, Expression<Func<TEntity, T>> selector, ICollection<T> results);
+        void Update<T>(IQueryable<TEntity> query, Expression<Func<TEntity, T>> selector, T result);
     }
 }
