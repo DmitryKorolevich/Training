@@ -12,13 +12,13 @@ window.addEventListener("load", function ()
             $(".product-action-right .in-stock").show();
             $(".product-action-right .out-of-stock").hide();
             $("#spSelectedPrice").text("Selected Price " + jChecked.attr("data-price"));
-            $("#hSelectedCode").text("Product #" + jChecked.val());
         }
         else
         {
             $(".product-action-right .in-stock").hide();
             $(".product-action-right .out-of-stock").show();
         }
+        $("#hSelectedCode").text("Product #" + jChecked.val());
     };
 
     $("input[name=sku]:first").attr("checked", true);

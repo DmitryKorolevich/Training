@@ -209,10 +209,6 @@ namespace VC.Admin.Controllers
             {
                 address.IdEditedBy = userId;
             }
-            foreach (var customerNote in item.Customer.CustomerNotes)
-            {
-                customerNote.IdEditedBy = userId;
-            }
             item.Customer.ProfileAddress.IdEditedBy = userId;
 
             await _customerService.UpdateAsync(item.Customer);

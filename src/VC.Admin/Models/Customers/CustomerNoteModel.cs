@@ -23,6 +23,17 @@ namespace VC.Admin.Models.Customer
 		[Map]
 		public DateTime DateEdited { get; set; }
 
-		public string EditedBy { get; set; }
-	}
+        [Map]
+        public int? IdEditedBy { get; set; }
+
+        public string EditedBy { get; set; }
+        
+        [Map]
+        public DateTime DateCreated { get; set; }
+
+        [Map]
+        public int? IdAddedBy { get; set; }
+
+        public string AddedBy { get; set; }
+    }
 }

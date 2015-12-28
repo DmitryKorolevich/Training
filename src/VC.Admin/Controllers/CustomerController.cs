@@ -207,6 +207,7 @@ namespace VC.Admin.Controllers
             var toReturn = new CustomerNoteModel()
             {
                 Priority = CustomerNotePriority.NormalPriority,
+                DateCreated = DateTime.Now,
                 DateEdited = DateTime.Now,
             };
             var sUserId = Request.HttpContext.User.GetUserId();
@@ -217,7 +218,10 @@ namespace VC.Admin.Controllers
                 var adminProfile = (await _adminProfileService.QueryAsync(adminProfileCondition)).FirstOrDefault();
                 if (adminProfile != null)
                 {
+                    toReturn.IdEditedBy = userId;
                     toReturn.EditedBy = adminProfile.AgentId;
+                    toReturn.IdAddedBy = userId;
+                    toReturn.AddedBy = adminProfile.AgentId;
                 }
             }
 
@@ -291,10 +295,6 @@ namespace VC.Admin.Controllers
                 {
                     address.IdEditedBy = userId;
                 }
-                foreach (var customerNote in item.CustomerNotes)
-                {
-                    customerNote.IdEditedBy = userId;
-                }
                 item.ProfileAddress.IdEditedBy = userId;
             }
             item.IdEditedBy = userId;
@@ -311,7 +311,9 @@ namespace VC.Admin.Controllers
 			toReturn.IsConfirmed = addUpdateCustomerModel.IsConfirmed;
 			toReturn.PublicUserId = addUpdateCustomerModel.PublicId;
 
-			return toReturn;
+            await PrepareCustomerNotes(item, toReturn);
+
+            return toReturn;
         }
 
         [HttpPost]
@@ -409,22 +411,32 @@ namespace VC.Admin.Controllers
 			customerModel.IsConfirmed = login.IsConfirmed;
 			customerModel.PublicUserId = login.PublicId;
 
-			var adminProfileCondition =
-                new AdminProfileQuery().IdInRange(
-                    result.CustomerNotes.Where(x => x.IdEditedBy.HasValue).Select(x => x.IdEditedBy.Value).ToList());
+            await PrepareCustomerNotes(result,customerModel);
+
+            return customerModel;
+        }
+
+        [NonAction]
+        public async Task PrepareCustomerNotes(CustomerDynamic dynamic, AddUpdateCustomerModel model)
+        {
+            var noteIds = dynamic.CustomerNotes.Where(x => x.IdEditedBy.HasValue).Select(x => x.IdEditedBy.Value).ToList();
+            noteIds.AddRange(dynamic.CustomerNotes.Where(x => x.IdAddedBy.HasValue).Select(x => x.IdAddedBy.Value).ToList());
+            var adminProfileCondition = new AdminProfileQuery().IdInRange(noteIds);
 
             var adminProfiles = await _adminProfileService.QueryAsync(adminProfileCondition);
-            foreach (var customerNote in customerModel.CustomerNotes)
+            foreach (var customerNote in model.CustomerNotes)
             {
                 customerNote.EditedBy =
                     adminProfiles.SingleOrDefault(
-                        y => y.Id == result.CustomerNotes.Single(z => z.Id == customerNote.Id).IdEditedBy)?
+                        y => y.Id == dynamic.CustomerNotes.Single(z => z.Id == customerNote.Id).IdEditedBy)?
+                        .AgentId;
+                customerNote.AddedBy =
+                    adminProfiles.SingleOrDefault(
+                        y => y.Id == dynamic.CustomerNotes.Single(z => z.Id == customerNote.Id).IdAddedBy)?
                         .AgentId;
             }
 
-            customerModel.CustomerNotes = customerModel.CustomerNotes.OrderByDescending(x => x.DateEdited).ToList();
-
-            return customerModel;
+            model.CustomerNotes = model.CustomerNotes.OrderByDescending(x => x.DateEdited).ToList();
         }
 
 		[HttpPost]

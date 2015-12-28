@@ -755,6 +755,12 @@ namespace VitalChoice.Ecommerce.Context
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
                 entity
+                    .HasOne(p => p.AddedBy)
+                    .WithMany()
+                    .HasForeignKey(p => p.IdAddedBy)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired(false);
+                entity
                     .HasMany(n => n.OptionValues)
                     .WithOne()
                     .HasForeignKey(o => o.IdCustomerNote)
