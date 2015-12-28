@@ -43,7 +43,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
 	    {
 		    {Keys.UpdateUserGeneral, "Error occurred while updating user"},
-		    {Keys.CantFindUserByActivationToken, "Invalid authentication token used to identify user in the database"},
+		    {Keys.CantFindUserByActivationToken, "Your forgot password link has either already been used or is no longer active. Please use the forgot password system to request a new password recovery link."},
 		    {Keys.UserAlreadyConfirmed, "User already activated or deleted"},
 		    {Keys.ActivationTokenExpired, "Activation token has expired"},
 		    {Keys.UserLockedOut, "User is locked out"},
@@ -69,7 +69,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
 			{Keys.EmailIsTakenPleaseLogon, "Email '{0}' is already registered"},
 			{Keys.SuspendedCustomer, "Operation can not be completed since associated customer is suspended"},
 			{Keys.PasswordRequiresSpecialCharacter, "Passwords must contain at least 1 special character."},
-			{Keys.InvalidToken, "Authentication token that has been sent to your email either is expired or regenerated already"},
+			{Keys.InvalidToken, "Please ensure the email address is identical to the email address where you received the password recovery link. Please use the forgot password system to request a new password recovery link."},
             {Keys.InvalidIdAffiliate, "Affiliate with the given Id cannot be found"},
             {Keys.ObjectNotFound, "Object cannot be found"},
             {Keys.AffiliateMinPayCommisionsAmountNotMatch, "Affiliate balance is less than ${0}"},
