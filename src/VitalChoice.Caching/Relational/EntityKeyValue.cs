@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace VitalChoice.Caching.Data
+namespace VitalChoice.Caching.Relational
 {
-    internal class EntityKeyValue : IEquatable<EntityKeyValue>
+    public class EntityKeyValue : IEquatable<EntityKeyValue>
     {
         public bool Equals(EntityKeyValue other)
         {

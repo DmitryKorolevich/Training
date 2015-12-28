@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using VitalChoice.Caching.Expressions;
 
-namespace VitalChoice.Caching.Data
+namespace VitalChoice.Caching.Relational
 {
     public class RelationInfo : IEquatable<RelationInfo>
     {

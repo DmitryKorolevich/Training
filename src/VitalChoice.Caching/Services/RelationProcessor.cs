@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using VitalChoice.Caching.Data;
+using VitalChoice.Caching.Relational;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Services
 {
-    public static class RelationCache
+    internal static class RelationProcessor
     {
         private static readonly ConcurrentDictionary<RelationCacheItem, Func<object, object>> AccessorsCache =
             new ConcurrentDictionary<RelationCacheItem, Func<object, object>>();

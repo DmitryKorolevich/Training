@@ -1,29 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
-namespace VitalChoice.Caching.Data
+namespace VitalChoice.Caching.Relational
 {
-    internal class EntityPrimaryKey : IEquatable<EntityPrimaryKey>
+    internal class EntityUniqueIndex : IEquatable<EntityUniqueIndex>
     {
-        private readonly IDictionary<string, EntityKeyValue> _keys;
+        public EntityUniqueIndexInfo IndexInfo { get; }
 
-        public EntityPrimaryKey(IEnumerable<EntityKeyValue> keys)
+        private readonly Dictionary<string, EntityIndexValue> _indexValues;
+
+        public EntityUniqueIndex(IEnumerable<EntityIndexValue> values)
         {
-            _keys = keys.ToDictionary(k => k.KeyInfo.Name);
+            _indexValues = values.ToDictionary(k => k.IndexInfo.Name);
+            IndexInfo = new EntityUniqueIndexInfo(_indexValues.Values.Select(v => v.IndexInfo));
         }
 
-        public bool Equals(EntityPrimaryKey other)
+        public bool Equals(EntityUniqueIndex other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            
+
             // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (var entityKey in _keys)
+            foreach (var entityKey in _indexValues)
             {
                 var thisKey = entityKey.Value;
-                var otherKey = other._keys[entityKey.Key];
+                var otherKey = other._indexValues[entityKey.Key];
                 if (!thisKey.Equals(otherKey))
                 {
                     return false;
@@ -36,7 +38,7 @@ namespace VitalChoice.Caching.Data
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            var primaryKey = obj as EntityPrimaryKey;
+            var primaryKey = obj as EntityUniqueIndex;
             if (primaryKey != null)
                 return Equals(primaryKey);
             return false;
@@ -46,18 +48,19 @@ namespace VitalChoice.Caching.Data
         {
             unchecked
             {
-                return _keys.Aggregate(0, (current, entityKey) => current*397 ^ entityKey.Value.GetHashCode());
+                return _indexValues.Aggregate(0, (current, indexValue) => current * 397 ^ indexValue.Value.GetHashCode());
             }
         }
 
-        public static bool operator ==(EntityPrimaryKey left, EntityPrimaryKey right)
+        public static bool operator ==(EntityUniqueIndex left, EntityUniqueIndex right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(EntityPrimaryKey left, EntityPrimaryKey right)
+        public static bool operator !=(EntityUniqueIndex left, EntityUniqueIndex right)
         {
             return !Equals(left, right);
         }
+
     }
 }

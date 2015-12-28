@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Data.Entity.Metadata.Internal;
 
-namespace VitalChoice.Caching.Data
+namespace VitalChoice.Caching.Relational
 {
-    internal class EntityKeyInfo : IEquatable<EntityKeyInfo>
+    internal class EntityIndexInfo : IEquatable<EntityIndexInfo>
     {
-        public EntityKeyInfo(string name, IClrPropertyGetter property)
+        public EntityIndexInfo(string name, IClrPropertyGetter property)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
@@ -21,7 +18,7 @@ namespace VitalChoice.Caching.Data
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            var keyInfo = obj as EntityKeyInfo;
+            var keyInfo = obj as EntityIndexInfo;
             if (keyInfo != null)
                 return Equals(keyInfo);
             return false;
@@ -31,16 +28,16 @@ namespace VitalChoice.Caching.Data
         {
             unchecked
             {
-                return (Name.GetHashCode()*397) ^ Property.GetHashCode();
+                return (Name.GetHashCode() * 397) ^ Property.GetHashCode();
             }
         }
 
-        public static bool operator ==(EntityKeyInfo left, EntityKeyInfo right)
+        public static bool operator ==(EntityIndexInfo left, EntityIndexInfo right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(EntityKeyInfo left, EntityKeyInfo right)
+        public static bool operator !=(EntityIndexInfo left, EntityIndexInfo right)
         {
             return !Equals(left, right);
         }
@@ -49,7 +46,7 @@ namespace VitalChoice.Caching.Data
 
         public IClrPropertyGetter Property { get; }
 
-        public bool Equals(EntityKeyInfo other)
+        public bool Equals(EntityIndexInfo other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;

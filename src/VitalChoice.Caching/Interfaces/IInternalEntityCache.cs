@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using VitalChoice.Caching.Data;
+using VitalChoice.Caching.Relational;
 using VitalChoice.Ecommerce.Domain;
 
 namespace VitalChoice.Caching.Interfaces
 {
-    internal interface IInternalEntityCache
+    public interface IInternalEntityCache
     {
         bool TryGetEntity(EntityPrimaryKey primaryKey, out object entity);
         bool TryRemove(object entity);
@@ -18,7 +18,7 @@ namespace VitalChoice.Caching.Interfaces
         bool Empty { get; }
     }
 
-    internal interface IInternalEntityCache<T> : IInternalEntityCache
+    public interface IInternalEntityCache<T> : IInternalEntityCache
         where T : Entity
     {
         bool TryGetEntity(EntityPrimaryKey primaryKey, out T entity);

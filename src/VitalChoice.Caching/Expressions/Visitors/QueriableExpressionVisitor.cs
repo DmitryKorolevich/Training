@@ -5,7 +5,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Data.Entity;
-using VitalChoice.Caching.Data;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Expressions.Visitors
@@ -13,11 +12,8 @@ namespace VitalChoice.Caching.Expressions.Visitors
     public class QueriableExpressionVisitor<T> : ExpressionVisitor
     {
         private bool _inWhereExpression;
-        private readonly Dictionary<RelationCacheInfo, RelationInfo> _relationsUsed = new Dictionary<RelationCacheInfo, RelationInfo>();
-        private RelationInfo _currentRelation;
 
         public WhereExpression<T> WhereExpression { get; private set; }
-        public ICollection<RelationInfo> Relations => _relationsUsed.Values;
 
         protected override Expression VisitLambda<T1>(Expression<T1> node)
         {
@@ -42,61 +38,18 @@ namespace VitalChoice.Caching.Expressions.Visitors
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            Expression result;
             if (node.Method.DeclaringType == typeof (Queryable) && node.Method.Name == "Where")
             {
                 if (!_inWhereExpression)
                 {
                     _inWhereExpression = true;
-                    result = base.VisitMethodCall(node);
+                    var result = base.VisitMethodCall(node);
                     _inWhereExpression = false;
                     return result;
                 }
             }
-            result = base.VisitMethodCall(node);
-            if (node.Method.DeclaringType == typeof (EntityFrameworkQueryableExtensions) && node.Method.Name == "Include")
-            {
-                var memberExpression = ((node.Arguments[1] as UnaryExpression)?.Operand as LambdaExpression)?.Body as MemberExpression;
-                string name = memberExpression?.Member.Name;
-                Type relationType = memberExpression?.Type;
-                Type ownType = memberExpression?.Expression.Type;
 
-                var elementType = relationType.TryGetElementType(typeof (ICollection<>));
-                relationType = elementType ?? relationType;
-
-                var searchKey = new RelationCacheInfo(name, relationType, ownType);
-
-                if (!_relationsUsed.TryGetValue(searchKey, out _currentRelation))
-                {
-                    var relationInfo = new RelationInfo(name, relationType, ownType);
-                    _relationsUsed.Add(searchKey, relationInfo);
-
-                    _currentRelation = relationInfo;
-                }
-            }
-            if (node.Method.DeclaringType == typeof (EntityFrameworkQueryableExtensions) && node.Method.Name == "ThenInclude")
-            {
-                var memberExpression = ((node.Arguments[1] as UnaryExpression)?.Operand as LambdaExpression)?.Body as MemberExpression;
-                var name = memberExpression?.Member.Name;
-                var relationType = memberExpression?.Type;
-
-                var elementType = relationType.TryGetElementType(typeof (ICollection<>));
-                relationType = elementType ?? relationType;
-
-                if (_currentRelation == null)
-                    throw new InvalidOperationException("ThenInclude used before Include, need investigation");
-
-                var searchKey = new RelationCacheInfo(name, relationType, _currentRelation.RelationEntityType);
-                RelationInfo newCurrent;
-                if (!_currentRelation.RelationsDict.TryGetValue(searchKey, out newCurrent))
-                {
-                    var relationInfo = new RelationInfo(name, relationType, _currentRelation.RelationEntityType);
-                    _currentRelation.RelationsDict.Add(searchKey, relationInfo);
-                    newCurrent = relationInfo;
-                }
-                _currentRelation = newCurrent;
-            }
-            return result;
+            return base.VisitMethodCall(node);
         }
     }
 }
