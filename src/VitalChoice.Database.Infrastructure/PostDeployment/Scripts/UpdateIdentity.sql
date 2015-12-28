@@ -78,3 +78,48 @@ SET [EmailConfirmed] = 1
 WHERE [Email] = N'noreplyvitalchoice@gmail.com'
 
 GO
+
+IF(NOT EXISTS (SELECT * FROM [dbo].[AspNetRoles] WHERE [NormalizedName]=N'Marketing User'))
+BEGIN
+
+DECLARE @id int
+
+INSERT INTO [dbo].[AspNetRoles]
+           ([ConcurrencyStamp]
+           ,[Name]
+           ,[NormalizedName]
+           ,[IdUserType])
+     VALUES
+           ('marketinguserstamp'
+           ,'Marketing User'
+           ,'Marketing User'
+           ,1)
+
+SET @id=@@IDENTITY
+
+INSERT INTO [dbo].[AspNetRoleClaims]
+([ClaimType], [ClaimValue], [RoleId])
+VALUES
+(N'Permission', 14, @id)
+
+INSERT INTO [dbo].[AspNetRoles]
+           ([ConcurrencyStamp]
+           ,[Name]
+           ,[NormalizedName]
+           ,[IdUserType])
+     VALUES
+           ('affiliateuserstamp'
+           ,'Affiliate User'
+           ,'Affiliate User'
+           ,1)
+
+SET @id=@@IDENTITY
+
+INSERT INTO [dbo].[AspNetRoleClaims]
+([ClaimType], [ClaimValue], [RoleId])
+VALUES
+(N'Permission', 5, @id)
+
+END
+
+GO

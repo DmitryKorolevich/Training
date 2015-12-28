@@ -29,6 +29,10 @@ namespace VC.Admin.Models.Help
 
         public bool AllowDelete { get; set; }
 
+        public int IdEditedBy { get; set; }
+
+        public string EditedByAgent { get; set; }
+
         public BugTicketListItemModel(BugTicket item)
         {
             if(item!=null)
@@ -42,6 +46,8 @@ namespace VC.Admin.Models.Help
                 IdAddedBy = item.IdAddedBy;
                 AddedBy = item.AddedBy;
                 AddedByAgent = item.AddedByAgent;
+                IdEditedBy = item.IdEditedBy;
+                EditedByAgent = item.EditedByAgent;
             }
         }
     }

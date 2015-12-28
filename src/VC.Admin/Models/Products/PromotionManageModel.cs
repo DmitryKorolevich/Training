@@ -42,6 +42,9 @@ namespace VC.Admin.Models.Product
         [Map]
         public bool AllowHealthwise { get; set; }
 
+        [Map]
+        public bool CanUseWithDiscount { get; set; }
+
         //1
         [Map]
         public int? MaxTimesUse { get; set; }

@@ -208,7 +208,7 @@ namespace VC.Admin.Controllers
             var superAdmin = _appInfrastructureService.Get().AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
             var isSuperAdmin = HttpContext.User.IsInRole(superAdmin.Normalize());
 
-            return await _helpService.DeleteBugTicketAsync(id, isSuperAdmin ? (int?)null : Int32.Parse(Request.HttpContext.User.GetUserId()));
+            return await _helpService.DeleteBugTicketAsync(id, Int32.Parse(Request.HttpContext.User.GetUserId()), isSuperAdmin ? (int?)null : Int32.Parse(Request.HttpContext.User.GetUserId()));
         }
 
 
@@ -273,7 +273,7 @@ namespace VC.Admin.Controllers
             {
                 bugTicketCommentId = Int32.Parse(form["bugTicketCommentId"]);
             }
-            if (!StringValues.IsNullOrEmpty(form["bugTicketCommentId"]))
+            if (!StringValues.IsNullOrEmpty(form["publicId"]))
             {
                 publicId = form["publicId"];
             }

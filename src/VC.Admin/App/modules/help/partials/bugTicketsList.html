@@ -108,7 +108,7 @@
                         </td>
                         <td>{{::item.Summary}}</td>
                         <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>
-                        <td>{{::item.DateEdited | date:"MM/dd/yy"}}<br />{{::item.DateEdited | date:"h:mm a"}}</td>
+                        <td>{{::item.DateEdited | date:"MM/dd/yy"}}<br />{{::item.DateEdited | date:"h:mm a"}}<br />{{::item.EditedByAgent}}</td>
                         <td>{{::item.AddedBy}} ({{::item.AddedByAgent}})</td>
                         <td>
                             <span data-ng-if="item.StatusCode == 1" class="label label-warning font-default">{{getReferenceItem(ReferenceData.TicketStatuses, item.StatusCode).Text}}</span>

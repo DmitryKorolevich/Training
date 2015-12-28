@@ -29,14 +29,9 @@ namespace VitalChoice.Core.Infrastructure
 
 		protected override void Fail(AuthorizationContext context)
 		{
-			if (context.HttpContext.User.Identity.IsAuthenticated)
-			{
-				context.Result = new HttpForbiddenResult();
-			}
-			else
-			{
-				context.Result = new HttpUnauthorizedResult();
-			}
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("returnUrl", context.HttpContext.Request.Path);
+            context.Result = new RedirectToActionResult("Login", "Account", parameters);
 		}
 
 		public override async Task OnAuthorizationAsync(AuthorizationContext context)

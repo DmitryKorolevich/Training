@@ -6,7 +6,9 @@
 
 	    public string ProductName { get; set; }
 
-	    public string IconLink { get; set; }
+        public string ProductSubTitle { get; set; }
+
+        public string IconLink { get; set; }
 
 	    public string SelectedPrice { get; set; }
 

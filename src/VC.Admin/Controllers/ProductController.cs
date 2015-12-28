@@ -41,6 +41,7 @@ namespace VC.Admin.Controllers
         private readonly IDynamicServiceAsync<ProductDynamic, Product> productUniversalService;
         private readonly IInventoryCategoryService inventoryCategoryService;
         private readonly IProductReviewService productReviewService;
+        private readonly ISettingService settingService;
         private readonly IDynamicMapper<ProductDynamic, Product> _mapper;
         private readonly ICsvExportService<ProductCategoryStatisticTreeItemModel, ProductCategoryStatisticTreeItemCsvMap> productCategoryStatisticTreeItemCSVExportService;
         private readonly IObjectHistoryLogService objectHistoryLogService;
@@ -52,6 +53,7 @@ namespace VC.Admin.Controllers
             IInventoryCategoryService inventoryCategoryService, 
             IProductReviewService productReviewService,
             ILoggerProviderExtended loggerProvider,
+            ISettingService settingService,
             IDynamicMapper<ProductDynamic, Product> mapper,
             ICsvExportService<ProductCategoryStatisticTreeItemModel, ProductCategoryStatisticTreeItemCsvMap> productCategoryStatisticTreeItemCSVExportService,
             IObjectHistoryLogService objectHistoryLogService)
@@ -61,6 +63,7 @@ namespace VC.Admin.Controllers
             this.productService = productService;
             this.productUniversalService = productUniversalService;
             this.productReviewService = productReviewService;
+            this.settingService = settingService;
             this.productCategoryStatisticTreeItemCSVExportService = productCategoryStatisticTreeItemCSVExportService;
             this.objectHistoryLogService = objectHistoryLogService;
             _mapper = mapper;
@@ -537,10 +540,21 @@ namespace VC.Admin.Controllers
             return toReturn.Select(p => new ProductOutOfStockContainerListItemModel(p)).ToList();
         }
 
-        [HttpPost]
-        public async Task<Result<bool>> SendProductOutOfStockRequests([FromBody]ICollection<int> ids)
+        [HttpGet]
+        public async Task<Result<string>> GetProductOutOfStockRequestsMessageFormat()
         {
-            return await productService.SendProductOutOfStockRequestsAsync(ids);
+            var setting = (await settingService.GetAppSettingItemsAsync(new List<string>() { SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE })).FirstOrDefault();
+            if (setting == null)
+            {
+                throw new NotSupportedException($"{SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE} not configurated.");
+            }
+            return setting.Value;
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> SendProductOutOfStockRequests([FromBody]SendOutOfStockProductRequestsModel model)
+        {
+            return await productService.SendProductOutOfStockRequestsAsync(model.Ids,model.MessageFormat);
         }
 
         [HttpPost]

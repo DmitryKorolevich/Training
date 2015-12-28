@@ -458,18 +458,37 @@ namespace VC.Public.Controllers
         [HttpGet]
         public async Task<IActionResult> LastOrderPlaced()
         {
-            var internalId = GetInternalCustomerId();
-
-            var lastOrder = await _orderService.SelectLastOrderAsync(internalId);
-
             var lines = new List<LastOrderLineModel>();
 
-            if (lastOrder != null)
+            var customer = await GetCurrentCustomerDynamic();
+            if (customer != null)
             {
-	            lines.AddRange(lastOrder.Skus.Select(skuOrdered => new LastOrderLineModel()
-	            {
-		            ProductUrl = ProductBaseUrl + skuOrdered.ProductWithoutSkus.Url, IconLink = skuOrdered.ProductWithoutSkus.Data.Thumbnail, ProductName = skuOrdered.ProductWithoutSkus.Name, PortionsCount = skuOrdered.Sku.Data.QTY, Quantity = skuOrdered.Quantity, SelectedPrice = skuOrdered.Amount.ToString("C2"), SkuCode = skuOrdered.Sku.Code
-	            }));
+                var lastOrder = await _orderService.SelectLastOrderAsync(customer.Id);
+
+                VProductSkuFilter filter = new VProductSkuFilter();
+                filter.Ids = lastOrder.Skus.Select(p => p.Sku.Id).ToList();
+                var skus = await _productService.GetSkusAsync(filter);
+
+                if (lastOrder != null)
+                {
+                    foreach(var skuOrdered in lastOrder.Skus)
+                    {
+                        var skuInDB = skus.FirstOrDefault(p => p.SkuId == skuOrdered.Sku.Id);
+
+                        var orderLineModel = new LastOrderLineModel()
+                        {
+                            ProductUrl = ProductBaseUrl + skuOrdered.ProductWithoutSkus.Url,
+                            IconLink = skuOrdered.ProductWithoutSkus.SafeData.Thumbnail,
+                            ProductName = skuOrdered.ProductWithoutSkus.Name,
+                            PortionsCount = skuOrdered.Sku.Data.QTY,
+                            Quantity = skuOrdered.Quantity,
+                            SkuCode= skuOrdered.Sku.Code,
+                            ProductSubTitle =skuInDB?.SubTitle,
+                            SelectedPrice = customer.IdObjectType==(int)CustomerType.Retail ? skuInDB?.Price?.ToString("C2") : skuInDB?.WholesalePrice?.ToString("C2"),
+                        };
+                        lines.Add(orderLineModel);
+                    }
+                }
             }
 
             return View(lines);

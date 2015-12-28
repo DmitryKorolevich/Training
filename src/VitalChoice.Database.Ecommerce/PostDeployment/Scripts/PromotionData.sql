@@ -57,3 +57,14 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT * FROM PromotionOptionTypes WHERE Name='CanUseWithDiscount')
+BEGIN
+
+	INSERT INTO PromotionOptionTypes
+	(DefaultValue, IdFieldType, IdObjectType, Name)
+	SELECT 'True', 5, NULL, N'CanUseWithDiscount'
+
+END
+
+GO

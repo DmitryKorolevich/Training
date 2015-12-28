@@ -19,7 +19,11 @@ namespace VitalChoice.Infrastructure.Domain.Content.Products
 
         public string LongDescription { get; set; }
 
+        public bool HideLongDescription { get; set; }
+
         public string LongDescriptionBottom { get; set; }
+
+        public bool HideLongDescriptionBottom { get; set; }
 
         public string NavLabel { get; set; }
         

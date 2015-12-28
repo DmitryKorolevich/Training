@@ -185,6 +185,7 @@ namespace VitalChoice.Infrastructure.Context
                     .WithMany()
                     .HasForeignKey(p => p.ContentItemId)
                     .HasPrincipalKey(p => p.Id);
+                entity.HasIndex(p => new { p.Type, p.Url, p.StatusCode }).HasName("IX_ContentCategories_Type_Url_StatusCode");
             });
 
 
@@ -256,6 +257,7 @@ namespace VitalChoice.Infrastructure.Context
                     .HasForeignKey(t => t.IdRecipe)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired();
+                entity.HasIndex(p => new { p.Url, p.StatusCode }).HasName("IX_Recipes_Url_StatusCode");
             });
 
 
@@ -296,6 +298,7 @@ namespace VitalChoice.Infrastructure.Context
                     .HasForeignKey(p => p.ContentItemId)
                     .HasPrincipalKey(p => p.Id);
                 entity.HasOne(p => p.User).WithMany().HasForeignKey(p => p.UserId).HasPrincipalKey(p => p.Id);
+                entity.HasIndex(p => new { p.Url, p.StatusCode }).HasName("IX_FAQs_Url_StatusCode");
             });
 
 
@@ -343,6 +346,7 @@ namespace VitalChoice.Infrastructure.Context
                     .HasForeignKey(t => t.IdArticle)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired();
+                entity.HasIndex(p => new { p.Url, p.StatusCode }).HasName("IX_Articles_Url_StatusCode");
             });
 
 
@@ -376,6 +380,7 @@ namespace VitalChoice.Infrastructure.Context
                     .HasForeignKey(p => p.ContentItemId)
                     .HasPrincipalKey(p => p.Id);
                 entity.HasOne(p => p.User).WithMany().HasForeignKey(p => p.UserId).HasPrincipalKey(p => p.Id);
+                entity.HasIndex(p => new { p.Url, p.StatusCode }).HasName("IX_ContentPages_Url_StatusCode");
             });
 
 
@@ -425,6 +430,7 @@ namespace VitalChoice.Infrastructure.Context
                     .WithMany()
                     .HasForeignKey(p => p.ContentItemId)
                     .HasPrincipalKey(p => p.Id);
+                entity.HasIndex(p => new { p.Url, p.StatusCode }).HasName("IX_ProductCategories_Url_StatusCode");
             });
 
 
@@ -449,6 +455,7 @@ namespace VitalChoice.Infrastructure.Context
                     .WithMany()
                     .HasForeignKey(p => p.ContentItemId)
                     .HasPrincipalKey(p => p.Id);
+                entity.HasIndex(p => new { p.Url, p.StatusCode }).HasName("IX_Products_Url_StatusCode");
             });
 
 
@@ -518,6 +525,7 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(p => p.AddedBy);
                 entity.Ignore(p => p.AddedByEmail);
                 entity.Ignore(p => p.AddedByAgent);
+                entity.Ignore(p => p.EditedByAgent);
             });
 
             builder.Entity<BugTicketComment>(entity =>

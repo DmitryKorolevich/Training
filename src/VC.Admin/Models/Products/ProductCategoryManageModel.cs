@@ -25,7 +25,11 @@ namespace VC.Admin.Models.Products
 
         public string LongDescription { get; set; }
 
+        public bool HideLongDescription { get; set; }
+
         public string LongDescriptionBottom { get; set; }
+
+        public bool HideLongDescriptionBottom { get; set; }
 
         public string FileImageSmallUrl { get; set; }
 
@@ -73,7 +77,9 @@ namespace VC.Admin.Models.Products
             ParentId = item.ProductCategory.ParentId;
             MasterContentItemId = item.MasterContentItemId;
             LongDescription = item.LongDescription;
+            HideLongDescription = item.HideLongDescription;
             LongDescriptionBottom = item.LongDescriptionBottom;
+            HideLongDescriptionBottom = item.HideLongDescriptionBottom;
             NavLabel = item.NavLabel;
             NavIdVisible = item.NavIdVisible;
             Description = item.ContentItem.Description;
@@ -110,7 +116,9 @@ namespace VC.Admin.Models.Products
                 },
                 MasterContentItemId = MasterContentItemId ?? 0,
                 LongDescription = LongDescription,
+                HideLongDescription = HideLongDescription,
                 LongDescriptionBottom = LongDescriptionBottom,
+                HideLongDescriptionBottom = HideLongDescriptionBottom,
                 NavLabel = NavLabel,
                 NavIdVisible = NavIdVisible,
                 ContentItem = new ContentItem

@@ -52,27 +52,19 @@
 
         $scope.send = function ()
         {
-            confirmUtil.confirm(function ()
+            var ids = getIds();
+            if (ids.length == 0)
             {
-                
-                var ids = getIds();
-                productService.sendProductOutOfStockRequests(ids, $scope.deleteTracker)
-                    .success(function (result)
-                    {
-                        if (result.Success)
-                        {
-                            toaster.pop('success', "Success!", "Successfully sent.");
-                            refreshItems();
-                        } else
-                        {
-                            errorHandler(result);
-                        }
-                    })
-                    .error(function (result)
-                    {
-                        errorHandler(result);
-                    });
-            }, 'Are you sure you want to send these emails?');
+                toaster.pop('error', "Error!", "Please, select at least one request.");
+                return;
+            }
+            modalUtil.open('app/modules/product/partials/sendOutOfStockRequestsPopup.html', 'sendOutOfStockRequestsPopupController', {
+                Ids:ids,
+                thenCallback: function (data)
+                {
+                    refreshItems();
+                }
+            });
         };
 
         $scope.delete = function ()

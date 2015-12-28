@@ -12,6 +12,9 @@ using VitalChoice.Core.DependencyInjection;
 using VitalChoice.Core.Infrastructure;
 using Microsoft.AspNet.Identity;
 using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.AspNet.Http;
+using System.Globalization;
+using Microsoft.AspNet.Http.Features;
 
 namespace VC.Public
 {
@@ -59,7 +62,6 @@ namespace VC.Public
                 // send the request to the following path or controller action.
                 app.UseExceptionHandler("/Shared/Error");
             }
-            app.UseStatusCodePagesWithReExecute("/help/error/{0}");
 
             // Add static files to the request pipeline.
             app.UseStaticFiles();
@@ -70,7 +72,9 @@ namespace VC.Public
 			app.UseCookieAuthentication();
 
             app.UseSession();
-            app.UseMvc(RouteConfig.RegisterRoutes).UseCookieAuthentication(x =>
+            app.UseStatusCodePagesWithReExecute("/help/error/{0}");
+            app.UseMvc(RouteConfig.RegisterRoutes);
+            app.UseCookieAuthentication(x =>
             {
                 x.AuthenticationScheme = IdentityCookieOptions.ApplicationCookieAuthenticationType;
                 x.LogoutPath = "/Account/Logout";

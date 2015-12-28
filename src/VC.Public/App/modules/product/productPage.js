@@ -143,6 +143,15 @@ window.addEventListener("load", function ()
 	firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 }, false);
 
+$(document).ready(function ()
+{
+    var review = getQueryParameterByName("review");
+    if (review=='true')
+    {
+        productPageAddReview();
+    }
+});
+
 function addOutOfStockProductRequestFormSubmitSuccess(data)
 {
     ajaxFormSubmitSuccess();
