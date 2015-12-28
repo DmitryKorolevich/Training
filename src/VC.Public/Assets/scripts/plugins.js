@@ -1,3 +1,20 @@
+var lhnAccountN = 7307;
+var lhnButtonN = 5138;
+var lhnVersion = 5.3;
+var lhnJsHost = (("https:" == document.location.protocol) ? "https://" : "http://");
+var lhnInviteEnabled = 1;
+var lhnInviteChime = 0;
+var lhnWindowN = 0;
+var lhnDepartmentN = 0;
+var lhnCustomInvitation = '';
+var lhnCustom1 = '';
+var lhnCustom2 = '';
+var lhnCustom3 = '';
+var lhnTrackingEnabled = 't';
+var lhnScriptSrc = lhnJsHost + 'www.livehelpnow.net/lhn/scripts/livehelpnow.aspx?lhnid=' + lhnAccountN + '&iv=' + lhnInviteEnabled + '&d=' + lhnDepartmentN + '&ver=' + lhnVersion + '&rnd=' + Math.random();
+var lhnScript = document.createElement("script"); lhnScript.type = "text/javascript"; lhnScript.src = lhnScriptSrc;
+
+
 // Avoid `console` errors in browsers that lack a console.
 (function() {
     var method;
@@ -234,7 +251,18 @@ $(function () {
 	if (successMessage) {
 		notifySuccess(successMessage);
 	}
+
+	initLiveHelp();
 });
+
+function initLiveHelp() {
+	if (window.addEventListener) {
+		window.addEventListener('load', function () { document.getElementById('lhnContainer').appendChild(lhnScript); }, false);
+	}
+	else if (window.attachEvent) {
+		window.attachEvent('onload', function () { document.getElementById('lhnContainer').appendChild(lhnScript); });
+	}
+}
 
 function confirmAction(successCallback, errorCallback, text) {
 	var message = "Are you sure?";
