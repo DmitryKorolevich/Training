@@ -140,31 +140,7 @@ namespace VitalChoice.Business.Services.Orders
 			orderNote.StatusCode = RecordStatusCode.Active;
 			orderNote.DateCreated = orderNote.DateEdited = DateTime.Now;
 			orderNote.IdEditedBy = Convert.ToInt32(_contextAccessor.HttpContext.User.GetUserId());
-
-			using (var transaction = new TransactionAccessor(_context).BeginTransaction())
-			{
-				try
-				{
-					await _orderNoteRepository.InsertAsync(orderNote);
-
-					if (orderNote.CustomerTypes.Any())
-					{
-						foreach (var customerType in orderNote.CustomerTypes)
-						{
-							customerType.IdOrderNote = orderNote.Id;
-						}
-
-						await _orderNoteToCustomerTypeRepository.InsertRangeAsync(orderNote.CustomerTypes);
-					}
-
-					transaction.Commit();
-				}
-				catch (Exception)
-				{
-					transaction.Rollback();
-					throw;
-				}
-			}
+            await _orderNoteRepository.InsertGraphAsync(orderNote);
 
 			return orderNote;
 		}
