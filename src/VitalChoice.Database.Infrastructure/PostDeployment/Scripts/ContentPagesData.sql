@@ -222,7 +222,7 @@ END
 
 GO
 
-IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentPages] WHERE [Name] = 'Not Found')
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentPages] WHERE [Url] = 'not-found')
 BEGIN
 
 DECLARE @contentItemId int

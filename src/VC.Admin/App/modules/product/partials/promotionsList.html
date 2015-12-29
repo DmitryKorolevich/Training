@@ -87,7 +87,7 @@
                                 <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                             </span>
                         </th>
-                        <th>Actions</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -104,7 +104,9 @@
                         <td>{{item.StartDate | date:"MM/dd/yy"}}</td>
                         <td>{{item.ExpirationDate | date:"MM/dd/yy"}}</td>
                         <td>
-                            <span data-ng-if="item.Expired" class="label label-danger font-default">Expired</span>
+                            <span data-ng-if="item.DateStatus == 1" class="label label-danger font-default">Expired</span>
+                            <span data-ng-if="item.DateStatus == 2" class="label label-success font-default">Live</span>
+                            <span data-ng-if="item.DateStatus == 3" class="label label-future font-default">Future</span>
                         </td>
                         <td>{{item.DateCreated | date:"MM/dd/yy"}}<br />{{item.DateCreated | date:"h:mm a"}}<br />{{item.AddedByAgentId}}</td>
                         <td>

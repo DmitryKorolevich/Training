@@ -29,6 +29,7 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Business.CsvExportMaps.Orders;
 using VitalChoice.Infrastructure.Domain.Constants;
 using Microsoft.Net.Http.Headers;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
 
 namespace VC.Admin.Controllers
 {
@@ -132,7 +133,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<Result<OrderManageModel>> GetOrder(int id)
+        public async Task<Result<OrderManageModel>> GetOrder(int id, int? idcustomer=null)
         {
             if (id == 0)
             {
@@ -151,6 +152,25 @@ namespace VC.Admin.Controllers
                 model.UpdateWireTransferForCustomer = true;
                 model.UpdateMarketingForCustomer = true;
                 model.UpdateVCWellnessForCustomer = true;
+
+                if (idcustomer.HasValue)
+                {
+                    var customer = await _customerService.SelectAsync(idcustomer.Value);
+                    if (customer != null)
+                    {
+                        var avaliableOrderNotes = await _customerService.GetAvailableOrderNotesAsync((CustomerType)customer.IdObjectType);
+                        model.OrderNotes = String.Empty;
+                        foreach (var IdCustomerOrderNote in customer.OrderNotes)
+                        {
+                            var orderNote = avaliableOrderNotes.FirstOrDefault(p => p.Id == IdCustomerOrderNote);
+                            if (orderNote != null)
+                            {
+                                model.OrderNotes += orderNote.Title + Environment.NewLine;
+                            }
+                        }
+                    }
+                }
+
                 return model;
             }
 
