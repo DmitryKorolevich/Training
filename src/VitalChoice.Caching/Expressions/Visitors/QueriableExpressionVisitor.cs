@@ -19,8 +19,8 @@ namespace VitalChoice.Caching.Expressions.Visitors
         {
             if (_inWhereExpression && typeof (T1) == typeof (Func<T, bool>))
             {
-                LambdaExpressionVisitor lambdaVisitor = new LambdaExpressionVisitor();
-                lambdaVisitor.Visit(node);
+                LambdaExpressionVisitor<T> lambdaVisitor = new LambdaExpressionVisitor<T>();
+                lambdaVisitor.Visit(node.Body);
 
                 if (WhereExpression != null)
                     throw new InvalidOperationException("Where clause used twice, need investigation");
@@ -28,8 +28,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
                 WhereExpression = new WhereExpression<T>
                 {
                     Expression = (Expression<Func<T, bool>>) (object) node,
-                    Conditions = lambdaVisitor.CurrentConditions,
-                    Operations = lambdaVisitor.CurrentOperations
+                    Condition = lambdaVisitor.Condition
                 };
                 return node;
             }

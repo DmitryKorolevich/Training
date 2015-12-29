@@ -9,7 +9,6 @@ namespace VitalChoice.Caching.Expressions
     public class WhereExpression<T>
     {
         public Expression<Func<T, bool>> Expression { get; set; }
-        public ICollection<Condition> Conditions { get; set; }
-        public ICollection<Operation> Operations { get; set; }
+        public Condition Condition { get; set; }
     }
 }

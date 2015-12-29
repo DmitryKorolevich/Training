@@ -8,10 +8,9 @@ namespace VitalChoice.Caching.Expressions
         public Condition(ExpressionType type)
         {
             Operator = type;
-            Left = new List<Operation>();
         }
 
-        public List<Operation> Left { get; }
         public ExpressionType Operator { get; }
+        public Expression Expression { get; set; }
     }
 }

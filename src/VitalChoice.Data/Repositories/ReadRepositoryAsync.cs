@@ -90,10 +90,8 @@ namespace VitalChoice.Data.Repositories
 
             //	return earlyRead.ToList();
             //}
-            QueriableExpressionVisitor<TEntity> visitor = new QueriableExpressionVisitor<TEntity>();
 		    var queryable = Select(query, filter, orderBy, page, pageSize, tracking);
-		    visitor.Visit(queryable.Expression);
-            return await Select(query, filter, orderBy, page, pageSize, tracking).ToListAsync();
+            return await queryable.ToListAsync();
 		}
 	}
 }
