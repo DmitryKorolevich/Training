@@ -161,7 +161,9 @@ namespace VitalChoice.Business.Services.Products
             categoryContent.FileImageSmallUrl = model.FileImageSmallUrl;
             categoryContent.FileImageLargeUrl = model.FileImageLargeUrl;
             categoryContent.LongDescription = model.LongDescription;
+            categoryContent.HideLongDescription = model.HideLongDescription;
             categoryContent.LongDescriptionBottom = model.LongDescriptionBottom;
+            categoryContent.HideLongDescriptionBottom = model.HideLongDescriptionBottom;
             categoryContent.NavLabel = model.NavLabel;
             categoryContent.NavIdVisible = model.NavIdVisible;
             if (model.MasterContentItemId != 0)

@@ -93,14 +93,10 @@ END
 
 GO
 
---update t
---set t.StatusCode=f.StatusCode,
---	t.Url=f.Url
---from [VitalChoice.Infrastructure].[dbo].ProductCategories t
---inner join [VitalChoice.Ecommerce].[dbo].ProductCategories f on t.Id = f.Id
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'ProductCategories') AND Name = N'HideLongDescription')
+BEGIN
+	ALTER TABLE ProductCategories ADD HideLongDescription BIT CONSTRAINT DV_ProductCategories_HideLongDescription DEFAULT 0 WITH VALUES	
+	ALTER TABLE ProductCategories ADD HideLongDescriptionBottom BIT CONSTRAINT DV_ProductCategories_HideLongDescriptionBottom DEFAULT 0 WITH VALUES	
+END
 
---DROP INDEX IX_ProductCategories_Url ON [VitalChoice.Ecommerce].dbo.ProductCategories
---GO
---ALTER TABLE [VitalChoice.Ecommerce].dbo.ProductCategories
---	DROP COLUMN Url
---GO
+GO

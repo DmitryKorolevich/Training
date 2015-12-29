@@ -56,7 +56,7 @@ namespace VitalChoice.Interfaces.Services.Products
 
         Task<ProductOutOfStockRequest> AddProductOutOfStockRequestAsync(ProductOutOfStockRequest model);
 
-        Task<bool> SendProductOutOfStockRequestsAsync(ICollection<int> ids);
+        Task<bool> SendProductOutOfStockRequestsAsync(ICollection<int> ids, string messageFormat = null);
 
         Task<bool> DeleteProductOutOfStockRequestsAsync(ICollection<int> ids);
 

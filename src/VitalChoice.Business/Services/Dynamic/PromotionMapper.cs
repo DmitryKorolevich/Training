@@ -8,6 +8,7 @@ using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain.Entities.Promotion;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.ObjectMapping.Interfaces;
 
@@ -53,7 +54,7 @@ namespace VitalChoice.Business.Services.Dynamic
             {
                 var entity = pair.Entity;
                 var dynamic = pair.Dynamic;
-                
+
                 entity.Description = dynamic.Description;
                 entity.Assigned = dynamic.Assigned;
                 entity.StartDate = dynamic.StartDate;
@@ -67,7 +68,7 @@ namespace VitalChoice.Business.Services.Dynamic
                         item.Id = 0;
                         item.IdPromotion = dynamic.Id;
                     }
-                    entity.PromotionsToBuySkus = dynamic.PromotionsToBuySkus.ToList();
+                    entity.PromotionsToBuySkus.MergeKeyed(dynamic.PromotionsToBuySkus, sku => sku.IdSku);
                 }
                 if (dynamic.PromotionsToGetSkus != null)
                 {
@@ -76,13 +77,14 @@ namespace VitalChoice.Business.Services.Dynamic
                         item.Id = 0;
                         item.IdPromotion = dynamic.Id;
                     }
-                    entity.PromotionsToGetSkus = dynamic.PromotionsToGetSkus.ToList();
+                    entity.PromotionsToGetSkus.MergeKeyed(dynamic.PromotionsToGetSkus, sku => sku.IdSku);
                 }
-                entity.PromotionsToSelectedCategories = dynamic.SelectedCategoryIds?.Select(c => new PromotionToSelectedCategory
-                {
-                    IdCategory = c,
-                    IdPromotion = dynamic.Id
-                }).ToList();
+                entity.PromotionsToSelectedCategories.MergeKeyed(dynamic.SelectedCategoryIds, ecat => ecat.IdCategory, i => i,
+                    i => new PromotionToSelectedCategory
+                    {
+                        IdCategory = i,
+                        IdPromotion = dynamic.Id
+                    });
             });
             return Task.Delay(0);
         }

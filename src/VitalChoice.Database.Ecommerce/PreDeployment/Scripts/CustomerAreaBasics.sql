@@ -701,3 +701,18 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = 'IdAddedBy' AND [object_id] = OBJECT_ID('CustomerNotes'))
+BEGIN
+
+	ALTER TABLE CustomerNotes
+	ADD IdAddedBy INT NULL
+	
+	ALTER TABLE [dbo].[CustomerNotes]  WITH CHECK ADD  CONSTRAINT [FK_CustomerNotes_Users_IdAddedBy] FOREIGN KEY([IdAddedBy])
+	REFERENCES [dbo].[Users] ([Id])
+	
+	ALTER TABLE [dbo].[CustomerNotes] CHECK CONSTRAINT [FK_CustomerNotes_Users_IdAddedBy]
+
+END
+
+GO

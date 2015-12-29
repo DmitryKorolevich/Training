@@ -7,6 +7,13 @@ using VitalChoice.Validation.Models;
 
 namespace VC.Admin.Models.Product
 {
+    public enum DiscountDateStatus
+    {
+        Expired=1,
+        Live=2,
+        Future=3
+    }
+
     public class DiscountListItemModel : BaseModel
     {
         public int Id { get; set; }
@@ -31,7 +38,7 @@ namespace VC.Admin.Models.Product
 
         public string AddedByAgentId { get; set; }
 
-        public bool Expired { get; set; }
+        public DiscountDateStatus DateStatus { get; set; }
 
         public DiscountListItemModel(DiscountDynamic item)
         {
@@ -52,9 +59,21 @@ namespace VC.Admin.Models.Product
                     AddedByAgentId = (string)item.DictionaryData["AddedByAgentId"];
                 }
                 ExpirationDate = ExpirationDate;
-                if(DateTime.Now.AddDays(-1)>=ExpirationDate)
+                DateTime now = DateTime.Now;
+                if (now.AddDays(-1)>=ExpirationDate)
                 {
-                    Expired = true;
+                    DateStatus = DiscountDateStatus.Expired;
+                }
+                else
+                {
+                    if(now>=StartDate)
+                    {
+                        DateStatus = DiscountDateStatus.Live;
+                    }
+                    else
+                    {
+                        DateStatus = DiscountDateStatus.Future;
+                    }
                 }
             }
         }

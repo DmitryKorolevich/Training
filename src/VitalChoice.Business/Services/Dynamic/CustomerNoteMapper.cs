@@ -44,6 +44,7 @@ namespace VitalChoice.Business.Services.Dynamic
 
                 dynamic.IdCustomer = entity.IdCustomer;
                 dynamic.Note = entity.Note;
+                dynamic.IdAddedBy = entity.IdAddedBy;
             });
             return Task.Delay(0);
         }
@@ -57,6 +58,8 @@ namespace VitalChoice.Business.Services.Dynamic
 
                 entity.IdCustomer = dynamic.IdCustomer;
                 entity.Note = dynamic.Note;
+                entity.DateEdited = dynamic.DateEdited;
+                entity.IdEditedBy = dynamic.IdEditedBy;
             });
             return Task.Delay(0);
         }
@@ -71,6 +74,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.IdCustomer = dynamic.IdCustomer;
                 entity.Note = dynamic.Note;
                 entity.StatusCode = (int)RecordStatusCode.Active;
+                entity.IdAddedBy = entity.IdEditedBy;
             });
             return Task.Delay(0);
         }

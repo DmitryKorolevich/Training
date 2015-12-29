@@ -75,16 +75,19 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                         Statuses = targetStatuses
                     });
 
-            var subCategories = FindTargetCategory(rootCategory, viewContext.Entity.Id).SubCategories;
+            var category = FindTargetCategory(rootCategory, viewContext.Entity.Id);
 
             var subCategoriesContent = new List<ProductCategoryContent>();
-            foreach (var subCategory in subCategories)
+            if (category != null)
             {
-                var subCategoryContent =
-                    (await _productCategoryRepository.Query(p => p.Id == subCategory.Id).SelectAsync(false)).Single();
-                subCategoryContent.ProductCategory = subCategory;
+                foreach (var subCategory in category.SubCategories)
+                {
+                    var subCategoryContent =
+                        (await _productCategoryRepository.Query(p => p.Id == subCategory.Id).SelectAsync(false)).Single();
+                    subCategoryContent.ProductCategory = subCategory;
 
-                subCategoriesContent.Add(subCategoryContent);
+                    subCategoriesContent.Add(subCategoryContent);
+                }
             }
 
             var productIds =
@@ -208,13 +211,16 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                 FileImageSmallUrl = productCategoryContent.FileImageSmallUrl,
                 FileImageLargeUrl = productCategoryContent.FileImageLargeUrl,
                 LongDescription = productCategoryContent.LongDescription,
+                HideLongDescription = productCategoryContent.HideLongDescription,
                 LongDescriptionBottom = productCategoryContent.LongDescriptionBottom,
+                HideLongDescriptionBottom = productCategoryContent.HideLongDescriptionBottom,
                 SubCategories = subProductCategoryContent?.Select(x => PopulateCategoryTemplateModel(x)).ToList(),
                 Products = products?.Where(x=>!x.Hidden).Select(x => new TtlCategoryProductModel
                 {
                     Id = x.IdProduct,
                     Name = x.Name,
-                    Thumbnail = x.Thumbnail
+                    Thumbnail = x.Thumbnail,
+                    SubTitle = x.SubTitle,
                 }).ToList(),
                 SideMenuItems = ConvertToSideMenuModelLevel(rootNavCategory?.SubItems),
                 BreadcrumbOrderedItems = breadcrumbItems

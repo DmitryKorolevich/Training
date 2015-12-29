@@ -25,8 +25,12 @@
                     </div>
                     <div class="form-group">
                         <label class="col-md-3 control-label"></label>
-                        <div class="col-md-3">
+                        <div data-ng-if="!selectedCustomerNote" class="col-md-3">
                             <button class="btn btn-info" data-ng-click="addNewCustomerNote();">Add Customer Note</button>
+                        </div>
+                        <div data-ng-if="selectedCustomerNote" class="col-md-3">
+                            <button class="btn btn-info margin-right-8px" data-ng-click="saveEdit();">Update</button>
+                            <button class="btn btn-danger" data-ng-click="cancelEdit();">Cancel</button>
                         </div>
                     </div>
                 </fieldset>
@@ -39,6 +43,7 @@
                         <th>Priority</th>
                         <th>Notes</th>
                         <th>Added</th>
+                        <th>Edited</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -46,9 +51,15 @@
                     <tr data-ng-repeat="note in customerNotes | orderBy:DateEdited:reverse">
                         <td>{{getReferenceItem(ReferenceData.CustomerNotePriorities, note.Priority).Text}}</td>
                         <td>{{note.Text}}</td>
+                        <td>{{note.DateCreated | date:"MM/dd/yy"}}<br />{{note.DateCreated | date:"h:mm a"}}<br />{{note.AddedBy}}</td>
                         <td>{{note.DateEdited | date:"MM/dd/yy"}}<br />{{note.DateEdited | date:"h:mm a"}}<br />{{note.EditedBy}}</td>
                         <td>
-                            <button class="btn btn-default btn-danger" data-ng-click="deleteCustomerNote($index);">Delete</button>
+                            <button data-ng-if="!note.Editing" title="Edit" class="btn btn-default btn-success btn-xs" data-ng-click="initEdit(note);">
+                                <i class="glyphicon glyphicon-edit"></i>
+                            </button>
+                            <button data-ng-if="!note.Editing" title="Delete" class="btn btn-default btn-danger btn-xs" data-ng-click="deleteCustomerNote($index);">
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </button>
                         </td>
                     </tr>
                 </tbody>

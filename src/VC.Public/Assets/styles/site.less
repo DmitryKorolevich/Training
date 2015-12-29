@@ -79,7 +79,7 @@ body {
 
 .header-top-middle {
     float: left;
-    margin: 7px 0px 0px 163px;
+    margin: 7px 0px 0px 140px;
     position: relative;
     font-family: Helvetica Neue,Arial,Helvetica,sans-serif;
     font-size: 14px;
@@ -1285,6 +1285,10 @@ footer {
         border-left: 1px solid #e3e3e3;
         border-right: 1px solid #e3e3e3;
         min-height: 780px;
+        
+        .center-wrapper {
+            margin-bottom: 20px;
+        }
 
         .icons-bar {
             border-top: 1px solid #e3e3e3;
@@ -1683,6 +1687,82 @@ footer {
 
         .faq-title {
             color: #2B6C82;
+        }
+    }
+}
+
+.working-area-holder.content-page.content-with-recipe-categories-page {
+    .header-block {
+
+    }
+
+    .left-content-pane {
+        width: 150px;
+
+        .sub-title {
+            margin-bottom: 10px;
+        }
+    }
+
+    .center-content-pane {
+        min-height: 575px;
+        width: 448px;
+        border-right: none;
+    }
+
+    .right-content-pane {
+        width: 290px;
+    }
+
+    .center-content-pane.in-the-kitchen {
+        .youtube-container-wrapper{
+            position: relative;
+
+            #youtube-container {
+                z-index: 1 !important;
+                position: absolute !important;
+                left: 0;
+                top: 0;
+                max-width: 468px;
+                max-height: 260px;
+                display: none;
+            }
+
+            #mainimg {
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
+
+            .youtube-close {
+                position: absolute;
+                right: -25px;
+                top: -15px;
+                z-index: 2;
+            }
+        }
+    }
+
+    .right-content-pane.in-the-kitchen {
+        .seafood-basics {
+            height: 532px;
+            overflow: scroll;
+            overflow-x: hidden;
+
+            .item-line {
+                margin-bottom: 20px;
+
+                .left-part {
+                    display: inline-block;
+                }
+
+                .right-part {
+                    margin-left: 6px;
+                    display: inline-block;
+                    vertical-align: top;
+                    max-width: 140px;
+                }
+            }
         }
     }
 }

@@ -22,6 +22,7 @@ angular.module('app.modules.product', [
 	'app.modules.product.controllers.promotionManageController',
 	'app.modules.product.controllers.outOfStocksController',
 	'app.modules.product.controllers.productCategoriesStatisticController',
+	'app.modules.product.controllers.sendOutOfStockRequestsPopupController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',

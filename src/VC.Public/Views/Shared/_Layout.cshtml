@@ -56,7 +56,7 @@
 					<img alt="Call Anytime" src="/assets/images/callanytime13.png" />
 				</div>
 				<div class="header-top-middle">
-					<div class="stars-container">
+					@*<div class="stars-container">
 						<div class="star">
 							<img alt="Star" src="/assets/images/sprite_star.png" />
 						</div>
@@ -72,13 +72,13 @@
 						<div class="star">
 							<img alt="Star" src="/assets/images/sprite_star.png" />
 						</div>
-					</div>
-					<a class="see-reviews-link" href="#">See our reviews</a>
+					</div>*@
+					<div class="trustpilot-widget" data-locale="en-US" data-template-id="5418052cfbfb950d88702476" data-businessunit-id="51975a73000064000533c457" data-style-height="30px" data-style-width="100%" data-theme="light" data-stars="4,5,3"></div>
 				</div>
 				<div class="header-top-right">
-					<a href="#">
-						<img alt="Live help" src="/assets/images/livehelp.png" />
-					</a>
+					<div id="lhnContainer">
+						<div id="lhnChatButton"></div>
+					</div>
 				</div>
 			</div>
 			<div class="header-main">
@@ -219,6 +219,7 @@
 			</div>
 		</footer>
 	</div>
+	<script async type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"></script>
 	@await Component.InvokeAsync("Assets", "scripts")
 	@RenderSection("PageScripts", false)
 </body>

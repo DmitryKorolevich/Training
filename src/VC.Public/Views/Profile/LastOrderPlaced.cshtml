@@ -40,7 +40,8 @@
 							<td>
 								<a href="@item.ProductUrl">
 									<span class="product-title">
-											@($"{item.ProductName} ({item.PortionsCount})")
+											@item.ProductName<br/>
+                                            @($"{item.ProductSubTitle} ({item.PortionsCount})")
 										</span>
 								</a>
 								<span class="sku-code">Product #@item.SkuCode</span>
@@ -48,7 +49,7 @@
 								<a href="#">
 									<img src="/assets/images/addtocartorange.jpg"/>
 								</a>
-								<a class="review-product-link" href="@item.ProductUrl">
+								<a class="review-product-link" href="@($"{item.ProductUrl}?review=true")">
 									Review this product
 								</a>
 							</td>

@@ -115,6 +115,10 @@ angular.module('app.core.dataAccess.services.productService', [])
 	    {
 	        return $http.post(baseUrl + 'GetProductOutOfStockContainers', null, getConfig(tracker));
 	    },
+	    getProductOutOfStockRequestsMessageFormat: function (tracker)
+	    {
+	        return $http.get(baseUrl + 'GetProductOutOfStockRequestsMessageFormat', getConfig(tracker));
+	    },
 	    sendProductOutOfStockRequests: function (ids, tracker)
 	    {
 	        return $http.post(baseUrl + 'SendProductOutOfStockRequests', ids, getConfig(tracker));

@@ -462,7 +462,9 @@ namespace VitalChoice.Business.Services.HelpService
             }
 
             var toReturn = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
-            var adminProfileCondition = new AdminProfileQuery().IdInRange(toReturn.Items.Select(x => x.IdAddedBy).ToList());
+            var ids = toReturn.Items.Select(x => x.IdAddedBy).ToList();
+            ids.AddRange(toReturn.Items.Select(x => x.IdEditedBy).ToList());
+            var adminProfileCondition = new AdminProfileQuery().IdInRange(ids);
             var adminProfiles = await _adminProfileRepository.Query(adminProfileCondition).Include(p => p.User).SelectAsync(false);
             foreach (var item in toReturn.Items)
             {
@@ -473,6 +475,10 @@ namespace VitalChoice.Business.Services.HelpService
                         item.AddedBy = adminProfile.User.FirstName + " " + adminProfile.User.LastName;
                         item.AddedByAgent = adminProfile.AgentId;
                         item.AddedByEmail = adminProfile.User.Email;
+                    }
+                    if (item.IdEditedBy == adminProfile.Id)
+                    {
+                        item.EditedByAgent = adminProfile.AgentId;
                     }
                 }
             }
@@ -488,12 +494,22 @@ namespace VitalChoice.Business.Services.HelpService
             {
                 item.Comments = item.Comments.Where(p => p.StatusCode != RecordStatusCode.Deleted).ToList();
 
-                var adminProfilesForTicket = await _adminProfileRepository.Query(p => p.Id == item.IdAddedBy).Include(p => p.User).SelectAsync(false);
-                if (adminProfilesForTicket != null && adminProfilesForTicket.Count > 0)
+                var adminProfilesForTicket = await _adminProfileRepository.Query(p => p.Id == item.IdAddedBy || p.Id==item.IdEditedBy).Include(p => p.User).SelectAsync(false);
+                if (adminProfilesForTicket.Count > 0)
                 {
-                    item.AddedBy = adminProfilesForTicket[0].User.FirstName + " " + adminProfilesForTicket[0].User.LastName;
-                    item.AddedByAgent = adminProfilesForTicket[0].AgentId;
-                    item.AddedByEmail = adminProfilesForTicket[0].User.Email;
+                    foreach (var adminProfile in adminProfilesForTicket)
+                    {
+                        if (item.IdAddedBy == adminProfile.Id)
+                        {
+                            item.AddedBy = adminProfile.User.FirstName + " " + adminProfile.User.LastName;
+                            item.AddedByAgent = adminProfile.AgentId;
+                            item.AddedByEmail = adminProfile.User.Email;
+                        }
+                        if (item.IdEditedBy == adminProfile.Id)
+                        {
+                            item.EditedByAgent = adminProfile.AgentId;
+                        }
+                    }
                 }
 
                 var adminProfileCondition = new AdminProfileQuery().IdInRange(item.Comments.Select(x => x.IdEditedBy).ToList());
@@ -570,7 +586,7 @@ namespace VitalChoice.Business.Services.HelpService
             return item;
         }
 
-        public async Task<bool> DeleteBugTicketAsync(int id, int? userId = null)
+        public async Task<bool> DeleteBugTicketAsync(int id,int adminId , int? userId = null)
         {
             var item = (await _bugTicketRepository.Query(new BugTicketQuery().NotDeleted().WithId(id)).SelectAsync(false)).FirstOrDefault();
 
@@ -583,6 +599,7 @@ namespace VitalChoice.Business.Services.HelpService
 
                 item.StatusCode = RecordStatusCode.Deleted;
                 item.DateEdited = DateTime.Now;
+                item.IdEditedBy = adminId;
 
                 await _bugTicketRepository.UpdateAsync(item);
 
@@ -652,6 +669,7 @@ namespace VitalChoice.Business.Services.HelpService
                     var condition = new BugTicketQuery().NotDeleted().WithId(item.IdBugTicket);
                     bugTicket = (await _bugTicketRepository.Query(condition).SelectAsync()).FirstOrDefault();
                     bugTicket.DateEdited = now;
+                    bugTicket.IdEditedBy = item.IdEditedBy;
                     await _bugTicketRepository.UpdateAsync(bugTicket);
 
                     transaction.Commit();
@@ -694,6 +712,7 @@ namespace VitalChoice.Business.Services.HelpService
                 var condition = new BugTicketQuery().NotDeleted().WithId(item.IdBugTicket);
                 var bugTicket = (await _bugTicketRepository.Query(condition).SelectAsync()).FirstOrDefault();
                 bugTicket.DateEdited = DateTime.Now;
+                bugTicket.IdEditedBy = adminId;
                 await _bugTicketRepository.UpdateAsync(bugTicket);
 
                 if (bugTicket.IdAddedBy != adminId)

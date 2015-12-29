@@ -121,24 +121,7 @@ namespace VitalChoice.Business.Services.Products
             }
         }
 
-        protected override async Task AfterEntityChangesAsync(PromotionDynamic model, Promotion updated, Promotion initial, IUnitOfWorkAsync uow)
-        {
-            var promotionToSelectedSkuRepository = uow.RepositoryAsync<PromotionToBuySku>();
-            var promotionToSkuRepository = uow.RepositoryAsync<PromotionToGetSku>();
-            var promotionToSelectedCategoryRepository = uow.RepositoryAsync<PromotionToSelectedCategory>();
-
-            await
-                promotionToSelectedSkuRepository.DeleteAllAsync(initial.PromotionsToBuySkus.ExceptKeyedWith(updated.PromotionsToBuySkus,
-                    item => item.IdSku));
-            await
-                promotionToSkuRepository.DeleteAllAsync(initial.PromotionsToGetSkus.ExceptKeyedWith(updated.PromotionsToGetSkus,
-                    item => item.IdSku));
-            await
-                promotionToSelectedCategoryRepository.DeleteAllAsync(
-                    initial.PromotionsToSelectedCategories.ExceptKeyedWith(updated.PromotionsToSelectedCategories, item => item.IdCategory));
-        }
-
-        protected override bool LogObjectFullData { get { return true; } }
+        protected override bool LogObjectFullData => true;
 
         #region Promotions
 

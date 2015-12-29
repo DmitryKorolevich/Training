@@ -547,14 +547,18 @@ namespace VitalChoice.Business.Services.Products
             return model;
         }
 
-        public async Task<bool> SendProductOutOfStockRequestsAsync(ICollection<int> ids)
+        public async Task<bool> SendProductOutOfStockRequestsAsync(ICollection<int> ids,string messageFormat=null)
         {
             if (ids.Count > 0)
             {
-                var setting = (await _settingService.GetAppSettingItemsAsync(new List<string>() { SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE })).FirstOrDefault();
-                if (setting == null)
+                if (messageFormat == null)
                 {
-                    throw new NotSupportedException($"{SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE} not configurated.");
+                    var setting = (await _settingService.GetAppSettingItemsAsync(new List<string>() { SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE })).FirstOrDefault();
+                    if (setting == null)
+                    {
+                        throw new NotSupportedException($"{SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE} not configurated.");
+                    }
+                    messageFormat = setting.Value;
                 }
 
                 var items = await _productOutOfStockRequestRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);
@@ -569,7 +573,7 @@ namespace VitalChoice.Business.Services.Products
                     if (product != null && contentProduct!=null)
                     {
                         var url = $"https://{_options.Value.PublicHost}/product/{contentProduct.Url}";
-                        var text = setting.Value.Replace(SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE_CUSTOMER_NAME_HOLDER, item.Name).
+                        var text = messageFormat.Replace(SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE_CUSTOMER_NAME_HOLDER, item.Name).
                             Replace(SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE_PRODUCT_NAME_HOLDER, product.Name).
                             Replace(SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE_PRODUCT_URL_HOLDER, url);
 

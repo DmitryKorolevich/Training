@@ -24,7 +24,7 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VC.Admin.Controllers
 {
-    [AdminAuthorize(PermissionType.Products)]
+    [AdminAuthorize(PermissionType.Marketing)]
     public class DiscountController : BaseApiController
     {
         private readonly IDiscountService _discountService;

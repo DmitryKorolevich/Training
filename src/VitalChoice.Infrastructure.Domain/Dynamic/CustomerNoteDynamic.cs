@@ -7,5 +7,7 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
 		public int IdCustomer { get; set; }
 
 		public string Note { get; set; }
+
+        public int? IdAddedBy { get; set; }
     }
 }

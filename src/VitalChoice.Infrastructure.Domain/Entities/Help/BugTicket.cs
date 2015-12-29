@@ -17,6 +17,8 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Help
 
         public int IdEditedBy { get; set; }
 
+        public string EditedByAgent { get; set; }
+
         public DateTime DateCreated { get; set; }
 
         public DateTime DateEdited { get; set; }

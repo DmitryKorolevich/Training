@@ -46,3 +46,4 @@ Post-Deployment Script Template
 
 :r .\Scripts\Products.sql
 :r .\Scripts\ContentPagesData.sql
+:r .\Scripts\ContentIndexes.sql

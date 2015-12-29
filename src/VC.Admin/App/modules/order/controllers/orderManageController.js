@@ -293,7 +293,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
     var loadOrder = function ()
     {
-        orderService.getOrder($scope.id, $scope.addEditTracker)
+        orderService.getOrder($scope.id, $scope.idCustomer!=0 ? $scope.idCustomer : null, $scope.addEditTracker)
             .success(function (result)
             {
                 processLoadingOrder(result);
@@ -306,7 +306,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
     var loadOrderSource = function ()
     {
-        orderService.getOrder($scope.idOrderSource, $scope.addEditTracker)
+        orderService.getOrder($scope.idOrderSource, null, $scope.addEditTracker)
             .success(function (result)
             {
                 if (result.Success)

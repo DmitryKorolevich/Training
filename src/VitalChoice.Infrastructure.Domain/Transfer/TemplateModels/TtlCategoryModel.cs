@@ -24,9 +24,13 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels
 
 		public string LongDescription { get; set; }
 
-		public string LongDescriptionBottom { get; set; }
+        public bool HideLongDescription { get; set; }
 
-	    public IList<TtlCategoryModel> SubCategories { get; set; }
+        public string LongDescriptionBottom { get; set; }
+
+        public bool HideLongDescriptionBottom { get; set; }
+
+        public IList<TtlCategoryModel> SubCategories { get; set; }
 
 	    public IList<TtlCategoryProductModel> Products { get; set; }
 

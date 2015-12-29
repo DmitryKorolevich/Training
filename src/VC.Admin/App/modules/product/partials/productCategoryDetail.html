@@ -62,6 +62,17 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
+                                                <label for="cbHideLongDescription" class="col-md-3 control-label"></label>
+                                                <div class="col-md-9">
+                                                    <div class="checkbox">
+                                                        <label>
+                                                            <input type="checkbox" id="cbHideLongDescription" name="HideLongDescription" data-ng-model="productCategory.HideLongDescription" />
+                                                            <strong>Hide Description</strong>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
                                                 <label for="longDescription" class="col-md-3 control-label">Top Long Description</label>
                                                 <div class="col-md-9">
                                                     <div class="input-group" data-ng-show="!longDescriptionExpanded">
@@ -74,6 +85,17 @@
                                                         <a data-ng-click="toogleEditorState('longDescriptionExpanded')" class="btn btn-default">Hide</a>
                                                     </div>
                                                     <div data-ng-show="longDescriptionExpanded" text-angular ta-unsafe-sanitizer="true" data-ng-model="productCategory.LongDescription"></div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="cbHideLongDescriptionBottom" class="col-md-3 control-label"></label>
+                                                <div class="col-md-9">
+                                                    <div class="checkbox">
+                                                        <label>
+                                                            <input type="checkbox" id="cbHideLongDescriptionBottom" name="HideLongDescriptionBottom" data-ng-model="productCategory.HideLongDescriptionBottom" />
+                                                            <strong>Hide Description</strong>
+                                                        </label>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">

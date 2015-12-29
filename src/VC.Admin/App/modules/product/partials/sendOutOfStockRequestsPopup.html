@@ -1,0 +1,26 @@
+﻿<div class="modal-header">
+    <h3 class="modal-title">Are you sure you want to send these emails?</h3>
+</div>
+<div class="modal-body">
+    <spinner-overlay data-loading="refreshTracker.active()">
+        <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted}" novalidate>
+            <fieldset>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">Message Format</label>
+                    <div class="col-md-9">
+                        <textarea type="text" name="MessageFormat" class="form-control" placeholder="Message Format" rows="10" data-ng-model="options.MessageFormat" required data-ng-maxlength="1000"></textarea>
+                        <div class="error-container" ng-show="forms.submitted && forms.form.MessageFormat.$invalid">
+                            <small class="error" ng-show="forms.form.MessageFormat.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Message Format")}}</small>
+                            <small class="error" ng-show="forms.form.MessageFormat.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Message Format", "1000"])}}</small>
+                            <small class="error" ng-show="forms.form.MessageFormat.$error.server">{{serverMessages.GetMessage('MessageFormat')}}</small>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </spinner-overlay>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-success" ladda="refreshTracker.active()" data-ng-click="save()">Send</button>
+    <button class="btn btn-default" data-ng-click="cancel()">Cancel</button>
+</div>

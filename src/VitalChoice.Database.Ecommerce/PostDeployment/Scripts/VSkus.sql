@@ -18,6 +18,7 @@ SELECT
 	p.Hidden,
 	p.IdObjectType AS IdProductType,
 	p.Name,
+	psval.Value as SubTitle,
 	p.Name +ISNULL(' - '+pval.Value, '')+ISNULL(' ('+sval.Value+')', '') AS DescriptionName,
 	CONVERT(bit,ISNULL(aval.Value, 0)) AS AutoShipProduct,
 	CONVERT(bit,ISNULL(aval1.Value, 0)) AS AutoShipFrequency1,
@@ -30,6 +31,8 @@ SELECT
 	JOIN Products AS p ON p.Id = s.IdProduct	
 	LEFT JOIN ProductOptionTypes AS popt ON popt.Name = N'SubProductGroupName' AND popt.IdObjectType = p.IdObjectType
 	LEFT JOIN ProductOptionValues AS pval ON pval.IdProduct = p.Id AND pval.IdOptionType = popt.Id	
+	LEFT JOIN ProductOptionTypes AS psopt ON psopt.Name = N'SubTitle' AND psopt.IdObjectType = p.IdObjectType
+	LEFT JOIN ProductOptionValues AS psval ON psval.IdProduct = p.Id AND psval.IdOptionType = psopt.Id	
 	LEFT JOIN ProductOptionTypes AS sopt ON sopt.Name = N'QTY' AND sopt.IdObjectType = p.IdObjectType
 	LEFT JOIN SkuOptionValues AS sval ON sval.IdSku = s.Id AND sval.IdOptionType = sopt.Id
 	LEFT JOIN ProductOptionTypes AS aopt ON aopt.Name = N'AutoShipProduct' AND aopt.IdObjectType = p.IdObjectType

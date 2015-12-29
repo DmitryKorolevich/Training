@@ -24,7 +24,7 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VC.Admin.Controllers
 {
-    [AdminAuthorize(PermissionType.Products)]
+    [AdminAuthorize(PermissionType.Marketing)]
     public class PromotionController : BaseApiController
     {
         private readonly IPromotionService _promotionService;
@@ -49,7 +49,7 @@ namespace VC.Admin.Controllers
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
 
-        #region Products
+        #region Promotions
         
         [HttpPost]
         public async Task<Result<PagedList<PromotionListItemModel>>> GetPromotions([FromBody]PromotionFilter filter)
@@ -80,6 +80,7 @@ namespace VC.Admin.Controllers
                     PromotionBuyType = PromoBuyType.Any,
                     StartDate = TimeZoneInfo.ConvertTime(now, _pstTimeZoneInfo, TimeZoneInfo.Local),
                     ExpirationDate = TimeZoneInfo.ConvertTime(now.AddDays(30), _pstTimeZoneInfo, TimeZoneInfo.Local),
+                    CanUseWithDiscount=true,
                     PromotionsToBuySkus = new List<PromotionToBuySkuModel>(),
                     PromotionsToGetSkus = new List<PromotionToGetSkuModel>(),
                 };
