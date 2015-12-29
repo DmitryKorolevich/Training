@@ -40,7 +40,6 @@ using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 
 namespace VC.Admin.Controllers
 {
-    [AdminAuthorize(PermissionType.Customers)]
     public class CustomerController : BaseApiController
     {
         private readonly ICountryService _countryService;
@@ -120,6 +119,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Customers)]
         public async Task<Result<AddUpdateCustomerModel>> CreateCustomerPrototype([FromBody] object temp)
         {
             var model = await _customerService.CreatePrototypeForAsync<AddUpdateCustomerModel>((int)CustomerType.Retail);
@@ -139,6 +139,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Customers)]
         public Result<CreditCardModel> CreateCreditCardPrototype([FromBody] object model)
         {
             return new CreditCardModel
@@ -149,6 +150,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Customers)]
         public Result<OacPaymentModel> CreateOacPrototype([FromBody] object model)
         {
             return new OacPaymentModel
@@ -160,6 +162,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Customers)]
         public Result<CheckPaymentModel> CreateCheckPrototype([FromBody] object model)
         {
             return new CheckPaymentModel
@@ -169,6 +172,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Customers)]
         public Result<CheckPaymentModel> CreateWireTransferPrototype([FromBody] object model)
         {
             return new CheckPaymentModel
@@ -178,6 +182,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Customers)]
         public Result<CheckPaymentModel> CreateMarketingPrototype([FromBody] object model)
         {
             return new CheckPaymentModel
@@ -187,6 +192,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Customers)]
         public Result<CheckPaymentModel> CreateVCWellnessPrototype([FromBody] object model)
         {
             return new CheckPaymentModel
@@ -196,12 +202,14 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Customers)]
         public Result<AddressModel> CreateAddressPrototype([FromBody] object model)
         {
             return new AddressModel() {AddressType = AddressType.Shipping, Country = new CountryListItemModel(_defaultCountry)};
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Customers)]
         public async Task<Result<CustomerNoteModel>> CreateCustomerNotePrototype([FromBody] object model)
         {
             var toReturn = new CustomerNoteModel()
@@ -229,6 +237,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Customers)]
         public async Task<Result<CustomerNoteModel>> AddNote([FromBody] CustomerNoteModel model, int idCustomer)
         {
             if (!Validate(model))
@@ -247,6 +256,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Customers)]
         public async Task<Result<bool>> DeleteNote(int idNote, [FromBody] object model)
         {
             if (idNote > 0)
@@ -255,6 +265,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Customers)]
         public async Task<Result<AddressModel>> AddAddress([FromBody] AddressModel model, int idCustomer)
         {
             if (!Validate(model))
@@ -272,6 +283,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Customers)]
         public async Task<Result<bool>> DeleteAddress(int idAddress, [FromBody] object model)
         {
             if (idAddress > 0)
@@ -280,6 +292,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Customers)]
         public async Task<Result<AddUpdateCustomerModel>> AddUpdateCustomer(
             [FromBody] AddUpdateCustomerModel addUpdateCustomerModel)
         {
@@ -392,6 +405,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
+        [AdminAuthorize(PermissionType.Customers)]
         public async Task<Result<AddUpdateCustomerModel>> GetExistingCustomer(int id)
         {
             var result = await _customerService.SelectAsync(id);
@@ -440,7 +454,8 @@ namespace VC.Admin.Controllers
         }
 
 		[HttpPost]
-	    public async Task<Result<CustomerFileModel>> UploadCustomerFile()
+        [AdminAuthorize(PermissionType.Customers)]
+        public async Task<Result<CustomerFileModel>> UploadCustomerFile()
 	    {
 		    var form = await Request.ReadFormAsync();
 
@@ -467,7 +482,8 @@ namespace VC.Admin.Controllers
 	    }
 
 		[HttpPost]
-		public async Task<Result<bool>> ResendActivation(Guid id, [FromBody] object model)
+        [AdminAuthorize(PermissionType.Customers)]
+        public async Task<Result<bool>> ResendActivation(Guid id, [FromBody] object model)
 		{
 			await _storefrontUserService.ResendActivationAsync(id);
 
@@ -475,7 +491,8 @@ namespace VC.Admin.Controllers
 		}
 
 		[HttpPost]
-		public async Task<Result<bool>> ResetPassword(Guid id, [FromBody] object model)
+        [AdminAuthorize(PermissionType.Customers)]
+        public async Task<Result<bool>> ResetPassword(Guid id, [FromBody] object model)
 		{
 			await _storefrontUserService.SendResetPasswordAsync(id);
 
@@ -483,7 +500,8 @@ namespace VC.Admin.Controllers
 		}
 
 		[HttpPost]
-		public async Task<Result<string>> LoginAsCustomer(Guid id, [FromBody] object model)
+        [AdminAuthorize(PermissionType.Customers)]
+        public async Task<Result<string>> LoginAsCustomer(Guid id, [FromBody] object model)
 		{
 			var token = await _storefrontUserService.GenerateLoginTokenAsync(id);
 
@@ -491,7 +509,8 @@ namespace VC.Admin.Controllers
 		}
 
 		[HttpGet]
-		public async Task<FileResult> GetFile([FromQuery]string publicId, [FromQuery]string fileName, [FromQuery]bool viewMode)
+        [AdminAuthorize(PermissionType.Customers)]
+        public async Task<FileResult> GetFile([FromQuery]string publicId, [FromQuery]string fileName, [FromQuery]bool viewMode)
 	    {
 			var blob = await _customerService.DownloadFileAsync(fileName, publicId);
 
@@ -505,6 +524,7 @@ namespace VC.Admin.Controllers
 		}
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Customers)]
         public async Task<Result<ObjectHistoryReportModel>> GetHistoryReport([FromBody]ObjectHistoryLogItemsFilter filter)
         {
             var toReturn = await _objectHistoryLogService.GetObjectHistoryReport(filter);
