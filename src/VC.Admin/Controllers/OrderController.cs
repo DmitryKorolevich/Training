@@ -165,7 +165,7 @@ namespace VC.Admin.Controllers
                             var orderNote = avaliableOrderNotes.FirstOrDefault(p => p.Id == IdCustomerOrderNote);
                             if (orderNote != null)
                             {
-                                model.OrderNotes += orderNote.Title + Environment.NewLine;
+                                model.OrderNotes += orderNote.Description + Environment.NewLine;
                             }
                         }
                     }

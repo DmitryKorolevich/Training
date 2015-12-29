@@ -55,7 +55,6 @@ namespace VC.Admin.Controllers
         #region Countries/States
 
         [HttpPost]
-        [AdminAuthorize(PermissionType.Settings)]
         public async Task<Result<IEnumerable<CountryListItemModel>>> GetCountries([FromBody] object model)
         {
             var result = await countryService.GetCountriesAsync();
