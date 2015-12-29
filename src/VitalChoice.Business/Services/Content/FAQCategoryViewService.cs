@@ -16,6 +16,7 @@ using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using System.Net;
 using Microsoft.AspNet.Mvc;
+using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Business.Services.Content
 {

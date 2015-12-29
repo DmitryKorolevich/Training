@@ -10,21 +10,6 @@ namespace VitalChoice.DynamicData.Helpers
 {
     public static class MapperTypeConverter
     {
-        public static void ThrowIfNotValid(Type modelType, Type dynamicType, object value, string propertyName,
-            GenericProperty destProperty, bool toModelDirection)
-        {
-            if (value == null && destProperty.PropertyType.GetTypeInfo().IsValueType && !destProperty.PropertyType.IsImplementGeneric(typeof(Nullable<>)))
-            {
-                throw new ApiException(
-                    $"Value is null while it should be a ValueType {destProperty.PropertyType}.\r\n [{modelType} <-> {dynamicType}]");
-            }
-            if (value != null && !destProperty.PropertyType.IsInstanceOfType(value))
-            {
-                throw new ApiException(
-                    $"Value {value} of Type [{value.GetType()}] is not assignable to property {propertyName} with Type {destProperty.PropertyType}.\r\n [{modelType} {(toModelDirection ? "<-" : "->")} {dynamicType}]");
-            }
-        }
-
         public static object ConvertTo<TOptionValue, TOptionType>(TOptionValue value, FieldType typeId)
             where TOptionValue: OptionValue<TOptionType> 
             where TOptionType : OptionType

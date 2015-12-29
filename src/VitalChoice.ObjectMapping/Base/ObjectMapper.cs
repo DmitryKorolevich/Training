@@ -3,13 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using VitalChoice.DynamicData.Helpers;
-using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.DynamicData.Services;
-using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.ObjectMapping.Interfaces;
+using VitalChoice.ObjectMapping.Services;
 
-namespace VitalChoice.DynamicData.Base
+namespace VitalChoice.ObjectMapping.Base
 {
     public static class ObjectMapper
     {
@@ -252,6 +250,11 @@ namespace VitalChoice.DynamicData.Base
             return (TObject) _typeConverter.Clone(obj, typeof (TObject), typeof (TBase), o => cloneBaseFunc((TBase) o));
         }
 
+        public void CloneInto<TBase>(TObject dest, TObject src)
+        {
+            throw new NotImplementedException();
+        }
+
         public object FromDictionary(IDictionary<string, object> model, bool caseSense = true)
         {
             if (model == null)
@@ -370,7 +373,7 @@ namespace VitalChoice.DynamicData.Base
                     var value = _typeConverter.ConvertFromModel(valueType, dynamicProperty.PropertyType, modelValue, dynamicProperty.Converter);
                     if (value != null)
                     {
-                        MapperTypeConverter.ThrowIfNotValid(model.GetType(), objectType, value, pair.Key, dynamicProperty,
+                        TypeValidator.ThrowIfNotValid(model.GetType(), objectType, value, pair.Key, dynamicProperty,
                             false);
                         dynamicProperty.Set?.Invoke(obj, value);
                     }
@@ -420,7 +423,7 @@ namespace VitalChoice.DynamicData.Base
                         pair.Value.Get?.Invoke(model), dynamicProperty.Converter);
                     if (value != null)
                     {
-                        MapperTypeConverter.ThrowIfNotValid(modelType, objectType, value, mappingName, dynamicProperty,
+                        TypeValidator.ThrowIfNotValid(modelType, objectType, value, mappingName, dynamicProperty,
                             false);
                         dynamicProperty.Set?.Invoke(obj, value);
                     }
@@ -449,7 +452,7 @@ namespace VitalChoice.DynamicData.Base
                         dynamicProperty.Get?.Invoke(obj), dynamicProperty.Converter);
                     if (value != null)
                     {
-                        MapperTypeConverter.ThrowIfNotValid(modelType, objectType, value, pair.Key, pair.Value, true);
+                        TypeValidator.ThrowIfNotValid(modelType, objectType, value, pair.Key, pair.Value, true);
                         pair.Value.Set?.Invoke(result, value);
                     }
                 }

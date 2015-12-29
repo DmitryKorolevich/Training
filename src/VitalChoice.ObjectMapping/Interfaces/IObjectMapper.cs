@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using VitalChoice.DynamicData.Base;
 
-namespace VitalChoice.DynamicData.Interfaces
+namespace VitalChoice.ObjectMapping.Interfaces
 {
     public interface IObjectMapper
     { 
@@ -27,5 +26,6 @@ namespace VitalChoice.DynamicData.Interfaces
         void UpdateObject<TModel>(TModel model, TObject obj);
         TObject Clone<TBase>(TObject obj);
         TObject Clone<TBase>(TObject obj, Func<TBase, TBase> cloneBaseFunc);
+        void CloneInto<TBase>(TObject dest, TObject src);
     }
 }

@@ -3,21 +3,24 @@ using System.Collections.Generic;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Services.Cache;
 using VitalChoice.Ecommerce.Domain;
+using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Caching.Services
 {
     internal class InternalEntityCacheFactory : IInternalEntityCacheFactory
     {
         private readonly IInternalEntityInfoStorage _keyStorage;
+        private readonly ITypeConverter _typeConverter;
 
         private readonly Dictionary<Type, IInternalEntityCollectionCache> _collectionCaches =
             new Dictionary<Type, IInternalEntityCollectionCache>();
 
         private readonly Dictionary<Type, IInternalEntityCache> _entityCaches = new Dictionary<Type, IInternalEntityCache>();
 
-        public InternalEntityCacheFactory(IInternalEntityInfoStorage keyStorage)
+        public InternalEntityCacheFactory(IInternalEntityInfoStorage keyStorage, ITypeConverter typeConverter)
         {
             _keyStorage = keyStorage;
+            _typeConverter = typeConverter;
         }
 
         public IInternalEntityCache GetCache(Type entityType)
@@ -31,7 +34,7 @@ namespace VitalChoice.Caching.Services
                 }
                 result =
                     (IInternalEntityCache)
-                        Activator.CreateInstance(typeof (EntityInternalCache<>).MakeGenericType(entityType), _keyStorage, this);
+                        Activator.CreateInstance(typeof (EntityInternalCache<>).MakeGenericType(entityType), _keyStorage, this, _typeConverter);
                 _entityCaches.Add(entityType, result);
             }
             return result;
@@ -48,7 +51,7 @@ namespace VitalChoice.Caching.Services
                 }
                 result =
                     (IInternalEntityCollectionCache)
-                        Activator.CreateInstance(typeof (EntityInternalCollectionCache<>).MakeGenericType(entityType), _keyStorage, this);
+                        Activator.CreateInstance(typeof (EntityInternalCollectionCache<>).MakeGenericType(entityType), _keyStorage, this, _typeConverter);
                 _collectionCaches.Add(entityType, result);
             }
             return result;

@@ -1,4 +1,5 @@
 ﻿using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.DynamicData.Base
 {

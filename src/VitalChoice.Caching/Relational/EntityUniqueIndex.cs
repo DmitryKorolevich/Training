@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace VitalChoice.Caching.Relational
 {
-    internal class EntityUniqueIndex : IEquatable<EntityUniqueIndex>
+    public class EntityUniqueIndex : IEquatable<EntityUniqueIndex>
     {
         public EntityUniqueIndexInfo IndexInfo { get; }
 

@@ -13,6 +13,7 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Interfaces.Services.Products;
+using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Business.Services.Dynamic
 {

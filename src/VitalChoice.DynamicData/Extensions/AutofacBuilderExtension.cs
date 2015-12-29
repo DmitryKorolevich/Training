@@ -7,6 +7,9 @@ using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.ObjectMapping.Base;
+using VitalChoice.ObjectMapping.Interfaces;
+using VitalChoice.ObjectMapping.Services;
 
 namespace VitalChoice.DynamicData.Extensions
 {

@@ -55,6 +55,8 @@ using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.Workflow.Core;
 using Microsoft.Extensions.Logging;
+using VitalChoice.ObjectMapping.Base;
+using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Business.Services.Orders
 {

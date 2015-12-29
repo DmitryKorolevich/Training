@@ -36,6 +36,7 @@ using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
+using VitalChoice.ObjectMapping.Base;
 
 namespace VitalChoice.Business.Services.Affiliates
 {

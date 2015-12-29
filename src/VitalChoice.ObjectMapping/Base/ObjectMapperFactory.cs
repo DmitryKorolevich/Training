@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.ObjectMapping.Interfaces;
 
-namespace VitalChoice.DynamicData.Base
+namespace VitalChoice.ObjectMapping.Base
 {
     public class ObjectMapperFactory : IObjectMapperFactory
     {

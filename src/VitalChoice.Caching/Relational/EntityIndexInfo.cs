@@ -3,7 +3,7 @@ using Microsoft.Data.Entity.Metadata.Internal;
 
 namespace VitalChoice.Caching.Relational
 {
-    internal class EntityIndexInfo : IEquatable<EntityIndexInfo>
+    public class EntityIndexInfo : IEquatable<EntityIndexInfo>
     {
         public EntityIndexInfo(string name, IClrPropertyGetter property)
         {

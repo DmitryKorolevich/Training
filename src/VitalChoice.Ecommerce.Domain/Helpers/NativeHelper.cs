@@ -10,8 +10,10 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             (IAssemblyLoadContextAccessor)
                 CallContextServiceLocator.Locator.ServiceProvider.GetService(typeof (IAssemblyLoadContextAccessor));
 
+#if DOTNET5_4
         private static readonly Func<object> GetCurrentDomain;
         private static readonly Func<object, Assembly[]> AssembliesGetter;
+#endif
 
         static NativeHelper() {
 #if DOTNET5_4

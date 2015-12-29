@@ -49,13 +49,13 @@ namespace VitalChoice.Caching.Services
                         foreach (var item in relatedObject as IEnumerable)
                         {
                             result.Add(new RelationInstance(entity, item, entityType,
-                                GetRelations(relation.RelationEntityType, item, relation.Relations)));
+                                GetRelations(relation.RelationEntityType, item, relation.Relations), relation));
                         }
                     }
                     else
                     {
                         result.Add(new RelationInstance(entity, relatedObject, entityType,
-                            GetRelations(relation.RelationEntityType, relatedObject, relation.Relations)));
+                            GetRelations(relation.RelationEntityType, relatedObject, relation.Relations), relation));
                     }
                 }
             }

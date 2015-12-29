@@ -2,7 +2,7 @@
 
 namespace VitalChoice.Caching.Relational
 {
-    internal class EntityIndexValue : IEquatable<EntityIndexValue>
+    public class EntityIndexValue : IEquatable<EntityIndexValue>
     {
         public bool Equals(EntityIndexValue other)
         {

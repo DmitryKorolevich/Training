@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace VitalChoice.DynamicData.Base
+namespace VitalChoice.ObjectMapping.Base
 {
     public struct TypePair : IEquatable<TypePair>
     {

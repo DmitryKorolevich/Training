@@ -19,6 +19,7 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Constants;
 using Microsoft.AspNet.Http.Extensions;
+using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.ContentProcessing.Base
 {

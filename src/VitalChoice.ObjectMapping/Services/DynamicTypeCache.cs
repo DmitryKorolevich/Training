@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
-namespace VitalChoice.DynamicData.Services
+namespace VitalChoice.ObjectMapping.Services
 {
     public struct TypeCache
     {
@@ -63,10 +61,10 @@ namespace VitalChoice.DynamicData.Services
             return result;
         }
 
-        internal static readonly Dictionary<Type, TypeCache> ModelTypeMappingCache =
+        public static readonly Dictionary<Type, TypeCache> ModelTypeMappingCache =
             new Dictionary<Type, TypeCache>();
 
-        internal static readonly Dictionary<Type, TypeCache> ObjectTypeMappingCache =
+        public static readonly Dictionary<Type, TypeCache> ObjectTypeMappingCache =
             new Dictionary<Type, TypeCache>();
     }
 }

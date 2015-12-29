@@ -111,7 +111,7 @@ namespace VitalChoice.Caching.Relational
         public string Name { get; }
         public Type ParentEntityType { get; }
         public Type RelationEntityType { get; }
-        internal Dictionary<RelationCacheInfo, RelationInfo> RelationsDict { get; } = new Dictionary<RelationCacheInfo, RelationInfo>();
+        internal Dictionary<RelationCacheInfo, RelationInfo> RelationsDict { get; set; } = new Dictionary<RelationCacheInfo, RelationInfo>();
         public ICollection<RelationInfo> Relations => RelationsDict.Values;
 
     }

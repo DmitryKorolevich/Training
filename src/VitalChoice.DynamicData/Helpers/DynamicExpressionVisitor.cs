@@ -10,6 +10,8 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.ObjectMapping.Base;
+using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.DynamicData.Helpers
 {

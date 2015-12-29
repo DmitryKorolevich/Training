@@ -1,20 +1,16 @@
 ﻿{
   "version": "1.0.0-*",
-  "description": "VitalChoice.Caching Class Library",
+  "description": "VitalChoice.ObjectMapping Class Library",
   "authors": [ "multi_000" ],
   "tags": [ "" ],
   "projectUrl": "",
   "licenseUrl": "",
   "dependencies": {
-    "VitalChoice.Ecommerce.Domain": "",
-    "VitalChoice.ObjectMapping": "",
-    "EntityFramework.Relational": "7.0.0-*",
+    "VitalChoice.Ecommerce.Domain": "1.0.0-*",
     "Autofac.Extensions.DependencyInjection": "4.0.0-*"
   },
   "frameworks": {
-    "dnx451": {
-
-    },
+    "dnx451": { },
     "dotnet5.4": {
       "dependencies": {
         "Microsoft.CSharp": "4.0.1-*",

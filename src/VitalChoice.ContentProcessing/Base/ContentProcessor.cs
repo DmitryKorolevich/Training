@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using VitalChoice.ContentProcessing.Interfaces;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Infrastructure.Domain.Content.Base;
+using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.ContentProcessing.Base
 {

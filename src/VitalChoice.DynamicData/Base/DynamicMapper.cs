@@ -5,7 +5,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.DynamicData.Services;
 using System.Threading.Tasks;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
@@ -16,6 +15,9 @@ using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.ObjectMapping.Base;
+using VitalChoice.ObjectMapping.Interfaces;
+using VitalChoice.ObjectMapping.Services;
 
 namespace VitalChoice.DynamicData.Base
 {
@@ -406,7 +408,7 @@ namespace VitalChoice.DynamicData.Base
                             var value = _typeConverter.ConvertToModel(dynamicValue?.GetType(), pair.Value.PropertyType, dynamicValue, pair.Value.Converter);
                             if (value != null)
                             {
-                                MapperTypeConverter.ThrowIfNotValid(modelType, objectType, value, pair.Key, pair.Value,
+                                TypeValidator.ThrowIfNotValid(modelType, objectType, value, pair.Key, pair.Value,
                                     true);
                                 pair.Value.Set?.Invoke(result, value);
                             }

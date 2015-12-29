@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VitalChoice.DynamicData.Interfaces
+namespace VitalChoice.ObjectMapping.Interfaces
 {
     public interface IModelConverterService
     {

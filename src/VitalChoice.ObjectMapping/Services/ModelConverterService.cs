@@ -1,8 +1,9 @@
 ﻿using System;
 using Autofac.Features.Indexed;
-using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.ObjectMapping.Base;
+using VitalChoice.ObjectMapping.Interfaces;
 
-namespace VitalChoice.DynamicData.Base
+namespace VitalChoice.ObjectMapping.Services
 {
     public class ModelConverterService : IModelConverterService
     {

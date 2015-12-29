@@ -9,6 +9,7 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain.Entities.Promotion;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Business.Services.Dynamic
 {

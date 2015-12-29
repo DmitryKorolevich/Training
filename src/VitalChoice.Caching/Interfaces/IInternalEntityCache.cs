@@ -9,6 +9,9 @@ namespace VitalChoice.Caching.Interfaces
     public interface IInternalEntityCache
     {
         bool TryGetEntity(EntityPrimaryKey primaryKey, out object entity);
+        bool TryGetEntities(EntityPrimaryKey[] primaryKeys, out List<object> entity);
+        bool TryGetEntity(EntityUniqueIndex uniqueIndex, out object entity);
+        bool TryGetEntities(EntityUniqueIndex[] uniqueIndexes, out List<object> entity);
         bool TryRemove(object entity);
         bool TryRemove(IEnumerable<object> entities);
         bool TryRemoveTree(object entity);
@@ -22,9 +25,12 @@ namespace VitalChoice.Caching.Interfaces
         where T : Entity
     {
         bool TryGetEntity(EntityPrimaryKey primaryKey, out T entity);
-        ICollection<T> GetWhere(Func<T, bool> whereFunc);
-        ICollection<T> GetWhere(Expression<Func<T, bool>> whereExpression);
-        ICollection<T> GetAll();
+        bool TryGetEntities(EntityPrimaryKey[] primaryKeys, out List<T> entities);
+        bool TryGetEntity(EntityUniqueIndex uniqueIndex, out T entity);
+        bool TryGetEntities(EntityUniqueIndex[] uniqueIndexes, out List<T> entities);
+        List<T> GetWhere(Func<T, bool> whereFunc);
+        List<T> GetWhere(Expression<Func<T, bool>> whereExpression);
+        List<T> GetAll();
         bool TryRemove(T entity);
         bool TryRemove(IEnumerable<T> entities);
         bool TryRemoveTree(T entity);

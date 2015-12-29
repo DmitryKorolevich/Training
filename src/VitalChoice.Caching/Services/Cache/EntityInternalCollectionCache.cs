@@ -3,13 +3,14 @@ using System.Linq;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Ecommerce.Domain;
+using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Caching.Services.Cache
 {
     internal class EntityInternalCollectionCache<T> : EntityInternalCache<T>, IInternalEntityCollectionCache<T> where T : Entity
     {
-        public EntityInternalCollectionCache(IInternalEntityInfoStorage keyStorage, IInternalEntityCacheFactory cacheFactory)
-            : base(keyStorage, cacheFactory)
+        public EntityInternalCollectionCache(IInternalEntityInfoStorage keyStorage, IInternalEntityCacheFactory cacheFactory, ITypeConverter typeConverter)
+            : base(keyStorage, cacheFactory, typeConverter)
         {
         }
 

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Ecommerce.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
+using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.DynamicData.Interfaces
 {

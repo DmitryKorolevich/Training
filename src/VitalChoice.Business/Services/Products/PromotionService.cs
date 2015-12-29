@@ -26,6 +26,7 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
+using VitalChoice.ObjectMapping.Base;
 
 namespace VitalChoice.Business.Services.Products
 {

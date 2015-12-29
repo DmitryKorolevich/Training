@@ -1,6 +1,6 @@
-using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.ObjectMapping.Interfaces;
 
-namespace VitalChoice.DynamicData.Base
+namespace VitalChoice.ObjectMapping.Base
 {
     public class DirectMapper<TObject> : ObjectMapper<TObject> 
         where TObject : class, new()

@@ -20,6 +20,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Data.Services;
 using VitalChoice.DynamicData.Helpers;
+using VitalChoice.ObjectMapping.Base;
 
 namespace VitalChoice.Business.Services.Settings
 {

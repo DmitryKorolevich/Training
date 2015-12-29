@@ -1,7 +1,7 @@
 ﻿using System;
 using VitalChoice.Ecommerce.Domain.Attributes;
 
-namespace VitalChoice.DynamicData
+namespace VitalChoice.ObjectMapping
 {
     public struct GenericProperty
     {

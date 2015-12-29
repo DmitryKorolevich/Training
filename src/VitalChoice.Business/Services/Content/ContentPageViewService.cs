@@ -28,6 +28,7 @@ using System.Security.Claims;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using System.Net;
+using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Business.Services.Content
 {

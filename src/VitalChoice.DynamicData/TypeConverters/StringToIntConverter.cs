@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.DynamicData.TypeConverters
 {

@@ -11,6 +11,8 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using ExpressionVisitor = System.Linq.Expressions.ExpressionVisitor;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.ObjectMapping.Base;
+using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.DynamicData.Base
 {

@@ -2,27 +2,25 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq.Expressions;
 using System.Reflection;
 using Autofac.Features.Indexed;
-using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.DynamicData.Services;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.ObjectMapping.Interfaces;
+using VitalChoice.ObjectMapping.Services;
 
-namespace VitalChoice.DynamicData.Base
+namespace VitalChoice.ObjectMapping.Base
 {
     public class TypeConverter : ITypeConverter
     {
-        private readonly IObjectMapperFactory _mapperFactory;
-        private readonly IIndex<Type, IObjectMapper> _mappers;
-        private readonly Dictionary<object, object> _objects = new Dictionary<object, object>();
-        private static readonly Dictionary<Type, IFieldTypeConverter> TypeConverters = new Dictionary<Type, IFieldTypeConverter>();
+        protected readonly IObjectMapperFactory MapperFactory;
+        protected readonly IIndex<Type, IObjectMapper> Mappers;
+        protected static readonly Dictionary<Type, IFieldTypeConverter> TypeConverters = new Dictionary<Type, IFieldTypeConverter>();
 
         public TypeConverter(IIndex<Type, IObjectMapper> mappers, IModelConverterService converterService)
         {
-            _mappers = mappers;
-            _mapperFactory = new ObjectMapperFactory(this, converterService);
+            Mappers = mappers;
+            MapperFactory = new ObjectMapperFactory(this, converterService);
         }
 
         public static object ConvertFromModelObject(Type sourceType, object obj)
@@ -73,7 +71,7 @@ namespace VitalChoice.DynamicData.Base
             }
 
             IObjectMapper objectMapper;
-            if (_mappers.TryGetValue(destType, out objectMapper))
+            if (Mappers.TryGetValue(destType, out objectMapper))
             {
                 return objectMapper.FromModel(sourceType, obj);
             }
@@ -88,7 +86,7 @@ namespace VitalChoice.DynamicData.Base
                 {
                     results.AddCast(obj as IEnumerable, srcElementType, destElementType);
                 }
-                else if (_mappers.TryGetValue(destElementType, out itemMapper))
+                else if (Mappers.TryGetValue(destElementType, out itemMapper))
                 {
                     foreach (var item in (IEnumerable) obj)
                     {
@@ -106,7 +104,7 @@ namespace VitalChoice.DynamicData.Base
             }
             try
             {
-                var mapper = _mapperFactory.CreateMapper(destType);
+                var mapper = MapperFactory.CreateMapper(destType);
                 return mapper.FromModel(sourceType, obj);
             }
             catch
@@ -141,7 +139,7 @@ namespace VitalChoice.DynamicData.Base
             //}
 
             IObjectMapper objectMapper;
-            if (_mappers.TryGetValue(sourceType, out objectMapper))
+            if (Mappers.TryGetValue(sourceType, out objectMapper))
             {
                 return objectMapper.ToModel(obj, destType);
             }
@@ -156,7 +154,7 @@ namespace VitalChoice.DynamicData.Base
                 {
                     results.AddCast(obj as IEnumerable, srcElementType, destElementType);
                 }
-                else if (_mappers.TryGetValue(srcElementType, out itemMapper))
+                else if (Mappers.TryGetValue(srcElementType, out itemMapper))
                 {
                     foreach (var item in (IEnumerable) obj)
                     {
@@ -174,7 +172,7 @@ namespace VitalChoice.DynamicData.Base
             }
             try
             {
-                var mapper = _mapperFactory.CreateMapper(sourceType);
+                var mapper = MapperFactory.CreateMapper(sourceType);
                 return mapper.ToModel(obj, destType);
             }
             catch
@@ -183,27 +181,27 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        public virtual object Clone(object obj, Type objectType, Type baseTypeToMemberwiseClone)
+        protected virtual object CloneInternal(object obj, Type objectType, Type baseTypeToMemberwiseClone, Dictionary<object, object> objects)
         {
             if (obj == null)
                 return null;
 
             object result;
 
-            if (_objects.TryGetValue(obj, out result))
+            if (objects.TryGetValue(obj, out result))
                 return result;
 
             result = Activator.CreateInstance(objectType);
 
-            _objects.Add(obj, result);
+            objects.Add(obj, result);
 
             var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
             foreach (var pair in objectCache.Properties)
             {
-                Type propertyElementType = pair.Value.PropertyType.TryGetElementType(typeof (ICollection<>));
+                Type propertyElementType = pair.Value.PropertyType.TryGetElementType(typeof(ICollection<>));
                 if (IsImplementBase(pair.Value.PropertyType, baseTypeToMemberwiseClone))
                 {
-                    var value = Clone(pair.Value.Get?.Invoke(obj), pair.Value.PropertyType, baseTypeToMemberwiseClone);
+                    var value = CloneInternal(pair.Value.Get?.Invoke(obj), pair.Value.PropertyType, baseTypeToMemberwiseClone, objects);
                     if (value != null)
                     {
                         pair.Value.Set?.Invoke(result, value);
@@ -214,10 +212,10 @@ namespace VitalChoice.DynamicData.Base
                     var collection = pair.Value.Get?.Invoke(obj);
                     if (collection != null)
                     {
-                        var results = (IList) Activator.CreateInstance(typeof (List<>).MakeGenericType(propertyElementType));
-                        foreach (var item in (IEnumerable) collection)
+                        var results = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(propertyElementType));
+                        foreach (var item in (IEnumerable)collection)
                         {
-                            var value = Clone(item, propertyElementType, baseTypeToMemberwiseClone);
+                            var value = CloneInternal(item, propertyElementType, baseTypeToMemberwiseClone, objects);
                             results.Add(value);
                         }
                         pair.Value.Set?.Invoke(result, results);
@@ -235,19 +233,26 @@ namespace VitalChoice.DynamicData.Base
             return result;
         }
 
-        public virtual object Clone(object obj, Type objectType, Type baseTypeToMemberwiseClone, Func<object, object> cloneBase)
+        public object Clone(object obj, Type objectType, Type baseTypeToMemberwiseClone)
+        {
+            Dictionary<object, object> objects = new Dictionary<object, object>();
+            return CloneInternal(obj, objectType, baseTypeToMemberwiseClone, objects);
+        }
+
+        protected virtual object CloneInternal(object obj, Type objectType, Type baseTypeToMemberwiseClone, Func<object, object> cloneBase,
+            Dictionary<object, object> objects)
         {
             if (obj == null)
                 return null;
 
             object result;
 
-            if (_objects.TryGetValue(obj, out result))
+            if (objects.TryGetValue(obj, out result))
                 return result;
 
             result = Activator.CreateInstance(objectType);
 
-            _objects.Add(obj, result);
+            objects.Add(obj, result);
 
             var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
             foreach (var pair in objectCache.Properties)
@@ -285,6 +290,64 @@ namespace VitalChoice.DynamicData.Base
                 }
             }
             return result;
+        }
+
+        public object Clone(object obj, Type objectType, Type baseTypeToMemberwiseClone, Func<object, object> cloneBase)
+        {
+            Dictionary<object, object> objects = new Dictionary<object, object>();
+            return CloneInternal(obj, objectType, baseTypeToMemberwiseClone, cloneBase, objects);
+        }
+
+        protected virtual void CloneIntoInternal(object dest, object src, Type objectType, Type baseTypeToMemberwiseClone,
+            HashSet<object> objects)
+        {
+            if (dest == null)
+                return;
+
+            if (objects.Contains(dest))
+                return;
+
+            objects.Add(dest);
+
+            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+            foreach (var pair in objectCache.Properties)
+            {
+                var srcProperty = src == null ? null : pair.Value.Get?.Invoke(src);
+                if (IsImplementBase(pair.Value.PropertyType, baseTypeToMemberwiseClone))
+                {
+                    if (srcProperty != null)
+                    {
+                        var destProperty = pair.Value.Get?.Invoke(dest) ?? Activator.CreateInstance(pair.Value.PropertyType);
+                        CloneIntoInternal(destProperty, srcProperty, pair.Value.PropertyType, baseTypeToMemberwiseClone, objects);
+                    }
+                    else
+                    {
+                        pair.Value.Set?.Invoke(dest, null);
+                    }
+                }
+                else
+                {
+                    pair.Value.Set?.Invoke(dest, srcProperty);
+                }
+            }
+        }
+
+        public void CloneInto(object dest, object src, Type objectType, Type baseTypeToMemberwiseClone)
+        {
+            HashSet<object> objects = new HashSet<object>();
+            CloneIntoInternal(dest, src, objectType, baseTypeToMemberwiseClone, objects);
+        }
+
+        public void CopyInto(object dest, object src, Type objectType)
+        {
+            if (dest == null)
+                return;
+            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+            foreach (var pair in objectCache.Properties)
+            {
+                var srcProperty = src == null ? null : pair.Value.Get?.Invoke(src);
+                pair.Value.Set?.Invoke(dest, srcProperty);
+            }
         }
 
         private static bool IsImplementBase(Type instanceType, Type baseTypeToMemberwiseClone)

@@ -17,6 +17,7 @@ using VitalChoice.Infrastructure.Domain.Content.Articles;
 using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.Infrastructure.Domain.Content.Recipes;
 using VitalChoice.Data.Helpers;
+using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Business.Services.Content
 {
