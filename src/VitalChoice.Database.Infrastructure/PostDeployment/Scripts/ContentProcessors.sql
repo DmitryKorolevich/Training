@@ -144,3 +144,130 @@ END
 
 GO
 
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentProcessors] WHERE [Type] = N'RecipeCategoriesForContentPageProcessor')
+BEGIN
+
+	DECLARE @id int
+
+	INSERT INTO [dbo].[ContentProcessors]
+	(Id, [Type], Name, Description)
+	VALUES
+	(19, N'RecipeCategoriesForContentPageProcessor', N'Recipe categories processor for content page', N'Tree view of recipe categories, chef recipe categories with recipes')
+
+	INSERT MasterContentItems
+	       ([Name]
+           ,[TypeId]
+           ,[Template]
+           ,[Created]
+           ,[Updated]
+           ,[StatusCode]
+           ,[UserId])
+     VALUES
+	 ('Content Individual with Recipe Categories',
+	 8,
+	 N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.Recipes}}
+@model() {{dynamic}}
+
+<%
+    
+<category>
+{{
+    @if(@model.SubCategories.Count>0)
+    {{
+        <ul class="drop-menu sub-menu collapsed">
+        @list(@model.SubCategories)
+        {{
+            <li>
+                @if(@model.SubCategories.Count>0)
+                {{
+                <a class="trigger" href="#">@(Name)</a>
+                }}
+                @if(@model.SubCategories.Count==0)
+                {{
+                <a href="@(Url)">@(Name)</a>
+                }}
+                @category()
+            </li>
+        }}
+        </ul>
+    }}
+}}
+
+<left>
+{{
+	<div class="left-content-pane">
+		    <div class="panel left-wrapper">
+        	<div class="sub-title">Chef Recipe Videos</div>
+            <ul class="drop-menu">
+                @list(ChefCategories)
+                {{
+                    <li>
+                        <a class="trigger" href="#">@(Name)</a>
+                        <ul class="drop-menu sub-menu collapsed">
+                        @list(Recipes)
+                        {{
+                            <li>
+                                <a href="@(Url)">@(Name)</a>
+                            </li>
+                        }}
+                        </ul>
+                    </li>
+                }}
+            </ul>
+	    </div>
+	    <div class="panel left-wrapper">
+        	<div class="sub-title">Recipes by Category</div>
+            <ul class="drop-menu">
+                @list(AllCategories)
+                {{
+                    <li>
+                        <a class="trigger" href="#">@(Name)</a>
+                        @category()
+                    </li>
+                }}
+            </ul>
+	    </div>
+	</div>
+}} :: TtlRecipeCategoriesModel
+
+<center>
+{{
+	<div class="center-content-pane">
+    
+	</div>
+}}
+
+<right>
+{{
+	<div class="right-content-pane">
+    
+	</div>
+}}
+
+<default> -> ()
+{{
+    <div class="working-area-holder content-page content-with-recipe-categories-page">
+        <div class="header-block">
+            <img src="/assets/images/in-the-kitchen-header-4-24-14a.png" />
+        </div>
+        @left(RecipeCategories)
+    	@center()
+    	@right()
+	</div>
+}}
+%>',
+	GETDATE(),
+	GETDATE(),
+	2,
+	NULL)
+
+	SET @id=@@IDENTITY
+
+	INSERT INTO [dbo].[MasterContentItemsToContentProcessors]
+	([MasterContentItemId],[ContentProcessorId])
+	VALUES
+	(@id,19)
+
+END
+
+GO

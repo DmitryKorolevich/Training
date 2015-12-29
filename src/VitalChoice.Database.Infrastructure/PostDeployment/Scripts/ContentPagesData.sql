@@ -268,3 +268,263 @@ INSERT INTO [dbo].[ContentPages]
 END
 
 GO
+
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentPages] WHERE [Url] = 'in-the-kitchen')
+BEGIN
+
+DECLARE @contentItemId int
+
+INSERT INTO [dbo].[ContentItems]
+           ([Created]
+           ,[Updated]
+           ,[Template]
+           ,[Description]
+           ,[Title]
+           ,[MetaKeywords]
+           ,[MetaDescription])
+     VALUES
+           (GETDATE()
+           ,GETDATE()
+           ,'<%
+<center:center>
+{{
+    @script(){{
+        <script src="https://www.youtube.com/iframe_api"></script>
+        <script src="/app/modules/content/in-the-kitchen.js"></script>
+    }}
+   <div class="center-content-pane in-the-kitchen">
+        <div class="center-wrapper youtube-container-wrapper">
+            <a href="#" data-video-id="MjH2Zfq1uDQ" class="youtube-item">
+                <img id="maining" src="/assets/images/main-video-468px-a.jpg">
+            </a>
+            <div id="youtube-container">
+                <a href="#" class="youtube-close">
+                    <img alt="Close" src="/assets/images/close_button.png">
+                </a>
+                <div id="youtube-player"></div>
+            </div>
+        </div>
+        <div class="center-wrapper">
+            <div class="current-item-wrapper" style="display: none;">
+                <h4></h4>
+                <div class="body"></div>
+                <a href="#"> - Click here for full text version of this recipe</a>
+            </div>
+        </div>
+        <div class="center-wrapper">
+            <a href="#">
+                <img src="/assets/images/guest-chef-banner-6-10-2014c.jpg">
+            </a>
+        </div>
+        <div>
+            <a href="#">
+                <img src="/assets/images/basic-techniques-banner-6-10-2014c.jpg">
+            </a>
+        </div>
+	</div>
+}}
+<right:right>
+{{
+    <div class="right-content-pane in-the-kitchen">
+        <div class="right-wrapper panel panel-border">
+    	    <div class="sub-title">Seafood How-To Videos</div><br/>
+    	    <div class="seafood-basics">
+    	        <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="#" class="tooltip-v tooltipstered youtube-item" data-video-id="MjH2Zfq1uDQ" data-tooltip-title="How to Broil Salmon" data-tooltip-body="Many don&#8217;t realize how incredibly simple it is to broil wild Alaskan silver salmon perfectly, until seeing this short guide by Chef Becky Selengut.">
+        	                <img src="/assets/images/broiling-salmon-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">
+    	                How to Broil Silver Salmon
+    	            </div>
+    	        </div>
+    	        <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="#" class="tooltip-v tooltipstered youtube-item" data-video-id="38FwAMSnFAA" data-tooltip-title="How to Saut&eacute; Salmon" data-tooltip-body="Using only seafood marinade and organic olive oil, Chef Becky Selengut shows just how simple it is to cook salmon beautifully in a frying pan.">
+        	                <img src="/assets/images/saute-sockeye-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">
+    	                How to Sauté Sockeye Salmon
+    	            </div>
+    	        </div>
+    	        <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="#" class="tooltip-v tooltipstered youtube-item" data-video-id="fiCKvcizzUY" data-tooltip-title="Steamed Wild Halibut" data-tooltip-body="A remarkably simple yet highly sophisticated recipe for wild Alaskan halibut using caviar, spinach, carrots and sesame seeds, by Chef Becky Selengut.">
+        	                <img src="/assets/images/steam-halibut-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">
+    	                How to Steam Halibut
+    	            </div>
+    	        </div>
+    	        <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="#" class="tooltip-v tooltipstered youtube-item" data-video-id="U3Wcs0fV2L0" data-tooltip-title="How to Clean Spot Prawns" data-tooltip-body="Chef Becky Selengut demystifies the process of cleaning spot prawns, demonstrating how to de-vein and shell these delicacies for cooking.">
+        	                <img src="/assets/images/clean-prawns-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">
+    	                How to Clean Spot Prawns
+    	            </div>
+    	        </div>
+    	        
+    	        <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="#" class="tooltip-v tooltipstered youtube-item" data-video-id="JVz0uPA0_TY" data-tooltip-title="Smoked Salmon & Egg Skillet" data-tooltip-body="Chef Becky Selengut demonstrates how simple it is to prepare a tasty, nutrient-packed breakfast that will have your family begging for more.">
+        	                <img src="/assets/images/skillet-eggs-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">
+    	                Smoked Salmon & Egg Skillet
+    	            </div>
+    	        </div>
+    	        <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="#" class="tooltip-v tooltipstered youtube-item" data-video-id="1wpdOffvZIA"  data-tooltip-title="Crab Salad & Thai Coconut Soup" data-tooltip-body="Using canned Dungeness crab as a centerpiece, Chef Becky Selengut shows how a few simple ingredients combine for a showpiece meal.">
+        	                <img src="/assets/images/cucumber-soup-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">
+    	                Crab Salad & Thai Coconut Soup
+    	            </div>
+    	        </div>
+    	        <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="#" class="tooltip-v tooltipstered youtube-item" data-video-id="eSjAajxRwd0"  data-tooltip-title="Wild Pacific Albacore Tuna Tataki" data-tooltip-body="Unbelievably simple yet so delicious, this tuna recipe by Chef Becky Selengut makes an elegant appetizer for health-conscious foodies.">
+        	                <img src="/assets/images/tuna-tataki-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">
+    	                Wild Pacific Albacore Tuna Tataki
+    	            </div>
+    	        </div>
+    	        <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="#" class="tooltip-v tooltipstered youtube-item" data-video-id="btlfoO75kfI"  data-tooltip-title="Mixed Seafood Snack Plate" data-tooltip-body="Organic almonds, pickled onions and olives complement a healthful combo of sardines, salmon and sablefish for a simple, crowd-pleasing appetizer.">
+        	                <img src="/assets/images/snack-plate-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">	
+    	                Mixed Seafood Snack Plate
+    	            </div>
+    	        </div>
+    	        
+    	       <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="#" class="tooltip-v tooltipstered youtube-item" data-video-id="1Rv5PMILK3M"  data-tooltip-title="Blueberry & Strawberry Smoothie" data-tooltip-body="Chef Becky Selengut walks through the simple steps that lead to a frosty, nutrient-packed smoothie with organic berries, spinach and chia seeds.">
+        	                <img src="/assets/images/smoothie-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">	
+    	                Blueberry & Strawberry Smoothie
+    	            </div>
+    	        </div>
+    	       <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="#" class="tooltip-v tooltipstered youtube-item" data-video-id="5236Z6x5l08"  data-tooltip-title="Smoked Nova Lox Sandwiches" data-tooltip-body="Your family or guests will love Chef Becky Selengut&#8217;s idea for simple, artfully arranged, open-faced sandwiches featuring lox and tomatoes.">
+        	                <img src="/assets/images/smoked-salmon-sandwich-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">	
+    	                Smoked Nova Lox Sandwiches
+    	            </div>
+    	        </div>
+    	       <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="#" class="tooltip-v tooltipstered youtube-item" data-video-id="HH7B5R9fujA"  data-tooltip-title="Pasta with Wild Spot Prawns" data-tooltip-body="Chef Becky Selengut shows how simple it is to create a mouthwatering meal using wild prawns, pasta, goat cheese, capers, olives and herbs.">
+        	                <img src="/assets/images/linguine-prawns-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">	
+    	                Pasta with Wild Spot Prawns
+    	            </div>
+    	        </div>
+    	       <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="#" class="tooltip-v tooltipstered youtube-item" data-video-id="vss-fcG5xyU"  data-tooltip-title="Lemon Vinaigrette Salad Dressing" data-tooltip-body="Make your salads come to life with Chef Becky Selengut&#8217;s simple recipe for a classic vinaigrette with fresh lemons, white balsamic and organic olive oil.">
+        	                <img src="/assets/images/vinaigrette-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">	
+    	                Lemon Vinaigrette Salad Dressing
+    	            </div>
+    	        </div>
+    	        
+    	        <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="#" class="tooltip-v tooltipstered youtube-item" data-video-id="3d587pEY2EI"  data-tooltip-title="Canned Wild Sockeye Salad" data-tooltip-body="Without Chef Becky Selengut&#8217;s easy-to-follow recipe, we might never know how simple it is to prepare such a nutrient-rich, wild salmon pasta salad.">
+        	                <img src="/assets/images/salmon-pasta-salad-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">	
+    	                Canned Wild Sockeye Salad
+    	            </div>
+    	        </div>
+    	       <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="#" class="tooltip-v tooltipstered youtube-item" data-video-id="v6IimKHX0_k"  data-tooltip-title="Wild Albacore Tuna Salad" data-tooltip-body="Using wild Pacific albacore tuna loin medallions, Chef Becky Selengut takes us through the simple process of preparing a classic French favorite.">
+        	                <img src="/assets/images/tuna-nicoise-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">	
+    	                Wild Albacore Tuna Salad
+    	            </div>
+    	        </div>
+    	       <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="#" class="tooltip-v tooltipstered youtube-item" data-video-id="bPYQNNLYePw"  data-tooltip-title="Oat Fruit Nut Granola" data-tooltip-body="Why buy store-bought when even-more delicious and nutritious granola is as simple as this mixing and baking method by Chef Becky Selengut.">
+        	                <img src="/assets/images/granola-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">	
+    	                Oat Fruit Nut Granola
+    	            </div>
+    	        </div>
+    	       <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="#" class="tooltip-v tooltipstered youtube-item" data-video-id="vCsRTamxWuw"  data-tooltip-title="An interview with Chef Becky Selengut" data-tooltip-body="A peak into Chef Becky Selengut&#8217;s passion for good fish and her  philosophy of standing back and letting the flavor of good fish shine.">
+        	                <img src="/assets/images/becky-interview-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">	
+    	                An interview with Chef Becky Selengut
+    	            </div>
+    	        </div>
+    	    </div>
+    	    <div class="clear"></div>
+        </div>
+	</div>
+}}
+%>'
+           ,'<p>empty</p>'
+           ,'Vital Choice - In The Kitchen'
+           ,NULL
+           ,NULL)
+
+SET @contentItemId=@@identity
+
+INSERT INTO [dbo].[ContentPages]
+           ([Url]
+           ,[Name]
+           ,[FileUrl]
+           ,[ContentItemId]
+           ,[MasterContentItemId]
+           ,[StatusCode]
+           ,[Assigned]
+           ,[UserId])
+     VALUES
+           ('in-the-kitchen'
+           ,'Vital Choice - In The Kitchen'
+           ,NULL
+           ,@contentItemId
+           ,(SELECT Id FROM MasterContentItems WHERE Name='Content Individual with Recipe Categories')
+           ,2
+           ,1
+           ,NULL)
+
+END
+
+GO
