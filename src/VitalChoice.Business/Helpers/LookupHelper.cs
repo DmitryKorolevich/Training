@@ -312,6 +312,18 @@ namespace VitalChoice.Business.Helpers
             return toReturn;
         }
 
+        public static IList<LookupItem<int?>> GetDateStatuses()
+        {
+            IList<LookupItem<int?>> toReturn = new List<LookupItem<int?>>
+            {
+                new LookupItem<int?>() {Key = (int?) null, Text="All" },
+                new LookupItem<int?>() {Key = (int?) DateStatus.Live, Text="Live" },
+                new LookupItem<int?>() {Key = (int?) DateStatus.Future, Text="Future" },
+                new LookupItem<int?>() {Key = (int?) DateStatus.Expired, Text="Expired" },
+            };
+            return toReturn;
+        }
+
         public static string GetOrderStatusName(OrderStatus type)
         {
             string toReturn = null;

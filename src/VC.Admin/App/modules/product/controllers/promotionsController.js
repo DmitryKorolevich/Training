@@ -53,7 +53,7 @@
                 Status: null,
                 ValidFrom: null,
                 ValidTo: null,
-                ExpiredType: null,
+                DateStatus: null,
                 Paging: { PageIndex: 1, PageItemCount: 100 },
                 Sorting: gridSorterUtil.resolve(refreshPromotions, "DateCreated", "Desc")
             };

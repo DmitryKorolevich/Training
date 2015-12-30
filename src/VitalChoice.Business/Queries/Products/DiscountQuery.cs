@@ -87,5 +87,27 @@ namespace VitalChoice.Business.Queries.Products
             }
             return this;
         }
+
+        public DiscountQuery WithDateStatus(DateStatus? dateStatus)
+        {
+            if (dateStatus.HasValue)
+            {
+                DateTime now = DateTime.Now;
+                DateTime dateBefore = now.AddDays(-1);//Discount is valid the entire end date
+                if (dateStatus.Value == DateStatus.Expired)
+                {
+                    Add(x => x.ExpirationDate <= dateBefore);
+                }
+                if (dateStatus.Value == DateStatus.Live)
+                {
+                    Add(x => x.ExpirationDate > dateBefore && now>=x.StartDate);
+                }
+                if (dateStatus.Value == DateStatus.Future)
+                {
+                    Add(x => now < x.StartDate);
+                }
+            }
+            return this;
+        }
     }
 }

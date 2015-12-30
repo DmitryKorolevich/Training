@@ -13,6 +13,6 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Products
 
         public DateTime? ValidTo { get; set; }
 
-        public ExpiredType? ExpiredType { get; set; }
+        public DateStatus? DateStatus { get; set; }
     }
 }
