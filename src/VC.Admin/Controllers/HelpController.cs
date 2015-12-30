@@ -65,7 +65,7 @@ namespace VC.Admin.Controllers
                 return new HelpTicketManageModel(null)
                 {
                     StatusCode = RecordStatusCode.Active,
-                    Priority = TicketPriority.Medium,
+                    Priority = TicketPriority.Low,
                 };
             }
 
@@ -169,7 +169,7 @@ namespace VC.Admin.Controllers
                 {
                     PublicId= Guid.NewGuid(),
                     StatusCode = RecordStatusCode.Active,
-                    Priority = TicketPriority.Medium,
+                    Priority = TicketPriority.Low,
                     IsAllowEdit=true,
                     Comments = new List<BugTicketCommentManageModel>(),
                     Files = new List<FileModel>(),

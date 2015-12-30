@@ -87,5 +87,14 @@ namespace VitalChoice.Business.Queries.Orders
             }
             return this;
         }
+
+        public VOrderQuery WithId(string idString)
+        {
+            if (!String.IsNullOrEmpty(idString))
+            {
+                Add(x => x.IdString.Contains(idString));
+            }
+            return this;
+        }
     }
 }

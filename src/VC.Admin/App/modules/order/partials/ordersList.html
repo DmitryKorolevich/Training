@@ -5,6 +5,14 @@
             <fieldset>
                 <div class="row form-group">
                     <div class="col-md-2">
+                        <input type="text" name="IdString" class="form-control" placeholder="Order #" data-ng-model="filter.IdString" autocomplete="off" data-ng-minlength="3">
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.IdString.$invalid">
+                            <small class="error" ng-show="forms.form.IdString.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Order #")}}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-2">
                         <p class="input-group">
                             <input type="text" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
                             <span class="input-group-btn">

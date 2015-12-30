@@ -551,6 +551,7 @@ namespace VitalChoice.Business.Services.Orders
             }
             conditions = conditions.WithOrderStatus(filter.OrderStatus)
                 .WithoutIncomplete(filter.OrderStatus)
+                .WithId(filter.IdString)//TODO - should be redone after adding - https://github.com/aspnet/EntityFramework/issues/2850
                 .WithOrderSource(filter.IdOrderSource)
                 .WithPOrderType(filter.POrderType)
                 .WithCustomerType(filter.IdCustomerType).WithShippingMethod(filter.IdShippingMethod);
