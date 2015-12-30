@@ -9,10 +9,6 @@ namespace VitalChoice.Caching.Interfaces
     public interface IInternalEntityCacheFactory
     {
         IInternalEntityCache GetCache(Type entityType);
-        IInternalEntityCollectionCache GetCollectionCache(Type entityType);
-        IInternalEntityCache<T> GetCache<T>() 
-            where T : Entity;
-        IInternalEntityCollectionCache<T> GetCollectionCache<T>() 
-            where T : Entity;
+        IInternalEntityCache<T> GetCache<T>();
     }
 }

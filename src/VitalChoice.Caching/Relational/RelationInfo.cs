@@ -7,6 +7,21 @@ namespace VitalChoice.Caching.Relational
 {
     public class RelationInfo : IEquatable<RelationInfo>
     {
+        public string Name { get; }
+        public Type ParentEntityType { get; }
+        public Type RelationEntityType { get; }
+        internal Dictionary<RelationCacheInfo, RelationInfo> RelationsDict { get; set; }
+        public ICollection<RelationInfo> Relations => RelationsDict.Values;
+
+        public RelationInfo(string name, Type relatedType, Type ownedType, IEnumerable<RelationInfo> subRelations = null)
+        {
+            ParentEntityType = ownedType;
+            RelationEntityType = relatedType;
+            Name = name;
+            RelationsDict = subRelations?.ToDictionary(r => new RelationCacheInfo(r.Name, r.RelationEntityType, r.RelationEntityType)) ??
+                            new Dictionary<RelationCacheInfo, RelationInfo>();
+        }
+
         public bool Equals(RelationInfo other)
         {
             if (ReferenceEquals(null, other)) return false;
@@ -73,7 +88,8 @@ namespace VitalChoice.Caching.Relational
         {
             unchecked
             {
-                return (Name.GetHashCode()*397) ^ RelationEntityType.GetHashCode();
+                return Relations.Aggregate((Name.GetHashCode()*397) ^ RelationEntityType.GetHashCode(),
+                    (current, next) => (current*397) ^ next.GetHashCode());
             }
         }
 
@@ -100,19 +116,6 @@ namespace VitalChoice.Caching.Relational
         {
             return left?.LessThanOrEqualTo(right) ?? false;
         }
-
-        public RelationInfo(string name, Type relatedType, Type ownedType)
-        {
-            ParentEntityType = ownedType;
-            RelationEntityType = relatedType;
-            Name = name;
-        }
-
-        public string Name { get; }
-        public Type ParentEntityType { get; }
-        public Type RelationEntityType { get; }
-        internal Dictionary<RelationCacheInfo, RelationInfo> RelationsDict { get; set; } = new Dictionary<RelationCacheInfo, RelationInfo>();
-        public ICollection<RelationInfo> Relations => RelationsDict.Values;
 
     }
 }

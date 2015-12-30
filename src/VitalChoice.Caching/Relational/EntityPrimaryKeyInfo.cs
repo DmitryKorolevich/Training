@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace VitalChoice.Caching.Relational
 {
-    internal class EntityPrimaryKeyInfo : IEquatable<EntityPrimaryKeyInfo>
+    public class EntityPrimaryKeyInfo : IEquatable<EntityPrimaryKeyInfo>
     {
         public bool Equals(EntityPrimaryKeyInfo other)
         {
@@ -31,7 +31,7 @@ namespace VitalChoice.Caching.Relational
 
         public override int GetHashCode()
         {
-            return _keyInfo.Aggregate(0, (current, indexInfo) => current * 397 ^ indexInfo.GetHashCode());
+            return _keyInfo.Aggregate(0, (current, indexInfo) => (current * 397) ^ indexInfo.GetHashCode());
         }
 
         public static bool operator ==(EntityPrimaryKeyInfo left, EntityPrimaryKeyInfo right)
@@ -45,11 +45,13 @@ namespace VitalChoice.Caching.Relational
         }
 
         private readonly HashSet<EntityKeyInfo> _keyInfo;
+        public IDictionary<string, EntityKeyInfo> KeyInfoFields { get; }
 
-        public EntityPrimaryKeyInfo(IEnumerable<EntityKeyInfo> indexInfo)
+        public EntityPrimaryKeyInfo(IEnumerable<EntityKeyInfo> keyInfos)
         {
-            if (indexInfo == null) throw new ArgumentNullException(nameof(indexInfo));
-            _keyInfo = new HashSet<EntityKeyInfo>(indexInfo);
+            if (keyInfos == null) throw new ArgumentNullException(nameof(keyInfos));
+            _keyInfo = new HashSet<EntityKeyInfo>(keyInfos);
+            KeyInfoFields = _keyInfo.ToDictionary(k => k.Name);
         }
 
         public ICollection<EntityKeyInfo> KeyInfo => _keyInfo;

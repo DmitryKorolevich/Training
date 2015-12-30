@@ -30,7 +30,7 @@ namespace VitalChoice.Caching.Relational
 
         public override int GetHashCode()
         {
-            return _indexInfo.Aggregate(0, (current, indexInfo) => current*397 ^ indexInfo.GetHashCode());
+            return _indexInfo.Aggregate(0, (current, indexInfo) => (current*397) ^ indexInfo.GetHashCode());
         }
 
         public static bool operator ==(EntityUniqueIndexInfo left, EntityUniqueIndexInfo right)

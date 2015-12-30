@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using VitalChoice.Caching.Expressions.Analyzers;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Ecommerce.Domain;
 
@@ -12,12 +13,14 @@ namespace VitalChoice.Caching.Services.Cache
         where T : Entity
     {
         private readonly IInternalEntityCache<T> _internalCache;
-        private readonly IInternalEntityCollectionCache<T> _internalFullCollectionCache;
+        private readonly PrimaryKeyAnalyzer<T> _primaryKeyAnalyzer;
+        private readonly IndexAnalyzer<T> _indexAnalyzer;
 
-        public EntityCache(IInternalEntityCacheFactory cacheFactory)
+        public EntityCache(IInternalEntityCacheFactory cacheFactory, IInternalEntityInfoStorage entityInfoStorage)
         {
+            _primaryKeyAnalyzer = new PrimaryKeyAnalyzer<T>(entityInfoStorage);
+            _indexAnalyzer = new IndexAnalyzer<T>(entityInfoStorage);
             _internalCache = cacheFactory.GetCache<T>();
-            _internalFullCollectionCache = cacheFactory.GetCollectionCache<T>();
         }
 
         public bool TryGetCached(IQueryable<T> query, out List<T> entities)

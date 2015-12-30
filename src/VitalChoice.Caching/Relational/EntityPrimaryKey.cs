@@ -17,7 +17,7 @@ namespace VitalChoice.Caching.Relational
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            
+
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var entityKey in _keys)
             {
@@ -45,7 +45,7 @@ namespace VitalChoice.Caching.Relational
         {
             unchecked
             {
-                return _keys.Aggregate(0, (current, entityKey) => current*397 ^ entityKey.Value.GetHashCode());
+                return _keys.Aggregate(0, (current, entityKey) => (current*397) ^ entityKey.Value.GetHashCode());
             }
         }
 

@@ -12,9 +12,6 @@ namespace VitalChoice.Caching.Services
         private readonly IInternalEntityInfoStorage _keyStorage;
         private readonly ITypeConverter _typeConverter;
 
-        private readonly Dictionary<Type, IInternalEntityCollectionCache> _collectionCaches =
-            new Dictionary<Type, IInternalEntityCollectionCache>();
-
         private readonly Dictionary<Type, IInternalEntityCache> _entityCaches = new Dictionary<Type, IInternalEntityCache>();
 
         public InternalEntityCacheFactory(IInternalEntityInfoStorage keyStorage, ITypeConverter typeConverter)
@@ -34,37 +31,16 @@ namespace VitalChoice.Caching.Services
                 }
                 result =
                     (IInternalEntityCache)
-                        Activator.CreateInstance(typeof (EntityInternalCache<>).MakeGenericType(entityType), _keyStorage, this, _typeConverter);
+                        Activator.CreateInstance(typeof (EntityInternalCache<>).MakeGenericType(entityType), _keyStorage, this,
+                            _typeConverter);
                 _entityCaches.Add(entityType, result);
             }
             return result;
         }
 
-        public IInternalEntityCollectionCache GetCollectionCache(Type entityType)
+        public IInternalEntityCache<T> GetCache<T>()
         {
-            IInternalEntityCollectionCache result;
-            lock (_collectionCaches)
-            {
-                if (_collectionCaches.TryGetValue(entityType, out result))
-                {
-                    return result;
-                }
-                result =
-                    (IInternalEntityCollectionCache)
-                        Activator.CreateInstance(typeof (EntityInternalCollectionCache<>).MakeGenericType(entityType), _keyStorage, this, _typeConverter);
-                _collectionCaches.Add(entityType, result);
-            }
-            return result;
-        }
-
-        public IInternalEntityCache<T> GetCache<T>() where T : Entity
-        {
-            return (IInternalEntityCache<T>) GetCache(typeof (T));
-        }
-
-        public IInternalEntityCollectionCache<T> GetCollectionCache<T>() where T : Entity
-        {
-            return (IInternalEntityCollectionCache<T>) GetCollectionCache(typeof (T));
+            return new EntityInternalCache<T>(_keyStorage, this, _typeConverter);
         }
     }
 }

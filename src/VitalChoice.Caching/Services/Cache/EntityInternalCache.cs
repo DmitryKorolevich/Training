@@ -13,43 +13,55 @@ using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Caching.Services.Cache
 {
-    internal class EntityInternalCache<T> : IInternalEntityCache<T> where T : Entity
+    public class EntityInternalCache<T> : IInternalEntityCache<T>
     {
         protected readonly IInternalEntityInfoStorage KeyStorage;
         protected readonly IInternalEntityCacheFactory CacheFactory;
         private readonly ITypeConverter _typeConverter;
 
-        protected readonly ConcurrentDictionary<EntityPrimaryKey, CachedEntity> EntityDictionary = new ConcurrentDictionary<EntityPrimaryKey, CachedEntity>();
-        protected readonly ConcurrentDictionary<EntityPrimaryKey, EntityUniqueIndex[]> PrimaryToIndexes = new ConcurrentDictionary<EntityPrimaryKey, EntityUniqueIndex[]>();
-        protected readonly Dictionary<EntityUniqueIndexInfo, ConcurrentDictionary<EntityUniqueIndex, CachedEntity>> IndexedDictionary;
+        protected readonly CacheStorage<T> CacheStorage;
 
-        public EntityInternalCache(IInternalEntityInfoStorage keyStorage, IInternalEntityCacheFactory cacheFactory, ITypeConverter typeConverter)
+        public EntityInternalCache(IInternalEntityInfoStorage keyStorage, IInternalEntityCacheFactory cacheFactory,
+            ITypeConverter typeConverter)
         {
             KeyStorage = keyStorage;
             CacheFactory = cacheFactory;
+            CacheStorage = new CacheStorage<T>(keyStorage);
             _typeConverter = typeConverter;
-            IndexedDictionary = new Dictionary<EntityUniqueIndexInfo, ConcurrentDictionary<EntityUniqueIndex, CachedEntity>>();
-            foreach (var indexInfo in keyStorage.GetIndexInfos<T>())
-            {
-                IndexedDictionary.Add(indexInfo, new ConcurrentDictionary<EntityUniqueIndex, CachedEntity>());
-            }
         }
 
-        public bool TryGetEntity(EntityPrimaryKey primaryKey, out T entity)
+        public bool TryGetEntity(EntityPrimaryKeySearchInfo searchInfo, out T entity)
         {
-            CachedEntity cached;
-            var result = EntityDictionary.TryGetValue(primaryKey, out cached);
+            CachedEntity<T> cached;
+            var data = CacheStorage.GetCacheData(searchInfo.RelationInfo);
+            var result = data.EntityDictionary.TryGetValue(searchInfo.PrimaryKey, out cached);
             entity = cached;
             return result;
         }
 
-        public bool TryGetEntities(EntityPrimaryKey[] primaryKeys, out List<T> entities)
+        public bool TryGetEntities(EntityPrimaryKeySearchInfo[] searchInfos, out List<T> entities)
+        {
+            entities = new List<T>(searchInfos.Length);
+            foreach (var key in searchInfos)
+            {
+                T cached;
+                if (!TryGetEntity(key, out cached))
+                {
+                    return false;
+                }
+                entities.Add(cached);
+            }
+            return true;
+        }
+
+        public bool TryGetEntities(EntityPrimaryKey[] primaryKeys, RelationInfo relations, out List<T> entities)
         {
             entities = new List<T>(primaryKeys.Length);
+            var data = CacheStorage.GetCacheData(relations);
             foreach (var key in primaryKeys)
             {
-                CachedEntity cached;
-                if (!EntityDictionary.TryGetValue(key, out cached))
+                CachedEntity<T> cached;
+                if (!data.EntityDictionary.TryGetValue(key, out cached))
                 {
                     return false;
                 }
@@ -58,21 +70,22 @@ namespace VitalChoice.Caching.Services.Cache
             return true;
         }
 
-        public bool TryGetEntity(EntityUniqueIndex uniqueIndex, out T entity)
+        public bool TryGetEntity(EntityUniqueIndexSearchInfo searchInfo, out T entity)
         {
-            CachedEntity cached;
-            var result = IndexedDictionary[uniqueIndex.IndexInfo].TryGetValue(uniqueIndex, out cached);
+            CachedEntity<T> cached;
+            var data = CacheStorage.GetCacheData(searchInfo.RelationInfo);
+            var result = data.IndexedDictionary[searchInfo.UniqueIndex.IndexInfo].TryGetValue(searchInfo.UniqueIndex, out cached);
             entity = cached;
             return result;
         }
 
-        public bool TryGetEntities(EntityUniqueIndex[] uniqueIndexes, out List<T> entities)
+        public bool TryGetEntities(EntityUniqueIndexSearchInfo[] searchInfos, out List<T> entities)
         {
-            entities = new List<T>(uniqueIndexes.Length);
-            foreach (var index in uniqueIndexes)
+            entities = new List<T>(searchInfos.Length);
+            foreach (var key in searchInfos)
             {
-                CachedEntity cached;
-                if (!IndexedDictionary[index.IndexInfo].TryGetValue(index, out cached))
+                T cached;
+                if (!TryGetEntity(key, out cached))
                 {
                     return false;
                 }
@@ -81,164 +94,201 @@ namespace VitalChoice.Caching.Services.Cache
             return true;
         }
 
-        public List<T> GetWhere(Func<T, bool> whereFunc)
+        public bool TryGetEntities(EntityUniqueIndex[] indexes, RelationInfo relations, out List<T> entities)
         {
-            return EntityDictionary.Values.Where(cached => whereFunc(cached)).Select(cached => cached.Entity).ToList();
+            entities = new List<T>(indexes.Length);
+            var data = CacheStorage.GetCacheData(relations);
+            foreach (var index in indexes)
+            {
+                CachedEntity<T> cached;
+                if (!data.IndexedDictionary[index.IndexInfo].TryGetValue(index, out cached))
+                {
+                    return false;
+                }
+                entities.Add(cached);
+            }
+            return true;
         }
 
-        public List<T> GetWhere(Expression<Func<T, bool>> whereExpression)
+        public IEnumerable<T> GetWhere(RelationInfo relations, Func<T, bool> whereFunc)
+        {
+            var data = CacheStorage.GetCacheData(relations);
+            return data.EntityDictionary.Values.Where(cached => whereFunc(cached)).Select(cached => cached.Entity);
+        }
+
+        public IEnumerable<T> GetWhere(RelationInfo relations, Expression<Func<T, bool>> whereExpression)
         {
             var whereFunc = whereExpression.CacheCompile();
-            return GetWhere(whereFunc);
+            return GetWhere(relations, whereFunc);
         }
 
-        public List<T> GetAll()
+        public IEnumerable<T> GetAll(RelationInfo relations)
         {
-            return EntityDictionary.Values.Select(cached => cached.Entity).ToList();
+            var data = CacheStorage.GetCacheData(relations);
+            return data.EntityDictionary.Values.Select(cached => cached.Entity);
         }
 
-        public bool TryRemove(T entity)
+        public bool TryRemove(T entity, out List<T> removedList)
         {
-            CachedEntity removed;
-            EntityUniqueIndex[] indexValues;
-
-            var pk = KeyStorage.GetPrimaryKeyValue(entity);
-            var result = EntityDictionary.TryRemove(pk, out removed);
-            if (result && PrimaryToIndexes.TryGetValue(pk, out indexValues))
+            CachedEntity<T> removed;
+            var pk = CacheStorage.GetPrimaryKeyValue(entity);
+            var datas = CacheStorage.AllCacheDatas;
+            var result = true;
+            removedList = new List<T>(datas.Count);
+            foreach (var data in datas)
             {
-                result = indexValues.Aggregate(true,
-                    (current, indexValue) => current & IndexedDictionary[indexValue.IndexInfo].TryRemove(indexValue, out removed));
+                result = result & data.EntityDictionary.TryRemove(pk, out removed);
+                removedList.Add(removed);
+                EntityUniqueIndex[] indexValues;
+                if (result && data.PrimaryToIndexes.TryGetValue(pk, out indexValues))
+                {
+                    result = indexValues.Aggregate(true,
+                        (current, indexValue) => current & data.IndexedDictionary[indexValue.IndexInfo].TryRemove(indexValue, out removed));
+                }
             }
             return result;
         }
 
-        public bool TryRemove(IEnumerable<T> entities)
+        public void Update(IEnumerable<T> entities, RelationInfo relationInfo)
         {
-            return entities.Aggregate(true, (current, entity) => current && TryRemove(entity));
-        }
-
-        public bool TryRemoveTree(T entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool TryRemoveTree(IEnumerable<T> entities)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update(IEnumerable<T> entities, ICollection<RelationInfo> relations)
-        {
+            var data = CacheStorage.GetCacheData(relationInfo);
             foreach (var entity in entities)
             {
-                Update(entity, relations);
+                var pk = CacheStorage.GetPrimaryKeyValue(entity);
+                var indexValues = CacheStorage.GetIndexValues(entity).ToArray();
+                var cached = new CachedEntity<T>(entity, RelationProcessor.GetRelations(typeof (T), entity, relationInfo.Relations));
+                data.EntityDictionary.AddOrUpdate(pk, cached, (key, _) => UpdateExist(_, cached));
+                data.PrimaryToIndexes.AddOrUpdate(pk, indexValues, (key, _) => indexValues);
+
+                foreach (var indexValue in indexValues)
+                {
+                    data.IndexedDictionary[indexValue.IndexInfo].AddOrUpdate(indexValue, cached, (index, _) => UpdateExist(_, cached, false));
+                }
             }
         }
 
-        public void Update(T entity, ICollection<RelationInfo> relations)
+        public void Update(T entity, RelationInfo relationInfo)
         {
-            var pk = KeyStorage.GetPrimaryKeyValue(entity);
-            var indexValues = KeyStorage.GetIndexValues(entity).ToArray();
-            var cached = new CachedEntity(entity, RelationProcessor.GetRelations(typeof(T), entity, relations), relations);
+            var pk = CacheStorage.GetPrimaryKeyValue(entity);
+            var indexValues = CacheStorage.GetIndexValues(entity).ToArray();
+            var cached = new CachedEntity<T>(entity, RelationProcessor.GetRelations(typeof (T), entity, relationInfo.Relations));
+            var data = CacheStorage.GetCacheData(relationInfo);
+            data.EntityDictionary.AddOrUpdate(pk, cached, (key, _) => UpdateExist(_, cached));
+            data.PrimaryToIndexes.AddOrUpdate(pk, indexValues, (key, _) => indexValues);
 
-            EntityDictionary.AddOrUpdate(pk, cached, (key, _) => UpdateExist(_, cached));
-            PrimaryToIndexes.AddOrUpdate(pk, indexValues, (key, _) => indexValues);
             foreach (var indexValue in indexValues)
             {
-                IndexedDictionary[indexValue.IndexInfo].AddOrUpdate(indexValue, cached, (index, _) => UpdateExist(_, cached));
+                data.IndexedDictionary[indexValue.IndexInfo].AddOrUpdate(indexValue, cached, (index, _) => UpdateExist(_, cached, false));
             }
         }
 
-        private CachedEntity UpdateExist(CachedEntity exist, CachedEntity newEntity)
+        public void UpdateAll(IEnumerable<T> entities, RelationInfo relationInfo)
         {
-            if (exist.RelationsInfo <= newEntity.RelationsInfo)
+            var data = CacheStorage.GetCacheData(relationInfo);
+            lock (data)
             {
-                _typeConverter.CopyInto(exist.Entity, newEntity.Entity, typeof (T));
-                exist.Relations = newEntity.Relations;
-                exist.RelationsInfo = newEntity.RelationsInfo;
+                data.EntityDictionary.Clear();
+                data.PrimaryToIndexes.Clear();
+                foreach (var indexed in data.IndexedDictionary.Values)
+                {
+                    indexed.Clear();
+                }
+                Update(entities, relationInfo);
             }
-            else
+        }
+
+        private CachedEntity<T> UpdateExist(CachedEntity<T> exist, CachedEntity<T> newEntity, bool updateEntireTree = true)
+        {
+            _typeConverter.CopyInto(exist.Entity, newEntity.Entity, typeof (T));
+            exist.Relations = newEntity.Relations;
+
+            if (!updateEntireTree)
+                return exist;
+
+            foreach (var relationInstance in exist.Relations)
             {
-                throw new InvalidOperationException("Cache update bucket is smaller than cached entity");
+                var cache = CacheFactory.GetCache(relationInstance.RelationObjectType);
+                cache.Update(relationInstance.RelatedObject, relationInstance.RelationInfo);
             }
             return exist;
         }
 
-        public bool TryGetEntity(EntityPrimaryKey primaryKey, out object entity)
+        public bool TryGetEntity(EntityPrimaryKeySearchInfo searchInfo, out object entity)
         {
             T resultEntity;
-            var result = TryGetEntity(primaryKey, out resultEntity);
+            var result = TryGetEntity(searchInfo, out resultEntity);
             entity = resultEntity;
             return result;
         }
 
-        public bool TryGetEntities(EntityPrimaryKey[] primaryKeys, out List<object> entity)
+        public bool TryGetEntities(EntityPrimaryKeySearchInfo[] searchInfos, out List<object> entities)
         {
-            throw new NotImplementedException();
+            List<T> results;
+            var result = TryGetEntities(searchInfos, out results);
+            entities = results.Cast<object>().ToList();
+            return result;
         }
 
-        public bool TryGetEntity(EntityUniqueIndex uniqueIndex, out object entity)
+        public bool TryGetEntities(EntityPrimaryKey[] primaryKeys, RelationInfo relations, out List<object> entities)
         {
-            throw new NotImplementedException();
+            List<T> results;
+            var result = TryGetEntities(primaryKeys, relations, out results);
+            entities = results.Cast<object>().ToList();
+            return result;
         }
 
-        public bool TryGetEntities(EntityUniqueIndex[] uniqueIndexes, out List<object> entity)
+        public bool TryGetEntity(EntityUniqueIndexSearchInfo uniqueIndex, out object entity)
         {
-            throw new NotImplementedException();
+            T entityTyped;
+            var result = TryGetEntity(uniqueIndex, out entityTyped);
+            entity = entityTyped;
+            return result;
         }
 
-        public bool TryRemove(object entity)
+        public bool TryGetEntities(EntityUniqueIndexSearchInfo[] uniqueIndexes, out List<object> entities)
         {
-            return TryRemove((T) entity);
+            List<T> results;
+            var result = TryGetEntities(uniqueIndexes, out results);
+            entities = results.Cast<object>().ToList();
+            return result;
         }
 
-        public bool TryRemove(IEnumerable<object> entities)
+        public bool TryGetEntities(EntityUniqueIndex[] indexes, RelationInfo relations, out List<object> entities)
         {
-            return TryRemove(entities.Cast<T>());
+            List<T> results;
+            var result = TryGetEntities(indexes, relations, out results);
+            entities = results.Cast<object>().ToList();
+            return result;
         }
 
-        public bool TryRemoveTree(object entity)
+        public void Update(IEnumerable<object> entities, RelationInfo relationInfo)
         {
-            return TryRemoveTree((T) entity);
+            Update(entities.Cast<T>(), relationInfo);
         }
 
-        public bool TryRemoveTree(IEnumerable<object> entities)
+        public void Update(object entity, RelationInfo relationInfo)
         {
-            return TryRemoveTree(entities.Cast<T>());
+            Update((T) entity, relationInfo);
         }
 
-        public void Update(IEnumerable<object> entities, ICollection<RelationInfo> relations)
+        public void UpdateAll(IEnumerable<object> entities, RelationInfo relationInfo)
         {
-            Update(entities.Cast<T>(), relations);
-        }
-
-        public void Update(object entity, ICollection<RelationInfo> relations)
-        {
-            Update((T) entity, relations);
-        }
-
-        public bool Empty => EntityDictionary.Count == 0;
-
-        protected class CachedEntity
-        {
-            public CachedEntity(T entity, ICollection<RelationInstance> relations, ICollection<RelationInfo> relationsInfo)
+            var data = CacheStorage.GetCacheData(relationInfo);
+            lock (data)
             {
-                Relations = relations;
-                RelationsInfo = new RelationInfo(string.Empty, typeof (T), typeof (T))
+                data.EntityDictionary.Clear();
+                data.PrimaryToIndexes.Clear();
+                foreach (var indexed in data.IndexedDictionary.Values)
                 {
-                    RelationsDict = relationsInfo.ToDictionary(r => new RelationCacheInfo(r.Name, r.RelationEntityType, r.ParentEntityType))
-                };
-                Entity = entity;
+                    indexed.Clear();
+                }
+                Update(entities, relationInfo);
             }
+        }
 
-            public T Entity { get; set; }
-            public ICollection<RelationInstance> Relations { get; set; }
-            public RelationInfo RelationsInfo { get; set; }
-
-            public static implicit operator T(CachedEntity cached)
-            {
-                return cached.Entity;
-            }
+        public bool GetCacheExist(RelationInfo relationInfo)
+        {
+            return CacheStorage.GetCacheExist(relationInfo);
         }
     }
 }

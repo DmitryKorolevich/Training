@@ -34,7 +34,7 @@ namespace VitalChoice.Caching.Services
                         indexes.Select(
                             index =>
                                 new EntityUniqueIndexInfo(
-                                    index.Properties.Select(property => new EntityIndexInfo(property.Name, property.GetGetter()))))
+                                    index.Properties.Select(property => new EntityIndexInfo(property.Name, property.GetGetter(), property.ClrType))))
                             .ToArray();
 
                     _entityInfos.Add(entityType.ClrType, new EntityInfo
@@ -47,18 +47,6 @@ namespace VitalChoice.Caching.Services
         }
 
         private readonly Dictionary<Type, EntityInfo> _entityInfos = new Dictionary<Type, EntityInfo>();
-
-        public EntityPrimaryKey GetPrimaryKeyValue<T>(T entity)
-        {
-            EntityInfo entityInfo;
-            if (_entityInfos.TryGetValue(typeof (T), out entityInfo))
-            {
-                var keyValues =
-                    entityInfo.PrimaryKey.KeyInfo.Select(keyInfo => new EntityKeyValue(keyInfo, keyInfo.Property.GetClrValue(entity)));
-                return new EntityPrimaryKey(keyValues);
-            }
-            return null;
-        }
 
         public EntityPrimaryKeyInfo GetPrimaryKeyInfo<T>()
         {
@@ -78,19 +66,6 @@ namespace VitalChoice.Caching.Services
                 return entityInfo.UniqueIndexes;
             }
             return new EntityUniqueIndexInfo[0];
-        }
-
-        public IEnumerable<EntityUniqueIndex> GetIndexValues<T>(T entity)
-        {
-            EntityInfo entityInfo;
-            if (_entityInfos.TryGetValue(typeof (T), out entityInfo))
-            {
-                foreach (var indexInfo in entityInfo.UniqueIndexes.Select(u => u.IndexInfo))
-                {
-                    var indexValues = indexInfo.Select(info => new EntityIndexValue(info, info.Property.GetClrValue(entity)));
-                    yield return new EntityUniqueIndex(indexValues);
-                }
-            }
         }
     }
 }

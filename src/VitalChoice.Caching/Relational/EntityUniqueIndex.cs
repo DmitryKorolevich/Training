@@ -31,7 +31,7 @@ namespace VitalChoice.Caching.Relational
                     return false;
                 }
             }
-            return true;
+            return base.Equals(other);
         }
 
         public override bool Equals(object obj)
@@ -48,7 +48,7 @@ namespace VitalChoice.Caching.Relational
         {
             unchecked
             {
-                return _indexValues.Aggregate(0, (current, indexValue) => current * 397 ^ indexValue.Value.GetHashCode());
+                return _indexValues.Aggregate(0, (current, indexValue) => (current*397) ^ indexValue.Value.GetHashCode());
             }
         }
 
