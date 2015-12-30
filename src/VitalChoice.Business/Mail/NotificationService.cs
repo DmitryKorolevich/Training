@@ -10,12 +10,14 @@ namespace VitalChoice.Business.Mail
 	    private readonly IEmailSender emailSender;
         private static string _mainSuperAdminEmail;
         private static string _adminHost;
+        private static string _publicHost;
 
         public NotificationService(IEmailSender emailSender, IOptions<AppOptions> appOptions)
 	    {
 		    this.emailSender = emailSender;
             _mainSuperAdminEmail = appOptions.Value.MainSuperAdminEmail;
             _adminHost = appOptions.Value.AdminHost;
+            _publicHost = appOptions.Value.PublicHost;
         }
 
 	    public async Task SendAdminUserActivationAsync(string email, UserActivation activation)
@@ -54,7 +56,7 @@ namespace VitalChoice.Business.Mail
             //todo:refactor this to user nustache or something
 
             var body =
-                $"<p>Dear {helpTicketEmail.Customer},</p><p>Details regarding your help desk ticket that you submitted regarding order #{helpTicketEmail.IdOrder} has been updated. <a href=\"https://{_adminHost}/help/tickets/{helpTicketEmail.Id}\">Please click here to review</a> or log into your Vital Choice customer profile to review your help desk tickets.</p><br/>" +
+                $"<p>Dear {helpTicketEmail.Customer},</p><p>Details regarding your help desk ticket that you submitted regarding order #{helpTicketEmail.IdOrder} has been updated. <a href=\"https://{_publicHost}/profile/helpticket/{helpTicketEmail.Id}\">Please click here to review</a> or log into your Vital Choice customer profile to review your help desk tickets.</p><br/>" +
                 $"<p>Please note that this is an automated message and this mailbox is not monitored. To make changes to your help desk tickets please submit a reply within the help desk ticket system found within your customer profile.</p><br/>" +
                 $"<p>Sincerely,</p>" +
                 $"<p>Vital Choice</p>";
@@ -67,7 +69,7 @@ namespace VitalChoice.Business.Mail
         public async Task SendNewBugTicketAddingForSuperAdminAsync(BugTicketEmail bugTicketEmail)
         {
             var body =
-                $"<p>New bug ticket was added - https://{_adminHost}/help/bugs/{bugTicketEmail.Id}</p>";
+                $"<p>New bug ticket was added - https://{_adminHost}/help/bugs/tickets/{bugTicketEmail.Id}</p>";
 
             var subject = $"Vital Choice - new bug ticket was added #{bugTicketEmail.Id}";
 
