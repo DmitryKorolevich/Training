@@ -465,13 +465,13 @@ namespace VC.Public.Controllers
             {
                 var lastOrder = await _orderService.SelectLastOrderAsync(customer.Id);
 
-                VProductSkuFilter filter = new VProductSkuFilter();
-                filter.Ids = lastOrder.Skus.Select(p => p.Sku.Id).ToList();
-                var skus = await _productService.GetSkusAsync(filter);
-
-                if (lastOrder != null)
+                if (lastOrder != null) 
                 {
-                    foreach(var skuOrdered in lastOrder.Skus)
+					VProductSkuFilter filter = new VProductSkuFilter();
+					filter.Ids = lastOrder.Skus.Select(p => p.Sku.Id).ToList();
+					var skus = await _productService.GetSkusAsync(filter);
+
+					foreach (var skuOrdered in lastOrder.Skus)
                     {
                         var skuInDB = skus.FirstOrDefault(p => p.SkuId == skuOrdered.Sku.Id);
 

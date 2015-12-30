@@ -37,6 +37,7 @@ using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 using VitalChoice.Infrastructure.Domain.Transfer.Settings;
+using VitalChoice.Interfaces.Services.Payments;
 
 namespace VC.Admin.Controllers
 {
@@ -60,6 +61,7 @@ namespace VC.Admin.Controllers
 
 		private readonly ILogger logger;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
+        private readonly IPaymentMethodService _paymentMethodService;
 
         public CustomerController(ICustomerService customerService,
             IDynamicMapper<CustomerDynamic, Customer> customerMapper,
@@ -71,7 +73,7 @@ namespace VC.Admin.Controllers
             IOptions<AppOptions> appOptions,
             IAppInfrastructureService appInfrastructureService,
             IObjectHistoryLogService objectHistoryLogService,
-            ICsvExportService<ExtendedVCustomer, CustomersForAffiliatesCsvMap> csvExportCustomersForAffiliatesService)
+            ICsvExportService<ExtendedVCustomer, CustomersForAffiliatesCsvMap> csvExportCustomersForAffiliatesService, IPaymentMethodService paymentMethodService)
         {
             _customerService = customerService;
             _countryService = countryService;
@@ -87,6 +89,7 @@ namespace VC.Admin.Controllers
             _defaultCountry = appInfrastructureService.Get().DefaultCountry;
             _csvExportCustomersForAffiliatesService = csvExportCustomersForAffiliatesService;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
+	        _paymentMethodService = paymentMethodService;
         }
 
 	    [HttpGet]
@@ -133,8 +136,11 @@ namespace VC.Admin.Controllers
             model.ProfileAddress.Country = new CountryListItemModel(_defaultCountry);
             model.Shipping = new List<AddressModel>() { new AddressModel() { AddressType = AddressType.Shipping, Country = new CountryListItemModel(_defaultCountry) } };
             model.StatusCode = (int)CustomerStatus.NotActive;
-            model.ApprovedPaymentMethods = new List<int>() { 1 };//card
-            model.DefaultPaymentMethod = 1;//card
+
+	        var defaultPaymentMethodId = (await _paymentMethodService.GetStorefrontDefaultPaymentMethod()).Id;
+
+			model.ApprovedPaymentMethods = new List<int>() { defaultPaymentMethodId };
+            model.DefaultPaymentMethod = defaultPaymentMethodId; 
             return model;
         }
 

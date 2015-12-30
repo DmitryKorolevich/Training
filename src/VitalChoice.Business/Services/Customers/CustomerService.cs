@@ -23,6 +23,7 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.Data.Services;
 using DynamicExpressionVisitor = VitalChoice.DynamicData.Helpers.DynamicExpressionVisitor;
 using VitalChoice.Business.Queries.Affiliate;
+using VitalChoice.Business.Queries.Customers;
 using VitalChoice.Business.Repositories;
 using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Data.Extensions;
@@ -172,6 +173,18 @@ namespace VitalChoice.Business.Services.Customers
             {
                 
             }
+
+	        if (model.StatusCode == (int)CustomerStatus.NotActive && model.Id > 0)
+	        {
+				var exists =
+				await
+					_customerRepositoryAsync.Query(
+						new CustomerQuery().NotDeleted().WithId(model.Id).NotInActive()).SelectAnyAsync();
+		        if (exists)
+		        {
+					throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CustomerWasModified]);
+				}
+			}
 
 			return errors;
 		}
