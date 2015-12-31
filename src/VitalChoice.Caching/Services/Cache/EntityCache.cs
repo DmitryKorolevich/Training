@@ -35,32 +35,12 @@ namespace VitalChoice.Caching.Services.Cache
             throw new NotImplementedException();
         }
 
-        public CacheGetResult TryGetCached<T1>(IQueryable<T> query, Expression<Func<T, T1>> selector, out List<T1> results)
-        {
-            throw new NotImplementedException();
-        }
-
-        public CacheGetResult TryGetCachedFirstOrDefault<T1>(IQueryable<T> query, Expression<Func<T, T1>> selector, out T1 result)
-        {
-            throw new NotImplementedException();
-        }
-
         public void Update(IQueryable<T> query, ICollection<T> entities)
         {
             throw new NotImplementedException();
         }
 
         public void Update(IQueryable<T> query, T entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update<T1>(IQueryable<T> query, Expression<Func<T, T1>> selector, ICollection<T1> results)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update<T1>(IQueryable<T> query, Expression<Func<T, T1>> selector, T1 result)
         {
             throw new NotImplementedException();
         }

@@ -47,7 +47,12 @@ namespace VitalChoice.Caching.Services.Cache
 
         public bool GetCacheExist(RelationInfo relationInfo)
         {
-            return _cacheData.ContainsKey(relationInfo);
+            CacheData<T> data;
+            if (_cacheData.TryGetValue(relationInfo, out data))
+            {
+                return data.EntityDictionary.Count > 0;
+            }
+            return false;
         }
     }
 }
