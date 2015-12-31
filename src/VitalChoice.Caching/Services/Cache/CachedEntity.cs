@@ -1,36 +1,70 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using VitalChoice.Caching.Relational;
 
 namespace VitalChoice.Caching.Services.Cache
 {
-    public class CachedEntity<T>
+    public abstract class CachedEntity
     {
-        private DateTime _lastAccessTime = DateTime.Now;
-        private readonly T _entity;
+        protected DateTime LastAccess = DateTime.Now;
+        private readonly object _entity;
+        private bool _needUpdate;
 
-        public CachedEntity(T entity, ICollection<RelationInstance> relations)
+        protected CachedEntity(object entity, ICollection<RelationInstance> relations)
         {
             Relations = relations;
             _entity = entity;
         }
 
-        public DateTime LastAccessTime => _lastAccessTime;
+        public DateTime LastAccessTime => LastAccess;
+
+        public bool NeedUpdate
+        {
+            get { return _needUpdate || Relations.Any(r => r.RelatedObject.NeedUpdate); }
+            set { _needUpdate = value; }
+        }
+
+        public object EntityUntyped
+        {
+            get
+            {
+                lock (this)
+                {
+                    LastAccess = DateTime.Now;
+                    return _entity;
+                }
+            }
+        }
+
+        public ICollection<RelationInstance> Relations { get; set; }
+    }
+
+    public class CachedEntity<T> : CachedEntity
+    {
+        private readonly T _entity;
+
+        public CachedEntity(T entity, ICollection<RelationInstance> relations) : base(entity, relations)
+        {
+            Relations = relations;
+            _entity = entity;
+        }
 
         public T Entity
         {
             get
             {
-                _lastAccessTime = DateTime.Now;
-                return _entity;
+                lock (this)
+                {
+                    LastAccess = DateTime.Now;
+                    return _entity;
+                }
             }
         }
 
-        public ICollection<RelationInstance> Relations { get; set; }
-
         public static implicit operator T(CachedEntity<T> cached)
         {
-            return cached.Entity;
+            return cached != null ? cached.Entity : default(T);
         }
     }
 }

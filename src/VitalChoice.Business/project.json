@@ -22,7 +22,7 @@
   },
 
   "frameworks": {
-    "dnx451": {
+    "net451": {
       "frameworkAssemblies": {
         "System.ServiceModel": "4.0.0.0"
       }

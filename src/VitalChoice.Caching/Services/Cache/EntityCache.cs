@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.Data.Entity.ChangeTracking.Internal;
 using VitalChoice.Caching.Expressions.Analyzers;
+using VitalChoice.Caching.Expressions.Visitors;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Ecommerce.Domain;
 
@@ -23,22 +25,22 @@ namespace VitalChoice.Caching.Services.Cache
             _internalCache = cacheFactory.GetCache<T>();
         }
 
-        public bool TryGetCached(IQueryable<T> query, out List<T> entities)
+        public CacheGetResult TryGetCached(IQueryable<T> query, out List<T> entities)
         {
             throw new NotImplementedException();
         }
 
-        public bool TryGetCachedFirstOrDefault(IQueryable<T> query, out T entity)
+        public CacheGetResult TryGetCachedFirstOrDefault(IQueryable<T> query, out T entity)
         {
             throw new NotImplementedException();
         }
 
-        public bool TryGetCached<T1>(IQueryable<T> query, Expression<Func<T, T1>> selector, out List<T1> results)
+        public CacheGetResult TryGetCached<T1>(IQueryable<T> query, Expression<Func<T, T1>> selector, out List<T1> results)
         {
             throw new NotImplementedException();
         }
 
-        public bool TryGetCachedFirstOrDefault<T1>(IQueryable<T> query, Expression<Func<T, T1>> selector, out T1 result)
+        public CacheGetResult TryGetCachedFirstOrDefault<T1>(IQueryable<T> query, Expression<Func<T, T1>> selector, out T1 result)
         {
             throw new NotImplementedException();
         }

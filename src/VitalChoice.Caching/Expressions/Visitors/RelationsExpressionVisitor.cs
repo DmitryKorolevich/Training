@@ -50,11 +50,11 @@ namespace VitalChoice.Caching.Expressions.Visitors
                 if (_currentRelation == null)
                     throw new InvalidOperationException("ThenInclude used before Include, need investigation");
 
-                var searchKey = new RelationCacheInfo(name, relationType, _currentRelation.RelationEntityType);
+                var searchKey = new RelationCacheInfo(name, relationType, _currentRelation.RelationType);
                 RelationInfo newCurrent;
                 if (!_currentRelation.RelationsDict.TryGetValue(searchKey, out newCurrent))
                 {
-                    var relationInfo = new RelationInfo(name, relationType, _currentRelation.RelationEntityType);
+                    var relationInfo = new RelationInfo(name, relationType, _currentRelation.RelationType);
                     _currentRelation.RelationsDict.Add(searchKey, relationInfo);
                     newCurrent = relationInfo;
                 }

@@ -27,40 +27,7 @@ namespace VitalChoice.Caching.Services
                 entityType.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance)
                     .GetMethod.CompileAccessor<object, object>();
             AccessorsCache.AddOrUpdate(cacheKey, accessor, (item, func) => accessor);
-            return accessor(entityType);
-        }
-
-        public static ICollection<RelationInstance> GetRelations(Type entityType, object entity, ICollection<RelationInfo> relationsInfo)
-        {
-            var result = new List<RelationInstance>();
-
-            if (entity == null)
-                return result;
-
-            foreach (var relation in relationsInfo)
-            {
-                var relatedObject = GetRelatedObject(relation.ParentEntityType, relation.Name, entity);
-                if (relatedObject != null)
-                {
-                    if (relatedObject.GetType().TryGetElementType(typeof (ICollection<>)) != null)
-                    {
-                        // ReSharper disable once PossibleNullReferenceException
-                        // ReSharper disable once LoopCanBeConvertedToQuery
-                        foreach (var item in relatedObject as IEnumerable)
-                        {
-                            result.Add(new RelationInstance(entity, item, entityType,
-                                GetRelations(relation.RelationEntityType, item, relation.Relations), relation));
-                        }
-                    }
-                    else
-                    {
-                        result.Add(new RelationInstance(entity, relatedObject, entityType,
-                            GetRelations(relation.RelationEntityType, relatedObject, relation.Relations), relation));
-                    }
-                }
-            }
-
-            return result;
+            return accessor(entity);
         }
 
         private struct RelationCacheItem : IEquatable<RelationCacheItem>

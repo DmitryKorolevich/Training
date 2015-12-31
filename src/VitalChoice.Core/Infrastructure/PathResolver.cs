@@ -1,5 +1,4 @@
-﻿#if DNX451 || DOTNET5_4 || NET45
-using System.IO;
+﻿using System.IO;
 using Microsoft.Extensions.PlatformAbstractions;
 
 namespace VitalChoice.Core.Infrastructure
@@ -10,15 +9,10 @@ namespace VitalChoice.Core.Infrastructure
 		{
 			get
 			{
-#if DNX451 || DOTNET5_4
 				var locator = CallContextServiceLocator.Locator;
 
 				var appEnv = (IApplicationEnvironment)locator.ServiceProvider.GetService(typeof(IApplicationEnvironment));
 				return appEnv.ApplicationBasePath;
-
-#elif NET45
-                return AppDomain.CurrentDomain.BaseDirectory;
-#endif
 			}
 		}
 
@@ -28,4 +22,3 @@ namespace VitalChoice.Core.Infrastructure
 		}
 	}
 }
-#endif

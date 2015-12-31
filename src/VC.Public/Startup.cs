@@ -30,13 +30,9 @@ namespace VC.Public
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(applicationEnvironment.ApplicationBasePath)
                 .AddJsonFile("config.json")
+                .AddJsonFile("config.local.json", true)
                 .AddEnvironmentVariables();
 
-            var path = PathResolver.ResolveAppRelativePath("config.local.json");
-            if (File.Exists(path))
-            {
-                configuration.AddJsonFile("config.local.json");
-            }
             Configuration = configuration.Build();
 
             var reg = new StorefrontDependencyConfig();

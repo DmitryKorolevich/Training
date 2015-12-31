@@ -14,7 +14,7 @@
   },
 
   "frameworks": {
-    "dnx451": {
+    "net451": {
       "dependencies": {
         "WindowsAzure.ServiceBus": "3.0.9",
         "Microsoft.WindowsAzure.ConfigurationManager": "3.1.0",

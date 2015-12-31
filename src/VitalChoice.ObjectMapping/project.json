@@ -10,7 +10,7 @@
     "Autofac.Extensions.DependencyInjection": "4.0.0-*"
   },
   "frameworks": {
-    "dnx451": { },
+    "net451": { },
     "dotnet5.4": {
       "dependencies": {
         "Microsoft.CSharp": "4.0.1-*",

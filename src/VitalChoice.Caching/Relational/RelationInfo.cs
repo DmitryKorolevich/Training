@@ -8,17 +8,17 @@ namespace VitalChoice.Caching.Relational
     public class RelationInfo : IEquatable<RelationInfo>
     {
         public string Name { get; }
-        public Type ParentEntityType { get; }
-        public Type RelationEntityType { get; }
+        public Type RelationType { get; }
+        public Type OwnedType { get; }
         internal Dictionary<RelationCacheInfo, RelationInfo> RelationsDict { get; set; }
         public ICollection<RelationInfo> Relations => RelationsDict.Values;
 
         public RelationInfo(string name, Type relatedType, Type ownedType, IEnumerable<RelationInfo> subRelations = null)
         {
-            ParentEntityType = ownedType;
-            RelationEntityType = relatedType;
+            RelationType = relatedType;
+            OwnedType = ownedType;
             Name = name;
-            RelationsDict = subRelations?.ToDictionary(r => new RelationCacheInfo(r.Name, r.RelationEntityType, r.RelationEntityType)) ??
+            RelationsDict = subRelations?.ToDictionary(r => new RelationCacheInfo(r.Name, r.RelationType, r.RelationType)) ??
                             new Dictionary<RelationCacheInfo, RelationInfo>();
         }
 
@@ -27,7 +27,7 @@ namespace VitalChoice.Caching.Relational
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            if (!string.Equals(Name, other.Name) || RelationEntityType != other.RelationEntityType || ParentEntityType != other.ParentEntityType)
+            if (!string.Equals(Name, other.Name) || RelationType != other.RelationType)
                 return false;
 
             if (other.RelationsDict.Count != RelationsDict.Count)
@@ -45,7 +45,7 @@ namespace VitalChoice.Caching.Relational
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            if (!string.Equals(Name, other.Name) || RelationEntityType != other.RelationEntityType || ParentEntityType != other.ParentEntityType)
+            if (!string.Equals(Name, other.Name) || RelationType != other.RelationType)
                 return false;
 
             if (RelationsDict.Count > other.RelationsDict.Count)
@@ -63,7 +63,7 @@ namespace VitalChoice.Caching.Relational
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            if (!string.Equals(Name, other.Name) || RelationEntityType != other.RelationEntityType || ParentEntityType != other.ParentEntityType)
+            if (!string.Equals(Name, other.Name) || RelationType != other.RelationType)
                 return false;
 
             if (RelationsDict.Count < other.RelationsDict.Count)
@@ -88,7 +88,7 @@ namespace VitalChoice.Caching.Relational
         {
             unchecked
             {
-                return Relations.Aggregate((Name.GetHashCode()*397) ^ RelationEntityType.GetHashCode(),
+                return Relations.Aggregate((Name.GetHashCode()*397) ^ RelationType.GetHashCode(),
                     (current, next) => (current*397) ^ next.GetHashCode());
             }
         }

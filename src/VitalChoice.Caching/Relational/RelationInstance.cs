@@ -1,24 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using VitalChoice.Caching.Interfaces;
+using VitalChoice.Caching.Services.Cache;
 
 namespace VitalChoice.Caching.Relational
 {
     public struct RelationInstance
     {
-        public RelationInfo RelationInfo { get; }
-        public object RelatedObject { get; }
-        public object ParentEntity { get; }
-        public Type RelationObjectType { get; }
+        public readonly IInternalEntityCache CacheContainer;
 
-        public ICollection<RelationInstance> SubRelationInstances { get; }
+        public readonly RelationInfo RelationInfo;
+        public readonly CachedEntity RelatedObject;
+        public readonly Type RelationObjectType;
 
-        public RelationInstance(object parentEntity, object relatedObject, Type relationObjectType, ICollection<RelationInstance> relationInstances, RelationInfo relationInfo)
+        public RelationInstance(CachedEntity cachedEntity, Type relationObjectType, RelationInfo relationInfo,
+            IInternalEntityCache cacheContainer)
         {
             RelationInfo = relationInfo;
-            ParentEntity = parentEntity;
-            RelatedObject = relatedObject;
+            CacheContainer = cacheContainer;
+            RelatedObject = cachedEntity;
             RelationObjectType = relationObjectType;
-            SubRelationInstances = relationInstances;
         }
     }
 }

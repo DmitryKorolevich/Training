@@ -13,7 +13,7 @@
   },
   "compilationOptions": {"allowUnsafe": true},
   "frameworks": {
-    "dnx451": {
+    "net451": {
       "frameworkAssemblies": {
         "System.Runtime.Serialization": "4.0.0.0",
         "System.Xml": "4.0.0.0",

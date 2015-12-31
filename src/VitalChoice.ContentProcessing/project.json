@@ -17,7 +17,7 @@
     "Templates": "2.6.2-rc1"
   },
   "frameworks": {
-    "dnx451": { },
+    "net451": { },
     "dotnet5.4": {
       "dependencies": {
         "Microsoft.CSharp": "4.0.1-*",
