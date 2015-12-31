@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Autofac;
+using Microsoft.Data.Entity.ChangeTracking.Internal;
 using Microsoft.Data.Entity.Metadata;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Services;
@@ -19,6 +20,7 @@ namespace VitalChoice.Caching.Extensions
             builder.RegisterType<InternalEntityCacheFactory>().As<IInternalEntityCacheFactory>().SingleInstance();
             builder.Register(cc => new InternalEntityInfoStorage(dataModels)).As<IInternalEntityInfoStorage>().SingleInstance();
             builder.RegisterGeneric(typeof (EntityCache<>)).As(typeof (IEntityCache<>)).SingleInstance();
+            builder.RegisterType<CacheStateManager>().As<IStateManager>().InstancePerLifetimeScope();
             return builder;
         }
     }
