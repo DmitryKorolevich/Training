@@ -9,7 +9,7 @@ namespace VitalChoice.Caching.Services.Cache
     {
         protected DateTime LastAccess = DateTime.Now;
         private readonly object _entity;
-        private bool _needUpdate;
+        private volatile bool _needUpdate;
 
         protected CachedEntity(object entity, ICollection<RelationInstance> relations)
         {

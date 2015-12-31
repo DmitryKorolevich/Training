@@ -468,10 +468,14 @@ namespace VitalChoice.Caching.Services.Cache
         {
             lock (exist)
             {
-                _typeConverter.CopyInto(exist.Entity, newEntity, typeof (T));
-                UpdateRelations(exist, newEntity, newRelations);
-                return exist;
+                if (exist.NeedUpdate)
+                {
+                    exist.NeedUpdate = false;
+                    _typeConverter.CopyInto(exist.Entity, newEntity, typeof (T));
+                    UpdateRelations(exist, newEntity, newRelations);
+                }
             }
+            return exist;
         }
     }
 }
