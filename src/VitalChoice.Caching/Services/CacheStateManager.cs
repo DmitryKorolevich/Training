@@ -32,7 +32,7 @@ namespace VitalChoice.Caching.Services
                     {
                         cache.TryRemove(entry.Entity);
                     }
-                    if (entry.EntityState == EntityState.Modified)
+                    if (entry.EntityState == EntityState.Modified || entry.EntityState == EntityState.Deleted)
                     {
                         cache.MarkForUpdate(entry.Entity);
                     }

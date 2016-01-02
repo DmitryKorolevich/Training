@@ -7,7 +7,7 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Expressions.Visitors
 {
-    public class LambdaExpressionVisitor<T> : ExpressionVisitor
+    internal class LambdaExpressionVisitor<T> : ExpressionVisitor
     {
         private readonly Stack<Condition> _conditions = new Stack<Condition>();
         private Condition _condition;
@@ -26,8 +26,6 @@ namespace VitalChoice.Caching.Expressions.Visitors
 
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            //if (node.NodeType == ExpressionType.AndAlso || node.NodeType == ExpressionType.OrElse)
-            //{
             _conditions.Push(new BinaryCondition(node.NodeType));
 
             var count = _conditions.Count;
@@ -44,16 +42,6 @@ namespace VitalChoice.Caching.Expressions.Visitors
             topCondition.Left = currentLeft;
             topCondition.Right = currentRight;
             _condition = topCondition;
-            //}
-            //else
-            //{
-            //    Condition = new BinaryCondition(node.NodeType)
-            //    {
-            //        Left = new Condition(node.Left.NodeType) {Expression = node.Left},
-            //        Right = new Condition(node.Right.NodeType) {Expression = node.Right}
-            //    };
-            //    _conditions.Push(Condition);
-            //}
             return node;
         }
 

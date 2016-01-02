@@ -1,25 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using VitalChoice.Caching.Expressions;
+using VitalChoice.Ecommerce.Domain.Helpers;
+
+// ReSharper disable NonReadonlyMemberInGetHashCode
 
 namespace VitalChoice.Caching.Relational
 {
-    public class RelationInfo : IEquatable<RelationInfo>
+    public interface IRelationGetter
+    {
+        object GetRelatedObject(object entity);
+    }
+
+    public class RelationInfo : IEquatable<RelationInfo>, IRelationGetter
     {
         public string Name { get; }
         public Type RelationType { get; }
         public Type OwnedType { get; }
         internal Dictionary<RelationCacheInfo, RelationInfo> RelationsDict { get; set; }
         public ICollection<RelationInfo> Relations => RelationsDict.Values;
+        private readonly IRelationGetter _relationGetter;
+        private static readonly IRelationGetter NullGetter = new NullRelationGetter();
 
-        public RelationInfo(string name, Type relatedType, Type ownedType, IEnumerable<RelationInfo> subRelations = null)
+        public RelationInfo(string name, Type relatedType, Type ownedType, LambdaExpression relationExpression,
+            IEnumerable<RelationInfo> subRelations = null)
         {
             RelationType = relatedType;
             OwnedType = ownedType;
             Name = name;
             RelationsDict = subRelations?.ToDictionary(r => new RelationCacheInfo(r.Name, r.RelationType, r.RelationType)) ??
                             new Dictionary<RelationCacheInfo, RelationInfo>();
+            if (relationExpression != null)
+            {
+                _relationGetter =
+                    (IRelationGetter)
+                        Activator.CreateInstance(typeof (RelationGetter<,>).MakeGenericType(ownedType, relationExpression.ReturnType),
+                            relationExpression);
+            }
+            else
+            {
+                _relationGetter = NullGetter;
+            }
         }
 
         public bool Equals(RelationInfo other)
@@ -84,13 +107,22 @@ namespace VitalChoice.Caching.Relational
             return Equals((RelationInfo) obj);
         }
 
+        private int? _hashCode;
+
         public override int GetHashCode()
         {
             unchecked
             {
-                return Relations.Aggregate((Name.GetHashCode()*397) ^ RelationType.GetHashCode(),
-                    (current, next) => (current*397) ^ next.GetHashCode());
+                if (!_hashCode.HasValue)
+                    _hashCode = Relations.Aggregate((Name.GetHashCode()*397) ^ RelationType.GetHashCode(),
+                        (current, next) => (current*397) ^ next.GetHashCode());
+                return _hashCode.Value;
             }
+        }
+
+        public object GetRelatedObject(object entity)
+        {
+            return _relationGetter.GetRelatedObject(entity);
         }
 
         public static bool operator ==(RelationInfo left, RelationInfo right)
@@ -117,5 +149,27 @@ namespace VitalChoice.Caching.Relational
             return left?.LessThanOrEqualTo(right) ?? false;
         }
 
+        private class RelationGetter<TEntity, TRelation> : IRelationGetter
+        {
+            public RelationGetter(Expression<Func<TEntity, TRelation>> getExpression)
+            {
+                _relationFunc = getExpression.CacheCompile();
+            }
+
+            private readonly Func<TEntity, TRelation> _relationFunc;
+
+            public object GetRelatedObject(object entity)
+            {
+                return _relationFunc((TEntity)entity);
+            }
+        }
+
+        private class NullRelationGetter : IRelationGetter
+        {
+            public object GetRelatedObject(object entity)
+            {
+                return null;
+            }
+        }
     }
 }

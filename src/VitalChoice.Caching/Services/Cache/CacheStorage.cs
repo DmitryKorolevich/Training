@@ -54,5 +54,15 @@ namespace VitalChoice.Caching.Services.Cache
             }
             return false;
         }
+
+        public bool GetIsCacheFullCollection(RelationInfo relationInfo)
+        {
+            CacheData<T> data;
+            if (_cacheData.TryGetValue(relationInfo, out data))
+            {
+                return data.FullCollection;
+            }
+            return false;
+        }
     }
 }

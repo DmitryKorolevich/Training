@@ -16,6 +16,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers
     public class PrimaryKeyAnalyzer<T>
     {
         private readonly EntityPrimaryKeyInfo _keyInfo;
+        public bool ContainsAdditionalConditions { get; private set; }
 
         public PrimaryKeyAnalyzer(IInternalEntityInfoStorage entityInfoStorage)
         {
@@ -61,6 +62,10 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                     {
                         keyValues.Add(new EntityKeyValue(info, value));
                     }
+                    else
+                    {
+                        ContainsAdditionalConditions = true;
+                    }
                     return true;
                 case ExpressionType.AndAlso:
                     var and = (BinaryCondition) top;
@@ -87,6 +92,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                         }
                         return false;
                     }
+                    ContainsAdditionalConditions = true;
                     return true;
                 default:
                     return true;

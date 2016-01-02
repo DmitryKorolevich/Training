@@ -9,11 +9,13 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Expressions.Visitors
 {
-    public class QueriableExpressionVisitor<T> : ExpressionVisitor
+    internal class QueriableExpressionVisitor<T> : ExpressionVisitor
     {
         private bool _inWhereExpression;
 
         public WhereExpression<T> WhereExpression { get; private set; }
+
+        public bool Tracking { get; private set; } = true;
 
         protected override Expression VisitLambda<T1>(Expression<T1> node)
         {
@@ -47,7 +49,10 @@ namespace VitalChoice.Caching.Expressions.Visitors
                     return result;
                 }
             }
-
+            if (node.Method.DeclaringType == typeof (EntityFrameworkQueryableExtensions) && node.Method.Name == "AsNoTracking")
+            {
+                Tracking = false;
+            }
             return base.VisitMethodCall(node);
         }
     }

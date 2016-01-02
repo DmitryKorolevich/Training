@@ -12,6 +12,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers
     public class IndexAnalyzer<T>
     {
         private readonly EntityUniqueIndexInfo[] _indexesInfo;
+        public bool ContainsAdditionalConditions { get; private set; }
 
         public IndexAnalyzer(IInternalEntityInfoStorage entityInfoStorage)
         {
@@ -70,6 +71,10 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                                         ii => ii.Name == member.Member.Name && ii.PropertyType == value.GetType()), value));
                         }
                     }
+                    else
+                    {
+                        ContainsAdditionalConditions = true;
+                    }
                     return true;
                 case ExpressionType.AndAlso:
                     var and = (BinaryCondition) top;
@@ -97,6 +102,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                         }
                         return false;
                     }
+                    ContainsAdditionalConditions = true;
                     return true;
                 default:
                     return true;
