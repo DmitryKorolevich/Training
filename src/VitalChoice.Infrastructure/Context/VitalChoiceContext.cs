@@ -16,6 +16,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Localization;
 using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Entities.VitalGreen;
+using VitalChoice.Infrastructure.Domain.Entities;
 
 namespace VitalChoice.Infrastructure.Context
 {
@@ -567,8 +568,16 @@ namespace VitalChoice.Infrastructure.Context
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
             });
-        }
 
-        #endregion
+            #endregion
+
+            builder.Entity<Redirect>(entity =>
+            {
+                entity.HasKey(t => t.Id);
+                entity.ToTable("Redirects");
+                entity.Ignore(p => p.AddedBy);
+                entity.Ignore(p => p.EditedBy);
+            });
+        }
     }
 }

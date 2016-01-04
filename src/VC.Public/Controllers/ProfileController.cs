@@ -31,6 +31,9 @@ using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
 using VitalChoice.Interfaces.Services.Help;
 using VitalChoice.SharedWeb.Models.Help;
+using VitalChoice.Interfaces.Services.Healthwise;
+using VitalChoice.Infrastructure.Domain.Transfer.Healthwise;
+using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
 
 namespace VC.Public.Controllers
 {
@@ -38,9 +41,9 @@ namespace VC.Public.Controllers
     public class ProfileController : BaseMvcController
     {
         private const string TicketCommentMessageTempData = "ticket-comment-messsage";
-		private const string ProductBaseUrl = "/product/";
+        private const string ProductBaseUrl = "/product/";
 
-		private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IHttpContextAccessor _contextAccessor;
         private readonly IStorefrontUserService _storefrontUserService;
         private readonly ICustomerService _customerService;
         private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
@@ -48,10 +51,14 @@ namespace VC.Public.Controllers
         private readonly IProductService _productService;
         private readonly IOrderService _orderService;
         private readonly IHelpService _helpService;
+        private readonly IHealthwiseService _healthwiseService;
 
         public ProfileController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
             ICustomerService customerService, IDynamicMapper<AddressDynamic, Address> addressConverter,
-            IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter, IOrderService orderService, IProductService productService, IHelpService helpService)
+            IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter, IOrderService orderService, 
+            IProductService productService, 
+            IHelpService helpService,
+            IHealthwiseService healthwiseService)
         {
             _contextAccessor = contextAccessor;
             _storefrontUserService = storefrontUserService;
@@ -61,6 +68,7 @@ namespace VC.Public.Controllers
             _orderService = orderService;
             _productService = productService;
             _helpService = helpService;
+            _healthwiseService = healthwiseService;
         }
 
         private async Task<PagedListEx<OrderHistoryItemModel>> PopulateHistoryModel(VOrderFilter filter)
@@ -70,7 +78,7 @@ namespace VC.Public.Controllers
             filter.IdCustomer = internalId;
             filter.Sorting.SortOrder = SortOrder.Desc;
             filter.Sorting.Path = VOrderSortPath.DateCreated;
-            
+
             var orders = await _orderService.GetOrdersAsync(filter);
 
             var ordersModel = new PagedListEx<OrderHistoryItemModel>
@@ -295,16 +303,16 @@ namespace VC.Public.Controllers
             {
                 var creditCardToUpdate =
                     currentCustomer.CustomerPaymentMethods.Single(
-                        x => x.IdObjectType == (int) PaymentMethodType.CreditCard && x.Id == model.Id);
+                        x => x.IdObjectType == (int)PaymentMethodType.CreditCard && x.Id == model.Id);
                 currentCustomer.CustomerPaymentMethods.Remove(creditCardToUpdate);
             }
 
             var customerPaymentMethod = _paymentMethodConverter.FromModel(model);
-            customerPaymentMethod.IdObjectType = (int) PaymentMethodType.CreditCard;
+            customerPaymentMethod.IdObjectType = (int)PaymentMethodType.CreditCard;
             customerPaymentMethod.Data.SecurityCode = model.SecurityCode;
 
             customerPaymentMethod.Address = _addressConverter.FromModel(model);
-            customerPaymentMethod.Address.IdObjectType = (int) AddressType.Billing;
+            customerPaymentMethod.Address.IdObjectType = (int)AddressType.Billing;
 
             currentCustomer.CustomerPaymentMethods.Add(customerPaymentMethod);
             try
@@ -330,7 +338,7 @@ namespace VC.Public.Controllers
                 ModelState.Add("Id", new ModelStateEntry
                 {
                     RawValue =
-                        model.Id = currentCustomer.CustomerPaymentMethods.Last(x => x.IdObjectType == (int) PaymentMethodType.CreditCard).Id
+                        model.Id = currentCustomer.CustomerPaymentMethods.Last(x => x.IdObjectType == (int)PaymentMethodType.CreditCard).Id
                 });
             }
             return View(PopulateCreditCard(currentCustomer, model.Id));
@@ -465,13 +473,13 @@ namespace VC.Public.Controllers
             {
                 var lastOrder = await _orderService.SelectLastOrderAsync(customer.Id);
 
-                if (lastOrder != null) 
+                if (lastOrder != null)
                 {
-					VProductSkuFilter filter = new VProductSkuFilter();
-					filter.Ids = lastOrder.Skus.Select(p => p.Sku.Id).ToList();
-					var skus = await _productService.GetSkusAsync(filter);
+                    VProductSkuFilter filter = new VProductSkuFilter();
+                    filter.Ids = lastOrder.Skus.Select(p => p.Sku.Id).ToList();
+                    var skus = await _productService.GetSkusAsync(filter);
 
-					foreach (var skuOrdered in lastOrder.Skus)
+                    foreach (var skuOrdered in lastOrder.Skus)
                     {
                         var skuInDB = skus.FirstOrDefault(p => p.SkuId == skuOrdered.Sku.Id);
 
@@ -482,9 +490,9 @@ namespace VC.Public.Controllers
                             ProductName = skuOrdered.ProductWithoutSkus.Name,
                             PortionsCount = skuOrdered.Sku.Data.QTY,
                             Quantity = skuOrdered.Quantity,
-                            SkuCode= skuOrdered.Sku.Code,
-                            ProductSubTitle =skuInDB?.SubTitle,
-                            SelectedPrice = customer.IdObjectType==(int)CustomerType.Retail ? skuInDB?.Price?.ToString("C2") : skuInDB?.WholesalePrice?.ToString("C2"),
+                            SkuCode = skuOrdered.Sku.Code,
+                            ProductSubTitle = skuInDB?.SubTitle,
+                            SelectedPrice = customer.IdObjectType == (int)CustomerType.Retail ? skuInDB?.Price?.ToString("C2") : skuInDB?.WholesalePrice?.ToString("C2"),
                         };
                         lines.Add(orderLineModel);
                     }
@@ -517,7 +525,7 @@ namespace VC.Public.Controllers
                 ProductSubTitle = favorite.ProductSubTitle,
                 ProductThumbnail = favorite.ProductThumbnail,
                 Url = ProductBaseUrl + favorite.Url
-			}).ToList();
+            }).ToList();
 
             ViewBag.MoreExist = !all && favorites.Count > filter.Paging.PageItemCount;
 
@@ -574,7 +582,7 @@ namespace VC.Public.Controllers
             {
                 var item = await _helpService.GetHelpTicketAsync(id.Value);
                 var customerId = GetInternalCustomerId();
-                if (item != null && item.Order.IdCustomer==customerId)
+                if (item != null && item.Order.IdCustomer == customerId)
                 {
                     toReturn = new HelpTicketManageModel(item);
                     if (TempData.ContainsKey(TicketCommentMessageTempData))
@@ -646,6 +654,52 @@ namespace VC.Public.Controllers
             var result = await _helpService.DeleteHelpTicketCommentAsync(model.Id, null);
             TempData[TicketCommentMessageTempData] = "Comment was successfully deleted.";
             return RedirectToAction("HelpTicket", new { id = model.IdHelpTicket });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> HealthWiseHistory()
+        {
+            HealthWiseHistoryModel toReturn = null;
+            var internalId = GetInternalCustomerId();
+            VHealthwisePeriodFilter filter = new VHealthwisePeriodFilter();
+            filter.NotPaid = true;
+            filter.IdCustomer = internalId;
+            var periods = await _healthwiseService.GetVHealthwisePeriodsAsync(filter);
+            periods = periods.OrderByDescending(p => p.StartDate).ToList();
+
+            VHealthwisePeriod lastPeriodWithOrders = null;
+            ICollection<HealthwiseOrder> orders=null;
+            foreach (var period in periods)
+            {
+                orders = await _healthwiseService.GetHealthwiseOrdersAsync(period.Id);
+                lastPeriodWithOrders = period;
+                if (orders.Count>0)
+                {
+                    break;
+                }
+            }
+            if(lastPeriodWithOrders!=null)
+            {
+                toReturn = new HealthWiseHistoryModel();
+                toReturn.EndDate = lastPeriodWithOrders.EndDate;
+                toReturn.Items = new List<HealthWiseHistoryOrderModel>();
+                foreach(var healthWiseOrder in orders)
+                {
+                    HealthWiseHistoryOrderModel orderModel = new HealthWiseHistoryOrderModel();
+                    orderModel.Id = healthWiseOrder.Id;
+                    orderModel.DateCreated = healthWiseOrder.Order.DateCreated;
+                    orderModel.OrderStatus = healthWiseOrder.Order.OrderStatus;
+                    orderModel.Total = healthWiseOrder.Order.Total;
+                    toReturn.Items.Add(orderModel);
+                }
+                if(toReturn.Items.Count>0)
+                {
+                    toReturn.Count = toReturn.Items.Count;
+                    toReturn.AverageAmount = toReturn.Items.Sum(p => p.Total) / toReturn.Count;
+                }
+            }
+
+            return View(toReturn);
         }
     }
 }

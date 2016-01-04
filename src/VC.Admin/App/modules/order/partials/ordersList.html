@@ -5,12 +5,16 @@
             <fieldset>
                 <div class="row form-group">
                     <div class="col-md-2">
-                        <input type="text" name="IdString" class="form-control" placeholder="Order #" data-ng-model="filter.IdString" autocomplete="off" data-ng-minlength="3">
+                        <input type="text" name="IdString" class="form-control" placeholder="Order #" data-ng-model="directOrdersfilter.IdString" autocomplete="off" data-ng-minlength="3">
                         <div class="error-container" ng-show="forms.form.submitted && forms.form.IdString.$invalid">
                             <small class="error" ng-show="forms.form.IdString.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Order #")}}</small>
                         </div>
                     </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-info" data-ng-click="directFilterOrders();" type="button">Locate Order</button>
+                    </div>
                 </div>
+                <hr />
                 <div class="row form-group">
                     <div class="col-md-2">
                         <p class="input-group">

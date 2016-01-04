@@ -45,9 +45,12 @@ namespace VitalChoice.Business.Queries.Healthwise
             return this;
         }
 
-        public VHealthwisePeriodQuery WithNotPaid()
+        public VHealthwisePeriodQuery WithNotPaid(bool notPaid)
         {
-            Add(x => !x.PaidDate.HasValue);
+            if (notPaid)
+            {
+                Add(x => !x.PaidDate.HasValue);
+            }
             return this;
         }
     }
