@@ -12,12 +12,12 @@ namespace VitalChoice.Caching.Services.Cache
     public sealed class CacheStorage<T>
     {
         private readonly EntityPrimaryKeyInfo _primaryKeyInfo;
-        private readonly EntityUniqueIndexInfo[] _indexes;
+        private readonly EntityUniqueIndexInfo _indexInfo;
 
         public CacheStorage(IInternalEntityInfoStorage keyStorage)
         {
             _primaryKeyInfo = keyStorage.GetPrimaryKeyInfo<T>();
-            _indexes = keyStorage.GetIndexInfos<T>();
+            _indexInfo = keyStorage.GetIndexInfos<T>();
         }
 
         private readonly ConcurrentDictionary<RelationInfo, CacheData<T>> _cacheData =
@@ -30,17 +30,16 @@ namespace VitalChoice.Caching.Services.Cache
             return new EntityPrimaryKey(keyValues);
         }
 
-        public IEnumerable<EntityUniqueIndex> GetIndexValues(T entity)
+        public EntityUniqueIndex GetIndexValue(T entity)
         {
             return
-                _indexes.Select(u => u.IndexInfo)
-                    .Select(indexInfo => indexInfo.Select(info => new EntityIndexValue(info, info.Property.GetClrValue(entity))))
-                    .Select(indexValues => new EntityUniqueIndex(indexValues));
+                new EntityUniqueIndex(
+                    _indexInfo.IndexInfoInternal.Values.Select(info => new EntityIndexValue(info, info.Property.GetClrValue(entity))));
         }
 
         public CacheData<T> GetCacheData(RelationInfo relationInfo)
         {
-            return _cacheData.GetOrAdd(relationInfo, r => new CacheData<T>(_indexes));
+            return _cacheData.GetOrAdd(relationInfo, r => new CacheData<T>());
         }
 
         public ICollection<CacheData<T>> AllCacheDatas => _cacheData.Values;

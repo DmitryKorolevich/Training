@@ -11,7 +11,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers
 {
     public class IndexAnalyzer<T>
     {
-        private readonly EntityUniqueIndexInfo[] _indexesInfo;
+        private readonly EntityUniqueIndexInfo _indexesInfo;
         public bool ContainsAdditionalConditions { get; private set; }
 
         public IndexAnalyzer(IInternalEntityInfoStorage entityInfoStorage)
@@ -22,19 +22,14 @@ namespace VitalChoice.Caching.Expressions.Analyzers
         public ICollection<EntityUniqueIndex> TryGetIndexes(WhereExpression<T> expression)
         {
             HashSet<EntityUniqueIndex> result = new HashSet<EntityUniqueIndex>();
-            Dictionary<EntityUniqueIndexInfo, HashSet<EntityIndexValue>> indexValues = _indexesInfo.ToDictionary(indexInfo => indexInfo,
-                indexInfo => new HashSet<EntityIndexValue>());
+            HashSet<EntityIndexValue> indexValues = new HashSet<EntityIndexValue>();
             try
             {
                 WalkConditionTree(expression.Condition, result, indexValues);
 
-                foreach (var potentialIndex in indexValues)
+                if (_indexesInfo.IndexInfoInternal.Count == indexValues.Count)
                 {
-                    if (potentialIndex.Key.IndexInfo.Count == potentialIndex.Value.Count)
-                    {
-                        result.Add(new EntityUniqueIndex(potentialIndex.Value));
-                        break;
-                    }
+                    result.Add(new EntityUniqueIndex(indexValues));
                 }
             }
             catch
@@ -45,8 +40,9 @@ namespace VitalChoice.Caching.Expressions.Analyzers
         }
 
         private bool WalkConditionTree(Condition top, HashSet<EntityUniqueIndex> indexes,
-            Dictionary<EntityUniqueIndexInfo, HashSet<EntityIndexValue>> indexValues)
+            HashSet<EntityIndexValue> indexValues)
         {
+            EntityIndexInfo indexInfo;
             switch (top.Operator)
             {
                 case ExpressionType.Equal:
@@ -56,20 +52,10 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                     var member = left as MemberExpression ?? right as MemberExpression;
                     var value = (right as ConstantExpression ??
                                  left as ConstantExpression)?.Value;
-                    if (member != null && value != null && member.Type == typeof (T))
+                    if (member != null && value != null && member.Type == typeof (T) &&
+                        _indexesInfo.IndexInfoInternal.TryGetValue(member.Member.Name, out indexInfo))
                     {
-                        var potentialIndexes =
-                            _indexesInfo.Where(
-                                i =>
-                                    i.IndexInfo.Any(
-                                        ii => ii.Name == member.Member.Name && ii.PropertyType == value.GetType()));
-                        foreach (var indexInfo in potentialIndexes)
-                        {
-                            indexValues[indexInfo].Add(
-                                new EntityIndexValue(
-                                    indexInfo.IndexInfo.Single(
-                                        ii => ii.Name == member.Member.Name && ii.PropertyType == value.GetType()), value));
-                        }
+                        indexValues.Add(new EntityIndexValue(indexInfo, value));
                     }
                     else
                     {
@@ -91,14 +77,13 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                     var memberSelector =
                         ((method?.Arguments.Last() as UnaryExpression)?.Operand as LambdaExpression)?.Body as MemberExpression;
                     var values = ((method?.Arguments.Last() as UnaryExpression)?.Operand as ConstantExpression)?.Value as IEnumerable;
-                    if (values != null && memberSelector != null && memberSelector.Type == typeof (T))
+                    if (values != null && memberSelector != null && memberSelector.Type == typeof (T) && _indexesInfo.IndexInfoInternal.Count == 1 &&
+                        _indexesInfo.IndexInfoInternal.TryGetValue(memberSelector.Member.Name, out indexInfo))
                     {
-                        var indexInfo =
-                            _indexesInfo.First(i => i.IndexInfo.Count == 1 && i.IndexInfo.Any(ii => ii.Name == memberSelector.Member.Name));
                         // ReSharper disable once LoopCanBeConvertedToQuery
                         foreach (var item in values)
                         {
-                            indexes.Add(new EntityUniqueIndex(new[] {new EntityIndexValue(indexInfo.IndexInfo.First(), item)}));
+                            indexes.Add(new EntityUniqueIndex(new[] {new EntityIndexValue(indexInfo, item)}));
                         }
                         return false;
                     }

@@ -6,6 +6,6 @@ namespace VitalChoice.Caching.Interfaces
     public interface IInternalEntityInfoStorage
     {
         EntityPrimaryKeyInfo GetPrimaryKeyInfo<T>();
-        EntityUniqueIndexInfo[] GetIndexInfos<T>();
+        EntityUniqueIndexInfo GetIndexInfos<T>();
     }
 }

@@ -12,9 +12,9 @@ namespace VitalChoice.Caching.Relational
                 return false;
             if (ReferenceEquals(this, other))
                 return true;
-            if (_indexInfo.Count != other._indexInfo.Count)
+            if (IndexInfoInternal.Count != other.IndexInfoInternal.Count)
                 return false;
-            return _indexInfo.All(i => other._indexInfo.Contains(i));
+            return IndexInfoInternal.All(i => other.IndexInfoInternal.Contains(i));
         }
 
         public override bool Equals(object obj)
@@ -30,7 +30,7 @@ namespace VitalChoice.Caching.Relational
 
         public override int GetHashCode()
         {
-            return _indexInfo.Aggregate(0, (current, indexInfo) => (current*397) ^ indexInfo.GetHashCode());
+            return IndexInfoInternal.Aggregate(0, (current, indexInfo) => (current*397) ^ indexInfo.GetHashCode());
         }
 
         public static bool operator ==(EntityUniqueIndexInfo left, EntityUniqueIndexInfo right)
@@ -43,14 +43,14 @@ namespace VitalChoice.Caching.Relational
             return !Equals(left, right);
         }
 
-        private readonly HashSet<EntityIndexInfo> _indexInfo;
+        internal Dictionary<string, EntityIndexInfo> IndexInfoInternal { get; }
 
         public EntityUniqueIndexInfo(IEnumerable<EntityIndexInfo> indexInfo)
         {
             if (indexInfo == null) throw new ArgumentNullException(nameof(indexInfo));
-            _indexInfo = new HashSet<EntityIndexInfo>(indexInfo);
+            IndexInfoInternal = indexInfo.ToDictionary(i => i.Name);
         }
 
-        public ICollection<EntityIndexInfo> IndexInfo => _indexInfo;
+        public ICollection<EntityIndexInfo> IndexInfos => IndexInfoInternal.Values;
     }
 }

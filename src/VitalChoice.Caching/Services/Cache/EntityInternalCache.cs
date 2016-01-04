@@ -86,7 +86,7 @@ namespace VitalChoice.Caching.Services.Cache
         {
             CachedEntity<T> cached;
             var data = CacheStorage.GetCacheData(searchInfo.RelationInfo);
-            if (data.IndexedDictionary[searchInfo.UniqueIndex.IndexInfo].TryGetValue(searchInfo.UniqueIndex, out cached))
+            if (data.IndexedDictionary.TryGetValue(searchInfo.UniqueIndex, out cached))
             {
                 entity = cached;
                 return cached.NeedUpdate ? CacheGetResult.Update : CacheGetResult.Found;
@@ -121,7 +121,7 @@ namespace VitalChoice.Caching.Services.Cache
             foreach (var index in indexes)
             {
                 CachedEntity<T> cached;
-                if (data.IndexedDictionary[index.IndexInfo].TryGetValue(index, out cached))
+                if (data.IndexedDictionary.TryGetValue(index, out cached))
                 {
                     if (cached.NeedUpdate)
                         return CacheGetResult.Update;
@@ -219,20 +219,19 @@ namespace VitalChoice.Caching.Services.Cache
 
         public bool TryRemove(T entity, out List<T> removedList)
         {
-            CachedEntity<T> removed;
             var pk = CacheStorage.GetPrimaryKeyValue(entity);
             var datas = CacheStorage.AllCacheDatas;
             var result = true;
             removedList = new List<T>(datas.Count);
             foreach (var data in datas)
             {
+                CachedEntity<T> removed;
                 result = result & data.EntityDictionary.TryRemove(pk, out removed);
                 removedList.Add(removed);
-                EntityUniqueIndex[] indexValues;
-                if (result && data.PrimaryToIndexes.TryGetValue(pk, out indexValues))
+                EntityUniqueIndex indexValue;
+                if (result && data.PrimaryToIndexes.TryGetValue(pk, out indexValue))
                 {
-                    result = indexValues.Aggregate(true,
-                        (current, indexValue) => current & data.IndexedDictionary[indexValue.IndexInfo].TryRemove(indexValue, out removed));
+                    result = data.IndexedDictionary.TryRemove(indexValue, out removed);
                 }
             }
             return result;
@@ -248,11 +247,10 @@ namespace VitalChoice.Caching.Services.Cache
             {
                 result = result & data.EntityDictionary.TryRemove(pk, out removed);
                 removed.NeedUpdate = true;
-                EntityUniqueIndex[] indexValues;
-                if (result && data.PrimaryToIndexes.TryGetValue(pk, out indexValues))
+                EntityUniqueIndex indexValue;
+                if (result && data.PrimaryToIndexes.TryGetValue(pk, out indexValue))
                 {
-                    result = indexValues.Aggregate(true,
-                        (current, indexValue) => current & data.IndexedDictionary[indexValue.IndexInfo].TryRemove(indexValue, out removed));
+                    result = data.IndexedDictionary.TryRemove(indexValue, out removed);
                 }
             }
             return result;
@@ -276,10 +274,7 @@ namespace VitalChoice.Caching.Services.Cache
                 data.FullCollection = false;
                 data.EntityDictionary.Clear();
                 data.PrimaryToIndexes.Clear();
-                foreach (var indexed in data.IndexedDictionary.Values)
-                {
-                    indexed.Clear();
-                }
+                data.IndexedDictionary.Clear();
                 Update(entities, relationInfo);
                 data.FullCollection = true;
             }
@@ -385,10 +380,7 @@ namespace VitalChoice.Caching.Services.Cache
                 data.FullCollection = false;
                 data.EntityDictionary.Clear();
                 data.PrimaryToIndexes.Clear();
-                foreach (var indexed in data.IndexedDictionary.Values)
-                {
-                    indexed.Clear();
-                }
+                data.IndexedDictionary.Clear();
                 Update(entities, relationInfo);
                 data.FullCollection = true;
             }
@@ -424,15 +416,11 @@ namespace VitalChoice.Caching.Services.Cache
             if (data == null)
                 data = CacheStorage.GetCacheData(relations);
             var pk = CacheStorage.GetPrimaryKeyValue(entity);
-            var indexValues = CacheStorage.GetIndexValues(entity).ToArray();
+            var indexValue = CacheStorage.GetIndexValue(entity);
             var result = data.EntityDictionary.AddOrUpdate(pk, key => new CachedEntity<T>(entity, GetRelations(entity, relations.Relations)),
                 (key, _) => UpdateExist(_, entity, relations.Relations));
-            data.PrimaryToIndexes.AddOrUpdate(pk, indexValues, (key, _) => indexValues);
-
-            foreach (var indexValue in indexValues)
-            {
-                data.IndexedDictionary[indexValue.IndexInfo].AddOrUpdate(indexValue, result, (index, _) => result);
-            }
+            data.PrimaryToIndexes.AddOrUpdate(pk, indexValue, (key, _) => indexValue);
+            data.IndexedDictionary.AddOrUpdate(indexValue, result, (index, _) => result);
             return result;
         }
 
@@ -444,15 +432,11 @@ namespace VitalChoice.Caching.Services.Cache
             foreach (var entity in entities)
             {
                 var pk = CacheStorage.GetPrimaryKeyValue(entity);
-                var indexValues = CacheStorage.GetIndexValues(entity).ToArray();
+                var indexValue = CacheStorage.GetIndexValue(entity);
                 var result = data.EntityDictionary.AddOrUpdate(pk, key => new CachedEntity<T>(entity, GetRelations(entity, relations.Relations)),
                     (key, _) => UpdateExist(_, entity, relations.Relations));
-                data.PrimaryToIndexes.AddOrUpdate(pk, indexValues, (key, _) => indexValues);
-
-                foreach (var indexValue in indexValues)
-                {
-                    data.IndexedDictionary[indexValue.IndexInfo].AddOrUpdate(indexValue, result, (index, _) => result);
-                }
+                data.PrimaryToIndexes.AddOrUpdate(pk, indexValue, (key, _) => indexValue);
+                data.IndexedDictionary.AddOrUpdate(indexValue, result, (index, _) => result);
                 results.Add(result);
             }
             return results;

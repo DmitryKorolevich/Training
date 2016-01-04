@@ -7,22 +7,18 @@ namespace VitalChoice.Caching.Services.Cache
 {
     public sealed class CacheData<T>
     {
-        public CacheData(EntityUniqueIndexInfo[] indexes)
+        public CacheData()
         {
-            IndexedDictionary = new Dictionary<EntityUniqueIndexInfo, ConcurrentDictionary<EntityUniqueIndex, CachedEntity<T>>>();
-            foreach (var indexInfo in indexes)
-            {
-                IndexedDictionary.Add(indexInfo, new ConcurrentDictionary<EntityUniqueIndex, CachedEntity<T>>());
-            }
+            IndexedDictionary = new ConcurrentDictionary<EntityUniqueIndex, CachedEntity<T>>();
         }
 
         public readonly ConcurrentDictionary<EntityPrimaryKey, CachedEntity<T>> EntityDictionary =
             new ConcurrentDictionary<EntityPrimaryKey, CachedEntity<T>>();
 
-        public readonly ConcurrentDictionary<EntityPrimaryKey, EntityUniqueIndex[]> PrimaryToIndexes =
-            new ConcurrentDictionary<EntityPrimaryKey, EntityUniqueIndex[]>();
+        public readonly ConcurrentDictionary<EntityPrimaryKey, EntityUniqueIndex> PrimaryToIndexes =
+            new ConcurrentDictionary<EntityPrimaryKey, EntityUniqueIndex>();
 
-        public readonly Dictionary<EntityUniqueIndexInfo, ConcurrentDictionary<EntityUniqueIndex, CachedEntity<T>>> IndexedDictionary;
+        public readonly ConcurrentDictionary<EntityUniqueIndex, CachedEntity<T>> IndexedDictionary;
 
         public bool FullCollection;
     }

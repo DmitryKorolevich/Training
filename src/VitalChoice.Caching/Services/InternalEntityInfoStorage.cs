@@ -30,17 +30,17 @@ namespace VitalChoice.Caching.Services
 
                     var indexes = entityType.GetIndexes().Where(index => index.IsUnique);
 
-                    EntityUniqueIndexInfo[] uniqueIndexes =
+                    var uniqueIndex =
                         indexes.Select(
                             index =>
                                 new EntityUniqueIndexInfo(
                                     index.Properties.Select(property => new EntityIndexInfo(property.Name, property.GetGetter(), property.ClrType))))
-                            .ToArray();
+                            .FirstOrDefault();
 
                     _entityInfos.Add(entityType.ClrType, new EntityInfo
                     {
                         PrimaryKey = new EntityPrimaryKeyInfo(keyInfos),
-                        UniqueIndexes = uniqueIndexes
+                        UniqueIndex = uniqueIndex
                     });
                 }
             }
@@ -58,14 +58,14 @@ namespace VitalChoice.Caching.Services
             return null;
         }
 
-        public EntityUniqueIndexInfo[] GetIndexInfos<T>()
+        public EntityUniqueIndexInfo GetIndexInfos<T>()
         {
             EntityInfo entityInfo;
             if (_entityInfos.TryGetValue(typeof (T), out entityInfo))
             {
-                return entityInfo.UniqueIndexes;
+                return entityInfo.UniqueIndex;
             }
-            return new EntityUniqueIndexInfo[0];
+            return null;
         }
     }
 }
