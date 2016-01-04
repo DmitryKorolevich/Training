@@ -16,11 +16,11 @@ namespace VitalChoice.Infrastructure.Domain.Entities
 
         public int IdAddedBy { get; set; }
 
-        public int AddedBy { get; set; }
+        public string AddedBy { get; set; }
 
         public int IdEditedBy { get; set; }
 
-        public int EditedBy { get; set; }
+        public string EditedBy { get; set; }
 
         public RecordStatusCode StatusCode { get; set; }
     }

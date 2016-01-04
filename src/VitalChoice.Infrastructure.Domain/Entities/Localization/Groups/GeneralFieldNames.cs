@@ -41,6 +41,7 @@
         CardType = 60,
         CardNumber = 61,
         ExpirationDateMonth = 62,
-        ExpirationDateYear = 63
+        ExpirationDateYear = 63,
+        RedirectUrl = 70,
     }
 }

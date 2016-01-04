@@ -457,6 +457,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<StylesService>().As<IStylesService>();
             builder.RegisterType<CatalogRequestAddressService>().As<ICatalogRequestAddressService>();
             builder.RegisterType<HealthwiseService>().As<IHealthwiseService>();
+            builder.RegisterType<RedirectService>().As<IRedirectService>();
             builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
             builder.RegisterModelConverters(projectAssembly);
 

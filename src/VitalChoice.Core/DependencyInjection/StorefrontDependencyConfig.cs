@@ -18,7 +18,7 @@ namespace VitalChoice.Core.DependencyInjection
         protected override void FinishCustomRegistrations(ContainerBuilder builder)
 	    {
             builder.RegisterType<PaginationLinkBuilder>().As<IBuildPaginationLinks>();
-            builder.RegisterType<RedirectService>().As<IRedirectService>().SingleInstance();
+            builder.RegisterType<RedirectViewService>().As<IRedirectViewService>().SingleInstance();
         }
     }
 }

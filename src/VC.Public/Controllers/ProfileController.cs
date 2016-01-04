@@ -689,7 +689,7 @@ namespace VC.Public.Controllers
                     orderModel.Id = healthWiseOrder.Id;
                     orderModel.DateCreated = healthWiseOrder.Order.DateCreated;
                     orderModel.OrderStatus = healthWiseOrder.Order.OrderStatus;
-                    orderModel.Total = healthWiseOrder.Order.Total;
+                    orderModel.Total = healthWiseOrder.Order.ProductsSubtotal;
                     toReturn.Items.Add(orderModel);
                 }
                 if(toReturn.Items.Count>0)
