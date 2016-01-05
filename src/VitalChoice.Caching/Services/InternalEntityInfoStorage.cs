@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Metadata.Internal;
+using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 
@@ -34,13 +36,31 @@ namespace VitalChoice.Caching.Services
                         indexes.Select(
                             index =>
                                 new EntityUniqueIndexInfo(
-                                    index.Properties.Select(property => new EntityIndexInfo(property.Name, property.GetGetter(), property.ClrType))))
+                                    index.Properties.Select(
+                                        property => new EntityIndexInfo(property.Name, property.GetGetter(), property.ClrType))))
                             .FirstOrDefault();
+
+                    List<EntityConditionalIndexInfo> nonUniqueList = new List<EntityConditionalIndexInfo>();
+
+                    // ReSharper disable once LoopCanBeConvertedToQuery
+                    foreach (var index in entityType.GetIndexes())
+                    {
+                        var conditionAnnotation = index.FindAnnotation(IndexBuilderExtension.UniqueIndexAnnotationName);
+                        if (conditionAnnotation != null)
+                        {
+                            nonUniqueList.Add(
+                                new EntityConditionalIndexInfo(
+                                    index.Properties.Select(
+                                        property => new EntityIndexInfo(property.Name, property.GetGetter(), property.ClrType)),
+                                    entityType.ClrType, conditionAnnotation.Value as LambdaExpression));
+                        }
+                    }
 
                     _entityInfos.Add(entityType.ClrType, new EntityInfo
                     {
                         PrimaryKey = new EntityPrimaryKeyInfo(keyInfos),
-                        UniqueIndex = uniqueIndex
+                        UniqueIndex = uniqueIndex,
+                        ConditionalIndexes = nonUniqueList
                     });
                 }
             }
@@ -66,6 +86,16 @@ namespace VitalChoice.Caching.Services
                 return entityInfo.UniqueIndex;
             }
             return null;
+        }
+
+        public ICollection<EntityConditionalIndexInfo> GetConditionalIndexInfos<T>()
+        {
+            EntityInfo entityInfo;
+            if (_entityInfos.TryGetValue(typeof (T), out entityInfo))
+            {
+                return entityInfo.ConditionalIndexes;
+            }
+            return new EntityConditionalIndexInfo[0];
         }
     }
 }

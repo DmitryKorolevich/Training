@@ -8,27 +8,27 @@ namespace VitalChoice.Caching.Interfaces
 {
     public interface IInternalEntityCache
     {
-        bool TryRemove(object entity, out List<object> removedList);
-        bool TryRemove(object entity);
+        CachedEntity Update(RelationInfo relations, object entity);
+        IEnumerable<CachedEntity> Update(RelationInfo relations, IEnumerable<object> entity);
         void Update(IEnumerable<object> entities, RelationInfo relationInfo);
         void Update(object entity, RelationInfo relationInfo);
         void UpdateAll(IEnumerable<object> entities, RelationInfo relationInfo);
         void MarkForUpdate(object entity);
         void MarkForUpdate(IEnumerable<object> entities);
-        CachedEntity UpdateCache(object entity, RelationInfo relations);
-        ICollection<CachedEntity> UpdateCache(IEnumerable<object> entities, RelationInfo relations);
+        bool TryRemove(object entity);
         bool GetCacheExist(RelationInfo relationInfo);
         bool GetIsCacheFullCollection(RelationInfo relationInfo);
     }
 
     public interface IInternalEntityCache<T> : IInternalEntityCache
     {
-        CacheGetResult TryGetEntity(EntityPrimaryKeySearchInfo searchInfo, out T entity);
-        CacheGetResult TryGetEntities(ICollection<EntityPrimaryKeySearchInfo> searchInfos, Expression<Func<T, bool>> whereExpression, out List<T> entities);
-        CacheGetResult TryGetEntities(ICollection<EntityPrimaryKey> primaryKeys, RelationInfo relations, Expression<Func<T, bool>> whereExpression, out List<T> entities);
-        CacheGetResult TryGetEntity(EntityUniqueIndexSearchInfo searchInfo, out T entity);
-        CacheGetResult TryGetEntities(ICollection<EntityUniqueIndexSearchInfo> searchInfos, Expression<Func<T, bool>> whereExpression, out List<T> entities);
-        CacheGetResult TryGetEntities(ICollection<EntityUniqueIndex> indexes, RelationInfo relations, Expression<Func<T, bool>> whereExpression, out List<T> entities);
+        CacheGetResult TryGetEntity(EntityKey key, RelationInfo relations, out T entity);
+        CacheGetResult TryGetEntities(ICollection<EntityKey> primaryKeys, RelationInfo relations, Expression<Func<T, bool>> whereExpression, out List<T> entities);
+        CacheGetResult TryGetEntity(EntityIndex index, RelationInfo relations, out T entity);
+        CacheGetResult TryGetEntities(ICollection<EntityIndex> indexes, RelationInfo relations, Expression<Func<T, bool>> whereExpression, out List<T> entities);
+        CacheGetResult TryGetEntity(EntityIndex key, EntityConditionalIndexInfo conditionalInfo, RelationInfo relations, out T entity);
+        CacheGetResult TryGetEntities(ICollection<EntityIndex> indexes, EntityConditionalIndexInfo conditionalInfo,
+            RelationInfo relations, Expression<Func<T, bool>> whereExpression, out List<T> entities);
         CacheGetResult GetWhere(RelationInfo relations, Func<T, bool> whereFunc, out List<T> entities);
         CacheGetResult GetWhere(RelationInfo relations, Expression<Func<T, bool>> whereExpression, out List<T> entities);
         CacheGetResult GetAll(RelationInfo relations, out List<T> entities);
@@ -39,10 +39,10 @@ namespace VitalChoice.Caching.Interfaces
         bool TryRemove(T entity);
         void Update(IEnumerable<T> entities, RelationInfo relationInfo);
         void Update(T entity, RelationInfo relationInfo);
+        CachedEntity<T> Update(RelationInfo relations, T entity);
+        IEnumerable<CachedEntity<T>> Update(RelationInfo relations, IEnumerable<T> entities);
         void UpdateAll(IEnumerable<T> entities, RelationInfo relationInfo);
         void MarkForUpdate(T entity);
         void MarkForUpdate(IEnumerable<T> entities);
-        CachedEntity<T> UpdateCache(T entity, RelationInfo relations, CacheData<T> data = null);
-        ICollection<CachedEntity<T>> UpdateCache(IEnumerable<T> entities, RelationInfo relations, CacheData<T> data = null);
     }
 }

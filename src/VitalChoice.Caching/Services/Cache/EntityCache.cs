@@ -163,7 +163,7 @@ namespace VitalChoice.Caching.Services.Cache
             return result;
         }
 
-        private CacheGetResult TryGetMultipleByIndexes(DbContext dbContext, out List<T> entities, ICollection<EntityUniqueIndex> indexes, RelationInfo relationInfo,
+        private CacheGetResult TryGetMultipleByIndexes(DbContext dbContext, out List<T> entities, ICollection<EntityIndex> indexes, RelationInfo relationInfo,
             QueriableExpressionVisitor<T> queryAnalyzer, bool ordered, Expression queryExpression)
         {
             var result = _internalCache.TryGetEntities(indexes, relationInfo, queryAnalyzer.WhereExpression.Expression, out entities);
@@ -196,15 +196,11 @@ namespace VitalChoice.Caching.Services.Cache
             return result;
         }
 
-        private CacheGetResult TryGetSingleByIndex(DbContext dbContext, out List<T> entities, RelationInfo relationInfo, ICollection<EntityUniqueIndex> indexes,
+        private CacheGetResult TryGetSingleByIndex(DbContext dbContext, out List<T> entities, RelationInfo relationInfo, ICollection<EntityIndex> indexes,
             QueriableExpressionVisitor<T> queryAnalyzer)
         {
             T entity;
-            var result = _internalCache.TryGetEntity(new EntityUniqueIndexSearchInfo
-            {
-                RelationInfo = relationInfo,
-                UniqueIndex = indexes.Single()
-            }, out entity);
+            var result = _internalCache.TryGetEntity(indexes.Single(), relationInfo, out entity);
             if (result == CacheGetResult.Found && _indexAnalyzer.ContainsAdditionalConditions)
             {
                 entity = queryAnalyzer.WhereExpression.Expression.CacheCompile()(entity) ? entity : null;
@@ -218,7 +214,7 @@ namespace VitalChoice.Caching.Services.Cache
             return result;
         }
 
-        private CacheGetResult TryGetMultipleByPks(DbContext dbContext, out List<T> entities, ICollection<EntityPrimaryKey> pks, RelationInfo relationInfo,
+        private CacheGetResult TryGetMultipleByPks(DbContext dbContext, out List<T> entities, ICollection<EntityKey> pks, RelationInfo relationInfo,
             QueriableExpressionVisitor<T> queryAnalyzer, bool ordered, Expression queryExpression)
         {
             var result = _internalCache.TryGetEntities(pks, relationInfo, queryAnalyzer.WhereExpression.Expression, out entities);
@@ -251,15 +247,11 @@ namespace VitalChoice.Caching.Services.Cache
             return result;
         }
 
-        private CacheGetResult TryGetSingleByPk(DbContext dbContext, out List<T> entities, RelationInfo relationInfo, ICollection<EntityPrimaryKey> pks,
+        private CacheGetResult TryGetSingleByPk(DbContext dbContext, out List<T> entities, RelationInfo relationInfo, ICollection<EntityKey> pks,
             QueriableExpressionVisitor<T> queryAnalyzer)
         {
             T entity;
-            var result = _internalCache.TryGetEntity(new EntityPrimaryKeySearchInfo
-            {
-                RelationInfo = relationInfo,
-                PrimaryKey = pks.Single()
-            }, out entity);
+            var result = _internalCache.TryGetEntity(pks.Single(), relationInfo, out entity);
             if (result == CacheGetResult.Found && _primaryKeyAnalyzer.ContainsAdditionalConditions)
             {
                 entity = queryAnalyzer.WhereExpression.Expression.CacheCompile()(entity) ? entity : null;
@@ -284,7 +276,7 @@ namespace VitalChoice.Caching.Services.Cache
             dbContext.Attach(entity);
             foreach (var relation in relations.Relations)
             {
-                var entityObject = RelationProcessor.GetRelatedObject(relation.OwnedType, relation.Name, entity);
+                var entityObject = relation.GetRelatedObject(entity);
                 Attach(entityObject, relation, dbContext, processedRelations);
             }
         }

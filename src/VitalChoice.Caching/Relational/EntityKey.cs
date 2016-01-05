@@ -4,16 +4,16 @@ using System.Linq;
 
 namespace VitalChoice.Caching.Relational
 {
-    public class EntityPrimaryKey : IEquatable<EntityPrimaryKey>
+    public class EntityKey : IEquatable<EntityKey>
     {
         private readonly Dictionary<string, EntityKeyValue> _keys;
 
-        public EntityPrimaryKey(IEnumerable<EntityKeyValue> keys)
+        public EntityKey(IEnumerable<EntityKeyValue> keys)
         {
             _keys = keys.ToDictionary(k => k.KeyInfo.Name);
         }
 
-        public bool Equals(EntityPrimaryKey other)
+        public bool Equals(EntityKey other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -35,7 +35,7 @@ namespace VitalChoice.Caching.Relational
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            var primaryKey = obj as EntityPrimaryKey;
+            var primaryKey = obj as EntityKey;
             if (primaryKey != null)
                 return Equals(primaryKey);
             return false;
@@ -49,12 +49,12 @@ namespace VitalChoice.Caching.Relational
             }
         }
 
-        public static bool operator ==(EntityPrimaryKey left, EntityPrimaryKey right)
+        public static bool operator ==(EntityKey left, EntityKey right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(EntityPrimaryKey left, EntityPrimaryKey right)
+        public static bool operator !=(EntityKey left, EntityKey right)
         {
             return !Equals(left, right);
         }

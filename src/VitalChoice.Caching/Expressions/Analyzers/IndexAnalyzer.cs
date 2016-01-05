@@ -19,9 +19,9 @@ namespace VitalChoice.Caching.Expressions.Analyzers
             _indexesInfo = entityInfoStorage.GetIndexInfos<T>();
         }
 
-        public ICollection<EntityUniqueIndex> TryGetIndexes(WhereExpression<T> expression)
+        public ICollection<EntityIndex> TryGetIndexes(WhereExpression<T> expression)
         {
-            HashSet<EntityUniqueIndex> result = new HashSet<EntityUniqueIndex>();
+            HashSet<EntityIndex> result = new HashSet<EntityIndex>();
             HashSet<EntityIndexValue> indexValues = new HashSet<EntityIndexValue>();
             try
             {
@@ -29,17 +29,17 @@ namespace VitalChoice.Caching.Expressions.Analyzers
 
                 if (_indexesInfo.IndexInfoInternal.Count == indexValues.Count)
                 {
-                    result.Add(new EntityUniqueIndex(indexValues));
+                    result.Add(new EntityIndex(indexValues));
                 }
             }
             catch
             {
-                return new EntityUniqueIndex[0];
+                return new EntityIndex[0];
             }
             return result;
         }
 
-        private bool WalkConditionTree(Condition top, HashSet<EntityUniqueIndex> indexes,
+        private bool WalkConditionTree(Condition top, HashSet<EntityIndex> indexes,
             HashSet<EntityIndexValue> indexValues)
         {
             EntityIndexInfo indexInfo;
@@ -83,7 +83,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                         // ReSharper disable once LoopCanBeConvertedToQuery
                         foreach (var item in values)
                         {
-                            indexes.Add(new EntityUniqueIndex(new[] {new EntityIndexValue(indexInfo, item)}));
+                            indexes.Add(new EntityIndex(new[] {new EntityIndexValue(indexInfo, item)}));
                         }
                         return false;
                     }

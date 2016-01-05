@@ -8,13 +8,16 @@ namespace VitalChoice.Caching.Services.Cache
     public abstract class CachedEntity
     {
         protected DateTime LastAccess = DateTime.Now;
-        private readonly object _entity;
+        private readonly object _valueInternal;
         private volatile bool _needUpdate;
 
-        protected CachedEntity(object entity, ICollection<RelationInstance> relations)
+        protected CachedEntity(object valueInternal, ICollection<RelationInstance> relations,
+            ICollection<KeyValuePair<EntityConditionalIndexInfo, EntityIndex>> conditionalIndexes, EntityIndex uniqueIndex = null)
         {
             Relations = relations;
-            _entity = entity;
+            ConditionalIndexes = conditionalIndexes;
+            UniqueIndex = uniqueIndex;
+            _valueInternal = valueInternal;
         }
 
         public DateTime LastAccessTime => LastAccess;
@@ -32,22 +35,26 @@ namespace VitalChoice.Caching.Services.Cache
                 lock (this)
                 {
                     LastAccess = DateTime.Now;
-                    return _entity;
+                    return _valueInternal;
                 }
             }
         }
 
         public ICollection<RelationInstance> Relations { get; set; }
+        public EntityIndex UniqueIndex { get; internal set; }
+        public ICollection<KeyValuePair<EntityConditionalIndexInfo, EntityIndex>> ConditionalIndexes { get; internal set; }
     }
 
     public class CachedEntity<T> : CachedEntity
     {
-        private readonly T _entity;
+        internal readonly T ValueInternal;
 
-        public CachedEntity(T entity, ICollection<RelationInstance> relations) : base(entity, relations)
+        public CachedEntity(T valueInternal, ICollection<RelationInstance> relations,
+            ICollection<KeyValuePair<EntityConditionalIndexInfo, EntityIndex>> conditionalIndexes, EntityIndex uniqueIndex = null)
+            : base(valueInternal, relations, conditionalIndexes, uniqueIndex)
         {
             Relations = relations;
-            _entity = entity;
+            ValueInternal = valueInternal;
         }
 
         public T Entity
@@ -57,7 +64,7 @@ namespace VitalChoice.Caching.Services.Cache
                 lock (this)
                 {
                     LastAccess = DateTime.Now;
-                    return _entity;
+                    return ValueInternal;
                 }
             }
         }

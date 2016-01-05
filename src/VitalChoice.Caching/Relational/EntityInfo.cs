@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using VitalChoice.Caching.Indexes;
 
 namespace VitalChoice.Caching.Relational
 {
@@ -10,6 +9,6 @@ namespace VitalChoice.Caching.Relational
     {
         public EntityPrimaryKeyInfo PrimaryKey;
         public EntityUniqueIndexInfo UniqueIndex;
-        public ConditionalIndexInfo[] ConditionalIndexes;
+        public ICollection<EntityConditionalIndexInfo> ConditionalIndexes;
     }
 }

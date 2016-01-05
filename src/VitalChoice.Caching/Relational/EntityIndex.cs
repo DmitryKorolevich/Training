@@ -4,19 +4,16 @@ using System.Linq;
 
 namespace VitalChoice.Caching.Relational
 {
-    public class EntityUniqueIndex : IEquatable<EntityUniqueIndex>
+    public class EntityIndex : IEquatable<EntityIndex>
     {
-        public EntityUniqueIndexInfo IndexInfo { get; }
-
         private readonly Dictionary<string, EntityIndexValue> _indexValues;
 
-        public EntityUniqueIndex(IEnumerable<EntityIndexValue> values)
+        public EntityIndex(IEnumerable<EntityIndexValue> values)
         {
             _indexValues = values.ToDictionary(k => k.IndexInfo.Name);
-            IndexInfo = new EntityUniqueIndexInfo(_indexValues.Values.Select(v => v.IndexInfo));
         }
 
-        public bool Equals(EntityUniqueIndex other)
+        public bool Equals(EntityIndex other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -31,14 +28,14 @@ namespace VitalChoice.Caching.Relational
                     return false;
                 }
             }
-            return base.Equals(other);
+            return true;
         }
 
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            var primaryKey = obj as EntityUniqueIndex;
+            var primaryKey = obj as EntityIndex;
             if (primaryKey != null)
                 return Equals(primaryKey);
             return false;
@@ -52,12 +49,12 @@ namespace VitalChoice.Caching.Relational
             }
         }
 
-        public static bool operator ==(EntityUniqueIndex left, EntityUniqueIndex right)
+        public static bool operator ==(EntityIndex left, EntityIndex right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(EntityUniqueIndex left, EntityUniqueIndex right)
+        public static bool operator !=(EntityIndex left, EntityIndex right)
         {
             return !Equals(left, right);
         }

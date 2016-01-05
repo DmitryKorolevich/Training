@@ -6,40 +6,36 @@ using System.Threading.Tasks;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Ecommerce.Domain;
+using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Caching.Services.Cache
 {
     public sealed class CacheStorage<T>
     {
+        private readonly IInternalEntityCacheFactory _cacheFactory;
+        private readonly ITypeConverter _typeConverter;
         private readonly EntityPrimaryKeyInfo _primaryKeyInfo;
         private readonly EntityUniqueIndexInfo _indexInfo;
+        private readonly ICollection<EntityConditionalIndexInfo> _conditionalIndexes;
 
-        public CacheStorage(IInternalEntityInfoStorage keyStorage)
+        public CacheStorage(IInternalEntityInfoStorage keyStorage, IInternalEntityCacheFactory cacheFactory, ITypeConverter typeConverter)
         {
+            _cacheFactory = cacheFactory;
+            _typeConverter = typeConverter;
             _primaryKeyInfo = keyStorage.GetPrimaryKeyInfo<T>();
             _indexInfo = keyStorage.GetIndexInfos<T>();
+            _conditionalIndexes = keyStorage.GetConditionalIndexInfos<T>();
         }
 
         private readonly ConcurrentDictionary<RelationInfo, CacheData<T>> _cacheData =
             new ConcurrentDictionary<RelationInfo, CacheData<T>>();
 
-        public EntityPrimaryKey GetPrimaryKeyValue(T entity)
-        {
-            var keyValues =
-                _primaryKeyInfo.KeyInfo.Select(keyInfo => new EntityKeyValue(keyInfo, keyInfo.Property.GetClrValue(entity)));
-            return new EntityPrimaryKey(keyValues);
-        }
+        
 
-        public EntityUniqueIndex GetIndexValue(T entity)
+        public ICacheData<T> GetCacheData(RelationInfo relationInfo)
         {
-            return
-                new EntityUniqueIndex(
-                    _indexInfo.IndexInfoInternal.Values.Select(info => new EntityIndexValue(info, info.Property.GetClrValue(entity))));
-        }
-
-        public CacheData<T> GetCacheData(RelationInfo relationInfo)
-        {
-            return _cacheData.GetOrAdd(relationInfo, r => new CacheData<T>());
+            return _cacheData.GetOrAdd(relationInfo,
+                r => new CacheData<T>(_cacheFactory, _typeConverter, this, _conditionalIndexes));
         }
 
         public ICollection<CacheData<T>> AllCacheDatas => _cacheData.Values;
@@ -49,7 +45,7 @@ namespace VitalChoice.Caching.Services.Cache
             CacheData<T> data;
             if (_cacheData.TryGetValue(relationInfo, out data))
             {
-                return data.EntityDictionary.Count > 0;
+                return data.Empty;
             }
             return false;
         }
@@ -62,6 +58,31 @@ namespace VitalChoice.Caching.Services.Cache
                 return data.FullCollection;
             }
             return false;
+        }
+
+        public EntityKey GetPrimaryKeyValue(T entity)
+        {
+            var keyValues =
+                _primaryKeyInfo.KeyInfo.Select(keyInfo => new EntityKeyValue(keyInfo, keyInfo.Property.GetClrValue(entity)));
+            return new EntityKey(keyValues);
+        }
+
+        public EntityIndex GetIndexValue(T entity)
+        {
+            if (_indexInfo != null)
+            {
+                return
+                    new EntityIndex(
+                        _indexInfo.IndexInfoInternal.Values.Select(info => new EntityIndexValue(info, info.Property.GetClrValue(entity))));
+            }
+            return null;
+        }
+
+        public EntityIndex GetConditionalIndexValue(T entity, EntityConditionalIndexInfo conditionalInfo)
+        {
+            return
+                new EntityIndex(
+                    conditionalInfo.IndexInfoInternal.Values.Select(info => new EntityIndexValue(info, info.Property.GetClrValue(entity))));
         }
     }
 }

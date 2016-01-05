@@ -23,9 +23,9 @@ namespace VitalChoice.Caching.Expressions.Analyzers
             _keyInfo = entityInfoStorage.GetPrimaryKeyInfo<T>();
         }
 
-        public ICollection<EntityPrimaryKey> TryGetPrimaryKeys(WhereExpression<T> expression)
+        public ICollection<EntityKey> TryGetPrimaryKeys(WhereExpression<T> expression)
         {
-            HashSet<EntityPrimaryKey> result = new HashSet<EntityPrimaryKey>();
+            HashSet<EntityKey> result = new HashSet<EntityKey>();
             HashSet<EntityKeyValue> keyValues = new HashSet<EntityKeyValue>();
             try
             {
@@ -35,17 +35,17 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                     return result;
 
                 if (keyValues.Count == _keyInfo.KeyInfo.Count)
-                    result.Add(new EntityPrimaryKey(keyValues));
+                    result.Add(new EntityKey(keyValues));
 
             }
             catch
             {
-                return new EntityPrimaryKey[0];
+                return new EntityKey[0];
             }
             return result;
         }
 
-        private bool WalkConditionTree(Condition top, HashSet<EntityPrimaryKey> pks, HashSet<EntityKeyValue> keyValues)
+        private bool WalkConditionTree(Condition top, HashSet<EntityKey> pks, HashSet<EntityKeyValue> keyValues)
         {
             switch (top.Operator)
             {
@@ -88,7 +88,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                         // ReSharper disable once LoopCanBeConvertedToQuery
                         foreach (var item in values)
                         {
-                            pks.Add(new EntityPrimaryKey(new[] {new EntityKeyValue(info, item)}));
+                            pks.Add(new EntityKey(new[] {new EntityKeyValue(info, item)}));
                         }
                         return false;
                     }

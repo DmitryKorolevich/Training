@@ -37,7 +37,7 @@ namespace VitalChoice.Caching.Relational
                 _relationGetter =
                     (IRelationGetter)
                         Activator.CreateInstance(typeof (RelationGetter<,>).MakeGenericType(ownedType, relationExpression.ReturnType),
-                            relationExpression);
+                            relationExpression, name);
             }
             else
             {
@@ -127,16 +127,12 @@ namespace VitalChoice.Caching.Relational
 
         public static bool operator ==(RelationInfo left, RelationInfo right)
         {
-            if ((object) left == (object) right)
-                return true;
-            return (object) left != null && left.Equals(right);
+            return Equals(left, right);
         }
 
         public static bool operator !=(RelationInfo left, RelationInfo right)
         {
-            if ((object) left == (object) right)
-                return false;
-            return (object) left == null || !left.Equals(right);
+            return !Equals(left, right);
         }
 
         public static bool operator >=(RelationInfo left, RelationInfo right)
@@ -151,9 +147,18 @@ namespace VitalChoice.Caching.Relational
 
         private class RelationGetter<TEntity, TRelation> : IRelationGetter
         {
-            public RelationGetter(Expression<Func<TEntity, TRelation>> getExpression)
+            private static readonly Dictionary<string, Func<TEntity, TRelation>> RelationsCache = new Dictionary<string, Func<TEntity, TRelation>>();
+
+            public RelationGetter(Expression<Func<TEntity, TRelation>> getExpression, string propertyName)
             {
-                _relationFunc = getExpression.CacheCompile();
+                lock (RelationsCache)
+                {
+                    if (RelationsCache.TryGetValue(propertyName, out _relationFunc))
+                        return;
+
+                    _relationFunc = getExpression.CacheCompile();
+                    RelationsCache.Add(propertyName, _relationFunc);
+                }
             }
 
             private readonly Func<TEntity, TRelation> _relationFunc;
