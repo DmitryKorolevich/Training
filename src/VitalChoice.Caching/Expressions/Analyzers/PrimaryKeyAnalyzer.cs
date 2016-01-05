@@ -31,12 +31,22 @@ namespace VitalChoice.Caching.Expressions.Analyzers
             {
                 WalkConditionTree(expression.Condition, result, keyValues);
 
-                if (!keyValues.Any())
-                    return result;
-
-                if (keyValues.Count == _keyInfo.KeyInfo.Count)
-                    result.Add(new EntityKey(keyValues));
-
+                if (result.Any())
+                {
+                    if (_keyInfo.KeyInfo.Count == keyValues.Count)
+                    {
+                        var newKey = new EntityKey(keyValues);
+                        if (result.Contains(newKey))
+                        {
+                            result.Clear();
+                            result.Add(newKey);
+                        }
+                        else
+                        {
+                            result.Clear();
+                        }
+                    }
+                }
             }
             catch
             {
@@ -85,12 +95,28 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                     if (values != null && memberSelector != null && memberSelector.Type == typeof (T) &&
                         _keyInfo.KeyInfoFields.TryGetValue(memberSelector.Member.Name, out info) && _keyInfo.KeyInfo.Count == 1)
                     {
-                        // ReSharper disable once LoopCanBeConvertedToQuery
-                        foreach (var item in values)
+                        if (pks.Any())
                         {
-                            pks.Add(new EntityKey(new[] {new EntityKeyValue(info, item)}));
+                            HashSet<EntityKey> newKeys = new HashSet<EntityKey>();
+                            foreach (var item in values)
+                            {
+                                newKeys.Add(new EntityKey(new[] {new EntityKeyValue(info, item)}));
+                            }
+                            var sameKeys = pks.Where(key => newKeys.Contains(key)).ToArray();
+                            pks.Clear();
+                            pks.AddRange(sameKeys);
                         }
-                        return false;
+                        else
+                        {
+                            foreach (var item in values)
+                            {
+                                pks.Add(new EntityKey(new[] { new EntityKeyValue(info, item) }));
+                            }
+                        }
+
+                        // ReSharper disable once LoopCanBeConvertedToQuery
+                        
+                        return true;
                     }
                     ContainsAdditionalConditions = true;
                     return true;

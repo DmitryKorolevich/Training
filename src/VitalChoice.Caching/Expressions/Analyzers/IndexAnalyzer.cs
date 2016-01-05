@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Expressions.Analyzers
 {
@@ -27,9 +28,21 @@ namespace VitalChoice.Caching.Expressions.Analyzers
             {
                 WalkConditionTree(expression.Condition, result, indexValues);
 
-                if (_indexesInfo.IndexInfoInternal.Count == indexValues.Count)
+                if (result.Any())
                 {
-                    result.Add(new EntityIndex(indexValues));
+                    if (_indexesInfo.IndexInfoInternal.Count == indexValues.Count)
+                    {
+                        var newIndex = new EntityIndex(indexValues);
+                        if (result.Contains(newIndex))
+                        {
+                            result.Clear();
+                            result.Add(newIndex);
+                        }
+                        else
+                        {
+                            result.Clear();
+                        }
+                    }
                 }
             }
             catch
@@ -80,11 +93,27 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                     if (values != null && memberSelector != null && memberSelector.Type == typeof (T) && _indexesInfo.IndexInfoInternal.Count == 1 &&
                         _indexesInfo.IndexInfoInternal.TryGetValue(memberSelector.Member.Name, out indexInfo))
                     {
-                        // ReSharper disable once LoopCanBeConvertedToQuery
-                        foreach (var item in values)
+                        if (indexes.Any())
                         {
-                            indexes.Add(new EntityIndex(new[] {new EntityIndexValue(indexInfo, item)}));
+                            HashSet<EntityIndex> newKeys = new HashSet<EntityIndex>();
+                            foreach (var item in values)
+                            {
+                                newKeys.Add(new EntityIndex(new[] { new EntityIndexValue(indexInfo, item) }));
+                            }
+                            var sameKeys = indexes.Where(key => newKeys.Contains(key)).ToArray();
+                            indexes.Clear();
+                            indexes.AddRange(sameKeys);
                         }
+                        else
+                        {
+                            foreach (var item in values)
+                            {
+                                indexes.Add(new EntityIndex(new[] { new EntityIndexValue(indexInfo, item) }));
+                            }
+                        }
+
+                        // ReSharper disable once LoopCanBeConvertedToQuery
+                        
                         return false;
                     }
                     ContainsAdditionalConditions = true;
