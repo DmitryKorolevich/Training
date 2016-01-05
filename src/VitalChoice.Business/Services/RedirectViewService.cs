@@ -28,6 +28,7 @@ namespace VitalChoice.Business.Services
         {
             get
             {
+                //TODO - should be read once after adding global caching for DB
                 //if (_map == null)
                 //{
                 //    lock (_mapSyncObject)
