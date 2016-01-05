@@ -60,20 +60,22 @@ namespace VitalChoice.Business.Services
 
         public async Task<Redirect> UpdateRedirectAsync(Redirect item)
         {
-            if(item.Id==0)
+            var dublicatesExist = await _redirectRepository.Query(p => p.From == item.From && p.Id != item.Id
+                && p.StatusCode != RecordStatusCode.Deleted).SelectAnyAsync();
+            if (dublicatesExist)
+            {
+                throw new AppValidationException("From", "Redirect with the same Source URL already exists, please use a unique URL.");
+            }
+
+            if (item.Id==0)
             {
                 item.IdAddedBy = item.IdEditedBy;
                 item.DateCreated = item.DateEdited =DateTime.Now;
+                item.StatusCode = RecordStatusCode.Active;
                 await _redirectRepository.InsertAsync(item);
             }
             else
             {
-                var dublicatesExist = await _redirectRepository.Query(p => p.From == item.From && p.Id != item.Id
-                    && p.StatusCode != RecordStatusCode.Deleted).SelectAnyAsync();
-                if (dublicatesExist)
-                {
-                    throw new AppValidationException("From", "Redirect with the same From URL already exists, please use a unique URL.");
-                }
                 var dbItem= (await _redirectRepository.Query(p =>p.Id == item.Id && p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).FirstOrDefault();
                 if(dbItem!=null)
                 {

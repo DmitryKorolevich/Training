@@ -52,9 +52,9 @@
                 Status: null,
                 ValidFrom: null,
                 ValidTo: null,
-                DateStatus: null,
+                DateStatus: 2,//live
                 Paging: { PageIndex: 1, PageItemCount: 100 },
-                Sorting: gridSorterUtil.resolve(refreshDiscounts, "DateCreated", "Desc")
+                Sorting: gridSorterUtil.resolve(refreshDiscounts, "Code", "Asc")
             };
 
             refreshDiscounts();

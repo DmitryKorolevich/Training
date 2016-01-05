@@ -27,7 +27,7 @@ namespace VC.Admin.Validators.Redirect
                     .WithMessage(model => model.From, ValidationMessages.FieldRequired)
                     .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
                     .WithMessage(model => model.From, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
-                    .Matches(ValidationPatterns.ContentUrlPattern).Matches(ValidationPatterns.ContentUrlPattern)
+                    .Matches(ValidationPatterns.RelativeUrlPattern)
                     .WithMessage(model => model.From, ValidationMessages.FieldContentUrlInvalidFormat);
 
                 RuleFor(model => model.To)

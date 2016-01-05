@@ -220,9 +220,19 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<OrderDynamic> SelectLastOrderAsync(int customerId)
         {
+            //TODO - should be redone on standart reading with dynamics after fixing missing data(Skus) with sort of operations
+            OrderDynamic toReturn = null;
             var orderQuery = new OrderQuery().WithActualStatusOnly().WithCustomerId(customerId);
+            var order = (await _orderRepository.Query(orderQuery).OrderBy(p => p.OrderByDescending(x => x.DateCreated)).SelectAsync(false)).FirstOrDefault();
+            if (order != null)
+            {
+                toReturn = await this.SelectAsync(order.Id);
+            }
+            return toReturn;
 
-            return await SelectFirstAsync(queryObject: orderQuery, orderBy: o => o.OrderByDescending(x => x.DateCreated));
+            //var orderQuery = new OrderQuery().WithActualStatusOnly().WithCustomerId(customerId);
+
+            //return await SelectFirstAsync(queryObject: orderQuery, orderBy: o => o.OrderByDescending(x => x.DateCreated));
         }
 
         private void UpdateOrderFromCalculationContext(OrderDynamic order, OrderDataContext dataContext)

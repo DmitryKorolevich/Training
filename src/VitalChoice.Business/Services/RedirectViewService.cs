@@ -52,7 +52,7 @@ namespace VitalChoice.Business.Services
         {
             if (context.Request.Path.HasValue)
             {
-                var path = context.Request.Path.Value.ToLower();
+                var path = context.Request.Path.ToUriComponent()+ context.Request.QueryString.ToUriComponent();
                 if (Map.ContainsKey(path))
                 {
                     context.Response.Redirect(Map[path], true);
