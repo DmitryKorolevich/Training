@@ -127,7 +127,21 @@
 		</header>
 		<div class="content">
             <div class="alert-banner">
-                @await Component.InvokeAsync("Area", "Alert Top Section")
+	            @*@await Component.InvokeAsync("Area", "Alert Top Section")*@
+	            <form class="bronto-form">
+		            <span>Get Special Offers, Recipes, Healthy News ... and more!</span>
+					<div class="email-input-container">
+						<input placeholder="Email Address" class="txtEmail" type="text"/>
+						<div class="bubble">
+							Please enter a valid email address
+						</div>
+					</div>
+		            <a href="#" class="btnPostEmail">I'm on Board</a>
+		            <a class="close-form" href="#">Hide this&nbsp;<img src="/Assets/images/cart/Close-128.png"/></a>
+	            </form>
+	            <div class="bronto-form-success">
+		            <span>Got it! You are now signed up to receive our newsletter.</span>
+	            </div>
             </div>
 			<div class="content-dynamic">
 				@RenderBody()

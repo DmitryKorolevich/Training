@@ -198,6 +198,28 @@ var successMessage;
 var defaultModalSize = 461;
 
 $(function () {
+	$(".btnPostEmail").on("click", function() {
+		if ($(".bronto-form").is(":visible")) {
+			$(".bronto-form").hide();
+			$(".bronto-form-success").show();
+		} else {
+			$(".bronto-form").show();
+			$(".bronto-form-success").hide();
+		}
+	});
+
+	$(".txtEmail").on("click", function() {
+		if ($(".bubble").is(":visible")) {
+			$(".bubble").hide();
+		} else {
+			$(".bubble").show();
+		}
+	});
+
+	$(".close-form").on("click", function() {
+		$(".bronto-form").hide();
+	});
+
 	//fix for IE7 and IE8
 	if (!$.support.placeholder) {
 		$("[placeholder]").focus(function () {
