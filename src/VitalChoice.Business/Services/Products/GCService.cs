@@ -19,6 +19,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
+using VitalChoice.Interfaces.Services.Orders;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -35,7 +36,9 @@ namespace VitalChoice.Business.Services.Products
         private readonly ILogger logger;
 
         public GCService(IEcommerceRepositoryAsync<GiftCertificate> giftCertificateRepository,
-            UserManager<ApplicationUser> userManager, INotificationService notificationService, ILoggerProviderExtended loggerProvider)
+            UserManager<ApplicationUser> userManager, 
+            INotificationService notificationService,
+            ILoggerProviderExtended loggerProvider)
         {
             this.giftCertificateRepository = giftCertificateRepository;
             this.userManager = userManager;

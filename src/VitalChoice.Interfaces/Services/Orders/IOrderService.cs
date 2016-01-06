@@ -45,5 +45,11 @@ namespace VitalChoice.Interfaces.Services.Orders
         Task<decimal> GetOrderWithRegionInfoAmountAsync(OrderRegionFilter filter);
 
         #endregion
+
+        #region GCOrders
+
+        Task<ICollection<GCOrderItem>> GetGCOrdersAsync(int idGC);
+
+        #endregion
     }
 }

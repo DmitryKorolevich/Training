@@ -79,5 +79,9 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    {
 	        return $http.post(baseUrl + 'GetOrderWithRegionInfoAmount', filter, getConfig(tracker));
 	    },
+	    getGCOrders: function (id, tracker)
+	    {
+	        return $http.get(baseUrl + 'GetGCOrders/'+ id, getConfig(tracker));
+	    },
 	};
 }]);

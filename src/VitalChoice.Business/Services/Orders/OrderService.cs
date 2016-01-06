@@ -78,6 +78,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly SPEcommerceRepository _sPEcommerceRepository;
         private readonly IPaymentMethodService _paymentMethodService;
         private readonly IObjectMapper<OrderPaymentMethodDynamic> _paymentMapper;
+        private readonly IEcommerceRepositoryAsync<OrderToGiftCertificate> _orderToGiftCertificateRepositoryAsync;
 
         public OrderService(
             IEcommerceRepositoryAsync<VOrder> vOrderRepository,
@@ -99,7 +100,10 @@ namespace VitalChoice.Business.Services.Orders
             IEcommerceRepositoryAsync<HealthwisePeriod> healthwisePeriodRepositoryAsync,
             IAppInfrastructureService appInfrastructureService,
             IEncryptedOrderExportService encryptedOrderExportService,
-            SPEcommerceRepository sPEcommerceRepository, IPaymentMethodService paymentMethodService, IObjectMapper<OrderPaymentMethodDynamic> paymentMapper)
+            SPEcommerceRepository sPEcommerceRepository,
+            IPaymentMethodService paymentMethodService,
+            IObjectMapper<OrderPaymentMethodDynamic> paymentMapper,
+            IEcommerceRepositoryAsync<OrderToGiftCertificate> orderToGiftCertificateRepositoryAsync)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor)
@@ -121,6 +125,7 @@ namespace VitalChoice.Business.Services.Orders
             _sPEcommerceRepository = sPEcommerceRepository;
             _paymentMethodService = paymentMethodService;
             _paymentMapper = paymentMapper;
+            _orderToGiftCertificateRepositoryAsync = orderToGiftCertificateRepositoryAsync;
         }
 
         protected override IQueryLite<Order> BuildQuery(IQueryLite<Order> query)
@@ -907,6 +912,43 @@ namespace VitalChoice.Business.Services.Orders
         public async Task<decimal> GetOrderWithRegionInfoAmountAsync(OrderRegionFilter filter)
         {
             return await _orderRepository.GetOrderWithRegionInfoAmountAsync(filter);
+        }
+
+        #endregion
+
+        #region GCOrders
+        
+        public async Task<ICollection<GCOrderItem>> GetGCOrdersAsync(int idGC)
+        {
+            List<GCOrderItem> toReturn = new List<GCOrderItem>();
+
+            var orderToGCs = await _orderToGiftCertificateRepositoryAsync.Query(p => p.IdGiftCertificate == idGC).SelectAsync(false);
+            var orders = (await SelectAsync(orderToGCs.Select(p => p.IdOrder).ToList())).OrderByDescending(p=>p.DateCreated);
+            foreach (var orderToGC in orderToGCs)
+            {
+                var order = orders.FirstOrDefault(p => p.Id == orderToGC.IdOrder);
+                if(order!=null)
+                {
+                    GCOrderItem item = new GCOrderItem();
+                    item.Order = order;
+                    item.GCAmountUsed = orderToGC.Amount;
+                    toReturn.Add(item);
+                }
+            }
+            var ids = toReturn.Select(p => p.Order.IdEditedBy).ToList();
+            var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
+            foreach (var item in toReturn)
+            {
+                foreach (var profile in profiles)
+                {
+                    if (item.Order.IdEditedBy == profile.Id)
+                    {
+                        item.EditedBy = profile.AgentId;
+                    }
+                }
+            }
+
+            return toReturn;
         }
 
         #endregion
