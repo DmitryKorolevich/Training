@@ -49,7 +49,7 @@ namespace VC.Admin.Models.Orders
             {
                 if (model.ProductWithoutSkus != null)
                 {
-                    ProductName = $"{model.ProductWithoutSkus.Name} - {model.ProductWithoutSkus.SafeData.SubProductGroupName}({model.Sku.SafeData.QTY})";
+                    ProductName = $"{model.ProductWithoutSkus.Name} {model.ProductWithoutSkus.SafeData.SubTitle} ({model.Sku.SafeData.QTY})";
                     IdProductType = model.ProductWithoutSkus.IdObjectType;
                 }
                 QTY = model.Quantity;

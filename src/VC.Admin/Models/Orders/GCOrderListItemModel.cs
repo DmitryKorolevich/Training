@@ -21,7 +21,7 @@ namespace VC.Admin.Models.Orders
 
         public int? IdEditedBy { get; set; }
 
-        public string EditedBy { get; set; }        
+        public string EditedBy { get; set; }
 
         public DateTime DateEdited { get; set; }
 
@@ -31,11 +31,13 @@ namespace VC.Admin.Models.Orders
 
         public string CustomerLastName { get; set; }
 
-        public string ShipTo { get; set; }
+        public string CustomerShipFirstName { get; set; }
+
+        public string CustomerShipLastName { get; set; }
 
         public GCOrderListItemModel(GCOrderItem item)
         {
-            if(item!=null)
+            if (item != null)
             {
                 Id = item.Order.Id;
                 OrderStatus = item.Order.OrderStatus;
@@ -48,14 +50,21 @@ namespace VC.Admin.Models.Orders
                 DateEdited = item.Order.DateEdited;
                 IdCustomer = item.Order.Customer.Id;
                 var address = item.Order?.PaymentMethod?.Address;
-                if(address==null)
+                if (address == null)
                 {
                     address = item.Order?.ShippingAddress;
                 }
-                if(address!=null)
+                if (address != null)
                 {
                     CustomerFirstName = address.SafeData.FirstName;
                     CustomerLastName = address.SafeData.LastName;
+                }
+
+                address = item.Order?.ShippingAddress;
+                if (address != null)
+                {
+                    CustomerShipFirstName = address.SafeData.FirstName;
+                    CustomerShipLastName = address.SafeData.LastName;
                 }
                 //ShipTo = item.ShipTo;
             }

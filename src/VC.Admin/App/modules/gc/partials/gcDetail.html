@@ -127,7 +127,7 @@
                                                     <a ui-sref="index.oneCol.orderDetail({id:item.Id})">{{::item.Id}}</a>
                                                 </td>
                                                 <td>{{::item.Total | currency}}</td>
-                                                <td></td>
+                                                <td>{{::item.CustomerShipFirstName}} {{::item.CustomerShipLastName}}</td>
                                                 <td>{{::item.GCAmountUsed | currency}}</td>
                                             </tr>
                                         </tbody>

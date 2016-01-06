@@ -54,6 +54,7 @@ namespace VitalChoice.Business.Services
             if (context.Request.Path.HasValue)
             {
                 var path = context.Request.Path.ToUriComponent()+ context.Request.QueryString.ToUriComponent();
+                path = path.ToLower();
                 if (Map.ContainsKey(path))
                 {
                     context.Response.Redirect(Map[path], true);
