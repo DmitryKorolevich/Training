@@ -57,9 +57,17 @@ namespace VitalChoice.Business.Helpers
         public static string GetGCTypeName(GCType type)
         {
             string toReturn = null;
-            if (type == GCType.ManualGC)
+            switch (type)
             {
-                toReturn = "Manually Created Gift Certificate";
+                case GCType.ManualGC:
+                    toReturn = "Manually Created Gift Certificate";
+                    break;
+                case GCType.GC:
+                    toReturn = "Gift Certificate";
+                    break;
+                case GCType.EGC:
+                    toReturn = "E-Gift Certificate";
+                    break;
             }
             return toReturn;
         }
@@ -68,6 +76,8 @@ namespace VitalChoice.Business.Helpers
         {
             Dictionary<int, string> toReturn = new Dictionary<int, string>();
             toReturn.Add((int)GCType.ManualGC, "Manually Created Gift Certificate");
+            toReturn.Add((int)GCType.GC, "Gift Certificate");
+            toReturn.Add((int)GCType.EGC, "E-Gift Certificate");
             return toReturn;
         }
 
@@ -114,7 +124,7 @@ namespace VitalChoice.Business.Helpers
                 {(int) ProductType.Perishable, "Perishable"},
                 {(int) ProductType.NonPerishable, "Non Perishable"},
                 {(int) ProductType.Gc, "Gift Certificate"},
-                {(int) ProductType.EGс, "E Gift Certificate"}
+                {(int) ProductType.EGс, "E-Gift Certificate"}
             };
             return toReturn;
         }

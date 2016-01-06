@@ -9,6 +9,7 @@ namespace VC.Admin.Models.Customer
         public CheckPaymentModel()
         {
             PaymentMethodType = PaymentMethodType.Check;
+            PaidInFull = true;
         }
 
         [Map]

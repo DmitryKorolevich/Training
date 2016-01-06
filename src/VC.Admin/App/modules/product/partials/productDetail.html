@@ -59,25 +59,25 @@
                                             </div>
 
                                             <span class="legend">Name, Clean URL & Short Description</span>
-											<div class="form-group">
-												<label for="name" class="col-md-3 control-label">Name</label>
-												<div class="col-md-9">
-													<input type="text" name="Name" class="form-control" placeholder="Name" data-ng-model="product.Name" required>
-													<div class="error-container" ng-show="forms.submitted && forms.parentDetails.Name.$invalid">
-														<small class="error" ng-show="forms.parentDetails.Name.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Name")}}</small>
-														<small class="error" ng-show="forms.parentDetails.Name.$error.server">{{serverMessages.GetMessage('Name')}}</small>
-													</div>
-												</div>
-											</div>
-											<div class="form-group">
-												<label for="name" class="col-md-3 control-label">Sub Title</label>
-												<div class="col-md-9">
-													<input type="text" name="SubTitle" class="form-control" placeholder="Sub Title" data-ng-model="product.SubTitle">
-													<div class="error-container" ng-show="forms.submitted && forms.parentDetails.SubTitle.$invalid">
-														<small class="error" ng-show="forms.parentDetails.SubTitle.$error.server">{{serverMessages.GetMessage('SubTitle')}}</small>
-													</div>
-												</div>
-											</div>
+                                            <div class="form-group">
+                                                <label for="name" class="col-md-3 control-label">Name</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="Name" class="form-control" placeholder="Name" data-ng-model="product.Name" required>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.parentDetails.Name.$invalid">
+                                                        <small class="error" ng-show="forms.parentDetails.Name.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Name")}}</small>
+                                                        <small class="error" ng-show="forms.parentDetails.Name.$error.server">{{serverMessages.GetMessage('Name')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="name" class="col-md-3 control-label">Sub Title</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="SubTitle" class="form-control" placeholder="Sub Title" data-ng-model="product.SubTitle">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.parentDetails.SubTitle.$invalid">
+                                                        <small class="error" ng-show="forms.parentDetails.SubTitle.$error.server">{{serverMessages.GetMessage('SubTitle')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <div class="form-group">
                                                 <label for="url" class="col-md-3 control-label">URL</label>
                                                 <div class="col-md-9">
@@ -413,15 +413,21 @@
                                                         <fieldset>
                                                             <div class="panel-heading">
                                                                 <h4 class="panel-title">
-                                                                    <a class="accordion-toggle" ng-click="toggleOpen(subSku, $event)">
+                                                                    <a class="accordion-toggle">
                                                                         <div class="form-horizontal">
                                                                             <div class="row">
-                                                                                <div class="col-md-1" data-ng-click="$event.stopPropagation()">
-                                                                                    <div class="sortable-move btn btn-info">
-                                                                                        <i class="glyphicon glyphicon-sort"></i>
+                                                                                <div class="col-md-12">
+                                                                                    <div class="fixed-accordion-row margin-zero">
+                                                                                        <div class="sortable-move btn btn-info">
+                                                                                            <i class="glyphicon glyphicon-sort"></i>
+                                                                                        </div>  
+                                                                                        <div data-ng-if="!subSku.IsOpen" class="btn btn-primary-orange margin-left-8px" data-ng-click="toggleOpen(subSku, $event)">
+                                                                                            <i class="glyphicon glyphicon-plus"></i>
+                                                                                        </div>
+                                                                                        <div data-ng-if="subSku.IsOpen" class="btn btn-primary-orange margin-left-8px" data-ng-click="toggleOpen(subSku, $event)">
+                                                                                            <i class="glyphicon glyphicon-minus"></i>
+                                                                                        </div>
                                                                                     </div>
-                                                                                </div>
-                                                                                <div class="col-md-11">
                                                                                     <div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">
                                                                                         <label class="control-label">SKU</label>
                                                                                         <div class="col-md-1">
@@ -679,16 +685,16 @@
                                                     </div>
                                                 </div>
                                             </div>
-											<div class="form-group">
-												<label for="IngredientsTitle" class="col-md-3 control-label">Ingredients</label>
-												<div class="col-md-9">
-													<input type="text" name="IngredientsTitle" class="form-control" placeholder="Ingredients" data-ng-model="product.IngredientsTitle">
-													<div class="error-container" ng-show="forms.submitted && forms.nutritional.IngredientsTitle.$invalid">
-														<small class="error" ng-show="forms.nutritional.IngredientsTitle.$error.server">{{serverMessages.GetMessage('IngredientsTitle')}}</small>
-													</div>
-												</div>
-											</div>
-											<div class="form-group">
+                                            <div class="form-group">
+                                                <label for="IngredientsTitle" class="col-md-3 control-label">Ingredients</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="IngredientsTitle" class="form-control" placeholder="Ingredients" data-ng-model="product.IngredientsTitle">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.IngredientsTitle.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.IngredientsTitle.$error.server">{{serverMessages.GetMessage('IngredientsTitle')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
                                                 <label for="serving_size" class="col-md-3 control-label">Serving Size</label>
                                                 <div class="col-md-9">
                                                     <input type="text" name="ServingSize" class="form-control" placeholder="Serving Size" data-ng-model="product.ServingSize">
@@ -933,9 +939,9 @@
                                                             <div class="panel-heading">
                                                                 <h4 class="panel-title">
                                                                     <div class="accordion-toggle">
-                                                                       <div class="form-horizontal">
+                                                                        <div class="form-horizontal">
                                                                             <div class="row">
-                                                                               <div class="col-md-12">
+                                                                                <div class="col-md-12">
                                                                                     <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
                                                                                         <label class="control-label">Cross Sell Image</label>
                                                                                         <div class="col-md-1" data-ng-if="crossSellProduct.ImageUse">
@@ -992,7 +998,7 @@
                                     </form>
 
                                     <span class="legend">YouTube Videos</span>
-                                   <form name="forms.Videos" data-ng-submit="save()" data-ng-class="{submitted: forms.videossubmitted}" novalidate unsaved-warning-form>
+                                    <form name="forms.Videos" data-ng-submit="save()" data-ng-class="{submitted: forms.videossubmitted}" novalidate unsaved-warning-form>
                                         <div class="panel-group sortable-accordion">
                                             <div ui-sortable="sortableOptions" data-ng-model="product.Videos">
                                                 <div data-ng-repeat="video in product.Videos" class="panel panel-default">
@@ -1001,7 +1007,7 @@
                                                             <div class="panel-heading">
                                                                 <h4 class="panel-title">
                                                                     <div class="accordion-toggle">
-                                                                       <div class="form-horizontal">
+                                                                        <div class="form-horizontal">
                                                                             <div class="row">
                                                                                 <div class="col-md-12">
                                                                                     <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
@@ -1043,7 +1049,7 @@
                                                                                 </div>
                                                                             </div>
                                                                             <div class="row">
-                                                                               <div class="col-md-12">
+                                                                                <div class="col-md-12">
                                                                                     <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
                                                                                         <label class="control-label">YouTube Text</label>
                                                                                         <div class="col-md-1" data-ng-if="video.TextUse">
@@ -1081,40 +1087,40 @@
                             </div>
                         </div>
                     </tab>
-                <tab heading="Sales Category" active="salesCategoriesTab.active">
-	                <div class="container container-left">
-		                <div class="well row categories sales">
-			                <spinner-overlay data-loading="refreshTracker.active()">
-				                <span class="legend">Sales Category</span>
-				                <button data-ng-if="!salesCategoriesExpanded" data-ng-click="updateSalesCategoriesCollapsed(true);" class="btn btn-primary btn-xs expand-button">Expand All</button>
-				                <button data-ng-if="salesCategoriesExpanded" data-ng-click="updateSalesCategoriesCollapsed(false);" class="btn btn-primary btn-xs expand-button">Collapse All</button>
-				                <div ui-tree data-drag-enabled="false" class="ya-treeview">
-					                <ol ui-tree-nodes="" data-ng-model="rootInventoryCategory.SubItems">
-						                <li ng-repeat="item in rootInventoryCategory.SubItems" ui-tree-node collapsed="true" data-ng-include="'app/modules/product/partials/inventoryCategoriesAssign.html'">
-						                </li>
-					                </ol>
-				                </div>
-			                </spinner-overlay>
-		                </div>
-	                </div>
-                </tab>
-					<tab heading="Template">
-						<div class="container container-left">
-							<div class="well row">
-								<spinner-overlay data-loading="refreshTracker.active()">
-									<form class="form-horizontal">
-										<fieldset>
-											<div data-ng-if="validatePermission(7)" class="form-group">
-												<label for="masterTemplate" class="col-md-3 control-label">Master Template</label>
-												<div class="col-md-9">
-													<select class="form-control" name="MasterTemplate" data-ng-model="product.MasterContentItemId" ng-options="master.Id as master.Name for master in masters"></select>
-												</div>
-											</div>
-											<button class="btn btn-info width-200px margin-bottom-10px" data-ng-if="validatePermission(7) && product.MasterContentItemId!=0" data-ng-click="goToMaster(product.MasterContentItemId);">Manage Master Template</button>
-											<span class="legend">Manage Template</span>
-											<div class="form-group">
-												<div class="col-md-12">
-													<div data-ng-model="product.Template" ui-ace="{
+                    <tab heading="Sales Category" active="salesCategoriesTab.active">
+                        <div class="container container-left">
+                            <div class="well row categories sales">
+                                <spinner-overlay data-loading="refreshTracker.active()">
+                                    <span class="legend">Sales Category</span>
+                                    <button data-ng-if="!salesCategoriesExpanded" data-ng-click="updateSalesCategoriesCollapsed(true);" class="btn btn-primary btn-xs expand-button">Expand All</button>
+                                    <button data-ng-if="salesCategoriesExpanded" data-ng-click="updateSalesCategoriesCollapsed(false);" class="btn btn-primary btn-xs expand-button">Collapse All</button>
+                                    <div ui-tree data-drag-enabled="false" class="ya-treeview">
+                                        <ol ui-tree-nodes="" data-ng-model="rootInventoryCategory.SubItems">
+                                            <li ng-repeat="item in rootInventoryCategory.SubItems" ui-tree-node collapsed="true" data-ng-include="'app/modules/product/partials/inventoryCategoriesAssign.html'">
+                                            </li>
+                                        </ol>
+                                    </div>
+                                </spinner-overlay>
+                            </div>
+                        </div>
+                    </tab>
+                    <tab heading="Template">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <spinner-overlay data-loading="refreshTracker.active()">
+                                    <form class="form-horizontal">
+                                        <fieldset>
+                                            <div data-ng-if="validatePermission(7)" class="form-group">
+                                                <label for="masterTemplate" class="col-md-3 control-label">Master Template</label>
+                                                <div class="col-md-9">
+                                                    <select class="form-control" name="MasterTemplate" data-ng-model="product.MasterContentItemId" ng-options="master.Id as master.Name for master in masters"></select>
+                                                </div>
+                                            </div>
+                                            <button class="btn btn-info width-200px margin-bottom-10px" data-ng-if="validatePermission(7) && product.MasterContentItemId!=0" data-ng-click="goToMaster(product.MasterContentItemId);">Manage Master Template</button>
+                                            <span class="legend">Manage Template</span>
+                                            <div class="form-group">
+                                                <div class="col-md-12">
+                                                    <div data-ng-model="product.Template" ui-ace="{
 				                                require: ['ace/ext/language_tools'],
 				                                advanced: {
 					                                enableSnippets: true,
@@ -1126,15 +1132,15 @@
 				                                onLoad: aceLoaded,
 				                                onChange: aceChanged
 		                                }">
-													</div>
-												</div>
-											</div>
-										</fieldset>
-									</form>
-								</spinner-overlay>
-							</div>
-						</div>
-					</tab>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </form>
+                                </spinner-overlay>
+                            </div>
+                        </div>
+                    </tab>
                 </tabset>
             </div>
         </div>
