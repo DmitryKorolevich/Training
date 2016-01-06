@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using VitalChoice.Caching.Expressions;
+using VitalChoice.Caching.Expressions.Visitors;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Relational
@@ -9,6 +11,7 @@ namespace VitalChoice.Caching.Relational
     public interface IConditionChecker
     {
         bool CheckCondition(object entity);
+        Condition Condition { get; }
     }
 
     public class EntityConditionalIndexInfo : IConditionChecker, IEquatable<EntityConditionalIndexInfo>
@@ -82,6 +85,9 @@ namespace VitalChoice.Caching.Relational
             public ConditionChecker(Expression<Func<TEntity, bool>> getExpression)
             {
                 _relationFunc = getExpression.CacheCompile();
+                LambdaExpressionVisitor<TEntity> lambdaExpressionVisitor = new LambdaExpressionVisitor<TEntity>();
+                lambdaExpressionVisitor.Visit(getExpression.Body);
+                Condition = lambdaExpressionVisitor.Condition;
             }
 
             private readonly Func<TEntity, bool> _relationFunc;
@@ -90,19 +96,30 @@ namespace VitalChoice.Caching.Relational
             {
                 return _relationFunc((TEntity) entity);
             }
+
+            public Condition Condition { get; }
         }
 
         private class NullConditionChecker : IConditionChecker
         {
+            public NullConditionChecker()
+            {
+                Condition = null;
+            }
+
             public bool CheckCondition(object entity)
             {
                 return false;
             }
+
+            public Condition Condition { get; }
         }
 
         public bool CheckCondition(object entity)
         {
             return _conditionChecker.CheckCondition(entity);
         }
+
+        public Condition Condition => _conditionChecker.Condition;
     }
 }

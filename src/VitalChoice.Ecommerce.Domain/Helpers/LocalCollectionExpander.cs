@@ -64,14 +64,14 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             if (value != null)
             {
                 object printer;
-                if (!value.GetType().IsImplementGeneric(typeof (HashSet<>)))
+                if (value.GetType().IsImplementGeneric(typeof (HashSet<>)))
                 {
-                    var printerType = typeof (CollectionPrinter<>).MakeGenericType(elementType);
+                    var printerType = typeof (HashSetPrinter<>).MakeGenericType(elementType);
                     printer = Activator.CreateInstance(printerType, value);
                 }
                 else
                 {
-                    var printerType = typeof (HashSetPrinter<>).MakeGenericType(elementType);
+                    var printerType = typeof (CollectionPrinter<>).MakeGenericType(elementType);
                     printer = Activator.CreateInstance(printerType, value);
                 }
 

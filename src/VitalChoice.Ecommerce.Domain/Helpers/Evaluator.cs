@@ -75,6 +75,10 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
                 {
                     return e;
                 }
+                if (e.NodeType == ExpressionType.Parameter)
+                {
+                    return Expression.Constant($"<{e.Type.FullName}>");
+                }
                 LambdaExpression lambda = Expression.Lambda(e);
                 Delegate fn = lambda.Compile();
                 return Expression.Constant(fn.DynamicInvoke(null), e.Type);
@@ -122,7 +126,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
                             _cannotBeEvaluated = true;
                         }
                     }
-                    _cannotBeEvaluated |= saveCannotBeEvaluated;
+                    _cannotBeEvaluated = _cannotBeEvaluated || saveCannotBeEvaluated;
                 }
                 return expression;
             }

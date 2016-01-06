@@ -26,17 +26,17 @@ namespace VitalChoice.Caching.Expressions.Visitors
 
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            _conditions.Push(new BinaryCondition(node.NodeType));
+            _conditions.Push(new BinaryCondition(node.NodeType, node));
 
             var count = _conditions.Count;
             Visit(node.Left);
-            var currentLeft = _conditions.Count > count ? _conditions.Pop() : new Condition(node.Left.NodeType) {Expression = node.Left};
+            var currentLeft = _conditions.Count > count ? _conditions.Pop() : new Condition(node.Left.NodeType, node.Left);
 
             count = _conditions.Count;
             Visit(node.Right);
             var currentRight = _conditions.Count > count
                 ? _conditions.Pop()
-                : new Condition(node.Right.NodeType) {Expression = node.Right};
+                : new Condition(node.Right.NodeType, node.Right);
 
             var topCondition = (BinaryCondition) _conditions.Pop();
             topCondition.Left = currentLeft;
@@ -60,10 +60,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
             if ((node.Method.DeclaringType == typeof (Enumerable) || node.Method.DeclaringType.TryGetElementType(typeof (ICollection<>)) != null) &&
                 node.Method.Name == "Contains")
             {
-                _condition = new Condition(node.NodeType)
-                {
-                    Expression = node
-                };
+                _condition = new Condition(node.NodeType, node);
                 _conditions.Push(_condition);
             }
             return result;
@@ -71,14 +68,8 @@ namespace VitalChoice.Caching.Expressions.Visitors
 
         protected override Expression VisitUnary(UnaryExpression node)
         {
-            if (node.NodeType != ExpressionType.Convert && node.NodeType != ExpressionType.ConvertChecked)
-            {
-                _condition = new Condition(node.NodeType)
-                {
-                    Expression = node
-                };
-                _conditions.Push(_condition);
-            }
+            _condition = new Condition(node.NodeType, node);
+            _conditions.Push(_condition);
             return base.VisitUnary(node);
         }
     }

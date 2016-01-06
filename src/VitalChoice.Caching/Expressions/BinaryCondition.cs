@@ -9,7 +9,7 @@ namespace VitalChoice.Caching.Expressions
 
         public Condition Left { get; set; }
 
-        public BinaryCondition(ExpressionType type) : base(type)
+        public BinaryCondition(ExpressionType type, Expression expression) : base(type, expression)
         {
         }
     }
