@@ -7,6 +7,7 @@ using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Helpers;
@@ -180,6 +181,11 @@ namespace VitalChoice.Business.Services.Dynamic
                         IdGiftCertificate = g.GiftCertificate.Id
                     });
                 entity.IdDiscount = dynamic.Discount?.Id;
+                if(dynamic.PaymentMethod.Address!=null && entity.PaymentMethod.BillingAddress==null)
+                {
+                    entity.PaymentMethod.BillingAddress = new VitalChoice.Ecommerce.Domain.Entities.Addresses.OrderAddress();
+                    entity.PaymentMethod.BillingAddress.OptionValues = new List<OrderAddressOptionValue>();
+                }
                 await _orderPaymentMethodMapper.UpdateEntityAsync(dynamic.PaymentMethod, entity.PaymentMethod);
                 Dictionary<int, SkuOrdered> keyedSkus = new Dictionary<int, SkuOrdered>();
                 if (dynamic.Skus != null)

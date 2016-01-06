@@ -58,7 +58,7 @@
                     {
                         errorHandler(result);
                     });
-            }, 'Are you sure you want to delete catelog requests?');
+            }, 'Are you sure you want to delete catalog requests?');
         };
 
         initialize();
