@@ -12,7 +12,6 @@ namespace VitalChoice.Caching.Expressions.Analyzers
     public class ConditionalIndexAnalyzer<T>
     {
         private readonly ICollection<EntityConditionalIndexInfo> _indexeInfos;
-        private static readonly LambdaBodyOrPartsComparer BodyComparer = new LambdaBodyOrPartsComparer();
         public bool ContainsAdditionalConditions { get; private set; }
 
         public ConditionalIndexAnalyzer(IInternalEntityInfoStorage entityInfoStorage)
