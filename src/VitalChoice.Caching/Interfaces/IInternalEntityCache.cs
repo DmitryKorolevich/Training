@@ -22,21 +22,26 @@ namespace VitalChoice.Caching.Interfaces
 
     public interface IInternalEntityCache<T> : IInternalEntityCache
     {
-        CacheGetResult TryGetEntity(EntityKey key, RelationInfo relations, out T entity);
-        CacheGetResult TryGetEntities(ICollection<EntityKey> primaryKeys, RelationInfo relations, Expression<Func<T, bool>> whereExpression, out List<T> entities);
-        CacheGetResult TryGetEntity(EntityIndex index, RelationInfo relations, out T entity);
-        CacheGetResult TryGetEntities(ICollection<EntityIndex> indexes, RelationInfo relations, Expression<Func<T, bool>> whereExpression, out List<T> entities);
-        CacheGetResult TryGetEntity(EntityIndex key, EntityConditionalIndexInfo conditionalInfo, RelationInfo relations, out T entity);
-        CacheGetResult TryGetEntities(ICollection<EntityIndex> indexes, EntityConditionalIndexInfo conditionalInfo,
-            RelationInfo relations, Expression<Func<T, bool>> whereExpression, out List<T> entities);
-        CacheGetResult GetWhere(RelationInfo relations, Func<T, bool> whereFunc, out List<T> entities);
-        CacheGetResult GetWhere(RelationInfo relations, Expression<Func<T, bool>> whereExpression, out List<T> entities);
-        CacheGetResult GetAll(RelationInfo relations, out List<T> entities);
-        CacheGetResult GetFirstWhere(RelationInfo relations, Func<T, bool> whereFunc, out T entity);
-        CacheGetResult GetFirstWhere(RelationInfo relations, Expression<Func<T, bool>> whereExpression, out T entity);
-        CacheGetResult GetFirst(RelationInfo relations, out T entity);
-        bool TryRemove(T entity, out List<T> removedList);
-        bool TryRemove(T entity);
+        CacheResult<T> TryGetEntity(EntityKey key, RelationInfo relations);
+
+        IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityKey> primaryKeys, RelationInfo relations,
+            Func<T, bool> whereFunc);
+
+        CacheResult<T> TryGetEntity(EntityIndex index, RelationInfo relations);
+
+        IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityIndex> indexes, RelationInfo relations,
+            Func<T, bool> whereFunc);
+
+        CacheResult<T> TryGetEntity(EntityIndex key, EntityConditionalIndexInfo conditionalInfo, RelationInfo relations);
+
+        IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityIndex> indexes,
+            EntityConditionalIndexInfo conditionalInfo,
+            RelationInfo relations, Func<T, bool> whereFunc);
+
+        IEnumerable<CacheResult<T>> GetWhere(RelationInfo relations, Func<T, bool> whereFunc);
+        IEnumerable<CacheResult<T>> GetAll(RelationInfo relations);
+        void TryRemove(T entity);
+        IEnumerable<CacheResult<T>> TryRemoveWithResult(T entity);
         void Update(IEnumerable<T> entities, RelationInfo relationInfo);
         void Update(T entity, RelationInfo relationInfo);
         CachedEntity<T> Update(RelationInfo relations, T entity);

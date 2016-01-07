@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Threading.Tasks;
 using Microsoft.Data.Entity;
-using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Expressions.Visitors
 {
@@ -27,9 +23,8 @@ namespace VitalChoice.Caching.Expressions.Visitors
                 if (WhereExpression != null)
                     throw new InvalidOperationException("Where clause used twice, need investigation");
 
-                WhereExpression = new WhereExpression<T>
+                WhereExpression = new WhereExpression<T>((Expression<Func<T, bool>>)(object)node)
                 {
-                    Expression = (Expression<Func<T, bool>>) (object) node,
                     Condition = lambdaVisitor.Condition
                 };
                 return node;

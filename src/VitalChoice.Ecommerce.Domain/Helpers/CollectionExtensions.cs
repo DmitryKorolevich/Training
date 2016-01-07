@@ -53,6 +53,19 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             }
         }
 
+        public static IEnumerable<T> DistinctObjects<T>(this IEnumerable<T> source)
+        {
+            HashSet<T> set = new HashSet<T>();
+            foreach (var value in source)
+            {
+                if (!set.Contains(value))
+                {
+                    set.Add(value);
+                    yield return value;
+                }
+            }
+        }
+
         public static void RemoveAll<T>(this ICollection<T> collection, Func<T, bool> where = null)
         {
             if (where == null)

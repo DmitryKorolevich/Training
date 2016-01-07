@@ -3,79 +3,96 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
 using System.Threading.Tasks;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Expressions.Analyzers
 {
     public class ConditionalIndexAnalyzer<T>
     {
-        private readonly ICollection<EntityConditionalIndexInfo> _indexeInfos;
+        private readonly ICollection<EntityConditionalIndexInfo> _indexInfos;
         public bool ContainsAdditionalConditions { get; private set; }
 
         public ConditionalIndexAnalyzer(IInternalEntityInfoStorage entityInfoStorage)
         {
-            _indexeInfos = entityInfoStorage.GetConditionalIndexInfos<T>();
+            _indexInfos = entityInfoStorage.GetConditionalIndexInfos<T>();
         }
 
-        public ICollection<EntityIndex> TryGetIndexes(WhereExpression<T> expression)
+        public ICollection<KeyValuePair<EntityConditionalIndexInfo, HashSet<EntityIndex>>> TryGetIndexes(
+            WhereExpression<T> expression)
         {
-            Dictionary<EntityConditionalIndexInfo, HashSet<EntityIndex>> result = new Dictionary<EntityConditionalIndexInfo, HashSet<EntityIndex>>();
-            Dictionary<EntityConditionalIndexInfo, HashSet<EntityIndexValue>> indexValues = new Dictionary<EntityConditionalIndexInfo, HashSet<EntityIndexValue>>();
-            foreach (var indexInfo in _indexeInfos)
+            var indexes = new Dictionary<EntityConditionalIndexInfo, HashSet<EntityIndex>>();
+            var indexesValues = new Dictionary<EntityConditionalIndexInfo, HashSet<EntityIndexValue>>();
+            foreach (var indexInfo in _indexInfos)
             {
                 if (!expression.Expression.ContainsCondition(indexInfo.LogicalUniquenessCondition))
                     continue;
 
-                result.Add(indexInfo, new HashSet<EntityIndex>());
-                indexValues.Add(indexInfo, new HashSet<EntityIndexValue>());
+                indexes.Add(indexInfo, new HashSet<EntityIndex>());
+                indexesValues.Add(indexInfo, new HashSet<EntityIndexValue>());
             }
             try
             {
-                WalkConditionTree(expression.Condition, result, indexValues);
+                WalkConditionTree(expression.Condition, indexes, indexesValues);
 
-                if (result.Any())
+                foreach (var result in indexes)
                 {
-                    if (_indexesInfo.IndexInfoInternal.Count == indexValues.Count)
+                    var indexValues = indexesValues[result.Key];
+                    if (result.Value.Any())
                     {
-                        var newIndex = new EntityIndex(indexValues);
-                        if (result.Contains(newIndex))
+                        if (result.Key.IndexInfoInternal.Count == indexValues.Count)
                         {
-                            result.Clear();
-                            result.Add(newIndex);
-                        }
-                        else
-                        {
-                            result.Clear();
+                            var newIndex = new EntityIndex(indexValues);
+                            if (result.Value.Contains(newIndex))
+                            {
+                                result.Value.Clear();
+                                result.Value.Add(newIndex);
+                            }
+                            else
+                            {
+                                result.Value.Clear();
+                            }
                         }
                     }
                 }
             }
             catch
             {
-                return new EntityIndex[0];
+                foreach (var result in indexes)
+                {
+                    result.Value.Clear();
+                }
             }
-            return result;
+            return indexes;
         }
 
-        private bool WalkConditionTree(Condition top, Dictionary<EntityConditionalIndexInfo, HashSet<EntityIndex>> indexes,
+        private bool WalkConditionTree(Condition top,
+            Dictionary<EntityConditionalIndexInfo, HashSet<EntityIndex>> indexes,
             Dictionary<EntityConditionalIndexInfo, HashSet<EntityIndexValue>> indexValues)
         {
             EntityIndexInfo indexInfo;
             switch (top.Operator)
             {
                 case ExpressionType.Equal:
-                    var equal = (BinaryCondition)top;
+                    var equal = (BinaryCondition) top;
                     var left = equal.Left.Expression.RemoveConvert();
                     var right = equal.Right.Expression.RemoveConvert();
                     var member = left as MemberExpression ?? right as MemberExpression;
                     var value = (right as ConstantExpression ??
                                  left as ConstantExpression)?.Value;
-                    if (member != null && value != null && member.Type == typeof(T) &&
-                        _indexesInfo.IndexInfoInternal.TryGetValue(member.Member.Name, out indexInfo))
+                    if (member != null && value != null && member.Type == typeof (T))
                     {
-                        indexValues.Add(new EntityIndexValue(indexInfo, value));
+                        foreach (var index in indexes)
+                        {
+                            if (!index.Key.IndexInfoInternal.TryGetValue(member.Member.Name, out indexInfo))
+                                continue;
+
+                            var indexValue = new EntityIndexValue(indexInfo, value);
+                            indexValues[index.Key].Add(indexValue);
+                        }
                     }
                     else
                     {
@@ -83,7 +100,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                     }
                     return true;
                 case ExpressionType.AndAlso:
-                    var and = (BinaryCondition)top;
+                    var and = (BinaryCondition) top;
                     if (!WalkConditionTree(and.Left, indexes, indexValues))
                         return false;
                     return WalkConditionTree(and.Right, indexes, indexValues);
@@ -95,37 +112,47 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                     var method = top.Expression as MethodCallExpression;
 
                     var memberSelector =
-                        ((method?.Arguments.Last() as UnaryExpression)?.Operand as LambdaExpression)?.Body as MemberExpression;
-                    var values = ((method?.Arguments.Last() as UnaryExpression)?.Operand as ConstantExpression)?.Value as IEnumerable;
-                    if (values != null && memberSelector != null && memberSelector.Type == typeof(T) && _indexesInfo.IndexInfoInternal.Count == 1 &&
-                        _indexesInfo.IndexInfoInternal.TryGetValue(memberSelector.Member.Name, out indexInfo))
+                        ((method?.Arguments.Last() as UnaryExpression)?.Operand as LambdaExpression)?.Body as
+                            MemberExpression;
+                    var values =
+                        ((method?.Arguments.Last() as UnaryExpression)?.Operand as ConstantExpression)?.Value as
+                            IEnumerable;
+                    if (values != null && memberSelector != null && memberSelector.Type == typeof (T))
                     {
-                        if (indexes.Any())
+                        // ReSharper disable once LoopCanBePartlyConvertedToQuery
+                        foreach (var index in indexes)
                         {
-                            HashSet<EntityIndex> newKeys = new HashSet<EntityIndex>();
-                            foreach (var item in values)
-                            {
-                                newKeys.Add(new EntityIndex(new[] { new EntityIndexValue(indexInfo, item) }));
-                            }
-                            var sameKeys = indexes.Where(key => newKeys.Contains(key)).ToArray();
-                            indexes.Clear();
-                            indexes.AddRange(sameKeys);
-                        }
-                        else
-                        {
-                            foreach (var item in values)
-                            {
-                                indexes.Add(new EntityIndex(new[] { new EntityIndexValue(indexInfo, item) }));
-                            }
-                        }
+                            if (index.Key.IndexInfoInternal.Count != 1 ||
+                                !index.Key.IndexInfoInternal.TryGetValue(memberSelector.Member.Name, out indexInfo))
+                                continue;
 
-                        // ReSharper disable once LoopCanBeConvertedToQuery
-
-                        return false;
+                            if (index.Value.Any())
+                            {
+                                var newKeys = new HashSet<EntityIndex>();
+                                // ReSharper disable once PossibleMultipleEnumeration
+                                foreach (var item in values)
+                                {
+                                    newKeys.Add(new EntityIndex(new[] {new EntityIndexValue(indexInfo, item)}));
+                                }
+                                var sameKeys = index.Value.Where(key => newKeys.Contains(key)).ToArray();
+                                index.Value.Clear();
+                                index.Value.AddRange(sameKeys);
+                            }
+                            else
+                            {
+                                // ReSharper disable once PossibleMultipleEnumeration
+                                foreach (var item in values)
+                                {
+                                    index.Value.Add(new EntityIndex(new[] {new EntityIndexValue(indexInfo, item)}));
+                                }
+                            }
+                        }
+                        return true;
                     }
                     ContainsAdditionalConditions = true;
                     return true;
                 default:
+                    ContainsAdditionalConditions = true;
                     return true;
             }
         }

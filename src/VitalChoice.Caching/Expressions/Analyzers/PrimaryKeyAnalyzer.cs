@@ -97,7 +97,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                     {
                         if (pks.Any())
                         {
-                            HashSet<EntityKey> newKeys = new HashSet<EntityKey>();
+                            var newKeys = new HashSet<EntityKey>();
                             foreach (var item in values)
                             {
                                 newKeys.Add(new EntityKey(new[] {new EntityKeyValue(info, item)}));
@@ -114,13 +114,12 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                             }
                         }
 
-                        // ReSharper disable once LoopCanBeConvertedToQuery
-                        
                         return true;
                     }
                     ContainsAdditionalConditions = true;
                     return true;
                 default:
+                    ContainsAdditionalConditions = true;
                     return true;
             }
         }

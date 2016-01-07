@@ -12,7 +12,7 @@ namespace VitalChoice.Caching.Interfaces
         bool Get(EntityKey key, out CachedEntity<T> entity);
         bool Get(EntityIndex key, out CachedEntity<T> entity);
         bool Get(EntityConditionalIndexInfo conditionalIndex, EntityIndex index, out CachedEntity<T> entity);
-        IEnumerable<CachedEntity<T>> GetAll();
+        ICollection<CachedEntity<T>> GetAll();
         bool TryRemove(EntityKey key, out CachedEntity<T> removed);
         bool TryRemove(EntityKey key);
         CachedEntity<T> Update(T entity, RelationInfo relations);

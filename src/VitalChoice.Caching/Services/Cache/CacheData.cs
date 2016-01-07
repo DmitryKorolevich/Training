@@ -56,7 +56,7 @@ namespace VitalChoice.Caching.Services.Cache
             return _conditionalIndexedDictionary[conditionalIndex].TryGetValue(key, out entity);
         }
 
-        public IEnumerable<CachedEntity<T>> GetAll()
+        public ICollection<CachedEntity<T>> GetAll()
         {
             return _entityDictionary.Values;
         }

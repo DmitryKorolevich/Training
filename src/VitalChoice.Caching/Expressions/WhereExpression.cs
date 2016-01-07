@@ -3,12 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Expressions
 {
     public class WhereExpression<T>
     {
-        public Expression<Func<T, bool>> Expression { get; set; }
+        public WhereExpression(Expression<Func<T, bool>> expression)
+        {
+            Expression = expression;
+            Compiled = expression?.CacheCompile();
+        }
+        public Expression<Func<T, bool>> Expression { get; }
+        public Func<T, bool> Compiled { get; }
         public Condition Condition { get; set; }
     }
 }

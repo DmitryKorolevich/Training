@@ -33,14 +33,10 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                     if (_indexesInfo.IndexInfoInternal.Count == indexValues.Count)
                     {
                         var newIndex = new EntityIndex(indexValues);
+                        result.Clear();
                         if (result.Contains(newIndex))
                         {
-                            result.Clear();
                             result.Add(newIndex);
-                        }
-                        else
-                        {
-                            result.Clear();
                         }
                     }
                 }
@@ -95,7 +91,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                     {
                         if (indexes.Any())
                         {
-                            HashSet<EntityIndex> newKeys = new HashSet<EntityIndex>();
+                            var newKeys = new HashSet<EntityIndex>();
                             foreach (var item in values)
                             {
                                 newKeys.Add(new EntityIndex(new[] { new EntityIndexValue(indexInfo, item) }));
@@ -111,14 +107,12 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                                 indexes.Add(new EntityIndex(new[] { new EntityIndexValue(indexInfo, item) }));
                             }
                         }
-
-                        // ReSharper disable once LoopCanBeConvertedToQuery
-                        
-                        return false;
+                        return true;
                     }
                     ContainsAdditionalConditions = true;
                     return true;
                 default:
+                    ContainsAdditionalConditions = true;
                     return true;
             }
         }
