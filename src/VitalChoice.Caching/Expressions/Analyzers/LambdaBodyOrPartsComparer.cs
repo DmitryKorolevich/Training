@@ -1,96 +1,110 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Expressions.Analyzers
 {
-    public class LambdaBodyOrPartsComparer
+    public static class LambdaBodyOrPartsComparer
     {
-        public bool GreaterOrEqualsTo(Expression left, Expression right)
+        public static bool ContainsCondition(this LambdaExpression left, LambdaExpression right)
         {
-            BinaryExpression lBinary = left as BinaryExpression;
-            BinaryExpression rBinary = right as BinaryExpression;
+            return left.Body.ContainsOrEqual(right?.Body);
+        }
 
-            switch (left.NodeType)
+        private static bool ContainsOrEqual(this Expression left, Expression right)
+        {
+            if (left == null || right == null)
+                return false;
+
+            var rightBinary = right as BinaryExpression;
+            var leftBinary = left as BinaryExpression;
+
+            switch (right.NodeType)
             {
                 case ExpressionType.AndAlso:
-                    if (lBinary != null)
+                    if (rightBinary != null)
                     {
-                        if (rBinary != null)
+                        if (leftBinary == null || left.NodeType != ExpressionType.AndAlso)
+                            return false;
+
+                        if (leftBinary.Left.ContainsOrEqual(right) ||
+                            leftBinary.Right.ContainsOrEqual(right))
                         {
-                            return GreaterOrEqualsTo(lBinary.Left, rBinary.Left) && GreaterOrEqualsTo(lBinary.Right, rBinary.Right)
+                            return true;
                         }
-                        return false;
-                        //return GreaterOrEqualsTo(lBinary.Left, right) || GreaterOrEqualsTo(lBinary.Right, right);
+                        return BinaryCompareBoth(leftBinary, rightBinary);
                     }
+                    return false;
                 case ExpressionType.OrElse:
-                    if (lBinary != null)
+                    if (rightBinary != null)
                     {
-                        if (rBinary != null)
+                        if (left.ContainsOrEqual(rightBinary.Left) ||
+                            left.ContainsOrEqual(rightBinary.Right))
+                            return true;
+                        if (leftBinary != null)
                         {
-                            
+                            return BinaryCompareBoth(leftBinary, rightBinary);
                         }
-                        return GreaterOrEqualsTo(lBinary.Left, right) || GreaterOrEqualsTo(lBinary.Right, right);
                     }
+                    return false;
                 case ExpressionType.Equal:
                 case ExpressionType.NotEqual:
-                    if (left.NodeType != right.NodeType)
+                    if (right.NodeType != left.NodeType)
+                    {
+                        if (leftBinary != null && left.NodeType == ExpressionType.AndAlso)
+                        {
+                            return leftBinary.Left.ContainsOrEqual(right) ||
+                                   leftBinary.Right.ContainsOrEqual(right);
+                        }
                         return false;
-                    return BinaryCompareBoth(lBinary, rBinary);
-                case ExpressionType.GreaterThan:
-                    if (right.NodeType == ExpressionType.GreaterThan)
-                    {
-                        return BinaryCompare(lBinary, rBinary);
                     }
-                    if (right.NodeType == ExpressionType.LessThan)
+                    return BinaryCompareBoth(leftBinary, rightBinary);
+                case ExpressionType.GreaterThan:
+                    switch (left.NodeType)
                     {
-                        return BinaryCompareReverse(lBinary, rBinary);
+                        case ExpressionType.GreaterThan:
+                            return BinaryCompare(leftBinary, rightBinary);
+                        case ExpressionType.LessThan:
+                            return BinaryCompareReverse(leftBinary, rightBinary);
                     }
                     return false;
                 case ExpressionType.LessThan:
-                    if (right.NodeType == ExpressionType.LessThan)
+                    switch (left.NodeType)
                     {
-                        return BinaryCompare(lBinary, rBinary);
-                    }
-                    if (right.NodeType == ExpressionType.GreaterThan)
-                    {
-                        return BinaryCompareReverse(lBinary, rBinary);
+                        case ExpressionType.LessThan:
+                            return BinaryCompare(leftBinary, rightBinary);
+                        case ExpressionType.GreaterThan:
+                            return BinaryCompareReverse(leftBinary, rightBinary);
                     }
                     return false;
                 case ExpressionType.GreaterThanOrEqual:
-                    if (right.NodeType == ExpressionType.GreaterThanOrEqual)
+                    switch (left.NodeType)
                     {
-                        return BinaryCompare(lBinary, rBinary);
-                    }
-                    if (right.NodeType == ExpressionType.LessThanOrEqual)
-                    {
-                        return BinaryCompareReverse(lBinary, rBinary);
+                        case ExpressionType.GreaterThanOrEqual:
+                            return BinaryCompare(leftBinary, rightBinary);
+                        case ExpressionType.LessThanOrEqual:
+                            return BinaryCompareReverse(leftBinary, rightBinary);
                     }
                     return false;
                 case ExpressionType.LessThanOrEqual:
-                    if (right.NodeType == ExpressionType.LessThanOrEqual)
+                    switch (left.NodeType)
                     {
-                        return BinaryCompare(lBinary, rBinary);
-                    }
-                    if (right.NodeType == ExpressionType.GreaterThanOrEqual)
-                    {
-                        return BinaryCompareReverse(lBinary, rBinary);
+                        case ExpressionType.LessThanOrEqual:
+                            return BinaryCompare(leftBinary, rightBinary);
+                        case ExpressionType.GreaterThanOrEqual:
+                            return BinaryCompareReverse(leftBinary, rightBinary);
                     }
                     return false;
                 default:
-                    if (left.NodeType != right.NodeType)
+                    if (right.NodeType != left.NodeType)
                         return false;
-                    if (lBinary != null)
-                    {
-                        if (rBinary == null)
-                            return false;
-                        return GreaterOrEqualsTo(lBinary.Left, rBinary.Left) && Equals(lBinary.Right, rBinary.Right);
-                    }
-                    //Decompose parameters to type name, evaluate constants and collections. Compare resulted set.
-                    return EqualsInternal(left, right);
+                    if (rightBinary == null)
+                        return EqualsInternal(right, left);
+                    if (leftBinary == null)
+                        return false;
+                    return rightBinary.Left.ContainsOrEqual(leftBinary.Left) &&
+                           rightBinary.Right.ContainsOrEqual(leftBinary.Right);
+                //Decompose parameters to type name, evaluate constants and collections. Compare resulted set.
             }
         }
 
@@ -107,55 +121,36 @@ namespace VitalChoice.Caching.Expressions.Analyzers
             return string.Equals(xRepro, yRepro);
         }
 
-        private bool BinaryCompareLessThanOrEquals(BinaryExpression xBinary, BinaryExpression yBinary)
+        private static bool BinaryCompareBoth(BinaryExpression leftBinary, BinaryExpression rightBinary)
         {
-            if (xBinary != null)
-            {
-                if (yBinary == null)
-                    return false;
-                return Equals(xBinary.Left, yBinary.Left) && Equals(xBinary.Right, yBinary.Right) ||
-                       Equals(xBinary.Left, yBinary.Right) && Equals(xBinary.Right, yBinary.Left);
-            }
-            return false;
+            if (leftBinary == null)
+                return false;
+            if (rightBinary == null)
+                return false;
+            return leftBinary.Left.ContainsOrEqual(rightBinary.Left) &&
+                   leftBinary.Right.ContainsOrEqual(rightBinary.Right) ||
+                   leftBinary.Left.ContainsOrEqual(rightBinary.Right) &&
+                   leftBinary.Right.ContainsOrEqual(rightBinary.Left);
         }
 
-        private bool BinaryCompareBoth(BinaryExpression xBinary, BinaryExpression yBinary)
+        private static bool BinaryCompare(BinaryExpression leftBinary, BinaryExpression rightBinary)
         {
-            if (xBinary != null)
-            {
-                if (yBinary == null)
-                    return false;
-                return Equals(xBinary.Left, yBinary.Left) && Equals(xBinary.Right, yBinary.Right) ||
-                       Equals(xBinary.Left, yBinary.Right) && Equals(xBinary.Right, yBinary.Left);
-            }
-            return false;
+            if (leftBinary == null)
+                return false;
+            if (rightBinary == null)
+                return false;
+            return leftBinary.Left.ContainsOrEqual(rightBinary.Left) &&
+                   leftBinary.Right.ContainsOrEqual(rightBinary.Right);
         }
 
-        private bool BinaryCompare(BinaryExpression xBinary, BinaryExpression yBinary)
+        private static bool BinaryCompareReverse(BinaryExpression leftBinary, BinaryExpression rightBinary)
         {
-            if (xBinary != null)
-            {
-                if (yBinary == null)
-                    return false;
-                return Equals(xBinary.Left, yBinary.Left) && Equals(xBinary.Right, yBinary.Right);
-            }
-            return false;
-        }
-
-        private bool BinaryCompareReverse(BinaryExpression xBinary, BinaryExpression yBinary)
-        {
-            if (xBinary != null)
-            {
-                if (yBinary == null)
-                    return false;
-                return Equals(xBinary.Left, yBinary.Right) && Equals(xBinary.Right, yBinary.Left);
-            }
-            return false;
-        }
-
-        public int GetHashCode(Expression obj)
-        {
-            return obj.GetHashCode();
+            if (leftBinary == null)
+                return false;
+            if (rightBinary == null)
+                return false;
+            return leftBinary.Left.ContainsOrEqual(rightBinary.Right) &&
+                   leftBinary.Right.ContainsOrEqual(rightBinary.Left);
         }
     }
 }

@@ -25,6 +25,9 @@ namespace VitalChoice.Caching.Expressions.Analyzers
             Dictionary<EntityConditionalIndexInfo, HashSet<EntityIndexValue>> indexValues = new Dictionary<EntityConditionalIndexInfo, HashSet<EntityIndexValue>>();
             foreach (var indexInfo in _indexeInfos)
             {
+                if (!expression.Expression.ContainsCondition(indexInfo.LogicalUniquenessCondition))
+                    continue;
+
                 result.Add(indexInfo, new HashSet<EntityIndex>());
                 indexValues.Add(indexInfo, new HashSet<EntityIndexValue>());
             }
