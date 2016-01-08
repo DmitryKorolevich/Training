@@ -37,6 +37,7 @@ namespace VC.Public.Controllers
 				States = p.States.Select(x => new StateListItemModel()
 				{
 					StateName = x.StateName,
+                    StateCode = x.StateCode,
 					Id = x.Id
 				}).OrderBy(x => x.StateName).ToList()
 			}).ToList();

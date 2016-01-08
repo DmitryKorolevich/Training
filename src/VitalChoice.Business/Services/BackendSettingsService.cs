@@ -33,6 +33,7 @@ namespace VitalChoice.Business.Services
             if(toReturn != null)
             {
                 toReturn.States = _stateRepository.Query(p => p.CountryCode == "US").Select(false);
+                toReturn.States = toReturn.States.OrderBy(p => p.Order).ToList();
             }
             return toReturn;
         }

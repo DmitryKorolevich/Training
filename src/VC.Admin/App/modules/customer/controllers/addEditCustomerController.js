@@ -139,6 +139,15 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 										$scope.shippingAddressTab.AddressIndex = "0";
 										$scope.customerNotesTab.CustomerNote = $scope.currentCustomer.CustomerNotes[0];
 										$scope.paymentInfoTab.Address = {};
+										angular.forEach($scope.currentCustomer.Shipping, function (shippingItem, index)
+										{
+										    customerEditService.syncCountry($scope, shippingItem);
+										    if (shippingItem.Default)
+										    {
+										        $scope.shippingAddressTab.AddressIndex = index.toString();
+										    }
+										});
+										customerEditService.syncCountry($scope, $scope.currentCustomer.ProfileAddress);
 
 										refreshHistory();
 										initCustomerFiles();

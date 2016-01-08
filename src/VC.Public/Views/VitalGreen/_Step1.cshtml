@@ -1,0 +1,109 @@
+﻿@using System.Threading.Tasks
+@using VC.Public.Models
+@model VitalGreenRequestModel
+
+@{
+    if (Model != null)
+    {
+        var cookies = Context.Request.Cookies[VC.Public.Controllers.VitalGreenController.VITAL_GREEN_COOKIE_NAME];
+        VitalGreenRequestModel model = null;
+        if (!String.IsNullOrEmpty(cookies))
+        {
+            try
+            {
+                cookies = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(cookies));
+                model = Newtonsoft.Json.JsonConvert.DeserializeObject<VitalGreenRequestModel>(cookies);
+                Model.FirstName = model.FirstName;
+                Model.LastName = model.LastName;
+                Model.Address = model.Address;
+                Model.Address2 = model.Address2;
+                Model.City = model.City;
+                Model.StateCode = model.StateCode;
+                Model.Zip = model.Zip;
+                Model.Email = model.Email;
+                Model.Phone = model.Phone;
+            }
+            catch (Exception e)
+            {
+                Context.Response.Cookies.Delete(VC.Public.Controllers.VitalGreenController.VITAL_GREEN_COOKIE_NAME);
+            }
+        }
+    }
+}
+
+<div class="content-ajax-form-wrapper">
+    <div id="vitalGreenWrapperInner">
+        <form asp-controller="VitalGreen" asp-action="Step1" data-ajax-success="vitalGreenStep1SubmitSuccess" data-ajax-failure="ajaxFormSubmitError" data-ajax="true" data-method="post" data-ajax-mode="replace" data-ajax-update="#vitalGreenWrapperInner" class="form-regular medium-small content-ajax-form">
+            @Html.ValidationSummary(true, "")
+
+            <input id="hdState" value="@Html.DisplayForEx(x=>x.StateCode)" type="hidden">
+            <div class="form-group">
+                @Html.LabelFor(m => m.FirstName, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.FirstName)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.LastName, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.LastName)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Address, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Address, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Address)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Address2, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Address2, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Address2)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.City, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.City, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.City)
+                </div>
+            </div>
+            <div class="form-group">
+                <!--todo-->
+                @Html.LabelFor(m => m.StateCode, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.DropDownListFor(m => m.StateCode, new List<SelectListItem>(), new { @class = "form-control", @id = "ddState" })
+                    @Html.ValidationMessageFor(m => m.StateCode)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Zip, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Zip, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Zip)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Email)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Phone, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Phone, new { @class = "form-control phone-mask" })
+                    @Html.ValidationMessageFor(m => m.Phone)
+                </div>
+            </div>
+            <div class="form-buttons-group">
+                <input type="submit" value="Continue" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>

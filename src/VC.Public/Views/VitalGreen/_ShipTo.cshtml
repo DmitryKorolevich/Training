@@ -1,0 +1,14 @@
+﻿@model VitalChoice.Infrastructure.Domain.Entities.VitalGreen.FedExZone
+
+@Html.ValidationSummary(true, "")
+@if (Model != null)
+{
+    <h4>The facility you should ship to is:</h4>
+    <div class="zone-description">
+        <strong>@Model.Company</strong><br />
+        <span>@Model.Address</span><br />
+        <span>@Model.City, @Model.State @Model.Zip</span><br />
+        <span id="phone" runat="server">Phone: @Model.Phone</span><br />
+        <a data-zone-id="@Model.Id" href="#">Click to create a shipping label</a>
+    </div>
+}
