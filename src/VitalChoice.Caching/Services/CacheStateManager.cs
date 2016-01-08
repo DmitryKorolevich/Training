@@ -28,13 +28,13 @@ namespace VitalChoice.Caching.Services
                 var cache = CacheFactory.GetCache(group.Key);
                 foreach (var entry in group)
                 {
-                    if (entry.EntityState == EntityState.Deleted)
-                    {
-                        cache.TryRemove(entry.Entity);
-                    }
                     if (entry.EntityState == EntityState.Modified || entry.EntityState == EntityState.Deleted)
                     {
                         cache.MarkForUpdate(entry.Entity);
+                    }
+                    if (entry.EntityState == EntityState.Deleted)
+                    {
+                        cache.TryRemove(entry.Entity);
                     }
                 }
             }
