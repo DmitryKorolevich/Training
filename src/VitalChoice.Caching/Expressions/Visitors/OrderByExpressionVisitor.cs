@@ -14,6 +14,8 @@ namespace VitalChoice.Caching.Expressions.Visitors
         private readonly ParameterExpression _parameter = Expression.Parameter(typeof (IEnumerable<CacheResult<T>>));
         private MethodCallExpression _current;
 
+        public bool Ordered => _current != null;
+
         public Func<IEnumerable<CacheResult<T>>, IOrderedEnumerable<CacheResult<T>>> GetOrderByFunction()
         {
             return

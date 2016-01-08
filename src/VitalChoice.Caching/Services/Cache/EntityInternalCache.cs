@@ -207,14 +207,16 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        public void TryRemove(T entity)
+        public bool TryRemove(T entity)
         {
             var pk = CacheStorage.GetPrimaryKeyValue(entity);
             var datas = CacheStorage.AllCacheDatas;
+            bool result = true;
             foreach (var data in datas)
             {
-                data.TryRemove(pk);
+                result = result && data.TryRemove(pk);
             }
+            return result;
         }
 
         public void Update(IEnumerable<T> entities, RelationInfo relationInfo)

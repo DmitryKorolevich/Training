@@ -12,9 +12,9 @@ namespace VitalChoice.Caching.Interfaces
     public interface IEntityCache<T>
         where T : Entity
     {
-        CacheGetResult TryGetCached(IQueryable<T> query, DbContext dbContext, out List<T> entities);
-        CacheGetResult TryGetCachedFirstOrDefault(IQueryable<T> query, DbContext dbContext, out T entity);
-        void Update(IQueryable<T> query, ICollection<T> entities);
-        void Update(IQueryable<T> query, T entity);
+        CacheGetResult TryGetCached(QueryCacheData<T> queryCache, DbContext dbContext, out List<T> entities);
+        CacheGetResult TryGetCachedFirstOrDefault(QueryCacheData<T> queryCache, DbContext dbContext, out T entity);
+        void Update(QueryCacheData<T> query, IEnumerable<T> entities);
+        void Update(QueryCacheData<T> query, T entity);
     }
 }

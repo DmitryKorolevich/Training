@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using Microsoft.Data.Entity;
-using VitalChoice.Caching.Expressions.Analyzers;
-using VitalChoice.Caching.Expressions.Visitors;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Ecommerce.Domain;
@@ -17,117 +13,137 @@ namespace VitalChoice.Caching.Services.Cache
         where T : Entity, new()
     {
         private readonly IInternalEntityCache<T> _internalCache;
-        private readonly PrimaryKeyAnalyzer<T> _primaryKeyAnalyzer;
-        private readonly IndexAnalyzer<T> _indexAnalyzer;
-        private readonly ConditionalIndexAnalyzer<T> _conditionalIndexAnalyzer;
         private readonly DirectMapper<T> _directMapper;
 
-        public EntityCache(IInternalEntityCacheFactory cacheFactory, IInternalEntityInfoStorage entityInfoStorage,
-            DirectMapper<T> directMapper)
+        public EntityCache(IInternalEntityCacheFactory cacheFactory, DirectMapper<T> directMapper)
         {
             _directMapper = directMapper;
-            _primaryKeyAnalyzer = new PrimaryKeyAnalyzer<T>(entityInfoStorage);
-            _indexAnalyzer = new IndexAnalyzer<T>(entityInfoStorage);
-            _conditionalIndexAnalyzer = new ConditionalIndexAnalyzer<T>(entityInfoStorage);
             _internalCache = cacheFactory.GetCache<T>();
         }
 
-        public CacheGetResult TryGetCached(IQueryable<T> query, DbContext dbContext, out List<T> entities)
+        public CacheGetResult TryGetCached(QueryCacheData<T> queryCache, DbContext dbContext, out List<T> entities)
         {
-            RelationsExpressionVisitor relationsExpressionVisitor = new RelationsExpressionVisitor();
-            relationsExpressionVisitor.Visit(query.Expression);
-            var relationInfo = new RelationInfo(string.Empty, typeof (T), typeof (T), null,
-                relationsExpressionVisitor.Relations);
-            if (_internalCache.GetCacheExist(relationInfo))
+            if (_internalCache.GetCacheExist(queryCache.RelationInfo))
             {
-                QueriableExpressionVisitor<T> queryAnalyzer = new QueriableExpressionVisitor<T>();
-                queryAnalyzer.Visit(query.Expression);
                 IEnumerable<CacheResult<T>> results;
-                if (queryAnalyzer.WhereExpression == null)
+                if (queryCache.WhereExpression == null)
                 {
-                    results = _internalCache.GetAll(relationInfo);
-                    return TranslateResult(dbContext, relationInfo, queryAnalyzer, query, results,
+                    results = _internalCache.GetAll(queryCache.RelationInfo);
+                    return TranslateResult(dbContext, queryCache, results,
                         out entities);
                 }
-                if (TryPrimaryKeys(queryAnalyzer, relationInfo, out results))
+                if (TryPrimaryKeys(queryCache, out results))
                 {
-                    return TranslateResult(dbContext, relationInfo, queryAnalyzer, query, results,
+                    return TranslateResult(dbContext, queryCache, results,
                         out entities);
                 }
 
-                if (TryUniqueIndexes(queryAnalyzer, relationInfo, out results))
-                    return TranslateResult(dbContext, relationInfo, queryAnalyzer, query, results,
+                if (TryUniqueIndexes(queryCache, out results))
+                    return TranslateResult(dbContext, queryCache, results,
                         out entities);
 
-                if (TryConditionalIndexes(queryAnalyzer, relationInfo, out results))
-                    return TranslateResult(dbContext, relationInfo, queryAnalyzer, query, results,
+                if (TryConditionalIndexes(queryCache, out results))
+                    return TranslateResult(dbContext, queryCache, results,
                         out entities);
 
-                results = _internalCache.GetWhere(relationInfo, queryAnalyzer.WhereExpression.Compiled);
-                return TranslateResult(dbContext, relationInfo, queryAnalyzer, query,
+                results = _internalCache.GetWhere(queryCache.RelationInfo, queryCache.WhereExpression.Compiled);
+                return TranslateResult(dbContext, queryCache,
                     results, out entities);
             }
-            entities = new List<T>();
+            entities = null;
             return CacheGetResult.Update;
         }
 
-        public CacheGetResult TryGetCachedFirstOrDefault(IQueryable<T> query, DbContext dbContext, out T entity)
+        public CacheGetResult TryGetCachedFirstOrDefault(QueryCacheData<T> queryCache, DbContext dbContext, out T entity)
         {
-            RelationsExpressionVisitor relationsExpressionVisitor = new RelationsExpressionVisitor();
-            relationsExpressionVisitor.Visit(query.Expression);
-            var relationInfo = new RelationInfo(string.Empty, typeof (T), typeof (T), null,
-                relationsExpressionVisitor.Relations);
+            var relationInfo = queryCache.RelationInfo;
             if (_internalCache.GetCacheExist(relationInfo))
             {
-                QueriableExpressionVisitor<T> queryAnalyzer = new QueriableExpressionVisitor<T>();
-                queryAnalyzer.Visit(query.Expression);
                 IEnumerable<CacheResult<T>> results;
-                if (queryAnalyzer.WhereExpression == null)
+                if (queryCache.WhereExpression == null)
                 {
                     results = _internalCache.GetAll(relationInfo);
-                    return TranslateFirstResult(dbContext, relationInfo, queryAnalyzer, query, results,
+                    return TranslateFirstResult(dbContext, queryCache, results,
                         out entity);
                 }
-                if (TryPrimaryKeys(queryAnalyzer, relationInfo, out results))
+                if (TryPrimaryKeys(queryCache, out results))
                 {
-                    return TranslateFirstResult(dbContext, relationInfo, queryAnalyzer, query, results,
+                    return TranslateFirstResult(dbContext, queryCache, results,
                         out entity);
                 }
 
-                if (TryUniqueIndexes(queryAnalyzer, relationInfo, out results))
-                    return TranslateFirstResult(dbContext, relationInfo, queryAnalyzer, query, results,
+                if (TryUniqueIndexes(queryCache, out results))
+                    return TranslateFirstResult(dbContext, queryCache, results,
                         out entity);
 
-                if (TryConditionalIndexes(queryAnalyzer, relationInfo, out results))
-                    return TranslateFirstResult(dbContext, relationInfo, queryAnalyzer, query, results,
+                if (TryConditionalIndexes(queryCache, out results))
+                    return TranslateFirstResult(dbContext, queryCache, results,
                         out entity);
 
-                results = _internalCache.GetWhere(relationInfo, queryAnalyzer.WhereExpression.Compiled);
-                return TranslateFirstResult(dbContext, relationInfo, queryAnalyzer, query,
+                results = _internalCache.GetWhere(relationInfo, queryCache.WhereExpression.Compiled);
+                return TranslateFirstResult(dbContext, queryCache,
                     results, out entity);
             }
             entity = default(T);
             return CacheGetResult.Update;
         }
 
-        public void Update(IQueryable<T> query, ICollection<T> entities)
+        public void Update(QueryCacheData<T> queryData, IEnumerable<T> entities)
         {
-            throw new NotImplementedException();
+            bool fullCollection;
+
+            if (!CanUpdate(queryData, out fullCollection))
+                return;
+
+            if (fullCollection)
+            {
+                _internalCache.UpdateAll(entities, queryData.RelationInfo);
+            }
+            else
+            {
+                _internalCache.Update(entities, queryData.RelationInfo);
+            }
         }
 
-        public void Update(IQueryable<T> query, T entity)
+        public void Update(QueryCacheData<T> queryData, T entity)
         {
-            throw new NotImplementedException();
+            bool fullCollection;
+
+            if (!CanUpdate(queryData, out fullCollection))
+                return;
+
+            if (fullCollection)
+            {
+                _internalCache.UpdateAll(Enumerable.Repeat(entity, 1), queryData.RelationInfo);
+            }
+            else
+            {
+                _internalCache.Update(entity, queryData.RelationInfo);
+            }
         }
 
-        private bool TryConditionalIndexes(QueriableExpressionVisitor<T> queryAnalyzer, RelationInfo relationInfo,
+        private bool CanUpdate(QueryCacheData<T> queryData, out bool fullCollection)
+        {
+            if (queryData.WhereExpression == null)
+            {
+                fullCollection = true;
+                return true;
+            }
+
+            fullCollection = false;
+
+            return queryData.PrimaryKeys.Count > 0 || queryData.UniqueIndexes.Count > 0 ||
+                   queryData.ConditionalIndexes.Any(c => c.Value.Count > 0);
+        }
+
+        private bool TryConditionalIndexes(QueryCacheData<T> queryData,
             out IEnumerable<CacheResult<T>> results)
         {
-            var conditionalIndexes = _conditionalIndexAnalyzer.TryGetIndexes(queryAnalyzer.WhereExpression);
+            var conditionalIndexes = queryData.ConditionalIndexes;
             if (conditionalIndexes.Count == 1 && conditionalIndexes.First().Value.Count == 1)
             {
                 var result = _internalCache.TryGetEntity(conditionalIndexes.First().Value.First(),
-                    conditionalIndexes.First().Key, relationInfo);
+                    conditionalIndexes.First().Key, queryData.RelationInfo);
                 results = Enumerable.Repeat(result, 1);
                 return true;
             }
@@ -137,8 +153,8 @@ namespace VitalChoice.Caching.Services.Cache
                 results =
                     conditionalIndexes.Select(
                         indexPair =>
-                            _internalCache.TryGetEntities(indexPair.Value, indexPair.Key, relationInfo,
-                                queryAnalyzer.WhereExpression.Compiled))
+                            _internalCache.TryGetEntities(indexPair.Value, indexPair.Key, queryData.RelationInfo,
+                                queryData.WhereExpression.Compiled))
                         .Aggregate(entityList, (current, perminilaryResults) => current.Union(perminilaryResults))
                         .DistinctObjects();
                 return true;
@@ -147,74 +163,66 @@ namespace VitalChoice.Caching.Services.Cache
             return false;
         }
 
-        private bool TryUniqueIndexes(QueriableExpressionVisitor<T> queryAnalyzer, RelationInfo relationInfo,
+        private bool TryUniqueIndexes(QueryCacheData<T> queryCache,
             out IEnumerable<CacheResult<T>> results)
         {
-            var indexes = _indexAnalyzer.TryGetIndexes(queryAnalyzer.WhereExpression);
+            var indexes = queryCache.UniqueIndexes;
             if (indexes.Count == 1)
             {
-                var result = _internalCache.TryGetEntity(indexes.First(), relationInfo);
+                var result = _internalCache.TryGetEntity(indexes.First(), queryCache.RelationInfo);
                 results = Enumerable.Repeat(result, 1);
                 return true;
             }
             if (indexes.Count > 1)
             {
-                results = _internalCache.TryGetEntities(indexes, relationInfo,
-                    queryAnalyzer.WhereExpression.Compiled);
+                results = _internalCache.TryGetEntities(indexes, queryCache.RelationInfo,
+                    queryCache.WhereExpression.Compiled);
                 return true;
             }
             results = null;
             return false;
         }
 
-        private bool TryPrimaryKeys(QueriableExpressionVisitor<T> queryAnalyzer, RelationInfo relationInfo,
+        private bool TryPrimaryKeys(QueryCacheData<T> queryCache,
             out IEnumerable<CacheResult<T>> results)
         {
-            var pks = _primaryKeyAnalyzer.TryGetPrimaryKeys(queryAnalyzer.WhereExpression);
+            var pks = queryCache.PrimaryKeys;
             if (pks.Count == 1)
             {
-                var result = _internalCache.TryGetEntity(pks.First(), relationInfo);
+                var result = _internalCache.TryGetEntity(pks.First(), queryCache.RelationInfo);
                 results = Enumerable.Repeat(result, 1);
                 return true;
             }
             if (pks.Count > 1)
             {
-                results = _internalCache.TryGetEntities(pks, relationInfo, queryAnalyzer.WhereExpression.Compiled);
+                results = _internalCache.TryGetEntities(pks, queryCache.RelationInfo, queryCache.WhereExpression.Compiled);
                 return true;
             }
             results = null;
             return false;
         }
 
-        private CacheGetResult TranslateFirstResult(DbContext dbContext, RelationInfo relationInfo,
-            QueriableExpressionVisitor<T> queryAnalyzer, IQueryable<T> query, IEnumerable<CacheResult<T>> results,
+        private CacheGetResult TranslateFirstResult(DbContext dbContext,
+            QueryCacheData<T> queryData, IEnumerable<CacheResult<T>> results,
             out T entity)
         {
-            if (queryAnalyzer.Tracking)
+            if (queryData.Tracking)
             {
-                return query is IOrderedQueryable<T>
-                    ? ConvertAttachResult(Order(results, query.Expression).FirstOrDefault(), relationInfo, dbContext,
-                        out entity)
-                    : ConvertAttachResult(results.FirstOrDefault(), relationInfo, dbContext, out entity);
+                return ConvertAttachResult(Order(results, queryData).FirstOrDefault(), queryData.RelationInfo, dbContext,
+                    out entity);
             }
-            return query is IOrderedQueryable<T>
-                ? ConvertResult(Order(results, query.Expression).FirstOrDefault(), out entity)
-                : ConvertResult(results.FirstOrDefault(), out entity);
+            return ConvertResult(Order(results, queryData).FirstOrDefault(), out entity);
         }
 
-        private CacheGetResult TranslateResult(DbContext dbContext, RelationInfo relationInfo,
-            QueriableExpressionVisitor<T> queryAnalyzer, IQueryable<T> query, IEnumerable<CacheResult<T>> results,
+        private CacheGetResult TranslateResult(DbContext dbContext, 
+            QueryCacheData<T> queryData, IEnumerable<CacheResult<T>> results,
             out List<T> entities)
         {
-            if (queryAnalyzer.Tracking)
+            if (queryData.Tracking)
             {
-                return query is IOrderedQueryable<T>
-                    ? ConvertAttachResult(Order(results, query.Expression), relationInfo, dbContext, out entities)
-                    : ConvertAttachResult(results, relationInfo, dbContext, out entities);
+                return ConvertAttachResult(Order(results, queryData), queryData.RelationInfo, dbContext, out entities);
             }
-            return query is IOrderedQueryable<T>
-                ? ConvertResult(Order(results, query.Expression), out entities)
-                : ConvertResult(results, out entities);
+            return ConvertResult(Order(results, queryData), out entities);
         }
 
         private void Attach<T1>(T1 entity, RelationInfo relations, DbContext dbContext,
@@ -236,13 +244,13 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        private static IEnumerable<CacheResult<T>> Order(IEnumerable<CacheResult<T>> entities,
-            Expression queryExpression)
+        private static IEnumerable<CacheResult<T>> Order(IEnumerable<CacheResult<T>> entities, QueryCacheData<T> queryData)
         {
-            OrderByExpressionVisitor<T> orderByExpressionVisitor = new OrderByExpressionVisitor<T>();
-            orderByExpressionVisitor.Visit(queryExpression);
-            var orderByFunc = orderByExpressionVisitor.GetOrderByFunction();
-            return orderByFunc(entities);
+            if (queryData.OrderByFunction != null)
+            {
+                return queryData.OrderByFunction(entities);
+            }
+            return entities;
         }
 
         private CacheGetResult ConvertAttachResult(CacheResult<T> result,

@@ -40,7 +40,7 @@ namespace VitalChoice.Caching.Interfaces
 
         IEnumerable<CacheResult<T>> GetWhere(RelationInfo relations, Func<T, bool> whereFunc);
         IEnumerable<CacheResult<T>> GetAll(RelationInfo relations);
-        void TryRemove(T entity);
+        bool TryRemove(T entity);
         IEnumerable<CacheResult<T>> TryRemoveWithResult(T entity);
         void Update(IEnumerable<T> entities, RelationInfo relationInfo);
         void Update(T entity, RelationInfo relationInfo);
