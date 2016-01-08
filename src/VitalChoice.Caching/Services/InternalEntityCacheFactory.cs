@@ -26,6 +26,8 @@ namespace VitalChoice.Caching.Services
 
         public IInternalEntityCache GetCache(Type entityType)
         {
+            if (!_keyStorage.HaveKeys(entityType))
+                return null;
             IInternalEntityCache result;
             lock (_entityCaches)
             {
@@ -44,6 +46,8 @@ namespace VitalChoice.Caching.Services
 
         public IInternalEntityCache<T> GetCache<T>()
         {
+            if (!_keyStorage.HaveKeys(typeof(T)))
+                return null;
             return new EntityInternalCache<T>(_keyStorage, this, _typeConverter);
         }
     }

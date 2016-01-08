@@ -22,7 +22,8 @@
     "VitalChoice.DynamicData": "1.0.0-*",
     "VitalChoice.Infrastructure": "1.0.0-*",
     "VitalChoice.Interfaces": "1.0.0-*",
-    "VitalChoice.Validation": "1.0.0-*"
+    "VitalChoice.Validation": "1.0.0-*",
+    "VitalChoice.Caching" : "1.0.0-*"
   },
 
   "frameworks": {

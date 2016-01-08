@@ -68,6 +68,11 @@ namespace VitalChoice.Caching.Services
 
         private readonly Dictionary<Type, EntityInfo> _entityInfos = new Dictionary<Type, EntityInfo>();
 
+        public bool HaveKeys(Type entityType)
+        {
+            return _entityInfos.ContainsKey(entityType);
+        }
+
         public EntityPrimaryKeyInfo GetPrimaryKeyInfo<T>()
         {
             EntityInfo entityInfo;

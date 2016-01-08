@@ -138,15 +138,20 @@ namespace VitalChoice.Caching.Services
                 IInternalEntityCacheFactory cacheFactory, ITypeConverter typeConverter,
                 IModelConverterService modelConverterService)
             {
+                _cache = new EntityCache<T>(cacheFactory,
+                    new DirectMapper<T>(typeConverter, modelConverterService));
                 _context = context;
                 var queryCache = queryCacheFactory.GetQueryCache<T>();
                 _queryData = queryCache.GerOrAdd(expression);
-                _cache = new EntityCache<T>(cacheFactory,
-                    new DirectMapper<T>(typeConverter, modelConverterService));
             }
 
             public IEnumerable<object> Execute(out CacheGetResult cacheResult)
             {
+                if (_queryData == null)
+                {
+                    cacheResult = CacheGetResult.NotFound;
+                    return null;
+                }
                 List<T> entities;
                 cacheResult = _cache.TryGetCached(_queryData, _context, out entities);
                 return entities;
@@ -154,6 +159,11 @@ namespace VitalChoice.Caching.Services
 
             public object ExecuteFirst(out CacheGetResult cacheResult)
             {
+                if (_queryData == null)
+                {
+                    cacheResult = CacheGetResult.NotFound;
+                    return null;
+                }
                 T entity;
                 cacheResult = _cache.TryGetCachedFirstOrDefault(_queryData, _context, out entity);
                 return entity;
@@ -161,11 +171,19 @@ namespace VitalChoice.Caching.Services
 
             public void Update(object entity)
             {
+                if (_queryData == null)
+                {
+                    return;
+                }
                 _cache.Update(_queryData, (T) entity);
             }
 
             public object Update(IEnumerable<object> entities)
             {
+                if (_queryData == null)
+                {
+                    return null;
+                }
                 var result = entities.Cast<T>().ToList();
                 _cache.Update(_queryData, result);
                 return result;

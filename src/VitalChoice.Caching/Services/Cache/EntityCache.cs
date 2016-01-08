@@ -23,6 +23,12 @@ namespace VitalChoice.Caching.Services.Cache
 
         public CacheGetResult TryGetCached(QueryCacheData<T> queryCache, DbContext dbContext, out List<T> entities)
         {
+            if (_internalCache == null)
+            {
+                entities = null;
+                return CacheGetResult.NotFound;
+            }
+
             if (_internalCache.GetCacheExist(queryCache.RelationInfo))
             {
                 IEnumerable<CacheResult<T>> results;
@@ -56,13 +62,18 @@ namespace VitalChoice.Caching.Services.Cache
 
         public CacheGetResult TryGetCachedFirstOrDefault(QueryCacheData<T> queryCache, DbContext dbContext, out T entity)
         {
-            var relationInfo = queryCache.RelationInfo;
-            if (_internalCache.GetCacheExist(relationInfo))
+            if (_internalCache == null)
+            {
+                entity = null;
+                return CacheGetResult.NotFound;
+            }
+
+            if (_internalCache.GetCacheExist(queryCache.RelationInfo))
             {
                 IEnumerable<CacheResult<T>> results;
                 if (queryCache.WhereExpression == null)
                 {
-                    results = _internalCache.GetAll(relationInfo);
+                    results = _internalCache.GetAll(queryCache.RelationInfo);
                     return TranslateFirstResult(dbContext, queryCache, results,
                         out entity);
                 }
@@ -80,7 +91,7 @@ namespace VitalChoice.Caching.Services.Cache
                     return TranslateFirstResult(dbContext, queryCache, results,
                         out entity);
 
-                results = _internalCache.GetWhere(relationInfo, queryCache.WhereExpression.Compiled);
+                results = _internalCache.GetWhere(queryCache.RelationInfo, queryCache.WhereExpression.Compiled);
                 return TranslateFirstResult(dbContext, queryCache,
                     results, out entity);
             }
@@ -90,6 +101,11 @@ namespace VitalChoice.Caching.Services.Cache
 
         public void Update(QueryCacheData<T> queryData, IEnumerable<T> entities)
         {
+            if (_internalCache == null)
+            {
+                return;
+            }
+
             bool fullCollection;
 
             if (!CanUpdate(queryData, out fullCollection))
@@ -107,6 +123,11 @@ namespace VitalChoice.Caching.Services.Cache
 
         public void Update(QueryCacheData<T> queryData, T entity)
         {
+            if (_internalCache == null)
+            {
+                return;
+            }
+
             bool fullCollection;
 
             if (!CanUpdate(queryData, out fullCollection))

@@ -82,6 +82,7 @@ using VitalChoice.Business.Services.Healthwise;
 using VitalChoice.Interfaces.Services.Healthwise;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Services.Ecommerce;
+using VitalChoice.Caching.Extensions;
 using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.Infrastructure.ServiceBus;
 
@@ -100,6 +101,8 @@ namespace VitalChoice.Core.DependencyInjection
             // Add EF services to the services container.
             services.AddEntityFramework() //.AddMigrations()
                 .AddSqlServer();
+
+            
             // Add Identity services to the services container.
             services.AddIdentity<ApplicationUser, ApplicationRole>(x =>
             {
@@ -315,7 +318,6 @@ namespace VitalChoice.Core.DependencyInjection
                     new NamedParameter("defaultCultureId", configuration.GetSection("App:DefaultCultureId").Value)
                 })
                 .SingleInstance();
-
             var container = BuildContainer(projectAssembly, builder);
             AutofacExecutionContext.Configure(container);
 
@@ -335,6 +337,13 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<EcommerceContext>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<LogsContext>();
+            builder.RegisterDatabaseCache(
+                cc =>
+                    new[]
+                    {
+                        new VitalChoiceContext(cc.Resolve<IOptions<AppOptionsBase>>()).Model,
+                        new EcommerceContext(cc.Resolve<IOptions<AppOptionsBase>>()).Model
+                    });
             builder.RegisterGeneric(typeof (RepositoryAsync<>))
                 .As(typeof (IRepositoryAsync<>));
             builder.RegisterGeneric(typeof (ReadRepositoryAsync<>))

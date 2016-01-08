@@ -16,10 +16,10 @@ namespace VitalChoice.Caching.Extensions
 {
     public static class AutofacBuilderExtension
     {
-        public static ContainerBuilder RegisterDatabaseCache(this ContainerBuilder builder, IEnumerable<IModel> dataModels)
+        public static ContainerBuilder RegisterDatabaseCache(this ContainerBuilder builder, Func<IComponentContext, IEnumerable<IModel>> resolveModels)
         {
             builder.RegisterType<InternalEntityCacheFactory>().As<IInternalEntityCacheFactory>().SingleInstance();
-            builder.Register(cc => new InternalEntityInfoStorage(dataModels)).As<IInternalEntityInfoStorage>().SingleInstance();
+            builder.Register(cc => new InternalEntityInfoStorage(resolveModels(cc))).As<IInternalEntityInfoStorage>().SingleInstance();
             builder.RegisterGeneric(typeof (EntityCache<>)).As(typeof (IEntityCache<>)).SingleInstance();
             builder.RegisterType<CacheStateManager>().As<IStateManager>();
             builder.RegisterType<CacheEntityQueryProvider>().As<IAsyncQueryProvider>();
