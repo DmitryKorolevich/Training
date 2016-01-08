@@ -7,6 +7,7 @@ CREATE VIEW [dbo].[VOrders]
 AS 
 SELECT 
 	o.Id,
+	CAST(o.Id as nvarchar(20)) As IdString,
 	o.OrderStatus,
 	CAST(oval.Value as int) As IdOrderSource,
 	oval.Value As SIdOrderSource,

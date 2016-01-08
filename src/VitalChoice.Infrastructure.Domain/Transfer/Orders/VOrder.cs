@@ -6,6 +6,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 {
     public class VOrder : Entity
     {
+        public string IdString { get; set; }
+
         public OrderStatus OrderStatus { get; set; }
 
         public int? IdOrderSource { get; set; }

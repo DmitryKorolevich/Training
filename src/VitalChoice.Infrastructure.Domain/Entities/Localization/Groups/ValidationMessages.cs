@@ -22,6 +22,7 @@
         AtLeastOnePaymentMethod = 18,
         AtLeastOneOrderNote = 19,
         MonthFormat = 20,
-        YearFormat = 21
+        YearFormat = 21,
+        FieldRelativeUrlInvalidFormat=22
     }
 }

@@ -232,13 +232,13 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			};
 
 			function successHandler(result) {
-			    processCustomerLoad(result);
 			    if (result.Success)
 			    {
 			        if (!$scope.currentCustomer.Id)
 			        {
 			            $state.go('index.oneCol.orderAdd', { idcustomer: result.Data.Id });
 			        }
+			        processCustomerLoad(result);
 			        $scope.currentCustomer.Id = result.Data.Id;
 			        $scope.options.DBStatusCode = result.Data.StatusCode;
 			        refreshHistory();
@@ -323,7 +323,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 						}
 					}
 					toaster.pop('error', "Error!", messages, null, 'trustedHtml');
-				}
+			    }
 			};
 
 			function errorHandler(result) {

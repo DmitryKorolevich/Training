@@ -123,3 +123,20 @@ VALUES
 END
 
 GO
+
+IF(NOT EXISTS (SELECT * FROM [dbo].[AspNetRoleClaims] WHERE [ClaimValue]='11' AND [RoleId]=9))
+BEGIN
+
+INSERT INTO [dbo].[AspNetRoleClaims]
+([ClaimType], [ClaimValue], [RoleId])
+VALUES
+(N'Permission', 11, 9)
+
+INSERT INTO [dbo].[AspNetRoleClaims]
+([ClaimType], [ClaimValue], [RoleId])
+VALUES
+(N'Permission', 11, 10)
+
+END
+
+GO

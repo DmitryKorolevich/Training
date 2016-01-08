@@ -24,7 +24,7 @@
                 <div class="form-group">
                     <span>Order #: <span class="info-text">@ViewBag.IdOrder</span></span><br />
                     <strong>Welcome to our Customer Service Desk.</strong><br /><br />
-                    @Html.ActionLink("Create a Help Ticket","HelpTicket",new {idorder = ViewBag.IdOrder},new { @class="button yellow pull-right" })
+                    @Html.ActionLink("Create a Help Ticket", "HelpTicket", new { idorder = ViewBag.IdOrder }, new { @class = "button yellow pull-right" })
                     <span>Use this section of our store to exchange order-related messages with us.</span><br />
                     <span>Here is a summary of the messages exchanged with regard to this order:</span>
                 </div>
@@ -43,6 +43,7 @@
                             <th>
                                 Status
                             </th>
+                        </tr>
                     </thead>
                     <tbody>
                         @if (Model.Any())
@@ -62,7 +63,7 @@
                                     <td>
                                         <span class="label @(item.StatusCode == VitalChoice.Ecommerce.Domain.Entities.RecordStatusCode.NotActive ? "label-warning" : "label-info" )">
                                             @infrastructure.TicketStatuses.Single(x => x.Key == (int)item.StatusCode).Text
-                                        <span>
+                                            <span>
                                     </td>
                                 </tr>
                             }

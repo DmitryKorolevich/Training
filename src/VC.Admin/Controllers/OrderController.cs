@@ -425,5 +425,12 @@ namespace VC.Admin.Controllers
             var toReturn = await _orderService.GetOrderWithRegionInfoAmountAsync(filter);
             return toReturn;
         }
+
+        [HttpGet]
+        public async Task<Result<ICollection<GCOrderListItemModel>>> GetGCOrders(int id)
+        {
+            var toReturn = await _orderService.GetGCOrdersAsync(id);
+            return toReturn.Select(p=>new GCOrderListItemModel(p)).ToList();
+        }
     }
 }

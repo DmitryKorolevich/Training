@@ -19,7 +19,7 @@ SELECT
 	p.IdObjectType AS IdProductType,
 	p.Name,
 	psval.Value as SubTitle,
-	p.Name +ISNULL(' - '+pval.Value, '')+ISNULL(' ('+sval.Value+')', '') AS DescriptionName,
+	p.Name +ISNULL(' '+psval.Value, '')+ISNULL(' ('+sval.Value+')', '') AS DescriptionName,
 	CONVERT(bit,ISNULL(aval.Value, 0)) AS AutoShipProduct,
 	CONVERT(bit,ISNULL(aval1.Value, 0)) AS AutoShipFrequency1,
 	CONVERT(bit,ISNULL(aval2.Value, 0)) AS AutoShipFrequency2,
@@ -29,8 +29,6 @@ SELECT
 	CONVERT(int,ISNULL(stval.Value, 0)) AS Stock
 	FROM Skus AS s
 	JOIN Products AS p ON p.Id = s.IdProduct	
-	LEFT JOIN ProductOptionTypes AS popt ON popt.Name = N'SubProductGroupName' AND popt.IdObjectType = p.IdObjectType
-	LEFT JOIN ProductOptionValues AS pval ON pval.IdProduct = p.Id AND pval.IdOptionType = popt.Id	
 	LEFT JOIN ProductOptionTypes AS psopt ON psopt.Name = N'SubTitle' AND psopt.IdObjectType = p.IdObjectType
 	LEFT JOIN ProductOptionValues AS psval ON psval.IdProduct = p.Id AND psval.IdOptionType = psopt.Id	
 	LEFT JOIN ProductOptionTypes AS sopt ON sopt.Name = N'QTY' AND sopt.IdObjectType = p.IdObjectType

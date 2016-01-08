@@ -128,7 +128,7 @@ namespace VitalChoice.Core.DependencyInjection
 
             // Add MVC services to the services container.
             StartCustomServicesRegistration(services);
-            services.AddMvc();
+            AddMvc(services);
 
             services.AddAuthorization(x => x.AddPolicy(IdentityConstants.IdentityBasicProfile, y => y.RequireAuthenticatedUser()));
 
@@ -466,6 +466,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<StylesService>().As<IStylesService>();
             builder.RegisterType<CatalogRequestAddressService>().As<ICatalogRequestAddressService>();
             builder.RegisterType<HealthwiseService>().As<IHealthwiseService>();
+            builder.RegisterType<RedirectService>().As<IRedirectService>();
             builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
             builder.RegisterModelConverters(projectAssembly);
 
@@ -519,5 +520,10 @@ namespace VitalChoice.Core.DependencyInjection
 	    protected virtual void FinishCustomRegistrations(ContainerBuilder builder)
 	    {
 	    }
+
+        protected virtual void AddMvc(IServiceCollection services)
+        {
+            services.AddMvc();
+        }
     }
 }

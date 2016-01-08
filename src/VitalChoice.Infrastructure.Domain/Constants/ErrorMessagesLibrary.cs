@@ -38,6 +38,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             public const string ObjectNotFound = "ObjectNotFound";
             public const string AffiliateMinPayCommisionsAmountNotMatch = "AffiliateMinPayCommisionsAmountNotMatch";
             public const string WrongCaptcha = "WrongCaptcha";
+            public const string CustomerWasModified = "CustomerWasModified";
         }
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
@@ -74,6 +75,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             {Keys.ObjectNotFound, "Object cannot be found"},
             {Keys.AffiliateMinPayCommisionsAmountNotMatch, "Affiliate balance is less than ${0}"},
             {Keys.WrongCaptcha, "The reCAPTCHA wasn't entered correctly"},
+            {Keys.CustomerWasModified, "The customer has been modified. Please refresh this page before making changes"}
         };
     }
 }

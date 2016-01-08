@@ -47,6 +47,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
                 { name: 'manageDCs', stateName: 'index.oneCol.manageDiscounts', stateLabel: 'Manage Discount Codes', access: 14 },
                 { name: 'managePromotions', stateName: 'index.oneCol.managePromotions', stateLabel: 'Manage Promotions', access: 14 },
                 { name: 'manageGCs', stateName: 'index.oneCol.manageGCs', stateLabel: 'Manage Gift Certificates', access: 14 },
+                { name: 'manageRedirect', stateName: 'index.oneCol.manageRedirect', stateLabel: 'Custom URL Redirects', access: 14 },
         	]
         },
 		{
@@ -58,25 +59,25 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				    stateLabel: 'Sales, Orders',
 				    subMenu: [
                         { name: 'healthwisePeriods', stateName: 'index.oneCol.healthwisePeriods', stateLabel: 'HealthWise Customer Report', access: 3 },
-                        { name: 'summarySalesReport', stateName: 'index.oneCol.summarySalesReport', stateLabel: 'Summary Sales Report', access: 3 },
-                        { name: 'breakdownReport', stateName: 'index.oneCol.breakdownReport', stateLabel: 'Breakdown Report', access: 3 },
-                        { name: 'sKUBreakdownReport', stateName: 'index.oneCol.sKUBreakdownReport', stateLabel: 'SKU Breakdown Report', access: 3 },
-                        { name: 'futuresBreakdownReport', stateName: 'index.oneCol.futuresBreakdownReport', stateLabel: 'Futures Breakdown Report', access: 3 },
-                        { name: 'orderSKUAddressReport', stateName: 'index.oneCol.orderSKUAddressReport', stateLabel: 'Order SKU and Address Report', access: 3 },
+                        //{ name: 'summarySalesReport', stateName: 'index.oneCol.summarySalesReport', stateLabel: 'Summary Sales Report', access: 3 },
+                        //{ name: 'breakdownReport', stateName: 'index.oneCol.breakdownReport', stateLabel: 'Breakdown Report', access: 3 },
+                        //{ name: 'sKUBreakdownReport', stateName: 'index.oneCol.sKUBreakdownReport', stateLabel: 'SKU Breakdown Report', access: 3 },
+                        //{ name: 'futuresBreakdownReport', stateName: 'index.oneCol.futuresBreakdownReport', stateLabel: 'Futures Breakdown Report', access: 3 },
+                        //{ name: 'orderSKUAddressReport', stateName: 'index.oneCol.orderSKUAddressReport', stateLabel: 'Order SKU and Address Report', access: 3 },
                         { name: 'ordersRegionStatistic', stateName: 'index.oneCol.ordersRegionStatistic', stateLabel: 'Regional Sales Summary', access: 3 },
-                        { name: 'deletedOrdersReport', stateName: 'index.oneCol.deletedOrdersReport', stateLabel: 'Deleted Orders Report', access: 3 },
-                        { name: 'orderSKUCounts', stateName: 'index.oneCol.orderSKUCounts', stateLabel: 'Order SKU Counts', access: 3 },
-                        { name: 'shippedViaReport', stateName: 'index.oneCol.shippedViaReport', stateLabel: 'Shipped Via Report', access: 3 },
+                        //{ name: 'deletedOrdersReport', stateName: 'index.oneCol.deletedOrdersReport', stateLabel: 'Deleted Orders Report', access: 3 },
+                        //{ name: 'orderSKUCounts', stateName: 'index.oneCol.orderSKUCounts', stateLabel: 'Order SKU Counts', access: 3 },
+                        //{ name: 'shippedViaReport', stateName: 'index.oneCol.shippedViaReport', stateLabel: 'Shipped Via Report', access: 3 },
                         { name: 'productCategoriesStatistic', stateName: 'index.oneCol.productCategoriesStatistic', stateLabel: 'Category Sales Report', access: 3 },
-                        { name: 'transactionRefundReport', stateName: 'index.oneCol.transactionRefundReport', stateLabel: 'Transaction & Refund Report', access: 3 },
+                        //{ name: 'transactionRefundReport', stateName: 'index.oneCol.transactionRefundReport', stateLabel: 'Transaction & Refund Report', access: 3 },
 				    ]
 				},
 				{
 				    name: 'wholesale',
 				    stateLabel: 'Wholesale',
 				    subMenu: [
-                        { name: 'wholesaleSummaryReport', stateName: 'index.oneCol.wholesaleSummaryReport', stateLabel: 'Wholesale Summary Report', access: 3 },
-                        { name: 'wholesaleDropShipOrdersReport', stateName: 'index.oneCol.wholesaleDropShipOrdersReport', stateLabel: 'Wholesale Drop Ship Orders Report', access: 3 },
+                    //    { name: 'wholesaleSummaryReport', stateName: 'index.oneCol.wholesaleSummaryReport', stateLabel: 'Wholesale Summary Report', access: 3 },
+                    //    { name: 'wholesaleDropShipOrdersReport', stateName: 'index.oneCol.wholesaleDropShipOrdersReport', stateLabel: 'Wholesale Drop Ship Orders Report', access: 3 },
 				    ]
 				},
 				{
@@ -90,10 +91,10 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				    name: 'operations',
 				    stateLabel: 'Operations',
 				    subMenu: [
-                        { name: 'weeklyAgentReport', stateName: 'index.oneCol.weeklyAgentReport', stateLabel: 'Weekly Agent Report', access: 3 },
-                        { name: 'serviceCodeReport', stateName: 'index.oneCol.serviceCodeReport', stateLabel: 'Service Code Report', access: 3 },
-                        { name: 'productQualityIssuesReport', stateName: 'index.oneCol.productQualityIssuesReport', stateLabel: 'Product Quality Issues Report', access: 3 },
-                        { name: 'kPIReport', stateName: 'index.oneCol.kPIReport', stateLabel: 'KPI Report (APIs)', access: 3 },
+                        //{ name: 'weeklyAgentReport', stateName: 'index.oneCol.weeklyAgentReport', stateLabel: 'Weekly Agent Report', access: 3 },
+                        //{ name: 'serviceCodeReport', stateName: 'index.oneCol.serviceCodeReport', stateLabel: 'Service Code Report', access: 3 },
+                        //{ name: 'productQualityIssuesReport', stateName: 'index.oneCol.productQualityIssuesReport', stateLabel: 'Product Quality Issues Report', access: 3 },
+                        //{ name: 'kPIReport', stateName: 'index.oneCol.kPIReport', stateLabel: 'KPI Report (APIs)', access: 3 },
                         { name: 'vitalGreen', stateName: 'index.oneCol.vitalGreen', stateLabel: 'Review VitalGreen Statistics', access: 3 },
 				    ]
 				},
@@ -101,13 +102,13 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				    name: 'listProcessingAnalysis',
 				    stateLabel: 'List Processing, Analysis',
 				    subMenu: [
-                        { name: 'matchbackPostSeasonAnalysisReport', stateName: 'index.oneCol.matchbackPostSeasonAnalysisReport', stateLabel: 'Matchback and Post-Season Analysis Report', access: 3 },
-                        { name: 'giftCertificateReport', stateName: 'index.oneCol.giftCertificateReport', stateLabel: 'Gift Certificate Report', access: 3 },
-                        { name: 'giftCertificateUsageReport', stateName: 'index.oneCol.giftCertificateUsageReport', stateLabel: 'Gift Certificate Usage Report', access: 3 },
-                        { name: 'lifeTimeCalculationReport', stateName: 'index.oneCol.lifeTimeCalculationReport', stateLabel: 'Life Time Calculation Report', access: 3 },
-                        { name: 'mailingListReport', stateName: 'index.oneCol.mailingListReport', stateLabel: 'Mailing List Report', access: 3 },
-                        { name: 'weeklySalesReport', stateName: 'index.oneCol.weeklySalesReport', stateLabel: 'Weekly Sales Report', access: 3 },
-                        { name: 'newCustomersReport', stateName: 'index.oneCol.newCustomersReport', stateLabel: 'New Customers Report', access: 3 },
+                        //{ name: 'matchbackPostSeasonAnalysisReport', stateName: 'index.oneCol.matchbackPostSeasonAnalysisReport', stateLabel: 'Matchback and Post-Season Analysis Report', access: 3 },
+                        //{ name: 'giftCertificateReport', stateName: 'index.oneCol.giftCertificateReport', stateLabel: 'Gift Certificate Report', access: 3 },
+                        //{ name: 'giftCertificateUsageReport', stateName: 'index.oneCol.giftCertificateUsageReport', stateLabel: 'Gift Certificate Usage Report', access: 3 },
+                        //{ name: 'lifeTimeCalculationReport', stateName: 'index.oneCol.lifeTimeCalculationReport', stateLabel: 'Life Time Calculation Report', access: 3 },
+                        //{ name: 'mailingListReport', stateName: 'index.oneCol.mailingListReport', stateLabel: 'Mailing List Report', access: 3 },
+                        //{ name: 'weeklySalesReport', stateName: 'index.oneCol.weeklySalesReport', stateLabel: 'Weekly Sales Report', access: 3 },
+                        //{ name: 'newCustomersReport', stateName: 'index.oneCol.newCustomersReport', stateLabel: 'New Customers Report', access: 3 },
 				    ]
 				},
                 { name: 'catalogRequests', stateName: 'index.oneCol.catalogRequests', stateLabel: 'Catalog Requests', access: 3 },
@@ -140,7 +141,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			stateLabel: 'Tools',
 			subMenu: [
 				{ name: 'manageProductTaxCodes', stateName: 'index.oneCol.manageProductTaxCodes', stateLabel: 'Manage Product Tax Codes', access: 8 },
-				{ name: 'emailAddressProfiles', stateName: 'index.oneCol.emailAddressProfiles', stateLabel: 'Multiple Email Address Profiles', access: 8 },
+				//{ name: 'emailAddressProfiles', stateName: 'index.oneCol.emailAddressProfiles', stateLabel: 'Multiple Email Address Profiles', access: 8 },
 				{ name: 'moveOrder', stateName: 'index.oneCol.moveOrder', stateLabel: 'Reassign Transaction', access: 8 },
 				{ name: 'changeOrderStatus', stateName: 'index.oneCol.changeOrderStatus', stateLabel: 'Change Order Status', access: 8 },
 			]
@@ -167,7 +168,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			stateLabel: 'Help',
 			subMenu: [
 				{ name: 'manageBugTickets', stateName: 'index.oneCol.manageBugTickets', stateLabel: 'Manage Bug Tickets', access: 11 },
-				{ name: 'viewWiki', stateName: 'index.oneCol.viewWiki', stateLabel: 'View Wiki', access: 11 },
+				//{ name: 'viewWiki', stateName: 'index.oneCol.viewWiki', stateLabel: 'View Wiki', access: 11 },
 				{ name: 'viewLogs', stateName: 'index.oneCol.manageLogs', stateLabel: 'View Logs', access: 10 }
 			]
 		}

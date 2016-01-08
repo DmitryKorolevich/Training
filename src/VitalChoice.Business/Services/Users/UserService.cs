@@ -195,7 +195,7 @@ namespace VitalChoice.Business.Services.Users
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsDisabled]);
 			}
 
-			var notConfirmed = await UserManager.Users.AnyAsync(x => !x.IsConfirmed && x.Email.Equals(login));
+			var notConfirmed = await UserManager.Users.AnyAsync(x => (!x.IsConfirmed || x.Status != UserStatus.Active) && x.Email.Equals(login));
 
 			if (notConfirmed)
 			{

@@ -1,5 +1,6 @@
 ﻿using System;
 using VitalChoice.Business.Helpers;
+using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Promotion;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -7,13 +8,6 @@ using VitalChoice.Validation.Models;
 
 namespace VC.Admin.Models.Product
 {
-    public enum PromotionDateStatus
-    {
-        Expired = 1,
-        Live = 2,
-        Future = 3
-    }
-
     public class PromotionListItemModel : BaseModel
     {
         public int Id { get; set; }
@@ -36,7 +30,7 @@ namespace VC.Admin.Models.Product
 
         public string AddedByAgentId { get; set; }
 
-        public PromotionDateStatus DateStatus { get; set; }
+        public DateStatus DateStatus { get; set; }
 
         public PromotionListItemModel(PromotionDynamic item)
         {
@@ -59,17 +53,17 @@ namespace VC.Admin.Models.Product
                 DateTime now = DateTime.Now;
                 if (now.AddDays(-1) >= ExpirationDate)
                 {
-                    DateStatus = PromotionDateStatus.Expired;
+                    DateStatus = DateStatus.Expired;
                 }
                 else
                 {
                     if (now >= StartDate)
                     {
-                        DateStatus = PromotionDateStatus.Live;
+                        DateStatus = DateStatus.Live;
                     }
                     else
                     {
-                        DateStatus = PromotionDateStatus.Future;
+                        DateStatus = DateStatus.Future;
                     }
                 }
             }

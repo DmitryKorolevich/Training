@@ -1,20 +1,27 @@
-﻿using System.Linq;
-using VitalChoice.Data.Helpers;
+﻿using VitalChoice.Data.Helpers;
 using VitalChoice.DynamicData.Extensions;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 
-namespace VitalChoice.Business.Queries.Customer
+namespace VitalChoice.Business.Queries.Customers
 {
     public class CustomerQuery : QueryObject<Ecommerce.Domain.Entities.Customers.Customer>
     {
 	    public CustomerQuery NotDeleted()
 	    {
-			Add(x=>x.StatusCode != (int)RecordStatusCode.Deleted);
+			Add(x=>x.StatusCode != (int)CustomerStatus.Deleted);
 
 		    return this;
 	    }
+
+		public CustomerQuery NotInActive()
+		{
+			Add(x => x.StatusCode != (int)CustomerStatus.NotActive);
+
+			return this;
+		}
 
 		public CustomerQuery Excluding(int? id)
 		{
@@ -73,7 +80,14 @@ namespace VitalChoice.Business.Queries.Customer
 			return this;
 		}
 
-        public CustomerQuery WithIdContains(string text)
+		public CustomerQuery WithId(int id)
+		{
+			Add(x => x.Id == id);
+
+			return this;
+		}
+
+		public CustomerQuery WithIdContains(string text)
         {
             if (!string.IsNullOrWhiteSpace(text))
                 Add(x => x.Id.ToString().Contains(text));

@@ -198,7 +198,7 @@ namespace VC.Public.Controllers
 			item.PublicId = Guid.NewGuid();
 			item.StatusCode = (int) CustomerStatus.Active;
 
-			var defaultPaymentMethod = await _paymentMethodService.GetStorefrontDefaultPaymentMenthod();
+			var defaultPaymentMethod = await _paymentMethodService.GetStorefrontDefaultPaymentMethod();
             item.IdDefaultPaymentMethod = defaultPaymentMethod.Id;
 			item.ApprovedPaymentMethods = new List<int> {defaultPaymentMethod.Id};
 			item.IdEditedBy = null;

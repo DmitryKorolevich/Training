@@ -19,6 +19,7 @@ using VitalChoice.Business.Queries.Customer;
 using VitalChoice.DynamicData.Helpers;
 using System.Globalization;
 using VitalChoice.Business.Queries.Affiliates;
+using VitalChoice.Business.Queries.Customers;
 using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;

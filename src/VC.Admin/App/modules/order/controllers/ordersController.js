@@ -1,30 +1,38 @@
-﻿angular.module('app.modules.order.controllers.ordersController',[])
+﻿angular.module('app.modules.order.controllers.ordersController', [])
 .controller('ordersController', ['$scope', '$rootScope', '$state', 'orderService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
     function ($scope, $rootScope, $state, orderService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil)
     {
         $scope.refreshTracker = promiseTracker("refresh");
         $scope.deleteTracker = promiseTracker("delete");
 
-        function errorHandler(result) {
+        function errorHandler(result)
+        {
             toaster.pop('error', "Error!", "Server error occured");
         };
 
-        function refreshOrders() {
-            orderService.getOrders($scope.filter, $scope.refreshTracker)
-                .success(function (result) {
-                    if (result.Success) {
+        function refreshOrders()
+        {
+            var filter = $scope.forms.IsActive ? $scope.filter : $scope.directOrdersfilter;
+            filter.Sorting = $scope.filter.Sorting;
+            orderService.getOrders(filter, $scope.refreshTracker)
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
                         $scope.items = result.Data.Items;
-                        $.each($scope.items, function(index, item)
+                        $.each($scope.items, function (index, item)
                         {
                             item.AllowExport = item.OrderStatus == 2;
                             item.IsSelected = item.OrderStatus == 3;//Shipped
                         });
                         $scope.totalItems = result.Data.Count;
-                    } else {
+                    } else
+                    {
                         errorHandler(result);
                     }
                 })
-                .error(function (result) {
+                .error(function (result)
+                {
                     errorHandler(result);
                 });
         };
@@ -43,10 +51,10 @@
             $scope.pOrderTypes = angular.copy($rootScope.ReferenceData.POrderTypes);
             $scope.pOrderTypes.splice(0, 0, { Key: null, Text: 'All  P/NP Types' });
 
-            $scope.shippingMethods = [ 
+            $scope.shippingMethods = [
                 { Key: null, Text: 'All Shipping Methods' },
-                {Key: 1, Text: 'Upgraded'},
-                {Key: 2, Text: 'None'}
+                { Key: 1, Text: 'Upgraded' },
+                { Key: 2, Text: 'None' }
             ];
             $scope.settings = {};
             $scope.settings.allExport = false;
@@ -65,7 +73,21 @@
                 IdCustomerType: null,
                 IdShippingMethod: null,
                 Paging: { PageIndex: 1, PageItemCount: 100 },
-                Sorting: gridSorterUtil.resolve(refreshOrders,"DateCreated","Desc")
+                Sorting: gridSorterUtil.resolve(refreshOrders, "DateCreated", "Desc"),
+                IsActive: true,
+            };
+
+            $scope.directOrdersfilter = {
+                To: null,
+                From: null,
+                ShipDate: false,
+                OrderStatus: null,
+                IdOrderSource: null,
+                POrderType: null,
+                IdCustomerType: null,
+                IdShippingMethod: null,
+                Paging: { PageIndex: 1, PageItemCount: 100 },
+                Sorting: gridSorterUtil.resolve(refreshOrders, "DateCreated", "Desc"),
             };
 
             $scope.$watch("filter.ShipDate", function (newValue, oldValue)
@@ -85,9 +107,18 @@
 
         $scope.filterOrders = function ()
         {
+            $scope.forms.IsActive = true;
+            $scope.forms.form.submitted = false;
+            $scope.filter.Paging.PageIndex = 1;
+            refreshOrders();
+        };
+
+        $scope.directFilterOrders = function ()
+        {
+            $scope.forms.IsActive = false;
             if ($scope.forms.form.$valid)
             {
-                $scope.filter.Paging.PageIndex = 1;
+                $scope.directOrdersfilter.Paging.PageIndex = 1;
                 refreshOrders();
             }
             else
@@ -96,16 +127,18 @@
             }
         };
 
-        $scope.pageChanged = function () {
+        $scope.pageChanged = function ()
+        {
             refreshOrders();
         };
 
-        $scope.delete = function () {
+        $scope.delete = function ()
+        {
         };
 
-        $scope.allExportCall = function()
+        $scope.allExportCall = function ()
         {
-            $.each($scope.items, function(index, item)
+            $.each($scope.items, function (index, item)
             {
                 if (item.AllowExport)
                 {
@@ -122,11 +155,13 @@
             }
         };
 
-        $scope.exportOrders = function () {
+        $scope.exportOrders = function ()
+        {
 
         };
 
-        $scope.openOrder = function (id) {
+        $scope.openOrder = function (id)
+        {
             $state.go('index.oneCol.orderDetail', { id: id });
         };
 

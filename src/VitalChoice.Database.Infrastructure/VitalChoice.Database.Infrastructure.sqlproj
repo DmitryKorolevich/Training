@@ -166,4 +166,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\ContentIndexes.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\Redirects.sql" />
+  </ItemGroup>
 </Project>

@@ -1,5 +1,6 @@
 ﻿using System;
 using VitalChoice.Business.Helpers;
+using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -7,13 +8,6 @@ using VitalChoice.Validation.Models;
 
 namespace VC.Admin.Models.Product
 {
-    public enum DiscountDateStatus
-    {
-        Expired=1,
-        Live=2,
-        Future=3
-    }
-
     public class DiscountListItemModel : BaseModel
     {
         public int Id { get; set; }
@@ -38,7 +32,7 @@ namespace VC.Admin.Models.Product
 
         public string AddedByAgentId { get; set; }
 
-        public DiscountDateStatus DateStatus { get; set; }
+        public DateStatus DateStatus { get; set; }
 
         public DiscountListItemModel(DiscountDynamic item)
         {
@@ -62,17 +56,17 @@ namespace VC.Admin.Models.Product
                 DateTime now = DateTime.Now;
                 if (now.AddDays(-1)>=ExpirationDate)
                 {
-                    DateStatus = DiscountDateStatus.Expired;
+                    DateStatus = DateStatus.Expired;
                 }
                 else
                 {
                     if(now>=StartDate)
                     {
-                        DateStatus = DiscountDateStatus.Live;
+                        DateStatus = DateStatus.Live;
                     }
                     else
                     {
-                        DateStatus = DiscountDateStatus.Future;
+                        DateStatus = DateStatus.Future;
                     }
                 }
             }

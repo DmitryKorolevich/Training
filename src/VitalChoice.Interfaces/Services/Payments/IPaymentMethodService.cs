@@ -13,7 +13,7 @@ namespace VitalChoice.Interfaces.Services.Payments
 
 	    Task SetStateAsync(IList<PaymentMethodsAvailability> paymentMethodsAvailability);
 
-	    Task<PaymentMethod> GetStorefrontDefaultPaymentMenthod();
+	    Task<PaymentMethod> GetStorefrontDefaultPaymentMethod();
 
         Task<List<MessageInfo>> AuthorizeCreditCard(PaymentMethodDynamic paymentMethod);
 

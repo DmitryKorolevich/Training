@@ -155,7 +155,7 @@ namespace VitalChoice.Business.Services.Payment
 			}
 		}
 
-		public async Task<PaymentMethod> GetStorefrontDefaultPaymentMenthod()
+		public async Task<PaymentMethod> GetStorefrontDefaultPaymentMethod()
 		{
 			var condition = new PaymentMethodQuery().NotDeleted().CreditCard();
 

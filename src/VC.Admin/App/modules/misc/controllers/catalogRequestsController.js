@@ -41,21 +41,24 @@
 
         $scope.clear = function ()
         {
-            settingService.deleteCatalogRequests($scope.refreshTracker)
-                .success(function (result)
-                {
-                    if (result.Success)
+            confirmUtil.confirm(function ()
+            {
+                settingService.deleteCatalogRequests($scope.refreshTracker)
+                    .success(function (result)
                     {
-                        refresh();
-                    } else
+                        if (result.Success)
+                        {
+                            refresh();
+                        } else
+                        {
+                            errorHandler(result);
+                        }
+                    })
+                    .error(function (result)
                     {
                         errorHandler(result);
-                    }
-                })
-                .error(function (result)
-                {
-                    errorHandler(result);
-                });
+                    });
+            }, 'Are you sure you want to delete catalog requests?');
         };
 
         initialize();

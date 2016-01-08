@@ -344,6 +344,7 @@ namespace VitalChoice.Business.Services
                     Text = x.Name
                 }).ToList();
             referenceData.ExpiredTypes = LookupHelper.GetExpiredTypes();
+            referenceData.DateStatuses = LookupHelper.GetDateStatuses();
             referenceData.PromotionBuyTypes = lookupVariantRepository.Query()
                 .Where(x => x.IdLookup == promotionBuyTypes)
                 .Select(false)

@@ -93,15 +93,16 @@ namespace VitalChoice.Business.Services.Healthwise
 
         public async Task<ICollection<HealthwiseOrder>> GetHealthwiseOrdersAsync(int idPeriod)
         {
+            Func<IQueryable<HealthwiseOrder>, IOrderedQueryable<HealthwiseOrder>> sortable = x => x.OrderByDescending(y => y.Order.DateCreated);
             return await _healthwiseOrderRepository.Query(p => p.IdHealthwisePeriod == idPeriod && p.Order.StatusCode != (int)RecordStatusCode.Deleted
                 && (p.Order.OrderStatus == OrderStatus.Processed || p.Order.OrderStatus == OrderStatus.Shipped ||
-                p.Order.OrderStatus == OrderStatus.Exported)).Include(p => p.Order).SelectAsync(false);
+                p.Order.OrderStatus == OrderStatus.Exported)).Include(p => p.Order).OrderBy(sortable).SelectAsync(false);
         }
 
         public async Task<ICollection<VHealthwisePeriod>> GetVHealthwisePeriodsAsync(VHealthwisePeriodFilter filter)
         {
-            VHealthwisePeriodQuery conditions = new VHealthwisePeriodQuery().WithDateTo(filter.To).WithDateFrom(filter.From).
-                WithAllowPaymentOnly(filter.NotBilledOnly, _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount);
+            VHealthwisePeriodQuery conditions = new VHealthwisePeriodQuery().WithCustomerId(filter.IdCustomer).WithDateTo(filter.To).WithDateFrom(filter.From).
+                WithAllowPaymentOnly(filter.NotBilledOnly, _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount).WithNotPaid(filter.NotPaid);
 
             var toReturn = await _vHealthwisePeriodRepository.Query(conditions).SelectAsync(false);
             return toReturn;
@@ -199,7 +200,7 @@ namespace VitalChoice.Business.Services.Healthwise
             if (period != null && count != 0)
             {
                 int maxCount = _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount;
-                VHealthwisePeriodQuery conditions = new VHealthwisePeriodQuery().WithCustomerId(period.IdCustomer).WithNotPaid();
+                VHealthwisePeriodQuery conditions = new VHealthwisePeriodQuery().WithCustomerId(period.IdCustomer).WithNotPaid(true);
                 var items = await _vHealthwisePeriodRepository.Query(conditions).SelectAsync(false);
                 foreach (var item in items)
                 {

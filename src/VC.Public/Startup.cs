@@ -15,6 +15,9 @@ using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.AspNet.Http;
 using System.Globalization;
 using Microsoft.AspNet.Http.Features;
+using Microsoft.AspNet.Mvc;
+using System.Threading.Tasks;
+using VitalChoice.Interfaces.Services;
 
 namespace VC.Public
 {
@@ -68,6 +71,16 @@ namespace VC.Public
 			app.UseCookieAuthentication();
 
             app.UseSession();
+            app.Use(async (context, next) =>
+            {
+                var redirectViewService = context.RequestServices.GetService<IRedirectViewService>();
+                var result = await redirectViewService.CheckRedirects(context);
+
+                if (!result)
+                {
+                    await next();
+                }
+            });
             app.UseStatusCodePagesWithReExecute("/help/error/{0}");
             app.UseMvc(RouteConfig.RegisterRoutes);
             app.UseCookieAuthentication(x =>
@@ -79,18 +92,6 @@ namespace VC.Public
                 x.ReturnUrlParameter = "returnUrl";
                 x.CookieName = "VitalChoice.Public";
             });
-            //app.Use(async (context, next) =>
-            //{
-            //    if (context.Request.IsHttps)
-            //    {
-            //        await next();
-            //    }
-            //    else
-            //    {
-            //        var withHttps = "https://" + context.Request.Host + context.Request.Path;
-            //        context.Response.Redirect(withHttps);
-            //    }
-            //});
         }
     }
 }
