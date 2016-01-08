@@ -529,7 +529,7 @@ END
 
 GO
 
-IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentPages] WHERE [Url] = 'not-found')
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentPages] WHERE [Url] = 'vitalgreen')
 BEGIN
 
 DECLARE @contentItemId int
@@ -594,7 +594,7 @@ INSERT INTO [dbo].[ContentPages]
            ,'Vital Green'
            ,NULL
            ,@contentItemId
-           ,(SELECT Id FROM MasterContentItems WHERE Name='Content Individual Empty')
+           ,(SELECT Id FROM MasterContentItems WHERE Name='Content Individual')
            ,2
            ,1
            ,NULL)
