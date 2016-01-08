@@ -2,6 +2,8 @@
 	Layout = "~/Views/Shared/_ViewCartLayout.cshtml";
 }
 
+@model VC.Public.Models.Cart.ViewCartModel
+
 <div class="cart-content-top">
 	<span class="cart-head-text">IMPORTANT NOTICE</span>
 	<span class="cart-subhead-text">You are only $27.00 from Free Shipping.</span>
@@ -25,48 +27,67 @@
 		</div>
 		<span>Please review your purchases and quantities, then click the Checkout button.</span>
 	</div>
-	<form>
-		<table class="standard-table">
+	@using (Html.BeginForm("ViewCart", "Cart", null, FormMethod.Post, new { @class = "form-cart", role = "form" }))
+	{
+		<div class="cart-control-container">
+			<a href="#" class="button">Continue Shopping</a>
+			<input type="submit" class="blue checkout" value="Checkout"/>
+		</div>
+		<table class="standard-table cart-items-list">
 			<thead>
-				<tr>
-					<th>
-						Item
-					</th>
-					<th>
-						Price
-					</th>
-					<th>
-						Quantity
-					</th>
-					<th>
-						Subtotal
-					</th>
-					<th>
-					</th>
-				</tr>
+			<tr>
+				<th>
+					Item
+				</th>
+				<th>
+					Price
+				</th>
+				<th>
+					Quantity
+				</th>
+				<th>
+					Subtotal
+				</th>
+				<th>
+				</th>
+			</tr>
 			</thead>
 			<tbody>
-				@*@if (Model.Items.Any())
+			@if (Model.Skus.Any())
+			{
+				foreach (var item in Model.Skus)
 				{
-				foreach (var item in Model.Items)
-				{
-				<tr>
-					<td><a href="#">@item.Id</a></td>
-					<td>@infrastructure.OrderStatuses.Single(x => x.Key == (int)item.OrderStatus).Text</td>
-					<td>@item.Total.ToString("C2")</td>
-					<td>@item.DateCreated.ToString("MM/dd/yyyy")</td>
-					<td>@(item.Healthwise ? "Yes" : "No")</td>
-					<td>@Html.ActionLink("Help Desk","HelpTickets", new { idorder= item.Id})</td>
-				</tr>
+					<tr>
+						<td>
+							<a class="cart-image-link" href="@item.ProductPageUrl">
+								<img src="@item.IconUrl"/>
+							</a>
+							<div class="cart-line-info">
+								<a class="cart-text-link" href="@item.ProductPageUrl">
+									@item.DisplayName
+								</a>
+								<span class="cart-sku-code">(@item.Code)</span>
+								<span class="stock-presence-note">@(item.InStock ? "In Stock Ready to Ship" : "Not in Stock")</span>
+							</div>
+						</td>
+						<td>@(item.Price.HasValue ? @item.Price.Value.ToString("C2") : string.Empty)</td>
+						<td>@Html.TextBoxFor(x => item.Quantity, new {@class = "input-control width-small"})</td>
+						<td>@(item.SubTotal.HasValue ? @item.SubTotal.Value.ToString("C2") : string.Empty)</td>
+					</tr>
 				}
-				}
-				else
-				{
-				<tr><td colspan="6">No Orders Found</td></tr>
-				}*@
+			}
+			else
+			{
+				<tr><td colspan="5">No Items Added</td></tr>
+			}
 			</tbody>
 		</table>
-	</form>
+
+		<div class="cart-control-container">
+			<a href="#" class="button">Continue Shopping</a>
+			<input type="submit" class="blue checkout" value="Checkout" />
+		</div>
+	}
 </div>
 <div class="cart-content-bottom">
 	<div class="best-proposals-container">
