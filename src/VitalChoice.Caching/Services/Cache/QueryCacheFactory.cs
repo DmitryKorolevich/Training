@@ -9,7 +9,7 @@ namespace VitalChoice.Caching.Services.Cache
 {
     public class QueryCacheFactory : IQueryCacheFactory
     {
-        private readonly ConcurrentDictionary<Type, object> _queryCaches = new ConcurrentDictionary<Type, object>();
+        private static readonly ConcurrentDictionary<Type, object> QueryCaches = new ConcurrentDictionary<Type, object>();
 
         private readonly IInternalEntityInfoStorage _entityInfo;
 
@@ -20,7 +20,7 @@ namespace VitalChoice.Caching.Services.Cache
 
         public IQueryCache<T> GetQueryCache<T>()
         {
-            return (IQueryCache<T>) _queryCaches.GetOrAdd(typeof (T), key => new QueryCache<T>(_entityInfo));
+            return (IQueryCache<T>) QueryCaches.GetOrAdd(typeof (T), key => new QueryCache<T>(_entityInfo));
         }
     }
 }

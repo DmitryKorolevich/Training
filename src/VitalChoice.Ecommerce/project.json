@@ -11,7 +11,8 @@
     "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
     "Microsoft.Extensions.OptionsModel": "1.0.0-*",
     "VitalChoice.Ecommerce.Domain": "",
-    "VitalChoice.Data": ""
+    "VitalChoice.Data": "",
+    "VitalChoice.Caching": ""
   },
   "frameworks": {
     "net451": { },

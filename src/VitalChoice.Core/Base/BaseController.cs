@@ -6,6 +6,7 @@ using VitalChoice.Validation.Helpers;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
 using Microsoft.AspNet.Mvc.Routing;
+using VitalChoice.Ecommerce.Context;
 
 namespace VitalChoice.Core.Base
 {

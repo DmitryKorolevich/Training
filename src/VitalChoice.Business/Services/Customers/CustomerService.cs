@@ -21,13 +21,13 @@ using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Data.Services;
-using DynamicExpressionVisitor = VitalChoice.DynamicData.Helpers.DynamicExpressionVisitor;
 using VitalChoice.Business.Queries.Affiliate;
 using VitalChoice.Business.Queries.Customers;
 using VitalChoice.Business.Repositories;
 using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Data.Extensions;
 using VitalChoice.DynamicData.Base;
+using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -91,7 +91,7 @@ namespace VitalChoice.Business.Services.Customers
             IOptions<AppOptions> appOptions,
             IStorefrontUserService storefrontUserService,
             IEcommerceRepositoryAsync<Affiliate> affiliateRepositoryAsync,
-            ILoggerProviderExtended loggerProvider, DirectMapper<Customer> directMapper, DynamicExpressionVisitor queryVisitor,
+            ILoggerProviderExtended loggerProvider, DirectMapper<Customer> directMapper, DynamicExtensionsRewriter queryVisitor,
             AddressOptionValueRepository addressOptionValueRepositoryAsync, CustomerAddressMapper customerAddressMapper,
             ICountryNameCodeResolver countryNameCode, IEncryptedOrderExportService encryptedOrderExportService,
             IObjectMapper<CustomerPaymentMethodDynamic> paymentMapper, IPaymentMethodService paymentMethodService)

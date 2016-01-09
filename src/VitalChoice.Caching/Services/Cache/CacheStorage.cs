@@ -45,7 +45,7 @@ namespace VitalChoice.Caching.Services.Cache
             CacheData<T> data;
             if (_cacheData.TryGetValue(relationInfo, out data))
             {
-                return data.Empty;
+                return !data.Empty;
             }
             return false;
         }

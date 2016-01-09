@@ -97,7 +97,7 @@ namespace VitalChoice.Business.Services.Orders
             AffiliateOrderPaymentRepository affiliateOrderPaymentRepository,
             IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync,
             DirectMapper<Order> directMapper,
-            DynamicExpressionVisitor queryVisitor,
+            DynamicExtensionsRewriter queryVisitor,
             IEcommerceRepositoryAsync<HealthwiseOrder> healthwiseOrderRepositoryAsync,
             IEcommerceRepositoryAsync<HealthwisePeriod> healthwisePeriodRepositoryAsync,
             IAppInfrastructureService appInfrastructureService,

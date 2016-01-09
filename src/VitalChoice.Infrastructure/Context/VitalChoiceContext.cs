@@ -1,7 +1,10 @@
 ﻿using Microsoft.Data.Entity;
 using System.Data.SqlClient;
+using Microsoft.Data.Entity.Infrastructure;
 using Microsoft.Extensions.OptionsModel;
+using VitalChoice.Caching.Extensions;
 using VitalChoice.Data.Context;
+using VitalChoice.Ecommerce.Context;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Content;
@@ -24,13 +27,15 @@ namespace VitalChoice.Infrastructure.Context
     {
         private readonly IOptions<AppOptionsBase> _options;
 
-        public VitalChoiceContext(IOptions<AppOptionsBase> options)
+        public VitalChoiceContext(IOptions<AppOptionsBase> options) : base(EcommerceContextBase.ServiceProvider)
         {
             _options = options;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder builder)
         {
+            //((IDbContextOptionsBuilderInfrastructure)builder).AddOrUpdateExtension(new DbContextCacheExtension());
+            
             var connectionString = (new SqlConnectionStringBuilder
             {
                 DataSource = _options.Value.Connection.Server,

@@ -38,7 +38,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
                 ? _conditions.Pop()
                 : new Condition(node.Right.NodeType, node.Right);
 
-            var topCondition = (BinaryCondition) _conditions.Pop();
+            var topCondition = (BinaryCondition) _conditions.Peek();
             topCondition.Left = currentLeft;
             topCondition.Right = currentRight;
             _condition = topCondition;

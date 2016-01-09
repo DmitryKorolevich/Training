@@ -40,6 +40,14 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                         }
                     }
                 }
+                else
+                {
+                    if (_indexesInfo.IndexInfoInternal.Count == indexValues.Count)
+                    {
+                        var newIndex = new EntityIndex(indexValues);
+                        result.Add(newIndex);
+                    }
+                }
             }
             catch
             {
@@ -56,12 +64,9 @@ namespace VitalChoice.Caching.Expressions.Analyzers
             {
                 case ExpressionType.Equal:
                     var equal = (BinaryCondition) top;
-                    var left = equal.Left.Expression.RemoveConvert();
-                    var right = equal.Right.Expression.RemoveConvert();
-                    var member = left as MemberExpression ?? right as MemberExpression;
-                    var value = (right as ConstantExpression ??
-                                 left as ConstantExpression)?.Value;
-                    if (member != null && value != null && member.Type == typeof (T) &&
+                    MemberExpression member;
+                    var value = equal.ParseMemeberCompare(out member);
+                    if (member != null && value != null && member.Expression.Type == typeof (T) &&
                         _indexesInfo.IndexInfoInternal.TryGetValue(member.Member.Name, out indexInfo))
                     {
                         indexValues.Add(new EntityIndexValue(indexInfo, value));
@@ -85,8 +90,8 @@ namespace VitalChoice.Caching.Expressions.Analyzers
 
                     var memberSelector =
                         ((method?.Arguments.Last() as UnaryExpression)?.Operand as LambdaExpression)?.Body as MemberExpression;
-                    var values = ((method?.Arguments.Last() as UnaryExpression)?.Operand as ConstantExpression)?.Value as IEnumerable;
-                    if (values != null && memberSelector != null && memberSelector.Type == typeof (T) && _indexesInfo.IndexInfoInternal.Count == 1 &&
+                    var values = (method?.Arguments.Last() as UnaryExpression)?.Operand.GetValue() as IEnumerable;
+                    if (values != null && memberSelector != null && memberSelector.Expression.Type == typeof (T) && _indexesInfo.IndexInfoInternal.Count == 1 &&
                         _indexesInfo.IndexInfoInternal.TryGetValue(memberSelector.Member.Name, out indexInfo))
                     {
                         if (indexes.Any())

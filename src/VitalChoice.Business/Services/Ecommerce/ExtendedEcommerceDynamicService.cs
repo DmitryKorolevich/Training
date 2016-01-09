@@ -2,13 +2,13 @@
 using VitalChoice.Data.Services;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.DynamicData.Base;
+using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.ObjectMapping.Base;
-using DynamicExpressionVisitor = VitalChoice.DynamicData.Helpers.DynamicExpressionVisitor;
 
 namespace VitalChoice.Business.Services.Ecommerce
 {
@@ -24,7 +24,7 @@ namespace VitalChoice.Business.Services.Ecommerce
             IEcommerceRepositoryAsync<TOptionValue> optionValueRepositoryAsync,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
-            ILoggerProviderExtended loggerProvider, DirectMapper<TEntity> directMapper, DynamicExpressionVisitor queryVisitor)
+            ILoggerProviderExtended loggerProvider, DirectMapper<TEntity> directMapper, DynamicExtensionsRewriter queryVisitor)
             : base(
                 mapper, objectRepository, optionValueRepositoryAsync, bigStringRepository, objectLogItemExternalService, queryVisitor,
                 directMapper, loggerProvider.CreateLoggerDefault())

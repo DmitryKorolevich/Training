@@ -210,7 +210,8 @@ namespace VitalChoice.Caching.Services.Cache
                     result.AddRange(
                         cachedItems.Select(
                             cached =>
-                                new RelationInstance(cache.Update(relation, cached), cached.EntityUntyped.GetType(), relation, cache)));
+                                new RelationInstance(cache.Update(relation, cached.EntityUntyped),
+                                    cached.EntityUntyped.GetType(), relation, cache)));
                 }
                 else
                 {

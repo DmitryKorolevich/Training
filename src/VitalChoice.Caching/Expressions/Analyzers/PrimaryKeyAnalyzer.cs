@@ -47,6 +47,14 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                         }
                     }
                 }
+                else
+                {
+                    if (_keyInfo.KeyInfo.Count == keyValues.Count)
+                    {
+                        var newKey = new EntityKey(keyValues);
+                        result.Add(newKey);
+                    }
+                }
             }
             catch
             {
@@ -61,13 +69,10 @@ namespace VitalChoice.Caching.Expressions.Analyzers
             {
                 case ExpressionType.Equal:
                     var equal = (BinaryCondition) top;
-                    var left = equal.Left.Expression.RemoveConvert();
-                    var right = equal.Right.Expression.RemoveConvert();
-                    var member = left as MemberExpression ?? right as MemberExpression;
-                    var value = (right as ConstantExpression ??
-                                 left as ConstantExpression)?.Value;
+                    MemberExpression member;
+                    var value = equal.ParseMemeberCompare(out member);
                     EntityKeyInfo info;
-                    if (member != null && value != null && member.Type == typeof (T) &&
+                    if (member != null && value != null && member.Expression.Type == typeof (T) &&
                         _keyInfo.KeyInfoFields.TryGetValue(member.Member.Name, out info))
                     {
                         keyValues.Add(new EntityKeyValue(info, value));
@@ -91,8 +96,8 @@ namespace VitalChoice.Caching.Expressions.Analyzers
 
                     var memberSelector =
                         ((method?.Arguments.Last() as UnaryExpression)?.Operand as LambdaExpression)?.Body as MemberExpression;
-                    var values = ((method?.Arguments.Last() as UnaryExpression)?.Operand as ConstantExpression)?.Value as IEnumerable;
-                    if (values != null && memberSelector != null && memberSelector.Type == typeof (T) &&
+                    var values = (method?.Arguments.Last() as UnaryExpression)?.Operand.GetValue() as IEnumerable;
+                    if (values != null && memberSelector != null && memberSelector.Expression.Type == typeof (T) &&
                         _keyInfo.KeyInfoFields.TryGetValue(memberSelector.Member.Name, out info) && _keyInfo.KeyInfo.Count == 1)
                     {
                         if (pks.Any())

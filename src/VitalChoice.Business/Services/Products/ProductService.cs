@@ -15,6 +15,7 @@ using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Services;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.DynamicData.Base;
+using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
@@ -36,7 +37,6 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.ObjectMapping.Base;
-using DynamicExpressionVisitor = VitalChoice.DynamicData.Helpers.DynamicExpressionVisitor;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -166,7 +166,7 @@ namespace VitalChoice.Business.Services.Products
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             IOptions<AppOptions> options,
             ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<VCustomerFavorite> vCustomerRepositoryAsync,
-            DirectMapper<Product> directMapper, DynamicExpressionVisitor queryVisitor)
+            DirectMapper<Product> directMapper, DynamicExtensionsRewriter queryVisitor)
             : base(
                 mapper, productRepository, productValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor)

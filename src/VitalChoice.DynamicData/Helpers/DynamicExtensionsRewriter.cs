@@ -15,14 +15,14 @@ using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.DynamicData.Helpers
 {
-    public class DynamicExpressionVisitor : ExpressionVisitor
+    public class DynamicExtensionsRewriter : ExpressionVisitor
     {
         private readonly IModelConverterService _converterService;
         private readonly ITypeConverter _typeConverter;
         private readonly IIndex<GenericTypePair, IOptionTypeQueryProvider> _optionTypeQueryProviderIndex;
         private readonly IDataContext _dataContext;
 
-        public DynamicExpressionVisitor(IModelConverterService converterService, ITypeConverter typeConverter,
+        public DynamicExtensionsRewriter(IModelConverterService converterService, ITypeConverter typeConverter,
             IIndex<GenericTypePair, IOptionTypeQueryProvider> optionTypeQueryProviderIndex, IDataContextAsync context)
         {
             _converterService = converterService;

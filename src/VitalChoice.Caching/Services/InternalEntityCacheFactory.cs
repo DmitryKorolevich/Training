@@ -16,7 +16,8 @@ namespace VitalChoice.Caching.Services
         private readonly IInternalEntityInfoStorage _keyStorage;
         private readonly ITypeConverter _typeConverter;
 
-        private readonly Dictionary<Type, IInternalEntityCache> _entityCaches = new Dictionary<Type, IInternalEntityCache>();
+        private static readonly Dictionary<Type, IInternalEntityCache> EntityCaches =
+            new Dictionary<Type, IInternalEntityCache>();
 
         public InternalEntityCacheFactory(IInternalEntityInfoStorage keyStorage, ITypeConverter typeConverter)
         {
@@ -29,26 +30,25 @@ namespace VitalChoice.Caching.Services
             if (!_keyStorage.HaveKeys(entityType))
                 return null;
             IInternalEntityCache result;
-            lock (_entityCaches)
+            lock (EntityCaches)
             {
-                if (_entityCaches.TryGetValue(entityType, out result))
+                if (EntityCaches.TryGetValue(entityType, out result))
                 {
                     return result;
                 }
                 result =
                     (IInternalEntityCache)
-                        Activator.CreateInstance(typeof (EntityInternalCache<>).MakeGenericType(entityType), _keyStorage, this,
+                        Activator.CreateInstance(typeof (EntityInternalCache<>).MakeGenericType(entityType), _keyStorage,
+                            this,
                             _typeConverter);
-                _entityCaches.Add(entityType, result);
+                EntityCaches.Add(entityType, result);
             }
             return result;
         }
 
         public IInternalEntityCache<T> GetCache<T>()
         {
-            if (!_keyStorage.HaveKeys(typeof(T)))
-                return null;
-            return new EntityInternalCache<T>(_keyStorage, this, _typeConverter);
+            return (IInternalEntityCache<T>) GetCache(typeof (T));
         }
     }
 }

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using VitalChoice.Caching.Expressions;
 using VitalChoice.Caching.Relational;
 
 namespace VitalChoice.Caching.Services.Cache
 {
-    public class QueryCacheData<T>
+    public struct QueryCacheData<T>
     {
         public WhereExpression<T> WhereExpression { get; set; }
         public RelationInfo RelationInfo { get; set; }

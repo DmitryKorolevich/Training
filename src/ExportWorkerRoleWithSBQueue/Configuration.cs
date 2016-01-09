@@ -324,7 +324,7 @@ namespace ExportWorkerRoleWithSBQueue
             builder.RegisterGeneric(typeof(TreeSetup<,>)).As(typeof(ITreeSetup<,>));
             builder.RegisterContentBase();
             builder.RegisterDynamicsBase();
-            builder.RegisterType<DynamicExpressionVisitor>()
+            builder.RegisterType<DynamicExtensionsRewriter>()
                 .AsSelf()
                 .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>());
             builder.RegisterProcessors(typeof(IContentProcessor).GetTypeInfo().Assembly);

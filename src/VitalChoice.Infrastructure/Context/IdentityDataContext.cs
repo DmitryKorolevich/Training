@@ -10,14 +10,19 @@ using VitalChoice.Infrastructure.Domain.Entities.Users;
 
 namespace VitalChoice.Data.Context
 {
-	public class IdentityDataContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>, IDataContext, IDataContextAsync
+	public abstract class IdentityDataContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>, IDataContext, IDataContextAsync
 	{
-	    public IdentityDataContext()
+	    protected IdentityDataContext()
 		{
 			InstanceId = Guid.NewGuid();
         }
 
-		public Guid InstanceId { get; }
+	    protected IdentityDataContext(IServiceProvider serviceProvider) : base(serviceProvider)
+	    {
+	        InstanceId = Guid.NewGuid();
+	    }
+
+	    public Guid InstanceId { get; }
 
 	    public IRelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted)
 	    {

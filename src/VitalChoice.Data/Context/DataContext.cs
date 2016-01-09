@@ -3,15 +3,21 @@ using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.Infrastructure;
 using Microsoft.Data.Entity.Storage;
 
 namespace VitalChoice.Data.Context
 {
-	public class DataContext : DbContext, IDataContext, IDataContextAsync
+	public abstract class DataContext : DbContext, IDataContextAsync
 	{
-	    public DataContext()
+	    protected DataContext()
 		{
 			InstanceId = Guid.NewGuid();
+        }
+
+	    protected DataContext(IServiceProvider serviceProvider) : base(serviceProvider)
+	    {
+            InstanceId = Guid.NewGuid();
         }
 
 		public Guid InstanceId { get; }

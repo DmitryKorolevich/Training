@@ -12,6 +12,7 @@ using Microsoft.AspNet.Mvc.Formatters;
 using Microsoft.AspNet.Mvc.Infrastructure;
 using System;
 using System.Diagnostics;
+using VitalChoice.Ecommerce.Context;
 
 namespace VitalChoice.Core.Base
 {
@@ -69,7 +70,6 @@ namespace VitalChoice.Core.Base
             }
 
             var actionDescriptor = context.ActionContext.ActionDescriptor as ControllerActionDescriptor;
-
             if (actionDescriptor != null)
             {
                 context.Result = new BaseControllerActionInvoker(

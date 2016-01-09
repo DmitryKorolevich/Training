@@ -8,6 +8,7 @@ using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Services;
 using VitalChoice.Data.UnitOfWork;
+using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Ecommerce.Domain;
@@ -17,7 +18,6 @@ using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Entities.History;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.ObjectMapping.Base;
-using DynamicExpressionVisitor = VitalChoice.DynamicData.Helpers.DynamicExpressionVisitor;
 
 namespace VitalChoice.DynamicData.Base
 {
@@ -35,7 +35,7 @@ namespace VitalChoice.DynamicData.Base
             IReadRepositoryAsync<TOptionValue> optionValueRepositoryAsync,
             IReadRepositoryAsync<BigStringValue> bigStringRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
-            DynamicExpressionVisitor queryVisitor,
+            DynamicExtensionsRewriter queryVisitor,
             DirectMapper<TEntity> directMapper, 
             ILogger logger)
             : base(

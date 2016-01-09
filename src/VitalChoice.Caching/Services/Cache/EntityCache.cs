@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Data.Entity;
 using VitalChoice.Caching.Interfaces;
@@ -250,18 +251,37 @@ namespace VitalChoice.Caching.Services.Cache
             HashSet<RelationInfo> processedRelations = null)
             where T1 : class
         {
+            if (entity == null)
+                return;
             if (processedRelations == null)
                 processedRelations = new HashSet<RelationInfo>();
             else if (processedRelations.Contains(relations))
                 return;
             processedRelations.Add(relations);
-            var entry = dbContext.Entry(entity);
-            if (entry.State == EntityState.Detached)
-                dbContext.Attach(entity);
-            foreach (var relation in relations.Relations)
+            if (entity.GetType().TryGetElementType(typeof (ICollection<>)) != null)
             {
-                var entityObject = relation.GetRelatedObject(entity);
-                Attach(entityObject, relation, dbContext, processedRelations);
+                foreach (var item in (IEnumerable)entity)
+                {
+                    var entry = dbContext.Entry(item);
+                    if (entry.State == EntityState.Detached)
+                        dbContext.Attach(item);
+                    foreach (var relation in relations.Relations)
+                    {
+                        var entityObject = relation.GetRelatedObject(item);
+                        Attach(entityObject, relation, dbContext, processedRelations);
+                    }
+                }
+            }
+            else
+            {
+                var entry = dbContext.Entry(entity);
+                if (entry.State == EntityState.Detached)
+                    dbContext.Attach(entity);
+                foreach (var relation in relations.Relations)
+                {
+                    var entityObject = relation.GetRelatedObject(entity);
+                    Attach(entityObject, relation, dbContext, processedRelations);
+                }
             }
         }
 

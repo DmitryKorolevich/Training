@@ -36,21 +36,12 @@ namespace VitalChoice.Caching.Expressions.Visitors
                         expr = GetOrderExpression(node.Arguments, out comparer);
                         if (comparer != null)
                         {
-                            var method = typeof (Enumerable).GetMethod("OrderBy",
-                                new[]
-                                {
-                                    typeof (Func<>).MakeGenericType(typeof (CacheResult<T>), expr.ReturnType),
-                                    typeof (IComparer<>).MakeGenericType(expr.ReturnType)
-                                });
+                            var method = GetOrderMethodWithComparer(expr, "OrderBy");
                             _current = Expression.Call(method, _parameter, CreateNewFunction(expr), comparer);
                         }
                         else
                         {
-                            var method = typeof (Enumerable).GetMethod("OrderBy",
-                                new[]
-                                {
-                                    typeof (Func<>).MakeGenericType(typeof (CacheResult<T>), expr.ReturnType)
-                                });
+                            var method = GetOrderMethod(expr, "OrderBy");
                             _current = Expression.Call(method, _parameter, CreateNewFunction(expr));
                         }
                         break;
@@ -58,21 +49,12 @@ namespace VitalChoice.Caching.Expressions.Visitors
                         expr = GetOrderExpression(node.Arguments, out comparer);
                         if (comparer != null)
                         {
-                            var method = typeof (Enumerable).GetMethod("OrderByDescending",
-                                new[]
-                                {
-                                    typeof (Func<>).MakeGenericType(typeof (CacheResult<T>), expr.ReturnType),
-                                    typeof (IComparer<>).MakeGenericType(expr.ReturnType)
-                                });
+                            var method = GetOrderMethodWithComparer(expr, "OrderByDescending");
                             _current = Expression.Call(method, _parameter, CreateNewFunction(expr), comparer);
                         }
                         else
                         {
-                            var method = typeof (Enumerable).GetMethod("OrderByDescending",
-                                new[]
-                                {
-                                    typeof (Func<>).MakeGenericType(typeof (CacheResult<T>), expr.ReturnType)
-                                });
+                            var method = GetOrderMethod(expr, "OrderByDescending");
                             _current = Expression.Call(method, _parameter, CreateNewFunction(expr));
                         }
                         break;
@@ -80,21 +62,12 @@ namespace VitalChoice.Caching.Expressions.Visitors
                         expr = GetOrderExpression(node.Arguments, out comparer);
                         if (comparer != null)
                         {
-                            var method = typeof (Enumerable).GetMethod("ThenBy",
-                                new[]
-                                {
-                                    typeof (Func<>).MakeGenericType(typeof (CacheResult<T>), expr.ReturnType),
-                                    typeof (IComparer<>).MakeGenericType(expr.ReturnType)
-                                });
+                            var method = GetOrderMethodWithComparer(expr, "ThenBy");
                             _current = Expression.Call(method, _current, CreateNewFunction(expr), comparer);
                         }
                         else
                         {
-                            var method = typeof (Enumerable).GetMethod("ThenBy",
-                                new[]
-                                {
-                                    typeof (Func<>).MakeGenericType(typeof (CacheResult<T>), expr.ReturnType)
-                                });
+                            var method = GetOrderMethod(expr, "ThenBy");
                             _current = Expression.Call(method, _current, CreateNewFunction(expr));
                         }
                         break;
@@ -102,27 +75,36 @@ namespace VitalChoice.Caching.Expressions.Visitors
                         expr = GetOrderExpression(node.Arguments, out comparer);
                         if (comparer != null)
                         {
-                            var method = typeof (Enumerable).GetMethod("ThenByDescending",
-                                new[]
-                                {
-                                    typeof (Func<>).MakeGenericType(typeof (CacheResult<T>), expr.ReturnType),
-                                    typeof (IComparer<>).MakeGenericType(expr.ReturnType)
-                                });
+                            var method = GetOrderMethodWithComparer(expr, "ThenByDescending");
                             _current = Expression.Call(method, _current, CreateNewFunction(expr), comparer);
                         }
                         else
                         {
-                            var method = typeof (Enumerable).GetMethod("ThenByDescending",
-                                new[]
-                                {
-                                    typeof (Func<>).MakeGenericType(typeof (CacheResult<T>), expr.ReturnType)
-                                });
+                            var method = GetOrderMethod(expr, "ThenByDescending");
                             _current = Expression.Call(method, _current, CreateNewFunction(expr));
                         }
                         break;
                 }
             }
             return result;
+        }
+
+        private static MethodInfo GetOrderMethod(LambdaExpression expr, string name)
+        {
+            var method =
+                typeof (Enumerable).GetMethods()
+                    .Single(m => m.Name == name && m.GetParameters().Length == 2)
+                    .MakeGenericMethod(typeof (CacheResult<T>), expr.ReturnType);
+            return method;
+        }
+
+        private static MethodInfo GetOrderMethodWithComparer(LambdaExpression expr, string name)
+        {
+            var method =
+                typeof (Enumerable).GetMethods()
+                    .Single(m => m.Name == name && m.GetParameters().Length == 3)
+                    .MakeGenericMethod(typeof (CacheResult<T>), expr.ReturnType);
+            return method;
         }
 
         private static readonly Expression<Func<CacheResult<T>, T>> Converter = result => result.Entity;
@@ -141,7 +123,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
         private LambdaExpression CreateNewFunction(LambdaExpression expression)
         {
             return ((IFnctionFactory)
-                Activator.CreateInstance(typeof (FunctionFactory<>).MakeGenericType(expression.ReturnType)))
+                Activator.CreateInstance(typeof (FunctionFactory<>).MakeGenericType(typeof (T), expression.ReturnType)))
                 .CreateNewFunction(expression);
         }
 
@@ -157,7 +139,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
                 ParameterExpression param = Expression.Parameter(typeof (CacheResult<T>));
                 return
                     Expression.Lambda<Func<CacheResult<T>, TResult>>(Expression.Invoke(initialExpression,
-                        Expression.Invoke(Converter, param)));
+                        Expression.Invoke(Converter, param)), param);
             }
         }
     }

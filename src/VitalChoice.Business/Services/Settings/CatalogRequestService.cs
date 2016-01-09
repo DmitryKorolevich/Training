@@ -39,7 +39,7 @@ namespace VitalChoice.Business.Services.Settings
             IEcommerceRepositoryAsync<CatalogRequestAddressOptionValue> catalogRequestAddressValueRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
             DirectMapper<CatalogRequestAddress> directMapper, 
-            DynamicExpressionVisitor queryVisitor,
+            DynamicExtensionsRewriter queryVisitor,
             IObjectLogItemExternalService objectLogItemExternalService,
             ILoggerProviderExtended loggerProvider)
             : base(

@@ -66,6 +66,7 @@ using VitalChoice.ContentProcessing.Helpers;
 using VitalChoice.ContentProcessing.Interfaces;
 using VitalChoice.DynamicData.Extensions;
 using Autofac.Extensions.DependencyInjection;
+using Microsoft.Data.Entity.Infrastructure;
 using VitalChoice.Business.Repositories;
 using VitalChoice.Core.Infrastructure.Helpers.ReCaptcha;
 using VitalChoice.DynamicData.Interfaces;
@@ -85,6 +86,7 @@ using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.Infrastructure.ServiceBus;
+using Microsoft.Data.Entity.Internal;
 
 namespace VitalChoice.Core.DependencyInjection
 {
@@ -92,17 +94,17 @@ namespace VitalChoice.Core.DependencyInjection
     {
         //private static bool _called = false;
 
-        public IServiceProvider RegisterInfrastructure(IConfiguration configuration, IServiceCollection services, Assembly projectAssembly)
+        public IServiceProvider RegisterInfrastructure(IConfiguration configuration, IServiceCollection services,
+            Assembly projectAssembly)
         {
             //if (!_called)
             //{
             //    _called = true;
 
             // Add EF services to the services container.
-            services.AddEntityFramework() //.AddMigrations()
+            services.AddEntityFramework().AddEntityFrameworkCache() //.AddMigrations()
                 .AddSqlServer();
 
-            
             // Add Identity services to the services container.
             services.AddIdentity<ApplicationUser, ApplicationRole>(x =>
             {
@@ -130,7 +132,8 @@ namespace VitalChoice.Core.DependencyInjection
             StartCustomServicesRegistration(services);
             AddMvc(services);
 
-            services.AddAuthorization(x => x.AddPolicy(IdentityConstants.IdentityBasicProfile, y => y.RequireAuthenticatedUser()));
+            services.AddAuthorization(
+                x => x.AddPolicy(IdentityConstants.IdentityBasicProfile, y => y.RequireAuthenticatedUser()));
 
             services.Configure<AppOptionsBase>(options =>
             {
@@ -146,7 +149,8 @@ namespace VitalChoice.Core.DependencyInjection
 
             services.Configure<AppOptions>(options =>
             {
-                options.GenerateLowercaseUrls = Convert.ToBoolean(configuration.GetSection("App:GenerateLowercaseUrls").Value);
+                options.GenerateLowercaseUrls =
+                    Convert.ToBoolean(configuration.GetSection("App:GenerateLowercaseUrls").Value);
                 options.EnableBundlingAndMinification =
                     Convert.ToBoolean(configuration.GetSection("App:EnableBundlingAndMinification").Value);
                 options.Versioning = new Versioning()
@@ -179,14 +183,14 @@ namespace VitalChoice.Core.DependencyInjection
                 options.FilesRelativePath = configuration.GetSection("App:FilesRelativePath").Value;
                 options.FilesPath = configuration.GetSection("App:FilesPath").Value;
                 options.EmailConfiguration = new Email
-	            {
-		            From = configuration.GetSection("App:Email:From").Value,
-		            Host = configuration.GetSection("App:Email:Host").Value,
-		            Port = Convert.ToInt32(configuration.GetSection("App:Email:Port").Value),
-		            Secured = Convert.ToBoolean(configuration.GetSection("App:Email:Secured").Value),
-		            Username = configuration.GetSection("App:Email:Username").Value,
-		            Password = configuration.GetSection("App:Email:Password").Value
-	            };
+                {
+                    From = configuration.GetSection("App:Email:From").Value,
+                    Host = configuration.GetSection("App:Email:Host").Value,
+                    Port = Convert.ToInt32(configuration.GetSection("App:Email:Port").Value),
+                    Secured = Convert.ToBoolean(configuration.GetSection("App:Email:Secured").Value),
+                    Username = configuration.GetSection("App:Email:Username").Value,
+                    Password = configuration.GetSection("App:Email:Password").Value
+                };
                 options.ExportService = new ExportService
                 {
                     ConnectionString = configuration.GetSection("App:ExportService:ConnectionString").Value,
@@ -194,15 +198,19 @@ namespace VitalChoice.Core.DependencyInjection
                     PlainQueueName = configuration.GetSection("App:ExportService:PlainQueueName").Value,
                     CertThumbprint = configuration.GetSection("App:ExportService:CertThumbprint").Value,
                     RootThumbprint = configuration.GetSection("App:ExportService:RootThumbprint").Value,
-                    EncryptionHostSessionExpire = Convert.ToBoolean(configuration.GetSection("App:ExportService:EncryptionHostSessionExpire").Value),
+                    EncryptionHostSessionExpire =
+                        Convert.ToBoolean(
+                            configuration.GetSection("App:ExportService:EncryptionHostSessionExpire").Value),
                     ServerHostName = configuration.GetSection("App:ExportService:ServerHostName").Value
                 };
                 options.AzureStorage = new AzureStorage()
-				{
-					StorageConnectionString = configuration.GetSection("App:AzureStorage:StorageConnectionString").Value,
-					CustomerContainerName = configuration.GetSection("App:AzureStorage:CustomerContainerName").Value,
-                    BugTicketFilesContainerName = configuration.GetSection("App:AzureStorage:BugTicketFilesContainerName").Value,
-                    BugTicketCommentFilesContainerName = configuration.GetSection("App:AzureStorage:BugTicketCommentFilesContainerName").Value,
+                {
+                    StorageConnectionString = configuration.GetSection("App:AzureStorage:StorageConnectionString").Value,
+                    CustomerContainerName = configuration.GetSection("App:AzureStorage:CustomerContainerName").Value,
+                    BugTicketFilesContainerName =
+                        configuration.GetSection("App:AzureStorage:BugTicketFilesContainerName").Value,
+                    BugTicketCommentFilesContainerName =
+                        configuration.GetSection("App:AzureStorage:BugTicketCommentFilesContainerName").Value,
                 };
                 options.FedExOptions = new FedExOptions()
                 {
@@ -225,11 +233,11 @@ namespace VitalChoice.Core.DependencyInjection
                     ServiceUrl = configuration.GetSection("App:Avatax:ServiceUrl").Value,
                     TurnOffCommit = Convert.ToBoolean(configuration.GetSection("App:Avatax:TurnOffCommit").Value)
                 };
-	            options.GoogleCaptcha = new GoogleCaptcha
-	            {
-					PublicKey = configuration.GetSection("App:GoogleCaptcha:PublicKey").Value,
-					SecretKey = configuration.GetSection("App:GoogleCaptcha:SecretKey").Value,
-					VerifyUrl = configuration.GetSection("App:GoogleCaptcha:VerifyUrl").Value
+                options.GoogleCaptcha = new GoogleCaptcha
+                {
+                    PublicKey = configuration.GetSection("App:GoogleCaptcha:PublicKey").Value,
+                    SecretKey = configuration.GetSection("App:GoogleCaptcha:SecretKey").Value,
+                    VerifyUrl = configuration.GetSection("App:GoogleCaptcha:VerifyUrl").Value
                 };
                 options.AuthorizeNet = new AuthorizeNet
                 {
@@ -306,10 +314,10 @@ namespace VitalChoice.Core.DependencyInjection
 
             //TODO: omit ILogger override in config parameter
             builder.Register((cc, pp) => cc.Resolve<ILoggerProviderExtended>().CreateLogger("Root")).As<ILogger>();
-            builder.RegisterGeneric(typeof(Logger<>))
-                .WithParameter((pi, cc) => pi.ParameterType == typeof(ILoggerFactory),
+            builder.RegisterGeneric(typeof (Logger<>))
+                .WithParameter((pi, cc) => pi.ParameterType == typeof (ILoggerFactory),
                     (pi, cc) => cc.Resolve<ILoggerProviderExtended>().Factory)
-                .As(typeof(ILogger<>));
+                .As(typeof (ILogger<>));
 
             builder.RegisterType<LocalizationService>()
                 .As<ILocalizationService>()
@@ -323,7 +331,8 @@ namespace VitalChoice.Core.DependencyInjection
 
             UnitOfWorkBase.SetOptions(container.Resolve<IOptions<AppOptionsBase>>());
             LoggerService.Build(container.Resolve<IOptions<AppOptions>>(), container.Resolve<IApplicationEnvironment>());
-            return container.Resolve<IServiceProvider>();
+            EcommerceContextBase.ServiceProvider = container.Resolve<IServiceProvider>();
+            return EcommerceContextBase.ServiceProvider;
             //}
             //return null;
         }
@@ -337,13 +346,6 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<EcommerceContext>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<LogsContext>();
-            builder.RegisterDatabaseCache(
-                cc =>
-                    new[]
-                    {
-                        new VitalChoiceContext(cc.Resolve<IOptions<AppOptionsBase>>()).Model,
-                        new EcommerceContext(cc.Resolve<IOptions<AppOptionsBase>>()).Model
-                    });
             builder.RegisterGeneric(typeof (RepositoryAsync<>))
                 .As(typeof (IRepositoryAsync<>));
             builder.RegisterGeneric(typeof (ReadRepositoryAsync<>))
@@ -485,7 +487,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterGeneric(typeof (TreeSetup<,>)).As(typeof (ITreeSetup<,>));
             builder.RegisterContentBase();
             builder.RegisterDynamicsBase();
-            builder.RegisterType<DynamicExpressionVisitor>()
+            builder.RegisterType<DynamicExtensionsRewriter>()
                 .AsSelf()
                 .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>());
             builder.RegisterProcessors(typeof (ProductCategoryProcessor).GetTypeInfo().Assembly);

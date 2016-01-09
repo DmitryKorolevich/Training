@@ -132,7 +132,7 @@ namespace VitalChoice.Caching.Services
         {
             private readonly DbContext _context;
             private readonly QueryCacheData<T> _queryData;
-            private readonly EntityCache<T> _cache;
+            private readonly IEntityCache<T> _cache;
 
             public CacheExecutor(Expression expression, DbContext context, IQueryCacheFactory queryCacheFactory,
                 IInternalEntityCacheFactory cacheFactory, ITypeConverter typeConverter,

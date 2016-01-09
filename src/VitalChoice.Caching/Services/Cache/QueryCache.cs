@@ -39,23 +39,14 @@ namespace VitalChoice.Caching.Services.Cache
             var cacheKey = new ExpressionStringBuilder().Build(query);
             return _queryCaches.GetOrAdd(cacheKey, key =>
             {
-                var result = new QueryCacheData<T>();
-                var queryModel = CreateQueryParser().GetParsedQuery(query);
-
-                var itemType
-                    = (queryModel.GetOutputDataInfo()
-                        as StreamedSequenceInfo)?.ResultItemType
-                      ?? typeof (T);
-
-                if (itemType != typeof (T))
-                    return null;
-
-                result.RelationInfo = GetRelations(query);
-
                 QueriableExpressionVisitor<T> queryAnalyzer = new QueriableExpressionVisitor<T>();
                 queryAnalyzer.Visit(query);
-                result.Tracking = queryAnalyzer.Tracking;
-                result.WhereExpression = queryAnalyzer.WhereExpression;
+                var result = new QueryCacheData<T>
+                {
+                    RelationInfo = GetRelations(query),
+                    Tracking = queryAnalyzer.Tracking,
+                    WhereExpression = queryAnalyzer.WhereExpression
+                };
 
                 if (result.WhereExpression != null)
                 {
@@ -82,58 +73,6 @@ namespace VitalChoice.Caching.Services.Cache
             var relationInfo = new RelationInfo(string.Empty, typeof(T), typeof(T), null,
                 relationsExpressionVisitor.Relations);
             return relationInfo;
-        }
-
-        private static QueryParser CreateQueryParser()
-        {
-            return
-                new QueryParser(new ExpressionTreeParser(NodeTypeProvider,
-                    new CompoundExpressionTreeProcessor(new IExpressionTreeProcessor[]
-                    {
-                        new PartialEvaluatingExpressionTreeProcessor(EvaluatableExpressionFilter),
-                        new TransformingExpressionTreeProcessor(ExpressionTransformerRegistry.CreateDefault())
-                    })));
-        }
-
-        private static readonly INodeTypeProvider NodeTypeProvider = CreateNodeTypeProvider();
-        private static readonly IEvaluatableExpressionFilter EvaluatableExpressionFilter = new ExpressionFilter();
-
-        private static INodeTypeProvider CreateNodeTypeProvider()
-        {
-            var methodInfoBasedNodeTypeRegistry = MethodInfoBasedNodeTypeRegistry.CreateFromRelinqAssembly();
-
-            methodInfoBasedNodeTypeRegistry
-                .Register(QueryAnnotationExpressionNode.SupportedMethods, typeof(QueryAnnotationExpressionNode));
-
-            methodInfoBasedNodeTypeRegistry
-                .Register(IncludeExpressionNode.SupportedMethods, typeof(IncludeExpressionNode));
-
-            methodInfoBasedNodeTypeRegistry
-                .Register(ThenIncludeExpressionNode.SupportedMethods, typeof(ThenIncludeExpressionNode));
-
-            var innerProviders
-                = new INodeTypeProvider[]
-                {
-                    methodInfoBasedNodeTypeRegistry,
-                    MethodNameBasedNodeTypeRegistry.CreateFromRelinqAssembly()
-                };
-
-            return new CompoundNodeTypeProvider(innerProviders);
-        }
-
-        private class ExpressionFilter : EvaluatableExpressionFilterBase
-        {
-            private static readonly PropertyInfo Now
-                = typeof(DateTime).GetTypeInfo().GetDeclaredProperty(nameof(DateTime.Now));
-
-            private static readonly PropertyInfo UtcNow
-                = typeof(DateTime).GetTypeInfo().GetDeclaredProperty(nameof(DateTime.UtcNow));
-
-            public override bool IsEvaluatableMethodCall(MethodCallExpression methodCallExpression)
-                => typeof(IQueryable).GetTypeInfo().IsAssignableFrom(methodCallExpression.Type.GetTypeInfo());
-
-            public override bool IsEvaluatableMember(MemberExpression memberExpression)
-                => memberExpression.Member != Now && memberExpression.Member != UtcNow;
         }
     }
 }
