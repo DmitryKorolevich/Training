@@ -30,13 +30,13 @@
 	@using (Html.BeginForm("ViewCart", "Cart", null, FormMethod.Post, new { @class = "form-cart", role = "form" }))
 	{
 		<div class="cart-control-container">
-			<a href="#" class="button">Continue Shopping</a>
-			<input type="submit" class="blue checkout" value="Checkout"/>
+			<a href="#" class="button arrow-left-red">Continue Shopping</a>
+			<input type="submit" class="checkout-blue" value="Checkout"/>
 		</div>
 		<table class="standard-table cart-items-list">
 			<thead>
 			<tr>
-				<th>
+				<th colspan="2">
 					Item
 				</th>
 				<th>
@@ -58,34 +58,99 @@
 				foreach (var item in Model.Skus)
 				{
 					<tr>
-						<td>
-							<a class="cart-image-link" href="@item.ProductPageUrl">
-								<img src="@item.IconUrl"/>
+						<td class="cart-image-link">
+							<a href="@item.ProductPageUrl">
+								<img src="@item.IconUrl" />
 							</a>
-							<div class="cart-line-info">
-								<a class="cart-text-link" href="@item.ProductPageUrl">
-									@item.DisplayName
-								</a>
-								<span class="cart-sku-code">(@item.Code)</span>
-								<span class="stock-presence-note">@(item.InStock ? "In Stock Ready to Ship" : "Not in Stock")</span>
-							</div>
+						</td>
+						<td class="cart-line-info">
+							<a class="cart-text-link" href="@item.ProductPageUrl">
+								@item.DisplayName
+							</a>
+							<span class="cart-sku-code">(@item.Code)</span>
+							<span class="stock-presence-note">@(item.InStock ? "In Stock Ready to Ship" : "Not in Stock")</span>
 						</td>
 						<td>@(item.Price.HasValue ? @item.Price.Value.ToString("C2") : string.Empty)</td>
 						<td>@Html.TextBoxFor(x => item.Quantity, new {@class = "input-control width-small"})</td>
 						<td>@(item.SubTotal.HasValue ? @item.SubTotal.Value.ToString("C2") : string.Empty)</td>
+						<td class="grid-controls-container">
+							<input type="button" value="Remove" />
+						</td>
 					</tr>
 				}
 			}
 			else
 			{
-				<tr><td colspan="5">No Items Added</td></tr>
+				<tr><td colspan="6">No Items Added</td></tr>
 			}
 			</tbody>
 		</table>
-
+		<div class="cart-order-details">
+			<div class="cart-shipping-instructions">
+				<span class="shipping-instructions-title">
+					Shipping Instructions:
+				</span>
+				<label class="cart-shipping-option">
+					<input name="rdUpgradeOption" type="radio"/>
+					Ship this order as soon as possible
+				</label>
+				<label class="cart-shipping-option">
+					<input name="rdUpgradeOption" type="radio"/>
+					Ship this order the week of:
+				</label>
+				@Html.TextBoxFor(x=>x.ShippingDate, new { @class = "cart-input-box input-control" })
+				<a href="#">View our shipping policies</a>
+			</div>
+			<div class="cart-order-totals">
+				<div class="cart-total-line">
+					<label>
+						Subtotal
+					</label>
+					<label class="cart-total-value">
+						@Model.SubTotal.ToString("C2")
+					</label>
+				</div>
+				<div class="cart-total-line">
+					<label>
+						Upgrade Non-Perishable Items
+					</label>
+					<select name="UpgradeOption" class="input-control cart-total-value">
+						<option>None Selected</option>
+					</select>
+				</div>
+				<div class="cart-total-line">
+					<label>
+						Shipping
+					</label>
+					<label class="cart-total-value">
+						@(Model.ShippingCost.HasValue ? Model.ShippingCost.Value.ToString("C2") : "FREE!")
+					</label>
+				</div>
+				<div class="cart-total-line cart-order-summary">
+					<label>
+						Order Total
+					</label>
+					<label class="cart-total-value">
+						@Model.OrderTotal.ToString("C2")
+					</label>
+				</div>
+			</div>
+			<div class="cart-promo-container">
+				<label>Enter Promo Code Here</label>
+				@Html.TextBoxFor(x => x.PromoCode, new {@class = "cart-input-box input-control"})
+			</div>
+			<div class="cart-gc-container">
+				<label>Gift Certificate Code</label>
+				@foreach (var code in Model.GiftCertificateCodes)
+				{
+					@Html.TextBoxFor(x => code, new { @class = "cart-input-box input-control" })
+					<input type="button" class="plus-button-red"/>
+				}
+			</div>
+		</div>
 		<div class="cart-control-container">
-			<a href="#" class="button">Continue Shopping</a>
-			<input type="submit" class="blue checkout" value="Checkout" />
+			<a href="#" class="button arrow-left-red">Continue Shopping</a>
+			<input type="submit" class="checkout-blue" value="Checkout" />
 		</div>
 	}
 </div>

@@ -63,6 +63,7 @@ namespace VC.Public.Controllers
 						InStock = true
 					}
 				},
+				GiftCertificateCodes = new List<string>() { "" },
 				OrderTotal = 169,
 				ShipAsap = true,
 				ShippingCost =	0,
