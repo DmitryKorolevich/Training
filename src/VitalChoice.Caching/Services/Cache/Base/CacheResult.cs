@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace VitalChoice.Caching.Services.Cache
+﻿namespace VitalChoice.Caching.Services.Cache.Base
 {
     public struct CacheResult<T>
     {

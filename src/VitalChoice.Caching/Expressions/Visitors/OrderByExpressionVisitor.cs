@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using VitalChoice.Caching.Services.Cache;
+using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Expressions.Visitors

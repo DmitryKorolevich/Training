@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
+using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.ObjectMapping.Interfaces;
 
@@ -26,15 +27,22 @@ namespace VitalChoice.Caching.Services.Cache
             CacheStorage = new CacheStorage<T>(keyStorage, cacheFactory, typeConverter);
         }
 
-        public CacheResult<T> TryGetEntity(EntityKey key, RelationInfo relations)
+        public CacheResult<T> TryGetEntity(EntityKey key, RelationInfo relations, Func<T, bool> whereFunc)
         {
             CachedEntity<T> cached;
             var data = CacheStorage.GetCacheData(relations);
             if (data.Get(key, out cached))
             {
-                return new CacheResult<T>(cached, cached.NeedUpdate ? CacheGetResult.Update : CacheGetResult.Found);
+                return FilterResult(whereFunc, cached);
             }
             return CacheGetResult.Update;
+        }
+
+        private static CacheResult<T> FilterResult(Func<T, bool> whereFunc, CachedEntity<T> cached)
+        {
+            if (whereFunc?.Invoke(cached) ?? true)
+                return new CacheResult<T>(cached, cached.NeedUpdate ? CacheGetResult.Update : CacheGetResult.Found);
+            return CacheGetResult.Found;
         }
 
         public IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityKey> primaryKeys, RelationInfo relations, Func<T, bool> whereFunc)
@@ -61,13 +69,13 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        public CacheResult<T> TryGetEntity(EntityIndex key, RelationInfo relationInfo)
+        public CacheResult<T> TryGetEntity(EntityIndex key, RelationInfo relationInfo, Func<T, bool> whereFunc)
         {
             CachedEntity<T> cached;
             var data = CacheStorage.GetCacheData(relationInfo);
             if (data.Get(key, out cached))
             {
-                return new CacheResult<T>(cached, cached.NeedUpdate ? CacheGetResult.Update : CacheGetResult.Found);
+                return FilterResult(whereFunc, cached);
             }
             return CacheGetResult.Update;
         }
@@ -92,13 +100,13 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        public CacheResult<T> TryGetEntity(EntityIndex key, EntityConditionalIndexInfo conditionalInfo, RelationInfo relations)
+        public CacheResult<T> TryGetEntity(EntityIndex key, EntityConditionalIndexInfo conditionalInfo, RelationInfo relations, Func<T, bool> whereFunc)
         {
             CachedEntity<T> cached;
             var data = CacheStorage.GetCacheData(relations);
             if (data.Get(conditionalInfo, key, out cached))
             {
-                return new CacheResult<T>(cached, cached.NeedUpdate ? CacheGetResult.Update : CacheGetResult.Found);
+                return FilterResult(whereFunc, cached);
             }
             return CacheGetResult.Update;
         }
@@ -211,12 +219,7 @@ namespace VitalChoice.Caching.Services.Cache
         {
             var pk = CacheStorage.GetPrimaryKeyValue(entity);
             var datas = CacheStorage.AllCacheDatas;
-            bool result = true;
-            foreach (var data in datas)
-            {
-                result = result && data.TryRemove(pk);
-            }
-            return result;
+            return datas.Aggregate(true, (current, data) => current && data.TryRemove(pk));
         }
 
         public void Update(IEnumerable<T> entities, RelationInfo relationInfo)

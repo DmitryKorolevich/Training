@@ -99,12 +99,12 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                     if (right.NodeType != left.NodeType)
                         return false;
                     if (rightBinary == null)
+                        //Decompose parameters to type name, evaluate constants and collections. Compare resulted set.
                         return EqualsInternal(right, left);
                     if (leftBinary == null)
                         return false;
                     return rightBinary.Left.ContainsOrEqual(leftBinary.Left) &&
                            rightBinary.Right.ContainsOrEqual(leftBinary.Right);
-                //Decompose parameters to type name, evaluate constants and collections. Compare resulted set.
             }
         }
 
@@ -127,10 +127,8 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                 return false;
             if (rightBinary == null)
                 return false;
-            return leftBinary.Left.ContainsOrEqual(rightBinary.Left) &&
-                   leftBinary.Right.ContainsOrEqual(rightBinary.Right) ||
-                   leftBinary.Left.ContainsOrEqual(rightBinary.Right) &&
-                   leftBinary.Right.ContainsOrEqual(rightBinary.Left);
+            return BinaryCompare(leftBinary, rightBinary) ||
+                   BinaryCompareReverse(leftBinary, rightBinary);
         }
 
         private static bool BinaryCompare(BinaryExpression leftBinary, BinaryExpression rightBinary)

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Services.Cache;
+using VitalChoice.Caching.Services.Cache.Base;
 
 namespace VitalChoice.Caching.Interfaces
 {

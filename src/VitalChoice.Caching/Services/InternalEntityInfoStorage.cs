@@ -8,6 +8,8 @@ using Microsoft.Data.Entity.Metadata.Internal;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
+using VitalChoice.Caching.Relational.Base;
+using VitalChoice.Caching.Services.Cache.Base;
 
 namespace VitalChoice.Caching.Services
 {
@@ -91,7 +93,7 @@ namespace VitalChoice.Caching.Services
             return null;
         }
 
-        public EntityUniqueIndexInfo GetIndexInfos<T>()
+        public EntityUniqueIndexInfo GetIndexInfo<T>()
         {
             EntityInfo entityInfo;
             if (_entityInfos.TryGetValue(typeof (T), out entityInfo))

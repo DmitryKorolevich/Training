@@ -17,6 +17,7 @@ using VitalChoice.Caching.Expressions.Analyzers;
 using VitalChoice.Caching.Expressions.Visitors;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
+using VitalChoice.Caching.Services.Cache.Base;
 
 namespace VitalChoice.Caching.Services.Cache
 {
@@ -25,13 +26,13 @@ namespace VitalChoice.Caching.Services.Cache
         private readonly ConcurrentDictionary<string, QueryCacheData<T>> _queryCaches = new ConcurrentDictionary<string, QueryCacheData<T>>();
         private readonly PrimaryKeyAnalyzer<T> _primaryKeyAnalyzer;
         private readonly IndexAnalyzer<T> _indexAnalyzer;
-        private readonly ConditionalIndexAnalyzer<T> _conditionalIndexAnalyzer;
+        private readonly ICollection<ConditionalIndexAnalyzer<T>> _conditionalIndexAnalyzers;
 
         public QueryCache(IInternalEntityInfoStorage entityInfo)
         {
-            _primaryKeyAnalyzer = new PrimaryKeyAnalyzer<T>(entityInfo);
-            _indexAnalyzer = new IndexAnalyzer<T>(entityInfo);
-            _conditionalIndexAnalyzer = new ConditionalIndexAnalyzer<T>(entityInfo);
+            _primaryKeyAnalyzer = new PrimaryKeyAnalyzer<T>(entityInfo.GetPrimaryKeyInfo<T>());
+            _indexAnalyzer = new IndexAnalyzer<T>(entityInfo.GetIndexInfo<T>());
+            _conditionalIndexAnalyzers = entityInfo.GetConditionalIndexInfos<T>().Select(i => new ConditionalIndexAnalyzer<T>(i)).ToArray();
         }
 
         public QueryCacheData<T> GerOrAdd(Expression query)
@@ -50,9 +51,14 @@ namespace VitalChoice.Caching.Services.Cache
 
                 if (result.WhereExpression != null)
                 {
-                    result.PrimaryKeys = _primaryKeyAnalyzer.TryGetPrimaryKeys(result.WhereExpression);
-                    result.UniqueIndexes = _indexAnalyzer.TryGetIndexes(result.WhereExpression);
-                    result.ConditionalIndexes = _conditionalIndexAnalyzer.TryGetIndexes(result.WhereExpression);
+                    result.PrimaryKeys = _primaryKeyAnalyzer.GetValuesFunction(result.WhereExpression);
+                    result.UniqueIndexes = _indexAnalyzer.GetValuesFunction(result.WhereExpression);
+                    result.ConditionalIndexes =
+                        _conditionalIndexAnalyzers.Select(
+                            analyzer =>
+                                new KeyValuePair<EntityConditionalIndexInfo, Func<ICollection<EntityIndex>>>(
+                                    (EntityConditionalIndexInfo) analyzer.GroupInfo, analyzer.GetValuesFunction(result.WhereExpression)))
+                            .ToArray();
                 }
 
                 OrderByExpressionVisitor<T> orderByVisitor = new OrderByExpressionVisitor<T>();

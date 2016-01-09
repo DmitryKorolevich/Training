@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
+using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.ObjectMapping.Interfaces;

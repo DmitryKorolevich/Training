@@ -8,7 +8,7 @@ namespace VitalChoice.Caching.Interfaces
     {
         bool HaveKeys(Type entityType);
         EntityPrimaryKeyInfo GetPrimaryKeyInfo<T>();
-        EntityUniqueIndexInfo GetIndexInfos<T>();
+        EntityUniqueIndexInfo GetIndexInfo<T>();
         ICollection<EntityConditionalIndexInfo> GetConditionalIndexInfos<T>(); 
     }
 }

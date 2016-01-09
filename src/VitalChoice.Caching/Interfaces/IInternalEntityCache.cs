@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Services.Cache;
+using VitalChoice.Caching.Services.Cache.Base;
 
 namespace VitalChoice.Caching.Interfaces
 {
@@ -22,17 +23,18 @@ namespace VitalChoice.Caching.Interfaces
 
     public interface IInternalEntityCache<T> : IInternalEntityCache
     {
-        CacheResult<T> TryGetEntity(EntityKey key, RelationInfo relations);
+        CacheResult<T> TryGetEntity(EntityKey key, RelationInfo relations, Func<T, bool> whereFunc);
 
         IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityKey> primaryKeys, RelationInfo relations,
             Func<T, bool> whereFunc);
 
-        CacheResult<T> TryGetEntity(EntityIndex index, RelationInfo relations);
+        CacheResult<T> TryGetEntity(EntityIndex index, RelationInfo relations, Func<T, bool> whereFunc);
 
         IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityIndex> indexes, RelationInfo relations,
             Func<T, bool> whereFunc);
 
-        CacheResult<T> TryGetEntity(EntityIndex key, EntityConditionalIndexInfo conditionalInfo, RelationInfo relations);
+        CacheResult<T> TryGetEntity(EntityIndex key, EntityConditionalIndexInfo conditionalInfo, RelationInfo relations,
+            Func<T, bool> whereFunc);
 
         IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityIndex> indexes,
             EntityConditionalIndexInfo conditionalInfo,

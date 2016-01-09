@@ -9,6 +9,7 @@ using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Query.Internal;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Services.Cache;
+using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.ObjectMapping.Base;
@@ -147,7 +148,7 @@ namespace VitalChoice.Caching.Services
 
             public IEnumerable<object> Execute(out CacheGetResult cacheResult)
             {
-                if (_queryData == null)
+                if (_queryData.IsEmpty)
                 {
                     cacheResult = CacheGetResult.NotFound;
                     return null;
@@ -159,7 +160,7 @@ namespace VitalChoice.Caching.Services
 
             public object ExecuteFirst(out CacheGetResult cacheResult)
             {
-                if (_queryData == null)
+                if (_queryData.IsEmpty)
                 {
                     cacheResult = CacheGetResult.NotFound;
                     return null;
@@ -171,7 +172,7 @@ namespace VitalChoice.Caching.Services
 
             public void Update(object entity)
             {
-                if (_queryData == null)
+                if (_queryData.IsEmpty)
                 {
                     return;
                 }
@@ -180,7 +181,7 @@ namespace VitalChoice.Caching.Services
 
             public object Update(IEnumerable<object> entities)
             {
-                if (_queryData == null)
+                if (_queryData.IsEmpty)
                 {
                     return null;
                 }

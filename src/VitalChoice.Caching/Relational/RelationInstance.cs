@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Services.Cache;
+using VitalChoice.Caching.Services.Cache.Base;
 
 namespace VitalChoice.Caching.Relational
 {
