@@ -301,7 +301,7 @@ namespace VitalChoice.Caching.Services.Cache
 
         private CacheGetResult ConvertAttachResult(IEnumerable<CacheResult<T>> results, DbContext dbContext, QueryCacheData<T> queryData, out T entity)
         {
-            var compiled = queryData.WhereExpression.Compiled;
+            var compiled = queryData.WhereExpression?.Compiled;
             CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled);
             var orderedList = Order(cacheIterator, queryData);
             entity = orderedList.Select(result => _directMapper.Clone<Entity>(result)).FirstOrDefault();
@@ -315,7 +315,7 @@ namespace VitalChoice.Caching.Services.Cache
 
         private static CacheGetResult ConvertResult(IEnumerable<CacheResult<T>> results, QueryCacheData<T> queryData, out T entity)
         {
-            var compiled = queryData.WhereExpression.Compiled;
+            var compiled = queryData.WhereExpression?.Compiled;
             CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled);
             var orderedList = Order(cacheIterator, queryData);
             entity = orderedList.FirstOrDefault();
@@ -328,7 +328,7 @@ namespace VitalChoice.Caching.Services.Cache
 
         private CacheGetResult ConvertAttachResult(IEnumerable<CacheResult<T>> results, DbContext dbContext, QueryCacheData<T> queryData, out List<T> entities)
         {
-            var compiled = queryData.WhereExpression.Compiled;
+            var compiled = queryData.WhereExpression?.Compiled;
             CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled);
             var orderedList = Order(cacheIterator, queryData);
             entities = orderedList.Select(result => _directMapper.Clone<Entity>(result)).ToList();
@@ -345,7 +345,7 @@ namespace VitalChoice.Caching.Services.Cache
 
         private static CacheGetResult ConvertResult(IEnumerable<CacheResult<T>> results, QueryCacheData<T> queryData, out List<T> entities)
         {
-            var compiled = queryData.WhereExpression.Compiled;
+            var compiled = queryData.WhereExpression?.Compiled;
             CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled);
             var orderedList = Order(cacheIterator, queryData);
             entities = orderedList.ToList();

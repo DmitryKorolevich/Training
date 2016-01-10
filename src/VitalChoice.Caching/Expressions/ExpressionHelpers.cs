@@ -10,7 +10,7 @@ namespace VitalChoice.Caching.Expressions
             var left = condition.Left.Expression.RemoveConvert();
             var right = condition.Right.Expression.RemoveConvert();
             member = left as MemberExpression;
-            if (member != null)
+            if (member != null && !(member.Expression is ConstantExpression))
             {
                 return GetValue(right);
             }

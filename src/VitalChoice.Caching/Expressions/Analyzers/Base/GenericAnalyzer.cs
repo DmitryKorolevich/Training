@@ -33,6 +33,8 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
 
         public virtual Func<ICollection<TValueGroup>> GetValuesFunction(WhereExpression<T> expression)
         {
+            if (GroupInfo == null || expression == null)
+                return () => new TValueGroup[0];
             var valueCandidateExpressions = new List<Expression<Action<HashSet<TValue>>>>();
             var itemCandidateExpressions = new List<Expression<Action<HashSet<TValueGroup>>>>();
             WalkConditionTree(expression.Condition, itemCandidateExpressions, valueCandidateExpressions);

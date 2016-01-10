@@ -17,7 +17,9 @@ namespace VitalChoice.Caching.Expressions.Analyzers
         public override Func<ICollection<EntityIndex>> GetValuesFunction(WhereExpression<T> expression)
         {
             var func = base.GetValuesFunction(expression);
-            return () => expression.Expression.ContainsCondition(_indexInfo.LogicalUniquenessCondition) ? func() : new EntityIndex[0];
+            if (expression?.Expression != null)
+                return () => expression.Expression.ContainsCondition(_indexInfo.LogicalUniquenessCondition) ? func() : new EntityIndex[0];
+            return () => new EntityIndex[0];
         }
     }
 }

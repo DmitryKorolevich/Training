@@ -12,7 +12,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
 {
     public class OrderByExpressionVisitor<T> : ExpressionVisitor
     {
-        private readonly ParameterExpression _parameter = Expression.Parameter(typeof (IEnumerable<CacheResult<T>>));
+        private readonly ParameterExpression _parameter = Expression.Parameter(typeof (IEnumerable<T>));
         private MethodCallExpression _current;
 
         public bool Ordered => _current != null;
@@ -95,7 +95,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
             var method =
                 typeof (Enumerable).GetMethods()
                     .Single(m => m.Name == name && m.GetParameters().Length == 2)
-                    .MakeGenericMethod(typeof (CacheResult<T>), expr.ReturnType);
+                    .MakeGenericMethod(typeof (T), expr.ReturnType);
             return method;
         }
 
@@ -104,7 +104,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
             var method =
                 typeof (Enumerable).GetMethods()
                     .Single(m => m.Name == name && m.GetParameters().Length == 3)
-                    .MakeGenericMethod(typeof (CacheResult<T>), expr.ReturnType);
+                    .MakeGenericMethod(typeof (T), expr.ReturnType);
             return method;
         }
 
