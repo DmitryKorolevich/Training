@@ -2,6 +2,8 @@
 using VitalChoice.Data.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
+using VitalChoice.DynamicData.Extensions;
+using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 
 namespace VitalChoice.Business.Queries.Product
 {
@@ -65,6 +67,42 @@ namespace VitalChoice.Business.Queries.Product
                 Add(x => x.GCType == type);
             }
 
+            return this;
+        }
+
+        public GcQuery WithFrom(DateTime? from)
+        {
+            if (from.HasValue)
+            {
+                Add(x => x.Created>=from.Value);
+            }
+            return this;
+        }
+
+        public GcQuery WithTo(DateTime? to)
+        {
+            if (to.HasValue)
+            {
+                Add(x => x.Created<=to.Value);
+            }
+            return this;
+        }
+
+        public GcQuery FilterShippingAddress(CustomerAddressFilter filter)
+        {
+            if (filter != null)
+            {
+                Add(c => c.Order.ShippingAddress.WhenValues(filter));
+            }
+            return this;
+        }
+
+        public GcQuery FilterBillingAddress(CustomerAddressFilter filter)
+        {
+            if (filter != null)
+            {
+                Add(c => c.Order.PaymentMethod.BillingAddress.WhenValues(filter));
+            }
             return this;
         }
     }

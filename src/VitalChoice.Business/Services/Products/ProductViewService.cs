@@ -14,6 +14,7 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Identity;
+using VitalChoice.Infrastructure.Domain.Constants;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -53,7 +54,7 @@ namespace VitalChoice.Business.Services.Products
             {
                 result.Title = !string.IsNullOrWhiteSpace(title)
                     ? title
-                    : $"{productDynamic.Name} | {productDynamic.Data.SubTitle}";
+                    : String.Format(ContentConstants.CONTENT_PAGE_TITLE_GENERAL_FORMAT, productDynamic.Name);
             }
             return result;
         }

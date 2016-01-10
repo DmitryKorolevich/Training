@@ -43,7 +43,9 @@
             dataType: "html"
         }).success(function (result)
         {
-            root.find('.step2').html(result);
+            root.find('.step2 .items').html(result);
+            var href = root.find('.step2 #linksource').attr('href');
+            root.find('.step2 #link').attr('href', href);
             root.find('.step2').show();
         }).error(function (result)
         {

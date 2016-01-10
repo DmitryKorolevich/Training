@@ -39,3 +39,21 @@ GO
 ALTER TABLE GiftCertificates ALTER COLUMN [Balance] money NOT NULL
 
 GO
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE [object_id] = OBJECT_ID(N'[dbo].[GiftCertificates]', N'U') AND Name = 'IdOrder')
+BEGIN
+	ALTER TABLE GiftCertificates
+	ADD IdOrder INT NULL
+
+	ALTER TABLE dbo.GiftCertificates ADD CONSTRAINT
+	FK_GiftCertificates_Orders FOREIGN KEY
+	(
+	IdOrder
+	) REFERENCES dbo.Orders
+	(
+	Id
+	) ON UPDATE  NO ACTION 
+	 ON DELETE  NO ACTION 
+END
+
+GO

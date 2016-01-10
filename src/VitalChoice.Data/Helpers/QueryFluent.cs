@@ -90,6 +90,11 @@ namespace VitalChoice.Data.Helpers
             return RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy).CountAsync();
         }
 
+        public Task<decimal> SelectSumAsync(Expression<Func<TEntity,decimal>> func)
+        {
+            return RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy).SumAsync(func);
+        }
+
         public List<TEntity> SelectPage(int page, int pageSize, out int totalCount, bool tracking = false)
         {
             totalCount = RepositoryAsync<TEntity>.Select(Query, _expression).Count();

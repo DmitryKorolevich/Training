@@ -15,6 +15,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Permissions;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 
 namespace VC.Admin.Controllers
 {
@@ -35,6 +36,23 @@ namespace VC.Admin.Controllers
         {
             var result = await GCService.GetGiftCertificatesAsync(filter);
 
+            var toReturn = new PagedList<GCListItemModel>
+            {
+                Items = result.Items.Select(p => new GCListItemModel(p)).ToList(),
+                Count = result.Count,
+            };
+
+            return toReturn;
+        }
+
+        [HttpGet]
+        public async Task<Result<PagedList<GCListItemModel>>> Test()
+        {
+            GCFilter testFilter = new GCFilter();
+            testFilter.ShippingAddress = new CustomerAddressFilter();
+            testFilter.ShippingAddress.LastName = "test";
+
+            var result = await GCService.GetGiftCertificatesWithOrderInfoAsync(testFilter);
             var toReturn = new PagedList<GCListItemModel>
             {
                 Items = result.Items.Select(p => new GCListItemModel(p)).ToList(),

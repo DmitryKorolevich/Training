@@ -12,7 +12,9 @@ namespace VitalChoice.Interfaces.Services.Products
 	public interface IGcService
     {
         Task<PagedList<GiftCertificate>> GetGiftCertificatesAsync(GCFilter filter);
-        
+
+        Task<PagedList<GiftCertificate>> GetGiftCertificatesWithOrderInfoAsync(GCFilter filter);
+
         Task<GiftCertificate> GetGiftCertificateAsync(int id);
 
         Task<GiftCertificate> UpdateGiftCertificateAsync(GiftCertificate model);

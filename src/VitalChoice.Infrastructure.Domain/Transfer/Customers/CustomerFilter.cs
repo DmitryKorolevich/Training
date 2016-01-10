@@ -14,7 +14,6 @@
         public string Zip { get; set; }
     }
 
-
     public class CustomerFilter : FilterBase
     {
         public string IdContains { get; set; }
