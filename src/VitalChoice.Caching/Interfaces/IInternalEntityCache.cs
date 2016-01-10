@@ -23,22 +23,19 @@ namespace VitalChoice.Caching.Interfaces
 
     public interface IInternalEntityCache<T> : IInternalEntityCache
     {
-        CacheResult<T> TryGetEntity(EntityKey key, RelationInfo relations, Func<T, bool> whereFunc);
+        CacheResult<T> TryGetEntity(EntityKey key, RelationInfo relations);
 
-        IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityKey> primaryKeys, RelationInfo relations,
-            Func<T, bool> whereFunc);
+        IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityKey> primaryKeys, RelationInfo relations);
 
-        CacheResult<T> TryGetEntity(EntityIndex index, RelationInfo relations, Func<T, bool> whereFunc);
+        CacheResult<T> TryGetEntity(EntityIndex index, RelationInfo relations);
 
-        IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityIndex> indexes, RelationInfo relations,
-            Func<T, bool> whereFunc);
+        IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityIndex> indexes, RelationInfo relations);
 
-        CacheResult<T> TryGetEntity(EntityIndex key, EntityConditionalIndexInfo conditionalInfo, RelationInfo relations,
-            Func<T, bool> whereFunc);
+        CacheResult<T> TryGetEntity(EntityIndex key, EntityConditionalIndexInfo conditionalInfo, RelationInfo relations);
 
         IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityIndex> indexes,
             EntityConditionalIndexInfo conditionalInfo,
-            RelationInfo relations, Func<T, bool> whereFunc);
+            RelationInfo relations);
 
         IEnumerable<CacheResult<T>> GetWhere(RelationInfo relations, Func<T, bool> whereFunc);
         IEnumerable<CacheResult<T>> GetAll(RelationInfo relations);

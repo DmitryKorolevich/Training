@@ -17,9 +17,9 @@
             return result.Entity;
         }
 
-        public static implicit operator CacheResult<T>(T entity)
+        public static implicit operator CacheResult<T>(CachedEntity<T> cached)
         {
-            return new CacheResult<T>(entity, CacheGetResult.Found);
+            return new CacheResult<T>(cached, cached.NeedUpdate ? CacheGetResult.Update : CacheGetResult.Found);
         }
 
         public static implicit operator CacheResult<T>(CacheGetResult result)

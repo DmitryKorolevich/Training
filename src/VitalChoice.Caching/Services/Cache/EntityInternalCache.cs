@@ -27,25 +27,18 @@ namespace VitalChoice.Caching.Services.Cache
             CacheStorage = new CacheStorage<T>(keyStorage, cacheFactory, typeConverter);
         }
 
-        public CacheResult<T> TryGetEntity(EntityKey key, RelationInfo relations, Func<T, bool> whereFunc)
+        public CacheResult<T> TryGetEntity(EntityKey key, RelationInfo relations)
         {
             CachedEntity<T> cached;
             var data = CacheStorage.GetCacheData(relations);
             if (data.Get(key, out cached))
             {
-                return FilterResult(whereFunc, cached);
+                return cached;
             }
             return CacheGetResult.Update;
         }
 
-        private static CacheResult<T> FilterResult(Func<T, bool> whereFunc, CachedEntity<T> cached)
-        {
-            if (whereFunc?.Invoke(cached) ?? true)
-                return new CacheResult<T>(cached, cached.NeedUpdate ? CacheGetResult.Update : CacheGetResult.Found);
-            return CacheGetResult.Found;
-        }
-
-        public IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityKey> primaryKeys, RelationInfo relations, Func<T, bool> whereFunc)
+        public IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityKey> primaryKeys, RelationInfo relations)
         {
             var data = CacheStorage.GetCacheData(relations);
             foreach (var key in primaryKeys)
@@ -62,25 +55,22 @@ namespace VitalChoice.Caching.Services.Cache
                 {
                     yield return CacheGetResult.Update;
                 }
-                if (whereFunc?.Invoke(cached) ?? true)
-                {
-                    yield return (T)cached;
-                }
+                yield return cached;
             }
         }
 
-        public CacheResult<T> TryGetEntity(EntityIndex key, RelationInfo relationInfo, Func<T, bool> whereFunc)
+        public CacheResult<T> TryGetEntity(EntityIndex key, RelationInfo relationInfo)
         {
             CachedEntity<T> cached;
             var data = CacheStorage.GetCacheData(relationInfo);
             if (data.Get(key, out cached))
             {
-                return FilterResult(whereFunc, cached);
+                return cached;
             }
             return CacheGetResult.Update;
         }
 
-        public IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityIndex> indexes, RelationInfo relations, Func<T, bool> whereFunc)
+        public IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityIndex> indexes, RelationInfo relations)
         {
             var data = CacheStorage.GetCacheData(relations);
             foreach (var index in indexes)
@@ -95,24 +85,22 @@ namespace VitalChoice.Caching.Services.Cache
                 {
                     yield return CacheGetResult.Update;
                 }
-                if (whereFunc?.Invoke(cached) ?? true)
-                    yield return (T)cached;
+                yield return cached;
             }
         }
 
-        public CacheResult<T> TryGetEntity(EntityIndex key, EntityConditionalIndexInfo conditionalInfo, RelationInfo relations, Func<T, bool> whereFunc)
+        public CacheResult<T> TryGetEntity(EntityIndex key, EntityConditionalIndexInfo conditionalInfo, RelationInfo relations)
         {
             CachedEntity<T> cached;
             var data = CacheStorage.GetCacheData(relations);
             if (data.Get(conditionalInfo, key, out cached))
             {
-                return FilterResult(whereFunc, cached);
+                return cached;
             }
             return CacheGetResult.Update;
         }
 
-        public IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityIndex> indexes, EntityConditionalIndexInfo conditionalInfo, RelationInfo relations,
-            Func<T, bool> whereFunc)
+        public IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityIndex> indexes, EntityConditionalIndexInfo conditionalInfo, RelationInfo relations)
         {
             var data = CacheStorage.GetCacheData(relations);
             foreach (var index in indexes)
@@ -127,8 +115,7 @@ namespace VitalChoice.Caching.Services.Cache
                 {
                     yield return CacheGetResult.Update;
                 }
-                if (whereFunc?.Invoke(cached) ?? true)
-                    yield return (T)cached;
+                yield return cached;
             }
         }
 
@@ -146,7 +133,7 @@ namespace VitalChoice.Caching.Services.Cache
             }
             foreach (var cached in allItems.Where(cached => whereFunc(cached)))
             {
-                yield return (T) cached;
+                yield return cached;
             }
         }
 
@@ -164,7 +151,7 @@ namespace VitalChoice.Caching.Services.Cache
             }
             foreach (var cached in allItems)
             {
-                yield return (T)cached;
+                yield return cached;
             }
         }
 
@@ -211,7 +198,7 @@ namespace VitalChoice.Caching.Services.Cache
                 CachedEntity<T> removed;
                 if (!data.TryRemove(pk, out removed))
                     yield return CacheGetResult.NotFound;
-                yield return (T)removed;
+                yield return removed;
             }
         }
 

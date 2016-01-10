@@ -11,7 +11,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
         public WhereExpression<T> WhereExpression { get; set; }
         public RelationInfo RelationInfo { get; set; }
         public bool Tracking { get; set; }
-        public Func<IEnumerable<CacheResult<T>>, IOrderedEnumerable<CacheResult<T>>> OrderByFunction { get; set; }
+        public Func<IEnumerable<T>, IOrderedEnumerable<T>> OrderByFunction { get; set; }
         public ICollection<KeyValuePair<EntityConditionalIndexInfo, Func<ICollection<EntityIndex>>>> ConditionalIndexes { get; set; }
         public Func<ICollection<EntityIndex>> UniqueIndexes { get; set; }
         public Func<ICollection<EntityKey>> PrimaryKeys { get; set; }

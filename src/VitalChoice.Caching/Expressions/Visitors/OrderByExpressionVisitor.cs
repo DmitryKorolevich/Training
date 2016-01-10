@@ -17,10 +17,10 @@ namespace VitalChoice.Caching.Expressions.Visitors
 
         public bool Ordered => _current != null;
 
-        public Func<IEnumerable<CacheResult<T>>, IOrderedEnumerable<CacheResult<T>>> GetOrderByFunction()
+        public Func<IEnumerable<T>, IOrderedEnumerable<T>> GetOrderByFunction()
         {
             return
-                Expression.Lambda<Func<IEnumerable<CacheResult<T>>, IOrderedEnumerable<CacheResult<T>>>>(_current,
+                Expression.Lambda<Func<IEnumerable<T>, IOrderedEnumerable<T>>>(_current,
                     _parameter).CacheCompile();
         }
 
@@ -38,12 +38,12 @@ namespace VitalChoice.Caching.Expressions.Visitors
                         if (comparer != null)
                         {
                             var method = GetOrderMethodWithComparer(expr, "OrderBy");
-                            _current = Expression.Call(method, _parameter, CreateNewFunction(expr), comparer);
+                            _current = Expression.Call(method, _parameter, expr, comparer);
                         }
                         else
                         {
                             var method = GetOrderMethod(expr, "OrderBy");
-                            _current = Expression.Call(method, _parameter, CreateNewFunction(expr));
+                            _current = Expression.Call(method, _parameter, expr);
                         }
                         break;
                     case "OrderByDescending":
@@ -51,12 +51,12 @@ namespace VitalChoice.Caching.Expressions.Visitors
                         if (comparer != null)
                         {
                             var method = GetOrderMethodWithComparer(expr, "OrderByDescending");
-                            _current = Expression.Call(method, _parameter, CreateNewFunction(expr), comparer);
+                            _current = Expression.Call(method, _parameter, expr, comparer);
                         }
                         else
                         {
                             var method = GetOrderMethod(expr, "OrderByDescending");
-                            _current = Expression.Call(method, _parameter, CreateNewFunction(expr));
+                            _current = Expression.Call(method, _parameter, expr);
                         }
                         break;
                     case "ThenBy":
@@ -64,12 +64,12 @@ namespace VitalChoice.Caching.Expressions.Visitors
                         if (comparer != null)
                         {
                             var method = GetOrderMethodWithComparer(expr, "ThenBy");
-                            _current = Expression.Call(method, _current, CreateNewFunction(expr), comparer);
+                            _current = Expression.Call(method, _current, expr, comparer);
                         }
                         else
                         {
                             var method = GetOrderMethod(expr, "ThenBy");
-                            _current = Expression.Call(method, _current, CreateNewFunction(expr));
+                            _current = Expression.Call(method, _current, expr);
                         }
                         break;
                     case "ThenByDescending":
@@ -77,12 +77,12 @@ namespace VitalChoice.Caching.Expressions.Visitors
                         if (comparer != null)
                         {
                             var method = GetOrderMethodWithComparer(expr, "ThenByDescending");
-                            _current = Expression.Call(method, _current, CreateNewFunction(expr), comparer);
+                            _current = Expression.Call(method, _current, expr, comparer);
                         }
                         else
                         {
                             var method = GetOrderMethod(expr, "ThenByDescending");
-                            _current = Expression.Call(method, _current, CreateNewFunction(expr));
+                            _current = Expression.Call(method, _current, expr);
                         }
                         break;
                 }
@@ -108,7 +108,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
             return method;
         }
 
-        private static readonly Expression<Func<CacheResult<T>, T>> Converter = result => result.Entity;
+        //private static readonly Expression<Func<CacheResult<T>, T>> Converter = result => result.Entity;
 
         private LambdaExpression GetOrderExpression(ICollection<Expression> arguments, out Expression comparer)
         {
@@ -121,27 +121,27 @@ namespace VitalChoice.Caching.Expressions.Visitors
             return (arguments.Skip(1).First() as UnaryExpression)?.Operand as LambdaExpression;
         }
 
-        private LambdaExpression CreateNewFunction(LambdaExpression expression)
-        {
-            return ((IFnctionFactory)
-                Activator.CreateInstance(typeof (FunctionFactory<>).MakeGenericType(typeof (T), expression.ReturnType)))
-                .CreateNewFunction(expression);
-        }
+        //private LambdaExpression CreateNewFunction(LambdaExpression expression)
+        //{
+        //    return ((IFnctionFactory)
+        //        Activator.CreateInstance(typeof (FunctionFactory<>).MakeGenericType(typeof (T), expression.ReturnType)))
+        //        .CreateNewFunction(expression);
+        //}
 
-        private interface IFnctionFactory
-        {
-            LambdaExpression CreateNewFunction(LambdaExpression initialExpression);
-        }
+        //private interface IFnctionFactory
+        //{
+        //    LambdaExpression CreateNewFunction(LambdaExpression initialExpression);
+        //}
 
-        private class FunctionFactory<TResult> : IFnctionFactory
-        {
-            public LambdaExpression CreateNewFunction(LambdaExpression initialExpression)
-            {
-                ParameterExpression param = Expression.Parameter(typeof (CacheResult<T>));
-                return
-                    Expression.Lambda<Func<CacheResult<T>, TResult>>(Expression.Invoke(initialExpression,
-                        Expression.Invoke(Converter, param)), param);
-            }
-        }
+        //private class FunctionFactory<TResult> : IFnctionFactory
+        //{
+        //    public LambdaExpression CreateNewFunction(LambdaExpression initialExpression)
+        //    {
+        //        ParameterExpression param = Expression.Parameter(typeof (CacheResult<T>));
+        //        return
+        //            Expression.Lambda<Func<CacheResult<T>, TResult>>(Expression.Invoke(initialExpression,
+        //                Expression.Invoke(Converter, param)), param);
+        //    }
+        //}
     }
 }
