@@ -9,7 +9,7 @@ namespace VitalChoice.Caching.Expressions
         public WhereExpression(Expression<Func<T, bool>> expression)
         {
             Expression = expression;
-            Compiled = expression?.CacheCompile();
+            Compiled = expression?.Compile();
         }
         public Expression<Func<T, bool>> Expression { get; }
         public Func<T, bool> Compiled { get; }

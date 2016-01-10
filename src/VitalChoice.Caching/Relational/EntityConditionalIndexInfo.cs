@@ -42,7 +42,7 @@ namespace VitalChoice.Caching.Relational
         {
             public ConditionChecker(Expression<Func<TEntity, bool>> getExpression)
             {
-                _relationFunc = getExpression.CacheCompile();
+                _relationFunc = getExpression.Compile();
             }
 
             private readonly Func<TEntity, bool> _relationFunc;

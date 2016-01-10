@@ -21,7 +21,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
         {
             return
                 Expression.Lambda<Func<IEnumerable<T>, IOrderedEnumerable<T>>>(_current,
-                    _parameter).CacheCompile();
+                    _parameter).Compile();
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
