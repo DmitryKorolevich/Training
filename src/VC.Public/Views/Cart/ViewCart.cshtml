@@ -4,6 +4,10 @@
 
 @model VC.Public.Models.Cart.ViewCartModel
 
+@section PageScripts {
+	<script src="@Url.Content("/app/modules/cart/viewcart.js")"></script>
+}
+
 <div class="cart-content-top">
 	<span class="cart-head-text">IMPORTANT NOTICE</span>
 	<span class="cart-subhead-text">You are only $27.00 from Free Shipping.</span>
@@ -29,6 +33,16 @@
 	</div>
 	@using (Html.BeginForm("ViewCart", "Cart", null, FormMethod.Post, new { @class = "form-cart", role = "form" }))
 	{
+		<div class="cart-certificates-container">
+			<a name="trustlink" href="http://secure.trust-guard.com/certificates/5867" target="_blank"
+			   onclick="var nonwin = navigator.appName != 'Microsoft Internet Explorer' ? 'yes' : 'no'; window.open(this.href.replace('http', 'https'), 'welcome', 'location=' + nonwin + ',scrollbars=yes,width=517,height=' + screen.availHeight + ',menubar=no,toolbar=no'); return false;"
+			   oncontextmenu="var d = new Date(); alert('Copying Prohibited by Law - This image and all included logos are copyrighted by trust-guard \251 '+d.getFullYear()+'.'); return false;">
+				<img name="trustseal" alt="Security Seal" style="border: 0;" src="https://secure.trust-guard.com/seals/5867/scanned/mini/gray"/>
+			</a>
+			<a class="cart-guarantee-link" href="#">
+				<img src="/assets/images/guarantee2-cart.jpg"/>
+			</a>
+		</div>
 		<div class="cart-control-container">
 			<a href="#" class="button arrow-left-red">Continue Shopping</a>
 			<input type="submit" class="checkout-blue" value="Checkout"/>
@@ -55,24 +69,24 @@
 			<tbody>
 			@if (Model.Skus.Any())
 			{
-				foreach (var item in Model.Skus)
+				for (int i = 0; i < Model.Skus.Count; i++)
 				{
 					<tr>
 						<td class="cart-image-link">
-							<a href="@item.ProductPageUrl">
-								<img src="@item.IconUrl" />
+							<a href="@Model.Skus[i].ProductPageUrl">
+								<img src="@Model.Skus[i].IconUrl" />
 							</a>
 						</td>
 						<td class="cart-line-info">
-							<a class="cart-text-link" href="@item.ProductPageUrl">
-								@item.DisplayName
+							<a class="cart-text-link" href="@Model.Skus[i].ProductPageUrl">
+								@Model.Skus[i].DisplayName
 							</a>
-							<span class="cart-sku-code">(@item.Code)</span>
-							<span class="stock-presence-note">@(item.InStock ? "In Stock Ready to Ship" : "Not in Stock")</span>
+							<span class="cart-sku-code">(@Model.Skus[i].Code)</span>
+							<span class="stock-presence-note">@(Model.Skus[i].InStock ? "In Stock Ready to Ship" : "Not in Stock")</span>
 						</td>
-						<td>@(item.Price.HasValue ? @item.Price.Value.ToString("C2") : string.Empty)</td>
-						<td>@Html.TextBoxFor(x => item.Quantity, new {@class = "input-control width-small"})</td>
-						<td>@(item.SubTotal.HasValue ? @item.SubTotal.Value.ToString("C2") : string.Empty)</td>
+						<td>@(Model.Skus[i].Price.HasValue ? Model.Skus[i].Price.Value.ToString("C2") : string.Empty)</td>
+						<td>@Html.TextBoxFor(x => Model.Skus[i].Quantity, new {@class = "input-control width-small"})</td>
+						<td>@(Model.Skus[i].SubTotal.HasValue ? Model.Skus[i].SubTotal.Value.ToString("C2") : string.Empty)</td>
 						<td class="grid-controls-container">
 							<input type="button" value="Remove" />
 						</td>
@@ -137,14 +151,25 @@
 			</div>
 			<div class="cart-promo-container">
 				<label>Enter Promo Code Here</label>
-				@Html.TextBoxFor(x => x.PromoCode, new {@class = "cart-input-box input-control"})
+				@Html.TextBoxFor(x => x.PromoCode, new { @class = "cart-input-box input-control" })<img class="tooltip-v" data-tooltip-title="Promo Code" data-tooltip-body="If you have a discount code, enter it in the box to see the change in your order's total." src="/assets/images/question-mark-4-24.png" />
 			</div>
-			<div class="cart-gc-container">
+			<div id="divGcContainer" class="cart-gc-container">
 				<label>Gift Certificate Code</label>
-				@foreach (var code in Model.GiftCertificateCodes)
+				@for (int i = 0; i < Model.GiftCertificateCodes.Count; i++)
 				{
-					@Html.TextBoxFor(x => code, new { @class = "cart-input-box input-control" })
-					<input type="button" class="plus-button-red"/>
+					if (i > 0)
+					{
+						<br/><label></label>
+					}
+					@Html.TextBoxFor(x => Model.GiftCertificateCodes[i], new {@class = "cart-input-box input-control"})
+					if (i == 0)
+					{
+						<input id="btnAddGc" type="button" class="plus-button-red"/><img class="tooltip-v" data-tooltip-title="Gift Certificate Code" data-tooltip-body="If you have a gift certificate code, enter it in the box to see the change in your order's total." src="/assets/images/question-mark-4-24.png"/>
+					}
+					else
+					{
+						<input type="button" class="minus-button-red btnRemoveGc" />
+					}
 				}
 			</div>
 		</div>

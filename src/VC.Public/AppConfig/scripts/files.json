@@ -15,7 +15,6 @@
     "assets/scripts/vendor/scriptbreaker-multiple-accordion-1.js",
     "lib/jquery.scrollTo/jquery.scrollTo.js",
     "lib/tooltipster/jquery.tooltipster.min.js",
-    "lib/jquery-loading-overlay/loading-overlay.js",
     "assets/scripts/plugins.js",
     "assets/scripts/vendor/modernizr-2.8.3.min.js"
   ]

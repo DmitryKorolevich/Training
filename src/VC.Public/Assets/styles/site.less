@@ -3439,6 +3439,28 @@ body.view-cart-layout{
     background-position:initial;
     background-repeat: no-repeat;
 
+	.tooltipster-default{
+		border-radius: 5px;
+		border: 2px solid #CCCCCC;
+		background: #F7F7F7;
+		color: #000000;
+
+		.tooltipster-content{
+			font-family: Tahoma;
+			font-size: 12px;
+			padding: 8px 10px;
+
+			.default{
+				font-size: 12px;
+				color: #000000;
+
+				.title{
+					color:#f15d22;
+				}
+			}
+		}
+	}
+
 	a{
 		color: #a30100;
 		text-decoration: none;
@@ -3502,6 +3524,16 @@ body.view-cart-layout{
 		&.plus-button-red:hover{
 			background-color: #BD281E;
 		}
+
+		&.minus-button-red{
+			background: #c3392f url("/assets/images/minus-5-24.png") 3px 3px no-repeat;
+			padding-left: 15px;
+			padding-right: 15px;
+		}
+
+		&.minus-button-red:hover{
+			background-color: #BD281E;
+		}
 	}
 }
 
@@ -3517,6 +3549,12 @@ body.view-cart-layout{
 		>div{
 				display:inline-block;
 				vertical-align:top;
+
+				&#lhnContainer{
+					margin-top: 18px;
+					margin-right: 35px;
+					margin-left: 30px;
+				}
 			}
 	}
 
@@ -3543,7 +3581,7 @@ body.view-cart-layout{
 			}
 
 			.footer-cart-right{
-
+				padding-top: 15px;
 			}
 		}
 
@@ -3614,7 +3652,7 @@ body.view-cart-layout{
 	border-top: 1px solid #CCC;
 	border-bottom: 1px solid #CCC;
 	margin-bottom: 40px;
-	margin-top:50px;
+	margin-top:30px;
 
 	.best-proposals-title{
 		text-align: center;
@@ -3684,6 +3722,15 @@ body.view-cart-layout{
 .cart-content-middle{
 	padding:0px 40px;
 
+	.cart-certificates-container{
+		float: left;
+		padding-top: 11px;
+
+		.cart-guarantee-link{
+			padding-left:10px;
+		}
+	}
+
 	.cart-shopping-notice{
 		>span{
 			float:left;
@@ -3752,6 +3799,12 @@ body.view-cart-layout{
     float: left;
     width: 100%;
 
+	.tooltip-v{
+		cursor:help;
+		padding-top: 8px;
+		margin-left: 10px;
+	}
+
 	.cart-shipping-instructions{
 		float:left;
 
@@ -3817,6 +3870,7 @@ body.view-cart-layout{
 		float:left;
 		clear:left;
 		margin-top: 10px;
+		margin-bottom:20px;
 
 		label{
 			font-weight:bold;
@@ -3826,7 +3880,8 @@ body.view-cart-layout{
 			margin-top:10px;
 		}
 
-		.plus-button-red{
+		.plus-button-red,
+		.minus-button-red{
 			margin-left:10px;
 			margin-top:10px;
 		}
@@ -3863,6 +3918,10 @@ body.view-cart-layout{
 	*:first-child{
 		margin-right: 20px;
 	}
+}
+
+.help-tooltip{
+	cursor:pointer;
 }
 
 /*---------*/
