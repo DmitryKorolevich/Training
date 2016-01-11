@@ -5,7 +5,7 @@ namespace VitalChoice.Caching.Expressions
 {
     public static class ExpressionHelpers
     {
-        public static Func<object> ParseMemeberCompare(this BinaryCondition condition, out MemberExpression member)
+        public static object ParseMemeberCompare(this BinaryCondition condition, out MemberExpression member)
         {
             var left = condition.Left.Expression.RemoveConvert();
             var right = condition.Right.Expression.RemoveConvert();
@@ -18,16 +18,14 @@ namespace VitalChoice.Caching.Expressions
             return GetValue(left);
         }
 
-        public static Func<object> GetValue(this Expression expression)
+        public static object GetValue(this Expression expression)
         {
             var constant = expression as ConstantExpression;
             if (constant != null)
-                return () => constant.Value;
+                return constant.Value;
             if (!(expression is ParameterExpression))
             {
-                LambdaExpression lambda = Expression.Lambda(expression);
-                Delegate fn = lambda.Compile();
-                return () => fn.DynamicInvoke(null);
+                return Expression.Lambda(expression).Compile().DynamicInvoke(null);
             }
             return null;
         }

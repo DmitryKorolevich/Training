@@ -11,7 +11,7 @@ namespace VitalChoice.ContentProcessing.Helpers
     {
         public static ContainerBuilder RegisterContentBase(this ContainerBuilder builder)
         {
-            builder.RegisterType<ContentProcessorService>().As<IContentProcessorService>();
+            builder.RegisterType<ContentProcessorService>().As<IContentProcessorService>().InstancePerLifetimeScope();
             return builder;
         }
 
@@ -27,7 +27,7 @@ namespace VitalChoice.ContentProcessing.Helpers
             {
                 var processorName = processorType.GetTypeInfo().GetCustomAttribute<ProcessorNameAttribute>(false)?.Name ??
                                     processorType.Name;
-                builder.RegisterType(processorType).Keyed<IContentProcessor>(processorName).AsSelf();
+                builder.RegisterType(processorType).Keyed<IContentProcessor>(processorName).AsSelf().InstancePerLifetimeScope();
             }
             return builder;
         }

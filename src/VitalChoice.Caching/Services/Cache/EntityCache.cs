@@ -144,7 +144,7 @@ namespace VitalChoice.Caching.Services.Cache
 
             if (entity == null)
             {
-                _internalCache.SetNull(queryData.PrimaryKeys(), queryData.RelationInfo);
+                _internalCache.SetNull(queryData.PrimaryKeys, queryData.RelationInfo);
             }
             else
             {
@@ -168,7 +168,8 @@ namespace VitalChoice.Caching.Services.Cache
             }
 
             fullCollection = false;
-            return true;
+            return queryData.PrimaryKeys.Count > 0 || queryData.UniqueIndexes.Count > 0 ||
+                   queryData.ConditionalIndexes.Any(c => c.Value.Count > 0);
         }
 
         private bool TryConditionalIndexes(QueryCacheData<T> queryData,
@@ -195,7 +196,7 @@ namespace VitalChoice.Caching.Services.Cache
                 results =
                     conditionalIndexes.Select(
                         indexPair =>
-                            _internalCache.TryGetEntities(indexPair.Value(), indexPair.Key, queryData.RelationInfo))
+                            _internalCache.TryGetEntities(indexPair.Value, indexPair.Key, queryData.RelationInfo))
                         .Aggregate(entityList, (current, perminilaryResults) => current.Union(perminilaryResults))
                         .DistinctObjects();
                 return true;
@@ -207,7 +208,7 @@ namespace VitalChoice.Caching.Services.Cache
         private bool TryUniqueIndexes(QueryCacheData<T> queryCache,
             out IEnumerable<CacheResult<T>> results)
         {
-            var indexes = queryCache.UniqueIndexes();
+            var indexes = queryCache.UniqueIndexes;
             //if (indexes.Count == 1)
             //{
             //    var result = _internalCache.TryGetEntity(indexes.First(), queryCache.RelationInfo);
@@ -226,7 +227,7 @@ namespace VitalChoice.Caching.Services.Cache
         private bool TryPrimaryKeys(QueryCacheData<T> queryCache,
             out IEnumerable<CacheResult<T>> results)
         {
-            var pks = queryCache.PrimaryKeys();
+            var pks = queryCache.PrimaryKeys;
             //if (pks.Count == 1)
             //{
             //    var result = _internalCache.TryGetEntity(pks.First(), queryCache.RelationInfo);

@@ -11,7 +11,7 @@ using VitalChoice.Caching.Services.Cache.Base;
 
 namespace VitalChoice.Caching.Iterators
 {
-    internal class CacheIterator<TSource> : SimpleIterator<TSource> 
+    internal class CacheIterator<TSource> : SimpleIterator<TSource>
         where TSource : class
     {
         private readonly IEnumerable<CacheResult<TSource>> _source;
@@ -103,7 +103,7 @@ namespace VitalChoice.Caching.Iterators
             return false;
         }
 
-        private CacheResult<TSource> Attach(CacheResult<TSource> item)
+        private TSource Attach(TSource item)
         {
             var pk = _keysStorage.GetPrimaryKeyValue(item);
             EntityEntry<TSource> entry;
@@ -111,16 +111,16 @@ namespace VitalChoice.Caching.Iterators
             {
                 if (entry.State == EntityState.Detached)
                 {
-                    _context.Attach((TSource) item);
+                    _context.Attach(item);
                 }
                 else
                 {
-                    item = new CacheResult<TSource>(entry.Entity, CacheGetResult.Found);
+                    item = entry.Entity;
                 }
             }
             else
             {
-                _context.Attach((TSource) item);
+                _context.Attach(item);
             }
             return item;
         }

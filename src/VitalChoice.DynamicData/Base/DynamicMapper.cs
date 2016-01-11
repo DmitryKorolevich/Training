@@ -52,6 +52,7 @@ namespace VitalChoice.DynamicData.Base
         where TDynamic : MappedObject, new()
     {
         private readonly ITypeConverter _typeConverter;
+        private readonly IReadRepositoryAsync<TOptionType> _optionTypeRepositoryAsync;
 
         protected abstract Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items, bool withDefaults = false);
         protected abstract Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
@@ -59,18 +60,13 @@ namespace VitalChoice.DynamicData.Base
         protected abstract Expression<Func<TOptionValue, int>> ObjectIdReferenceSelector { get; }
         private Action<TOptionValue, int> _valueSetter;
         private Func<TOptionValue, int> _valueGetter;
-        private static ICollection<TOptionType> _optionTypes;
 
         protected DynamicMapper(ITypeConverter typeConverter,
             IModelConverterService converterService,
             IReadRepositoryAsync<TOptionType> optionTypeRepositoryAsync) : base(typeConverter, converterService)
         {
             _typeConverter = typeConverter;
-            if (OptionTypes == null)
-            {
-                Interlocked.CompareExchange(ref _optionTypes,
-                    optionTypeRepositoryAsync.Query().Include(o => o.Lookup).ThenInclude(l => l.LookupVariants).Select(false), null);
-            }
+            _optionTypeRepositoryAsync = optionTypeRepositoryAsync;
         }
 
         public virtual void SyncCollections(ICollection<TDynamic> dynamics, ICollection<TEntity> entities, ICollection<TOptionType> optionTypes = null)
@@ -121,7 +117,8 @@ namespace VitalChoice.DynamicData.Base
             return new OptionTypeQuery<TOptionType>();
         }
 
-        public ICollection<TOptionType> OptionTypes => _optionTypes;
+        public ICollection<TOptionType> OptionTypes
+            => _optionTypeRepositoryAsync.Query().Include(o => o.Lookup).ThenInclude(l => l.LookupVariants).Select(false);
 
         public Action<TOptionValue, int> SetObjectReferenceId
         {

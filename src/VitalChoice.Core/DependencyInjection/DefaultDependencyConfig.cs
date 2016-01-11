@@ -345,7 +345,7 @@ namespace VitalChoice.Core.DependencyInjection
                 .InstancePerLifetimeScope();
             builder.RegisterType<EcommerceContext>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<LogsContext>();
+            builder.RegisterType<LogsContext>().InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof (RepositoryAsync<>))
                 .As(typeof (IRepositoryAsync<>));
             builder.RegisterGeneric(typeof (ReadRepositoryAsync<>))
@@ -360,32 +360,32 @@ namespace VitalChoice.Core.DependencyInjection
                 .As(typeof (IGenericService<>));
             builder.RegisterGeneric(typeof(CsvExportService<,>))
                 .As(typeof(ICsvExportService<,>));
-            builder.RegisterType<ContentEditService>().As<IContentEditService>();
-            builder.RegisterType<LogViewService>().As<ILogViewService>();
-            builder.RegisterType<MasterContentService>().As<IMasterContentService>();
-            builder.RegisterType<GeneralContentService>().As<IGeneralContentService>();
-            builder.RegisterType<CategoryService>().As<ICategoryService>();
-            builder.RegisterType<RecipeService>().As<IRecipeService>();
-            builder.RegisterType<FAQService>().As<IFAQService>();
-            builder.RegisterType<ArticleService>().As<IArticleService>();
-            builder.RegisterType<ContentPageService>().As<IContentPageService>();
+            builder.RegisterType<ContentEditService>().As<IContentEditService>().InstancePerLifetimeScope();
+            builder.RegisterType<LogViewService>().As<ILogViewService>().InstancePerLifetimeScope();
+            builder.RegisterType<MasterContentService>().As<IMasterContentService>().InstancePerLifetimeScope();
+            builder.RegisterType<GeneralContentService>().As<IGeneralContentService>().InstancePerLifetimeScope();
+            builder.RegisterType<CategoryService>().As<ICategoryService>().InstancePerLifetimeScope();
+            builder.RegisterType<RecipeService>().As<IRecipeService>().InstancePerLifetimeScope();
+            builder.RegisterType<FAQService>().As<IFAQService>().InstancePerLifetimeScope();
+            builder.RegisterType<ArticleService>().As<IArticleService>().InstancePerLifetimeScope();
+            builder.RegisterType<ContentPageService>().As<IContentPageService>().InstancePerLifetimeScope();
             builder.RegisterType<TtlGlobalCache>().As<ITtlGlobalCache>().SingleInstance();
-            builder.RegisterType<CustomUrlHelper>().As<IUrlHelper>();
-            builder.RegisterType<MemoryCache>().As<IMemoryCache>();
+            builder.RegisterType<CustomUrlHelper>().As<IUrlHelper>().InstancePerLifetimeScope();
+            builder.RegisterType<MemoryCache>().As<IMemoryCache>().SingleInstance();
             builder.RegisterType<CacheProvider>().As<ICacheProvider>().SingleInstance();
-            builder.RegisterType<AppInfrastructureService>().As<IAppInfrastructureService>();
-	        builder.RegisterType<AdminUserService>().As<IAdminUserService>();
+            builder.RegisterType<AppInfrastructureService>().As<IAppInfrastructureService>().InstancePerLifetimeScope();
+	        builder.RegisterType<AdminUserService>().As<IAdminUserService>().InstancePerLifetimeScope();
 
-	        builder.RegisterType<StorefrontUserStore>().Named<IUserStore<ApplicationUser>>("storefronUserStore");
-	        builder.RegisterType<UserValidator<ApplicationUser>>().Named<IUserValidator<ApplicationUser>>("storefrontUserValidator");
+	        builder.RegisterType<StorefrontUserStore>().Named<IUserStore<ApplicationUser>>("storefronUserStore").InstancePerLifetimeScope();
+	        builder.RegisterType<UserValidator<ApplicationUser>>().Named<IUserValidator<ApplicationUser>>("storefrontUserValidator").InstancePerLifetimeScope();
 	        builder.RegisterType<ExtendedUserManager>()
 		        .Named<ExtendedUserManager>("storefrontUserManager")
 		        .WithParameter((pi, cc) => pi.Name == "store",
-			        (pi, cc) => cc.ResolveNamed<IUserStore<ApplicationUser>>("storefronUserStore"));
+			        (pi, cc) => cc.ResolveNamed<IUserStore<ApplicationUser>>("storefronUserStore")).InstancePerLifetimeScope();
 	        builder.RegisterType<SignInManager<ApplicationUser>>()
 		        .Named<SignInManager<ApplicationUser>>("storefrontSignInManager")
 		        .WithParameter((pi, cc) => pi.Name == "userManager",
-			        (pi, cc) => cc.ResolveNamed<ExtendedUserManager>("storefrontUserManager"));
+			        (pi, cc) => cc.ResolveNamed<ExtendedUserManager>("storefrontUserManager")).InstancePerLifetimeScope();
 	        builder.RegisterType<StorefrontUserService>()
 		        .As<IStorefrontUserService>()
 		        .WithParameter((pi, cc) => pi.Name == "userManager",
@@ -393,18 +393,18 @@ namespace VitalChoice.Core.DependencyInjection
 		        .WithParameter((pi, cc) => pi.Name == "userValidator",
 			        (pi, cc) => cc.ResolveNamed<IUserValidator<ApplicationUser>>("storefrontUserValidator"))
 		        .WithParameter((pi, cc) => pi.Name == "signInManager",
-			        (pi, cc) => cc.ResolveNamed<SignInManager<ApplicationUser>>("storefrontSignInManager"));
+			        (pi, cc) => cc.ResolveNamed<SignInManager<ApplicationUser>>("storefrontSignInManager")).InstancePerLifetimeScope();
 
-            builder.RegisterType<AffiliateUserStore>().Named<IUserStore<ApplicationUser>>("affiliateUserStore");
-            builder.RegisterType<UserValidator<ApplicationUser>>().Named<IUserValidator<ApplicationUser>>("affiliateUserValidator");
+            builder.RegisterType<AffiliateUserStore>().Named<IUserStore<ApplicationUser>>("affiliateUserStore").InstancePerLifetimeScope();
+            builder.RegisterType<UserValidator<ApplicationUser>>().Named<IUserValidator<ApplicationUser>>("affiliateUserValidator").InstancePerLifetimeScope();
             builder.RegisterType<ExtendedUserManager>()
                 .Named<ExtendedUserManager>("affiliateUserManager")
                 .WithParameter((pi, cc) => pi.Name == "store",
-                    (pi, cc) => cc.ResolveNamed<IUserStore<ApplicationUser>>("affiliateUserStore"));
+                    (pi, cc) => cc.ResolveNamed<IUserStore<ApplicationUser>>("affiliateUserStore")).InstancePerLifetimeScope();
             builder.RegisterType<SignInManager<ApplicationUser>>()
                 .Named<SignInManager<ApplicationUser>>("affiliateSignInManager")
                 .WithParameter((pi, cc) => pi.Name == "userManager",
-                    (pi, cc) => cc.ResolveNamed<ExtendedUserManager>("affiliateUserManager"));
+                    (pi, cc) => cc.ResolveNamed<ExtendedUserManager>("affiliateUserManager")).InstancePerLifetimeScope();
             builder.RegisterType<AffiliateUserService>()
                 .As<IAffiliateUserService>()
                 .WithParameter((pi, cc) => pi.Name == "userManager",
@@ -412,34 +412,34 @@ namespace VitalChoice.Core.DependencyInjection
                 .WithParameter((pi, cc) => pi.Name == "userValidator",
                     (pi, cc) => cc.ResolveNamed<IUserValidator<ApplicationUser>>("affiliateUserValidator"))
                 .WithParameter((pi, cc) => pi.Name == "signInManager",
-                    (pi, cc) => cc.ResolveNamed<SignInManager<ApplicationUser>>("affiliateSignInManager"));
-            builder.RegisterType<CategoryViewService>().As<ICategoryViewService>(); 
-			builder.RegisterType<ProductViewService>().As<IProductViewService>();
-            builder.RegisterType<ContentPageViewService>().As<IContentPageViewService>();
-            builder.RegisterType<ProductCategoryService>().As<IProductCategoryService>();
-            builder.RegisterType<InventoryCategoryService>().As<IInventoryCategoryService>();
-            builder.RegisterType<ProductReviewService>().As<IProductReviewService>();
-            builder.RegisterType<CountryService>().As<ICountryService>();
-            builder.RegisterType<SettingService>().As<ISettingService>();
-            builder.RegisterType<FileService>().As<IFileService>();
-            builder.RegisterType<ArticleCategoryViewService>().As<IArticleCategoryViewService>();
-            builder.RegisterType<ArticleViewService>().As<IArticleViewService>();
-            builder.RegisterType<RecipeCategoryViewService>().As<IRecipeCategoryViewService>();
-            builder.RegisterType<RecipeViewService>().As<IRecipeViewService>();
-            builder.RegisterType<FAQCategoryViewService>().As<IFAQCategoryViewService>();
-            builder.RegisterType<FAQViewService>().As<IFAQViewService>();
+                    (pi, cc) => cc.ResolveNamed<SignInManager<ApplicationUser>>("affiliateSignInManager")).InstancePerLifetimeScope();
+            builder.RegisterType<CategoryViewService>().As<ICategoryViewService>().InstancePerLifetimeScope(); 
+			builder.RegisterType<ProductViewService>().As<IProductViewService>().InstancePerLifetimeScope();
+            builder.RegisterType<ContentPageViewService>().As<IContentPageViewService>().InstancePerLifetimeScope();
+            builder.RegisterType<ProductCategoryService>().As<IProductCategoryService>().InstancePerLifetimeScope();
+            builder.RegisterType<InventoryCategoryService>().As<IInventoryCategoryService>().InstancePerLifetimeScope();
+            builder.RegisterType<ProductReviewService>().As<IProductReviewService>().InstancePerLifetimeScope();
+            builder.RegisterType<CountryService>().As<ICountryService>().InstancePerLifetimeScope();
+            builder.RegisterType<SettingService>().As<ISettingService>().InstancePerLifetimeScope();
+            builder.RegisterType<FileService>().As<IFileService>().InstancePerLifetimeScope();
+            builder.RegisterType<ArticleCategoryViewService>().As<IArticleCategoryViewService>().InstancePerLifetimeScope();
+            builder.RegisterType<ArticleViewService>().As<IArticleViewService>().InstancePerLifetimeScope();
+            builder.RegisterType<RecipeCategoryViewService>().As<IRecipeCategoryViewService>().InstancePerLifetimeScope();
+            builder.RegisterType<RecipeViewService>().As<IRecipeViewService>().InstancePerLifetimeScope();
+            builder.RegisterType<FAQCategoryViewService>().As<IFAQCategoryViewService>().InstancePerLifetimeScope();
+            builder.RegisterType<FAQViewService>().As<IFAQViewService>().InstancePerLifetimeScope();
 
             builder.RegisterType<EmailSender>()
                 .As<IEmailSender>()
                 .WithParameter((pi, cc) => pi.Name == "options", (pi, cc) => cc.Resolve<IOptions<AppOptions>>())
                 .InstancePerLifetimeScope();
-            builder.RegisterType<NotificationService>().As<INotificationService>();
-            builder.RegisterType<GCService>().As<IGcService>();
-            builder.RegisterType<ProductService>().As<IProductService>();
-            builder.RegisterType<DiscountService>().As<IDiscountService>();
-            builder.RegisterType<CountryService>().As<ICountryService>();
-            builder.RegisterType<ActionItemProvider>().As<IActionItemProvider>();
-            builder.RegisterType<WorkflowFactory>().As<IWorkflowFactory>();
+            builder.RegisterType<NotificationService>().As<INotificationService>().InstancePerLifetimeScope();
+            builder.RegisterType<GCService>().As<IGcService>().InstancePerLifetimeScope();
+            builder.RegisterType<ProductService>().As<IProductService>().InstancePerLifetimeScope();
+            builder.RegisterType<DiscountService>().As<IDiscountService>().InstancePerLifetimeScope();
+            builder.RegisterType<CountryService>().As<ICountryService>().InstancePerLifetimeScope();
+            builder.RegisterType<ActionItemProvider>().As<IActionItemProvider>().InstancePerLifetimeScope();
+            builder.RegisterType<WorkflowFactory>().As<IWorkflowFactory>().InstancePerLifetimeScope();
             builder.RegisterType<VProductSkuRepository>()
                 .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>());
             builder.RegisterType<OrderSkusRepository>()
@@ -454,50 +454,50 @@ namespace VitalChoice.Core.DependencyInjection
                 .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>());
             builder.RegisterType<SPEcommerceRepository>()
                 .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>());
-            builder.RegisterType<PaymentMethodService>().As<IPaymentMethodService>();
-            builder.RegisterType<OrderNoteService>().As<IOrderNoteService>();
-            builder.RegisterType<CustomerService>().As<ICustomerService>();
-            builder.RegisterType<OrderService>().As<IOrderService>();
-            builder.RegisterType<AffiliateService>().As<IAffiliateService>();
-            builder.RegisterType<HelpService>().As<IHelpService>();
-            builder.RegisterType<BlobStorageClient>().As<IBlobStorageClient>();
-            builder.RegisterType<PromotionService>().As<IPromotionService>();
-            builder.RegisterType<ContentAreaService>().As<IContentAreaService>();
-            builder.RegisterType<FedExService>().As<IFedExService>();
-            builder.RegisterType<VitalGreenService>().As<IVitalGreenService>();
-            builder.RegisterType<StylesService>().As<IStylesService>();
-            builder.RegisterType<CatalogRequestAddressService>().As<ICatalogRequestAddressService>();
-            builder.RegisterType<HealthwiseService>().As<IHealthwiseService>();
-            builder.RegisterType<RedirectService>().As<IRedirectService>();
+            builder.RegisterType<PaymentMethodService>().As<IPaymentMethodService>().InstancePerLifetimeScope();
+            builder.RegisterType<OrderNoteService>().As<IOrderNoteService>().InstancePerLifetimeScope();
+            builder.RegisterType<CustomerService>().As<ICustomerService>().InstancePerLifetimeScope();
+            builder.RegisterType<OrderService>().As<IOrderService>().InstancePerLifetimeScope();
+            builder.RegisterType<AffiliateService>().As<IAffiliateService>().InstancePerLifetimeScope();
+            builder.RegisterType<HelpService>().As<IHelpService>().InstancePerLifetimeScope();
+            builder.RegisterType<BlobStorageClient>().As<IBlobStorageClient>().InstancePerLifetimeScope();
+            builder.RegisterType<PromotionService>().As<IPromotionService>().InstancePerLifetimeScope();
+            builder.RegisterType<ContentAreaService>().As<IContentAreaService>().InstancePerLifetimeScope();
+            builder.RegisterType<FedExService>().As<IFedExService>().InstancePerLifetimeScope();
+            builder.RegisterType<VitalGreenService>().As<IVitalGreenService>().InstancePerLifetimeScope();
+            builder.RegisterType<StylesService>().As<IStylesService>().InstancePerLifetimeScope();
+            builder.RegisterType<CatalogRequestAddressService>().As<ICatalogRequestAddressService>().InstancePerLifetimeScope();
+            builder.RegisterType<HealthwiseService>().As<IHealthwiseService>().InstancePerLifetimeScope();
+            builder.RegisterType<RedirectService>().As<IRedirectService>().InstancePerLifetimeScope();
             builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
             builder.RegisterModelConverters(projectAssembly);
 
             builder.RegisterGeneric(typeof(ExtendedEcommerceDynamicService<,,,>))
-                .As(typeof(IExtendedDynamicServiceAsync<,,,>));
+                .As(typeof(IExtendedDynamicServiceAsync<,,,>)).InstancePerLifetimeScope();
 
             builder.RegisterGenericServiceDecorator(typeof (EcommerceDynamicServiceDecorator<,>), "extendedService")
-                .As(typeof (IDynamicServiceAsync<,>));
+                .As(typeof (IDynamicServiceAsync<,>)).InstancePerLifetimeScope();
 
             builder.RegisterGenericServiceDecorator(typeof(EcommerceDynamicReadServiceDecorator<,>), "extendedService")
-                .As(typeof(IDynamicReadServiceAsync<,>));
+                .As(typeof(IDynamicReadServiceAsync<,>)).InstancePerLifetimeScope();
 
             builder.RegisterGenericServiceDecorator(typeof (ExtendedEcommerceDynamicReadServiceDecorator<,>), "extendedService")
-                .As(typeof (IExtendedDynamicReadServiceAsync<,>));
+                .As(typeof (IExtendedDynamicReadServiceAsync<,>)).InstancePerLifetimeScope();
 
-            builder.RegisterGeneric(typeof (TreeSetup<,>)).As(typeof (ITreeSetup<,>));
+            builder.RegisterGeneric(typeof (TreeSetup<,>)).As(typeof (ITreeSetup<,>)).InstancePerLifetimeScope();
             builder.RegisterContentBase();
             builder.RegisterDynamicsBase();
             builder.RegisterType<DynamicExtensionsRewriter>()
                 .AsSelf()
-                .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>());
+                .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>()).InstancePerLifetimeScope();
             builder.RegisterProcessors(typeof (ProductCategoryProcessor).GetTypeInfo().Assembly);
-            builder.RegisterType<TaxService>().As<ITaxService>();
-            builder.RegisterType<AddressService>().As<IAddressService>();
-            builder.RegisterType<AvalaraTax>().As<IAvalaraTax>();
-            builder.RegisterType<BackendSettingsService>().As<IBackendSettingsService>();
-            builder.RegisterType<ObjectHistoryLogService>().As<IObjectHistoryLogService>();
-            builder.RegisterType<ObjectLogItemExternalService>().As<IObjectLogItemExternalService>();
-            builder.RegisterType<ReCaptchaValidator>().AsSelf();
+            builder.RegisterType<TaxService>().As<ITaxService>().InstancePerLifetimeScope();
+            builder.RegisterType<AddressService>().As<IAddressService>().InstancePerLifetimeScope();
+            builder.RegisterType<AvalaraTax>().As<IAvalaraTax>().InstancePerLifetimeScope();
+            builder.RegisterType<BackendSettingsService>().As<IBackendSettingsService>().InstancePerLifetimeScope();
+            builder.RegisterType<ObjectHistoryLogService>().As<IObjectHistoryLogService>().InstancePerLifetimeScope();
+            builder.RegisterType<ObjectLogItemExternalService>().As<IObjectLogItemExternalService>().InstancePerLifetimeScope();
+            builder.RegisterType<ReCaptchaValidator>().AsSelf().SingleInstance();
             builder.RegisterType<CountryNameCodeResolver>().As<ICountryNameCodeResolver>()
                 //little optimization on instance count, since it's self hosted data
                 .InstancePerLifetimeScope();
@@ -507,7 +507,7 @@ namespace VitalChoice.Core.DependencyInjection
                 .WithParameter((pi, cc) => pi.ParameterType == typeof (ILogger),
                     (pi, cc) => cc.Resolve<ILoggerProviderExtended>().CreateLogger(typeof (ObjectEncryptionHost)))
                 .SingleInstance();
-            builder.RegisterType<EncryptedOrderExportService>().As<IEncryptedOrderExportService>();
+            builder.RegisterType<EncryptedOrderExportService>().As<IEncryptedOrderExportService>().InstancePerLifetimeScope();
             FinishCustomRegistrations(builder);
 
             var container = builder.Build();

@@ -12,9 +12,9 @@ namespace VitalChoice.Caching.Services.Cache.Base
         public RelationInfo RelationInfo { get; set; }
         public bool Tracking { get; set; }
         public Func<IEnumerable<T>, IOrderedEnumerable<T>> OrderByFunction { get; set; }
-        public ICollection<KeyValuePair<EntityConditionalIndexInfo, Func<ICollection<EntityIndex>>>> ConditionalIndexes { get; set; }
-        public Func<ICollection<EntityIndex>> UniqueIndexes { get; set; }
-        public Func<ICollection<EntityKey>> PrimaryKeys { get; set; }
+        public ICollection<KeyValuePair<EntityConditionalIndexInfo, ICollection<EntityIndex>>> ConditionalIndexes { get; set; }
+        public ICollection<EntityIndex> UniqueIndexes { get; set; }
+        public ICollection<EntityKey> PrimaryKeys { get; set; }
 
         public bool IsEmpty => WhereExpression == null && RelationInfo == null && OrderByFunction == null;
 

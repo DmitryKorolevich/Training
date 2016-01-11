@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using VitalChoice.Caching.Relational.Base;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
@@ -15,7 +16,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
     {
         EntityValueGroupInfo<TInfo> GroupInfo { get; }
         bool ContainsAdditionalConditions { get; }
-        Func<ICollection<TValueGroup>> GetValuesFunction(WhereExpression<T> expression);
+        ICollection<TValueGroup> GetValuesFunction(WhereExpression<T> expression);
     }
 
     public abstract class GenericAnalyzer<T, TValueGroup, TValue, TInfo> : IConditionAnalyzer<T, TValueGroup, TValue, TInfo>
@@ -31,29 +32,25 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
             GroupInfo = indexInfo;
         }
 
-        public virtual Func<ICollection<TValueGroup>> GetValuesFunction(WhereExpression<T> expression)
+        public virtual ICollection<TValueGroup> GetValuesFunction(WhereExpression<T> expression)
         {
             if (GroupInfo == null || expression == null)
-                return () => new TValueGroup[0];
-            var valueCandidateExpressions = new List<Expression<Action<HashSet<TValue>>>>();
-            var itemCandidateExpressions = new List<Expression<Action<HashSet<TValueGroup>>>>();
-            WalkConditionTree(expression.Condition, itemCandidateExpressions, valueCandidateExpressions);
-            var itemFunctionsList =
-                itemCandidateExpressions.Select(itemExpression => itemExpression.Compile()).ToArray();
-            if (valueCandidateExpressions.Count != GroupInfo.Count)
-                valueCandidateExpressions.Clear();
-            var valueFunctionList =
-                valueCandidateExpressions.Select(valueExpression => valueExpression.Compile()).ToArray();
-            if (itemFunctionsList.Any() || valueFunctionList.Any() && valueFunctionList.Length == GroupInfo.Count)
+                return new TValueGroup[0];
+            var values = new HashSet<TValue>();
+            var items = new HashSet<TValueGroup>();
+            WalkConditionTree(expression.Condition, items, values);
+            if (values.Count != GroupInfo.Count)
+                values.Clear();
+            if (items.Any() || values.Any() && values.Count == GroupInfo.Count)
             {
-                return () => GetKeys(GroupInfo, itemFunctionsList, valueFunctionList);
+                return GetKeys(GroupInfo, items, values);
             }
-            return () => new TValueGroup[0];
+            return new TValueGroup[0];
         }
 
         protected virtual bool WalkConditionTree(Condition top,
-            ICollection<Expression<Action<HashSet<TValueGroup>>>> itemExpressions,
-            ICollection<Expression<Action<HashSet<TValue>>>> valueExpressions)
+            HashSet<TValueGroup> itemsSet,
+            HashSet<TValue> valuesSet)
         {
             switch (top.Operator)
             {
@@ -65,9 +62,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
                     if (member != null && value != null && member.Expression.Type == typeof (T) &&
                         GroupInfo.TryGet(member.Member.Name, out info))
                     {
-                        Expression<Action<HashSet<TValue>>> addValueExpression =
-                            keyValues => keyValues.Add(ValueFactory(info, value()));
-                        valueExpressions.Add(addValueExpression);
+                        valuesSet.Add(ValueFactory(info, value));
                     }
                     else
                     {
@@ -76,25 +71,23 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
                     return true;
                 case ExpressionType.AndAlso:
                     var and = (BinaryCondition) top;
-                    if (!WalkConditionTree(and.Left, itemExpressions, valueExpressions))
+                    if (!WalkConditionTree(and.Left, itemsSet, valuesSet))
                         return false;
-                    return WalkConditionTree(and.Right, itemExpressions, valueExpressions);
+                    return WalkConditionTree(and.Right, itemsSet, valuesSet);
                 case ExpressionType.OrElse:
-                    itemExpressions.Clear();
-                    valueExpressions.Clear();
+                    itemsSet.Clear();
+                    valuesSet.Clear();
                     return false;
                 case ExpressionType.Call:
                     var method = top.Expression as MethodCallExpression;
 
                     var memberSelector =
                         ((method?.Arguments.Last() as UnaryExpression)?.Operand as LambdaExpression)?.Body as MemberExpression;
-                    var valuesFunc = (method?.Arguments.Last() as UnaryExpression)?.Operand.GetValue();
-                    if (valuesFunc != null && memberSelector != null && memberSelector.Expression.Type == typeof (T) &&
+                    var values = (method?.Arguments.Last() as UnaryExpression)?.Operand.GetValue();
+                    if (values != null && memberSelector != null && memberSelector.Expression.Type == typeof (T) &&
                         GroupInfo.TryGet(memberSelector.Member.Name, out info) && GroupInfo.Count == 1)
                     {
-                        Expression<Action<HashSet<TValueGroup>>> addListExpression =
-                            pks => AddNewKeys(pks, info, valuesFunc() as IEnumerable);
-                        itemExpressions.Add(addListExpression);
+                        AddNewKeys(itemsSet, info, values);
                     }
                     ContainsAdditionalConditions = true;
                     return true;
@@ -108,18 +101,8 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
         protected abstract TValue ValueFactory(TInfo info, object value);
 
         protected virtual ICollection<TValueGroup> GetKeys(EntityValueGroupInfo<TInfo> keyInfo,
-            ICollection<Action<HashSet<TValueGroup>>> itemFunctionsList, ICollection<Action<HashSet<TValue>>> valueFunctionList)
+            HashSet<TValueGroup> result, HashSet<TValue> keyValues)
         {
-            var result = new HashSet<TValueGroup>();
-            var keyValues = new HashSet<TValue>();
-            foreach (var itemFunc in itemFunctionsList)
-            {
-                itemFunc(result);
-            }
-            foreach (var itemFunc in valueFunctionList)
-            {
-                itemFunc(keyValues);
-            }
             try
             {
                 if (result.Any())
@@ -154,14 +137,16 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
             return result;
         }
 
-        protected virtual void AddNewKeys(ISet<TValueGroup> pks, TInfo info, IEnumerable values)
+        protected virtual void AddNewKeys(ISet<TValueGroup> pks, TInfo info, object values)
         {
-            if (values == null)
+            var enumerable = values as IEnumerable;
+            if (enumerable == null)
                 return;
+            
             if (pks.Any())
             {
                 var newKeys = new HashSet<TValueGroup>();
-                foreach (var item in values)
+                foreach (var item in enumerable)
                 {
                     newKeys.Add(GroupFactory(new[] {ValueFactory(info, item)}));
                 }
@@ -171,7 +156,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
             }
             else
             {
-                foreach (var item in values)
+                foreach (var item in enumerable)
                 {
                     pks.Add(GroupFactory(new[] {ValueFactory(info, item)}));
                 }

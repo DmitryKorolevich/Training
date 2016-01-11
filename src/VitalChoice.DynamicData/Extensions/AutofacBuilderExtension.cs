@@ -17,10 +17,10 @@ namespace VitalChoice.DynamicData.Extensions
     {
         public static ContainerBuilder RegisterDynamicsBase(this ContainerBuilder builder)
         {
-            builder.RegisterType<TypeConverter>().As<ITypeConverter>();
-            builder.RegisterType<ModelConverterService>().As<IModelConverterService>();
-            builder.RegisterGeneric(typeof (DirectMapper<>)).AsSelf();
-            builder.RegisterType<ObjectMapperFactory>().As<IObjectMapperFactory>();
+            builder.RegisterType<TypeConverter>().As<ITypeConverter>().InstancePerLifetimeScope();
+            builder.RegisterType<ModelConverterService>().As<IModelConverterService>().InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof (DirectMapper<>)).AsSelf().InstancePerLifetimeScope();
+            builder.RegisterType<ObjectMapperFactory>().As<IObjectMapperFactory>().InstancePerLifetimeScope();
             return builder;
         }
 
@@ -32,7 +32,7 @@ namespace VitalChoice.DynamicData.Extensions
                     t =>
                         t.IsImplementGeneric(typeof (DynamicMapper<,,,>)) && !t.GetTypeInfo().IsAbstract &&
                         !t.GetTypeInfo().IsGenericType);
-            builder.RegisterGeneric(typeof(ObjectMapper<>)).As(typeof(IObjectMapper<>));
+            builder.RegisterGeneric(typeof(ObjectMapper<>)).As(typeof(IObjectMapper<>)).InstancePerLifetimeScope();
             foreach (var mapperType in mapperTypes)
             {
                 var types = mapperType.TryGetTypeArguments(typeof (IOptionTypeQueryProvider<,,>));
@@ -51,7 +51,7 @@ namespace VitalChoice.DynamicData.Extensions
                             mapperType.TryGetTypeArguments(typeof (IOptionTypeQueryProvider<,,>))))
                         .AsSelf()
                         .Keyed<IObjectMapper>(mapperType.TryGetElementType(typeof (DynamicMapper<,,,>)))
-                        .Keyed<IOptionTypeQueryProvider>(new GenericTypePair(types[0], types[1]));
+                        .Keyed<IOptionTypeQueryProvider>(new GenericTypePair(types[0], types[1])).InstancePerLifetimeScope();
                 }
             }
             return builder;
@@ -79,7 +79,7 @@ namespace VitalChoice.DynamicData.Extensions
                     return
                         cc.Resolve(typeof (IExtendedDynamicServiceAsync<,,,>).MakeGenericType(dynamicType, entityType,
                             optionTypeType, optionValueType));
-                });
+                }).InstancePerLifetimeScope();
         }
 
 
@@ -98,7 +98,7 @@ namespace VitalChoice.DynamicData.Extensions
                             typeof (IModelConverter<,>).MakeGenericType(
                                 converter.TryGetTypeArguments(typeof (IModelConverter<,>))))
                         .AsSelf()
-                        .Keyed<IModelConverter>(new TypePair(types[0], types[1]));
+                        .Keyed<IModelConverter>(new TypePair(types[0], types[1])).InstancePerLifetimeScope();
                 }
             }
             return builder;
