@@ -42,18 +42,18 @@ namespace VitalChoice.Caching.Services
                 var cache = CacheFactory.GetCache(group.Key);
                 foreach (var entry in group)
                 {
-                    if (entry.EntityState == EntityState.Modified)
+                    switch (entry.EntityState)
                     {
-                        cache.Update(entry.Entity);
-                    }
-                    if (entry.EntityState == EntityState.Deleted)
-                    {
-                        cache.MarkForUpdate(entry.Entity);
-                        cache.TryRemove(entry.Entity);
-                    }
-                    if (entry.EntityState == EntityState.Added)
-                    {
-                        cache.MarkForUpdate(entry.Entity);
+                        case EntityState.Modified:
+                            cache.Update(entry.Entity);
+                            break;
+                        case EntityState.Deleted:
+                            cache.MarkForUpdate(entry.Entity);
+                            cache.TryRemove(entry.Entity);
+                            break;
+                        case EntityState.Added:
+                            cache.MarkForUpdate(entry.Entity);
+                            break;
                     }
                 }
             }

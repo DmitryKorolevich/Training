@@ -71,7 +71,7 @@ namespace VitalChoice.Caching.Services
             return entityInfos;
         }
 
-        private static readonly ConcurrentDictionary<Type, Dictionary<Type, EntityInfo>> ContextModelCaches = new ConcurrentDictionary<Type, Dictionary<Type, EntityInfo>>();
+        internal static readonly ConcurrentDictionary<Type, Dictionary<Type, EntityInfo>> ContextModelCaches = new ConcurrentDictionary<Type, Dictionary<Type, EntityInfo>>();
 
         private readonly Dictionary<Type, EntityInfo> _entityInfos;
 
