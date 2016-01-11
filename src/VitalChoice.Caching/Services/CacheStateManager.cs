@@ -42,7 +42,7 @@ namespace VitalChoice.Caching.Services
                 var cache = CacheFactory.GetCache(group.Key);
                 foreach (var entry in group)
                 {
-                    if (entry.EntityState == EntityState.Modified)
+                    if (entry.EntityState == EntityState.Modified || entry.EntityState == EntityState.Added)
                     {
                         cache.Update(entry.Entity);
                     }
