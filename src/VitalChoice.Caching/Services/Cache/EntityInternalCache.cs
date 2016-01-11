@@ -155,40 +155,6 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        //public CacheResult<T> GetFirstWhere(RelationInfo relations, Func<T, bool> whereFunc)
-        //{
-        //    var data = CacheStorage.GetCacheData(relations);
-        //    if (!data.FullCollection)
-        //    {
-        //        return CacheGetResult.NotFound;
-        //    }
-        //    if (data.GetAll().Any(cached => cached.NeedUpdate))
-        //    {
-        //        entity = default(T);
-        //        return CacheGetResult.Update;
-        //    }
-        //    entity = data.GetAll().FirstOrDefault(cached => whereFunc(cached));
-        //    return CacheGetResult.Found;
-        //}
-
-        //public CacheGetResult GetFirst(RelationInfo relations, out T entity)
-        //{
-        //    var data = CacheStorage.GetCacheData(relations);
-        //    if (!data.Empty && !data.FullCollection)
-        //    {
-        //        entity = default(T);
-        //        return CacheGetResult.NotFound;
-        //    }
-        //    var first = data.GetAll().FirstOrDefault();
-        //    if (first?.NeedUpdate ?? true)
-        //    {
-        //        entity = default(T);
-        //        return CacheGetResult.Update;
-        //    }
-        //    entity = first;
-        //    return CacheGetResult.Found;
-        //}
-
         public IEnumerable<CacheResult<T>> TryRemoveWithResult(T entity)
         {
             var pk = CacheStorage.GetPrimaryKeyValue(entity);
@@ -212,31 +178,46 @@ namespace VitalChoice.Caching.Services.Cache
         public void Update(IEnumerable<T> entities, RelationInfo relationInfo)
         {
             var data = CacheStorage.GetCacheData(relationInfo);
-            data.Update(entities, relationInfo);
+            data.Update(entities);
         }
 
         public void Update(T entity, RelationInfo relationInfo)
         {
+            if (entity == null)
+                return;
+
             var data = CacheStorage.GetCacheData(relationInfo);
-            data.Update(entity, relationInfo);
+            data.Update(entity);
+        }
+
+        public void Update(T entity)
+        {
+            if (entity == null)
+                return;
+
+            var datas = CacheStorage.AllCacheDatas;
+            foreach (var data in datas)
+            {
+                data.Update(entity, true);
+            }
         }
 
         public CachedEntity<T> Update(RelationInfo relations, T entity)
         {
             var data = CacheStorage.GetCacheData(relations);
-            return data.Update(entity, relations);
+            return data.Update(entity);
         }
 
         public IEnumerable<CachedEntity<T>> Update(RelationInfo relations, IEnumerable<T> entities)
         {
             var data = CacheStorage.GetCacheData(relations);
-            return entities.Select(entity => data.Update(entity, relations));
+            return entities.Select(entity => data.Update(entity));
         }
 
         public void UpdateAll(IEnumerable<T> entities, RelationInfo relationInfo)
         {
             var data = CacheStorage.GetCacheData(relationInfo);
-            data.UpdateAll(entities, relationInfo);
+            data.UpdateAll(entities);
         }
 
         public void MarkForUpdate(T entity)
@@ -280,6 +261,23 @@ namespace VitalChoice.Caching.Services.Cache
             Update((T) entity, relationInfo);
         }
 
+        public void Update(object entity)
+        {
+            Update((T) entity);
+        }
+
+        public void SetNull(IEnumerable<EntityKey> keys, RelationInfo relationInfo)
+        {
+            var data = CacheStorage.GetCacheData(relationInfo);
+            data.SetNull(keys);
+        }
+
+        public void SetNull(EntityKey key, RelationInfo relationInfo)
+        {
+            var data = CacheStorage.GetCacheData(relationInfo);
+            data.SetNull(key);
+        }
+
         public void UpdateAll(IEnumerable<object> entities, RelationInfo relationInfo)
         {
             UpdateAll(entities.Cast<T>(), relationInfo);
@@ -308,6 +306,21 @@ namespace VitalChoice.Caching.Services.Cache
         public bool GetIsCacheFullCollection(RelationInfo relationInfo)
         {
             return CacheStorage.GetIsCacheFullCollection(relationInfo);
+        }
+
+        public EntityKey GetPrimaryKeyValue(T entity)
+        {
+            return CacheStorage.GetPrimaryKeyValue(entity);
+        }
+
+        public EntityIndex GetIndexValue(T entity)
+        {
+            return CacheStorage.GetIndexValue(entity);
+        }
+
+        public EntityIndex GetConditionalIndexValue(T entity, EntityConditionalIndexInfo conditionalInfo)
+        {
+            return CacheStorage.GetConditionalIndexValue(entity, conditionalInfo);
         }
     }
 }

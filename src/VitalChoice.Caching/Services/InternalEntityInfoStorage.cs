@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -17,11 +18,7 @@ namespace VitalChoice.Caching.Services
     {
         public InternalEntityInfoStorage(DbContext context)
         {
-            if (ContextModelCaches.TryGetValue(context.GetType(), out _entityInfos))
-                return;
-
-            _entityInfos = Initialize(context.Model);
-            ContextModelCaches.Add(context.GetType(), _entityInfos);
+            _entityInfos = ContextModelCaches.GetOrAdd(context.GetType(), key => Initialize(context.Model));
         }
 
         private static Dictionary<Type, EntityInfo> Initialize(IModel dataModel)
@@ -74,7 +71,7 @@ namespace VitalChoice.Caching.Services
             return entityInfos;
         }
 
-        private static readonly Dictionary<Type, Dictionary<Type, EntityInfo>> ContextModelCaches = new Dictionary<Type, Dictionary<Type, EntityInfo>>();
+        private static readonly ConcurrentDictionary<Type, Dictionary<Type, EntityInfo>> ContextModelCaches = new ConcurrentDictionary<Type, Dictionary<Type, EntityInfo>>();
 
         private readonly Dictionary<Type, EntityInfo> _entityInfos;
 

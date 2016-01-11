@@ -10,7 +10,7 @@ using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Caching.Services.Cache
 {
-    public sealed class CacheStorage<T>
+    public sealed class CacheStorage<T> : ICacheKeysStorage<T>
     {
         private readonly IInternalEntityCacheFactory _cacheFactory;
         private readonly ITypeConverter _typeConverter;
@@ -35,7 +35,7 @@ namespace VitalChoice.Caching.Services.Cache
         public ICacheData<T> GetCacheData(RelationInfo relationInfo)
         {
             return _cacheData.GetOrAdd(relationInfo,
-                r => new CacheData<T>(_cacheFactory, _typeConverter, this, _conditionalIndexes));
+                r => new CacheData<T>(_cacheFactory, _typeConverter, this, _conditionalIndexes, relationInfo));
         }
 
         public ICollection<CacheData<T>> AllCacheDatas => _cacheData.Values;

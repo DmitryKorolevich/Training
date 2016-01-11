@@ -11,7 +11,7 @@ namespace VitalChoice.Caching.Expressions
             Expression = expression;
             Compiled = expression?.Compile();
         }
-        public Expression<Func<T, bool>> Expression { get; }
+        public Expression<Func<T, bool>> Expression { get; set; }
         public Func<T, bool> Compiled { get; }
         public Condition Condition { get; set; }
     }

@@ -37,7 +37,10 @@ namespace VitalChoice.Caching.Expressions.Visitors
             var currentRight = _conditions.Count > count
                 ? _conditions.Pop()
                 : new Condition(node.Right.NodeType, node.Right);
-
+            while (!(_conditions.Peek() is BinaryCondition))
+            {
+                _conditions.Pop();
+            }
             var topCondition = (BinaryCondition) _conditions.Peek();
             topCondition.Left = currentLeft;
             topCondition.Right = currentRight;

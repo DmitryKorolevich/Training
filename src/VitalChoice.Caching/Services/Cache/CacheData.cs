@@ -17,21 +17,26 @@ namespace VitalChoice.Caching.Services.Cache
         private readonly IInternalEntityCacheFactory _cacheFactory;
         private readonly ITypeConverter _typeConverter;
         private readonly CacheStorage<T> _cacheStorage;
+        private readonly RelationInfo _relationInfo;
 
         private readonly object _lockObj = new object();
 
         private readonly ConcurrentDictionary<EntityKey, CachedEntity<T>> _entityDictionary =
             new ConcurrentDictionary<EntityKey, CachedEntity<T>>();
 
-        private readonly ConcurrentDictionary<EntityIndex, CachedEntity<T>> _indexedDictionary = new ConcurrentDictionary<EntityIndex, CachedEntity<T>>();
+        private readonly ConcurrentDictionary<EntityIndex, CachedEntity<T>> _indexedDictionary =
+            new ConcurrentDictionary<EntityIndex, CachedEntity<T>>();
 
-        private readonly Dictionary<EntityConditionalIndexInfo, ConcurrentDictionary<EntityIndex, CachedEntity<T>>> _conditionalIndexedDictionary;
+        private readonly Dictionary<EntityConditionalIndexInfo, ConcurrentDictionary<EntityIndex, CachedEntity<T>>>
+            _conditionalIndexedDictionary;
 
-        public CacheData(IInternalEntityCacheFactory cacheFactory, ITypeConverter typeConverter, CacheStorage<T> cacheStorage, ICollection<EntityConditionalIndexInfo> conditionalIndexes)
+        public CacheData(IInternalEntityCacheFactory cacheFactory, ITypeConverter typeConverter, CacheStorage<T> cacheStorage,
+            ICollection<EntityConditionalIndexInfo> conditionalIndexes, RelationInfo relationInfo)
         {
             _cacheFactory = cacheFactory;
             _typeConverter = typeConverter;
             _cacheStorage = cacheStorage;
+            _relationInfo = relationInfo;
             _conditionalIndexedDictionary = new Dictionary<EntityConditionalIndexInfo, ConcurrentDictionary<EntityIndex, CachedEntity<T>>>();
             foreach (var conditionalIndex in conditionalIndexes)
             {
@@ -103,8 +108,10 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        public CachedEntity<T> Update(T entity, RelationInfo relations)
+        public CachedEntity<T> Update(T entity, bool ignoreState = false)
         {
+            if (entity == null)
+                return null;
             lock (_lockObj)
             {
                 var pk = _cacheStorage.GetPrimaryKeyValue(entity);
@@ -113,22 +120,22 @@ namespace VitalChoice.Caching.Services.Cache
                     _conditionalIndexedDictionary.Keys.Where(c => c.CheckCondition(entity))
                         .ToDictionary(c => c, c => _cacheStorage.GetConditionalIndexValue(entity, c));
                 var result = _entityDictionary.AddOrUpdate(pk,
-                    key => new CachedEntity<T>(entity, GetRelations(entity, relations.Relations), conditional, indexValue),
-                    (key, _) => UpdateExist(_, entity, relations.Relations, indexValue, conditional));
-                
+                    key => new CachedEntity<T>(entity, GetRelations(entity, _relationInfo.Relations), conditional, indexValue),
+                    (key, _) => UpdateExist(_, entity, _relationInfo.Relations, indexValue, conditional, ignoreState));
+
                 return result;
             }
         }
 
-        public void Update(IEnumerable<T> entities, RelationInfo relations)
+        public void Update(IEnumerable<T> entities)
         {
             foreach (var entity in entities)
             {
-                Update(entity, relations);
+                Update(entity);
             }
         }
 
-        public void UpdateAll(IEnumerable<T> entities, RelationInfo relations)
+        public void UpdateAll(IEnumerable<T> entities)
         {
             lock (_lockObj)
             {
@@ -141,7 +148,27 @@ namespace VitalChoice.Caching.Services.Cache
                 }
                 FullCollection = true;
             }
-            Update(entities, relations);
+            Update(entities);
+        }
+
+        public void SetNull(EntityKey pk)
+        {
+            if (pk == null)
+                return;
+            lock (_lockObj)
+            {
+                _entityDictionary.AddOrUpdate(pk,
+                    key => new CachedEntity<T>(default(T), null, null),
+                    (key, _) => UpdateExist(_, default(T), _relationInfo.Relations, null, null));
+            }
+        }
+
+        public void SetNull(IEnumerable<EntityKey> keys)
+        {
+            foreach (var key in keys)
+            {
+                SetNull(key);
+            }
         }
 
         public bool FullCollection { get; private set; }
@@ -169,7 +196,7 @@ namespace VitalChoice.Caching.Services.Cache
                     continue;
 
                 var objType = obj.GetType();
-                var elementType = objType.TryGetElementType(typeof(ICollection<>));
+                var elementType = objType.TryGetElementType(typeof (ICollection<>));
                 if (elementType != null)
                 {
                     // ReSharper disable once PossibleNullReferenceException
@@ -201,18 +228,14 @@ namespace VitalChoice.Caching.Services.Cache
                     continue;
 
                 var objType = obj.GetType();
-                var elementType = objType.TryGetElementType(typeof(ICollection<>));
+                var elementType = objType.TryGetElementType(typeof (ICollection<>));
                 if (elementType != null)
                 {
                     var cache = _cacheFactory.GetCache(elementType);
 
                     // ReSharper disable once AssignNullToNotNullAttribute
                     var cachedItems = cache.Update(relation, (obj as IEnumerable).Cast<object>());
-                    result.AddRange(
-                        cachedItems.Select(
-                            cached =>
-                                new RelationInstance(cache.Update(relation, cached.EntityUntyped),
-                                    cached.EntityUntyped.GetType(), relation, cache)));
+                    result.Add(new RelationInstance(cachedItems.ToArray(), elementType, relation, cache));
                 }
                 else
                 {
@@ -225,11 +248,11 @@ namespace VitalChoice.Caching.Services.Cache
         }
 
         private CachedEntity<T> UpdateExist(CachedEntity<T> exist, T newEntity, IEnumerable<RelationInfo> newRelations,
-            EntityIndex indexValue, Dictionary<EntityConditionalIndexInfo, EntityIndex> conditional)
+            EntityIndex indexValue, Dictionary<EntityConditionalIndexInfo, EntityIndex> conditional, bool ignoreState = false)
         {
             lock (exist)
             {
-                if (exist.NeedUpdate)
+                if (exist.NeedUpdate || ignoreState)
                 {
                     if (exist.UniqueIndex != null && indexValue != exist.UniqueIndex)
                     {
@@ -238,22 +261,41 @@ namespace VitalChoice.Caching.Services.Cache
                     }
                     if (indexValue != null)
                         _indexedDictionary.AddOrUpdate(indexValue, exist, (index, _) => exist);
-
-                    foreach (var conditionalIndex in conditional)
+                    IEnumerable<EntityConditionalIndexInfo> removeList;
+                    if (conditional == null)
                     {
-                        _conditionalIndexedDictionary[conditionalIndex.Key].AddOrUpdate(conditionalIndex.Value, exist, (index, _) => exist);
+                        removeList = _conditionalIndexedDictionary.Keys.ToArray();
                     }
-                    var removeList = _conditionalIndexedDictionary.Keys.Where(key => !conditional.ContainsKey(key)).ToArray();
+                    else
+                    {
+                        foreach (var conditionalIndex in conditional)
+                        {
+                            _conditionalIndexedDictionary[conditionalIndex.Key].AddOrUpdate(conditionalIndex.Value, exist,
+                                (index, _) => exist);
+                        }
+                        removeList = _conditionalIndexedDictionary.Keys.Where(key => !conditional.ContainsKey(key)).ToArray();
+                    }
                     foreach (var indexInfo in removeList)
                     {
                         CachedEntity<T> temp;
-                        _conditionalIndexedDictionary[indexInfo].TryRemove(_cacheStorage.GetConditionalIndexValue(exist, indexInfo), out temp);
+                        _conditionalIndexedDictionary[indexInfo].TryRemove(_cacheStorage.GetConditionalIndexValue(exist, indexInfo),
+                            out temp);
                     }
                     exist.UniqueIndex = indexValue;
                     exist.ConditionalIndexes = conditional;
                     exist.NeedUpdate = false;
-                    _typeConverter.CopyInto(exist.ValueInternal, newEntity, typeof (T));
-                    UpdateRelations(exist, newEntity, newRelations);
+                    if (exist.EntityUntyped != (object) newEntity)
+                    {
+                        if (newEntity != null)
+                        {
+                            _typeConverter.CopyInto(exist.Entity, newEntity, typeof (T));
+                            UpdateRelations(exist, newEntity, newRelations);
+                        }
+                        else
+                        {
+                            exist.Entity = default(T);
+                        }
+                    }
                 }
             }
             return exist;

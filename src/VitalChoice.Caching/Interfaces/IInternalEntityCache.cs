@@ -13,6 +13,9 @@ namespace VitalChoice.Caching.Interfaces
         IEnumerable<CachedEntity> Update(RelationInfo relations, IEnumerable<object> entity);
         void Update(IEnumerable<object> entities, RelationInfo relationInfo);
         void Update(object entity, RelationInfo relationInfo);
+        void Update(object entity);
+        void SetNull(IEnumerable<EntityKey> keys, RelationInfo relationInfo);
+        void SetNull(EntityKey key, RelationInfo relationInfo);
         void UpdateAll(IEnumerable<object> entities, RelationInfo relationInfo);
         void MarkForUpdate(object entity);
         void MarkForUpdate(IEnumerable<object> entities);
@@ -21,7 +24,7 @@ namespace VitalChoice.Caching.Interfaces
         bool GetIsCacheFullCollection(RelationInfo relationInfo);
     }
 
-    public interface IInternalEntityCache<T> : IInternalEntityCache
+    public interface IInternalEntityCache<T> : IInternalEntityCache, ICacheKeysStorage<T>
     {
         CacheResult<T> TryGetEntity(EntityKey key, RelationInfo relations);
 
@@ -43,6 +46,7 @@ namespace VitalChoice.Caching.Interfaces
         IEnumerable<CacheResult<T>> TryRemoveWithResult(T entity);
         void Update(IEnumerable<T> entities, RelationInfo relationInfo);
         void Update(T entity, RelationInfo relationInfo);
+        void Update(T entity);
         CachedEntity<T> Update(RelationInfo relations, T entity);
         IEnumerable<CachedEntity<T>> Update(RelationInfo relations, IEnumerable<T> entities);
         void UpdateAll(IEnumerable<T> entities, RelationInfo relationInfo);

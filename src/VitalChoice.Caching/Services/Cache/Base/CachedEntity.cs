@@ -8,7 +8,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
     public abstract class CachedEntity
     {
         protected DateTime LastAccess = DateTime.Now;
-        private readonly object _valueInternal;
+        protected object ValueInternal;
         private volatile bool _needUpdate;
 
         protected CachedEntity(object valueInternal, ICollection<RelationInstance> relations,
@@ -17,14 +17,14 @@ namespace VitalChoice.Caching.Services.Cache.Base
             Relations = relations;
             ConditionalIndexes = conditionalIndexes;
             UniqueIndex = uniqueIndex;
-            _valueInternal = valueInternal;
+            ValueInternal = valueInternal;
         }
 
         public DateTime LastAccessTime => LastAccess;
 
         public bool NeedUpdate
         {
-            get { return _needUpdate || Relations.Any(r => r.RelatedObject.NeedUpdate); }
+            get { return _needUpdate || Relations.Any(r => r.RelatedObject?.NeedUpdate ?? r.RelatedList?.Any(e => e.NeedUpdate) ?? false); }
             set { _needUpdate = value; }
         }
 
@@ -35,7 +35,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
                 lock (this)
                 {
                     LastAccess = DateTime.Now;
-                    return _valueInternal;
+                    return ValueInternal;
                 }
             }
         }
@@ -47,14 +47,11 @@ namespace VitalChoice.Caching.Services.Cache.Base
 
     public class CachedEntity<T> : CachedEntity
     {
-        internal readonly T ValueInternal;
-
         public CachedEntity(T valueInternal, ICollection<RelationInstance> relations,
             ICollection<KeyValuePair<EntityConditionalIndexInfo, EntityIndex>> conditionalIndexes, EntityIndex uniqueIndex = null)
             : base(valueInternal, relations, conditionalIndexes, uniqueIndex)
         {
             Relations = relations;
-            ValueInternal = valueInternal;
         }
 
         public T Entity
@@ -64,7 +61,15 @@ namespace VitalChoice.Caching.Services.Cache.Base
                 lock (this)
                 {
                     LastAccess = DateTime.Now;
-                    return ValueInternal;
+                    return (T) ValueInternal;
+                }
+            }
+            set
+            {
+                lock (this)
+                {
+                    LastAccess = DateTime.Now;
+                    ValueInternal = value;
                 }
             }
         }

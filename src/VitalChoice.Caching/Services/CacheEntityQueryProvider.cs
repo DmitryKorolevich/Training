@@ -139,8 +139,8 @@ namespace VitalChoice.Caching.Services
                 IInternalEntityCacheFactory cacheFactory, ITypeConverter typeConverter,
                 IModelConverterService modelConverterService)
             {
-                _cache = new EntityCache<T>(cacheFactory,
-                    new DirectMapper<T>(typeConverter, modelConverterService));
+                _cache = new EntityCache<T>(cacheFactory/*,
+                    new DirectMapper<T>(typeConverter, modelConverterService)*/);
                 _context = context;
                 var queryCache = queryCacheFactory.GetQueryCache<T>();
                 _queryData = queryCache.GerOrAdd(expression);

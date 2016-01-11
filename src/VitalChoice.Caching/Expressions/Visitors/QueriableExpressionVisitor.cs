@@ -21,12 +21,22 @@ namespace VitalChoice.Caching.Expressions.Visitors
                 lambdaVisitor.Visit(node.Body);
 
                 if (WhereExpression != null)
-                    throw new InvalidOperationException("Where clause used twice, need investigation");
-
-                WhereExpression = new WhereExpression<T>((Expression<Func<T, bool>>)(object)node)
                 {
-                    Condition = lambdaVisitor.Condition
-                };
+                    WhereExpression.Expression = Expression.Lambda<Func<T, bool>>(Expression.AndAlso(Expression.Invoke(WhereExpression.Expression, WhereExpression.Expression.Parameters), Expression.Invoke(node, node.Parameters)),
+                        WhereExpression.Expression.Parameters);
+                    WhereExpression.Condition = new BinaryCondition(ExpressionType.AndAlso, WhereExpression.Expression)
+                    {
+                        Left = WhereExpression.Condition,
+                        Right = lambdaVisitor.Condition
+                    };
+                }
+                else
+                {
+                    WhereExpression = new WhereExpression<T>((Expression<Func<T, bool>>) (object) node)
+                    {
+                        Condition = lambdaVisitor.Condition
+                    };
+                }
                 return node;
             }
             return base.VisitLambda(node);

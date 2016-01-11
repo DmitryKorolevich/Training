@@ -12,6 +12,7 @@ namespace VitalChoice.Caching.Relational
 
         public readonly RelationInfo RelationInfo;
         public readonly CachedEntity RelatedObject;
+        public readonly ICollection<CachedEntity> RelatedList;
         public readonly Type RelationObjectType;
 
         public RelationInstance(CachedEntity cachedEntity, Type relationObjectType, RelationInfo relationInfo,
@@ -21,6 +22,17 @@ namespace VitalChoice.Caching.Relational
             CacheContainer = cacheContainer;
             RelatedObject = cachedEntity;
             RelationObjectType = relationObjectType;
+            RelatedList = null;
+        }
+
+        public RelationInstance(ICollection<CachedEntity> cachedList, Type relationObjectType, RelationInfo relationInfo,
+            IInternalEntityCache cacheContainer)
+        {
+            RelationInfo = relationInfo;
+            CacheContainer = cacheContainer;
+            RelatedObject = null;
+            RelationObjectType = relationObjectType;
+            RelatedList = cachedList;
         }
     }
 }

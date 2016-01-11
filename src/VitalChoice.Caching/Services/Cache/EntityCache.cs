@@ -17,11 +17,11 @@ namespace VitalChoice.Caching.Services.Cache
         where T : Entity, new()
     {
         private readonly IInternalEntityCache<T> _internalCache;
-        private readonly DirectMapper<T> _directMapper;
+        //private readonly DirectMapper<T> _directMapper;
 
-        public EntityCache(IInternalEntityCacheFactory cacheFactory, DirectMapper<T> directMapper)
+        public EntityCache(IInternalEntityCacheFactory cacheFactory/*, DirectMapper<T> directMapper*/)
         {
-            _directMapper = directMapper;
+            //_directMapper = directMapper;
             _internalCache = cacheFactory.GetCache<T>();
         }
 
@@ -115,6 +115,11 @@ namespace VitalChoice.Caching.Services.Cache
             if (!CanUpdate(queryData, out fullCollection))
                 return;
 
+            //if (queryData.Tracking)
+            //{
+            //    entities = entities.Select(e => _directMapper.Clone<Entity>(e));
+            //}
+
             if (fullCollection)
             {
                 _internalCache.UpdateAll(entities, queryData.RelationInfo);
@@ -137,13 +142,20 @@ namespace VitalChoice.Caching.Services.Cache
             if (!CanUpdate(queryData, out fullCollection))
                 return;
 
-            if (fullCollection)
+            if (entity == null)
             {
-                _internalCache.UpdateAll(Enumerable.Repeat(entity, 1), queryData.RelationInfo);
+                _internalCache.SetNull(queryData.PrimaryKeys(), queryData.RelationInfo);
             }
             else
             {
-                _internalCache.Update(entity, queryData.RelationInfo);
+                if (fullCollection)
+                {
+                    _internalCache.UpdateAll(Enumerable.Repeat(entity, 1), queryData.RelationInfo);
+                }
+                else
+                {
+                    _internalCache.Update(entity, queryData.RelationInfo);
+                }
             }
         }
 
@@ -252,43 +264,25 @@ namespace VitalChoice.Caching.Services.Cache
             return ConvertResult(results, queryData, out entities);
         }
 
-        private void Attach<T1>(T1 entity, RelationInfo relations, DbContext dbContext,
-            HashSet<RelationInfo> processedRelations = null)
-            where T1 : class
-        {
-            if (entity == null)
-                return;
-            if (processedRelations == null)
-                processedRelations = new HashSet<RelationInfo>();
-            else if (processedRelations.Contains(relations))
-                return;
-            processedRelations.Add(relations);
-            if (entity.GetType().TryGetElementType(typeof (ICollection<>)) != null)
-            {
-                foreach (var item in (IEnumerable) entity)
-                {
-                    var entry = dbContext.Entry(item);
-                    if (entry.State == EntityState.Detached)
-                        dbContext.Attach(item);
-                    foreach (var relation in relations.Relations)
-                    {
-                        var entityObject = relation.GetRelatedObject(item);
-                        Attach(entityObject, relation, dbContext, processedRelations);
-                    }
-                }
-            }
-            else
-            {
-                var entry = dbContext.Entry(entity);
-                if (entry.State == EntityState.Detached)
-                    dbContext.Attach(entity);
-                foreach (var relation in relations.Relations)
-                {
-                    var entityObject = relation.GetRelatedObject(entity);
-                    Attach(entityObject, relation, dbContext, processedRelations);
-                }
-            }
-        }
+        //private void Attach(T entity, DbContext dbContext)
+        //{
+        //    if (entity == null)
+        //        return;
+        //    //if (processedRelations == null)
+        //    //    processedRelations = new HashSet<RelationInfo>();
+        //    //else if (processedRelations.Contains(relations))
+        //    //    return;
+        //    //processedRelations.Add(relations);
+        //    var entry = dbContext.Entry(entity);
+        //    if (entry.State == EntityState.Detached)
+        //        dbContext.Attach(entity);
+        //    //foreach (var relation in relations.Relations)
+        //    //{
+        //    //    var entityObject = relation.GetRelatedObject(entity);
+        //    //    Attach(entityObject, relation, dbContext, processedRelations);
+        //    //}
+
+        //}
 
         private static IEnumerable<T> Order(IEnumerable<T> entities, QueryCacheData<T> queryData)
         {
@@ -302,14 +296,15 @@ namespace VitalChoice.Caching.Services.Cache
         private CacheGetResult ConvertAttachResult(IEnumerable<CacheResult<T>> results, DbContext dbContext, QueryCacheData<T> queryData, out T entity)
         {
             var compiled = queryData.WhereExpression?.Compiled;
-            CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled);
+            CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled, true, dbContext, _internalCache);
             var orderedList = Order(cacheIterator, queryData);
-            entity = orderedList.Select(result => _directMapper.Clone<Entity>(result)).FirstOrDefault();
+            //entity = orderedList.Select(result => _directMapper.Clone<Entity>(result)).FirstOrDefault();
+            entity = orderedList.FirstOrDefault();
             if (cacheIterator.AggregatedResult != CacheGetResult.Found)
             {
                 return cacheIterator.AggregatedResult;
             }
-            Attach(entity, queryData.RelationInfo, dbContext);
+            //Attach(entity, dbContext);
             return cacheIterator.Found ? CacheGetResult.Found : CacheGetResult.Update;
         }
 
@@ -329,17 +324,18 @@ namespace VitalChoice.Caching.Services.Cache
         private CacheGetResult ConvertAttachResult(IEnumerable<CacheResult<T>> results, DbContext dbContext, QueryCacheData<T> queryData, out List<T> entities)
         {
             var compiled = queryData.WhereExpression?.Compiled;
-            CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled);
+            CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled, true, dbContext, _internalCache);
             var orderedList = Order(cacheIterator, queryData);
-            entities = orderedList.Select(result => _directMapper.Clone<Entity>(result)).ToList();
+            //entities = orderedList.Select(result => _directMapper.Clone<Entity>(result)).ToList();
+            entities = orderedList.ToList();
             if (cacheIterator.AggregatedResult != CacheGetResult.Found)
             {
                 return cacheIterator.AggregatedResult;
             }
-            foreach (var entity in entities)
-            {
-                Attach(entity, queryData.RelationInfo, dbContext);
-            }
+            //foreach (var entity in entities)
+            //{
+            //    Attach(entity, dbContext);
+            //}
             return cacheIterator.Found ? CacheGetResult.Found : CacheGetResult.Update;
         }
 
