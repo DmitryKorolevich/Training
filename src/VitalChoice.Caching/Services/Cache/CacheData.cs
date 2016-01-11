@@ -120,7 +120,7 @@ namespace VitalChoice.Caching.Services.Cache
                     _conditionalIndexedDictionary.Keys.Where(c => c.CheckCondition(entity))
                         .ToDictionary(c => c, c => _cacheStorage.GetConditionalIndexValue(entity, c));
                 var result = _entityDictionary.AddOrUpdate(pk,
-                    key => new CachedEntity<T>(entity, GetRelations(entity, _relationInfo.Relations), conditional, indexValue),
+                    key => new CachedEntity<T>(entity, GetRelations(entity, _relationInfo.Relations), conditional, this, indexValue),
                     (key, _) => UpdateExist(_, entity, _relationInfo.Relations, indexValue, conditional, ignoreState));
 
                 return result;
@@ -158,7 +158,7 @@ namespace VitalChoice.Caching.Services.Cache
             lock (_lockObj)
             {
                 _entityDictionary.AddOrUpdate(pk,
-                    key => new CachedEntity<T>(default(T), null, null),
+                    key => new CachedEntity<T>(default(T), null, null, this),
                     (key, _) => UpdateExist(_, default(T), _relationInfo.Relations, null, null));
             }
         }
@@ -172,6 +172,7 @@ namespace VitalChoice.Caching.Services.Cache
         }
 
         public bool FullCollection { get; private set; }
+        public bool NeedUpdate { get; set; }
         public bool Empty => _entityDictionary.IsEmpty;
 
         #region Helper Methods

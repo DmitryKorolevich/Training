@@ -22,6 +22,7 @@ namespace VitalChoice.Caching.Interfaces
         void SetNull(EntityKey key);
         void SetNull(IEnumerable<EntityKey> keys);
         bool FullCollection { get; }
+        bool NeedUpdate { get; set; }
         bool Empty { get; }
     }
 }

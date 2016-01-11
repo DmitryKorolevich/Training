@@ -230,6 +230,10 @@ namespace VitalChoice.Caching.Services.Cache
                 {
                     cached.NeedUpdate = true;
                 }
+                else if (data.FullCollection)
+                {
+                    data.NeedUpdate = true;
+                }
             }
         }
 

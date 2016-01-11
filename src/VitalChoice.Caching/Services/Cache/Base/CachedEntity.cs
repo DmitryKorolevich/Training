@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 
 namespace VitalChoice.Caching.Services.Cache.Base
@@ -22,11 +23,13 @@ namespace VitalChoice.Caching.Services.Cache.Base
 
         public DateTime LastAccessTime => LastAccess;
 
-        public bool NeedUpdate
+        protected bool NeedUpdateRelations
         {
             get { return _needUpdate || Relations.Any(r => r.RelatedObject?.NeedUpdate ?? r.RelatedList?.Any(e => e.NeedUpdate) ?? false); }
             set { _needUpdate = value; }
         }
+
+        public abstract bool NeedUpdate { get; set; }
 
         public object EntityUntyped
         {
@@ -47,10 +50,13 @@ namespace VitalChoice.Caching.Services.Cache.Base
 
     public class CachedEntity<T> : CachedEntity
     {
+        private readonly ICacheData<T> _cacheData;
+
         public CachedEntity(T valueInternal, ICollection<RelationInstance> relations,
-            ICollection<KeyValuePair<EntityConditionalIndexInfo, EntityIndex>> conditionalIndexes, EntityIndex uniqueIndex = null)
+            ICollection<KeyValuePair<EntityConditionalIndexInfo, EntityIndex>> conditionalIndexes, ICacheData<T> cacheData, EntityIndex uniqueIndex = null)
             : base(valueInternal, relations, conditionalIndexes, uniqueIndex)
         {
+            _cacheData = cacheData;
             Relations = relations;
         }
 
@@ -72,6 +78,12 @@ namespace VitalChoice.Caching.Services.Cache.Base
                     ValueInternal = value;
                 }
             }
+        }
+
+        public override bool NeedUpdate
+        {
+            get { return _cacheData.FullCollection && _cacheData.NeedUpdate || NeedUpdateRelations; }
+            set { NeedUpdateRelations = value; }
         }
 
         public static implicit operator T(CachedEntity<T> cached)
