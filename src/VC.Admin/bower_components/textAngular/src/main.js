@@ -2,65 +2,6 @@
 var dropFired = false;
 var textAngular = angular.module("textAngular", ['ngSanitize', 'textAngularSetup', 'textAngular.factories', 'textAngular.DOM', 'textAngular.validators', 'textAngular.taBind']); //This makes ngSanitize required
 
-// setup the global contstant functions for setting up the toolbar
-
-// all tool definitions
-var taTools = {};
-/*
-	A tool definition is an object with the following key/value parameters:
-		action: [function(deferred, restoreSelection)]
-				a function that is executed on clicking on the button - this will allways be executed using ng-click and will
-				overwrite any ng-click value in the display attribute.
-				The function is passed a deferred object ($q.defer()), if this is wanted to be used `return false;` from the action and
-				manually call `deferred.resolve();` elsewhere to notify the editor that the action has finished.
-				restoreSelection is only defined if the rangy library is included and it can be called as `restoreSelection()` to restore the users
-				selection in the WYSIWYG editor.
-		display: [string]?
-				Optional, an HTML element to be displayed as the button. The `scope` of the button is the tool definition object with some additional functions
-				If set this will cause buttontext and iconclass to be ignored
-		class: [string]?
-				Optional, if set will override the taOptions.classes.toolbarButton class.
-		buttontext: [string]?
-				if this is defined it will replace the contents of the element contained in the `display` element
-		iconclass: [string]?
-				if this is defined an icon (<i>) will be appended to the `display` element with this string as it's class
-		tooltiptext: [string]?
-				Optional, a plain text description of the action, used for the title attribute of the action button in the toolbar by default.
-		activestate: [function(commonElement)]?
-				this function is called on every caret movement, if it returns true then the class taOptions.classes.toolbarButtonActive
-				will be applied to the `display` element, else the class will be removed
-		disabled: [function()]?
-				if this function returns true then the tool will have the class taOptions.classes.disabled applied to it, else it will be removed
-	Other functions available on the scope are:
-		name: [string]
-				the name of the tool, this is the first parameter passed into taRegisterTool
-		isDisabled: [function()]
-				returns true if the tool is disabled, false if it isn't
-		displayActiveToolClass: [function(boolean)]
-				returns true if the tool is 'active' in the currently focussed toolbar
-		onElementSelect: [Object]
-				This object contains the following key/value pairs and is used to trigger the ta-element-select event
-				element: [String]
-					an element name, will only trigger the onElementSelect action if the tagName of the element matches this string
-				filter: [function(element)]?
-					an optional filter that returns a boolean, if true it will trigger the onElementSelect.
-				action: [function(event, element, editorScope)]
-					the action that should be executed if the onElementSelect function runs
-*/
-// name and toolDefinition to add into the tools available to be added on the toolbar
-function registerTextAngularTool(name, toolDefinition){
-	if(!name || name === '' || taTools.hasOwnProperty(name)) throw('textAngular Error: A unique name is required for a Tool Definition');
-	if(
-		(toolDefinition.display && (toolDefinition.display === '' || !validElementString(toolDefinition.display))) ||
-		(!toolDefinition.display && !toolDefinition.buttontext && !toolDefinition.iconclass)
-	)
-		throw('textAngular Error: Tool Definition for "' + name + '" does not have a valid display/iconclass/buttontext value');
-	taTools[name] = toolDefinition;
-}
-
-textAngular.constant('taRegisterTool', registerTextAngularTool);
-textAngular.value('taTools', taTools);
-
 textAngular.config([function(){
 	// clear taTools variable. Just catches testing and any other time that this config may run multiple times...
 	angular.forEach(taTools, function(value, key){ delete taTools[key];	});
@@ -69,12 +10,26 @@ textAngular.config([function(){
 textAngular.run([function(){
 	/* istanbul ignore next: not sure how to test this */
 	// Require Rangy and rangy savedSelection module.
-	if(!window.rangy){
-		throw("rangy-core.js and rangy-selectionsaverestore.js are required for textAngular to work correctly, rangy-core is not yet loaded.");
-	}else{
-		window.rangy.init();
-		if(!window.rangy.saveSelection){
-			throw("rangy-selectionsaverestore.js is required for textAngular to work correctly.");
+	if (typeof define === 'function' && define.amd) {
+		// AMD. Register as an anonymous module.
+		define(function(require) {
+			window.rangy = require('rangy');
+			window.rangy.saveSelection = require('rangy/lib/rangy-selectionsaverestore');
+		});
+	} else if (typeof require ==='function' && typeof module !== 'undefined' && typeof exports === 'object') {
+		// Node/CommonJS style
+		window.rangy = require('rangy');
+		window.rangy.saveSelection = require('rangy/lib/rangy-selectionsaverestore');
+	} else {
+		// Ensure that rangy and rangy.saveSelection exists on the window (global scope).
+		// TODO: Refactor so that the global scope is no longer used.
+		if(!window.rangy){
+			throw("rangy-core.js and rangy-selectionsaverestore.js are required for textAngular to work correctly, rangy-core is not yet loaded.");
+		}else{
+			window.rangy.init();
+			if(!window.rangy.saveSelection){
+				throw("rangy-selectionsaverestore.js is required for textAngular to work correctly.");
+			}
 		}
 	}
 }]);
@@ -88,13 +43,14 @@ textAngular.directive("textAngular", [
 			require: '?ngModel',
 			scope: {},
 			restrict: "EA",
+			priority: 2, // So we override validators correctly
 			link: function(scope, element, attrs, ngModel){
 				// all these vars should not be accessable outside this directive
 				var _keydown, _keyup, _keypress, _mouseup, _focusin, _focusout,
 					_originalContents, _toolbars,
 					_serial = (attrs.serial) ? attrs.serial : Math.floor(Math.random() * 10000000000000000),
 					_taExecCommand, _resizeMouseDown, _updateSelectedStylesTimeout;
-				
+
 				scope._name = (attrs.name) ? attrs.name : 'textAngularEditor' + _serial;
 
 				var oneEvent = function(_element, event, action){
@@ -118,7 +74,7 @@ textAngular.directive("textAngular", [
 							scope['$redoTaBindtaTextElement' + _serial]();
 						}else{
 							// catch errors like FF erroring when you try to force an undo with nothing done
-							_taExecCommand(command, false, opt);
+							_taExecCommand(command, false, opt, scope.defaultTagAttributes);
 							if(isSelectableElementTool){
 								// re-apply the selectable tool events
 								scope['reApplyOnSelectorHandlerstaTextElement' + _serial]();
@@ -134,6 +90,14 @@ textAngular.directive("textAngular", [
 				if(attrs.taFocussedClass)			scope.classes.focussed = attrs.taFocussedClass;
 				if(attrs.taTextEditorClass)			scope.classes.textEditor = attrs.taTextEditorClass;
 				if(attrs.taHtmlEditorClass)			scope.classes.htmlEditor = attrs.taHtmlEditorClass;
+				if(attrs.taDefaultTagAttributes){
+					try	{
+						//	TODO: This should use angular.merge to enhance functionality once angular 1.4 is required
+						angular.extend(scope.defaultTagAttributes, angular.fromJson(attrs.taDefaultTagAttributes));
+					} catch (error) {
+						$log.error(error);
+					}
+				}
 				// optional setup functions
 				if(attrs.taTextEditorSetup)			scope.setup.textEditorSetup = scope.$parent.$eval(attrs.taTextEditorSetup);
 				if(attrs.taHtmlEditorSetup)			scope.setup.htmlEditorSetup = scope.$parent.$eval(attrs.taHtmlEditorSetup);
@@ -205,13 +169,10 @@ textAngular.directive("textAngular", [
 					scope.displayElements.popoverArrow.css('margin-left', (Math.min(_targetLeft, (Math.max(0, _targetLeft - _maxLeft))) - 11) + 'px');
 				};
 				scope.hidePopover = function(){
-					/* istanbul ignore next: dosen't test with mocked animate */
-					var doneCb = function(){
-						scope.displayElements.popover.css('display', '');
-						scope.displayElements.popoverContainer.attr('style', '');
-						scope.displayElements.popoverContainer.attr('class', 'popover-content');
-					};
-					$q.when($animate.removeClass(scope.displayElements.popover, 'in', doneCb)).then(doneCb);
+					scope.displayElements.popover.css('display', '');
+					scope.displayElements.popoverContainer.attr('style', '');
+					scope.displayElements.popoverContainer.attr('class', 'popover-content');
+					scope.displayElements.popover.removeClass('in');
 				};
 
 				// setup the resize overlay
@@ -252,17 +213,27 @@ textAngular.directive("textAngular", [
 								x: Math.max(0, startPosition.width + (event.clientX - startPosition.x)),
 								y: Math.max(0, startPosition.height + (event.clientY - startPosition.y))
 							};
-							
-							if(event.shiftKey){
-								// keep ratio
+
+							// DEFAULT: the aspect ratio is not locked unless the Shift key is pressed.
+							//
+							// attribute: ta-resize-force-aspect-ratio -- locks resize into maintaing the aspect ratio
+							var bForceAspectRatio = (attrs.taResizeForceAspectRatio !== undefined);
+							// attribute: ta-resize-maintain-aspect-ratio=true causes the space ratio to remain locked
+							// unless the Shift key is pressed
+							var bFlipKeyBinding = attrs.taResizeMaintainAspectRatio;
+							var bKeepRatio =  bForceAspectRatio || (bFlipKeyBinding && !event.shiftKey);
+							if(bKeepRatio) {
 								var newRatio = pos.y / pos.x;
 								pos.x = ratio > newRatio ? pos.x : pos.y / ratio;
 								pos.y = ratio > newRatio ? pos.x * ratio : pos.y;
 							}
-							el = angular.element(_el);
-							el.attr('height', Math.max(0, pos.y));
-							el.attr('width', Math.max(0, pos.x));
-							
+							var el = angular.element(_el);
+							function roundedMaxVal(val) {
+								return Math.round(Math.max(0, val));
+							}
+							el.css('height', roundedMaxVal(pos.y) + 'px');
+							el.css('width', roundedMaxVal(pos.x) + 'px');
+
 							// reflow the popover tooltip
 							scope.reflowResizeOverlay(_el);
 						};
@@ -277,6 +248,7 @@ textAngular.directive("textAngular", [
 						event.preventDefault();
 					};
 
+					scope.displayElements.resize.anchors[3].off('mousedown');
 					scope.displayElements.resize.anchors[3].on('mousedown', _resizeMouseDown);
 
 					scope.reflowResizeOverlay(_el);
@@ -295,22 +267,24 @@ textAngular.directive("textAngular", [
 					'id': 'taHtmlElement' + _serial,
 					'ng-show': 'showHtml',
 					'ta-bind': 'ta-bind',
-					'ng-model': 'html'
+					'ng-model': 'html',
+					'ng-model-options': element.attr('ng-model-options')
 				});
 				scope.displayElements.text.attr({
 					'id': 'taTextElement' + _serial,
 					'contentEditable': 'true',
 					'ta-bind': 'ta-bind',
-					'ng-model': 'html'
+					'ng-model': 'html',
+					'ng-model-options': element.attr('ng-model-options')
 				});
 				scope.displayElements.scrollWindow.attr({'ng-hide': 'showHtml'});
 				if(attrs.taDefaultWrap) scope.displayElements.text.attr('ta-default-wrap', attrs.taDefaultWrap);
-				
+
 				if(attrs.taUnsafeSanitizer){
 					scope.displayElements.text.attr('ta-unsafe-sanitizer', attrs.taUnsafeSanitizer);
 					scope.displayElements.html.attr('ta-unsafe-sanitizer', attrs.taUnsafeSanitizer);
 				}
-				
+
 				// add the main elements to the origional element
 				scope.displayElements.scrollWindow.append(scope.displayElements.text);
 				element.append(scope.displayElements.scrollWindow);
@@ -343,14 +317,14 @@ textAngular.directive("textAngular", [
 						}
 					});
 				}
-				
+
 				if(attrs.taPaste){
 					scope._pasteHandler = function(_html){
 						return $parse(attrs.taPaste)(scope.$parent, {$html: _html});
 					};
 					scope.displayElements.text.attr('ta-paste', '_pasteHandler($html)');
 				}
-				
+
 				// compile the scope with the text and html elements only - if we do this with the main element it causes a compile loop
 				$compile(scope.displayElements.scrollWindow)(scope);
 				$compile(scope.displayElements.html)(scope);
@@ -376,7 +350,15 @@ textAngular.directive("textAngular", [
 				};
 				scope.endAction = function(){
 					scope._actionRunning = false;
-					if(_savedSelection) $window.rangy.removeMarkers(_savedSelection);
+					if(_savedSelection){
+						if(scope.showHtml){
+							scope.displayElements.html[0].focus();
+						}else{
+							scope.displayElements.text[0].focus();
+						}
+						// $window.rangy.restoreSelection(_savedSelection);
+						$window.rangy.removeMarkers(_savedSelection);
+					}
 					_savedSelection = false;
 					scope.updateSelectedStyles();
 					// only update if in text or WYSIWYG mode
@@ -410,11 +392,11 @@ textAngular.directive("textAngular", [
 				};
 				scope.displayElements.html.on('blur', _focusout);
 				scope.displayElements.text.on('blur', _focusout);
-				
+
 				scope.displayElements.text.on('paste', function(event){
 					element.triggerHandler('paste', event);
 				});
-				
+
 				// Setup the default toolbar tools, this way allows the user to add new tools like plugins.
 				// This is on the editor for future proofing if we find a better way to do this.
 				scope.queryFormatBlockState = function(command){
@@ -467,19 +449,13 @@ textAngular.directive("textAngular", [
 						}
 						scope.displayElements.forminput.val(ngModel.$viewValue);
 						// if the editors aren't focused they need to be updated, otherwise they are doing the updating
-						/* istanbul ignore else: don't care */
-						if(!scope._elementSelectTriggered){
-							// catch model being null or undefined
-							scope.html = ngModel.$viewValue || '';
-						}
+						scope.html = ngModel.$viewValue || '';
 					};
 					// trigger the validation calls
-					var _validity = function(value){
-						if(attrs.required) ngModel.$setValidity('required', !(!value || value.trim() === ''));
-						return value;
+					if(element.attr('required')) ngModel.$validators.required = function(modelValue, viewValue) {
+						var value = modelValue || viewValue;
+						return !(!value || value.trim() === '');
 					};
-					ngModel.$parsers.push(_validity);
-					ngModel.$formatters.push(_validity);
 				}else{
 					// if no ngModel then update from the contents of the origional html.
 					scope.displayElements.forminput.val(_originalContents);
@@ -512,6 +488,7 @@ textAngular.directive("textAngular", [
 
 				scope.$on('$destroy', function(){
 					textAngularManager.unregisterEditor(scope._name);
+					angular.element(window).off('blur');
 				});
 
 				// catch element select event and pass to toolbar tools
@@ -690,8 +667,8 @@ textAngular.service('textAngularManager', ['taToolExecuteAction', 'taTools', 'ta
 					sendKeyCommand: function(event){
 						// we return true if we applied an action, false otherwise
 						var result = false;
-						if(event.ctrlKey || event.metaKey) angular.forEach(taTools, function(tool, name){
-							if(tool.commandKeyCode && tool.commandKeyCode === event.which){
+						if(event.ctrlKey || event.metaKey || event.specialKey) angular.forEach(taTools, function(tool, name){
+							if(tool.commandKeyCode && (tool.commandKeyCode === event.which || tool.commandKeyCode === event.specialKey)){
 								for(var _t = 0; _t < _toolbars.length; _t++){
 									if(_toolbars[_t].tools[name] !== undefined){
 										taToolExecuteAction.call(_toolbars[_t].tools[name], scope);
@@ -757,7 +734,7 @@ textAngular.service('textAngularManager', ['taToolExecuteAction', 'taTools', 'ta
 										break;
 									}
 								}
-								if(result) break; 
+								if(result) break;
 							}
 						}
 						return result;
@@ -881,6 +858,20 @@ textAngular.service('textAngularManager', ['taToolExecuteAction', 'taTools', 'ta
 				/* istanbul ignore else: phase catch */
 				if(!editors[name].scope.$$phase) editors[name].scope.$digest();
 			}else throw('textAngular Error: No Editor with name "' + name + '" exists');
+		},
+		// this is used by taBind to send a key command in response to a special key event
+		sendKeyCommand: function(scope, event){
+			angular.forEach(editors, function(_editor){
+				/* istanbul ignore else: if nothing to do, do nothing */
+				if (_editor.editorFunctions.sendKeyCommand(event)){
+					/* istanbul ignore else: don't run if already running */
+					if(!scope._bUpdateSelectedStyles){
+						scope.updateSelectedStyles();
+					}
+					event.preventDefault();
+					return false;
+				}
+			});
 		}
 	};
 }]);
@@ -919,13 +910,13 @@ textAngular.directive('textAngularToolbar', [
 						toolElement = angular.element(toolDefinition.display);
 					}
 					else toolElement = angular.element("<button type='button'>");
-					
+
 					if(toolDefinition && toolDefinition["class"]) toolElement.addClass(toolDefinition["class"]);
 					else toolElement.addClass(scope.classes.toolbarButton);
-					
+
 					toolElement.attr('name', toolScope.name);
 					// important to not take focus from the main text/html entry
-					toolElement.attr('unselectable', 'on');
+					toolElement.attr('ta-button', 'ta-button');
 					toolElement.attr('ng-disabled', 'isDisabled()');
 					toolElement.attr('tabindex', '-1');
 					toolElement.attr('ng-click', 'executeAction()');
@@ -934,14 +925,6 @@ textAngular.directive('textAngularToolbar', [
 					if (toolDefinition && toolDefinition.tooltiptext) {
 						toolElement.attr('title', toolDefinition.tooltiptext);
 					}
-
-					toolElement.on('mousedown', function(e, eventData){
-						/* istanbul ignore else: this is for catching the jqLite testing*/
-						if(eventData) angular.extend(e, eventData);
-						// this prevents focusout from firing on the editor when clicking toolbar buttons
-						e.preventDefault();
-						return false;
-					});
 					if(toolDefinition && !toolDefinition.display && !toolScope._display){
 						// first clear out the current contents if any
 						toolElement[0].innerHTML = '';
