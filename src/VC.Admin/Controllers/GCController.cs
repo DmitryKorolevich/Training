@@ -16,6 +16,11 @@ using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
+using VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Business.CsvExportMaps;
+using Microsoft.Net.Http.Headers;
+using VitalChoice.Infrastructure.Domain.Constants;
 
 namespace VC.Admin.Controllers
 {
@@ -23,11 +28,17 @@ namespace VC.Admin.Controllers
     public class GCController : BaseApiController
     {
         private readonly IGcService GCService;
+        private readonly ICsvExportService<GCWithOrderListItemModel, GCWithOrderListItemModelCsvMap> _gCWithOrderListItemModelCsvMapCSVExportService;
+        private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly ILogger logger;
 
-        public GCController(IGcService GCService, ILoggerProviderExtended loggerProvider)
+        public GCController(IGcService GCService,
+            ICsvExportService<GCWithOrderListItemModel, GCWithOrderListItemModelCsvMap> gCWithOrderListItemModelCsvMapCSVExportService,
+            ILoggerProviderExtended loggerProvider)
         {
             this.GCService = GCService;
+            _gCWithOrderListItemModelCsvMapCSVExportService = gCWithOrderListItemModelCsvMapCSVExportService;
+            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             this.logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -45,21 +56,46 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
-        [HttpGet]
-        public async Task<Result<PagedList<GCListItemModel>>> Test()
+        [HttpPost]
+        public async Task<Result<GCStatisticModel>> GetGiftCertificatesWithOrderInfo([FromBody]GCFilter filter)
         {
-            GCFilter testFilter = new GCFilter();
-            testFilter.ShippingAddress = new CustomerAddressFilter();
-            testFilter.ShippingAddress.LastName = "test";
-
-            var result = await GCService.GetGiftCertificatesWithOrderInfoAsync(testFilter);
-            var toReturn = new PagedList<GCListItemModel>
-            {
-                Items = result.Items.Select(p => new GCListItemModel(p)).ToList(),
-                Count = result.Count,
-            };
+            GCStatisticModel toReturn = await GCService.GetGiftCertificatesWithOrderInfoAsync(filter);
 
             return toReturn;
+        }
+
+        [HttpGet]
+        public async Task<FileResult> GetGiftCertificatesWithOrderInfoReportFile([FromQuery]DateTime from, [FromQuery]DateTime to,
+            [FromQuery]int? type = null, [FromQuery]int? status = null, [FromQuery]string billinglastname = null, [FromQuery]string shippinglastname = null)
+        {
+            GCFilter filter = new GCFilter()
+            {
+                From = from,
+                To = to,
+                Type = type.HasValue ? (GCType?)type.Value : null,
+                StatusCode = status.HasValue ? (RecordStatusCode?)status.Value : null,
+                BillingAddress = !String.IsNullOrEmpty(billinglastname) ? new CustomerAddressFilter() { LastName= billinglastname }:
+                    null,
+                ShippingAddress = !String.IsNullOrEmpty(shippinglastname) ? new CustomerAddressFilter() { LastName = shippinglastname } :
+                    null,
+            };
+            filter.Paging = null;
+
+            var data = await GCService.GetGiftCertificatesWithOrderInfoAsync(filter);
+            foreach (var item in data.Items)
+            {
+                item.Created = TimeZoneInfo.ConvertTime(item.Created, TimeZoneInfo.Local, _pstTimeZoneInfo);
+            }
+
+            var result = _gCWithOrderListItemModelCsvMapCSVExportService.ExportToCsv(data.Items);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.GIFT_CERTIFICATES_REPORT_STATISTIC, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
         }
 
         [HttpGet]

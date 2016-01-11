@@ -18,6 +18,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Products
 
         public DateTime? To { get; set; }
 
+        public RecordStatusCode? StatusCode { get; set; }
+
         public CustomerAddressFilter ShippingAddress { get; set; }
 
         public CustomerAddressFilter BillingAddress { get; set; }

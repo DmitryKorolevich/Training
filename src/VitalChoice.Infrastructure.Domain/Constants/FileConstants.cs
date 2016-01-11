@@ -8,5 +8,6 @@
         public const string PRODUCT_CATEGORY_STATISTIC = "Category_Sales_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
         public const string REGIONAL_SALES_STATISTIC = "Regional_Sales_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
         public const string REGIONAL_SALES_DETAILS_STATISTIC = "Regional_Sales_Detail_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
+        public const string GIFT_CERTIFICATES_REPORT_STATISTIC = "Gift_Certificates_Report _{0:MM_dd_yyyy_hh_mm_ss}.csv";
     }
 }

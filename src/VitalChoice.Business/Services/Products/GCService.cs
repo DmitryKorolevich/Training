@@ -22,6 +22,8 @@ using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Data.Helpers;
 using DynamicExpressionVisitor = VitalChoice.DynamicData.Helpers.DynamicExpressionVisitor;
+using VitalChoice.Business.Services.Dynamic;
+using VitalChoice.Business.Helpers;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -35,19 +37,19 @@ namespace VitalChoice.Business.Services.Products
         private readonly IEcommerceRepositoryAsync<GiftCertificate> giftCertificateRepository;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly INotificationService notificationService;
-        private readonly DynamicExpressionVisitor queryVisitor;
+        private readonly OrderAddressMapper orderAddressMapper;
         private readonly ILogger logger;
 
         public GCService(IEcommerceRepositoryAsync<GiftCertificate> giftCertificateRepository,
             UserManager<ApplicationUser> userManager, 
             INotificationService notificationService,
-            DynamicExpressionVisitor queryVisitor,
+            OrderAddressMapper orderAddressMapper,
             ILoggerProviderExtended loggerProvider)
         {
             this.giftCertificateRepository = giftCertificateRepository;
             this.userManager = userManager;
             this.notificationService = notificationService;
-            this.queryVisitor = queryVisitor;
+            this.orderAddressMapper = orderAddressMapper;
             logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -107,52 +109,102 @@ namespace VitalChoice.Business.Services.Products
             return toReturn;
         }
 
-        public async Task<PagedList<GiftCertificate>> GetGiftCertificatesWithOrderInfoAsync(GCFilter filter)
+        public async Task<GCStatisticModel> GetGiftCertificatesWithOrderInfoAsync(GCFilter filter)
         {
-            var conditions = new GcQuery().NotDeleted().WithType(filter.Type).WithCode(filter.Code).WithEmail(filter.Email).WithName(filter.Name).
-                WithFrom(filter.From).WithTo(filter.To).FilterShippingAddress(filter.ShippingAddress).FilterBillingAddress(filter.BillingAddress);
-
-            var queryConditions = (Expression<Func<GiftCertificate, bool>>)queryVisitor.Visit(conditions.Query());
-
-            var query = giftCertificateRepository.Query(queryConditions).
+            //Get all GCs from cache
+            var data = await giftCertificateRepository.Query(p=>p.StatusCode!=RecordStatusCode.Deleted).
                 Include(p=>p.Order).ThenInclude(p=>p.ShippingAddress).ThenInclude(p=>p.OptionValues).
-                Include(p=>p.Order).ThenInclude(p=>p.PaymentMethod).ThenInclude(p=>p.BillingAddress).ThenInclude(p=>p.OptionValues);
+                Include(p=>p.Order).ThenInclude(p=>p.PaymentMethod).ThenInclude(p=>p.BillingAddress).ThenInclude(p=>p.OptionValues).
+                SelectAsync(false);
 
-            Func<IQueryable<GiftCertificate>, IOrderedQueryable<GiftCertificate>> sortable = x => x.OrderByDescending(y => y.Created);
+            var query = data.Select(p => new GCWithOrderListItemModel(p, orderAddressMapper.OptionTypes));
+            if(filter.From.HasValue)
+            {
+                query = query.Where(p => p.Created >= filter.From.Value);
+            }
+            if (filter.To.HasValue)
+            {
+                query = query.Where(p => p.Created <= filter.To.Value);
+            }
+            if (filter.Type.HasValue)
+            {
+                query = query.Where(p => p.GCType==filter.Type.Value);
+            }
+            if (filter.StatusCode.HasValue)
+            {
+                query = query.Where(p => p.StatusCode == filter.StatusCode.Value);
+            }
+            if (filter.ShippingAddress!=null && !String.IsNullOrEmpty(filter.ShippingAddress.LastName))
+            {
+                query = query.Where(p => !String.IsNullOrEmpty(p.ShippingLastName) && p.ShippingLastName.IndexOf(filter.ShippingAddress.LastName, StringComparison.OrdinalIgnoreCase)>=0);
+            }
+            if (filter.BillingAddress != null && !String.IsNullOrEmpty(filter.BillingAddress.LastName))
+            {
+                query = query.Where(p => !String.IsNullOrEmpty(p.BillingLastName) && p.BillingLastName.IndexOf(filter.BillingAddress.LastName, StringComparison.OrdinalIgnoreCase) >= 0);
+            }
+
+            Func<IQueryable<GCWithOrderListItemModel>, IOrderedQueryable<GCWithOrderListItemModel>> sortable = x => x.OrderByDescending(y => y.Created);
             var sortOrder = filter.Sorting.SortOrder;
+            if(String.IsNullOrEmpty(filter.Sorting.Path))
+            {
+                filter.Sorting.Path = GiftCertificatesWithOrderSortPath.Created;
+            }
             switch (filter.Sorting.Path)
             {
-                case GiftCertificateSortPath.Recipient:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.FirstName).ThenBy(y => y.LastName)
-                                : x.OrderByDescending(y => y.FirstName).ThenByDescending(y => y.LastName);
+                case GiftCertificatesWithOrderSortPath.Code:
+                    query = sortOrder == SortOrder.Asc
+                                ? query.OrderBy(y => y.Code)
+                                : query.OrderByDescending(y => y.Code);
                     break;
-                case GiftCertificateSortPath.Available:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.Balance)
-                                : x.OrderByDescending(y => y.Balance);
+                case GiftCertificatesWithOrderSortPath.Created:
+                    query = sortOrder == SortOrder.Asc
+                                ? query.OrderBy(y => y.Created)
+                                : query.OrderByDescending(y => y.Created);
                     break;
-                case GiftCertificateSortPath.Status:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.StatusCode)
-                                : x.OrderByDescending(y => y.StatusCode);
+                case GiftCertificatesWithOrderSortPath.BillingLastName:
+                    query = sortOrder == SortOrder.Asc
+                                ? query.OrderBy(y => y.BillingLastName)
+                                : query.OrderByDescending(y => y.BillingLastName);
                     break;
-                case GiftCertificateSortPath.Created:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.Created)
-                                : x.OrderByDescending(y => y.Created);
+                case GiftCertificatesWithOrderSortPath.ShippingLastName:
+                    query = sortOrder == SortOrder.Asc
+                                ? query.OrderBy(y => y.ShippingLastName)
+                                : query.OrderByDescending(y => y.ShippingLastName);
+                    break;
+                case GiftCertificatesWithOrderSortPath.Type:
+                    query = sortOrder == SortOrder.Asc
+                                ? query.OrderBy(y => y.GCType)
+                                : query.OrderByDescending(y => y.GCType);
+                    break;
+                case GiftCertificatesWithOrderSortPath.Status:
+                    query = sortOrder == SortOrder.Asc
+                                ? query.OrderBy(y => y.StatusCode)
+                                : query.OrderByDescending(y => y.StatusCode);
+                    break;
+                case GiftCertificatesWithOrderSortPath.Balance:
+                    query = sortOrder == SortOrder.Asc
+                                ? query.OrderBy(y => y.Balance)
+                                : query.OrderByDescending(y => y.Balance);
                     break;
             }
-            
-            PagedList<GiftCertificate> toReturn = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+
+            var items = query.ToList();
+            GCStatisticModel toReturn = new GCStatisticModel();
+            toReturn.Count = items.Count;
+            toReturn.Total = items.Sum(p => p.Balance);
+            if (filter.Paging != null)
+            {
+                toReturn.Items = items.Skip((filter.Paging.PageIndex-1)* filter.Paging.PageItemCount).Take(filter.Paging.PageItemCount).ToList();
+            }
+            else
+            {
+                toReturn.Items = items;
+            }
+            foreach(var item in items)
+            {
+                item.GCTypeName = LookupHelper.GetShortGCTypeName(item.GCType);
+                item.StatusCodeName = LookupHelper.GetRecordStatus(item.StatusCode);
+            }
 
             return toReturn;
         }

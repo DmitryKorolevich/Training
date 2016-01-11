@@ -163,11 +163,17 @@ namespace VitalChoice.Business.Services
                 Key = x.Key,
                 Text = x.Value
             }).ToList();
+            referenceData.GCShortTypes = LookupHelper.GetShortGCTypeNames().Select(x => new LookupItem<int>
+            {
+                Key = x.Key,
+                Text = x.Value
+            }).ToList();
             referenceData.RecordStatuses = LookupHelper.GetRecordStatuses().Select(x => new LookupItem<int>
             {
                 Key = x.Key,
                 Text = x.Value
             }).ToList();
+            referenceData.PublicRecordStatuses = LookupHelper.GetPublicRecordStatuses();
             referenceData.CustomerStatuses = LookupHelper.GetCustomerStatuses().Select(x => new LookupItem<int>
             {
                 Key = x.Key,

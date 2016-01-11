@@ -81,6 +81,51 @@ namespace VitalChoice.Business.Helpers
             return toReturn;
         }
 
+        public static string GetShortGCTypeName(GCType type)
+        {
+            string toReturn = null;
+            switch (type)
+            {
+                case GCType.ManualGC:
+                    toReturn = "ManualGC";
+                    break;
+                case GCType.GC:
+                    toReturn = "GC";
+                    break;
+                case GCType.EGC:
+                    toReturn = "eGC";
+                    break;
+            }
+            return toReturn;
+        }
+
+        public static Dictionary<int, string> GetShortGCTypeNames()
+        {
+            Dictionary<int, string> toReturn = new Dictionary<int, string>();
+            toReturn.Add((int)GCType.ManualGC, "ManualGC");
+            toReturn.Add((int)GCType.GC, "GC");
+            toReturn.Add((int)GCType.EGC, "eGC");
+            return toReturn;
+        }
+
+        public static string GetRecordStatus(RecordStatusCode status)
+        {
+            string toReturn = null;
+            switch (status)
+            {
+                case RecordStatusCode.Active:
+                    toReturn = "Active";
+                    break;
+                case RecordStatusCode.NotActive:
+                    toReturn = "Not Active";
+                    break;
+                case RecordStatusCode.Deleted:
+                    toReturn = "Deleted";
+                    break;
+            }
+            return toReturn;
+        }
+
         public static Dictionary<int, string> GetRecordStatuses()
         {
             Dictionary<int, string> toReturn = new Dictionary<int, string>
@@ -88,6 +133,17 @@ namespace VitalChoice.Business.Helpers
                 {(int) RecordStatusCode.Active, "Active"},
                 {(int) RecordStatusCode.NotActive, "Not Active"},
                 {(int) RecordStatusCode.Deleted, "Deleted"}
+            };
+            return toReturn;
+        }
+
+        public static IList<LookupItem<int?>> GetPublicRecordStatuses()
+        {
+            IList<LookupItem<int?>> toReturn = new List<LookupItem<int?>>
+            {
+                new LookupItem<int?>() {Key = (int?) null, Text="All" },
+                new LookupItem<int?>() {Key = (int?) RecordStatusCode.Active, Text="Active" },
+                new LookupItem<int?>() {Key = (int?) RecordStatusCode.NotActive, Text="Not Active" },
             };
             return toReturn;
         }

@@ -5,6 +5,7 @@ angular.module('app.modules.gc', [
 	'app.modules.gc.controllers.sendEmailController',
 	'app.modules.gc.controllers.gcDetailController',
 	'app.modules.gc.controllers.gcsAddController',
+	'app.modules.gc.controllers.gcOrdersController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -15,6 +16,11 @@ angular.module('app.modules.gc', [
 				    url: '/gcs',
 				    templateUrl: 'app/modules/gc/partials/gcsList.html',
 				    controller: 'gcsController'
+				})
+				.state('index.oneCol.manageGCOrders', {
+				    url: '/report/gcs',
+				    templateUrl: 'app/modules/gc/partials/gcOrdersList.html',
+				    controller: 'gcOrdersController'
 				})
 		        .state('index.oneCol.gcDetail', {
 		            url: '/gcs/{id:int}',
