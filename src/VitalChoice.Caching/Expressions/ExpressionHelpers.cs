@@ -7,8 +7,8 @@ namespace VitalChoice.Caching.Expressions
 {
     public static class ExpressionHelpers
     {
-        private static readonly ConcurrentDictionary<MemberAccessCache, Func<object, object>> _memberAccessCache =
-            new ConcurrentDictionary<MemberAccessCache, Func<object, object>>();
+        private static readonly ConcurrentDictionary<MemberAccessInfo, Func<object, object>> MemberAccessCache =
+            new ConcurrentDictionary<MemberAccessInfo, Func<object, object>>();
 
         public static object ParseMemeberCompare(this BinaryCondition condition, out MemberExpression member)
         {
@@ -34,7 +34,7 @@ namespace VitalChoice.Caching.Expressions
                 var accessObject = member?.Expression;
                 if (accessObject != null)
                 {
-                    var accessor = _memberAccessCache.GetOrAdd(new MemberAccessCache(accessObject.Type, member.Member.Name),
+                    var accessor = MemberAccessCache.GetOrAdd(new MemberAccessInfo(accessObject.Type, member.Member.Name),
                         valueFactory: init =>
                         {
                             var objectParam = Expression.Parameter(typeof (object));
@@ -44,7 +44,8 @@ namespace VitalChoice.Caching.Expressions
                                         member.Member), typeof (object)), objectParam)
                                     .Compile();
                         });
-                    return accessor(GetValue(accessObject));
+                    var value = GetValue(accessObject);
+                    return value == null ? null : accessor(value);
                 }
 
                 Expression.Lambda(expression).Compile().DynamicInvoke(null);
@@ -52,15 +53,44 @@ namespace VitalChoice.Caching.Expressions
             return null;
         }
 
-        private struct MemberAccessCache
+        private struct MemberAccessInfo : IEquatable<MemberAccessInfo>
         {
-            public Type ObjectType;
-            public string MemberName;
-
-            public MemberAccessCache(Type objectType, string memberName)
+            public bool Equals(MemberAccessInfo other)
             {
-                ObjectType = objectType;
-                MemberName = memberName;
+                return string.Equals(_memberName, other._memberName) && _objectType == other._objectType;
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                return obj is MemberAccessInfo && Equals((MemberAccessInfo) obj);
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    return (_memberName.GetHashCode()*397) ^ _objectType.GetHashCode();
+                }
+            }
+
+            public static bool operator ==(MemberAccessInfo left, MemberAccessInfo right)
+            {
+                return left.Equals(right);
+            }
+
+            public static bool operator !=(MemberAccessInfo left, MemberAccessInfo right)
+            {
+                return !left.Equals(right);
+            }
+
+            private readonly Type _objectType;
+            private readonly string _memberName;
+
+            public MemberAccessInfo(Type objectType, string memberName)
+            {
+                _objectType = objectType;
+                _memberName = memberName;
             }
         }
     }
