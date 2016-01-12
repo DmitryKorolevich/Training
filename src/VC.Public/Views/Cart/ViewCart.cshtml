@@ -88,7 +88,6 @@
 						<td>@Html.TextBoxFor(x => Model.Skus[i].Quantity, new {@class = "input-control width-small"})</td>
 						<td>@(Model.Skus[i].SubTotal.HasValue ? Model.Skus[i].SubTotal.Value.ToString("C2") : string.Empty)</td>
 						<td class="grid-controls-container">
-							<!--<input type="button" value="Remove"/>-->
 							<a class="circle-button button-red">
 								<i class="glyphicon glyphicon-remove-sign"></i>
 							</a>
@@ -151,34 +150,33 @@
 						@Model.OrderTotal.ToString("C2")
 					</label>
 				</div>
-			</div>
-			<div class="cart-promo-container">
-				<label>Promo Code</label>
-				@Html.TextBoxFor(x => x.PromoCode, new { @class = "cart-input-box input-control" })<i class="tooltip-v glyphicon glyphicon-question-sign" data-tooltip-title="Promo Code" data-tooltip-body="If you have a discount code, enter it in the box to see the change in your order's total."></i>
-			</div>
-			<div id="divGcContainer" class="cart-gc-container">
-				<label>Gift Certificate Code</label>
-				@for (int i = 0; i < Model.GiftCertificateCodes.Count; i++)
-				{
-					if (i > 0)
+				<div class="cart-promo-container">
+					<i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Promo Code" data-tooltip-body="If you have a discount code, enter it in the box to see the change in your order's total."></i>
+					<label>Promo Code</label>
+					@Html.TextBoxFor(x => x.PromoCode, new {@class = "cart-input-box input-control"})
+				</div>
+				<div id="divGcContainer" class="cart-gc-container">
+					@for (int i = 0; i < Model.GiftCertificateCodes.Count; i++)
 					{
-						<br/><label></label>
+						<div>
+							@if (i == 0)
+							{
+								<i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Gift Certificate Code" data-tooltip-body="If you have a gift certificate code, enter it in the box to see the change in your order's total."></i>
+								<label>Gift Certificate Code</label>
+								<a id="btnAddGc" class="circle-button button-green">
+									<i class="glyphicon glyphicon-plus-sign"></i>
+								</a>
+							}
+							else
+							{
+								<a class="btnRemoveGc circle-button button-red">
+									<i class="glyphicon glyphicon-minus-sign"></i>
+								</a>
+							}
+							@Html.TextBoxFor(x => Model.GiftCertificateCodes[i], new { @class = "cart-input-box input-control" })
+						</div>
 					}
-					@Html.TextBoxFor(x => Model.GiftCertificateCodes[i], new {@class = "cart-input-box input-control"})
-					if (i == 0)
-					{
-						<a id="btnAddGc" class="circle-button button-green">
-							<i class="glyphicon glyphicon-plus-sign"></i>
-						</a>
-						<i class="tooltip-v glyphicon glyphicon-question-sign" data-tooltip-title="Gift Certificate Code" data-tooltip-body="If you have a gift certificate code, enter it in the box to see the change in your order's total."></i>
-					}
-					else
-					{
-						<a class="btnRemoveGc circle-button button-red">
-							<i class="glyphicon glyphicon-minus-sign"></i>
-						</a>
-					}
-				}
+				</div>
 			</div>
 		</div>
 		<div class="cart-control-container">

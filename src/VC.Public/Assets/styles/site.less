@@ -4371,6 +4371,7 @@ body.view-cart-layout{
 	}
 
 	i.tooltip-h,
+	i.tooltip-l,
 	i.tooltip-v{
 		color: #C3392F;
 		font-size: 18px;
@@ -4781,47 +4782,58 @@ body.view-cart-layout{
 	}
 
 	.cart-promo-container{
-		float:left;
-		clear:left;
+		float:right;
+		clear:both;
 		margin-top: 40px;
 
 		label{
 			font-weight:bold;
 			float:left;
 			padding: 8px 0;
-			width:140px;
 			text-align: right;
+		}
+
+		i.tooltip-l{
+			margin-top:6px;
+			float:left;
+			clear:both;
+			margin-right:10px;
 		}
 	}
 
 	.cart-gc-container{
-		float:left;
-		clear:left;
-		margin-top: 20px;
+		float:right;
+		clear:both;
 		margin-bottom:20px;
+
+		div{
+			clear:both;
+		}
 
 		label{
 			font-weight:bold;
 			float:left;
 			padding: 8px 0;
-			width:140px;
 			margin-top:10px;
 			text-align: right;
-			clear: left;
 		}
 
 		.cart-input-box{
 			margin-top:10px;
+			float:right;
 		}
 
 		a.circle-button{
 			margin-top:16px;
-			float:left;
+			margin-right: -27px;
+			float:right;
 		}
 
-		i.tooltip-v{
+		i.tooltip-l{
 			margin-top:16px;
 			float:left;
+			clear:both;
+			margin-right:10px;
 		}
 	}
 
