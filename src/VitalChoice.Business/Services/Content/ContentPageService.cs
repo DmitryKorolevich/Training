@@ -152,13 +152,6 @@ namespace VitalChoice.Business.Services.Content
             {
                 dbItem = (await contentPageRepository.Query(p => p.Id == model.Id).Include(p => p.ContentItem).ThenInclude(p=>p.ContentItemToContentProcessors).
                     SelectAsync()).FirstOrDefault();
-                if (dbItem != null)
-                {
-                    foreach (var proccesorRef in dbItem.ContentItem.ContentItemToContentProcessors)
-                    {
-                        await contentItemToContentProcessorRepository.DeleteAsync(proccesorRef.Id);
-                    }
-                }
             }
 
             if (dbItem != null && dbItem.StatusCode != RecordStatusCode.Deleted)
@@ -185,7 +178,6 @@ namespace VitalChoice.Business.Services.Content
                 dbItem.ContentItem.Title = model.ContentItem.Title;
                 dbItem.ContentItem.MetaDescription = model.ContentItem.MetaDescription;
                 dbItem.ContentItem.MetaKeywords = model.ContentItem.MetaKeywords;
-                dbItem.ContentItem.ContentItemToContentProcessors = model.ContentItem.ContentItemToContentProcessors;
 
                 if (model.Id == 0)
                 {

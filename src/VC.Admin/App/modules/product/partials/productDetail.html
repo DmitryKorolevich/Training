@@ -140,7 +140,7 @@
                                                     <div data-ng-show="DescriptionExpanded" text-angular data-ng-model="product.Description"></div>
                                                 </div>
                                             </div>
-                                            <div class="form-group" data-ng-hide="product.Type==3 || product.Type==4">
+                                            <div class="form-group" data-ng-if="!(product.Type==3 || product.Type==4)">
                                                 <label for="Description" class="col-md-3 control-label">Nutrition & Ingredients</label>
                                                 <div class="col-md-4">
                                                     <input name="IngredientsTitleOverride" class="form-control" placeholder="Title Overwrite" data-ng-model="product.IngredientsTitleOverride" data-max-characters="25" data-ng-maxlength="25">
@@ -159,7 +159,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-group" data-ng-hide="product.Type==3 || product.Type==4">
+                                            <div class="form-group" data-ng-if="!(product.Type==3 || product.Type==4)">
                                                 <label for="Ingredients" class="col-md-3 control-label"></label>
                                                 <div class="col-md-9">
                                                     <div class="input-group" data-ng-show="!IngredientsExpanded">
@@ -174,7 +174,7 @@
                                                     <div data-ng-show="IngredientsExpanded" text-angular data-ng-model="product.Ingredients"></div>
                                                 </div>
                                             </div>
-                                            <div class="form-group" data-ng-hide="product.Type==3 || product.Type==4">
+                                            <div class="form-group" data-ng-if="!(product.Type==3 || product.Type==4)">
                                                 <label for="Description" class="col-md-3 control-label">Recipes</label>
                                                 <div class="col-md-4">
                                                     <input name="RecipesTitleOverride" class="form-control" placeholder="Title Overwrite" data-ng-model="product.RecipesTitleOverride" data-max-characters="25" data-ng-maxlength="25">
@@ -193,7 +193,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-group" data-ng-hide="product.Type==3 || product.Type==4">
+                                            <div class="form-group" data-ng-if="!(product.Type==3 || product.Type==4)">
                                                 <label for="Recipes" class="col-md-3 control-label"></label>
                                                 <div class="col-md-9">
                                                     <div class="input-group" data-ng-show="!RecipesExpanded">
@@ -208,7 +208,7 @@
                                                     <div data-ng-show="RecipesExpanded" text-angular data-ng-model="product.Recipes"></div>
                                                 </div>
                                             </div>
-                                            <div class="form-group" data-ng-hide="product.Type==3 || product.Type==4">
+                                            <div class="form-group" data-ng-if="!(product.Type==3 || product.Type==4)">
                                                 <label for="Description" class="col-md-3 control-label">Serving/Storage</label>
                                                 <div class="col-md-4">
                                                     <input name="ServingTitleOverride" class="form-control" placeholder="Title Overwrite" data-ng-model="product.ServingTitleOverride" data-max-characters="25" data-ng-maxlength="25">
@@ -227,7 +227,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-group" data-ng-hide="product.Type==3 || product.Type==4">
+                                            <div class="form-group" data-ng-if="!(product.Type==3 || product.Type==4)">
                                                 <label for="Serving" class="col-md-3 control-label"></label>
                                                 <div class="col-md-9">
                                                     <div class="input-group" data-ng-show="!ServingExpanded">
@@ -242,7 +242,7 @@
                                                     <div data-ng-show="ServingExpanded" text-angular data-ng-model="product.Serving"></div>
                                                 </div>
                                             </div>
-                                            <div class="form-group" data-ng-hide="product.Type==3 || product.Type==4">
+                                            <div class="form-group" data-ng-if="!(product.Type==3 || product.Type==4)">
                                                 <label for="Description" class="col-md-3 control-label">Shipping</label>
                                                 <div class="col-md-4">
                                                     <input name="ShippingTitleOverride" class="form-control" placeholder="Title Overwrite" data-ng-model="product.ShippingTitleOverride" data-max-characters="25" data-ng-maxlength="25">
@@ -261,7 +261,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-group" data-ng-hide="product.Type==3 || product.Type==4">
+                                            <div class="form-group" data-ng-if="!(product.Type==3 || product.Type==4)">
                                                 <label for="Shipping" class="col-md-3 control-label"></label>
                                                 <div class="col-md-9">
                                                     <div class="input-group" data-ng-show="!ShippingExpanded">
@@ -512,7 +512,7 @@
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
-                                                                                <div class="fixed-accordion-row" data-ng-hide="product.Type==3 || product.Type==4">
+                                                                                <div class="fixed-accordion-row" data-ng-if="!(product.Type==3 || product.Type==4)">
                                                                                     <label class="control-label">Stock</label>
                                                                                     <div class="col-md-1">
                                                                                         <input type="text" name="Stock" class="form-control number" placeholder="Stock" numbers-only data-ng-model="subSku.Stock" min="0" max="100000" ng-pattern="/^\d{0,9}?$/" required>
@@ -528,7 +528,7 @@
                                                                         </div>
                                                                         <div class="form-group">
                                                                             <div class="col-md-12">
-                                                                                <div class="fixed-accordion-row" data-ng-hide="product.Type==3 || product.Type==4">
+                                                                                <div class="fixed-accordion-row" data-ng-if="!(product.Type==3 || product.Type==4)">
                                                                                     <label for="lblDisregard{{subSku.Id}}" class="control-label">Disregard Stock</label>
                                                                                     <div class="checkbox">
                                                                                         <label>
@@ -536,7 +536,7 @@
                                                                                         </label>
                                                                                     </div>
                                                                                 </div>
-                                                                                <div class="fixed-accordion-row" data-ng-hide="product.Type==3 || product.Type==4">
+                                                                                <div class="fixed-accordion-row" data-ng-if="!(product.Type==3 || product.Type==4)">
                                                                                     <label for="lblDisallowSingle{{subSku.Id}}" class="control-label">Disallow Single</label>
                                                                                     <div class="checkbox">
                                                                                         <label>
@@ -574,7 +574,7 @@
                                                                                 </div>
                                                                             </div>
                                                                         </div>
-                                                                        <div class="form-group" data-ng-hide="product.Type==3 || product.Type==4">
+                                                                        <div class="form-group" data-ng-if="!(product.Type==3 || product.Type==4)">
                                                                             <div class="col-md-12">
                                                                                 <div class="fixed-accordion-row extra-spacing">
                                                                                     <label for="lblAutoship{{subSku.Id}}" class="control-label">Auto-Ship Product</label>
@@ -669,7 +669,7 @@
                             </div>
                         </div>
                     </tab>
-                    <tab heading="Nutritional" active="nutritionalTab.active" data-ng-hide="product.Type==3 || product.Type==4">
+                    <tab heading="Nutritional" active="nutritionalTab.active" data-ng-if="!(product.Type==3 || product.Type==4)">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">

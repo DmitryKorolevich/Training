@@ -130,6 +130,24 @@ namespace VC.Public.Controllers
             return PartialView("_ContactCustomerService");
         }
 
+        [HttpPost]
+        public async Task<IActionResult> PrivacyRequest(PrivacyRequestModel model)
+        {
+            if (!Validate(model))
+            {
+                return PartialView("_PrivacyRequestForm", model);
+            }
+            if (!await _reCaptchaValidator.Validate(Request.Form[ReCaptchaValidator.DefaultPostParamName]))
+            {
+                ModelState.AddModelError(string.Empty, ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.WrongCaptcha]);
+                return PartialView("_PrivacyRequestForm", model);
+            }
+
+            ViewBag.SuccessMessage = InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullySent];
+            ModelState.Clear();
+            return PartialView("_PrivacyRequestForm");
+        }       
+
 
         [HttpGet]
         public async Task<IActionResult> SendContentUrlNotification(string name, string url)
