@@ -759,8 +759,15 @@ INSERT INTO [dbo].[ContentItems]
         <div class="newsletter-block">
             <div class="body">
                 <div class="input-wrapper">
-                    <input type="text" autocomplete="off" placeholder="Enter email here">
-                    <input class="yellow" type="button" value="Go">
+                    <form method="post" name="search" action="https://app.bronto.com/public/webform/process/">
+                		<input type="hidden" value="92galxckiog3fu5rrpft43l7m738f" name="fid"/>
+    					<input type="hidden" value="09dcaffa5c9971f4be87813780496171" name="sid"/>
+    					<input type="hidden" value="" name="delid"/>
+    					<input type="hidden" value="" name="subid"/>
+    					<input type="hidden" value="true" name="24793[291714]"/>
+                        <input type="text" name="24791" autocomplete="off" placeholder="Enter email here">
+                        <input class="yellow" type="submit" value="Go">
+                    </form>
                 </div>
             </div>
         </div>

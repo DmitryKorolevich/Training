@@ -191,7 +191,7 @@ namespace VitalChoice.Business.Services.Products
             var items = query.ToList();
             GCStatisticModel toReturn = new GCStatisticModel();
             toReturn.Count = items.Count;
-            toReturn.Total = items.Sum(p => p.Balance);
+            toReturn.Total = items.Where(p=>p.StatusCode==RecordStatusCode.Active).Sum(p => p.Balance);
             if (filter.Paging != null)
             {
                 toReturn.Items = items.Skip((filter.Paging.PageIndex-1)* filter.Paging.PageItemCount).Take(filter.Paging.PageItemCount).ToList();
