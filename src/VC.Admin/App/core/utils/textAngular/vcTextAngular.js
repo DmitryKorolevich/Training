@@ -1147,7 +1147,7 @@ Commonjs package manager support (eg componentjs).
 							var domTest = angular.element("<div>" + value + "</div>");
 							//console.log('domTest.children().length():', domTest.children().length);
 							if (domTest.children().length === 0) {
-								value = "" + value + "" //"<" + attrs.taDefaultWrap + ">" + value + "</" + attrs.taDefaultWrap + ">";
+								value = " " + value + " " //"<" + attrs.taDefaultWrap + ">" + value + "</" + attrs.taDefaultWrap + ">";
 							} else {
 								var _children = domTest[0].childNodes;
 								var i;
@@ -1156,7 +1156,7 @@ Commonjs package manager support (eg componentjs).
 									if (_foundBlockElement = _children[i].nodeName.toLowerCase().match(BLOCKELEMENTS)) break;
 								}
 								if (!_foundBlockElement) {
-									value = "" + value + ""; //"<" + attrs.taDefaultWrap + ">" + value + "</" + attrs.taDefaultWrap + ">";
+									value = " " + value + " "; //"<" + attrs.taDefaultWrap + ">" + value + "</" + attrs.taDefaultWrap + ">";
 								}
 								else {
 									value = "";
@@ -1175,14 +1175,14 @@ Commonjs package manager support (eg componentjs).
 												value += text;
 											} else {
 												// not pure white space so wrap in <p>...</p> or whatever attrs.taDefaultWrap is set to.
-												value += "" + text + ""//"<" + attrs.taDefaultWrap + ">" + text + "</" + attrs.taDefaultWrap + ">";
+												value += " " + text + " "//"<" + attrs.taDefaultWrap + ">" + text + "</" + attrs.taDefaultWrap + ">";
 											}
 										} else if (!nodeName.match(BLOCKELEMENTS)) {
 											/* istanbul ignore  next: Doesn't seem to trigger on tests */
 											var _subVal = (node.outerHTML || node.nodeValue);
 											/* istanbul ignore else: Doesn't seem to trigger on tests, is tested though */
 											if (_subVal.trim() !== '')
-												value += "" + _subVal + ""; //"<" + attrs.taDefaultWrap + ">" + _subVal + "</" + attrs.taDefaultWrap + ">";
+												value += " " + _subVal + " "; //"<" + attrs.taDefaultWrap + ">" + _subVal + "</" + attrs.taDefaultWrap + ">";
 											else value += _subVal;
 										} else {
 											value += node.outerHTML;
