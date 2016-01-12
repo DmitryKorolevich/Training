@@ -88,7 +88,10 @@
 						<td>@Html.TextBoxFor(x => Model.Skus[i].Quantity, new {@class = "input-control width-small"})</td>
 						<td>@(Model.Skus[i].SubTotal.HasValue ? Model.Skus[i].SubTotal.Value.ToString("C2") : string.Empty)</td>
 						<td class="grid-controls-container">
-							<input type="button" value="Remove" />
+							<!--<input type="button" value="Remove"/>-->
+							<a class="button">
+								<i class="glyphicon glyphicon-remove"></i>
+							</a>
 						</td>
 					</tr>
 				}
@@ -150,8 +153,8 @@
 				</div>
 			</div>
 			<div class="cart-promo-container">
-				<label>Enter Promo Code Here</label>
-				@Html.TextBoxFor(x => x.PromoCode, new { @class = "cart-input-box input-control" })<img class="tooltip-v" data-tooltip-title="Promo Code" data-tooltip-body="If you have a discount code, enter it in the box to see the change in your order's total." src="/assets/images/question-mark-4-24.png" />
+				<label>Promo Code</label>
+				@Html.TextBoxFor(x => x.PromoCode, new { @class = "cart-input-box input-control" })<i class="tooltip-v glyphicon glyphicon-question-sign" data-tooltip-title="Promo Code" data-tooltip-body="If you have a discount code, enter it in the box to see the change in your order's total."></i>
 			</div>
 			<div id="divGcContainer" class="cart-gc-container">
 				<label>Gift Certificate Code</label>
@@ -164,11 +167,16 @@
 					@Html.TextBoxFor(x => Model.GiftCertificateCodes[i], new {@class = "cart-input-box input-control"})
 					if (i == 0)
 					{
-						<input id="btnAddGc" type="button" class="plus-button-red"/><img class="tooltip-v" data-tooltip-title="Gift Certificate Code" data-tooltip-body="If you have a gift certificate code, enter it in the box to see the change in your order's total." src="/assets/images/question-mark-4-24.png"/>
+						<a id="btnAddGc" class="circle-button button-green">
+							<i class="glyphicon glyphicon-plus-sign"></i>
+						</a>
+						<i class="tooltip-v glyphicon glyphicon-question-sign" data-tooltip-title="Gift Certificate Code" data-tooltip-body="If you have a gift certificate code, enter it in the box to see the change in your order's total."></i>
 					}
 					else
 					{
-						<input type="button" class="minus-button-red btnRemoveGc" />
+						<a class="btnRemoveGc circle-button button-red">
+							<i class="glyphicon glyphicon-minus-sign"></i>
+						</a>
 					}
 				}
 			</div>
