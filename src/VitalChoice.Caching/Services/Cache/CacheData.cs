@@ -67,29 +67,29 @@ namespace VitalChoice.Caching.Services.Cache
             return _entityDictionary.Values;
         }
 
+        public void Clear()
+        {
+            lock (_lockObj)
+            {
+                NeedUpdate = true;
+                _entityDictionary.Clear();
+                _indexedDictionary.Clear();
+                foreach (var conditionalIndex in _conditionalIndexedDictionary)
+                {
+                    conditionalIndex.Value.Clear();
+                }
+            }
+        }
+
+        public IEnumerable<CachedEntity> GetAllUntyped()
+        {
+            return _entityDictionary.Values;
+        }
+
         public bool TryRemove(EntityKey key, out CachedEntity<T> removed)
         {
             lock (_lockObj)
             {
-                CachedEntity<T> temp;
-                var result = _entityDictionary.TryRemove(key, out removed);
-                if (result && removed.UniqueIndex != null)
-                    result = _indexedDictionary.TryRemove(removed.UniqueIndex, out temp);
-                if (result && removed.ConditionalIndexes != null)
-                {
-                    result = removed.ConditionalIndexes.Aggregate(true,
-                        (current, conditionalIndex) =>
-                            current && _conditionalIndexedDictionary[conditionalIndex.Key].TryRemove(conditionalIndex.Value, out temp));
-                }
-                return result;
-            }
-        }
-
-        public bool TryRemove(EntityKey key)
-        {
-            lock (_lockObj)
-            {
-                CachedEntity<T> removed;
                 CachedEntity<T> temp;
                 var result = _entityDictionary.TryRemove(key, out removed);
                 if (result)
@@ -106,6 +106,12 @@ namespace VitalChoice.Caching.Services.Cache
                 }
                 return result;
             }
+        }
+
+        public bool TryRemove(EntityKey key)
+        {
+            CachedEntity<T> removed;
+            return TryRemove(key, out removed);
         }
 
         public CachedEntity<T> Update(T entity, bool ignoreState = false)
@@ -137,17 +143,7 @@ namespace VitalChoice.Caching.Services.Cache
 
         public void UpdateAll(IEnumerable<T> entities)
         {
-            lock (_lockObj)
-            {
-                FullCollection = false;
-                _entityDictionary.Clear();
-                _indexedDictionary.Clear();
-                foreach (var conditionalIndex in _conditionalIndexedDictionary)
-                {
-                    conditionalIndex.Value.Clear();
-                }
-                FullCollection = true;
-            }
+            Clear();
             Update(entities);
         }
 

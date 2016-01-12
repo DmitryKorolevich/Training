@@ -8,21 +8,27 @@ using VitalChoice.Caching.Services.Cache.Base;
 
 namespace VitalChoice.Caching.Interfaces
 {
-    public interface ICacheData<T>
+    public interface ICacheData
+    {
+        void Clear();
+        IEnumerable<CachedEntity> GetAllUntyped();
+        bool TryRemove(EntityKey key);
+        bool FullCollection { get; }
+        bool NeedUpdate { get; set; }
+        bool Empty { get; }
+    }
+
+    public interface ICacheData<T> : ICacheData
     {
         bool Get(EntityKey key, out CachedEntity<T> entity);
         bool Get(EntityIndex key, out CachedEntity<T> entity);
         bool Get(EntityConditionalIndexInfo conditionalIndex, EntityIndex index, out CachedEntity<T> entity);
         ICollection<CachedEntity<T>> GetAll();
         bool TryRemove(EntityKey key, out CachedEntity<T> removed);
-        bool TryRemove(EntityKey key);
         CachedEntity<T> Update(T entity, bool ignoreState = false);
         void Update(IEnumerable<T> entity);
         void UpdateAll(IEnumerable<T> entity);
         void SetNull(EntityKey key);
         void SetNull(IEnumerable<EntityKey> keys);
-        bool FullCollection { get; }
-        bool NeedUpdate { get; set; }
-        bool Empty { get; }
     }
 }

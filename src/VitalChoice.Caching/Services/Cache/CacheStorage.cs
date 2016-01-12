@@ -84,5 +84,20 @@ namespace VitalChoice.Caching.Services.Cache
                 new EntityIndex(
                     conditionalInfo.InfoCollection.Select(info => new EntityIndexValue(info, info.Property.GetClrValue(entity))));
         }
+
+        public EntityKey GetPrimaryKeyValue(object entity)
+        {
+            return GetPrimaryKeyValue((T) entity);
+        }
+
+        public EntityIndex GetIndexValue(object entity)
+        {
+            return GetIndexValue((T) entity);
+        }
+
+        public EntityIndex GetConditionalIndexValue(object entity, EntityConditionalIndexInfo conditionalInfo)
+        {
+            return GetConditionalIndexValue((T) entity, conditionalInfo);
+        }
     }
 }

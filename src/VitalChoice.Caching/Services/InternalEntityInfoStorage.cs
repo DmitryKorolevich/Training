@@ -109,5 +109,8 @@ namespace VitalChoice.Caching.Services
             }
             return new EntityConditionalIndexInfo[0];
         }
+
+        public ICollection<Type> TrackedTypes => _entityInfos.Keys;
+        
     }
 }

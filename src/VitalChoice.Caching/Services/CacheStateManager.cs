@@ -48,7 +48,6 @@ namespace VitalChoice.Caching.Services
                             cache.Update(entry.Entity);
                             break;
                         case EntityState.Deleted:
-                            cache.MarkForUpdate(entry.Entity);
                             cache.TryRemove(entry.Entity);
                             break;
                         case EntityState.Added:

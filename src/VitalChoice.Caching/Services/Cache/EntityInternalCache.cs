@@ -312,6 +312,11 @@ namespace VitalChoice.Caching.Services.Cache
             return CacheStorage.GetIsCacheFullCollection(relationInfo);
         }
 
+        public IEnumerable<ICacheData> GetAllCaches()
+        {
+            return CacheStorage.AllCacheDatas;
+        }
+
         public EntityKey GetPrimaryKeyValue(T entity)
         {
             return CacheStorage.GetPrimaryKeyValue(entity);
@@ -323,6 +328,21 @@ namespace VitalChoice.Caching.Services.Cache
         }
 
         public EntityIndex GetConditionalIndexValue(T entity, EntityConditionalIndexInfo conditionalInfo)
+        {
+            return CacheStorage.GetConditionalIndexValue(entity, conditionalInfo);
+        }
+
+        public EntityKey GetPrimaryKeyValue(object entity)
+        {
+            return CacheStorage.GetPrimaryKeyValue(entity);
+        }
+
+        public EntityIndex GetIndexValue(object entity)
+        {
+            return CacheStorage.GetIndexValue(entity);
+        }
+
+        public EntityIndex GetConditionalIndexValue(object entity, EntityConditionalIndexInfo conditionalInfo)
         {
             return CacheStorage.GetConditionalIndexValue(entity, conditionalInfo);
         }

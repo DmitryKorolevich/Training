@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using VitalChoice.Caching.Relational;
+using VitalChoice.Caching.Services.Cache.Base;
 
 namespace VitalChoice.Caching.Interfaces
 {
@@ -9,6 +10,7 @@ namespace VitalChoice.Caching.Interfaces
         bool HaveKeys(Type entityType);
         EntityPrimaryKeyInfo GetPrimaryKeyInfo<T>();
         EntityUniqueIndexInfo GetIndexInfo<T>();
-        ICollection<EntityConditionalIndexInfo> GetConditionalIndexInfos<T>(); 
+        ICollection<EntityConditionalIndexInfo> GetConditionalIndexInfos<T>();
+        ICollection<Type> TrackedTypes { get; }
     }
 }
