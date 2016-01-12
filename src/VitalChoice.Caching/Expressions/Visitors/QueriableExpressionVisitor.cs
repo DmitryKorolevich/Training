@@ -15,31 +15,30 @@ namespace VitalChoice.Caching.Expressions.Visitors
 
         protected override Expression VisitLambda<T1>(Expression<T1> node)
         {
-            if (_inWhereExpression && typeof (T1) == typeof (Func<T, bool>))
-            {
-                LambdaExpressionVisitor<T> lambdaVisitor = new LambdaExpressionVisitor<T>();
-                lambdaVisitor.Visit(node.Body);
+            if (!_inWhereExpression || typeof (T1) != typeof (Func<T, bool>))
+                return base.VisitLambda(node);
 
-                if (WhereExpression != null)
+            LambdaExpressionVisitor<T> lambdaVisitor = new LambdaExpressionVisitor<T>();
+            lambdaVisitor.Visit(node.Body);
+
+            if (WhereExpression != null)
+            {
+                WhereExpression.Expression = Expression.Lambda<Func<T, bool>>(Expression.AndAlso(Expression.Invoke(WhereExpression.Expression, WhereExpression.Expression.Parameters), Expression.Invoke(node, node.Parameters)),
+                    WhereExpression.Expression.Parameters);
+                WhereExpression.Condition = new BinaryCondition(ExpressionType.AndAlso, WhereExpression.Expression)
                 {
-                    WhereExpression.Expression = Expression.Lambda<Func<T, bool>>(Expression.AndAlso(Expression.Invoke(WhereExpression.Expression, WhereExpression.Expression.Parameters), Expression.Invoke(node, node.Parameters)),
-                        WhereExpression.Expression.Parameters);
-                    WhereExpression.Condition = new BinaryCondition(ExpressionType.AndAlso, WhereExpression.Expression)
-                    {
-                        Left = WhereExpression.Condition,
-                        Right = lambdaVisitor.Condition
-                    };
-                }
-                else
-                {
-                    WhereExpression = new WhereExpression<T>((Expression<Func<T, bool>>) (object) node)
-                    {
-                        Condition = lambdaVisitor.Condition
-                    };
-                }
-                return node;
+                    Left = WhereExpression.Condition,
+                    Right = lambdaVisitor.Condition
+                };
             }
-            return base.VisitLambda(node);
+            else
+            {
+                WhereExpression = new WhereExpression<T>((Expression<Func<T, bool>>) (object) node)
+                {
+                    Condition = lambdaVisitor.Condition
+                };
+            }
+            return node;
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression node)

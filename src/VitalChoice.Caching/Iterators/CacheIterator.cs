@@ -8,36 +8,54 @@ using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Services.Cache;
 using VitalChoice.Caching.Services.Cache.Base;
+using VitalChoice.Ecommerce.Domain;
+using VitalChoice.ObjectMapping.Base;
 
 namespace VitalChoice.Caching.Iterators
 {
+    internal struct TrackedIteratorParams<T> 
+        where T : class, new()
+    {
+        public IEnumerable<CacheResult<T>> Source;
+        public Func<T, bool> Predicate;
+        public DbContext Context;
+        public ICacheKeysStorage<T> KeysStorage;
+        public DirectMapper<T> DirectMapper;
+    }
+
     internal class CacheIterator<TSource> : SimpleIterator<TSource>
-        where TSource : class
+        where TSource : class, new()
     {
         private readonly IEnumerable<CacheResult<TSource>> _source;
         private readonly Func<TSource, bool> _predicate;
         private readonly bool _track;
         private readonly DbContext _context;
         private readonly ICacheKeysStorage<TSource> _keysStorage;
+        private readonly DirectMapper<TSource> _directMapper;
         private readonly Dictionary<EntityKey, EntityEntry<TSource>> _tracked;
         private IEnumerator<CacheResult<TSource>> _enumerator;
 
-        public CacheIterator(IEnumerable<CacheResult<TSource>> source, Func<TSource, bool> predicate, bool track = false,
-            DbContext context = null, ICacheKeysStorage<TSource> keysStorage = null)
+        public CacheIterator(IEnumerable<CacheResult<TSource>> source, Func<TSource, bool> predicate)
         {
             _source = source;
             _predicate = predicate;
-            _track = track;
-            _context = context;
-            _keysStorage = keysStorage;
-            if (track)
+        }
+
+        public CacheIterator(TrackedIteratorParams<TSource> trackedParams)
+        {
+            if (trackedParams.Context == null || trackedParams.KeysStorage == null || trackedParams.DirectMapper == null)
             {
-                if (context == null || keysStorage == null)
-                {
-                    throw new ArgumentException($"DbContext is null or ICacheKeysStorage is null <{typeof (TSource)}>");
-                }
-                _tracked = context.ChangeTracker.Entries<TSource>().ToDictionary(e => keysStorage.GetPrimaryKeyValue(e.Entity), e => e);
+                throw new ArgumentException($"DbContext is null or ICacheKeysStorage is null or DirectMapper is null <{typeof (TSource)}>");
             }
+            _track = true;
+            _source = trackedParams.Source;
+            _predicate = trackedParams.Predicate;
+            _context = trackedParams.Context;
+            _keysStorage = trackedParams.KeysStorage;
+            _directMapper = trackedParams.DirectMapper;
+            _tracked =
+                trackedParams.Context.ChangeTracker.Entries<TSource>()
+                    .ToDictionary(e => trackedParams.KeysStorage.GetPrimaryKeyValue(e.Entity), e => e);
         }
 
         public override void Dispose()
@@ -111,7 +129,7 @@ namespace VitalChoice.Caching.Iterators
             {
                 if (entry.State == EntityState.Detached)
                 {
-                    _context.Attach(item);
+                    _context.Attach(_directMapper.Clone<Entity>(item));
                 }
                 else
                 {
@@ -120,7 +138,7 @@ namespace VitalChoice.Caching.Iterators
             }
             else
             {
-                _context.Attach(item);
+                _context.Attach(_directMapper.Clone<Entity>(item));
             }
             return item;
         }

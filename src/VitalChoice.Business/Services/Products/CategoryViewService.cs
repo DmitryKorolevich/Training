@@ -26,6 +26,7 @@ using Microsoft.Extensions.Logging;
 using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.ObjectMapping.Interfaces;
 

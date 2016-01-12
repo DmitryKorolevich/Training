@@ -10,7 +10,7 @@ using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Caching.Services.Cache
 {
-    public sealed class CacheStorage<T> : ICacheKeysStorage<T>
+    public sealed class CacheStorage<T> : ICacheKeysStorage<T>, IDisposable
     {
         private readonly IInternalEntityCacheFactory _cacheFactory;
         private readonly ITypeConverter _typeConverter;
@@ -98,6 +98,15 @@ namespace VitalChoice.Caching.Services.Cache
         public EntityIndex GetConditionalIndexValue(object entity, EntityConditionalIndexInfo conditionalInfo)
         {
             return GetConditionalIndexValue((T) entity, conditionalInfo);
+        }
+
+        public void Dispose()
+        {
+            foreach (var data in _cacheData.Values)
+            {
+                data.Clear();
+            }
+            _cacheData.Clear();
         }
     }
 }

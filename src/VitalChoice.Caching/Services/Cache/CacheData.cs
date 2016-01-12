@@ -125,6 +125,7 @@ namespace VitalChoice.Caching.Services.Cache
                 var conditional =
                     _conditionalIndexedDictionary.Keys.Where(c => c.CheckCondition(entity))
                         .ToDictionary(c => c, c => _cacheStorage.GetConditionalIndexValue(entity, c));
+
                 var result = _entityDictionary.AddOrUpdate(pk,
                     key => new CachedEntity<T>(entity, GetRelations(entity, _relationInfo.Relations), conditional, this, indexValue),
                     (key, _) => UpdateExist(_, entity, _relationInfo.Relations, indexValue, conditional, ignoreState));

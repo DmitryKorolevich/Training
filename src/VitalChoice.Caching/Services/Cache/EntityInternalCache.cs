@@ -346,5 +346,10 @@ namespace VitalChoice.Caching.Services.Cache
         {
             return CacheStorage.GetConditionalIndexValue(entity, conditionalInfo);
         }
+
+        public void Dispose()
+        {
+            CacheStorage.Dispose();
+        }
     }
 }

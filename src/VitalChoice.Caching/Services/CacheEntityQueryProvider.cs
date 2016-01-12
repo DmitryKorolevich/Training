@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Query.Internal;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Services.Cache;
 using VitalChoice.Caching.Services.Cache.Base;
@@ -24,22 +25,24 @@ namespace VitalChoice.Caching.Services
         private readonly ITypeConverter _typeConverter;
         private readonly IModelConverterService _modelConverterService;
         private readonly DbContext _context;
+        private readonly ILogger<CacheEntityQueryProvider> _logger;
 
         public CacheEntityQueryProvider(IQueryCompiler queryCompiler, IQueryCacheFactory queryCacheFactory,
             IInternalEntityCacheFactory cacheFactory, ITypeConverter typeConverter,
-            IModelConverterService modelConverterService, DbContext context) : base(queryCompiler)
+            IModelConverterService modelConverterService, DbContext context, ILogger<CacheEntityQueryProvider> logger) : base(queryCompiler)
         {
             _queryCacheFactory = queryCacheFactory;
             _cacheFactory = cacheFactory;
             _typeConverter = typeConverter;
             _modelConverterService = modelConverterService;
             _context = context;
+            _logger = logger;
         }
 
         public override TResult Execute<TResult>(Expression expression)
         {
             var cacheObjectType = typeof (TResult);
-            var elementType = typeof (TResult).TryGetElementType(typeof (IEnumerable<>));
+            var elementType = typeof (TResult).TryGetElementType(typeof (ICollection<>));
             if (elementType != null)
             {
                 cacheObjectType = elementType;
@@ -49,7 +52,7 @@ namespace VitalChoice.Caching.Services
                 var cacheExecutor =
                     (ICacheExecutor)
                         Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
-                            _context, _queryCacheFactory, _cacheFactory, _typeConverter, _modelConverterService);
+                            _context, _queryCacheFactory, _cacheFactory, _typeConverter, _modelConverterService, _logger);
                 CacheGetResult cacheGetResult;
                 var result = elementType != null
                     ? cacheExecutor.Execute(out cacheGetResult)
@@ -62,7 +65,7 @@ namespace VitalChoice.Caching.Services
                         result = base.Execute<TResult>(expression);
                         if (elementType != null)
                         {
-                            return (TResult) cacheExecutor.Update((IEnumerable<object>) result);
+                            cacheExecutor.UpdateList(result);
                         }
                         cacheExecutor.Update(result);
                         return (TResult) result;
@@ -79,17 +82,18 @@ namespace VitalChoice.Caching.Services
                 var cacheExecutor =
                     (ICacheExecutor)
                         Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
-                            _context, _queryCacheFactory, _cacheFactory, _typeConverter, _modelConverterService);
+                            _context, _queryCacheFactory, _cacheFactory, _typeConverter, _modelConverterService, _logger);
                 CacheGetResult cacheGetResult;
-                var result = cacheExecutor.Execute(out cacheGetResult);
+                var result = (List<TResult>)cacheExecutor.Execute(out cacheGetResult);
                 switch (cacheGetResult)
                 {
                     case CacheGetResult.Found:
-                        return result.Cast<TResult>().ToAsyncEnumerable();
+                        return result.ToAsyncEnumerable();
                     case CacheGetResult.Update:
                         var asyncResult = base.ExecuteAsync<TResult>(expression);
                         var results = asyncResult.ToList().GetAwaiter().GetResult();
-                        return ((List<TResult>) cacheExecutor.Update(results.Cast<object>())).ToAsyncEnumerable();
+                        cacheExecutor.UpdateList(results);
+                        return results.ToAsyncEnumerable();
                 }
             }
             return base.ExecuteAsync<TResult>(expression);
@@ -98,14 +102,21 @@ namespace VitalChoice.Caching.Services
         public override Task<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken)
         {
             var cacheObjectType = typeof (TResult);
+            var elementType = typeof(TResult).TryGetElementType(typeof(ICollection<>));
+            if (elementType != null)
+            {
+                cacheObjectType = elementType;
+            }
             if (cacheObjectType.GetTypeInfo().IsSubclassOf(typeof (Entity)))
             {
                 var cacheExecutor =
                     (ICacheExecutor)
                         Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
-                            _context, _queryCacheFactory, _cacheFactory, _typeConverter, _modelConverterService);
+                            _context, _queryCacheFactory, _cacheFactory, _typeConverter, _modelConverterService, _logger);
                 CacheGetResult cacheGetResult;
-                var result = cacheExecutor.ExecuteFirst(out cacheGetResult);
+                var result = elementType != null
+                    ? cacheExecutor.Execute(out cacheGetResult)
+                    : cacheExecutor.ExecuteFirst(out cacheGetResult);
                 switch (cacheGetResult)
                 {
                     case CacheGetResult.Found:
@@ -113,6 +124,10 @@ namespace VitalChoice.Caching.Services
                     case CacheGetResult.Update:
                         var asyncResult = base.ExecuteAsync<TResult>(expression, cancellationToken);
                         var results = asyncResult.GetAwaiter().GetResult();
+                        if (elementType != null)
+                        {
+                            cacheExecutor.UpdateList(results);
+                        }
                         cacheExecutor.Update(results);
                         return Task.FromResult(results);
                 }
@@ -122,40 +137,51 @@ namespace VitalChoice.Caching.Services
 
         private interface ICacheExecutor
         {
-            IEnumerable<object> Execute(out CacheGetResult cacheResult);
+            object Execute(out CacheGetResult cacheResult);
             object ExecuteFirst(out CacheGetResult cacheResult);
             void Update(object entity);
-            object Update(IEnumerable<object> entities);
+            void UpdateList(object entities);
         }
 
         private class CacheExecutor<T> : ICacheExecutor
             where T : Entity, new()
         {
             private readonly DbContext _context;
+            private readonly ILogger _logger;
             private readonly QueryCacheData<T> _queryData;
             private readonly IEntityCache<T> _cache;
 
             public CacheExecutor(Expression expression, DbContext context, IQueryCacheFactory queryCacheFactory,
                 IInternalEntityCacheFactory cacheFactory, ITypeConverter typeConverter,
-                IModelConverterService modelConverterService)
+                IModelConverterService modelConverterService, ILogger logger)
             {
-                _cache = new EntityCache<T>(cacheFactory/*,
-                    new DirectMapper<T>(typeConverter, modelConverterService)*/);
+                _cache = new EntityCache<T>(cacheFactory,
+                    new DirectMapper<T>(typeConverter, modelConverterService));
                 _context = context;
+                _logger = logger;
                 var queryCache = queryCacheFactory.GetQueryCache<T>();
                 _queryData = queryCache.GerOrAdd(expression);
             }
 
-            public IEnumerable<object> Execute(out CacheGetResult cacheResult)
+            public object Execute(out CacheGetResult cacheResult)
             {
                 if (_queryData.IsEmpty)
                 {
                     cacheResult = CacheGetResult.NotFound;
                     return null;
                 }
-                List<T> entities;
-                cacheResult = _cache.TryGetCached(_queryData, _context, out entities);
-                return entities;
+                try
+                {
+                    List<T> entities;
+                    cacheResult = _cache.TryGetCached(_queryData, _context, out entities);
+                    return entities;
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e.Message, e);
+                    cacheResult = CacheGetResult.NotFound;
+                    return null;
+                }
             }
 
             public object ExecuteFirst(out CacheGetResult cacheResult)
@@ -165,9 +191,18 @@ namespace VitalChoice.Caching.Services
                     cacheResult = CacheGetResult.NotFound;
                     return null;
                 }
-                T entity;
-                cacheResult = _cache.TryGetCachedFirstOrDefault(_queryData, _context, out entity);
-                return entity;
+                try
+                {
+                    T entity;
+                    cacheResult = _cache.TryGetCachedFirstOrDefault(_queryData, _context, out entity);
+                    return entity;
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e.Message, e);
+                    cacheResult = CacheGetResult.NotFound;
+                    return null;
+                }
             }
 
             public void Update(object entity)
@@ -176,18 +211,30 @@ namespace VitalChoice.Caching.Services
                 {
                     return;
                 }
-                _cache.Update(_queryData, (T) entity);
+                try
+                {
+                    _cache.Update(_queryData, (T) entity);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e.Message, e);
+                }
             }
 
-            public object Update(IEnumerable<object> entities)
+            public void UpdateList(object entities)
             {
                 if (_queryData.IsEmpty)
                 {
-                    return null;
+                    return;
                 }
-                var result = entities.Cast<T>().ToList();
-                _cache.Update(_queryData, result);
-                return result;
+                try
+                {
+                    _cache.Update(_queryData, (IEnumerable<T>)entities);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e.Message, e);
+                }
             }
         }
     }

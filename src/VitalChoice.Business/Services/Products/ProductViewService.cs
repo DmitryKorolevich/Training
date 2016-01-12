@@ -8,6 +8,7 @@ using VitalChoice.ContentProcessing.Interfaces;
 using VitalChoice.Data.Repositories;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Interfaces.Services;

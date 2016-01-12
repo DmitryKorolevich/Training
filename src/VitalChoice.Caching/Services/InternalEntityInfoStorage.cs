@@ -6,22 +6,39 @@ using System.Linq.Expressions;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Metadata.Internal;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Caching.Extensions;
+using VitalChoice.Caching.GC;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
-using VitalChoice.Caching.Relational.Base;
 using VitalChoice.Caching.Services.Cache.Base;
+using VitalChoice.Ecommerce.Domain.Options;
+using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Caching.Services
 {
     internal class InternalEntityInfoStorage : IInternalEntityInfoStorage
     {
-        public InternalEntityInfoStorage(DbContext context)
+        internal static readonly ConcurrentDictionary<Type, ModelCache> ContextModelCaches = new ConcurrentDictionary<Type, ModelCache>();
+
+        private readonly ITypeConverter _typeConverter;
+        private readonly IOptions<AppOptionsBase> _options;
+        private readonly ILogger _logger;
+        private readonly IReadOnlyDictionary<Type, EntityInfo> _entityInfos;
+        private readonly IEntityCollectorInfo _gcCollector;
+
+        public InternalEntityInfoStorage(DbContext context, ITypeConverter typeConverter, IOptions<AppOptionsBase> options, ILogger logger)
         {
-            _entityInfos = ContextModelCaches.GetOrAdd(context.GetType(), key => Initialize(context.Model));
+            _typeConverter = typeConverter;
+            _options = options;
+            _logger = logger;
+            var modelInfo = ContextModelCaches.GetOrAdd(context.GetType(), key => Initialize(context.Model));
+            _entityInfos = modelInfo.EntityCache;
+            _gcCollector = modelInfo.EntityCollector;
         }
 
-        private static Dictionary<Type, EntityInfo> Initialize(IModel dataModel)
+        private ModelCache Initialize(IModel dataModel)
         {
             var entityInfos = new Dictionary<Type, EntityInfo>();
             foreach (var entityType in dataModel.GetEntityTypes())
@@ -68,12 +85,13 @@ namespace VitalChoice.Caching.Services
                     ConditionalIndexes = nonUniqueList
                 });
             }
-            return entityInfos;
+
+            return new ModelCache
+            {
+                EntityCache = entityInfos,
+                EntityCollector = new EntityCollector(this, new InternalEntityCacheFactory(this, _typeConverter), _options, _logger)
+            };
         }
-
-        internal static readonly ConcurrentDictionary<Type, Dictionary<Type, EntityInfo>> ContextModelCaches = new ConcurrentDictionary<Type, Dictionary<Type, EntityInfo>>();
-
-        private readonly Dictionary<Type, EntityInfo> _entityInfos;
 
         public bool HaveKeys(Type entityType)
         {
@@ -110,7 +128,17 @@ namespace VitalChoice.Caching.Services
             return new EntityConditionalIndexInfo[0];
         }
 
-        public ICollection<Type> TrackedTypes => _entityInfos.Keys;
-        
+        public IEnumerable<Type> TrackedTypes => _entityInfos.Keys;
+
+        public bool CanAddUpCache()
+        {
+            return _gcCollector.CanAddUpCache();
+        }
+    }
+
+    internal struct ModelCache
+    {
+        public IReadOnlyDictionary<Type, EntityInfo> EntityCache;
+        public EntityCollector EntityCollector;
     }
 }

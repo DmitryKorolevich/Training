@@ -21,7 +21,6 @@ using VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Data.Helpers;
-using DynamicExpressionVisitor = VitalChoice.DynamicData.Helpers.DynamicExpressionVisitor;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Business.Helpers;
 
