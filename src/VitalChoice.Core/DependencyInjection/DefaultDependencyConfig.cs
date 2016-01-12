@@ -31,7 +31,6 @@ using VitalChoice.Business.Services.Products;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Services;
 using VitalChoice.Data.Repositories.Customs;
-using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services.Products;
 using Autofac;
 using Autofac.Core;
@@ -59,21 +58,16 @@ using VitalChoice.Interfaces.Services.Avatax;
 using VitalChoice.Interfaces.Services.Users;
 using Microsoft.AspNet.Mvc.Abstractions;
 using Microsoft.AspNet.Mvc.Formatters;
-using VitalChoice.ContentProcessing.Base;
 using Microsoft.Extensions.PlatformAbstractions;
 using VitalChoice.Workflow.Base;
 using VitalChoice.ContentProcessing.Helpers;
-using VitalChoice.ContentProcessing.Interfaces;
 using VitalChoice.DynamicData.Extensions;
 using Autofac.Extensions.DependencyInjection;
-using Microsoft.Data.Entity.Infrastructure;
 using VitalChoice.Business.Repositories;
 using VitalChoice.Core.Infrastructure.Helpers.ReCaptcha;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Cache;
 using VitalChoice.Ecommerce.Context;
-using VitalChoice.Ecommerce.Domain.Entities.Base;
-using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Options;
 using VitalChoice.Ecommerce.UnitOfWork;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
@@ -86,21 +80,14 @@ using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.Infrastructure.ServiceBus;
-using Microsoft.Data.Entity.Internal;
 
 namespace VitalChoice.Core.DependencyInjection
 {
     public abstract class DefaultDependencyConfig : IDependencyConfig
     {
-        //private static bool _called = false;
-
         public IServiceProvider RegisterInfrastructure(IConfiguration configuration, IServiceCollection services,
             Assembly projectAssembly)
         {
-            //if (!_called)
-            //{
-            //    _called = true;
-
             // Add EF services to the services container.
             services.AddEntityFramework().AddEntityFrameworkCache() //.AddMigrations()
                 .AddSqlServer();
@@ -137,169 +124,15 @@ namespace VitalChoice.Core.DependencyInjection
 
             services.Configure<AppOptionsBase>(options =>
             {
-                options.LogPath = configuration.GetSection("App:LogPath").Value;
-                options.LogLevel = configuration.GetSection("App:LogLevel").Value;
-                options.Connection = new Connection
-                {
-                    UserName = configuration.GetSection("App:Connection:UserName").Value,
-                    Password = configuration.GetSection("App:Connection:Password").Value,
-                    Server = configuration.GetSection("App:Connection:Server").Value,
-                };
+                ConfigureBaseOptions(configuration, options);
             });
 
             services.Configure<AppOptions>(options =>
             {
-                options.GenerateLowercaseUrls =
-                    Convert.ToBoolean(configuration.GetSection("App:GenerateLowercaseUrls").Value);
-                options.EnableBundlingAndMinification =
-                    Convert.ToBoolean(configuration.GetSection("App:EnableBundlingAndMinification").Value);
-                options.Versioning = new Versioning()
-                {
-                    EnableStaticContentVersioning =
-                        Convert.ToBoolean(configuration.GetSection("App:Versioning:EnableStaticContentVersioning").Value),
-                    BuildNumber =
-                        Convert.ToBoolean(configuration.GetSection("App:Versioning:AutoGenerateBuildNumber").Value)
-                            ? Guid.NewGuid().ToString("N")
-                            : configuration.GetSection("App:Versioning:BuildNumber").Value
-                };
-                options.LogPath = configuration.GetSection("App:LogPath").Value;
-                options.LogLevel = configuration.GetSection("App:LogLevel").Value;
-                options.DefaultCacheExpirationTermMinutes =
-                    Convert.ToInt32(configuration.GetSection("App:DefaultCacheExpirationTermMinutes").Value);
-                options.ActivationTokenExpirationTermDays =
-                    Convert.ToInt32(configuration.GetSection("App:ActivationTokenExpirationTermDays").Value);
-                options.DefaultCultureId = configuration.GetSection("App:DefaultCultureId").Value;
-                options.Connection = new Connection
-                {
-                    UserName = configuration.GetSection("App:Connection:UserName").Value,
-                    Password = configuration.GetSection("App:Connection:Password").Value,
-                    Server = configuration.GetSection("App:Connection:Server").Value,
-                };
-                options.PublicHost = configuration.GetSection("App:PublicHost").Value;
-                options.AdminHost = configuration.GetSection("App:AdminHost").Value;
-                options.MainSuperAdminEmail = configuration.GetSection("App:MainSuperAdminEmail").Value;
-                options.CustomerServiceToEmail = configuration.GetSection("App:CustomerServiceToEmail").Value;
-                options.CustomerFeedbackToEmail = configuration.GetSection("App:CustomerFeedbackToEmail").Value;
-                options.FilesRelativePath = configuration.GetSection("App:FilesRelativePath").Value;
-                options.FilesPath = configuration.GetSection("App:FilesPath").Value;
-                options.EmailConfiguration = new Email
-                {
-                    From = configuration.GetSection("App:Email:From").Value,
-                    Host = configuration.GetSection("App:Email:Host").Value,
-                    Port = Convert.ToInt32(configuration.GetSection("App:Email:Port").Value),
-                    Secured = Convert.ToBoolean(configuration.GetSection("App:Email:Secured").Value),
-                    Username = configuration.GetSection("App:Email:Username").Value,
-                    Password = configuration.GetSection("App:Email:Password").Value
-                };
-                options.ExportService = new ExportService
-                {
-                    ConnectionString = configuration.GetSection("App:ExportService:ConnectionString").Value,
-                    EncryptedQueueName = configuration.GetSection("App:ExportService:EncryptedQueueName").Value,
-                    PlainQueueName = configuration.GetSection("App:ExportService:PlainQueueName").Value,
-                    CertThumbprint = configuration.GetSection("App:ExportService:CertThumbprint").Value,
-                    RootThumbprint = configuration.GetSection("App:ExportService:RootThumbprint").Value,
-                    EncryptionHostSessionExpire =
-                        Convert.ToBoolean(
-                            configuration.GetSection("App:ExportService:EncryptionHostSessionExpire").Value),
-                    ServerHostName = configuration.GetSection("App:ExportService:ServerHostName").Value
-                };
-                options.AzureStorage = new AzureStorage()
-                {
-                    StorageConnectionString = configuration.GetSection("App:AzureStorage:StorageConnectionString").Value,
-                    CustomerContainerName = configuration.GetSection("App:AzureStorage:CustomerContainerName").Value,
-                    BugTicketFilesContainerName =
-                        configuration.GetSection("App:AzureStorage:BugTicketFilesContainerName").Value,
-                    BugTicketCommentFilesContainerName =
-                        configuration.GetSection("App:AzureStorage:BugTicketCommentFilesContainerName").Value,
-                };
-                options.FedExOptions = new FedExOptions()
-                {
-                    AccountNumber = configuration.GetSection("App:FedExOptions:AccountNumber").Value,
-                    MeterNumber = configuration.GetSection("App:FedExOptions:MeterNumber").Value,
-                    MerchantPhoneNumber = configuration.GetSection("App:FedExOptions:MerchantPhoneNumber").Value,
-                    Key = configuration.GetSection("App:FedExOptions:Key").Value,
-                    Password = configuration.GetSection("App:FedExOptions:Password").Value,
-                    PayAccountNumber = configuration.GetSection("App:FedExOptions:PayAccountNumber").Value,
-                    ShipServiceUrl = configuration.GetSection("App:FedExOptions:ShipServiceUrl").Value,
-                    LocatorServiceUrl = configuration.GetSection("App:FedExOptions:LocatorServiceUrl").Value,
-                };
-                options.Avatax = new AvataxOptions
-                {
-                    AccountNumber = configuration.GetSection("App:Avatax:AccountNumber").Value,
-                    CompanyCode = configuration.GetSection("App:Avatax:CompanyCode").Value,
-                    AccountName = configuration.GetSection("App:Avatax:AccountName").Value,
-                    LicenseKey = configuration.GetSection("App:Avatax:LicenseKey").Value,
-                    ProfileName = configuration.GetSection("App:Avatax:ProfileName").Value,
-                    ServiceUrl = configuration.GetSection("App:Avatax:ServiceUrl").Value,
-                    TurnOffCommit = Convert.ToBoolean(configuration.GetSection("App:Avatax:TurnOffCommit").Value)
-                };
-                options.GoogleCaptcha = new GoogleCaptcha
-                {
-                    PublicKey = configuration.GetSection("App:GoogleCaptcha:PublicKey").Value,
-                    SecretKey = configuration.GetSection("App:GoogleCaptcha:SecretKey").Value,
-                    VerifyUrl = configuration.GetSection("App:GoogleCaptcha:VerifyUrl").Value
-                };
-                options.AuthorizeNet = new AuthorizeNet
-                {
-                    ApiKey = configuration.GetSection("App:AuthorizeNet:ApiKey").Value,
-                    ApiLogin = configuration.GetSection("App:AuthorizeNet:ApiLogin").Value,
-                    TestEnv = Convert.ToBoolean(configuration.GetSection("App:AuthorizeNet:TestEnv").Value)
-                };
+                ConfigureAppOptions(configuration, options);
             });
 
-            services.Configure<MvcOptions>(o =>
-            {
-                var inputFormatter =
-                    (JsonInputFormatter)
-                        o.InputFormatters.SingleOrDefault(f => f.GetType() == typeof (JsonInputFormatter));
-                var outputFormatter =
-                    (JsonOutputFormatter)
-                        o.OutputFormatters.SingleOrDefault(f => f.GetType() == typeof (JsonOutputFormatter));
-
-                if (inputFormatter != null)
-                {
-                    inputFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
-                    inputFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
-                    inputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Unspecified;
-                    inputFormatter.SerializerSettings.Converters.Add(new PstLocalIsoDateTimeConverter());
-                }
-                else
-                {
-                    var newFormatter = new JsonInputFormatter
-                    {
-                        SerializerSettings =
-                        {
-                            DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                            DateParseHandling = DateParseHandling.DateTime,
-                            DateTimeZoneHandling = DateTimeZoneHandling.Unspecified
-                        }
-                    };
-                    newFormatter.SerializerSettings.Converters.Add(new PstLocalIsoDateTimeConverter());
-                    o.InputFormatters.Add(newFormatter);
-                }
-
-                if (outputFormatter != null)
-                {
-                    outputFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
-                    outputFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
-                    outputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Unspecified;
-                    outputFormatter.SerializerSettings.Converters.Add(new PstLocalIsoDateTimeConverter());
-                }
-                else
-                {
-                    var newFormatter = new JsonOutputFormatter
-                    {
-                        SerializerSettings =
-                        {
-                            DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                            DateParseHandling = DateParseHandling.DateTime,
-                            DateTimeZoneHandling = DateTimeZoneHandling.Unspecified
-                        }
-                    };
-                    newFormatter.SerializerSettings.Converters.Add(new PstLocalIsoDateTimeConverter());
-                    o.OutputFormatters.Add(newFormatter);
-                }
-            });
+            services.Configure<MvcOptions>(ConfigureMvcOptions);
 
 
             var builder = new ContainerBuilder();
@@ -333,8 +166,171 @@ namespace VitalChoice.Core.DependencyInjection
             LoggerService.Build(container.Resolve<IOptions<AppOptions>>(), container.Resolve<IApplicationEnvironment>());
             EcommerceContextBase.ServiceProvider = container.Resolve<IServiceProvider>();
             return EcommerceContextBase.ServiceProvider;
-            //}
-            //return null;
+        }
+
+        private static void ConfigureMvcOptions(MvcOptions o)
+        {
+            var inputFormatter =
+                (JsonInputFormatter)
+                    o.InputFormatters.SingleOrDefault(f => f.GetType() == typeof (JsonInputFormatter));
+            var outputFormatter =
+                (JsonOutputFormatter)
+                    o.OutputFormatters.SingleOrDefault(f => f.GetType() == typeof (JsonOutputFormatter));
+
+            if (inputFormatter != null)
+            {
+                inputFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+                inputFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
+                inputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Unspecified;
+                inputFormatter.SerializerSettings.Converters.Add(new PstLocalIsoDateTimeConverter());
+            }
+            else
+            {
+                var newFormatter = new JsonInputFormatter
+                {
+                    SerializerSettings =
+                    {
+                        DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                        DateParseHandling = DateParseHandling.DateTime,
+                        DateTimeZoneHandling = DateTimeZoneHandling.Unspecified
+                    }
+                };
+                newFormatter.SerializerSettings.Converters.Add(new PstLocalIsoDateTimeConverter());
+                o.InputFormatters.Add(newFormatter);
+            }
+
+            if (outputFormatter != null)
+            {
+                outputFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+                outputFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
+                outputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Unspecified;
+                outputFormatter.SerializerSettings.Converters.Add(new PstLocalIsoDateTimeConverter());
+            }
+            else
+            {
+                var newFormatter = new JsonOutputFormatter
+                {
+                    SerializerSettings =
+                    {
+                        DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                        DateParseHandling = DateParseHandling.DateTime,
+                        DateTimeZoneHandling = DateTimeZoneHandling.Unspecified
+                    }
+                };
+                newFormatter.SerializerSettings.Converters.Add(new PstLocalIsoDateTimeConverter());
+                o.OutputFormatters.Add(newFormatter);
+            }
+        }
+
+        private static void ConfigureAppOptions(IConfiguration configuration, AppOptions options)
+        {
+            ConfigureBaseOptions(configuration, options);
+            options.GenerateLowercaseUrls =
+                Convert.ToBoolean(configuration.GetSection("App:GenerateLowercaseUrls").Value);
+            options.EnableBundlingAndMinification =
+                Convert.ToBoolean(configuration.GetSection("App:EnableBundlingAndMinification").Value);
+            options.Versioning = new Versioning()
+            {
+                EnableStaticContentVersioning =
+                    Convert.ToBoolean(configuration.GetSection("App:Versioning:EnableStaticContentVersioning").Value),
+                BuildNumber =
+                    Convert.ToBoolean(configuration.GetSection("App:Versioning:AutoGenerateBuildNumber").Value)
+                        ? Guid.NewGuid().ToString("N")
+                        : configuration.GetSection("App:Versioning:BuildNumber").Value
+            };
+            options.DefaultCacheExpirationTermMinutes =
+                Convert.ToInt32(configuration.GetSection("App:DefaultCacheExpirationTermMinutes").Value);
+            options.ActivationTokenExpirationTermDays =
+                Convert.ToInt32(configuration.GetSection("App:ActivationTokenExpirationTermDays").Value);
+            options.DefaultCultureId = configuration.GetSection("App:DefaultCultureId").Value;
+            options.PublicHost = configuration.GetSection("App:PublicHost").Value;
+            options.AdminHost = configuration.GetSection("App:AdminHost").Value;
+            options.MainSuperAdminEmail = configuration.GetSection("App:MainSuperAdminEmail").Value;
+            options.CustomerServiceToEmail = configuration.GetSection("App:CustomerServiceToEmail").Value;
+            options.CustomerFeedbackToEmail = configuration.GetSection("App:CustomerFeedbackToEmail").Value;
+            options.FilesRelativePath = configuration.GetSection("App:FilesRelativePath").Value;
+            options.FilesPath = configuration.GetSection("App:FilesPath").Value;
+            options.EmailConfiguration = new Email
+            {
+                From = configuration.GetSection("App:Email:From").Value,
+                Host = configuration.GetSection("App:Email:Host").Value,
+                Port = Convert.ToInt32(configuration.GetSection("App:Email:Port").Value),
+                Secured = Convert.ToBoolean(configuration.GetSection("App:Email:Secured").Value),
+                Username = configuration.GetSection("App:Email:Username").Value,
+                Password = configuration.GetSection("App:Email:Password").Value
+            };
+            options.ExportService = new ExportService
+            {
+                ConnectionString = configuration.GetSection("App:ExportService:ConnectionString").Value,
+                EncryptedQueueName = configuration.GetSection("App:ExportService:EncryptedQueueName").Value,
+                PlainQueueName = configuration.GetSection("App:ExportService:PlainQueueName").Value,
+                CertThumbprint = configuration.GetSection("App:ExportService:CertThumbprint").Value,
+                RootThumbprint = configuration.GetSection("App:ExportService:RootThumbprint").Value,
+                EncryptionHostSessionExpire =
+                    Convert.ToBoolean(
+                        configuration.GetSection("App:ExportService:EncryptionHostSessionExpire").Value),
+                ServerHostName = configuration.GetSection("App:ExportService:ServerHostName").Value
+            };
+            options.AzureStorage = new AzureStorage()
+            {
+                StorageConnectionString = configuration.GetSection("App:AzureStorage:StorageConnectionString").Value,
+                CustomerContainerName = configuration.GetSection("App:AzureStorage:CustomerContainerName").Value,
+                BugTicketFilesContainerName =
+                    configuration.GetSection("App:AzureStorage:BugTicketFilesContainerName").Value,
+                BugTicketCommentFilesContainerName =
+                    configuration.GetSection("App:AzureStorage:BugTicketCommentFilesContainerName").Value,
+            };
+            options.FedExOptions = new FedExOptions()
+            {
+                AccountNumber = configuration.GetSection("App:FedExOptions:AccountNumber").Value,
+                MeterNumber = configuration.GetSection("App:FedExOptions:MeterNumber").Value,
+                MerchantPhoneNumber = configuration.GetSection("App:FedExOptions:MerchantPhoneNumber").Value,
+                Key = configuration.GetSection("App:FedExOptions:Key").Value,
+                Password = configuration.GetSection("App:FedExOptions:Password").Value,
+                PayAccountNumber = configuration.GetSection("App:FedExOptions:PayAccountNumber").Value,
+                ShipServiceUrl = configuration.GetSection("App:FedExOptions:ShipServiceUrl").Value,
+                LocatorServiceUrl = configuration.GetSection("App:FedExOptions:LocatorServiceUrl").Value,
+            };
+            options.Avatax = new AvataxOptions
+            {
+                AccountNumber = configuration.GetSection("App:Avatax:AccountNumber").Value,
+                CompanyCode = configuration.GetSection("App:Avatax:CompanyCode").Value,
+                AccountName = configuration.GetSection("App:Avatax:AccountName").Value,
+                LicenseKey = configuration.GetSection("App:Avatax:LicenseKey").Value,
+                ProfileName = configuration.GetSection("App:Avatax:ProfileName").Value,
+                ServiceUrl = configuration.GetSection("App:Avatax:ServiceUrl").Value,
+                TurnOffCommit = Convert.ToBoolean(configuration.GetSection("App:Avatax:TurnOffCommit").Value)
+            };
+            options.GoogleCaptcha = new GoogleCaptcha
+            {
+                PublicKey = configuration.GetSection("App:GoogleCaptcha:PublicKey").Value,
+                SecretKey = configuration.GetSection("App:GoogleCaptcha:SecretKey").Value,
+                VerifyUrl = configuration.GetSection("App:GoogleCaptcha:VerifyUrl").Value
+            };
+            options.AuthorizeNet = new AuthorizeNet
+            {
+                ApiKey = configuration.GetSection("App:AuthorizeNet:ApiKey").Value,
+                ApiLogin = configuration.GetSection("App:AuthorizeNet:ApiLogin").Value,
+                TestEnv = Convert.ToBoolean(configuration.GetSection("App:AuthorizeNet:TestEnv").Value)
+            };
+        }
+
+        private static void ConfigureBaseOptions(IConfiguration configuration, AppOptionsBase options)
+        {
+            options.LogPath = configuration.GetSection("App:LogPath").Value;
+            options.LogLevel = configuration.GetSection("App:LogLevel").Value;
+            options.Connection = new Connection
+            {
+                UserName = configuration.GetSection("App:Connection:UserName").Value,
+                Password = configuration.GetSection("App:Connection:Password").Value,
+                Server = configuration.GetSection("App:Connection:Server").Value,
+            };
+            options.CacheSettings = new CacheSettings
+            {
+                CacheTimeToLeaveSeconds = Convert.ToInt32(configuration.GetSection("App:CacheSettings:CacheTimeToLeaveSeconds").Value),
+                CacheScanPeriodSeconds = Convert.ToInt32(configuration.GetSection("App:CacheSettings:CacheScanPeriodSeconds").Value),
+                MaxProcessHeapsSizeBytes = Convert.ToInt64(configuration.GetSection("App:CacheSettings:MaxProcessHeapsSizeBytes").Value),
+            };
         }
 
         public IContainer BuildContainer(Assembly projectAssembly, ContainerBuilder builder)
