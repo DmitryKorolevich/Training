@@ -366,7 +366,9 @@ angular.module('app.modules.customer.services.customerEditService', [])
             if (uiScope.forms.card.$valid) {
                 customerService.createCreditCardPrototype(uiScope.addEditTracker)
                     .success(function (result) {
-                        if (result.Success) {
+                        if (result.Success)
+                        {
+                            syncCountry(uiScope, result.Data.Address);
                             uiScope.currentCustomer.CreditCards.push(result.Data);
                             if (uiScope.paymentInfoTab.CreditCardIndex === undefined) {
                                 uiScope.paymentInfoTab.CreditCardIndex = "0";
@@ -400,7 +402,9 @@ angular.module('app.modules.customer.services.customerEditService', [])
             {
                 customerService.createCheckPrototype(uiScope.addEditTracker)
                     .success(function (result) {
-                        if (result.Success) {
+                        if (result.Success)
+                        {
+                            syncCountry(uiScope, result.Data.Address);
                             uiScope.currentCustomer.Check = result.Data;
                             uiScope.currentCustomer.Check.formName = 'check';
                             if (callback)
@@ -428,7 +432,9 @@ angular.module('app.modules.customer.services.customerEditService', [])
             {
                 customerService.createOacPrototype(uiScope.addEditTracker)
                     .success(function (result) {
-                        if (result.Success) {
+                        if (result.Success)
+                        {
+                            syncCountry(uiScope, result.Data.Address);
                             uiScope.currentCustomer.Oac = result.Data;
                             uiScope.currentCustomer.Oac.formName = 'oac';
                             if (callback)
@@ -459,6 +465,7 @@ angular.module('app.modules.customer.services.customerEditService', [])
                     {
                         if (result.Success)
                         {
+                            syncCountry(uiScope, result.Data.Address);
                             uiScope.currentCustomer.WireTransfer = result.Data;
                             uiScope.currentCustomer.WireTransfer.formName = 'wiretransfer';
                             if (callback)
@@ -494,6 +501,7 @@ angular.module('app.modules.customer.services.customerEditService', [])
                     {
                         if (result.Success)
                         {
+                            syncCountry(uiScope, result.Data.Address);
                             uiScope.currentCustomer.Marketing = result.Data;
                             uiScope.currentCustomer.Marketing.formName = 'marketing';
                             if (callback)
@@ -528,6 +536,7 @@ angular.module('app.modules.customer.services.customerEditService', [])
                     {
                         if (result.Success)
                         {
+                            syncCountry(uiScope, result.Data.Address);
                             uiScope.currentCustomer.VCWellness = result.Data;
                             uiScope.currentCustomer.VCWellness.formName = 'vcwellness';
                             if (callback)
@@ -563,6 +572,7 @@ angular.module('app.modules.customer.services.customerEditService', [])
                     .success(function (result) {
                         if (result.Success) {
                             uiScope.paymentInfoTab.CreditCard = result.Data;
+                            syncCountry(uiScope, result.Data.Address);
                             uiScope.paymentInfoTab.CreditCard.formName = "card";
                             uiScope.currentCustomer.CreditCards.push(uiScope.paymentInfoTab.CreditCard);
                             if (uiScope.paymentInfoTab.CreditCardIndex === undefined)
@@ -599,6 +609,7 @@ angular.module('app.modules.customer.services.customerEditService', [])
                     .success(function (result) {
                         if (result.Success) {
                             uiScope.order.Check = result.Data;
+                            syncCountry(uiScope, result.Data.Address);
                             uiScope.order.Check.formName = 'check';
                             if (callback)
                                 callback(result.Data);
@@ -626,6 +637,7 @@ angular.module('app.modules.customer.services.customerEditService', [])
                     .success(function (result) {
                         if (result.Success) {
                             uiScope.order.Oac = result.Data;
+                            syncCountry(uiScope, result.Data.Address);
                             uiScope.order.Oac.formName = 'oac';
                             if (callback)
                                 callback(result.Data);
@@ -656,6 +668,7 @@ angular.module('app.modules.customer.services.customerEditService', [])
                         if (result.Success)
                         {
                             uiScope.order.WireTransfer = result.Data;
+                            syncCountry(uiScope, result.Data.Address);
                             uiScope.order.WireTransfer.formName = 'wiretransfer';
                             if (callback)
                                 callback(result.Data);
@@ -690,6 +703,7 @@ angular.module('app.modules.customer.services.customerEditService', [])
                         if (result.Success)
                         {
                             uiScope.order.Marketing = result.Data;
+                            syncCountry(uiScope, result.Data.Address);
                             uiScope.order.Marketing.formName = 'marketing';
                             if (callback)
                                 callback(result.Data);
@@ -724,6 +738,7 @@ angular.module('app.modules.customer.services.customerEditService', [])
                         if (result.Success)
                         {
                             uiScope.order.VCWellness = result.Data;
+                            syncCountry(uiScope, result.Data.Address);
                             uiScope.order.VCWellness.formName = 'vcwellness';
                             if (callback)
                                 callback(result.Data);

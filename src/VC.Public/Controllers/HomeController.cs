@@ -9,10 +9,5 @@ namespace VC.Public.Controllers
         {
             return View();
         }
-
-		public IActionResult ViewCart()
-		{
-			return View();
-		}
 	}
 }

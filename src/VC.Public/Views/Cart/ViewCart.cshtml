@@ -1,0 +1,220 @@
+﻿@{
+	Layout = "~/Views/Shared/_ViewCartLayout.cshtml";
+}
+
+@model VC.Public.Models.Cart.ViewCartModel
+
+@section PageScripts {
+	<script src="@Url.Content("/app/modules/cart/viewcart.js")"></script>
+}
+
+<div class="cart-content-top">
+	<span class="cart-head-text">IMPORTANT NOTICE</span>
+	<span class="cart-subhead-text">You are only $27.00 from Free Shipping.</span>
+	<p class="cart-body-text">To enjoy Free Shipping simply add more items until the Cart total reaches $99.00 or more.<br/>
+		(Gift Certificates are exempt from shipping charges). <a href="/">Continue Shopping</a></p>
+</div>
+<div class="cart-content-middle">
+	<div class="cart-shopping-notice">
+		<div class="shopping-notice-left">
+			<h6>Your Shopping Cart</h6>
+		</div>
+		<div class="shopping-notice-right">
+			<span class="shopping-notice-note">NOTE:</span><span>We cannot ship frozen foods to Canada, due to cost and excessive delays.</span>
+			<ul>
+				<li>
+					Free shipping on orders of $99 or more does not apply to Canada.<br />
+					Please call 800-608-4825 to place your order. <a href="#">Click here for details.</a>
+				</li>
+				<li>Frozen goods sent to Alaska or Hawaii* are subject to surcharges: <a href="#">Click here for details.</a></li>
+			</ul>
+		</div>
+		<span>Please review your purchases and quantities, then click the Checkout button.</span>
+	</div>
+	@using (Html.BeginForm("ViewCart", "Cart", null, FormMethod.Post, new { @class = "form-cart", role = "form" }))
+	{
+		<div class="cart-certificates-container">
+			<a name="trustlink" href="http://secure.trust-guard.com/certificates/5867" target="_blank"
+			   onclick="var nonwin = navigator.appName != 'Microsoft Internet Explorer' ? 'yes' : 'no'; window.open(this.href.replace('http', 'https'), 'welcome', 'location=' + nonwin + ',scrollbars=yes,width=517,height=' + screen.availHeight + ',menubar=no,toolbar=no'); return false;"
+			   oncontextmenu="var d = new Date(); alert('Copying Prohibited by Law - This image and all included logos are copyrighted by trust-guard \251 '+d.getFullYear()+'.'); return false;">
+				<img name="trustseal" alt="Security Seal" style="border: 0;" src="https://secure.trust-guard.com/seals/5867/scanned/mini/gray"/>
+			</a>
+			<a class="cart-guarantee-link" href="#">
+				<img src="/assets/images/guarantee2-cart.jpg"/>
+			</a>
+		</div>
+		<div class="cart-control-container">
+			<a href="#" class="button arrow-left-red">Continue Shopping</a>
+			<input type="submit" class="checkout-blue" value="Checkout"/>
+		</div>
+		<table class="standard-table cart-items-list">
+			<thead>
+			<tr>
+				<th colspan="2">
+					Item
+				</th>
+				<th>
+					Price
+				</th>
+				<th>
+					Quantity
+				</th>
+				<th>
+					Subtotal
+				</th>
+				<th>
+				</th>
+			</tr>
+			</thead>
+			<tbody>
+			@if (Model.Skus.Any())
+			{
+				for (int i = 0; i < Model.Skus.Count; i++)
+				{
+					<tr>
+						<td class="cart-image-link">
+							<a href="@Model.Skus[i].ProductPageUrl">
+								<img src="@Model.Skus[i].IconUrl" />
+							</a>
+						</td>
+						<td class="cart-line-info">
+							<a class="cart-text-link" href="@Model.Skus[i].ProductPageUrl">
+								@Model.Skus[i].DisplayName
+							</a>
+							<span class="cart-sku-code">(@Model.Skus[i].Code)</span>
+							<span class="stock-presence-note">@(Model.Skus[i].InStock ? "In Stock Ready to Ship" : "Not in Stock")</span>
+						</td>
+						<td>@(Model.Skus[i].Price.HasValue ? Model.Skus[i].Price.Value.ToString("C2") : string.Empty)</td>
+						<td>@Html.TextBoxFor(x => Model.Skus[i].Quantity, new {@class = "input-control width-small"})</td>
+						<td>@(Model.Skus[i].SubTotal.HasValue ? Model.Skus[i].SubTotal.Value.ToString("C2") : string.Empty)</td>
+						<td class="grid-controls-container">
+							<input type="button" value="Remove" />
+						</td>
+					</tr>
+				}
+			}
+			else
+			{
+				<tr><td colspan="6">No Items Added</td></tr>
+			}
+			</tbody>
+		</table>
+		<div class="cart-order-details">
+			<div class="cart-shipping-instructions">
+				<span class="shipping-instructions-title">
+					Shipping Instructions:
+				</span>
+				<label class="cart-shipping-option">
+					<input name="rdUpgradeOption" type="radio"/>
+					Ship this order as soon as possible
+				</label>
+				<label class="cart-shipping-option">
+					<input name="rdUpgradeOption" type="radio"/>
+					Ship this order the week of:
+				</label>
+				@Html.TextBoxFor(x=>x.ShippingDate, new { @class = "cart-input-box input-control" })
+				<a href="#">View our shipping policies</a>
+			</div>
+			<div class="cart-order-totals">
+				<div class="cart-total-line">
+					<label>
+						Subtotal
+					</label>
+					<label class="cart-total-value">
+						@Model.SubTotal.ToString("C2")
+					</label>
+				</div>
+				<div class="cart-total-line">
+					<label>
+						Upgrade Non-Perishable Items
+					</label>
+					<select name="UpgradeOption" class="input-control cart-total-value">
+						<option>None Selected</option>
+					</select>
+				</div>
+				<div class="cart-total-line">
+					<label>
+						Shipping
+					</label>
+					<label class="cart-total-value">
+						@(Model.ShippingCost.HasValue ? Model.ShippingCost.Value.ToString("C2") : "FREE!")
+					</label>
+				</div>
+				<div class="cart-total-line cart-order-summary">
+					<label>
+						Order Total
+					</label>
+					<label class="cart-total-value">
+						@Model.OrderTotal.ToString("C2")
+					</label>
+				</div>
+			</div>
+			<div class="cart-promo-container">
+				<label>Enter Promo Code Here</label>
+				@Html.TextBoxFor(x => x.PromoCode, new { @class = "cart-input-box input-control" })<img class="tooltip-v" data-tooltip-title="Promo Code" data-tooltip-body="If you have a discount code, enter it in the box to see the change in your order's total." src="/assets/images/question-mark-4-24.png" />
+			</div>
+			<div id="divGcContainer" class="cart-gc-container">
+				<label>Gift Certificate Code</label>
+				@for (int i = 0; i < Model.GiftCertificateCodes.Count; i++)
+				{
+					if (i > 0)
+					{
+						<br/><label></label>
+					}
+					@Html.TextBoxFor(x => Model.GiftCertificateCodes[i], new {@class = "cart-input-box input-control"})
+					if (i == 0)
+					{
+						<input id="btnAddGc" type="button" class="plus-button-red"/><img class="tooltip-v" data-tooltip-title="Gift Certificate Code" data-tooltip-body="If you have a gift certificate code, enter it in the box to see the change in your order's total." src="/assets/images/question-mark-4-24.png"/>
+					}
+					else
+					{
+						<input type="button" class="minus-button-red btnRemoveGc" />
+					}
+				}
+			</div>
+		</div>
+		<div class="cart-control-container">
+			<a href="#" class="button arrow-left-red">Continue Shopping</a>
+			<input type="submit" class="checkout-blue" value="Checkout" />
+		</div>
+	}
+</div>
+<div class="cart-content-bottom">
+	<div class="best-proposals-container">
+		<span class="best-proposals-title">
+			Great products. Great value. Add these to your cart.
+		</span>
+		<div class="best-proposals-item">
+			<span class="proposals-item-title">6.5$</span>
+			<a class="proposals-item-link" href="#">
+				<img src="/Assets/images/cart/NRT501_alabcore_pouched_30z_218.jpg" />
+				Wild Albacore Tuna
+				Grab 'n Go Pouch
+			</a>
+		</div>
+		<div class="best-proposals-item">
+			<span class="proposals-item-title">6.5$</span>
+			<a class="proposals-item-link" href="#">
+				<img src="/Assets/images/cart/ntm1_trail-mix_no_pistachio_218.jpg" />
+				Organic Super Antioxidant
+				Trail Mix - 16 oz
+			</a>
+		</div>
+		<div class="best-proposals-item">
+			<span class="proposals-item-title">6.5$</span>
+			<a class="proposals-item-link" href="#">
+				<img src="/Assets/images/cart/seaweedsalad_218.jpg" />
+				Wakame Seaweed Salad
+				8 oz tub
+			</a>
+		</div>
+		<div class="best-proposals-item">
+			<span class="proposals-item-title">6.5$</span>
+			<a class="proposals-item-link" href="#">
+				<img src="/Assets/images/cart/NSC201_salmonoil_1000mg_90_218.jpg" />
+				1000 mg Sockeye Salmon Oil
+				Softgels - 90 Caps
+			</a>
+		</div>
+	</div>
+</div>

@@ -528,3 +528,117 @@ INSERT INTO [dbo].[ContentPages]
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentPages] WHERE [Url] = 'vitalgreen')
+BEGIN
+
+DECLARE @contentItemId int
+
+INSERT INTO [dbo].[ContentItems]
+           ([Created]
+           ,[Updated]
+           ,[Template]
+           ,[Description]
+           ,[Title]
+           ,[MetaKeywords]
+           ,[MetaDescription])
+     VALUES
+           (GETDATE()
+           ,GETDATE()
+           ,'<%
+<body:body>
+{{
+    @script(){{
+        <script src="/app/common/dataAccess.js"></script>
+        <script src="/app/modules/content/vitalgreen.js"></script>
+    }}
+    <div class="vitalgreen relative">
+        <div data-ng-show="show" class="overlay hide"><div class="loading">Loading…</div></div>
+        <div>
+            <div class="header">
+                <img src="/assets/images/VitalGreen_350x72.jpg">
+            </div>
+            <div class="step1">
+                <h4>Vital Green Step #1: Provide Your Address and Information</h4>
+                <span class="form-control-hint">
+                    Please fill in all the fields marked with a red asterisk (leave the Address 2 field blank if it does not apply to you).<br />
+                    Click "Continue" to see a list of FedEx shipping centers near you.<br />
+                    Click where indicated at the top of the next page, to view and print out a shipping label for the foam recycling center nearest you.<br />
+                </span>
+            </div>
+            @razor(@(new VC.Public.Models.VitalGreenRequestModel())){{~/Views/VitalGreen/_Step1.cshtml}}
+            <div class="step2 hide">
+                <h4>
+                    Vital Green Step #2:<br />
+                    Get FedEx Center Addresses and Your Foam-Recycling Center Shipping Label
+                </h4>
+                <div class="form-regular">
+                    <span class="form-control-hint">
+                        A FedEx shipping label has been created for your foam shipping cube. To view and
+                        print it, please click <a href="#" id="link" target="_blank">HERE</a>
+                        <br />
+                        Affix the label to your clean foam shipping cube and drop the cube off at the FedEx
+                        center nearest you.
+                        <br />
+                        Below is a list of FedEx drop-off centers near you, from which your foam shipping
+                        cube will be sent to the nearest recycling center, at no charge.
+                        <br />
+                        We suggest that you copy the address of the nearest center, or print this page for
+                        future reference.
+                        <br />
+                        <br />
+                    </span>
+                    <div class="items">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}}
+%>'
+           ,'<p>empty</p>'
+           ,'Vital Green'
+           ,NULL
+           ,NULL)
+
+SET @contentItemId=@@identity
+
+INSERT INTO [dbo].[ContentPages]
+           ([Url]
+           ,[Name]
+           ,[FileUrl]
+           ,[ContentItemId]
+           ,[MasterContentItemId]
+           ,[StatusCode]
+           ,[Assigned]
+           ,[UserId])
+     VALUES
+           ('vitalgreen'
+           ,'Vital Green'
+           ,NULL
+           ,@contentItemId
+           ,(SELECT Id FROM MasterContentItems WHERE Name='Content Individual')
+           ,2
+           ,1
+           ,NULL)
+
+END
+
+GO
+
+IF EXISTS(SELECT Id FROM ContentItems
+WHERE Id IN 
+(SELECT ContentItemId FROM ContentCategories 
+WHERE ParentId IS NULL)
+AND Title !='')
+BEGIN
+
+UPDATE ContentItems
+SET Title=''
+WHERE Id IN 
+(SELECT ContentItemId FROM ContentCategories 
+WHERE ParentId IS NULL)
+
+END
+
+GO

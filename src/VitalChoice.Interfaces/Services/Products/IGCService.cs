@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 
 namespace VitalChoice.Interfaces.Services.Products
@@ -12,7 +13,9 @@ namespace VitalChoice.Interfaces.Services.Products
 	public interface IGcService
     {
         Task<PagedList<GiftCertificate>> GetGiftCertificatesAsync(GCFilter filter);
-        
+
+        Task<GCStatisticModel> GetGiftCertificatesWithOrderInfoAsync(GCFilter filter);
+
         Task<GiftCertificate> GetGiftCertificateAsync(int id);
 
         Task<GiftCertificate> UpdateGiftCertificateAsync(GiftCertificate model);

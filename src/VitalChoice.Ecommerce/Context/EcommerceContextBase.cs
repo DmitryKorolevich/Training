@@ -194,6 +194,12 @@ namespace VitalChoice.Ecommerce.Context
                 entity.HasKey(p => p.Id);
                 entity.ToTable("GiftCertificates");
                 entity.Property(p => p.PublicId).ValueGeneratedOnAdd();
+                entity
+                    .HasOne(p => p.Order)
+                    .WithMany()
+                    .HasForeignKey(p => p.IdOrder)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired(false);
             });
 
             #endregion

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
 
 namespace VitalChoice.Ecommerce.Domain.Entities.GiftCertificates
 {
@@ -27,6 +28,10 @@ namespace VitalChoice.Ecommerce.Domain.Entities.GiftCertificates
         public GCType GCType { get; set; }
 
         public Guid PublicId { get; set; }
+
+        public int? IdOrder { get; set; }
+
+        public Order Order { get; set; }
 
         public GiftCertificate Clone()
         {

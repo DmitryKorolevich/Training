@@ -16,6 +16,7 @@ namespace VitalChoice.Data.Helpers
         IQueryFluent<TEntity> OrderBy(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy);
         Task<bool> SelectAnyAsync();
         Task<int> SelectCountAsync();
+        Task<decimal> SelectSumAsync(Expression<Func<TEntity, decimal>> func);
         List<TEntity> SelectPage(int page, int pageSize, out int totalCount, bool tracking = true);
         Task<PagedList<TEntity>> SelectPageAsync(int page, int pageSize, bool tracking = false);
         List<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> selector = null, bool tracking = true);

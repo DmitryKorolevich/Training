@@ -103,7 +103,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				    stateLabel: 'List Processing, Analysis',
 				    subMenu: [
                         //{ name: 'matchbackPostSeasonAnalysisReport', stateName: 'index.oneCol.matchbackPostSeasonAnalysisReport', stateLabel: 'Matchback and Post-Season Analysis Report', access: 3 },
-                        //{ name: 'giftCertificateReport', stateName: 'index.oneCol.giftCertificateReport', stateLabel: 'Gift Certificate Report', access: 3 },
+                        { name: 'giftCertificateReport', stateName: 'index.oneCol.manageGCOrders', stateLabel: 'Gift Certificate Report', access: 3 },
                         //{ name: 'giftCertificateUsageReport', stateName: 'index.oneCol.giftCertificateUsageReport', stateLabel: 'Gift Certificate Usage Report', access: 3 },
                         //{ name: 'lifeTimeCalculationReport', stateName: 'index.oneCol.lifeTimeCalculationReport', stateLabel: 'Life Time Calculation Report', access: 3 },
                         //{ name: 'mailingListReport', stateName: 'index.oneCol.mailingListReport', stateLabel: 'Mailing List Report', access: 3 },

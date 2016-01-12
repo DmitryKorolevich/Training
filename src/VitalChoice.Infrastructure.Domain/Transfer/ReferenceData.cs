@@ -37,8 +37,12 @@ namespace VitalChoice.Infrastructure.Domain.Transfer
 
         public IList<LookupItem<int>> GCTypes { get; set; }
 
+        public IList<LookupItem<int>> GCShortTypes { get; set; }
+
         public IList<LookupItem<int>> RecordStatuses { get; set; }
 
+        public IList<LookupItem<int?>> PublicRecordStatuses { get; set; }
+        
         public IList<LookupItem<int>> CustomerStatuses { get; set; }
 
         public IList<LookupItem<int>> AffiliateStatuses { get; set; }

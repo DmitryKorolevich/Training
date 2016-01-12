@@ -72,7 +72,7 @@ angular.module('textAngularSetup', [])
     // forceTextAngularSanitize
     // set false to allow the textAngular-sanitize provider to be replaced
     // with angular-sanitize or a custom provider.
-	forceTextAngularSanitize: false,
+	forceTextAngularSanitize: true,
 	///////////////////////////////////////////////////////////////////////////////////////
 	// keyMappings
 	// allow customizable keyMappings for specialized key boards or languages

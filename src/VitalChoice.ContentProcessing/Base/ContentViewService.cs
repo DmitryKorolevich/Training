@@ -155,7 +155,8 @@ namespace VitalChoice.ContentProcessing.Base
             return new ContentViewModel
             {
                 Body = generatedHtml,
-                Title = entity.ContentItem.Title,
+                Title = !String.IsNullOrEmpty(entity.ContentItem.Title) ? entity.ContentItem.Title :
+                    String.Format(ContentConstants.CONTENT_PAGE_TITLE_GENERAL_FORMAT, entity.Name),
                 MetaDescription = entity.ContentItem.MetaDescription,
                 MetaKeywords = entity.ContentItem.MetaKeywords,
                 Scripts = viewContext.Scripts

@@ -24,7 +24,7 @@ namespace VC.Public.Controllers
     [AllowAnonymous]
     public class VitalGreenController : BaseMvcController
     {
-        private const string VITAL_GREEN_COOKIE_NAME = "VitalGreen";
+        public const string VITAL_GREEN_COOKIE_NAME = "VitalGreen";
         private const int VITAL_GREEN_COOKIE_EXPIRED_HOURS = 24;
 
         private readonly IStorefrontUserService _userService;
@@ -49,21 +49,12 @@ namespace VC.Public.Controllers
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Step1()
-        {
-            await SetStates();
-            var request = GetRequestFromCookie();
-            return View(request ?? new VitalGreenRequestModel());
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Step1(VitalGreenRequestModel model)
         {
             if (!Validate(model))
             {
-                await SetStates();
                 return View(model);
             }
 
@@ -83,7 +74,7 @@ namespace VC.Public.Controllers
 
             if (request == null)
             {
-                return RedirectToAction("Step1");
+                return Redirect("/content/vitalgreen");
             }
 
             FedExZone zone = await _vitalGreenService.GetFedExZone(request.StateCode);
@@ -91,13 +82,13 @@ namespace VC.Public.Controllers
             {
                 ModelState.AddModelError("", "No Zone Found.");
             }
-            if (zone.Id == 13)//13
+            if (zone!=null && zone.Id == 13)//13
             {
                 ModelState.AddModelError("", "No Recyclers yet.");
                 zone = null;
             }
 
-            return View(zone);
+            return PartialView("_ShipTo",zone);
         }
 
         [HttpGet]
@@ -146,22 +137,10 @@ namespace VC.Public.Controllers
                 }
             }
 
-            return View(model);
+            return PartialView("_Step2", model);
         }
 
         #region Private
-
-        [NonAction]
-        private async Task SetStates()
-        {
-            CountryFilter filter = new CountryFilter();
-            filter.CountryCode = "US";
-            ViewBag.States = (await _countryService.GetCountriesAsync(filter)).SingleOrDefault().States.Select(p => new SelectListItem()
-            {
-                Text = p.StateName,
-                Value = p.StateCode,
-            }).ToList();
-        }
 
         [NonAction]
         private VitalGreenRequestModel GetRequestFromCookie()

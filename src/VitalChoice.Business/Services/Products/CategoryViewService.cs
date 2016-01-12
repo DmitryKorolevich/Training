@@ -88,6 +88,27 @@ namespace VitalChoice.Business.Services.Products
             return entity;
         }
 
+
+        protected override ContentViewModel CreateResult(string generatedHtml, ContentViewContext<ProductCategoryContent> viewContext)
+        {
+            var result = base.CreateResult(generatedHtml, viewContext);
+            var title = viewContext.Entity.ContentItem.Title;
+            ProductCategory category = viewContext.Entity?.ProductCategory;
+            if(category.Id==0 && viewContext.Entity!=null)
+            {
+                //For root category
+                category = (_productCategoryEcommerceRepository.Query(p => p.Id == viewContext.Entity.Id)
+                    .Select(false)).FirstOrDefault();
+            }
+            if (category != null)
+            {
+                result.Title = !string.IsNullOrWhiteSpace(title)
+                    ? title
+                    : String.Format(ContentConstants.CONTENT_PAGE_TITLE_GENERAL_FORMAT, category.Name);
+            }
+            return result;
+        }
+
         #endregion
-	}
+    }
 }

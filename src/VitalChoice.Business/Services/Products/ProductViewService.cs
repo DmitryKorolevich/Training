@@ -54,7 +54,7 @@ namespace VitalChoice.Business.Services.Products
             {
                 result.Title = !string.IsNullOrWhiteSpace(title)
                     ? title
-                    : $"{productDynamic.Name} | {productDynamic.Data.SubTitle}";
+                    : String.Format(ContentConstants.CONTENT_PAGE_TITLE_GENERAL_FORMAT, productDynamic.Name);
             }
             return result;
         }
