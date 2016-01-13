@@ -4385,13 +4385,28 @@ body.view-cart-layout{
 		}
 	}
 
-	a{
+	a,
+	.working-area-holder a{
 		color: #a30100;
 		text-decoration: none;
 
 		&:hover{
 			text-decoration: underline;
 		}
+	}
+
+	.working-area-holder h4{
+		color:#C3392F;
+
+		&.checkout-step-heading{
+			padding-top: 20px;
+			color:#f15d22;
+		}
+	}
+
+	.form-regular {
+		font-family: Tahoma;
+		font-size: 12px;
 	}
 
 	a.circle-button{
@@ -4437,7 +4452,7 @@ body.view-cart-layout{
 		white-space: nowrap;
 		padding: 7px 12px;
 		color: #FFF;
-		text-decoration: none;
+		text-decoration: none !important;
 
 		&:hover {
             background-color: #BD281E;
@@ -4866,3 +4881,57 @@ body.view-cart-layout{
 	}
 }
 /*---------*/
+
+/*--Checkout---*/
+.checkout-step-container{
+	padding: 0px 40px;
+	margin-bottom: 40px;
+	float:left;
+	clear:left;
+
+	.welcome-centered-button{
+		text-align:center;
+
+		a{
+			margin-right: 60px;
+			margin-top: 92px;
+		}
+	}
+
+	.welcome-columns-container{
+		margin-top: 10px;
+	}
+
+	.checkout-notification-important{
+		display:block;
+		font-weight:bold;
+	}
+
+	.checkout-notification-simple{
+		display:block;
+	}
+
+	.checkout-columns-divider{
+		position:absolute;
+		left:50%;
+		top:10%;
+		bottom:10%;
+		border-left:1px solid #5C95AF;
+	}
+
+	.checkout-login-form{
+		margin-left:60px;
+	}
+}
+
+.columns-container{
+	float:left;
+	clear:left;
+	position:relative;
+	width:100%;
+}
+
+.two-columns-block{
+	float:left;
+	width:50%;
+}
