@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.OptionsModel;
 using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Mail;
+using VitalChoice.Infrastructure.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Options;
 
 namespace VitalChoice.Business.Mail
@@ -186,6 +187,16 @@ namespace VitalChoice.Business.Mail
             var subject = $"Check out this article I found on Vital Choice: {model.Name}";
 
             await emailSender.SendEmailAsync(email, subject, body,fromDisplayName: model.FromName, fromEmail: model.FromEmail, toDisplayName: model.RecipentName);
+        }
+
+        public async Task SendPrivacyRequestEmailAsync(string email, PrivacyRequestEmail model)
+        {
+            var body =
+                $"<p>Name - {model.Name}</p><p>Mailing Address - {model.MailingAddress}</p><p>Other Name - {model.OtherName}</p><p>Other Address - {model.OtherAddress}</p><p>Comment - {model.Comment}</p><p>Vital Choice Administration,</p><p></p><p>This is an automated message. Do not reply. This mailbox is not monitored.</p>";
+
+            var subject = "Vital Choice - Privacy Request Email";
+
+            await emailSender.SendEmailAsync(email, subject, body);
         }
     }
 }
