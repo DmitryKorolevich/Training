@@ -54,9 +54,9 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
 
         public decimal StandardShippingCharges { get; set; }
 
-        public IList<LookupItem<ShippingUpgradeOption>> ShippingUpgradePOptions { get; set; }
+        public ICollection<LookupItem<ShippingUpgradeOption>> ShippingUpgradePOptions { get; set; }
 
-        public IList<LookupItem<ShippingUpgradeOption>> ShippingUpgradeNpOptions { get; set; }
+        public ICollection<LookupItem<ShippingUpgradeOption>> ShippingUpgradeNpOptions { get; set; }
 
         public decimal ShippingTotal { get; set; }
 
@@ -82,11 +82,11 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
 
         public bool ProductsPerishableThresholdIssue { get; set; }
 
-        public IList<SkuOrdered> SkuOrdereds { get; set; }
+        public ICollection<SkuOrdered> SkuOrdereds { get; set; }
 
-        public IList<SkuOrdered> PromoSkus { get; set; }
+        public ICollection<SkuOrdered> PromoSkus { get; set; }
 
-        public IList<MessageInfo> Messages { get; set; }
+        public ICollection<MessageInfo> Messages { get; set; }
 
         public SplitInfo SplitInfo { get; set; }
 
