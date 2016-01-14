@@ -45,7 +45,7 @@ namespace VitalChoice.Caching.Services.Cache
             var result = new QueryCacheData<T>
             {
                 RelationInfo = cached.Relations,
-                Tracking = queryAnalyzer.Tracking,
+                Tracked = queryAnalyzer.Tracking,
                 WhereExpression = queryAnalyzer.WhereExpression,
                 OrderByFunction = cached.OrderByFunction
             };

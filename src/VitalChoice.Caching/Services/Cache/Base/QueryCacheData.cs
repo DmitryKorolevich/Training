@@ -10,7 +10,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
     {
         public WhereExpression<T> WhereExpression { get; set; }
         public RelationInfo RelationInfo { get; set; }
-        public bool Tracking { get; set; }
+        public bool Tracked { get; set; }
         public Func<IEnumerable<T>, IOrderedEnumerable<T>> OrderByFunction { get; set; }
         public ICollection<KeyValuePair<EntityConditionalIndexInfo, ICollection<EntityIndex>>> ConditionalIndexes { get; set; }
         public ICollection<EntityIndex> UniqueIndexes { get; set; }

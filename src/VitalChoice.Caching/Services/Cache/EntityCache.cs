@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.ChangeTracking;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Iterators;
 using VitalChoice.Caching.Relational;
@@ -19,15 +20,17 @@ namespace VitalChoice.Caching.Services.Cache
         private readonly IInternalEntityCache<T> _internalCache;
         private readonly IInternalEntityCacheFactory _cacheFactory;
         private readonly DirectMapper<T> _directMapper;
+        private readonly DbContext _context;
 
-        public EntityCache(IInternalEntityCacheFactory cacheFactory, DirectMapper<T> directMapper)
+        public EntityCache(IInternalEntityCacheFactory cacheFactory, DirectMapper<T> directMapper, DbContext context)
         {
             _cacheFactory = cacheFactory;
             _directMapper = directMapper;
+            _context = context;
             _internalCache = cacheFactory.GetCache<T>();
         }
 
-        public CacheGetResult TryGetCached(QueryCacheData<T> queryCache, DbContext dbContext, out List<T> entities)
+        public CacheGetResult TryGetCached(QueryCacheData<T> queryCache, out List<T> entities)
         {
             if (_internalCache == null)
             {
@@ -41,32 +44,32 @@ namespace VitalChoice.Caching.Services.Cache
                 if (queryCache.WhereExpression == null)
                 {
                     results = _internalCache.GetAll(queryCache.RelationInfo);
-                    return TranslateResult(dbContext, queryCache, results,
+                    return TranslateResult(queryCache, results,
                         out entities);
                 }
                 if (TryPrimaryKeys(queryCache, out results))
                 {
-                    return TranslateResult(dbContext, queryCache, results,
+                    return TranslateResult(queryCache, results,
                         out entities);
                 }
 
                 if (TryUniqueIndexes(queryCache, out results))
-                    return TranslateResult(dbContext, queryCache, results,
+                    return TranslateResult(queryCache, results,
                         out entities);
 
                 if (TryConditionalIndexes(queryCache, out results))
-                    return TranslateResult(dbContext, queryCache, results,
+                    return TranslateResult(queryCache, results,
                         out entities);
 
                 results = _internalCache.GetWhere(queryCache.RelationInfo, queryCache.WhereExpression.Compiled);
-                return TranslateResult(dbContext, queryCache,
+                return TranslateResult(queryCache,
                     results, out entities);
             }
             entities = null;
             return CacheGetResult.Update;
         }
 
-        public CacheGetResult TryGetCachedFirstOrDefault(QueryCacheData<T> queryCache, DbContext dbContext, out T entity)
+        public CacheGetResult TryGetCachedFirstOrDefault(QueryCacheData<T> queryCache, out T entity)
         {
             if (_internalCache == null)
             {
@@ -80,25 +83,25 @@ namespace VitalChoice.Caching.Services.Cache
                 if (queryCache.WhereExpression == null)
                 {
                     results = _internalCache.GetAll(queryCache.RelationInfo);
-                    return TranslateFirstResult(dbContext, queryCache, results,
+                    return TranslateFirstResult(queryCache, results,
                         out entity);
                 }
                 if (TryPrimaryKeys(queryCache, out results))
                 {
-                    return TranslateFirstResult(dbContext, queryCache, results,
+                    return TranslateFirstResult(queryCache, results,
                         out entity);
                 }
 
                 if (TryUniqueIndexes(queryCache, out results))
-                    return TranslateFirstResult(dbContext, queryCache, results,
+                    return TranslateFirstResult(queryCache, results,
                         out entity);
 
                 if (TryConditionalIndexes(queryCache, out results))
-                    return TranslateFirstResult(dbContext, queryCache, results,
+                    return TranslateFirstResult(queryCache, results,
                         out entity);
 
                 results = _internalCache.GetWhere(queryCache.RelationInfo, queryCache.WhereExpression.Compiled);
-                return TranslateFirstResult(dbContext, queryCache,
+                return TranslateFirstResult(queryCache,
                     results, out entity);
             }
             entity = default(T);
@@ -116,6 +119,11 @@ namespace VitalChoice.Caching.Services.Cache
 
             if (!CanUpdate(queryData, out fullCollection))
                 return;
+
+            if (queryData.Tracked)
+            {
+                entities = entities.Select(e => _directMapper.Clone<Entity>(e));
+            }
 
             if (fullCollection)
             {
@@ -145,6 +153,10 @@ namespace VitalChoice.Caching.Services.Cache
             }
             else
             {
+                if (queryData.Tracked)
+                {
+                    entity = _directMapper.Clone<Entity>(entity);
+                }
                 if (fullCollection)
                 {
                     _internalCache.UpdateAll(Enumerable.Repeat(entity, 1), queryData.RelationInfo);
@@ -240,24 +252,24 @@ namespace VitalChoice.Caching.Services.Cache
             return false;
         }
 
-        private CacheGetResult TranslateFirstResult(DbContext dbContext,
+        private CacheGetResult TranslateFirstResult(
             QueryCacheData<T> queryData, IEnumerable<CacheResult<T>> results,
             out T entity)
         {
-            if (queryData.Tracking)
+            if (queryData.Tracked)
             {
-                return ConvertAttachResult(results, dbContext, queryData, out entity);
+                return ConvertAttachResult(results, queryData, out entity);
             }
             return ConvertResult(results, queryData, out entity);
         }
 
-        private CacheGetResult TranslateResult(DbContext dbContext,
+        private CacheGetResult TranslateResult(
             QueryCacheData<T> queryData, IEnumerable<CacheResult<T>> results,
             out List<T> entities)
         {
-            if (queryData.Tracking)
+            if (queryData.Tracked)
             {
-                return ConvertAttachResult(results, dbContext, queryData, out entities);
+                return ConvertAttachResult(results, queryData, out entities);
             }
             return ConvertResult(results, queryData, out entities);
         }
@@ -271,12 +283,13 @@ namespace VitalChoice.Caching.Services.Cache
             return entities;
         }
 
-        private CacheGetResult ConvertAttachResult(IEnumerable<CacheResult<T>> results, DbContext dbContext, QueryCacheData<T> queryData, out T entity)
+        private CacheGetResult ConvertAttachResult(IEnumerable<CacheResult<T>> results, QueryCacheData<T> queryData, out T entity)
         {
             var compiled = queryData.WhereExpression?.Compiled;
             CacheIterator<T> cacheIterator = new CacheIterator<T>(new TrackedIteratorParams<T>
             {
-                Context = dbContext,
+                Tracked = _context.ChangeTracker.Entries<T>()
+                    .ToDictionary(e => _internalCache.GetPrimaryKeyValue(e.Entity), e => e),
                 KeysStorage = _internalCache,
                 DirectMapper = _directMapper,
                 Predicate = compiled,
@@ -284,7 +297,7 @@ namespace VitalChoice.Caching.Services.Cache
             });
             var orderedList = Order(cacheIterator, queryData);
             entity = orderedList.FirstOrDefault();
-            return CreateGetResult(cacheIterator);
+            return CreateGetResult(cacheIterator, queryData, Enumerable.Repeat(entity, 1));
         }
 
         private CacheGetResult ConvertResult(IEnumerable<CacheResult<T>> results, QueryCacheData<T> queryData, out T entity)
@@ -293,15 +306,16 @@ namespace VitalChoice.Caching.Services.Cache
             CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled);
             var orderedList = Order(cacheIterator, queryData);
             entity = orderedList.FirstOrDefault();
-            return CreateGetResult(cacheIterator);
+            return CreateGetResult(cacheIterator, queryData, Enumerable.Repeat(entity, 1));
         }
 
-        private CacheGetResult ConvertAttachResult(IEnumerable<CacheResult<T>> results, DbContext dbContext, QueryCacheData<T> queryData, out List<T> entities)
+        private CacheGetResult ConvertAttachResult(IEnumerable<CacheResult<T>> results, QueryCacheData<T> queryData, out List<T> entities)
         {
             var compiled = queryData.WhereExpression?.Compiled;
             CacheIterator<T> cacheIterator = new CacheIterator<T>(new TrackedIteratorParams<T>
             {
-                Context = dbContext,
+                Tracked = _context.ChangeTracker.Entries<T>()
+                            .ToDictionary(e => _internalCache.GetPrimaryKeyValue(e.Entity), e => e),
                 KeysStorage = _internalCache,
                 DirectMapper = _directMapper,
                 Predicate = compiled,
@@ -309,7 +323,7 @@ namespace VitalChoice.Caching.Services.Cache
             });
             var orderedList = Order(cacheIterator, queryData);
             entities = orderedList.ToList();
-            return CreateGetResult(cacheIterator);
+            return CreateGetResult(cacheIterator, queryData, entities);
         }
 
         private CacheGetResult ConvertResult(IEnumerable<CacheResult<T>> results, QueryCacheData<T> queryData, out List<T> entities)
@@ -318,18 +332,44 @@ namespace VitalChoice.Caching.Services.Cache
             CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled);
             var orderedList = Order(cacheIterator, queryData);
             entities = orderedList.ToList();
-            return CreateGetResult(cacheIterator);
+            return CreateGetResult(cacheIterator, queryData, entities);
         }
 
-        private CacheGetResult CreateGetResult(CacheIterator<T> cacheIterator)
+        private CacheGetResult CreateGetResult(CacheIterator<T> cacheIterator, QueryCacheData<T> queryData, IEnumerable<T> entities)
         {
             if (cacheIterator.AggregatedResult != CacheGetResult.Found)
             {
                 return !_cacheFactory.CanAddUpCache() ? CacheGetResult.NotFound : cacheIterator.AggregatedResult;
             }
             if (cacheIterator.Found)
+            {
+                if (queryData.Tracked)
+                {
+                    AttachNotTracked(entities, cacheIterator.Tracked);
+                }
                 return CacheGetResult.Found;
+            }
             return !_cacheFactory.CanAddUpCache() ? CacheGetResult.NotFound : CacheGetResult.Update;
+        }
+
+        private void AttachNotTracked(IEnumerable<T> items, Dictionary<EntityKey, EntityEntry<T>> tracked)
+        {
+            foreach (var item in items)
+            {
+                var pk = _internalCache.GetPrimaryKeyValue(item);
+                EntityEntry<T> entry;
+                if (tracked.TryGetValue(pk, out entry))
+                {
+                    if (entry.State == EntityState.Detached)
+                    {
+                        _context.Attach(item);
+                    }
+                }
+                else
+                {
+                    _context.Attach(item);
+                }
+            }
         }
     }
 }

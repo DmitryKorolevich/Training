@@ -146,7 +146,6 @@ namespace VitalChoice.Caching.Services
         private class CacheExecutor<T> : ICacheExecutor
             where T : Entity, new()
         {
-            private readonly DbContext _context;
             private readonly ILogger _logger;
             private readonly QueryCacheData<T> _queryData;
             private readonly IEntityCache<T> _cache;
@@ -156,8 +155,7 @@ namespace VitalChoice.Caching.Services
                 IModelConverterService modelConverterService, ILogger logger)
             {
                 _cache = new EntityCache<T>(cacheFactory,
-                    new DirectMapper<T>(typeConverter, modelConverterService));
-                _context = context;
+                    new DirectMapper<T>(typeConverter, modelConverterService), context);
                 _logger = logger;
                 var queryCache = queryCacheFactory.GetQueryCache<T>();
                 _queryData = queryCache.GerOrAdd(expression);
@@ -173,7 +171,7 @@ namespace VitalChoice.Caching.Services
                 try
                 {
                     List<T> entities;
-                    cacheResult = _cache.TryGetCached(_queryData, _context, out entities);
+                    cacheResult = _cache.TryGetCached(_queryData, out entities);
                     return entities;
                 }
                 catch (Exception e)
@@ -194,7 +192,7 @@ namespace VitalChoice.Caching.Services
                 try
                 {
                     T entity;
-                    cacheResult = _cache.TryGetCachedFirstOrDefault(_queryData, _context, out entity);
+                    cacheResult = _cache.TryGetCachedFirstOrDefault(_queryData, out entity);
                     return entity;
                 }
                 catch (Exception e)
