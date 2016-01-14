@@ -6,6 +6,7 @@ using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
+using VitalChoice.Ecommerce.Domain.Entities.Checkout;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
@@ -1384,6 +1385,37 @@ namespace VitalChoice.Ecommerce.Context
                     .HasPrincipalKey(p => p.IdObjectHistoryLogDataItem)
                     .IsRequired(false);
             });
+
+            #endregion
+
+            #region Checkout
+
+            builder.Entity<Cart>(entity =>
+            {
+                entity.ToTable("Carts");
+                entity.HasKey(c => c.Id);
+                entity.HasIndex(c => c.CartUid).IsUnique();
+                entity.HasOne(c => c.Discount).WithMany().HasForeignKey(c => c.IdDiscount).IsRequired(false).HasPrincipalKey(d => d.Id);
+                entity.HasMany(c => c.GiftCertificates).WithOne().HasForeignKey(g => g.IdCart).HasPrincipalKey(c => c.Id);
+                entity.HasMany(c => c.Skus).WithOne().HasForeignKey(s => s.IdCart).HasPrincipalKey(c => c.Id);
+            });
+
+            builder.Entity<CartToSku>(entity =>
+            {
+                entity.ToTable("CartToSkus");
+                entity.Ignore(c => c.Id);
+                entity.HasKey(c => new {c.IdCart, c.IdSku});
+                entity.HasOne(c => c.Sku).WithMany().HasForeignKey(c => c.IdSku).HasPrincipalKey(s => s.Id);
+            });
+
+            builder.Entity<CartToGiftCertificate>(entity =>
+            {
+                entity.ToTable("CartToGiftCertificates");
+                entity.Ignore(c => c.Id);
+                entity.HasKey(c => new { c.IdCart, c.IdGiftCertificate });
+                entity.HasOne(c => c.GiftCertificate).WithMany().HasForeignKey(c => c.IdGiftCertificate).HasPrincipalKey(s => s.Id);
+            });
+
 
             #endregion
         }

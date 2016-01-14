@@ -1,6 +1,4 @@
-﻿var lhnButtonN = 3881;
-
-$(function () {
+﻿$(function () {
 	$("body").on("click", "#btnAddGc", function () {
 		var count = $("#divGcContainer input[type=text]").length;
 

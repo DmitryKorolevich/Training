@@ -84,6 +84,7 @@
     <None Include="PreDeployment\Scripts\CustomerAddressStructureUpdate.sql" />
     <None Include="PostDeployment\Scripts\CustomerAddressStructureModeData.sql" />
     <None Include="PreDeployment\Scripts\AllValueTablesStructureOptimize.sql" />
+    <None Include="PreDeployment\Scripts\Checkout.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="VitalChoice.Database.Ecommerce.refactorlog" />

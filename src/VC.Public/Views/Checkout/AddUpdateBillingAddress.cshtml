@@ -1,0 +1,150 @@
+﻿@using System.Threading.Tasks
+@using VC.Public.Helpers
+@model VC.Public.Models.Checkout.AddUpdateBillingAddress
+
+@section Meta {
+	<title>Wild Seafood & Organics - Vital Choice</title>
+}
+
+@{
+	Layout = "~/Views/Shared/_ViewCartLayout.cshtml";
+}
+
+@section PageScripts {
+	<script src="@Url.Content("/app/common/dataAccess.js")"></script>
+	<script src="@Url.Content("/app/modules/auth/registration.js")"></script>
+    <script src="@Url.Content("/app/modules/profile/billingInfo.js")"></script>
+}
+
+<script>
+	var creditCards = @Html.Raw((string)ViewBag.CreditCards);
+	successMessage = '@ViewBag.SuccessMessage';
+</script>
+
+<div class="working-area-holder">
+    <div class="right-pane clean-indent">
+        @using (Html.BeginForm("ChangeBillingInfo", "Profile", null, FormMethod.Post, new {@class = "form-regular medium-small border-form-left", role = "form"}))
+        {
+            <input id="hdCountry" value="@Html.DisplayForEx(x => x.IdCountry)" type="hidden">
+            <input id="hdState" value="@Html.DisplayForEx(x => x.IdState)" type="hidden">
+            
+            @*@Html.HiddenFor(m => m.Id, new {@id = "hdCreditCard"})*@
+            @Html.AntiForgeryToken()
+            <h4>Manage Billing Addresses</h4>
+            <span class="form-control-important-info">You must provide all credit card details to add or update any saved credit card billing information.</span>
+            <div class="form-group">
+                <div class="input-group control-label-indent">
+                    <input id="addNew" class="yellow inline-button" type="button" value="Add New"/>
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.Label("SavedCards", "Saved Cards", new {@class = "control-label"})
+                <div class="input-group">
+                    <select class="form-control" id="ddCreditCardsSelection"></select>
+                    <input id="delSelected" class="red left-indent-small inline-button" type="button" value="Delete Card"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <hr/>
+            </div>
+            @Html.ValidationSummary(true, "")
+            <div class="form-group">
+                <hr/>
+            </div>
+            <div class="form-two-column">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.FirstName, new {@class = "control-label"})
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.FirstName, new {@class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.FirstName)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.LastName, new {@class = "control-label"})
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.LastName, new {@class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.LastName)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Company, new {@class = "control-label"})
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.Company, new {@class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.Company)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.IdCountry, new {@class = "control-label"})
+                    <div class="input-group">
+                        @Html.DropDownListFor(m => m.IdCountry, new List<SelectListItem>(), new {@class = "form-control", @id = "ddCountry"})
+                        @Html.ValidationMessageFor(m => m.IdCountry)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Address1, new {@class = "control-label"})
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.Address1, new {@class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.Address1)
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label"></label>
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.Address2, new {@class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.Address2)
+                    </div>
+                </div>
+            </div>
+            <div class="form-two-column">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.City, new {@class = "control-label"})
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.City, new {@class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.City)
+                    </div>
+                </div>
+                <div class="form-group">
+                    <!--todo-->
+                    @Html.LabelFor(m => m.IdState, new {@class = "control-label"})
+                    <div class="input-group">
+                        @Html.DropDownListFor(m => m.IdState, new List<SelectListItem>(), new {@class = "form-control", @id = "ddState"})
+                        @Html.ValidationMessageFor(m => m.IdState)
+                    </div>
+                </div>
+                <div class="form-group">
+                    <!--todo-->
+                    @Html.LabelFor(m => m.County, new {@class = "control-label"})
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.County, new {@class = "form-control", @id = "txtState"})
+                        @Html.ValidationMessageFor(m => m.County)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.PostalCode, new {@class = "control-label"})
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.PostalCode, new {@class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.PostalCode)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Phone, new {@class = "control-label"})
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.Phone, new {@class = "form-control phone-mask"})
+                        @Html.ValidationMessageFor(m => m.Phone)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Fax, new {@class = "control-label"})
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.Fax, new {@class = "form-control phone-mask"})
+                        @Html.ValidationMessageFor(m => m.Fax)
+                    </div>
+                </div>
+            </div>
+            <div class="form-buttons-group">
+                <input data-back-button="@Url.Action("TopFavoriteItems", "Profile")" type="button" value="Back"/>
+                <input class="yellow" type="submit" value="Save"/>
+            </div>
+        }
+    </div>
+</div>
