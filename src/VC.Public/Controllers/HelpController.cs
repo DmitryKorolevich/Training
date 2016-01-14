@@ -34,6 +34,7 @@ using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Routing;
 using Microsoft.AspNet.Mvc.Abstractions;
 using System.Net;
+using VitalChoice.Infrastructure.Domain.Mail;
 
 namespace VC.Public.Controllers
 {
@@ -142,6 +143,14 @@ namespace VC.Public.Controllers
                 ModelState.AddModelError(string.Empty, ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.WrongCaptcha]);
                 return PartialView("_PrivacyRequestForm", model);
             }
+
+            PrivacyRequestEmail emailData = new PrivacyRequestEmail();
+            emailData.Name = model.Name;
+            emailData.MailingAddress = model.MailingAddress;
+            emailData.OtherName = model.OtherName;
+            emailData.OtherAddress = model.OtherAddress;
+            emailData.Comment = model.Comment;
+            await _notificationService.SendPrivacyRequestEmailAsync(_options.Value.CustomerServiceToEmail, emailData);
 
             ViewBag.SuccessMessage = InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullySent];
             ModelState.Clear();

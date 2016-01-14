@@ -38,14 +38,12 @@ using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
 namespace VC.Public.Controllers
 {
     [CustomerAuthorize]
-    public class ProfileController : BaseMvcController
+    public class ProfileController : PublicControllerBase
     {
         private const string TicketCommentMessageTempData = "ticket-comment-messsage";
         private const string ProductBaseUrl = "/product/";
 
-        private readonly IHttpContextAccessor _contextAccessor;
         private readonly IStorefrontUserService _storefrontUserService;
-        private readonly ICustomerService _customerService;
         private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
         private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _paymentMethodConverter;
         private readonly IProductService _productService;
@@ -58,11 +56,9 @@ namespace VC.Public.Controllers
             IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter, IOrderService orderService, 
             IProductService productService, 
             IHelpService helpService,
-            IHealthwiseService healthwiseService)
+            IHealthwiseService healthwiseService):base(contextAccessor, customerService)
         {
-            _contextAccessor = contextAccessor;
             _storefrontUserService = storefrontUserService;
-            _customerService = customerService;
             _addressConverter = addressConverter;
             _paymentMethodConverter = paymentMethodConverter;
             _orderService = orderService;
@@ -155,33 +151,6 @@ namespace VC.Public.Controllers
             return model;
         }
 
-        private int GetInternalCustomerId()
-        {
-            var context = _contextAccessor.HttpContext;
-            var internalId = Convert.ToInt32(context.User.GetUserId());
-
-            return internalId;
-        }
-
-        private async Task<CustomerDynamic> GetCurrentCustomerDynamic()
-        {
-            var internalId = GetInternalCustomerId();
-            var customer = await _customerService.SelectAsync(internalId);
-            if (customer == null)
-            {
-                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
-            }
-
-            if (customer.StatusCode == (int)CustomerStatus.Suspended || customer.StatusCode == (int)CustomerStatus.Deleted)
-            {
-                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SuspendedCustomer]);
-            }
-
-            customer.IdEditedBy = null;
-
-            return customer;
-        }
-
         private void CleanProfileEmailFields(ChangeProfileModel model)
         {
             model.ConfirmEmail = model.NewEmail = string.Empty;
@@ -209,7 +178,7 @@ namespace VC.Public.Controllers
                 return View(model);
             }
 
-            var context = _contextAccessor.HttpContext;
+            var context = ContextAccessor.HttpContext;
 
             var user = await _storefrontUserService.FindAsync(context.User.GetUserName());
             if (user == null)
@@ -259,7 +228,7 @@ namespace VC.Public.Controllers
                         : oldEmail;
 
             CleanProfileEmailFields(model);
-            customer = await _customerService.UpdateAsync(customer);
+            customer = await CustomerService.UpdateAsync(customer);
 
             if (oldEmail != customer.Email)
             {
@@ -317,7 +286,7 @@ namespace VC.Public.Controllers
             currentCustomer.CustomerPaymentMethods.Add(customerPaymentMethod);
             try
             {
-                currentCustomer = await _customerService.UpdateAsync(currentCustomer);
+                currentCustomer = await CustomerService.UpdateAsync(currentCustomer);
             }
             catch (AppValidationException e)
             {
@@ -356,7 +325,7 @@ namespace VC.Public.Controllers
             }
             currentCustomer.CustomerPaymentMethods.Remove(creditCardToDelete);
 
-            await _customerService.UpdateAsync(currentCustomer);
+            await CustomerService.UpdateAsync(currentCustomer);
 
             return true;
         }
@@ -401,7 +370,7 @@ namespace VC.Public.Controllers
 
             currentCustomer.ShippingAddresses.Add(newAddress);
 
-            currentCustomer = await _customerService.UpdateAsync(currentCustomer);
+            currentCustomer = await CustomerService.UpdateAsync(currentCustomer);
 
             ViewBag.SuccessMessage = model.Id > 0
                 ? InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullyUpdated]
@@ -428,7 +397,7 @@ namespace VC.Public.Controllers
 
             currentCustomer.ShippingAddresses.Remove(shippingAddressToDelete);
 
-            await _customerService.UpdateAsync(currentCustomer);
+            await CustomerService.UpdateAsync(currentCustomer);
 
             return true;
         }
@@ -458,7 +427,7 @@ namespace VC.Public.Controllers
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
             }
 
-            await _customerService.UpdateAsync(currentCustomer);
+            await CustomerService.UpdateAsync(currentCustomer);
 
             return true;
         }
