@@ -12,6 +12,9 @@ namespace VitalChoice.Caching.Interfaces
         EntityPrimaryKeyInfo GetPrimaryKeyInfo<T>();
         EntityUniqueIndexInfo GetIndexInfo<T>();
         ICollection<EntityConditionalIndexInfo> GetConditionalIndexInfos<T>();
+        EntityPrimaryKeyInfo GetPrimaryKeyInfo(Type entityType);
+        EntityUniqueIndexInfo GetIndexInfo(Type entityType);
+        ICollection<EntityConditionalIndexInfo> GetConditionalIndexInfos(Type entityType);
         IEnumerable<Type> TrackedTypes { get; }
     }
 }

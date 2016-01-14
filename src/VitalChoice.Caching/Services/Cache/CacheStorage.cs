@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Ecommerce.Domain;
@@ -62,27 +63,21 @@ namespace VitalChoice.Caching.Services.Cache
 
         public EntityKey GetPrimaryKeyValue(T entity)
         {
-            var keyValues =
-                _primaryKeyInfo.InfoCollection.Select(keyInfo => new EntityKeyValue(keyInfo, keyInfo.Property.GetClrValue(entity)));
-            return new EntityKey(keyValues);
+            return entity.GetPrimaryKeyValue(_primaryKeyInfo);
         }
 
         public EntityIndex GetIndexValue(T entity)
         {
             if (_indexInfo != null)
             {
-                return
-                    new EntityIndex(
-                        _indexInfo.InfoCollection.Select(info => new EntityIndexValue(info, info.Property.GetClrValue(entity))));
+                return entity.GetIndexValue(_indexInfo);
             }
             return null;
         }
 
         public EntityIndex GetConditionalIndexValue(T entity, EntityConditionalIndexInfo conditionalInfo)
         {
-            return
-                new EntityIndex(
-                    conditionalInfo.InfoCollection.Select(info => new EntityIndexValue(info, info.Property.GetClrValue(entity))));
+            return entity.GetConditionalIndexValue(conditionalInfo);
         }
 
         public EntityKey GetPrimaryKeyValue(object entity)

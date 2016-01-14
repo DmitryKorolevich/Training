@@ -128,6 +128,36 @@ namespace VitalChoice.Caching.Services
             return new EntityConditionalIndexInfo[0];
         }
 
+        public EntityPrimaryKeyInfo GetPrimaryKeyInfo(Type entityType)
+        {
+            EntityInfo entityInfo;
+            if (_entityInfos.TryGetValue(entityType, out entityInfo))
+            {
+                return entityInfo.PrimaryKey;
+            }
+            return null;
+        }
+
+        public EntityUniqueIndexInfo GetIndexInfo(Type entityType)
+        {
+            EntityInfo entityInfo;
+            if (_entityInfos.TryGetValue(entityType, out entityInfo))
+            {
+                return entityInfo.UniqueIndex;
+            }
+            return null;
+        }
+
+        public ICollection<EntityConditionalIndexInfo> GetConditionalIndexInfos(Type entityType)
+        {
+            EntityInfo entityInfo;
+            if (_entityInfos.TryGetValue(entityType, out entityInfo))
+            {
+                return entityInfo.ConditionalIndexes;
+            }
+            return new EntityConditionalIndexInfo[0];
+        }
+
         public IEnumerable<Type> TrackedTypes => _entityInfos.Keys;
 
         public bool CanAddUpCache()

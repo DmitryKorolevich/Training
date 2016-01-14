@@ -171,8 +171,7 @@ namespace VitalChoice.Caching.Services.Cache
         public bool TryRemove(T entity)
         {
             var pk = CacheStorage.GetPrimaryKeyValue(entity);
-            var datas = CacheStorage.AllCacheDatas;
-            return datas.Aggregate(true, (current, data) => current && data.TryRemove(pk));
+            return TryRemove(pk);
         }
 
         public void Update(IEnumerable<T> entities, RelationInfo relationInfo)
@@ -223,18 +222,7 @@ namespace VitalChoice.Caching.Services.Cache
         public void MarkForUpdate(T entity)
         {
             var pk = CacheStorage.GetPrimaryKeyValue(entity);
-            foreach (var data in CacheStorage.AllCacheDatas)
-            {
-                CachedEntity<T> cached;
-                if (data.Get(pk, out cached))
-                {
-                    cached.NeedUpdate = true;
-                }
-                else if (data.FullCollection)
-                {
-                    data.NeedUpdate = true;
-                }
-            }
+            MarkForUpdate(pk);
         }
 
         public void MarkForUpdate(IEnumerable<T> entities)
@@ -297,9 +285,39 @@ namespace VitalChoice.Caching.Services.Cache
             MarkForUpdate(entities.Cast<T>());
         }
 
+        public void MarkForUpdate(EntityKey pk)
+        {
+            foreach (var data in CacheStorage.AllCacheDatas)
+            {
+                CachedEntity<T> cached;
+                if (data.Get(pk, out cached))
+                {
+                    cached.NeedUpdate = true;
+                }
+                else if (data.FullCollection)
+                {
+                    data.NeedUpdate = true;
+                }
+            }
+        }
+
+        public void MarkForUpdate(IEnumerable<EntityKey> pks)
+        {
+            foreach (var pk in pks)
+            {
+                MarkForUpdate(pk);
+            }
+        }
+
         public bool TryRemove(object entity)
         {
             return TryRemove((T) entity);
+        }
+
+        public bool TryRemove(EntityKey pk)
+        {
+            var datas = CacheStorage.AllCacheDatas;
+            return datas.Aggregate(true, (current, data) => current && data.TryRemove(pk));
         }
 
         public bool GetCacheExist(RelationInfo relationInfo)

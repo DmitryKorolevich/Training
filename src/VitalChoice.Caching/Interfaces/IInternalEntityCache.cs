@@ -19,7 +19,10 @@ namespace VitalChoice.Caching.Interfaces
         void UpdateAll(IEnumerable<object> entities, RelationInfo relationInfo);
         void MarkForUpdate(object entity);
         void MarkForUpdate(IEnumerable<object> entities);
+        void MarkForUpdate(EntityKey pk);
+        void MarkForUpdate(IEnumerable<EntityKey> pks);
         bool TryRemove(object entity);
+        bool TryRemove(EntityKey pk);
         bool GetCacheExist(RelationInfo relationInfo);
         bool GetIsCacheFullCollection(RelationInfo relationInfo);
         IEnumerable<ICacheData> GetAllCaches();
