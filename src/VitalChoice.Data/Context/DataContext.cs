@@ -9,43 +9,50 @@ using VitalChoice.Data.Transaction;
 
 namespace VitalChoice.Data.Context
 {
-	public abstract class DataContext : DbContext, IDataContextAsync
-	{
-private InnerEmbeddingTransaction _transaction;protected DataContext()
-		{
-			InstanceId = Guid.NewGuid();
-        }
+    public abstract class DataContext : DbContext, IDataContextAsync
+    {
+        private InnerEmbeddingTransaction _transaction;
 
-	    protected DataContext(IServiceProvider serviceProvider) : base(serviceProvider)
-	    {
+        protected DataContext()
+        {
             InstanceId = Guid.NewGuid();
         }
 
-		public Guid InstanceId { get; }
+        protected DataContext(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+            InstanceId = Guid.NewGuid();
+        }
 
-	    public IRelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted)
-	    {
-	        if (_transaction == null || _transaction.Closed)
-	        {
+        public Guid InstanceId { get; }
+
+        public IRelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted)
+        {
+            if (_transaction == null || _transaction.Closed)
+            {
                 _transaction = new InnerEmbeddingTransaction(Database.BeginTransaction(isolation));
+                _transaction.TransactionCommit += OnTransactionCommit;
             }
-	        _transaction.IncReference();
-	        return _transaction;
-	    }
+            _transaction.IncReference();
+            return _transaction;
+        }
 
-	    public override int SaveChanges()
-		{
-			var changes = base.SaveChanges();
-			return changes;
-		}
+        public bool InTransaction => _transaction != null && !_transaction.Closed;
 
-		public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
-		{
-			var changesAsync = await base.SaveChangesAsync(cancellationToken);
-			return changesAsync;
-		}
+        public event Action TransactionCommit;
 
-		public void SetState(object entity, EntityState state)
+        public override int SaveChanges()
+        {
+            var changes = base.SaveChanges();
+            return changes;
+        }
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var changesAsync = await base.SaveChangesAsync(cancellationToken);
+            return changesAsync;
+        }
+
+        public void SetState(object entity, EntityState state)
         {
             base.Entry(entity).State = state;
         }
@@ -53,6 +60,11 @@ private InnerEmbeddingTransaction _transaction;protected DataContext()
         public void TrackGraphForAdd(object entity)
         {
             this.ChangeTracker.TrackGraph(entity, e => e.Entry.State = EntityState.Added);
+        }
+
+        protected virtual void OnTransactionCommit()
+        {
+            TransactionCommit?.Invoke();
         }
     }
 }

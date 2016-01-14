@@ -7,31 +7,48 @@ using Microsoft.Data.Entity.ChangeTracking.Internal;
 using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Storage;
 using VitalChoice.Caching.Interfaces;
+using VitalChoice.Data.Context;
 
 namespace VitalChoice.Caching.Services
 {
     public class CacheStateManager : StateManager
     {
         protected readonly IInternalEntityCacheFactory CacheFactory;
+        protected readonly IDataContext DataContext;
 
         public CacheStateManager(IInternalEntityEntryFactory factory, IInternalEntityEntrySubscriber subscriber,
             IInternalEntityEntryNotifier notifier, IValueGenerationManager valueGeneration, IModel model, IDatabase database,
             DbContext context, IInternalEntityCacheFactory cacheFactory) : base(factory, subscriber, notifier, valueGeneration, model, database, context)
         {
             CacheFactory = cacheFactory;
+            DataContext = context as IDataContext;
         }
 
         protected override int SaveChanges(IReadOnlyList<InternalEntityEntry> entriesToSave)
         {
             var result = base.SaveChanges(entriesToSave);
-            UpdateCache(entriesToSave);
+            if (DataContext.InTransaction)
+            {
+                DataContext.TransactionCommit += () => UpdateCache(entriesToSave);
+            }
+            else
+            {
+                UpdateCache(entriesToSave);
+            }
             return result;
         }
 
         protected override async Task<int> SaveChangesAsync(IReadOnlyList<InternalEntityEntry> entriesToSave, CancellationToken cancellationToken = new CancellationToken())
         {
             var result = await base.SaveChangesAsync(entriesToSave, cancellationToken);
-            UpdateCache(entriesToSave);
+            if (DataContext.InTransaction)
+            {
+                DataContext.TransactionCommit += () => UpdateCache(entriesToSave);
+            }
+            else
+            {
+                UpdateCache(entriesToSave);
+            }
             return result;
         }
 

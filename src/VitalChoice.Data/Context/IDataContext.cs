@@ -11,6 +11,10 @@ namespace VitalChoice.Data.Context
     {
         IRelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted);
 
+        bool InTransaction { get; }
+
+        event Action TransactionCommit;
+
         int SaveChanges();
 
         DbSet<T> Set<T>() 

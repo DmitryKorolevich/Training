@@ -24,6 +24,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.TemplateModels;
 using VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.Articles;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Interfaces.Services.Products;
+using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
 {

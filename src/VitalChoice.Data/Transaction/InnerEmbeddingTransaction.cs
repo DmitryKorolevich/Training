@@ -35,6 +35,7 @@ namespace VitalChoice.Data.Transaction
             if (_referenceCount == 1)
             {
                 _transaction.Commit();
+                OnTransactionCommit();
             }
             if (_referenceCount <= 0)
             {
@@ -60,5 +61,12 @@ namespace VitalChoice.Data.Transaction
         public bool Closed { get; private set; }
 
         public IRelationalConnection Connection => _transaction.Connection;
+
+        public event Action TransactionCommit;
+
+        protected virtual void OnTransactionCommit()
+        {
+            TransactionCommit?.Invoke();
+        }
     }
 }
