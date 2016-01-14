@@ -116,7 +116,15 @@ namespace VitalChoice.Business.Mail
 			await emailSender.SendEmailAsync(email, subject, body);
 		}
 
+        public async Task SendWholesaleCustomerRegistrationSuccess(string email, SuccessfulUserRegistration registration)
+        {
+            var body =
+                $"<p>Dear {registration.FirstName} {registration.LastName},  Thank you for submitting your wholesale application. Vital Choice Seafood.</p>";
 
+            var subject = "Vital Choice - Confirmation of Submitting Your Wholesale Application";
+
+            await emailSender.SendEmailAsync(email, subject, body);
+        }
 
         public async Task SendAffiliateActivationAsync(string email, UserActivation activation)
         {

@@ -15,7 +15,7 @@
 	<div class="right-pane clean-indent">
 		<div class="border-form-left">
 			<h4>Items On Your Last Order</h4>
-			@if (Model.Any())
+			@if (Model!=null && Model.Any())
 			{
 				<table class="last-order-lines">
 					<thead>

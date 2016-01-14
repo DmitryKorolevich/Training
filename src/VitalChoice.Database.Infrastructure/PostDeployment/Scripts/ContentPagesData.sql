@@ -934,3 +934,231 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentPages] WHERE [Url] = 'wholesale-review')
+BEGIN
+
+DECLARE @contentItemId int
+
+INSERT INTO [dbo].[ContentItems]
+           ([Created]
+           ,[Updated]
+           ,[Template]
+           ,[Description]
+           ,[Title]
+           ,[MetaKeywords]
+           ,[MetaDescription])
+     VALUES
+           (GETDATE()
+           ,GETDATE()
+           ,'<%
+<body:body>
+{{
+    <div class="working-area-holder content-page wholesale review">
+        <div class="wholesale-registration-box centered-horizontal">
+            <img src="/assets/images/wholesale/progress-step3.jpg">
+            <div class="body">
+                <div class="margin-top-medium margin-bottom-medium">
+                    <p>
+                        <strong class="important">You're almost there!</strong>
+                         An account has been created for you. But before you can start shopping, we need to collect some final paperwork.
+                    </p>
+                    <p>
+                        <em>
+                            Please note that until your account has been approved, you will not be able to shop at VitalChoice.com while logged in as a wholesaler.
+                            If you'd like to shop in our retail store, please log out and proceed as a guest.
+                        </em>
+                    </p>
+                </div>
+                <div class="wholesale-paperwork">
+                    <em class="important">What paperwork should you send?</em><br/>
+                    <hr/>
+                    <p>
+                        <strong>Resale Certificate (Reseller Permit):</strong>
+                        If your business is located in WA or VA, we need to collect your Resale Certificate before you can sell Vital Choice products.
+                        Find out more about resale certificates in <a target="_blank" href="http://dor.wa.gov/Content/FindTaxesAndRates/RetailSalesTax/ResellerPermit/default.aspx">WA</a> and 
+                        <a target="_blank" href="http://www.tax.virginia.gov/content/sales-and-use-tax">VA</a>.
+                    </p>
+                    <p>
+                        <strong>W9:</strong>
+                         If you or your business is located anywhere other than WA or VA, we need to collect your signed W9 before you can re-sell Vital Choice products.
+                         <em><a target="_blank" href="http://www.irs.gov/uac/Form-W-9,-Request-for-Taxpayer-Identification-Number-and-Certification">Click here</a> to find out more about the W9 tax form.</em>
+                    </p>
+                </div>
+                <div class="margin-top-medium">
+                    <p>
+                        <strong>
+                            Please send the required paperwork to <a href="mailto:wholesale@{@}@vitalchoice.com">wholesale@{@}@vitalchoice.com</a> or FAX to: 
+                            800-608-4910. We'll review your application and contact you when you've been approved.
+                        </strong>
+                    </p>
+                    <p>
+                        <em>
+                            Thank you again for your interest in the Vital Choice Wholesale Program.
+                        </em>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+}}
+%>'
+           ,'<p>empty</p>'
+           ,'Account Currently Pending - Vital Choice Wild Seafood & Organics'
+           ,NULL
+           ,NULL)
+
+SET @contentItemId=@@identity
+
+INSERT INTO [dbo].[ContentPages]
+           ([Url]
+           ,[Name]
+           ,[FileUrl]
+           ,[ContentItemId]
+           ,[MasterContentItemId]
+           ,[StatusCode]
+           ,[Assigned]
+           ,[UserId])
+     VALUES
+           ('wholesale-review'
+           ,'Wholesale Review'
+           ,NULL
+           ,@contentItemId
+           ,(SELECT Id FROM MasterContentItems WHERE Name='Content Individual Empty')
+           ,2
+           ,1
+           ,NULL)
+
+END
+
+GO
+
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentPages] WHERE [Url] = 'wholesale-registration')
+BEGIN
+
+DECLARE @contentItemId int
+
+INSERT INTO [dbo].[ContentItems]
+           ([Created]
+           ,[Updated]
+           ,[Template]
+           ,[Description]
+           ,[Title]
+           ,[MetaKeywords]
+           ,[MetaDescription])
+     VALUES
+           (GETDATE()
+           ,GETDATE()
+           ,'<%
+<body:body>
+{{
+    @script(){{
+        <script src="https://www.google.com/recaptcha/api.js?onload=onloadRecaptchaCallback&render=explicit" async defer></script>
+        <script src="/app/common/dataAccess.js"></script>
+        <script src="/app/modules/auth/registration.js"></script>
+        <script src="/app/modules/content/wholesale-registration.js"></script>
+    }}
+    <div class="working-area-holder content-page wholesale registration step1">
+        <div class="top-step1">
+            <a class="wholesale-login-link" href="/account/login"></a>
+            <div class="top-section">
+                <p>
+                    <strong>A Vital Choice wholesale account</strong>
+                     allows you to purchase canned wild seafood and premium bottled supplements in full-case quantities
+                    at a significant discount for resale to your customers. Signup is simple. Just fill in your email address and the short form that follows, and we'll get the ball rolling!
+                </p>
+                <strong><em>Benefits of our Wholesale Program include:</em></strong><br/>
+                <ul>
+    				<li>Free shipping within the continental United States with orders of $200 or more</li>
+    				<li>Free monthly newsletter with exclusive promotions, great recipes and industry news</li>
+    				<li>Courtesy discounts on all Vital Choice frozen seafood products</li>
+    				<li>A special selection of premium organic foods at wholesale prices</li>
+    			</ul>
+            </div>
+        </div>
+        <div class="top-step2">
+        </div>
+        <div class="wholesale-registration-box centered-horizontal">
+            <div data-ng-show="show" class="overlay hide"><div class="loading">Loading…</div></div>
+            <img class="progress-step1" src="/assets/images/wholesale/progress-step1.jpg">
+            <img class="progress-step2" src="/assets/images/wholesale/progress-step2.jpg">
+            <div class="body">
+                <div class="body-inner-step1">
+                    <div class="margin-top-medium margin-bottom-medium important">
+                        <p>
+                            <strong>
+                                Interested in opening a wholesale account to enhance your business and your customers' health? Simply provide your email, and let's get started!
+                            </strong>
+                        </p>
+                    </div>
+                    <div class="form-regular big">
+                        <div class="form-group">
+			                <label class="control-label" for="Email">Email Address:</label>
+                			<div class="input-group margin-right-small">
+                				<input class="form-control" id="Email" name="Email" type="text">
+                			</div>
+                			<div class="input-group">
+                			    <input class="yellow" id="step1go" type="button" value="Go">
+                			</div>
+		                </div>
+                    </div>
+                    <div class="margin-top-medium">
+                        <p>
+                            <em>
+                                If you prefer to speak to a real person, we have those! Just call <a href="tel:866-482-5887">866-482-5887</a> or email 
+                                <a href="mailto:wholesale@{@}@vitalchoice.com.">wholesale@{@}@vitalchoice.com</a>.
+                                We'll contact you with further details.
+                            </em>
+                        </p>
+                        <p>
+                            <em>
+                                Thank you for your interest in Vital Choice. We look forward to working with you.
+                            </em>
+                        </p>
+                    </div>
+                </div>
+                <div class="body-inner-step2">
+                    <div class="margin-top-medium margin-bottom-medium important">
+                        <p>
+                            <strong>
+                                Details. Details. Details. We just need a few more of yours in order to create a new wholesale account:
+                            </strong>
+                        </p>
+                    </div>
+                    @razor(@null){{~/Views/Account/_RegisterWholesaleAccount.cshtml}}
+                </div>
+            </div>
+        </div>
+    </div>
+}}
+%>'
+           ,'<p>empty</p>'
+           ,NULL
+           ,NULL
+           ,NULL)
+
+SET @contentItemId=@@identity
+
+INSERT INTO [dbo].[ContentPages]
+           ([Url]
+           ,[Name]
+           ,[FileUrl]
+           ,[ContentItemId]
+           ,[MasterContentItemId]
+           ,[StatusCode]
+           ,[Assigned]
+           ,[UserId])
+     VALUES
+           ('wholesale-registration'
+           ,'Wholesale Registration'
+           ,NULL
+           ,@contentItemId
+           ,(SELECT Id FROM MasterContentItems WHERE Name='Content Individual Empty')
+           ,2
+           ,1
+           ,NULL)
+
+END
+
+GO

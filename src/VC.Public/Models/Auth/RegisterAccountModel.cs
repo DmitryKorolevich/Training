@@ -77,5 +77,8 @@ namespace VC.Public.Models.Auth
 		[Display(Name = "Fax")]
 		[Map]
 		public string Fax { get; set; }
-	}
+
+        public bool IsAllowAgreement { get; set; }
+
+    }
 }

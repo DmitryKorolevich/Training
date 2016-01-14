@@ -144,6 +144,7 @@
                             <span data-ng-if="customer.StatusCode == 2" class="label label-info font-default">{{getReferenceItem(ReferenceData.CustomerStatuses, customer.StatusCode).Text}}</span>
                             <span data-ng-if="customer.StatusCode == 3" class="label label-danger font-default">{{getReferenceItem(ReferenceData.CustomerStatuses, customer.StatusCode).Text}}</span>
                             <span data-ng-if="customer.StatusCode == 4" class="label label-danger font-default">{{getReferenceItem(ReferenceData.CustomerStatuses, customer.StatusCode).Text}}</span>
+                            <span data-ng-if="customer.StatusCode == 5" class="label label-danger font-default">{{getReferenceItem(ReferenceData.CustomerStatuses, customer.StatusCode).Text}}</span>
                         </td>
                         <td>{{::customer.DateEdited | date:"MM/dd/yy"}}<br />{{::customer.DateEdited | date:"h:mm a"}}<br />{{::customer.EditedBy}}</td>
                         <td>

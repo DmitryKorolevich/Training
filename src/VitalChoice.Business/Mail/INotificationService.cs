@@ -22,6 +22,8 @@ namespace VitalChoice.Business.Mail
 
         Task SendCustomerRegistrationSuccess(string email, SuccessfulUserRegistration registration);
 
+        Task SendWholesaleCustomerRegistrationSuccess(string email, SuccessfulUserRegistration registration);
+
         Task SendAffiliateActivationAsync(string email, UserActivation activation);
 
         Task SendAffiliateRegistrationSuccess(string email, SuccessfulUserRegistration registration);

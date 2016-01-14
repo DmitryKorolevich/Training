@@ -113,7 +113,7 @@ namespace VitalChoice.Business.Services.Users
             if (appUser!=null)
             {
                 var affiliate = (await _affiliateRepositoryAsync.Query(p => p.Id == appUser.Id).SelectAsync()).FirstOrDefault();
-                if(affiliate.StatusCode==(int)AffiliateStatus.Pending)
+                if(affiliate!=null && affiliate.StatusCode==(int)AffiliateStatus.Pending)
                 {
                     throw new AffiliatePendingException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsNotConfirmed]);
                 }
