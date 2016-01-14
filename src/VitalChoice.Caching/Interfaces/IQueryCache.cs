@@ -5,6 +5,6 @@ namespace VitalChoice.Caching.Interfaces
 {
     public interface IQueryCache<T>
     {
-        QueryCacheData<T> GerOrAdd(Expression query);
+        QueryData<T> GerOrAdd(Expression query);
     }
 }

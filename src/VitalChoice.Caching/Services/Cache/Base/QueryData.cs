@@ -6,7 +6,7 @@ using VitalChoice.Caching.Relational;
 
 namespace VitalChoice.Caching.Services.Cache.Base
 {
-    public struct QueryCacheData<T>
+    public struct QueryData<T>
     {
         public WhereExpression<T> WhereExpression { get; set; }
         public RelationInfo RelationInfo { get; set; }
@@ -18,6 +18,6 @@ namespace VitalChoice.Caching.Services.Cache.Base
 
         public bool IsEmpty => WhereExpression == null && RelationInfo == null && OrderByFunction == null;
 
-        public static readonly QueryCacheData<T> Empty = new QueryCacheData<T>();
+        public static readonly QueryData<T> Empty = new QueryData<T>();
     }
 }

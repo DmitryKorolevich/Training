@@ -26,7 +26,7 @@ namespace VitalChoice.Caching.Services.Cache
             _conditionalIndexAnalyzers = entityInfo.GetConditionalIndexInfos<T>().Select(i => new ConditionalIndexAnalyzer<T>(i)).ToArray();
         }
 
-        public QueryCacheData<T> GerOrAdd(Expression query)
+        public QueryData<T> GerOrAdd(Expression query)
         {
             var cacheKey = new ExpressionStringBuilder().Build(query);
             var cached = _queryCaches.GetOrAdd(cacheKey, key =>
@@ -42,7 +42,7 @@ namespace VitalChoice.Caching.Services.Cache
             });
             QueriableExpressionVisitor<T> queryAnalyzer = new QueriableExpressionVisitor<T>();
             queryAnalyzer.Visit(query);
-            var result = new QueryCacheData<T>
+            var result = new QueryData<T>
             {
                 RelationInfo = cached.Relations,
                 Tracked = queryAnalyzer.Tracking,

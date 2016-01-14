@@ -30,7 +30,7 @@ namespace VitalChoice.Caching.Services.Cache
             _internalCache = cacheFactory.GetCache<T>();
         }
 
-        public CacheGetResult TryGetCached(QueryCacheData<T> queryCache, out List<T> entities)
+        public CacheGetResult TryGetCached(QueryData<T> query, out List<T> entities)
         {
             if (_internalCache == null)
             {
@@ -38,38 +38,38 @@ namespace VitalChoice.Caching.Services.Cache
                 return CacheGetResult.NotFound;
             }
 
-            if (_internalCache.GetCacheExist(queryCache.RelationInfo))
+            if (_internalCache.GetCacheExist(query.RelationInfo))
             {
                 IEnumerable<CacheResult<T>> results;
-                if (queryCache.WhereExpression == null)
+                if (query.WhereExpression == null)
                 {
-                    results = _internalCache.GetAll(queryCache.RelationInfo);
-                    return TranslateResult(queryCache, results,
+                    results = _internalCache.GetAll(query.RelationInfo);
+                    return TranslateResult(query, results,
                         out entities);
                 }
-                if (TryPrimaryKeys(queryCache, out results))
+                if (TryPrimaryKeys(query, out results))
                 {
-                    return TranslateResult(queryCache, results,
+                    return TranslateResult(query, results,
                         out entities);
                 }
 
-                if (TryUniqueIndexes(queryCache, out results))
-                    return TranslateResult(queryCache, results,
+                if (TryUniqueIndexes(query, out results))
+                    return TranslateResult(query, results,
                         out entities);
 
-                if (TryConditionalIndexes(queryCache, out results))
-                    return TranslateResult(queryCache, results,
+                if (TryConditionalIndexes(query, out results))
+                    return TranslateResult(query, results,
                         out entities);
 
-                results = _internalCache.GetWhere(queryCache.RelationInfo, queryCache.WhereExpression.Compiled);
-                return TranslateResult(queryCache,
+                results = _internalCache.GetWhere(query.RelationInfo, query.WhereExpression.Compiled);
+                return TranslateResult(query,
                     results, out entities);
             }
             entities = null;
             return CacheGetResult.Update;
         }
 
-        public CacheGetResult TryGetCachedFirstOrDefault(QueryCacheData<T> queryCache, out T entity)
+        public CacheGetResult TryGetCachedFirstOrDefault(QueryData<T> query, out T entity)
         {
             if (_internalCache == null)
             {
@@ -77,38 +77,38 @@ namespace VitalChoice.Caching.Services.Cache
                 return CacheGetResult.NotFound;
             }
 
-            if (_internalCache.GetCacheExist(queryCache.RelationInfo))
+            if (_internalCache.GetCacheExist(query.RelationInfo))
             {
                 IEnumerable<CacheResult<T>> results;
-                if (queryCache.WhereExpression == null)
+                if (query.WhereExpression == null)
                 {
-                    results = _internalCache.GetAll(queryCache.RelationInfo);
-                    return TranslateFirstResult(queryCache, results,
+                    results = _internalCache.GetAll(query.RelationInfo);
+                    return TranslateFirstResult(query, results,
                         out entity);
                 }
-                if (TryPrimaryKeys(queryCache, out results))
+                if (TryPrimaryKeys(query, out results))
                 {
-                    return TranslateFirstResult(queryCache, results,
+                    return TranslateFirstResult(query, results,
                         out entity);
                 }
 
-                if (TryUniqueIndexes(queryCache, out results))
-                    return TranslateFirstResult(queryCache, results,
+                if (TryUniqueIndexes(query, out results))
+                    return TranslateFirstResult(query, results,
                         out entity);
 
-                if (TryConditionalIndexes(queryCache, out results))
-                    return TranslateFirstResult(queryCache, results,
+                if (TryConditionalIndexes(query, out results))
+                    return TranslateFirstResult(query, results,
                         out entity);
 
-                results = _internalCache.GetWhere(queryCache.RelationInfo, queryCache.WhereExpression.Compiled);
-                return TranslateFirstResult(queryCache,
+                results = _internalCache.GetWhere(query.RelationInfo, query.WhereExpression.Compiled);
+                return TranslateFirstResult(query,
                     results, out entity);
             }
             entity = default(T);
             return CacheGetResult.Update;
         }
 
-        public void Update(QueryCacheData<T> queryData, IEnumerable<T> entities)
+        public void Update(QueryData<T> queryData, IEnumerable<T> entities)
         {
             if (_internalCache == null)
             {
@@ -135,7 +135,7 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        public void Update(QueryCacheData<T> queryData, T entity)
+        public void Update(QueryData<T> queryData, T entity)
         {
             if (_internalCache == null)
             {
@@ -168,7 +168,7 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        private bool CanUpdate(QueryCacheData<T> queryData, out bool fullCollection)
+        private bool CanUpdate(QueryData<T> queryData, out bool fullCollection)
         {
             if (queryData.WhereExpression == null)
             {
@@ -181,7 +181,7 @@ namespace VitalChoice.Caching.Services.Cache
                    queryData.ConditionalIndexes.Any(c => c.Value.Count > 0);
         }
 
-        private bool TryConditionalIndexes(QueryCacheData<T> queryData,
+        private bool TryConditionalIndexes(QueryData<T> queryData,
             out IEnumerable<CacheResult<T>> results)
         {
             var conditionalIndexes = queryData.ConditionalIndexes;
@@ -214,10 +214,10 @@ namespace VitalChoice.Caching.Services.Cache
             return false;
         }
 
-        private bool TryUniqueIndexes(QueryCacheData<T> queryCache,
+        private bool TryUniqueIndexes(QueryData<T> query,
             out IEnumerable<CacheResult<T>> results)
         {
-            var indexes = queryCache.UniqueIndexes;
+            var indexes = query.UniqueIndexes;
             //if (indexes.Count == 1)
             //{
             //    var result = _internalCache.TryGetEntity(indexes.First(), queryCache.RelationInfo);
@@ -226,17 +226,17 @@ namespace VitalChoice.Caching.Services.Cache
             //}
             if (indexes.Count > 0)
             {
-                results = _internalCache.TryGetEntities(indexes, queryCache.RelationInfo);
+                results = _internalCache.TryGetEntities(indexes, query.RelationInfo);
                 return true;
             }
             results = null;
             return false;
         }
 
-        private bool TryPrimaryKeys(QueryCacheData<T> queryCache,
+        private bool TryPrimaryKeys(QueryData<T> query,
             out IEnumerable<CacheResult<T>> results)
         {
-            var pks = queryCache.PrimaryKeys;
+            var pks = query.PrimaryKeys;
             //if (pks.Count == 1)
             //{
             //    var result = _internalCache.TryGetEntity(pks.First(), queryCache.RelationInfo);
@@ -245,7 +245,7 @@ namespace VitalChoice.Caching.Services.Cache
             //}
             if (pks.Count > 0)
             {
-                results = _internalCache.TryGetEntities(pks, queryCache.RelationInfo);
+                results = _internalCache.TryGetEntities(pks, query.RelationInfo);
                 return true;
             }
             results = null;
@@ -253,7 +253,7 @@ namespace VitalChoice.Caching.Services.Cache
         }
 
         private CacheGetResult TranslateFirstResult(
-            QueryCacheData<T> queryData, IEnumerable<CacheResult<T>> results,
+            QueryData<T> queryData, IEnumerable<CacheResult<T>> results,
             out T entity)
         {
             if (queryData.Tracked)
@@ -264,7 +264,7 @@ namespace VitalChoice.Caching.Services.Cache
         }
 
         private CacheGetResult TranslateResult(
-            QueryCacheData<T> queryData, IEnumerable<CacheResult<T>> results,
+            QueryData<T> queryData, IEnumerable<CacheResult<T>> results,
             out List<T> entities)
         {
             if (queryData.Tracked)
@@ -274,7 +274,7 @@ namespace VitalChoice.Caching.Services.Cache
             return ConvertResult(results, queryData, out entities);
         }
 
-        private static IEnumerable<T> Order(IEnumerable<T> entities, QueryCacheData<T> queryData)
+        private static IEnumerable<T> Order(IEnumerable<T> entities, QueryData<T> queryData)
         {
             if (queryData.OrderByFunction != null)
             {
@@ -283,7 +283,7 @@ namespace VitalChoice.Caching.Services.Cache
             return entities;
         }
 
-        private CacheGetResult ConvertAttachResult(IEnumerable<CacheResult<T>> results, QueryCacheData<T> queryData, out T entity)
+        private CacheGetResult ConvertAttachResult(IEnumerable<CacheResult<T>> results, QueryData<T> queryData, out T entity)
         {
             var compiled = queryData.WhereExpression?.Compiled;
             CacheIterator<T> cacheIterator = new CacheIterator<T>(new TrackedIteratorParams<T>
@@ -300,7 +300,7 @@ namespace VitalChoice.Caching.Services.Cache
             return CreateGetResult(cacheIterator, queryData, Enumerable.Repeat(entity, 1));
         }
 
-        private CacheGetResult ConvertResult(IEnumerable<CacheResult<T>> results, QueryCacheData<T> queryData, out T entity)
+        private CacheGetResult ConvertResult(IEnumerable<CacheResult<T>> results, QueryData<T> queryData, out T entity)
         {
             var compiled = queryData.WhereExpression?.Compiled;
             CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled);
@@ -309,7 +309,7 @@ namespace VitalChoice.Caching.Services.Cache
             return CreateGetResult(cacheIterator, queryData, Enumerable.Repeat(entity, 1));
         }
 
-        private CacheGetResult ConvertAttachResult(IEnumerable<CacheResult<T>> results, QueryCacheData<T> queryData, out List<T> entities)
+        private CacheGetResult ConvertAttachResult(IEnumerable<CacheResult<T>> results, QueryData<T> queryData, out List<T> entities)
         {
             var compiled = queryData.WhereExpression?.Compiled;
             CacheIterator<T> cacheIterator = new CacheIterator<T>(new TrackedIteratorParams<T>
@@ -326,7 +326,7 @@ namespace VitalChoice.Caching.Services.Cache
             return CreateGetResult(cacheIterator, queryData, entities);
         }
 
-        private CacheGetResult ConvertResult(IEnumerable<CacheResult<T>> results, QueryCacheData<T> queryData, out List<T> entities)
+        private CacheGetResult ConvertResult(IEnumerable<CacheResult<T>> results, QueryData<T> queryData, out List<T> entities)
         {
             var compiled = queryData.WhereExpression?.Compiled;
             CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled);
@@ -335,7 +335,7 @@ namespace VitalChoice.Caching.Services.Cache
             return CreateGetResult(cacheIterator, queryData, entities);
         }
 
-        private CacheGetResult CreateGetResult(CacheIterator<T> cacheIterator, QueryCacheData<T> queryData, IEnumerable<T> entities)
+        private CacheGetResult CreateGetResult(CacheIterator<T> cacheIterator, QueryData<T> queryData, IEnumerable<T> entities)
         {
             if (cacheIterator.AggregatedResult != CacheGetResult.Found)
             {

@@ -147,7 +147,7 @@ namespace VitalChoice.Caching.Services
             where T : Entity, new()
         {
             private readonly ILogger _logger;
-            private readonly QueryCacheData<T> _queryData;
+            private readonly QueryData<T> _queryData;
             private readonly IEntityCache<T> _cache;
 
             public CacheExecutor(Expression expression, DbContext context, IQueryCacheFactory queryCacheFactory,
