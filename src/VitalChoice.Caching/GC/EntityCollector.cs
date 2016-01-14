@@ -52,6 +52,10 @@ namespace VitalChoice.Caching.GC
             {
                 try
                 {
+                    if (System.GC.GetTotalMemory(true) < _maxSize)
+                    {
+                        continue;
+                    }
                     var now = DateTime.Now;
                     foreach (var entityType in _entityInfoStorage.TrackedTypes)
                     {
@@ -77,7 +81,6 @@ namespace VitalChoice.Caching.GC
                             }
                         }
                     }
-                    System.GC.Collect();
                 }
                 catch (Exception e)
                 {
