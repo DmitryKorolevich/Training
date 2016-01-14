@@ -16,9 +16,9 @@ namespace VC.Admin.Models.Orders
 
         public decimal StandardShippingCharges { get; set; }
 
-        public IList<LookupItem<ShippingUpgradeOption>> ShippingUpgradePOptions { get; set; }
+        public ICollection<LookupItem<ShippingUpgradeOption>> ShippingUpgradePOptions { get; set; }
 
-        public IList<LookupItem<ShippingUpgradeOption>> ShippingUpgradeNPOptions { get; set; }
+        public ICollection<LookupItem<ShippingUpgradeOption>> ShippingUpgradeNPOptions { get; set; }
 
         public ShippingUpgradeOption? ShippingUpgradeP { get; set; }
 
@@ -48,11 +48,11 @@ namespace VC.Admin.Models.Orders
 
         public bool ShouldSplit { get; set; }
 
-        public IList<SkuOrderedManageModel> SkuOrdereds { get; set; }
+        public ICollection<SkuOrderedManageModel> SkuOrdereds { get; set; }
 
-        public IList<PromoSkuOrderedManageModel> PromoSkus { get; set; }
+        public ICollection<PromoSkuOrderedManageModel> PromoSkus { get; set; }
 
-        public IList<MessageInfo> Messages { get; set; }
+        public ICollection<MessageInfo> Messages { get; set; }
 
         public OrderCalculateModel(OrderDataContext dataContext)
         {

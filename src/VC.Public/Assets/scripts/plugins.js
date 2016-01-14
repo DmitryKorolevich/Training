@@ -84,7 +84,23 @@ var lhnScript = document.createElement("script"); lhnScript.type = "text/javascr
             e.preventDefault();
         });
 
-        //tooltips
+    	//tooltips
+        var settingsLeft = {
+        	content: undefined,
+        	contentAsHTML: true,
+        	animation: 'grow',
+        	delay: 0,
+        	theme: 'tooltipster-default',
+        	touchDevices: false,
+        	trigger: 'hover',
+        	interactive: 'true',
+        	position: 'left',
+        	offsetY: 0,
+        	fixedWidth: 250,
+        	maxWidth: 250,
+        	onlyOne: true
+        };
+
         var settingsVertical = {
             content: undefined,
             contentAsHTML: true,
@@ -134,6 +150,12 @@ var lhnScript = document.createElement("script"); lhnScript.type = "text/javascr
             var body = $(this).data("tooltip-body");
             settingsHorizontal.content = getBaseHtml(title,body);
             $(this).tooltipster(settingsHorizontal);
+        });
+        $('.tooltip-l').each(function () {
+        	var title = $(this).data("tooltip-title");
+        	var body = $(this).data("tooltip-body");
+        	settingsLeft.content = getBaseHtml(title, body);
+        	$(this).tooltipster(settingsLeft);
         });
 
         $('.small-window-open-link').click(function(e){

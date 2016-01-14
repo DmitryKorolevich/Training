@@ -5,12 +5,13 @@ using System.Threading.Tasks;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Infrastructure;
 using Microsoft.Data.Entity.Storage;
+using VitalChoice.Data.Transaction;
 
 namespace VitalChoice.Data.Context
 {
 	public abstract class DataContext : DbContext, IDataContextAsync
 	{
-	    protected DataContext()
+private InnerEmbeddingTransaction _transaction;protected DataContext()
 		{
 			InstanceId = Guid.NewGuid();
         }
@@ -24,7 +25,12 @@ namespace VitalChoice.Data.Context
 
 	    public IRelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted)
 	    {
-	        return Database.BeginTransaction(isolation);
+	        if (_transaction == null || _transaction.Closed)
+	        {
+                _transaction = new InnerEmbeddingTransaction(Database.BeginTransaction(isolation));
+            }
+	        _transaction.IncReference();
+	        return _transaction;
 	    }
 
 	    public override int SaveChanges()

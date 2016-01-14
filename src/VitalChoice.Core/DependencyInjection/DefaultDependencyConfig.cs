@@ -76,10 +76,12 @@ using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Business.Services.Healthwise;
 using VitalChoice.Interfaces.Services.Healthwise;
 using Microsoft.Extensions.Logging;
+using VitalChoice.Business.Services.Checkout;
 using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.Infrastructure.ServiceBus;
+using VitalChoice.Interfaces.Services.Checkout;
 
 namespace VitalChoice.Core.DependencyInjection
 {
@@ -465,6 +467,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<CatalogRequestAddressService>().As<ICatalogRequestAddressService>().InstancePerLifetimeScope();
             builder.RegisterType<HealthwiseService>().As<IHealthwiseService>().InstancePerLifetimeScope();
             builder.RegisterType<RedirectService>().As<IRedirectService>().InstancePerLifetimeScope();
+            builder.RegisterType<CheckoutService>().As<ICheckoutService>();
             builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
             builder.RegisterModelConverters(projectAssembly);
 

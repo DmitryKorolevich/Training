@@ -1,20 +1,13 @@
-﻿var lhnButtonN = 3881;
-
-$(function () {
+﻿$(function () {
 	$("body").on("click", "#btnAddGc", function () {
 		var count = $("#divGcContainer input[type=text]").length;
 
-		$("#divGcContainer").append('<br/><label></label><input class="cart-input-box input-control" name="GiftCertificateCodes[' + count + ']" type="text"/><input type="button" class="minus-button-red btnRemoveGc"/>')
+		$("#divGcContainer").append('<div><a class="btnRemoveGc circle-button button-red"><i class="glyphicon glyphicon-minus-sign"></i></a><input class="cart-input-box input-control" name="GiftCertificateCodes[' + count + ']" type="text"/></div>')
 	});
 
 	$("body").on("click", ".btnRemoveGc", function () {
-		var jInput = $(this).prev();
-		var jLabel = jInput.prev();
-		var jBr = jLabel.prev();
+		var jContainer = $(this).parent();
 
-		jInput.remove();
-		jLabel.remove();
-		jBr.remove();
-		$(this).remove();
+		jContainer.remove();
 	});
 });

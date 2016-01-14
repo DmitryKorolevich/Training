@@ -1,0 +1,59 @@
+﻿@using Microsoft.Extensions.OptionsModel
+@using VitalChoice.Infrastructure.Domain.Options
+@model VC.Public.Models.Help.PrivacyRequestModel
+@inject IOptions<AppOptions> appOptions;
+
+<div class="content-ajax-form-wrapper">
+    <div id="privacyRequestFormWrapperInner">
+        <script>
+            successMessage = '@ViewBag.SuccessMessage';
+            var captchaSiteKey = "@appOptions.Value.GoogleCaptcha.PublicKey";
+        </script>
+        <form asp-controller="Help" asp-action="PrivacyRequest" data-ajax-success="ajaxFormSubmitSuccess" data-ajax-failure="ajaxFormSubmitError" data-ajax="true" data-method="post" data-ajax-mode="replace" data-ajax-update="#privacyRequestFormWrapperInner" class="form-regular medium-small content-ajax-form">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "")
+            <div class="form-group">
+                @Html.LabelFor(m => m.Name, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Name)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.MailingAddress, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.MailingAddress, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.MailingAddress)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.OtherName, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.OtherName, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.OtherName)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.OtherAddress, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.OtherAddress, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.OtherAddress)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Comment, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextAreaFor(m => m.Comment, new { @class = "form-control bigger", @rows = 10 })
+                    @Html.ValidationMessageFor(m => m.Comment)
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label"></label>
+                <div class="google-captcha pull-left" id="googleCaptcha"></div>
+            </div>
+            <div class="form-buttons-group">
+                <input class="yellow" type="submit" value="Submit" />
+            </div>
+        </form>
+    </div>
+</div>

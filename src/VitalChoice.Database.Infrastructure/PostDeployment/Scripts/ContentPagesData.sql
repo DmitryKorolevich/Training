@@ -642,3 +642,295 @@ WHERE ParentId IS NULL)
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentPages] WHERE [Url] = 'privacy')
+BEGIN
+
+DECLARE @contentItemId int
+
+INSERT INTO [dbo].[ContentItems]
+           ([Created]
+           ,[Updated]
+           ,[Template]
+           ,[Description]
+           ,[Title]
+           ,[MetaKeywords]
+           ,[MetaDescription])
+     VALUES
+           (GETDATE()
+           ,GETDATE()
+           ,'<%
+<body:body>
+{{
+    @script(){{
+        <script src="https://www.google.com/recaptcha/api.js?onload=onloadRecaptchaCallback&render=explicit" async defer></script>
+    }}
+    <h4>Privacy and Security</h4>
+    <p>
+        <strong>Vital Choice will not sell, trade, or rent your email or phone number to anyone. </strong>
+    </p>
+    <p>
+        We use a major credit card processing company to bill our customers for goods and services, 
+        and we use major shipping companies to ship orders (Fed Ex, DHL, USPS, or UPS).
+    </p>
+    <p>
+        We must send selected personal information to these companies to process and ship your order. 
+        Our agreements with these companies bar them from sharing or storing any personal customer information,
+        and bar them from using personal customer information for any unauthorized purposes.
+    </p>
+    <p>
+        Your personal data will be stored on secure servers accessible only to Vital Choice,
+        Inc. for as long as your account is active. If you wish to change your information,
+        please email us at <a href="mailto:customercare@{@}@vitalchoice.com">customercare@{@}@vitalchoice.com</a>.
+    </p>
+    <p>
+        We use all features of Google Analytics. Google Analytics does not store any visitor specific data 
+        and we will not use visitor specific data in any way related to Google Analytics, Google Adwords,
+        and Remarketing. We use remarketing and analytics to display content specific advertisements to visitors
+        that have previously visited our site when those visitors go to other websites.
+    </p>
+    <p>
+        Like many direct-mail retailers, we sometimes make our mailing lists (physical addresses only) 
+        available for rental or exchange with reputable, like-minded companies.
+    </p>
+    <p>
+        If you do NOT want your physical address shared, please complete and submit the form below.
+    </p>
+    @razor(@null){{~/Views/Help/_PrivacyRequestForm.cshtml}}
+}}
+%>'
+           ,'<p>empty</p>'
+           ,NULL
+           ,NULL
+           ,NULL)
+
+SET @contentItemId=@@identity
+
+INSERT INTO [dbo].[ContentPages]
+           ([Url]
+           ,[Name]
+           ,[FileUrl]
+           ,[ContentItemId]
+           ,[MasterContentItemId]
+           ,[StatusCode]
+           ,[Assigned]
+           ,[UserId])
+     VALUES
+           ('privacy'
+           ,'Privacy'
+           ,NULL
+           ,@contentItemId
+           ,(SELECT Id FROM MasterContentItems WHERE Name='Content Individual')
+           ,2
+           ,1
+           ,NULL)
+
+END
+
+GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentPages] WHERE [Url] = 'newsletter-sign-up')
+BEGIN
+
+DECLARE @contentItemId int
+
+INSERT INTO [dbo].[ContentItems]
+           ([Created]
+           ,[Updated]
+           ,[Template]
+           ,[Description]
+           ,[Title]
+           ,[MetaKeywords]
+           ,[MetaDescription])
+     VALUES
+           (GETDATE()
+           ,GETDATE()
+           ,'<%
+<top:top>
+{{
+    <div class="header-block">
+        <img src="/assets/images/news-subscribe-header-11-12-13A-955px.png">
+    </div>
+}}
+
+<body:body>
+{{
+    <div class="newsletter-sign-up-page-center center-wrapper centered-horizontal">
+        <div class="newsletter-block">
+            <div class="body">
+                <div class="input-wrapper">
+                    <form method="post" name="search" action="https://app.bronto.com/public/webform/process/">
+                		<input type="hidden" value="92galxckiog3fu5rrpft43l7m738f" name="fid"/>
+    					<input type="hidden" value="09dcaffa5c9971f4be87813780496171" name="sid"/>
+    					<input type="hidden" value="" name="delid"/>
+    					<input type="hidden" value="" name="subid"/>
+    					<input type="hidden" value="true" name="24793[291714]"/>
+                        <input type="text" name="24791" autocomplete="off" placeholder="Enter email here">
+                        <input class="yellow" type="submit" value="Go">
+                    </form>
+                </div>
+            </div>
+        </div>
+        <p>
+            Opt out at any time using the unsubscribe link in every newsletter.<br>
+            Your email address will never be sold or shared.<br>
+        </p>
+    </div>
+    <div class="center-wrapper centered-horizontal">
+        <img src="/assets/images/newsletter-image-1.jpg">
+    </div>
+}}
+
+<category>
+{{
+    @if(@model.SubCategories.Count>0)
+    {{
+        <ul class="drop-menu sub-menu collapsed">
+        @list(@model.SubCategories)
+        {{
+            <li>
+                @if(@model.SubCategories.Count>0)
+                {{
+                <a class="trigger" href="#">@(Name)</a>
+                }}
+                @if(@model.SubCategories.Count==0)
+                {{
+                <a href="@(Url)">@(Name)</a>
+                }}
+                @category()
+            </li>
+        }}
+        </ul>
+    }}
+}}
+
+<left:left>
+{{
+    <div class="left-content-pane">
+	    <strong>ARTICLES BY TOPIC</strong>
+        <br/>
+        <br/>
+        <ul class="drop-menu">
+            @list(@model.ArticleCategories)
+            {{
+                <li>
+                    <a class="trigger" href="#">@(Name)</a>
+                    @category()
+                </li>
+            }}
+        </ul>
+	</div>
+}}
+
+<right:right>
+{{
+    <div class="right-content-pane">
+    	<div class="right-wrapper">
+	        <a href="#"><img src="/assets/images//bonus-tile-10-30-12A.jpg"></a>
+        </div>
+        <div class="right-wrapper centered-horizontal">
+            <p>
+                "Congrats on your wonderful newsletter. It''s extremely informative with absolutely fabulous recipes to boot! Please keep up the good work!"
+                <br/>
+                <em>– Debbie Francis</em>
+            </p>
+        </div>
+        <div class="right-wrapper centered-horizontal">
+            <p>
+                "... you continue to provide outstanding insights into important medical topics ... please keep up your really excellent educational work!"
+                <br/>
+                <em>– Michael Clague, M.D.</em>
+            </p>
+        </div>
+        <div class="right-wrapper centered-horizontal">
+            <p>
+                "Thanks for your newsletter. It''s informative, well-written, well-researched and cutting edge. I''ve learned so much from reading it over the years. It''s actually why I put my trust in all the Vital Choice products."
+                <br/>
+                <em>– Joanna B.</em>
+            </p>
+        </div>
+        <div>
+            <strong>RECENT ARTICLES</strong>
+            <br/>
+            <br/>
+            @list(@model.RecentArticles)
+            {{
+                <a href="@(Url)">@(Name)</a>
+                <br/>
+                <br/>
+            }}
+            @list(@model.RecentRecipes)
+            {{
+                <a href="@(Url)">@(Name)</a>
+                <br/>
+                <br/>
+            }}
+        </div>
+    	<div class="right-wrapper">
+	        <a href="#"><img src="/assets/images//Top-sellers-sidebar-tile-12-27-12-296px-A.jpg"></a>
+        </div>
+	</div>
+}}
+%>'
+           ,'<p>empty</p>'
+           ,NULL
+           ,NULL
+           ,NULL)
+
+SET @contentItemId=@@identity
+
+INSERT INTO [dbo].[ContentPages]
+           ([Url]
+           ,[Name]
+           ,[FileUrl]
+           ,[ContentItemId]
+           ,[MasterContentItemId]
+           ,[StatusCode]
+           ,[Assigned]
+           ,[UserId])
+     VALUES
+           ('newsletter-sign-up'
+           ,'Newsletter Sign-up'
+           ,NULL
+           ,@contentItemId
+           ,(SELECT Id FROM MasterContentItems WHERE Name='Content Individual')
+           ,2
+           ,1
+           ,NULL)
+
+END
+
+GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentProcessors] WHERE [Type] = N'ArticleCategoriesForContentPageProcessor')
+BEGIN
+	DECLARE @id int
+
+	INSERT INTO [dbo].[ContentProcessors]
+	(Id, [Type], Name, Description)
+	VALUES
+	(20, N'ArticleCategoriesForContentPageProcessor', N'Article categories processor for article', N'Tree view of article categories')
+	INSERT INTO [dbo].[ContentProcessors]
+	(Id, [Type], Name, Description)
+	VALUES
+	(21, N'RecentRecipesForContentPageProcessor', N'Recent recipes processor', N'1 recent recips by date')
+	INSERT INTO [dbo].[ContentProcessors]
+	(Id, [Type], Name, Description)
+	VALUES
+	(22, N'RecentArticlesForContentPageProcessor', N'Recent articles processor', N'5 recent articles by date')
+
+	SET @id=(SELECT ContentItemId FROM ContentPages	WHERE Url='newsletter-sign-up')
+
+	IF(@id IS NOT NULL)
+	BEGIN
+		INSERT INTO [dbo].ContentItemsToContentProcessors
+		(ContentItemId,ContentItemProcessorId)
+		SELECT @id,20
+		UNION
+		SELECT @id,21
+		UNION
+		SELECT @id,22
+	END
+END
+
+GO

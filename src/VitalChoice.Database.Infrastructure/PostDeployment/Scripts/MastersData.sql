@@ -674,8 +674,15 @@ BEGIN
             </strong>
             <br>
             <div class="input-wrapper">
-                <input type="text" autocomplete="off" placeholder="Enter email here">
-                <input class="yellow" type="button" value="Go">
+                <form method="post" name="search" action="https://app.bronto.com/public/webform/process/">
+            		<input type="hidden" value="92galxckiog3fu5rrpft43l7m738f" name="fid"/>
+					<input type="hidden" value="09dcaffa5c9971f4be87813780496171" name="sid"/>
+					<input type="hidden" value="" name="delid"/>
+					<input type="hidden" value="" name="subid"/>
+					<input type="hidden" value="true" name="24793[291714]"/>
+                    <input type="text" name="24791" autocomplete="off" placeholder="Enter email here">
+                    <input class="yellow" type="submit" value="Go">
+                </form>
             </div>
             <a href="#">View a recent issue</a>
         </div>
@@ -1209,11 +1216,17 @@ BEGIN
 	INSERT [dbo].[MasterContentItems] ([Name], [TypeId], [Template], [Created], [Updated], [StatusCode], [UserId])
 	VALUES 
 	('Content Individual Empty', 8, N'<%
-<default> -> (Model)
+    
+<body>
 {{
     <div class="working-area-holder content-page">
-    	@(@model.ContentItem.Description)
+    	@(@model.Model.ContentItem.Description)
     </div>
+}}
+    
+<default> -> ()
+{{
+    @body()
 }} :: dynamic
 %>', GETDATE(), GETDATE(),2, NULL)
 

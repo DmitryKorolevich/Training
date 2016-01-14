@@ -5,14 +5,17 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Storage;
+using VitalChoice.Data.Context;
+using VitalChoice.Data.Transaction;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 
-namespace VitalChoice.Data.Context
+namespace VitalChoice.Infrastructure.Context
 {
 	public abstract class IdentityDataContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>, IDataContext, IDataContextAsync
 	{
 	    protected IdentityDataContext()
+private InnerEmbeddingTransaction _transaction;
 		{
 			InstanceId = Guid.NewGuid();
         }
@@ -23,13 +26,16 @@ namespace VitalChoice.Data.Context
 	    }
 
 	    public Guid InstanceId { get; }
-
-	    public IRelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted)
-	    {
-	        return Database.BeginTransaction(isolation);
-	    }
-
-	    public override int SaveChanges()
+public IRelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted)
+        {
+            if (_transaction == null || _transaction.Closed)
+            {
+                _transaction = new InnerEmbeddingTransaction(Database.BeginTransaction(isolation));
+            }
+            _transaction.IncReference();
+            return _transaction;
+        }
+        public override int SaveChanges()
 		{
 			var changes = base.SaveChanges();
 			return changes;
