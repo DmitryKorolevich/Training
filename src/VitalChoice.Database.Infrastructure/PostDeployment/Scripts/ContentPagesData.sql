@@ -960,13 +960,13 @@ INSERT INTO [dbo].[ContentItems]
             <div class="body">
                 <div class="margin-top-medium margin-bottom-medium">
                     <p>
-                        <strong class="important">You're almost there!</strong>
+                        <strong class="important">You''re almost there!</strong>
                          An account has been created for you. But before you can start shopping, we need to collect some final paperwork.
                     </p>
                     <p>
                         <em>
                             Please note that until your account has been approved, you will not be able to shop at VitalChoice.com while logged in as a wholesaler.
-                            If you'd like to shop in our retail store, please log out and proceed as a guest.
+                            If you''d like to shop in our retail store, please log out and proceed as a guest.
                         </em>
                     </p>
                 </div>
@@ -989,7 +989,7 @@ INSERT INTO [dbo].[ContentItems]
                     <p>
                         <strong>
                             Please send the required paperwork to <a href="mailto:wholesale@{@}@vitalchoice.com">wholesale@{@}@vitalchoice.com</a> or FAX to: 
-                            800-608-4910. We'll review your application and contact you when you've been approved.
+                            800-608-4910. We''ll review your application and contact you when you''ve been approved.
                         </strong>
                     </p>
                     <p>
@@ -1066,7 +1066,7 @@ INSERT INTO [dbo].[ContentItems]
                 <p>
                     <strong>A Vital Choice wholesale account</strong>
                      allows you to purchase canned wild seafood and premium bottled supplements in full-case quantities
-                    at a significant discount for resale to your customers. Signup is simple. Just fill in your email address and the short form that follows, and we'll get the ball rolling!
+                    at a significant discount for resale to your customers. Signup is simple. Just fill in your email address and the short form that follows, and we''ll get the ball rolling!
                 </p>
                 <strong><em>Benefits of our Wholesale Program include:</em></strong><br/>
                 <ul>
@@ -1088,7 +1088,7 @@ INSERT INTO [dbo].[ContentItems]
                     <div class="margin-top-medium margin-bottom-medium important">
                         <p>
                             <strong>
-                                Interested in opening a wholesale account to enhance your business and your customers' health? Simply provide your email, and let's get started!
+                                Interested in opening a wholesale account to enhance your business and your customers'' health? Simply provide your email, and let''s get started!
                             </strong>
                         </p>
                     </div>
@@ -1108,7 +1108,7 @@ INSERT INTO [dbo].[ContentItems]
                             <em>
                                 If you prefer to speak to a real person, we have those! Just call <a href="tel:866-482-5887">866-482-5887</a> or email 
                                 <a href="mailto:wholesale@{@}@vitalchoice.com.">wholesale@{@}@vitalchoice.com</a>.
-                                We'll contact you with further details.
+                                We''ll contact you with further details.
                             </em>
                         </p>
                         <p>
