@@ -10,7 +10,7 @@ namespace VitalChoice.Caching.Interfaces
 {
     public interface ICacheSyncProvider
     {
-        void SendChanges(IReadOnlyList<InternalEntityEntry> entriesToSave);
-        void AcceptChanges(IReadOnlyList<SyncOperation> syncOperations);
+        void SendChanges(IEnumerable<SyncOperation> syncOperations);
+        void AcceptChanges(IEnumerable<SyncOperation> syncOperations);
     }
 }

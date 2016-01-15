@@ -8,7 +8,7 @@ namespace VitalChoice.Caching.Relational.Base
         where TValue: EntityValue<TInfo>
         where TInfo: EntityValueInfo
     {
-        protected readonly Dictionary<string, TValue> Values;
+        internal readonly Dictionary<string, TValue> Values;
 
         protected EntityValueGroup(IEnumerable<TValue> values)
         {

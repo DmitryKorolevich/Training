@@ -9,7 +9,7 @@ namespace VitalChoice.Caching.Relational.Base
     {
         public virtual int Count => ValuesDictionary.Count;
 
-        protected readonly Dictionary<string, TInfo> ValuesDictionary;
+        internal readonly Dictionary<string, TInfo> ValuesDictionary;
 
         public ICollection<TInfo> InfoCollection => ValuesDictionary.Values;
 

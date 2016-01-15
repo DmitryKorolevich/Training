@@ -20,6 +20,20 @@ namespace VitalChoice.Caching.Extensions
             services.AddScoped<IQueryCacheFactory, QueryCacheFactory>();
             services.AddScoped<IInternalEntityCacheFactory, InternalEntityCacheFactory>();
             services.AddScoped<IInternalEntityInfoStorage, InternalEntityInfoStorage>();
+            services.AddScoped<ICacheSyncProvider, CacheSyncProvider>();
+            return builder;
+        }
+
+        public static EntityFrameworkServicesBuilder AddEntityFrameworkCache<TSyncProvider>(this EntityFrameworkServicesBuilder builder)
+            where TSyncProvider: class, ICacheSyncProvider
+        {
+            var services = builder.GetInfrastructure();
+            services.Replace(ServiceDescriptor.Scoped(typeof(IStateManager), typeof(CacheStateManager)));
+            services.Replace(ServiceDescriptor.Scoped(typeof(IAsyncQueryProvider), typeof(CacheEntityQueryProvider)));
+            services.AddScoped<IQueryCacheFactory, QueryCacheFactory>();
+            services.AddScoped<IInternalEntityCacheFactory, InternalEntityCacheFactory>();
+            services.AddScoped<IInternalEntityInfoStorage, InternalEntityInfoStorage>();
+            services.AddScoped<ICacheSyncProvider, TSyncProvider>();
             return builder;
         }
     }
