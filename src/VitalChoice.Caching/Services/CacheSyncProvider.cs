@@ -9,15 +9,15 @@ namespace VitalChoice.Caching.Services
 {
     public class CacheSyncProvider : ICacheSyncProvider
     {
-        private readonly IInternalEntityCacheFactory _cacheFactory;
-        private readonly IInternalEntityInfoStorage _keyStorage;
-        private readonly ILogger _logger;
+        protected readonly IInternalEntityCacheFactory CacheFactory;
+        protected readonly IInternalEntityInfoStorage KeyStorage;
+        protected readonly ILogger Logger;
 
         protected CacheSyncProvider(IInternalEntityCacheFactory cacheFactory, IInternalEntityInfoStorage keyStorage, ILogger logger)
         {
-            _cacheFactory = cacheFactory;
-            _keyStorage = keyStorage;
-            _logger = logger;
+            CacheFactory = cacheFactory;
+            KeyStorage = keyStorage;
+            Logger = logger;
         }
 
         public virtual void SendChanges(IEnumerable<SyncOperation> syncOperations)
@@ -29,8 +29,8 @@ namespace VitalChoice.Caching.Services
         {
             foreach (var group in syncOperations.GroupBy(s => s.EntityType))
             {
-                var internalCache = _cacheFactory.GetCache(group.Key);
-                var pkInfo = _keyStorage.GetPrimaryKeyInfo(group.Key);
+                var internalCache = CacheFactory.GetCache(group.Key);
+                var pkInfo = KeyStorage.GetPrimaryKeyInfo(group.Key);
                 foreach (var op in group)
                 {
                     switch (op.SyncType)
@@ -45,7 +45,7 @@ namespace VitalChoice.Caching.Services
                             internalCache.MarkForUpdate(op.Key.ToPrimaryKey(pkInfo));
                             break;
                         default:
-                            _logger.LogWarning("Invalid SyncType was sent over.");
+                            Logger.LogWarning("Invalid SyncType was sent over.");
                             break;
                     }
                 }

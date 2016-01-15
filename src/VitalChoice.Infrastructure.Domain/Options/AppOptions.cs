@@ -23,6 +23,14 @@ namespace VitalChoice.Infrastructure.Domain.Options
         public AvataxOptions Avatax { get; set; }
 	    public GoogleCaptcha GoogleCaptcha { get; set; }
         public ExportService ExportService { get; set; }
+        public CacheSyncOptions CacheSyncOptions { get; set; }
         public AuthorizeNet AuthorizeNet { get; set; }
+    }
+
+    public class CacheSyncOptions
+    {
+        public string ConnectionString { get; set; }
+        public string ServiceBusQueueName { get; set; }
+        public bool Enabled { get; set; }
     }
 }
