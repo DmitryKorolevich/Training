@@ -48,13 +48,14 @@ namespace VC.Public.Controllers
 		}
 
         [HttpGet]
-        public IActionResult Login(string alreadyTakenEmail = null, bool forgot = false)
+        public IActionResult Login(string alreadyTakenEmail = null, bool forgot = false, int? type=null)
         {
             if (!string.IsNullOrWhiteSpace(alreadyTakenEmail))
             {
                 ViewBag.AlreadyTakenEmail = alreadyTakenEmail;
             }
             ViewBag.ForgotPassSuccess = forgot;
+            ViewBag.Type = type;
 
             return View(new LoginModel());
         }
@@ -93,7 +94,7 @@ namespace VC.Public.Controllers
         {
             var user = await _userService.FindAsync(email);
 
-            return user != null ? "/account/login?alreadytakenemail="+email : null;
+            return user != null ? $"/account/login?alreadytakenemail={email}&type=2" : null;//2 - wholesale
         }
 
         public async Task<IActionResult> Logout()

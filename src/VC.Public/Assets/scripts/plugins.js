@@ -166,6 +166,26 @@ var lhnScript = document.createElement("script"); lhnScript.type = "text/javascr
                 e.preventDefault();
             }
         });
+
+        $('textarea.line-limit').keydown(function (e)
+        {
+            var maxLines = $(this).data('line-limit');
+            if (maxLines)
+            {
+                var keynum;
+                if (window.event)
+                {
+                    keynum = e.keyCode;
+                } else if (e.which)
+                {
+                    keynum = e.which;
+                }
+                if (this.value.split('\n').length > maxLines && keynum !== 8 && keynum !== 46)
+                {
+                    return false;
+                }
+            }
+        });
     });
 })(jQuery);
 

@@ -51,7 +51,7 @@
             <div class="form-group">
                 @Html.LabelFor(m => m.PromotingWebsites, new { @class = "control-label" })
                 <div class="input-group">
-                    @Html.TextAreaFor(m => m.PromotingWebsites, new { @class = "form-control bigger", @rows = 5 })
+                    @Html.TextAreaFor(m => m.PromotingWebsites, new { @class = "form-control bigger line-limit", @rows = 4, @data_line_limit=4 })
                     @Html.ValidationMessageFor(m => m.PromotingWebsites)
                 </div>
             </div>

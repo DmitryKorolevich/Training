@@ -79,6 +79,13 @@
                                 <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                             </span>
                         </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('IdObjectType')">
+                            <span>Type</span>
+                            <span data-ng-if="filter.Sorting.Path == 'IdObjectType'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Name')">
                             <span>Name</span>
                             <span data-ng-if="filter.Sorting.Path == 'Name'">
@@ -130,6 +137,10 @@
                     <tr data-ng-repeat="customer in customers">
                         <td>
                             <a ui-sref="index.oneCol.customerDetail({id:customer.Id})">{{::customer.Id}}</a>
+                        </td>
+                        <td>
+                            <span data-ng-if="customer.IdObjectType == 1" class="label label-retail font-default">{{getReferenceItem(ReferenceData.ShortCustomerTypes, customer.IdObjectType).Text}}</span>
+                            <span data-ng-if="customer.IdObjectType == 2" class="label label-wholesale font-default">{{getReferenceItem(ReferenceData.ShortCustomerTypes, customer.IdObjectType).Text}}</span>
                         </td>
                         <td>
                             <a ui-sref="index.oneCol.customerDetail({id:customer.Id})">{{::customer.Name}}</a>

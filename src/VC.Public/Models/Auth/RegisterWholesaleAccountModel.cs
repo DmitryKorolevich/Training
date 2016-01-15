@@ -11,7 +11,8 @@ namespace VC.Public.Models.Auth
 		public int? TradeClass { get; set; }
 
 		[Display(Name = "Websites where you will promote our products(1 per line, max 4)")]
-		[Map]
+        [MaxLength(BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE)]
+        [Map]
 		public string PromotingWebsites { get; set; }
 	}
 }

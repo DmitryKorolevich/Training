@@ -9,6 +9,7 @@
         public const string DateShipped = "DateShipped";
         public const string Company = "Company";
         public const string StateCode = "StateCode";
+        public const string IdCustomerType = "IdCustomerType";
         public const string Customer = "Customer";
         public const string ShipTo = "ShipTo";
         public const string Id = "Id";

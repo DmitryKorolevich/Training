@@ -3,6 +3,7 @@ using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Attributes;
+using System;
 
 namespace VC.Admin.Models.Product
 {
@@ -15,6 +16,8 @@ namespace VC.Admin.Models.Product
         public string ToEmail { get; set; }
 
         public string FromName { get; set; }
+        
+        public string Subject { get; set; }
 
         [Localized(GeneralFieldNames.Message)]
         public string Message { get; set; }
@@ -26,7 +29,7 @@ namespace VC.Admin.Models.Product
                 ToName = ToName,
                 ToEmail = ToEmail,
                 FromName = FromName,
-                Subject = "Your Vital Choice Gift Certificate(s)",
+                Subject = Subject,
                 Body = Message,
                 IsHTML=false,
             };

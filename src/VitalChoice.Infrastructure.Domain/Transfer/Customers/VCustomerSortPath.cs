@@ -3,6 +3,7 @@
     public static class VCustomerSortPath
     {
         public const string Id = "Id";
+        public const string IdObjectType = "IdObjectType";
         public const string Name = "Name";
         public const string Email = "Email";
         public const string LastOrderPlaced = "LastOrderPlaced";
