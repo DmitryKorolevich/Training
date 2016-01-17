@@ -19,5 +19,11 @@ namespace VC.Public.Models.Checkout
 		[Compare("Password")]
 		[Display(Name = "Password Confirm")]
 		public string ConfirmPassword { get; set; }
+
+	    public bool GuestCheckout { get; set; }
+
+	    public bool SendNews { get; set; }
+
+	    public bool SendCatalog { get; set; }
 	}
 }
