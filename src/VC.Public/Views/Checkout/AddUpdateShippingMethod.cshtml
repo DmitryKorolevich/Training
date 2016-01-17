@@ -1,6 +1,7 @@
 ﻿@using System.Threading.Tasks
 @using VC.Public.Helpers
-@model VC.Public.Models.Checkout.AddUpdateShippingMethod
+@using VitalChoice.Ecommerce.Domain.Entities.Addresses
+@model VC.Public.Models.Checkout.AddUpdateShippingMethodModel
 
 @section Meta {
 	<title>Wild Seafood & Organics - Vital Choice</title>
@@ -11,112 +12,140 @@
 }
 
 @section PageScripts {
+	<script src="@Url.Content("/app/modules/checkout/checkoutMain.js")"></script>
 	<script src="@Url.Content("/app/common/dataAccess.js")"></script>
 	<script src="@Url.Content("/app/modules/auth/registration.js")"></script>
+	<script src="@Url.Content("/app/modules/checkout/shippingInfo.js")"></script>
 }
 
 <script>
+	var shippingAddressesJson = '@Html.Raw(ViewBag.ShippingAddresses)';
 	successMessage = '@ViewBag.SuccessMessage';
 </script>
 
 <div class="checkout-step-container working-area-holder">
 	<img src="/assets/images/checkout/step3.gif"/>
 	<h4 class="checkout-step-heading">3. Shipping Method</h4>
-	<span class="checkout-notification-important">Please enter your billing address below.</span>
-	<span class="checkout-notification-simple">An accurate billing address is essential to get your order to you quickly.</span>
-	<div class="columns-container checkout-columns-container">
-		@using (Html.BeginForm("ChangeBillingInfo", "Profile", null, FormMethod.Post, new {@class = "form-regular medium-small", role = "form"}))
-		{
-			<input id="hdCountry" value="@Html.DisplayForEx(x => x.IdCountry)" type="hidden">
-			<input id="hdState" value="@Html.DisplayForEx(x => x.IdState)" type="hidden">
-			@Html.AntiForgeryToken()
+	<span class="checkout-notification-simple">Enter your Shipping Address information below.</span>
+	@using (Html.BeginForm("AddUpdateShippingMethod", "Checkout", null, FormMethod.Post, new {@class = "form-regular medium-small", role = "form"}))
+	{
+		<input id="hdCountry" value="@Html.DisplayForEx(x => x.IdCountry)" type="hidden">
+		<input id="hdState" value="@Html.DisplayForEx(x => x.IdState)" type="hidden">
+		@Html.AntiForgeryToken()
+		<span class="checkout-notification-important margin-top-small margin-bottom-small">OR</span>
+		<div class="form-group">
+			<div class="input-group">
+				<label class="multiline-checkbox-container">
+					@Html.CheckBoxFor(m => m.UseBillingAddress, new {@class = "form-control"})
+					Use my Billing address as my Shipping address.<br/>
+					<span class="shopping-notice-note">NOTE:</span> Frozen goods cannot be sent to PO boxes.
+				</label>
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="input-group">
+				<label class="multiline-checkbox-container">
+					<input id="chkSelectOther" type="checkbox"/>
+					View and select other Shipping addresses in my account.
+				</label>
+			</div>
+		</div>
+		<div class="form-group" style="display: none;">
+			@Html.Label("SavedAddresses", "Saved Addresses", new { @class = "control-label" })
+			<div class="input-group">
+				<select class="form-control" id="ddShippingAddressesSelection"></select>
+			</div>
+		</div>
+		<span class="checkout-notification-simple">Then click Continue, below.</span>
+		<span class="checkout-notification-important" id="spEnterAddress">Enter your Shipping Address.</span>
+		<div class="columns-container checkout-columns-container">
 			@Html.ValidationSummary(true, "")
 			<div class="two-columns-block">
 				<div class="form-group">
-					@Html.LabelFor(m => m.FirstName, new {@class = "control-label"})
+					@Html.LabelFor(m => m.FirstName, new { @class = "control-label" })
 					<div class="input-group">
-						@Html.TextBoxFor(m => m.FirstName, new {@class = "form-control"})
+						@Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
 						@Html.ValidationMessageFor(m => m.FirstName)
 					</div>
 				</div>
 				<div class="form-group">
-					@Html.LabelFor(m => m.LastName, new {@class = "control-label"})
+					@Html.LabelFor(m => m.LastName, new { @class = "control-label" })
 					<div class="input-group">
-						@Html.TextBoxFor(m => m.LastName, new {@class = "form-control"})
+						@Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
 						@Html.ValidationMessageFor(m => m.LastName)
 					</div>
 				</div>
 				<div class="form-group">
-					@Html.LabelFor(m => m.Company, new {@class = "control-label"})
+					@Html.LabelFor(m => m.Company, new { @class = "control-label" })
 					<div class="input-group">
-						@Html.TextBoxFor(m => m.Company, new {@class = "form-control"})
+						@Html.TextBoxFor(m => m.Company, new { @class = "form-control" })
 						@Html.ValidationMessageFor(m => m.Company)
 					</div>
 				</div>
 				<div class="form-group">
-					@Html.LabelFor(m => m.IdCountry, new {@class = "control-label"})
+					@Html.LabelFor(m => m.IdCountry, new { @class = "control-label" })
 					<div class="input-group">
-						@Html.DropDownListFor(m => m.IdCountry, new List<SelectListItem>(), new {@class = "form-control", @id = "ddCountry"})
+						@Html.DropDownListFor(m => m.IdCountry, new List<SelectListItem>(), new { @class = "form-control", @id = "ddCountry" })
 						@Html.ValidationMessageFor(m => m.IdCountry)
 					</div>
 				</div>
 				<div class="form-group">
-					@Html.LabelFor(m => m.Address1, new {@class = "control-label"})
+					@Html.LabelFor(m => m.Address1, new { @class = "control-label" })
 					<div class="input-group">
-						@Html.TextBoxFor(m => m.Address1, new {@class = "form-control"})
+						@Html.TextBoxFor(m => m.Address1, new { @class = "form-control" })
 						@Html.ValidationMessageFor(m => m.Address1)
 					</div>
 				</div>
 				<div class="form-group">
 					<label class="control-label"></label>
 					<div class="input-group">
-						@Html.TextBoxFor(m => m.Address2, new {@class = "form-control"})
+						@Html.TextBoxFor(m => m.Address2, new { @class = "form-control" })
 						@Html.ValidationMessageFor(m => m.Address2)
 					</div>
 				</div>
 			</div>
 			<div class="two-columns-block">
 				<div class="form-group">
-					@Html.LabelFor(m => m.City, new {@class = "control-label"})
+					@Html.LabelFor(m => m.City, new { @class = "control-label" })
 					<div class="input-group">
-						@Html.TextBoxFor(m => m.City, new {@class = "form-control"})
+						@Html.TextBoxFor(m => m.City, new { @class = "form-control" })
 						@Html.ValidationMessageFor(m => m.City)
 					</div>
 				</div>
 				<div class="form-group">
 					<!--todo-->
-					@Html.LabelFor(m => m.IdState, new {@class = "control-label"})
+					@Html.LabelFor(m => m.IdState, new { @class = "control-label" })
 					<div class="input-group">
-						@Html.DropDownListFor(m => m.IdState, new List<SelectListItem>(), new {@class = "form-control", @id = "ddState"})
+						@Html.DropDownListFor(m => m.IdState, new List<SelectListItem>(), new { @class = "form-control", @id = "ddState" })
 						@Html.ValidationMessageFor(m => m.IdState)
 					</div>
 				</div>
 				<div class="form-group">
 					<!--todo-->
-					@Html.LabelFor(m => m.County, new {@class = "control-label"})
+					@Html.LabelFor(m => m.County, new { @class = "control-label" })
 					<div class="input-group">
-						@Html.TextBoxFor(m => m.County, new {@class = "form-control", @id = "txtState"})
+						@Html.TextBoxFor(m => m.County, new { @class = "form-control", @id = "txtState" })
 						@Html.ValidationMessageFor(m => m.County)
 					</div>
 				</div>
 				<div class="form-group">
-					@Html.LabelFor(m => m.PostalCode, new {@class = "control-label"})
+					@Html.LabelFor(m => m.PostalCode, new { @class = "control-label" })
 					<div class="input-group">
-						@Html.TextBoxFor(m => m.PostalCode, new {@class = "form-control"})
+						@Html.TextBoxFor(m => m.PostalCode, new { @class = "form-control" })
 						@Html.ValidationMessageFor(m => m.PostalCode)
 					</div>
 				</div>
 				<div class="form-group">
-					@Html.LabelFor(m => m.Phone, new {@class = "control-label"})
+					@Html.LabelFor(m => m.Phone, new { @class = "control-label" })
 					<div class="input-group">
-						@Html.TextBoxFor(m => m.Phone, new {@class = "form-control phone-mask"})
+						@Html.TextBoxFor(m => m.Phone, new { @class = "form-control phone-mask" })
 						@Html.ValidationMessageFor(m => m.Phone)
 					</div>
 				</div>
 				<div class="form-group">
-					@Html.LabelFor(m => m.Fax, new {@class = "control-label"})
+					@Html.LabelFor(m => m.Fax, new { @class = "control-label" })
 					<div class="input-group">
-						@Html.TextBoxFor(m => m.Fax, new {@class = "form-control phone-mask"})
+						@Html.TextBoxFor(m => m.Fax, new { @class = "form-control phone-mask" })
 						@Html.ValidationMessageFor(m => m.Fax)
 					</div>
 				</div>
@@ -125,27 +154,49 @@
 				<div class="checkout-sections-divider"></div>
 			</div>
 			<div class="form-group">
-				<span class="checkout-notification-important">For faster checkout and to receive customer rewards and incentives please register your account by providing a password.</span>
+				<label class="control-label">Address Type</label>
+				<div class="input-group">
+					<label>
+						@Html.RadioButtonFor(m => m.AddressType, (int)CheckoutAddressType.Residental, new { @class = "form-control" })
+						Residential
+					</label>
+					<label class="left-indent-medium">
+						@Html.RadioButtonFor(m => m.AddressType, (int)CheckoutAddressType.Commercial, new { @class = "form-control" })
+						Commercial
+					</label>
+				</div>
 			</div>
 			<div class="form-group">
-				
+				@Html.LabelFor(m => m.DeliveryInstructions, new { @class = "control-label" })
+				<div class="input-group">
+					@Html.TextAreaFor(m => m.DeliveryInstructions, new { @class = "form-control", rows = "5" })
+					@Html.ValidationMessageFor(m => m.DeliveryInstructions)
+				</div>
 			</div>
 			<div class="form-group">
-				
+				<label class="control-label"></label>
+				<div class="input-group">
+					<label class="multiline-checkbox-container bold">
+						@Html.CheckBoxFor(m => m.IsGiftCertificate, new { @class = "form-control" })
+						Check here if this order is a gift
+					</label>
+				</div>
 			</div>
-			<div class="form-group">
-				
-			</div>
-			<div class="form-group">
-				
-			</div>
-			<div class="form-group">
-
+			<div class="form-group" style="display: none;">
+				@Html.LabelFor(m => m.GiftMessage, new { @class = "control-label" })
+				<div class="input-group">
+					<div class="form-control-note">
+						<span class="shopping-notice-note">NOTE:</span> If this is an e-Gift Certificate, enter the recipient’s email address where indicated AFTER you place your order,<br/>
+						using the form on the Thank You page. (This is a security requirement.)
+					</div>
+					@Html.TextAreaFor(m => m.GiftMessage, new {@class = "form-control", rows="5"})
+					@Html.ValidationMessageFor(m => m.GiftMessage)
+				</div>
 			</div>
 			<div class="form-buttons-group">
 				<input class="arrow-left-red" type="button" value="Back" />
 				<input class="arrow-right-blue" type="submit" value="Continue" />
 			</div>
-		}
-	</div>
+		</div>
+	}
 </div>

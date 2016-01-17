@@ -6,7 +6,7 @@ using VitalChoice.Infrastructure.Domain.Constants;
 
 namespace VC.Public.Models.Checkout
 {
-    public class AddUpdateShippingMethod: AddressModel
+    public class AddUpdateShippingMethodModel: AddressModel
 	{
 		[Display(Name = "Address Type")]
 		public CheckoutAddressType AddressType { get; set; }
@@ -14,10 +14,11 @@ namespace VC.Public.Models.Checkout
 		[Display(Name = "Delivery Instructions")]
 		public string DeliveryInstructions { get; set; }
 
-		[Display(Name = "Check here if this order is a gift")]
-	    public bool IsGiftCertificate { get; set; }
+		public bool IsGiftCertificate { get; set; }
 
-		[Display(Name = "Delivery Instructions")]
+		[Display(Name = "Gift Message")]
 		public string GiftMessage { get; set; }
+
+		public bool UseBillingAddress { get; set; }
 	}
 }

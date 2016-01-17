@@ -1,6 +1,6 @@
 ﻿@using System.Threading.Tasks
 @using VC.Public.Helpers
-@model VC.Public.Models.Checkout.AddUpdateBillingAddress
+@model VC.Public.Models.Checkout.AddUpdateBillingAddressModel
 
 @section Meta {
 	<title>Wild Seafood & Organics - Vital Choice</title>
@@ -11,6 +11,7 @@
 }
 
 @section PageScripts {
+	<script src="@Url.Content("/app/modules/checkout/checkoutMain.js")"></script>
 	<script src="@Url.Content("/app/common/dataAccess.js")"></script>
 	<script src="@Url.Content("/app/modules/auth/registration.js")"></script>
 	<script src="@Url.Content("/app/modules/checkout/billingInfo.js")"></script>
@@ -163,7 +164,7 @@
 				<label class="control-label"></label>
 				<div class="input-group">
 					<label class="multiline-checkbox-container">
-						@Html.CheckBoxFor(m => m.SendNews, new {@class = "form-control vertical-align-bottom"})
+						@Html.CheckBoxFor(m => m.SendNews, new {@class = "form-control"})
 						Send weekly Offers, Recipes, and Food/Health News via the <i>Vital Choices</i> e-letter.<br /><br />
 						<span class="shopping-notice-note">NOTE:</span>If you already get <i>Vital Choices</i>, DO NOT UN-CHECK THIS BOX unless you want to cancel it … we won’t <br/>	duplicate your subscription!
 					</label>
@@ -173,7 +174,7 @@
 				<label class="control-label"></label>
 				<div class="input-group">
 					<label class="multiline-checkbox-container">
-						@Html.CheckBoxFor(m => m.SendCatalog, new {@class = "form-control vertical-align-bottom"})
+						@Html.CheckBoxFor(m => m.SendCatalog, new {@class = "form-control"})
 						Send me the award-winning Vital Choice catalog on a seasonal basis.<br/><br/>
 						<a href="#">Our privacy policy</a>
 					</label>

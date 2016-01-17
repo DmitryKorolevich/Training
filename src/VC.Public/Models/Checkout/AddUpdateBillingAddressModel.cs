@@ -5,7 +5,7 @@ using VitalChoice.Infrastructure.Domain.Constants;
 
 namespace VC.Public.Models.Checkout
 {
-    public class AddUpdateBillingAddress: AddressModel
+    public class AddUpdateBillingAddressModel: AddressModel
 	{
 		[EmailAddress]
 		[MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
