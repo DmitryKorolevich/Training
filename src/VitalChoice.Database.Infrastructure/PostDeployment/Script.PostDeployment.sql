@@ -49,5 +49,5 @@ Post-Deployment Script Template
 :r .\Scripts\ContentIndexes.sql
 :r .\Scripts\Redirects.sql
 
-:r .\Scripts\EmailTemplates.
+:r .\Scripts\EmailTemplates.sql
 :r .\Scripts\EmailTemplatesData.sql
