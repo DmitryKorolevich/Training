@@ -46,7 +46,11 @@ namespace VC.Public.Controllers
 		[HttpGet]
 		public async Task<IActionResult> AddUpdateBillingAddress()
 		{
-			var billingInfoModel = new AddUpdateBillingAddress();
+			var billingInfoModel = new AddUpdateBillingAddressModel()
+			{
+				SendNews = false,
+				SendCatalog = true
+			};
 			if (ContextAccessor.HttpContext.User.Identity.IsAuthenticated)
 			{
 				var currentCustomer = await GetCurrentCustomerDynamic();
@@ -55,6 +59,44 @@ namespace VC.Public.Controllers
 			}
 
 			return View(billingInfoModel);
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> AddUpdateShippingMethod()
+		{
+			var shippingMethodModel = new AddUpdateShippingMethodModel()
+			{
+
+			};
+			if (ContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+			{
+				var currentCustomer = await GetCurrentCustomerDynamic();
+
+				//todo: populate model
+			}
+
+			ViewBag.ShippingAddresses = null;
+
+			return View(shippingMethodModel);
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> AddPaymentMethod()
+		{
+			var shippingMethodModel = new AddPaymentMethodModel()
+			{
+
+			};
+			if (ContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+			{
+				var currentCustomer = await GetCurrentCustomerDynamic();
+
+				//todo: populate model
+			}
+
+			ViewBag.ShippingAddresses = null;
+
+			return View(shippingMethodModel);
 		}
 	}
 }
