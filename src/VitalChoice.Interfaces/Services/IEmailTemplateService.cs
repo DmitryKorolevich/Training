@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Content.Articles;
 using VitalChoice.Infrastructure.Domain.Content.Recipes;
@@ -12,6 +13,7 @@ namespace VitalChoice.Interfaces.Services
     {
         Task<PagedList<EmailTemplate>> GetEmailTemplatesAsync(FilterBase filter);
         Task<EmailTemplate> GetEmailTemplateAsync(int id);
+        Task<BasicEmail> GenerateEmailAsync(string name, EmailTemplateDataModel model);
         Task<EmailTemplate> UpdateEmailTemplateAsync(EmailTemplate recipe);
         Task<bool> DeleteEmailTemplateAsync(int id);
     }

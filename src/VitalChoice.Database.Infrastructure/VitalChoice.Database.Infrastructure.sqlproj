@@ -172,4 +172,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\EmailTemplates.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\EmailTemplatesData.sql" />
+  </ItemGroup>
 </Project>

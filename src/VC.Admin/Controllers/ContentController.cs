@@ -20,6 +20,8 @@ using VitalChoice.Infrastructure.Domain.Transfer.ContentManagement;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VC.Admin.Models.EmailTemplates;
+using VitalChoice.Ecommerce.Domain.Mail;
+using VitalChoice.Infrastructure.Domain.Constants;
 
 namespace VC.Admin.Controllers
 {
@@ -165,7 +167,6 @@ namespace VC.Admin.Controllers
         #region EmailTemplates
 
         [HttpPost]
-        [AdminAuthorize(PermissionType.Content)]
         public async Task<Result<PagedList<EmailTemplateListItemModel>>> GetEmailTemplates([FromBody]FilterBase filter)
         {
             var result = await emailTemplateService.GetEmailTemplatesAsync(filter);
@@ -179,7 +180,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
-        [AdminAuthorize(PermissionType.Content)]
+        [AdminAuthorize(PermissionType.Marketing)]
         public async Task<Result<EmailTemplateManageModel>> GetEmailTemplate(int id)
         {
             if (id == 0)
@@ -196,7 +197,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        [AdminAuthorize(PermissionType.Content)]
+        [AdminAuthorize(PermissionType.Marketing)]
         public async Task<Result<EmailTemplateManageModel>> UpdateEmailTemplate([FromBody]EmailTemplateManageModel model)
         {
             if (!Validate(model))
@@ -215,7 +216,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        [AdminAuthorize(PermissionType.Content)]
+        [AdminAuthorize(PermissionType.Marketing)]
         public async Task<Result<bool>> DeleteEmailTemplate(int id, [FromBody] object model)
         {
             return await emailTemplateService.DeleteEmailTemplateAsync(id);

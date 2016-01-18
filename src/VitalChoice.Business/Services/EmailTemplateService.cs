@@ -25,6 +25,10 @@ using VitalChoice.Infrastructure.Domain.Content.Recipes;
 using VitalChoice.Ecommerce.Domain.Mail;
 using System.Reflection;
 using VitalChoice.Infrastructure.Domain.Mail;
+using Templates;
+using System.Dynamic;
+using VitalChoice.Ecommerce.Domain.Helpers;
+using Templates.Runtime;
 
 namespace VitalChoice.Business.Services.Content
 {
@@ -75,7 +79,7 @@ namespace VitalChoice.Business.Services.Content
             var modelType = _modelTypes.FirstOrDefault(p => p.Name == typeName);
             if(modelType!=null)
             {
-                toReturn = modelType.GetProperties(BindingFlags.Public).Select(p=>p.Name).ToList();
+                toReturn = modelType.GetProperties().Select(p=>p.Name).ToList();
             }
             return toReturn;
         }
@@ -97,6 +101,61 @@ namespace VitalChoice.Business.Services.Content
                 toReturn.ModelPropertyNames = GetEmailTemplateModelPropertyNames(toReturn.ModelType);
             }
 
+            return toReturn;
+        }
+
+        private readonly string DefaultModelName = "Model";
+        private readonly string SubjectMasterTemplate = "<%"+Environment.NewLine+"<default> -> (Model)"+ Environment.NewLine+ "{{ data }} :: dynamic" + Environment.NewLine + "%>";
+
+        public async Task<BasicEmail> GenerateEmailAsync(string name, EmailTemplateDataModel model)
+        {
+            BasicEmail toReturn = null;
+            var emailTemplate = (await _emailTemplateRepository.Query(p => p.Name == name && p.StatusCode != RecordStatusCode.Deleted).
+                Include(p=>p.ContentItem).Include(p=>p.MasterContentItem).SelectAsync(false)).FirstOrDefault();
+            if(emailTemplate!=null)
+            {
+                ITtlTemplate mainTemplate;
+                ITtlTemplate subjectTemplate;
+                string generatedBody;
+                string generatedSubject;
+                try
+                {
+                    var templateCacheOptions = new TemplateCacheParam
+                    {
+                        IdMaster = emailTemplate.MasterContentItemId,
+                        IdTemplate = emailTemplate.ContentItemId,
+                        Master = emailTemplate.MasterContentItem.Template,
+                        Template = emailTemplate.ContentItem.Template,
+                        MasterUpdateDate = emailTemplate.MasterContentItem.Updated,
+                        TemplateUpdateDate = emailTemplate.ContentItem.Updated,
+                    };
+                    mainTemplate = _templatesCache.GetOrCreateTemplate(templateCacheOptions);
+
+                    var subjectTextTemplate = SubjectMasterTemplate.Replace("data", emailTemplate.ContentItem.Title ?? String.Empty);
+                    subjectTemplate = new TtlTemplate(subjectTextTemplate, new CompileContext(model.GetType()));
+
+                    Dictionary<string, object> templateModel = new Dictionary<string, object>
+                    {
+                        {DefaultModelName, model},
+                    };
+
+                    var templatingModel = new ExpandoObject();
+                    templateModel.CopyToDictionary(templatingModel);
+
+                    generatedBody = mainTemplate.Generate(templatingModel);
+                    generatedSubject = subjectTemplate.Generate(templatingModel);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e.Message, e);
+                    return null;
+                }
+
+                toReturn = new BasicEmail() {
+                    Subject = generatedSubject,
+                    Body=generatedBody,
+                };
+            }
             return toReturn;
         }
 
@@ -126,14 +185,11 @@ namespace VitalChoice.Business.Services.Content
 
             if (dbItem != null && dbItem.StatusCode != RecordStatusCode.Deleted)
             {
-                dbItem.Name = model.Name;
                 dbItem.UserId = model.UserId;
+                dbItem.MasterContentItemId = model.MasterContentItemId;
                 dbItem.ContentItem.Updated = DateTime.Now;
                 dbItem.ContentItem.Template = model.ContentItem.Template;
-                dbItem.ContentItem.Description = model.ContentItem.Description;
                 dbItem.ContentItem.Title = model.ContentItem.Title;
-                dbItem.ContentItem.MetaDescription = model.ContentItem.MetaDescription;
-                dbItem.ContentItem.MetaKeywords = model.ContentItem.MetaKeywords;
 
                 if (model.Id == 0)
                 {

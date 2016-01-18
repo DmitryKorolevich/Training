@@ -14,6 +14,8 @@ namespace VC.Admin.Models.EmailTemplates
 
 	    public string Name { get; set; }
 
+        public string Subject { get; set; }
+
         public string EmailDescription { get; set; }
         
         public DateTime Created { get; set; }
@@ -36,6 +38,7 @@ namespace VC.Admin.Models.EmailTemplates
                 {
                     Created = item.ContentItem.Created;
                     Updated = item.ContentItem.Updated;
+                    Subject = item.ContentItem.Title;
                 }
                 if (item.User != null && item.User.Profile != null)
                 {

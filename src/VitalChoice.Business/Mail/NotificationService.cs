@@ -1,21 +1,27 @@
 ﻿using Microsoft.Extensions.OptionsModel;
 using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Mail;
+using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Mail
 {
     public class NotificationService : INotificationService
     {
 	    private readonly IEmailSender emailSender;
+        private readonly IEmailTemplateService _emailTemplateService;
         private static string _mainSuperAdminEmail;
         private static string _adminHost;
         private static string _publicHost;
 
-        public NotificationService(IEmailSender emailSender, IOptions<AppOptions> appOptions)
+        public NotificationService(IEmailSender emailSender,
+            IEmailTemplateService emailTemplateService,
+            IOptions<AppOptions> appOptions)
 	    {
 		    this.emailSender = emailSender;
+            _emailTemplateService = emailTemplateService;
             _mainSuperAdminEmail = appOptions.Value.MainSuperAdminEmail;
             _adminHost = appOptions.Value.AdminHost;
             _publicHost = appOptions.Value.PublicHost;
@@ -151,14 +157,12 @@ namespace VitalChoice.Business.Mail
 
         public async Task SendUserPasswordForgotAsync(string email, PasswordReset passwordReset)
         {
-            //todo:refactor this to user nustache or something
+            var generatedEmail =  await _emailTemplateService.GenerateEmailAsync(EmailConstants.UserPasswordForgot, passwordReset);
 
-            var body =
-                $"<p>Dear {passwordReset.FirstName} {passwordReset.LastName},</p><p>Please click the following <a href=\"{passwordReset.Link}\">link</a> to setup a new password</p><p></p><p>Vital Choice Administration,</p><p></p><p>This is an automated message. Do not reply. This mailbox is not monitored.</p>";
-
-            var subject = "Vital Choice - Recover Your Forgot Password";
-
-            await emailSender.SendEmailAsync(email, subject, body);
+            if (generatedEmail != null)
+            {
+                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body);
+            }
         }
 
         public async Task SendCustomerServiceEmailAsync(string email, CustomerServiceEmail model)
