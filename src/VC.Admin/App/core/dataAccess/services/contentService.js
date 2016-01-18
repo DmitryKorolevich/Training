@@ -44,6 +44,24 @@ angular.module('app.core.dataAccess.services.contentService', [])
 	        return $http.post(baseUrl + 'DeleteMasterContentItem/' + id, null, getConfig(tracker));
 	    },
 
+	    //email templates
+	    getEmailTemplates: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetEmailTemplates', filter, getConfig(tracker));
+	    },
+	    getEmailTemplate: function (id, tracker)
+	    {
+	        return $http.get(baseUrl + 'GetEmailTemplate/' + id, getConfig(tracker));
+	    },
+	    updateEmailTemplate: function (model, tracker)
+	    {
+	        return $http.post(baseUrl + 'UpdateEmailTemplate', model, getConfig(tracker));
+	    },
+	    deleteEmailTemplate: function (id, tracker)
+	    {
+	        return $http.post(baseUrl + 'DeleteEmailTemplate/' + id, getConfig(tracker));
+	    },
+
         //recipes
 		getRecipes: function(filter,tracker) {
 		    return $http.post(baseUrl + 'GetRecipes', filter, getConfig(tracker));

@@ -117,8 +117,8 @@
 				</ul>
 			</nav>
 			<div class="search-area">
-				<form>
-					<input type="text" placeholder="What can we help you find?" value="" />
+				<form id="search-area-form" action="/help/search" method="get">
+					<input type="text" name="q" placeholder="What can we help you find?" value="" />
 					<input type="image" src="/Assets/images/mag.jpg" />
 				</form>
 			</div>
@@ -205,7 +205,9 @@
 		</footer>
 	</div>
 	<script async type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"></script>
+    <script src="https://www.google.com/jsapi" type="text/javascript"></script>
 	@await Component.InvokeAsync("Assets", "scripts")
 	@RenderSection("PageScripts", false)
+    @RenderSection("EndPageStyles", false)
 </body>
 </html>

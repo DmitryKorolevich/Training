@@ -18,6 +18,8 @@ using VitalChoice.Infrastructure.Domain.Content.Recipes;
 using VitalChoice.Infrastructure.Domain.Entities.Permissions;
 using VitalChoice.Infrastructure.Domain.Transfer.ContentManagement;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.Infrastructure.Domain.Transfer;
+using VC.Admin.Models.EmailTemplates;
 
 namespace VC.Admin.Controllers
 {
@@ -29,11 +31,12 @@ namespace VC.Admin.Controllers
         private readonly IFAQService faqService;
         private readonly IArticleService articleService;
         private readonly IContentPageService contentPageService;
+        private readonly IEmailTemplateService emailTemplateService;
         private readonly ILogger logger;
 
         public ContentController(IMasterContentService masterContentService, ICategoryService categoryService,
             IRecipeService recipeService, IFAQService faqService, IArticleService articleService, IContentPageService contentPageService,
-            ILoggerProviderExtended loggerProvider)
+            IEmailTemplateService emailTemplateService, ILoggerProviderExtended loggerProvider)
         {
             this.masterContentService = masterContentService;
             this.categoryService = categoryService;
@@ -41,6 +44,7 @@ namespace VC.Admin.Controllers
             this.faqService = faqService;
             this.articleService = articleService;
             this.contentPageService = contentPageService;
+            this.emailTemplateService = emailTemplateService;
             this.logger = loggerProvider.CreateLoggerDefault();
         }
         
@@ -155,6 +159,67 @@ namespace VC.Admin.Controllers
             return await categoryService.DeleteCategoryAsync(id);
         }
 
+
+        #endregion
+
+        #region EmailTemplates
+
+        [HttpPost]
+        [AdminAuthorize(PermissionType.Content)]
+        public async Task<Result<PagedList<EmailTemplateListItemModel>>> GetEmailTemplates([FromBody]FilterBase filter)
+        {
+            var result = await emailTemplateService.GetEmailTemplatesAsync(filter);
+            var toReturn = new PagedList<EmailTemplateListItemModel>
+            {
+                Items = result.Items.Select(p => new EmailTemplateListItemModel(p)).ToList(),
+                Count = result.Count,
+            };
+
+            return toReturn;
+        }
+
+        [HttpGet]
+        [AdminAuthorize(PermissionType.Content)]
+        public async Task<Result<EmailTemplateManageModel>> GetEmailTemplate(int id)
+        {
+            if (id == 0)
+            {
+                var model = new EmailTemplateManageModel()
+                {
+                    Subject=string.Empty,
+                    Template = string.Empty,
+                };
+
+                return model;
+            }
+            return new EmailTemplateManageModel(await emailTemplateService.GetEmailTemplateAsync(id));
+        }
+
+        [HttpPost]
+        [AdminAuthorize(PermissionType.Content)]
+        public async Task<Result<EmailTemplateManageModel>> UpdateEmailTemplate([FromBody]EmailTemplateManageModel model)
+        {
+            if (!Validate(model))
+                return null;
+            var item = model.Convert();
+            var sUserId = Request.HttpContext.User.GetUserId();
+            int userId;
+            if (Int32.TryParse(sUserId, out userId))
+            {
+                item.UserId = userId;
+            }
+
+            item = await emailTemplateService.UpdateEmailTemplateAsync(item);
+
+            return new EmailTemplateManageModel(item);
+        }
+
+        [HttpPost]
+        [AdminAuthorize(PermissionType.Content)]
+        public async Task<Result<bool>> DeleteEmailTemplate(int id, [FromBody] object model)
+        {
+            return await emailTemplateService.DeleteEmailTemplateAsync(id);
+        }
 
         #endregion
 

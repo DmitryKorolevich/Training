@@ -2,7 +2,7 @@
 
 namespace VitalChoice.Ecommerce.Domain.Mail
 {
-    public class GCNotificationEmail
+    public class GCNotificationEmail : EmailTemplateDataModel
     {
 	    public string FirstName { get; set; }
         public string LastName { get; set; }

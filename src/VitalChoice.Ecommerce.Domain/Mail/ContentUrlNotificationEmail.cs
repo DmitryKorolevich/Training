@@ -1,6 +1,6 @@
 ﻿namespace VitalChoice.Ecommerce.Domain.Mail
 {
-    public struct ContentUrlNotificationEmail
+    public class ContentUrlNotificationEmail : EmailTemplateDataModel
     {
         public string FromEmail { get; set; }
 

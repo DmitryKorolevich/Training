@@ -1,0 +1,16 @@
+﻿@using System.Threading.Tasks
+@using VC.Public.Models.Auth
+
+@section PageScripts {
+    <script src="@Url.Content("/app/modules/help/search.js")"></script>
+}
+
+@section EndPageStyles {
+    <link rel="stylesheet" href="//www.google.com/cse/style/look/default.css" type="text/css" />
+}
+
+<div class="working-area-holder min-size relative">
+    <div data-ng-show="show" class="overlay"><div class="loading">Loading…</div></div>
+    <h4>Search Results</h4>
+    <div id="search-result-box"></div>
+</div>

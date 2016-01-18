@@ -1,6 +1,8 @@
-﻿namespace VitalChoice.Infrastructure.Domain.Mail
+﻿using VitalChoice.Ecommerce.Domain.Mail;
+
+namespace VitalChoice.Infrastructure.Domain.Mail
 {
-    public class PrivacyRequestEmail
+    public class PrivacyRequestEmail : EmailTemplateDataModel
     {
 	    public string Name { get; set; }
         public string MailingAddress { get; set; }

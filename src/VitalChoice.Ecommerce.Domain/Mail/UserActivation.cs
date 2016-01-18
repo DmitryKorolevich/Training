@@ -1,6 +1,6 @@
 ﻿namespace VitalChoice.Ecommerce.Domain.Mail
 {
-    public struct UserActivation
+    public class UserActivation : EmailTemplateDataModel
     {
 	    public string FirstName { get; set; }
 	    public string LastName { get; set; }

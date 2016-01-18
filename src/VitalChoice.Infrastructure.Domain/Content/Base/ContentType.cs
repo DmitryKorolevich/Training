@@ -12,5 +12,6 @@
         ContentPage = 8,
         ProductCategory = 9,
         Product = 10,
+        Email = 11,
     }
 }
