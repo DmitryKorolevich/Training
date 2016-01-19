@@ -687,5 +687,26 @@ namespace VitalChoice.Business.Services.Customers
             }
             return entity;
         }
+
+        public async Task<string> GetNewOrderNotesBasedOnCustomer(int idCustomer)
+        {
+            string toReturn = null;
+            var customer = await SelectAsync(idCustomer);
+            if (customer != null)
+            {
+                var avaliableOrderNotes = await GetAvailableOrderNotesAsync((CustomerType)customer.IdObjectType);
+                toReturn = String.Empty;
+                foreach (var IdCustomerOrderNote in customer.OrderNotes)
+                {
+                    var orderNote = avaliableOrderNotes.FirstOrDefault(p => p.Id == IdCustomerOrderNote);
+                    if (orderNote != null)
+                    {
+                        toReturn += orderNote.Description + Environment.NewLine;
+                    }
+                }
+            }
+
+            return toReturn;
+        }
     }
 }

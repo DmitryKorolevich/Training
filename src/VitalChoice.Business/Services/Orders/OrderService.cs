@@ -689,6 +689,23 @@ namespace VitalChoice.Business.Services.Orders
             return toReturn;
         }
 
+        public async Task<OrderDynamic> CreateNewNormalOrder(OrderStatus status)
+        {
+            var toReturn = await CreatePrototypeAsync((int)OrderType.Normal);
+
+            toReturn.StatusCode = (int)RecordStatusCode.Active;
+            if(status!= OrderStatus.Processed && status != OrderStatus.Incomplete)
+            {
+                throw new Exception("New normal order invalid status");
+            }
+            toReturn.OrderStatus = status;
+            toReturn.DateCreated = DateTime.Now;
+            toReturn.Data.PreferredShipMethod = (int)PreferredShipMethod.Best;
+            toReturn.Data.ShipDelayType = (int)ShipDelayType.None;
+
+            return toReturn;
+        }
+
         #region AffiliatesOrders
 
         public async Task<PagedList<AffiliateOrderListItemModel>> GetAffiliateOrderPaymentsWithCustomerInfo(AffiliateOrderPaymentFilter filter)

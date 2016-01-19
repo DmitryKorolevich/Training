@@ -20,6 +20,8 @@ namespace VitalChoice.Interfaces.Services.Orders
 	    Task<OrderDataContext> CalculateOrder(OrderDynamic order);
 		Task<OrderDynamic> SelectLastOrderAsync(int customerId);
 
+        Task<OrderDynamic> CreateNewNormalOrder(OrderStatus status);
+
         #region AffiliatesOrders
 
         Task<PagedList<AffiliateOrderListItemModel>> GetAffiliateOrderPaymentsWithCustomerInfo(AffiliateOrderPaymentFilter filter);

@@ -137,14 +137,16 @@ namespace VC.Admin.Controllers
         {
             if (id == 0)
             {
-                var model = await _orderService.CreatePrototypeForAsync<OrderManageModel>((int) OrderType.Normal);
-                model.GCs = new List<GCListItemModel>() {new GCListItemModel(null)};
-                model.SkuOrdereds = new List<SkuOrderedManageModel>() {new SkuOrderedManageModel(null)};
-                model.StatusCode = RecordStatusCode.Active;
-                model.OrderStatus = OrderStatus.Processed;
-                model.DateCreated = DateTime.Now;
-                model.PreferredShipMethod = 1;
-                model.ShipDelayType = 0;
+                var order = await _orderService.CreateNewNormalOrder(OrderStatus.Processed);
+                if (idcustomer.HasValue)
+                {
+                    order.Data.OrderNotes = await _customerService.GetNewOrderNotesBasedOnCustomer(idcustomer.Value);
+                }
+
+                var model = _mapper.ToModel<OrderManageModel>(order);
+
+                model.GCs = new List<GCListItemModel>() { new GCListItemModel(null) };
+                model.SkuOrdereds = new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) };
                 model.UpdateShippingAddressForCustomer = true;
                 model.UpdateCardForCustomer = true;
                 model.UpdateCheckForCustomer = true;
@@ -152,24 +154,6 @@ namespace VC.Admin.Controllers
                 model.UpdateWireTransferForCustomer = true;
                 model.UpdateMarketingForCustomer = true;
                 model.UpdateVCWellnessForCustomer = true;
-
-                if (idcustomer.HasValue)
-                {
-                    var customer = await _customerService.SelectAsync(idcustomer.Value);
-                    if (customer != null)
-                    {
-                        var avaliableOrderNotes = await _customerService.GetAvailableOrderNotesAsync((CustomerType)customer.IdObjectType);
-                        model.OrderNotes = String.Empty;
-                        foreach (var IdCustomerOrderNote in customer.OrderNotes)
-                        {
-                            var orderNote = avaliableOrderNotes.FirstOrDefault(p => p.Id == IdCustomerOrderNote);
-                            if (orderNote != null)
-                            {
-                                model.OrderNotes += orderNote.Description + Environment.NewLine;
-                            }
-                        }
-                    }
-                }
 
                 return model;
             }
