@@ -31,6 +31,10 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			        {
 			            $scope.currentCustomer.InceptionDate = Date.parseDateTime($scope.currentCustomer.InceptionDate);
 			        }
+			        if (!$scope.currentCustomer.Email)
+			        {
+			            $scope.options.OverrideEmail = true;
+			        }
 			        $scope.currentCustomer.ActivatePending = false;
 			        $scope.options.DBStatusCode = $scope.currentCustomer.StatusCode;
 			        $scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
@@ -380,18 +384,27 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 				});
 
 				if (valid) {
-					if ($scope.currentCustomer.newEmail || $scope.currentCustomer.emailConfirm) {
-						$scope.currentCustomer.Email = $scope.currentCustomer.newEmail;
-						$scope.currentCustomer.EmailConfirm = $scope.currentCustomer.emailConfirm;
-					} else {
-						$scope.currentCustomer.EmailConfirm = $scope.currentCustomer.Email;
-					}
-
 					if (!$scope.editMode) {
 						$scope.currentCustomer.Shipping[0].Default = true;
 					}
 
 					var data = angular.copy($scope.currentCustomer);
+
+					if (data.newEmail || data.uiEmailConfirm)
+					{
+					    data.Email = data.newEmail;
+					    data.EmailConfirm = data.uiEmailConfirm;
+					} else
+					{
+					    data.EmailConfirm = data.Email;
+					}
+
+					if ($scope.options.OverrideEmail)
+					{
+					    data.Email = null;
+					    data.EmailConfirm = null;
+					}
+
 					if (data.ActivatePending)
 					{
 					    data.StatusCode = 2;//active

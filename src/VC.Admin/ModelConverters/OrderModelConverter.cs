@@ -13,6 +13,7 @@ using VitalChoice.Interfaces.Services.Products;
 using VC.Admin.Models.Orders;
 using VitalChoice.Business.Queries.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
 
 namespace VC.Admin.ModelConverters
 {
@@ -76,7 +77,7 @@ namespace VC.Admin.ModelConverters
 
             if(!model.ShipDelayType.HasValue)
             {
-                model.ShipDelayType = 0;
+                model.ShipDelayType = ShipDelayType.None;
             }
 
             model.Shipping = _addressMapper.ToModel<AddressModel>(dynamic.ShippingAddress);
@@ -118,7 +119,7 @@ namespace VC.Admin.ModelConverters
 
             ModelToSkusDynamic(model, dynamic);
 
-            if(dynamic.DictionaryData.ContainsKey("ShipDelayType") && (int?)dynamic.DictionaryData["ShipDelayType"] == 0)
+            if(dynamic.DictionaryData.ContainsKey("ShipDelayType") && (ShipDelayType)dynamic.DictionaryData["ShipDelayType"] == ShipDelayType.None)
             {
                 dynamic.DictionaryData["ShipDelayType"] = null;
             }
@@ -171,6 +172,8 @@ namespace VC.Admin.ModelConverters
                         }
                         dbCustomer.ApprovedPaymentMethods = dynamic.Customer.ApprovedPaymentMethods;
                         dbCustomer.OrderNotes = dynamic.Customer.OrderNotes;
+                        dbCustomer.Email = dynamic.Customer.Email;
+                        dbCustomer.ProfileAddress = dynamic.Customer.ProfileAddress;
 
                         if (model.UpdateShippingAddressForCustomer)
                         {

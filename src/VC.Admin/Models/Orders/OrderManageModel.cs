@@ -180,7 +180,7 @@ namespace VC.Admin.Models.Orders
         public int? AutoShipFrequency { get; set; }
 
         [Map]
-        public int? ShipDelayType { get; set; }
+        public ShipDelayType? ShipDelayType { get; set; }
 
         [Map]
         public DateTime? ShipDelayDateP { get; set; }
@@ -225,7 +225,7 @@ namespace VC.Admin.Models.Orders
         public decimal ShippingTotal { get; set; }
 
         [Map]
-        public int? PreferredShipMethod { get; set; }
+        public PreferredShipMethod? PreferredShipMethod { get; set; }
 
         [Map]
         public decimal ProductsSubtotal { get; set; }

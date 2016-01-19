@@ -145,19 +145,19 @@ namespace VC.Admin.Validators.Order
 
                              RuleFor(model => model.ShipDelayDate)
                               .Must(p => p.HasValue)
-                              .When(p => p.ShipDelayType == 1)
+                              .When(p => p.ShipDelayType == ShipDelayType.EntireOrder)
                               .WithMessage(model => model.ShipDelayDate, ValidationMessages.FieldRequired);
                             RuleFor(model => model.ShipDelayDate)
                               .Must(p=>p >= DateTime.Now)
-                              .When(p => p.ShipDelayDate.HasValue && p.ShipDelayType == 1)
+                              .When(p => p.ShipDelayDate.HasValue && p.ShipDelayType == ShipDelayType.EntireOrder)
                               .WithMessage("Ship delay should be future date. Please review.");
                              RuleFor(model => model.ShipDelayDateP)
                                  .Must(p => p >= DateTime.Now)
-                                 .When(p => p.ShipDelayDateP.HasValue && p.ShipDelayType == 2)
+                                 .When(p => p.ShipDelayDateP.HasValue && p.ShipDelayType == ShipDelayType.PerishableAndNonPerishable)
                                  .WithMessage("Ship delay should be future date. Please review.");
                              RuleFor(model => model.ShipDelayDateNP)
                                  .Must(p => p >= DateTime.Now)
-                                 .When(p => p.ShipDelayDateNP.HasValue && p.ShipDelayType==2)
+                                 .When(p => p.ShipDelayDateNP.HasValue && p.ShipDelayType== ShipDelayType.PerishableAndNonPerishable)
                                  .WithMessage("Ship delay should be future date. Please review.");
                          });
                 RuleSet("NewOrder",

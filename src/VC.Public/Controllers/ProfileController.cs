@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.ModelBinding;
@@ -34,6 +35,7 @@ using VitalChoice.SharedWeb.Models.Help;
 using VitalChoice.Interfaces.Services.Healthwise;
 using VitalChoice.Infrastructure.Domain.Transfer.Healthwise;
 using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
+using VitalChoice.Interfaces.Services;
 
 namespace VC.Public.Controllers
 {
@@ -53,10 +55,12 @@ namespace VC.Public.Controllers
 
         public ProfileController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
             ICustomerService customerService, IDynamicMapper<AddressDynamic, Address> addressConverter,
-            IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter, IOrderService orderService, 
-            IProductService productService, 
+            IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter, IOrderService orderService,
+            IProductService productService,
             IHelpService helpService,
-            IHealthwiseService healthwiseService):base(contextAccessor, customerService)
+            IHealthwiseService healthwiseService, IAppInfrastructureService infrastructureService,
+            IAuthorizationService authorizationService)
+            : base(contextAccessor, customerService, infrastructureService, authorizationService)
         {
             _storefrontUserService = storefrontUserService;
             _addressConverter = addressConverter;
@@ -99,7 +103,7 @@ namespace VC.Public.Controllers
             var creditCards = new List<BillingInfoModel>();
             foreach (
                 var creditCard in
-                    currentCustomer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard))
+                    currentCustomer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard))
             {
                 var billingInfoModel = _addressConverter.ToModel<BillingInfoModel>(creditCard.Address);
                 _paymentMethodConverter.UpdateModel(billingInfoModel, creditCard);
@@ -219,7 +223,7 @@ namespace VC.Public.Controllers
             var oldEmail = customer.Email;
 
             var newProfileAddress = _addressConverter.FromModel(model);
-            newProfileAddress.IdObjectType = (int)AddressType.Profile;
+            newProfileAddress.IdObjectType = (int) AddressType.Profile;
             customer.ProfileAddress = newProfileAddress;
             customer.Email =
                 newProfileAddress.Data.Email =
@@ -272,16 +276,16 @@ namespace VC.Public.Controllers
             {
                 var creditCardToUpdate =
                     currentCustomer.CustomerPaymentMethods.Single(
-                        x => x.IdObjectType == (int)PaymentMethodType.CreditCard && x.Id == model.Id);
+                        x => x.IdObjectType == (int) PaymentMethodType.CreditCard && x.Id == model.Id);
                 currentCustomer.CustomerPaymentMethods.Remove(creditCardToUpdate);
             }
 
             var customerPaymentMethod = _paymentMethodConverter.FromModel(model);
-            customerPaymentMethod.IdObjectType = (int)PaymentMethodType.CreditCard;
+            customerPaymentMethod.IdObjectType = (int) PaymentMethodType.CreditCard;
             customerPaymentMethod.Data.SecurityCode = model.SecurityCode;
 
             customerPaymentMethod.Address = _addressConverter.FromModel(model);
-            customerPaymentMethod.Address.IdObjectType = (int)AddressType.Billing;
+            customerPaymentMethod.Address.IdObjectType = (int) AddressType.Billing;
 
             currentCustomer.CustomerPaymentMethods.Add(customerPaymentMethod);
             try
@@ -307,7 +311,7 @@ namespace VC.Public.Controllers
                 ModelState.Add("Id", new ModelStateEntry
                 {
                     RawValue =
-                        model.Id = currentCustomer.CustomerPaymentMethods.Last(x => x.IdObjectType == (int)PaymentMethodType.CreditCard).Id
+                        model.Id = currentCustomer.CustomerPaymentMethods.Last(x => x.IdObjectType == (int) PaymentMethodType.CreditCard).Id
                 });
             }
             return View(PopulateCreditCard(currentCustomer, model.Id));
@@ -318,7 +322,9 @@ namespace VC.Public.Controllers
         {
             var currentCustomer = await GetCurrentCustomerDynamic();
 
-            var creditCardToDelete = currentCustomer.CustomerPaymentMethods.FirstOrDefault(x => x.IdObjectType == (int)PaymentMethodType.CreditCard && x.Id == id);
+            var creditCardToDelete =
+                currentCustomer.CustomerPaymentMethods.FirstOrDefault(
+                    x => x.IdObjectType == (int) PaymentMethodType.CreditCard && x.Id == id);
             if (creditCardToDelete == null)
             {
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
@@ -340,7 +346,7 @@ namespace VC.Public.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangeShippingInfo([FromForm]ShippingInfoModel model)
+        public async Task<IActionResult> ChangeShippingInfo([FromForm] ShippingInfoModel model)
         {
             var currentCustomer = await GetCurrentCustomerDynamic();
 
@@ -366,7 +372,7 @@ namespace VC.Public.Controllers
             }
 
             var newAddress = _addressConverter.FromModel(model);
-            newAddress.IdObjectType = (int)AddressType.Shipping;
+            newAddress.IdObjectType = (int) AddressType.Shipping;
 
             currentCustomer.ShippingAddresses.Add(newAddress);
 
@@ -461,7 +467,10 @@ namespace VC.Public.Controllers
                             Quantity = skuOrdered.Quantity,
                             SkuCode = skuOrdered.Sku.Code,
                             ProductSubTitle = skuInDB?.SubTitle,
-                            SelectedPrice = customer.IdObjectType == (int)CustomerType.Retail ? skuInDB?.Price?.ToString("C2") : skuInDB?.WholesalePrice?.ToString("C2"),
+                            SelectedPrice =
+                                customer.IdObjectType == (int) CustomerType.Retail
+                                    ? skuInDB?.Price?.ToString("C2")
+                                    : skuInDB?.WholesalePrice?.ToString("C2"),
                         };
                         lines.Add(orderLineModel);
                     }
@@ -520,7 +529,7 @@ namespace VC.Public.Controllers
         public async Task<IActionResult> HelpTickets(int idorder, bool ignore = false)
         {
             ICollection<HelpTicketListItemModel> toReturn = new List<HelpTicketListItemModel>();
-            ViewBag.IdOrder = (int?)null;
+            ViewBag.IdOrder = (int?) null;
             var customerId = GetInternalCustomerId();
             var orderCustomerId = await _orderService.GetOrderIdCustomer(idorder);
             if (orderCustomerId == customerId)
@@ -531,9 +540,9 @@ namespace VC.Public.Controllers
                 var items = (await _helpService.GetHelpTicketsAsync(filter)).Items;
                 if (items.Count == 0 && !ignore)
                 {
-                    return RedirectToAction("HelpTicket", new { idorder = idorder });
+                    return RedirectToAction("HelpTicket", new {idorder = idorder});
                 }
-                ViewBag.IdOrder = (int?)idorder;
+                ViewBag.IdOrder = (int?) idorder;
                 toReturn = items.Select(p => new HelpTicketListItemModel(p)).ToList();
             }
             else
@@ -586,14 +595,14 @@ namespace VC.Public.Controllers
 
             var ticket = model.Convert();
             ticket = await _helpService.UpdateHelpTicketAsync(ticket, null);
-            return RedirectToAction("HelpTickets", new { idorder = ticket.IdOrder });
+            return RedirectToAction("HelpTickets", new {idorder = ticket.IdOrder});
         }
 
         [HttpPost]
         public async Task<IActionResult> DeleteHelpTicket(HelpTicketManageModel model)
         {
             await _helpService.DeleteHelpTicketAsync(model.Id);
-            return RedirectToAction("HelpTickets", new { idorder = model.IdOrder });
+            return RedirectToAction("HelpTickets", new {idorder = model.IdOrder});
         }
 
         [HttpPost]
@@ -614,7 +623,7 @@ namespace VC.Public.Controllers
             {
                 TempData[TicketCommentMessageTempData] = "Comment was successfully updated.";
             }
-            return RedirectToAction("HelpTicket", new { id = item.IdHelpTicket });
+            return RedirectToAction("HelpTicket", new {id = item.IdHelpTicket});
         }
 
         [HttpPost]
@@ -622,7 +631,7 @@ namespace VC.Public.Controllers
         {
             var result = await _helpService.DeleteHelpTicketCommentAsync(model.Id, null);
             TempData[TicketCommentMessageTempData] = "Comment was successfully deleted.";
-            return RedirectToAction("HelpTicket", new { id = model.IdHelpTicket });
+            return RedirectToAction("HelpTicket", new {id = model.IdHelpTicket});
         }
 
         [HttpGet]
@@ -637,22 +646,22 @@ namespace VC.Public.Controllers
             periods = periods.OrderByDescending(p => p.StartDate).ToList();
 
             VHealthwisePeriod lastPeriodWithOrders = null;
-            ICollection<HealthwiseOrder> orders=null;
+            ICollection<HealthwiseOrder> orders = null;
             foreach (var period in periods)
             {
                 orders = await _healthwiseService.GetHealthwiseOrdersAsync(period.Id);
                 lastPeriodWithOrders = period;
-                if (orders.Count>0)
+                if (orders.Count > 0)
                 {
                     break;
                 }
             }
-            if(lastPeriodWithOrders!=null)
+            if (lastPeriodWithOrders != null)
             {
                 toReturn = new HealthWiseHistoryModel();
                 toReturn.EndDate = lastPeriodWithOrders.EndDate;
                 toReturn.Items = new List<HealthWiseHistoryOrderModel>();
-                foreach(var healthWiseOrder in orders)
+                foreach (var healthWiseOrder in orders)
                 {
                     HealthWiseHistoryOrderModel orderModel = new HealthWiseHistoryOrderModel();
                     orderModel.Id = healthWiseOrder.Id;
@@ -661,10 +670,10 @@ namespace VC.Public.Controllers
                     orderModel.Total = healthWiseOrder.Order.ProductsSubtotal;
                     toReturn.Items.Add(orderModel);
                 }
-                if(toReturn.Items.Count>0)
+                if (toReturn.Items.Count > 0)
                 {
                     toReturn.Count = toReturn.Items.Count;
-                    toReturn.AverageAmount = toReturn.Items.Sum(p => p.Total) / toReturn.Count;
+                    toReturn.AverageAmount = toReturn.Items.Sum(p => p.Total)/toReturn.Count;
                 }
             }
 

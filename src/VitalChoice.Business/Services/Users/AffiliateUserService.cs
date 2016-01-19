@@ -63,7 +63,7 @@ namespace VitalChoice.Business.Services.Users
 
 		protected override async Task SendResetPasswordInternalAsync(ApplicationUser dbUser, string token)
 		{
-			await NotificationService.SendAdminPasswordResetAsync(dbUser.Email, new PasswordReset() //for now email template is the same as for admin
+			await NotificationService.SendCustomerPasswordResetAsync(dbUser.Email, new PasswordReset()
 			{
 				FirstName = dbUser.FirstName,
 				LastName = dbUser.LastName,

@@ -8,5 +8,6 @@ namespace VitalChoice.Ecommerce.Domain.Mail
         public string LastName { get; set; }
         public string Email { get; set; }
         public IDictionary<string,decimal> Data { get; set; }
+        public string BalancesBlock { get; set; }
     }
 }

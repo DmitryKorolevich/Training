@@ -208,12 +208,20 @@ namespace VitalChoice.Business.Services.Products
             return toReturn;
         }
 
-        public async Task<GiftCertificate> GetGiftCertificateAsync(int id)
+        public Task<GiftCertificate> GetGiftCertificateAsync(int id)
         {
             var conditions = new GcQuery().WithId(id).NotDeleted();
             var query = giftCertificateRepository.Query(conditions);
 
-            return (await query.SelectAsync(false)).FirstOrDefault();
+            return query.SelectFirstOrDefaultAsync(false);
+        }
+
+        public Task<GiftCertificate> GetGiftCertificateAsync(string code)
+        {
+            var conditions = new GcQuery().WithCode(code).NotDeleted();
+            var query = giftCertificateRepository.Query(conditions);
+
+            return query.SelectFirstOrDefaultAsync(false);
         }
 
         public async Task<GiftCertificate> UpdateGiftCertificateAsync(GiftCertificate model)

@@ -382,8 +382,8 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<AppInfrastructureService>().As<IAppInfrastructureService>().InstancePerLifetimeScope();
 	        builder.RegisterType<AdminUserService>().As<IAdminUserService>().InstancePerLifetimeScope();
 
-	        builder.RegisterType<StorefrontUserStore>().Named<IUserStore<ApplicationUser>>("storefronUserStore").InstancePerLifetimeScope();
-	        builder.RegisterType<UserValidator<ApplicationUser>>().Named<IUserValidator<ApplicationUser>>("storefrontUserValidator").InstancePerLifetimeScope();
+	        builder.RegisterType<StorefrontUserStore>().Named<IUserStore<ApplicationUser>>("storefronUserStore");
+	        builder.RegisterType<StorefrontUserValidator>().Named<IUserValidator<ApplicationUser>>("storefrontUserValidator");
 	        builder.RegisterType<ExtendedUserManager>()
 		        .Named<ExtendedUserManager>("storefrontUserManager")
 		        .WithParameter((pi, cc) => pi.Name == "store",

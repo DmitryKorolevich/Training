@@ -77,16 +77,16 @@ namespace VitalChoice.Business.Services.Content
         {
             List<string> toReturn = new List<string>();
             var modelType = _modelTypes.FirstOrDefault(p => p.Name == typeName);
-            if(modelType!=null)
+            if (modelType != null)
             {
-                toReturn = modelType.GetProperties().Select(p=>p.Name).ToList();
+                toReturn = modelType.GetProperties().Select(p => p.Name).ToList();
             }
             return toReturn;
         }
 
         public async Task<PagedList<EmailTemplate>> GetEmailTemplatesAsync(FilterBase filter)
         {
-	        var toReturn = await _emailTemplateRepository.Query(p=>p.StatusCode!=RecordStatusCode.Deleted).Include(p=>p.ContentItem).
+            var toReturn = await _emailTemplateRepository.Query(p => p.StatusCode != RecordStatusCode.Deleted).Include(p => p.ContentItem).
                 Include(p => p.User).ThenInclude(p => p.Profile).
                 SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
             return toReturn;
@@ -94,9 +94,9 @@ namespace VitalChoice.Business.Services.Content
 
         public async Task<EmailTemplate> GetEmailTemplateAsync(int id)
         {
-            var toReturn = (await _emailTemplateRepository.Query(p =>p.Id==id && p.StatusCode != RecordStatusCode.Deleted).Include(p=>p.ContentItem).Include(p => p.User).ThenInclude(p => p.Profile).
+            var toReturn = (await _emailTemplateRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).Include(p => p.ContentItem).Include(p => p.User).ThenInclude(p => p.Profile).
                 SelectAsync(false)).FirstOrDefault();
-            if(toReturn!=null)
+            if (toReturn != null)
             {
                 toReturn.ModelPropertyNames = GetEmailTemplateModelPropertyNames(toReturn.ModelType);
             }
@@ -105,14 +105,20 @@ namespace VitalChoice.Business.Services.Content
         }
 
         private readonly string DefaultModelName = "Model";
-        private readonly string SubjectMasterTemplate = "<%"+Environment.NewLine+"<default> -> (Model)"+ Environment.NewLine+ "{{ data }} :: dynamic" + Environment.NewLine + "%>";
+        private readonly string SubjectMasterTemplate = "<%" + Environment.NewLine + "<default> -> (Model)" + Environment.NewLine + "{{ data }} :: dynamic" + Environment.NewLine + "%>";
 
         public async Task<BasicEmail> GenerateEmailAsync(string name, EmailTemplateDataModel model)
         {
-            BasicEmail toReturn = null;
+            var result = await GenerateEmailsAsync(name, new List<EmailTemplateDataModel>() { model });
+            return result.Count == 1 ? result.First().Value : null;
+        }
+
+        public async Task<Dictionary<EmailTemplateDataModel, BasicEmail>> GenerateEmailsAsync(string name, ICollection<EmailTemplateDataModel> models)
+        {
+            Dictionary<EmailTemplateDataModel, BasicEmail> toReturn = new Dictionary<EmailTemplateDataModel, BasicEmail>();
             var emailTemplate = (await _emailTemplateRepository.Query(p => p.Name == name && p.StatusCode != RecordStatusCode.Deleted).
-                Include(p=>p.ContentItem).Include(p=>p.MasterContentItem).SelectAsync(false)).FirstOrDefault();
-            if(emailTemplate!=null)
+                Include(p => p.ContentItem).Include(p => p.MasterContentItem).SelectAsync(false)).FirstOrDefault();
+            if (emailTemplate != null && models.Count != 0)
             {
                 ITtlTemplate mainTemplate;
                 ITtlTemplate subjectTemplate;
@@ -132,29 +138,41 @@ namespace VitalChoice.Business.Services.Content
                     mainTemplate = _templatesCache.GetOrCreateTemplate(templateCacheOptions);
 
                     var subjectTextTemplate = SubjectMasterTemplate.Replace("data", emailTemplate.ContentItem.Title ?? String.Empty);
-                    subjectTemplate = new TtlTemplate(subjectTextTemplate, new CompileContext(model.GetType()));
-
-                    Dictionary<string, object> templateModel = new Dictionary<string, object>
-                    {
-                        {DefaultModelName, model},
-                    };
-
-                    var templatingModel = new ExpandoObject();
-                    templateModel.CopyToDictionary(templatingModel);
-
-                    generatedBody = mainTemplate.Generate(templatingModel);
-                    generatedSubject = subjectTemplate.Generate(templatingModel);
+                    subjectTemplate = new TtlTemplate(subjectTextTemplate, new CompileContext(models.First().GetType()));
                 }
                 catch (Exception e)
                 {
                     _logger.LogError(e.Message, e);
-                    return null;
+                    return toReturn;
                 }
 
-                toReturn = new BasicEmail() {
-                    Subject = generatedSubject,
-                    Body=generatedBody,
-                };
+                foreach (var model in models)
+                {
+                    Dictionary<string, object> templateModel = new Dictionary<string, object>
+                        {
+                            {DefaultModelName, model},
+                        };
+
+                    var templatingModel = new ExpandoObject();
+                    templateModel.CopyToDictionary(templatingModel);
+
+                    try
+                    {
+                        generatedBody = mainTemplate.Generate(templatingModel);
+                        generatedSubject = subjectTemplate.Generate(templatingModel);
+                        var item =new BasicEmail()
+                        {
+                            Subject = generatedSubject,
+                            Body = generatedBody,
+                        };
+
+                        toReturn.Add(model, item);
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError(e.Message, e);
+                    }
+                }
             }
             return toReturn;
         }
@@ -217,7 +235,7 @@ namespace VitalChoice.Business.Services.Content
                 {
                     await _templatesCache.RemoveFromCache(dbItem.MasterContentItemId, dbItem.ContentItemId);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     _logger.LogError(e.ToString());
                 }

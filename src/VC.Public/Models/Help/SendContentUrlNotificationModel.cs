@@ -11,6 +11,12 @@ using VitalChoice.Validation.Models;
 
 namespace VC.Public.Models.Help
 {
+    public enum SendContentUrlType
+    {
+        Article=1,
+        Recipe=2
+    }
+
     public class SendContentUrlNotificationModel : BaseModel
     {
 		[Display(Name = "Your Name")]
@@ -42,5 +48,8 @@ namespace VC.Public.Models.Help
         [Display(Name = "Name")]
         [Required]
         public string Name { get; set; }
+
+        [Display(Name = "Type")]
+        public SendContentUrlType Type { get; set; }
     }
 }

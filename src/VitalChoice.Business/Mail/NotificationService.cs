@@ -29,130 +29,124 @@ namespace VitalChoice.Business.Mail
 
 	    public async Task SendAdminUserActivationAsync(string email, UserActivation activation)
 	    {
-			//todo:refactor this to user nustache or something
+            var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.AdminRegistration, activation);
 
-			var body =
-			    $"<p>Dear {activation.FirstName} {activation.LastName},</p><p>Please click the following <a href=\"{activation.Link}\">link</a> to activate your account</p><p></p><p>Vital Choice Administration,</p><p></p><p>This is an automated message. Do not reply. This mailbox is not monitored.</p>";
-
-		    var subject = $"Your Vital Choice User Activation";
-
-		    await emailSender.SendEmailAsync(email, subject, body);
+            if (generatedEmail != null)
+            {
+                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body);
+            }
 	    }
 
 		public async Task SendAdminPasswordResetAsync(string email, PasswordReset passwordReset)
 	    {
-			//todo:refactor this to user nustache or something
+            var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.AdminPasswordForgot, passwordReset);
 
-			var body =
-				$"<p>Dear {passwordReset.FirstName} {passwordReset.LastName},</p><p>Please click the following <a href=\"{passwordReset.Link}\">link</a> to reset your password</p><p></p><p>Vital Choice Administration,</p><p></p><p>This is an automated message. Do not reply. This mailbox is not monitored.</p>";
+            if (generatedEmail != null)
+            {
+                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body);
+            }
+        }
 
-			var subject = $"Your Vital Choice User Password Reset";
+        public async Task SendCustomerPasswordResetAsync(string email, PasswordReset passwordReset)
+        {
+            var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.CustomerPasswordResetViaAdmin, passwordReset);
 
-			await emailSender.SendEmailAsync(email, subject, body);
-		}
+            if (generatedEmail != null)
+            {
+                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body);
+            }
+        }
 
         public async Task<bool> SendBasicEmailAsync(BasicEmail email)
         {
-            //todo:refactor this to user nustache or something
             await emailSender.SendEmailAsync(email.ToEmail, email.Subject, email.Body, email.FromName, email.FromEmail, email.ToName, email.IsHTML);
             return true;
         }
 
         public async Task SendHelpTicketUpdatingEmailForCustomerAsync(string email, HelpTicketEmail helpTicketEmail)
         {
-            //todo:refactor this to user nustache or something
+            helpTicketEmail.Url = $"https://{_publicHost}/profile/helpticket/{helpTicketEmail.Id}";
 
-            var body =
-                $"<p>Dear {helpTicketEmail.Customer},</p><p>Details regarding your help desk ticket that you submitted regarding order #{helpTicketEmail.IdOrder} has been updated. <a href=\"https://{_publicHost}/profile/helpticket/{helpTicketEmail.Id}\">Please click here to review</a> or log into your Vital Choice customer profile to review your help desk tickets.</p><br/>" +
-                $"<p>Please note that this is an automated message and this mailbox is not monitored. To make changes to your help desk tickets please submit a reply within the help desk ticket system found within your customer profile.</p><br/>" +
-                $"<p>Sincerely,</p>" +
-                $"<p>Vital Choice</p>";
+            var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.HelpTicketUpdateCustomerNotification, helpTicketEmail);
 
-            var subject = $"Your Vital Choice Help Desk #{helpTicketEmail.Id} Has Been Updated";
-
-            await emailSender.SendEmailAsync(email, subject, body);
+            if (generatedEmail != null)
+            {
+                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body);
+            }
         }
 
         public async Task SendNewBugTicketAddingForSuperAdminAsync(BugTicketEmail bugTicketEmail)
         {
-            var body =
-                $"<p>New bug ticket was added - https://{_adminHost}/help/bugs/tickets/{bugTicketEmail.Id}</p>";
+            bugTicketEmail.Url = $"https://{_adminHost}/help/bugs/tickets/{bugTicketEmail.Id}";
 
-            var subject = $"Vital Choice - new bug ticket was added #{bugTicketEmail.Id}";
+            var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.BugTicketUpdateSuperAdminNotification, bugTicketEmail);
 
-            await emailSender.SendEmailAsync(_mainSuperAdminEmail, subject, body);
+            if (generatedEmail != null)
+            {
+                await emailSender.SendEmailAsync(_mainSuperAdminEmail, generatedEmail.Subject, generatedEmail.Body);
+            }
         }
 
         public async Task SendBugTicketUpdatingEmailForAuthorAsync(string email, BugTicketEmail bugTicketEmail)
         {
-            var body =
-                $"<p>Dear {bugTicketEmail.Customer},</p><p>Details regarding your help desk ticket that you submitted has been updated. <a href=\"https://{_adminHost}/help/bugs/tickets/{bugTicketEmail.Id}\">Please click here to review</a> or log into your Vital Choice customer profile to review your help desk tickets.</p><br/>" +
-                $"<p>Please note that this is an automated message and this mailbox is not monitored. To make changes to your help desk tickets please submit a reply within the help desk ticket system found within your customer profile.</p><br/>" +
-                $"<p>Sincerely,</p>" +
-                $"<p>Vital Choice</p>";
+            bugTicketEmail.Url = $"https://{_adminHost}/help/bugs/tickets/{bugTicketEmail.Id}";
 
-            var subject = $"Your Vital Choice Bug Ticket #{bugTicketEmail.Id} Has Been Updated";
+            var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.BugTicketUpdateAuthorNotification, bugTicketEmail);
 
-            await emailSender.SendEmailAsync(email, subject, body);
+            if (generatedEmail != null)
+            {
+                await emailSender.SendEmailAsync(_mainSuperAdminEmail, generatedEmail.Subject, generatedEmail.Body);
+            }
         }
-
-
 
         public async Task SendCustomerActivationAsync(string email, UserActivation activation)
         {
-            //todo:refactor this to user nustache or something
+            var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.CustomerRegistrationViaAdmin, activation);
 
-            var body =
-                $"<p>Dear {activation.FirstName} {activation.LastName},</p><p>Our records show that you recently had an account created for you. Your account is currently only available for phone orders. To begin using your account on our storefront please click the following <a href=\"{activation.Link}\">link</a> to setup a password and activate your account for online ordering</p><p></p><p>Vital Choice Administration,</p><p></p><p>This is an automated message. Do not reply. This mailbox is not monitored.</p>";
-
-            var subject = "Vital Choice - Setup Your Account To Order Online";
-
-            await emailSender.SendEmailAsync(email, subject, body);
+            if (generatedEmail != null)
+            {
+                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body);
+            }
         }
 
         public async Task SendCustomerRegistrationSuccess(string email, SuccessfulUserRegistration registration)
 	    {
-			var body =
-				$"<p>Dear {registration.FirstName} {registration.LastName},  thank you for registering with our store!</p>" +
-				$"<p>At any time you can log into your account to check order status, update your billing information, add multiple shipping addresses, and much more. To log in, use <a href=\"{registration.ProfileLink}\">link</a></p>" +
-				$"<p>Thanks again for visiting our store. Let us know if there is anything we can do to make your experience with us a better one!</p>";
+            var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.CustomerRegistrationViaWeb, registration);
 
-			var subject = "Vital Choice - Confirmation of Customer Registration";
-
-			await emailSender.SendEmailAsync(email, subject, body);
+            if (generatedEmail != null)
+            {
+                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body);
+            }
 		}
 
         public async Task SendWholesaleCustomerRegistrationSuccess(string email, SuccessfulUserRegistration registration)
         {
-            var body =
-                $"<p>Dear {registration.FirstName} {registration.LastName},  Thank you for submitting your wholesale application. Vital Choice Seafood.</p>";
+            var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.CustomerWholesaleRegistrationViaWeb, registration);
 
-            var subject = "Vital Choice - Confirmation of Submitting Your Wholesale Application";
-
-            await emailSender.SendEmailAsync(email, subject, body);
+            if (generatedEmail != null)
+            {
+                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body);
+            }
         }
 
         public async Task SendAffiliateActivationAsync(string email, UserActivation activation)
         {
-            //todo:refactor this to user nustache or something
+            var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.AffiliateRegistrationViaAdmin, activation);
 
-            var body =
-                $"<p>Dear {activation.FirstName} {activation.LastName},</p><p>Our records show that you recently had an account created for you. To begin using your account on our storefront please click the following <a href=\"{activation.Link}\">link</a> to setup a password and activate your account.</p><p></p><p>Vital Choice Administration,</p><p></p><p>This is an automated message. Do not reply. This mailbox is not monitored.</p>";
-
-            var subject = "Vital Choice - Setup Your Affiliate Account";
-
-            await emailSender.SendEmailAsync(email, subject, body);
+            if (generatedEmail != null)
+            {
+                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body);
+            }
         }
 
         public async Task SendAffiliateRegistrationSuccess(string email, SuccessfulUserRegistration registration)
         {
-            var body =
-                $"<p>Dear {registration.FirstName} {registration.LastName},  thank you for registering with our store!</p>" +
-                $"<p>At any time you can log into your affiliate account. To log in, use <a href=\"{registration.ProfileLink}\">link</a></p>";
+            var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.AffiliateRegistrationViaWeb, registration);
 
-            var subject = "Vital Choice - Confirmation of Affiliate Registration";
-
-            await emailSender.SendEmailAsync(email, subject, body);
+            if (generatedEmail != null)
+            {
+                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body);
+            }
         }
 
         public async Task SendUserPasswordForgotAsync(string email, PasswordReset passwordReset)
@@ -167,48 +161,59 @@ namespace VitalChoice.Business.Mail
 
         public async Task SendCustomerServiceEmailAsync(string email, CustomerServiceEmail model)
         {
-            var body =
-                $"<p>Name - {model.Name}</p><p>Email - {model.Email}</p><p>Comment - {model.Comment}</p><p>Vital Choice Administration,</p><p></p><p>This is an automated message. Do not reply. This mailbox is not monitored.</p>";
+            var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.CustomerServiceRequestEmail, model);
 
-            var subject = "Vital Choice - Customer Service Email";
-
-            await emailSender.SendEmailAsync(email, subject, body);
+            if (generatedEmail != null)
+            {
+                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body);
+            }
         }
 
         public async Task SendGCNotificationEmailAsyn(string email, GCNotificationEmail model)
         {
-            var body =
-                $"<p>Your Vital Choice Gift Certificate(s):</p><p>";            
+            model.BalancesBlock = "<p>";
             foreach (var item in model.Data)
             {
-                body += $"{item.Key}({item.Value:c} available)<br/>";
+                model.BalancesBlock += $"{item.Key}({item.Value:c} available)<br/>";
             }
-            body += "</p>";
+            model.BalancesBlock += "</p>";
 
-            var subject = "Your Vital Choice Gift Certificate(s)";
+            var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.HealthwiseSendGCEmail, model);
 
-            await emailSender.SendEmailAsync(email, subject, body, toDisplayName: model.FirstName+" "+model.LastName);
+            if (generatedEmail != null)
+            {
+                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body, toDisplayName: model.FirstName + " " + model.LastName);
+            }
         }
 
-        public async Task SendContentUrlNotificationAsync(string email, ContentUrlNotificationEmail model)
+        public async Task SendContentUrlNotificationForArticleAsync(string email, ContentUrlNotificationEmail model)
         {
-            var body = $"<p>Dear {model.RecipentName},</p>";
-            body += $"<p>{model.FromName} ({model.FromEmail}) has recommended you read this article from Vital Choice: <a href='{model.Url}' target='_blank'>{model.Name}</a></p>";
-            body += $"<p>Personal message from {model.FromName}: {model.Message}</p>";
+            var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.EmailArticle, model);
 
-            var subject = $"Check out this article I found on Vital Choice: {model.Name}";
+            if (generatedEmail != null)
+            {
+                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body, fromDisplayName: model.FromName, fromEmail: model.FromEmail, toDisplayName: model.RecipentName);
+            }
+        }
 
-            await emailSender.SendEmailAsync(email, subject, body,fromDisplayName: model.FromName, fromEmail: model.FromEmail, toDisplayName: model.RecipentName);
+        public async Task SendContentUrlNotificationForRecipeAsync(string email, ContentUrlNotificationEmail model)
+        {
+            var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.EmailRecipe, model);
+
+            if (generatedEmail != null)
+            {
+                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body, fromDisplayName: model.FromName, fromEmail: model.FromEmail, toDisplayName: model.RecipentName);
+            }
         }
 
         public async Task SendPrivacyRequestEmailAsync(string email, PrivacyRequestEmail model)
         {
-            var body =
-                $"<p>Name - {model.Name}</p><p>Mailing Address - {model.MailingAddress}</p><p>Other Name - {model.OtherName}</p><p>Other Address - {model.OtherAddress}</p><p>Comment - {model.Comment}</p><p>Vital Choice Administration,</p><p></p><p>This is an automated message. Do not reply. This mailbox is not monitored.</p>";
+            var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.PrivacyRequestEmail, model);
 
-            var subject = "Vital Choice - Privacy Request Email";
-
-            await emailSender.SendEmailAsync(email, subject, body);
+            if (generatedEmail != null)
+            {
+                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body);
+            }
         }
     }
 }

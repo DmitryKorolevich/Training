@@ -20,6 +20,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Checkout;
+using VitalChoice.Interfaces.Services.Customers;
 
 namespace VitalChoice.Business.Services.Checkout
 {
@@ -31,11 +32,12 @@ namespace VitalChoice.Business.Services.Checkout
         private readonly ProductMapper _productMapper;
         private readonly OrderService _orderService;
         private readonly EcommerceContext _context;
+        private readonly ICustomerService _customerService;
         private readonly ILogger _logger;
 
         public CheckoutService(IEcommerceRepositoryAsync<Cart> cartRepository,
             DiscountMapper discountMapper,
-            SkuMapper skuMapper, ProductMapper productMapper, OrderService orderService, EcommerceContext context, ILoggerProviderExtended loggerProvider)
+            SkuMapper skuMapper, ProductMapper productMapper, OrderService orderService, EcommerceContext context, ILoggerProviderExtended loggerProvider, ICustomerService customerService)
         {
             _cartRepository = cartRepository;
             _discountMapper = discountMapper;
@@ -43,6 +45,7 @@ namespace VitalChoice.Business.Services.Checkout
             _productMapper = productMapper;
             _orderService = orderService;
             _context = context;
+            _customerService = customerService;
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -89,40 +92,53 @@ namespace VitalChoice.Business.Services.Checkout
 
         public async Task<CustomerCartOrder> GetOrCreateCart(Guid? uid, int idCustomer)
         {
-            Cart cart = null;
+            Cart cart;
+            CustomerCartOrder result;
             if (uid.HasValue)
             {
                 cart =
-                    await _cartRepository.Query(c => c.CartUid == uid.Value && c.IdCustomer == idCustomer).SelectFirstOrDefaultAsync(false);
+                    await _cartRepository.Query(c => c.CartUid == uid.Value && c.IdCustomer == idCustomer).SelectFirstOrDefaultAsync(false) ??
+                    await CreateNew(idCustomer);
 
-                if (cart.IdOrder == null)
+                result = new CustomerCartOrder
                 {
-                    var anonymCart = await GetOrCreateAnonymCart(uid);
-                    var newOrder = await _orderService.CreatePrototypeAsync((int) OrderType.Normal);
-                    newOrder.OrderStatus = OrderStatus.Incomplete;
-                    newOrder.GiftCertificates = anonymCart.GiftCertificates;
-                    newOrder.Discount = anonymCart.Discount;
-                    newOrder.Skus = anonymCart.Skus;
-                }
-            }
-            if (cart == null)
-            {
-                cart = await CreateNew(idCustomer);
-            }
-
-            if (cart.IdOrder.HasValue && cart.IdOrder.Value > 0)
-            {
-                return new CustomerCartOrder
-                {
-                    CartUid = cart.CartUid,
-                    Order = await _orderService.SelectAsync(cart.IdOrder.Value, true)
+                    CartUid = uid.Value
                 };
             }
-            return new CustomerCartOrder
+            else
             {
-                CartUid = cart.CartUid,
-                Order = await _orderService.CreatePrototypeAsync((int) OrderType.Normal)
-            };
+                cart = await CreateNew(idCustomer);
+                result = new CustomerCartOrder
+                {
+                    CartUid = cart.CartUid
+                };
+            }
+            if (cart.IdOrder == null)
+            {
+                var anonymCart = await GetOrCreateAnonymCart(uid);
+
+                var newOrder = await _orderService.CreatePrototypeAsync((int) OrderType.Normal);
+                newOrder.OrderStatus = OrderStatus.Incomplete;
+                newOrder.GiftCertificates = anonymCart.GiftCertificates;
+                newOrder.Discount = anonymCart.Discount;
+                newOrder.Skus = anonymCart.Skus;
+
+                newOrder = await _orderService.InsertAsync(newOrder);
+
+                cart = await _cartRepository.Query(c => c.CartUid == anonymCart.CartUid).SelectFirstOrDefaultAsync();
+                cart.IdOrder = newOrder.Id;
+                await _context.SaveChangesAsync();
+
+                newOrder.Customer = await _customerService.SelectAsync(idCustomer, true);
+
+                result.Order = newOrder;
+            }
+            else
+            {
+                result.Order = await _orderService.SelectAsync(cart.IdOrder.Value, true);
+            }
+
+            return result;
         }
 
         private async Task<Cart> CreateNew(int? idCustomer = null)

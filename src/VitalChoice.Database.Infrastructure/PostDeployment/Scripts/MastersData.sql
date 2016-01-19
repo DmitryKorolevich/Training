@@ -644,7 +644,7 @@ BEGIN
                     <img src="/assets/images/icons/fb.png">
                     <span>GOOGLE+</span>
                 </a>
-                <a href="#" data-content-name="@(@model.Model.Name)" data-absolute-url="@(@model.Request.AbsoluteUrl)" class="margin-right-medium email-button">
+                <a href="#" data-content-type="1" data-content-name="@(@model.Model.Name)" data-absolute-url="@(@model.Request.AbsoluteUrl)" class="margin-right-medium email-button">
                     <img src="/assets/images/icons/fb.png">
                     <span>E-MAIL</span>
                 </a>
@@ -734,13 +734,10 @@ BEGIN
 
 <default> -> ()
 {{
-    <script>
-        window.addEventListener("load", function() {
-            var element = document.createElement("script");
-            element.src = "/app/modules/help/sendContentUrlNotification.js";
-            document.body.appendChild(element);
-        }, false);
-    </script>
+    @script(){{
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+        <script src="/app/modules/help/sendContentUrlNotification.js"></script>
+    }}
     <div class="working-area-holder content-page article-page">
         <div class="header-block">
             <img src="/assets/images/article-master-header-10-25-13A.png">
@@ -1077,7 +1074,7 @@ SET	[Updated] = GETDATE(),
                 <img src="/assets/images/icons/fb.png">
                 <span>GOOGLE+</span>
             </a>
-            <a href="#" data-content-name="@(@model.Model.Name)" data-absolute-url="@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium email-button">
+            <a href="#" data-content-type="1" data-content-name="@(@model.Model.Name)" data-absolute-url="@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium email-button">
                 <img src="/assets/images/icons/fb.png">
                 <span>E-MAIL</span>
             </a>

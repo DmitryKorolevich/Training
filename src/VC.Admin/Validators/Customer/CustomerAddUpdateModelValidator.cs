@@ -6,6 +6,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Logic;
+using VitalChoice.Ecommerce.Domain.Entities;
 
 namespace VC.Admin.Validators.Customer
 {
@@ -110,24 +111,29 @@ namespace VC.Admin.Validators.Customer
 
 				RuleFor(model => model.Email)
 					.NotEmpty()
+                    .When(model=>model.Id!=0 && model.StatusCode!=(int)CustomerStatus.NotActive)
 					.WithMessage(model => model.Email, ValidationMessages.FieldRequired)
 					.Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
 					.WithMessage(model => model.Email, ValidationMessages.FieldLength,
 						BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
 					.EmailAddress()
-					.WithMessage(model => model.Email, ValidationMessages.EmailFormat);
+                    .When(model => model.Id != 0 && model.StatusCode != (int)CustomerStatus.NotActive && !string.IsNullOrEmpty(model.Email))
+                    .WithMessage(model => model.Email, ValidationMessages.EmailFormat);
 
 
 				RuleFor(model => model.EmailConfirm)
 					.NotEmpty()
-					.WithMessage(model => model.EmailConfirm, ValidationMessages.FieldRequired)
+                    .When(model => model.Id != 0 && model.StatusCode != (int)CustomerStatus.NotActive)
+                    .WithMessage(model => model.EmailConfirm, ValidationMessages.FieldRequired)
 					.Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
 					.WithMessage(model => model.EmailConfirm, ValidationMessages.FieldLength,
 						BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
 					.EmailAddress()
-					.WithMessage(model => model.EmailConfirm, ValidationMessages.EmailFormat)
+                    .When(model => model.Id != 0 && model.StatusCode != (int)CustomerStatus.NotActive && !string.IsNullOrEmpty(model.EmailConfirm))
+                    .WithMessage(model => model.EmailConfirm, ValidationMessages.EmailFormat)
 					.Equal(x => x.Email)
-					.WithMessage(model => model.EmailConfirm, ValidationMessages.EmailMustMatch);
+                    .When(model => !string.IsNullOrEmpty(model.Email) || !string.IsNullOrEmpty(model.EmailConfirm))
+                    .WithMessage(model => model.EmailConfirm, ValidationMessages.EmailMustMatch);
 
                 RuleFor(model => model.DefaultPaymentMethod)
 					.Must(model => model.HasValue)

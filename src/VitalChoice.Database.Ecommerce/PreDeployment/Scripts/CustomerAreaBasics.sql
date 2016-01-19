@@ -716,3 +716,14 @@ BEGIN
 END
 
 GO
+
+IF EXISTS(SELECT * FROM sys.columns WHERE Name = 'Email' AND [object_id] = OBJECT_ID('Customers') AND is_nullable = 0)
+BEGIN
+
+	ALTER TABLE Customers
+	ALTER COLUMN Email NVARCHAR(100) NULL
+
+	DROP INDEX [IX_Email_Customers] ON [dbo].[Customers]
+END
+
+GO
