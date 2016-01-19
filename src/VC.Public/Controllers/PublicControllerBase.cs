@@ -1,28 +1,51 @@
 ﻿using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Http;
 using VitalChoice.Core.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Entities.Roles;
+using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Customers;
+using VitalChoice.Core.Infrastructure.Helpers;
+using VitalChoice.Infrastructure.Identity;
 
 namespace VC.Public.Controllers
 {
 	public abstract class PublicControllerBase : BaseMvcController
 	{
-		protected IHttpContextAccessor ContextAccessor { get; }
+	    protected readonly IAppInfrastructureService InfrastructureService;
+        protected readonly IAuthorizationService AuthorizationService;
+	    protected IHttpContextAccessor ContextAccessor { get; }
 		protected ICustomerService CustomerService { get; }
 
-		protected PublicControllerBase(IHttpContextAccessor contextAccessor, ICustomerService customerService)
+		protected PublicControllerBase(IHttpContextAccessor contextAccessor, ICustomerService customerService, IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService)
 		{
-			ContextAccessor = contextAccessor;
+		    InfrastructureService = infrastructureService;
+		    AuthorizationService = authorizationService;
+		    ContextAccessor = contextAccessor;
 			CustomerService = customerService;
 		}
 
-		protected int GetInternalCustomerId()
+	    protected async Task<bool> CustomerLoggenIn()
+	    {
+	        var context = ContextAccessor.HttpContext;
+            var signedIn = await AuthorizationService.AuthorizeAsync(context.User, null, IdentityConstants.IdentityBasicProfile);
+	        if (signedIn)
+	        {
+	            if (InfrastructureService.IsValidCustomer(context.User))
+	            {
+	                return true;
+	            }
+	        }
+	        return false;
+	    }
+
+	    protected int GetInternalCustomerId()
 		{
 			var context = ContextAccessor.HttpContext;
 			var internalId = Convert.ToInt32(context.User.GetUserId());

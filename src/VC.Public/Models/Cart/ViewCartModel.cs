@@ -14,7 +14,7 @@ namespace VC.Public.Models.Cart
 			GiftCertificateCodes = new List<string>();
 	    }
 
-	    public IList<CartSkuModel> Skus { get; set; }
+	    public ICollection<CartSkuModel> Skus { get; set; }
 
 		public bool ShipAsap { get; set; }
 
@@ -22,14 +22,14 @@ namespace VC.Public.Models.Cart
 
 	    public decimal SubTotal { get; set; }
 
-	    public ShippingUpgradeOption? UpgradeOption { get; set; }
+	    public ShippingUpgrade? UpgradeOptions { get; set; }
 
-	    public decimal? ShippingCost { get; set; }
+        public decimal? ShippingCost { get; set; }
 
 	    public decimal OrderTotal { get; set; }
 
 	    public string PromoCode { get; set; }
 
-	    public IList<string> GiftCertificateCodes { get; set; }
+	    public ICollection<string> GiftCertificateCodes { get; set; }
     }
 }

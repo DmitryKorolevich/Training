@@ -9,6 +9,7 @@ using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services;
 using AuthorizationContext = Microsoft.AspNet.Mvc.Filters.AuthorizationContext;
 using Microsoft.AspNet.Mvc.Filters;
+using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 
 namespace VitalChoice.Core.Infrastructure
@@ -42,19 +43,9 @@ namespace VitalChoice.Core.Infrastructure
 			var result = await authorizationService.AuthorizeAsync(claimUser, null, IdentityConstants.IdentityBasicProfile);
 			if (result)
 			{
-				if (claimUser.HasClaim(x=>x.Type == IdentityConstants.CustomerRoleType))
-				{
-					var customerRoles =
-						context.HttpContext.RequestServices.GetService<IAppInfrastructureService>()
-							.Get()
-							.CustomerRoles;
+			    var referenceService = context.HttpContext.RequestServices.GetService<IAppInfrastructureService>();
 
-					if (customerRoles.Any(customerRole => claimUser.IsInRole(customerRole.Text.Normalize())))
-					{
-						return;
-					}
-				}
-                else
+                if (!referenceService.IsValidCustomer(claimUser))
                 {
                     if(claimUser.HasClaim(x => x.Type == IdentityConstants.AffiliateRole))
                     {

@@ -160,9 +160,9 @@ namespace VC.Admin.Controllers
                     {
                         var avaliableOrderNotes = await _customerService.GetAvailableOrderNotesAsync((CustomerType)customer.IdObjectType);
                         model.OrderNotes = String.Empty;
-                        foreach (var IdCustomerOrderNote in customer.OrderNotes)
+                        foreach (var idCustomerOrderNote in customer.OrderNotes)
                         {
-                            var orderNote = avaliableOrderNotes.FirstOrDefault(p => p.Id == IdCustomerOrderNote);
+                            var orderNote = avaliableOrderNotes.FirstOrDefault(p => p.Id == idCustomerOrderNote);
                             if (orderNote != null)
                             {
                                 model.OrderNotes += orderNote.Description + Environment.NewLine;
