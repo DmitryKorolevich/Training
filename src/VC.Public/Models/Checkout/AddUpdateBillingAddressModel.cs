@@ -9,6 +9,7 @@ namespace VC.Public.Models.Checkout
 	{
 		[EmailAddress]
 		[MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+		[Required]
 		[Map]
 		public string Email { get; set; }
 
