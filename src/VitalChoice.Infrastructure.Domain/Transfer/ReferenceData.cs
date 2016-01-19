@@ -59,6 +59,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer
 
         public IList<LookupItem<int>> CustomerTypes { get; set; }
 
+        public IList<LookupItem<int>> ShortCustomerTypes { get; set; }
+
         public IList<LookupItem<int>> OrderStatuses { get; set; }
 
         public IList<LookupItem<int>> PaymentMethods { get;set; }

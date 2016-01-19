@@ -27,6 +27,11 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			{
 			    if (result.Success) {
 			        $scope.currentCustomer = result.Data;
+			        if ($scope.currentCustomer.InceptionDate)
+			        {
+			            $scope.currentCustomer.InceptionDate = Date.parseDateTime($scope.currentCustomer.InceptionDate);
+			        }
+			        $scope.currentCustomer.ActivatePending = false;
 			        $scope.options.DBStatusCode = $scope.currentCustomer.StatusCode;
 			        $scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
 			        $scope.paymentInfoTab.PaymentMethodType = $scope.currentCustomer.DefaultPaymentMethod;
@@ -134,6 +139,10 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 								.success(function(result) {
 									if (result.Success) {
 									    $scope.currentCustomer = result.Data;
+									    if ($scope.currentCustomer.InceptionDate)
+									    {
+									        $scope.currentCustomer.InceptionDate = Date.parseDateTime($scope.currentCustomer.InceptionDate);
+									    }
 									    $scope.options.DBStatusCode = $scope.currentCustomer.StatusCode;
 										$scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
 										$scope.shippingAddressTab.AddressIndex = "0";
@@ -250,6 +259,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			        processCustomerLoad(result);
 			        $scope.currentCustomer.Id = result.Data.Id;
 			        $scope.options.DBStatusCode = result.Data.StatusCode;
+			        $scope.currentCustomer.ActivatePending = false;
 			        refreshHistory();
 					toaster.pop('success', "Success!", "Successfully saved");
 				} else {
@@ -381,8 +391,19 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 						$scope.currentCustomer.Shipping[0].Default = true;
 					}
 
+					var data = angular.copy($scope.currentCustomer);
+					if (data.ActivatePending)
+					{
+					    data.StatusCode = 2;//active
+					}
+					if (data.InceptionDate)
+					{
+					    data.InceptionDate = data.InceptionDate.toServerDateTime();
+					}
+
 					$scope.saving = true;
-					customerService.createUpdateCustomer($scope.currentCustomer, $scope.addEditTracker).success(function(result) {
+				    customerService.createUpdateCustomer(data, $scope.addEditTracker).success(function (result)
+				    {
 							successHandler(result);
 						}).
 						error(function(result) {

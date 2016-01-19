@@ -1,6 +1,6 @@
 ﻿namespace VitalChoice.Ecommerce.Domain.Mail
 {
-    public class BasicEmail
+    public class BasicEmail : EmailTemplateDataModel
     {
 	    public string ToEmail { get; set; }
         public string ToName { get; set; }

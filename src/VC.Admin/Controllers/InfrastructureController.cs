@@ -54,6 +54,7 @@ namespace VC.Admin.Controllers
                     AssignedCustomerTypes = referenceData.AssignedCustomerTypes,
                     ActiveFilterOptions = referenceData.ActiveFilterOptions,
                     CustomerTypes = referenceData.CustomerTypes,
+                    ShortCustomerTypes=referenceData.ShortCustomerTypes,
                     OrderStatuses = referenceData.OrderStatuses,
                     PaymentMethods = referenceData.PaymentMethods,
                     ShortPaymentMethods = referenceData.ShortPaymentMethods,

@@ -236,8 +236,11 @@ img.thumb {
 .categories.full-lines .ya-treeview-content .flex-left {
   width: 100%;
 }
-.ya-treeview-content .label-wholesale {
+.label-wholesale {
   background-color: #9a43b0;
+}
+.label-retail {
+  background-color: #717171;
 }
 .label-future {
   background-color: #9a43b0;

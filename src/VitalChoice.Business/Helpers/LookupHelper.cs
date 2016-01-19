@@ -153,6 +153,7 @@ namespace VitalChoice.Business.Helpers
             Dictionary<int, string> toReturn = new Dictionary<int, string>
             {
                 {(int) CustomerStatus.Active, "Active"},
+                {(int) CustomerStatus.Pending, "Pending"},
                 {(int) CustomerStatus.NotActive, "Phone Only"},
                 {(int) CustomerStatus.Deleted, "Deleted"},
                 {(int) CustomerStatus.Suspended, "Suspended"},

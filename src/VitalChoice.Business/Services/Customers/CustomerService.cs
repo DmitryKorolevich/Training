@@ -341,6 +341,13 @@ namespace VitalChoice.Business.Services.Customers
                                 ? x.OrderBy(y => y.Id)
                                 : x.OrderByDescending(y => y.Id);
                     break;
+                case VCustomerSortPath.IdObjectType:
+                    sortable =
+                        (x) =>
+                            sortOrder == SortOrder.Asc
+                                ? x.OrderBy(y => y.IdObjectType)
+                                : x.OrderByDescending(y => y.IdObjectType);
+                    break;
                 case VCustomerSortPath.Name:
                     sortDynamic =
                         (x) =>

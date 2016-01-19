@@ -7,6 +7,8 @@ namespace VitalChoice.Interfaces.Services.Users
     {
 	    Task SendSuccessfulRegistration(string email, string firstName, string lastName);
 
-	    Task<string> GenerateLoginTokenAsync(Guid publicId);
+        Task SendWholesaleSuccessfulRegistration(string email, string firstName, string lastName);
+
+        Task<string> GenerateLoginTokenAsync(Guid publicId);
     }
 }

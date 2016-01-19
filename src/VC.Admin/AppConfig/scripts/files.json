@@ -140,6 +140,8 @@
     "app/modules/content/controllers/contentPageCategoryManageController.js",
     "app/modules/content/controllers/contentAreasController.js",
     "app/modules/content/controllers/manageStylesController.js",
+    "app/modules/content/controllers/emailTemplatesController.js",
+    "app/modules/content/controllers/emailTemplateManageController.js",
     "app/modules/content/content.js",
     "app/modules/setting/controllers/logsController.js",
     "app/modules/setting/controllers/logDetailsController.js",

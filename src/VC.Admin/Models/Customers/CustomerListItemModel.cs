@@ -1,4 +1,5 @@
 ﻿using System;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Validation.Models;
 
 namespace VC.Admin.Models.Customer
@@ -7,7 +8,9 @@ namespace VC.Admin.Models.Customer
 	{
 		public int Id { get; set; }
 
-		public string Name { get; set; }
+        public CustomerType IdObjectType { get; set; }
+
+        public string Name { get; set; }
 
         public string FirstName { get; set; }
 

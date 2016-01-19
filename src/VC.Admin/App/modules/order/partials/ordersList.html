@@ -122,6 +122,13 @@
                                 <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                             </span>
                         </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('IdCustomerType')">
+                            <span>Type</span>
+                            <span data-ng-if="filter.Sorting.Path == 'IdCustomerType'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Customer')">
                             <span>Customer</span>
                             <span data-ng-if="filter.Sorting.Path == 'Customer'">
@@ -194,6 +201,10 @@
                         <td>{{::item.DateShipped | date:"MM/dd/yy"}}<br />{{::item.DateShipped | date:"h:mm a"}}</td>
                         <td>{{::item.Company}}</td>
                         <td>{{::item.StateCode}}</td>
+                        <td>
+                            <span data-ng-if="item.IdCustomerType == 1" class="label label-retail font-default">{{getReferenceItem(ReferenceData.ShortCustomerTypes, item.IdCustomerType).Text}}</span>
+                            <span data-ng-if="item.IdCustomerType == 2" class="label label-wholesale font-default">{{getReferenceItem(ReferenceData.ShortCustomerTypes, item.IdCustomerType).Text}}</span>
+                        </td>
                         <td>
                             <a ui-sref="index.oneCol.customerDetail({id:item.IdCustomer})">{{::item.Customer}}</a>
                         </td>

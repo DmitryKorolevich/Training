@@ -46,7 +46,11 @@ namespace VC.Public.Controllers
 		[HttpGet]
 		public async Task<IActionResult> AddUpdateBillingAddress()
 		{
-			var billingInfoModel = new AddUpdateBillingAddress();
+			var billingInfoModel = new AddUpdateBillingAddressModel()
+			{
+				SendNews = false,
+				SendCatalog = true
+			};
 			if (ContextAccessor.HttpContext.User.Identity.IsAuthenticated)
 			{
 				var currentCustomer = await GetCurrentCustomerDynamic();
@@ -55,6 +59,163 @@ namespace VC.Public.Controllers
 			}
 
 			return View(billingInfoModel);
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> AddUpdateShippingMethod()
+		{
+			var shippingMethodModel = new AddUpdateShippingMethodModel()
+			{
+
+			};
+			if (ContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+			{
+				var currentCustomer = await GetCurrentCustomerDynamic();
+
+				//todo: populate model
+			}
+
+			ViewBag.ShippingAddresses = null;
+
+			return View(shippingMethodModel);
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> AddPaymentMethod()
+		{
+			var shippingMethodModel = new AddPaymentMethodModel()
+			{
+
+			};
+			if (ContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+			{
+				var currentCustomer = await GetCurrentCustomerDynamic();
+
+				//todo: populate model
+			}
+
+			ViewBag.ShippingAddresses = null;
+
+			return View(shippingMethodModel);
+		}
+
+		[HttpGet]
+	    public async Task<IActionResult> ReviewOrder()
+		{
+			var reviewOrderModel = new ReviewOrderModel()
+			{
+				Skus = new List<CartSkuModel>()
+				{
+					new CartSkuModel()
+					{
+						ProductPageUrl = "url",
+						Code = "CWR712P",
+						DisplayName = "Wild Traditional Canned Sockeye Salmon 7.5 oz. - Easy Open (12)",
+						IconUrl = "/Assets/images/cart/NRT501_alabcore_pouched_30z_218.jpg",
+						Price = 72,
+						Quantity = 2,
+						InStock = true,
+						SubTotal = 144
+					},
+					new CartSkuModel()
+					{
+						ProductPageUrl = "url1",
+						Code = "PNC",
+						DisplayName = "Vital Choice Catalog",
+						IconUrl = "/Assets/images/cart/seaweedsalad_218.jpg",
+						Quantity = 1,
+						InStock = true
+					}
+				},
+				GiftCertificateCodes = new List<string>() {""},
+				OrderTotal = 169,
+				ShipAsap = true,
+				ShippingCost = 0,
+				SubTotal = 144,
+				BillToAddress = new List<KeyValuePair<string, string>>()
+				{
+					new KeyValuePair<string, string>(string.Empty, "first name last name"),
+					new KeyValuePair<string, string>(string.Empty, "company name"),
+					new KeyValuePair<string, string>(string.Empty, "address1"),
+					new KeyValuePair<string, string>(string.Empty, "address2"),
+					new KeyValuePair<string, string>(string.Empty, "city, AA 123456"),
+					new KeyValuePair<string, string>("Phone", "923112312323"),
+					new KeyValuePair<string, string>("Email", "mailforspam200@mailforspam.com"),
+				},
+				ShipToAddress = new List<KeyValuePair<string, string>>()
+				{
+					new KeyValuePair<string, string>(string.Empty, "first name last name"),
+					new KeyValuePair<string, string>(string.Empty, "company name"),
+					new KeyValuePair<string, string>(string.Empty, "address1"),
+					new KeyValuePair<string, string>(string.Empty, "address2"),
+					new KeyValuePair<string, string>(string.Empty, "city, AA 123456"),
+					new KeyValuePair<string, string>("Phone", "923112312323"),
+				},
+				PaymentDetails = new List<KeyValuePair<string, string>>()
+				{
+					new KeyValuePair<string, string>("Credit Card", "Visa"),
+					new KeyValuePair<string, string>("Number", "XXXX-XXXX-XXXX-7890"),
+					new KeyValuePair<string, string>("Expiration", "01/16")
+				}
+			};
+
+			return View(reviewOrderModel);
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> Receipt()
+		{
+			var reviewOrderModel = new ReceiptModel()
+			{
+				Skus = new List<CartSkuModel>()
+				{
+					new CartSkuModel()
+					{
+						ProductPageUrl = "url",
+						Code = "CWR712P",
+						DisplayName = "Wild Traditional Canned Sockeye Salmon 7.5 oz. - Easy Open (12)",
+						IconUrl = "/Assets/images/cart/NRT501_alabcore_pouched_30z_218.jpg",
+						Price = 72,
+						Quantity = 2,
+						InStock = true,
+						SubTotal = 144
+					},
+					new CartSkuModel()
+					{
+						ProductPageUrl = "url1",
+						Code = "PNC",
+						DisplayName = "Vital Choice Catalog",
+						IconUrl = "/Assets/images/cart/seaweedsalad_218.jpg",
+						Quantity = 1,
+						InStock = true
+					}
+				},
+				BillToAddress = new List<KeyValuePair<string, string>>()
+				{
+					new KeyValuePair<string, string>(string.Empty, "first name last name"),
+					new KeyValuePair<string, string>(string.Empty, "company name"),
+					new KeyValuePair<string, string>(string.Empty, "address1"),
+					new KeyValuePair<string, string>(string.Empty, "address2"),
+					new KeyValuePair<string, string>(string.Empty, "city, AA 123456"),
+					new KeyValuePair<string, string>("Phone", "923112312323"),
+					new KeyValuePair<string, string>("Email", "mailforspam200@mailforspam.com"),
+				},
+				ShipToAddress = new List<KeyValuePair<string, string>>()
+				{
+					new KeyValuePair<string, string>(string.Empty, "first name last name"),
+					new KeyValuePair<string, string>(string.Empty, "company name"),
+					new KeyValuePair<string, string>(string.Empty, "address1"),
+					new KeyValuePair<string, string>(string.Empty, "address2"),
+					new KeyValuePair<string, string>(string.Empty, "city, AA 123456"),
+					new KeyValuePair<string, string>("Phone", "923112312323"),
+				},
+				ShippingCost = 100,
+				SubTotal = 50,
+				Tax = 10,
+				OrderTotal = 160
+			};
+
+			return View(reviewOrderModel);
 		}
 	}
 }

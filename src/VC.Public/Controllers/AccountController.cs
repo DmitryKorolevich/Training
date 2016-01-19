@@ -16,6 +16,8 @@ using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Validation.Models;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
 
 namespace VC.Public.Controllers
 {
@@ -46,13 +48,14 @@ namespace VC.Public.Controllers
 		}
 
         [HttpGet]
-        public IActionResult Login(string alreadyTakenEmail = null, bool forgot = false)
+        public IActionResult Login(string alreadyTakenEmail = null, bool forgot = false, int? type=null)
         {
             if (!string.IsNullOrWhiteSpace(alreadyTakenEmail))
             {
                 ViewBag.AlreadyTakenEmail = alreadyTakenEmail;
             }
             ViewBag.ForgotPassSuccess = forgot;
+            ViewBag.Type = type;
 
             return View(new LoginModel());
         }
@@ -64,7 +67,15 @@ namespace VC.Public.Controllers
 			if (!ModelState.IsValid)
 				return View(model);
 
-            var user = await _userService.SignInAsync(model.Email, model.Password);
+            ApplicationUser user = null;
+            try
+            {
+                user = await _userService.SignInAsync(model.Email, model.Password);
+            }
+            catch(WholesalePendingException e)
+            {
+                return Redirect("/content/wholesale-review");
+            }
 			if (user == null)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
@@ -78,7 +89,15 @@ namespace VC.Public.Controllers
 			return RedirectToAction("Index", "Profile");
 	    }
 
-		public async Task<IActionResult> Logout()
+        [HttpPost]
+        public async Task<Result<string>> CheckEmail(object model, string email)
+        {
+            var user = await _userService.FindAsync(email);
+
+            return user != null ? $"/account/login?alreadytakenemail={email}&type=2" : null;//2 - wholesale
+        }
+
+        public async Task<IActionResult> Logout()
 		{
 			var context = _contextAccessor.HttpContext;
 
@@ -214,7 +233,56 @@ namespace VC.Public.Controllers
 			return await Login(new LoginModel() { Email = model.Email, Password = model.Password }, string.Empty);
 		}
 
-		[HttpGet]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RegisterWholesaleAccount(RegisterWholesaleAccountModel model)
+        {
+            if (!model.IsAllowAgreement)
+            {
+                ModelState.AddModelError(String.Empty, "Please agree to the terms and conditions.");
+            }
+            if (!Validate(model))
+            {
+                return PartialView("_RegisterWholesaleAccount", model);
+            }
+
+            var item = _customerMapper.FromModel(model);
+
+            item.IdObjectType = (int)CustomerType.Wholesale;
+            item.PublicId = Guid.NewGuid();
+            item.StatusCode = (int)CustomerStatus.Pending;
+
+            var defaultPaymentMethod = await _paymentMethodService.GetStorefrontDefaultPaymentMethod();
+            item.IdDefaultPaymentMethod = defaultPaymentMethod.Id;
+            item.ApprovedPaymentMethods = new List<int> { defaultPaymentMethod.Id };
+            item.IdEditedBy = null;
+
+            try
+            {
+                item = await _customerService.InsertAsync(item, model.Password);
+            }
+            catch(AppValidationException e)
+            {
+                foreach (var message in e.Messages)
+                {
+                    ModelState.AddModelError(message.Field, message.Message);
+                }
+                return PartialView("_RegisterWholesaleAccount", model);
+            }
+            if (item == null || item.Id == 0)
+            {
+                ModelState.AddModelError(String.Empty, ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+                return PartialView("_RegisterWholesaleAccount", model);
+            }
+
+            await _userService.SendWholesaleSuccessfulRegistration(model.Email, model.FirstName, model.LastName);
+
+            ViewBag.SuccessMessage = InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullyAdded];
+
+            return PartialView("_RegisterWholesaleAccount", model);
+        }
+
+        [HttpGet]
 		public async Task<IActionResult> ResetPassword(Guid id)
 		{
 			var result = await _userService.GetByTokenAsync(id);

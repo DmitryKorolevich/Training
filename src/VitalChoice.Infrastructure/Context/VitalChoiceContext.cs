@@ -416,6 +416,29 @@ namespace VitalChoice.Infrastructure.Context
 
             #endregion
 
+            #region Emails
+
+            builder.Entity<EmailTemplate>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("EmailTemplates");
+                entity.Ignore(p => p.Url);
+                entity.Ignore(p => p.ModelPropertyNames);
+                entity
+                    .HasOne(p => p.MasterContentItem)
+                    .WithMany()
+                    .HasForeignKey(p => p.MasterContentItemId)
+                    .HasPrincipalKey(p => p.Id);
+                entity
+                    .HasOne(p => p.ContentItem)
+                    .WithMany()
+                    .HasForeignKey(p => p.ContentItemId)
+                    .HasPrincipalKey(p => p.Id);
+                entity.HasOne(p => p.User).WithMany().HasForeignKey(p => p.UserId).HasPrincipalKey(p => p.Id);
+            });
+
+            #endregion
+
             #region Products
 
             builder.Entity<ProductCategoryContent>(entity =>

@@ -1,0 +1,138 @@
+﻿'use strict';
+
+angular.module('app.modules.content.controllers.emailTemplateManageController', [])
+.controller('emailTemplateManageController', ['$scope', '$rootScope', '$state', '$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
+    function ($scope, $rootScope, $state, $stateParams, contentService, toaster, confirmUtil, promiseTracker)
+    {
+        $scope.refreshTracker = promiseTracker("get");
+
+        function successSaveHandler(result)
+        {
+            if (result.Success)
+            {
+                toaster.pop('success', "Success!", "Successfully saved.");
+                $scope.id = result.Data.Id;
+                $scope.emailTemplate.Id = result.Data.Id;
+                $scope.emailTemplate.MasterContentItemId = result.Data.MasterContentItemId;
+            } else
+            {
+                var messages = "";
+                if (result.Messages)
+                {
+                    $scope.forms.form.submitted = true;
+                    $scope.detailsTab.active = true;
+                    $scope.serverMessages = new ServerMessages(result.Messages);
+                    $.each(result.Messages, function (index, value)
+                    {
+                        if (value.Field)
+                        {
+                            $scope.forms.form[value.Field].$setValidity("server", false);
+                        }
+                        messages += value.Message + "<br />";
+                    });
+                }
+                toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+            }
+        };
+
+        function errorHandler(result)
+        {
+            toaster.pop('error', "Error!", "Server error occured");
+        };
+
+        function initialize()
+        {
+            $scope.id = $stateParams.id ? $stateParams.id : 0;
+            
+            $scope.detailsTab = {
+                active: true
+            };
+            $scope.forms = {};
+
+            refreshMasters();
+        };
+
+        $scope.save = function ()
+        {
+            $.each($scope.forms.form, function (index, element)
+            {
+                if (element && element.$name == index)
+                {
+                    element.$setValidity("server", true);
+                }
+            });
+
+            if ($scope.forms.form.$valid)
+            {
+                contentService.updateEmailTemplate($scope.emailTemplate, $scope.refreshTracker).success(function (result)
+                {
+                    successSaveHandler(result);
+                }).
+                error(function (result)
+                {
+                    errorHandler(result);
+                });
+            } else
+            {
+                $scope.forms.form.submitted = true;
+                $scope.detailsTab.active = true;
+            }
+        };
+
+        function refresh()
+        {
+            contentService.getEmailTemplate($scope.id, $scope.refreshTracker)
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        $scope.emailTemplate = result.Data;
+                        if (!$scope.emailTemplate.MasterContentItemId)
+                        {
+                            $scope.emailTemplate.MasterContentItemId = $scope.MasterContentItemId;
+                        };
+                    } else
+                    {
+                        errorHandler(result);
+                    }
+                }).
+                error(function (result)
+                {
+                    errorHandler(result);
+                });
+        };
+
+        function refreshMasters()
+        {
+            contentService.getMasterContentItems({ Type: 11 })//email templates
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        $scope.masters = result.Data;
+                        $.each($scope.masters, function (index, master)
+                        {
+                            if (master.IsDefault)
+                            {
+                                $scope.MasterContentItemId = master.Id;
+                            };
+                        });
+                        refresh();
+                    } else
+                    {
+                        errorHandler(result);
+                    }
+                })
+                .error(function (result)
+                {
+                    errorHandler(result);
+                });
+        };
+
+        $scope.goToMaster = function (id)
+        {
+            $state.go('index.oneCol.masterDetail', { id: id });
+        };
+
+        initialize();
+    }]);

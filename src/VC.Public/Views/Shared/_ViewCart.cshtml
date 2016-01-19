@@ -1,0 +1,134 @@
+﻿@model VC.Public.Models.Cart.ViewCartModel
+
+<table class="standard-table cart-items-list">
+	<thead>
+		<tr>
+			<th colspan="2">
+				Item
+			</th>
+			<th>
+				Price
+			</th>
+			<th>
+				Quantity
+			</th>
+			<th>
+				Subtotal
+			</th>
+			<th>
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		@if (Model.Skus.Any())
+			{
+				for (int i = 0; i < Model.Skus.Count; i++)
+				{
+				<tr>
+					<td class="cart-image-link">
+						<a href="@Model.Skus[i].ProductPageUrl">
+							<img src="@Model.Skus[i].IconUrl" />
+						</a>
+					</td>
+					<td class="cart-line-info">
+						<a class="cart-text-link" href="@Model.Skus[i].ProductPageUrl">
+							@Model.Skus[i].DisplayName
+						</a>
+						<span class="cart-sku-code">(@Model.Skus[i].Code)</span>
+						<span class="stock-presence-note">@(Model.Skus[i].InStock ? "In Stock Ready to Ship" : "Not in Stock")</span>
+					</td>
+					<td>@(Model.Skus[i].Price.HasValue ? Model.Skus[i].Price.Value.ToString("C2") : string.Empty)</td>
+					<td>@Html.TextBoxFor(x => Model.Skus[i].Quantity, new { @class = "input-control width-small" })</td>
+					<td>@(Model.Skus[i].SubTotal.HasValue ? Model.Skus[i].SubTotal.Value.ToString("C2") : string.Empty)</td>
+					<td class="grid-controls-container">
+						<a class="circle-button button-red">
+							<i class="glyphicon glyphicon-remove-sign"></i>
+						</a>
+					</td>
+				</tr>
+				}
+			}
+			else
+			{
+			<tr><td colspan="6">No Items Added</td></tr>
+			}
+	</tbody>
+</table>
+<div class="cart-order-details">
+	<div class="cart-shipping-instructions">
+		<span class="shipping-instructions-title">
+			Shipping Instructions:
+		</span>
+		<label class="cart-shipping-option">
+			<input name="rdUpgradeOption" type="radio" />
+			Ship this order as soon as possible
+		</label>
+		<label class="cart-shipping-option">
+			<input name="rdUpgradeOption" type="radio" />
+			Ship this order the week of:
+		</label>
+		@Html.TextBoxFor(x => x.ShippingDate, new { @class = "cart-input-box input-control" })
+		<a href="#">View our shipping policies</a>
+	</div>
+	<div class="cart-order-totals">
+		<div class="cart-total-line">
+			<label>
+				Subtotal
+			</label>
+			<label class="cart-total-value">
+				@Model.SubTotal.ToString("C2")
+			</label>
+		</div>
+		<div class="cart-total-line">
+			<label>
+				Upgrade Non-Perishable Items
+			</label>
+			<select name="UpgradeOption" class="input-control cart-total-value">
+				<option>None Selected</option>
+			</select>
+		</div>
+		<div class="cart-total-line">
+			<label>
+				Shipping
+			</label>
+			<label class="cart-total-value">
+				@(Model.ShippingCost.HasValue ? Model.ShippingCost.Value.ToString("C2") : "FREE!")
+			</label>
+		</div>
+		<div class="cart-total-line cart-order-summary">
+			<label>
+				Order Total
+			</label>
+			<label class="cart-total-value">
+				@Model.OrderTotal.ToString("C2")
+			</label>
+		</div>
+		<div class="cart-promo-container">
+			<i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Promo Code" data-tooltip-body="If you have a discount code, enter it in the box to see the change in your order's total."></i>
+			<label>Promo Code</label>
+			@Html.TextBoxFor(x => x.PromoCode, new { @class = "cart-input-box input-control" })
+		</div>
+		<div id="divGcContainer" class="cart-gc-container">
+			@for (int i = 0; i < Model.GiftCertificateCodes.Count; i++)
+			{
+				<div>
+					@if (i == 0)
+					{
+						<i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Gift Certificate Code" data-tooltip-body="If you have a gift certificate code, enter it in the box to see the change in your order's total."></i>
+								<label>Gift Certificate Code</label>
+								<a id="btnAddGc" class="circle-button button-green">
+									<i class="glyphicon glyphicon-plus-sign"></i>
+								</a>
+					}
+					else
+					{
+						<a class="btnRemoveGc circle-button button-red">
+							<i class="glyphicon glyphicon-minus-sign"></i>
+						</a>
+					}
+					@Html.TextBoxFor(x => Model.GiftCertificateCodes[i], new { @class = "cart-input-box input-control" })
+				</div>
+			}
+		</div>
+	</div>
+</div>

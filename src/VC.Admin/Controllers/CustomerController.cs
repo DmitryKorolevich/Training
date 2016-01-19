@@ -345,6 +345,7 @@ namespace VC.Admin.Controllers
                 Items = result.Items.Select(p => new CustomerListItemModel()
                 {
                     Id = p.Id,
+                    IdObjectType = p.IdObjectType,
                     Name = $"{p.LastName}, {p.FirstName}",
                     FirstName = p.FirstName,
                     LastName = p.LastName,

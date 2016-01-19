@@ -14,6 +14,8 @@ var lhnTrackingEnabled = 't';
 var lhnScriptSrc = lhnJsHost + 'www.livehelpnow.net/lhn/scripts/livehelpnow.aspx?lhnid=' + lhnAccountN + '&iv=' + lhnInviteEnabled + '&d=' + lhnDepartmentN + '&ver=' + lhnVersion + '&rnd=' + Math.random();
 var lhnScript = document.createElement("script"); lhnScript.type = "text/javascript"; lhnScript.src = lhnScriptSrc;
 
+var googleSearchcx = '006613472277305802095:2wviofnvpvs';
+
 
 // Avoid `console` errors in browsers that lack a console.
 (function() {
@@ -54,6 +56,14 @@ var lhnScript = document.createElement("script"); lhnScript.type = "text/javascr
                 options.messages["required"] = options.message;
             }
         }
+    });
+
+    google.load('search', '1', { language: 'en' });
+    google.setOnLoadCallback(function() {
+        google.search.CustomSearchControl.attachAutoCompletion(
+        googleSearchcx,
+        $('.search-area form input[type=text]').get(0),
+        'search-area-form');
     });
 
     $(document).ready(function ()
@@ -164,6 +174,26 @@ var lhnScript = document.createElement("script"); lhnScript.type = "text/javascr
             {
                 window.open(href,'', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');
                 e.preventDefault();
+            }
+        });
+
+        $('textarea.line-limit').keydown(function (e)
+        {
+            var maxLines = $(this).data('line-limit');
+            if (maxLines)
+            {
+                var keynum;
+                if (window.event)
+                {
+                    keynum = e.keyCode;
+                } else if (e.which)
+                {
+                    keynum = e.which;
+                }
+                if (this.value.split('\n').length > maxLines && keynum !== 8 && keynum !== 46)
+                {
+                    return false;
+                }
             }
         });
     });

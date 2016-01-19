@@ -43,7 +43,6 @@ namespace VC.Public.Controllers
 			}).ToList();
 		}
 
-		[CustomerAuthorize]
 		[HttpGet]
 		public Result<IList<LookupItem<int>>> GetCreditCardTypes()
 		{

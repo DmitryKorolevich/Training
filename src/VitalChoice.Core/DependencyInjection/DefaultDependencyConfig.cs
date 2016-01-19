@@ -475,6 +475,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<CatalogRequestAddressService>().As<ICatalogRequestAddressService>().InstancePerLifetimeScope();
             builder.RegisterType<HealthwiseService>().As<IHealthwiseService>().InstancePerLifetimeScope();
             builder.RegisterType<RedirectService>().As<IRedirectService>().InstancePerLifetimeScope();
+			builder.RegisterType<EmailTemplateService>().As<IEmailTemplateService>();
             builder.RegisterType<CheckoutService>().As<ICheckoutService>();
             builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
             builder.RegisterModelConverters(projectAssembly);

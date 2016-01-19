@@ -48,6 +48,8 @@ angular.module('app.modules.gc.controllers.sendEmailController', [])
 	        $scope.email.Message += '{0} (${1} available)\r\n'.format(code.Code, balanceData);
 	    });
 
+	    $scope.email.Subject = 'Your Vital Choice Gift Certificate(s)';
+
 	    $scope.save = function () {
 	        $.each($scope.forms.form, function (index, element) {
 	        	if (element && element.$name == index) {

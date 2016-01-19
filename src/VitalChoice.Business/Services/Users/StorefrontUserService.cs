@@ -18,21 +18,28 @@ using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Options;
+using Microsoft.Data.Entity;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
 
 namespace VitalChoice.Business.Services.Users
 {
 	public class StorefrontUserService : UserService, IStorefrontUserService
 	{
-		public StorefrontUserService(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager,
+        private readonly IEcommerceRepositoryAsync<Customer> _customerRepositoryAsync;
+
+        public StorefrontUserService(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager,
 			IDataContextAsync context, SignInManager<ApplicationUser> signInManager,
 			IAppInfrastructureService appInfrastructureService, INotificationService notificationService,
 			IOptions<AppOptions> options, IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync,
-			IUserValidator<ApplicationUser> userValidator)
+            IEcommerceRepositoryAsync<Customer> customerRepositoryAsync,
+            IUserValidator<ApplicationUser> userValidator)
 			: base(
 				userManager, roleManager, context, signInManager, appInfrastructureService, notificationService, options,
 				ecommerceRepositoryAsync, userValidator)
 		{
-		}
+            _customerRepositoryAsync = customerRepositoryAsync;
+
+        }
 
 		protected override async Task SendActivationInternalAsync(ApplicationUser dbUser)
 		{
@@ -93,7 +100,23 @@ namespace VitalChoice.Business.Services.Users
 			return base.ValidateUserInternalAsync(user);
 		}
 
-		public async Task SendSuccessfulRegistration(string email, string firstName, string lastName)
+        protected override async Task ValidateUserOnSignIn(string login)
+        {
+            var appUser = await UserManager.Users.FirstOrDefaultAsync(x => x.Email.Equals(login));
+
+            if (appUser != null)
+            {
+                var customer = (await _customerRepositoryAsync.Query(p => p.Id == appUser.Id).SelectAsync()).FirstOrDefault();
+                if (customer!=null && customer.StatusCode == (int)CustomerStatus.Pending && customer.IdObjectType==(int)CustomerType.Wholesale)
+                {
+                    throw new WholesalePendingException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsNotConfirmed]);
+                }
+            }
+
+            await base.ValidateUserOnSignIn(login);
+        }
+
+        public async Task SendSuccessfulRegistration(string email, string firstName, string lastName)
 		{
 			await NotificationService.SendCustomerRegistrationSuccess(email, new SuccessfulUserRegistration()
 			{
@@ -103,7 +126,17 @@ namespace VitalChoice.Business.Services.Users
 			});
 		}
 
-		public async Task<string> GenerateLoginTokenAsync(Guid publicId)
+        public async Task SendWholesaleSuccessfulRegistration(string email, string firstName, string lastName)
+        {
+            await NotificationService.SendWholesaleCustomerRegistrationSuccess(email, new SuccessfulUserRegistration()
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                ProfileLink = $"https://{Options.PublicHost}/profile/index"
+            });
+        }
+
+        public async Task<string> GenerateLoginTokenAsync(Guid publicId)
 		{
 			var user = await GetAsync(publicId);
 

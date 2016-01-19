@@ -21,7 +21,9 @@ angular.module('app.modules.content', [
 	'app.modules.content.controllers.contentPageCategoryManageController',
 	'app.modules.content.controllers.contentAreasController',
 	'app.modules.content.controllers.contentAreaDetailController',
-	'app.modules.content.controllers.manageStylesController'
+	'app.modules.content.controllers.manageStylesController',
+	'app.modules.content.controllers.emailTemplatesController',
+	'app.modules.content.controllers.emailTemplateManageController'
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -110,10 +112,10 @@ angular.module('app.modules.content', [
 		        })
                 /*articles*/
                 .state('index.oneCol.manageArticles', {
-		            url: '/content/articles',
-		            templateUrl: 'app/modules/content/partials/articlesList.html',
-		            controller: 'articlesController'
-		        })
+                    url: '/content/articles',
+                    templateUrl: 'app/modules/content/partials/articlesList.html',
+                    controller: 'articlesController'
+                })
 		        .state('index.oneCol.addNewArticle', {
 		            url: '/content/articles/add',
 		            templateUrl: 'app/modules/content/partials/articleDetail.html',
@@ -142,10 +144,10 @@ angular.module('app.modules.content', [
 		        })
 		        /*contentpages*/
                 .state('index.oneCol.manageContentPages', {
-		            url: '/content/contentpages',
-		            templateUrl: 'app/modules/content/partials/contentPagesList.html',
-		            controller: 'contentPagesController'
-		        })
+                    url: '/content/contentpages',
+                    templateUrl: 'app/modules/content/partials/contentPagesList.html',
+                    controller: 'contentPagesController'
+                })
 		        .state('index.oneCol.addNewContentPage', {
 		            url: '/content/contentpages/add',
 		            templateUrl: 'app/modules/content/partials/contentPageDetail.html',
@@ -174,20 +176,31 @@ angular.module('app.modules.content', [
 		        })
 				/*manage areas*/
 				.state('index.oneCol.manageContentAreas', {
-					url: '/content/contentareas',
-					templateUrl: 'app/modules/content/partials/contentAreas.html',
-					controller: 'contentAreasController'
+				    url: '/content/contentareas',
+				    templateUrl: 'app/modules/content/partials/contentAreas.html',
+				    controller: 'contentAreasController'
 				})
 				.state('index.oneCol.manageContentAreaDetail', {
-					url: '/content/contentareas/{id:int}',
-					templateUrl: 'app/modules/content/partials/contentAreaDetail.html',
-					controller: 'contentAreaDetailController'
+				    url: '/content/contentareas/{id:int}',
+				    templateUrl: 'app/modules/content/partials/contentAreaDetail.html',
+				    controller: 'contentAreaDetailController'
 				})
 				/*manage css*/
 				.state('index.oneCol.manageStyles', {
-		    		url: '/content/css',
-		    		templateUrl: 'app/modules/content/partials/stylesDetail.html',
-		    		controller: 'manageStylesController'
-				});
+				    url: '/content/css',
+				    templateUrl: 'app/modules/content/partials/stylesDetail.html',
+				    controller: 'manageStylesController'
+				})
+            	/*email templates*/
+                .state('index.oneCol.manageEmailTemplates', {
+                    url: '/content/emailtemplates',
+                    templateUrl: 'app/modules/content/partials/emailTemplatesList.html',
+                    controller: 'emailTemplatesController'
+                })
+		        .state('index.oneCol.emailTemplateDetail', {
+		            url: '/content/emailtemplates/{id:int}',
+		            templateUrl: 'app/modules/content/partials/emailTemplateDetail.html',
+		            controller: 'emailTemplateManageController'
+		        });
 		}
 ]);

@@ -30,6 +30,7 @@ namespace VC.Admin.Models.Infrastructure
         public IList<LookupItem<int>> AssignedCustomerTypes { get; set; }
         public IList<LookupItem<int?>> ActiveFilterOptions { get; set; }
         public IList<LookupItem<int>> CustomerTypes { get; set; }
+        public IList<LookupItem<int>> ShortCustomerTypes { get; set; }
         public IList<LookupItem<int>> OrderStatuses { get; set; }
         public IList<LookupItem<int>> PaymentMethods { get; set; }
         public IList<LookupItem<int>> ShortPaymentMethods { get; set; }

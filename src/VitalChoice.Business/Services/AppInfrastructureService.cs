@@ -212,6 +212,7 @@ namespace VitalChoice.Business.Services
             referenceData.CustomerTypes = customerTypeRepository.Query(new CustomerTypeQuery().NotDeleted())
                 .Select(x => new LookupItem<int>() { Key = x.Id, Text = x.Name })
                 .ToList();
+            referenceData.ShortCustomerTypes = referenceData.CustomerTypes.Select(x => new LookupItem<int>() { Key = x.Key, Text = x.Text.Substring(0,1) }).ToList();
             referenceData.OrderStatuses = orderStatusRepository.Query().Select(x => new LookupItem<int>() { Key = x.Id, Text = x.Name })
                 .ToList();
             referenceData.PaymentMethods = paymentMethodRepository.Query().Select(x => new LookupItem<int>() { Key = x.Id, Text = x.Name })

@@ -5,6 +5,7 @@
 		NotActive = 1,
 		Active = 2,
 		Deleted = 3,
-		Suspended = 4
-	}
+		Suspended = 4,
+        Pending = 5
+    }
 }
