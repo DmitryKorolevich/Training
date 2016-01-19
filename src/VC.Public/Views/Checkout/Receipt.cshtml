@@ -1,0 +1,145 @@
+﻿@{
+	Layout = "~/Views/Shared/_ViewCartLayout.cshtml";
+}
+
+@model VC.Public.Models.Checkout.ReceiptModel
+
+@section PageScripts {
+	<script src="@Url.Content("/app/modules/checkout/checkoutMain.js")"></script>
+}
+
+@section Meta {
+	<title>Wild Seafood & Organics - Vital Choice</title>
+}
+
+<div class="checkout-step-container working-area-holder">
+	<img src="/assets/images/checkout/step6.gif"/>
+	<div class="centered-horizontal">
+		<h4 class="checkout-step-heading centered-horizontal">Thank You for Your Order!</h4>
+		<span class="checkout-notification-simple">Your order has been processed and a confirmation email has been sent to the address you provided.<br/>
+			If you see any errors, please send the details, including your 6-digit order number<br/>
+			and your telephone number, to <a href="#">info@vitalchoice.com</a> or call 1-800-608-4825.<br/>
+		</span>
+		<span class="checkout-notification-simple margin-top-small">
+			We will send you a Shipping Notification email when your order ships.<br />
+			Frozen foods ship separately, and generally arrive before non-perishable goods.<br />
+			As applicable, you will receive separate Shipping Notification emails for frozen and non-perishable goods.<br />
+		</span>
+		<span class="checkout-notification-simple margin-top-reasonable">
+			<span class="shopping-notice-note">NOTE:</span> If you ordered an e-Gift, please scroll down to the “Notify Recipient” section,<br/>
+			enter recipient’s name, email address, and your message where indicated, then click “Send Email”.
+		</span>
+		<div class="margin-top-reasonable">
+			<a href="#" class="button arrow-left-red">Continue Shopping</a>
+		</div>
+	</div>
+	<div class="checkout-sections-divider margin-top-reasonable"></div>
+	<div class="reivew-order-info receipt-step">
+		<div class="reivew-info-box">
+			<div class="review-header-container">
+				<span>Bill to Details</span>
+			</div>
+			@foreach (var item in Model.BillToAddress)
+			{
+				<div class="review-box-line">
+					@if (!string.IsNullOrWhiteSpace(item.Key))
+					{
+						<span class="review-info-label">@item.Key:</span>
+					}
+					<span class="review-info-value">@item.Value</span>
+				</div>
+			}
+		</div>
+		<div class="reivew-info-box">
+			<div class="review-header-container">
+				<span>Ship to Details</span>
+			</div>
+			@foreach (var item in Model.ShipToAddress)
+			{
+				<div class="review-box-line">
+					@if (!string.IsNullOrWhiteSpace(item.Key))
+					{
+						<span class="review-info-label">@item.Key:</span>
+					}
+					<span class="review-info-value">@item.Value</span>
+				</div>
+			}
+		</div>
+	</div>
+	<div>
+		<table class="standard-table cart-items-list">
+			<thead>
+			<tr>
+				<th>
+					Qty
+				</th>
+				<th>
+					SKU
+				</th>
+				<th>
+					Description
+				</th>
+				<th>
+					Unit Price
+				</th>
+				<th>
+					Price
+				</th>
+			</tr>
+			</thead>
+			<tbody>
+			@if (Model.Skus.Any())
+			{
+				for (int i = 0; i < Model.Skus.Count; i++)
+				{
+					<tr>
+						<td>@Model.Skus[i].Quantity</td>
+						<td>@Model.Skus[i].Code</td>
+						<td>@Model.Skus[i].DisplayName</td>
+						<td>@(Model.Skus[i].Price.HasValue ? Model.Skus[i].Price.Value.ToString("C2") : string.Empty)</td>
+						<td>@(Model.Skus[i].SubTotal.HasValue ? Model.Skus[i].SubTotal.Value.ToString("C2") : string.Empty)</td>
+					</tr>
+				}
+			}
+			else
+			{
+				<tr><td colspan="6">No Items Added</td></tr>
+			}
+			</tbody>
+		</table>
+	</div>
+	@*<div class="cart-order-totals">
+		<div class="cart-total-line">
+			<label>
+				Subtotal
+			</label>
+			<label class="cart-total-value">
+				@Model.SubTotal.ToString("C2")
+			</label>
+		</div>
+		<div class="cart-total-line">
+			<label>
+				Shipping
+			</label>
+			<label class="cart-total-value">
+				@Model.ShippingCost.ToString("C2")
+			</label>
+		</div>
+		<div class="cart-total-line">
+			<label>
+				Shipping
+			</label>
+			<label class="cart-total-value">
+				@Model.Tax.ToString("C2")
+			</label>
+		</div>
+		<div class="cart-total-line cart-order-summary">
+			<label>
+				Order Total
+			</label>
+			<label class="cart-total-value">
+				@Model.OrderTotal.ToString("C2")
+			</label>
+		</div>
+	</div>*@
+</div>

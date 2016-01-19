@@ -3357,6 +3357,10 @@ footer {
     margin-top: 10px !important;
 }
 
+.margin-top-reasonable {
+    margin-top: 20px !important;
+}
+
 .margin-bottom-small {
     margin-bottom: 10px !important;
 }
@@ -4268,7 +4272,7 @@ a.product-recipe-link {
     line-height: 14px;
     padding-bottom: 40px;
 
-    hr {
+	hr {
         margin: 10px 0 10px 0;
     }
 
@@ -4373,6 +4377,19 @@ body.view-cart-layout{
     background-position:initial;
     background-repeat: no-repeat;
 
+	.view-cart-content{
+		width: 100%;
+		float: left;
+		clear: left;
+		margin-bottom: 40px;
+	}
+
+	.form-buttons-group{
+		:first-child{
+			margin-right:100px;
+		}
+	}
+
 	.tooltipster-default{
 		border-radius: 5px;
 		border: 2px solid #CCCCCC;
@@ -4422,6 +4439,10 @@ body.view-cart-layout{
 
 	.working-area-holder h4{
 		color:#C3392F;
+		
+		&.centered-horizontal{
+			text-align:center;
+		}
 
 		&.checkout-step-heading{
 			padding-top: 20px;
@@ -4470,6 +4491,7 @@ body.view-cart-layout{
 		background-color: #C3392F;
 		display: inline-block;
 		margin-bottom: 0;
+		margin-right:0px;
 		vertical-align: middle;
 		touch-action: manipulation;
 		cursor: pointer;
@@ -4911,7 +4933,7 @@ body.view-cart-layout{
 	padding:20px 0;
 
 	*:first-child{
-		margin-right: 20px;
+		margin-right: 20px !important; 
 	}
 }
 /*---------*/
@@ -4919,8 +4941,6 @@ body.view-cart-layout{
 /*--Checkout---*/
 .checkout-step-container{
 	padding: 0px 40px;
-	margin-bottom: 40px;
-	float:left;
 	clear:left;
 
 	.welcome-centered-button{
@@ -4985,4 +5005,77 @@ body.view-cart-layout{
 .two-columns-block{
 	float:left;
 	width:50%;
+}
+
+.review-order-certificates{
+	float:right;
+	margin-top: -10px;
+}
+
+.review-order-notifications{
+	float:left;
+}
+
+.review-order-cart{
+	padding:20px 0;
+	clear:left;
+}
+
+.reivew-order-info{
+	clear: both;
+    float: left;
+    width: 100%;
+	margin-top:10px;
+
+	.reivew-info-box{
+		width: 100%;
+		float: left;
+		clear: left;
+		margin:10px 0;
+
+		.review-header-container{
+			background-color: #FFFFCC;
+			padding: 6px 0px;
+			border-bottom: 1px solid #E1E1E1;
+			float: left;
+			width:100%;
+
+			span{
+				font-size: 13px;
+				font-weight: bold;
+				margin-left: 12px;
+				padding: 8px 0;
+				display: inline-block;
+			}
+
+			a{
+				float:right;
+				margin-right:0px;
+			}
+		}
+	}
+
+	.review-box-line{
+		float:left;
+		clear:left;
+		padding:3px 0;
+		margin-left:12px;
+	}
+
+	.review-info-value{
+	}
+
+	.review-info-label{
+	}
+}
+
+.reivew-order-info.receipt-step{
+	.reivew-info-box{
+		width:50%;
+		clear:none;
+
+		.review-header-container span{
+			padding:0;
+		}
+	}
 }
