@@ -5,9 +5,10 @@
     {
         var title = $(this).data('title');
         var name = $(this).data('content-name');
+        var type = $(this).data('content-type');
         var url = $(this).data('absolute-url');
         $.ajax({
-            url: "/Help/SendContentUrlNotification?name={0}&url={1}".format(name, url),
+            url: "/Help/SendContentUrlNotification?name={0}&url={1}&type={2}".format(name, url, type),
             dataType: "html"
         }).success(function (result)
         {

@@ -165,7 +165,7 @@ namespace VC.Public.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> SendContentUrlNotification(string name, string url)
+        public async Task<IActionResult> SendContentUrlNotification(string name, string url, int type= (int)SendContentUrlType.Article)
         {
             ViewBag.Url = url;
             ViewBag.Name = name;
@@ -173,6 +173,7 @@ namespace VC.Public.Controllers
             return PartialView("_SendContentUrlNotification", new SendContentUrlNotificationModel {
                 Url = url,
                 Name=name,
+                Type=(SendContentUrlType)type,
             });
         }
 
@@ -194,7 +195,14 @@ namespace VC.Public.Controllers
                     emailModel.Url = model.Url;
                     emailModel.Name = model.Name;
                     emailModel.Message = model.Message;
-                    await _notificationService.SendContentUrlNotificationAsync(model.RecipentEmail, emailModel);
+                    if (model.Type == SendContentUrlType.Article)
+                    {
+                        await _notificationService.SendContentUrlNotificationForArticleAsync(model.RecipentEmail, emailModel);
+                    }
+                    else
+                    {
+                        await _notificationService.SendContentUrlNotificationForRecipeAsync(model.RecipentEmail, emailModel);
+                    }
 
                     ViewBag.SuccessMessage = InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullySent];
                     return PartialView("_SendContentUrlNotificationInner", model);

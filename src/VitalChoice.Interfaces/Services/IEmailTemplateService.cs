@@ -14,6 +14,7 @@ namespace VitalChoice.Interfaces.Services
         Task<PagedList<EmailTemplate>> GetEmailTemplatesAsync(FilterBase filter);
         Task<EmailTemplate> GetEmailTemplateAsync(int id);
         Task<BasicEmail> GenerateEmailAsync(string name, EmailTemplateDataModel model);
+        Task<Dictionary<EmailTemplateDataModel, BasicEmail>> GenerateEmailsAsync(string name, ICollection<EmailTemplateDataModel> models);
         Task<EmailTemplate> UpdateEmailTemplateAsync(EmailTemplate recipe);
         Task<bool> DeleteEmailTemplateAsync(int id);
     }

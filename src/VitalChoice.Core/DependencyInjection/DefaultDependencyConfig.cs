@@ -368,7 +368,7 @@ namespace VitalChoice.Core.DependencyInjection
 	        builder.RegisterType<AdminUserService>().As<IAdminUserService>();
 
 	        builder.RegisterType<StorefrontUserStore>().Named<IUserStore<ApplicationUser>>("storefronUserStore");
-	        builder.RegisterType<UserValidator<ApplicationUser>>().Named<IUserValidator<ApplicationUser>>("storefrontUserValidator");
+	        builder.RegisterType<StorefrontUserValidator>().Named<IUserValidator<ApplicationUser>>("storefrontUserValidator");
 	        builder.RegisterType<ExtendedUserManager>()
 		        .Named<ExtendedUserManager>("storefrontUserManager")
 		        .WithParameter((pi, cc) => pi.Name == "store",

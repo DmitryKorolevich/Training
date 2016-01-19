@@ -606,7 +606,7 @@
                                                     <span data-ng-bind="currentCustomer.Email"></span>
                                                 </div>
                                             </div>
-                                            <div class="form-group">
+                                            <div data-ng-if="!options.OverrideEmail" class="form-group">
                                                 <label for="enterEmail" class="col-md-3 control-label">Enter Email</label>
                                                 <div class="col-md-9">
                                                     <input type="email" name="Email" class="form-control" id="enterEmail" data-ng-model="currentCustomer.newEmail" placeholder="Enter Email" data-ng-maxlength="100" autocomplete="off" data-ng-disabled="orderEditDisabled">
@@ -618,7 +618,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-group">
+                                            <div data-ng-if="!options.OverrideEmail" class="form-group">
                                                 <label for="reEnterEmail" class="col-md-3 control-label">Re-enter Email</label>
                                                 <div class="col-md-9">
                                                     <input type="email" name="EmailConfirm" class="form-control" id="reEnterEmail" data-ng-model="currentCustomer.emailConfirm" placeholder="Re-enter Email" data-ng-maxlength="100" autocomplete="off" data-ng-disabled="orderEditDisabled">
@@ -630,7 +630,15 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-group">
+                                            <div data-ng-if="!currentCustomer.Id || (options.DBStatusCode == 1 && !currentCustomer.Email)" class="form-group">
+                                                <label for="active" class="col-md-3 control-label">Override</label>
+                                                <div class="col-md-9">
+                                                    <div class="checkbox">
+                                                        <label><input type="checkbox" id="overrideEmail" name="OverrideEmail" data-ng-model="options.OverrideEmail" /></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div data-ng-if="currentCustomer.Email" class="form-group">
                                                 <div class="col-md-3"></div>
                                                 <div class="col-md-9">
                                                     <button class="btn btn-info" data-ng-if="currentCustomer.StatusCode == 2" ladda="resetTracker.active()" data-ng-click="resetPassword()">Reset Password</button>

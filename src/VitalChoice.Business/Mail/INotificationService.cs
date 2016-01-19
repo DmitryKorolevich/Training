@@ -10,6 +10,8 @@ namespace VitalChoice.Business.Mail
         
 		Task SendAdminPasswordResetAsync(string email, PasswordReset passwordReset);
 
+        Task SendCustomerPasswordResetAsync(string email, PasswordReset passwordReset);
+
         Task<bool> SendBasicEmailAsync(BasicEmail email);
 
         Task SendHelpTicketUpdatingEmailForCustomerAsync(string email, HelpTicketEmail helpTicketEmail);
@@ -34,7 +36,9 @@ namespace VitalChoice.Business.Mail
 
         Task SendGCNotificationEmailAsyn(string email, GCNotificationEmail model);
 
-        Task SendContentUrlNotificationAsync(string email, ContentUrlNotificationEmail model);
+        Task SendContentUrlNotificationForArticleAsync(string email, ContentUrlNotificationEmail model);
+
+        Task SendContentUrlNotificationForRecipeAsync(string email, ContentUrlNotificationEmail model);
 
         Task SendPrivacyRequestEmailAsync(string email, PrivacyRequestEmail model);
     }

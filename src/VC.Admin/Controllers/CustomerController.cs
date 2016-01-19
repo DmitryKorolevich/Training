@@ -328,7 +328,7 @@ namespace VC.Admin.Controllers
             var toReturn = _customerMapper.ToModel<AddUpdateCustomerModel>(item);
 
 			toReturn.IsConfirmed = addUpdateCustomerModel.IsConfirmed;
-			toReturn.PublicUserId = addUpdateCustomerModel.PublicId;
+			toReturn.PublicUserId = addUpdateCustomerModel.PublicUserId;
 
             await PrepareCustomerNotes(item, toReturn);
 

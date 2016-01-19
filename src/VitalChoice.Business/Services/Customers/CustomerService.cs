@@ -142,16 +142,19 @@ namespace VitalChoice.Business.Services.Customers
 		{
 			var errors = new List<MessageInfo>();
 
-			var customerSameEmail =
-				await
-					_customerRepositoryAsync.Query(
-						new CustomerQuery().NotDeleted().Excluding(model.Id).WithEmail(model.Email))
-						.SelectAsync(false);
+            if (!String.IsNullOrEmpty(model.Email))
+            {
+                var customerSameEmail =
+                    await
+                        _customerRepositoryAsync.Query(
+                            new CustomerQuery().NotDeleted().Excluding(model.Id).WithEmail(model.Email))
+                            .SelectAsync(false);
 
-			if (customerSameEmail.Any())
-			{
-				throw new AppValidationException(
-					string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.EmailIsTakenAlready], model.Email));
+                if (customerSameEmail.Any())
+                {
+                    throw new AppValidationException(
+                        string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.EmailIsTakenAlready], model.Email));
+                }
             }
 
             if (model.ShippingAddresses.Where(x => x.StatusCode != (int) RecordStatusCode.Deleted).All(x => !x.Data.Default))
@@ -554,8 +557,9 @@ namespace VitalChoice.Business.Services.Customers
                 appUser.ConfirmationToken = Guid.Empty;
             }
 
-            appUser.Email = model.Email;
-            appUser.UserName = model.Email;
+            var email = string.IsNullOrEmpty(password) && string.IsNullOrEmpty(model.Email) && appUser.Email==BaseAppConstants.FAKE_CUSTOMER_EMAIL ? BaseAppConstants.FAKE_CUSTOMER_EMAIL : model.Email;
+            appUser.Email = email;
+            appUser.UserName = email;
 
             var profileAddress = model.ProfileAddress;
             appUser.FirstName = profileAddress.Data.FirstName;
@@ -610,8 +614,8 @@ namespace VitalChoice.Business.Services.Customers
             {
                 FirstName = profileAddress.Data.FirstName,
                 LastName = profileAddress.Data.LastName,
-                Email = model.Email,
-                UserName = model.Email,
+                Email = string.IsNullOrEmpty(password) && string.IsNullOrEmpty(model.Email) ? BaseAppConstants.FAKE_CUSTOMER_EMAIL : model.Email,
+                UserName = string.IsNullOrEmpty(password) && string.IsNullOrEmpty(model.Email) ? BaseAppConstants.FAKE_CUSTOMER_EMAIL : model.Email,
                 TokenExpirationDate = DateTime.Now.AddDays(_appOptions.Value.ActivationTokenExpirationTermDays),
                 IsConfirmed = false,
                 ConfirmationToken = Guid.NewGuid(),
@@ -657,7 +661,7 @@ namespace VitalChoice.Business.Services.Customers
 
                     entity = await base.InsertAsync(model, uow);
 
-                    if (string.IsNullOrWhiteSpace(password) && model.StatusCode != suspendedCustomer)
+                    if (string.IsNullOrWhiteSpace(password) && model.StatusCode != suspendedCustomer && !String.IsNullOrEmpty(model.Email))
                     {
                         await _storefrontUserService.SendActivationAsync(model.Email);
                     }

@@ -12,7 +12,7 @@ namespace VitalChoice.Infrastructure.Identity.UserManagers
 {
     //needed to remove default user validator
     public class ExtendedUserManager : UserManager<ApplicationUser>
-    {
+    {   
         public ExtendedUserManager(IUserStore<ApplicationUser> store, IOptions<IdentityOptions> optionsAccessor,
             IPasswordHasher<ApplicationUser> passwordHasher, IEnumerable<IUserValidator<ApplicationUser>> userValidators,
             IEnumerable<IPasswordValidator<ApplicationUser>> passwordValidators, ILookupNormalizer keyNormalizer,

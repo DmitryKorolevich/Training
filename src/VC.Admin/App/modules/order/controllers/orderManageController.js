@@ -354,6 +354,11 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 $scope.countries = result.countriesCall.data.Data;
 
                 $scope.currentCustomer = result.customerGetCall.data.Data;
+                $scope.options.DBStatusCode = $scope.currentCustomer.StatusCode;
+                if (!$scope.currentCustomer.Email)
+                {
+                    $scope.options.OverrideEmail = true;
+                }
                 if ($scope.id==0 && $scope.currentCustomer && $scope.currentCustomer.StatusCode == 4)
                 {
                     $state.go('index.oneCol.customerDetail', { id: $scope.currentCustomer.Id });
@@ -1114,6 +1119,12 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             if (order.ShipDelayDateNP)
             {
                 order.ShipDelayDateNP = order.ShipDelayDateNP.toServerDateTime();
+            }
+
+            if ($scope.options.OverrideEmail)
+            {
+                order.Customer.Email = null;
+                order.Customer.EmailConfirm = null;
             }
 
             orderService.updateOrder(order, $scope.addEditTracker).success(function (result)

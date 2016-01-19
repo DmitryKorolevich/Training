@@ -171,6 +171,8 @@ namespace VC.Admin.ModelConverters
                         }
                         dbCustomer.ApprovedPaymentMethods = dynamic.Customer.ApprovedPaymentMethods;
                         dbCustomer.OrderNotes = dynamic.Customer.OrderNotes;
+                        dbCustomer.Email = dynamic.Customer.Email;
+                        dbCustomer.ProfileAddress = dynamic.Customer.ProfileAddress;
 
                         if (model.UpdateShippingAddressForCustomer)
                         {

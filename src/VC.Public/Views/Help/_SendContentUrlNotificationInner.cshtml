@@ -12,6 +12,7 @@
 	<form asp-controller="Help" asp-action="SendContentUrlNotification" data-ajax-success="articleSubmitSuccess" data-ajax-failure="articleSubmitError" data-ajax="true" data-method="post" data-ajax-mode="replace" data-ajax-update="#sendContentDialogInner" class="form-regular medium-small">
 		@Html.HiddenFor(x => x.Name)
         @Html.HiddenFor(x => x.Url)
+        @Html.HiddenFor(x => x.Type)
 		@Html.ValidationSummary(true, "")
 		<div class="form-group">
 			@Html.LabelFor(m => m.YourName, new {@class = "control-label"})
