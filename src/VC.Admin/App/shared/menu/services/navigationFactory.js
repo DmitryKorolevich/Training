@@ -48,7 +48,6 @@ angular.module('app.shared.menu.services.navigationFactory', [])
                 { name: 'managePromotions', stateName: 'index.oneCol.managePromotions', stateLabel: 'Manage Promotions', access: 14 },
                 { name: 'manageGCs', stateName: 'index.oneCol.manageGCs', stateLabel: 'Manage Gift Certificates', access: 14 },
                 { name: 'manageRedirect', stateName: 'index.oneCol.manageRedirect', stateLabel: 'Custom URL Redirects', access: 14 },
-                { name: 'manageEmailTemplate', stateName: 'index.oneCol.manageEmailTemplates', stateLabel: 'Manage Email Templates', access: 14 },
         	]
         },
 		{
@@ -135,6 +134,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
                 { name: 'manageContentAreas', stateName: 'index.oneCol.manageContentAreas', stateLabel: 'Manage Design Elements', access: 6 },
                 { name: 'manageStyles', stateName: 'index.oneCol.manageStyles', stateLabel: 'Manage Custom CSS', access: 6 },
 				{ name: 'filesManagement', stateName: 'index.oneCol.filesManagement', stateLabel: 'Manage Media', access: 12 },
+                { name: 'manageEmailTemplate', stateName: 'index.oneCol.manageEmailTemplates', stateLabel: 'Manage Email Templates', access: 6 },
 			]
 		},
 		{

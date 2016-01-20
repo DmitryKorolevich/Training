@@ -15,7 +15,7 @@
             successMessage = '@ViewBag.SuccessMessage';
             var captchaSiteKey = "@appOptions.Value.GoogleCaptcha.PublicKey";
         </script>
-        <form asp-controller="Help" asp-action="RequestCatalog" data-ajax-success="ajaxFormSubmitSuccess" data-ajax-failure="ajaxFormSubmitError" data-ajax="true" data-method="post" data-ajax-mode="replace" data-ajax-update="#requestCatalogFormWrapperInner" class="form-regular medium-small content-ajax-form">
+        <form asp-controller="Help" asp-action="RequestCatalog" data-ajax-success="requestCatalogFormSubmitSuccess" data-ajax-failure="ajaxFormSubmitError" data-ajax="true" data-method="post" data-ajax-mode="replace" data-ajax-update="#requestCatalogFormWrapperInner" class="form-regular medium-small content-ajax-form">
             <input id="hdCountry" value="@Html.DisplayForEx(x=>x.IdCountry)" type="hidden">
             <input id="hdState" value="@Html.DisplayForEx(x=>x.IdState)" type="hidden">
             @Html.AntiForgeryToken()
@@ -86,22 +86,22 @@
                 </div>
             </div>
             <div class="form-group">
-                <label class="control-label"></label>
-                <div class="google-captcha pull-left" id="googleCaptcha"></div>
-            </div>
-            <div class="form-group">
                 <label class="control-label" for="SignUpOnNewsletters"></label>
                 <div class="input-group">
                     @Html.CheckBoxFor(m => m.SignUpOnNewsletters, new { @class = "form-control" })
                     <label for="SignUpOnNewsletters">Also sign me up to receive your newsletter.</label>
                 </div>
             </div>
-            <div class="form-group">
+            <div class="form-group hide">
                 @Html.LabelFor(m => m.Email, new { @class = "control-label" })
                 <div class="input-group">
-                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @data_val = "true", @data_val_required = "The Email field is required.", data_val_email = "The Email field is not a valid e-mail address." })
                     @Html.ValidationMessageFor(m => m.Email)
                 </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label"></label>
+                <div class="google-captcha pull-left" id="googleCaptcha"></div>
             </div>
             <div class="form-buttons-group">
                 <input class="yellow content-form-submit-button" type="button" value="Sign Up" />

@@ -22,7 +22,8 @@ INSERT INTO [dbo].[ContentItems]
     @script(){{
         <script src="https://www.google.com/recaptcha/api.js?onload=onloadRecaptchaCallback&render=explicit" async defer></script>
         <script src="/app/common/dataAccess.js"></script>
-        <script src="/app/modules/auth/registration.js"></script>
+        <script src="/app/modules/auth/registration.js"></script>		
+        <script src="/app/modules/content/request-catalog.js"></script>
     }}
     <h4>Request a Catalog</h4>
     <p>

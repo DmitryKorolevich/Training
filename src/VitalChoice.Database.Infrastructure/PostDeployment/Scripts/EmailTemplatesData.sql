@@ -895,7 +895,7 @@ INSERT INTO [dbo].[EmailTemplates]
            ,(SELECT Id FROM MasterContentItems WHERE Name='Admin Email Template')
            ,2
            ,NULL
-           ,'GCNotificationEmail'
+           ,'PrivacyRequestEmail'
            ,'Privacy request email')
 
 END

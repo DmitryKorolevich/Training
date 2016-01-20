@@ -180,7 +180,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
-        [AdminAuthorize(PermissionType.Marketing)]
+        [AdminAuthorize(PermissionType.Content)]
         public async Task<Result<EmailTemplateManageModel>> GetEmailTemplate(int id)
         {
             if (id == 0)
@@ -197,7 +197,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        [AdminAuthorize(PermissionType.Marketing)]
+        [AdminAuthorize(PermissionType.Content)]
         public async Task<Result<EmailTemplateManageModel>> UpdateEmailTemplate([FromBody]EmailTemplateManageModel model)
         {
             if (!Validate(model))
@@ -216,7 +216,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        [AdminAuthorize(PermissionType.Marketing)]
+        [AdminAuthorize(PermissionType.Content)]
         public async Task<Result<bool>> DeleteEmailTemplate(int id, [FromBody] object model)
         {
             return await emailTemplateService.DeleteEmailTemplateAsync(id);
