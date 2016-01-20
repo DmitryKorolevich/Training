@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Http;
@@ -212,7 +213,13 @@ namespace VC.Public.Controllers
 				ShippingCost = 100,
 				SubTotal = 50,
 				Tax = 10,
-				OrderTotal = 160
+				OrderTotal = 160,
+				OrderNumber = "1051135",
+				OrderDate = DateTime.Now,
+				PaymentMethod = "Credit Card (Authorize.Net)",
+				TransactionId = "123456789",
+				PreAuthorizationCode = "123123123",
+				ShippingMethod = "Standard Shipping"
 			};
 
 			return View(reviewOrderModel);

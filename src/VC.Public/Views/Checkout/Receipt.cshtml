@@ -33,7 +33,13 @@
 			<a href="#" class="button arrow-left-red">Continue Shopping</a>
 		</div>
 	</div>
-	<div class="checkout-sections-divider margin-top-reasonable"></div>
+	<div class="checkout-sections-divider margin-top-reasonable margin-bottom-small"></div>
+	<div class="receipt-info-line">
+		@Html.LabelFor(x=>x.OrderNumber, null,new { @class= "bold" }):<span>@Model.OrderNumber</span>
+	</div>
+	<div class="receipt-info-line">
+		@Html.LabelFor(x => x.OrderDate, null, new { @class = "bold" }):<span>@Model.OrderDate.ToString("MM/dd/yyyy")</span>
+	</div>
 	<div class="reivew-order-info receipt-step">
 		<div class="reivew-info-box">
 			<div class="review-header-container">
@@ -66,7 +72,17 @@
 			}
 		</div>
 	</div>
-	<div>
+	<div class="checkout-sections-divider margin-bottom-small"></div>
+	<div class="receipt-info-line">
+		@Html.LabelFor(x => x.OrderDate, null, new { @class = "bold" }):<span>@Model.PaymentMethod</span>
+	</div>
+	<div class="receipt-info-line">
+		@Html.LabelFor(x => x.TransactionId, null, new { @class = "bold" }):<span>@Model.TransactionId</span>
+	</div>
+	<div class="receipt-info-line">
+		@Html.LabelFor(x => x.PreAuthorizationCode, null, new { @class = "bold" }):<span>@Model.PreAuthorizationCode</span>
+	</div>
+	<div class="receipt-sku-details">
 		<table class="standard-table cart-items-list">
 			<thead>
 			<tr>
@@ -108,38 +124,38 @@
 			</tbody>
 		</table>
 	</div>
-	@*<div class="cart-order-totals">
-		<div class="cart-total-line">
-			<label>
-				Subtotal
+	<div class="receipt-shipping-method">
+		<div class="receipt-shipping-line">
+			@Html.LabelFor(x => x.ShippingMethod, null, new { @class= "bold" }):
+			<label class="cart-total-value">
+				@Model.ShippingMethod
 			</label>
+		</div>
+	</div>
+	<div class="cart-order-totals">
+		<div class="cart-total-line">
+			@Html.LabelFor(x => x.SubTotal)
 			<label class="cart-total-value">
 				@Model.SubTotal.ToString("C2")
 			</label>
 		</div>
 		<div class="cart-total-line">
-			<label>
-				Shipping
-			</label>
+			@Html.LabelFor(x => x.ShippingCost)
 			<label class="cart-total-value">
 				@Model.ShippingCost.ToString("C2")
 			</label>
 		</div>
 		<div class="cart-total-line">
-			<label>
-				Shipping
-			</label>
+			@Html.LabelFor(x => x.Tax)
 			<label class="cart-total-value">
 				@Model.Tax.ToString("C2")
 			</label>
 		</div>
 		<div class="cart-total-line cart-order-summary">
-			<label>
-				Order Total
-			</label>
+			@Html.LabelFor(x => x.OrderTotal)
 			<label class="cart-total-value">
 				@Model.OrderTotal.ToString("C2")
 			</label>
 		</div>
-	</div>*@
+	</div>
 </div>

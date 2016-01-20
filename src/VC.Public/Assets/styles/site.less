@@ -4798,6 +4798,41 @@ body.view-cart-layout{
 	}
 }
 
+.cart-order-totals{
+		float:right;
+		text-align: right;
+		padding-top:22px;
+
+		.cart-total-line{
+			clear:both;
+			
+			label{
+				display:inline-block;
+				padding: 8px 0;
+			}
+
+			.cart-total-value{
+				margin-left: 10px;
+				width: 150px;
+			}
+
+			&.cart-order-summary{
+				font-size:14px;
+				font-weight:bold;
+			}
+		}
+	}
+
+.receipt-shipping-method{
+	float:left;
+	text-align: left;
+	padding-top:22px;
+
+	.receipt-shipping-line{
+		.cart-order-totals .cart-total-line;
+	}
+}
+
 .cart-order-details{
 	clear: both;
     margin-top: 20px;
@@ -4824,31 +4859,6 @@ body.view-cart-layout{
 			padding: 8px 0;
 			clear:left;
 			float:left;
-		}
-	}
-
-	.cart-order-totals{
-		float:right;
-		text-align: right;
-		padding-top:22px;
-
-		.cart-total-line{
-			clear:both;
-			
-			label{
-				display:inline-block;
-				padding: 8px 0;
-			}
-
-			.cart-total-value{
-				margin-left: 10px;
-				width: 150px;
-			}
-
-			&.cart-order-summary{
-				font-size:14px;
-				font-weight:bold;
-			}
 		}
 	}
 
@@ -5070,6 +5080,8 @@ body.view-cart-layout{
 }
 
 .reivew-order-info.receipt-step{
+	margin-top:0px;
+
 	.reivew-info-box{
 		width:50%;
 		clear:none;
@@ -5077,5 +5089,20 @@ body.view-cart-layout{
 		.review-header-container span{
 			padding:0;
 		}
+	}
+}
+
+.receipt-sku-details{
+	float:left;
+	clear:left;
+	width:100%;
+	margin-top:10px;
+}
+
+.receipt-info-line{
+	padding:3px 0;
+
+	span{
+		margin-left:5px;
 	}
 }
