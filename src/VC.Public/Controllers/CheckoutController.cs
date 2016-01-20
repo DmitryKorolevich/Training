@@ -10,6 +10,7 @@ using VC.Public.Models.Checkout;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Interfaces.Services;
@@ -67,7 +68,7 @@ namespace VC.Public.Controllers
 		{
 			var shippingMethodModel = new AddUpdateShippingMethodModel()
 			{
-
+				AddressType = CheckoutAddressType.Residental
 			};
 			if (ContextAccessor.HttpContext.User.Identity.IsAuthenticated)
 			{

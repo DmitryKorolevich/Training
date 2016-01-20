@@ -1,7 +1,9 @@
 ﻿$(function() {
 	$("body").on("click", "#chkSelectOther", function() { controlSectionState("#ddShippingAddressesSelection", "#chkSelectOther"); });
 	$("body").on("click", "#IsGiftCertificate", function () { controlSectionState("#GiftMessage", "#IsGiftCertificate"); });
-	$("body").on("click", "#UseBillingAddress", function() { controlUseBillingState(".two-columns-block", "#UseBillingAddress"); });
+	$("body").on("click", "#UseBillingAddress", function () { controlUseBillingState(".two-columns-block", "#UseBillingAddress"); });
+
+	$('body').on("keyup", "textarea", function (elem) { processCharcount(elem); });
 });
 
 function controlSectionState(selector, controlId) {
@@ -11,6 +13,19 @@ function controlSectionState(selector, controlId) {
 		jSel.show();
 	} else {
 		jSel.hide();
+	}
+}
+
+function processCharcount(ev) {
+	var elem = ev.target;
+
+	var max = $(elem).attr("maxlength");
+	var len = $(elem).val().length;
+	if (len >= max) {
+		$(elem).next().html('you have reached the limit');
+	} else {
+		var char = max - len;
+		$(elem).next().html('<b>' + char + '</b> characters remaining');
 	}
 }
 
@@ -30,5 +45,7 @@ function controlUseBillingState(selector, controlId) {
 		jDrop.show();
 		jChk.show();
 		jSpan.show();
+
+		controlSectionState("#ddShippingAddressesSelection", "#chkSelectOther");
 	}
 }
