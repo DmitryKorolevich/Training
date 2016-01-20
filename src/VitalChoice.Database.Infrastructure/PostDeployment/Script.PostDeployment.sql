@@ -9,7 +9,7 @@ Post-Deployment Script Template
                SELECT * FROM [$(TableName)]					
 --------------------------------------------------------------------------------------
 */
-set dateformat mdy
+
 
 :r .\Scripts\StartInit.sql
 :r .\Scripts\LocalizationItems.sql
