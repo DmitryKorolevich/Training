@@ -22,7 +22,7 @@ namespace VC.Public.Models.Cart
 
 	    public decimal SubTotal { get; set; }
 
-	    public ShippingUpgradeOption? UpgradeOption { get; set; }
+	    public ShippingUpgrade UpgradeOption { get; set; }
 
 	    public decimal? ShippingCost { get; set; }
 

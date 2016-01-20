@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
 using VC.Public.Models.Auth;
@@ -10,6 +11,7 @@ using VitalChoice.Core.Infrastructure;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
@@ -19,16 +21,14 @@ namespace VC.Public.Controllers
 {
     public class CheckoutController : PublicControllerBase
     {
-        private readonly IHttpContextAccessor _contextAccessor;
         private readonly IStorefrontUserService _storefrontUserService;
-        private readonly ICustomerService _customerService;
         private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _paymentMethodConverter;
         private readonly IProductService _productService;
         private readonly IOrderService _orderService;
 
         public CheckoutController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
             ICustomerService customerService, IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter,
-			IOrderService orderService, IProductService productService):base(contextAccessor, customerService)
+			IOrderService orderService, IProductService productService, IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService) :base(contextAccessor, customerService, infrastructureService, authorizationService)
         {
             _storefrontUserService = storefrontUserService;
             _paymentMethodConverter = paymentMethodConverter;
