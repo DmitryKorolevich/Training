@@ -16,6 +16,12 @@
             }
         });
 
+        $scope.$on('customerOrders#in#refresh', function (event, args)
+        {
+            $scope.ordersFilter.Paging.PageIndex = 1;
+            refreshOrdersHistory();
+        });
+
         function initialize()
         {
 

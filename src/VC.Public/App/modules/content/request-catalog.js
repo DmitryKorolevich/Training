@@ -9,6 +9,7 @@
         else
         {
             $('#requestCatalogFormWrapperInner #Email').closest(".form-group").hide();
+            $('#requestCatalogFormWrapperInner #Email').val('');
         }
     });
 });

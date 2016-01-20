@@ -55,6 +55,10 @@ using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.Workflow.Core;
 using Microsoft.Extensions.Logging;
+using System.IO;
+using CsvHelper;
+using System.Text;
+using CsvHelper.Configuration;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -704,6 +708,28 @@ namespace VitalChoice.Business.Services.Orders
             toReturn.Data.ShipDelayType = (int)ShipDelayType.None;
 
             return toReturn;
+        }
+
+        public async Task<bool> ImportOrders(byte[] file, string fileName, OrderType orderType, int idCustomer, int idPaymentMethod)
+        {
+            using (var memoryStream = new MemoryStream(file))
+            {
+                using (var streamReader = new StreamReader(memoryStream))
+                {
+                    CsvConfiguration configuration = new CsvConfiguration();
+                    //configuration.RegisterClassMap<TestCsvMap>();
+                    using (var csv = new CsvReader(streamReader, configuration))
+                    {
+                        while (csv.Read())
+                        {
+                        //    var temp = csv.GetRecord<Test>();
+                        //    temp.PO = csv.GetField<string>("po");
+                        }
+                    }
+                }
+            }
+
+            return true;
         }
 
         #region AffiliatesOrders

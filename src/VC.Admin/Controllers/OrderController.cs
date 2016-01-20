@@ -30,6 +30,7 @@ using VitalChoice.Business.CsvExportMaps.Orders;
 using VitalChoice.Infrastructure.Domain.Constants;
 using Microsoft.Net.Http.Headers;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Core.Infrastructure.Helpers;
 
 namespace VC.Admin.Controllers
 {
@@ -415,6 +416,36 @@ namespace VC.Admin.Controllers
         {
             var toReturn = await _orderService.GetGCOrdersAsync(id);
             return toReturn.Select(p=>new GCOrderListItemModel(p)).ToList();
+        }
+
+        [HttpPost]
+        [AdminAuthorize(PermissionType.Customers)]
+        public async Task<Result<bool>> ImportOrders()
+        {
+            var form = await Request.ReadFormAsync();
+
+            var idCustomer = Int32.Parse(form["idcustomer"]);
+            var idPaymentMethod = Int32.Parse(form["idpaymentmethod"]);
+            OrderType orderType = (OrderType)Int32.Parse(form["ordertype"]);
+
+            var parsedContentDisposition = ContentDispositionHeaderValue.Parse(form.Files[0].ContentDisposition);
+
+            var contentType = form.Files[0].ContentType;
+            using (var stream = form.Files[0].OpenReadStream())
+            {
+                var fileContent = stream.ReadFully();
+                try
+                {
+                    var toReturn = await _orderService.ImportOrders(fileContent, parsedContentDisposition.FileName, orderType, idCustomer, idPaymentMethod);
+
+                    return toReturn;
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(ex.ToString());
+                    throw;
+                }
+            }
         }
     }
 }
