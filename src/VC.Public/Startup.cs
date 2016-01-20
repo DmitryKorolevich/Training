@@ -78,7 +78,7 @@ namespace VC.Public
             app.Use(async (context, next) =>
             {
                 var redirectViewService = context.RequestServices.GetService<IRedirectViewService>();
-                var result = await redirectViewService.CheckRedirects(context);
+                var result = redirectViewService.CheckRedirects(context);
 
                 if (!result)
                 {
