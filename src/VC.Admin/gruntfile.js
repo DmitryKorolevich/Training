@@ -88,6 +88,7 @@ module.exports = function (grunt) {
 				  { expand: true, cwd: 'assets/images/', src: ['**'], dest: 'wwwroot/assets/images/' },
 				  { expand: true, cwd: 'assets/fonts/', src: ['**'], dest: 'wwwroot/lib/fonts/' },
 				  { expand: true, cwd: 'assets/miscellaneous/', src: ['**'], dest: 'wwwroot/assets/miscellaneous/' },
+				  { expand: true, cwd: 'assets/templates/', src: ['**'], dest: 'wwwroot/assets/templates/' },
                   { expand: true, cwd: 'app/core/utils/ace/', src: ['**'], dest: 'wwwroot/lib/ace-builds/src-min-noconflict/' }
         		]
         	},
@@ -98,6 +99,7 @@ module.exports = function (grunt) {
 					{ expand: true, cwd: 'assets/images/', src: ['**'], dest: 'wwwroot/assets/images/' },
 					{ expand: true, cwd: 'assets/fonts/', src: ['**'], dest: 'wwwroot/fonts/' },
 					{ expand: true, cwd: 'assets/miscellaneous/', src: ['**'], dest: 'wwwroot/assets/miscellaneous/' },
+				    { expand: true, cwd: 'assets/templates/', src: ['**'], dest: 'wwwroot/assets/templates/' },
 					{ expand: true, cwd: 'wwwroot/lib/bootstrap/fonts/', src: ['**'], dest: 'wwwroot/fonts/' },
 					{ expand: true, cwd: 'wwwroot/lib/ace-builds/src-min-noconflict/', src: ['theme-cobalt.js', 'mode-ttl.js', 'worker-ttl.js', 'mode-html.js', 'worker-html.js', 'mode-css.js', 'worker-css.js'], dest: 'wwwroot/' },
 					{ expand: true, cwd: 'wwwroot/lib/ace-builds/src-min-noconflict/snippets/', src: ['text.js', 'ttl.js', 'html.js', 'css.js'], dest: 'wwwroot/snippets/' }

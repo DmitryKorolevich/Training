@@ -59,6 +59,15 @@ using System.IO;
 using CsvHelper;
 using System.Text;
 using CsvHelper.Configuration;
+using VitalChoice.Business.CsvExportMaps;
+using VitalChoice.Infrastructure.Domain.Entities.Orders;
+using System.Reflection;
+using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using VitalChoice.Interfaces.Services.Settings;
+using VitalChoice.Infrastructure.Domain.Transfer.Country;
+using FluentValidation.Validators;
+using System.Text.RegularExpressions;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -83,6 +92,8 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IPaymentMethodService _paymentMethodService;
         private readonly IObjectMapper<OrderPaymentMethodDynamic> _paymentMapper;
         private readonly IEcommerceRepositoryAsync<OrderToGiftCertificate> _orderToGiftCertificateRepositoryAsync;
+        private readonly ICountryService _countryService;
+        private readonly TimeZoneInfo _pstTimeZoneInfo;
 
         public OrderService(
             IEcommerceRepositoryAsync<VOrder> vOrderRepository,
@@ -107,7 +118,8 @@ namespace VitalChoice.Business.Services.Orders
             SPEcommerceRepository sPEcommerceRepository,
             IPaymentMethodService paymentMethodService,
             IObjectMapper<OrderPaymentMethodDynamic> paymentMapper,
-            IEcommerceRepositoryAsync<OrderToGiftCertificate> orderToGiftCertificateRepositoryAsync)
+            IEcommerceRepositoryAsync<OrderToGiftCertificate> orderToGiftCertificateRepositoryAsync,
+            ICountryService countryService)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor)
@@ -130,6 +142,8 @@ namespace VitalChoice.Business.Services.Orders
             _paymentMethodService = paymentMethodService;
             _paymentMapper = paymentMapper;
             _orderToGiftCertificateRepositoryAsync = orderToGiftCertificateRepositoryAsync;
+            _countryService = countryService;
+            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
 
         protected override IQueryLite<Order> BuildQuery(IQueryLite<Order> query)
@@ -710,27 +724,284 @@ namespace VitalChoice.Business.Services.Orders
             return toReturn;
         }
 
+        #region OrdersImport
+
         public async Task<bool> ImportOrders(byte[] file, string fileName, OrderType orderType, int idCustomer, int idPaymentMethod)
         {
+            List<OrderBaseImportItem> records=null;
+            Dictionary<string, OrderValidationGenericProperty> validationSettings=null;
+            var countries = await _countryService.GetCountriesAsync(new CountryFilter());
             using (var memoryStream = new MemoryStream(file))
             {
                 using (var streamReader = new StreamReader(memoryStream))
                 {
                     CsvConfiguration configuration = new CsvConfiguration();
-                    //configuration.RegisterClassMap<TestCsvMap>();
+                    configuration.TrimFields = true;
+                    configuration.TrimHeaders = true;
+                    configuration.RegisterClassMap<OrderGiftListImportItemCsvMap>();
                     using (var csv = new CsvReader(streamReader, configuration))
                     {
-                        while (csv.Read())
+                        if (orderType == OrderType.GiftList)
                         {
-                        //    var temp = csv.GetRecord<Test>();
-                        //    temp.PO = csv.GetField<string>("po");
+                            records = ProcessGiftListOrders(csv, countries,out validationSettings);
                         }
                     }
                 }
             }
 
+            if (records != null && validationSettings!=null)
+            {
+                ValidateOrderImportItems(records, validationSettings);
+            }
+
+            var messages =  FormatRowsRecordErrorMessages(records);
+            if(messages.Count>0)
+            {
+                throw new AppValidationException(messages);
+            }
+
             return true;
         }
+
+        private List<OrderBaseImportItem> ProcessGiftListOrders(CsvReader reader, ICollection<Country> countries, out Dictionary<string, OrderValidationGenericProperty> validationSettings)
+        {
+            List<OrderBaseImportItem> toReturn = new List<OrderBaseImportItem>();
+
+            var modelProperties = typeof(OrderGiftListImportItem).GetProperties();
+            validationSettings = GetOrderImportValidationSettings(modelProperties);
+
+            var shipDateProperty = modelProperties.FirstOrDefault(p => p.Name == nameof(OrderGiftListImportItem.ShipDelayDate));
+            var shipDateHeader = shipDateProperty.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault().Name;
+
+            var skuProperties = typeof(OrderSkuImportItem).GetProperties();
+            var skuProperty = skuProperties.FirstOrDefault(p => p.Name == nameof(OrderSkuImportItem.SKU));
+            var skuBaseHeader = skuProperty.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault().Name;
+            var qtyProperty = skuProperties.FirstOrDefault(p => p.Name == nameof(OrderSkuImportItem.QTY));
+            var qtyBaseHeader = qtyProperty.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault().Name;
+            
+            int rowNumber = 1;
+            try
+            {
+                while (reader.Read())
+                {
+                    var item = reader.GetRecord<OrderGiftListImportItem>();
+                    item.RowNumber = rowNumber;
+                    var messages = new List<MessageInfo>();
+                    rowNumber++;
+
+                    item.ShipDelayDate = ParseOrderShipDate(reader, shipDateHeader, ref messages);
+                    item.Skus = ParseOrderSkus(reader, skuBaseHeader, qtyBaseHeader, ref messages);
+
+                    int? idState = null;
+                    int? idCountry = null;
+                    GetContryAndState(item.State, item.Country, countries, ref messages, out idState, out idCountry);
+                    item.IdState = idState;
+                    item.IdCountry = idCountry;
+
+                    item.ErrorMessages = messages;
+                    toReturn.Add(item);
+                }
+            }
+            catch(Exception e)
+            {
+                throw new AppValidationException("Invalid file format");
+            }
+            return toReturn;
+        }
+
+        private void ValidateOrderImportItems(ICollection<OrderBaseImportItem> models, Dictionary<string, OrderValidationGenericProperty> settings)
+        {
+            EmailValidator emailValidator = new EmailValidator();
+            var emailRegex = new Regex(emailValidator.Expression, RegexOptions.IgnoreCase);
+            foreach (var model in models)
+            {
+                foreach (var pair in settings)
+                {
+                    var setting = pair.Value;
+
+                    bool valid = true;
+                    if (typeof(string) == setting.PropertyType)
+                    {
+                        string value = (string)setting.Get(model);
+                        if (setting.IsRequired && String.IsNullOrEmpty(value))
+                        {
+                            model.ErrorMessages.Add(AddErrorMessage(setting.DisplayName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldIsRequired],
+                                setting.DisplayName)));
+                            valid = false;
+                        }
+
+                        if (valid && setting.MaxLength.HasValue && String.IsNullOrEmpty(value) && value.Length > setting.MaxLength.Value)
+                        {
+                            model.ErrorMessages.Add(AddErrorMessage(setting.DisplayName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldMaxLength],
+                                setting.DisplayName, setting.MaxLength.Value)));
+                            valid = false;
+                        }
+
+                        if (valid && setting.IsEmail && String.IsNullOrEmpty(value))
+                        {
+                            if (!emailRegex.IsMatch(value))
+                            {
+                                model.ErrorMessages.Add(AddErrorMessage(setting.DisplayName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldIsInvalidEmail],
+                                    setting.DisplayName, setting.MaxLength.Value)));
+                                valid = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private Dictionary<string, OrderValidationGenericProperty> GetOrderImportValidationSettings(ICollection<PropertyInfo> modelProperties)
+        {
+            Dictionary<string, OrderValidationGenericProperty> toReturn = new Dictionary<string, OrderValidationGenericProperty>();
+            foreach (var modelProperty in modelProperties)
+            {
+                var displayAttribute = modelProperty.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault();
+                if (displayAttribute != null)
+                {
+                    OrderValidationGenericProperty item = new OrderValidationGenericProperty();
+                    item.DisplayName = displayAttribute.Name;
+                    item.PropertyInfo = modelProperty;
+                    item.PropertyType = modelProperty.PropertyType;
+                    item.Get = modelProperty.GetMethod?.CompileAccessor<object, object>();
+                    var requiredAttribute = modelProperty.GetCustomAttributes<RequiredAttribute>(true).FirstOrDefault();
+                    if (requiredAttribute != null)
+                    {
+                        item.IsRequired = true;
+                    }
+                    var emailAddressAttribute = modelProperty.GetCustomAttributes<EmailAddressAttribute>(true).FirstOrDefault();
+                    if (emailAddressAttribute != null)
+                    {
+                        item.IsEmail = true;
+                    }
+                    var maxLengthAttribute = modelProperty.GetCustomAttributes<MaxLengthAttribute>(true).FirstOrDefault();
+                    if (maxLengthAttribute != null)
+                    {
+                        item.MaxLength = maxLengthAttribute.Length;
+                    }
+                    toReturn.Add(modelProperty.Name, item);
+                }
+            }
+
+            return toReturn;
+        }
+
+        private void GetContryAndState(string stateCode, string countryCode, ICollection<Country> countries,
+            ref List<MessageInfo> messages, out int? idState,out int? idCountry)
+        {
+            idState = null;
+            idCountry = null;
+            if (!String.IsNullOrEmpty(countryCode))
+            {
+                var country = countries.FirstOrDefault(p => p.CountryCode == countryCode);
+                if (country != null)
+                {
+                    idCountry = country.Id;
+                    if (!String.IsNullOrEmpty(stateCode))
+                    {
+                        var state = country.States.FirstOrDefault(p => p.StateCode == stateCode);
+                        if (state == null)
+                        {
+                            messages.Add(AddErrorMessage(nameof(OrderBaseImportItem.State), String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InvalidFieldValue],
+                                nameof(OrderBaseImportItem.State))));
+                        }
+                        else
+                        {
+                            idState = state.Id;
+                        }
+                    }
+                }
+                else
+                {
+                    messages.Add(AddErrorMessage(nameof(OrderBaseImportItem.Country), String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InvalidFieldValue],
+                        nameof(OrderBaseImportItem.Country))));
+                }
+            }
+        }
+
+        private DateTime? ParseOrderShipDate(CsvReader reader, string columnName, ref List<MessageInfo> messages)
+        {
+            DateTime? toReturn=null;
+            DateTime shipDate;
+            var sShipDate = reader.GetField<string>(columnName);
+            if (!String.IsNullOrEmpty(sShipDate))
+            {
+                if (DateTime.TryParse(sShipDate, CultureInfo.InvariantCulture, DateTimeStyles.None, out shipDate))
+                {
+                    toReturn = TimeZoneInfo.ConvertTime(shipDate, TimeZoneInfo.Local, _pstTimeZoneInfo);
+                }
+                else
+                {
+                    messages.Add(AddErrorMessage(columnName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ParseDateError], columnName)));
+                }
+            }
+
+            return toReturn;
+        }
+
+        private ICollection<OrderSkuImportItem> ParseOrderSkus(CsvReader reader, string skuColumnName, string qtyColumnName, ref List<MessageInfo> messages)
+        {
+            List<OrderSkuImportItem> toReturn = new List<OrderSkuImportItem>();
+            int number = 1;
+            bool existInHeaders = true;
+            while(existInHeaders)
+            {
+                existInHeaders = reader.FieldHeaders.Contains($"{skuColumnName} {number}");
+                existInHeaders = existInHeaders && reader.FieldHeaders.Contains($"{qtyColumnName} {number}");
+
+                if (existInHeaders)
+                {
+                    var sku = reader.GetField<string>($"{skuColumnName} {number}");
+                    var sqty = reader.GetField<string>($"{qtyColumnName} {number}");
+
+                    int qty=0;
+                    Int32.TryParse(sqty, out qty);
+                    if (qty==0)
+                    {
+                        messages.Add(AddErrorMessage($"{qtyColumnName} {number}",
+                            String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ParseIntError], $"{qtyColumnName} {number}")));
+                    }
+                    else
+                    {
+                        OrderSkuImportItem item = new OrderSkuImportItem();
+                        item.SKU = sku;
+                        item.QTY = qty;
+                        toReturn.Add(item);
+                    }
+                }
+
+                number++;
+            }
+            if(toReturn.Count==0)
+            {
+                messages.Add(AddErrorMessage(null,
+                            String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ParseIntError], $"{qtyColumnName} {number}")));
+            }
+            return toReturn;
+        }
+
+        private ICollection<MessageInfo> FormatRowsRecordErrorMessages(ICollection<OrderBaseImportItem> items)
+        {
+            List<MessageInfo> toReturn = new List<MessageInfo>();
+            foreach (var item in items)
+            {
+                toReturn.AddRange(item.ErrorMessages.Select(p => new MessageInfo() {
+                    Field = p.Field,
+                    Message = String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.OrderImportRowError],item.RowNumber),
+                }));
+            }
+            return toReturn;
+        }
+
+        private MessageInfo AddErrorMessage(string field, string message)
+        {
+            return new MessageInfo() {
+                Field=field ?? "Base",
+                Message=message,
+            };
+        }
+
+        #endregion
 
         #region AffiliatesOrders
 

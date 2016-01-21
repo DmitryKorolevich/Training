@@ -37,6 +37,12 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			            $scope.options.OverrideEmail = true;
 			        }
 			        setCreditCardsForOrdersImport();
+			        var uploadOrderTypes = [{ Key: 4, Text: 'Gift Orders' }];
+			        if ($scope.currentCustomer.CustomerType==2)//wholesale
+			        {
+			            uploadOrderTypes.splice(0, 0, { Key: 3, Text: 'Dropship Orders' });
+			        }
+                    $scope.uploadOrderTypes = uploadOrderTypes;
 			        $scope.currentCustomer.ActivatePending = false;
 			        $scope.options.DBStatusCode = $scope.currentCustomer.StatusCode;
 			        $scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
@@ -125,10 +131,6 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 				    formName: 'uploadOrderType'
 				};
 				$scope.creditCardTypes = $rootScope.ReferenceData.CreditCardTypes;
-				$scope.uploadOrderTypes = [
-                    { Key: 3, Text: 'Dropship Orders' },
-                    { Key: 4, Text: 'Gift Orders' }
-				];
 				var tabs = [];
 				tabs.push($scope.accountProfileTab);
 				tabs.push($scope.shippingAddressTab);

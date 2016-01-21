@@ -39,6 +39,15 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             public const string AffiliateMinPayCommisionsAmountNotMatch = "AffiliateMinPayCommisionsAmountNotMatch";
             public const string WrongCaptcha = "WrongCaptcha";
             public const string CustomerWasModified = "CustomerWasModified";
+
+            public const string OrderImportRowError = "OrderImportRowError";
+            public const string ParseDateError = "ParseDateError";
+            public const string ParseIntError = "ParseIntError";
+            public const string ZeroSkusForOrderInImport = "ZeroSkusForOrderInImport";
+            public const string InvalidFieldValue = "InvalidFieldValue";
+            public const string FieldIsRequired = "FieldIsRequired";
+            public const string FieldIsInvalidEmail = "FieldIsInvalidEmail";
+            public const string FieldMaxLength = "FieldMaxLength";
         }
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
@@ -75,7 +84,16 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             {Keys.ObjectNotFound, "Object cannot be found"},
             {Keys.AffiliateMinPayCommisionsAmountNotMatch, "Affiliate balance is less than ${0}"},
             {Keys.WrongCaptcha, "The reCAPTCHA wasn't entered correctly"},
-            {Keys.CustomerWasModified, "The customer has been modified. Please refresh this page before making changes"}
+            {Keys.CustomerWasModified, "The customer has been modified. Please refresh this page before making changes"},
+            
+            {Keys.OrderImportRowError, "Row number {0} error: {1})"},
+            {Keys.ParseDateError, "{0} can't be parsed(format 'MM/dd/yyyy')"},
+            {Keys.ParseIntError, "{0} can't be parsed"},
+            {Keys.ZeroSkusForOrderInImport, "Order should have at least one sku with specified qty"},
+            {Keys.InvalidFieldValue, "{0} have invalid value"},
+            {Keys.FieldIsRequired, "{0} is required"},
+            {Keys.FieldIsInvalidEmail, "{0} is not a valid e-mail address."},
+            {Keys.FieldMaxLength, "{0} exceeds length of {1} literals."},
         };
     }
 }
