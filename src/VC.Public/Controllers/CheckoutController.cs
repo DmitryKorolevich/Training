@@ -217,9 +217,6 @@ namespace VC.Public.Controllers
 				OrderTotal = 160,
 				OrderNumber = "1051135",
 				OrderDate = DateTime.Now,
-				PaymentMethod = "Credit Card (Authorize.Net)",
-				TransactionId = "123456789",
-				PreAuthorizationCode = "123123123",
 				ShippingMethod = "Standard Shipping"
 			};
 

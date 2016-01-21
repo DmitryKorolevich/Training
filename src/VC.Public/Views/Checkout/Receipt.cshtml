@@ -72,16 +72,7 @@
 			}
 		</div>
 	</div>
-	<div class="checkout-sections-divider margin-bottom-small"></div>
-	<div class="receipt-info-line">
-		@Html.LabelFor(x => x.OrderDate, null, new { @class = "bold" }):<span>@Model.PaymentMethod</span>
-	</div>
-	<div class="receipt-info-line">
-		@Html.LabelFor(x => x.TransactionId, null, new { @class = "bold" }):<span>@Model.TransactionId</span>
-	</div>
-	<div class="receipt-info-line">
-		@Html.LabelFor(x => x.PreAuthorizationCode, null, new { @class = "bold" }):<span>@Model.PreAuthorizationCode</span>
-	</div>
+	<div class="margin-bottom-small"></div>
 	<div class="receipt-sku-details">
 		<table class="standard-table cart-items-list">
 			<thead>

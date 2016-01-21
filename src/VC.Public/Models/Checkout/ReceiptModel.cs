@@ -41,15 +41,6 @@ namespace VC.Public.Models.Checkout
 		[Display(Name = "Order Date")]
 		public DateTime OrderDate { get; set; }
 
-		[Display(Name = "Payment Method")]
-		public string PaymentMethod { get; set; }
-
-		[Display(Name = "Transaction ID")]
-		public string TransactionId { get; set; }
-
-		[Display(Name = "Pre-Authorization Code")]
-		public string PreAuthorizationCode { get; set; }
-
 		[Display(Name = "Shipping")]
 	    public string ShippingMethod { get; set; }
     }
