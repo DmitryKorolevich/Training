@@ -22,33 +22,24 @@ namespace VitalChoice.Business.Services
 {
     public class RedirectViewService : IRedirectViewService
     {
-        private readonly Dictionary<string, string> _map;
+        private readonly IRepositoryAsync<Redirect> _redirectRepository;
 
-        //BUG: this query will never be cached, and even not needed
-        //if (_map == null)
-        //{
-        //    lock (_mapSyncObject)
-        //    {
-        //        if (_map == null)
-        //        {
-        //var items = _redirectRepository.Query(p => p.StatusCode == RecordStatusCode.Active).Select(false);
-        //_map = items.ToDictionary(p => p.From.ToLower(), x => x.To);
-        //        }
-        //    }
-        //}
-
-        public RedirectViewService(IOptions<AppOptions> options)
+        public Dictionary<string, string> Map
         {
-            using (var context = new VitalChoiceContext(options))
+            get
             {
-                var rep = new ReadRepositoryAsync<Redirect>(context);
-                _map = rep.Query(p => p.StatusCode == RecordStatusCode.Active)
-                    .Select(false)
-                    .ToDictionary(p => p.From.ToLower(), x => x.To);
+                //will be loaded from cache
+                var items = _redirectRepository.Query().Select(false);
+                items = items.Where(p => p.StatusCode == RecordStatusCode.Active).ToList();
+                return items.ToDictionary(p => p.From.ToLower(), x => x.To);
             }
         }
 
-        //BUG: Make no sense to have fully sync method asyncronous
+        public RedirectViewService(IRepositoryAsync<Redirect> redirectRepository)
+        {
+            _redirectRepository = redirectRepository;
+        }
+
         public bool CheckRedirects(HttpContext context)
         {
             if (!context.Request.Path.HasValue)
@@ -56,16 +47,10 @@ namespace VitalChoice.Business.Services
 
             var path = context.Request.Path.ToUriComponent() + context.Request.QueryString.ToUriComponent();
             path = path.ToLower();
-            //BUG: double key scan !!
-            //if (_map.ContainsKey(path))
-            //{
-            //    context.Response.Redirect(_map[path], true);
-            //    return true;
-            //}
-            string redirect;
 
-            //Single key scan !!
-            if (!_map.TryGetValue(path, out redirect))
+            string redirect;
+            
+            if (!Map.TryGetValue(path, out redirect))
                 return false;
 
             context.Response.Redirect(redirect, true);
