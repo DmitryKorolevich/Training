@@ -1094,15 +1094,18 @@ INSERT INTO [dbo].[ContentItems]
                         </p>
                     </div>
                     <div class="form-regular big">
-                        <div class="form-group">
-			                <label class="control-label" for="Email">Email Address:</label>
-                			<div class="input-group margin-right-small">
-                				<input class="form-control" id="Email" name="Email" type="text">
-                			</div>
-                			<div class="input-group">
-                			    <input class="yellow" id="step1go" type="button" value="Go">
-                			</div>
-		                </div>
+                        <form>
+                            <div class="form-group">
+    			                <label class="control-label" for="Email">Email Address:</label>
+                    			<div class="input-group margin-right-small">
+                    				<input class="form-control" id="Email" name="Email" type="text" data-val="true" data-val-email="The Email field is not a valid e-mail address." data-val-maxlength="The field Email must be a string or array type with a maximum length of '100'." data-val-maxlength-max="100" data-val-required="The Email field is required.">
+                    			    <span class="field-validation-valid" data-valmsg-for="Email" data-valmsg-replace="true"></span>
+                    			</div>
+                    			<div class="input-group">
+                    			    <input class="yellow" id="step1go" type="button" value="Go">
+                    			</div>
+    		                </div>
+		                </form>
                     </div>
                     <div class="margin-top-medium">
                         <p>
