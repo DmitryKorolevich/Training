@@ -270,10 +270,11 @@ namespace VitalChoice.Business.Services.Products
             sku.OptionTypes =
                 _mapper.OptionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().CacheCompile()).ToList();
             sku.Product.OptionTypes = sku.OptionTypes;
+            var skuDynamic = await _skuMapper.FromEntityAsync(sku, true);
             return new SkuOrdered
             {
-                Sku = await _skuMapper.FromEntityAsync(sku, true),
-                ProductWithoutSkus = await Mapper.FromEntityAsync(sku.Product, true)
+                Sku = skuDynamic,
+                ProductWithoutSkus = await Mapper.FromEntityAsync(sku.Product, true),
             };
         }
 

@@ -22,6 +22,7 @@ using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
@@ -74,6 +75,40 @@ namespace VC.Public.Controllers
                 cartModel = await GetFromAnonymCart(existingUid);
             }
             return View(cartModel);
+        }
+
+        [HttpPost]
+        public async Task<bool> AddToCart(string skuCode)
+        {
+            var existingUid = GetCartUid();
+            var sku = await _productService.GetSkuOrderedAsync(skuCode);
+            if (await CustomerLoggenIn())
+            {
+                var id = GetInternalCustomerId();
+                var cart = await _checkoutService.GetOrCreateCart(existingUid, id);
+                cart.Order.Skus.MergeUpdateWithDeleteKeyed(Enumerable.Repeat(sku, 1).ToArray(),
+                    ordered => ordered.Sku.Code, skuModel => skuModel.Sku.Code, skuModel =>
+                    {
+                        var result = _productService.GetSkuOrderedAsync(skuModel.Sku.Code).Result;
+                        result.Quantity = skuModel.Quantity;
+                        result.Amount = HasRole(RoleType.Wholesale) ? skuModel.Sku.WholesalePrice : skuModel.Sku.Price;
+                        return result;
+                    }, (ordered, skuModel) => ordered.Quantity += skuModel.Quantity);
+                return await _checkoutService.UpdateCart(cart);
+            }
+            else
+            {
+                var cart = await _checkoutService.GetOrCreateAnonymCart(existingUid);
+                cart.Skus.MergeUpdateWithDeleteKeyed(Enumerable.Repeat(sku, 1).ToArray(), ordered => ordered.Sku.Code,
+                    skuModel => skuModel.Sku.Code, skuModel =>
+                    {
+                        var result = _productService.GetSkuOrderedAsync(skuModel.Sku.Code).Result;
+                        result.Quantity = skuModel.Quantity;
+                        result.Amount = skuModel.Sku.Price;
+                        return result;
+                    }, (ordered, skuModel) => ordered.Quantity += skuModel.Quantity);
+                return await _checkoutService.UpdateCart(cart);
+            }
         }
 
         [HttpPost]

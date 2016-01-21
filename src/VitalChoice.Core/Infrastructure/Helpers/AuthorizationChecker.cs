@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
-using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services;
@@ -38,6 +34,16 @@ namespace VitalChoice.Core.Infrastructure.Helpers
                 }
             }
             return false;
+        }
+
+        public static bool HasRole(this IAppInfrastructureService service, ClaimsPrincipal user, RoleType role)
+        {
+            var appData = service.Get();
+            var roleLookup =
+                appData.CustomerRoles.Union(appData.AffiliateRoles)
+                    .Union(appData.AdminRoles)
+                    .FirstOrDefault(r => r.Key == (int) role);
+            return roleLookup != null && user.IsInRole(roleLookup.Text.Normalize());
         }
     }
 }
