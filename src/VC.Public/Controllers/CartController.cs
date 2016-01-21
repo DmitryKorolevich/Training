@@ -169,7 +169,7 @@ namespace VC.Public.Controllers
         private async Task FillModel(ViewCartModel cartModel, CustomerCart cart)
         {
             cartModel.Skus.AddRange(
-                cart.Skus.Select(sku =>
+                cart.Skus?.Select(sku =>
                 {
                     var result = _skuMapper.ToModel<CartSkuModel>(sku.Sku);
                     _productMapper.UpdateModel(result, sku.ProductWithoutSkus);
@@ -177,8 +177,8 @@ namespace VC.Public.Controllers
                     result.Quantity = sku.Quantity;
                     result.SubTotal = sku.Quantity*sku.Amount;
                     return result;
-                }));
-            cartModel.GiftCertificateCodes.AddRange(cart.GiftCertificates.Select(g => g.GiftCertificate.Code));
+                }) ?? Enumerable.Empty<CartSkuModel>());
+            cartModel.GiftCertificateCodes.AddRange(cart.GiftCertificates?.Select(g => g.GiftCertificate.Code) ?? Enumerable.Empty<string>());
             var order = await _orderService.CreatePrototypeAsync((int) OrderType.Normal);
             order.Skus = cart.Skus;
             order.GiftCertificates = cart.GiftCertificates;

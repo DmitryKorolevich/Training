@@ -11,7 +11,7 @@ namespace VitalChoice.Business.Workflow.Trees
     {
         public override async Task<decimal> ExecuteAsync(OrderDataContext dataContext)
         {
-            if (dataContext.Order.Skus.Any())
+            if (dataContext.Order.Skus?.Any() ?? false)
             {
                 var result = await ExecuteAsync<TotalAction>(dataContext);
                 dataContext.Total = result;
