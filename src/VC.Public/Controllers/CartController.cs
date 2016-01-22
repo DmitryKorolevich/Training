@@ -63,7 +63,6 @@ namespace VC.Public.Controllers
 
         public async Task<IActionResult> ViewCart()
         {
-            await AddToCart("FRP012");
             ViewCartModel cartModel;
             var existingUid = GetCartUid();
             if (await CustomerLoggenIn())
