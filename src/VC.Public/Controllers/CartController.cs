@@ -96,6 +96,7 @@ namespace VC.Public.Controllers
                         result.Amount = HasRole(RoleType.Wholesale) ? skuModel.Sku.WholesalePrice : skuModel.Sku.Price;
                         return result;
                     }, (ordered, skuModel) => ordered.Quantity += 1);
+                SetCartUid(cart.CartUid);
                 return await _checkoutService.UpdateCart(cart);
             }
             else
@@ -109,6 +110,7 @@ namespace VC.Public.Controllers
                         result.Amount = skuModel.Sku.Price;
                         return result;
                     }, (ordered, skuModel) => ordered.Quantity += 1);
+                SetCartUid(cart.CartUid);
                 return await _checkoutService.UpdateCart(cart);
             }
         }
@@ -135,6 +137,7 @@ namespace VC.Public.Controllers
                     });
                 await _checkoutService.UpdateCart(cart);
                 await FillModel(model, cart);
+                SetCartUid(cart.CartUid);
                 return model;
             }
             else
@@ -154,6 +157,7 @@ namespace VC.Public.Controllers
                     });
                 await _checkoutService.UpdateCart(cart);
                 await FillModel(model, cart);
+                SetCartUid(cart.CartUid);
                 return model;
             }
         }
@@ -170,11 +174,20 @@ namespace VC.Public.Controllers
             return existingUid;
         }
 
+        private void SetCartUid(Guid uid)
+        {
+            Response.Cookies.Append(CheckoutConstants.CartUidCookieName, uid.ToString(), new CookieOptions
+            {
+                Expires = DateTime.Now.AddYears(1)
+            });
+        }
+
         private async Task<ViewCartModel> GetFromCustomerCart(Guid? existingUid, int idCustomer)
         {
             var cartModel = new ViewCartModel();
             var cart = await _checkoutService.GetOrCreateCart(existingUid, idCustomer);
             await FillModel(cartModel, cart);
+            SetCartUid(cart.CartUid);
             return cartModel;
         }
 
@@ -183,6 +196,7 @@ namespace VC.Public.Controllers
             var cartModel = new ViewCartModel();
             var cart = await _checkoutService.GetOrCreateAnonymCart(existingUid);
             await FillModel(cartModel, cart);
+            SetCartUid(cart.CartUid);
             return cartModel;
         }
 
