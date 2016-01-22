@@ -82,6 +82,8 @@ namespace VC.Public.Controllers
         {
             var existingUid = GetCartUid();
             var sku = await _productService.GetSkuOrderedAsync(skuCode);
+            if (sku == null)
+                return false;
             if (await CustomerLoggenIn())
             {
                 var id = GetInternalCustomerId();
@@ -90,10 +92,10 @@ namespace VC.Public.Controllers
                     ordered => ordered.Sku.Code, skuModel => skuModel.Sku.Code, skuModel =>
                     {
                         var result = _productService.GetSkuOrderedAsync(skuModel.Sku.Code).Result;
-                        result.Quantity = skuModel.Quantity;
+                        result.Quantity = 1;
                         result.Amount = HasRole(RoleType.Wholesale) ? skuModel.Sku.WholesalePrice : skuModel.Sku.Price;
                         return result;
-                    }, (ordered, skuModel) => ordered.Quantity += skuModel.Quantity);
+                    }, (ordered, skuModel) => ordered.Quantity += 1);
                 return await _checkoutService.UpdateCart(cart);
             }
             else
@@ -103,10 +105,10 @@ namespace VC.Public.Controllers
                     skuModel => skuModel.Sku.Code, skuModel =>
                     {
                         var result = _productService.GetSkuOrderedAsync(skuModel.Sku.Code).Result;
-                        result.Quantity = skuModel.Quantity;
+                        result.Quantity = 1;
                         result.Amount = skuModel.Sku.Price;
                         return result;
-                    }, (ordered, skuModel) => ordered.Quantity += skuModel.Quantity);
+                    }, (ordered, skuModel) => ordered.Quantity += 1);
                 return await _checkoutService.UpdateCart(cart);
             }
         }
