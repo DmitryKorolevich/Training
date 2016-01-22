@@ -45,5 +45,5 @@ END
 IF NOT EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'dbo.Carts') AND name = N'IX_CARTUID_UQ')
 BEGIN
 	CREATE UNIQUE INDEX [IX_CARTUID_UQ] ON [dbo].[Carts] (CartUid)
-	CREATE UNIQUE INDEX [IX_CUSTOMERID_UQ] ON [dbo].[Carts] (IdCustomer)
+	CREATE INDEX [IX_CUSTOMERID_UQ] ON [dbo].[Carts] (IdCustomer)
 END
