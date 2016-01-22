@@ -267,6 +267,8 @@ namespace VitalChoice.Business.Services.Products
                     .Include(s => s.Product)
                     .ThenInclude(p => p.ProductsToCategories)
                     .SelectFirstOrDefaultAsync(false);
+            if (sku == null)
+                return null;
             sku.OptionTypes =
                 _mapper.OptionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().CacheCompile()).ToList();
             sku.Product.OptionTypes = sku.OptionTypes;

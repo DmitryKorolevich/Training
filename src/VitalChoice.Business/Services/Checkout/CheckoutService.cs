@@ -170,19 +170,24 @@ namespace VitalChoice.Business.Services.Checkout
                     if (cart == null)
                         return false;
                     cart.IdDiscount = anonymCart.Discount?.Id;
-                    cart.GiftCertificates.MergeKeyed(anonymCart.GiftCertificates, c => c.IdGiftCertificate, co => co.GiftCertificate.Id,
+                    cart.GiftCertificates.MergeUpdateWithDeleteKeyed(anonymCart.GiftCertificates, c => c.IdGiftCertificate,
+                        co => co.GiftCertificate.Id,
                         co => new CartToGiftCertificate
                         {
                             Amount = co.Amount,
                             IdCart = cart.Id,
                             IdGiftCertificate = co.GiftCertificate.Id
-                        });
-                    cart.Skus.MergeKeyed(anonymCart.Skus, s => s.IdSku, so => so.Sku.Id, so => new CartToSku
+                        }, (certificate, order) => certificate.Amount = order.Amount);
+                    cart.Skus.MergeUpdateWithDeleteKeyed(anonymCart.Skus, s => s.IdSku, so => so.Sku.Id, so => new CartToSku
                     {
                         Amount = so.Amount,
                         IdCart = cart.Id,
                         IdSku = so.Sku.Id,
                         Quantity = so.Quantity
+                    }, (sku, ordered) =>
+                    {
+                        sku.Quantity = ordered.Quantity;
+                        sku.Amount = ordered.Amount;
                     });
                     if (cart.IdOrder.HasValue)
                     {

@@ -63,6 +63,7 @@ namespace VC.Public.Controllers
 
         public async Task<IActionResult> ViewCart()
         {
+            await AddToCart("FRP012");
             ViewCartModel cartModel;
             var existingUid = GetCartUid();
             if (await CustomerLoggenIn())
@@ -95,7 +96,8 @@ namespace VC.Public.Controllers
                         result.Quantity = 1;
                         result.Amount = HasRole(RoleType.Wholesale) ? skuModel.Sku.WholesalePrice : skuModel.Sku.Price;
                         return result;
-                    }, (ordered, skuModel) => ordered.Quantity += 1);
+                    }, 
+                    (ordered, skuModel) => ordered.Quantity += 1);
                 SetCartUid(cart.CartUid);
                 return await _checkoutService.UpdateCart(cart);
             }
