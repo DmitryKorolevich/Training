@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Security.Claims;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Identity;
