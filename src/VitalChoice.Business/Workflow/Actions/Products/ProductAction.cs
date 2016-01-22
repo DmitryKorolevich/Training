@@ -17,9 +17,9 @@ namespace VitalChoice.Business.Workflow.Actions.Products
             dataContext.SkuOrdereds = dataContext.Order.Skus.Where(s => s.Quantity > 0).ToList();
             foreach (var sku in dataContext.SkuOrdereds)
             {
-                if (!sku.Sku.Data.DisregardStock)
+                if (!(sku.Sku.SafeData.DisregardStock ?? true))
                 {
-                    if (sku.Sku.Data.Stock < sku.Quantity)
+                    if (sku.Sku.SafeData.Stock < sku.Quantity)
                     {
                         sku.Messages.Add("Out of stock");
                     }
