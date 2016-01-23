@@ -88,7 +88,7 @@ namespace VC.Public.Controllers
             {
                 var id = GetInternalCustomerId();
                 var cart = await _checkoutService.GetOrCreateCart(existingUid, id);
-                cart.Order.Skus.MergeUpdateWithDeleteKeyed(Enumerable.Repeat(sku, 1).ToArray(),
+                cart.Order.Skus.MergeUpdateKeyed(Enumerable.Repeat(sku, 1).ToArray(),
                     ordered => ordered.Sku.Code, skuModel => skuModel.Sku.Code, skuModel =>
                     {
                         var result = _productService.GetSkuOrderedAsync(skuModel.Sku.Code).Result;
@@ -103,7 +103,7 @@ namespace VC.Public.Controllers
             else
             {
                 var cart = await _checkoutService.GetOrCreateAnonymCart(existingUid);
-                cart.Skus.MergeUpdateWithDeleteKeyed(Enumerable.Repeat(sku, 1).ToArray(), ordered => ordered.Sku.Code,
+                cart.Skus.MergeUpdateKeyed(Enumerable.Repeat(sku, 1).ToArray(), ordered => ordered.Sku.Code,
                     skuModel => skuModel.Sku.Code, skuModel =>
                     {
                         var result = _productService.GetSkuOrderedAsync(skuModel.Sku.Code).Result;
