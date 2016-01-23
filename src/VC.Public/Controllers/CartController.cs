@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
+using Newtonsoft.Json;
 using VC.Public.Models.Cart;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
@@ -63,18 +64,14 @@ namespace VC.Public.Controllers
 
         public async Task<IActionResult> ViewCart()
         {
-            ViewCartModel cartModel;
-            var existingUid = GetCartUid();
-            if (await CustomerLoggenIn())
-            {
-                var id = GetInternalCustomerId();
-                cartModel = await GetFromCustomerCart(existingUid, id);
-            }
-            else
-            {
-                cartModel = await GetFromAnonymCart(existingUid);
-            }
-            return View(cartModel);
+	  //      await AddToCart("NCB");
+			//await AddToCart("FRB606");
+
+	        var cartModel = await GetCart();
+
+			ViewBag.InitialData = JsonConvert.SerializeObject(cartModel, Formatting.None);
+
+			return View(cartModel);
         }
 
         [HttpPost]
@@ -163,7 +160,27 @@ namespace VC.Public.Controllers
             }
         }
 
-        private Guid? GetCartUid()
+	    private async Task<ViewCartModel> GetCart()
+	    {
+			ViewCartModel cartModel;
+			var existingUid = GetCartUid();
+			if (await CustomerLoggenIn())
+			{
+				var id = GetInternalCustomerId();
+				cartModel = await GetFromCustomerCart(existingUid, id);
+			}
+			else
+			{
+				cartModel = await GetFromAnonymCart(existingUid);
+			}
+
+			cartModel.GiftCertificateCodes = new List<string>() { string.Empty}; //needed to to force first input to appear
+		    cartModel.ShipAsap = true;
+
+		    return cartModel;
+	    }
+
+	    private Guid? GetCartUid()
         {
             var cartUidString = Request.Cookies[CheckoutConstants.CartUidCookieName];
             Guid? existingUid = null;

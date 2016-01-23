@@ -14,9 +14,7 @@ namespace VC.Public.Models.Cart
 			GiftCertificateCodes = new List<string>();
 	    }
 
-	    public IList<CartSkuModel> Skus { get; set; }
-
-		public bool ShipAsap { get; set; }
+	    public bool ShipAsap { get; set; }
 
 	    public DateTime? ShippingDate { get; set; }
 
@@ -31,5 +29,7 @@ namespace VC.Public.Models.Cart
 	    public string PromoCode { get; set; }
 
 	    public IList<string> GiftCertificateCodes { get; set; }
-    }
+
+		public IList<CartSkuModel> Skus { get; set; }
+	}
 }

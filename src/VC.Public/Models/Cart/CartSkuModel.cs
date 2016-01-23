@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Attributes;
@@ -24,7 +25,8 @@ namespace VC.Public.Models.Cart
 
 	    public decimal? Price { get; set; }
 
-	    public int Quantity { get; set; }
+		[Range(0, int.MaxValue, ErrorMessage = "Quantity must be greater than zero")]
+		public int Quantity { get; set; }
 
 	    public decimal? SubTotal { get; set; }
     }

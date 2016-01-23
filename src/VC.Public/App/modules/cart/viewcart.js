@@ -10,4 +10,34 @@
 
 		jContainer.remove();
 	});
+
+	$("#ShippingDate").datepicker();
+
+	var Cart = function (data) {
+		var self = this;
+
+		self.Model = ko.mapping.fromJSON(data);
+		self.removeSku = function(sku) {
+			self.Model.Skus.remove(sku)
+		};
+
+		ko.computed(function () {
+			return ko.toJSON(self.Model);
+		}).subscribe(function () {
+			alert("atata");
+		});
+	}
+
+	var cartViewModel = new Cart(initialData);
+
+	//cartViewModel.Model.Skus.subscribe(function(newValue) {
+	//	alert("atata");
+	//});
+
+	ko.applyBindings(cartViewModel);
+
 });
+
+function formatCurrency(value) {
+	return "$" + value.toFixed(2);
+}

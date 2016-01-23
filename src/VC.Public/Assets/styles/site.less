@@ -3143,15 +3143,7 @@ footer {
             /*.form-control:focus{
 				.input-control:focus;
 			}*/
-            .field-validation-error {
-                color: red;
-                margin: 5px 0 0 0px;
-                display: block;
-            }
-
-            .input-validation-error {
-                border: 1px solid red;
-            }
+           
 
 			.multiline-checkbox-container{
 				padding-left:25px;
@@ -3176,6 +3168,16 @@ footer {
         }
     }
 }
+
+ .field-validation-error {
+                color: red;
+                margin: 5px 0 0 0px;
+                display: block;
+            }
+
+            .input-validation-error {
+                border: 1px solid red;
+            }
 
 .form-buttons-group {
     margin-top: 15px;
@@ -4895,8 +4897,11 @@ body.view-cart-layout{
 		clear:both;
 		margin-bottom:20px;
 
-		div{
-			clear:both;
+		div {
+			float:right;
+			div{
+				clear:both;
+			}
 		}
 
 		label{
@@ -4921,7 +4926,7 @@ body.view-cart-layout{
 		i.tooltip-l{
 			margin-top:16px;
 			float:left;
-			clear:both;
+			/*clear:both;*/
 			margin-right:10px;
 		}
 	}
