@@ -53,14 +53,14 @@
 			Shipping Instructions:
 		</span>
 		<label class="cart-shipping-option">
-			<input name="rdUpgradeOption" type="radio" data-bind="checked: Model.ShipAsap, checkedValue: true" />
+			<input name="rdUpgradeOption" type="radio" data-bind="checked: Model.ShipAsap, checkedValue: true, event: { change: shipAsapChanged }" />
 			Ship this order as soon as possible
 		</label>
 		<label class="cart-shipping-option">
-			<input name="rdUpgradeOption" type="radio" data-bind="checked: Model.ShipAsap, checkedValue: false"/>
+			<input name="rdUpgradeOption" type="radio" data-bind="checked: Model.ShipAsap, checkedValue: false, event: { change: shipAsapChanged }"/>
 			Ship this order the week of:
 		</label>
-		@Html.TextBoxFor(x => x.ShippingDate, new { @class = "cart-input-box input-control", data_bind = "value: Model.ShippingDate, disable: Model.ShipAsap" })
+		@Html.TextBoxFor(x => x.ShippingDate, new { @class = "cart-input-box input-control date-picker", data_bind = "value: Model.ShippingDate, disable: Model.ShipAsap" })
 		@Html.ValidationMessageFor(x => x.ShippingDate)
 		<a href="#">View our shipping policies</a>
 	</div>
@@ -75,8 +75,7 @@
 			<label>
 				Upgrade Non-Perishable Items
 			</label>
-			<select name="UpgradeOption" class="input-control cart-total-value">
-				<option>None Selected</option>
+			<select id="slUpgradeOption" name="UpgradeOption" class="input-control cart-total-value" data-bind='options: upgradeOptions, optionsText: "Text", optionsValue: "Key",  value: Model.UpgradeOption'>
 			</select>
 		</div>
 		<div class="cart-total-line">
@@ -102,17 +101,17 @@
 				<div>
 					<!-- ko if: $index() == 0 -->
 					<label>Gift Certificate Code</label>
-					<a id="btnAddGc" class="circle-button button-green">
+					<a id="btnAddGc" class="circle-button button-green" data-bind="click: $parent.addGc, visible: $index() == 0">
 						<i class="glyphicon glyphicon-plus-sign"></i>
 					</a>
 					<!-- /ko -->
 					<!-- ko if: $index() != 0 -->
-					<a class="btnRemoveGc circle-button button-red">
+					<a class="btnRemoveGc circle-button button-red" data-bind="click: $parent.removeGc, visible: $index() != 0">
 						<i class="glyphicon glyphicon-minus-sign"></i>
 					</a>
 					<!-- /ko -->
-					@Html.TextBoxFor(x => x.GiftCertificateCodes[0], new {@class = "cart-input-box input-control", data_bind = "value: $data, attr: { name: 'GiftCertificateCodes' + $index(), id: 'GiftCertificateCodes' + $index()}"})
-					@Html.ValidationMessageFor(x => x.GiftCertificateCodes[0], string.Empty, new {data_bind = "attr: { 'data-valmsg-for': 'GiftCertificateCodes' + $index()}"})
+					@Html.TextBoxFor(x => x.GiftCertificateCodes[0].Value, new {@class = "cart-input-box input-control", data_bind = "value: Value, attr: { name: 'GiftCertificateCodes' + $index(), id: 'GiftCertificateCodes' + $index()}" })
+					@Html.ValidationMessageFor(x => x.GiftCertificateCodes[0].Value, string.Empty, new {data_bind = "attr: { 'data-valmsg-for': 'GiftCertificateCodes' + $index()}"})
 				</div>
 			</div>
 		</div>

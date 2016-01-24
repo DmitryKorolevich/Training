@@ -11,7 +11,8 @@ namespace VC.Public.Models.Cart
 	    public ViewCartModel()
 	    {
 		    Skus = new List<CartSkuModel>();
-			GiftCertificateCodes = new List<string>();
+			GiftCertificateCodes = new List<CartGcModel>();
+		    ShipAsap = true;
 	    }
 
 	    public bool ShipAsap { get; set; }
@@ -28,7 +29,7 @@ namespace VC.Public.Models.Cart
 
 	    public string PromoCode { get; set; }
 
-	    public IList<string> GiftCertificateCodes { get; set; }
+	    public IList<CartGcModel> GiftCertificateCodes { get; set; }
 
 		public IList<CartSkuModel> Skus { get; set; }
 	}

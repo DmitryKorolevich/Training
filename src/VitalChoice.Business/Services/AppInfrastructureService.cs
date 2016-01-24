@@ -352,6 +352,11 @@ namespace VitalChoice.Business.Services
                 }).ToList();
             referenceData.ExpiredTypes = LookupHelper.GetExpiredTypes();
             referenceData.DateStatuses = LookupHelper.GetDateStatuses();
+            referenceData.CartShippingOptions = LookupHelper.GetCartShippingOptions().Select(x => new LookupItem<int>
+			{
+				Key = x.Key,
+				Text = x.Value
+			}).ToList();
             referenceData.PromotionBuyTypes = lookupVariantRepository.Query()
                 .Where(x => x.IdLookup == promotionBuyTypes)
                 .Select(false)

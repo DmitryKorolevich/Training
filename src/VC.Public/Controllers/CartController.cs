@@ -27,6 +27,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
+using VitalChoice.Validation.Models;
 
 namespace VC.Public.Controllers
 {
@@ -68,6 +69,8 @@ namespace VC.Public.Controllers
 			//await AddToCart("FRB606");
 
 	        var cartModel = await GetCart();
+
+			cartModel.GiftCertificateCodes.Add(new CartGcModel() { Value = string.Empty} );//needed to to force first input to appear
 
 			ViewBag.InitialData = JsonConvert.SerializeObject(cartModel, Formatting.None);
 
@@ -114,7 +117,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpPost]
-        public async Task<ViewCartModel> UpdateCart(ViewCartModel model)
+        public async Task<Result<ViewCartModel>> UpdateCart([FromBody]ViewCartModel model)
         {
             var existingUid = GetCartUid();
             if (await CustomerLoggenIn())
@@ -128,7 +131,8 @@ namespace VC.Public.Controllers
                     return result;
                 }, (ordered, skuModel) => ordered.Quantity = skuModel.Quantity);
                 cart.Order.Discount = await _discountService.GetByCode(model.PromoCode);
-                cart.Order.GiftCertificates.MergeKeyed(model.GiftCertificateCodes, gc => gc.GiftCertificate.Code, code => code,
+				var gcCodes = model.GiftCertificateCodes.Select(x => x.Value).ToList();
+				cart.Order.GiftCertificates.MergeKeyed(gcCodes, gc => gc.GiftCertificate.Code, code => code,
                     code => new GiftCertificateInOrder
                     {
                         GiftCertificate = _gcService.GetGiftCertificateAsync(code).Result
@@ -148,7 +152,8 @@ namespace VC.Public.Controllers
                     return result;
                 }, (ordered, skuModel) => ordered.Quantity = skuModel.Quantity);
                 cart.Discount = await _discountService.GetByCode(model.PromoCode);
-                cart.GiftCertificates.MergeKeyed(model.GiftCertificateCodes, gc => gc.GiftCertificate.Code, code => code,
+				var gcCodes = model.GiftCertificateCodes.Select(x => x.Value).ToList();
+				cart.GiftCertificates.MergeKeyed(gcCodes, gc => gc.GiftCertificate.Code, code => code,
                     code => new GiftCertificateInOrder
                     {
                         GiftCertificate = _gcService.GetGiftCertificateAsync(code).Result
@@ -174,10 +179,7 @@ namespace VC.Public.Controllers
 				cartModel = await GetFromAnonymCart(existingUid);
 			}
 
-			cartModel.GiftCertificateCodes = new List<string>() { string.Empty}; //needed to to force first input to appear
-		    cartModel.ShipAsap = true;
-
-		    return cartModel;
+			return cartModel;
 	    }
 
 	    private Guid? GetCartUid()
@@ -230,13 +232,14 @@ namespace VC.Public.Controllers
                     result.SubTotal = sku.Quantity * sku.Amount;
                     return result;
                 }));
-            cartModel.GiftCertificateCodes.AddRange(cart.Order.GiftCertificates.Select(g => g.GiftCertificate.Code));
+            cartModel.GiftCertificateCodes.AddRange(cart.Order.GiftCertificates.Select(g => g.GiftCertificate.Code).Select(x=> new CartGcModel() { Value = x}));
             await _orderService.CalculateOrder(cart.Order);
             FillFromOrder(cartModel, cart.Order);
         }
 
         private async Task FillModel(ViewCartModel cartModel, CustomerCart cart)
         {
+	        cartModel.Skus.Clear();
             cartModel.Skus.AddRange(
                 cart.Skus?.Select(sku =>
                 {
@@ -247,7 +250,7 @@ namespace VC.Public.Controllers
                     result.SubTotal = sku.Quantity*sku.Amount;
                     return result;
                 }) ?? Enumerable.Empty<CartSkuModel>());
-            cartModel.GiftCertificateCodes.AddRange(cart.GiftCertificates?.Select(g => g.GiftCertificate.Code) ?? Enumerable.Empty<string>());
+            cartModel.GiftCertificateCodes.AddRange(cart.GiftCertificates?.Select(g => g.GiftCertificate.Code).Select(x => new CartGcModel() { Value = x }) ?? Enumerable.Empty<CartGcModel>());
             var order = await _orderService.CreatePrototypeAsync((int) OrderType.Normal);
             order.Skus = cart.Skus;
             order.GiftCertificates = cart.GiftCertificates;
