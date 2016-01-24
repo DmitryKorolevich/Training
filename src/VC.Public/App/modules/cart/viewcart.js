@@ -16,8 +16,9 @@
 			}
 		};
 		self.addGc = function () {
-			self.refreshing = true;
-			self.Model.GiftCertificateCodes.push({ Value : ""});
+		    self.refreshing = true;
+		    var newGc = { Value: "" };
+		    self.Model.GiftCertificateCodes.push(newGc);
 			self.refreshing = false;
 		};
 		self.shipAsapChanged = function() {

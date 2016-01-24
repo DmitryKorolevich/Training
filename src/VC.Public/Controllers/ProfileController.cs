@@ -18,6 +18,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Ecommerce.Utils;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Help;
@@ -117,10 +118,7 @@ namespace VC.Public.Controllers
             if (creditCards.Any())
             {
                 model = selectedId > 0 ? creditCards.Single(x => x.Id == selectedId) : creditCards.First();
-                ViewBag.CreditCards = JsonConvert.SerializeObject(creditCards, new JsonSerializerSettings()
-                {
-                    StringEscapeHandling = StringEscapeHandling.EscapeHtml
-                });
+                ViewBag.CreditCards = creditCards.ToJson();
             }
             else
             {
@@ -145,7 +143,7 @@ namespace VC.Public.Controllers
             if (shippingAddresses.Any())
             {
                 model = selectedId > 0 ? shippingAddresses.Single(x => x.Id == selectedId) : shippingAddresses.First(x => x.Default);
-                ViewBag.ShippingAddresses = JsonConvert.SerializeObject(shippingAddresses, Formatting.None);
+                ViewBag.ShippingAddresses = shippingAddresses.ToJson();
             }
             else
             {

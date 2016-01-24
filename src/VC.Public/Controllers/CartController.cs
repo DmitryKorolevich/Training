@@ -23,6 +23,7 @@ using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Ecommerce.Utils;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
@@ -65,16 +66,19 @@ namespace VC.Public.Controllers
 
         public async Task<IActionResult> ViewCart()
         {
-	  //      await AddToCart("NCB");
-			//await AddToCart("FRB606");
+            //await AddToCart("NCB");
+            //await AddToCart("FRB606");
 
-	        var cartModel = await GetCart();
+            var cartModel = await GetCart();
 
-			cartModel.GiftCertificateCodes.Add(new CartGcModel() { Value = string.Empty} );//needed to to force first input to appear
+            if (!cartModel.GiftCertificateCodes.Any())
+            {
+                cartModel.GiftCertificateCodes.Add(new CartGcModel() {Value = string.Empty}); //needed to to force first input to appear
+            }
 
-			ViewBag.InitialData = JsonConvert.SerializeObject(cartModel, Formatting.None);
+            ViewBag.InitialData = cartModel.ToJson();
 
-			return View(cartModel);
+            return View(cartModel);
         }
 
         [HttpPost]
