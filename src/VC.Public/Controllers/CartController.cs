@@ -254,6 +254,7 @@ namespace VC.Public.Controllers
             var order = await _orderService.CreatePrototypeAsync((int) OrderType.Normal);
             order.Skus = cart.Skus;
             order.GiftCertificates = cart.GiftCertificates;
+            order.Discount = cart.Discount;
             await _orderService.CalculateOrder(order);
             FillFromOrder(cartModel, order);
         }
