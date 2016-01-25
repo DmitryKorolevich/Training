@@ -1,11 +1,13 @@
-﻿$(function () {
-	var Cart = function (data) {
+﻿var Cart;
+
+$(function () {
+	Cart = function (data) {
 		var self = this;
 
-		self.Model = ko.mapping.fromJSON(data);
+		self.Model = ko.mapping.fromJS(data);
 		self.upgradeOptions = ko.observableArray([]);
 		self.refreshing = true;
-		self.inititalizing = true;
+		self.initializing = true;
 
 		self.removeSku = function(sku) {
 			self.Model.Skus.remove(sku)
@@ -22,31 +24,21 @@
 			self.refreshing = false;
 		};
 		self.shipAsapChanged = function() {
-			if (self.Model.ShipAsap() && !self.inititalizing) {
+			if (self.Model.ShipAsap() && !self.initializing) {
 				$(".date-picker").datepicker('setDate', null);
 				self.Model.ShippingDate(null);
 			}
 		};
+		self.gcLostFocus = function() {
+			recalculateCart(self);
+		};
 		self.submitCart = function() {
 			$("#viewCartForm").validate();
 
-			if ($("#viewCartForm").valid()) {
-				viewModel.refreshing = true;
-
-				$.ajax({
-					url: "/Cart/ViewCart", //todo: post action has to be added
-					dataType: "json",
-					data: ko.toJSON(viewModel.Model),
-					contentType: "application/json; charset=utf-8",
-					type: "POST"
-				}).success(function (result) {
-					window.location.href = "/Checkout/AddUpdateBillingAddress";
-					viewModel.refreshing = false;
-				}).error(function (result) {
-					notifyError();
-					viewModel.refreshing = false;
-				});
-			}
+			recalculateCart(self, function() {
+				window.location.href = "/Checkout/AddUpdateBillingAddress";
+				viewModel.refreshing = false;
+			});
 		};
 
 		ko.computed(function () {
@@ -56,34 +48,14 @@
 		});
 	}
 
-	var cartViewModel = new Cart(initialData);
-
-	ko.applyBindings(cartViewModel);
-
-	getCartShippingOptions(function (result) {
-		if (result.Success) {
-			$.each(result.Data, function (index, el) {
-				cartViewModel.upgradeOptions.push(el);
-			});
-		} else {
-			notifyError(result.Messages[0]);
-		}
-		cartViewModel.refreshing = false;
-		cartViewModel.ininitalizing = false;
-	}, function (errorResult) {
-		notifyError();
-		cartViewModel.refreshing = false;
-		cartViewModel.ininitalizing = false;
-	});
-
-	reparseElementValidators("form#viewCartForm");
+	initCart();
 });
 
 function formatCurrency(value) {
 	return "$" + value.toFixed(2);
 }
 
-function recalculateCart(viewModel) {
+function recalculateCart(viewModel, successCallback) {
 	if (viewModel.refreshing) {
 		return;
 	}
@@ -101,7 +73,11 @@ function recalculateCart(viewModel) {
 			type: "POST"
 		}).success(function (result) {
 			if (result.Success) {
-				ko.mapping.fromJS(result.Data, { 'ignore': ["ShipAsap", "GiftCertificateCodes", "PromoCode", "ShippingDate"] }, viewModel.Model);
+				if (successCallback) {
+					successCallback();
+				} else {
+					ko.mapping.fromJS(result.Data, { 'ignore': ["ShipAsap", "GiftCertificateCodes", "PromoCode", "ShippingDate"] }, viewModel.Model);
+				}
 			} else {
 				notifyError(result.Messages[0]);
 			}
@@ -111,4 +87,32 @@ function recalculateCart(viewModel) {
 			viewModel.refreshing = false;
 		});
 	}
+}
+
+function initCart() {
+	var viewModel;
+
+	$.ajax({
+		url: "/Cart/InitCartModel",
+		dataType: "json",
+		contentType: "application/json; charset=utf-8",
+		type: "GET"
+	}).success(function (result) {
+		if (result.Success) {
+			viewModel = new Cart(result.Data);
+		} else {
+			notifyError(result.Messages[0]);
+		}
+
+		ko.applyBindings(viewModel);
+
+		reparseElementValidators("form#viewCartForm");
+
+		viewModel.refreshing = false;
+		viewModel.initializing = false;
+	}).error(function (result) {
+		notifyError();
+		viewModel.refreshing = false;
+		viewModel.initializing = false;
+	});
 }
