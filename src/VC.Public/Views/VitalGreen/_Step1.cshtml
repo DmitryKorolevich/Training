@@ -2,35 +2,6 @@
 @using VC.Public.Models
 @model VitalGreenRequestModel
 
-@{
-    if (Model != null)
-    {
-        var cookies = Context.Request.Cookies[VC.Public.Controllers.VitalGreenController.VITAL_GREEN_COOKIE_NAME];
-        VitalGreenRequestModel model = null;
-        if (!String.IsNullOrEmpty(cookies))
-        {
-            try
-            {
-                cookies = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(cookies));
-                model = Newtonsoft.Json.JsonConvert.DeserializeObject<VitalGreenRequestModel>(cookies);
-                Model.FirstName = model.FirstName;
-                Model.LastName = model.LastName;
-                Model.Address = model.Address;
-                Model.Address2 = model.Address2;
-                Model.City = model.City;
-                Model.StateCode = model.StateCode;
-                Model.Zip = model.Zip;
-                Model.Email = model.Email;
-                Model.Phone = model.Phone;
-            }
-            catch (Exception e)
-            {
-                Context.Response.Cookies.Delete(VC.Public.Controllers.VitalGreenController.VITAL_GREEN_COOKIE_NAME);
-            }
-        }
-    }
-}
-
 <div class="content-ajax-form-wrapper">
     <div id="vitalGreenWrapperInner">
         <form asp-controller="VitalGreen" asp-action="Step1" data-ajax-success="vitalGreenStep1SubmitSuccess" data-ajax-failure="ajaxFormSubmitError" data-ajax="true" data-method="post" data-ajax-mode="replace" data-ajax-update="#vitalGreenWrapperInner" class="form-regular medium-small content-ajax-form">

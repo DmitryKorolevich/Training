@@ -5,13 +5,18 @@
 @model VC.Public.Models.Cart.ViewCartModel
 
 @section PageScripts {
+	<script src="@Url.Content("/app/common/dataAccess.js")"></script>
 	<script src="@Url.Content("/app/modules/cart/viewcart.js")"></script>
-<script src="@Url.Content("/app/modules/checkout/checkoutMain.js")"></script>
+	<script src="@Url.Content("/app/modules/checkout/checkoutMain.js")"></script>
 }
 
 @section Meta {
 	<title>Wild Seafood & Organics - Vital Choice</title>
 }
+
+<script>
+	var initialData = '@Html.Raw(ViewBag.InitialData)';
+</script>
 
 <div class="cart-content-top">
 	<span class="cart-head-text">IMPORTANT NOTICE</span>
@@ -36,7 +41,7 @@
 		</div>
 		<span>Please review your purchases and quantities, then click the Checkout button.</span>
 	</div>
-	@using (Html.BeginForm("ViewCart", "Cart", null, FormMethod.Post, new { @class = "form-cart", role = "form" }))
+	@using (Html.BeginForm("UpdateCart", "Cart", null, FormMethod.Post, new { @class = "form-cart", role = "form", @id="viewCartForm", data_bind = "submit: submitCart" }))
 	{
 		<div class="cart-certificates-container">
 			<a name="trustlink" href="http://secure.trust-guard.com/certificates/5867" target="_blank"

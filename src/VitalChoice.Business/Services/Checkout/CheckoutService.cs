@@ -21,6 +21,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Interfaces.Services.Customers;
+using VitalChoice.Interfaces.Services.Orders;
 
 namespace VitalChoice.Business.Services.Checkout
 {
@@ -30,14 +31,14 @@ namespace VitalChoice.Business.Services.Checkout
         private readonly DiscountMapper _discountMapper;
         private readonly SkuMapper _skuMapper;
         private readonly ProductMapper _productMapper;
-        private readonly OrderService _orderService;
+        private readonly IOrderService _orderService;
         private readonly EcommerceContext _context;
         private readonly ICustomerService _customerService;
         private readonly ILogger _logger;
 
         public CheckoutService(IEcommerceRepositoryAsync<Cart> cartRepository,
             DiscountMapper discountMapper,
-            SkuMapper skuMapper, ProductMapper productMapper, OrderService orderService, EcommerceContext context, ILoggerProviderExtended loggerProvider, ICustomerService customerService)
+            SkuMapper skuMapper, ProductMapper productMapper, IOrderService orderService, EcommerceContext context, ILoggerProviderExtended loggerProvider, ICustomerService customerService)
         {
             _cartRepository = cartRepository;
             _discountMapper = discountMapper;
@@ -70,7 +71,6 @@ namespace VitalChoice.Business.Services.Checkout
             {
                 cart = await CreateNew();
             }
-
             return new CustomerCart
             {
                 CartUid = cart.CartUid,
@@ -80,13 +80,13 @@ namespace VitalChoice.Business.Services.Checkout
                     GiftCertificate = g.GiftCertificate
                 }).ToList(),
                 Discount = await _discountMapper.FromEntityAsync(cart.Discount, true),
-                Skus = await Task.WhenAll(cart.Skus?.Select(async s => new SkuOrdered
+                Skus = cart.Skus?.Select(s => new SkuOrdered
                 {
                     Amount = s.Amount,
-                    Sku = await _skuMapper.FromEntityAsync(s.Sku, true),
-                    ProductWithoutSkus = await _productMapper.FromEntityAsync(s.Sku.Product, true),
+                    Sku = _skuMapper.FromEntity(s.Sku, true),
+                    ProductWithoutSkus = _productMapper.FromEntity(s.Sku.Product, true),
                     Quantity = s.Quantity
-                }))
+                }).ToList()
             };
         }
 
@@ -170,19 +170,24 @@ namespace VitalChoice.Business.Services.Checkout
                     if (cart == null)
                         return false;
                     cart.IdDiscount = anonymCart.Discount?.Id;
-                    cart.GiftCertificates.MergeKeyed(anonymCart.GiftCertificates, c => c.IdGiftCertificate, co => co.GiftCertificate.Id,
+                    cart.GiftCertificates.MergeUpdateWithDeleteKeyed(anonymCart.GiftCertificates, c => c.IdGiftCertificate,
+                        co => co.GiftCertificate.Id,
                         co => new CartToGiftCertificate
                         {
                             Amount = co.Amount,
                             IdCart = cart.Id,
                             IdGiftCertificate = co.GiftCertificate.Id
-                        });
-                    cart.Skus.MergeKeyed(anonymCart.Skus, s => s.IdSku, so => so.Sku.Id, so => new CartToSku
+                        }, (certificate, order) => certificate.Amount = order.Amount);
+                    cart.Skus.MergeUpdateWithDeleteKeyed(anonymCart.Skus, s => s.IdSku, so => so.Sku.Id, so => new CartToSku
                     {
                         Amount = so.Amount,
                         IdCart = cart.Id,
                         IdSku = so.Sku.Id,
                         Quantity = so.Quantity
+                    }, (sku, ordered) =>
+                    {
+                        sku.Quantity = ordered.Quantity;
+                        sku.Amount = ordered.Amount;
                     });
                     if (cart.IdOrder.HasValue)
                     {

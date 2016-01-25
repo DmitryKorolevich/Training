@@ -27,3 +27,18 @@ function getCreditCardTypes(successCallback, errorCallback) {
 		}
 	});
 }
+
+function getCartShippingOptions(successCallback, errorCallback) {
+	$.ajax({
+		url: "/Lookup/GetCartShippingOptions",
+		dataType: "json"
+	}).success(function (result) {
+		if (successCallback) {
+			successCallback(result);
+		}
+	}).error(function (result) {
+		if (errorCallback) {
+			errorCallback(result);
+		}
+	});
+}

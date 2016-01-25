@@ -10,6 +10,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Promotion;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Entities.Help;
 using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 
 namespace VitalChoice.Business.Helpers
 {
@@ -433,5 +434,17 @@ namespace VitalChoice.Business.Helpers
             };
             return toReturn;
         }
-    }
+
+		public static Dictionary<int, string> GetCartShippingOptions()
+		{
+			Dictionary<int, string> toReturn = new Dictionary<int, string>
+			{
+				{(int) ShippingUpgrade.None, "Not Selected"},
+				{(int) ShippingUpgrade.OvernightP, "Overnight"},
+				{(int) ShippingUpgrade.OvernightNp, "Overnight - Add $25.00"},
+				{(int) ShippingUpgrade.SecondDayNp, "2 Day - Add $14.40"}
+			};
+			return toReturn;
+		}
+	}
 }

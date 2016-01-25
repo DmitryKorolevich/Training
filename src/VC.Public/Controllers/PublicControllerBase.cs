@@ -46,6 +46,14 @@ namespace VC.Public.Controllers
             return false;
         }
 
+        protected bool HasRole(RoleType role)
+        {
+            if (role != RoleType.Retail && role != RoleType.Wholesale)
+                return false;
+            var context = ContextAccessor.HttpContext;
+            return InfrastructureService.HasRole(context.User, role);
+        }
+
         protected int GetInternalCustomerId()
         {
             var context = ContextAccessor.HttpContext;

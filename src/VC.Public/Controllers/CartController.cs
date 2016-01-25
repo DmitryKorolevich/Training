@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
+using Newtonsoft.Json;
 using VC.Public.Models.Cart;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
@@ -22,9 +23,12 @@ using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Ecommerce.Utils;
+using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
+using VitalChoice.Validation.Models;
 
 namespace VC.Public.Controllers
 {
@@ -62,22 +66,62 @@ namespace VC.Public.Controllers
 
         public async Task<IActionResult> ViewCart()
         {
-            ViewCartModel cartModel;
-            var existingUid = GetCartUid();
-            if (await CustomerLoggenIn())
+            //await AddToCart("NCB");
+            //await AddToCart("FRB606");
+
+            var cartModel = await GetCart();
+
+            if (!cartModel.GiftCertificateCodes.Any())
             {
-                var id = GetInternalCustomerId();
-                cartModel = await GetFromCustomerCart(existingUid, id);
+                cartModel.GiftCertificateCodes.Add(new CartGcModel() {Value = string.Empty}); //needed to to force first input to appear
             }
-            else
-            {
-                cartModel = await GetFromAnonymCart(existingUid);
-            }
+
+            ViewBag.InitialData = cartModel.ToJson();
+
             return View(cartModel);
         }
 
         [HttpPost]
-        public async Task<ViewCartModel> UpdateCart(ViewCartModel model)
+        public async Task<bool> AddToCart(string skuCode)
+        {
+            var existingUid = GetCartUid();
+            var sku = await _productService.GetSkuOrderedAsync(skuCode);
+            if (sku == null)
+                return false;
+            if (await CustomerLoggenIn())
+            {
+                var id = GetInternalCustomerId();
+                var cart = await _checkoutService.GetOrCreateCart(existingUid, id);
+                cart.Order.Skus.MergeUpdateKeyed(Enumerable.Repeat(sku, 1).ToArray(),
+                    ordered => ordered.Sku.Code, skuModel => skuModel.Sku.Code, skuModel =>
+                    {
+                        var result = _productService.GetSkuOrderedAsync(skuModel.Sku.Code).Result;
+                        result.Quantity = 1;
+                        result.Amount = HasRole(RoleType.Wholesale) ? skuModel.Sku.WholesalePrice : skuModel.Sku.Price;
+                        return result;
+                    }, 
+                    (ordered, skuModel) => ordered.Quantity += 1);
+                SetCartUid(cart.CartUid);
+                return await _checkoutService.UpdateCart(cart);
+            }
+            else
+            {
+                var cart = await _checkoutService.GetOrCreateAnonymCart(existingUid);
+                cart.Skus.MergeUpdateKeyed(Enumerable.Repeat(sku, 1).ToArray(), ordered => ordered.Sku.Code,
+                    skuModel => skuModel.Sku.Code, skuModel =>
+                    {
+                        var result = _productService.GetSkuOrderedAsync(skuModel.Sku.Code).Result;
+                        result.Quantity = 1;
+                        result.Amount = skuModel.Sku.Price;
+                        return result;
+                    }, (ordered, skuModel) => ordered.Quantity += 1);
+                SetCartUid(cart.CartUid);
+                return await _checkoutService.UpdateCart(cart);
+            }
+        }
+
+        [HttpPost]
+        public async Task<Result<ViewCartModel>> UpdateCart([FromBody]ViewCartModel model)
         {
             var existingUid = GetCartUid();
             if (await CustomerLoggenIn())
@@ -91,13 +135,15 @@ namespace VC.Public.Controllers
                     return result;
                 }, (ordered, skuModel) => ordered.Quantity = skuModel.Quantity);
                 cart.Order.Discount = await _discountService.GetByCode(model.PromoCode);
-                cart.Order.GiftCertificates.MergeKeyed(model.GiftCertificateCodes, gc => gc.GiftCertificate.Code, code => code,
+				var gcCodes = model.GiftCertificateCodes.Select(x => x.Value).ToList();
+				cart.Order.GiftCertificates.MergeKeyed(gcCodes, gc => gc.GiftCertificate.Code, code => code,
                     code => new GiftCertificateInOrder
                     {
                         GiftCertificate = _gcService.GetGiftCertificateAsync(code).Result
                     });
                 await _checkoutService.UpdateCart(cart);
                 await FillModel(model, cart);
+                SetCartUid(cart.CartUid);
                 return model;
             }
             else
@@ -110,18 +156,37 @@ namespace VC.Public.Controllers
                     return result;
                 }, (ordered, skuModel) => ordered.Quantity = skuModel.Quantity);
                 cart.Discount = await _discountService.GetByCode(model.PromoCode);
-                cart.GiftCertificates.MergeKeyed(model.GiftCertificateCodes, gc => gc.GiftCertificate.Code, code => code,
+				var gcCodes = model.GiftCertificateCodes.Select(x => x.Value).ToList();
+				cart.GiftCertificates.MergeKeyed(gcCodes, gc => gc.GiftCertificate.Code, code => code,
                     code => new GiftCertificateInOrder
                     {
                         GiftCertificate = _gcService.GetGiftCertificateAsync(code).Result
                     });
                 await _checkoutService.UpdateCart(cart);
                 await FillModel(model, cart);
+                SetCartUid(cart.CartUid);
                 return model;
             }
         }
 
-        private Guid? GetCartUid()
+	    private async Task<ViewCartModel> GetCart()
+	    {
+			ViewCartModel cartModel;
+			var existingUid = GetCartUid();
+			if (await CustomerLoggenIn())
+			{
+				var id = GetInternalCustomerId();
+				cartModel = await GetFromCustomerCart(existingUid, id);
+			}
+			else
+			{
+				cartModel = await GetFromAnonymCart(existingUid);
+			}
+
+			return cartModel;
+	    }
+
+	    private Guid? GetCartUid()
         {
             var cartUidString = Request.Cookies[CheckoutConstants.CartUidCookieName];
             Guid? existingUid = null;
@@ -133,11 +198,20 @@ namespace VC.Public.Controllers
             return existingUid;
         }
 
+        private void SetCartUid(Guid uid)
+        {
+            Response.Cookies.Append(CheckoutConstants.CartUidCookieName, uid.ToString(), new CookieOptions
+            {
+                Expires = DateTime.Now.AddYears(1)
+            });
+        }
+
         private async Task<ViewCartModel> GetFromCustomerCart(Guid? existingUid, int idCustomer)
         {
             var cartModel = new ViewCartModel();
             var cart = await _checkoutService.GetOrCreateCart(existingUid, idCustomer);
             await FillModel(cartModel, cart);
+            SetCartUid(cart.CartUid);
             return cartModel;
         }
 
@@ -146,6 +220,7 @@ namespace VC.Public.Controllers
             var cartModel = new ViewCartModel();
             var cart = await _checkoutService.GetOrCreateAnonymCart(existingUid);
             await FillModel(cartModel, cart);
+            SetCartUid(cart.CartUid);
             return cartModel;
         }
 
@@ -161,15 +236,16 @@ namespace VC.Public.Controllers
                     result.SubTotal = sku.Quantity * sku.Amount;
                     return result;
                 }));
-            cartModel.GiftCertificateCodes.AddRange(cart.Order.GiftCertificates.Select(g => g.GiftCertificate.Code));
+            cartModel.GiftCertificateCodes.AddRange(cart.Order.GiftCertificates.Select(g => g.GiftCertificate.Code).Select(x=> new CartGcModel() { Value = x}));
             await _orderService.CalculateOrder(cart.Order);
             FillFromOrder(cartModel, cart.Order);
         }
 
         private async Task FillModel(ViewCartModel cartModel, CustomerCart cart)
         {
+	        cartModel.Skus.Clear();
             cartModel.Skus.AddRange(
-                cart.Skus.Select(sku =>
+                cart.Skus?.Select(sku =>
                 {
                     var result = _skuMapper.ToModel<CartSkuModel>(sku.Sku);
                     _productMapper.UpdateModel(result, sku.ProductWithoutSkus);
@@ -177,11 +253,12 @@ namespace VC.Public.Controllers
                     result.Quantity = sku.Quantity;
                     result.SubTotal = sku.Quantity*sku.Amount;
                     return result;
-                }));
-            cartModel.GiftCertificateCodes.AddRange(cart.GiftCertificates.Select(g => g.GiftCertificate.Code));
+                }) ?? Enumerable.Empty<CartSkuModel>());
+            cartModel.GiftCertificateCodes.AddRange(cart.GiftCertificates?.Select(g => g.GiftCertificate.Code).Select(x => new CartGcModel() { Value = x }) ?? Enumerable.Empty<CartGcModel>());
             var order = await _orderService.CreatePrototypeAsync((int) OrderType.Normal);
             order.Skus = cart.Skus;
             order.GiftCertificates = cart.GiftCertificates;
+            order.Discount = cart.Discount;
             await _orderService.CalculateOrder(order);
             FillFromOrder(cartModel, order);
         }

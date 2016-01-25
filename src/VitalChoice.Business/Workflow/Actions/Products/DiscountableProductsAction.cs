@@ -23,7 +23,7 @@ namespace VitalChoice.Business.Workflow.Actions.Products
             {
                 if (dataContext.Order.Discount.ExcludeCategories)
                 {
-                    if (dataContext.Order.Discount.CategoryIds.Any())
+                    if (dataContext.Order.Discount.CategoryIds?.Any() ?? false)
                     {
                         HashSet<int> categories = new HashSet<int>(dataContext.Order.Discount.CategoryIds);
                         var excludedSkus =
@@ -40,7 +40,7 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                 }
                 else
                 {
-                    if (dataContext.Order.Discount.CategoryIds.Any())
+                    if (dataContext.Order.Discount.CategoryIds?.Any() ?? false)
                     {
                         HashSet<int> categories = new HashSet<int>(dataContext.Order.Discount.CategoryIds);
                         var excludedSkus =
@@ -57,7 +57,7 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                 }
                 if (dataContext.Order.Discount.ExcludeSkus)
                 {
-                    if (dataContext.Order.Discount.SkusFilter.Any())
+                    if (dataContext.Order.Discount.SkusFilter?.Any() ?? false)
                     {
                         HashSet<int> filteredSkus =
                             new HashSet<int>(dataContext.Order.Discount.SkusFilter.Select(s => s.IdSku));
@@ -75,7 +75,7 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                 }
                 else
                 {
-                    if (dataContext.Order.Discount.SkusFilter.Any())
+                    if (dataContext.Order.Discount.SkusFilter?.Any() ?? false)
                     {
                         HashSet<int> filteredSkus =
                             new HashSet<int>(dataContext.Order.Discount.SkusFilter.Select(s => s.IdSku));
@@ -91,10 +91,10 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                         }
                     }
                 }
-                if (dataContext.Order.Discount.SkusAppliedOnlyTo.Any())
+                if (dataContext.Order.Discount.SkusAppliedOnlyTo?.Any() ?? false)
                 {
                     var selectedSkus = skus.IntersectKeyedWith(dataContext.Order.Discount.SkusAppliedOnlyTo, sku => sku.Sku.Id,
-                        selectedSku => selectedSku.IdSku);
+                        selectedSku => selectedSku.IdSku).ToArray();
                     if (!selectedSkus.Any())
                     {
                         dataContext.Messages.Add(new MessageInfo
@@ -106,7 +106,7 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                     skus = selectedSkus;
                 }
             }
-            return Task.FromResult(skus.Where(s => !s.Sku.Data.NonDiscountable).Sum(s => s.Amount*s.Quantity));
+            return Task.FromResult(skus.Where(s => !((bool?)s.Sku.SafeData.NonDiscountable ?? false)).Sum(s => s.Amount*s.Quantity));
         }
     }
 }

@@ -1,57 +1,50 @@
 ﻿@model VC.Public.Models.Cart.ViewCartModel
-
 <table class="standard-table cart-items-list">
 	<thead>
-		<tr>
-			<th colspan="2">
-				Item
-			</th>
-			<th>
-				Price
-			</th>
-			<th>
-				Quantity
-			</th>
-			<th>
-				Subtotal
-			</th>
-			<th>
-			</th>
-		</tr>
+	<tr>
+		<th colspan="2">
+			Item
+		</th>
+		<th>
+			Price
+		</th>
+		<th>
+			Quantity
+		</th>
+		<th>
+			Subtotal
+		</th>
+		<th>
+		</th>
+	</tr>
 	</thead>
-	<tbody>
-		@if (Model.Skus.Any())
-			{
-				for (int i = 0; i < Model.Skus.Count; i++)
-				{
-				<tr>
-					<td class="cart-image-link">
-						<a href="@Model.Skus[i].ProductPageUrl">
-							<img src="@Model.Skus[i].IconUrl" />
-						</a>
-					</td>
-					<td class="cart-line-info">
-						<a class="cart-text-link" href="@Model.Skus[i].ProductPageUrl">
-							@Model.Skus[i].DisplayName
-						</a>
-						<span class="cart-sku-code">(@Model.Skus[i].Code)</span>
-						<span class="stock-presence-note">@(Model.Skus[i].InStock ? "In Stock Ready to Ship" : "Not in Stock")</span>
-					</td>
-					<td>@(Model.Skus[i].Price.HasValue ? Model.Skus[i].Price.Value.ToString("C2") : string.Empty)</td>
-					<td>@Html.TextBoxFor(x => Model.Skus[i].Quantity, new { @class = "input-control width-small" })</td>
-					<td>@(Model.Skus[i].SubTotal.HasValue ? Model.Skus[i].SubTotal.Value.ToString("C2") : string.Empty)</td>
-					<td class="grid-controls-container">
-						<a class="circle-button button-red">
-							<i class="glyphicon glyphicon-remove-sign"></i>
-						</a>
-					</td>
-				</tr>
-				}
-			}
-			else
-			{
-			<tr><td colspan="6">No Items Added</td></tr>
-			}
+	<tbody data-bind="if: Model.Skus().length == 0">
+		<tr><td colspan="6">No Items Added</td></tr>
+	</tbody>
+	<tbody data-bind="foreach:Model.Skus">
+		<tr>
+			<td class="cart-image-link">
+				<a data-bind="attr: { href: ProductPageUrl, title: DisplayName }">
+					<img data-bind="attr: { src: IconUrl, title: DisplayName }"/>
+				</a>
+			</td>
+			<td class="cart-line-info">
+				<a class="cart-text-link" data-bind="attr: { href: ProductPageUrl, title: DisplayName }, text: DisplayName"></a>
+				<span class="cart-sku-code" data-bind="text: Code"></span>
+				<span class="stock-presence-note" data-bind="text: InStock() ? 'In Stock Ready to Ship' : 'Not in Stock'"></span>
+			</td>
+			<td data-bind="text: Price() ? formatCurrency(Price()) : ''"></td>
+			<td>
+				@Html.TextBoxFor(x => x.Skus[0].Quantity, new {@class = "input-control width-small", data_bind = "value: Quantity, attr: { name: 'SkusQuantity' + $index(), id: 'SkusQuantity' + $index()}" })
+				@Html.ValidationMessageFor(x => x.Skus[0].Quantity, string.Empty, new { data_bind = "attr: { 'data-valmsg-for': 'SkusQuantity' + $index()}" })
+			</td>
+			<td data-bind="text: SubTotal() ? formatCurrency(SubTotal()) : ''"></td>
+			<td class="grid-controls-container">
+				<a class="circle-button button-red" data-bind="click: $parent.removeSku">
+					<i class="glyphicon glyphicon-remove-sign"></i>
+				</a>
+			</td>
+		</tr>
 	</tbody>
 </table>
 <div class="cart-order-details">
@@ -60,14 +53,15 @@
 			Shipping Instructions:
 		</span>
 		<label class="cart-shipping-option">
-			<input name="rdUpgradeOption" type="radio" />
+			<input name="rdUpgradeOption" type="radio" data-bind="checked: Model.ShipAsap, checkedValue: true, event: { change: shipAsapChanged }" />
 			Ship this order as soon as possible
 		</label>
 		<label class="cart-shipping-option">
-			<input name="rdUpgradeOption" type="radio" />
+			<input name="rdUpgradeOption" type="radio" data-bind="checked: Model.ShipAsap, checkedValue: false, event: { change: shipAsapChanged }"/>
 			Ship this order the week of:
 		</label>
-		@Html.TextBoxFor(x => x.ShippingDate, new { @class = "cart-input-box input-control" })
+		@Html.TextBoxFor(x => x.ShippingDate, new { @class = "cart-input-box input-control date-picker", data_bind = "value: Model.ShippingDate, disable: Model.ShipAsap" })
+		@Html.ValidationMessageFor(x => x.ShippingDate)
 		<a href="#">View our shipping policies</a>
 	</div>
 	<div class="cart-order-totals">
@@ -75,60 +69,51 @@
 			<label>
 				Subtotal
 			</label>
-			<label class="cart-total-value">
-				@Model.SubTotal.ToString("C2")
-			</label>
+			<label class="cart-total-value" data-bind="text: Model.SubTotal() ? formatCurrency(Model.SubTotal()) : ''"></label>
 		</div>
 		<div class="cart-total-line">
 			<label>
 				Upgrade Non-Perishable Items
 			</label>
-			<select name="UpgradeOption" class="input-control cart-total-value">
-				<option>None Selected</option>
+			<select id="slUpgradeOption" name="UpgradeOption" class="input-control cart-total-value" data-bind='options: upgradeOptions, optionsText: "Text", optionsValue: "Key",  value: Model.UpgradeOption'>
 			</select>
 		</div>
 		<div class="cart-total-line">
 			<label>
 				Shipping
 			</label>
-			<label class="cart-total-value">
-				@(Model.ShippingCost.HasValue ? Model.ShippingCost.Value.ToString("C2") : "FREE!")
-			</label>
+			<label class="cart-total-value" data-bind="text: Model.ShippingCost() ? formatCurrency(Model.ShippingCost()) : 'FREE!'"></label>
 		</div>
 		<div class="cart-total-line cart-order-summary">
 			<label>
 				Order Total
 			</label>
-			<label class="cart-total-value">
-				@Model.OrderTotal.ToString("C2")
-			</label>
+			<label class="cart-total-value" data-bind="text: Model.OrderTotal() ? formatCurrency(Model.OrderTotal()) : ''"></label>
 		</div>
 		<div class="cart-promo-container">
 			<i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Promo Code" data-tooltip-body="If you have a discount code, enter it in the box to see the change in your order's total."></i>
 			<label>Promo Code</label>
-			@Html.TextBoxFor(x => x.PromoCode, new { @class = "cart-input-box input-control" })
+			@Html.TextBoxFor(x => x.PromoCode, new {@class = "cart-input-box input-control", data_bind = "value: Model.PromoCode" })
 		</div>
 		<div id="divGcContainer" class="cart-gc-container">
-			@for (int i = 0; i < Model.GiftCertificateCodes.Count; i++)
-			{
+			<i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Gift Certificate Code" data-tooltip-body="If you have a gift certificate code, enter it in the box to see the change in your order's total."></i>
+			<div data-bind="foreach:Model.GiftCertificateCodes">
 				<div>
-					@if (i == 0)
-					{
-						<i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Gift Certificate Code" data-tooltip-body="If you have a gift certificate code, enter it in the box to see the change in your order's total."></i>
-								<label>Gift Certificate Code</label>
-								<a id="btnAddGc" class="circle-button button-green">
-									<i class="glyphicon glyphicon-plus-sign"></i>
-								</a>
-					}
-					else
-					{
-						<a class="btnRemoveGc circle-button button-red">
-							<i class="glyphicon glyphicon-minus-sign"></i>
-						</a>
-					}
-					@Html.TextBoxFor(x => Model.GiftCertificateCodes[i], new { @class = "cart-input-box input-control" })
+					<!-- ko if: $index() == 0 -->
+					<label>Gift Certificate Code</label>
+					<a id="btnAddGc" class="circle-button button-green" data-bind="click: $parent.addGc, visible: $index() == 0">
+						<i class="glyphicon glyphicon-plus-sign"></i>
+					</a>
+					<!-- /ko -->
+					<!-- ko if: $index() != 0 -->
+					<a class="btnRemoveGc circle-button button-red" data-bind="click: $parent.removeGc, visible: $index() != 0">
+						<i class="glyphicon glyphicon-minus-sign"></i>
+					</a>
+					<!-- /ko -->
+					@Html.TextBoxFor(x => x.GiftCertificateCodes[0].Value, new {@class = "cart-input-box input-control", data_bind = "value: Value, attr: { name: 'GiftCertificateCodes' + $index(), id: 'GiftCertificateCodes' + $index()}" })
+					@Html.ValidationMessageFor(x => x.GiftCertificateCodes[0].Value, string.Empty, new {data_bind = "attr: { 'data-valmsg-for': 'GiftCertificateCodes' + $index()}"})
 				</div>
-			}
+			</div>
 		</div>
 	</div>
 </div>

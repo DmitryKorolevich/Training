@@ -129,7 +129,7 @@ namespace VC.Public.Controllers
 						InStock = true
 					}
 				},
-				GiftCertificateCodes = new List<string>() {""},
+				GiftCertificateCodes = new List<CartGcModel>() { new CartGcModel() { Value = string.Empty} },
 				OrderTotal = 169,
 				ShipAsap = true,
 				ShippingCost = 0,

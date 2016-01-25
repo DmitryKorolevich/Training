@@ -18,6 +18,8 @@ using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using System.IO;
 using Microsoft.AspNet.Mvc.ViewEngines;
 using Microsoft.AspNet.Mvc.ViewFeatures;
+using VitalChoice.Ecommerce.Utils;
+using System.Text;
 
 namespace VC.Public.Controllers
 {
@@ -51,20 +53,44 @@ namespace VC.Public.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Step1(VitalGreenRequestModel model)
+        public Task<IActionResult> Step1(VitalGreenRequestModel model)
         {
+            string cookies;
             if (!Validate(model))
             {
-                return View(model);
+                cookies = Request.Cookies[VITAL_GREEN_COOKIE_NAME];
+                if (!string.IsNullOrEmpty(cookies))
+                {
+                    try
+                    {
+                        cookies = Encoding.UTF8.GetString(Convert.FromBase64String(cookies));
+                        var deserialized = cookies.FromJson<VitalGreenRequestModel>();
+                        model.FirstName = deserialized.FirstName;
+                        model.LastName = deserialized.LastName;
+                        model.Address = deserialized.Address;
+                        model.Address2 = deserialized.Address2;
+                        model.City = deserialized.City;
+                        model.StateCode = deserialized.StateCode;
+                        model.Zip = deserialized.Zip;
+                        model.Email = deserialized.Email;
+                        model.Phone = deserialized.Phone;
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError(e.Message, e);
+                        Response.Cookies.Delete(VITAL_GREEN_COOKIE_NAME);
+                    }
+                }
+                return Task.FromResult<IActionResult>(View(model));
             }
 
-            var cookies = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(model)));
+            cookies = Convert.ToBase64String(Encoding.UTF8.GetBytes(model.ToJson()));
             Response.Cookies.Append(VITAL_GREEN_COOKIE_NAME, cookies, new CookieOptions()
             {
                 Expires = DateTime.Now.AddHours(VITAL_GREEN_COOKIE_EXPIRED_HOURS),
             });
 
-            return RedirectToAction("ShipTo");
+            return Task.FromResult<IActionResult>(RedirectToAction("ShipTo"));
         }
 
         [HttpGet]
@@ -152,7 +178,7 @@ namespace VC.Public.Controllers
                 try
                 {
                     cookies = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(cookies));
-                    model = JsonConvert.DeserializeObject<VitalGreenRequestModel>(cookies);
+                    model = ((string) cookies).FromJson<VitalGreenRequestModel>();
                 }
                 catch (Exception e)
                 {

@@ -11,12 +11,11 @@ namespace VC.Public.Models.Cart
 	    public ViewCartModel()
 	    {
 		    Skus = new List<CartSkuModel>();
-			GiftCertificateCodes = new List<string>();
+			GiftCertificateCodes = new List<CartGcModel>();
+		    ShipAsap = true;
 	    }
 
-	    public IList<CartSkuModel> Skus { get; set; }
-
-		public bool ShipAsap { get; set; }
+	    public bool ShipAsap { get; set; }
 
 	    public DateTime? ShippingDate { get; set; }
 
@@ -30,6 +29,8 @@ namespace VC.Public.Models.Cart
 
 	    public string PromoCode { get; set; }
 
-	    public IList<string> GiftCertificateCodes { get; set; }
-    }
+	    public IList<CartGcModel> GiftCertificateCodes { get; set; }
+
+		public IList<CartSkuModel> Skus { get; set; }
+	}
 }
