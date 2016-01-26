@@ -66,7 +66,7 @@ namespace VC.Public.Controllers
             _gcService = gcService;
         }
 
-		[HttpGet]
+	    [HttpGet]
 	    public async Task<Result<ViewCartModel>> InitCartModel()
 	    {
 			return await InitCartModelInternal();
@@ -74,10 +74,7 @@ namespace VC.Public.Controllers
 
 	    public async Task<IActionResult> ViewCart()
         {
-			//await AddToCart("NCB");
-			//await AddToCart("FRB606");
-
-		    var cartModel = await InitCartModelInternal();
+			var cartModel = await InitCartModelInternal();
 
             return View(cartModel);
         }
