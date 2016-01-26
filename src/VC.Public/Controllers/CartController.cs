@@ -23,6 +23,7 @@ using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Ecommerce.Utils;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
@@ -64,19 +65,18 @@ namespace VC.Public.Controllers
             _gcService = gcService;
         }
 
-        public async Task<IActionResult> ViewCart()
+		[HttpGet]
+	    public async Task<Result<ViewCartModel>> InitCartModel()
+	    {
+			return await InitCartModelInternal();
+	    }
+
+	    public async Task<IActionResult> ViewCart()
         {
-            //await AddToCart("NCB");
-            //await AddToCart("FRB606");
+			//await AddToCart("NCB");
+			//await AddToCart("FRB606");
 
-            var cartModel = await GetCart();
-
-            if (!cartModel.GiftCertificateCodes.Any())
-            {
-                cartModel.GiftCertificateCodes.Add(new CartGcModel() {Value = string.Empty}); //needed to to force first input to appear
-            }
-
-            ViewBag.InitialData = cartModel.ToJson();
+		    var cartModel = await InitCartModelInternal();
 
             return View(cartModel);
         }
@@ -169,7 +169,36 @@ namespace VC.Public.Controllers
             }
         }
 
-	    private async Task<ViewCartModel> GetCart()
+		private async Task<ViewCartModel> InitCartModelInternal()
+		{
+			var cartModel = await GetCart();
+
+			if (!cartModel.GiftCertificateCodes.Any())
+			{
+				cartModel.GiftCertificateCodes.Add(new CartGcModel() { Value = string.Empty }); //needed to to force first input to appear
+			}
+
+			//ToDo: replace with something valuable
+			cartModel.DiscountTotal = 100;
+			cartModel.GiftCertificatesTotal = 100;
+			cartModel.ShippingUpgradePOptions = new List<LookupItem<ShippingUpgradeOption>>() { new LookupItem<ShippingUpgradeOption>() { Key = ShippingUpgradeOption.Overnight, Text = "asdasdasd" }, new LookupItem<ShippingUpgradeOption>() { Key = ShippingUpgradeOption.SecondDay, Text = "tja a.s k" } };
+			cartModel.ShippingUpgradeNPOptions = new List<LookupItem<ShippingUpgradeOption>>() { new LookupItem<ShippingUpgradeOption>() { Key = ShippingUpgradeOption.Overnight, Text = "asdasdasd1" }, new LookupItem<ShippingUpgradeOption>() { Key = ShippingUpgradeOption.SecondDay, Text = "tja a.s k2" } };
+			cartModel.PromoSkus = new List<CartSkuModel>() {new CartSkuModel()
+			{
+				Code = "123123123",
+				ProductPageUrl = "asdasdasd",
+				DisplayName = "asdasdasda das a",
+				IconUrl = "asdasdad",
+				InStock = false,
+				Price = 50,
+				Quantity = 10,
+				SubTotal = 25
+			} };
+
+			return cartModel;
+		}
+
+		private async Task<ViewCartModel> GetCart()
 	    {
 			ViewCartModel cartModel;
 			var existingUid = GetCartUid();

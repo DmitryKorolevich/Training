@@ -14,10 +14,6 @@
 	<title>Wild Seafood & Organics - Vital Choice</title>
 }
 
-<script>
-	var initialData = '@Html.Raw(ViewBag.InitialData)';
-</script>
-
 <div class="cart-content-top">
 	<span class="cart-head-text">IMPORTANT NOTICE</span>
 	<span class="cart-subhead-text">You are only $27.00 from Free Shipping.</span>
@@ -54,14 +50,14 @@
 			</a>
 		</div>
 		<div class="cart-control-container">
-			<a href="#" class="button arrow-left-red">Continue Shopping</a>
+			<a href="/" class="button arrow-left-red">Continue Shopping</a>
 			<input type="submit" class="checkout-blue" value="Checkout"/>
 		</div>
 
 		await Html.RenderPartialAsync("_ViewCart");
 
 		<div class="cart-control-container">
-			<a href="#" class="button arrow-left-red">Continue Shopping</a>
+			<a href="/" class="button arrow-left-red">Continue Shopping</a>
 			<input type="submit" class="checkout-blue" value="Checkout" />
 		</div>
 	}
