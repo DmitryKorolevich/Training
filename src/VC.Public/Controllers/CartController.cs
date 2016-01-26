@@ -14,6 +14,7 @@ using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Interfaces.Services;
@@ -81,7 +82,21 @@ namespace VC.Public.Controllers
             return View(cartModel);
         }
 
-        [HttpPost]
+		[HttpPost]
+		public async Task<IActionResult> AddToCartView(string skuCode)
+	    {
+		    var res = await AddToCart(skuCode);
+		    if (!res)
+		    {
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SkuNotFound]);
+			}
+
+			var model = await InitCartModelInternal();
+
+			return PartialView("_CartLite", model);
+		}
+
+	    [HttpPost]
         public async Task<bool> AddToCart(string skuCode)
         {
             var existingUid = GetCartUid();
