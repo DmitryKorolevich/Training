@@ -9,6 +9,7 @@ using VitalChoice.Business.Services.Orders;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Checkout;
 using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
@@ -97,13 +98,18 @@ namespace VitalChoice.Business.Services.Checkout
             if (uid.HasValue)
             {
                 cart =
-                    await _cartRepository.Query(c => c.CartUid == uid.Value && c.IdCustomer == idCustomer).SelectFirstOrDefaultAsync(false) ??
+                    await _cartRepository.Query(c => c.CartUid == uid.Value).SelectFirstOrDefaultAsync(false) ??
                     await CreateNew(idCustomer);
 
                 result = new CustomerCartOrder
                 {
                     CartUid = uid.Value
                 };
+                if (cart.IdCustomer == null)
+                {
+                    cart.IdCustomer = idCustomer;
+                    await _cartRepository.UpdateAsync(cart);
+                }
             }
             else
             {
@@ -118,11 +124,12 @@ namespace VitalChoice.Business.Services.Checkout
                 var anonymCart = await GetOrCreateAnonymCart(uid);
 
                 var newOrder = await _orderService.CreatePrototypeAsync((int) OrderType.Normal);
+                newOrder.StatusCode = (int) RecordStatusCode.Active;
                 newOrder.OrderStatus = OrderStatus.Incomplete;
                 newOrder.GiftCertificates = anonymCart.GiftCertificates;
                 newOrder.Discount = anonymCart.Discount;
                 newOrder.Skus = anonymCart.Skus;
-
+                newOrder.Customer = await _customerService.SelectAsync(idCustomer);
                 newOrder = await _orderService.InsertAsync(newOrder);
 
                 cart = await _cartRepository.Query(c => c.CartUid == anonymCart.CartUid).SelectFirstOrDefaultAsync();

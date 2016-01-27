@@ -8,7 +8,8 @@
     "jquery.scrollTo": "~2.1.2",
     "tooltipster": "~3.3.0",
     "font-awesome": "~4.5.0",
-    "knockout": "~3.4.0"
+    "knockout": "~3.4.0",
+    "moment": "~2.11.1"
   },
   "exportsOverride": {
     "jQuery": {

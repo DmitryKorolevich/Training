@@ -153,6 +153,18 @@ namespace VC.Public.Controllers
                     {
                         GiftCertificate = _gcService.GetGiftCertificateAsync(code).Result
                     });
+                if (!model.ShipAsap)
+                {
+                    cart.Order.Data.ShipDelayType = ShipDelayType.EntireOrder;
+                    cart.Order.Data.ShipDelayDateP = model.ShippingDate;
+                    cart.Order.Data.ShipDelayDateNP = model.ShippingDate;
+                }
+                else
+                {
+                    cart.Order.Data.ShipDelayType = ShipDelayType.None;
+                    cart.Order.Data.ShipDelayDateP = null;
+                    cart.Order.Data.ShipDelayDateNP = null;
+                }
                 await _checkoutService.UpdateCart(cart);
                 await FillModel(model, cart);
                 SetCartUid(cart.CartUid);
@@ -189,24 +201,6 @@ namespace VC.Public.Controllers
 			{
 				cartModel.GiftCertificateCodes.Add(new CartGcModel() { Value = string.Empty }); //needed to to force first input to appear
 			}
-
-			//ToDo: replace with something valuable
-			cartModel.DiscountTotal = 100;
-			cartModel.GiftCertificatesTotal = 100;
-			cartModel.ShippingUpgradePOptions = new List<LookupItem<ShippingUpgradeOption>>() { new LookupItem<ShippingUpgradeOption>() { Key = ShippingUpgradeOption.Overnight, Text = "asdasdasd" }, new LookupItem<ShippingUpgradeOption>() { Key = ShippingUpgradeOption.SecondDay, Text = "tja a.s k" } };
-			cartModel.ShippingUpgradeNPOptions = new List<LookupItem<ShippingUpgradeOption>>() { new LookupItem<ShippingUpgradeOption>() { Key = ShippingUpgradeOption.Overnight, Text = "asdasdasd1" }, new LookupItem<ShippingUpgradeOption>() { Key = ShippingUpgradeOption.SecondDay, Text = "tja a.s k2" } };
-			cartModel.PromoSkus = new List<CartSkuModel>() {new CartSkuModel()
-			{
-				Code = "123123123",
-				ProductPageUrl = "asdasdasd",
-				DisplayName = "asdasdasda das a",
-				IconUrl = "asdasdad",
-				InStock = false,
-				Price = 50,
-				Quantity = 10,
-				SubTotal = 25
-			} };
-
 			return cartModel;
 		}
 
@@ -267,6 +261,7 @@ namespace VC.Public.Controllers
 
         private async Task FillModel(ViewCartModel cartModel, CustomerCartOrder cart)
         {
+            cartModel.Skus.Clear();
             cartModel.Skus.AddRange(
                 cart.Order.Skus.Select(sku =>
                 {
@@ -277,9 +272,9 @@ namespace VC.Public.Controllers
                     result.SubTotal = sku.Quantity * sku.Amount;
                     return result;
                 }));
+            cartModel.GiftCertificateCodes.Clear();
             cartModel.GiftCertificateCodes.AddRange(cart.Order.GiftCertificates.Select(g => g.GiftCertificate.Code).Select(x=> new CartGcModel() { Value = x}));
-            await _orderService.CalculateOrder(cart.Order);
-            FillFromOrder(cartModel, cart.Order);
+            await Calculate(cartModel, cart.Order);
         }
 
         private async Task FillModel(ViewCartModel cartModel, CustomerCart cart)
@@ -300,20 +295,40 @@ namespace VC.Public.Controllers
             order.Skus = cart.Skus;
             order.GiftCertificates = cart.GiftCertificates;
             order.Discount = cart.Discount;
-            await _orderService.CalculateOrder(order);
-            FillFromOrder(cartModel, order);
+            await Calculate(cartModel, order);
         }
 
-        private static void FillFromOrder(ViewCartModel cartModel, OrderDynamic order)
+        private async Task Calculate(ViewCartModel cartModel, OrderDynamic order)
         {
+            var context = await _orderService.CalculateOrder(order);
+            cartModel.ShippingUpgradeNPOptions = context.ShippingUpgradeNpOptions;
+            cartModel.ShippingUpgradePOptions = context.ShippingUpgradePOptions;
+            cartModel.DiscountTotal = context.DiscountTotal;
+            cartModel.GiftCertificatesTotal = context.GiftCertificatesSubtotal;
+            cartModel.PromoSkus.AddRange(context.PromoSkus?.Select(sku =>
+            {
+                var result = _skuMapper.ToModel<CartSkuModel>(sku.Sku);
+                _productMapper.UpdateModel(result, sku.ProductWithoutSkus);
+                result.Price = sku.Amount;
+                result.Quantity = sku.Quantity;
+                result.SubTotal = sku.Quantity*sku.Amount;
+                return result;
+            }) ?? Enumerable.Empty<CartSkuModel>());
             cartModel.OrderTotal = order.Total;
             cartModel.PromoCode = order.Discount?.Code;
             cartModel.ShippingCost = order.ShippingTotal;
             cartModel.SubTotal = order.ProductsSubtotal;
-            //cartModel.ShipAsap = cart.Order.SafeData.ShipDelayType != null && ShipDelayType
-            //cartModel.ShippingDate = cart.Order.
-            //cartModel.UpgradeOption = (ShippingUpgrade)(int?)order.SafeData.ShippingUpgradeP |
-            //                           (ShippingUpgrade)(int?)order.SafeData.ShippingUpgradeNP;
+            if (((ShipDelayType?)order.SafeData.ShipDelayType ?? ShipDelayType.None) != ShipDelayType.None)
+            {
+                cartModel.ShipAsap = false;
+                cartModel.ShippingDate = order.SafeData.ShipDelayDateP;
+            }
+            else
+            {
+                cartModel.ShipAsap = true;
+            }
+            cartModel.ShippingUpgradeNP = order.SafeData.ShippingUpgradeP;
+            cartModel.ShippingUpgradeNP = order.SafeData.ShippingUpgradeNP;
         }
     }
 }

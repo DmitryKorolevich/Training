@@ -37,7 +37,8 @@ namespace VitalChoice.Business.Workflow.Actions.GiftCertificates
                 gc.Amount = charge;
                 orderSubTotal -= charge;
             }
-            return Task.FromResult(orderSubTotal - (decimal) dataContext.Data.SubTotal);
+            dataContext.GiftCertificatesSubtotal = orderSubTotal - (decimal) dataContext.Data.SubTotal;
+            return Task.FromResult(dataContext.GiftCertificatesSubtotal);
         }
     }
 }
