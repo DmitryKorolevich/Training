@@ -122,13 +122,13 @@
 			</label>
 			<select id="slUpgradeOption" name="UpgradeOption" class="input-control cart-total-value" data-bind='options: Model.ShippingUpgradePOptions, optionsText: "Text", optionsValue: "Key",  value: Model.ShippingUpgradeP, optionsCaption: "Not Selected"'></select>
 		</div>
-		<div class="cart-total-line" data-bind="visible: Model.DiscountTotal() != null && Model.DiscountTotal() > 0" style="display:none;">
+		<div class="cart-total-line" data-bind="visible: Model.DiscountTotal() != null && Model.DiscountTotal() != 0" style="display:none;">
 			<label>
 				Discount
 			</label>
 			<label class="cart-total-value" data-bind="text: Model.DiscountTotal() ? formatCurrency(Model.DiscountTotal()) : ''">@(Model.DiscountTotal?.ToString("C2"))</label>
 		</div>
-		<div class="cart-total-line" data-bind="visible: Model.GiftCertificatesTotal() != null && Model.GiftCertificatesTotal() > 0" style="display:none;">
+		<div class="cart-total-line" data-bind="visible: Model.GiftCertificatesTotal() != null && Model.GiftCertificatesTotal() != 0" style="display:none;">
 			<label>
 				Gift Certificates
 			</label>

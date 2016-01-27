@@ -58,7 +58,13 @@ function formatCurrency(value) {
 	if (!value) {
 		value = 0;
 	}
-	return "$" + value.toFixed(2);
+
+	if (value >= 0) {
+		return "$" + value.toFixed(2);
+	}
+	else {
+		return "-$" + Math.abs(value).toFixed(2);
+	}
 }
 
 function recalculateCart(viewModel, successCallback) {
@@ -126,10 +132,13 @@ function initCart() {
 	});
 }
 
+var originalDiscountDescription;
+
 function processServerMessages(model) {
-	if (model.DiscountDescription() && isDiscountValid(model)) {
+	if (model.DiscountDescription() && isDiscountValid(model) && originalDiscountDescription != model.DiscountDescription()) {
 		notifySuccess(model.DiscountDescription() + "<br/>was applied to your order")
 	}
+	originalDiscountDescription = model.DiscountDescription();
 }
 
 function isDiscountValid(model) {
