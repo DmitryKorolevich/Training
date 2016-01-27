@@ -33,7 +33,7 @@
 			<span class="cart-sku-code" data-bind="text: Code"></span>
 			<span class="stock-presence-note" data-bind="text: InStock() ? 'In Stock Ready to Ship' : 'Not in Stock'"></span>
 		</td>
-		<td data-bind="text: Price() ? formatCurrency(Price()) : ''"></td>
+		<td data-bind="text: formatCurrency(Price())"></td>
 		<td>
 			@if (Model.Skus.Any())
 			{
@@ -41,7 +41,7 @@
 				@Html.ValidationMessageFor(x => x.Skus[0].Quantity, string.Empty, new { data_bind = "attr: { 'data-valmsg-for': 'SkusQuantity' + $index()}" })
 			}
 		</td>
-		<td data-bind="text: SubTotal() ? formatCurrency(SubTotal()) : ''"></td>
+		<td data-bind="text: formatCurrency(SubTotal())"></td>
 		<td class="grid-controls-container">
 			<a class="circle-button button-red" data-bind="click: $parent.removeSku">
 				<i class="glyphicon glyphicon-remove-sign"></i>
@@ -80,9 +80,9 @@
 			<span class="cart-sku-code" data-bind="text: Code"></span>
 			<span class="stock-presence-note" data-bind="text: InStock() ? 'In Stock Ready to Ship' : 'Not in Stock'"></span>
 		</td>
-		<td data-bind="text: Price() ? formatCurrency(Price()) : ''"></td>
+		<td data-bind="text: formatCurrency(Price())"></td>
 		<td data-bind="text: Quantity"></td>
-		<td data-bind="text: SubTotal() ? formatCurrency(SubTotal()) : ''"></td>
+		<td data-bind="text: formatCurrency(SubTotal())"></td>
 	</tr>
 	</tbody>
 </table>
@@ -149,7 +149,11 @@
 		<div class="cart-promo-container">
 			<i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Promo Code" data-tooltip-body="If you have a discount code, enter it in the box to see the change in your order's total."></i>
 			<label>Promo Code</label>
-			@Html.TextBoxFor(x => x.PromoCode, new {@class = "cart-input-box input-control", data_bind = "value: Model.PromoCode" })
+			@Html.TextBoxFor(x => x.PromoCode, new {@class = "cart-input-box input-control", data_bind = "value: Model.PromoCode, css: {'field-validation-error': !isDiscountValid(Model) }" })
+			<span class="success-message-box" data-bind="text: Model.DiscountMessage, visible: Model.DiscountMessage"></span>
+			<span class="field-validation-error" data-bind="if: !isDiscountValid(Model)" data-valmsg-for="PromoCode" data-valmsg-replace="true">
+				<span id="PromoCode-error" class="" data-bind="text: getDiscountRelatedErrors(Model)[0].Value ? : 'Invalid promo code. Discount was not applied'"></span>
+			</span>
 		</div>
 		<div id="divGcContainer" class="cart-gc-container">
 			<i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Gift Certificate Code" data-tooltip-body="If you have a gift certificate code, enter it in the box to see the change in your order's total."></i>

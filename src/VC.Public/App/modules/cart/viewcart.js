@@ -38,7 +38,7 @@ $(function () {
 		self.submitCart = function() {
 			$("#viewCartForm").validate();
 
-			recalculateCart(self, function() {
+			recalculateCart(self, function () {
 				window.location.href = "/Checkout/AddUpdateBillingAddress";
 				viewModel.refreshing = false;
 			});
@@ -55,6 +55,9 @@ $(function () {
 });
 
 function formatCurrency(value) {
+	if (!value) {
+		value = 0;
+	}
 	return "$" + value.toFixed(2);
 }
 
@@ -80,6 +83,7 @@ function recalculateCart(viewModel, successCallback) {
 					successCallback();
 				} else {
 					ko.mapping.fromJS(result.Data, { 'ignore': ["ShipAsap", "GiftCertificateCodes", "PromoCode", "ShippingDate"] }, viewModel.Model);
+					processServerMessages(viewModel.Model);
 				}
 			} else {
 				notifyError(result.Messages[0]);
@@ -103,6 +107,8 @@ function initCart() {
 	}).success(function (result) {
 		if (result.Success) {
 			viewModel = new Cart(result.Data);
+
+			processServerMessages(viewModel.Model);
 		} else {
 			notifyError(result.Messages[0]);
 		}
@@ -117,5 +123,27 @@ function initCart() {
 		notifyError();
 		viewModel.refreshing = false;
 		viewModel.initializing = false;
+	});
+}
+
+function processServerMessages(model) {
+	if (model.DiscountDescription()) {
+		notifySuccess(model.DiscountDescription() + "<br/>was applied to your order")
+	}
+}
+
+function isDiscountValid(model) {
+	var discountRelated = getDiscountRelatedErrors(model);
+
+	return !discountRelated || discountRelated.length == 0;
+}
+
+function getDiscountRelatedErrors(model) {
+	if (!model.Messages()) {
+		return null;
+	}
+
+	return $.grep(model.Messages(), function(element) {
+		return element().Key = "DiscountCode";
 	});
 }

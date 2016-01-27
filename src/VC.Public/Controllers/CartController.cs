@@ -218,7 +218,9 @@ namespace VC.Public.Controllers
         private async Task Calculate(ViewCartModel cartModel, OrderDynamic order)
         {
             var context = await _orderService.CalculateOrder(order);
-            cartModel.Skus.Clear();
+	        cartModel.DiscountDescription = context.Order.Discount.Description;
+	        cartModel.DiscountMessage = context.DiscountMessage;
+			cartModel.Skus.Clear();
             cartModel.Skus.AddRange(
                 order.Skus?.Select(sku =>
                 {
