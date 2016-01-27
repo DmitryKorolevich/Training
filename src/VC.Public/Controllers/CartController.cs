@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Authorization;
@@ -218,8 +219,10 @@ namespace VC.Public.Controllers
         private async Task Calculate(ViewCartModel cartModel, OrderDynamic order)
         {
             var context = await _orderService.CalculateOrder(order);
-	        cartModel.DiscountDescription = context.Order.Discount.Description;
+	        cartModel.DiscountDescription = context.Order?.Discount?.Description;
 	        cartModel.DiscountMessage = context.DiscountMessage;
+	        cartModel.Messages =
+		        context.Messages?.Select(x => new KeyValuePair<string, string>(x.Field, x.Message)).ToList();
 			cartModel.Skus.Clear();
             cartModel.Skus.AddRange(
                 order.Skus?.Select(sku =>

@@ -127,7 +127,7 @@ function initCart() {
 }
 
 function processServerMessages(model) {
-	if (model.DiscountDescription()) {
+	if (model.DiscountDescription() && isDiscountValid(model)) {
 		notifySuccess(model.DiscountDescription() + "<br/>was applied to your order")
 	}
 }
@@ -144,6 +144,6 @@ function getDiscountRelatedErrors(model) {
 	}
 
 	return $.grep(model.Messages(), function(element) {
-		return element().Key = "DiscountCode";
+		return element.Key = "DiscountCode";
 	});
 }
