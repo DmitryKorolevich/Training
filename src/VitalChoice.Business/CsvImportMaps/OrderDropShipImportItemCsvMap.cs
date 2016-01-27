@@ -21,7 +21,6 @@ namespace VitalChoice.Business.CsvExportMaps
             Map(m => m.Zip).Name("Postal Code");
             Map(m => m.Phone).Name("Phone");
             Map(m => m.Email).Name("Email");
-            Map(m => m.GiftMessage).Name("Greeting");
         }
     }
 }

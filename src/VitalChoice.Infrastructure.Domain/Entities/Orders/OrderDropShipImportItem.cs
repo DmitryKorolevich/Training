@@ -26,11 +26,6 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Orders
         public string OrderNotes { get; set; }
 
         [Map]
-        [Display(Name = "Greeting")]
-        [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
-        public string GiftMessage { get; set; }
-
-        [Map]
         [Display(Name = "Ship Date")]
         public DateTime? ShipDelayDate { get; set; }
 
@@ -42,7 +37,6 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Orders
             order.Data.OrderType = (int)SourceOrderType.Web;
             order.Data.PoNumber = PoNumber;
             order.Data.OrderNotes = OrderNotes;
-            order.Data.GiftMessage = GiftMessage;
             order.Data.ShipDelayType = ShipDelayType.EntireOrder;
             order.Data.ShipDelayDate = ShipDelayDate;
         }

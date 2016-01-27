@@ -48,7 +48,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             public const string FieldIsRequired = "FieldIsRequired";
             public const string FieldIsInvalidEmail = "FieldIsInvalidEmail";
             public const string FieldMaxLength = "FieldMaxLength";
-            public const string SkuNotFoundOrderImport = "SkuNotFound";
+            public const string SkuNotFoundOrderImport = "SkuNotFoundOrderImport";
         }
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
