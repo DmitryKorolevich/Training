@@ -6,6 +6,7 @@ using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
 using Newtonsoft.Json;
+using VC.Public.Helpers;
 using VC.Public.Models.Cart;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
@@ -82,24 +83,21 @@ namespace VC.Public.Controllers
 		[HttpPost]
 		public async Task<IActionResult> AddToCartView(string skuCode)
 	    {
-		    var res = await AddToCart(skuCode);
-		    if (!res)
+		    var cart = await AddToCart(skuCode);
+		    if (cart == null)
 		    {
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SkuNotFound]);
 			}
-
-			var model = await InitCartModelInternal();
-
-			return PartialView("_CartLite", model);
+			return PartialView("_CartLite", cart);
 		}
 
 	    [HttpPost]
-        public async Task<bool> AddToCart(string skuCode)
-        {
-            var existingUid = GetCartUid();
+        public async Task<ViewCartModel> AddToCart(string skuCode)
+	    {
+            var existingUid = Request.GetCartUid();
             var sku = await _productService.GetSkuOrderedAsync(skuCode);
             if (sku == null)
-                return false;
+                return null;
             if (await CustomerLoggenIn())
             {
                 var id = GetInternalCustomerId();
@@ -107,14 +105,19 @@ namespace VC.Public.Controllers
                 cart.Order.Skus.MergeUpdateKeyed(Enumerable.Repeat(sku, 1).ToArray(),
                     ordered => ordered.Sku.Code, skuModel => skuModel.Sku.Code, skuModel =>
                     {
-                        var result = _productService.GetSkuOrderedAsync(skuModel.Sku.Code).Result;
-                        result.Quantity = 1;
-                        result.Amount = HasRole(RoleType.Wholesale) ? skuModel.Sku.WholesalePrice : skuModel.Sku.Price;
-                        return result;
+                        var skuOrdered = _productService.GetSkuOrderedAsync(skuModel.Sku.Code).Result;
+                        skuOrdered.Quantity = 1;
+                        skuOrdered.Amount = HasRole(RoleType.Wholesale) ? skuModel.Sku.WholesalePrice : skuModel.Sku.Price;
+                        return skuOrdered;
                     }, 
                     (ordered, skuModel) => ordered.Quantity += 1);
                 SetCartUid(cart.CartUid);
-                return await _checkoutService.UpdateCart(cart);
+                if (!await _checkoutService.UpdateCart(cart))
+                    return null;
+                ViewCartModel result = new ViewCartModel();
+                await FillModel(result, cart);
+                SetCartUid(cart.CartUid);
+                return result;
             }
             else
             {
@@ -122,20 +125,25 @@ namespace VC.Public.Controllers
                 cart.Skus.MergeUpdateKeyed(Enumerable.Repeat(sku, 1).ToArray(), ordered => ordered.Sku.Code,
                     skuModel => skuModel.Sku.Code, skuModel =>
                     {
-                        var result = _productService.GetSkuOrderedAsync(skuModel.Sku.Code).Result;
-                        result.Quantity = 1;
-                        result.Amount = skuModel.Sku.Price;
-                        return result;
+                        var skuOrdered = _productService.GetSkuOrderedAsync(skuModel.Sku.Code).Result;
+                        skuOrdered.Quantity = 1;
+                        skuOrdered.Amount = skuModel.Sku.Price;
+                        return skuOrdered;
                     }, (ordered, skuModel) => ordered.Quantity += 1);
                 SetCartUid(cart.CartUid);
-                return await _checkoutService.UpdateCart(cart);
+                if (!await _checkoutService.UpdateCart(cart))
+                    return null;
+                ViewCartModel result = new ViewCartModel();
+                await FillModel(result, cart);
+                SetCartUid(cart.CartUid);
+                return result;
             }
         }
 
         [HttpPost]
         public async Task<Result<ViewCartModel>> UpdateCart([FromBody]ViewCartModel model)
         {
-            var existingUid = GetCartUid();
+            var existingUid = Request.GetCartUid();
             if (await CustomerLoggenIn())
             {
                 var id = GetInternalCustomerId();
@@ -207,7 +215,7 @@ namespace VC.Public.Controllers
 		private async Task<ViewCartModel> GetCart()
 	    {
 			ViewCartModel cartModel;
-			var existingUid = GetCartUid();
+			var existingUid = Request.GetCartUid();
 			if (await CustomerLoggenIn())
 			{
 				var id = GetInternalCustomerId();
@@ -220,18 +228,6 @@ namespace VC.Public.Controllers
 
 			return cartModel;
 	    }
-
-	    private Guid? GetCartUid()
-        {
-            var cartUidString = Request.Cookies[CheckoutConstants.CartUidCookieName];
-            Guid? existingUid = null;
-            Guid cartUid;
-            if (cartUidString.Count > 0 && Guid.TryParse(cartUidString.First(), out cartUid))
-            {
-                existingUid = cartUid;
-            }
-            return existingUid;
-        }
 
         private void SetCartUid(Guid uid)
         {

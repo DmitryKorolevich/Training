@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Business.Services.Orders;
 using VitalChoice.Data.Helpers;
+using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -35,11 +36,13 @@ namespace VitalChoice.Business.Services.Checkout
         private readonly IOrderService _orderService;
         private readonly EcommerceContext _context;
         private readonly ICustomerService _customerService;
+        private readonly IEcommerceRepositoryAsync<CartToSku> _skusRepository;
         private readonly ILogger _logger;
 
         public CheckoutService(IEcommerceRepositoryAsync<Cart> cartRepository,
             DiscountMapper discountMapper,
-            SkuMapper skuMapper, ProductMapper productMapper, IOrderService orderService, EcommerceContext context, ILoggerProviderExtended loggerProvider, ICustomerService customerService)
+            SkuMapper skuMapper, ProductMapper productMapper, IOrderService orderService, EcommerceContext context,
+            ILoggerProviderExtended loggerProvider, ICustomerService customerService, IEcommerceRepositoryAsync<CartToSku> skusRepository)
         {
             _cartRepository = cartRepository;
             _discountMapper = discountMapper;
@@ -48,6 +51,7 @@ namespace VitalChoice.Business.Services.Checkout
             _orderService = orderService;
             _context = context;
             _customerService = customerService;
+            _skusRepository = skusRepository;
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -90,6 +94,8 @@ namespace VitalChoice.Business.Services.Checkout
                 }).ToList()
             };
         }
+
+
 
         public async Task<CustomerCartOrder> GetOrCreateCart(Guid? uid, int idCustomer)
         {
@@ -302,6 +308,18 @@ namespace VitalChoice.Business.Services.Checkout
         public Task<bool> SaveOrder(CustomerCartOrder cart)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<int> GetCartItemsCount(Guid uid)
+        {
+            var cart =
+                await
+                    _cartRepository.Query(c => c.CartUid == uid).SelectFirstOrDefaultAsync(false);
+            if (cart != null)
+            {
+                return await _skusRepository.Query(s => s.IdCart == cart.Id).SelectCountAsync();
+            }
+            return 0;
         }
     }
 }
