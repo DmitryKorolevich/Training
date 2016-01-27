@@ -69,7 +69,7 @@ namespace VitalChoice.Business.Services.Checkout
 
         public async Task<CustomerCartOrder> GetOrCreateCart(Guid? uid)
         {
-            Cart cart = null;
+            Cart cart;
             if (uid.HasValue)
             {
                 var cartForCheck = await _cartRepository.Query(c => c.CartUid == uid.Value).SelectFirstOrDefaultAsync(false);
@@ -88,6 +88,10 @@ namespace VitalChoice.Business.Services.Checkout
                     .ThenInclude(s => s.Sku)
                     .ThenInclude(s => s.Product)
                     .ThenInclude(p => p.OptionValues).SelectFirstOrDefaultAsync(false) ?? await CreateNew();
+            }
+            else
+            {
+                cart = await CreateNew();
             }
             var newOrder = await _orderService.CreatePrototypeAsync((int) OrderType.Normal);
             if (newOrder.Customer != null)

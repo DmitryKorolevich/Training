@@ -44,7 +44,8 @@ namespace VC.Public.Controllers
             ICustomerService customerService, IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter,
             IOrderService orderService, IProductService productService, ICheckoutService checkoutService,
             IAuthorizationService authorizationService, IAppInfrastructureService appInfrastructureService,
-            IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper, IDiscountService discountService, IGcService gcService)
+            IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
+            IDiscountService discountService, IGcService gcService)
             : base(contextAccessor, customerService, appInfrastructureService, authorizationService)
         {
             _storefrontUserService = storefrontUserService;
@@ -59,29 +60,29 @@ namespace VC.Public.Controllers
             _gcService = gcService;
         }
 
-	    [HttpGet]
-	    public async Task<Result<ViewCartModel>> InitCartModel()
-	    {
-			return await InitCartModelInternal();
-	    }
-
-	    public async Task<IActionResult> ViewCart()
+        [HttpGet]
+        public async Task<Result<ViewCartModel>> InitCartModel()
         {
-			var cartModel = await InitCartModelInternal();
+            return await InitCartModelInternal();
+        }
+
+        public async Task<IActionResult> ViewCart()
+        {
+            var cartModel = await InitCartModelInternal();
 
             return View(cartModel);
         }
 
-		[HttpPost]
-		public async Task<IActionResult> AddToCartView(string skuCode)
-	    {
-		    var cart = await AddToCart(skuCode);
-		    if (cart == null)
-		    {
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SkuNotFound]);
-			}
-			return PartialView("_CartLite", cart);
-		}
+        [HttpPost]
+        public async Task<IActionResult> AddToCartView(string skuCode)
+        {
+            var cart = await AddToCart(skuCode);
+            if (cart == null)
+            {
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SkuNotFound]);
+            }
+            return PartialView("_CartLite", cart);
+        }
 
         [HttpPost]
         public async Task<ViewCartModel> AddToCart(string skuCode)
@@ -170,15 +171,15 @@ namespace VC.Public.Controllers
         }
 
         private async Task<ViewCartModel> InitCartModelInternal()
-		{
-			var cartModel = await GetCart();
+        {
+            var cartModel = await GetCart();
 
-			if (!cartModel.GiftCertificateCodes.Any())
-			{
-				cartModel.GiftCertificateCodes.Add(new CartGcModel() { Value = string.Empty }); //needed to to force first input to appear
-			}
-			return cartModel;
-		}
+            if (!cartModel.GiftCertificateCodes.Any())
+            {
+                cartModel.GiftCertificateCodes.Add(new CartGcModel() {Value = string.Empty}); //needed to to force first input to appear
+            }
+            return cartModel;
+        }
 
         private async Task<ViewCartModel> GetCart()
         {
@@ -211,25 +212,27 @@ namespace VC.Public.Controllers
 
         private async Task FillModel(ViewCartModel cartModel, CustomerCartOrder cart)
         {
-            cartModel.Skus.Clear();
-            cartModel.Skus.AddRange(
-                cart.Order.Skus.Select(sku =>
-                {
-                    var result = _skuMapper.ToModel<CartSkuModel>(sku.Sku);
-                    _productMapper.UpdateModel(result, sku.ProductWithoutSkus);
-                    result.Price = sku.Amount;
-                    result.Quantity = sku.Quantity;
-                    result.SubTotal = sku.Quantity * sku.Amount;
-                    return result;
-                }));
-            cartModel.GiftCertificateCodes.Clear();
-            cartModel.GiftCertificateCodes.AddRange(cart.Order.GiftCertificates.Select(g => g.GiftCertificate.Code).Select(x=> new CartGcModel() { Value = x}));
             await Calculate(cartModel, cart.Order);
         }
 
         private async Task Calculate(ViewCartModel cartModel, OrderDynamic order)
         {
             var context = await _orderService.CalculateOrder(order);
+            cartModel.Skus.Clear();
+            cartModel.Skus.AddRange(
+                order.Skus?.Select(sku =>
+                {
+                    var result = _skuMapper.ToModel<CartSkuModel>(sku.Sku);
+                    _productMapper.UpdateModel(result, sku.ProductWithoutSkus);
+                    result.Price = sku.Amount;
+                    result.Quantity = sku.Quantity;
+                    result.SubTotal = sku.Quantity*sku.Amount;
+                    return result;
+                }) ?? Enumerable.Empty<CartSkuModel>());
+            cartModel.GiftCertificateCodes.Clear();
+            cartModel.GiftCertificateCodes.AddRange(
+                order.GiftCertificates?.Select(g => g.GiftCertificate.Code).Select(x => new CartGcModel() {Value = x}) ??
+                Enumerable.Empty<CartGcModel>());
             cartModel.ShippingUpgradeNPOptions = context.ShippingUpgradeNpOptions;
             cartModel.ShippingUpgradePOptions = context.ShippingUpgradePOptions;
             cartModel.DiscountTotal = context.DiscountTotal;
@@ -248,7 +251,7 @@ namespace VC.Public.Controllers
             cartModel.PromoCode = order.Discount?.Code;
             cartModel.ShippingCost = order.ShippingTotal;
             cartModel.SubTotal = order.ProductsSubtotal;
-            if (((ShipDelayType?)order.SafeData.ShipDelayType ?? ShipDelayType.None) != ShipDelayType.None)
+            if (((ShipDelayType?) order.SafeData.ShipDelayType ?? ShipDelayType.None) != ShipDelayType.None)
             {
                 cartModel.ShipAsap = false;
                 cartModel.ShippingDate = order.SafeData.ShipDelayDateP;
