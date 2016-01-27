@@ -22,5 +22,10 @@ namespace VitalChoice.Ecommerce.Utils
         {
             return JsonConvert.DeserializeObject<T>(jsonString, Settings);
         }
+
+        public static object FromJson(this string jsonString, Type type)
+        {
+            return JsonConvert.DeserializeObject(jsonString, type, Settings);
+        }
     }
 }

@@ -14,6 +14,7 @@ using Templates.Data;
 using Templates.Exceptions;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.ContentProcessing.Extensions;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 [assembly: ExportExtensions(typeof(RazorPartial))]
 

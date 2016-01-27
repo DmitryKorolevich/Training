@@ -40,7 +40,7 @@
                                                     <input type="checkbox" data-ng-model="order.OnHold" data-ng-disabled="orderEditDisabled">Hold Order
                                                     <i class="fa fa-pause"></i>
                                                 </label>
-                                                <div class="inline-block">
+                                                <div data-ng-if="order.IdObjectType==1" class="inline-block">
                                                     <form class="form-horizontal" name="forms.topForm" data-ng-submit="save()" data-ng-class="{submitted: forms.topForm.submitted}" novalidate unsaved-warning-form>
                                                         <label data-ng-if="autoShipOrderOptionShow" class="checkbox-inline">
                                                             <input type="checkbox" data-ng-model="order.AutoShip" data-ng-disabled="orderEditDisabled">Auto-Ship Order
@@ -56,11 +56,11 @@
                                                         </div>
                                                     </form>
                                                 </div>
-                                                <label class="checkbox-inline">
+                                                <label data-ng-if="order.IdObjectType!=3" class="checkbox-inline">
                                                     <input type="checkbox" data-ng-model="order.GiftOrder" data-ng-disabled="orderEditDisabled">Gift Order
                                                     <i class="fa fa-gift"></i>
                                                 </label>
-                                                <label class="checkbox-inline">
+                                                <label data-ng-if="order.IdObjectType!=3" class="checkbox-inline">
                                                     <input type="checkbox" data-ng-model="order.MailOrder" data-ng-disabled="orderEditDisabled">Mail Order
                                                     <i class="fa fa-envelope"></i>
                                                 </label>
@@ -236,7 +236,7 @@
                                                         <div class="col-md-12">
                                                             <label class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="0" type="radio" data-ng-disabled="orderEditDisabled">None</label>
                                                             <label class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="1" type="radio" data-ng-disabled="orderEditDisabled">Entire Order</label>
-                                                            <label data-ng-if="order.ShouldSplit" class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="2" type="radio" data-ng-disabled="orderEditDisabled">Perishable & Non-Perishable</label>
+                                                            <label data-ng-if="order.ShouldSplit && order.IdObjectType!=3" class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="2" type="radio" data-ng-disabled="orderEditDisabled">Perishable & Non-Perishable</label>
                                                         </div>
                                                     </div>
                                                     <div data-ng-if="order.ShipDelayType==1" class="form-group">
@@ -298,7 +298,7 @@
                                                             <textarea type="text" name="GiftMessage" class="form-control" placeholder="Gift Message" rows="5" data-ng-model="order.GiftMessage" data-ng-disabled="orderEditDisabled"></textarea>
                                                         </div>
                                                     </div>
-                                                    <div class="form-group">
+                                                    <div data-ng-if="order.IdObjectType!=3" class="form-group">
                                                         <label class="col-md-12 control-label left">Delivery Instructions (*Prints to Shipping Label):</label>
                                                         <div class="col-md-12">
                                                             <textarea type="text" name="DeliveryInstructions" class="form-control" placeholder="Delivery Instructions" rows="5" data-ng-model="order.DeliveryInstructions" data-ng-disabled="orderEditDisabled"></textarea>
@@ -339,7 +339,7 @@
                                                             <span>{{order.StandardShippingCharges | currency}}</span>
                                                         </div>
                                                     </div>
-                                                    <div data-ng-if="shippingUpgradePOptions && shippingUpgradePOptions.length!=0" class="form-group">
+                                                    <div data-ng-if="shippingUpgradePOptions && shippingUpgradePOptions.length!=0 && order.IdObjectType!=3" class="form-group">
                                                         <label for="type" class="col-md-7 control-label">Upgrade Perishable Shipping</label>
                                                         <div class="col-md-5">
                                                             <select data-ng-disabled="!shippingUpgradePOptions || shippingUpgradePOptions.length==0 || orderEditDisabled" class="form-control" name="ShippingUpgradeP" data-ng-model="order.ShippingUpgradeP" ng-options="item.Key as item.Text for item in shippingUpgradePOptions" data-ng-change="requestRecalculate()">
@@ -347,7 +347,7 @@
                                                             </select>
                                                         </div>
                                                     </div>
-                                                    <div data-ng-if="shippingUpgradeNPOptions && shippingUpgradeNPOptions.length!=0" class="form-group">
+                                                    <div data-ng-if="shippingUpgradeNPOptions && shippingUpgradeNPOptions.length!=0 && order.IdObjectType!=3" class="form-group">
                                                         <label for="type" class="col-md-7 control-label">Upgrade Non-Perishable Shipping</label>
                                                         <div class="col-md-5">
                                                             <select data-ng-disabled="!shippingUpgradeNPOptions || shippingUpgradeNPOptions.length==0 || orderEditDisabled" class="form-control" name="ShippingUpgradeNP" data-ng-model="order.ShippingUpgradeNP" ng-options="item.Key as item.Text for item in shippingUpgradeNPOptions" data-ng-change="requestRecalculate()">
@@ -370,7 +370,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="form-group">
+                                                    <div data-ng-if="order.IdObjectType!=3" class="form-group">
                                                         <label for="type" class="col-md-7 control-label">Shipping Override (-)</label>
                                                         <div class="col-md-5">
                                                             <div class="input-group">
@@ -391,7 +391,7 @@
                                                             <span>{{order.TotalShipping | currency}}</span>
                                                         </div>
                                                     </div>
-                                                    <div class="form-group">
+                                                    <div data-ng-if="order.IdObjectType!=3" class="form-group">
                                                         <label for="type" class="col-md-7 control-label">Preferred Ship Method</label>
                                                         <div class="col-md-5">
                                                             <select class="form-control" name="PreferredShipMethod" data-ng-model="order.PreferredShipMethod" ng-options="item.Key as item.Text for item in orderPreferredShipMethod" required data-ng-disabled="orderEditDisabled">
@@ -411,7 +411,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="form-group">
+                                                    <div data-ng-if="order.IdObjectType!=3" class="form-group">
                                                         <label for="type" class="col-md-7 control-label">Discount Code</label>
                                                         <div class="col-md-5">
                                                             <div class="input-group autocomplete">
@@ -429,7 +429,7 @@
 
                                             <form name="forms.GCs" class="form-horizontal" data-ng-submit="save()" data-ng-class="{submitted: forms.GCs.skussubmitted}" novalidate unsaved-warning-form>
                                                 <fieldset>
-                                                    <div class="form-group">
+                                                    <div data-ng-if="order.IdObjectType!=3" class="form-group">
                                                         <label for="type" class="col-md-7 control-label">Gift Certificate</label>
                                                         <div class="col-md-5">
                                                             <div data-ng-repeat="gc in order.GCs" class="gcs">
@@ -456,19 +456,19 @@
                                                     </div>
 
                                                     <div class="total-section">
-                                                        <div class="form-group margin-bottom-0px">
+                                                        <div data-ng-if="order.IdObjectType!=3" class="form-group margin-bottom-0px">
                                                             <label for="type" class="col-md-6 control-label">Discount</label>
                                                             <div class="col-md-6 form-control-static">
                                                                 <span>{{order.DiscountMessage}}</span>
                                                             </div>
                                                         </div>
-                                                        <div class="form-group margin-bottom-0px">
+                                                        <div data-ng-if="order.IdObjectType!=3" class="form-group margin-bottom-0px">
                                                             <label for="type" class="col-md-6 control-label">Discount Amount</label>
                                                             <div class="col-md-6 form-control-static">
                                                                 <span>{{order.DiscountTotal | currency}}</span>
                                                             </div>
                                                         </div>
-                                                        <div class="form-group margin-bottom-0px">
+                                                        <div data-ng-if="order.IdObjectType!=3" class="form-group margin-bottom-0px">
                                                             <label for="type" class="col-md-6 control-label">Discounted Subtotal</label>
                                                             <div class="col-md-6 form-control-static">
                                                                 <span>{{order.DiscountedSubtotal | currency}}</span>

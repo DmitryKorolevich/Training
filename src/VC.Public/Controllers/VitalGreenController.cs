@@ -58,30 +58,7 @@ namespace VC.Public.Controllers
             string cookies;
             if (!Validate(model))
             {
-                cookies = Request.Cookies[VITAL_GREEN_COOKIE_NAME];
-                if (!string.IsNullOrEmpty(cookies))
-                {
-                    try
-                    {
-                        cookies = Encoding.UTF8.GetString(Convert.FromBase64String(cookies));
-                        var deserialized = cookies.FromJson<VitalGreenRequestModel>();
-                        model.FirstName = deserialized.FirstName;
-                        model.LastName = deserialized.LastName;
-                        model.Address = deserialized.Address;
-                        model.Address2 = deserialized.Address2;
-                        model.City = deserialized.City;
-                        model.StateCode = deserialized.StateCode;
-                        model.Zip = deserialized.Zip;
-                        model.Email = deserialized.Email;
-                        model.Phone = deserialized.Phone;
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.LogError(e.Message, e);
-                        Response.Cookies.Delete(VITAL_GREEN_COOKIE_NAME);
-                    }
-                }
-                return Task.FromResult<IActionResult>(View(model));
+                View(model);
             }
 
             cookies = Convert.ToBase64String(Encoding.UTF8.GetBytes(model.ToJson()));

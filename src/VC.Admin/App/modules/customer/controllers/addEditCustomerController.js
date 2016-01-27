@@ -3,9 +3,10 @@
 angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	.controller('addEditCustomerController', [
 		'$scope', '$injector', '$filter', 'customerService', 'toaster', 'promiseTracker', '$rootScope', '$q',
-		'$state', '$stateParams', 'customerEditService', '$window', 'Upload',
+		'$state', '$stateParams', 'customerEditService', '$window', 'Upload', 'modalUtil',
         function($scope, $injector, $filter, customerService, toaster, promiseTracker, $rootScope, $q, $state, $stateParams, customerEditService, $window, 
-        Upload) {
+        Upload, modalUtil)
+        {
 			$scope.addEditTracker = promiseTracker("addEdit");
 			$scope.resetTracker = promiseTracker("reset");
 			$scope.resendTracker = promiseTracker("resend");
@@ -37,6 +38,12 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			            $scope.options.OverrideEmail = true;
 			        }
 			        setCreditCardsForOrdersImport();
+			        var uploadOrderTypes = [{ Key: 4, Text: 'Gift Orders' }];
+			        if ($scope.currentCustomer.CustomerType==2)//wholesale
+			        {
+			            uploadOrderTypes.splice(0, 0, { Key: 3, Text: 'Dropship Orders' });
+			        }
+                    $scope.uploadOrderTypes = uploadOrderTypes;
 			        $scope.currentCustomer.ActivatePending = false;
 			        $scope.options.DBStatusCode = $scope.currentCustomer.StatusCode;
 			        $scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
@@ -125,10 +132,6 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 				    formName: 'uploadOrderType'
 				};
 				$scope.creditCardTypes = $rootScope.ReferenceData.CreditCardTypes;
-				$scope.uploadOrderTypes = [
-                    { Key: 3, Text: 'Dropship Orders' },
-                    { Key: 4, Text: 'Gift Orders' }
-				];
 				var tabs = [];
 				tabs.push($scope.accountProfileTab);
 				tabs.push($scope.shippingAddressTab);
@@ -366,7 +369,8 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 
 			function setCountryValidity() {
 				$.each($scope.forms, function(index, form) {
-					if (form && !(typeof form === 'boolean')) {
+				    if (form && !(typeof form === 'boolean'))
+				    {
 						if (form.Country && form.Country.$viewValue && form.Country.$viewValue.Id == 0) {
 							form.Country.$setValidity("required", false);
 						}
@@ -385,7 +389,8 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 				setCountryValidity();
 
 				$.each($scope.forms, function(index, form) {
-					if (form && !(typeof form === 'boolean')) {
+				    if (form && !(typeof form === 'boolean') && index != 'uploadOrderType')
+				    {
 						if (!form.$valid && index != 'submitted') {
 							valid = false;
 							activateTab(index);
@@ -519,6 +524,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			        if ($scope.options.selectedOrderImportFile)
 			        {
 			            $scope.options.uploadingOrdersImport = true;
+			            var deferred = $scope.addEditTracker.createPromise();
 			            Upload.upload({
 			                url: '/api/order/ImportOrders',
 			                data: {
@@ -532,12 +538,19 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 
 			            }).success(function (result, status, headers, config)
 			            {
+			                deferred.resolve();
 			                if (result.Success)
 			                {                                
 			                    $scope.$broadcast('customerOrders#in#refresh');
+			                    toaster.pop('success', "Success!", "Successfully imported");
 			                } else
 			                {
-			                    toaster.pop('error', 'Error!', "Can't upload file");
+			                    if (result.Messages)
+			                    {
+			                        modalUtil.open('app/modules/setting/partials/errorDetailsPopup.html', 'errorDetailsController', {
+			                            Messages: result.Messages
+			                        });
+			                    }
 			                }
 
 			                $scope.options.selectedOrderImportFile = null;
@@ -545,6 +558,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			                $scope.options.uploadingOrdersImport = false;
 			            }).error(function (data, status, headers, config)
 			            {
+			                deferred.resolve();
 			                $scope.options.uploadingOrdersImport = false;
 			                $scope.options.selectedOrderImportFile = null;
 

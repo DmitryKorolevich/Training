@@ -160,16 +160,16 @@ namespace VC.Admin.ModelConverters
                     dbCustomer.IdObjectType = (int) model.Customer.CustomerType;
                     dbCustomer.CustomerNotes = dynamic.Customer.CustomerNotes;
                     dbCustomer.Files = dynamic.Customer.Files;
+                    if (dynamic.Customer.DictionaryData.ContainsKey("Source"))
+                    {
+                        dbCustomer.Data.Source = dynamic.Customer.Data.Source;
+                    }
+                    if (dynamic.Customer.DictionaryData.ContainsKey("SourceDetails"))
+                    {
+                        dbCustomer.Data.SourceDetails = dynamic.Customer.Data.SourceDetails;
+                    }
                     if (model.Id == 0)
                     {
-                        if (dynamic.Customer.DictionaryData.ContainsKey("Source"))
-                        {
-                            dbCustomer.Data.Source = dynamic.Customer.Data.Source;
-                        }
-                        if (dynamic.Customer.DictionaryData.ContainsKey("SourceDetails"))
-                        {
-                            dbCustomer.Data.SourceDetails = dynamic.Customer.Data.SourceDetails;
-                        }
                         dbCustomer.ApprovedPaymentMethods = dynamic.Customer.ApprovedPaymentMethods;
                         dbCustomer.OrderNotes = dynamic.Customer.OrderNotes;
                         dbCustomer.Email = dynamic.Customer.Email;
