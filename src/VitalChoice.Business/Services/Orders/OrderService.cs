@@ -100,6 +100,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IObjectMapper<AddressDynamic> _addressMapper;
         private readonly IProductService _productService;
         private readonly INotificationService _notificationService;
+        private readonly IExtendedDynamicServiceAsync<OrderPaymentMethodDynamic, OrderPaymentMethod, CustomerPaymentMethodOptionType, OrderPaymentMethodOptionValue> _paymentGenericService;
 
         public OrderService(
             IEcommerceRepositoryAsync<VOrder> vOrderRepository,
@@ -124,7 +125,8 @@ namespace VitalChoice.Business.Services.Orders
             SPEcommerceRepository sPEcommerceRepository,
             IPaymentMethodService paymentMethodService,
             IObjectMapper<OrderPaymentMethodDynamic> paymentMapper,
-            IEcommerceRepositoryAsync<OrderToGiftCertificate> orderToGiftCertificateRepositoryAsync,
+            IEcommerceRepositoryAsync<OrderToGiftCertificate> orderToGiftCertificateRepositoryAsync, 
+            IExtendedDynamicServiceAsync<OrderPaymentMethodDynamic, OrderPaymentMethod, CustomerPaymentMethodOptionType, OrderPaymentMethodOptionValue> paymentGenericService,
             IObjectMapper<AddressDynamic> addressMapper,
             IProductService productService,
             INotificationService notificationService,
@@ -151,6 +153,7 @@ namespace VitalChoice.Business.Services.Orders
             _paymentMethodService = paymentMethodService;
             _paymentMapper = paymentMapper;
             _orderToGiftCertificateRepositoryAsync = orderToGiftCertificateRepositoryAsync;
+            _paymentGenericService = paymentGenericService;
             _countryService = countryService;
             _addressMapper = addressMapper;
             _productService = productService;
@@ -339,6 +342,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 try
                 {
+                    await EnsurePaymentMethod(model);
                     model.PaymentMethod.IdOrder = model.Id;
                     var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
                     var paymentCopy = _paymentMapper.Clone<ExpandoObject>(model.PaymentMethod, o =>
@@ -369,6 +373,37 @@ namespace VitalChoice.Business.Services.Orders
                 Logger.LogError("Cannot update order payment info on remote.");
             }
             return entity;
+        }
+
+        private async Task EnsurePaymentMethod(OrderDynamic model)
+        {
+            if (model.PaymentMethod == null)
+            {
+                switch ((OrderType) model.IdObjectType)
+                {
+                    case OrderType.Normal:
+                        model.PaymentMethod = await _paymentGenericService.CreatePrototypeAsync((int) PaymentMethodType.CreditCard);
+                        break;
+                    case OrderType.AutoShip:
+                        model.PaymentMethod = await _paymentGenericService.CreatePrototypeAsync((int) PaymentMethodType.CreditCard);
+                        break;
+                    case OrderType.DropShip:
+                        model.PaymentMethod = await _paymentGenericService.CreatePrototypeAsync((int) PaymentMethodType.NoCharge);
+                        break;
+                    case OrderType.GiftList:
+                        model.PaymentMethod = await _paymentGenericService.CreatePrototypeAsync((int) PaymentMethodType.NoCharge);
+                        break;
+                    case OrderType.Reship:
+                        model.PaymentMethod = await _paymentGenericService.CreatePrototypeAsync((int) PaymentMethodType.CreditCard);
+                        break;
+                    case OrderType.Refund:
+                        model.PaymentMethod = await _paymentGenericService.CreatePrototypeAsync((int) PaymentMethodType.CreditCard);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                model.PaymentMethod.StatusCode = (int)RecordStatusCode.Active;
+            }
         }
 
         /// <summary>
@@ -415,6 +450,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 try
                 {
+                    await EnsurePaymentMethod(model);
                     model.PaymentMethod.IdOrder = model.Id;
                     var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
                     var paymentCopy = _paymentMapper.Clone<ExpandoObject>(model.PaymentMethod, o =>
@@ -541,9 +577,7 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         var maxCount = _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount;
                         var dateNow = DateTime.Now;
-                        var periods = (await healthwisePeriodRepository.Query(p => p.IdCustomer == model.Customer.Id &&
-                            dateNow >= p.StartDate && dateNow < p.EndDate && !p.PaidDate.HasValue).
-                            Include(p => p.HealthwiseOrders).SelectAsync(false)).ToList();
+                        var periods = (await healthwisePeriodRepository.Query(p => p.IdCustomer == model.Customer.Id && dateNow >= p.StartDate && dateNow < p.EndDate && !p.PaidDate.HasValue).Include(p => p.HealthwiseOrders).SelectAsync(false)).ToList();
 
                         bool addedToPeriod = false;
                         foreach (var period in periods)
@@ -552,8 +586,7 @@ namespace VitalChoice.Business.Services.Orders
                             {
                                 healthwiseOrder = new HealthwiseOrder()
                                 {
-                                    Id = model.Id,
-                                    IdHealthwisePeriod = period.Id
+                                    Id = model.Id, IdHealthwisePeriod = period.Id
                                 };
                                 _healthwiseOrderRepositoryAsync.Insert(healthwiseOrder);
                                 addedToPeriod = true;
@@ -568,7 +601,7 @@ namespace VitalChoice.Business.Services.Orders
                             period.EndDate = period.StartDate.AddYears(1);
                             period.HealthwiseOrders = new List<HealthwiseOrder>()
                             {
-                                new HealthwiseOrder() { Id=model.Id }
+                                new HealthwiseOrder() {Id = model.Id}
                             };
                             _healthwisePeriodRepositoryAsync.InsertGraph(period);
                         }
@@ -592,12 +625,8 @@ namespace VitalChoice.Business.Services.Orders
             {
                 conditions = conditions.WithShippedDate(filter.From, filter.To);
             }
-            conditions = conditions.WithOrderStatus(filter.OrderStatus)
-                .WithoutIncomplete(filter.OrderStatus)
-                .WithId(filter.IdString)//TODO - should be redone after adding - https://github.com/aspnet/EntityFramework/issues/2850
-                .WithOrderSource(filter.IdOrderSource)
-                .WithPOrderType(filter.POrderType)
-                .WithCustomerType(filter.IdCustomerType).WithShippingMethod(filter.IdShippingMethod);
+            conditions = conditions.WithOrderStatus(filter.OrderStatus).WithoutIncomplete(filter.OrderStatus).WithId(filter.IdString) //TODO - should be redone after adding - https://github.com/aspnet/EntityFramework/issues/2850
+                .WithOrderSource(filter.IdOrderSource).WithPOrderType(filter.POrderType).WithCustomerType(filter.IdCustomerType).WithShippingMethod(filter.IdShippingMethod);
 
             var query = _vOrderRepository.Query(conditions);
 
@@ -606,25 +635,13 @@ namespace VitalChoice.Business.Services.Orders
             switch (filter.Sorting.Path)
             {
                 case VOrderSortPath.OrderStatus:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.OrderStatus)
-                                : x.OrderByDescending(y => y.OrderStatus);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.OrderStatus) : x.OrderByDescending(y => y.OrderStatus);
                     break;
                 case VOrderSortPath.IdOrderSource:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.IdOrderSource)
-                                : x.OrderByDescending(y => y.IdOrderSource);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.IdOrderSource) : x.OrderByDescending(y => y.IdOrderSource);
                     break;
                 case VOrderSortPath.IdPaymentMethod:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.IdPaymentMethod)
-                                : x.OrderByDescending(y => y.IdPaymentMethod);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.IdPaymentMethod) : x.OrderByDescending(y => y.IdPaymentMethod);
                     break;
                 case VOrderSortPath.DateCreated:
                     sortable =
@@ -634,72 +651,35 @@ namespace VitalChoice.Business.Services.Orders
                                 : x.OrderByDescending(y => y.DateCreated).ThenByDescending(y => y.Id);
                     break;
                 case VOrderSortPath.DateShipped:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.DateShipped)
-                                : x.OrderByDescending(y => y.DateShipped);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.DateShipped) : x.OrderByDescending(y => y.DateShipped);
                     break;
                 case VOrderSortPath.Company:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.Company)
-                                : x.OrderByDescending(y => y.Company);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.Company) : x.OrderByDescending(y => y.Company);
                     break;
                 case VOrderSortPath.StateCode:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.StateCode)
-                                : x.OrderByDescending(y => y.StateCode);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.StateCode) : x.OrderByDescending(y => y.StateCode);
                     break;
                 case VOrderSortPath.IdCustomerType:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.IdCustomerType)
-                                : x.OrderByDescending(y => y.IdCustomerType);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.IdCustomerType) : x.OrderByDescending(y => y.IdCustomerType);
                     break;
                 case VOrderSortPath.Customer:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.Customer)
-                                : x.OrderByDescending(y => y.Customer);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.Customer) : x.OrderByDescending(y => y.Customer);
                     break;
                 case VOrderSortPath.ShipTo:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.ShipTo)
-                                : x.OrderByDescending(y => y.ShipTo);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.ShipTo) : x.OrderByDescending(y => y.ShipTo);
                     break;
                 case VOrderSortPath.Id:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.Id)
-                                : x.OrderByDescending(y => y.Id);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.Id) : x.OrderByDescending(y => y.Id);
                     break;
                 case VOrderSortPath.Total:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.Total)
-                                : x.OrderByDescending(y => y.Total);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.Total) : x.OrderByDescending(y => y.Total);
                     break;
                 case VOrderSortPath.DateEdited:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.DateEdited)
-                                : x.OrderByDescending(y => y.DateEdited);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.DateEdited) : x.OrderByDescending(y => y.DateEdited);
                     break;
             }
 
-            var toReturn =
-                await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            var toReturn = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
             if (toReturn.Items.Any())
             {
                 var ids = toReturn.Items.Select(p => p.IdEditedBy).ToList();
@@ -721,7 +701,7 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<OrderDynamic> CreateNewNormalOrder(OrderStatus status)
         {
-            var toReturn = await CreatePrototypeAsync((int)OrderType.Normal);
+            var toReturn = await CreatePrototypeAsync((int) OrderType.Normal);
 
             toReturn.StatusCode = (int)RecordStatusCode.Active;
             if (status != OrderStatus.Processed && status != OrderStatus.Incomplete)
@@ -730,8 +710,8 @@ namespace VitalChoice.Business.Services.Orders
             }
             toReturn.OrderStatus = status;
             toReturn.DateCreated = DateTime.Now;
-            toReturn.Data.PreferredShipMethod = (int)PreferredShipMethod.Best;
-            toReturn.Data.ShipDelayType = (int)ShipDelayType.None;
+            toReturn.Data.PreferredShipMethod = (int) PreferredShipMethod.Best;
+            toReturn.Data.ShipDelayType = (int) ShipDelayType.None;
 
             return toReturn;
         }
@@ -904,7 +884,7 @@ namespace VitalChoice.Business.Services.Orders
                         var dbSku = dbSkus.FirstOrDefault(p => p.Sku.Code == sku.Sku.Code);
                         if(dbSku==null)
                         {
-                            item.OrderImportItem.ErrorMessages.Add(AddErrorMessage("SKU " + index, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SKUNotFound],
+                            item.OrderImportItem.ErrorMessages.Add(AddErrorMessage("SKU " + index, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SkuNotFoundOrderImport],
                                 "SKU " + index, sku.Sku.Code)));
                             continue;
                         }
@@ -1218,20 +1198,11 @@ namespace VitalChoice.Business.Services.Orders
         {
             PagedList<AffiliateOrderListItemModel> toReturn = new PagedList<AffiliateOrderListItemModel>();
 
-            OrderQuery conditions = new OrderQuery().WithIdAffiliate(filter.IdAffiliate).WithPaymentStatus(filter.Status).
-                WithAffiliateOrderStatus().WithFromDate(filter.From).WithToDate(filter.To);
-            Func<IQueryLite<Order>, IQueryLite<Order>> includes = (p => p.Include(o => o.PaymentMethod)
-                                                                         .ThenInclude(o => o.BillingAddress)
-                                                                         .ThenInclude(o => o.OptionValues)
-                                                                         .Include(o => o.PaymentMethod)
-                                                                         .ThenInclude(o => o.OptionValues)
-                                                                         .Include(o => o.PaymentMethod)
-                                                                         .ThenInclude(o => o.PaymentMethod)
-                                                                         .Include(o => o.AffiliateOrderPayment));
+            OrderQuery conditions = new OrderQuery().WithIdAffiliate(filter.IdAffiliate).WithPaymentStatus(filter.Status).WithAffiliateOrderStatus().WithFromDate(filter.From).WithToDate(filter.To);
+            Func<IQueryLite<Order>, IQueryLite<Order>> includes = (p => p.Include(o => o.PaymentMethod).ThenInclude(o => o.BillingAddress).ThenInclude(o => o.OptionValues).Include(o => o.PaymentMethod).ThenInclude(o => o.OptionValues).Include(o => o.PaymentMethod).ThenInclude(o => o.PaymentMethod).Include(o => o.AffiliateOrderPayment));
 
             Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable = x => x.OrderByDescending(y => y.DateCreated);
-            var result = await this.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount,
-                queryObject: conditions, orderBy: sortable, includesOverride: includes);
+            var result = await this.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, queryObject: conditions, orderBy: sortable, includesOverride: includes);
 
             var customerOrders = await _affiliateOrderPaymentRepository.GetAffiliateOrdersInCustomers(filter.IdAffiliate, result.Items.Select(p => p.Customer.Id).Distinct().ToList());
 
@@ -1246,9 +1217,7 @@ namespace VitalChoice.Business.Services.Orders
                 customerFirstName = null;
                 customerLastName = null;
                 customerOrdersCount = 0;
-                if (order.PaymentMethod != null && order.PaymentMethod.Address != null &&
-                    order.PaymentMethod.Address.DictionaryData.ContainsKey("FirstName") &&
-                    order.PaymentMethod.Address.DictionaryData.ContainsKey("LastName"))
+                if (order.PaymentMethod != null && order.PaymentMethod.Address != null && order.PaymentMethod.Address.DictionaryData.ContainsKey("FirstName") && order.PaymentMethod.Address.DictionaryData.ContainsKey("LastName"))
                 {
                     customerFirstName = order.PaymentMethod.Address.Data.FirstName;
                     customerLastName = order.PaymentMethod.Address.Data.LastName;
@@ -1262,8 +1231,7 @@ namespace VitalChoice.Business.Services.Orders
                     customerOrdersCount = customerOrders[order.Customer.Id];
                 }
 
-                AffiliateOrderListItemModel item = new AffiliateOrderListItemModel(order.AffiliateOrderPayment, customerFirstName, customerLastName,
-                    customerOrdersCount);
+                AffiliateOrderListItemModel item = new AffiliateOrderListItemModel(order.AffiliateOrderPayment, customerFirstName, customerLastName, customerOrdersCount);
                 toReturn.Items.Add(item);
             }
 
@@ -1299,15 +1267,14 @@ namespace VitalChoice.Business.Services.Orders
             {
                 toReturn.Add(new MessageInfo() { Message = "Invalid order #" });
             }
-            if (order == null || !(order.OrderStatus == OrderStatus.Processed || order.OrderStatus == OrderStatus.Exported ||
-                order.OrderStatus == OrderStatus.Shipped))
+            if (order == null || !(order.OrderStatus == OrderStatus.Processed || order.OrderStatus == OrderStatus.Exported || order.OrderStatus == OrderStatus.Shipped))
             {
-                toReturn.Add(new MessageInfo() { Message = "The given order can'be flagged" });
+                toReturn.Add(new MessageInfo() {Message = "The given order can'be flagged"});
                 throw new AppValidationException("The given order can'be flagged");
             }
-            if (!order.DictionaryData.ContainsKey("OrderType") || order.Data.OrderType != (int?)SourceOrderType.Web)
+            if (!order.DictionaryData.ContainsKey("OrderType") || order.Data.OrderType != (int?) SourceOrderType.Web)
             {
-                toReturn.Add(new MessageInfo() { Message = "The given order can'be flagged" });
+                toReturn.Add(new MessageInfo() {Message = "The given order can'be flagged"});
             }
             return toReturn;
         }
@@ -1349,9 +1316,7 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     var maxCount = _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount;
                     var orderCreatedDate = order.DateCreated;
-                    var periods = (await _healthwisePeriodRepositoryAsync.Query(p => p.IdCustomer == order.Customer.Id &&
-                        orderCreatedDate >= p.StartDate && orderCreatedDate < p.EndDate && !p.PaidDate.HasValue).
-                        Include(p => p.HealthwiseOrders).SelectAsync(false)).ToList();
+                    var periods = (await _healthwisePeriodRepositoryAsync.Query(p => p.IdCustomer == order.Customer.Id && orderCreatedDate >= p.StartDate && orderCreatedDate < p.EndDate && !p.PaidDate.HasValue).Include(p => p.HealthwiseOrders).SelectAsync(false)).ToList();
                     bool addedToPeriod = false;
                     foreach (var period in periods)
                     {
@@ -1359,8 +1324,7 @@ namespace VitalChoice.Business.Services.Orders
                         {
                             healthwiseOrder = new HealthwiseOrder()
                             {
-                                Id = order.Id,
-                                IdHealthwisePeriod = period.Id
+                                Id = order.Id, IdHealthwisePeriod = period.Id
                             };
                             _healthwiseOrderRepositoryAsync.Insert(healthwiseOrder);
                             addedToPeriod = true;
@@ -1375,7 +1339,7 @@ namespace VitalChoice.Business.Services.Orders
                         period.EndDate = period.StartDate.AddYears(1);
                         period.HealthwiseOrders = new List<HealthwiseOrder>()
                         {
-                            new HealthwiseOrder() { Id=order.Id }
+                            new HealthwiseOrder() {Id = order.Id}
                         };
                         _healthwisePeriodRepositoryAsync.InsertGraph(period);
                     }
@@ -1401,8 +1365,7 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<PagedList<VOrderWithRegionInfoItem>> GetOrderWithRegionInfoItemsAsync(OrderRegionFilter filter)
         {
-            VOrderWithRegionInfoItemQuery conditions = new VOrderWithRegionInfoItemQuery().WithDates(filter.From, filter.To).
-                WithIdCustomerType(filter.IdCustomerType).WithIdOrderType(filter.IdOrderType).WithRegion(filter.Region).WithZip(filter.Zip);
+            VOrderWithRegionInfoItemQuery conditions = new VOrderWithRegionInfoItemQuery().WithDates(filter.From, filter.To).WithIdCustomerType(filter.IdCustomerType).WithIdOrderType(filter.IdOrderType).WithRegion(filter.Region).WithZip(filter.Zip);
             Func<IQueryable<VOrderWithRegionInfoItem>, IOrderedQueryable<VOrderWithRegionInfoItem>> sortable = p => p.OrderByDescending(x => x.Id);
 
             var query = _vOrderWithRegionInfoItemRepository.Query(conditions).OrderBy(sortable);

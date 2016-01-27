@@ -68,6 +68,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
 
         public decimal DiscountedSubtotal { get; set; }
 
+        public decimal GiftCertificatesSubtotal { get; set; }
+
         public string DiscountMessage { get; set; }
 
         public decimal TaxTotal { get; set; }

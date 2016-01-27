@@ -4,7 +4,10 @@ $(function () {
 	Cart = function (data) {
 		var self = this;
 
-		self.Model = ko.mapping.fromJS(data);
+		self.Model = ko.mapping.fromJS(data, { 'ignore': ["ShippingDate"] });
+		if (data.ShippingDate !== null && data.ShippingDate !== undefined) {
+		    self.Model.ShippingDate = ko.observable(moment(data.ShippingDate).format('L'));
+		}
 		self.upgradeOptions = ko.observableArray([]);
 		self.refreshing = true;
 		self.initializing = true;
