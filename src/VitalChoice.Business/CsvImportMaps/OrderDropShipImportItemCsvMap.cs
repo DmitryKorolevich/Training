@@ -4,10 +4,11 @@ using VitalChoice.Infrastructure.Domain.Entities.VitalGreen;
 
 namespace VitalChoice.Business.CsvExportMaps
 {
-    public class OrderGiftListImportItemCsvMap : CsvClassMap<OrderGiftListImportItem>
+    public class OrderDropShipImportItemCsvMap : CsvClassMap<OrderDropShipImportItem>
     {
-        public OrderGiftListImportItemCsvMap()
+        public OrderDropShipImportItemCsvMap()
         {
+            Map(m => m.PoNumber).Name("po");
             Map(m => m.OrderNotes).Name("order notes");
             Map(m => m.FirstName).Name("First Name");
             Map(m => m.LastName).Name("Last Name");

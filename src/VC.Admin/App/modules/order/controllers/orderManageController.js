@@ -30,7 +30,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             var messages = "";
             if (result.Messages)
             {
-                $scope.forms.topForm.submitted = true;
+                if ($scope.forms.topForm != null)
+                {
+                    $scope.forms.topForm.submitted = true;
+                }
                 $scope.forms.mainForm.submitted = true;
                 $scope.forms.mainForm2.submitted = true;
                 $scope.forms.GCs.skussubmitted = true;
@@ -588,7 +591,14 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             }
             else
             {
-                $scope.order.OrderStatus = $scope.oldOrderStatus;
+                if ($scope.order.OrderStatus != $scope.oldOrderStatus)
+                {
+                    $scope.order.OrderStatus = $scope.oldOrderStatus;
+                }
+                else
+                {
+                    $scope.order.OrderStatus = 2; //processed
+                }
             }
         });
         $scope.orderEditDisabled = $scope.order.OrderStatus == 3 || $scope.order.OrderStatus == 4
@@ -1138,7 +1148,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             //billing info - for exist order all data should be sent and backend will save only needed one based on IdPaymentMethodType
         } else
         {
-            $scope.forms.topForm.submitted = true;
+            if ($scope.forms.topForm != null)
+            {
+                $scope.forms.topForm.submitted = true;
+            }
             $scope.forms.mainForm.submitted = true;
             $scope.forms.mainForm2.submitted = true;
             $scope.forms.submitted['profile'] = true;

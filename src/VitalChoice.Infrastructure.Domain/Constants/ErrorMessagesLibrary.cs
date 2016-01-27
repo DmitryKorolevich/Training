@@ -48,6 +48,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             public const string FieldIsRequired = "FieldIsRequired";
             public const string FieldIsInvalidEmail = "FieldIsInvalidEmail";
             public const string FieldMaxLength = "FieldMaxLength";
+            public const string SKUNotFound = "SKUNotFound";
         }
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
@@ -86,14 +87,15 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             {Keys.WrongCaptcha, "The reCAPTCHA wasn't entered correctly"},
             {Keys.CustomerWasModified, "The customer has been modified. Please refresh this page before making changes"},
             
-            {Keys.OrderImportRowError, "Row number {0} error: {1})"},
+            {Keys.OrderImportRowError, "Row number {0} error: {1}"},
             {Keys.ParseDateError, "{0} can't be parsed(format 'MM/dd/yyyy')"},
             {Keys.ParseIntError, "{0} can't be parsed"},
             {Keys.ZeroSkusForOrderInImport, "Order should have at least one sku with specified qty"},
             {Keys.InvalidFieldValue, "{0} have invalid value"},
             {Keys.FieldIsRequired, "{0} is required"},
-            {Keys.FieldIsInvalidEmail, "{0} is not a valid e-mail address."},
-            {Keys.FieldMaxLength, "{0} exceeds length of {1} literals."},
+            {Keys.FieldIsInvalidEmail, "{0} is not a valid e-mail address"},
+            {Keys.FieldMaxLength, "{0} exceeds length of {1} literals"},
+            {Keys.SKUNotFound, "Field \"{0}\": the given SKU isn't found({1})"},
         };
     }
 }

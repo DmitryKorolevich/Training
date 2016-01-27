@@ -277,3 +277,38 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT * FROM OrderOptionTypes WHERE [IdObjectType]=4 AND [Name]=N'GiftOrder')
+BEGIN
+
+	INSERT INTO [dbo].[OrderOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'GiftOrder', 5, NULL, 4, N'True'),
+	(N'MailOrder', 5, NULL, 4, N'False'),
+	(N'ShipDelayDateP', 6, NULL, 4, NULL),
+	(N'ShipDelayDateNP', 6, NULL, 4, NULL),
+	(N'ShippingUpgradeP', 3, (SELECT Id FROM [dbo].[Lookups] WHERE Name='ShippingUpgrade'), 4, NULL),
+	(N'ShippingUpgradeNP', 3, (SELECT Id FROM [dbo].[Lookups] WHERE Name='ShippingUpgrade'), 4, NULL),
+	(N'ShippingOverride', 1, NULL, 4, NULL),
+	(N'SurchargeOverride', 1, NULL, 4, NULL),
+	(N'PreferredShipMethod', 3, (SELECT Id FROM [dbo].[Lookups] WHERE Name='PreferredShipMethod'), 4, N'1'),
+	(N'DeliveryInstructions', 4, NULL, 4, NULL),	
+	(N'AlaskaHawaiiSurcharge', 1, NULL, 4, NULL),
+	(N'CanadaSurcharge', 1, NULL, 4, NULL),	
+	(N'StandardShippingCharges', 1, NULL, 4, NULL)
+
+END
+GO
+
+IF ((SELECT count(*) FROM OrderOptionTypes WHERE [Name]=N'PoNumber' AND [IdObjectType]=3)>1)
+BEGIN
+	DELETE OrderOptionTypes
+	WHERE [Id]=(SELECT TOP 1 [Id] FROM OrderOptionTypes WHERE [Name]=N'PoNumber' AND [IdObjectType]=3)
+
+	INSERT INTO [dbo].[OrderOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'PoNumber', 4, NULL, 1, NULL)
+END
+GO

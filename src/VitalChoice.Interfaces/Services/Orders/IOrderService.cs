@@ -22,7 +22,9 @@ namespace VitalChoice.Interfaces.Services.Orders
 
         Task<OrderDynamic> CreateNewNormalOrder(OrderStatus status);
 
-        Task<bool> ImportOrders(byte[] file, string fileName, OrderType orderType, int idCustomer, int idPaymentMethod);
+        POrderType? GetPOrderType(OrderDynamic item);
+
+        Task<bool> ImportOrders(byte[] file, string fileName, OrderType orderType, int idCustomer, int idPaymentMethod, int idAddedBy);
 
         #region AffiliatesOrders
 

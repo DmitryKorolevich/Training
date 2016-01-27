@@ -87,16 +87,16 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<bool>> UpdateOrderStatus(int id, int status, [FromBody] object model)
         {
-            var order = await _orderService.SelectAsync(id,false);
+            var order = await _orderService.SelectAsync(id, false);
 
-            if(order==null)
+            if (order == null)
             {
                 throw new AppValidationException("Id", "The given order doesn't exist.");
             }
             order.OrderStatus = (OrderStatus)status;
             order = await _orderService.UpdateAsync(order);
 
-            return order!=null;
+            return order != null;
         }
 
         [HttpPost]
@@ -134,7 +134,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<Result<OrderManageModel>> GetOrder(int id, int? idcustomer=null)
+        public async Task<Result<OrderManageModel>> GetOrder(int id, int? idcustomer = null)
         {
             if (id == 0)
             {
@@ -185,22 +185,10 @@ namespace VC.Admin.Controllers
 
             var item = _mapper.FromModel(model);
 
-            var pOrder = false;
-            var npOrder = false;
-            foreach(var skuOrdered in item.Skus)
+            var pOrderType = _orderService.GetPOrderType(item);
+            if (pOrderType.HasValue)
             {
-                pOrder = pOrder || skuOrdered.ProductWithoutSkus.IdObjectType == (int)ProductType.Perishable;
-                npOrder = npOrder || skuOrdered.ProductWithoutSkus.IdObjectType == (int)ProductType.NonPerishable;
-            }
-            if(pOrder && npOrder)
-            {
-                item.Data.POrderType = (int)POrderType.PNP;
-            } else if(pOrder)
-            {
-                item.Data.POrderType = (int)POrderType.P;
-            } else if(npOrder)
-            {
-                item.Data.POrderType = (int)POrderType.NP;
+                item.Data.POrderType = (int)pOrderType;
             }
 
             var sUserId = Request.HttpContext.User.GetUserId();
@@ -308,15 +296,15 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<FileResult> GetOrdersRegionStatisticReportFile([FromQuery]DateTime from, [FromQuery]DateTime to, 
-            [FromQuery]int? idcustomertype=null, [FromQuery]int? idordertype=null)
+        public async Task<FileResult> GetOrdersRegionStatisticReportFile([FromQuery]DateTime from, [FromQuery]DateTime to,
+            [FromQuery]int? idcustomertype = null, [FromQuery]int? idordertype = null)
         {
             OrderRegionFilter filter = new OrderRegionFilter()
             {
-                From=from,
-                To=to,
-                IdCustomerType= idcustomertype,
-                IdOrderType= idordertype,
+                From = from,
+                To = to,
+                IdCustomerType = idcustomertype,
+                IdOrderType = idordertype,
             };
 
             var items = await _orderService.GetOrdersRegionStatisticAsync(filter);
@@ -341,7 +329,7 @@ namespace VC.Admin.Controllers
 
         [HttpGet]
         public async Task<FileResult> GetOrdersZipStatisticReportFile([FromQuery]DateTime from, [FromQuery]DateTime to,
-            [FromQuery]int? idcustomertype=null, [FromQuery]int? idordertype=null)
+            [FromQuery]int? idcustomertype = null, [FromQuery]int? idordertype = null)
         {
             OrderRegionFilter filter = new OrderRegionFilter()
             {
@@ -374,7 +362,7 @@ namespace VC.Admin.Controllers
 
         [HttpGet]
         public async Task<FileResult> GetOrderWithRegionInfoItemsReportFile([FromQuery]DateTime from, [FromQuery]DateTime to,
-            [FromQuery]int? idcustomertype=null, [FromQuery]int? idordertype=null, [FromQuery]string region=null, [FromQuery]string zip=null)
+            [FromQuery]int? idcustomertype = null, [FromQuery]int? idordertype = null, [FromQuery]string region = null, [FromQuery]string zip = null)
         {
             OrderRegionFilter filter = new OrderRegionFilter()
             {
@@ -383,12 +371,12 @@ namespace VC.Admin.Controllers
                 IdCustomerType = idcustomertype,
                 IdOrderType = idordertype,
                 Region = region,
-                Zip=zip,
+                Zip = zip,
             };
             filter.Paging = null;
 
             var data = await _orderService.GetOrderWithRegionInfoItemsAsync(filter);
-            foreach(var item in data.Items)
+            foreach (var item in data.Items)
             {
                 item.DateCreated = TimeZoneInfo.ConvertTime(item.DateCreated, TimeZoneInfo.Local, _pstTimeZoneInfo);
             }
@@ -415,7 +403,7 @@ namespace VC.Admin.Controllers
         public async Task<Result<ICollection<GCOrderListItemModel>>> GetGCOrders(int id)
         {
             var toReturn = await _orderService.GetGCOrdersAsync(id);
-            return toReturn.Select(p=>new GCOrderListItemModel(p)).ToList();
+            return toReturn.Select(p => new GCOrderListItemModel(p)).ToList();
         }
 
         [HttpPost]
@@ -434,17 +422,16 @@ namespace VC.Admin.Controllers
             using (var stream = form.Files[0].OpenReadStream())
             {
                 var fileContent = stream.ReadFully();
-                try
-                {
-                    var toReturn = await _orderService.ImportOrders(fileContent, parsedContentDisposition.FileName, orderType, idCustomer, idPaymentMethod);
 
-                    return toReturn;
-                }
-                catch (Exception ex)
+                var sUserId = Request.HttpContext.User.GetUserId();
+                int userId;
+                var toReturn = false;
+                if (int.TryParse(sUserId, out userId))
                 {
-                    this.logger.LogError(ex.ToString());
-                    throw;
+                    toReturn = await _orderService.ImportOrders(fileContent, parsedContentDisposition.FileName, orderType, idCustomer, idPaymentMethod, userId);
                 }
+                
+                return toReturn;
             }
         }
     }

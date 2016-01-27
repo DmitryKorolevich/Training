@@ -12,8 +12,14 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VitalChoice.Infrastructure.Domain.Entities.Orders
 {
-    public class OrderGiftListImportItem : OrderBaseImportItem
+    public class OrderDropShipImportItem : OrderBaseImportItem
     {
+        [Map]
+        [Required]
+        [Display(Name = "po")]
+        [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+        public string PoNumber { get; set; }
+
         [Map]
         [Display(Name = "Order Notes")]
         [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
@@ -31,11 +37,10 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Orders
         public override void SetFields(OrderDynamic order)
         {
             base.SetFields(order);
-            order.Data.KeyCode = "GIFT LIST";
-            order.OrderStatus = OrderStatus.OnHold;
-            order.Data.GiftOrder = true;
-            order.Data.OrderType = (int)SourceOrderType.Phone;
-            order.Data.PreferredShipMethod = (int)PreferredShipMethod.Best;
+            order.Data.KeyCode = "DROPSHIP";
+            order.OrderStatus = OrderStatus.Processed;
+            order.Data.OrderType = (int)SourceOrderType.Web;
+            order.Data.PoNumber = PoNumber;
             order.Data.OrderNotes = OrderNotes;
             order.Data.GiftMessage = GiftMessage;
             order.Data.ShipDelayType = ShipDelayType.EntireOrder;

@@ -847,7 +847,6 @@ END
 
 GO
 
-
 IF NOT EXISTS(SELECT [Id] FROM [dbo].[EmailTemplates] WHERE [Name] = 'PrivacyRequestEmail')
 BEGIN
 
@@ -897,6 +896,62 @@ INSERT INTO [dbo].[EmailTemplates]
            ,NULL
            ,'PrivacyRequestEmail'
            ,'Privacy request email')
+
+END
+
+GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[EmailTemplates] WHERE [Name] = 'GLOrdersImportEmail')
+BEGIN
+
+DECLARE @contentItemId int
+
+INSERT INTO [dbo].[ContentItems]
+           ([Created]
+           ,[Updated]
+           ,[Template]
+           ,[Description]
+           ,[Title]
+           ,[MetaKeywords]
+           ,[MetaDescription])
+     VALUES
+           (GETDATE()
+           ,GETDATE()
+           ,'<%
+<body:body>
+{{
+	<p>Summary of the following Gift List Import completed @date(Date) {{MM''/''dd''/''yyyy hh:mm tt}}</p>
+	<p>Agent: @(Agent)</p>
+	<p>Customer Name: @(CustomerFirstName) @(CustomerLastName)</p>
+	<p>Customer #: @(IdCustomer)</p>
+	<p>Total # of imported orders: @(ImportedOrdersCount)</p>
+	<p>Total $ amount of orders imported: @(ImportedOrdersAmount)</p>
+	<p>Credit Card Selected: @(CardNumber)</p>
+}}
+%>'
+           ,''
+           ,'Vital Choice - "Gift List" orders were imported'
+           ,NULL
+           ,NULL)
+
+SET @contentItemId=@@identity
+
+INSERT INTO [dbo].[EmailTemplates]
+           ([Name]
+           ,[ContentItemId]
+           ,[MasterContentItemId]
+           ,[StatusCode]
+           ,[UserId]
+           ,[ModelType]
+           ,[EmailDescription])
+     VALUES
+           ('GLOrdersImportEmail'
+           ,@contentItemId
+           ,(SELECT Id FROM MasterContentItems WHERE Name='Admin Email Template')
+           ,2
+           ,NULL
+           ,'GLOrdersImportEmail'
+           ,'Gift List successful orders import email')
 
 END
 
