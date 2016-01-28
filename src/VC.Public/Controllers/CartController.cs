@@ -123,24 +123,30 @@ namespace VC.Public.Controllers
         [HttpPost]
         public async Task<Result<ViewCartModel>> UpdateCart([FromBody] ViewCartModel model)
         {
+            if (model.ShippingDate != null && model.ShippingDate <= DateTime.Today)
+            {
+                model.ShippingDateError = "Invalid date. Must be in the future. Please correct.";
+                return model;
+            }
+            model.ShippingDateError = string.Empty;
             var existingUid = Request.GetCartUid();
             CustomerCartOrder cart;
             if (await CustomerLoggenIn())
             {
                 var id = GetInternalCustomerId();
                 cart = await _checkoutService.GetOrCreateCart(existingUid, id);
-
             }
             else
             {
                 cart = await _checkoutService.GetOrCreateCart(existingUid);
             }
-            cart.Order.Skus?.MergeUpdateWithDeleteKeyed(model.Skus, ordered => ordered.Sku.Code, skuModel => skuModel.Code, skuModel =>
-            {
-                var result = _productService.GetSkuOrderedAsync(skuModel.Code).Result;
-                result.Quantity = skuModel.Quantity;
-                return result;
-            }, (ordered, skuModel) => ordered.Quantity = skuModel.Quantity);
+            cart.Order.Skus?.MergeUpdateWithDeleteKeyed(model.Skus.Where(s => s.Quantity > 0).ToArray(), ordered => ordered.Sku.Code,
+                skuModel => skuModel.Code, skuModel =>
+                {
+                    var result = _productService.GetSkuOrderedAsync(skuModel.Code).Result;
+                    result.Quantity = skuModel.Quantity;
+                    return result;
+                }, (ordered, skuModel) => ordered.Quantity = skuModel.Quantity);
             cart.Order.Discount = await _discountService.GetByCode(model.PromoCode);
             var gcCodes = model.GiftCertificateCodes.Select(x => x.Value).ToList();
             cart.Order.GiftCertificates?.MergeKeyed(
@@ -229,8 +235,8 @@ namespace VC.Public.Controllers
                     Field = "DiscountCode",
                     Message = "Discount not found"
                 });
-
             }
+            cartModel.FreeShipDifference = context.FreeShippingThresholdDifference;
             cartModel.DiscountDescription = context.Order?.Discount?.Description;
 	        cartModel.DiscountMessage = context.DiscountMessage;
 	        cartModel.Messages =

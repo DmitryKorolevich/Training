@@ -15,6 +15,10 @@ namespace VitalChoice.Business.Workflow.Actions.Shipping
         {
             if (dataContext.Data.PromoProducts < 99 && dataContext.Data.DeliveredAmount > 0)
             {
+                if (dataContext.Data.PromoProducts < 99)
+                {
+                    dataContext.FreeShippingThresholdDifference = 99 - dataContext.Data.PromoProducts;
+                }
                 if (dataContext.Data.PromoProducts < 50)
                 {
                     dataContext.StandardShippingCharges = (decimal) 4.95;

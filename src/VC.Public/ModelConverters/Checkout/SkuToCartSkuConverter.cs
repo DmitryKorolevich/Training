@@ -12,7 +12,7 @@ namespace VC.Public.ModelConverters.Checkout
     {
         public override void DynamicToModel(CartSkuModel model, SkuDynamic dynamic)
         {
-            model.InStock = !((bool?) dynamic.SafeData.DisregardStock ?? false) || ((int?) dynamic.SafeData.Stock ?? 0) > 0;
+            model.InStock = ((bool?) dynamic.SafeData.DisregardStock ?? false) || ((int?) dynamic.SafeData.Stock ?? 0) > 0;
         }
 
         public override void ModelToDynamic(CartSkuModel model, SkuDynamic dynamic)

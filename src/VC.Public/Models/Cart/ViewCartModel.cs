@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 
@@ -21,9 +22,13 @@ namespace VC.Public.Models.Cart
 
 	    public DateTime? ShippingDate { get; set; }
 
+        public string ShippingDateError { get; set; }
+
 	    public decimal SubTotal { get; set; }
 
 	    public decimal? ShippingCost { get; set; }
+
+        public decimal? FreeShipDifference { get; set; }
 
 	    public decimal OrderTotal { get; set; }
 
