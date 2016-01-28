@@ -219,8 +219,9 @@ namespace VitalChoice.Business.Services.Products
 
         public Task<GiftCertificate> GetGiftCertificateAsync(string code)
         {
-            var conditions = new GcQuery().WithCode(code).NotDeleted();
-            var query = giftCertificateRepository.Query(conditions);
+            if (string.IsNullOrWhiteSpace(code))
+                return Task.FromResult<GiftCertificate>(null);
+            var query = giftCertificateRepository.Query(g => g.Code == code && g.StatusCode != RecordStatusCode.Deleted);
 
             return query.SelectFirstOrDefaultAsync(false);
         }

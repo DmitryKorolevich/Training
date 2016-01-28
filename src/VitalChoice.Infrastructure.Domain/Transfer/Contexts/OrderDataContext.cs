@@ -43,6 +43,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
         {
             Messages = new List<MessageInfo>();
             PromoSkus = new List<SkuOrdered>();
+            GcMessageInfos = new List<MessageInfo>();
             SplitInfo = new SplitInfo();
         }
 
@@ -57,6 +58,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
         public ICollection<LookupItem<ShippingUpgradeOption>> ShippingUpgradePOptions { get; set; }
 
         public ICollection<LookupItem<ShippingUpgradeOption>> ShippingUpgradeNpOptions { get; set; }
+
+        public ICollection<MessageInfo> GcMessageInfos { get; set; }
 
         public decimal ShippingTotal { get; set; }
 

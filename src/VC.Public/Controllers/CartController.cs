@@ -135,7 +135,7 @@ namespace VC.Public.Controllers
             {
                 cart = await _checkoutService.GetOrCreateCart(existingUid);
             }
-            cart.Order.Skus.MergeUpdateWithDeleteKeyed(model.Skus, ordered => ordered.Sku.Code, skuModel => skuModel.Code, skuModel =>
+            cart.Order.Skus?.MergeUpdateWithDeleteKeyed(model.Skus, ordered => ordered.Sku.Code, skuModel => skuModel.Code, skuModel =>
             {
                 var result = _productService.GetSkuOrderedAsync(skuModel.Code).Result;
                 result.Quantity = skuModel.Quantity;
@@ -143,10 +143,12 @@ namespace VC.Public.Controllers
             }, (ordered, skuModel) => ordered.Quantity = skuModel.Quantity);
             cart.Order.Discount = await _discountService.GetByCode(model.PromoCode);
             var gcCodes = model.GiftCertificateCodes.Select(x => x.Value).ToList();
-            cart.Order.GiftCertificates.MergeKeyed(gcCodes, gc => gc.GiftCertificate.Code, code => code,
+            cart.Order.GiftCertificates?.MergeKeyed(
+                gcCodes.Select(code => _gcService.GetGiftCertificateAsync(code).Result).Where(g => g != null).ToArray(),
+                gc => gc.GiftCertificate?.Code, code => code.Code,
                 code => new GiftCertificateInOrder
                 {
-                    GiftCertificate = _gcService.GetGiftCertificateAsync(code).Result
+                    GiftCertificate = code
                 });
             if (!model.ShipAsap)
             {
@@ -219,7 +221,17 @@ namespace VC.Public.Controllers
         private async Task Calculate(ViewCartModel cartModel, OrderDynamic order)
         {
             var context = await _orderService.CalculateOrder(order);
-	        cartModel.DiscountDescription = context.Order?.Discount?.Description;
+            var gcMessages = context.GcMessageInfos.ToDictionary(m => m.Field);
+            if (!string.IsNullOrWhiteSpace(cartModel.PromoCode) && order.Discount == null)
+            {
+                context.Messages.Add(new MessageInfo
+                {
+                    Field = "DiscountCode",
+                    Message = "Discount not found"
+                });
+
+            }
+            cartModel.DiscountDescription = context.Order?.Discount?.Description;
 	        cartModel.DiscountMessage = context.DiscountMessage;
 	        cartModel.Messages =
 		        context.Messages?.Select(x => new KeyValuePair<string, string>(x.Field, x.Message)).ToList();
@@ -234,13 +246,27 @@ namespace VC.Public.Controllers
                     result.SubTotal = sku.Quantity*sku.Amount;
                     return result;
                 }) ?? Enumerable.Empty<CartSkuModel>());
+            var gcsInCart = cartModel.GiftCertificateCodes.ToArray();
             cartModel.GiftCertificateCodes.Clear();
-            cartModel.GiftCertificateCodes.AddRange(
-                order.GiftCertificates?.Select(g => g.GiftCertificate.Code).Select(x => new CartGcModel()
+            foreach (var code in gcsInCart)
+            {
+                if (!string.IsNullOrWhiteSpace(code.Value) && order.GiftCertificates.All(g => g.GiftCertificate.Code != code.Value))
                 {
-	                Value = x,
-					SuccessMessage = string.Empty,//todo: alex g please population here
-					ErrorMessage = string.Empty //todo: here as well
+                    cartModel.GiftCertificateCodes.Add(code);
+                    code.ErrorMessage = "Gift Certificate Not Found";
+                }
+            }
+            cartModel.GiftCertificateCodes.AddRange(
+                order.GiftCertificates?.Select(g => g.GiftCertificate.Code).Select(x =>
+                {
+                    var message = gcMessages[x];
+
+                    return new CartGcModel
+                    {
+                        Value = x,
+                        SuccessMessage = message.MessageLevel == MessageLevel.Info ? message.Message : string.Empty,
+                        ErrorMessage = message.MessageLevel == MessageLevel.Error ? message.Message : string.Empty
+                    };
                 }) ??
                 Enumerable.Empty<CartGcModel>());
             cartModel.ShippingUpgradeNPOptions = context.ShippingUpgradeNpOptions;
