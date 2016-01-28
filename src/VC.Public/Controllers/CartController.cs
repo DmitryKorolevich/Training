@@ -248,7 +248,15 @@ namespace VC.Public.Controllers
             cartModel.DiscountTotal = context.DiscountTotal;
             cartModel.GiftCertificatesTotal = context.GiftCertificatesSubtotal;
             cartModel.PromoSkus.Clear();
-            cartModel.PromoSkus = cartModel.Skus;
+            cartModel.PromoSkus.AddRange(context.PromoSkus?.Select(sku =>
+            {
+                var result = _skuMapper.ToModel<CartSkuModel>(sku.Sku);
+                _productMapper.UpdateModel(result, sku.ProductWithoutSkus);
+                result.Price = sku.Amount;
+                result.Quantity = sku.Quantity;
+                result.SubTotal = sku.Quantity*sku.Amount;
+                return result;
+            }) ?? Enumerable.Empty<CartSkuModel>());
             cartModel.OrderTotal = order.Total;
             cartModel.PromoCode = order.Discount?.Code;
             cartModel.ShippingCost = order.ShippingTotal;
