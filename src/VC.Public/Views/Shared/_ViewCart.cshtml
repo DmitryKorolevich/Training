@@ -34,7 +34,7 @@
 			<span class="stock-presence-note" data-bind="text: InStock() ? 'In Stock Ready to Ship' : 'Not in Stock'"></span>
 		</td>
 		<td data-bind="text: formatCurrency(Price())"></td>
-		<td>
+		<td class="width-cart-quantity">
 			@if (Model.Skus.Any())
 			{
 				@Html.TextBoxFor(x => x.Skus[0].Quantity, new { @class = "input-control width-small", data_bind = "value: Quantity, attr: { name: 'SkusQuantity' + $index(), id: 'SkusQuantity' + $index()}" })
@@ -42,7 +42,7 @@
 			}
 		</td>
 		<td data-bind="text: formatCurrency(SubTotal())"></td>
-		<td class="grid-controls-container">
+		<td class="grid-controls-container width-cart-control">
 			<a class="circle-button button-red" data-bind="click: $parent.removeSku">
 				<i class="glyphicon glyphicon-remove-sign"></i>
 			</a>
@@ -66,6 +66,8 @@
 		<th>
 			Subtotal
 		</th>
+		<th>
+		</th>
 	</tr>
 	</thead>
 	<tbody data-bind="foreach:Model.PromoSkus">
@@ -81,8 +83,9 @@
 			<span class="stock-presence-note" data-bind="text: InStock() ? 'In Stock Ready to Ship' : 'Not in Stock'"></span>
 		</td>
 		<td data-bind="text: formatCurrency(Price())"></td>
-		<td data-bind="text: Quantity"></td>
+		<td class="width-cart-quantity" data-bind="text: Quantity"></td>
 		<td data-bind="text: formatCurrency(SubTotal())"></td>
+		<td class="grid-controls-container width-cart-control"></td>
 	</tr>
 	</tbody>
 </table>

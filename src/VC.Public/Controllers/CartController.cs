@@ -236,22 +236,19 @@ namespace VC.Public.Controllers
                 }) ?? Enumerable.Empty<CartSkuModel>());
             cartModel.GiftCertificateCodes.Clear();
             cartModel.GiftCertificateCodes.AddRange(
-                order.GiftCertificates?.Select(g => g.GiftCertificate.Code).Select(x => new CartGcModel() {Value = x}) ??
+                order.GiftCertificates?.Select(g => g.GiftCertificate.Code).Select(x => new CartGcModel()
+                {
+	                Value = x,
+					SuccessMessage = string.Empty,//todo: alex g please population here
+					ErrorMessage = string.Empty //todo: here as well
+                }) ??
                 Enumerable.Empty<CartGcModel>());
             cartModel.ShippingUpgradeNPOptions = context.ShippingUpgradeNpOptions;
             cartModel.ShippingUpgradePOptions = context.ShippingUpgradePOptions;
             cartModel.DiscountTotal = context.DiscountTotal;
             cartModel.GiftCertificatesTotal = context.GiftCertificatesSubtotal;
             cartModel.PromoSkus.Clear();
-            cartModel.PromoSkus.AddRange(context.PromoSkus?.Select(sku =>
-            {
-                var result = _skuMapper.ToModel<CartSkuModel>(sku.Sku);
-                _productMapper.UpdateModel(result, sku.ProductWithoutSkus);
-                result.Price = sku.Amount;
-                result.Quantity = sku.Quantity;
-                result.SubTotal = sku.Quantity*sku.Amount;
-                return result;
-            }) ?? Enumerable.Empty<CartSkuModel>());
+            cartModel.PromoSkus = cartModel.Skus;
             cartModel.OrderTotal = order.Total;
             cartModel.PromoCode = order.Discount?.Code;
             cartModel.ShippingCost = order.ShippingTotal;
