@@ -235,7 +235,7 @@ namespace VC.Public.Controllers
                 Enumerable.Empty<CartGcModel>());
             cartModel.ShippingUpgradeNPOptions = context.ShippingUpgradeNpOptions;
             cartModel.ShippingUpgradePOptions = context.ShippingUpgradePOptions;
-            cartModel.DiscountTotal = context.DiscountTotal;
+            cartModel.DiscountTotal = -context.DiscountTotal;
             cartModel.GiftCertificatesTotal = context.GiftCertificatesSubtotal;
             cartModel.PromoSkus.Clear();
             cartModel.PromoSkus.AddRange(context.PromoSkus?.Select(sku =>

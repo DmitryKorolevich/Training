@@ -255,7 +255,7 @@ namespace VitalChoice.Business.Services.Products
         {
             if (string.IsNullOrWhiteSpace(code))
                 return Task.FromResult<DiscountDynamic>(null);
-            return SelectFirstAsync(new DiscountQuery().WithCode(code).NotDeleted(), withDefaults: true);
+            return SelectFirstAsync(d => d.Code == code && d.StatusCode != (int) RecordStatusCode.Deleted, withDefaults: true);
         }
 
         #endregion

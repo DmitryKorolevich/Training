@@ -19,6 +19,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Context;
+using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
@@ -45,13 +46,15 @@ namespace VitalChoice.Business.Services.Checkout
         private readonly IDynamicReadServiceAsync<AddressDynamic, OrderAddress> _addressService;
         private readonly ICountryService _countryService;
         private readonly IEcommerceRepositoryAsync<OrderToSku> _skuRepository;
+        private readonly IRepositoryAsync<ProductContent> _productContentRep;
         private readonly ILogger _logger;
 
         public CheckoutService(IEcommerceRepositoryAsync<Cart> cartRepository,
             DiscountMapper discountMapper,
             SkuMapper skuMapper, ProductMapper productMapper, IOrderService orderService, EcommerceContext context,
             ILoggerProviderExtended loggerProvider, ICustomerService customerService, IEcommerceRepositoryAsync<CartToSku> skusRepository,
-            IDynamicReadServiceAsync<AddressDynamic, OrderAddress> addressService, ICountryService countryService, IEcommerceRepositoryAsync<OrderToSku> skuRepository)
+            IDynamicReadServiceAsync<AddressDynamic, OrderAddress> addressService, ICountryService countryService,
+            IEcommerceRepositoryAsync<OrderToSku> skuRepository, IRepositoryAsync<ProductContent> productContentRep)
         {
             _cartRepository = cartRepository;
             _discountMapper = discountMapper;
@@ -64,6 +67,7 @@ namespace VitalChoice.Business.Services.Checkout
             _addressService = addressService;
             _countryService = countryService;
             _skuRepository = skuRepository;
+            _productContentRep = productContentRep;
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -112,11 +116,14 @@ namespace VitalChoice.Business.Services.Checkout
                     _productMapper.OptionTypes.Where(
                         _productMapper.GetOptionTypeQuery().WithObjectType(s.Sku.Product.IdObjectType).Query().CacheCompile()).ToList();
                 s.Sku.Product.OptionTypes = s.Sku.OptionTypes;
+                var productUrl = _productContentRep.Query(p => p.Id == s.Sku.IdProduct).Select(p => p.Url, false).FirstOrDefault();
+                var product = _productMapper.FromEntity(s.Sku.Product, true);
+                product.Url = productUrl;
                 return new SkuOrdered
                 {
                     Amount = s.Amount,
                     Sku = _skuMapper.FromEntity(s.Sku, true),
-                    ProductWithoutSkus = _productMapper.FromEntity(s.Sku.Product, true),
+                    ProductWithoutSkus = product,
                     Quantity = s.Quantity
                 };
             }).ToList();
@@ -182,6 +189,11 @@ namespace VitalChoice.Business.Services.Checkout
                     else
                     {
                         result.Order = await _orderService.SelectAsync(cart.IdOrder.Value, true);
+                        foreach (var skuOrdered in result.Order.Skus)
+                        {
+                            var productUrl = _productContentRep.Query(p => p.Id == skuOrdered.Sku.IdProduct).Select(p => p.Url, false).FirstOrDefault();
+                            skuOrdered.ProductWithoutSkus.Url = productUrl;
+                        }
                     }
                     transaction.Commit();
                 }
