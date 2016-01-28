@@ -46,5 +46,11 @@ namespace VC.Public.Models.Cart
 		public IList<CartSkuModel> Skus { get; set; }
 
 		public IList<CartSkuModel> PromoSkus { get; set; }
-	}
+
+	    public string DiscountMessage { get; set; }
+
+	    public string DiscountDescription { get; set; }
+
+	    public IList<KeyValuePair<string, string>> Messages { get; set; }
+    }
 }

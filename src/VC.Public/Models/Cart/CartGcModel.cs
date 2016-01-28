@@ -8,5 +8,9 @@ namespace VC.Public.Models.Cart
     public class CartGcModel
     {
 	    public string Value { get; set; }
+
+	    public string SuccessMessage { get; set; }
+
+	    public string ErrorMessage { get; set; }
     }
 }

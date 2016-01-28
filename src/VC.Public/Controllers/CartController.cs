@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Authorization;
@@ -218,7 +219,11 @@ namespace VC.Public.Controllers
         private async Task Calculate(ViewCartModel cartModel, OrderDynamic order)
         {
             var context = await _orderService.CalculateOrder(order);
-            cartModel.Skus.Clear();
+	        cartModel.DiscountDescription = context.Order?.Discount?.Description;
+	        cartModel.DiscountMessage = context.DiscountMessage;
+	        cartModel.Messages =
+		        context.Messages?.Select(x => new KeyValuePair<string, string>(x.Field, x.Message)).ToList();
+			cartModel.Skus.Clear();
             cartModel.Skus.AddRange(
                 order.Skus?.Select(sku =>
                 {
@@ -231,7 +236,12 @@ namespace VC.Public.Controllers
                 }) ?? Enumerable.Empty<CartSkuModel>());
             cartModel.GiftCertificateCodes.Clear();
             cartModel.GiftCertificateCodes.AddRange(
-                order.GiftCertificates?.Select(g => g.GiftCertificate.Code).Select(x => new CartGcModel() {Value = x}) ??
+                order.GiftCertificates?.Select(g => g.GiftCertificate.Code).Select(x => new CartGcModel()
+                {
+	                Value = x,
+					SuccessMessage = string.Empty,//todo: alex g please population here
+					ErrorMessage = string.Empty //todo: here as well
+                }) ??
                 Enumerable.Empty<CartGcModel>());
             cartModel.ShippingUpgradeNPOptions = context.ShippingUpgradeNpOptions;
             cartModel.ShippingUpgradePOptions = context.ShippingUpgradePOptions;
