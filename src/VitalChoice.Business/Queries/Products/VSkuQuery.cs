@@ -35,6 +35,15 @@ namespace VitalChoice.Business.Queries.Product
             return this;
         }
 
+        public VSkuQuery WithExactCodes(ICollection<string> codes)
+        {
+            if (codes != null)
+            {
+                Add(x => codes.Contains(x.Code));
+            }
+            return this;
+        }
+
         public VSkuQuery WithDescriptionName(string descriptionName)
         {
             if (!string.IsNullOrEmpty(descriptionName))

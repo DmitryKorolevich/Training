@@ -22,9 +22,9 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    {
 	        return $http.post(baseUrl + 'GetOrders', filter, getConfig(tracker));
 	    },
-	    getOrder: function (id, idcustomer, tracker)
+	    getOrder: function (id, idcustomer, refreshPrices, tracker)
 	    {
-	        return $http.get(baseUrl + 'GetOrder/{0}?idcustomer={1}'.format(id, idcustomer), getConfig(tracker));
+	        return $http.get(baseUrl + 'GetOrder/{0}?idcustomer={1}&refreshprices={2}'.format(id, idcustomer, refreshPrices), getConfig(tracker));
 	    },
 	    calculateOrder: function (model, canceller)
 	    {

@@ -221,7 +221,7 @@ namespace VitalChoice.Business.Services.Products
         {
             if (string.IsNullOrWhiteSpace(code))
                 return Task.FromResult<GiftCertificate>(null);
-            var query = giftCertificateRepository.Query(g => g.Code == code && g.StatusCode != RecordStatusCode.Deleted);
+            var query = giftCertificateRepository.Query(new GcQuery().WithEqualCode(code).NotDeleted());
 
             return query.SelectFirstOrDefaultAsync(false);
         }

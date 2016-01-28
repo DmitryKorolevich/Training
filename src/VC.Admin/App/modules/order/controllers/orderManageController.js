@@ -296,7 +296,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
     var loadOrder = function ()
     {
-        orderService.getOrder($scope.id, $scope.idCustomer!=0 ? $scope.idCustomer : null, $scope.addEditTracker)
+        orderService.getOrder($scope.id, $scope.idCustomer!=0 ? $scope.idCustomer : null, false, $scope.addEditTracker)
             .success(function (result)
             {
                 processLoadingOrder(result);
@@ -309,7 +309,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
     var loadOrderSource = function ()
     {
-        orderService.getOrder($scope.idOrderSource, null, $scope.addEditTracker)
+        orderService.getOrder($scope.idOrderSource, null, true, $scope.addEditTracker)
             .success(function (result)
             {
                 if (result.Success)
@@ -318,7 +318,6 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     {
                         $scope.order.SkuOrdereds = result.Data.SkuOrdereds;
                     }
-                    $scope.order.PromoSkus = result.Data.PromoSkus;
                     loadReferencedData();
                 } else
                 {
@@ -357,6 +356,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 $scope.countries = result.countriesCall.data.Data;
 
                 $scope.currentCustomer = result.customerGetCall.data.Data;
+                if ($scope.currentCustomer.InceptionDate)
+                {
+                    $scope.currentCustomer.InceptionDate = Date.parseDateTime($scope.currentCustomer.InceptionDate);
+                }
                 $scope.options.DBStatusCode = $scope.currentCustomer.StatusCode;
                 if (!$scope.currentCustomer.Email)
                 {
@@ -585,19 +588,22 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         $scope.order.AutoShip = $scope.order.AutoShipFrequency ? true : false;
         $scope.$watch('order.OnHold', function (newValue, oldValue)
         {
-            if (newValue)
+            if (newValue !== undefined && newValue !== null)
             {
-                $scope.order.OrderStatus = 7;
-            }
-            else
-            {
-                if ($scope.order.OrderStatus != $scope.oldOrderStatus)
+                if (newValue)
                 {
-                    $scope.order.OrderStatus = $scope.oldOrderStatus;
+                    $scope.order.OrderStatus = 7;
                 }
                 else
                 {
-                    $scope.order.OrderStatus = 2; //processed
+                    if ($scope.order.OrderStatus != $scope.oldOrderStatus)
+                    {
+                        $scope.order.OrderStatus = $scope.oldOrderStatus;
+                    }
+                    else
+                    {
+                        $scope.order.OrderStatus = 2; //processed
+                    }
                 }
             }
         });
@@ -1112,6 +1118,11 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
             var order = angular.copy($scope.order);
             order.Customer = angular.copy($scope.currentCustomer);
+
+            if (order.Customer.InceptionDate)
+            {
+                order.Customer.InceptionDate = order.Customer.InceptionDate.toServerDateTime();
+            }
 
             if (!order.AutoShip)
             {

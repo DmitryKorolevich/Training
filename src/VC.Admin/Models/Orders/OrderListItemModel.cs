@@ -21,6 +21,10 @@ namespace VC.Admin.Models.Orders
 
         public DateTime? DateShipped { get; set; }
 
+        public DateTime? PDateShipped { get; set; }
+
+        public DateTime? NPDateShipped { get; set; }
+
         public decimal Total { get; set; }
 
         public int? IdEditedBy { get; set; }
@@ -56,6 +60,8 @@ namespace VC.Admin.Models.Orders
                 IdPaymentMethod = item.IdPaymentMethod;
                 DateCreated = item.DateCreated;
                 DateShipped = item.DateShipped;
+                PDateShipped = item.PDateShipped;
+                NPDateShipped = item.NPDateShipped;
                 Total = item.Total;
                 IdEditedBy = item.IdEditedBy;
                 EditedByAgentId = item.EditedByAgentId;

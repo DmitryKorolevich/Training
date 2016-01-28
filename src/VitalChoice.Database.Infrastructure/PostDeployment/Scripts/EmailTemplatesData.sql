@@ -924,7 +924,7 @@ INSERT INTO [dbo].[ContentItems]
 	<p>Agent: @(Agent)</p>
 	<p>Customer Name: @(CustomerFirstName) @(CustomerLastName)</p>
 	<p>Customer #: @(IdCustomer)</p>
-	<p>Total # of imported orders: @(ImportedOrdersCount)</p>
+	<p>Total # of imported orders: @(@string.Format("{0:c}",model.ImportedOrdersAmount))</p>
 	<p>Total $ amount of orders imported: @(ImportedOrdersAmount)</p>
 	<p>Credit Card Selected: @(CardNumber)</p>
 }}

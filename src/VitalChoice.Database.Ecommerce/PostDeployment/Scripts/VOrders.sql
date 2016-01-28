@@ -9,38 +9,38 @@ SELECT
 	o.Id,
 	CAST(o.Id as nvarchar(20)) As IdString,
 	o.OrderStatus,
-	CAST(oval.Value as int) As IdOrderSource,
-	oval.Value As SIdOrderSource,
-	onval.Value As OrderNotes,
+	CAST(orderOptions.OrderType as int) As IdOrderSource,
+	orderOptions.OrderType As SIdOrderSource,
+	orderOptions.OrderNotes As OrderNotes,
 	opm.IdObjectType As IdPaymentMethod,
 	o.DateCreated,
-	CAST(NULL as datetime2) As DateShipped,
 	o.Total,
 	o.IdEditedBy,
 	o.DateEdited,
-	CAST(opval.Value as int) As POrderType,
-	opval.Value As SPOrderType,
+	CAST(orderOptions.POrderType as int) As POrderType,
+	orderOptions.POrderType As SPOrderType,
 	c.IdObjectType AS IdCustomerType,
-	CASE WHEN sppval.Value IS NULL AND snpval.Value IS NULL THEN 2 ELSE 1 END As IdShippingMethod,
+	CASE WHEN orderOptions.ShippingUpgradeP IS NULL AND orderOptions.ShippingUpgradeNP IS NULL THEN 2 ELSE 1 END As IdShippingMethod,
 	c.Id AS IdCustomer,
 	options.Company,
 	options.FirstName+' '+options.LastName As Customer,
 	st.StateCode,
 	shipOptions.FirstName+' '+shipOptions.LastName As ShipTo,
-	CONVERT(bit,CASE WHEN ho.Id IS NULL THEN 0 ELSE 1 END) As Healthwise
+	CONVERT(bit,CASE WHEN ho.Id IS NULL THEN 0 ELSE 1 END) As Healthwise,
+	CAST(orderOptions.[ShipDelayDate] as datetime2) As DateShipped,
+	CAST(orderOptions.[ShipDelayDateP] as datetime2) As PDateShipped,
+	CAST(orderOptions.[ShipDelayDateNP] as datetime2) As NPDateShipped
 	FROM Orders AS o
 	LEFT JOIN HealthwiseOrders AS ho ON ho.Id = o.Id
 	LEFT JOIN OrderPaymentMethods AS opm ON opm.Id = o.IdPaymentMethod
-	LEFT JOIN OrderOptionTypes AS oopt ON oopt.Name = N'OrderType' AND (oopt.IdObjectType = o.IdObjectType OR oopt.IdObjectType IS NULL)
-	LEFT JOIN OrderOptionValues AS oval ON oval.IdOrder = o.Id AND oval.IdOptionType = oopt.Id
-	LEFT JOIN OrderOptionTypes AS onopt ON onopt.Name = N'OrderNotes' AND (onopt.IdObjectType = o.IdObjectType OR onopt.IdObjectType IS NULL)
-	LEFT JOIN OrderOptionValues AS onval ON onval.IdOrder = o.Id AND onval.IdOptionType = onopt.Id
-	LEFT JOIN OrderOptionTypes AS opopt ON opopt.Name = N'POrderType' AND (opopt.IdObjectType = o.IdObjectType OR opopt.IdObjectType IS NULL)
-	LEFT JOIN OrderOptionValues AS opval ON opval.IdOrder = o.Id AND opval.IdOptionType = opopt.Id
-	LEFT JOIN OrderOptionTypes AS sppopt ON sppopt.Name = N'ShippingUpgradeP' AND (sppopt.IdObjectType = o.IdObjectType OR sppopt.IdObjectType IS NULL)
-	LEFT JOIN OrderOptionValues AS sppval ON sppval.IdOrder = o.Id AND sppval.IdOptionType = sppopt.Id
-	LEFT JOIN OrderOptionTypes AS snpopt ON snpopt.Name = N'ShippingUpgradeNP' AND (snpopt.IdObjectType = o.IdObjectType OR snpopt.IdObjectType IS NULL)
-	LEFT JOIN OrderOptionValues AS snpval ON snpval.IdOrder = o.Id AND snpval.IdOptionType = snpopt.Id
+
+	LEFT JOIN (SELECT [IdOrder], [OrderType], [OrderNotes], [POrderType], [ShippingUpgradeP], [ShippingUpgradeNP], [ShipDelayDate], [ShipDelayDateP], [ShipDelayDateNP]
+	FROM (SELECT [IdOrder], [Name], [Value] FROM [dbo].[OrderOptionTypes] AS adt
+	INNER JOIN [dbo].[OrderOptionValues] AS adv on adt.Id = adv.IdOptionType) As source
+	PIVOT(
+	MIN([Value]) FOR [Name] in ([OrderType], [OrderNotes], [POrderType], [ShippingUpgradeP], [ShippingUpgradeNP], [ShipDelayDate], [ShipDelayDateP], [ShipDelayDateNP])
+	) AS piv) AS orderOptions ON o.Id = orderOptions.IdOrder
+
 	JOIN Customers AS c ON c.Id = o.[IdCustomer]
 	JOIN Addresses AS ad ON ad.Id = c.IdProfileAddress
 	LEFT JOIN (SELECT [IdAddress], [FirstName], [LastName], [Company]

@@ -25,6 +25,12 @@ namespace VitalChoice.Business.Queries.Product
             return this;
         }
 
+        public GcQuery WithEqualCode(string code)
+        {
+            Add(x => x.Code == code);
+            return this;
+        }
+
         public GcQuery WithEmail(string email)
         {
             if (!String.IsNullOrEmpty(email))

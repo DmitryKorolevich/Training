@@ -101,13 +101,7 @@
                                 <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                             </span>
                         </th>
-                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('DateShipped')">
-                            <span>Ship Date</span>
-                            <span data-ng-if="filter.Sorting.Path == 'DateShipped'">
-                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
-                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
-                            </span>
-                        </th>
+                        <th class="actions">Ship Date</th>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Company')">
                             <span>Company</span>
                             <span data-ng-if="filter.Sorting.Path == 'Company'">
@@ -198,7 +192,11 @@
                             <span>{{getReferenceItem(ReferenceData.ShortPaymentMethods, item.IdPaymentMethod).Text}}</span>
                         </td>
                         <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>
-                        <td>{{::item.DateShipped | date:"MM/dd/yy"}}<br />{{::item.DateShipped | date:"h:mm a"}}</td>
+                        <td>
+                            <span data-ng-if="item.DateShipped">All - {{::item.DateShipped | date:"MM/dd/yy"}}</span>
+                            <span data-ng-if="!item.DateShipped && item.PDateShipped">P - {{::item.PDateShipped | date:"MM/dd/yy"}}</span><br/>
+                            <span data-ng-if="!item.DateShipped && item.NPDateShipped">NP - {{::item.NPDateShipped | date:"MM/dd/yy"}}</span><br />
+                        </td>
                         <td>{{::item.Company}}</td>
                         <td>{{::item.StateCode}}</td>
                         <td>

@@ -31,6 +31,8 @@ using VitalChoice.Infrastructure.Domain.Constants;
 using Microsoft.Net.Http.Headers;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Core.Infrastructure.Helpers;
+using VitalChoice.Interfaces.Services.Products;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
 
 namespace VC.Admin.Controllers
 {
@@ -45,6 +47,7 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> _ordersRegionStatisticItemCSVExportService;
         private readonly ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> _ordersZipStatisticItemCSVExportService;
         private readonly ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> _vOrderWithRegionInfoItemCSVExportService;
+        private readonly IProductService _productService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly ILogger logger;
 
@@ -57,6 +60,7 @@ namespace VC.Admin.Controllers
             ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> ordersRegionStatisticItemCSVExportService,
             ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> ordersZipStatisticItemCSVExportService,
             ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> vOrderWithRegionInfoItemCSVExportService,
+            IProductService productService,
             IObjectHistoryLogService objectHistoryLogService)
         {
             _orderService = orderService;
@@ -66,6 +70,7 @@ namespace VC.Admin.Controllers
             _ordersRegionStatisticItemCSVExportService = ordersRegionStatisticItemCSVExportService;
             _ordersZipStatisticItemCSVExportService = ordersZipStatisticItemCSVExportService;
             _vOrderWithRegionInfoItemCSVExportService = vOrderWithRegionInfoItemCSVExportService;
+            _productService = productService;
             _objectHistoryLogService = objectHistoryLogService;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             this.logger = loggerProvider.CreateLoggerDefault();
@@ -134,7 +139,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<Result<OrderManageModel>> GetOrder(int id, int? idcustomer = null)
+        public async Task<Result<OrderManageModel>> GetOrder(int id, int? idcustomer = null, bool refreshprices=false)
         {
             if (id == 0)
             {
@@ -160,6 +165,17 @@ namespace VC.Admin.Controllers
             }
 
             var item = await _orderService.SelectAsync(id);
+            if(id!=0 && refreshprices && item.Skus!=null)
+            {
+                var customer = await _customerService.SelectAsync(item.Customer.Id);
+                foreach(var orderSku in item.Skus)
+                {
+                    if(orderSku.Sku!=null)
+                    {
+                        orderSku.Amount = customer.IdObjectType == (int)CustomerType.Retail ? orderSku.Sku.Price : orderSku.Sku.WholesalePrice;
+                    }
+                }
+            }
 
             OrderManageModel toReturn = _mapper.ToModel<OrderManageModel>(item);
 

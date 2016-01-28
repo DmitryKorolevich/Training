@@ -131,7 +131,7 @@ namespace VitalChoice.Business.Services.Avatax
                 CompanyCode = _companyCode,
                 CustomerUsageType =
                     context.Order.Customer.IdObjectType == (int) CustomerType.Wholesale &&
-                    context.Order.Customer.Data.TaxExempt
+                    context.Order.Customer.SafeData.TaxExempt == 1//Yes, Current Certificate
                         ? "G"
                         : null,
                 DocCode =
@@ -201,7 +201,7 @@ namespace VitalChoice.Business.Services.Avatax
                     LineNo = "01-SHIP",
                     CustomerUsageType =
                         order.Order.Customer.IdObjectType == (int) CustomerType.Wholesale &&
-                        order.Order.Customer.Data.TaxExempt
+                        order.Order.Customer.SafeData.TaxExempt == 1//Yes, Current Certificate
                             ? "G"
                             : null
                 }
@@ -242,7 +242,7 @@ namespace VitalChoice.Business.Services.Avatax
                     Ref1 = p.Sku.Id.ToString(CultureInfo.InvariantCulture),
                     CustomerUsageType =
                         order.Order.Customer.IdObjectType == (int) CustomerType.Wholesale &&
-                        order.Order.Customer.Data.TaxExempt
+                        order.Order.Customer.SafeData.TaxExempt == 1//Yes, Current Certificate
                             ? "G"
                             : null
                 });
