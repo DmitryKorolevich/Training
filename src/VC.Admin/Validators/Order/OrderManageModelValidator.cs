@@ -140,7 +140,7 @@ namespace VC.Admin.Validators.Order
                                .WithMessage(model => model.KeyCode, ValidationMessages.FieldRequired);
                              RuleFor(model => model.PoNumber)
                                .NotEmpty()
-                               .When(p => p.Customer != null && p.Customer.CustomerType == CustomerType.Wholesale)
+                               .When(p => p.Customer != null && p.Customer.CustomerType == CustomerType.Wholesale && p.IdObjectType!=(int)OrderType.GiftList)
                                .WithMessage(model => model.PoNumber, ValidationMessages.FieldRequired);
 
                              RuleFor(model => model.ShipDelayDate)

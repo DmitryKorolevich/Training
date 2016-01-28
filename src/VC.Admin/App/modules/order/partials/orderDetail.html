@@ -209,7 +209,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div data-ng-if="currentCustomer.CustomerType == 2" class="form-group">
+                                                    <div data-ng-if="currentCustomer.CustomerType == 2 && order.IdObjectType!=4" class="form-group">
                                                         <label for="type" class="col-md-3 control-label">PO#</label>
                                                         <div class="col-md-9">
                                                             <input name="PoNumber" class="form-control" placeholder="PO#" data-ng-model="order.PoNumber" data-ng-required="!order.OnHold" data-ng-disabled="orderEditDisabled">
