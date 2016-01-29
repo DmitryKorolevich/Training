@@ -8,8 +8,7 @@ $(function () {
 		if (data.ShippingDate !== null && data.ShippingDate !== undefined) {
 		    self.Model.ShippingDate = ko.observable(moment(data.ShippingDate).format('L'));
 		}
-		else
-		{
+		else {
 		    self.Model.ShippingDate = ko.observable("");
 		}
 		self.upgradeOptions = ko.observableArray([]);

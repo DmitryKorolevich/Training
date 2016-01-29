@@ -9,11 +9,17 @@ namespace VC.Public.Models.Cart
 {
     public class CartSkuModel
     {
+        private string _productPageUrl;
+
         [Map]
 		public string Code { get; set; }
 
         [Map("Url")]
-        public string ProductPageUrl { get; set; }
+        public string ProductPageUrl
+        {
+            get { return _productPageUrl; }
+            set { _productPageUrl = "/product/" + value; }
+        }
 
         [Map("Name")]
         public string DisplayName { get; set; }
