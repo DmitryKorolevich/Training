@@ -302,7 +302,7 @@ namespace VC.Public.Controllers
             {
                 cartModel.ShipAsap = true;
             }
-            cartModel.ShippingUpgradeNP = order.SafeData.ShippingUpgradeP;
+            cartModel.ShippingUpgradeP = order.SafeData.ShippingUpgradeP;
             cartModel.ShippingUpgradeNP = order.SafeData.ShippingUpgradeNP;
         }
     }
