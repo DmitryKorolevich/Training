@@ -6,6 +6,9 @@ using VitalChoice.Infrastructure.Domain.Constants;
 using System;
 using System.Linq;
 using Microsoft.Extensions.OptionsModel;
+#if NET451
+using System.Net.Mail;
+#endif
 
 namespace VitalChoice.Infrastructure.Identity.Validators
 {
