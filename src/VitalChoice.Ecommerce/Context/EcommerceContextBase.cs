@@ -56,259 +56,41 @@ namespace VitalChoice.Ecommerce.Context
 
             #region Base
 
-            builder.Entity<AppOption>().HasKey(f => f.OptionName);
-            builder.Entity<AppOption>().Ignore(f => f.Id);
-            builder.Entity<AppOption>().ToTable("AppOptions");
-
-
-            builder.Entity<FieldTypeEntity>(entity =>
-            {
-                entity.HasKey(f => f.Id);
-                entity.ToTable("FieldTypes");
-            });
-
-            builder.Entity<BigStringValue>(entity =>
-            {
-                entity.HasKey(b => b.IdBigString);
-                entity.Ignore(b => b.Id);
-                entity.ToTable("BigStringValues");
-            });
+            AppOptions(builder);
+            FieldTypes(builder);
+            BigStringValues(builder);
 
             #endregion
 
-
             #region Workflow
 
-
-            builder.Entity<WorkflowExecutor>(entity =>
-            {
-                entity.HasKey(w => w.Id);
-                entity.ToTable("WorkflowExecutors");
-                entity
-                    .HasMany(e => e.ResolverPaths)
-                    .WithOne(r => r.Resolver)
-                    .HasForeignKey(r => r.IdResolver)
-                    .HasPrincipalKey(e => e.Id);
-                entity
-                    .HasMany(e => e.ResolverPaths)
-                    .WithOne(r => r.Resolver)
-                    .HasForeignKey(r => r.IdResolver)
-                    .HasPrincipalKey(e => e.Id);
-                entity
-                    .HasMany(e => e.Dependencies)
-                    .WithOne(d => d.Parent)
-                    .HasForeignKey(d => d.IdParent)
-                    .HasPrincipalKey(e => e.Id);
-            });
-
-
-
-            builder.Entity<WorkflowResolverPath>(entity =>
-            {
-                entity.HasKey(w => w.Id);
-                entity.ToTable("WorkflowResolverPaths");
-                entity
-                    .HasOne(resolverPath => resolverPath.Executor)
-                    .WithMany()
-                    .HasForeignKey(resolverPath => resolverPath.IdExecutor)
-                    .HasPrincipalKey(executor => executor.Id);
-                entity
-                    .HasOne(w => w.Resolver)
-                    .WithMany(r => r.ResolverPaths)
-                    .HasForeignKey(w => w.IdResolver)
-                    .HasPrincipalKey(w => w.Id);
-            });
-
-            builder.Entity<WorkflowTree>(entity =>
-            {
-                entity.HasKey(w => w.Id);
-                entity.ToTable("WorkflowTrees");
-                entity
-                    .HasMany(tree => tree.Actions)
-                    .WithOne(action => action.Tree)
-                    .HasForeignKey(action => action.IdTree)
-                    .HasPrincipalKey(tree => tree.Id);
-            });
-
-            builder.Entity<WorkflowTreeAction>(entity =>
-            {
-                entity.HasKey(a => new { a.IdExecutor, a.IdTree });
-                entity.Ignore(a => a.Id);
-                entity.ToTable("WorkflowTreeActions");
-                entity
-                    .HasOne(treeAction => treeAction.Executor)
-                    .WithOne()
-                    .HasForeignKey<WorkflowTreeAction>(treeAction => treeAction.IdExecutor)
-                    .HasPrincipalKey<WorkflowExecutor>(executor => executor.Id);
-                entity
-                    .HasOne(action => action.Tree)
-                    .WithMany(tree => tree.Actions)
-                    .HasForeignKey(action => action.IdTree)
-                    .HasPrincipalKey(tree => tree.Id);
-            });
-
-            builder.Entity<WorkflowActionDependency>(entity =>
-            {
-                entity.ToTable("WorkflowActionDependencies");
-                entity.HasKey(d => new { d.IdParent, d.IdDependent });
-                entity.Ignore(d => d.Id);
-                entity.HasOne(d => d.Parent)
-                    .WithMany(e => e.Dependencies)
-                    .HasForeignKey(d => d.IdParent)
-                    .HasPrincipalKey(e => e.Id);
-                entity.HasOne(d => d.Dependent)
-                    .WithMany()
-                    .HasForeignKey(d => d.IdDependent)
-                    .HasPrincipalKey(e => e.Id);
-            });
-
-            builder.Entity<WorkflowActionAggregation>(entity =>
-            {
-                entity.ToTable("WorkflowActionAggregations");
-                entity.HasKey(d => new { d.IdParent, d.IdAggregate });
-                entity.Ignore(d => d.Id);
-                entity.HasOne(d => d.Parent)
-                    .WithMany(e => e.Aggreagations)
-                    .HasForeignKey(d => d.IdParent)
-                    .HasPrincipalKey(e => e.Id);
-                entity.HasOne(d => d.ToAggregate)
-                    .WithMany()
-                    .HasForeignKey(d => d.IdAggregate)
-                    .HasPrincipalKey(e => e.Id);
-            });
+            WorkflowExecutors(builder);
+            WorkflowResolverPaths(builder);
+            WorkflowTrees(builder);
+            WorkflowTreeActions(builder);
+            WorkflowActionDependencies(builder);
+            WorkflowActionAggregations(builder);
 
             #endregion
 
             #region GiftCertificates
 
-            builder.Entity<GiftCertificate>(entity =>
-            {
-                entity.HasKey(p => p.Id);
-                entity.ToTable("GiftCertificates");
-                entity.Property(p => p.PublicId).ValueGeneratedOnAdd();
-                entity
-                    .HasOne(p => p.Order)
-                    .WithMany()
-                    .HasForeignKey(p => p.IdOrder)
-                    .HasPrincipalKey(p => p.Id)
-                    .IsRequired(false);
-            });
+            GiftCertificates(builder);
 
             #endregion
 
             #region Discounts
 
-            builder.Entity<DiscountOptionType>(entity =>
-            {
-                entity.HasKey(p => p.Id);
-                entity.ToTable("DiscountOptionTypes");
-                entity
-                    .HasOne(p => p.Lookup)
-                    .WithMany()
-                    .HasForeignKey(p => p.IdLookup)
-                    .HasPrincipalKey(p => p.Id)
-                    .IsRequired(false);
-            });
-
-            builder.Entity<DiscountOptionValue>(entity =>
-            {
-                entity.Ignore(o => o.Id);
-                entity.HasKey(d => new { d.IdDiscount, d.IdOptionType });
-                entity.ToTable("DiscountOptionValues");
-                entity
-                    .HasOne(v => v.OptionType)
-                    .WithMany()
-                    .HasForeignKey(t => t.IdOptionType)
-                    .HasPrincipalKey(v => v.Id);
-
-                entity.Ignore(d => d.BigValue);
-                entity.Ignore(d => d.IdBigString);
-            });
-
-            builder.Entity<DiscountToCategory>(entity =>
-            {
-                entity.HasKey(p => p.Id);
-                entity.ToTable("DiscountsToCategories");
-            });
-
-            builder.Entity<DiscountToSku>(entity =>
-            {
-                entity.HasKey(p => p.Id);
-                entity.ToTable("DiscountsToSkus");
-                entity.Ignore(p => p.ShortSkuInfo);
-            });
-
-            builder.Entity<DiscountToSelectedSku>(entity =>
-            {
-                entity.HasKey(p => p.Id);
-                entity.ToTable("DiscountsToSelectedSkus");
-                entity.Ignore(p => p.ShortSkuInfo);
-            });
-
-            builder.Entity<DiscountToSelectedCategory>(entity =>
-            {
-                entity.HasKey(p => p.Id);
-                entity.ToTable("DiscountToSelectedCategories");
-            });
-
-            builder.Entity<DiscountTier>(entity =>
-            {
-                entity.HasKey(p => p.Id);
-                entity.ToTable("DiscountTiers");
-            });
-
-            builder.Entity<Discount>(entity =>
-            {
-                entity.HasKey(p => p.Id);
-                entity.ToTable("Discounts");
-                entity
-                    .HasMany(p => p.OptionValues)
-                    .WithOne()
-                    .HasForeignKey(o => o.IdDiscount)
-                    .HasPrincipalKey(p => p.Id);
-
-                entity.Ignore(p => p.OptionTypes);
-
-                entity
-                    .HasMany(p => p.DiscountsToCategories)
-                    .WithOne()
-                    .HasForeignKey(t => t.IdDiscount)
-                    .HasPrincipalKey(p => p.Id)
-                    .IsRequired();
-                entity
-                    .HasMany(p => p.DiscountsToSelectedCategories)
-                    .WithOne()
-                    .HasForeignKey(t => t.IdDiscount)
-                    .HasPrincipalKey(p => p.Id)
-                    .IsRequired();
-                entity
-                    .HasMany(p => p.DiscountsToSkus)
-                    .WithOne()
-                    .HasForeignKey(t => t.IdDiscount)
-                    .HasPrincipalKey(p => p.Id)
-                    .IsRequired();
-                entity
-                    .HasMany(p => p.DiscountsToSelectedSkus)
-                    .WithOne()
-                    .HasForeignKey(t => t.IdDiscount)
-                    .HasPrincipalKey(p => p.Id)
-                    .IsRequired();
-                entity
-                    .HasMany(p => p.DiscountTiers)
-                    .WithOne()
-                    .HasForeignKey(t => t.IdDiscount)
-                    .HasPrincipalKey(p => p.Id)
-                    .IsRequired();
-                entity
-                    .HasOne(p => p.EditedBy)
-                    .WithMany()
-                    .HasForeignKey(o => o.IdEditedBy)
-                    .HasPrincipalKey(p => p.Id)
-                    .IsRequired(false);
-            });
+            DiscountOptionTypes(builder);
+            DiscountOptionValues(builder);
+            DiscountsToCategories(builder);
+            DiscountsToSkus(builder);
+            DiscountsToSelectedSkus(builder);
+            DiscountToSelectedCategories(builder);
+            DiscountTiers(builder);
+            Discounts(builder);
 
             #endregion
-
 
             #region Promotions
 
@@ -556,7 +338,6 @@ namespace VitalChoice.Ecommerce.Context
 
             #endregion
 
-
             #region Lookups
 
             builder.Entity<Lookup>(entity =>
@@ -582,7 +363,6 @@ namespace VitalChoice.Ecommerce.Context
 
 
             #endregion
-
 
             #region Settings
 
@@ -1390,6 +1170,37 @@ namespace VitalChoice.Ecommerce.Context
 
             #region Checkout
 
+            Carts(builder);
+            CartToSkus(builder);
+            CartToGiftCertificates(builder);
+
+            #endregion
+        }
+
+        protected virtual void CartToGiftCertificates(ModelBuilder builder)
+        {
+            builder.Entity<CartToGiftCertificate>(entity =>
+            {
+                entity.ToTable("CartToGiftCertificates");
+                entity.Ignore(c => c.Id);
+                entity.HasKey(c => new {c.IdCart, c.IdGiftCertificate});
+                entity.HasOne(c => c.GiftCertificate).WithMany().HasForeignKey(c => c.IdGiftCertificate).HasPrincipalKey(s => s.Id);
+            });
+        }
+
+        protected virtual void CartToSkus(ModelBuilder builder)
+        {
+            builder.Entity<CartToSku>(entity =>
+            {
+                entity.ToTable("CartToSkus");
+                entity.Ignore(c => c.Id);
+                entity.HasKey(c => new {c.IdCart, c.IdSku});
+                entity.HasOne(c => c.Sku).WithMany().HasForeignKey(c => c.IdSku).HasPrincipalKey(s => s.Id);
+            });
+        }
+
+        protected virtual void Carts(ModelBuilder builder)
+        {
             builder.Entity<Cart>(entity =>
             {
                 entity.ToTable("Carts");
@@ -1399,25 +1210,294 @@ namespace VitalChoice.Ecommerce.Context
                 entity.HasMany(c => c.GiftCertificates).WithOne().HasForeignKey(g => g.IdCart).HasPrincipalKey(c => c.Id);
                 entity.HasMany(c => c.Skus).WithOne().HasForeignKey(s => s.IdCart).HasPrincipalKey(c => c.Id);
             });
+        }
 
-            builder.Entity<CartToSku>(entity =>
+        protected virtual void Discounts(ModelBuilder builder)
+        {
+            builder.Entity<Discount>(entity =>
             {
-                entity.ToTable("CartToSkus");
-                entity.Ignore(c => c.Id);
-                entity.HasKey(c => new {c.IdCart, c.IdSku});
-                entity.HasOne(c => c.Sku).WithMany().HasForeignKey(c => c.IdSku).HasPrincipalKey(s => s.Id);
-            });
+                entity.HasKey(p => p.Id);
+                entity.ToTable("Discounts");
+                entity
+                    .HasMany(p => p.OptionValues)
+                    .WithOne()
+                    .HasForeignKey(o => o.IdDiscount)
+                    .HasPrincipalKey(p => p.Id);
 
-            builder.Entity<CartToGiftCertificate>(entity =>
+                entity.Ignore(p => p.OptionTypes);
+
+                entity
+                    .HasMany(p => p.DiscountsToCategories)
+                    .WithOne()
+                    .HasForeignKey(t => t.IdDiscount)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired();
+                entity
+                    .HasMany(p => p.DiscountsToSelectedCategories)
+                    .WithOne()
+                    .HasForeignKey(t => t.IdDiscount)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired();
+                entity
+                    .HasMany(p => p.DiscountsToSkus)
+                    .WithOne()
+                    .HasForeignKey(t => t.IdDiscount)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired();
+                entity
+                    .HasMany(p => p.DiscountsToSelectedSkus)
+                    .WithOne()
+                    .HasForeignKey(t => t.IdDiscount)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired();
+                entity
+                    .HasMany(p => p.DiscountTiers)
+                    .WithOne()
+                    .HasForeignKey(t => t.IdDiscount)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired();
+                entity
+                    .HasOne(p => p.EditedBy)
+                    .WithMany()
+                    .HasForeignKey(o => o.IdEditedBy)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired(false);
+            });
+        }
+
+        protected virtual void DiscountTiers(ModelBuilder builder)
+        {
+            builder.Entity<DiscountTier>(entity =>
             {
-                entity.ToTable("CartToGiftCertificates");
-                entity.Ignore(c => c.Id);
-                entity.HasKey(c => new { c.IdCart, c.IdGiftCertificate });
-                entity.HasOne(c => c.GiftCertificate).WithMany().HasForeignKey(c => c.IdGiftCertificate).HasPrincipalKey(s => s.Id);
+                entity.HasKey(p => p.Id);
+                entity.ToTable("DiscountTiers");
             });
+        }
 
+        protected virtual void DiscountToSelectedCategories(ModelBuilder builder)
+        {
+            builder.Entity<DiscountToSelectedCategory>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("DiscountToSelectedCategories");
+            });
+        }
 
-            #endregion
+        protected virtual void DiscountsToSelectedSkus(ModelBuilder builder)
+        {
+            builder.Entity<DiscountToSelectedSku>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("DiscountsToSelectedSkus");
+                entity.Ignore(p => p.ShortSkuInfo);
+            });
+        }
+
+        protected virtual void DiscountsToSkus(ModelBuilder builder)
+        {
+            builder.Entity<DiscountToSku>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("DiscountsToSkus");
+                entity.Ignore(p => p.ShortSkuInfo);
+            });
+        }
+
+        protected virtual void DiscountsToCategories(ModelBuilder builder)
+        {
+            builder.Entity<DiscountToCategory>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("DiscountsToCategories");
+            });
+        }
+
+        protected virtual void DiscountOptionValues(ModelBuilder builder)
+        {
+            builder.Entity<DiscountOptionValue>(entity =>
+            {
+                entity.Ignore(o => o.Id);
+                entity.HasKey(d => new {d.IdDiscount, d.IdOptionType});
+                entity.ToTable("DiscountOptionValues");
+                entity
+                    .HasOne(v => v.OptionType)
+                    .WithMany()
+                    .HasForeignKey(t => t.IdOptionType)
+                    .HasPrincipalKey(v => v.Id);
+
+                entity.Ignore(d => d.BigValue);
+                entity.Ignore(d => d.IdBigString);
+            });
+        }
+
+        protected virtual void DiscountOptionTypes(ModelBuilder builder)
+        {
+            builder.Entity<DiscountOptionType>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("DiscountOptionTypes");
+                entity
+                    .HasOne(p => p.Lookup)
+                    .WithMany()
+                    .HasForeignKey(p => p.IdLookup)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired(false);
+            });
+        }
+
+        protected virtual void GiftCertificates(ModelBuilder builder)
+        {
+            builder.Entity<GiftCertificate>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("GiftCertificates");
+                entity.Property(p => p.PublicId).ValueGeneratedOnAdd();
+                entity
+                    .HasOne(p => p.Order)
+                    .WithMany()
+                    .HasForeignKey(p => p.IdOrder)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired(false);
+            });
+        }
+
+        protected virtual void WorkflowActionAggregations(ModelBuilder builder)
+        {
+            builder.Entity<WorkflowActionAggregation>(entity =>
+            {
+                entity.ToTable("WorkflowActionAggregations");
+                entity.HasKey(d => new {d.IdParent, d.IdAggregate});
+                entity.Ignore(d => d.Id);
+                entity.HasOne(d => d.Parent)
+                    .WithMany(e => e.Aggreagations)
+                    .HasForeignKey(d => d.IdParent)
+                    .HasPrincipalKey(e => e.Id);
+                entity.HasOne(d => d.ToAggregate)
+                    .WithMany()
+                    .HasForeignKey(d => d.IdAggregate)
+                    .HasPrincipalKey(e => e.Id);
+            });
+        }
+
+        protected virtual void WorkflowActionDependencies(ModelBuilder builder)
+        {
+            builder.Entity<WorkflowActionDependency>(entity =>
+            {
+                entity.ToTable("WorkflowActionDependencies");
+                entity.HasKey(d => new {d.IdParent, d.IdDependent});
+                entity.Ignore(d => d.Id);
+                entity.HasOne(d => d.Parent)
+                    .WithMany(e => e.Dependencies)
+                    .HasForeignKey(d => d.IdParent)
+                    .HasPrincipalKey(e => e.Id);
+                entity.HasOne(d => d.Dependent)
+                    .WithMany()
+                    .HasForeignKey(d => d.IdDependent)
+                    .HasPrincipalKey(e => e.Id);
+            });
+        }
+
+        protected virtual void WorkflowTreeActions(ModelBuilder builder)
+        {
+            builder.Entity<WorkflowTreeAction>(entity =>
+            {
+                entity.HasKey(a => new {a.IdExecutor, a.IdTree});
+                entity.Ignore(a => a.Id);
+                entity.ToTable("WorkflowTreeActions");
+                entity
+                    .HasOne(treeAction => treeAction.Executor)
+                    .WithOne()
+                    .HasForeignKey<WorkflowTreeAction>(treeAction => treeAction.IdExecutor)
+                    .HasPrincipalKey<WorkflowExecutor>(executor => executor.Id);
+                entity
+                    .HasOne(action => action.Tree)
+                    .WithMany(tree => tree.Actions)
+                    .HasForeignKey(action => action.IdTree)
+                    .HasPrincipalKey(tree => tree.Id);
+            });
+        }
+
+        protected virtual void WorkflowTrees(ModelBuilder builder)
+        {
+            builder.Entity<WorkflowTree>(entity =>
+            {
+                entity.HasKey(w => w.Id);
+                entity.ToTable("WorkflowTrees");
+                entity
+                    .HasMany(tree => tree.Actions)
+                    .WithOne(action => action.Tree)
+                    .HasForeignKey(action => action.IdTree)
+                    .HasPrincipalKey(tree => tree.Id);
+            });
+        }
+
+        protected virtual void WorkflowResolverPaths(ModelBuilder builder)
+        {
+            builder.Entity<WorkflowResolverPath>(entity =>
+            {
+                entity.HasKey(w => w.Id);
+                entity.ToTable("WorkflowResolverPaths");
+                entity
+                    .HasOne(resolverPath => resolverPath.Executor)
+                    .WithMany()
+                    .HasForeignKey(resolverPath => resolverPath.IdExecutor)
+                    .HasPrincipalKey(executor => executor.Id);
+                entity
+                    .HasOne(w => w.Resolver)
+                    .WithMany(r => r.ResolverPaths)
+                    .HasForeignKey(w => w.IdResolver)
+                    .HasPrincipalKey(w => w.Id);
+            });
+        }
+
+        protected virtual void WorkflowExecutors(ModelBuilder builder)
+        {
+            builder.Entity<WorkflowExecutor>(entity =>
+            {
+                entity.HasKey(w => w.Id);
+                entity.ToTable("WorkflowExecutors");
+                entity
+                    .HasMany(e => e.ResolverPaths)
+                    .WithOne(r => r.Resolver)
+                    .HasForeignKey(r => r.IdResolver)
+                    .HasPrincipalKey(e => e.Id);
+                entity
+                    .HasMany(e => e.ResolverPaths)
+                    .WithOne(r => r.Resolver)
+                    .HasForeignKey(r => r.IdResolver)
+                    .HasPrincipalKey(e => e.Id);
+                entity
+                    .HasMany(e => e.Dependencies)
+                    .WithOne(d => d.Parent)
+                    .HasForeignKey(d => d.IdParent)
+                    .HasPrincipalKey(e => e.Id);
+            });
+        }
+
+        protected virtual void BigStringValues(ModelBuilder builder)
+        {
+            builder.Entity<BigStringValue>(entity =>
+            {
+                entity.HasKey(b => b.IdBigString);
+                entity.Ignore(b => b.Id);
+                entity.ToTable("BigStringValues");
+            });
+        }
+
+        protected virtual void FieldTypes(ModelBuilder builder)
+        {
+            builder.Entity<FieldTypeEntity>(entity =>
+            {
+                entity.HasKey(f => f.Id);
+                entity.ToTable("FieldTypes");
+            });
+        }
+
+        protected virtual void AppOptions(ModelBuilder builder)
+        {
+            builder.Entity<AppOption>().HasKey(f => f.OptionName);
+            builder.Entity<AppOption>().Ignore(f => f.Id);
+            builder.Entity<AppOption>().ToTable("AppOptions");
         }
     }
 }
