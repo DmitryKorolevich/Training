@@ -48,7 +48,7 @@ namespace VitalChoice.Caching.Services
                 var key = entityType.FindPrimaryKey();
                 if (key == null) continue;
 
-                var keyInfos = key.Properties.Select(property => new EntityKeyInfo(property.Name, property.GetGetter()));
+                var keyInfos = key.Properties.Select(property => new EntityKeyInfo(property.Name, property.GetGetter(), property.ClrType));
 
                 var indexes = entityType.GetIndexes().Where(index => index.IsUnique);
 

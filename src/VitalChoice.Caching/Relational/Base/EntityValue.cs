@@ -20,7 +20,7 @@ namespace VitalChoice.Caching.Relational.Base
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return ValueInfo.Equals(other.ValueInfo) && Value.Equals(other.Value);
+            return Value.Equals(other.Value);
         }
 
         public override bool Equals(object obj)
@@ -35,10 +35,7 @@ namespace VitalChoice.Caching.Relational.Base
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                return (ValueInfo.GetHashCode()*397) ^ Value.GetHashCode();
-            }
+            return Value?.GetHashCode() ?? 0;
         }
 
         public static bool operator ==(EntityValue<TInfo> left, EntityValue<TInfo> right)

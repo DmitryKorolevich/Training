@@ -34,7 +34,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
 
         public virtual ICollection<TValueGroup> GetValuesFunction(WhereExpression<T> expression)
         {
-            if (GroupInfo == null || expression == null)
+            if (GroupInfo == null || expression?.Condition == null)
                 return new TValueGroup[0];
             var values = new HashSet<TValue>();
             var items = new HashSet<TValueGroup>();

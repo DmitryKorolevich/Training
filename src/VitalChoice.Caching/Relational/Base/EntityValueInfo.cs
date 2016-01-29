@@ -1,16 +1,24 @@
 ﻿using System;
+using System.Reflection;
 using Microsoft.Data.Entity.Metadata.Internal;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Relational.Base
 {
-    public abstract class EntityValueInfo : IEquatable<EntityValueInfo>
+    public abstract class EntityValueInfo : IEquatable<EntityValueInfo>, IClrPropertyGetter
     {
-        protected EntityValueInfo(string name, IClrPropertyGetter property)
+        private readonly IClrPropertyGetter _property;
+        public Type PropertyType { get; }
+        private readonly TypeInfo _propertyTypeInfo;
+
+        protected EntityValueInfo(string name, IClrPropertyGetter property, Type propertyType)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
 
-            Property = property;
+            _property = property;
+            PropertyType = propertyType;
+            _propertyTypeInfo = propertyType.GetTypeInfo();
             Name = name;
         }
 
@@ -26,10 +34,7 @@ namespace VitalChoice.Caching.Relational.Base
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                return (Name.GetHashCode()*397) ^ Property.GetHashCode();
-            }
+            return Name.GetHashCode();
         }
 
         public static bool operator ==(EntityValueInfo left, EntityValueInfo right)
@@ -44,13 +49,27 @@ namespace VitalChoice.Caching.Relational.Base
 
         public virtual string Name { get; }
 
-        public virtual IClrPropertyGetter Property { get; }
-
         public virtual bool Equals(EntityValueInfo other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return string.Equals(Name, other.Name) && Property.Equals(other.Property);
+            return string.Equals(Name, other.Name);
+        }
+
+        public object GetClrValue(object instance)
+        {
+            if (_propertyTypeInfo.IsEnum)
+            {
+#if !DOTNET5_4
+                var enumTypeCode = Enum.GetUnderlyingType(PropertyType).GetTypeCode();
+                return Convert.ChangeType(_property.GetClrValue(instance), enumTypeCode);
+#else
+                var enumType = Enum.GetUnderlyingType(PropertyType);
+                return Convert.ChangeType(_property.GetClrValue(instance), enumType);
+#endif
+            }
+
+            return _property.GetClrValue(instance);
         }
     }
 }

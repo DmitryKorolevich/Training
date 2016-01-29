@@ -14,7 +14,7 @@ namespace VitalChoice.Caching.Extensions
                 throw new ArgumentNullException(nameof(pkInfo));
 
             var keyValues =
-                pkInfo.InfoCollection.Select(keyInfo => new EntityKeyValue(keyInfo, keyInfo.Property.GetClrValue(entity)));
+                pkInfo.InfoCollection.Select(keyInfo => new EntityKeyValue(keyInfo, keyInfo.GetClrValue(entity)));
             return new EntityKey(keyValues);
         }
 
@@ -27,7 +27,7 @@ namespace VitalChoice.Caching.Extensions
 
             return
                 new EntityIndex(
-                    indexInfo.InfoCollection.Select(info => new EntityIndexValue(info, info.Property.GetClrValue(entity))));
+                    indexInfo.InfoCollection.Select(info => new EntityIndexValue(info, info.GetClrValue(entity))));
         }
 
         public static EntityIndex GetConditionalIndexValue(this object entity, EntityConditionalIndexInfo conditionalInfo)
@@ -39,7 +39,7 @@ namespace VitalChoice.Caching.Extensions
 
             return
                 new EntityIndex(
-                    conditionalInfo.InfoCollection.Select(info => new EntityIndexValue(info, info.Property.GetClrValue(entity))));
+                    conditionalInfo.InfoCollection.Select(info => new EntityIndexValue(info, info.GetClrValue(entity))));
         }
     }
 }

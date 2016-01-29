@@ -6,15 +6,11 @@ namespace VitalChoice.Caching.Relational
 {
     public class EntityIndexInfo : EntityValueInfo, IEquatable<EntityIndexInfo>
     {
-        public EntityIndexInfo(string name, IClrPropertyGetter property, Type propertyType): base(name, property)
+        public EntityIndexInfo(string name, IClrPropertyGetter property, Type propertyType): base(name, property, propertyType)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
-
-            PropertyType = propertyType;
         }
-
-        public Type PropertyType { get; }
 
         public bool Equals(EntityIndexInfo other)
         {

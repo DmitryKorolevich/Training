@@ -5,6 +5,7 @@ using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Data.Context;
 using VitalChoice.Ecommerce.Context;
+using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Content;
@@ -192,6 +193,7 @@ namespace VitalChoice.Infrastructure.Context
                     .HasForeignKey(p => p.ContentItemId)
                     .HasPrincipalKey(p => p.Id);
                 entity.HasIndex(p => new { p.Type, p.Url, p.StatusCode }).HasName("IX_ContentCategories_Type_Url_StatusCode");
+                entity.CacheIndexWhen(c => c.StatusCode != RecordStatusCode.Deleted, c => new {c.Url, c.Type});
             });
 
 
@@ -221,6 +223,7 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.HasKey(p => p.Id);
                 entity.ToTable("Recipes");
+                entity.CacheIndexWhen(c => c.StatusCode != RecordStatusCode.Deleted, c => c.Url);
             });
 
             builder.Entity<RecipeToContentCategory>(entity =>
@@ -278,6 +281,7 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.HasKey(p => p.Id);
                 entity.ToTable("FAQs");
+                entity.CacheIndexWhen(c => c.StatusCode != RecordStatusCode.Deleted, c => c.Url);
             });
 
             builder.Entity<FAQToContentCategory>(entity =>
@@ -320,6 +324,7 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.HasKey(p => p.Id);
                 entity.ToTable("Articles");
+                entity.CacheIndexWhen(c => c.StatusCode != RecordStatusCode.Deleted, c => c.Url);
             });
 
             builder.Entity<ArticleToContentCategory>(entity =>
@@ -360,6 +365,7 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.HasKey(p => p.Id);
                 entity.ToTable("ContentPages");
+                entity.CacheIndexWhen(c => c.StatusCode != RecordStatusCode.Deleted, c => c.Url);
             });
 
             builder.Entity<ContentPageToContentCategory>(entity =>
@@ -460,6 +466,7 @@ namespace VitalChoice.Infrastructure.Context
                     .HasForeignKey(p => p.ContentItemId)
                     .HasPrincipalKey(p => p.Id);
                 entity.HasIndex(p => new { p.Url, p.StatusCode }).HasName("IX_ProductCategories_Url_StatusCode");
+                entity.CacheIndexWhen(c => c.StatusCode != RecordStatusCode.Deleted, c => c.Url);
             });
 
 
@@ -485,6 +492,7 @@ namespace VitalChoice.Infrastructure.Context
                     .HasForeignKey(p => p.ContentItemId)
                     .HasPrincipalKey(p => p.Id);
                 entity.HasIndex(p => new { p.Url, p.StatusCode }).HasName("IX_Products_Url_StatusCode");
+                entity.CacheIndexWhen(c => c.StatusCode != RecordStatusCode.Deleted, c => c.Url);
             });
 
 

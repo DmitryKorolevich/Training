@@ -39,7 +39,7 @@ namespace VitalChoice.Business.Services.Content
         #region Public
 
         protected override Expression<Func<ContentCategory, bool>> FilterExpression(CategoryContentParametersModel model) =>
-            p => p.Url == model.Url && p.StatusCode != RecordStatusCode.Deleted && p.Type==ContentType.ArticleCategory;
+            p => p.Url == model.Url && p.StatusCode != RecordStatusCode.Deleted && p.Type == ContentType.ArticleCategory;
 
         protected override async Task<ContentCategory> GetDataInternal(CategoryContentParametersModel model, ContentViewContext viewContext)
         {

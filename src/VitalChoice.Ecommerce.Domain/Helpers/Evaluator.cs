@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using Microsoft.Data.Entity.Internal;
 
 namespace VitalChoice.Ecommerce.Domain.Helpers
 {
@@ -74,6 +75,21 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
                 if (e.NodeType == ExpressionType.Constant)
                 {
                     return e;
+                }
+                var convertRemoved = e.RemoveConvert();
+                if (convertRemoved.NodeType == ExpressionType.MemberAccess)
+                {
+                    Stack<string> members = new Stack<string>();
+                    while (convertRemoved.NodeType == ExpressionType.MemberAccess)
+                    {
+                        var member = (MemberExpression)convertRemoved;
+                        members.Push(member.Member.Name);
+                        convertRemoved = member.Expression;
+                    }
+                    if (convertRemoved.NodeType == ExpressionType.Parameter)
+                    {
+                        return Expression.Constant($"<{convertRemoved.Type.FullName}>" + members.Join("."));
+                    }
                 }
                 if (e.NodeType == ExpressionType.Parameter)
                 {

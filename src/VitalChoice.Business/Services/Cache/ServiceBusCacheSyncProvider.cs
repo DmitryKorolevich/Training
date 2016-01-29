@@ -33,13 +33,13 @@ namespace VitalChoice.Business.Services.Cache
             {
                 if (!_enabled)
                 {
-                    _enabled = options.Value.CacheSyncOptions.Enabled;
+                    _enabled = options.Value.CacheSyncOptions?.Enabled ?? false;
                 }
                 if (_serviceBusClient == null && _enabled)
                 {
                     var namespaceManager =
-                        NamespaceManager.CreateFromConnectionString(options.Value.CacheSyncOptions.ConnectionString);
-                    var queName = options.Value.CacheSyncOptions.ServiceBusQueueName;
+                        NamespaceManager.CreateFromConnectionString(options.Value.CacheSyncOptions?.ConnectionString);
+                    var queName = options.Value.CacheSyncOptions?.ServiceBusQueueName;
                     if (!namespaceManager.QueueExists(queName))
                     {
                         namespaceManager.CreateQueue(new QueueDescription(queName)

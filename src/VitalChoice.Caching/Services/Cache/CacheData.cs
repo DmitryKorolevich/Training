@@ -125,13 +125,32 @@ namespace VitalChoice.Caching.Services.Cache
                 var conditional =
                     _conditionalIndexedDictionary.Keys.Where(c => c.CheckCondition(entity))
                         .ToDictionary(c => c, c => _cacheStorage.GetConditionalIndexValue(entity, c));
-
+                
                 var result = _entityDictionary.AddOrUpdate(pk,
-                    key => new CachedEntity<T>(entity, GetRelations(entity, _relationInfo.Relations), conditional, this, indexValue),
+                    key => CreateNew(entity, conditional, indexValue),
                     (key, _) => UpdateExist(_, entity, _relationInfo.Relations, indexValue, conditional, ignoreState));
 
                 return result;
             }
+        }
+
+        private CachedEntity<T> CreateNew(T entity, Dictionary<EntityConditionalIndexInfo, EntityIndex> conditional, EntityIndex indexValue)
+        {
+            CachedEntity<T> cached;
+            if (entity == null)
+            {
+                cached = new CachedEntity<T>(default(T), null, null, this);
+            }
+            else
+            {
+                cached = new CachedEntity<T>(entity, GetRelations(entity, _relationInfo.Relations), conditional, this, indexValue);
+                foreach (var conditionalIndex in conditional)
+                {
+                    _conditionalIndexedDictionary[conditionalIndex.Key].AddOrUpdate(conditionalIndex.Value, cached,
+                        (index, cachedEntity) => cached);
+                }
+            }
+            return cached;
         }
 
         public void Update(IEnumerable<T> entities)
@@ -156,7 +175,7 @@ namespace VitalChoice.Caching.Services.Cache
             lock (_lockObj)
             {
                 _entityDictionary.AddOrUpdate(pk,
-                    key => new CachedEntity<T>(default(T), null, null, this),
+                    key => CreateNew(default(T), null, null),
                     (key, _) => UpdateExist(_, default(T), _relationInfo.Relations, null, null));
             }
         }
