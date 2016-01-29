@@ -102,6 +102,7 @@
                 }
             });
 
+            $scope.forms.IsActive = true;
             refreshOrders();
         }
 

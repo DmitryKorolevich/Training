@@ -3,8 +3,10 @@
 angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	.controller('addEditCustomerController', [
 		'$scope', '$injector', '$filter', 'customerService', 'toaster', 'promiseTracker', '$rootScope', '$q',
-		'$state', '$stateParams', 'customerEditService', '$window',
-		function($scope, $injector, $filter, customerService, toaster, promiseTracker, $rootScope, $q, $state, $stateParams, customerEditService, $window) {
+		'$state', '$stateParams', 'customerEditService', '$window', 'Upload', 'modalUtil',
+        function($scope, $injector, $filter, customerService, toaster, promiseTracker, $rootScope, $q, $state, $stateParams, customerEditService, $window, 
+        Upload, modalUtil)
+        {
 			$scope.addEditTracker = promiseTracker("addEdit");
 			$scope.resetTracker = promiseTracker("reset");
 			$scope.resendTracker = promiseTracker("resend");
@@ -35,6 +37,13 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			        {
 			            $scope.options.OverrideEmail = true;
 			        }
+			        setCreditCardsForOrdersImport();
+			        var uploadOrderTypes = [{ Key: 4, Text: 'Gift Orders' }];
+			        if ($scope.currentCustomer.CustomerType==2)//wholesale
+			        {
+			            uploadOrderTypes.splice(0, 0, { Key: 3, Text: 'Dropship Orders' });
+			        }
+                    $scope.uploadOrderTypes = uploadOrderTypes;
 			        $scope.currentCustomer.ActivatePending = false;
 			        $scope.options.DBStatusCode = $scope.currentCustomer.StatusCode;
 			        $scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
@@ -118,6 +127,10 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 					active: false,
 					formName: 'customerFile'
 				};
+				$scope.additionalActionsTab = {
+				    active: false,
+				    formName: 'uploadOrderType'
+				};
 				$scope.creditCardTypes = $rootScope.ReferenceData.CreditCardTypes;
 				var tabs = [];
 				tabs.push($scope.accountProfileTab);
@@ -125,6 +138,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 				tabs.push($scope.paymentInfoTab);
 				tabs.push($scope.customerNotesTab);
 				tabs.push($scope.customerFilesTab);
+				tabs.push($scope.additionalActionsTab);				
 				$scope.tabs = tabs;
 
 				customerEditService.initBase($scope);
@@ -355,7 +369,8 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 
 			function setCountryValidity() {
 				$.each($scope.forms, function(index, form) {
-					if (form && !(typeof form === 'boolean')) {
+				    if (form && !(typeof form === 'boolean'))
+				    {
 						if (form.Country && form.Country.$viewValue && form.Country.$viewValue.Id == 0) {
 							form.Country.$setValidity("required", false);
 						}
@@ -374,7 +389,8 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 				setCountryValidity();
 
 				$.each($scope.forms, function(index, form) {
-					if (form && !(typeof form === 'boolean')) {
+				    if (form && !(typeof form === 'boolean') && index != 'uploadOrderType')
+				    {
 						if (!form.$valid && index != 'submitted') {
 							valid = false;
 							activateTab(index);
@@ -494,6 +510,82 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 					});
 
 				return;
+			};
+
+			$scope.setOrderImportFile = function (files)
+			{
+			    $scope.options.selectedOrderImportFile = files && files.length > 0 ? files[0] : null;
+			};
+
+			$scope.uploadOrderImportFile = function ()
+			{
+			    if ($scope.forms.uploadOrderType.$valid)
+			    {
+			        if ($scope.options.selectedOrderImportFile)
+			        {
+			            $scope.options.uploadingOrdersImport = true;
+			            var deferred = $scope.addEditTracker.createPromise();
+			            Upload.upload({
+			                url: '/api/order/ImportOrders',
+			                data: {
+			                    idcustomer: $scope.currentCustomer.Id,
+			                    idpaymentmethod: $scope.options.UploadOrderCreditCard,
+			                    ordertype: $scope.options.UploadOrderType
+			                },
+			                file: $scope.options.selectedOrderImportFile
+			            }).progress(function (evt)
+			            {
+
+			            }).success(function (result, status, headers, config)
+			            {
+			                deferred.resolve();
+			                if (result.Success)
+			                {                                
+			                    $scope.$broadcast('customerOrders#in#refresh');
+			                    toaster.pop('success', "Success!", "Successfully imported");
+			                } else
+			                {
+			                    if (result.Messages)
+			                    {
+			                        modalUtil.open('app/modules/setting/partials/errorDetailsPopup.html', 'errorDetailsController', {
+			                            Messages: result.Messages
+			                        });
+			                    }
+			                }
+
+			                $scope.options.selectedOrderImportFile = null;
+
+			                $scope.options.uploadingOrdersImport = false;
+			            }).error(function (data, status, headers, config)
+			            {
+			                deferred.resolve();
+			                $scope.options.uploadingOrdersImport = false;
+			                $scope.options.selectedOrderImportFile = null;
+
+			                toaster.pop('error', "Error!", "Server error ocurred");
+
+			                console.log('error status: ' + status);
+			            });
+			        }
+			    }
+			    else
+			    {
+			        $scope.forms.submitted['uploadOrderType'] = true;
+			    }
+			};
+
+			var setCreditCardsForOrdersImport = function()
+			{
+			    if ($scope.currentCustomer.Id && $scope.currentCustomer.CreditCards)
+			    {
+			        var uploadOrderCreditCards = [];
+			        $.each($scope.currentCustomer.CreditCards, function (index, item)
+			        {
+			            var text = $scope.getCreditCardTypeName(item.CardType) + ', ending in ' + $scope.getLast4(item.CardNumber)
+			            uploadOrderCreditCards.push({ Key: item.Id, Text: text });
+			        });
+			        $scope.uploadOrderCreditCards = uploadOrderCreditCards;
+			    }
 			};
 
 			initialize();

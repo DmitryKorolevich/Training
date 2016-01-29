@@ -22,6 +22,10 @@ namespace VitalChoice.Interfaces.Services.Orders
 
         Task<OrderDynamic> CreateNewNormalOrder(OrderStatus status);
 
+        POrderType? GetPOrderType(OrderDynamic item);
+
+        Task<bool> ImportOrders(byte[] file, string fileName, OrderType orderType, int idCustomer, int idPaymentMethod, int idAddedBy);
+
         #region AffiliatesOrders
 
         Task<PagedList<AffiliateOrderListItemModel>> GetAffiliateOrderPaymentsWithCustomerInfo(AffiliateOrderPaymentFilter filter);

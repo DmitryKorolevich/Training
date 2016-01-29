@@ -22,6 +22,10 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 
         public DateTime? DateShipped { get; set; }
 
+        public DateTime? PDateShipped { get; set; }
+
+        public DateTime? NPDateShipped { get; set; }
+
         public decimal Total { get; set; }
 
         public int? IdEditedBy { get; set; }

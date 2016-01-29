@@ -33,12 +33,12 @@ namespace VitalChoice.Business.Services
 
         public bool IsState(AddressDynamic address, string countryCode, string stateCode)
         {
-            return _states.GetStateId(countryCode, stateCode) == address.IdState;
+            return _states.GetStateId(countryCode, stateCode) == address?.IdState;
         }
 
         public bool IsCountry(AddressDynamic address, string countryCode)
         {
-            return _coutries.GetCountryId(countryCode) == address.IdCountry;
+            return _coutries.GetCountryId(countryCode) == address?.IdCountry;
         }
 
         public string GetCountryCode(int idCountry)
@@ -53,32 +53,32 @@ namespace VitalChoice.Business.Services
 
         public string GetStateCode(AddressDynamic address)
         {
-            return _stateCodes.GetState(address.IdCountry, address.IdState ?? 0)?.StateCode;
+            return _stateCodes.GetState(address?.IdCountry ?? 0, address?.IdState ?? 0)?.StateCode;
         }
 
         public string GetStateName(AddressDynamic address)
         {
-            return _stateCodes.GetState(address.IdCountry, address.IdState ?? 0)?.StateName;
+            return _stateCodes.GetState(address?.IdCountry ?? 0, address?.IdState ?? 0)?.StateName;
         }
 
         public string GetCountryCode(AddressDynamic address)
         {
-            return _coutryCodes.GetCountry(address.IdCountry)?.CountryCode;
+            return _coutryCodes.GetCountry(address?.IdCountry ?? 0)?.CountryCode;
         }
 
         public string GetCountryName(AddressDynamic address)
         {
-            return _coutryCodes.GetCountry(address.IdCountry)?.CountryName;
+            return _coutryCodes.GetCountry(address?.IdCountry ?? 0)?.CountryName;
         }
 
         public string GetRegionOrStateCode(AddressDynamic address)
         {
-            return _stateCodes.GetState(address.IdCountry, address.IdState ?? 0)?.StateCode ?? address.County;
+            return _stateCodes.GetState(address?.IdCountry ?? 0, address?.IdState ?? 0)?.StateCode ?? address?.County;
         }
 
         public string GetRegionOrStateName(AddressDynamic address)
         {
-            return _stateCodes.GetState(address.IdCountry, address.IdState ?? 0)?.StateName ?? address.County;
+            return _stateCodes.GetState(address?.IdCountry ?? 0, address?.IdState ?? 0)?.StateName ?? address?.County;
         }
     }
 }

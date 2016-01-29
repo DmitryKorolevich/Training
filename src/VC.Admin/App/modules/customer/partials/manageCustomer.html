@@ -554,6 +554,56 @@
                             <div ng-controller="manageCustomerFilesController" onload="name = 'CustomerFiles'" data-ng-include="'app/modules/customer/partials/manageCustomerFiles.html'"></div>
                         </div>
                     </tab>
+                    <tab data-ng-show="currentCustomer.Id" heading="Additional Actions" active="additionalActionsTab.active">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <spinner-overlay data-loading="addEditTracker.active()">
+                                    <form class="form-horizontal" name="forms.uploadOrderType" data-ng-class="{submitted: forms.submitted['uploadOrderType']}" novalidate unsaved-warning-form>
+                                        <fieldset>
+                                            <span class="legend">Import Orders</span>
+                                            <div class="form-group">
+                                                <label for="UploadOrdersType" class="col-md-3 control-label">Upload Type</label>
+                                                <div class="col-md-9">
+                                                    <select class="form-control" id="Type" name="Type" data-ng-model="options.UploadOrderType" ng-options="item.Key as item.Text for item in uploadOrderTypes" required autocomplete="off"></select>
+                                                    <div class="error-container" ng-show="forms.submitted['uploadOrderType'] && forms.uploadOrderType.Type.$invalid">
+                                                        <small class="error" ng-show="forms.uploadOrderType.Type.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Upload Type")}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="UploadOrdersType" class="col-md-3 control-label">Credit Card</label>
+                                                <div class="col-md-9">
+                                                    <select class="form-control" id="CreditCard" name="CreditCard" data-ng-model="options.UploadOrderCreditCard" ng-options="item.Key as item.Text for item in uploadOrderCreditCards" required autocomplete="off"></select>
+                                                    <div class="error-container" ng-show="forms.submitted['uploadOrderType'] && forms.uploadOrderType.CreditCard.$invalid">
+                                                        <small class="error" ng-show="forms.uploadOrderType.CreditCard.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Credit Card")}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div data-ng-if="options.UploadOrderType==3" class="form-group">
+                                                <label class="col-md-3 control-label"></label>
+                                                <div class="col-md-9 form-control-static">
+                                                    <a  target="_blank" href="/assets/templates/ds_template.csv">Get a template</a>
+                                                </div>
+                                            </div>
+                                            <div data-ng-if="options.UploadOrderType==4" class="form-group">
+                                                <label class="col-md-3 control-label"></label>
+                                                <div class="col-md-9 form-control-static">
+                                                    <a target="_blank" href="/assets/templates/gl_template.csv">Get a template</a>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">File</label>
+                                                <div class="col-md-9">
+                                                    <button class="btn btn-primary margin-right-8px" ngf-select ngf-change="setOrderImportFile($files)" accept=".csv">Locate file</button>
+                                                    <button data-ng-if="options.selectedOrderImportFile" class="btn btn-success" data-ng-click="uploadOrderImportFile()" ladda="uploadingOrdersImport">Upload</button>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </form>
+                                </spinner-overlay>
+                            </div>
+                        </div>
+                    </tab>
                 </tabset>
             </div>
         </div>

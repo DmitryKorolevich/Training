@@ -8,6 +8,6 @@ namespace VitalChoice.Interfaces.Services
 {
 	public interface IRedirectViewService
 	{
-		Task<bool> CheckRedirects(HttpContext context);
+		bool CheckRedirects(HttpContext context);
     }
 }

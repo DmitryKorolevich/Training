@@ -18,6 +18,8 @@ using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using System.IO;
 using Microsoft.AspNet.Mvc.ViewEngines;
 using Microsoft.AspNet.Mvc.ViewFeatures;
+using VitalChoice.Ecommerce.Utils;
+using System.Text;
 
 namespace VC.Public.Controllers
 {
@@ -51,20 +53,21 @@ namespace VC.Public.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Step1(VitalGreenRequestModel model)
+        public Task<IActionResult> Step1(VitalGreenRequestModel model)
         {
+            string cookies;
             if (!Validate(model))
             {
-                return View(model);
+                View(model);
             }
 
-            var cookies = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(model)));
+            cookies = Convert.ToBase64String(Encoding.UTF8.GetBytes(model.ToJson()));
             Response.Cookies.Append(VITAL_GREEN_COOKIE_NAME, cookies, new CookieOptions()
             {
                 Expires = DateTime.Now.AddHours(VITAL_GREEN_COOKIE_EXPIRED_HOURS),
             });
 
-            return RedirectToAction("ShipTo");
+            return Task.FromResult<IActionResult>(RedirectToAction("ShipTo"));
         }
 
         [HttpGet]
@@ -152,7 +155,7 @@ namespace VC.Public.Controllers
                 try
                 {
                     cookies = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(cookies));
-                    model = JsonConvert.DeserializeObject<VitalGreenRequestModel>(cookies);
+                    model = ((string) cookies).FromJson<VitalGreenRequestModel>();
                 }
                 catch (Exception e)
                 {

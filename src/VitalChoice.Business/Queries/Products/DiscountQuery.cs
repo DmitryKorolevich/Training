@@ -26,6 +26,12 @@ namespace VitalChoice.Business.Queries.Products
             return this;
         }
 
+        public DiscountQuery WithEqualCode(string code)
+        {
+            Add(x => x.Code == code);
+            return this;
+        }
+
         public DiscountQuery NotDeleted()
         {
             Add(x => x.StatusCode == (int)RecordStatusCode.Active || x.StatusCode == (int)RecordStatusCode.NotActive);

@@ -157,11 +157,11 @@
 				<label class="control-label">Address Type</label>
 				<div class="input-group">
 					<label>
-						@Html.RadioButtonFor(m => m.AddressType, (int)CheckoutAddressType.Residental, new { @class = "form-control" })
+						@Html.RadioButtonFor(m => m.AddressType, CheckoutAddressType.Residental, new { @class = "form-control"  })
 						Residential
 					</label>
 					<label class="left-indent-medium">
-						@Html.RadioButtonFor(m => m.AddressType, (int)CheckoutAddressType.Commercial, new { @class = "form-control" })
+						@Html.RadioButtonFor(m => m.AddressType, CheckoutAddressType.Commercial, new { @class = "form-control" })
 						Commercial
 					</label>
 				</div>
@@ -169,7 +169,8 @@
 			<div class="form-group">
 				@Html.LabelFor(m => m.DeliveryInstructions, new { @class = "control-label" })
 				<div class="input-group">
-					@Html.TextAreaFor(m => m.DeliveryInstructions, new { @class = "form-control", rows = "5" })
+					@Html.TextAreaFor(m => m.DeliveryInstructions, new { @class = "form-control checkout-huge", rows = "5", maxlength = 60, placeholder = "Please enter any special notes for the driver. Example: Please Knock on Door" })
+					<span class="checkout-charcount"><b>60</b> characters remaining</span>
 					@Html.ValidationMessageFor(m => m.DeliveryInstructions)
 				</div>
 			</div>
@@ -189,7 +190,8 @@
 						<span class="shopping-notice-note">NOTE:</span> If this is an e-Gift Certificate, enter the recipient’s email address where indicated AFTER you place your order,<br/>
 						using the form on the Thank You page. (This is a security requirement.)
 					</div>
-					@Html.TextAreaFor(m => m.GiftMessage, new {@class = "form-control", rows="5"})
+					@Html.TextAreaFor(m => m.GiftMessage, new {@class = "form-control checkout-huge", rows="5", maxlength=255})
+					<span class="checkout-charcount"><b>255</b> characters remaining</span>
 					@Html.ValidationMessageFor(m => m.GiftMessage)
 				</div>
 			</div>

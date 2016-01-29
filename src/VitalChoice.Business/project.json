@@ -10,6 +10,7 @@
     "Autofac.Extensions.DependencyInjection": "4.0.0-*",
     "Avalara.Avatax.Rest": "1.0.0-*",
     "CsvHelper": "2.13.2-*",
+    "FluentValidation": "5.6.0.5-*",
     "VitalChoice.Infrastructure": "",
     "VitalChoice.Data": "",
     "VitalChoice.Ecommerce.Domain": "",

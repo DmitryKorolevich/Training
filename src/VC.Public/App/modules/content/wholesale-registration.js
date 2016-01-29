@@ -5,14 +5,11 @@
 
     root.on('click', '#step1go', function ()
     {
-        var email = root.find('#Email').val();
-        if (!email)
+        var form = root.find('#Email').closest('form');
+        if (form.valid())
         {
-            alert('E-mail addess is a required field.');
-            return;
+            executeStep1(root.find('#Email').val());
         }
-
-        executeStep1(email);
     });
 
     var executeStep1 = function (email)

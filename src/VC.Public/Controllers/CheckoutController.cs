@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Http;
@@ -9,6 +10,7 @@ using VC.Public.Models.Checkout;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Interfaces.Services;
@@ -66,7 +68,7 @@ namespace VC.Public.Controllers
 		{
 			var shippingMethodModel = new AddUpdateShippingMethodModel()
 			{
-
+				AddressType = CheckoutAddressType.Residental
 			};
 			if (ContextAccessor.HttpContext.User.Identity.IsAuthenticated)
 			{
@@ -127,7 +129,7 @@ namespace VC.Public.Controllers
 						InStock = true
 					}
 				},
-				GiftCertificateCodes = new List<string>() {""},
+				GiftCertificateCodes = new List<CartGcModel>() { new CartGcModel() { Value = string.Empty} },
 				OrderTotal = 169,
 				ShipAsap = true,
 				ShippingCost = 0,
@@ -212,7 +214,10 @@ namespace VC.Public.Controllers
 				ShippingCost = 100,
 				SubTotal = 50,
 				Tax = 10,
-				OrderTotal = 160
+				OrderTotal = 160,
+				OrderNumber = "1051135",
+				OrderDate = DateTime.Now,
+				ShippingMethod = "Standard Shipping"
 			};
 
 			return View(reviewOrderModel);

@@ -10,6 +10,8 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic.Masking
     {
         public override string MaskValue(string value)
         {
+            if (value == null)
+                return null;
             return MaskArea(value, 0, value.Length - 4);
         }
     }

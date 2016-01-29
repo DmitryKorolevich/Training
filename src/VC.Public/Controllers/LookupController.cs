@@ -52,5 +52,15 @@ namespace VC.Public.Controllers
 
 			return new Result<IList<LookupItem<int>>>(true, creditCardTypes);
 		}
+
+		[HttpGet]
+		public Result<IList<LookupItem<int>>> GetCartShippingOptions()
+		{
+			var referenceData = _appInfrastructureService.Get();
+
+			var options = referenceData.CartShippingOptions;
+
+			return new Result<IList<LookupItem<int>>>(true, options);
+		}
 	}
 }

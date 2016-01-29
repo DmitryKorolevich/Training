@@ -10,6 +10,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Products
 
         public string ExactCode { get; set; }
 
+        public ICollection<string> ExactCodes { get; set; }
+
         public string ExactDescriptionName { get; set; }
 
         public IList<int> Ids { get; set; }

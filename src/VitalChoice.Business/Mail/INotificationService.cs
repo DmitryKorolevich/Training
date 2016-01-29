@@ -41,5 +41,7 @@ namespace VitalChoice.Business.Mail
         Task SendContentUrlNotificationForRecipeAsync(string email, ContentUrlNotificationEmail model);
 
         Task SendPrivacyRequestEmailAsync(string email, PrivacyRequestEmail model);
+
+        Task SendGLOrdersImportEmailAsync(GLOrdersImportEmail model);
     }
 }

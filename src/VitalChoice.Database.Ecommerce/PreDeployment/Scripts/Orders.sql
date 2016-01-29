@@ -245,3 +245,13 @@ BEGIN
 	ADD IdAddedBy INT NULL
 		CONSTRAINT FK_OrdersAddedToUser FOREIGN KEY (IdEditedBy) REFERENCES dbo.Users (Id)
 END
+
+GO
+
+IF EXISTS(SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'OrderAddresses') AND Name = N'IdState' AND is_nullable = 0)
+BEGIN
+	ALTER TABLE OrderAddresses
+	ALTER COLUMN IdState INT NULL
+END
+
+GO

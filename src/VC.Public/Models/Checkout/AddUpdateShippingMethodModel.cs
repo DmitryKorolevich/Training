@@ -12,11 +12,13 @@ namespace VC.Public.Models.Checkout
 		public CheckoutAddressType AddressType { get; set; }
 
 		[Display(Name = "Delivery Instructions")]
+		[MaxLength(60)]
 		public string DeliveryInstructions { get; set; }
 
 		public bool IsGiftCertificate { get; set; }
 
 		[Display(Name = "Gift Message")]
+		[MaxLength(255)]
 		public string GiftMessage { get; set; }
 
 		public bool UseBillingAddress { get; set; }

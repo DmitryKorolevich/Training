@@ -16,6 +16,7 @@ using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.ObjectMapping.Interfaces;
+using VitalChoice.Infrastructure.Domain.Entities.Roles;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -69,6 +70,11 @@ namespace VitalChoice.Business.Services.Products
             {
                 viewContext.Parameters.CustomerTypeCodes = GetCategoryMenuAvailability(viewContext.User);
                 viewContext.Parameters.Product = await _productService.SelectAsync(entity.Id, true);
+                if(viewContext.User.Identity.IsAuthenticated)
+                {
+                    viewContext.Parameters.Role = viewContext.User.IsInRole(IdentityConstants.WholesaleCustomer) ? (int?)RoleType.Wholesale :
+                         viewContext.User.IsInRole(IdentityConstants.RetailCustomer) ? (int?)RoleType.Retail : null;
+                }
             }
 
             return entity;

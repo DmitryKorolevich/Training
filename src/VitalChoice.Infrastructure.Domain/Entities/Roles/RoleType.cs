@@ -2,8 +2,8 @@
 {
     public enum RoleType
     {
-		/*Admin*/
-		AdminUser = 1,
+        /*Admin*/
+        AdminUser = 1,
 		ContentUser = 2,
 		OrderUser = 3,
 		ProductUser = 4,

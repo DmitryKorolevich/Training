@@ -30,6 +30,9 @@ using VitalChoice.Business.CsvExportMaps.Orders;
 using VitalChoice.Infrastructure.Domain.Constants;
 using Microsoft.Net.Http.Headers;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Core.Infrastructure.Helpers;
+using VitalChoice.Interfaces.Services.Products;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
 
 namespace VC.Admin.Controllers
 {
@@ -44,6 +47,7 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> _ordersRegionStatisticItemCSVExportService;
         private readonly ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> _ordersZipStatisticItemCSVExportService;
         private readonly ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> _vOrderWithRegionInfoItemCSVExportService;
+        private readonly IProductService _productService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly ILogger logger;
 
@@ -56,6 +60,7 @@ namespace VC.Admin.Controllers
             ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> ordersRegionStatisticItemCSVExportService,
             ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> ordersZipStatisticItemCSVExportService,
             ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> vOrderWithRegionInfoItemCSVExportService,
+            IProductService productService,
             IObjectHistoryLogService objectHistoryLogService)
         {
             _orderService = orderService;
@@ -65,6 +70,7 @@ namespace VC.Admin.Controllers
             _ordersRegionStatisticItemCSVExportService = ordersRegionStatisticItemCSVExportService;
             _ordersZipStatisticItemCSVExportService = ordersZipStatisticItemCSVExportService;
             _vOrderWithRegionInfoItemCSVExportService = vOrderWithRegionInfoItemCSVExportService;
+            _productService = productService;
             _objectHistoryLogService = objectHistoryLogService;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             this.logger = loggerProvider.CreateLoggerDefault();
@@ -86,16 +92,16 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<bool>> UpdateOrderStatus(int id, int status, [FromBody] object model)
         {
-            var order = await _orderService.SelectAsync(id,false);
+            var order = await _orderService.SelectAsync(id, false);
 
-            if(order==null)
+            if (order == null)
             {
                 throw new AppValidationException("Id", "The given order doesn't exist.");
             }
             order.OrderStatus = (OrderStatus)status;
             order = await _orderService.UpdateAsync(order);
 
-            return order!=null;
+            return order != null;
         }
 
         [HttpPost]
@@ -133,7 +139,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<Result<OrderManageModel>> GetOrder(int id, int? idcustomer=null)
+        public async Task<Result<OrderManageModel>> GetOrder(int id, int? idcustomer = null, bool refreshprices=false)
         {
             if (id == 0)
             {
@@ -159,6 +165,17 @@ namespace VC.Admin.Controllers
             }
 
             var item = await _orderService.SelectAsync(id);
+            if(id!=0 && refreshprices && item.Skus!=null)
+            {
+                var customer = await _customerService.SelectAsync(item.Customer.Id);
+                foreach(var orderSku in item.Skus)
+                {
+                    if(orderSku.Sku!=null)
+                    {
+                        orderSku.Amount = customer.IdObjectType == (int)CustomerType.Retail ? orderSku.Sku.Price : orderSku.Sku.WholesalePrice;
+                    }
+                }
+            }
 
             OrderManageModel toReturn = _mapper.ToModel<OrderManageModel>(item);
 
@@ -184,22 +201,10 @@ namespace VC.Admin.Controllers
 
             var item = _mapper.FromModel(model);
 
-            var pOrder = false;
-            var npOrder = false;
-            foreach(var skuOrdered in item.Skus)
+            var pOrderType = _orderService.GetPOrderType(item);
+            if (pOrderType.HasValue)
             {
-                pOrder = pOrder || skuOrdered.ProductWithoutSkus.IdObjectType == (int)ProductType.Perishable;
-                npOrder = npOrder || skuOrdered.ProductWithoutSkus.IdObjectType == (int)ProductType.NonPerishable;
-            }
-            if(pOrder && npOrder)
-            {
-                item.Data.POrderType = (int)POrderType.PNP;
-            } else if(pOrder)
-            {
-                item.Data.POrderType = (int)POrderType.P;
-            } else if(npOrder)
-            {
-                item.Data.POrderType = (int)POrderType.NP;
+                item.Data.POrderType = (int)pOrderType;
             }
 
             var sUserId = Request.HttpContext.User.GetUserId();
@@ -307,15 +312,15 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<FileResult> GetOrdersRegionStatisticReportFile([FromQuery]DateTime from, [FromQuery]DateTime to, 
-            [FromQuery]int? idcustomertype=null, [FromQuery]int? idordertype=null)
+        public async Task<FileResult> GetOrdersRegionStatisticReportFile([FromQuery]DateTime from, [FromQuery]DateTime to,
+            [FromQuery]int? idcustomertype = null, [FromQuery]int? idordertype = null)
         {
             OrderRegionFilter filter = new OrderRegionFilter()
             {
-                From=from,
-                To=to,
-                IdCustomerType= idcustomertype,
-                IdOrderType= idordertype,
+                From = from,
+                To = to,
+                IdCustomerType = idcustomertype,
+                IdOrderType = idordertype,
             };
 
             var items = await _orderService.GetOrdersRegionStatisticAsync(filter);
@@ -340,7 +345,7 @@ namespace VC.Admin.Controllers
 
         [HttpGet]
         public async Task<FileResult> GetOrdersZipStatisticReportFile([FromQuery]DateTime from, [FromQuery]DateTime to,
-            [FromQuery]int? idcustomertype=null, [FromQuery]int? idordertype=null)
+            [FromQuery]int? idcustomertype = null, [FromQuery]int? idordertype = null)
         {
             OrderRegionFilter filter = new OrderRegionFilter()
             {
@@ -373,7 +378,7 @@ namespace VC.Admin.Controllers
 
         [HttpGet]
         public async Task<FileResult> GetOrderWithRegionInfoItemsReportFile([FromQuery]DateTime from, [FromQuery]DateTime to,
-            [FromQuery]int? idcustomertype=null, [FromQuery]int? idordertype=null, [FromQuery]string region=null, [FromQuery]string zip=null)
+            [FromQuery]int? idcustomertype = null, [FromQuery]int? idordertype = null, [FromQuery]string region = null, [FromQuery]string zip = null)
         {
             OrderRegionFilter filter = new OrderRegionFilter()
             {
@@ -382,12 +387,12 @@ namespace VC.Admin.Controllers
                 IdCustomerType = idcustomertype,
                 IdOrderType = idordertype,
                 Region = region,
-                Zip=zip,
+                Zip = zip,
             };
             filter.Paging = null;
 
             var data = await _orderService.GetOrderWithRegionInfoItemsAsync(filter);
-            foreach(var item in data.Items)
+            foreach (var item in data.Items)
             {
                 item.DateCreated = TimeZoneInfo.ConvertTime(item.DateCreated, TimeZoneInfo.Local, _pstTimeZoneInfo);
             }
@@ -414,7 +419,36 @@ namespace VC.Admin.Controllers
         public async Task<Result<ICollection<GCOrderListItemModel>>> GetGCOrders(int id)
         {
             var toReturn = await _orderService.GetGCOrdersAsync(id);
-            return toReturn.Select(p=>new GCOrderListItemModel(p)).ToList();
+            return toReturn.Select(p => new GCOrderListItemModel(p)).ToList();
+        }
+
+        [HttpPost]
+        [AdminAuthorize(PermissionType.Customers)]
+        public async Task<Result<bool>> ImportOrders()
+        {
+            var form = await Request.ReadFormAsync();
+
+            var idCustomer = Int32.Parse(form["idcustomer"]);
+            var idPaymentMethod = Int32.Parse(form["idpaymentmethod"]);
+            OrderType orderType = (OrderType)Int32.Parse(form["ordertype"]);
+
+            var parsedContentDisposition = ContentDispositionHeaderValue.Parse(form.Files[0].ContentDisposition);
+
+            var contentType = form.Files[0].ContentType;
+            using (var stream = form.Files[0].OpenReadStream())
+            {
+                var fileContent = stream.ReadFully();
+
+                var sUserId = Request.HttpContext.User.GetUserId();
+                int userId;
+                var toReturn = false;
+                if (int.TryParse(sUserId, out userId))
+                {
+                    toReturn = await _orderService.ImportOrders(fileContent, parsedContentDisposition.FileName, orderType, idCustomer, idPaymentMethod, userId);
+                }
+                
+                return toReturn;
+            }
         }
     }
 }

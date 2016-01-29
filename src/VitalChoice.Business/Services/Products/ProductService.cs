@@ -268,13 +268,16 @@ namespace VitalChoice.Business.Services.Products
                     .Include(s => s.Product)
                     .ThenInclude(p => p.ProductsToCategories)
                     .SelectFirstOrDefaultAsync(false);
+            if (sku == null)
+                return null;
             sku.OptionTypes =
                 _mapper.OptionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().CacheCompile()).ToList();
             sku.Product.OptionTypes = sku.OptionTypes;
+            var skuDynamic = await _skuMapper.FromEntityAsync(sku, true);
             return new SkuOrdered
             {
-                Sku = await _skuMapper.FromEntityAsync(sku, true),
-                ProductWithoutSkus = await Mapper.FromEntityAsync(sku.Product, true)
+                Sku = skuDynamic,
+                ProductWithoutSkus = await Mapper.FromEntityAsync(sku.Product, true),
             };
         }
 
@@ -392,7 +395,7 @@ namespace VitalChoice.Business.Services.Products
         public async Task<ICollection<VSku>> GetSkusAsync(VProductSkuFilter filter)
         {
             var conditions = new VSkuQuery().NotDeleted().WithText(filter.SearchText).WithCode(filter.Code).WithDescriptionName(filter.DescriptionName)
-                .WithExactCode(filter.ExactCode).WithExactDescriptionName(filter.ExactDescriptionName).WithIds(filter.Ids).WithIdProducts(filter.IdProducts);
+                .WithExactCode(filter.ExactCode).WithExactCodes(filter.ExactCodes).WithExactDescriptionName(filter.ExactDescriptionName).WithIds(filter.Ids).WithIdProducts(filter.IdProducts);
             var query = _vSkuRepository.Query(conditions);
 
             Func<IQueryable<VSku>, IOrderedQueryable<VSku>> sortable = x => x.OrderByDescending(y => y.DateCreated);

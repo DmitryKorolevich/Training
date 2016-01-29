@@ -57,6 +57,22 @@ using VitalChoice.Workflow.Core;
 using Microsoft.Extensions.Logging;
 using VitalChoice.ObjectMapping.Base;
 using VitalChoice.ObjectMapping.Interfaces;
+using System.IO;
+using CsvHelper;
+using System.Text;
+using CsvHelper.Configuration;
+using VitalChoice.Business.CsvExportMaps;
+using VitalChoice.Infrastructure.Domain.Entities.Orders;
+using System.Reflection;
+using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using VitalChoice.Interfaces.Services.Settings;
+using VitalChoice.Infrastructure.Domain.Transfer.Country;
+using FluentValidation.Validators;
+using System.Text.RegularExpressions;
+using VitalChoice.Interfaces.Services.Products;
+using VitalChoice.Infrastructure.Domain.Mail;
+using VitalChoice.Business.Mail;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -81,6 +97,12 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IPaymentMethodService _paymentMethodService;
         private readonly IObjectMapper<OrderPaymentMethodDynamic> _paymentMapper;
         private readonly IEcommerceRepositoryAsync<OrderToGiftCertificate> _orderToGiftCertificateRepositoryAsync;
+        private readonly ICountryService _countryService;
+        private readonly TimeZoneInfo _pstTimeZoneInfo;
+        private readonly IObjectMapper<AddressDynamic> _addressMapper;
+        private readonly IProductService _productService;
+        private readonly INotificationService _notificationService;
+        private readonly IExtendedDynamicServiceAsync<OrderPaymentMethodDynamic, OrderPaymentMethod, CustomerPaymentMethodOptionType, OrderPaymentMethodOptionValue> _paymentGenericService;
 
         public OrderService(
             IEcommerceRepositoryAsync<VOrder> vOrderRepository,
@@ -105,7 +127,12 @@ namespace VitalChoice.Business.Services.Orders
             SPEcommerceRepository sPEcommerceRepository,
             IPaymentMethodService paymentMethodService,
             IObjectMapper<OrderPaymentMethodDynamic> paymentMapper,
-            IEcommerceRepositoryAsync<OrderToGiftCertificate> orderToGiftCertificateRepositoryAsync)
+            IEcommerceRepositoryAsync<OrderToGiftCertificate> orderToGiftCertificateRepositoryAsync, 
+            IExtendedDynamicServiceAsync<OrderPaymentMethodDynamic, OrderPaymentMethod, CustomerPaymentMethodOptionType, OrderPaymentMethodOptionValue> paymentGenericService,
+            IObjectMapper<AddressDynamic> addressMapper,
+            IProductService productService,
+            INotificationService notificationService,
+            ICountryService countryService)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor)
@@ -128,6 +155,12 @@ namespace VitalChoice.Business.Services.Orders
             _paymentMethodService = paymentMethodService;
             _paymentMapper = paymentMapper;
             _orderToGiftCertificateRepositoryAsync = orderToGiftCertificateRepositoryAsync;
+            _paymentGenericService = paymentGenericService;
+            _countryService = countryService;
+            _addressMapper = addressMapper;
+            _productService = productService;
+            _notificationService = notificationService;
+            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
 
         protected override IQueryLite<Order> BuildQuery(IQueryLite<Order> query)
@@ -311,6 +344,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 try
                 {
+                    await EnsurePaymentMethod(model);
                     model.PaymentMethod.IdOrder = model.Id;
                     var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
                     var paymentCopy = _paymentMapper.Clone<ExpandoObject>(model.PaymentMethod, o =>
@@ -341,6 +375,37 @@ namespace VitalChoice.Business.Services.Orders
                 Logger.LogError("Cannot update order payment info on remote.");
             }
             return entity;
+        }
+
+        private async Task EnsurePaymentMethod(OrderDynamic model)
+        {
+            if (model.PaymentMethod == null)
+            {
+                switch ((OrderType) model.IdObjectType)
+                {
+                    case OrderType.Normal:
+                        model.PaymentMethod = await _paymentGenericService.CreatePrototypeAsync((int) PaymentMethodType.CreditCard);
+                        break;
+                    case OrderType.AutoShip:
+                        model.PaymentMethod = await _paymentGenericService.CreatePrototypeAsync((int) PaymentMethodType.CreditCard);
+                        break;
+                    case OrderType.DropShip:
+                        model.PaymentMethod = await _paymentGenericService.CreatePrototypeAsync((int) PaymentMethodType.NoCharge);
+                        break;
+                    case OrderType.GiftList:
+                        model.PaymentMethod = await _paymentGenericService.CreatePrototypeAsync((int) PaymentMethodType.NoCharge);
+                        break;
+                    case OrderType.Reship:
+                        model.PaymentMethod = await _paymentGenericService.CreatePrototypeAsync((int) PaymentMethodType.CreditCard);
+                        break;
+                    case OrderType.Refund:
+                        model.PaymentMethod = await _paymentGenericService.CreatePrototypeAsync((int) PaymentMethodType.CreditCard);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                model.PaymentMethod.StatusCode = (int)RecordStatusCode.Active;
+            }
         }
 
         /// <summary>
@@ -387,6 +452,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 try
                 {
+                    await EnsurePaymentMethod(model);
                     model.PaymentMethod.IdOrder = model.Id;
                     var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
                     var paymentCopy = _paymentMapper.Clone<ExpandoObject>(model.PaymentMethod, o =>
@@ -513,9 +579,7 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         var maxCount = _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount;
                         var dateNow = DateTime.Now;
-                        var periods = (await healthwisePeriodRepository.Query(p => p.IdCustomer == model.Customer.Id &&
-                            dateNow >= p.StartDate && dateNow < p.EndDate && !p.PaidDate.HasValue).
-                            Include(p => p.HealthwiseOrders).SelectAsync(false)).ToList();
+                        var periods = (await healthwisePeriodRepository.Query(p => p.IdCustomer == model.Customer.Id && dateNow >= p.StartDate && dateNow < p.EndDate && !p.PaidDate.HasValue).Include(p => p.HealthwiseOrders).SelectAsync(false)).ToList();
 
                         bool addedToPeriod = false;
                         foreach (var period in periods)
@@ -524,8 +588,7 @@ namespace VitalChoice.Business.Services.Orders
                             {
                                 healthwiseOrder = new HealthwiseOrder()
                                 {
-                                    Id = model.Id,
-                                    IdHealthwisePeriod = period.Id
+                                    Id = model.Id, IdHealthwisePeriod = period.Id
                                 };
                                 _healthwiseOrderRepositoryAsync.Insert(healthwiseOrder);
                                 addedToPeriod = true;
@@ -540,7 +603,7 @@ namespace VitalChoice.Business.Services.Orders
                             period.EndDate = period.StartDate.AddYears(1);
                             period.HealthwiseOrders = new List<HealthwiseOrder>()
                             {
-                                new HealthwiseOrder() { Id=model.Id }
+                                new HealthwiseOrder() {Id = model.Id}
                             };
                             _healthwisePeriodRepositoryAsync.InsertGraph(period);
                         }
@@ -564,12 +627,8 @@ namespace VitalChoice.Business.Services.Orders
             {
                 conditions = conditions.WithShippedDate(filter.From, filter.To);
             }
-            conditions = conditions.WithOrderStatus(filter.OrderStatus)
-                .WithoutIncomplete(filter.OrderStatus)
-                .WithId(filter.IdString)//TODO - should be redone after adding - https://github.com/aspnet/EntityFramework/issues/2850
-                .WithOrderSource(filter.IdOrderSource)
-                .WithPOrderType(filter.POrderType)
-                .WithCustomerType(filter.IdCustomerType).WithShippingMethod(filter.IdShippingMethod);
+            conditions = conditions.WithOrderStatus(filter.OrderStatus).WithoutIncomplete(filter.OrderStatus).WithId(filter.IdString) //TODO - should be redone after adding - https://github.com/aspnet/EntityFramework/issues/2850
+                .WithOrderSource(filter.IdOrderSource).WithPOrderType(filter.POrderType).WithCustomerType(filter.IdCustomerType).WithShippingMethod(filter.IdShippingMethod);
 
             var query = _vOrderRepository.Query(conditions);
 
@@ -578,100 +637,51 @@ namespace VitalChoice.Business.Services.Orders
             switch (filter.Sorting.Path)
             {
                 case VOrderSortPath.OrderStatus:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.OrderStatus)
-                                : x.OrderByDescending(y => y.OrderStatus);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.OrderStatus) : x.OrderByDescending(y => y.OrderStatus);
                     break;
                 case VOrderSortPath.IdOrderSource:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.IdOrderSource)
-                                : x.OrderByDescending(y => y.IdOrderSource);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.IdOrderSource) : x.OrderByDescending(y => y.IdOrderSource);
                     break;
                 case VOrderSortPath.IdPaymentMethod:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.IdPaymentMethod)
-                                : x.OrderByDescending(y => y.IdPaymentMethod);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.IdPaymentMethod) : x.OrderByDescending(y => y.IdPaymentMethod);
                     break;
                 case VOrderSortPath.DateCreated:
                     sortable =
                         (x) =>
                             sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.DateCreated)
-                                : x.OrderByDescending(y => y.DateCreated);
+                                ? x.OrderBy(y => y.DateCreated).ThenBy(y => y.Id)
+                                : x.OrderByDescending(y => y.DateCreated).ThenByDescending(y => y.Id);
                     break;
                 case VOrderSortPath.DateShipped:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.DateShipped)
-                                : x.OrderByDescending(y => y.DateShipped);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.DateShipped) : x.OrderByDescending(y => y.DateShipped);
                     break;
                 case VOrderSortPath.Company:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.Company)
-                                : x.OrderByDescending(y => y.Company);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.Company) : x.OrderByDescending(y => y.Company);
                     break;
                 case VOrderSortPath.StateCode:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.StateCode)
-                                : x.OrderByDescending(y => y.StateCode);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.StateCode) : x.OrderByDescending(y => y.StateCode);
                     break;
                 case VOrderSortPath.IdCustomerType:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.IdCustomerType)
-                                : x.OrderByDescending(y => y.IdCustomerType);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.IdCustomerType) : x.OrderByDescending(y => y.IdCustomerType);
                     break;
                 case VOrderSortPath.Customer:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.Customer)
-                                : x.OrderByDescending(y => y.Customer);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.Customer) : x.OrderByDescending(y => y.Customer);
                     break;
                 case VOrderSortPath.ShipTo:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.ShipTo)
-                                : x.OrderByDescending(y => y.ShipTo);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.ShipTo) : x.OrderByDescending(y => y.ShipTo);
                     break;
                 case VOrderSortPath.Id:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.Id)
-                                : x.OrderByDescending(y => y.Id);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.Id) : x.OrderByDescending(y => y.Id);
                     break;
                 case VOrderSortPath.Total:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.Total)
-                                : x.OrderByDescending(y => y.Total);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.Total) : x.OrderByDescending(y => y.Total);
                     break;
                 case VOrderSortPath.DateEdited:
-                    sortable =
-                        (x) =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.DateEdited)
-                                : x.OrderByDescending(y => y.DateEdited);
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.DateEdited) : x.OrderByDescending(y => y.DateEdited);
                     break;
             }
 
-            var toReturn =
-                await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            var toReturn = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
             if (toReturn.Items.Any())
             {
                 var ids = toReturn.Items.Select(p => p.IdEditedBy).ToList();
@@ -693,20 +703,496 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<OrderDynamic> CreateNewNormalOrder(OrderStatus status)
         {
-            var toReturn = await CreatePrototypeAsync((int)OrderType.Normal);
+            var toReturn = await CreatePrototypeAsync((int) OrderType.Normal);
 
             toReturn.StatusCode = (int)RecordStatusCode.Active;
-            if(status!= OrderStatus.Processed && status != OrderStatus.Incomplete)
+            if (status != OrderStatus.Processed && status != OrderStatus.Incomplete)
             {
                 throw new Exception("New normal order invalid status");
             }
             toReturn.OrderStatus = status;
             toReturn.DateCreated = DateTime.Now;
-            toReturn.Data.PreferredShipMethod = (int)PreferredShipMethod.Best;
-            toReturn.Data.ShipDelayType = (int)ShipDelayType.None;
+            toReturn.Data.PreferredShipMethod = (int) PreferredShipMethod.Best;
+            toReturn.Data.ShipDelayType = (int) ShipDelayType.None;
 
             return toReturn;
         }
+
+        public POrderType? GetPOrderType(OrderDynamic item)
+        {
+            POrderType? toReturn = null;
+            var pOrder = false;
+            var npOrder = false;
+            if (item != null)
+            {
+                foreach (var skuOrdered in item.Skus)
+                {
+                    pOrder = pOrder || skuOrdered?.ProductWithoutSkus.IdObjectType == (int)ProductType.Perishable;
+                    npOrder = npOrder || skuOrdered?.ProductWithoutSkus.IdObjectType == (int)ProductType.NonPerishable;
+                }
+                if (pOrder && npOrder)
+                {
+                    toReturn = POrderType.PNP;
+                }
+                else if (pOrder)
+                {
+                    toReturn = POrderType.P;
+                }
+                else if (npOrder)
+                {
+                    toReturn = POrderType.NP;
+                }
+            }
+            return toReturn;
+        }
+
+        #region OrdersImport
+
+        public async Task<bool> ImportOrders(byte[] file, string fileName, OrderType orderType, int idCustomer, int idPaymentMethod, int idAddedBy)
+        {
+            var customer = await _customerService.SelectAsync(idCustomer);
+            if (customer == null)
+            {
+                throw new AppValidationException("Invalid file format");
+            }
+            if (!customer.ApprovedPaymentMethods.Contains((int)PaymentMethodType.NoCharge))
+            {
+                throw new AppValidationException("Payment method \"No Charge\" should be allowed");
+            }
+            if(orderType!=OrderType.GiftList && orderType!=OrderType.DropShip)
+            {
+                throw new ApiException("Orders import with the given orderType isn't implemented");
+            }
+
+            List<OrderBaseImportItem> records = null;
+            Dictionary<string, OrderValidationGenericProperty> validationSettings = null;
+            var countries = await _countryService.GetCountriesAsync(new CountryFilter());
+            using (var memoryStream = new MemoryStream(file))
+            {
+                using (var streamReader = new StreamReader(memoryStream))
+                {
+                    CsvConfiguration configuration = new CsvConfiguration();
+                    configuration.TrimFields = true;
+                    configuration.TrimHeaders = true;
+                    configuration.RegisterClassMap<OrderGiftListImportItemCsvMap>();
+                    configuration.RegisterClassMap<OrderDropShipImportItemCsvMap>();
+                    using (var csv = new CsvReader(streamReader, configuration))
+                    {
+                        records = ProcessImportOrderItems(csv, orderType, countries, out validationSettings);
+                    }
+                }
+            }
+
+            if (records != null && validationSettings != null)
+            {
+                ValidateOrderImportItems(records, validationSettings);
+            }
+
+            //throw parsing and validation errors
+            var messages = FormatRowsRecordErrorMessages(records);
+            if (messages.Count > 0)
+            {
+                throw new AppValidationException(messages);
+            }
+
+            var map = OrdersForImportBaseConvert(records, orderType, customer, idAddedBy);
+
+            await LoadSkusDynamic(map, customer);
+            //not found SKU errors
+            messages = FormatRowsRecordErrorMessages(records);
+            if (messages.Count > 0)
+            {
+                throw new AppValidationException(messages);
+            }
+
+            foreach (var item in map)
+            {
+                var context = await this.CalculateOrder(item.Order);
+                item.Order = context.Order;
+                item.OrderImportItem.ErrorMessages.AddRange(context.Messages);
+                if (context.SkuOrdereds != null)
+                {
+                    item.OrderImportItem.ErrorMessages.AddRange(context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages).Select(p =>
+                              new MessageInfo() {
+                                  Message = p
+                              }));
+                }
+                if (context.PromoSkus != null)
+                {
+                    item.OrderImportItem.ErrorMessages.AddRange(context.PromoSkus.Where(p => p.Messages != null).SelectMany(p => p.Messages).Select(p =>
+                              new MessageInfo()
+                              {
+                                  Message = p
+                              }));
+                }
+            }
+
+            //throw calculating errors
+            messages = FormatRowsRecordErrorMessages(map.Select(p=>p.OrderImportItem).ToList());
+            if (messages.Count > 0)
+            {
+                throw new AppValidationException(messages);
+            }
+
+            var orders = map.Select(p => p.Order).ToList();
+            //set POrderType
+            foreach (var order in orders)
+            {
+                order.Data.POrderType = (int?)GetPOrderType(order);
+            }
+            orders = await InsertRangeAsync(orders);
+
+            if(orderType==OrderType.GiftList)
+            {
+                await SendGLOrdersImportEmailAsync(orders, customer, idPaymentMethod, idAddedBy);
+            }
+
+            return true;
+        }
+
+        private async Task SendGLOrdersImportEmailAsync(ICollection<OrderDynamic> orders, CustomerDynamic customer, int idPaymentMethod, int idAddedBy)
+        {
+            GLOrdersImportEmail model = new GLOrdersImportEmail();
+            model.Date = DateTime.Now;
+            model.IdCustomer = customer.Id;
+            model.CustomerFirstName = customer.ProfileAddress.SafeData.FirstName;
+            model.CustomerLastName = customer.ProfileAddress.SafeData.LastName;
+            var creditCard = customer.CustomerPaymentMethods.FirstOrDefault(p => p.Id == idPaymentMethod);
+            if(creditCard!=null)
+            {
+                model.CardNumber = creditCard.SafeData.CardNumber;
+            }
+            var profile = (await _adminProfileRepository.Query(p => p.Id==idAddedBy).SelectAsync(false)).FirstOrDefault();
+            model.Agent = profile?.AgentId;
+            model.ImportedOrdersCount = orders.Count;
+            model.ImportedOrdersAmount = orders.Sum(p=>p.Total);
+            model.OrderIds = orders.Select(p => p.Id).ToList();
+
+            await _notificationService.SendGLOrdersImportEmailAsync(model);
+        }
+
+        private async Task LoadSkusDynamic(List<OrderImportItemOrderDynamic> map, CustomerDynamic customer)
+        {
+            List<string> requestCodes = map.Select(p=>p.Order).Where(p => p.Skus != null).SelectMany(p => p.Skus).Where(p => p.Sku != null).Select(p => p.Sku.Code).ToList();
+
+            var dbSkus = await _productService.GetSkusOrderedAsync(requestCodes);
+            foreach (var item in map)
+            {
+                if (item.Order.Skus != null)
+                {
+                    int index = 1;
+                    foreach (var sku in item.Order.Skus)
+                    {
+                        var dbSku = dbSkus.FirstOrDefault(p => p.Sku.Code == sku.Sku.Code);
+                        if(dbSku==null)
+                        {
+                            item.OrderImportItem.ErrorMessages.Add(AddErrorMessage("SKU " + index, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SkuNotFoundOrderImport],
+                                "SKU " + index, sku.Sku.Code)));
+                            continue;
+                        }
+                        else
+                        {
+                            sku.ProductWithoutSkus = dbSku.ProductWithoutSkus;
+                            sku.Sku = dbSku.Sku;
+                            if(sku.Sku!=null)
+                            {
+                                sku.Amount = customer.IdObjectType == (int)CustomerType.Retail ? sku.Sku.Price :
+                                    customer.IdObjectType == (int)CustomerType.Wholesale ? sku.Sku.WholesalePrice : 0;
+                            }
+                        }
+
+                        index++;
+                    }
+                }
+            }
+        }
+
+        private List<OrderImportItemOrderDynamic> OrdersForImportBaseConvert(List<OrderBaseImportItem> records, OrderType orderType, CustomerDynamic customer,
+            int idAddedBy)
+        {
+            List<OrderImportItemOrderDynamic> toReturn = new List<OrderImportItemOrderDynamic>();
+            foreach (var record in records)
+            {
+                var order = this.CreatePrototype((int)orderType);
+                order.IdEditedBy = idAddedBy;
+                order.Customer = customer;
+                order.ShippingAddress = _addressMapper.FromModel<OrderBaseImportItem>(record);
+                order.ShippingAddress.IdObjectType = (int)AddressType.Shipping;
+                record.SetFields(order);
+                toReturn.Add(new OrderImportItemOrderDynamic()
+                {
+                    OrderImportItem = record,
+                    Order = order,
+                });
+            }
+            return toReturn;
+        }
+
+        private List<OrderBaseImportItem> ProcessImportOrderItems(CsvReader reader, OrderType orderType, ICollection<Country> countries, out Dictionary<string, OrderValidationGenericProperty> validationSettings)
+        {
+            List<OrderBaseImportItem> toReturn = new List<OrderBaseImportItem>();
+
+            Type orderImportItemType = null;
+            if (orderType == OrderType.GiftList)
+            {
+                orderImportItemType = typeof(OrderGiftListImportItem);
+            }
+            if (orderType == OrderType.DropShip)
+            {
+                orderImportItemType = typeof(OrderDropShipImportItem);
+            }
+            PropertyInfo[] modelProperties = orderImportItemType.GetProperties();
+            validationSettings = GetOrderImportValidationSettings(modelProperties);
+
+            var shipDateProperty = modelProperties.FirstOrDefault(p => p.Name == nameof(OrderGiftListImportItem.ShipDelayDate));
+            var shipDateHeader = shipDateProperty.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault().Name;
+
+            var skuProperties = typeof(OrderSkuImportItem).GetProperties();
+            var skuProperty = skuProperties.FirstOrDefault(p => p.Name == nameof(OrderSkuImportItem.SKU));
+            var skuBaseHeader = skuProperty.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault().Name;
+            var qtyProperty = skuProperties.FirstOrDefault(p => p.Name == nameof(OrderSkuImportItem.QTY));
+            var qtyBaseHeader = qtyProperty.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault().Name;
+
+            int rowNumber = 1;
+            try
+            {
+                while (reader.Read())
+                {
+                    OrderBaseImportItem item = (OrderBaseImportItem)reader.GetRecord(orderImportItemType);
+                    item.RowNumber = rowNumber;
+                    var messages = new List<MessageInfo>();
+                    rowNumber++;
+
+                    if (orderImportItemType == typeof(OrderGiftListImportItem))
+                    {
+                        ((OrderGiftListImportItem)item).ShipDelayDate = ParseOrderShipDate(reader, shipDateHeader, ref messages);
+                    }
+                    if (orderImportItemType == typeof(OrderDropShipImportItem))
+                    {
+                        ((OrderDropShipImportItem)item).ShipDelayDate = ParseOrderShipDate(reader, shipDateHeader, ref messages);
+                    }
+                    item.Skus = ParseOrderSkus(reader, skuBaseHeader, qtyBaseHeader, ref messages);
+
+                    int? idState = null;
+                    int? idCountry = null;
+                    GetContryAndState(item.State, item.Country, countries, ref messages, out idState, out idCountry);
+                    item.IdState = idState;
+                    item.IdCountry = idCountry;
+
+                    if(!String.IsNullOrEmpty(item.Phone))
+                    {
+                        item.Phone = item.Phone.Replace(" ", "").Replace("+", "").Replace("-", "");
+                    }
+
+                    item.ErrorMessages = messages;
+                    toReturn.Add(item);
+                }
+            }
+            catch (Exception e)
+            {
+                throw new AppValidationException("Invalid file format");
+            }
+            return toReturn;
+        }
+
+        private void ValidateOrderImportItems(ICollection<OrderBaseImportItem> models, Dictionary<string, OrderValidationGenericProperty> settings)
+        {
+            EmailValidator emailValidator = new EmailValidator();
+            var emailRegex = new Regex(emailValidator.Expression, RegexOptions.IgnoreCase);
+            foreach (var model in models)
+            {
+                foreach (var pair in settings)
+                {
+                    var setting = pair.Value;
+
+                    bool valid = true;
+                    if (typeof(string) == setting.PropertyType)
+                    {
+                        string value = (string)setting.Get(model);
+                        if (setting.IsRequired && String.IsNullOrEmpty(value))
+                        {
+                            model.ErrorMessages.Add(AddErrorMessage(setting.DisplayName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldIsRequired],
+                                setting.DisplayName)));
+                            valid = false;
+                        }
+
+                        if (valid && setting.MaxLength.HasValue && !String.IsNullOrEmpty(value) && value.Length > setting.MaxLength.Value)
+                        {
+                            model.ErrorMessages.Add(AddErrorMessage(setting.DisplayName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldMaxLength],
+                                setting.DisplayName, setting.MaxLength.Value)));
+                            valid = false;
+                        }
+
+                        if (valid && setting.IsEmail && !String.IsNullOrEmpty(value))
+                        {
+                            if (!emailRegex.IsMatch(value))
+                            {
+                                model.ErrorMessages.Add(AddErrorMessage(setting.DisplayName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldIsInvalidEmail],
+                                    setting.DisplayName, setting.MaxLength.Value)));
+                                valid = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private Dictionary<string, OrderValidationGenericProperty> GetOrderImportValidationSettings(ICollection<PropertyInfo> modelProperties)
+        {
+            Dictionary<string, OrderValidationGenericProperty> toReturn = new Dictionary<string, OrderValidationGenericProperty>();
+            foreach (var modelProperty in modelProperties)
+            {
+                var displayAttribute = modelProperty.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault();
+                if (displayAttribute != null)
+                {
+                    OrderValidationGenericProperty item = new OrderValidationGenericProperty();
+                    item.DisplayName = displayAttribute.Name;
+                    item.PropertyInfo = modelProperty;
+                    item.PropertyType = modelProperty.PropertyType;
+                    item.Get = modelProperty.GetMethod?.CompileAccessor<object, object>();
+                    var requiredAttribute = modelProperty.GetCustomAttributes<RequiredAttribute>(true).FirstOrDefault();
+                    if (requiredAttribute != null)
+                    {
+                        item.IsRequired = true;
+                    }
+                    var emailAddressAttribute = modelProperty.GetCustomAttributes<EmailAddressAttribute>(true).FirstOrDefault();
+                    if (emailAddressAttribute != null)
+                    {
+                        item.IsEmail = true;
+                    }
+                    var maxLengthAttribute = modelProperty.GetCustomAttributes<MaxLengthAttribute>(true).FirstOrDefault();
+                    if (maxLengthAttribute != null)
+                    {
+                        item.MaxLength = maxLengthAttribute.Length;
+                    }
+                    toReturn.Add(modelProperty.Name, item);
+                }
+            }
+
+            return toReturn;
+        }
+
+        private void GetContryAndState(string stateCode, string countryCode, ICollection<Country> countries,
+            ref List<MessageInfo> messages, out int? idState, out int? idCountry)
+        {
+            idState = null;
+            idCountry = null;
+            if (!String.IsNullOrEmpty(countryCode))
+            {
+                var country = countries.FirstOrDefault(p => p.CountryCode == countryCode);
+                if (country != null)
+                {
+                    idCountry = country.Id;
+                    if (!String.IsNullOrEmpty(stateCode))
+                    {
+                        var state = country.States.FirstOrDefault(p => p.StateCode == stateCode);
+                        if (state == null)
+                        {
+                            messages.Add(AddErrorMessage(nameof(OrderBaseImportItem.State), String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InvalidFieldValue],
+                                nameof(OrderBaseImportItem.State))));
+                        }
+                        else
+                        {
+                            idState = state.Id;
+                        }
+                    }
+                }
+                else
+                {
+                    messages.Add(AddErrorMessage(nameof(OrderBaseImportItem.Country), String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InvalidFieldValue],
+                        nameof(OrderBaseImportItem.Country))));
+                }
+            }
+        }
+
+        private DateTime? ParseOrderShipDate(CsvReader reader, string columnName, ref List<MessageInfo> messages)
+        {
+            DateTime? toReturn = null;
+            DateTime shipDate;
+            var sShipDate = reader.GetField<string>(columnName);
+            if (!String.IsNullOrEmpty(sShipDate))
+            {
+                if (DateTime.TryParse(sShipDate, CultureInfo.InvariantCulture, DateTimeStyles.None, out shipDate))
+                {
+                    toReturn = TimeZoneInfo.ConvertTime(shipDate, _pstTimeZoneInfo, TimeZoneInfo.Local);
+                }
+                else
+                {
+                    messages.Add(AddErrorMessage(columnName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ParseDateError], columnName)));
+                }
+            }
+
+            return toReturn;
+        }
+
+        private ICollection<OrderSkuImportItem> ParseOrderSkus(CsvReader reader, string skuColumnName, string qtyColumnName, ref List<MessageInfo> messages)
+        {
+            List<OrderSkuImportItem> toReturn = new List<OrderSkuImportItem>();
+            int number = 1;
+            bool existInHeaders = true;
+            while (existInHeaders)
+            {
+                existInHeaders = reader.FieldHeaders.Contains($"{skuColumnName} {number}");
+                existInHeaders = existInHeaders && reader.FieldHeaders.Contains($"{qtyColumnName} {number}");
+
+                if (existInHeaders)
+                {
+                    var sku = reader.GetField<string>($"{skuColumnName} {number}");
+                    var sqty = reader.GetField<string>($"{qtyColumnName} {number}");
+
+                    if (!String.IsNullOrEmpty(sku) || !String.IsNullOrEmpty(sqty))
+                    {
+                        int qty = 0;
+                        Int32.TryParse(sqty, out qty);
+                        if (qty == 0)
+                        {
+                            messages.Add(AddErrorMessage($"{qtyColumnName} {number}",
+                                String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ParseIntError], $"{qtyColumnName} {number}")));
+                        }
+                        else
+                        {
+                            OrderSkuImportItem item = new OrderSkuImportItem();
+                            item.SKU = sku;
+                            item.QTY = qty;
+                            toReturn.Add(item);
+                        }
+                    }
+                }
+
+                number++;
+            }
+            if (toReturn.Count == 0)
+            {
+                messages.Add(AddErrorMessage(null,
+                            String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ZeroSkusForOrderInImport])));
+            }
+            return toReturn;
+        }
+
+        private ICollection<MessageInfo> FormatRowsRecordErrorMessages(ICollection<OrderBaseImportItem> items)
+        {
+            List<MessageInfo> toReturn = new List<MessageInfo>();
+            foreach (var item in items)
+            {
+                toReturn.AddRange(item.ErrorMessages.Select(p => new MessageInfo()
+                {
+                    Field = p.Field,
+                    Message = String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.OrderImportRowError], item.RowNumber, p.Message),
+                }));
+            }
+            return toReturn;
+        }
+
+        private MessageInfo AddErrorMessage(string field, string message)
+        {
+            return new MessageInfo()
+            {
+                Field = field ?? "Base",
+                Message = message,
+            };
+        }
+
+        #endregion
 
         #region AffiliatesOrders
 
@@ -714,20 +1200,11 @@ namespace VitalChoice.Business.Services.Orders
         {
             PagedList<AffiliateOrderListItemModel> toReturn = new PagedList<AffiliateOrderListItemModel>();
 
-            OrderQuery conditions = new OrderQuery().WithIdAffiliate(filter.IdAffiliate).WithPaymentStatus(filter.Status).
-                WithAffiliateOrderStatus().WithFromDate(filter.From).WithToDate(filter.To);
-            Func<IQueryLite<Order>, IQueryLite<Order>> includes = (p => p.Include(o => o.PaymentMethod)
-                                                                         .ThenInclude(o => o.BillingAddress)
-                                                                         .ThenInclude(o => o.OptionValues)
-                                                                         .Include(o => o.PaymentMethod)
-                                                                         .ThenInclude(o => o.OptionValues)
-                                                                         .Include(o => o.PaymentMethod)
-                                                                         .ThenInclude(o => o.PaymentMethod)
-                                                                         .Include(o => o.AffiliateOrderPayment));
+            OrderQuery conditions = new OrderQuery().WithIdAffiliate(filter.IdAffiliate).WithPaymentStatus(filter.Status).WithAffiliateOrderStatus().WithFromDate(filter.From).WithToDate(filter.To);
+            Func<IQueryLite<Order>, IQueryLite<Order>> includes = (p => p.Include(o => o.PaymentMethod).ThenInclude(o => o.BillingAddress).ThenInclude(o => o.OptionValues).Include(o => o.PaymentMethod).ThenInclude(o => o.OptionValues).Include(o => o.PaymentMethod).ThenInclude(o => o.PaymentMethod).Include(o => o.AffiliateOrderPayment));
 
             Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable = x => x.OrderByDescending(y => y.DateCreated);
-            var result = await this.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount,
-                queryObject: conditions, orderBy: sortable, includesOverride: includes);
+            var result = await this.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, queryObject: conditions, orderBy: sortable, includesOverride: includes);
 
             var customerOrders = await _affiliateOrderPaymentRepository.GetAffiliateOrdersInCustomers(filter.IdAffiliate, result.Items.Select(p => p.Customer.Id).Distinct().ToList());
 
@@ -742,9 +1219,7 @@ namespace VitalChoice.Business.Services.Orders
                 customerFirstName = null;
                 customerLastName = null;
                 customerOrdersCount = 0;
-                if (order.PaymentMethod != null && order.PaymentMethod.Address != null &&
-                    order.PaymentMethod.Address.DictionaryData.ContainsKey("FirstName") &&
-                    order.PaymentMethod.Address.DictionaryData.ContainsKey("LastName"))
+                if (order.PaymentMethod != null && order.PaymentMethod.Address != null && order.PaymentMethod.Address.DictionaryData.ContainsKey("FirstName") && order.PaymentMethod.Address.DictionaryData.ContainsKey("LastName"))
                 {
                     customerFirstName = order.PaymentMethod.Address.Data.FirstName;
                     customerLastName = order.PaymentMethod.Address.Data.LastName;
@@ -758,8 +1233,7 @@ namespace VitalChoice.Business.Services.Orders
                     customerOrdersCount = customerOrders[order.Customer.Id];
                 }
 
-                AffiliateOrderListItemModel item = new AffiliateOrderListItemModel(order.AffiliateOrderPayment, customerFirstName, customerLastName,
-                    customerOrdersCount);
+                AffiliateOrderListItemModel item = new AffiliateOrderListItemModel(order.AffiliateOrderPayment, customerFirstName, customerLastName, customerOrdersCount);
                 toReturn.Items.Add(item);
             }
 
@@ -793,17 +1267,16 @@ namespace VitalChoice.Business.Services.Orders
             List<MessageInfo> toReturn = new List<MessageInfo>();
             if (order == null)
             {
-                toReturn.Add(new MessageInfo() { Message= "Invalid order #" });
+                toReturn.Add(new MessageInfo() { Message = "Invalid order #" });
             }
-            if (order == null || !(order.OrderStatus == OrderStatus.Processed || order.OrderStatus == OrderStatus.Exported ||
-                order.OrderStatus == OrderStatus.Shipped))
+            if (order == null || !(order.OrderStatus == OrderStatus.Processed || order.OrderStatus == OrderStatus.Exported || order.OrderStatus == OrderStatus.Shipped))
             {
-                toReturn.Add(new MessageInfo() { Message = "The given order can'be flagged" });
+                toReturn.Add(new MessageInfo() {Message = "The given order can'be flagged"});
                 throw new AppValidationException("The given order can'be flagged");
             }
-            if (!order.DictionaryData.ContainsKey("OrderType") || order.Data.OrderType != (int?)SourceOrderType.Web)
+            if (!order.DictionaryData.ContainsKey("OrderType") || order.Data.OrderType != (int?) SourceOrderType.Web)
             {
-                toReturn.Add(new MessageInfo() { Message = "The given order can'be flagged" });
+                toReturn.Add(new MessageInfo() {Message = "The given order can'be flagged"});
             }
             return toReturn;
         }
@@ -812,7 +1285,7 @@ namespace VitalChoice.Business.Services.Orders
         {
             var order = await this.SelectAsync(orderId);
             var messages = ValidateUpdateHealthwiseOrder(order);
-            if(messages.Count>0)
+            if (messages.Count > 0)
             {
                 throw new AppValidationException(messages);
             }
@@ -845,9 +1318,7 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     var maxCount = _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount;
                     var orderCreatedDate = order.DateCreated;
-                    var periods = (await _healthwisePeriodRepositoryAsync.Query(p => p.IdCustomer == order.Customer.Id &&
-                        orderCreatedDate >= p.StartDate && orderCreatedDate < p.EndDate && !p.PaidDate.HasValue).
-                        Include(p => p.HealthwiseOrders).SelectAsync(false)).ToList();
+                    var periods = (await _healthwisePeriodRepositoryAsync.Query(p => p.IdCustomer == order.Customer.Id && orderCreatedDate >= p.StartDate && orderCreatedDate < p.EndDate && !p.PaidDate.HasValue).Include(p => p.HealthwiseOrders).SelectAsync(false)).ToList();
                     bool addedToPeriod = false;
                     foreach (var period in periods)
                     {
@@ -855,8 +1326,7 @@ namespace VitalChoice.Business.Services.Orders
                         {
                             healthwiseOrder = new HealthwiseOrder()
                             {
-                                Id = order.Id,
-                                IdHealthwisePeriod = period.Id
+                                Id = order.Id, IdHealthwisePeriod = period.Id
                             };
                             _healthwiseOrderRepositoryAsync.Insert(healthwiseOrder);
                             addedToPeriod = true;
@@ -871,7 +1341,7 @@ namespace VitalChoice.Business.Services.Orders
                         period.EndDate = period.StartDate.AddYears(1);
                         period.HealthwiseOrders = new List<HealthwiseOrder>()
                         {
-                            new HealthwiseOrder() { Id=order.Id }
+                            new HealthwiseOrder() {Id = order.Id}
                         };
                         _healthwisePeriodRepositoryAsync.InsertGraph(period);
                     }
@@ -897,8 +1367,7 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<PagedList<VOrderWithRegionInfoItem>> GetOrderWithRegionInfoItemsAsync(OrderRegionFilter filter)
         {
-            VOrderWithRegionInfoItemQuery conditions = new VOrderWithRegionInfoItemQuery().WithDates(filter.From, filter.To).
-                WithIdCustomerType(filter.IdCustomerType).WithIdOrderType(filter.IdOrderType).WithRegion(filter.Region).WithZip(filter.Zip);
+            VOrderWithRegionInfoItemQuery conditions = new VOrderWithRegionInfoItemQuery().WithDates(filter.From, filter.To).WithIdCustomerType(filter.IdCustomerType).WithIdOrderType(filter.IdOrderType).WithRegion(filter.Region).WithZip(filter.Zip);
             Func<IQueryable<VOrderWithRegionInfoItem>, IOrderedQueryable<VOrderWithRegionInfoItem>> sortable = p => p.OrderByDescending(x => x.Id);
 
             var query = _vOrderWithRegionInfoItemRepository.Query(conditions).OrderBy(sortable);
@@ -941,17 +1410,17 @@ namespace VitalChoice.Business.Services.Orders
         #endregion
 
         #region GCOrders
-        
+
         public async Task<ICollection<GCOrderItem>> GetGCOrdersAsync(int idGC)
         {
             List<GCOrderItem> toReturn = new List<GCOrderItem>();
 
             var orderToGCs = await _orderToGiftCertificateRepositoryAsync.Query(p => p.IdGiftCertificate == idGC).SelectAsync(false);
-            var orders = (await SelectAsync(orderToGCs.Select(p => p.IdOrder).ToList())).OrderByDescending(p=>p.DateCreated);
+            var orders = (await SelectAsync(orderToGCs.Select(p => p.IdOrder).ToList())).OrderByDescending(p => p.DateCreated);
             foreach (var orderToGC in orderToGCs)
             {
                 var order = orders.FirstOrDefault(p => p.Id == orderToGC.IdOrder);
-                if(order!=null)
+                if (order != null)
                 {
                     GCOrderItem item = new GCOrderItem();
                     item.Order = order;

@@ -1,0 +1,49 @@
+﻿@model VC.Public.Models.Cart.ViewCartModel
+
+<div class="cart-lite-container working-area-holder" title="Item(s) added to the cart">
+	<div class="cart-lite-info">
+		<span>Cart contains <b>@(Model.Skus.Sum(x => x.Quantity)+Model.PromoSkus.Sum(x => x.Quantity))</b> Item(s)</span>&nbsp;|&nbsp;
+		<span>Subtotal: <b>@Model.SubTotal.ToString("C2")</b></span>
+	</div>
+	<div class="cart-lite-controls">
+		@Html.ActionLink("View Cart", "ViewCart", "Cart", null, new {@class= "button yellow" })
+		<a id="lnkClose" href="#" class="button">Continue Shopping</a>
+	</div>
+	<div class="cartlite-proposals-container">
+		<span class="cartlite-proposals-title">
+				Great products. Great value. Add these to your cart.
+			</span>
+		<div class="cartlite-proposals-item">
+			<span class="proposals-item-title">$6.50</span>
+			<a class="proposals-item-link" href="#">
+				<img src="/Assets/images/cart/NRT501_alabcore_pouched_30z_218.jpg"/>
+				Wild Albacore Tuna
+				Grab 'n Go Pouch
+			</a>
+		</div>
+		<div class="cartlite-proposals-item">
+			<span class="proposals-item-title">$6.50</span>
+			<a class="proposals-item-link" href="#">
+				<img src="/Assets/images/cart/ntm1_trail-mix_no_pistachio_218.jpg"/>
+				Organic Super Antioxidant
+				Trail Mix - 16 oz
+			</a>
+		</div>
+		<div class="cartlite-proposals-item">
+			<span class="proposals-item-title">$6.50</span>
+			<a class="proposals-item-link" href="#">
+				<img src="/Assets/images/cart/seaweedsalad_218.jpg"/>
+				Wakame Seaweed Salad
+				8 oz tub
+			</a>
+		</div>
+		<div class="cartlite-proposals-item">
+			<span class="proposals-item-title">$6.50</span>
+			<a class="proposals-item-link" href="#">
+				<img src="/Assets/images/cart/NSC201_salmonoil_1000mg_90_218.jpg"/>
+				1000 mg Sockeye Salmon Oil
+				Softgels - 90 Caps
+			</a>
+		</div>
+	</div>
+</div>

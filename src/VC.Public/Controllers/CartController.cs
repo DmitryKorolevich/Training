@@ -5,14 +5,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
+using VC.Public.Helpers;
 using VC.Public.Models.Cart;
-using VitalChoice.Core.Base;
-using VitalChoice.Core.Infrastructure;
 using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Interfaces.Services;
@@ -22,9 +21,10 @@ using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
-using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
+using VitalChoice.Validation.Models;
 
 namespace VC.Public.Controllers
 {
@@ -45,7 +45,8 @@ namespace VC.Public.Controllers
             ICustomerService customerService, IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter,
             IOrderService orderService, IProductService productService, ICheckoutService checkoutService,
             IAuthorizationService authorizationService, IAppInfrastructureService appInfrastructureService,
-            IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper, IDiscountService discountService, IGcService gcService)
+            IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
+            IDiscountService discountService, IGcService gcService)
             : base(contextAccessor, customerService, appInfrastructureService, authorizationService)
         {
             _storefrontUserService = storefrontUserService;
@@ -60,116 +61,189 @@ namespace VC.Public.Controllers
             _gcService = gcService;
         }
 
+        [HttpGet]
+        public async Task<Result<ViewCartModel>> InitCartModel()
+        {
+            return await InitCartModelInternal();
+        }
+
         public async Task<IActionResult> ViewCart()
         {
-            ViewCartModel cartModel;
-            var existingUid = GetCartUid();
-            if (await CustomerLoggenIn())
-            {
-                var id = GetInternalCustomerId();
-                cartModel = await GetFromCustomerCart(existingUid, id);
-            }
-            else
-            {
-                cartModel = await GetFromAnonymCart(existingUid);
-            }
+            var cartModel = await InitCartModelInternal();
+
             return View(cartModel);
         }
 
         [HttpPost]
-        public async Task<ViewCartModel> UpdateCart(ViewCartModel model)
+        public async Task<IActionResult> AddToCartView(string skuCode)
         {
-            var existingUid = GetCartUid();
+            var cart = await AddToCart(skuCode);
+            if (cart == null)
+            {
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SkuNotFound]);
+            }
+            return PartialView("_CartLite", cart);
+        }
+
+        [HttpPost]
+        public async Task<ViewCartModel> AddToCart(string skuCode)
+        {
+            var existingUid = Request.GetCartUid();
+            var sku = await _productService.GetSkuOrderedAsync(skuCode);
+            if (sku == null)
+                return null;
+            CustomerCartOrder cart;
+            if (await CustomerLoggenIn())
+            {
+                var id = GetInternalCustomerId();
+                cart = await _checkoutService.GetOrCreateCart(existingUid, id);
+            }
+            else
+            {
+                cart = await _checkoutService.GetOrCreateCart(existingUid);
+            }
+            cart.Order.Skus.MergeUpdateKeyed(Enumerable.Repeat(sku, 1).ToArray(),
+                ordered => ordered.Sku.Code, skuModel => skuModel.Sku.Code, skuModel =>
+                {
+                    var skuOrdered = _productService.GetSkuOrderedAsync(skuModel.Sku.Code).Result;
+                    skuOrdered.Quantity = 1;
+                    skuOrdered.Amount = HasRole(RoleType.Wholesale) ? skuModel.Sku.WholesalePrice : skuModel.Sku.Price;
+                    return skuOrdered;
+                },
+                (ordered, skuModel) => ordered.Quantity += 1);
+            SetCartUid(cart.CartUid);
+            if (!await _checkoutService.UpdateCart(cart))
+                return null;
+            ViewCartModel result = new ViewCartModel();
+            await FillModel(result, cart);
+            SetCartUid(cart.CartUid);
+            return result;
+        }
+
+        [HttpPost]
+        public async Task<Result<ViewCartModel>> UpdateCart([FromBody] ViewCartModel model)
+        {
+            if (model.ShippingDate != null && model.ShippingDate <= DateTime.Today)
+            {
+                model.ShippingDateError = "Invalid date. Must be in the future. Please correct.";
+                return model;
+            }
+            model.ShippingDateError = string.Empty;
+            var existingUid = Request.GetCartUid();
+            CustomerCartOrder cart;
+            if (await CustomerLoggenIn())
+            {
+                var id = GetInternalCustomerId();
+                cart = await _checkoutService.GetOrCreateCart(existingUid, id);
+            }
+            else
+            {
+                cart = await _checkoutService.GetOrCreateCart(existingUid);
+            }
+            cart.Order.Skus?.MergeUpdateWithDeleteKeyed(model.Skus.Where(s => s.Quantity > 0).ToArray(), ordered => ordered.Sku.Code,
+                skuModel => skuModel.Code, skuModel =>
+                {
+                    var result = _productService.GetSkuOrderedAsync(skuModel.Code).Result;
+                    result.Quantity = skuModel.Quantity;
+                    return result;
+                }, (ordered, skuModel) => ordered.Quantity = skuModel.Quantity);
+            cart.Order.Discount = await _discountService.GetByCode(model.PromoCode);
+            var gcCodes = model.GiftCertificateCodes.Select(x => x.Value).ToList();
+            cart.Order.GiftCertificates?.MergeKeyed(
+                gcCodes.Select(code => _gcService.GetGiftCertificateAsync(code).Result).Where(g => g != null).ToArray(),
+                gc => gc.GiftCertificate?.Code, code => code.Code,
+                code => new GiftCertificateInOrder
+                {
+                    GiftCertificate = code
+                });
+            if (!model.ShipAsap)
+            {
+                cart.Order.Data.ShipDelayType = ShipDelayType.EntireOrder;
+                cart.Order.Data.ShipDelayDateP = model.ShippingDate;
+                cart.Order.Data.ShipDelayDateNP = model.ShippingDate;
+            }
+            else
+            {
+                cart.Order.Data.ShipDelayType = ShipDelayType.None;
+                cart.Order.Data.ShipDelayDateP = null;
+                cart.Order.Data.ShipDelayDateNP = null;
+            }
+            cart.Order.Data.ShippingUpgradeP = model.ShippingUpgradeP;
+            cart.Order.Data.ShippingUpgradeNP = model.ShippingUpgradeNP;
+            if (!await _checkoutService.UpdateCart(cart))
+            {
+                return new Result<ViewCartModel>(false, model);
+            }
+            await FillModel(model, cart);
+            SetCartUid(cart.CartUid);
+            return model;
+        }
+
+        private async Task<ViewCartModel> InitCartModelInternal()
+        {
+            var cartModel = await GetCart();
+
+            if (!cartModel.GiftCertificateCodes.Any())
+            {
+                cartModel.GiftCertificateCodes.Add(new CartGcModel() {Value = string.Empty}); //needed to to force first input to appear
+            }
+            return cartModel;
+        }
+
+        private async Task<ViewCartModel> GetCart()
+        {
+            var existingUid = Request.GetCartUid();
+            var cartModel = new ViewCartModel();
             if (await CustomerLoggenIn())
             {
                 var id = GetInternalCustomerId();
                 var cart = await _checkoutService.GetOrCreateCart(existingUid, id);
-                cart.Order.Skus.MergeUpdateWithDeleteKeyed(model.Skus, ordered => ordered.Sku.Code, skuModel => skuModel.Code, skuModel =>
-                {
-                    var result = _productService.GetSkuOrderedAsync(skuModel.Code).Result;
-                    result.Quantity = skuModel.Quantity;
-                    return result;
-                }, (ordered, skuModel) => ordered.Quantity = skuModel.Quantity);
-                cart.Order.Discount = await _discountService.GetByCode(model.PromoCode);
-                cart.Order.GiftCertificates.MergeKeyed(model.GiftCertificateCodes, gc => gc.GiftCertificate.Code, code => code,
-                    code => new GiftCertificateInOrder
-                    {
-                        GiftCertificate = _gcService.GetGiftCertificateAsync(code).Result
-                    });
-                await _checkoutService.UpdateCart(cart);
-                await FillModel(model, cart);
-                return model;
+                await FillModel(cartModel, cart);
+                SetCartUid(cart.CartUid);
+                return cartModel;
             }
             else
             {
-                var cart = await _checkoutService.GetOrCreateAnonymCart(existingUid);
-                cart.Skus.MergeUpdateWithDeleteKeyed(model.Skus, ordered => ordered.Sku.Code, skuModel => skuModel.Code, skuModel =>
-                {
-                    var result = _productService.GetSkuOrderedAsync(skuModel.Code).Result;
-                    result.Quantity = skuModel.Quantity;
-                    return result;
-                }, (ordered, skuModel) => ordered.Quantity = skuModel.Quantity);
-                cart.Discount = await _discountService.GetByCode(model.PromoCode);
-                cart.GiftCertificates.MergeKeyed(model.GiftCertificateCodes, gc => gc.GiftCertificate.Code, code => code,
-                    code => new GiftCertificateInOrder
-                    {
-                        GiftCertificate = _gcService.GetGiftCertificateAsync(code).Result
-                    });
-                await _checkoutService.UpdateCart(cart);
-                await FillModel(model, cart);
-                return model;
+                var cart = await _checkoutService.GetOrCreateCart(existingUid);
+                await FillModel(cartModel, cart);
+                SetCartUid(cart.CartUid);
+                return cartModel;
             }
         }
 
-        private Guid? GetCartUid()
+        private void SetCartUid(Guid uid)
         {
-            var cartUidString = Request.Cookies[CheckoutConstants.CartUidCookieName];
-            Guid? existingUid = null;
-            Guid cartUid;
-            if (cartUidString.Count > 0 && Guid.TryParse(cartUidString.First(), out cartUid))
+            Response.Cookies.Append(CheckoutConstants.CartUidCookieName, uid.ToString(), new CookieOptions
             {
-                existingUid = cartUid;
-            }
-            return existingUid;
-        }
-
-        private async Task<ViewCartModel> GetFromCustomerCart(Guid? existingUid, int idCustomer)
-        {
-            var cartModel = new ViewCartModel();
-            var cart = await _checkoutService.GetOrCreateCart(existingUid, idCustomer);
-            await FillModel(cartModel, cart);
-            return cartModel;
-        }
-
-        private async Task<ViewCartModel> GetFromAnonymCart(Guid? existingUid)
-        {
-            var cartModel = new ViewCartModel();
-            var cart = await _checkoutService.GetOrCreateAnonymCart(existingUid);
-            await FillModel(cartModel, cart);
-            return cartModel;
+                Expires = DateTime.Now.AddYears(1)
+            });
         }
 
         private async Task FillModel(ViewCartModel cartModel, CustomerCartOrder cart)
         {
-            cartModel.Skus.AddRange(
-                cart.Order.Skus.Select(sku =>
-                {
-                    var result = _skuMapper.ToModel<CartSkuModel>(sku.Sku);
-                    _productMapper.UpdateModel(result, sku.ProductWithoutSkus);
-                    result.Price = sku.Amount;
-                    result.Quantity = sku.Quantity;
-                    result.SubTotal = sku.Quantity * sku.Amount;
-                    return result;
-                }));
-            cartModel.GiftCertificateCodes.AddRange(cart.Order.GiftCertificates.Select(g => g.GiftCertificate.Code));
-            await _orderService.CalculateOrder(cart.Order);
-            FillFromOrder(cartModel, cart.Order);
+            await Calculate(cartModel, cart.Order);
         }
 
-        private async Task FillModel(ViewCartModel cartModel, CustomerCart cart)
+        private async Task Calculate(ViewCartModel cartModel, OrderDynamic order)
         {
+            var context = await _orderService.CalculateOrder(order);
+            var gcMessages = context.GcMessageInfos.ToDictionary(m => m.Field);
+            if (!string.IsNullOrWhiteSpace(cartModel.PromoCode) && order.Discount == null)
+            {
+                context.Messages.Add(new MessageInfo
+                {
+                    Field = "DiscountCode",
+                    Message = "Discount not found"
+                });
+            }
+            cartModel.FreeShipDifference = context.FreeShippingThresholdDifference;
+            cartModel.DiscountDescription = context.Order?.Discount?.Description;
+	        cartModel.DiscountMessage = context.DiscountMessage;
+	        cartModel.Messages =
+		        context.Messages?.Select(x => new KeyValuePair<string, string>(x.Field, x.Message)).ToList();
+			cartModel.Skus.Clear();
             cartModel.Skus.AddRange(
-                cart.Skus.Select(sku =>
+                order.Skus?.Select(sku =>
                 {
                     var result = _skuMapper.ToModel<CartSkuModel>(sku.Sku);
                     _productMapper.UpdateModel(result, sku.ProductWithoutSkus);
@@ -177,25 +251,59 @@ namespace VC.Public.Controllers
                     result.Quantity = sku.Quantity;
                     result.SubTotal = sku.Quantity*sku.Amount;
                     return result;
-                }));
-            cartModel.GiftCertificateCodes.AddRange(cart.GiftCertificates.Select(g => g.GiftCertificate.Code));
-            var order = await _orderService.CreatePrototypeAsync((int) OrderType.Normal);
-            order.Skus = cart.Skus;
-            order.GiftCertificates = cart.GiftCertificates;
-            await _orderService.CalculateOrder(order);
-            FillFromOrder(cartModel, order);
-        }
+                }) ?? Enumerable.Empty<CartSkuModel>());
+            var gcsInCart = cartModel.GiftCertificateCodes.ToArray();
+            cartModel.GiftCertificateCodes.Clear();
+            foreach (var code in gcsInCart)
+            {
+                if (!string.IsNullOrWhiteSpace(code.Value) && order.GiftCertificates.All(g => g.GiftCertificate.Code != code.Value))
+                {
+                    cartModel.GiftCertificateCodes.Add(code);
+                    code.ErrorMessage = "Gift Certificate Not Found";
+                }
+            }
+            cartModel.GiftCertificateCodes.AddRange(
+                order.GiftCertificates?.Select(g => g.GiftCertificate.Code).Select(x =>
+                {
+                    var message = gcMessages[x];
 
-        private static void FillFromOrder(ViewCartModel cartModel, OrderDynamic order)
-        {
+                    return new CartGcModel
+                    {
+                        Value = x,
+                        SuccessMessage = message.MessageLevel == MessageLevel.Info ? message.Message : string.Empty,
+                        ErrorMessage = message.MessageLevel == MessageLevel.Error ? message.Message : string.Empty
+                    };
+                }) ??
+                Enumerable.Empty<CartGcModel>());
+            cartModel.ShippingUpgradeNPOptions = context.ShippingUpgradeNpOptions;
+            cartModel.ShippingUpgradePOptions = context.ShippingUpgradePOptions;
+            cartModel.DiscountTotal = -context.DiscountTotal;
+            cartModel.GiftCertificatesTotal = context.GiftCertificatesSubtotal;
+            cartModel.PromoSkus.Clear();
+            cartModel.PromoSkus.AddRange(context.PromoSkus?.Select(sku =>
+            {
+                var result = _skuMapper.ToModel<CartSkuModel>(sku.Sku);
+                _productMapper.UpdateModel(result, sku.ProductWithoutSkus);
+                result.Price = sku.Amount;
+                result.Quantity = sku.Quantity;
+                result.SubTotal = sku.Quantity*sku.Amount;
+                return result;
+            }) ?? Enumerable.Empty<CartSkuModel>());
             cartModel.OrderTotal = order.Total;
             cartModel.PromoCode = order.Discount?.Code;
             cartModel.ShippingCost = order.ShippingTotal;
             cartModel.SubTotal = order.ProductsSubtotal;
-            //cartModel.ShipAsap = cart.Order.SafeData.ShipDelayType != null && ShipDelayType
-            //cartModel.ShippingDate = cart.Order.
-            //cartModel.UpgradeOption = (ShippingUpgrade)(int?)order.SafeData.ShippingUpgradeP |
-            //                           (ShippingUpgrade)(int?)order.SafeData.ShippingUpgradeNP;
+            if (((ShipDelayType?) order.SafeData.ShipDelayType ?? ShipDelayType.None) != ShipDelayType.None)
+            {
+                cartModel.ShipAsap = false;
+                cartModel.ShippingDate = order.SafeData.ShipDelayDateP;
+            }
+            else
+            {
+                cartModel.ShipAsap = true;
+            }
+            cartModel.ShippingUpgradeNP = order.SafeData.ShippingUpgradeP;
+            cartModel.ShippingUpgradeNP = order.SafeData.ShippingUpgradeNP;
         }
     }
 }

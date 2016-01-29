@@ -81,13 +81,15 @@ namespace VC.Admin.Controllers
                     DateStatuses = referenceData.DateStatuses,
                     PromotionBuyTypes = referenceData.PromotionBuyTypes,
                     PersonTitles=referenceData.PersonTitles,
-                };
+					CartShippingOptions = referenceData.CartShippingOptions
+				};
 	        }
 			else
 			{
 				referenceDataModel = new RestrictedReferenceData()
 				{
-					Labels = referenceData.Labels
+					Labels = referenceData.Labels,
+					CartShippingOptions = referenceData.CartShippingOptions
 				};
 			}
 

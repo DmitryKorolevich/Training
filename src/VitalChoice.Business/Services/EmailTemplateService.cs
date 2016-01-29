@@ -29,6 +29,8 @@ using Templates;
 using System.Dynamic;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using Templates.Runtime;
+using System.Reflection;
+using VitalChoice.Ecommerce.Domain.Attributes;
 
 namespace VitalChoice.Business.Services.Content
 {
@@ -79,7 +81,15 @@ namespace VitalChoice.Business.Services.Content
             var modelType = _modelTypes.FirstOrDefault(p => p.Name == typeName);
             if (modelType != null)
             {
-                toReturn = modelType.GetProperties().Select(p => p.Name).ToList();
+                var properties = modelType.GetProperties().ToList();
+                foreach(var property in properties)
+                {
+                    var ignoreUserTemplateUse = property.GetCustomAttribute<IgnoreUserTemplateUseAttribute>(true);
+                    if(ignoreUserTemplateUse==null)
+                    {
+                        toReturn.Add(property.Name);
+                    }
+                }
             }
             return toReturn;
         }

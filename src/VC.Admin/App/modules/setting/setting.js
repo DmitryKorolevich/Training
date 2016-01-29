@@ -11,7 +11,8 @@ angular.module('app.modules.setting', [
 	'app.modules.setting.controllers.orderNotesManagementController',
 	'app.modules.setting.controllers.addEditOrderNoteController',
 	'app.modules.setting.controllers.objectLogReportController',
-	'app.modules.setting.controllers.objectHistorySectionController'
+	'app.modules.setting.controllers.objectHistorySectionController',
+	'app.modules.setting.controllers.errorDetailsController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
