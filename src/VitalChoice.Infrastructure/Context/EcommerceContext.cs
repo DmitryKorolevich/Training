@@ -15,6 +15,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Entities.CatalogRequests;
+using VitalChoice.Infrastructure.Domain.Entities.Checkout;
 using VitalChoice.Infrastructure.Domain.Entities.Products;
 
 namespace VitalChoice.Infrastructure.Context
@@ -23,6 +24,19 @@ namespace VitalChoice.Infrastructure.Context
     {
         public EcommerceContext(IOptions<AppOptionsBase> options): base(options)
         {
+        }
+
+        protected override void Carts(ModelBuilder builder)
+        {
+            builder.Entity<CartExtended>(entity =>
+            {
+                entity.ToTable("Carts");
+                entity.HasKey(c => c.Id);
+                entity.HasIndex(c => c.CartUid).IsUnique();
+                entity.HasOne(c => c.Discount).WithMany().HasForeignKey(c => c.IdDiscount).IsRequired(false).HasPrincipalKey(d => d.Id);
+                entity.HasMany(c => c.GiftCertificates).WithOne().HasForeignKey(g => g.IdCart).HasPrincipalKey(c => c.Id);
+                entity.HasMany(c => c.Skus).WithOne().HasForeignKey(s => s.IdCart).HasPrincipalKey(c => c.Id);
+            });
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -250,6 +264,11 @@ namespace VitalChoice.Infrastructure.Context
                     .IsRequired();
                 entity.Ignore(v => v.BigValue);
                 entity.Ignore(v => v.IdBigString);
+            });
+
+            builder.Entity<CartExtended>(entity =>
+            {
+                //entity.
             });
         }
     }

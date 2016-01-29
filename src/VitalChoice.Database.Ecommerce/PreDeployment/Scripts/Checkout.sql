@@ -53,3 +53,11 @@ BEGIN
 	DROP INDEX [IX_CUSTOMERID_UQ] ON [dbo].[Carts]
 	CREATE INDEX [IX_CUSTOMERID] ON [dbo].[Carts] (IdCustomer)
 END
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'dbo.Carts') AND name = N'ShipDelayDate')
+BEGIN
+	ALTER TABLE Carts
+	ADD ShipDelayDate DATETIME NULL,
+	ShippingUpgradeP INT NULL,
+	ShippingUpgradeNP INT NULL
+END

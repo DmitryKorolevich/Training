@@ -21,6 +21,7 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Entities.Checkout;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
@@ -35,7 +36,7 @@ namespace VitalChoice.Business.Services.Checkout
 {
     public class CheckoutService : ICheckoutService
     {
-        private readonly IEcommerceRepositoryAsync<Cart> _cartRepository;
+        private readonly IEcommerceRepositoryAsync<CartExtended> _cartRepository;
         private readonly DiscountMapper _discountMapper;
         private readonly SkuMapper _skuMapper;
         private readonly ProductMapper _productMapper;
@@ -49,7 +50,7 @@ namespace VitalChoice.Business.Services.Checkout
         private readonly IRepositoryAsync<ProductContent> _productContentRep;
         private readonly ILogger _logger;
 
-        public CheckoutService(IEcommerceRepositoryAsync<Cart> cartRepository,
+        public CheckoutService(IEcommerceRepositoryAsync<CartExtended> cartRepository,
             DiscountMapper discountMapper,
             SkuMapper skuMapper, ProductMapper productMapper, IOrderService orderService, EcommerceContext context,
             ILoggerProviderExtended loggerProvider, ICustomerService customerService, IEcommerceRepositoryAsync<CartToSku> skusRepository,
@@ -73,7 +74,7 @@ namespace VitalChoice.Business.Services.Checkout
 
         public async Task<CustomerCartOrder> GetOrCreateCart(Guid? uid)
         {
-            Cart cart;
+            CartExtended cart;
             if (uid.HasValue)
             {
                 var cartForCheck = await _cartRepository.Query(c => c.CartUid == uid.Value).SelectFirstOrDefaultAsync(false);
@@ -132,6 +133,14 @@ namespace VitalChoice.Business.Services.Checkout
             {
                 CountryCode = "US"
             })).FirstOrDefault()?.Id ?? 0;
+            if (cart.ShipDelayDate != null)
+            {
+                newOrder.Data.ShipDelayType = ShipDelayType.EntireOrder;
+                newOrder.Data.ShipDelayDateP = cart.ShipDelayDate;
+                newOrder.Data.ShipDelayDateNP = cart.ShipDelayDate;
+            }
+            newOrder.Data.ShippingUpgradeP = cart.ShippingUpgradeP;
+            newOrder.Data.ShippingUpgradeNP = cart.ShippingUpgradeNP;
             return new CustomerCartOrder
             {
                 CartUid = cart.CartUid,
@@ -146,7 +155,7 @@ namespace VitalChoice.Business.Services.Checkout
             {
                 try
                 {
-                    Cart cart;
+                    CartExtended cart;
                     if (uid.HasValue)
                     {
                         cart =
@@ -208,9 +217,9 @@ namespace VitalChoice.Business.Services.Checkout
             return result;
         }
 
-        private async Task<Cart> CreateNew(int? idCustomer = null)
+        private async Task<CartExtended> CreateNew(int? idCustomer = null)
         {
-            var cart = new Cart
+            var cart = new CartExtended
             {
                 CartUid = Guid.NewGuid(),
                 IdCustomer = idCustomer
@@ -251,6 +260,9 @@ namespace VitalChoice.Business.Services.Checkout
                         cart.IdDiscount = null;
                         cart.GiftCertificates.Clear();
                         cart.Skus.Clear();
+                        cart.ShipDelayDate = null;
+                        cart.ShippingUpgradeNP = null;
+                        cart.ShippingUpgradeP = null;
                     }
                     else
                     {
@@ -270,6 +282,11 @@ namespace VitalChoice.Business.Services.Checkout
                             IdSku = so.Sku.Id,
                             Quantity = so.Quantity
                         }, (sku, ordered) => sku.Quantity = ordered.Quantity);
+                        cart.ShipDelayDate = cartOrder.Order.SafeData.ShipDelayType == ShipDelayType.EntireOrder
+                            ? cartOrder.Order.Data.ShipDelayDateP
+                            : null;
+                        cart.ShippingUpgradeP = cartOrder.Order.SafeData.ShippingUpgradeP;
+                        cart.ShippingUpgradeNP = cartOrder.Order.SafeData.ShippingUpgradeNP;
                     }
                     await _context.SaveChangesAsync();
                     transaction.Commit();
