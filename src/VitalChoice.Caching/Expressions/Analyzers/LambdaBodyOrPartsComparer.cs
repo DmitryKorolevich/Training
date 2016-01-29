@@ -1,21 +1,73 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Expressions.Analyzers
 {
-    public static class LambdaBodyOrPartsComparer
+    public class LambdaComparer
     {
-        public static bool ContainsCondition(this LambdaExpression left, LambdaExpression right)
+        private struct ExpressionPair : IEquatable<ExpressionPair>
         {
-            return left.Body.ContainsOrEqual(right?.Body);
+            public bool Equals(ExpressionPair other)
+            {
+                return _left.Equals(other._left) && _right.Equals(other._right);
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                if (obj.GetType() != this.GetType()) return false;
+                return Equals((ExpressionPair) obj);
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    return (_left.GetHashCode()*397) ^ _right.GetHashCode();
+                }
+            }
+
+            public static bool operator ==(ExpressionPair left, ExpressionPair right)
+            {
+                return Equals(left, right);
+            }
+
+            public static bool operator !=(ExpressionPair left, ExpressionPair right)
+            {
+                return !Equals(left, right);
+            }
+
+            private readonly Expression _left;
+            private readonly Expression _right;
+
+            public ExpressionPair(Expression left, Expression right)
+            {
+                _left = left;
+                _right = right;
+            }
         }
 
-        private static bool ContainsOrEqual(this Expression left, Expression right)
+        private readonly Dictionary<ExpressionPair, bool> _parsedResult = new Dictionary<ExpressionPair, bool>();
+
+        public bool ContainsOrEqual(Expression left, Expression right)
         {
             if (left == null || right == null)
                 return false;
+            bool result;
+            var expressionPair = new ExpressionPair(left, right);
+            if (_parsedResult.TryGetValue(expressionPair, out result))
+            {
+                return result;
+            }
+            result = ContainsOrEqualInternal(left, right);
+            _parsedResult.Add(expressionPair, result);
+            return result;
+        }
 
+        protected virtual bool ContainsOrEqualInternal(Expression left, Expression right)
+        {
             var rightBinary = right as BinaryExpression;
             var leftBinary = left as BinaryExpression;
 
@@ -27,8 +79,8 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                         if (leftBinary == null || left.NodeType != ExpressionType.AndAlso)
                             return false;
 
-                        if (leftBinary.Left.ContainsOrEqual(right) ||
-                            leftBinary.Right.ContainsOrEqual(right))
+                        if (ContainsOrEqual(leftBinary.Left, right) ||
+                            ContainsOrEqual(leftBinary.Right, right))
                         {
                             return true;
                         }
@@ -38,8 +90,8 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                 case ExpressionType.OrElse:
                     if (rightBinary != null)
                     {
-                        if (left.ContainsOrEqual(rightBinary.Left) ||
-                            left.ContainsOrEqual(rightBinary.Right))
+                        if (ContainsOrEqual(left, rightBinary.Left) ||
+                            ContainsOrEqual(left, rightBinary.Right))
                             return true;
                         if (leftBinary != null)
                         {
@@ -53,8 +105,8 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                     {
                         if (leftBinary != null && left.NodeType == ExpressionType.AndAlso)
                         {
-                            return leftBinary.Left.ContainsOrEqual(right) ||
-                                   leftBinary.Right.ContainsOrEqual(right);
+                            return ContainsOrEqual(leftBinary.Left, right) ||
+                                   ContainsOrEqual(leftBinary.Right, right);
                         }
                         return false;
                     }
@@ -103,8 +155,8 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                         return EqualsInternal(right, left);
                     if (leftBinary == null)
                         return false;
-                    return rightBinary.Left.ContainsOrEqual(leftBinary.Left) &&
-                           rightBinary.Right.ContainsOrEqual(leftBinary.Right);
+                    return ContainsOrEqual(rightBinary.Left, leftBinary.Left) &&
+                           ContainsOrEqual(rightBinary.Right, leftBinary.Right);
             }
         }
 
@@ -121,7 +173,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers
             return string.Equals(xRepro, yRepro);
         }
 
-        private static bool BinaryCompareBoth(BinaryExpression leftBinary, BinaryExpression rightBinary)
+        private bool BinaryCompareBoth(BinaryExpression leftBinary, BinaryExpression rightBinary)
         {
             if (leftBinary == null)
                 return false;
@@ -131,24 +183,33 @@ namespace VitalChoice.Caching.Expressions.Analyzers
                    BinaryCompareReverse(leftBinary, rightBinary);
         }
 
-        private static bool BinaryCompare(BinaryExpression leftBinary, BinaryExpression rightBinary)
+        private bool BinaryCompare(BinaryExpression leftBinary, BinaryExpression rightBinary)
         {
             if (leftBinary == null)
                 return false;
             if (rightBinary == null)
                 return false;
-            return leftBinary.Left.ContainsOrEqual(rightBinary.Left) &&
-                   leftBinary.Right.ContainsOrEqual(rightBinary.Right);
+            return ContainsOrEqual(leftBinary.Left, rightBinary.Left) &&
+                   ContainsOrEqual(leftBinary.Right, rightBinary.Right);
         }
 
-        private static bool BinaryCompareReverse(BinaryExpression leftBinary, BinaryExpression rightBinary)
+        private bool BinaryCompareReverse(BinaryExpression leftBinary, BinaryExpression rightBinary)
         {
             if (leftBinary == null)
                 return false;
             if (rightBinary == null)
                 return false;
-            return leftBinary.Left.ContainsOrEqual(rightBinary.Right) &&
-                   leftBinary.Right.ContainsOrEqual(rightBinary.Left);
+            return ContainsOrEqual(leftBinary.Left, rightBinary.Right) &&
+                   ContainsOrEqual(leftBinary.Right, rightBinary.Left);
+        }
+    }
+
+    public static class LambdaBodyOrPartsComparer
+    {
+        public static bool ContainsCondition(this LambdaExpression left, LambdaExpression right)
+        {
+            var comparer = new LambdaComparer();
+            return comparer.ContainsOrEqual(left?.Body, right?.Body);
         }
     }
 }
