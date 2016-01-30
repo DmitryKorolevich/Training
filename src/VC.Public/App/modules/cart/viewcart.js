@@ -91,7 +91,7 @@ function recalculateCart(viewModel, successCallback) {
 				if (successCallback) {
 					successCallback();
 				} else {
-					ko.mapping.fromJS(result.Data, { 'ignore': ["ShipAsap", "GiftCertificateCodes", "PromoCode", "ShippingDate"] }, viewModel.Model);
+					ko.mapping.fromJS(result.Data, { 'ignore': ["ShipAsap", "PromoCode", "ShippingDate"] }, viewModel.Model);
 					processServerMessages(viewModel.Model);
 				}
 			} else {
@@ -137,11 +137,24 @@ function initCart() {
 
 var originalDiscountDescription;
 
+var originalGiftCertificates = [];
+
 function processServerMessages(model) {
 	if (model.DiscountDescription() && isDiscountValid(model) && originalDiscountDescription != model.DiscountDescription()) {
-		notifySuccess(model.DiscountDescription() + "<br/>was applied to your order")
+		notifySuccess(model.DiscountDescription() + "<br/>was applied to your order");
 	}
 	originalDiscountDescription = model.DiscountDescription();
+
+	var actualSuccessMessages = $.grep(model.GiftCertificateCodes(), function(elem, index) {
+		if (elem.SuccessMessage() && (originalGiftCertificates.length != originalGiftCertificates.length || elem.SuccessMessage() != originalGiftCertificates[index])) {
+			notifySuccess(elem.SuccessMessage());
+		}
+	});
+
+	originalGiftCertificates = [];
+	$.each(model.GiftCertificateCodes(), function (ind, element) {
+		originalGiftCertificates.push(element.SuccessMessage());
+	});
 }
 
 function isDiscountValid(model) {
@@ -158,4 +171,14 @@ function getDiscountRelatedErrors(model) {
 	return $.grep(model.Messages(), function(element) {
 		return element.Key = "DiscountCode";
 	});
+}
+
+function isGcValid(model, index) {
+	if (model.GiftCertificateCodes() && model.GiftCertificateCodes().length > index) {
+		var target = model.GiftCertificateCodes()[index];
+		if (target.ErrorMessage && target.ErrorMessage()) {
+			return false;
+		}
+	}
+	return true;
 }

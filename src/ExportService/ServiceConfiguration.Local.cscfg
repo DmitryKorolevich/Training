@@ -3,7 +3,6 @@
   <Role name="ExportWorker">
     <Instances count="1" />
     <ConfigurationSettings>
-      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
       <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.Enabled" value="true" />
       <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountUsername" value="multiarc" />
       <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountEncryptedPassword" value="MIIBpQYJKoZIhvcNAQcDoIIBljCCAZICAQAxggFOMIIBSgIBADAyMB4xHDAaBgNVBAMME1dpbmRvd3MgQXp1cmUgVG9vbHMCEFc28P0x1DG3TvwdAXwZ9FowDQYJKoZIhvcNAQEBBQAEggEACNip0CceJSsd522XTb+ojd+BiokQj9xjSwssNMCcFHNbxqy65Rbr8s8n9/b2JBnHekRdDSB6N9oFuSkHK1dKdcPCcVhVCitJizpQqcuR7FAcEDnYFZqqcPlbEakoup+bNkLVUcOZH2B7XChABKGqsEQ1Dx5Fu7JURQrdFi5QUGsLLButJtwdE3ta9lVcsy/8xp1owDOZXExpFjf5U2h3hYTj4pMlg1DIdi+xCg+j0Dn+njxgykTIIidRU2zam4MFQ8NPj0QT9xaHedaSQGBjudi7QZeZkEArkrRhkxwVR9iKSxogQSc5eJ7KoEYC/biuTNHLY76WCuSG94xvIIhS1jA7BgkqhkiG9w0BBwEwFAYIKoZIhvcNAwcECKxr4HKy3V5lgBgdf/o4H6xPX4ww2IXTWVBhQfwxy1HEhRA=" />

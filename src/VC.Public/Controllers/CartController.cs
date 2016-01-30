@@ -259,7 +259,7 @@ namespace VC.Public.Controllers
                 if (!string.IsNullOrWhiteSpace(code.Value) && order.GiftCertificates.All(g => g.GiftCertificate.Code != code.Value))
                 {
                     cartModel.GiftCertificateCodes.Add(code);
-                    code.ErrorMessage = "Gift Certificate Not Found";
+                    code.ErrorMessage = "Gift Certificate not Found";
                 }
             }
             cartModel.GiftCertificateCodes.AddRange(
@@ -304,6 +304,11 @@ namespace VC.Public.Controllers
             }
             cartModel.ShippingUpgradeP = order.SafeData.ShippingUpgradeP;
             cartModel.ShippingUpgradeNP = order.SafeData.ShippingUpgradeNP;
+
+	        if (!cartModel.GiftCertificateCodes.Any())
+	        {
+		        cartModel.GiftCertificateCodes.Add(new CartGcModel() { Value = string.Empty});
+	        }
         }
     }
 }
