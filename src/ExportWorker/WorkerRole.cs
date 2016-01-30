@@ -35,6 +35,10 @@ namespace ExportWorker
         {
             try
             {
+                if (!EventLog.SourceExists("ExportService"))
+                {
+                    EventLog.CreateEventSource("ExportService", "Application");
+                }
                 Trace.Listeners.Add(new EventLogTraceListener(new EventLog("Application")
                 {
                     Source = "ExportService"
