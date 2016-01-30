@@ -173,8 +173,10 @@
 						<i class="glyphicon glyphicon-minus-sign"></i>
 					</a>
 					<!-- /ko -->
-					@Html.TextBoxFor(x => x.GiftCertificateCodes[0].Value, new {@class = "cart-input-box input-control", data_bind = "value: Value, attr: { name: 'GiftCertificateCodes' + $index(), id: 'GiftCertificateCodes' + $index()}, event: { blur: $parent.gcLostFocus }" })
-					@Html.ValidationMessageFor(x => x.GiftCertificateCodes[0].Value, string.Empty, new {data_bind = "attr: { 'data-valmsg-for': 'GiftCertificateCodes' + $index()}"})
+					@Html.TextBoxFor(x => x.GiftCertificateCodes[0].Value, new {@class = "cart-input-box input-control", data_bind = "value: Value, attr: { name: 'GiftCertificateCodes' + $index(), id: 'GiftCertificateCodes' + $index()}, event: { blur: $parent.gcLostFocus }, css: {'input-validation-error': !isGcValid($parent.Model, $index()) }" })
+					<span class="field-validation-error" data-bind="if: !isGcValid($parent.Model, $index()), attr: { 'data-valmsg-for': 'GiftCertificateCodes' + $index()}" data-valmsg-replace="true">
+						<span class="" data-bind="text: ErrorMessage"></span>
+					</span>
 				</div>
 			</div>
 		</div>

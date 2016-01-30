@@ -28,7 +28,7 @@ namespace VitalChoice.Business.Workflow.Actions.GiftCertificates
                 {
                     dataContext.GcMessageInfos.Add(new MessageInfo
                     {
-                        Message = "Gift Certificate Not Active",
+                        Message = "Gift Certificate not Active",
                         Field = gc.GiftCertificate.Code
                     });
                     continue;
