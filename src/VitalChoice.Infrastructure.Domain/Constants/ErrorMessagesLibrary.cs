@@ -49,6 +49,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             public const string FieldIsInvalidEmail = "FieldIsInvalidEmail";
             public const string FieldMaxLength = "FieldMaxLength";
             public const string SkuNotFoundOrderImport = "SkuNotFoundOrderImport";
+            public const string EmptyCart = "EmptyCart";
         }
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
@@ -96,6 +97,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             {Keys.FieldIsInvalidEmail, "{0} is not a valid e-mail address"},
             {Keys.FieldMaxLength, "{0} exceeds length of {1} literals"},
             {Keys.SkuNotFoundOrderImport, "Field \"{0}\": the given product SKU has not been found in the database({1})"},
+            {Keys.EmptyCart, "Your cart is empty"},
         };
     }
 }

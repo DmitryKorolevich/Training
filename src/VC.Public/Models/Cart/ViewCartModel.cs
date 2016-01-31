@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using VC.Public.DataAnnotations;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 
@@ -20,6 +21,7 @@ namespace VC.Public.Models.Cart
 
 	    public bool ShipAsap { get; set; }
 
+		[FutureDate(ErrorMessage = "Shipping Date should be in the future")]
 	    public DateTime? ShippingDate { get; set; }
 
         public string ShippingDateError { get; set; }

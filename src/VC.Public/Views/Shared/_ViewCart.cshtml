@@ -24,13 +24,13 @@
 	<tbody data-bind="foreach:Model.Skus">
 	<tr>
 		<td class="cart-image-link">
-			<a data-bind="attr: { href: ProductPageUrl, title: DisplayName }">
-				<img data-bind="attr: { src: IconUrl, title: DisplayName }"/>
+			<a data-bind="attr: { href: ProductPageUrl, title: formatDisplayName($data) }">
+				<img data-bind="attr: { src: IconUrl, title: formatDisplayName($data) }"/>
 			</a>
 		</td>
 		<td class="cart-line-info">
-			<a class="cart-text-link" data-bind="attr: { href: ProductPageUrl, title: DisplayName }, text: DisplayName"></a>
-			<span class="cart-sku-code" data-bind="text: Code"></span>
+			<a class="cart-text-link" data-bind="attr: { href: ProductPageUrl, title: formatDisplayName($data) }, text: formatDisplayName($data)"></a>
+			<span class="cart-sku-code" data-bind="text: '(' + Code() + ')', visible: Code"></span>
 			<span class="stock-presence-note" data-bind="text: InStock() ? 'In Stock Ready to Ship' : 'Not in Stock'"></span>
 		</td>
 		<td data-bind="text: formatCurrency(Price())"></td>
@@ -73,13 +73,13 @@
 	<tbody data-bind="foreach:Model.PromoSkus">
 	<tr>
 		<td class="cart-image-link">
-			<a data-bind="attr: { href: ProductPageUrl, title: DisplayName }">
-				<img data-bind="attr: { src: IconUrl, title: DisplayName }"/>
+			<a data-bind="attr: { href: ProductPageUrl, title: formatDisplayName($data) }">
+				<img data-bind="attr: { src: IconUrl, title: formatDisplayName($data) }"/>
 			</a>
 		</td>
 		<td class="cart-line-info">
-			<a class="cart-text-link" data-bind="attr: { href: ProductPageUrl, title: DisplayName }, text: DisplayName"></a>
-			<span class="cart-sku-code" data-bind="text: Code"></span>
+			<a class="cart-text-link" data-bind="attr: { href: ProductPageUrl, title: formatDisplayName($data) }, text: formatDisplayName($data)"></a>
+			<span class="cart-sku-code" data-bind="text: '(' + Code() + ')', visible: Code"></span>
 			<span class="stock-presence-note" data-bind="text: InStock() ? 'In Stock Ready to Ship' : 'Not in Stock'"></span>
 		</td>
 		<td data-bind="text: formatCurrency(Price())"></td>
@@ -102,8 +102,10 @@
 			<input name="rdUpgradeOption" type="radio" data-bind="checked: Model.ShipAsap, checkedValue: false, event: { change: shipAsapChanged }"/>
 			Ship this order the week of:
 		</label>
-		@Html.TextBoxFor(x => x.ShippingDate, Model.ShippingDate?.ToString("MM/dd/yyyy") ?? string.Empty, new { @class = "cart-input-box input-control date-picker", data_bind = "value: Model.ShippingDate, disable: Model.ShipAsap" })
-		@*@Html.ValidationMessageFor(x => x.ShippingDate, string.Empty, new { data_bind = "text: Model.ShippingDateError"})*@
+		@Html.TextBoxFor(x => x.ShippingDate, Model.ShippingDate?.ToString("MM/dd/yyyy") ?? string.Empty, new { @class = "cart-input-box input-control date-picker", data_bind = "value: Model.ShippingDate, disable: Model.ShipAsap, css: {'input-validation-error': Model.ShippingDateError() && !Model.ShipAsap()}" })
+		<span class="field-validation-error" data-bind="if: Model.ShippingDateError() && !Model.ShipAsap()" data-valmsg-replace="true" data-valmsg-for="ShippingDate">
+			<span class="" data-bind="text: Model.ShippingDateError"></span>
+		</span>
 		<a href="#">View our shipping policies</a>
 	</div>
 	<div class="cart-order-totals">
