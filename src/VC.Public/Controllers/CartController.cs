@@ -47,7 +47,7 @@ namespace VC.Public.Controllers
             IAuthorizationService authorizationService, IAppInfrastructureService appInfrastructureService,
             IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
             IDiscountService discountService, IGcService gcService)
-            : base(contextAccessor, customerService, appInfrastructureService, authorizationService)
+            : base(contextAccessor, customerService, appInfrastructureService, authorizationService, checkoutService)
         {
             _storefrontUserService = storefrontUserService;
             _customerService = customerService;
@@ -69,7 +69,12 @@ namespace VC.Public.Controllers
 
         public async Task<IActionResult> ViewCart()
         {
-            var cartModel = await InitCartModelInternal();
+	        if (await IsCartEmpty())
+	        {
+		        return View("EmptyCart");
+	        }
+
+	        var cartModel = await InitCartModelInternal();
 
             return View(cartModel);
         }
@@ -93,7 +98,7 @@ namespace VC.Public.Controllers
             if (sku == null)
                 return null;
             CustomerCartOrder cart;
-            if (await CustomerLoggenIn())
+            if (await CustomerLoggedIn())
             {
                 var id = GetInternalCustomerId();
                 cart = await _checkoutService.GetOrCreateCart(existingUid, id);
@@ -123,15 +128,22 @@ namespace VC.Public.Controllers
         [HttpPost]
         public async Task<Result<ViewCartModel>> UpdateCart([FromBody] ViewCartModel model)
         {
-            if (model.ShippingDate != null && model.ShippingDate <= DateTime.Today)
+	        if (model.ShipAsap && model.ShippingDate.HasValue)
+	        {
+		        model.ShippingDate = null;
+		        ModelState.Clear();
+	        }
+
+            if (!ModelState.IsValid)
             {
-                model.ShippingDateError = "Invalid date. Must be in the future. Please correct.";
-                return model;
+	            model.ShippingDateError = ModelState["ShippingDate"].Errors.Select(x => x.ErrorMessage).FirstOrDefault();
+				return model;
             }
+
             model.ShippingDateError = string.Empty;
             var existingUid = Request.GetCartUid();
             CustomerCartOrder cart;
-            if (await CustomerLoggenIn())
+            if (await CustomerLoggedIn())
             {
                 var id = GetInternalCustomerId();
                 cart = await _checkoutService.GetOrCreateCart(existingUid, id);
@@ -194,7 +206,7 @@ namespace VC.Public.Controllers
         {
             var existingUid = Request.GetCartUid();
             var cartModel = new ViewCartModel();
-            if (await CustomerLoggenIn())
+            if (await CustomerLoggedIn())
             {
                 var id = GetInternalCustomerId();
                 var cart = await _checkoutService.GetOrCreateCart(existingUid, id);
@@ -250,7 +262,7 @@ namespace VC.Public.Controllers
                     result.Price = sku.Amount;
                     result.Quantity = sku.Quantity;
                     result.SubTotal = sku.Quantity*sku.Amount;
-                    return result;
+					return result;
                 }) ?? Enumerable.Empty<CartSkuModel>());
             var gcsInCart = cartModel.GiftCertificateCodes.ToArray();
             cartModel.GiftCertificateCodes.Clear();
@@ -265,7 +277,7 @@ namespace VC.Public.Controllers
             cartModel.GiftCertificateCodes.AddRange(
                 order.GiftCertificates?.Select(g => g.GiftCertificate.Code).Select(x =>
                 {
-                    var message = gcMessages[x];
+                    var message = gcMessages.ContainsKey(x) ?  gcMessages[x] : new MessageInfo();
 
                     return new CartGcModel
                     {
@@ -287,7 +299,7 @@ namespace VC.Public.Controllers
                 result.Price = sku.Amount;
                 result.Quantity = sku.Quantity;
                 result.SubTotal = sku.Quantity*sku.Amount;
-                return result;
+				return result;
             }) ?? Enumerable.Empty<CartSkuModel>());
             cartModel.OrderTotal = order.Total;
             cartModel.PromoCode = order.Discount?.Code;

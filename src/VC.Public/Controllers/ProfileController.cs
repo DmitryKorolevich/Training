@@ -37,6 +37,7 @@ using VitalChoice.Interfaces.Services.Healthwise;
 using VitalChoice.Infrastructure.Domain.Transfer.Healthwise;
 using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.Interfaces.Services.Checkout;
 
 namespace VC.Public.Controllers
 {
@@ -60,8 +61,8 @@ namespace VC.Public.Controllers
             IProductService productService,
             IHelpService helpService,
             IHealthwiseService healthwiseService, IAppInfrastructureService infrastructureService,
-            IAuthorizationService authorizationService)
-            : base(contextAccessor, customerService, infrastructureService, authorizationService)
+            IAuthorizationService authorizationService, ICheckoutService checkoutService)
+            : base(contextAccessor, customerService, infrastructureService, authorizationService, checkoutService)
         {
             _storefrontUserService = storefrontUserService;
             _addressConverter = addressConverter;

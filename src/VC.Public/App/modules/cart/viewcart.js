@@ -43,7 +43,6 @@ $(function () {
 
 			recalculateCart(self, function () {
 				window.location.href = "/Checkout/AddUpdateBillingAddress";
-				viewModel.refreshing = false;
 			});
 		};
 
@@ -55,6 +54,8 @@ $(function () {
 	}
 
 	initCart();
+
+	$(".date-picker").datepicker("option", "minDate", 1);
 });
 
 function formatCurrency(value) {
@@ -68,6 +69,17 @@ function formatCurrency(value) {
 	else {
 		return "-$" + Math.abs(value).toFixed(2);
 	}
+}
+
+function formatDisplayName(sku) {
+	var displayName = sku.DisplayName();
+	if (sku.SubTitle()) {
+		displayName += " " + sku.SubTitle();
+	}
+
+	displayName += " (" + sku.PortionsCount() + ")";
+
+	return displayName;
 }
 
 function recalculateCart(viewModel, successCallback) {

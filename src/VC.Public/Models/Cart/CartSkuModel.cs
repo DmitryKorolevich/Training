@@ -35,5 +35,11 @@ namespace VC.Public.Models.Cart
 		public int Quantity { get; set; }
 
 	    public decimal? SubTotal { get; set; }
+
+		[Map("QTY")]
+		public int PortionsCount { get; set; }
+
+		[Map]
+	    public string SubTitle { get; set; }
     }
 }

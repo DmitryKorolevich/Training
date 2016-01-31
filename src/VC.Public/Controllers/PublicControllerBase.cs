@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Http;
+using VC.Public.Helpers;
 using VitalChoice.Core.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -13,6 +14,7 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Infrastructure.Identity;
+using VitalChoice.Interfaces.Services.Checkout;
 
 namespace VC.Public.Controllers
 {
@@ -22,17 +24,19 @@ namespace VC.Public.Controllers
         protected readonly IAuthorizationService AuthorizationService;
         protected readonly IHttpContextAccessor ContextAccessor;
         protected readonly ICustomerService CustomerService;
+        protected readonly ICheckoutService CheckoutService;
 
         protected PublicControllerBase(IHttpContextAccessor contextAccessor, ICustomerService customerService,
-            IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService)
+            IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService, ICheckoutService checkoutService)
         {
             InfrastructureService = infrastructureService;
             AuthorizationService = authorizationService;
             ContextAccessor = contextAccessor;
-            CustomerService = customerService;
+			CustomerService = customerService;
+			CheckoutService = checkoutService;
         }
 
-        protected async Task<bool> CustomerLoggenIn()
+        protected async Task<bool> CustomerLoggedIn()
         {
             var context = ContextAccessor.HttpContext;
             var signedIn = await AuthorizationService.AuthorizeAsync(context.User, null, IdentityConstants.IdentityBasicProfile);
@@ -80,5 +84,11 @@ namespace VC.Public.Controllers
 
             return customer;
         }
+
+	    protected async Task<bool> IsCartEmpty()
+	    {
+			var uid = Request.GetCartUid();
+		    return uid == null || await CheckoutService.GetCartItemsCount(uid.Value) == 0;
+	    }
     }
 }

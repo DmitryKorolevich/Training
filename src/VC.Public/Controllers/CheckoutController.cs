@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
+using VC.Public.Helpers;
 using VC.Public.Models.Auth;
 using VC.Public.Models.Cart;
 using VC.Public.Models.Checkout;
@@ -12,8 +13,11 @@ using VitalChoice.Core.Infrastructure;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
@@ -26,16 +30,19 @@ namespace VC.Public.Controllers
         private readonly IStorefrontUserService _storefrontUserService;
         private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _paymentMethodConverter;
         private readonly IProductService _productService;
-        private readonly IOrderService _orderService;
+	    private readonly ICheckoutService checkoutService;
+	    private readonly IOrderService _orderService;
+		private readonly ICheckoutService _checkoutService;
 
-        public CheckoutController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
+		public CheckoutController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
             ICustomerService customerService, IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter,
-			IOrderService orderService, IProductService productService, IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService) :base(contextAccessor, customerService, infrastructureService, authorizationService)
+			IOrderService orderService, IProductService productService, IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService, ICheckoutService checkoutService) :base(contextAccessor, customerService, infrastructureService, authorizationService, checkoutService)
         {
             _storefrontUserService = storefrontUserService;
             _paymentMethodConverter = paymentMethodConverter;
             _orderService = orderService;
             _productService = productService;
+			_checkoutService = checkoutService;
         }
 
 	    public async Task<IActionResult> Welcome(bool forgot = false)
@@ -48,6 +55,16 @@ namespace VC.Public.Controllers
 		[HttpGet]
 		public async Task<IActionResult> AddUpdateBillingAddress()
 		{
+			if (await IsCartEmpty())
+			{
+				return View("EmptyCart");
+			}
+
+			if (!await CustomerLoggedIn())
+			{
+				return RedirectToAction("Welcome");
+			}
+
 			var billingInfoModel = new AddUpdateBillingAddressModel()
 			{
 				SendNews = false,
