@@ -1,13 +1,23 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using VC.Public.Models.Profile;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Validation.Models;
 
 namespace VC.Public.Models.Checkout
 {
-    public class AddUpdateBillingAddressModel: AddressModel
+    public class AddUpdateBillingAddressModel: BaseModel
 	{
-		[EmailAddress]
+	    public AddUpdateBillingAddressModel()
+	    {
+		    SendNews = true;
+		    SendCatalog = true;
+			BillingAddress = new BillingInfoModel();
+			CreditCards = new Dictionary<int, string>();
+	    }
+
+	    [EmailAddress]
 		[MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
 		[Required]
 		[Map]
@@ -26,5 +36,9 @@ namespace VC.Public.Models.Checkout
 	    public bool SendNews { get; set; }
 
 	    public bool SendCatalog { get; set; }
+
+	    public Dictionary<int,string> CreditCards { get; set; }
+
+	    public BillingInfoModel BillingAddress { get; set; }
 	}
 }

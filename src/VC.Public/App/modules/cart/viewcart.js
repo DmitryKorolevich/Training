@@ -42,7 +42,7 @@ $(function () {
 			$("#viewCartForm").validate();
 
 			recalculateCart(self, function () {
-				window.location.href = "/Checkout/AddUpdateBillingAddress";
+				window.location.href = "/Checkout/Welcome";
 			});
 		};
 
