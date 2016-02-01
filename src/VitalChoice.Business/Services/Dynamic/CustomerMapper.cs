@@ -100,7 +100,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 var addresses = entity.ShippingAddresses.Select(s => s.ShippingAddress).ToList();
                 await _customerAddressMapper.SyncCollectionsAsync(dynamic.ShippingAddresses, addresses);
 
-                entity.ShippingAddresses.MergeKeyedAdd(addresses,
+                entity.ShippingAddresses.AddKeyed(addresses,
                     address => address.IdAddress, newAddress => newAddress.Id, dbAddress => new CustomerToShippingAddress
                     {
                         IdAddress = dbAddress.Id,

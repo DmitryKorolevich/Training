@@ -77,7 +77,9 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             }
         }
 
-        public static void MergeAdd<T1, T2>(this ICollection<T1> main, ICollection<T2> toAdd,
+        #region Merge Operations
+
+        public static void AddWhen<T1, T2>(this ICollection<T1> main, ICollection<T2> toAdd,
             Func<T1, T2, bool> addCondition, Func<T2, T1> projection)
         {
             if (main != null && toAdd != null)
@@ -86,7 +88,15 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             }
         }
 
-        public static void MergeKeyedAdd<T, TKey>(this ICollection<T> main, ICollection<T> toAdd, Func<T, TKey> keySelector)
+        public static void AddWhen<T>(this ICollection<T> main, ICollection<T> toAdd, Func<T, T, bool> addCondition)
+        {
+            if (main != null && toAdd != null)
+            {
+                main.AddRange(toAdd.WhereAll(main, (r, l) => addCondition(l, r)).ToArray());
+            }
+        }
+
+        public static void AddKeyed<T, TKey>(this ICollection<T> main, ICollection<T> toAdd, Func<T, TKey> keySelector)
         {
             if (main != null && toAdd != null)
             {
@@ -94,42 +104,12 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             }
         }
 
-        public static void MergeKeyedAdd<T1, T2, TKey>(this ICollection<T1> main, ICollection<T2> toAdd,
+        public static void AddKeyed<T1, T2, TKey>(this ICollection<T1> main, ICollection<T2> toAdd,
             Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T2, T1> projection)
         {
             if (main != null && toAdd != null)
             {
                 main.AddRange(toAdd.ExceptKeyedWith(main, rightKeySelector, leftKeySelector).Select(projection).ToArray());
-            }
-        }
-
-        public static void Merge<T1, T2>(this ICollection<T1> main, ICollection<T2> toAdd,
-            Func<T1, T2, bool> addCondition, Func<T2, T1> projection)
-        {
-            if (main != null && toAdd != null)
-            {
-                main.MergeAdd(toAdd, addCondition, projection);
-                main.RemoveAll(main.WhereAll(toAdd, addCondition).ToArray());
-            }
-        }
-
-        public static void MergeUpdateKeyed<T1, T2, TKey>(this ICollection<T1> main, ICollection<T2> toAdd,
-            Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T2, T1> projection, Action<T1, T2> updateAction)
-        {
-            if (main != null && toAdd != null)
-            {
-                main.UpdateKeyed(toAdd, leftKeySelector, rightKeySelector, updateAction);
-                main.MergeKeyedAdd(toAdd, leftKeySelector, rightKeySelector, projection);
-            }
-        }
-
-        public static void MergeUpdateWithDeleteKeyed<T1, T2, TKey>(this ICollection<T1> main, ICollection<T2> toAdd,
-            Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T2, T1> projection, Action<T1, T2> updateAction)
-        {
-            if (main != null && toAdd != null)
-            {
-                MergeUpdateKeyed(main, toAdd, leftKeySelector, rightKeySelector, projection, updateAction);
-                main.RemoveAll(main.ExceptKeyedWith(toAdd, leftKeySelector, rightKeySelector).ToArray());
             }
         }
 
@@ -150,12 +130,89 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             }
         }
 
+        public static void UpdateKeyed<T, TKey>(this ICollection<T> main, ICollection<T> toAdd,
+            Func<T, TKey> keySelector, Action<T, T> updateAction)
+        {
+            if (main != null && toAdd != null)
+            {
+                Dictionary<TKey, T> searchIn = toAdd.ToDictionary(keySelector);
+                foreach (var m in main)
+                {
+                    T item;
+                    if (searchIn.TryGetValue(keySelector(m), out item))
+                    {
+                        updateAction(m, item);
+                    }
+                }
+            }
+        }
+
+        public static void AddUpdateKeyed<T1, T2, TKey>(this ICollection<T1> main, ICollection<T2> toAdd,
+            Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T2, T1> projection, Action<T1, T2> updateAction)
+        {
+            if (main != null && toAdd != null)
+            {
+                main.UpdateKeyed(toAdd, leftKeySelector, rightKeySelector, updateAction);
+                main.AddKeyed(toAdd, leftKeySelector, rightKeySelector, projection);
+            }
+        }
+
+        public static void AddUpdateKeyed<T, TKey>(this ICollection<T> main, ICollection<T> toAdd,
+            Func<T, TKey> keySelector, Action<T, T> updateAction)
+        {
+            if (main != null && toAdd != null)
+            {
+                main.UpdateKeyed(toAdd, keySelector, updateAction);
+                main.AddKeyed(toAdd, keySelector);
+            }
+        }
+
+        public static void Merge<T1, T2>(this ICollection<T1> main, ICollection<T2> toAdd,
+            Func<T1, T2, bool> addCondition, Func<T2, T1> projection)
+        {
+            if (main != null && toAdd != null)
+            {
+                main.AddWhen(toAdd, addCondition, projection);
+                main.RemoveAll(main.WhereAll(toAdd, addCondition).ToArray());
+            }
+        }
+
+        public static void Merge<T>(this ICollection<T> main, ICollection<T> toAdd,
+            Func<T, T, bool> addCondition)
+        {
+            if (main != null && toAdd != null)
+            {
+                main.AddWhen(toAdd, addCondition);
+                main.RemoveAll(main.WhereAll(toAdd, addCondition).ToArray());
+            }
+        }
+
+        public static void MergeKeyed<T1, T2, TKey>(this ICollection<T1> main, ICollection<T2> toAdd,
+            Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T2, T1> projection, Action<T1, T2> updateAction)
+        {
+            if (main != null && toAdd != null)
+            {
+                AddUpdateKeyed(main, toAdd, leftKeySelector, rightKeySelector, projection, updateAction);
+                main.RemoveAll(main.ExceptKeyedWith(toAdd, leftKeySelector, rightKeySelector).ToArray());
+            }
+        }
+
+        public static void MergeKeyed<T, TKey>(this ICollection<T> main, ICollection<T> toAdd,
+            Func<T, TKey> keySelector, Action<T, T> updateAction)
+        {
+            if (main != null && toAdd != null)
+            {
+                AddUpdateKeyed(main, toAdd, keySelector, updateAction);
+                main.RemoveAll(main.ExceptKeyedWith(toAdd, keySelector).ToArray());
+            }
+        }
+
         public static void MergeKeyed<T, TKey>(this ICollection<T> main, ICollection<T> toAdd,
             Func<T, TKey> keySelector)
         {
             if (main != null && toAdd != null)
             {
-                main.MergeKeyedAdd(toAdd, keySelector);
+                main.AddKeyed(toAdd, keySelector);
                 main.RemoveAll(main.ExceptKeyedWith(toAdd, keySelector, keySelector).ToArray());
             }
         }
@@ -165,10 +222,12 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
         {
             if (main != null && toAdd != null)
             {
-                main.MergeKeyedAdd(toAdd, leftKeySelector, rightKeySelector, projection);
+                main.AddKeyed(toAdd, leftKeySelector, rightKeySelector, projection);
                 main.RemoveAll(main.ExceptKeyedWith(toAdd, leftKeySelector, rightKeySelector).ToArray());
             }
         }
+
+        #endregion
 
         public static IEnumerable<T1> WhereAll<T1, T2>(this IEnumerable<T1> main, IEnumerable<T2> compareTo,
             Func<T1, T2, bool> allCondition)
@@ -183,15 +242,15 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             return left.Where(m => !searchIn.Contains(leftKeySelector(m)));
         }
 
-        public static IEnumerable<T1> IntersectKeyedWith<T1, TKey>(this IEnumerable<T1> left,
-            IEnumerable<T1> right, Func<T1, TKey> keySelector)
+        public static IEnumerable<T> IntersectKeyedWith<T, TKey>(this IEnumerable<T> left,
+            IEnumerable<T> right, Func<T, TKey> keySelector)
         {
             HashSet<TKey> searchIn = new HashSet<TKey>(right.Select(keySelector));
             return left.Where(m => searchIn.Contains(keySelector(m)));
         }
 
-        public static IEnumerable<T1> ExceptKeyedWith<T1, TKey>(this IEnumerable<T1> left,
-            IEnumerable<T1> right, Func<T1, TKey> keySelector)
+        public static IEnumerable<T> ExceptKeyedWith<T, TKey>(this IEnumerable<T> left,
+            IEnumerable<T> right, Func<T, TKey> keySelector)
         {
             HashSet<TKey> searchIn = new HashSet<TKey>(right.Select(keySelector));
             return left.Where(m => !searchIn.Contains(keySelector(m)));

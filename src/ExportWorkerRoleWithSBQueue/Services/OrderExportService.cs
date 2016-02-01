@@ -32,7 +32,7 @@ namespace ExportWorkerRoleWithSBQueue.Services
                 var rep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
                 var customerPayments = await rep.Query(c => customerIds.Contains(c.IdCustomer)).SelectAsync(true);
 
-                customerPayments.MergeUpdateKeyed(paymentMethods,
+                customerPayments.AddUpdateKeyed(paymentMethods,
                     export => export.IdPaymentMethod,
                     dynamic => dynamic.Id,
                     dynamic => new CustomerPaymentMethodExport

@@ -107,7 +107,7 @@ namespace VC.Public.Controllers
             {
                 cart = await _checkoutService.GetOrCreateCart(existingUid);
             }
-            cart.Order.Skus.MergeUpdateKeyed(Enumerable.Repeat(sku, 1).ToArray(),
+            cart.Order.Skus.AddUpdateKeyed(Enumerable.Repeat(sku, 1).ToArray(),
                 ordered => ordered.Sku.Code, skuModel => skuModel.Sku.Code, skuModel =>
                 {
                     var skuOrdered = _productService.GetSkuOrderedAsync(skuModel.Sku.Code).Result;
@@ -152,7 +152,7 @@ namespace VC.Public.Controllers
             {
                 cart = await _checkoutService.GetOrCreateCart(existingUid);
             }
-            cart.Order.Skus?.MergeUpdateWithDeleteKeyed(model.Skus.Where(s => s.Quantity > 0).ToArray(), ordered => ordered.Sku.Code,
+            cart.Order.Skus?.MergeKeyed(model.Skus.Where(s => s.Quantity > 0).ToArray(), ordered => ordered.Sku.Code,
                 skuModel => skuModel.Code, skuModel =>
                 {
                     var result = _productService.GetSkuOrderedAsync(skuModel.Code).Result;
