@@ -9,7 +9,6 @@ using VC.Public.Helpers;
 using VC.Public.Models.Cart;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
-using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
@@ -19,7 +18,6 @@ using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
-using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
@@ -30,10 +28,7 @@ namespace VC.Public.Controllers
 {
     public class CartController : PublicControllerBase
     {
-        private readonly IStorefrontUserService _storefrontUserService;
-        private readonly ICustomerService _customerService;
-        private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _paymentMethodConverter;
-        private readonly IProductService _productService;
+	    private readonly IProductService _productService;
         private readonly ICheckoutService _checkoutService;
         private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
         private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
@@ -41,18 +36,15 @@ namespace VC.Public.Controllers
         private readonly IGcService _gcService;
         private readonly IOrderService _orderService;
 
-        public CartController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
-            ICustomerService customerService, IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter,
+        public CartController(IHttpContextAccessor contextAccessor,
+            ICustomerService customerService,
             IOrderService orderService, IProductService productService, ICheckoutService checkoutService,
             IAuthorizationService authorizationService, IAppInfrastructureService appInfrastructureService,
             IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
             IDiscountService discountService, IGcService gcService)
             : base(contextAccessor, customerService, appInfrastructureService, authorizationService, checkoutService)
         {
-            _storefrontUserService = storefrontUserService;
-            _customerService = customerService;
-            _paymentMethodConverter = paymentMethodConverter;
-            _orderService = orderService;
+	        _orderService = orderService;
             _productService = productService;
             _checkoutService = checkoutService;
             _skuMapper = skuMapper;
@@ -140,7 +132,7 @@ namespace VC.Public.Controllers
                 //return model;
             }
             else
-            {
+            { 
                 model.ShippingDateError = string.Empty;
             }
             var existingUid = Request.GetCartUid();

@@ -12,7 +12,7 @@ $(function () {
 		    self.Model.ShippingDate = ko.observable("");
 		}
 		self.upgradeOptions = ko.observableArray([]);
-		self.refreshing = true;
+		self.refreshing = ko.observable(true);
 		self.initializing = true;
 
 		self.removeSku = function(sku) {
@@ -24,10 +24,8 @@ $(function () {
 			}
 		};
 		self.addGc = function () {
-		    self.refreshing = true;
-		    var newGc = { Value: "" };
-		    self.Model.GiftCertificateCodes.push(newGc);
-			self.refreshing = false;
+			var newGc = { Value: "" };
+			self.Model.GiftCertificateCodes.push(newGc);
 		};
 		self.shipAsapChanged = function() {
 			if (self.Model.ShipAsap() && !self.initializing) {
@@ -82,23 +80,27 @@ function formatDisplayName(sku) {
 	return displayName;
 }
 
+var ajax_request;
 function recalculateCart(viewModel, successCallback) {
-	if (viewModel.refreshing) {
+	if (viewModel.refreshing()) {
 		return;
 	}
 
 	$("#viewCartForm").validate();
 
 	if ($("#viewCartForm").valid()) {
-		viewModel.refreshing = true;
+		viewModel.refreshing(true);
 
-		$.ajax({
+		if (typeof ajaxRequest !== 'undefined') {
+			ajaxRequest.abort();
+		}
+		ajaxRequest = $.ajax({
 			url: "/Cart/UpdateCart",
 			dataType: "json",
 			data: ko.toJSON(viewModel.Model),
 			contentType: "application/json; charset=utf-8",
 			type: "POST"
-		}).success(function (result) {
+		}).success(function(result) {
 			if (result.Success) {
 				if (successCallback) {
 					successCallback();
@@ -109,10 +111,10 @@ function recalculateCart(viewModel, successCallback) {
 			} else {
 				notifyError(result.Messages[0]);
 			}
-			viewModel.refreshing = false;
-		}).error(function (result) {
+			viewModel.refreshing(false);
+		}).error(function(result) {
 			notifyError();
-			viewModel.refreshing = false;
+			viewModel.refreshing(false);
 		});
 	}
 }
@@ -138,11 +140,11 @@ function initCart() {
 
 		reparseElementValidators("form#viewCartForm");
 
-		viewModel.refreshing = false;
+		viewModel.refreshing(false);
 		viewModel.initializing = false;
 	}).error(function (result) {
 		notifyError();
-		viewModel.refreshing = false;
+		viewModel.refreshing(false);
 		viewModel.initializing = false;
 	});
 }
