@@ -194,8 +194,8 @@
                         <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>
                         <td>
                             <span data-ng-if="item.DateShipped">All - {{::item.DateShipped | date:"MM/dd/yy"}}</span>
-                            <span data-ng-if="!item.DateShipped && item.PDateShipped">P - {{::item.PDateShipped | date:"MM/dd/yy"}}</span><br/>
-                            <span data-ng-if="!item.DateShipped && item.NPDateShipped">NP - {{::item.NPDateShipped | date:"MM/dd/yy"}}</span><br />
+                            <span data-ng-if="!item.DateShipped && item.PDateShipped">P - {{::item.PDateShipped | date:"MM/dd/yy"}}<br /></span>
+                            <span data-ng-if="!item.DateShipped && item.NPDateShipped">NP - {{::item.NPDateShipped | date:"MM/dd/yy"}}</span>
                         </td>
                         <td>{{::item.Company}}</td>
                         <td>{{::item.StateCode}}</td>
@@ -212,8 +212,11 @@
                         <td>{{::item.Total | currency}}</td>
                         <td>{{::item.DateEdited | date:"MM/dd/yy"}}<br />{{::item.DateEdited | date:"h:mm a"}}<br />{{::item.EditedByAgentId}}</td>
                         <td>
-                            <button title="View" class="btn btn-default btn-success btn-xs" data-ng-click="openOrder(item.Id);">
+                            <a class="btn btn-default btn-success btn-xs" target="_blank" data-ng-href="/api/orderinvoice/base/{{::item.Id}}">
                                 <i class="fa fa-search"></i>
+                            </a>
+                            <button title="Edit" class="btn btn-default btn-success btn-xs" data-ng-click="openOrder(item.Id);">
+                                <i class="glyphicon glyphicon-edit"></i>
                             </button>
                             <button title="Delete" data-ng-if="item.OrderStatus==1 || item.OrderStatus==2 || item.OrderStatus==6 || item.OrderStatus==7" class="btn btn-default btn-danger btn-xs" ladda="deleteTracker.active()" data-ng-click="delete(item.Id);">
                                 <i class="glyphicon glyphicon-remove"></i>

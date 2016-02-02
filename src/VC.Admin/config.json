@@ -70,6 +70,10 @@
       "ProfileName": "Vital Choice",
       "CompanyCode": "VC001",
       "TurnOffCommit": true
+    },
+    "PDFMyUrl": {
+      "LicenseKey": "sZ0ZaPUmBkt8&",
+      "ServiceUrl": "http://pdfmyurl.com/api"
     }
   }
 }

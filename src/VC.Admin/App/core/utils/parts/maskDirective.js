@@ -14,7 +14,7 @@
                    if(attr.clean)
                    {
                        modelCtrl.$parsers.push(function (inputValue) {
-                           var resultValues =inputValue.replace('(', '').replace(')', '').replace(' ', '').replace('-', '').replace('x', '');
+                           var resultValues = inputValue.replaceAll('(', '').replaceAll(')', '').replaceAll(' ', '').replaceAll('-', '').replaceAll('x', '');
                            return resultValues;
                        });
                    }

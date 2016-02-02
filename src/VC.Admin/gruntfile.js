@@ -4,6 +4,7 @@
 module.exports = function (grunt) {
 	var jsConfig = grunt.file.readJSON('AppConfig/scripts/files.json');
 	var cssConfig = grunt.file.readJSON('AppConfig/styles/files.json');
+	var cssOrderInvoiceConfig = grunt.file.readJSON('AppConfig/styles-order-invoice/files.json');
 
 	var jsFiles = jsConfig.files;
 	for (var i = 0; i < jsFiles.length; i++) {
@@ -15,9 +16,16 @@ module.exports = function (grunt) {
 		cssFiles[j] = "wwwroot/" + cssFiles[j];
 	}
 
+	var cssOrderInvoiceFiles = cssOrderInvoiceConfig.files;
+	for (var j = 0; j < cssOrderInvoiceFiles.length; j++)
+	{
+	    cssOrderInvoiceFiles[j] = "wwwroot/" + cssOrderInvoiceFiles[j];
+	}
+
 	grunt.initConfig({
 		jsMinifiedFileName: jsConfig.minifiedFileName,
 		cssMinifiedFileName: cssConfig.minifiedFileName,
+		cssOrderInvoiceMinifiedFileName: cssOrderInvoiceConfig.minifiedFileName,
 		pkg: grunt.file.readJSON('package.json'),
         bower: {
 		    install: {
@@ -32,7 +40,11 @@ module.exports = function (grunt) {
         	css: {
 				src: cssFiles,
 				dest: 'temp/css/<%= cssMinifiedFileName %>.css'
-			},
+        	},
+        	cssorderinvoice: {
+        	    src: cssOrderInvoiceFiles,
+        	    dest: 'temp/css/<%= cssOrderInvoiceMinifiedFileName %>.css'
+        	},
         	js: {
 				src: jsFiles,
 				// the location of the resulting JS file
@@ -109,7 +121,8 @@ module.exports = function (grunt) {
         cssmin: {
         	target: {
         		files: [
-					{ expand: true, cwd: 'temp/css/', src: ['<%= cssMinifiedFileName %>.css'], dest: 'temp/css/minified/', ext: '.min.css' }
+					{ expand: true, cwd: 'temp/css/', src: ['<%= cssMinifiedFileName %>.css'], dest: 'temp/css/minified/', ext: '.min.css' },
+					{ expand: true, cwd: 'temp/css/', src: ['<%= cssOrderInvoiceMinifiedFileName %>.css'], dest: 'temp/css/minified/', ext: '.min.css' }
         		],
         		options: {
         			shorthandCompacting: false,

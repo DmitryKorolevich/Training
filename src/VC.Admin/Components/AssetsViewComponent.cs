@@ -68,7 +68,24 @@ namespace VC.Admin.Components
 					}
 				}
 			}
-			else
+            else if (assetType.Equals("styles-order-invoice", StringComparison.OrdinalIgnoreCase))
+            {
+                viewName = "Styles";
+                var assetInfo = FrontEndAssetManager.GetOrderInvoiceStyles();
+                if (appOptions.EnableBundlingAndMinification)
+                {
+                    filePaths.Add(urlHelper.Content(
+                        $"~/{assetInfo.MinifiedFileName}.min.css{versionQueryString}"));
+                }
+                else
+                {
+                    foreach (var assetFileInfo in assetInfo.Files)
+                    {
+                        filePaths.Add(urlHelper.Content($"~/{assetFileInfo}{versionQueryString}"));
+                    }
+                }
+            }
+            else
 			{
 				throw new InvalidOperationException($"Asset type '{assetType}' is not recognized.");
 			}

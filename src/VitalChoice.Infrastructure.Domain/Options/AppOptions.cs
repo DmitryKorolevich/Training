@@ -24,5 +24,6 @@ namespace VitalChoice.Infrastructure.Domain.Options
 	    public GoogleCaptcha GoogleCaptcha { get; set; }
         public ExportService ExportService { get; set; }
         public AuthorizeNet AuthorizeNet { get; set; }
+        public PDFMyUrl PDFMyUrl { get; set; }
     }
 }

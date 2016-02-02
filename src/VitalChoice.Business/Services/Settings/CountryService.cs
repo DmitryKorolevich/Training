@@ -67,6 +67,16 @@ namespace VitalChoice.Business.Services.Settings
             return toReturn;
         }
 
+        public async Task<Country> GetCountryAsync(int id)
+        {
+            Country toReturn = (await countryRepository.Query(x=>x.Id==id).SelectAsync(false)).FirstOrDefault();
+            if (toReturn != null)
+            {
+                toReturn.States = await stateRepository.Query(x=>x.CountryCode == toReturn.CountryCode).SelectAsync(false);
+            }
+            return toReturn;
+        }
+
         public async Task<bool> UpdateCountriesOrderAsync(ICollection<Country> model)
         {
             bool toReturn = false;

@@ -51,3 +51,5 @@ Post-Deployment Script Template
 
 :r .\Scripts\EmailTemplates.sql
 :r .\Scripts\EmailTemplatesData.sql
+
+:r .\Scripts\Tokens.sql

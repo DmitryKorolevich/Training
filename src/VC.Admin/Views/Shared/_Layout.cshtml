@@ -1,0 +1,16 @@
+﻿@using System.Threading.Tasks
+@using VitalChoice.Infrastructure.Domain.Options
+@inject Microsoft.Extensions.OptionsModel.IOptions<AppOptions> appOptions;
+<!DOCTYPE html>
+<html data-ng-app="mainApp" data-ng-strict-di data-ng-init="buildNumber='@appOptions.Value.Versioning.BuildNumber'">
+<head>
+    <base href="/">
+    <title>Vital Choice Admin</title>
+    <link rel="icon" type="img/ico" href="/assets/miscellaneous/favicon.ico">
+    @await Component.InvokeAsync("Assets", "styles")
+</head>
+<body>
+    @RenderBody()
+    @await Component.InvokeAsync("Assets", "scripts")
+</body>
+</html>

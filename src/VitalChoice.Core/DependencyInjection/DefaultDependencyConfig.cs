@@ -236,6 +236,11 @@ namespace VitalChoice.Core.DependencyInjection
                     ApiLogin = configuration.GetSection("App:AuthorizeNet:ApiLogin").Value,
                     TestEnv = Convert.ToBoolean(configuration.GetSection("App:AuthorizeNet:TestEnv").Value)
                 };
+                options.PDFMyUrl = new PDFMyUrl
+                {
+                    LicenseKey = configuration.GetSection("App:PDFMyUrl:LicenseKey").Value,
+                    ServiceUrl = configuration.GetSection("App:PDFMyUrl:ServiceUrl").Value,
+                };
             });
 
             services.Configure<MvcOptions>(o =>
@@ -461,6 +466,8 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<HealthwiseService>().As<IHealthwiseService>();
             builder.RegisterType<EmailTemplateService>().As<IEmailTemplateService>();
             builder.RegisterType<RedirectService>().As<IRedirectService>();
+            builder.RegisterType<TokenService>().As<ITokenService>();
+            builder.RegisterType<TrackingService>().As<ITrackingService>();
             builder.RegisterType<CheckoutService>().As<ICheckoutService>();
             builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
             builder.RegisterModelConverters(projectAssembly);

@@ -567,7 +567,8 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
     {
         if ($scope.order === undefined || $scope.order.Shipping === undefined)
             return undefined;
-        if ($scope.shippingAddressTab.OrderShippingEditModel === undefined)
+        if ($scope.shippingAddressTab.OrderShippingEditModel === undefined ||
+            $scope.shippingAddressTab.OrderShippingEditModel.Address != $scope.order.Shipping)
         {
             $scope.shippingAddressTab.OrderShippingEditModel = { Address: $scope.order.Shipping, formName: 'shipping', recalculate: true };
         }
@@ -1387,7 +1388,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     $scope.requestRecalculate();
                 }
             }
-        }, 100);
+        }, 20);
     };
 
     $scope.getSKUsByProductName = function (val)

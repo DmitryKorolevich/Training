@@ -1,0 +1,607 @@
+﻿@using System.Threading.Tasks
+@using VC.Admin.Models.Orders
+
+@model OrderInvoiceModel
+
+@if (Model == null)
+{
+    <span class="error">Invalid Order</span>
+}
+else
+{
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr class="header">
+                            <td class="left">
+                                <span class="title">
+                                    Vital Choice Seafood, Inc
+                                </span>
+                                <br />
+                                <div>
+                                    <div align="left">
+                                        P.O. Box 4121
+                                        <br />
+                                        Bellingham, WA 98227
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="right">
+                                <div align="right">
+                                    Phone: 360.603.9546
+                                    <br />
+                                    Fax: 800.608.4910
+                                    <br />
+                                    Web: www.vitalchoice.com
+                                    <br />
+                                    @if (Model.ShowVitalChoiceTaxId)
+                                    {
+                                        <span>Vital Choice Tax ID: 82-0539768</span>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <tr class="empty"><td></td></tr>
+            <tr>
+                <td>
+                    <div align="right" class="big-title">
+                        <span>@Model.InvoiceTypeName</span>
+                    </div>
+                </td>
+            </tr>
+            <tr class="empty"><td></td></tr>
+
+            <tr>
+                <td>
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tbody>
+                            <tr>
+                                <td width="50%" valign="top">
+                                    <strong>Bill To:</strong><br />
+                                    @if (Model.BillingAddress != null)
+                                    {
+                                        <span>@Model.BillingAddress.Company</span><br />
+                                        <span>@Model.BillingAddress.FirstName @Model.BillingAddress.LastName</span><br />
+                                        <span>@Model.BillingAddress.Address1</span><br />
+                                        @if (!string.IsNullOrEmpty(Model.BillingAddress.Address2))
+                                        {
+                                            <span>@Model.BillingAddress.Address2</span><br />
+                                        }
+                                        <span>@Model.BillingAddress.City,&nbsp;@(!string.IsNullOrEmpty(Model.BillingAddress.StateCode) ? Model.BillingAddress.StateCode : Model.BillingAddress.County )&nbsp;@Model.BillingAddress.Zip</span><br />
+                                        <span>@Model.BillingAddress.Country.CountryCode</span><br />
+                                    }
+                                </td>
+                                <td width="2%" valign="top">
+                                    &nbsp;
+                                </td>
+                                <td width="16%" valign="top">
+                                    <strong>Ship To:</strong><br />
+                                    @if (Model.ShippingAddress != null)
+                                    {
+                                        <span>@Model.ShippingAddress.Company</span><br />
+                                        <span>@Model.ShippingAddress.FirstName @Model.ShippingAddress.LastName</span><br />
+                                        <span>@Model.ShippingAddress.Address1</span><br />
+                                        @if (!string.IsNullOrEmpty(Model.ShippingAddress.Address2))
+                                        {
+                                            <span>@Model.ShippingAddress.Address2</span><br />
+                                        }
+                                        <span>@Model.ShippingAddress.City,&nbsp;@(!string.IsNullOrEmpty(Model.ShippingAddress.StateCode) ? Model.ShippingAddress.StateCode : Model.ShippingAddress.County )&nbsp;@Model.ShippingAddress.Zip</span><br />
+                                        <span>@Model.ShippingAddress.Country.CountryCode</span><br />
+                                        <span>Tel:&nbsp;@Model.ShippingAddress.Phone</span><br />
+                                        <span>E-mail:&nbsp;@Model.ShippingAddress.Email</span>
+                                    }
+                                </td>
+                                <td width="2%" valign="top">
+                                    &nbsp;
+                                </td>
+                                <td width="30%" valign="top" class="text">
+                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                        <tbody>
+                                            <tr>
+                                                <td width="60%">
+                                                    <div align="right">
+                                                        <strong>Invoice / Order ID:</strong>
+                                                    </div>
+                                                </td>
+                                                <td width="2%">
+                                                    &nbsp;
+                                                </td>
+                                                <td width="38%">
+                                                    <span>@Model.Id</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div align="right">
+                                                        <strong>Order Date:</strong>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    &nbsp;
+                                                </td>
+                                                <td>
+                                                    <span>@Model.DateCreated.ToString("MM/dd/yyyy")</span>
+                                                </td>
+                                            </tr>
+                                            @* Ship date isn't added yet *@
+                                            @if (false)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <div align="right">
+                                                            <strong>Ship Date:</strong>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        &nbsp;
+                                                    </td>
+                                                    <td>
+                                                        <span></span>
+                                                    </td>
+                                                </tr>
+                                            }
+                                            @if (Model.OrderStatus == VitalChoice.Ecommerce.Domain.Entities.Orders.OrderStatus.ShipDelayed ||
+(Model.ShipDelayType.HasValue && Model.ShipDelayType.Value != VitalChoice.Ecommerce.Domain.Entities.Orders.ShipDelayType.None))
+                                            {
+                                                <tr id="ShipDelayDateRow" runat="Server">
+                                                    <td>
+                                                        <div align="right">
+                                                            <strong>Ship Delay Date:</strong>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        &nbsp;
+                                                    </td>
+                                                    <td>
+                                                        @if (Model.ShipDelayDate.HasValue)
+                                                        {
+                                                            <strong>@Model.ShipDelayDate.Value.ToString("MM/dd/yyyy")</strong>
+                                                        }
+                                                        else if (Model.ShipDelayDateP.HasValue || Model.ShipDelayDateNP.HasValue)
+                                                        {
+                                                            <strong>
+                                                                @if (Model.ShipDelayDateP.HasValue)
+                                                                {
+                                                                    @:P - @Model.ShipDelayDateP.Value.ToString("MM/dd/yyyy"),
+                                                            }
+                                                                @if (Model.ShipDelayDateNP.HasValue)
+                                                                {
+                                                                    @:NP - @Model.ShipDelayDateNP.Value.ToString("MM/dd/yyyy")
+                                                            }
+                                                            </strong>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                            <tr>
+                                                <td>
+                                                    &nbsp;
+                                                </td>
+                                                <td>
+                                                    &nbsp;
+                                                </td>
+                                                <td>
+                                                    &nbsp;
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div align="right">
+                                                        <strong>Customer ID:</strong>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    &nbsp;
+                                                </td>
+                                                <td>
+                                                    <span>@Model.IdCustomer</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div align="right">
+                                                        <strong>Payment Type:</strong>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    &nbsp;
+                                                </td>
+                                                <td>
+                                                    <span>@Model.PaymentTypeName</span>
+                                                </td>
+                                            </tr>
+                                            @if (!string.IsNullOrEmpty(Model.CreditCardInformationRow))
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        &nbsp;
+                                                    </td>
+                                                    <td>
+                                                        &nbsp;
+                                                    </td>
+                                                    <td>
+                                                        <div align="left">
+                                                            <span>@Model.CreditCardInformationRow</span>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            <tr class="empty"><td></td></tr>
+
+            @if (!string.IsNullOrEmpty(Model.OrderNotes))
+            {
+                <tr>
+                    <td class="text">
+                        <strong>Order Specific Notes:</strong>
+                        <br />
+                        <div>
+                            @Html.Raw(Model.OrderNotes)
+                        </div>
+                    </td>
+                </tr>
+                <tr class="empty"><td></td></tr>
+            }
+            @if (!string.IsNullOrEmpty(Model.GiftMessage))
+            {
+                <tr>
+                    <td class="text">
+                        <strong>Gift Messages:</strong>
+                        <br />
+                        <div>
+                            @Html.Raw(@Model.GiftMessage)
+                        </div>
+                    </td>
+                </tr>
+                <tr class="empty"><td></td></tr>
+            }
+
+            @if (Model.ShowWholesaleShortView || Model.ShowWholesaleNormalView)
+            {
+                <tr>
+                    <td>
+                        @if (Model.ShowWholesaleShortView)
+                    {
+                            <table runat="server" visible="false" width="20%" border="0" cellspacing="0" cellpadding="0">
+                                <tbody>
+                                    <tr>
+                                        <td class="title-text-right">
+                                            PO #
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td valign="top" class="entry-text-right">
+                                            <span>@Model.PoNumber</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        }
+                        @if (Model.ShowWholesaleNormalView)
+                        {
+                            <table id="WholeSaleNoramlView" runat="server" width="100%" border="0" cellspacing="0" cellpadding="0">
+                                <tbody>
+                                    <tr>
+                                        @if (!string.IsNullOrEmpty(Model.PoNumber))
+                                        {
+                                        <td width="20%" class="title-text">
+                                            PO #
+                                        </td>
+                                        }
+                                        <td width="20%" class="title-text">
+                                            Sales Rep
+                                        </td>
+                                        <td width="20%" class="title-text">
+                                            FOB
+                                        </td>
+                                        <td width="20%" class="title-text">
+                                            Preferred Ship Method
+                                        </td>
+                                        <td width="20%" class="title-text-right">
+                                            Terms
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        @if (!string.IsNullOrEmpty(Model.PoNumber))
+                                        {
+                                        <td valign="top" class="entry-text">
+                                            <span>@Model.PoNumber</span>
+                                        </td>
+                                        }
+                                        <td valign="top" class="entry-text">
+                                            <span>@Model.IdEditAgent</span>
+                                        </td>
+                                        <td valign="top" class="entry-text">
+                                            <span>@Model.OACFOB</span>
+                                        </td>
+                                        <td valign="top" class="entry-text">
+                                            <span>@Model.PreferredShipMethodName</span>
+                                        </td>
+                                        <td valign="top" class="entry-text-right">
+                                            <span>@Model.OACTerms</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        }
+                    </td>
+                </tr>
+                <tr class="empty"><td></td></tr>
+            }
+            <tr>
+                <td>
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <thead>
+                            <tr>
+                                <td class="title-text">
+                                    Quantity
+                                </td>
+                                <td class="title-text">
+                                    SKU
+                                </td>
+                                <td class="title-text">
+                                    Description
+                                </td>
+                                <td class="title-text">
+                                    Unit Price
+                                </td>
+                                <td class="title-text-right">
+                                    Total
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var skuOrdered in Model.SkuOrdereds)
+                            {
+                            <tr>
+                                <td valign="top" class="entry-text">
+                                    @skuOrdered.QTY
+                                </td>
+                                <td valign="top" class="entry-text">
+                                    @skuOrdered.Code
+                                </td>
+                                <td valign="top" class="entry-text">
+                                    @skuOrdered.ProductName
+                                </td>
+                                <td valign="top" class="entry-text">
+                                    @if (skuOrdered.Price.HasValue)
+                                    {
+                                    @skuOrdered.Price.Value.ToString("c")
+                                    }
+                                </td>
+                                <td valign="top" class="entry-text-right">
+                                    @if (skuOrdered.Amount.HasValue)
+                                    {
+                                    @skuOrdered.Amount.Value.ToString("c")
+                                    }
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            <tr class="empty"><td></td></tr>
+
+            @if (Model.PromoSkuOrdereds.Count > 0)
+            {
+            <tr class="empty"><td>Promo products:</td></tr>
+            <tr>
+                <td>
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <thead>
+                            <tr>
+                                <td class="title-text">
+                                    Quantity
+                                </td>
+                                <td class="title-text">
+                                    SKU
+                                </td>
+                                <td class="title-text">
+                                    Description
+                                </td>
+                                <td class="title-text">
+                                    Unit Price
+                                </td>
+                                <td class="title-text-right">
+                                    Total
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var skuOrdered in Model.PromoSkuOrdereds)
+                            {
+                                <tr>
+                                    <td valign="top" class="entry-text">
+                                        @skuOrdered.QTY
+                                    </td>
+                                    <td valign="top" class="entry-text">
+                                        @skuOrdered.Code
+                                    </td>
+                                    <td valign="top" class="entry-text">
+                                        @skuOrdered.ProductName
+                                    </td>
+                                    <td valign="top" class="entry-text">
+                                        @if (skuOrdered.Price.HasValue)
+                                        {
+                                            @skuOrdered.Price.Value.ToString("c")
+                                        }
+                                    </td>
+                                    <td valign="top" class="entry-text-right">
+                                        @if (skuOrdered.Amount.HasValue)
+                                        {
+                                            @skuOrdered.Amount.Value.ToString("c")
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            <tr class="empty"><td></td></tr>
+            }
+
+            <tr>
+                <td>
+                    <table width="100%">
+                        <tbody>
+                            <tr>
+                                <td valign="bottom" width="20%">
+                                    @if (Model.ShowTrackingView)
+                                    {
+                                    <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                                        <tbody>
+                                            <tr>
+                                                <td class="title-text text-align-right font-normal">      
+                                                    Date Shipped:
+                                                </td>
+                                                <td class="title-text-right font-normal">
+                                                    <span>@Model.DateShipped.ToString("MM/dd/yyyy")</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="entry-text text-align-right">
+                                                    Shipped Via:
+                                                </td>
+                                                <td class="entry-text-right">
+                                                    <span>@Model.ShipVia</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="entry-text text-align-right" valign="top">
+                                                    Tracking No.:
+                                                </td>
+                                                <td class="entry-text-right">
+                                                    <table cellpadding="0" cellspacing="0" border="0">
+                                                        @foreach(var item in Model.TrackingEntities)
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    @item.Sku&nbsp;-&nbsp;<a target="_blank" href="@item.ServiceUrl">"@item.TrackingNumber</a>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    }
+                                </td>
+                                <td width="70%">
+                                    <table align="right" border="0" cellspacing="0" cellpadding="0" width="58%">
+                                        <tbody>
+                                            <tr>
+                                                <td width="46%" class="title-text text-align-right font-normal">
+                                                    Subtotal:
+                                                </td>
+                                                <td width="54%" class="title-text-right text-align-right font-normal">
+                                                    @Model.ProductsSubtotal.ToString("c")
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="entry-text text-align-right">
+                                                    (+)Tax:
+                                                </td>
+                                                <td class="entry-text-right text-align-right">
+                                                    @Model.TaxTotal.ToString("c")
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="entry-text text-align-right">
+                                                    (+)Shipping:
+                                                </td>
+                                                <td class="entry-text-right text-align-right">
+                                                    @Model.TotalShipping.ToString("c")
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="entry-text text-align-right">
+                                                    (+)Shipping Surcharge:
+                                                </td>
+                                                <td class="entry-text-right text-align-right">
+                                                    @Model.ShippingSurcharge.ToString("c")
+                                                </td>
+                                            </tr>
+                                            @if (Model.GCs.Count > 0)
+                                            {
+                                                @foreach (var item in Model.GCs)
+                                                {
+                                            <tr>
+                                                <td class="entry-text text-align-right">
+                                                    (-)Gift Certificate:
+                                                </td>
+                                                <td class="entry-text-right text-align-right">
+                                                    @item.Code&nbsp;-&nbsp;@item.Amount.ToString("c")
+                                                </td>
+                                            </tr>
+                                                }
+                                            }
+                                            @if (Model.DiscountTotal != 0)
+                                            {
+                                            <tr id="discountRow" runat="server">
+                                                <td class="entry-text text-align-right">
+                                                    (-)Product Discount:
+                                                </td>
+                                                <td class="entry-text-right text-align-right">
+                                                    @Model.DiscountTotal.ToString("c")
+                                                </td>
+                                            </tr>
+                                            }
+                                            @if (Model.RefundedManualOverride.HasValue)
+                                            {
+                                            <tr>
+                                                <td class="title-bottom-text text-align-right">
+                                                    Manual Override:
+                                                </td>
+                                                <td class="title-bottom-text-right text-align-right">
+                                                    @Model.RefundedManualOverride.Value.ToString("c")
+                                                </td>
+                                            </tr>
+                                            }
+                                            <tr>
+                                                <td class="title-bottom-text text-align-right">
+                                                    Order Total:
+                                                </td>
+                                                <td class="title-bottom-text-right text-align-right">
+                                                    @Model.Total.ToString("c")
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            <tr class="empty"><td></td></tr>
+
+            @if (!string.IsNullOrEmpty(Model.PDFUrl))
+            {
+                <tr class="empty"><td></td></tr>
+                <tr>
+                    <td class="entrytextpdf">
+                        <img src="/assets/images/page_white_acrobat.png" alt="acrobat" align="left" />
+                        <a href="@Model.PDFUrl">Save as PDF</a>
+                    </td>
+                </tr>
+                <tr class="empty"><td></td></tr>
+            }
+        </tbody>
+    </table>
+}
