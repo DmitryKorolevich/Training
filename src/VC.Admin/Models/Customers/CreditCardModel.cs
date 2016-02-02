@@ -84,6 +84,9 @@ namespace VC.Admin.Models.Customer
         public bool IsSelected { get; set; }
 
         public int? IdCustomerPaymentMethod { get; set; }
+
+        [Map]
+        public bool Default { get; set; }
     }
 
     public class WireTransferPaymentModel : BaseModel

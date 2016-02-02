@@ -147,6 +147,15 @@ namespace VitalChoice.Business.Services.Dynamic
                     IdPaymentMethod = c
                 }).ToList();
 
+                await _paymentMethodMapper.SyncCollectionsAsync(dynamic.CustomerPaymentMethods, entity.CustomerPaymentMethods);
+                foreach (var paymentMethod in entity.CustomerPaymentMethods)
+                {
+                    if (paymentMethod.StatusCode == (int)RecordStatusCode.Deleted && paymentMethod.BillingAddress != null)
+                    {
+                        paymentMethod.BillingAddress.StatusCode = (int)RecordStatusCode.Deleted;
+                    }
+                }
+
                 entity.OrderNotes = dynamic.OrderNotes?.Select(c => new CustomerToOrderNote()
                 {
                     IdCustomer = dynamic.Id,

@@ -465,3 +465,14 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[CustomerPaymentMethodOptionTypes] WHERE [IdObjectType]=1 AND Name='Default')
+BEGIN
+	INSERT INTO [dbo].[CustomerPaymentMethodOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'Default', 5, NULL, 1, 'False')
+
+END
+
+GO

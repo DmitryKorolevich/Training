@@ -361,6 +361,21 @@ angular.module('app.modules.customer.services.customerEditService', [])
             });
         };
 
+        uiScope.setDefaultCreditCard = function ()
+        {
+            angular.forEach(uiScope.currentCustomer.CreditCards, function (creditCard, index)
+            {
+                if (index != uiScope.paymentInfoTab.CreditCardIndex && creditCard.Default)
+                {
+                    creditCard.Default = false;
+                }
+                else if (index == uiScope.paymentInfoTab.CreditCardIndex)
+                {
+                    creditCard.Default = true;
+                }
+            });
+        };        
+
         uiScope.setNewCreditCard = function (callback)
         {
             if (uiScope.forms.card.$valid) {
@@ -369,6 +384,10 @@ angular.module('app.modules.customer.services.customerEditService', [])
                         if (result.Success)
                         {
                             syncCountry(uiScope, result.Data.Address);
+                            if (uiScope.currentCustomer.CreditCards.length == 0)
+                            {
+                                result.Data.Default = true;
+                            }
                             uiScope.currentCustomer.CreditCards.push(result.Data);
                             if (uiScope.paymentInfoTab.CreditCardIndex === undefined) {
                                 uiScope.paymentInfoTab.CreditCardIndex = "0";
