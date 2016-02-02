@@ -44,7 +44,6 @@ using VitalChoice.Business.Helpers;
 
 namespace VC.Admin.Controllers
 {
-    [AdminAuthorize(PermissionType.Orders)]
     public class OrderInvoiceController : BaseController
     {
         private readonly IOrderService _orderService;
@@ -88,6 +87,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
+        [AdminAuthorize(PermissionType.Orders)]
         public async Task<IActionResult> Base(int id)
         {
             var order = await _orderService.SelectAsync(id,true);
