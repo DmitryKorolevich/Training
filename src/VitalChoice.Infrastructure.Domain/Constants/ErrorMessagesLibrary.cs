@@ -14,7 +14,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
 		    public const string IncorrectUserPassword = "IncorrectUserPassword";
 		    public const string CantFindUser = "CantFindUser";
 		    public const string CantFindLogin = "CantFindLogin";
-		    public const string CantSignIn = "CanSignIn";
+		    public const string CantSignIn = "CantSignIn";
 		    public const string UserIsDisabled = "UserIsDisabled";
             public const string EmailIsTakenAlready = "EmailTakenAlready";
             public const string AgentIdIsTakenAlready = "AgentIdIsTakenAlready";

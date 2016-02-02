@@ -3,7 +3,10 @@
 $(function () {
 	changeSaveButtonLabel($("#hdCreditCard").val());
 
-	if (creditCards === undefined || creditCards.length == 0) {
+	creditCards = [];
+	if (creditCardsJson != "") {
+		creditCards = $.parseJSON(creditCardsJson);
+	} else {
 		$("#delSelected").hide();
 	}
 
