@@ -184,9 +184,12 @@ namespace VC.Public.Controllers
             }
             cart.Order.Data.ShippingUpgradeP = model.ShippingUpgradeP;
             cart.Order.Data.ShippingUpgradeNP = model.ShippingUpgradeNP;
-            if (!await _checkoutService.UpdateCart(cart))
+            if (ModelState.IsValid)
             {
-                return new Result<ViewCartModel>(false, model);
+                if (!await _checkoutService.UpdateCart(cart))
+                {
+                    return new Result<ViewCartModel>(false, model);
+                }
             }
             await FillModel(model, cart);
             SetCartUid(cart.CartUid);
@@ -267,6 +270,7 @@ namespace VC.Public.Controllers
 					return result;
                 }) ?? Enumerable.Empty<CartSkuModel>());
             var gcsInCart = cartModel.GiftCertificateCodes.ToArray();
+            var hasEmpty = gcsInCart.Any(g => string.IsNullOrWhiteSpace(g));
             cartModel.GiftCertificateCodes.Clear();
             foreach (var code in gcsInCart)
             {
@@ -274,10 +278,6 @@ namespace VC.Public.Controllers
                 {
                     cartModel.GiftCertificateCodes.Add(code);
                     code.ErrorMessage = "Gift Certificate not Found";
-                }
-                if (string.IsNullOrWhiteSpace(code.Value))
-                {
-                    cartModel.GiftCertificateCodes.Add(code);
                 }
             }
             cartModel.GiftCertificateCodes.AddRange(
@@ -293,6 +293,10 @@ namespace VC.Public.Controllers
                     };
                 }) ??
                 Enumerable.Empty<CartGcModel>());
+            if (hasEmpty)
+            {
+                cartModel.GiftCertificateCodes.Add(new CartGcModel() {Value = string.Empty});
+            }
             cartModel.ShippingUpgradeNPOptions = context.ShippingUpgradeNpOptions;
             cartModel.ShippingUpgradePOptions = context.ShippingUpgradePOptions;
             cartModel.DiscountTotal = -context.DiscountTotal;
