@@ -136,11 +136,13 @@ namespace VC.Public.Controllers
 
             if (!ModelState.IsValid)
             {
-	            model.ShippingDateError = ModelState["ShippingDate"].Errors.Select(x => x.ErrorMessage).FirstOrDefault();
-				return model;
+                model.ShippingDateError = ModelState["ShippingDate"].Errors.Select(x => x.ErrorMessage).FirstOrDefault();
+                //return model;
             }
-
-            model.ShippingDateError = string.Empty;
+            else
+            {
+                model.ShippingDateError = string.Empty;
+            }
             var existingUid = Request.GetCartUid();
             CustomerCartOrder cart;
             if (await CustomerLoggedIn())
@@ -272,6 +274,10 @@ namespace VC.Public.Controllers
                 {
                     cartModel.GiftCertificateCodes.Add(code);
                     code.ErrorMessage = "Gift Certificate not Found";
+                }
+                if (string.IsNullOrWhiteSpace(code.Value))
+                {
+                    cartModel.GiftCertificateCodes.Add(code);
                 }
             }
             cartModel.GiftCertificateCodes.AddRange(
