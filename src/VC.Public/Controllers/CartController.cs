@@ -270,7 +270,7 @@ namespace VC.Public.Controllers
 					return result;
                 }) ?? Enumerable.Empty<CartSkuModel>());
             var gcsInCart = cartModel.GiftCertificateCodes.ToArray();
-            var hasEmpty = gcsInCart.Any(g => string.IsNullOrWhiteSpace(g));
+            var hasEmpty = gcsInCart.Any(g => string.IsNullOrWhiteSpace(g.Value));
             cartModel.GiftCertificateCodes.Clear();
             foreach (var code in gcsInCart)
             {

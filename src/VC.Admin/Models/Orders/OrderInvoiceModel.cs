@@ -265,7 +265,7 @@ namespace VC.Admin.Models.Orders
                             {
                                 CreditCardInformationRow = order.PaymentMethod.SafeData.CardNumber;
                                 CreditCardInformationRow = CreditCardInformationRow.Replace("X", "");
-                                CreditCardInformationRow += String.Format("{0} exp {1}/{2}", CreditCardInformationRow, ((DateTime)order.PaymentMethod.SafeData.ExpDate).Month,
+                                CreditCardInformationRow = String.Format("{0} exp {1}/{2}", CreditCardInformationRow, ((DateTime)order.PaymentMethod.SafeData.ExpDate).Month,
                                     ((DateTime)order.PaymentMethod.SafeData.ExpDate).Year);
                             }
                         }
