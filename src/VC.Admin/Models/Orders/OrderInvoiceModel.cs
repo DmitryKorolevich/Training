@@ -16,6 +16,12 @@ using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
+using System.Threading.Tasks;
+using VitalChoice.Interfaces.Services.Settings;
+using VitalChoice.Business.Helpers;
+using VitalChoice.Infrastructure.Domain.Constants;
 
 namespace VC.Admin.Models.Orders
 {
@@ -187,10 +193,48 @@ namespace VC.Admin.Models.Orders
         }
 
         public void FillAdditionalFields(OrderDynamic order, CustomerDynamic customer, AdminProfile adminProfile, 
-            IAppInfrastructureService appInfrastructureService, TimeZoneInfo pstTimeZoneInfo, ITrackingService trackingService)
+            IAppInfrastructureService appInfrastructureService, TimeZoneInfo pstTimeZoneInfo, ITrackingService trackingService,
+            IDynamicMapper<AddressDynamic, OrderAddress> addressMapper, ICountryService countryService)
         {
+            if (order.ShippingAddress != null)
+            {
+                this.ShippingAddress = addressMapper.ToModel<AddressModel>(order.ShippingAddress);
+                FillAdditionalAddressFields(this.ShippingAddress, countryService);
+            }
+            if(order?.PaymentMethod.IdObjectType== (int)PaymentMethodType.NoCharge && customer.ProfileAddress!=null)
+            {
+                this.BillingAddress = addressMapper.ToModel<AddressModel>(customer.ProfileAddress);
+                FillAdditionalAddressFields(this.BillingAddress, countryService);
+            }
+            else if(order?.PaymentMethod?.Address != null)
+            {
+                this.BillingAddress = addressMapper.ToModel<AddressModel>(order.PaymentMethod.Address);
+                FillAdditionalAddressFields(this.BillingAddress, countryService);
+            }
             FillGeneralInfo(order, customer, adminProfile, pstTimeZoneInfo, trackingService);
             FillPaymentInfo(order, customer, appInfrastructureService);
+        }
+
+        private void FillAdditionalAddressFields(AddressModel addressModel, ICountryService countryService)
+        {
+            if (addressModel != null && addressModel.Country != null)
+            {
+                var country = countryService.GetCountryAsync(addressModel.Country.Id).Result;
+                if (country != null)
+                {
+                    addressModel.Country.CountryCode = country.CountryCode;
+                    if (addressModel.State != 0)
+                    {
+                        var state = country.States.FirstOrDefault(p => p.Id == addressModel.State);
+                        if (state != null)
+                        {
+                            addressModel.StateCode = state.StateCode;
+                        }
+                    }
+                }
+                addressModel.Phone = addressModel.Phone.FormatAsPhone(BaseAppConstants.BASE_PHONE_FORMAT);
+                addressModel.Fax = addressModel.Fax.FormatAsPhone(BaseAppConstants.BASE_PHONE_FORMAT);
+            }
         }
 
         private void FillGeneralInfo(OrderDynamic order, CustomerDynamic customer, AdminProfile adminProfile, 

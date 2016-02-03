@@ -167,40 +167,8 @@ namespace VC.Admin.Controllers
                 adminProfile = await _adminUserService.GetAdminProfileAsync(order.IdEditedBy.Value);
             }
             OrderInvoiceModel toReturn = _mapper.ToModel<OrderInvoiceModel>(order);
-            if (order.ShippingAddress != null)
-            {
-                toReturn.ShippingAddress = _addressMapper.ToModel<AddressModel>(order.ShippingAddress);
-                await FillAdditionalFields(toReturn.ShippingAddress);
-            }
-            if (order?.PaymentMethod?.Address != null)
-            {
-                toReturn.BillingAddress = _addressMapper.ToModel<AddressModel>(order.PaymentMethod.Address);
-                await FillAdditionalFields(toReturn.BillingAddress);
-            }
-            toReturn.FillAdditionalFields(order, customer, adminProfile, _appInfrastructureService,_pstTimeZoneInfo, _trackingService);
+            toReturn.FillAdditionalFields(order, customer, adminProfile, _appInfrastructureService,_pstTimeZoneInfo, _trackingService,_addressMapper, _countryService);
             return toReturn;
-        }
-
-        private async Task FillAdditionalFields(AddressModel addressModel)
-        {
-            if (addressModel != null && addressModel.Country != null)
-            {
-                var country = await _countryService.GetCountryAsync(addressModel.Country.Id);
-                if (country != null)
-                {
-                    addressModel.Country.CountryCode = country.CountryCode;
-                    if (addressModel.State!=0)
-                    {
-                        var state = country.States.FirstOrDefault(p => p.Id == addressModel.State);
-                        if (state != null)
-                        {
-                            addressModel.StateCode = state.StateCode;
-                        }
-                    }
-                }
-                addressModel.Phone = addressModel.Phone.FormatAsPhone(BaseAppConstants.BASE_PHONE_FORMAT);
-                addressModel.Fax = addressModel.Fax.FormatAsPhone(BaseAppConstants.BASE_PHONE_FORMAT);
-            }
-        }        
+        }     
     }
 }

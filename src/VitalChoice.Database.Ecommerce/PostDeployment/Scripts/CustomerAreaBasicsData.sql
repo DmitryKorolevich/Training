@@ -476,3 +476,13 @@ BEGIN
 END
 
 GO
+
+IF EXISTS(SELECT [Id] FROM [dbo].[AddressOptionTypes] WHERE [IdObjectType]=3 AND Name='Email')
+BEGIN
+	DELETE AddressOptionValues
+	WHERE IdOptionType IN
+	(SELECT Id  FROM [dbo].[AddressOptionTypes]
+	WHERE [IdObjectType]=3 AND Name='Email')
+END
+
+GO

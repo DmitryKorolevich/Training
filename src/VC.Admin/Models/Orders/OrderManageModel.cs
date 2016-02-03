@@ -216,10 +216,10 @@ namespace VC.Admin.Models.Orders
         public ShippingUpgradeOption? ShippingUpgradeNP { get; set; }
 
         [Map]
-        public decimal SurchargeOverride { get; set; }
+        public decimal? SurchargeOverride { get; set; }
 
         [Map]
-        public decimal ShippingOverride { get; set; }
+        public decimal? ShippingOverride { get; set; }
 
         [Map]
         public decimal ShippingTotal { get; set; }

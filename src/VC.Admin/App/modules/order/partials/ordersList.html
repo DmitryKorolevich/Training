@@ -212,7 +212,7 @@
                         <td>{{::item.Total | currency}}</td>
                         <td>{{::item.DateEdited | date:"MM/dd/yy"}}<br />{{::item.DateEdited | date:"h:mm a"}}<br />{{::item.EditedByAgentId}}</td>
                         <td>
-                            <a class="btn btn-default btn-success btn-xs" target="_blank" data-ng-href="/api/orderinvoice/base/{{::item.Id}}">
+                            <a class="btn btn-default btn-primary btn-xs" target="_blank" data-ng-href="/api/orderinvoice/base/{{::item.Id}}">
                                 <i class="fa fa-search"></i>
                             </a>
                             <button title="Edit" class="btn btn-default btn-success btn-xs" data-ng-click="openOrder(item.Id);">
