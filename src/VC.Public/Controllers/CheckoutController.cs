@@ -100,22 +100,17 @@ namespace VC.Public.Controllers
 			var billingInfoModel = new AddUpdateBillingAddressModel();
 			if (await CustomerLoggedIn())
 			{
-				//var appInfr = _appInfrastructureService.Get();
+				var currentCustomer = await GetCurrentCustomerDynamic();
 
-				//var currentCustomer = await GetCurrentCustomerDynamic();
+				var creditCards = currentCustomer.CustomerPaymentMethods
+					.Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard).ToList();
 
-				//var creditCards = currentCustomer.CustomerPaymentMethods
-				//	.Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard).ToList();
-
-				//billingInfoModel.CreditCards = creditCards.ToDictionary(x => x.Id,
-				//	y => appInfr.CreditCardTypes.Single(z=>z.Key == y.Data.)
-				//		", ending in " + ((string) y.Address.Data.CardNumber).Substring(((string) y.Address.Data.CardNumber).Length - 4));
-
-				//var firstCreditCard = creditCards.FirstOrDefault();
-				//if (firstCreditCard != null)
-				//{
-				//	_addressConverter.UpdateModel(billingInfoModel.AddressDetails, firstCreditCard.Address);
-				//}
+				var firstCreditCard = creditCards.FirstOrDefault();
+				if (firstCreditCard != null)
+				{
+					_addressConverter.UpdateModel(billingInfoModel.BillingAddress, firstCreditCard.Address);
+					_paymentMethodConverter.UpdateModel(billingInfoModel.BillingAddress, firstCreditCard);
+				}
 			}
 			else
 			{

@@ -14,6 +14,7 @@
 	<script src="@Url.Content("/app/modules/checkout/checkoutMain.js")"></script>
 	<script src="@Url.Content("/app/common/dataAccess.js")"></script>
 	<script src="@Url.Content("/app/modules/auth/registration.js")"></script>
+	<script src="@Url.Content("/app/common/billing.js")"></script>
 	<script src="@Url.Content("/app/modules/checkout/billingInfo.js")"></script>
 }
 
@@ -22,155 +23,72 @@
 </script>
 
 <div class="checkout-step-container working-area-holder">
-	<img src="/assets/images/checkout/step2.gif"/>
+	<img src="/assets/images/checkout/step2.jpg"/>
 	<h4 class="checkout-step-heading">2. Billing Address Details</h4>
 	<span class="checkout-notification-important">Please enter your billing address below.</span>
 	<span class="checkout-notification-simple">An accurate billing address is essential to get your order to you quickly.</span>
+	<span class="checkout-notification-important">Shopping online with Vital Choice is extremely safe. All information is encrypted.</span>
 	<div class="columns-container checkout-columns-container">
-		@using (Html.BeginForm("ChangeBillingInfo", "Profile", null, FormMethod.Post, new {@class = "form-regular medium-small", role = "form"}))
+		@using (Html.BeginForm("AddUpdateBillingAddress", "Checkout", null, FormMethod.Post, new {@class = "form-regular medium-small", role = "form"}))
 		{
 			<input id="hdCountry" value="@Html.DisplayForEx(x => x.BillingAddress.IdCountry)" type="hidden">
 			<input id="hdState" value="@Html.DisplayForEx(x => x.BillingAddress.IdState)" type="hidden">
+			<input id="hdCardType" value="@Html.DisplayForEx(x => x.BillingAddress.CardType)" type="hidden">
+			@Html.HiddenFor(m => m.BillingAddress.Id, new { @id = "hdCreditCard" })
 			@Html.AntiForgeryToken()
 			@Html.ValidationSummary(true, "")
 			<div class="form-group">
 				@Html.Label("SavedCards", "Saved Cards", new { @class = "control-label" })
 				<div class="input-group">
-					<select class="form-control" id="ddCreditCardsSelection"></select>
-					@*@Html.DropDownListFor(x=>x.BillingAddress.Cer)*@
+					@*@Html.DropDownListFor(x=>x.BillingAddress.Id, null)*@ <!--, Model.CreditCards.-->
 				</div>
 			</div>
 			<div class="form-group">
 				<div class="checkout-sections-divider"></div>
 			</div>
-			<div class="two-columns-block">
+			<div class="form-group">
+				<label class="control-label control-label-big">Pay with Credit Card</label>
+				<div class="input-group">
+					<img src="/Assets/images/checkout/ccicons.jpg" />
+				</div>
+			</div>
+
+			await Html.RenderPartialAsync("_AddUpdateBillingAddress", Model);
+
+			<div class="form-group">
+				<div class="checkout-sections-divider"></div>
+			</div>
+			if (!User.Identity.IsAuthenticated)
+			{
 				<div class="form-group">
-					@Html.LabelFor(m => m.Email, new {@class = "control-label"})
+					<span class="checkout-notification-important">For faster checkout and to receive customer rewards and incentives please register your account by providing a password.</span>
+				</div>
+				<span id="spPasswordHint" class="form-control-important-info">Must be at least 8 characters long, contain at least 1 numerical digit, 1 capital character and 1 special character.<br />Example: Dontuse!#1</span>
+				<div class="form-group">
+					@Html.LabelFor(m => m.Password, new { @class = "control-label" })
 					<div class="input-group">
-						@Html.TextBoxFor(m => m.Email, new {@class = "form-control"})
-						@Html.ValidationMessageFor(m => m.Email)
+						@Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+						@Html.ValidationMessageFor(m => m.Password, "")
 					</div>
 				</div>
 				<div class="form-group">
-					@Html.LabelFor(m => m.BillingAddress.FirstName, new {@class = "control-label"})
+					@Html.LabelFor(m => m.ConfirmPassword, new { @class = "control-label" })
 					<div class="input-group">
-						@Html.TextBoxFor(m => m.BillingAddress.FirstName, new {@class = "form-control"})
-						@Html.ValidationMessageFor(m => m.BillingAddress.FirstName)
+						@Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+						@Html.ValidationMessageFor(m => m.ConfirmPassword, "")
 					</div>
 				</div>
-				<div class="form-group">
-					@Html.LabelFor(m => m.BillingAddress.LastName, new {@class = "control-label"})
-					<div class="input-group">
-						@Html.TextBoxFor(m => m.BillingAddress.LastName, new {@class = "form-control"})
-						@Html.ValidationMessageFor(m => m.BillingAddress.LastName)
-					</div>
-				</div>
-				<div class="form-group">
-					@Html.LabelFor(m => m.BillingAddress.Company, new {@class = "control-label"})
-					<div class="input-group">
-						@Html.TextBoxFor(m => m.BillingAddress.Company, new {@class = "form-control"})
-						@Html.ValidationMessageFor(m => m.BillingAddress.Company)
-					</div>
-				</div>
-				<div class="form-group">
-					@Html.LabelFor(m => m.BillingAddress.IdCountry, new {@class = "control-label"})
-					<div class="input-group">
-						@Html.DropDownListFor(m => m.BillingAddress.IdCountry, new List<SelectListItem>(), new {@class = "form-control", @id = "ddCountry"})
-						@Html.ValidationMessageFor(m => m.BillingAddress.IdCountry)
-					</div>
-				</div>
-				<div class="form-group">
-					@Html.LabelFor(m => m.BillingAddress.Address1, new {@class = "control-label"})
-					<div class="input-group">
-						@Html.TextBoxFor(m => m.BillingAddress.Address1, new {@class = "form-control"})
-						@Html.ValidationMessageFor(m => m.BillingAddress.Address1)
-					</div>
-				</div>
+				<span id="spGuestNotify" style="display: none;" class="form-control-important-info">By checking out as a guest you will not be able to retrieve your order history or receive all the benefits of a registered user.</span>
 				<div class="form-group">
 					<label class="control-label"></label>
 					<div class="input-group">
-						@Html.TextBoxFor(m => m.BillingAddress.Address2, new {@class = "form-control"})
-						@Html.ValidationMessageFor(m => m.BillingAddress.Address2)
+						<label class="bold">
+							@Html.CheckBoxFor(m => m.GuestCheckout, new { @class = "form-control" })
+							No thank you. I would like to checkout as a guest
+						</label>
 					</div>
 				</div>
-			</div>
-			<div class="two-columns-block">
-				<div class="form-group">
-					@Html.LabelFor(m => m.BillingAddress.City, new {@class = "control-label"})
-					<div class="input-group">
-						@Html.TextBoxFor(m => m.BillingAddress.City, new {@class = "form-control"})
-						@Html.ValidationMessageFor(m => m.BillingAddress.City)
-					</div>
-				</div>
-				<div class="form-group">
-					<!--todo-->
-					@Html.LabelFor(m => m.BillingAddress.IdState, new {@class = "control-label"})
-					<div class="input-group">
-						@Html.DropDownListFor(m => m.BillingAddress.IdState, new List<SelectListItem>(), new {@class = "form-control", @id = "ddState"})
-						@Html.ValidationMessageFor(m => m.BillingAddress.IdState)
-					</div>
-				</div>
-				<div class="form-group">
-					<!--todo-->
-					@Html.LabelFor(m => m.BillingAddress.County, new {@class = "control-label"})
-					<div class="input-group">
-						@Html.TextBoxFor(m => m.BillingAddress.County, new {@class = "form-control", @id = "txtState"})
-						@Html.ValidationMessageFor(m => m.BillingAddress.County)
-					</div>
-				</div>
-				<div class="form-group">
-					@Html.LabelFor(m => m.BillingAddress.PostalCode, new {@class = "control-label"})
-					<div class="input-group">
-						@Html.TextBoxFor(m => m.BillingAddress.PostalCode, new {@class = "form-control"})
-						@Html.ValidationMessageFor(m => m.BillingAddress.PostalCode)
-					</div>
-				</div>
-				<div class="form-group">
-					@Html.LabelFor(m => m.BillingAddress.Phone, new {@class = "control-label"})
-					<div class="input-group">
-						@Html.TextBoxFor(m => m.BillingAddress.Phone, new {@class = "form-control phone-mask"})
-						@Html.ValidationMessageFor(m => m.BillingAddress.Phone)
-					</div>
-				</div>
-				<div class="form-group">
-					@Html.LabelFor(m => m.BillingAddress.Fax, new {@class = "control-label"})
-					<div class="input-group">
-						@Html.TextBoxFor(m => m.BillingAddress.Fax, new {@class = "form-control phone-mask"})
-						@Html.ValidationMessageFor(m => m.BillingAddress.Fax)
-					</div>
-				</div>
-			</div>
-			<div class="form-group">
-				<div class="checkout-sections-divider"></div>
-			</div>
-			<div class="form-group">
-				<span class="checkout-notification-important">For faster checkout and to receive customer rewards and incentives please register your account by providing a password.</span>
-			</div>
-			<span id="spPasswordHint" class="form-control-important-info">Must be at least 8 characters long, contain at least 1 numerical digit, 1 capital character and 1 special character.<br />Example: Dontuse!#1</span>
-			<div class="form-group">
-				@Html.LabelFor(m => m.Password, new { @class = "control-label" })
-				<div class="input-group">
-					@Html.PasswordFor(m => m.Password, new { @class = "form-control" })
-					@Html.ValidationMessageFor(m => m.Password, "")
-				</div>
-			</div>
-			<div class="form-group">
-				@Html.LabelFor(m => m.ConfirmPassword, new {@class = "control-label"})
-				<div class="input-group">
-					@Html.PasswordFor(m => m.ConfirmPassword, new {@class = "form-control"})
-					@Html.ValidationMessageFor(m => m.ConfirmPassword, "")
-				</div>
-			</div>
-			<span id="spGuestNotify" style="display: none;" class="form-control-important-info">By checking out as a guest you will not be able to retrieve your order history or receive all the benefits of a registered user.</span>
-			<div class="form-group">
-				<label class="control-label"></label>
-				<div class="input-group">
-					<label class="bold">
-						@Html.CheckBoxFor(m => m.GuestCheckout, new {@class = "form-control"})
-						No thank you. I would like to checkout as a guest
-					</label>
-				</div>
-			</div>
+			}
 			<img class="billing-advert-image" src="/Assets/images/checkout/subscribe-promo-bar-5-16-13-A.png"/>
 			<div class="form-group">
 				<label class="control-label"></label>

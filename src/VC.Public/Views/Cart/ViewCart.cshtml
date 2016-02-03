@@ -28,7 +28,7 @@
 			<span class="shopping-notice-note">NOTE:</span><span>We cannot ship frozen foods to Canada, due to cost and excessive delays.</span>
 			<ul>
 				<li>
-					Free shipping on orders of $99 or more does not apply to Canada.<br />
+					Free shipping on orders of $99 or more does not apply to Canada.<br/>
 					Please call 800-608-4825 to place your order. <a href="#">Click here for details.</a>
 				</li>
 				<li>Frozen goods sent to Alaska or Hawaii* are subject to surcharges: <a href="#">Click here for details.</a></li>
@@ -36,7 +36,7 @@
 		</div>
 		<span>Please review your purchases and quantities, then click the Checkout button.</span>
 	</div>
-	@using (Html.BeginForm("UpdateCart", "Cart", null, FormMethod.Post, new { @class = "form-cart", role = "form", @id="viewCartForm", data_bind = "submit: submitCart" }))
+	@using (Html.BeginForm("UpdateCart", "Cart", null, FormMethod.Post, new {@class = "form-cart", role = "form", @id = "viewCartForm", data_bind = "submit: submitCart"}))
 	{
 		<div class="cart-certificates-container">
 			<a name="trustlink" href="http://secure.trust-guard.com/certificates/5867" target="_blank"
@@ -48,16 +48,21 @@
 				<img src="/assets/images/guarantee2-cart.jpg"/>
 			</a>
 		</div>
-		<div class="cart-control-container">
-			<a href="/" class="button arrow-left-red">Continue Shopping</a>
-			<input type="submit" class="checkout-blue" value="Checkout"/>
-		</div>
+		<div class="cart-overlay-container">
+			<div class="overlay" data-bind="visible:refreshing">
+				<div class="loading">Loading…</div>
+			</div>
+			<div class="cart-control-container">
+				<a href="/" class="button arrow-left-red">Continue Shopping</a>
+				<input type="submit" class="checkout-blue" value="Checkout"/>
+			</div>
 
-		await Html.RenderPartialAsync("_ViewCart");
+			@(await Html.PartialAsync("_ViewCart", Model, ViewData))
 
-		<div class="cart-control-container">
-			<a href="/" class="button arrow-left-red">Continue Shopping</a>
-			<input type="submit" class="checkout-blue" value="Checkout" />
+			<div class="cart-control-container">
+				<a href="/" class="button arrow-left-red">Continue Shopping</a>
+				<input type="submit" class="checkout-blue" value="Checkout"/>
+			</div>
 		</div>
 	}
 </div>
