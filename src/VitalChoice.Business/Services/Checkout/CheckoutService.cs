@@ -78,7 +78,7 @@ namespace VitalChoice.Business.Services.Checkout
             if (uid.HasValue)
             {
                 var cartForCheck = await _cartRepository.Query(c => c.CartUid == uid.Value).SelectFirstOrDefaultAsync(false);
-                if (cartForCheck?.IdCustomer != null)
+                if (cartForCheck?.IdCustomer != null && cartForCheck.IdOrder != null)
                 {
                     return await GetOrCreateCart(uid, cartForCheck.IdCustomer.Value);
                 }
