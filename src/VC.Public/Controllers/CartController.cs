@@ -22,6 +22,7 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
+using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 using VitalChoice.Validation.Models;
 
 namespace VC.Public.Controllers
@@ -316,8 +317,8 @@ namespace VC.Public.Controllers
             {
                 cartModel.ShipAsap = true;
             }
-            cartModel.ShippingUpgradeP = order.SafeData.ShippingUpgradeP;
-            cartModel.ShippingUpgradeNP = order.SafeData.ShippingUpgradeNP;
+            cartModel.ShippingUpgradeP = (ShippingUpgradeOption?)order.SafeData.ShippingUpgradeP;
+            cartModel.ShippingUpgradeNP = (ShippingUpgradeOption?)order.SafeData.ShippingUpgradeNP;
 
 	        if (!cartModel.GiftCertificateCodes.Any())
 	        {

@@ -78,7 +78,7 @@ namespace VitalChoice.Business.Services.Checkout
             if (uid.HasValue)
             {
                 var cartForCheck = await _cartRepository.Query(c => c.CartUid == uid.Value).SelectFirstOrDefaultAsync(false);
-                if (cartForCheck?.IdCustomer != null)
+                if (cartForCheck?.IdCustomer != null && cartForCheck.IdOrder != null)
                 {
                     return await GetOrCreateCart(uid, cartForCheck.IdCustomer.Value);
                 }
@@ -109,7 +109,7 @@ namespace VitalChoice.Business.Services.Checkout
             {
                 Amount = g.Amount,
                 GiftCertificate = g.GiftCertificate
-            }).ToList();
+            }).ToList() ?? new List<GiftCertificateInOrder>();
             newOrder.Discount = await _discountMapper.FromEntityAsync(cart.Discount, true);
             newOrder.Skus = cart.Skus?.Select(s =>
             {
@@ -127,7 +127,7 @@ namespace VitalChoice.Business.Services.Checkout
                     ProductWithoutSkus = product,
                     Quantity = s.Quantity
                 };
-            }).ToList();
+            }).ToList() ?? new List<SkuOrdered>();
             newOrder.ShippingAddress = await _addressService.CreatePrototypeAsync((int) AddressType.Shipping);
             newOrder.ShippingAddress.IdCountry = (await _countryService.GetCountriesAsync(new CountryFilter
             {
