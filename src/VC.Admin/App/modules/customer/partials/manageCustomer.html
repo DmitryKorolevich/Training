@@ -284,10 +284,11 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <select class="form-control" id="selectPaymentMethod" data-ng-disabled="paymentInfoTab.PaymentMethodType != 1 || !currentCustomer.CreditCards || currentCustomer.CreditCards.length == 0" data-ng-model="paymentInfoTab.CreditCardIndex"
-                                                        data-ng-options="idx as (getCreditCardTypeName(creditCard.CardType) + ', ending in ' + getLast4(creditCard.CardNumber)) for (idx, creditCard) in currentCustomer.CreditCards"></select>
+                                                        data-ng-options="idx as (getCreditCardTypeName(creditCard.CardType) + ', ending in ' + getLast4(creditCard.CardNumber) + (creditCard.Default ? ' (Default)' : '')) for (idx, creditCard) in currentCustomer.CreditCards"></select>
                                             </div>
-                                            <div class="col-md-3">
-                                                <button class="btn btn-danger pull-right" data-ng-show="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex] && paymentInfoTab.PaymentMethodType == 1" data-ng-click="deleteSelectedCreditCard();">Delete</button>
+                                            <div class="col-md-3 padding-l-0px">
+                                                <button class="btn btn-danger pull-right" data-ng-show="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex] && paymentInfoTab.PaymentMethodType == 1 && !currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].Default" data-ng-click="deleteSelectedCreditCard();">Delete</button>
+                                                <button class="btn btn-success pull-right margin-right-8px" data-ng-show="!currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].Default && paymentInfoTab.PaymentMethodType == 1 && currentCustomer.CreditCards && currentCustomer.CreditCards.length>0" data-ng-click="setDefaultCreditCard();">Set as Default</button>
                                             </div>
                                         </div>
                                         <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(2) >= 0">

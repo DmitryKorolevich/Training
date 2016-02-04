@@ -290,34 +290,63 @@ namespace VitalChoice.Business.Helpers
 
         public static IList<LookupItem<int>> GetShortPaymentMethods(IList<LookupItem<int>> paymentMethods)
         {
-            foreach(var paymentMethod in paymentMethods)
+            List<LookupItem<int>> toReturn = new List<LookupItem<int>>();
+            foreach (var paymentMethod in paymentMethods)
             {
                 switch (paymentMethod.Key)
                 {
                     case 1:
-                        paymentMethod.Text = "CC";
+                        toReturn.Add(new LookupItem<int>()
+                        {
+                            Key = 1,
+                            Text = "CC"
+                        });
                         break;
                     case 2:
-                        paymentMethod.Text = "OAC";
+                        toReturn.Add(new LookupItem<int>()
+                        {
+                            Key = 2,
+                            Text = "OAC"
+                        });
                         break;
                     case 3:
-                        paymentMethod.Text = "Check";
+                        toReturn.Add(new LookupItem<int>()
+                        {
+                            Key = 3,
+                            Text = "Check"
+                        });
                         break;
                     case 4:
-                        paymentMethod.Text = "NC";
+                        toReturn.Add(new LookupItem<int>()
+                        {
+                            Key = 4,
+                            Text = "NC"
+                        });
                         break;
                     case 5:
-                        paymentMethod.Text = "PP";
+                        toReturn.Add(new LookupItem<int>()
+                        {
+                            Key = 5,
+                            Text = "PP"
+                        });
                         break;
                     case 6:
-                        paymentMethod.Text = "WT";
+                        toReturn.Add(new LookupItem<int>()
+                        {
+                            Key = 6,
+                            Text = "WT"
+                        });
                         break;
                     case 8:
-                        paymentMethod.Text = "Employee";
+                        toReturn.Add(new LookupItem<int>()
+                        {
+                            Key = 7,
+                            Text = "Employee"
+                        });
                         break;
                 }
             }
-            return paymentMethods;
+            return toReturn;
         }
 
         public static IList<LookupItem<int?>> GetVisibleOptions()

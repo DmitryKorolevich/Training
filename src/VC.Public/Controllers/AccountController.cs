@@ -64,8 +64,11 @@ namespace VC.Public.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Login(LoginModel model, string returnUrl)
 	    {
+			ViewBag.ReturnUrl = returnUrl;
 			if (!ModelState.IsValid)
+		    {
 				return View(model);
+			}
 
             ApplicationUser user = null;
             try
@@ -318,16 +321,19 @@ namespace VC.Public.Controllers
 		}
 
         [HttpGet]
-        public IActionResult ForgotPassword()
+        public IActionResult ForgotPassword(string returnUrl)
         {
-            return View(new ForgotPasswordEmailModel());
+			ViewBag.ReturnUrl = returnUrl;
+			return View(new ForgotPasswordEmailModel());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ForgotPassword(ForgotPasswordEmailModel model)
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordEmailModel model, string returnUrl)
         {
-            if (!ModelState.IsValid)
+			ViewBag.ReturnUrl = returnUrl;
+
+			if (!ModelState.IsValid)
                 return View(model);
 
             var user = await _userService.FindAsync(model.Email);
@@ -338,7 +344,12 @@ namespace VC.Public.Controllers
 
             await _userService.SendForgotPasswordAsync(user.PublicId);
 
-            return RedirectToAction("Login",new { forgot = true });
+			if (!string.IsNullOrWhiteSpace(returnUrl))
+			{
+				return Redirect(returnUrl);
+			}
+
+			return RedirectToAction("Login",new { forgot = true });
         }
 
 		[HttpGet]

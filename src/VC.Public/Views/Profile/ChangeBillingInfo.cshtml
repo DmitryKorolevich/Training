@@ -9,12 +9,13 @@
 @section PageScripts {
 	<script src="@Url.Content("/app/common/dataAccess.js")"></script>
 	<script src="@Url.Content("/app/modules/auth/registration.js")"></script>
+    <script src="@Url.Content("/app/common/billing.js")"></script>
     <script src="@Url.Content("/app/modules/profile/billingInfo.js")"></script>
     <script src="@Url.Content("/app/modules/profile/gccheckform.js")"></script>
 }
 
 <script>
-	var creditCards = @Html.Raw((string)ViewBag.CreditCards);
+	var creditCardsJson = '@Html.Raw(ViewBag.CreditCards)';
 	successMessage = '@ViewBag.SuccessMessage';
 </script>
 

@@ -1,27 +1,15 @@
-﻿var creditCardTypes = null;
-
-$(function () {
+﻿$(function () {
 	changeSaveButtonLabel($("#hdCreditCard").val());
 
-	if (creditCards === undefined || creditCards.length == 0) {
+	creditCards = [];
+	if (creditCardsJson != "") {
+		creditCards = $.parseJSON(creditCardsJson);
+	} else {
 		$("#delSelected").hide();
 	}
 
-	getCreditCardTypes(function (result) {
-		creditCardTypes = result.Data;
-
-		$.each(result.Data, function (creditTypeIndex, creditType) {
-			$("#ddCardType").append($('<option></option>').val(creditType.Key).html(creditType.Text));
-		});
-
-		var idCreditType = $("#hdCardType").val();
-		if (idCreditType) {
-			$("#ddCardType").val(idCreditType);
-		}
-
+	populateCardTypes(function() {
 		populateCreditCardsSelection(creditCards, false);
-	}, function(errorResult) {
-		//todo: handle result
 	});
 
 	$("body").on("change", "#ddCreditCardsSelection", function() {
@@ -84,7 +72,7 @@ $(function () {
 					notifyError(result.Messages[0].Message);
 				}
 			}, function(errorResult) {
-				//todo: handle result
+				notifyError();
 			});
 		});
 	});
@@ -114,7 +102,9 @@ function changeSelection(id) {
 		return item.Id == id;
 	})[0];
 
-	setChangedData(selectedCreditCard);
+	setChangedData(selectedCreditCard, function (selectedCreditCard) {
+		changeSaveButtonLabel(selectedCreditCard.Id);
+	});
 
 	$("#ddCountry").trigger("change");
 }
@@ -125,6 +115,22 @@ function changeSaveButtonLabel(id) {
 	} else {
 		$("input[type=submit]").val("Update");
 	}
+}
+
+function deleteCreditCard(idCreditCard, successCallback, errorCallback) {
+	$.ajax({
+		type: "POST",
+		url: "/Profile/DeleteBillingInfo/" + idCreditCard,
+		dataType: "json"
+	}).success(function (result) {
+		if (successCallback) {
+			successCallback(result);
+		}
+	}).error(function (result) {
+		if (errorCallback) {
+			errorCallback(result);
+		}
+	});
 }
 
 function setChangedData(selectedCreditCard) {
@@ -158,20 +164,4 @@ function setChangedData(selectedCreditCard) {
 	$("form").removeData("validator");
 	$("form").removeData("unobtrusiveValidation");
 	$.validator.unobtrusive.parse("form");
-}
-
-function deleteCreditCard(idCreditCard, successCallback, errorCallback) {
-	$.ajax({
-		type: "POST",
-		url: "/Profile/DeleteBillingInfo/" + idCreditCard,
-		dataType: "json"
-	}).success(function (result) {
-		if (successCallback) {
-			successCallback(result);
-		}
-	}).error(function (result) {
-		if (errorCallback) {
-			errorCallback(result);
-		}
-	});
 }

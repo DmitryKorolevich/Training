@@ -21,6 +21,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Entities.VitalGreen;
 using VitalChoice.Infrastructure.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Entities.Tokens;
 
 namespace VitalChoice.Infrastructure.Context
 {
@@ -613,6 +614,14 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("Redirects");
                 entity.Ignore(p => p.AddedBy);
                 entity.Ignore(p => p.EditedBy);
+            });
+
+            builder.Entity<Token>(entity =>
+            {
+                entity.HasKey(t => t.IdToken);
+                entity.ToTable("Tokens");
+                entity.Ignore(p => p.Id);
+                entity.Property(t => t.IdToken).ValueGeneratedOnAdd();
             });
         }
     }

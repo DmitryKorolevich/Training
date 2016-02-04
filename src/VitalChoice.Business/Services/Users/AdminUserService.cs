@@ -17,16 +17,33 @@ using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using System;
 using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Data.Repositories;
 
 namespace VitalChoice.Business.Services.Users
 {
 	public class AdminUserService : UserService, IAdminUserService
-	{
-		public AdminUserService(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, IDataContextAsync context, SignInManager<ApplicationUser> signInManager, IAppInfrastructureService appInfrastructureService, INotificationService notificationService, IOptions<AppOptions> options, IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync, IUserValidator<ApplicationUser> userValidator) : base(userManager, roleManager, context, signInManager, appInfrastructureService, notificationService, options, ecommerceRepositoryAsync, userValidator)
+    {
+        private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
+
+        public AdminUserService(UserManager<ApplicationUser> userManager,
+            RoleManager<ApplicationRole> roleManager,
+            IDataContextAsync context, SignInManager<ApplicationUser> signInManager, 
+            IAppInfrastructureService appInfrastructureService, INotificationService notificationService, 
+            IOptions<AppOptions> options,
+            IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync,
+            IRepositoryAsync<AdminProfile> adminProfileRepository,
+            IUserValidator<ApplicationUser> userValidator) : 
+            base(userManager, roleManager, context, signInManager, appInfrastructureService, notificationService, options, ecommerceRepositoryAsync, userValidator)
 		{
+            _adminProfileRepository = adminProfileRepository;
 		}
 
-		public async Task<bool> IsSuperAdmin(ApplicationUser user)
+        public async Task<AdminProfile> GetAdminProfileAsync(int id)
+        {
+            return (await _adminProfileRepository.Query(p => p.Id == id).SelectAsync(false)).FirstOrDefault();
+        }
+
+        public async Task<bool> IsSuperAdmin(ApplicationUser user)
 		{
 			return await UserManager.IsInRoleAsync(user, AppInfrastructureService.Get()
 				.AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser)

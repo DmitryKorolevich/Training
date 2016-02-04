@@ -136,6 +136,11 @@ namespace VitalChoice.Core.DependencyInjection
             services.Configure<AppOptions>(options =>
             {
                 ConfigureAppOptions(configuration, options);
+                options.PDFMyUrl = new PDFMyUrl
+                {
+                    LicenseKey = configuration.GetSection("App:PDFMyUrl:LicenseKey").Value,
+                    ServiceUrl = configuration.GetSection("App:PDFMyUrl:ServiceUrl").Value,
+                };
             });
 
             services.Configure<MvcOptions>(ConfigureMvcOptions);
@@ -477,6 +482,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<RedirectService>().As<IRedirectService>().InstancePerLifetimeScope();
 			builder.RegisterType<EmailTemplateService>().As<IEmailTemplateService>().InstancePerLifetimeScope();
             builder.RegisterType<CheckoutService>().As<ICheckoutService>().InstancePerLifetimeScope();
+            builder.RegisterType<TrackingService>().As<ITrackingService>().InstancePerLifetimeScope();
             builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
             builder.RegisterModelConverters(projectAssembly);
 

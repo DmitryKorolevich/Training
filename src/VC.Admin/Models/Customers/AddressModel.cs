@@ -48,7 +48,9 @@ namespace VC.Admin.Models.Customer
 		[Map("IdState")]
 		public int State { get; set; }
 
-		[Map]
+        public string StateCode { get; set; }
+
+        [Map]
 		public string Zip { get; set; }
 
 		[Map]

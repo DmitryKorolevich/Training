@@ -13,5 +13,9 @@
         public const int DEFAULT_MAX_ALLOWED_PARAMS_SQL = 100;
         public const string DEFAULT_FORM_FIELD_NAME = "Field";
         public const string FAKE_CUSTOMER_EMAIL= "";
+        public const int DEFAULT_TOKEN_EXPIRED_MINUTES = 60;
+        public const string ORDER_INVOICE_PAGE_URL_TEMPLATE = "https://{0}/api/orderinvoice/pdf/{1}";
+        public const string PDF_URL_GENERATE_ORDER_INVOICE_TEMPLATE = "{0}?license={1}url={2}&page_size=Letter&orientation=portrait&filename=Vital+Choice+Seafood+Invoice-{3}.pdf";
+        public const string BASE_PHONE_FORMAT = "(___) ___-____? x_____";
     }
 }

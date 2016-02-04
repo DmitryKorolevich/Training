@@ -16,13 +16,13 @@
 }
 
 <div class="checkout-step-container working-area-holder">
-	<img src="/assets/images/checkout/step1.gif"/>
+	<img src="/assets/images/checkout/step1.jpg"/>
 	<h4 class="checkout-step-heading">1. Welcome</h4>
 	<span class="checkout-notification-important">Ordering from Vital Choice has never been faster or easier.</span>
 	<span class="checkout-notification-simple">Just fill out the information below to get started.</span>
 	<div class="columns-container welcome-columns-container">
-		<div class="two-columns-block" data-forgot-pass-success="@(ViewBag.ForgotPassSuccess != null && ViewBag.ForgotPassSuccess ? "Instructions on resetting your password have been emailed to your email address" : "")">
-			@using (Html.BeginForm("Login", "Account", new {ReturnUrl = ViewBag.ReturnUrl}, FormMethod.Post, new {@class = "form-regular small checkout-login-form", role = "form"}))
+		<div class="two-columns-block login" data-forgot-pass-success="@(ViewBag.ForgotPassSuccess != null && ViewBag.ForgotPassSuccess ? "Instructions on resetting your password have been emailed to your email address" : "")">
+			@using (Html.BeginForm("Welcome", "Checkout", FormMethod.Post, new { @class = "form-regular small checkout-login-form", role = "form" }))
 			{
 				@Html.AntiForgeryToken()
 				<h4>Account Login</h4>
@@ -45,13 +45,13 @@
 					<input type="submit" value="Login"/>
 				</div>
 				<div class="form-group">
-					Forgot your password? @Html.ActionLink("Click here to reset it.", "ForgotPassword", "Account")
+					Forgot your password? @Html.ActionLink("Click here to reset it.", "ForgotPassword", "Account", new { ReturnUrl = Url.Action("Welcome", new { forgot = true})})
 				</div>
 			}
 		</div>
 		<div class="checkout-columns-divider"></div>
 		<div class="two-columns-block welcome-centered-button">
-			<a class="button blue">Proceed as New Customer / Guest</a>
+			@Html.ActionLink("Proceed as New Customer / Guest", "AddUpdateBillingAddress", null, htmlAttributes: new { @class = "button blue" })
 		</div>
 	</div>
 </div>

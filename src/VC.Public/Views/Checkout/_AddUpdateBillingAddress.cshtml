@@ -1,0 +1,143 @@
+﻿@using System.Threading.Tasks
+@using VC.Public.Models.Checkout
+@model  VC.Public.Models.Checkout.AddUpdateBillingAddressModel
+
+<div class="form-group">
+	@Html.LabelFor(m => m.BillingAddress.NameOnCard, new { @class = "control-label" })
+	<div class="input-group">
+		@Html.TextBoxFor(m => m.BillingAddress.NameOnCard, new { @class = "form-control" })
+		@Html.ValidationMessageFor(m => m.BillingAddress.NameOnCard)
+	</div>
+</div>
+<div class="form-group">
+	@Html.LabelFor(m => m.BillingAddress.CardType, new { @class = "control-label" })
+	<div class="input-group">
+		@Html.DropDownListFor(m => m.BillingAddress.CardType, new List<SelectListItem>(), new { @class = "form-control", @id = "ddCardType" })
+		@Html.ValidationMessageFor(m => m.BillingAddress.CardType)
+	</div>
+</div>
+<div class="form-group">
+	@Html.LabelFor(m => m.BillingAddress.CardNumber, new { @class = "control-label" })
+	<div class="input-group">
+		@Html.TextBoxFor(m => m.BillingAddress.CardNumber, new { @class = "form-control", maxlength = "16" })
+		@Html.ValidationMessageFor(m => m.BillingAddress.CardNumber)
+	</div>
+</div>
+<div class="form-group form-control-container">
+	@Html.Label("ExpirationDate", "Expiration Date", new { @class = "control-label" })
+	<div class="input-group">
+		@Html.TextBoxFor(m => m.BillingAddress.ExpirationDateMonth, new { @class = "form-control small-form-control", maxlength = "2" })
+		<span>/</span>
+		@Html.TextBoxFor(m => m.BillingAddress.ExpirationDateYear, new { @class = "form-control small-form-control", maxlength = "2" })
+		@Html.ValidationMessageFor(m => m.BillingAddress.ExpirationDateMonth)
+		@Html.ValidationMessageFor(m => m.BillingAddress.ExpirationDateYear)
+	</div>
+</div>
+<div class="form-group">
+	@Html.LabelFor(m => m.BillingAddress.SecurityCode, new { @class = "control-label" })
+	<div class="input-group">
+		@Html.TextBoxFor(m => m.BillingAddress.SecurityCode, new { @class = "form-control small-form-control", maxlength = "4" })
+		<i class="tooltip-v glyphicon glyphicon-question-sign on-input-box" data-tooltip-title="What is a security code?" data-tooltip-body="Credit card security codes provide an additional measure of security when you make purchases online. <br>They may be called a card security code (CSC), card verification value (CVV or CV2), card verification code (CVC) or a card code verification (CCV).<br><br><strong>How to find your card's code</strong><br>Visa, MasterCard, or Discover cards:<ul><li>Turn the card over. </li><li>In the signature box or just to the right of it, you will see a series of numbers. </li><li>If you have only 3 numbers, those are the security code. </li><li>If you have 7 numbers, the last three are the security code.</li><li>If you have 19 numbers, the last three are the security code.</li></ul>American Express cards:<ul><li>The four-digit security code is shown on the front side.</li><li>The code appears to the left or right of the embossed 16-digit card number. </li><li>The four-digit security code is printed in black, and is not embossed.</li></ul>"></i>
+		@Html.ValidationMessageFor(m => m.BillingAddress.SecurityCode)
+	</div>
+</div>
+<div class="form-group">
+	<div class="checkout-sections-divider"></div>
+</div>
+<div class="two-columns-block">
+	<div class="form-group">
+		@Html.LabelFor(m => m.Email, new { @class = "control-label" })
+		<div class="input-group">
+			@Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+			@Html.ValidationMessageFor(m => m.Email)
+		</div>
+	</div>
+	<div class="form-group">
+		@Html.LabelFor(m => m.BillingAddress.FirstName, new { @class = "control-label" })
+		<div class="input-group">
+			@Html.TextBoxFor(m => m.BillingAddress.FirstName, new { @class = "form-control" })
+			@Html.ValidationMessageFor(m => m.BillingAddress.FirstName)
+		</div>
+	</div>
+	<div class="form-group">
+		@Html.LabelFor(m => m.BillingAddress.LastName, new { @class = "control-label" })
+		<div class="input-group">
+			@Html.TextBoxFor(m => m.BillingAddress.LastName, new { @class = "form-control" })
+			@Html.ValidationMessageFor(m => m.BillingAddress.LastName)
+		</div>
+	</div>
+	<div class="form-group">
+		@Html.LabelFor(m => m.BillingAddress.Company, new { @class = "control-label" })
+		<div class="input-group">
+			@Html.TextBoxFor(m => m.BillingAddress.Company, new { @class = "form-control" })
+			@Html.ValidationMessageFor(m => m.BillingAddress.Company)
+		</div>
+	</div>
+	<div class="form-group">
+		@Html.LabelFor(m => m.BillingAddress.IdCountry, new { @class = "control-label" })
+		<div class="input-group">
+			@Html.DropDownListFor(m => m.BillingAddress.IdCountry, new List<SelectListItem>(), new { @class = "form-control", @id = "ddCountry" })
+			@Html.ValidationMessageFor(m => m.BillingAddress.IdCountry)
+		</div>
+	</div>
+	<div class="form-group">
+		@Html.LabelFor(m => m.BillingAddress.Address1, new { @class = "control-label" })
+		<div class="input-group">
+			@Html.TextBoxFor(m => m.BillingAddress.Address1, new { @class = "form-control" })
+			@Html.ValidationMessageFor(m => m.BillingAddress.Address1)
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="control-label"></label>
+		<div class="input-group">
+			@Html.TextBoxFor(m => m.BillingAddress.Address2, new { @class = "form-control" })
+			@Html.ValidationMessageFor(m => m.BillingAddress.Address2)
+		</div>
+	</div>
+</div>
+<div class="two-columns-block">
+	<div class="form-group">
+		@Html.LabelFor(m => m.BillingAddress.City, new { @class = "control-label" })
+		<div class="input-group">
+			@Html.TextBoxFor(m => m.BillingAddress.City, new { @class = "form-control" })
+			@Html.ValidationMessageFor(m => m.BillingAddress.City)
+		</div>
+	</div>
+	<div class="form-group">
+		<!--todo-->
+		@Html.LabelFor(m => m.BillingAddress.IdState, new { @class = "control-label" })
+		<div class="input-group">
+			@Html.DropDownListFor(m => m.BillingAddress.IdState, new List<SelectListItem>(), new { @class = "form-control", @id = "ddState" })
+			@Html.ValidationMessageFor(m => m.BillingAddress.IdState)
+		</div>
+	</div>
+	<div class="form-group">
+		<!--todo-->
+		@Html.LabelFor(m => m.BillingAddress.County, new { @class = "control-label" })
+		<div class="input-group">
+			@Html.TextBoxFor(m => m.BillingAddress.County, new { @class = "form-control", @id = "txtState" })
+			@Html.ValidationMessageFor(m => m.BillingAddress.County)
+		</div>
+	</div>
+	<div class="form-group">
+		@Html.LabelFor(m => m.BillingAddress.PostalCode, new { @class = "control-label" })
+		<div class="input-group">
+			@Html.TextBoxFor(m => m.BillingAddress.PostalCode, new { @class = "form-control" })
+			@Html.ValidationMessageFor(m => m.BillingAddress.PostalCode)
+		</div>
+	</div>
+	<div class="form-group">
+		@Html.LabelFor(m => m.BillingAddress.Phone, new { @class = "control-label" })
+		<div class="input-group">
+			@Html.TextBoxFor(m => m.BillingAddress.Phone, new { @class = "form-control phone-mask" })
+			@Html.ValidationMessageFor(m => m.BillingAddress.Phone)
+		</div>
+	</div>
+	<div class="form-group">
+		@Html.LabelFor(m => m.BillingAddress.Fax, new { @class = "control-label" })
+		<div class="input-group">
+			@Html.TextBoxFor(m => m.BillingAddress.Fax, new { @class = "form-control phone-mask" })
+			@Html.ValidationMessageFor(m => m.BillingAddress.Fax)
+		</div>
+	</div>
+</div>

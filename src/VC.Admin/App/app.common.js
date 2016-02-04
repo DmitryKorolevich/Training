@@ -137,6 +137,11 @@ String.prototype.doPlaceDate = function (fDate) {
     return Date.doPlaceDate(this, fDate);
 };
 
+String.prototype.replaceAll = function(find, replace) {
+    var str = this;
+    return str.replace(new RegExp(find.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), replace);
+};
+
 if (!('format' in Date.prototype))
     Date.prototype.format = function (fFormat) {
         return Date.doPlaceDate(fFormat, this);

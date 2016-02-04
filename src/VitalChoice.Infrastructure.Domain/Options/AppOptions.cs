@@ -25,6 +25,7 @@ namespace VitalChoice.Infrastructure.Domain.Options
         public ExportService ExportService { get; set; }
         public CacheSyncOptions CacheSyncOptions { get; set; }
         public AuthorizeNet AuthorizeNet { get; set; }
+        public PDFMyUrl PDFMyUrl { get; set; }
     }
 
     public class CacheSyncOptions

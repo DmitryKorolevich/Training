@@ -63,21 +63,18 @@ namespace VitalChoice.Business.Services.Dynamic
 
                 if (dynamic.PromotionsToBuySkus != null)
                 {
-                    foreach (var item in dynamic.PromotionsToBuySkus)
-                    {
-                        item.Id = 0;
-                        item.IdPromotion = dynamic.Id;
-                    }
-                    entity.PromotionsToBuySkus.MergeKeyed(dynamic.PromotionsToBuySkus, sku => sku.IdSku);
+                    entity.PromotionsToBuySkus.MergeKeyed(dynamic.PromotionsToBuySkus, sku => sku.IdSku,
+                        (sku, rsku) => {
+                            sku.Quantity = rsku.Quantity;
+                        });
                 }
                 if (dynamic.PromotionsToGetSkus != null)
                 {
-                    foreach (var item in dynamic.PromotionsToGetSkus)
-                    {
-                        item.Id = 0;
-                        item.IdPromotion = dynamic.Id;
-                    }
-                    entity.PromotionsToGetSkus.MergeKeyed(dynamic.PromotionsToGetSkus, sku => sku.IdSku);
+                    entity.PromotionsToGetSkus.MergeKeyed(dynamic.PromotionsToGetSkus, sku => sku.IdSku,
+                        (sku, rsku)=> {
+                            sku.Percent = rsku.Percent;
+                            sku.Quantity = rsku.Quantity;
+                        });
                 }
                 entity.PromotionsToSelectedCategories.MergeKeyed(dynamic.SelectedCategoryIds, ecat => ecat.IdCategory, i => i,
                     i => new PromotionToSelectedCategory

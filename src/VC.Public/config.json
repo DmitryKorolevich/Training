@@ -72,6 +72,10 @@
       "SecretKey": "6LduhBETAAAAAKeX2NoU3T0IXqqQ2JgyhJ2PDtMK",
       "VerifyUrl": "https://www.google.com/recaptcha/api/siteverify"
     },
+    "PDFMyUrl": {
+      "LicenseKey": "sZ0ZaPUmBkt8&",
+      "ServiceUrl": "http://pdfmyurl.com/api"
+    },
     "CacheSettings": {
       "MaxProcessHeapsSizeBytes": 805306368, //768 Mb, entire application
       "CacheTimeToLeaveSeconds": 1800, //30 minutes

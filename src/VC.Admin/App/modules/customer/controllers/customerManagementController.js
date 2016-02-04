@@ -46,27 +46,41 @@ angular.module('app.modules.customer.controllers.customerManagementController', 
 
 		    $scope.pageChanged = function ()
 		    {
+		        if (!isCustomerFilterAllowSearch())
+		        {
+		            return;
+		        }
+
 		        refreshCustomers();
 		    };
 
 		    $scope.filterCustomers = function ()
 		    {
-		        if ((!$scope.filter.Email || $scope.filter.Email.length<3) &&
-                    (!$scope.filter.Address.LastName || $scope.filter.Address.LastName.length < 3) &&
-                    (!$scope.filter.Address.FirstName || $scope.filter.Address.FirstName.length < 3) &&
-                    (!$scope.filter.Address.Address1 || $scope.filter.Address.Address1.length < 3) &&
-                    (!$scope.filter.SearchText || $scope.filter.SearchText.length<3) &&
-                    (!$scope.filter.Address.City || $scope.filter.Address.City.length < 3) &&
-                    (!$scope.filter.Address.Zip || $scope.filter.Address.Zip.length < 3) &&
-                    (!$scope.filter.Address.Phone || $scope.filter.Address.Phone.length < 3))
+		        if (!isCustomerFilterAllowSearch())
 		        {                    
-					toaster.pop('error', "Info", "At least one field should be filled with at least 3 characters.");
                     return;
 		        }
 
 		        $scope.filter.Paging.PageIndex = 1;
 
 		        refreshCustomers();
+		    };
+
+		    var isCustomerFilterAllowSearch = function ()
+		    {
+		        if ((!$scope.filter.Email || $scope.filter.Email.length < 3) &&
+                    (!$scope.filter.Address.LastName || $scope.filter.Address.LastName.length < 3) &&
+                    (!$scope.filter.Address.FirstName || $scope.filter.Address.FirstName.length < 3) &&
+                    (!$scope.filter.Address.Address1 || $scope.filter.Address.Address1.length < 3) &&
+                    (!$scope.filter.SearchText || $scope.filter.SearchText.length < 3) &&
+                    (!$scope.filter.Address.City || $scope.filter.Address.City.length < 3) &&
+                    (!$scope.filter.Address.Zip || $scope.filter.Address.Zip.length < 3) &&
+                    (!$scope.filter.Address.Phone || $scope.filter.Address.Phone.length < 3))
+		        {
+		            toaster.pop('error', "Info", "At least one field should be filled with at least 3 characters.");
+		            return false;
+		        }
+		        return true;
 		    };
             
 		    $scope.getByStaticAutoComplete = function (val, field)
@@ -101,6 +115,16 @@ angular.module('app.modules.customer.controllers.customerManagementController', 
                             });
                         });
 		        }
+		    };
+
+		    $scope.applySort = function (columnName)
+		    {
+		        if (!isCustomerFilterAllowSearch())
+		        {
+		            return;
+		        }
+
+		        $scope.filter.Sorting.applySort(columnName);
 		    };
 
 		    initialize();

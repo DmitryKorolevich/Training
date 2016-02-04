@@ -1,186 +1,187 @@
 ﻿@model VC.Public.Models.Cart.ViewCartModel
-<table class="standard-table cart-items-list">
-	<thead>
-	<tr>
-		<th colspan="2">
-			Item
-		</th>
-		<th>
-			Price
-		</th>
-		<th>
-			Quantity
-		</th>
-		<th>
-			Subtotal
-		</th>
-		<th>
-		</th>
-	</tr>
-	</thead>
-	<tbody style="display:none;" data-bind="visible: Model.Skus().length == 0">
-	<tr><td colspan="6">No Items Added</td></tr>
-	</tbody>
-	<tbody data-bind="foreach:Model.Skus">
-	<tr>
-		<td class="cart-image-link">
-			<a data-bind="attr: { href: ProductPageUrl, title: formatDisplayName($data) }">
-				<img data-bind="attr: { src: IconUrl, title: formatDisplayName($data) }"/>
-			</a>
-		</td>
-		<td class="cart-line-info">
-			<a class="cart-text-link" data-bind="attr: { href: ProductPageUrl, title: formatDisplayName($data) }, text: formatDisplayName($data)"></a>
-			<span class="cart-sku-code" data-bind="text: '(' + Code() + ')', visible: Code"></span>
-			<span class="stock-presence-note" data-bind="text: InStock() ? 'In Stock Ready to Ship' : 'Not in Stock'"></span>
-		</td>
-		<td data-bind="text: formatCurrency(Price())"></td>
-		<td class="width-cart-quantity">
-			@if (Model.Skus.Any())
-			{
-				@Html.TextBoxFor(x => x.Skus[0].Quantity, new { @class = "input-control width-small", data_bind = "value: Quantity, attr: { name: 'SkusQuantity' + $index(), id: 'SkusQuantity' + $index()}" })
-				@Html.ValidationMessageFor(x => x.Skus[0].Quantity, string.Empty, new { data_bind = "attr: { 'data-valmsg-for': 'SkusQuantity' + $index()}" })
-			}
-		</td>
-		<td data-bind="text: formatCurrency(SubTotal())"></td>
-		<td class="grid-controls-container width-cart-control">
-			<a class="circle-button button-red" data-bind="click: $parent.removeSku">
-				<i class="glyphicon glyphicon-remove-sign"></i>
-			</a>
-		</td>
-	</tr>
-	</tbody>
-</table>
-<span class="shipping-instructions-title margin-top-small" data-bind="visible: Model.PromoSkus() != null && Model.PromoSkus().length > 0" style="display:none;">Promo Products</span>
-<table class="standard-table cart-items-list" data-bind="visible: Model.PromoSkus() != null && Model.PromoSkus().length > 0" style="display:none;">
-	<thead>
-	<tr>
-		<th colspan="2">
-			Item
-		</th>
-		<th>
-			Price
-		</th>
-		<th>
-			Quantity
-		</th>
-		<th>
-			Subtotal
-		</th>
-		<th>
-		</th>
-	</tr>
-	</thead>
-	<tbody data-bind="foreach:Model.PromoSkus">
-	<tr>
-		<td class="cart-image-link">
-			<a data-bind="attr: { href: ProductPageUrl, title: formatDisplayName($data) }">
-				<img data-bind="attr: { src: IconUrl, title: formatDisplayName($data) }"/>
-			</a>
-		</td>
-		<td class="cart-line-info">
-			<a class="cart-text-link" data-bind="attr: { href: ProductPageUrl, title: formatDisplayName($data) }, text: formatDisplayName($data)"></a>
-			<span class="cart-sku-code" data-bind="text: '(' + Code() + ')', visible: Code"></span>
-			<span class="stock-presence-note" data-bind="text: InStock() ? 'In Stock Ready to Ship' : 'Not in Stock'"></span>
-		</td>
-		<td data-bind="text: formatCurrency(Price())"></td>
-		<td class="width-cart-quantity" data-bind="text: Quantity"></td>
-		<td data-bind="text: formatCurrency(SubTotal())"></td>
-		<td class="grid-controls-container width-cart-control"></td>
-	</tr>
-	</tbody>
-</table>
-<div class="cart-order-details">
-	<div class="cart-shipping-instructions"> 
-		<span class="shipping-instructions-title">
+
+	<table class="standard-table cart-items-list">
+		<thead>
+		<tr>
+			<th colspan="2">
+				Item
+			</th>
+			<th>
+				Price
+			</th>
+			<th>
+				Quantity
+			</th>
+			<th>
+				Subtotal
+			</th>
+			<th>
+			</th>
+		</tr>
+		</thead>
+		<tbody style="display: none;" data-bind="visible: Model.Skus().length == 0">
+		<tr><td colspan="6">No Items Added</td></tr>
+		</tbody>
+		<tbody data-bind="foreach:Model.Skus">
+		<tr>
+			<td class="cart-image-link">
+				<a data-bind="attr: { href: ProductPageUrl, title: formatDisplayName($data) }">
+					<img data-bind="attr: { src: IconUrl, title: formatDisplayName($data) }"/>
+				</a>
+			</td>
+			<td class="cart-line-info">
+				<a class="cart-text-link" data-bind="attr: { href: ProductPageUrl, title: formatDisplayName($data) }, text: formatDisplayName($data)"></a>
+				<span class="cart-sku-code" data-bind="text: '(' + Code() + ')', visible: Code"></span>
+				<span class="stock-presence-note" data-bind="text: InStock() ? 'In Stock Ready to Ship' : 'Not in Stock'"></span>
+			</td>
+			<td data-bind="text: formatCurrency(Price())"></td>
+			<td class="width-cart-quantity">
+				@if (Model.Skus.Any())
+				{
+					@Html.TextBoxFor(x => x.Skus[0].Quantity, new {@class = "input-control width-small", data_bind = "value: Quantity, attr: { name: 'SkusQuantity' + $index(), id: 'SkusQuantity' + $index()}"})
+					@Html.ValidationMessageFor(x => x.Skus[0].Quantity, string.Empty, new {data_bind = "attr: { 'data-valmsg-for': 'SkusQuantity' + $index()}"})
+				}
+			</td>
+			<td data-bind="text: formatCurrency(SubTotal())"></td>
+			<td class="grid-controls-container width-cart-control">
+				<a class="circle-button button-red" data-bind="click: $parent.removeSku">
+					<i class="glyphicon glyphicon-remove-sign"></i>
+				</a>
+			</td>
+		</tr>
+		</tbody>
+	</table>
+	<span class="shipping-instructions-title margin-top-small" data-bind="visible: Model.PromoSkus() != null && Model.PromoSkus().length > 0" style="display: none;">Promo Products</span>
+	<table class="standard-table cart-items-list" data-bind="visible: Model.PromoSkus() != null && Model.PromoSkus().length > 0" style="display: none;">
+		<thead>
+		<tr>
+			<th colspan="2">
+				Item
+			</th>
+			<th>
+				Price
+			</th>
+			<th>
+				Quantity
+			</th>
+			<th>
+				Subtotal
+			</th>
+			<th>
+			</th>
+		</tr>
+		</thead>
+		<tbody data-bind="foreach:Model.PromoSkus">
+		<tr>
+			<td class="cart-image-link">
+				<a data-bind="attr: { href: ProductPageUrl, title: formatDisplayName($data) }">
+					<img data-bind="attr: { src: IconUrl, title: formatDisplayName($data) }"/>
+				</a>
+			</td>
+			<td class="cart-line-info">
+				<a class="cart-text-link" data-bind="attr: { href: ProductPageUrl, title: formatDisplayName($data) }, text: formatDisplayName($data)"></a>
+				<span class="cart-sku-code" data-bind="text: '(' + Code() + ')', visible: Code"></span>
+				<span class="stock-presence-note" data-bind="text: InStock() ? 'In Stock Ready to Ship' : 'Not in Stock'"></span>
+			</td>
+			<td data-bind="text: formatCurrency(Price())"></td>
+			<td class="width-cart-quantity" data-bind="text: Quantity"></td>
+			<td data-bind="text: formatCurrency(SubTotal())"></td>
+			<td class="grid-controls-container width-cart-control"></td>
+		</tr>
+		</tbody>
+	</table>
+	<div class="cart-order-details">
+		<div class="cart-shipping-instructions">
+			<span class="shipping-instructions-title">
 			Shipping Instructions:
 		</span>
-		<label class="cart-shipping-option">
-			<input name="rdUpgradeOption" type="radio" data-bind="checked: Model.ShipAsap, checkedValue: true, event: { change: shipAsapChanged }" />
-			Ship this order as soon as possible
-		</label>
-		<label class="cart-shipping-option">
-			<input name="rdUpgradeOption" type="radio" data-bind="checked: Model.ShipAsap, checkedValue: false, event: { change: shipAsapChanged }"/>
-			Ship this order the week of:
-		</label>
-		@Html.TextBoxFor(x => x.ShippingDate, Model.ShippingDate?.ToString("MM/dd/yyyy") ?? string.Empty, new { @class = "cart-input-box input-control date-picker", data_bind = "value: Model.ShippingDate, disable: Model.ShipAsap, css: {'input-validation-error': Model.ShippingDateError() && !Model.ShipAsap()}" })
-		<span class="field-validation-error" data-bind="if: Model.ShippingDateError() && !Model.ShipAsap()" data-valmsg-replace="true" data-valmsg-for="ShippingDate">
+			<label class="cart-shipping-option">
+				<input name="rdUpgradeOption" type="radio" data-bind="checked: Model.ShipAsap, checkedValue: true, event: { change: shipAsapChanged }"/>
+				Ship this order as soon as possible
+			</label>
+			<label class="cart-shipping-option">
+				<input name="rdUpgradeOption" type="radio" data-bind="checked: Model.ShipAsap, checkedValue: false, event: { change: shipAsapChanged }"/>
+				Ship this order the week of:
+			</label>
+			@Html.TextBoxFor(x => x.ShippingDate, Model.ShippingDate?.ToString("MM/dd/yyyy") ?? string.Empty, new {@class = "cart-input-box input-control date-picker", data_bind = "value: Model.ShippingDate, disable: Model.ShipAsap, css: {'input-validation-error': Model.ShippingDateError() && !Model.ShipAsap()}"})
+			<span class="field-validation-error" data-bind="if: Model.ShippingDateError() && !Model.ShipAsap()" data-valmsg-replace="true" data-valmsg-for="ShippingDate">
 			<span class="" data-bind="text: Model.ShippingDateError"></span>
 		</span>
-		<a href="#">View our shipping policies</a>
-	</div>
-	<div class="cart-order-totals">
-		<div class="cart-total-line">
-			<label>
-				Subtotal
-			</label>
-			<label class="cart-total-value" data-bind="text: Model.SubTotal() ? formatCurrency(Model.SubTotal()) : ''">@Model.SubTotal.ToString("C2")</label>
+			<a href="#">View our shipping policies</a>
 		</div>
-		<div class="cart-total-line" data-bind="visible: Model.ShippingUpgradeNPOptions() != null && Model.ShippingUpgradeNPOptions().length > 0">
-			<label>
-				Upgrade Non-Perishable Items
-			</label>
-			<select id="slNpUpgradeOption" name="NpUpgradeOption" class="input-control cart-total-value" data-bind='options: Model.ShippingUpgradeNPOptions, optionsText: "Text", optionsValue: "Key",  value: Model.ShippingUpgradeNP, optionsCaption: "Not Selected"'></select>
-		</div>
-		<div class="cart-total-line margin-top-small" data-bind="visible: Model.ShippingUpgradePOptions() != null && Model.ShippingUpgradePOptions().length > 0">
-			<label>
-				Upgrade Perishable Items
-			</label>
-			<select id="slUpgradeOption" name="UpgradeOption" class="input-control cart-total-value" data-bind='options: Model.ShippingUpgradePOptions, optionsText: "Text", optionsValue: "Key",  value: Model.ShippingUpgradeP, optionsCaption: "Not Selected"'></select>
-		</div>
-		<div class="cart-total-line" data-bind="visible: Model.DiscountTotal() != null && Model.DiscountTotal() != 0" style="display:none;">
-			<label>
-				Discount
-			</label>
-			<label class="cart-total-value" data-bind="text: Model.DiscountTotal() ? formatCurrency(Model.DiscountTotal()) : ''">@(Model.DiscountTotal?.ToString("C2"))</label>
-		</div>
-		<div class="cart-total-line" data-bind="visible: Model.GiftCertificatesTotal() != null && Model.GiftCertificatesTotal() != 0" style="display:none;">
-			<label>
-				Gift Certificates
-			</label>
-			<label class="cart-total-value" data-bind="text: Model.GiftCertificatesTotal() ? formatCurrency(Model.GiftCertificatesTotal()) : ''">@(Model.GiftCertificatesTotal?.ToString("C2"))</label>
-		</div>
-		<div class="cart-total-line">
-			<label>
-				Shipping
-			</label>
-			<label class="cart-total-value" data-bind="text: Model.ShippingCost() ? formatCurrency(Model.ShippingCost()) : 'FREE!'">@(Model.ShippingCost.HasValue ? Model.ShippingCost.Value.ToString("C2") : "FREE!")</label>
-		</div>
-		<div class="cart-total-line cart-order-summary">
-			<label>
-				Order Total
-			</label>
-			<label class="cart-total-value" data-bind="text: Model.OrderTotal() ? formatCurrency(Model.OrderTotal()) : ''">@Model.OrderTotal.ToString("C2")</label>
-		</div>
-		<div class="cart-promo-container">
-			<i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Promo Code" data-tooltip-body="If you have a discount code, enter it in the box to see the change in your order's total."></i>
-			<label>Promo Code</label>
-			@Html.TextBoxFor(x => x.PromoCode, new {@class = "cart-input-box input-control", data_bind = "value: Model.PromoCode, css: {'input-validation-error': !isDiscountValid(Model) }" })
-			<span class="field-validation-error" data-bind="if: !isDiscountValid(Model)" data-valmsg-for="PromoCode" data-valmsg-replace="true">
+		<div class="cart-order-totals">
+			<div class="cart-total-line">
+				<label>
+					Subtotal
+				</label>
+				<label class="cart-total-value" data-bind="text: Model.SubTotal() ? formatCurrency(Model.SubTotal()) : ''">@Model.SubTotal.ToString("C2")</label>
+			</div>
+			<div class="cart-total-line" data-bind="visible: Model.ShippingUpgradeNPOptions() != null && Model.ShippingUpgradeNPOptions().length > 0">
+				<label>
+					Upgrade Non-Perishable Items
+				</label>
+				<select id="slNpUpgradeOption" name="NpUpgradeOption" class="input-control cart-total-value" data-bind='options: Model.ShippingUpgradeNPOptions, optionsText: "Text", optionsValue: "Key",  value: Model.ShippingUpgradeNP, optionsCaption: "Not Selected"'></select>
+			</div>
+			<div class="cart-total-line margin-top-small" data-bind="visible: Model.ShippingUpgradePOptions() != null && Model.ShippingUpgradePOptions().length > 0">
+				<label>
+					Upgrade Perishable Items
+				</label>
+				<select id="slUpgradeOption" name="UpgradeOption" class="input-control cart-total-value" data-bind='options: Model.ShippingUpgradePOptions, optionsText: "Text", optionsValue: "Key",  value: Model.ShippingUpgradeP, optionsCaption: "Not Selected"'></select>
+			</div>
+			<div class="cart-total-line" data-bind="visible: Model.DiscountTotal() != null && Model.DiscountTotal() != 0" style="display: none;">
+				<label>
+					Discount
+				</label>
+				<label class="cart-total-value" data-bind="text: Model.DiscountTotal() ? formatCurrency(Model.DiscountTotal()) : ''">@(Model.DiscountTotal?.ToString("C2"))</label>
+			</div>
+			<div class="cart-total-line" data-bind="visible: Model.GiftCertificatesTotal() != null && Model.GiftCertificatesTotal() != 0" style="display: none;">
+				<label>
+					Gift Certificates
+				</label>
+				<label class="cart-total-value" data-bind="text: Model.GiftCertificatesTotal() ? formatCurrency(Model.GiftCertificatesTotal()) : ''">@(Model.GiftCertificatesTotal?.ToString("C2"))</label>
+			</div>
+			<div class="cart-total-line">
+				<label>
+					Shipping
+				</label>
+				<label class="cart-total-value" data-bind="text: Model.ShippingCost() ? formatCurrency(Model.ShippingCost()) : 'FREE!'">@(Model.ShippingCost.HasValue ? Model.ShippingCost.Value.ToString("C2") : "FREE!")</label>
+			</div>
+			<div class="cart-total-line cart-order-summary">
+				<label>
+					Order Total
+				</label>
+				<label class="cart-total-value" data-bind="text: Model.OrderTotal() ? formatCurrency(Model.OrderTotal()) : ''">@Model.OrderTotal.ToString("C2")</label>
+			</div>
+			<div class="cart-promo-container">
+				<i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Promo Code" data-tooltip-body="If you have a discount code, enter it in the box to see the change in your order's total."></i>
+				<label>Promo Code</label>
+				@Html.TextBoxFor(x => x.PromoCode, new {@class = "cart-input-box input-control", data_bind = "value: Model.PromoCode, css: {'input-validation-error': !isDiscountValid(Model) }"})
+				<span class="field-validation-error" data-bind="if: !isDiscountValid(Model)" data-valmsg-for="PromoCode" data-valmsg-replace="true">
 				<span id="PromoCode-error" class="" data-bind="text: getDiscountRelatedErrors(Model)[0].Value"></span>
 			</span>
-			<span class="success-message-box" data-bind="text: Model.DiscountMessage, visible: Model.DiscountMessage && isDiscountValid(Model)"></span>
-		</div>
-		<div id="divGcContainer" class="cart-gc-container">
-			<i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Gift Certificate Code" data-tooltip-body="If you have a gift certificate code, enter it in the box to see the change in your order's total."></i>
-			<div data-bind="foreach:Model.GiftCertificateCodes">
-				<div>
-					<!-- ko if: $index() == 0 -->
-					<label>Gift Certificate Code</label>
-					<a id="btnAddGc" class="circle-button button-green" data-bind="click: $parent.addGc, visible: $index() == 0">
-						<i class="glyphicon glyphicon-plus-sign"></i>
-					</a>
-					<!-- /ko -->
-					<!-- ko if: $index() != 0 -->
-					<a class="btnRemoveGc circle-button button-red" data-bind="click: $parent.removeGc, visible: $index() != 0">
-						<i class="glyphicon glyphicon-minus-sign"></i>
-					</a>
-					<!-- /ko -->
-					@Html.TextBoxFor(x => x.GiftCertificateCodes[0].Value, new {@class = "cart-input-box input-control", data_bind = "value: Value, attr: { name: 'GiftCertificateCodes' + $index(), id: 'GiftCertificateCodes' + $index()}, event: { blur: $parent.gcLostFocus }, css: {'input-validation-error': !isGcValid($parent.Model, $index()) }" })
-					<span class="field-validation-error" data-bind="if: !isGcValid($parent.Model, $index()), attr: { 'data-valmsg-for': 'GiftCertificateCodes' + $index()}" data-valmsg-replace="true">
+				<span class="success-message-box" data-bind="text: Model.DiscountMessage, visible: Model.DiscountMessage && isDiscountValid(Model)"></span>
+			</div>
+			<div id="divGcContainer" class="cart-gc-container">
+				<i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Gift Certificate Code" data-tooltip-body="If you have a gift certificate code, enter it in the box to see the change in your order's total."></i>
+				<div data-bind="foreach:Model.GiftCertificateCodes">
+					<div>
+						<!-- ko if: $index() == 0 -->
+						<label>Gift Certificate Code</label>
+						<a id="btnAddGc" class="circle-button button-green" data-bind="click: $parent.addGc, visible: $index() == 0">
+							<i class="glyphicon glyphicon-plus-sign"></i>
+						</a>
+						<!-- /ko -->
+						<!-- ko if: $index() != 0 -->
+						<a class="btnRemoveGc circle-button button-red" data-bind="click: $parent.removeGc, visible: $index() != 0">
+							<i class="glyphicon glyphicon-minus-sign"></i>
+						</a>
+						<!-- /ko -->
+						@Html.TextBoxFor(x => x.GiftCertificateCodes[0].Value, new {@class = "cart-input-box input-control", data_bind = "value: Value, attr: { name: 'GiftCertificateCodes' + $index(), id: 'GiftCertificateCodes' + $index()}, event: { blur: $parent.gcLostFocus }, css: {'input-validation-error': !isGcValid($parent.Model, $index()) }"})
+						<span class="field-validation-error" data-bind="if: !isGcValid($parent.Model, $index()), attr: { 'data-valmsg-for': 'GiftCertificateCodes' + $index()}" data-valmsg-replace="true">
 						<span class="" data-bind="text: ErrorMessage"></span>
 					</span>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-</div>

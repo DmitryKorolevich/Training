@@ -12,4 +12,6 @@
 			$("#spPasswordHint").show();
 		}
 	});
+
+	populateCardTypes();
 });

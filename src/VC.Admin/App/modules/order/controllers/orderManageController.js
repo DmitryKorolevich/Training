@@ -418,13 +418,16 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     });
                 }
 
-                angular.forEach($scope.currentCustomer.CreditCards, function (creditCard)
+                angular.forEach($scope.currentCustomer.CreditCards, function (creditCard, index)
                 {
                     creditCard.formName = "card";
                     customerEditService.syncCountry($scope, creditCard.Address);
-                });
-                if ($scope.currentCustomer.CreditCards && $scope.currentCustomer.CreditCards[0])
                     $scope.paymentInfoTab.CreditCardIndex = "0";
+                    if (creditCard.Default)
+                    {
+                        $scope.paymentInfoTab.CreditCardIndex = index.toString();
+                    }
+                });
 
                 if ($scope.currentCustomer.Oac)
                 {
@@ -567,7 +570,8 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
     {
         if ($scope.order === undefined || $scope.order.Shipping === undefined)
             return undefined;
-        if ($scope.shippingAddressTab.OrderShippingEditModel === undefined)
+        if ($scope.shippingAddressTab.OrderShippingEditModel === undefined ||
+            $scope.shippingAddressTab.OrderShippingEditModel.Address != $scope.order.Shipping)
         {
             $scope.shippingAddressTab.OrderShippingEditModel = { Address: $scope.order.Shipping, formName: 'shipping', recalculate: true };
         }
@@ -1387,7 +1391,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     $scope.requestRecalculate();
                 }
             }
-        }, 100);
+        }, 20);
     };
 
     $scope.getSKUsByProductName = function (val)

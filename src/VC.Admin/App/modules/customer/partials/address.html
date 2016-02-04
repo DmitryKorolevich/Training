@@ -125,14 +125,3 @@
         </div>
     </div>
 </div>
-<div class="form-group" data-ng-if="model.Address.AddressType == 3">
-    <label for="{{::model.formName}}_model_email" class="col-md-3 control-label">Email</label>
-    <div class="col-md-9">
-        <input type="email" name="Email" class="form-control" id="{{::model.formName}}_model_email" placeholder="Email" data-ng-model="model.Address.Email" data-ng-maxlength="100" autocomplete="off" data-ng-disabled="orderEditDisabled"/>
-        <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].Email.$invalid">
-            <small class="error" ng-show="forms[model.formName].Email.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","GeneralFieldNames.Email")}}</small>
-            <small class="error" ng-show="forms[model.formName].Email.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.Email", "100"])}}</small>
-            <small class="error" ng-show="forms[model.formName].Email.$error.server">{{serverMessages.GetMessage('Email', model.collectionName, model.index, model.formName)}}</small>
-        </div>
-    </div>
-</div>

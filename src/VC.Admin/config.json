@@ -71,6 +71,10 @@
       "CompanyCode": "VC001",
       "TurnOffCommit": true
     },
+    "PDFMyUrl": {
+      "LicenseKey": "sZ0ZaPUmBkt8&",
+      "ServiceUrl": "http://pdfmyurl.com/api"
+    },
     "CacheSettings": {
       "MaxProcessHeapsSizeBytes": 805306368, //768 Mb, entire application
       "CacheTimeToLeaveSeconds": 1800, //30 minutes

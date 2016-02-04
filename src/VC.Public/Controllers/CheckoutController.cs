@@ -8,6 +8,7 @@ using VC.Public.Helpers;
 using VC.Public.Models.Auth;
 using VC.Public.Models.Cart;
 using VC.Public.Models.Checkout;
+using VC.Public.Models.Profile;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.DynamicData.Interfaces;
@@ -16,12 +17,14 @@ using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Users;
+using System.Linq;
 
 namespace VC.Public.Controllers
 {
@@ -29,28 +32,62 @@ namespace VC.Public.Controllers
     {
         private readonly IStorefrontUserService _storefrontUserService;
         private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _paymentMethodConverter;
-        private readonly IProductService _productService;
-	    private readonly ICheckoutService checkoutService;
+		private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
+		private readonly IProductService _productService;
 	    private readonly IOrderService _orderService;
 		private readonly ICheckoutService _checkoutService;
+		private readonly IAppInfrastructureService _appInfrastructureService;
 
 		public CheckoutController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
             ICustomerService customerService, IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter,
-			IOrderService orderService, IProductService productService, IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService, ICheckoutService checkoutService) :base(contextAccessor, customerService, infrastructureService, authorizationService, checkoutService)
+			IOrderService orderService, IProductService productService, IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService, ICheckoutService checkoutService, IDynamicMapper<AddressDynamic, Address> addressConverter, IAppInfrastructureService appInfrastructureService) :base(contextAccessor, customerService, infrastructureService, authorizationService, checkoutService)
         {
             _storefrontUserService = storefrontUserService;
             _paymentMethodConverter = paymentMethodConverter;
             _orderService = orderService;
             _productService = productService;
 			_checkoutService = checkoutService;
+			_addressConverter = addressConverter;
+			_appInfrastructureService = appInfrastructureService;
         }
 
-	    public async Task<IActionResult> Welcome(bool forgot = false)
+	    public async Task<IActionResult> Welcome( bool forgot = false)
 	    {
+			if (await CustomerLoggedIn())
+			{
+				return RedirectToAction("AddUpdateBillingAddress");
+			}
+
 			ViewBag.ForgotPassSuccess = forgot;
 
 			return View(new LoginModel());
 	    }
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Welcome(LoginModel model)
+		{
+			if (!ModelState.IsValid)
+			{
+				return View(model);
+			}
+
+			ApplicationUser user = null;
+			try
+			{
+				user = await _storefrontUserService.SignInAsync(model.Email, model.Password);
+			}
+			catch (WholesalePendingException e)
+			{
+				return Redirect("/content/wholesale-review");
+			}
+			if (user == null)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+			}
+
+			return RedirectToAction("AddUpdateBillingAddress");
+		}
 
 		[HttpGet]
 		public async Task<IActionResult> AddUpdateBillingAddress()
@@ -60,21 +97,24 @@ namespace VC.Public.Controllers
 				return View("EmptyCart");
 			}
 
-			if (!await CustomerLoggedIn())
-			{
-				return RedirectToAction("Welcome");
-			}
-
-			var billingInfoModel = new AddUpdateBillingAddressModel()
-			{
-				SendNews = false,
-				SendCatalog = true
-			};
-			if (ContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+			var billingInfoModel = new AddUpdateBillingAddressModel();
+			if (await CustomerLoggedIn())
 			{
 				var currentCustomer = await GetCurrentCustomerDynamic();
 
-				//todo: populate model
+				var creditCards = currentCustomer.CustomerPaymentMethods
+					.Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard).ToList();
+
+				var firstCreditCard = creditCards.FirstOrDefault();
+				if (firstCreditCard != null)
+				{
+					_addressConverter.UpdateModel(billingInfoModel.BillingAddress, firstCreditCard.Address);
+					_paymentMethodConverter.UpdateModel(billingInfoModel.BillingAddress, firstCreditCard);
+				}
+			}
+			else
+			{
+				//todo:
 			}
 
 			return View(billingInfoModel);

@@ -1,0 +1,10 @@
+﻿@using System.Threading.Tasks
+@using VC.Admin.Models.Orders
+
+@model OrderInvoiceModel
+
+@{ 
+    Layout = "~/Views/OrderInvoice/_LayoutOrderInvoice.cshtml";
+}    
+
+@await Html.PartialAsync("/Views/OrderInvoice/_Invoice", Model)

@@ -29,7 +29,9 @@ namespace VitalChoice.Business.Queries.Orders
         {
             if (from.HasValue && to.HasValue)
             {
-                Add(x => x.DateShipped >= from.Value && x.DateShipped <= to.Value);
+                Add(x => (x.DateShipped >= from.Value && x.DateShipped <= to.Value) ||
+                    (x.PDateShipped >= from.Value && x.PDateShipped <= to.Value) ||
+                    (x.NPDateShipped >= from.Value && x.NPDateShipped <= to.Value));
             }
             return this;
         }

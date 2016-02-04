@@ -9,7 +9,6 @@ using VC.Public.Helpers;
 using VC.Public.Models.Cart;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
-using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
@@ -19,21 +18,18 @@ using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
-using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
+using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 using VitalChoice.Validation.Models;
 
 namespace VC.Public.Controllers
 {
     public class CartController : PublicControllerBase
     {
-        private readonly IStorefrontUserService _storefrontUserService;
-        private readonly ICustomerService _customerService;
-        private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _paymentMethodConverter;
-        private readonly IProductService _productService;
+	    private readonly IProductService _productService;
         private readonly ICheckoutService _checkoutService;
         private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
         private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
@@ -41,18 +37,15 @@ namespace VC.Public.Controllers
         private readonly IGcService _gcService;
         private readonly IOrderService _orderService;
 
-        public CartController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
-            ICustomerService customerService, IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter,
+        public CartController(IHttpContextAccessor contextAccessor,
+            ICustomerService customerService,
             IOrderService orderService, IProductService productService, ICheckoutService checkoutService,
             IAuthorizationService authorizationService, IAppInfrastructureService appInfrastructureService,
             IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
             IDiscountService discountService, IGcService gcService)
             : base(contextAccessor, customerService, appInfrastructureService, authorizationService, checkoutService)
         {
-            _storefrontUserService = storefrontUserService;
-            _customerService = customerService;
-            _paymentMethodConverter = paymentMethodConverter;
-            _orderService = orderService;
+	        _orderService = orderService;
             _productService = productService;
             _checkoutService = checkoutService;
             _skuMapper = skuMapper;
@@ -107,7 +100,7 @@ namespace VC.Public.Controllers
             {
                 cart = await _checkoutService.GetOrCreateCart(existingUid);
             }
-            cart.Order.Skus.MergeUpdateKeyed(Enumerable.Repeat(sku, 1).ToArray(),
+            cart.Order.Skus.AddUpdateKeyed(Enumerable.Repeat(sku, 1).ToArray(),
                 ordered => ordered.Sku.Code, skuModel => skuModel.Sku.Code, skuModel =>
                 {
                     var skuOrdered = _productService.GetSkuOrderedAsync(skuModel.Sku.Code).Result;
@@ -136,11 +129,13 @@ namespace VC.Public.Controllers
 
             if (!ModelState.IsValid)
             {
-	            model.ShippingDateError = ModelState["ShippingDate"].Errors.Select(x => x.ErrorMessage).FirstOrDefault();
-				return model;
+                model.ShippingDateError = ModelState["ShippingDate"].Errors.Select(x => x.ErrorMessage).FirstOrDefault();
+                //return model;
             }
-
-            model.ShippingDateError = string.Empty;
+            else
+            { 
+                model.ShippingDateError = string.Empty;
+            }
             var existingUid = Request.GetCartUid();
             CustomerCartOrder cart;
             if (await CustomerLoggedIn())
@@ -152,7 +147,7 @@ namespace VC.Public.Controllers
             {
                 cart = await _checkoutService.GetOrCreateCart(existingUid);
             }
-            cart.Order.Skus?.MergeUpdateWithDeleteKeyed(model.Skus.Where(s => s.Quantity > 0).ToArray(), ordered => ordered.Sku.Code,
+            cart.Order.Skus?.MergeKeyed(model.Skus.Where(s => s.Quantity > 0).ToArray(), ordered => ordered.Sku.Code,
                 skuModel => skuModel.Code, skuModel =>
                 {
                     var result = _productService.GetSkuOrderedAsync(skuModel.Code).Result;
@@ -182,9 +177,12 @@ namespace VC.Public.Controllers
             }
             cart.Order.Data.ShippingUpgradeP = model.ShippingUpgradeP;
             cart.Order.Data.ShippingUpgradeNP = model.ShippingUpgradeNP;
-            if (!await _checkoutService.UpdateCart(cart))
+            if (ModelState.IsValid)
             {
-                return new Result<ViewCartModel>(false, model);
+                if (!await _checkoutService.UpdateCart(cart))
+                {
+                    return new Result<ViewCartModel>(false, model);
+                }
             }
             await FillModel(model, cart);
             SetCartUid(cart.CartUid);
@@ -265,6 +263,7 @@ namespace VC.Public.Controllers
 					return result;
                 }) ?? Enumerable.Empty<CartSkuModel>());
             var gcsInCart = cartModel.GiftCertificateCodes.ToArray();
+            var hasEmpty = gcsInCart.Any(g => string.IsNullOrWhiteSpace(g.Value));
             cartModel.GiftCertificateCodes.Clear();
             foreach (var code in gcsInCart)
             {
@@ -287,6 +286,10 @@ namespace VC.Public.Controllers
                     };
                 }) ??
                 Enumerable.Empty<CartGcModel>());
+            if (hasEmpty)
+            {
+                cartModel.GiftCertificateCodes.Add(new CartGcModel() {Value = string.Empty});
+            }
             cartModel.ShippingUpgradeNPOptions = context.ShippingUpgradeNpOptions;
             cartModel.ShippingUpgradePOptions = context.ShippingUpgradePOptions;
             cartModel.DiscountTotal = -context.DiscountTotal;
@@ -314,8 +317,8 @@ namespace VC.Public.Controllers
             {
                 cartModel.ShipAsap = true;
             }
-            cartModel.ShippingUpgradeP = order.SafeData.ShippingUpgradeP;
-            cartModel.ShippingUpgradeNP = order.SafeData.ShippingUpgradeNP;
+            cartModel.ShippingUpgradeP = (ShippingUpgradeOption?)order.SafeData.ShippingUpgradeP;
+            cartModel.ShippingUpgradeNP = (ShippingUpgradeOption?)order.SafeData.ShippingUpgradeNP;
 
 	        if (!cartModel.GiftCertificateCodes.Any())
 	        {

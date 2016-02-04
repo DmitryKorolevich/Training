@@ -5,6 +5,8 @@ namespace VitalChoice.Interfaces.Services.Users
 {
     public interface IAdminUserService: IUserService
     {
-		Task<bool> IsSuperAdmin(ApplicationUser user);
+        Task<AdminProfile> GetAdminProfileAsync(int id);
+
+        Task<bool> IsSuperAdmin(ApplicationUser user);
 	}
 }

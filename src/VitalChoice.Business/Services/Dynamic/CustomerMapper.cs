@@ -101,7 +101,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 var addresses = entity.ShippingAddresses.Select(s => s.ShippingAddress).ToList();
                 await _customerAddressMapper.SyncCollectionsAsync(dynamic.ShippingAddresses, addresses);
 
-                entity.ShippingAddresses.MergeKeyedAdd(addresses,
+                entity.ShippingAddresses.AddKeyed(addresses,
                     address => address.IdAddress, newAddress => newAddress.Id, dbAddress => new CustomerToShippingAddress
                     {
                         IdAddress = dbAddress.Id,
@@ -147,6 +147,15 @@ namespace VitalChoice.Business.Services.Dynamic
                     IdCustomer = dynamic.Id,
                     IdPaymentMethod = c
                 }).ToList();
+
+                await _paymentMethodMapper.SyncCollectionsAsync(dynamic.CustomerPaymentMethods, entity.CustomerPaymentMethods);
+                foreach (var paymentMethod in entity.CustomerPaymentMethods)
+                {
+                    if (paymentMethod.StatusCode == (int)RecordStatusCode.Deleted && paymentMethod.BillingAddress != null)
+                    {
+                        paymentMethod.BillingAddress.StatusCode = (int)RecordStatusCode.Deleted;
+                    }
+                }
 
                 entity.OrderNotes = dynamic.OrderNotes?.Select(c => new CustomerToOrderNote()
                 {
