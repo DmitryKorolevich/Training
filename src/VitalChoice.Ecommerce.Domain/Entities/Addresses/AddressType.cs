@@ -4,6 +4,7 @@
     {
 		Profile = 1,
 		Billing = 2,
-		Shipping = 3
+		Shipping = 3,
+        CatalogRequest = 4
     }
 }

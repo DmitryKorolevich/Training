@@ -8,16 +8,25 @@
                {
                    modelCtrl.$render = function () {
                        elem.val(modelCtrl.$viewValue || '');
-                       elem.mask(attr.mask, { placeholder: attr.maskPlaceholder });
+                       elem.mask(attr.mask, { placeholder: attr.maskPlaceholder, autoclear: false });
                    };
 
                    if(attr.clean)
                    {
                        modelCtrl.$parsers.push(function (inputValue) {
-                           var resultValues = inputValue.replaceAll('(', '').replaceAll(')', '').replaceAll(' ', '').replaceAll('-', '').replaceAll('x', '');
+                           var resultValues = inputValue.replaceAll('(', '').replaceAll(')', '').replaceAll(' ', '').replaceAll('-', '').replaceAll('x', '').replaceAll('_', '');
                            return resultValues;
                        });
                    }
+
+                   modelCtrl.$validators.mask = function (modelValue, viewValue)
+                   {
+                       var value = modelValue || viewValue;
+                       var testElem = $('<input type"text"/>');
+                       testElem.val(value);
+                       testElem.mask(attr.mask, { placeholder: attr.maskPlaceholder });
+                       return modelCtrl.$isEmpty(value) || !modelCtrl.$isEmpty(testElem.val());
+                   };
                }
            }
        };

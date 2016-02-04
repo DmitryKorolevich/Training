@@ -456,16 +456,6 @@ END
 
 GO
 
-IF NOT EXISTS(SELECT [Id] FROM [dbo].[AddressOptionTypes] WHERE [IdObjectType]=3 AND Name='PersonTitle')
-BEGIN
-	INSERT INTO [dbo].[AddressOptionTypes]
-	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
-	VALUES
-	(N'PersonTitle', 4, NULL, 3, NULL)
-END
-
-GO
-
 IF NOT EXISTS(SELECT [Id] FROM [dbo].[CustomerPaymentMethodOptionTypes] WHERE [IdObjectType]=1 AND Name='Default')
 BEGIN
 	INSERT INTO [dbo].[CustomerPaymentMethodOptionTypes]
@@ -483,6 +473,36 @@ BEGIN
 	WHERE IdOptionType IN
 	(SELECT Id  FROM [dbo].[AddressOptionTypes]
 	WHERE [IdObjectType]=3 AND Name='Email')
+
+	DELETE OrderAddressOptionValues
+	WHERE IdOptionType IN
+	(SELECT Id  FROM [dbo].[AddressOptionTypes]
+	WHERE [IdObjectType]=3 AND Name='Email')
+
+	DELETE CatalogRequestAddressOptionValues
+
+	DELETE CatalogRequestAddresses
+
+	DELETE [AddressOptionTypes]
+	WHERE [IdObjectType]=3 AND Name='Email'
+
+	DELETE [AddressOptionTypes]
+	WHERE [IdObjectType]=3 AND Name='PersonTitle'
+	
+	SET IDENTITY_INSERT [dbo].[AddressTypes] ON
+
+	INSERT AddressTypes
+	(Id,Name)
+	VALUES
+	(4,'CatalogRequest')
+	
+	SET IDENTITY_INSERT [dbo].[AddressTypes] OFF
+
+	INSERT INTO [dbo].[AddressOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'Email', 4, NULL, 4, NULL),
+	(N'PersonTitle', 4, NULL, 4, NULL)
 END
 
 GO

@@ -103,7 +103,7 @@ namespace VC.Public.Controllers
             }
 
             var address = _catalogRequestAddressMapper.FromModel(model);
-            address.IdObjectType = (int)AddressType.Shipping;
+            address.IdObjectType = (int)AddressType.CatalogRequest;
             address = await _catalogRequestAddressService.InsertAsync(address);
             //TODO: - add sign up for newsletter(SignUpNewsletter)
             ViewBag.SuccessMessage= InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullySent];
