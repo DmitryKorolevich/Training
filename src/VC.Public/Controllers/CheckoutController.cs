@@ -25,6 +25,7 @@ using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Users;
 using System.Linq;
+using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VC.Public.Controllers
 {
@@ -36,7 +37,7 @@ namespace VC.Public.Controllers
 		private readonly IProductService _productService;
 	    private readonly IOrderService _orderService;
 		private readonly ICheckoutService _checkoutService;
-		private readonly IAppInfrastructureService _appInfrastructureService;
+		private readonly ReferenceData _appInfrastructure;
 
 		public CheckoutController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
             ICustomerService customerService, IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter,
@@ -48,8 +49,16 @@ namespace VC.Public.Controllers
             _productService = productService;
 			_checkoutService = checkoutService;
 			_addressConverter = addressConverter;
-			_appInfrastructureService = appInfrastructureService;
+			_appInfrastructure = appInfrastructureService.Get();
         }
+
+	    private void PopulateCreditCardsLookup(IList<CustomerPaymentMethodDynamic> creditCards)
+	    {
+			ViewBag.CreditCards = creditCards.ToDictionary(x => x.Id,
+					y =>
+						_appInfrastructure.CreditCardTypes.Single(z => z.Key == (int)y.Data.CardType).Text + ", ending in " +
+						((string)y.Data.CardNumber).Substring(((string)y.Data.CardNumber).Length - 4));
+		}
 
 	    public async Task<IActionResult> Welcome( bool forgot = false)
 	    {
@@ -89,7 +98,24 @@ namespace VC.Public.Controllers
 			return RedirectToAction("AddUpdateBillingAddress");
 		}
 
-		[HttpGet]
+	    [HttpGet]
+		[CustomerAuthorize]
+	    public async Task<IActionResult> GetBillingAddress(int id)
+	    {
+			var currentCustomer = await GetCurrentCustomerDynamic();
+
+			var creditCard = currentCustomer.CustomerPaymentMethods
+				.Single(p => p.IdObjectType == (int)PaymentMethodType.CreditCard && p.Id == id);
+
+			var billingInfoModel =_addressConverter.ToModel<AddUpdateBillingAddressModel>(creditCard.Address);
+			_paymentMethodConverter.UpdateModel<BillingInfoModel>(billingInfoModel, creditCard);
+
+		    billingInfoModel.Email = currentCustomer.Email;
+
+			return PartialView("_AddUpdateBillingAddress", billingInfoModel);
+	    }
+
+	    [HttpGet]
 		public async Task<IActionResult> AddUpdateBillingAddress()
 		{
 			if (await IsCartEmpty())
@@ -97,7 +123,7 @@ namespace VC.Public.Controllers
 				return View("EmptyCart");
 			}
 
-			var billingInfoModel = new AddUpdateBillingAddressModel();
+			var addUpdateModel = new AddUpdateBillingAddressModel();
 			if (await CustomerLoggedIn())
 			{
 				var currentCustomer = await GetCurrentCustomerDynamic();
@@ -108,43 +134,46 @@ namespace VC.Public.Controllers
 				var firstCreditCard = creditCards.FirstOrDefault();
 				if (firstCreditCard != null)
 				{
-					_addressConverter.UpdateModel(billingInfoModel.BillingAddress, firstCreditCard.Address);
-					_paymentMethodConverter.UpdateModel(billingInfoModel.BillingAddress, firstCreditCard);
+					_addressConverter.UpdateModel(addUpdateModel, firstCreditCard.Address);
+					_paymentMethodConverter.UpdateModel<BillingInfoModel>(addUpdateModel, firstCreditCard);
+
+					PopulateCreditCardsLookup(creditCards);
 				}
-			}
-			else
-			{
-				//todo:
+
+				addUpdateModel.Email = currentCustomer.Email;
 			}
 
-			return View(billingInfoModel);
+			return View(addUpdateModel);
 		}
 
-		[HttpGet]
+	    [HttpPost]
+	    public async Task<IActionResult> AddUpdateBillingAddress(AddUpdateBillingAddressModel model)
+	    {
+			if (ModelState.IsValid)
+		    {
+			    //todo:alex g please write your code here
+
+			    return RedirectToAction("AddUpdateShippingMethod");
+		    }
+
+		    if (await CustomerLoggedIn())
+		    {
+				var currentCustomer = await GetCurrentCustomerDynamic();
+				var creditCards = currentCustomer.CustomerPaymentMethods
+					.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard).ToList();
+
+			    PopulateCreditCardsLookup(creditCards);
+		    }
+
+		    return View(model);
+	    }
+
+	    [HttpGet]
 		public async Task<IActionResult> AddUpdateShippingMethod()
 		{
 			var shippingMethodModel = new AddUpdateShippingMethodModel()
 			{
 				AddressType = CheckoutAddressType.Residental
-			};
-			if (ContextAccessor.HttpContext.User.Identity.IsAuthenticated)
-			{
-				var currentCustomer = await GetCurrentCustomerDynamic();
-
-				//todo: populate model
-			}
-
-			ViewBag.ShippingAddresses = null;
-
-			return View(shippingMethodModel);
-		}
-
-		[HttpGet]
-		public async Task<IActionResult> AddPaymentMethod()
-		{
-			var shippingMethodModel = new AddPaymentMethodModel()
-			{
-
 			};
 			if (ContextAccessor.HttpContext.User.Identity.IsAuthenticated)
 			{

@@ -7,14 +7,12 @@ using VitalChoice.Validation.Models;
 
 namespace VC.Public.Models.Checkout
 {
-    public class AddUpdateBillingAddressModel: BaseModel
+    public class AddUpdateBillingAddressModel: BillingInfoModel
 	{
 	    public AddUpdateBillingAddressModel()
 	    {
 		    SendNews = true;
 		    SendCatalog = true;
-			BillingAddress = new BillingInfoModel();
-			CreditCards = new Dictionary<int, string>();
 	    }
 
 	    [EmailAddress]
@@ -36,9 +34,5 @@ namespace VC.Public.Models.Checkout
 	    public bool SendNews { get; set; }
 
 	    public bool SendCatalog { get; set; }
-
-	    public Dictionary<int,string> CreditCards { get; set; }
-
-	    public BillingInfoModel BillingAddress { get; set; }
 	}
 }
