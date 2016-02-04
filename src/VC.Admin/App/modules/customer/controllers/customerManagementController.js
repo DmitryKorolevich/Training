@@ -59,8 +59,8 @@ angular.module('app.modules.customer.controllers.customerManagementController', 
 		        }
 
 		        $scope.filter.Address = angular.copy($scope.address);
-		        $scope.Email = $scope.address.Email;
-		        $scope.SearchText = $scope.address.SearchText;
+		        $scope.filter.Email = $scope.address.Email;
+		        $scope.filter.SearchText = $scope.address.SearchText;
                 $scope.filter.Paging.PageIndex = 1;
 
 		        refreshCustomers();
