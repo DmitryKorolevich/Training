@@ -6,7 +6,7 @@ using VitalChoice.Infrastructure.Domain.Constants;
 
 namespace VC.Public.Models.Checkout
 {
-    public class AddUpdateShippingMethodModel: AddressModel
+    public class AddUpdateShippingMethodModel: ShippingInfoModel
 	{
 		[Display(Name = "Address Type")]
 		public CheckoutAddressType AddressType { get; set; }

@@ -171,13 +171,20 @@ namespace VC.Public.Controllers
 	    [HttpGet]
 		public async Task<IActionResult> AddUpdateShippingMethod()
 		{
+			if (await IsCartEmpty())
+			{
+				return View("EmptyCart");
+			}
+
 			var shippingMethodModel = new AddUpdateShippingMethodModel()
 			{
 				AddressType = CheckoutAddressType.Residental
 			};
-			if (ContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+			if (await CustomerLoggedIn())
 			{
 				var currentCustomer = await GetCurrentCustomerDynamic();
+
+				var shippingAddresses = currentCustomer.ShippingAddresses;
 
 				//todo: populate model
 			}

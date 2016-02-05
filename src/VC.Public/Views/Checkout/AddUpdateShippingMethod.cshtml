@@ -24,7 +24,7 @@
 </script>
 
 <div class="checkout-step-container working-area-holder">
-	<img src="/assets/images/checkout/step3.jpg"/>
+	<img class="checkout-step-banner" src="/assets/images/checkout/step3.jpg"/>
 	<h4 class="checkout-step-heading">3. Shipping Method</h4>
 	<span class="checkout-notification-simple">Enter your Shipping Address information below.</span>
 	@using (Html.BeginForm("AddUpdateShippingMethod", "Checkout", null, FormMethod.Post, new {@class = "form-regular medium-small", role = "form"}))
@@ -60,7 +60,7 @@
 		<span class="checkout-notification-important" id="spEnterAddress">Enter your Shipping Address.</span>
 		<div class="columns-container checkout-columns-container">
 			@Html.ValidationSummary(true, "")
-			<div class="two-columns-block">
+			<div class="form-two-column">
 				<div class="form-group">
 					@Html.LabelFor(m => m.FirstName, new { @class = "control-label" })
 					<div class="input-group">
@@ -104,7 +104,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="two-columns-block">
+			<div class="form-two-column">
 				<div class="form-group">
 					@Html.LabelFor(m => m.City, new { @class = "control-label" })
 					<div class="input-group">

@@ -1,7 +1,7 @@
 ﻿$(function() {
 	$("body").on("click", "#chkSelectOther", function() { controlSectionState("#ddShippingAddressesSelection", "#chkSelectOther"); });
 	$("body").on("click", "#IsGiftCertificate", function () { controlSectionState("#GiftMessage", "#IsGiftCertificate"); });
-	$("body").on("click", "#UseBillingAddress", function () { controlUseBillingState(".two-columns-block", "#UseBillingAddress"); });
+	$("body").on("click", "#UseBillingAddress", function () { controlUseBillingState(".form-two-column", "#UseBillingAddress"); });
 
 	$('body').on("keyup", "textarea", function (elem) { processCharcount(elem); });
 });

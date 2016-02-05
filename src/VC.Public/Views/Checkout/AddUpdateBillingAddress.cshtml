@@ -19,7 +19,7 @@
 }
 
 <div class="checkout-step-container working-area-holder">
-	<img src="/assets/images/checkout/step2.jpg"/>
+	<img class="checkout-step-banner" src="/assets/images/checkout/step2.jpg"/>
 	<h4 class="checkout-step-heading">2. Billing Address Details</h4>
 	<span class="checkout-notification-important">Please enter your billing address below.</span>
 	<span class="checkout-notification-simple">An accurate billing address is essential to get your order to you quickly.</span>
@@ -42,8 +42,8 @@
 				 </div>
 			 }
 			<div class="form-group">
-				<label class="control-label control-label-big">Pay with Credit Card</label>
-				<div class="input-group">
+				<label class="control-label">Pay with Credit Card</label>
+				<div class="input-group checkout-acceptable-cards">
 					<img src="/Assets/images/checkout/ccicons.jpg" />
 				</div>
 			</div>
@@ -65,14 +65,14 @@
 					@Html.LabelFor(m => m.Password, new { @class = "control-label" })
 					<div class="input-group">
 						@Html.PasswordFor(m => m.Password, new { @class = "form-control" })
-						@Html.ValidationMessageFor(m => m.Password, "")
+						@Html.ValidationMessageFor(m => m.Password)
 					</div>
 				</div>
 				<div class="form-group">
 					@Html.LabelFor(m => m.ConfirmPassword, new { @class = "control-label" })
 					<div class="input-group">
 						@Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
-						@Html.ValidationMessageFor(m => m.ConfirmPassword, "")
+						@Html.ValidationMessageFor(m => m.ConfirmPassword)
 					</div>
 				</div>
 				<span id="spGuestNotify" style="display: none;" class="form-control-important-info">By checking out as a guest you will not be able to retrieve your order history or receive all the benefits of a registered user.</span>
@@ -88,8 +88,9 @@
 			}
 			else
 			{
-				@Html.Hidden("Password", "password")
-				@Html.Hidden("ConfirmPassword", "password")
+				@Html.HiddenFor(x => x.Email)
+				@Html.Hidden("Password", "password", new { @id = "loggedInPassword" })
+				@Html.Hidden("ConfirmPassword", "password", new { @id = "loggedInConfirmPassword"})
 			}
 			<img class="billing-advert-image" src="/Assets/images/checkout/subscribe-promo-bar-5-16-13-A.png"/>
 			<div class="form-group">

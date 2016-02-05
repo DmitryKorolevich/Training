@@ -13,16 +13,21 @@
 });
 
 function changeSelection(selId) {
-	var oldEmail = $("#Email").val();
 	$.ajax({
 		url: "/Checkout/GetBillingAddress/" + selId,
 		dataType: "html"
 	}).success(function (result) {
 		$("#dynamicArea").html(result);
-		$("#Email").val(oldEmail);
 
 		refreshCountries();
 		populateCardTypes();
+
+		$('.tooltip-v').each(function () {
+			var title = $(this).data("tooltip-title");
+			var body = $(this).data("tooltip-body");
+			settingsVertical.content = getBaseHtml(title, body);
+			$(this).tooltipster(settingsVertical);
+		});
 
 		reparseElementValidators("form");
 	}).error(function (result) {

@@ -50,12 +50,19 @@
 <div class="form-group">
 	<div class="checkout-sections-divider"></div>
 </div>
-<div class="two-columns-block">
+<div class="form-two-column">
 	<div class="form-group">
 		@Html.LabelFor(m => m.Email, new { @class = "control-label" })
 		<div class="input-group">
-			@Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
-			@Html.ValidationMessageFor(m => m.Email)
+			@if (User.Identity.IsAuthenticated)
+			{
+				<label class="form-control-static">@Html.DisplayForEx(m => m.Email)</label>
+			}
+			else
+			{
+				@Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+				@Html.ValidationMessageFor(m => m.Email)
+			}
 		</div>
 	</div>
 	<div class="form-group">
@@ -101,7 +108,7 @@
 		</div>
 	</div>
 </div>
-<div class="two-columns-block">
+<div class="form-two-column">
 	<div class="form-group">
 		@Html.LabelFor(m => m.City, new { @class = "control-label" })
 		<div class="input-group">
