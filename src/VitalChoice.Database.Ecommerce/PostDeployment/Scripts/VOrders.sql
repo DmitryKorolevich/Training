@@ -9,6 +9,8 @@ SELECT
 	o.Id,
 	CAST(o.Id as nvarchar(20)) As IdString,
 	o.OrderStatus,
+	o.POrderStatus,
+	o.NPOrderStatus,
 	CAST(orderOptions.OrderType as int) As IdOrderSource,
 	orderOptions.OrderType As SIdOrderSource,
 	orderOptions.OrderNotes As OrderNotes,

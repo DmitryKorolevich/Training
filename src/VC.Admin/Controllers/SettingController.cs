@@ -34,7 +34,7 @@ namespace VC.Admin.Controllers
 
         public SettingController(
             ILogViewService logViewService,
-            ICountryService countryService, 
+            ICountryService countryService,
             ISettingService settingService,
             IFileService fileService,
             IObjectHistoryLogService objectHistoryLogService,
@@ -151,14 +151,14 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Settings)]
         public async Task<Result<PagedList<LogListItemModel>>> GetLogItems([FromBody]LogItemListFilter filter)
         {
-            var items =await _catalogRequestAddressService.GetCatalogRequestsAsync();
+            var items = await _catalogRequestAddressService.GetCatalogRequestsAsync();
 
-            var result = await logViewService.GetCommonItemsAsync(filter.LogLevel,filter.Message, filter.Source, filter.From, filter.To?.AddDays(1),
+            var result = await logViewService.GetCommonItemsAsync(filter.LogLevel, filter.Message, filter.Source, filter.From, filter.To?.AddDays(1),
                 filter.Paging.PageIndex, filter.Paging.PageItemCount, filter.Sorting);
             var toReturn = new PagedList<LogListItemModel>
             {
-                Items = result.Items.Select(p=>new LogListItemModel(p)).ToList(),
-                Count= result.Count,
+                Items = result.Items.Select(p => new LogListItemModel(p)).ToList(),
+                Count = result.Count,
             };
 
             return toReturn;
@@ -175,6 +175,19 @@ namespace VC.Admin.Controllers
             var toReturn = new PagedList<ObjectHistoryLogListItemModel>
             {
                 Items = result.Items.Select(p => new ObjectHistoryLogListItemModel(p)).ToList(),
+                Count = result.Count,
+            };
+
+            return toReturn;
+        }
+
+        [HttpPost]
+        public async Task<Result<PagedList<ObjectHistoryOrderLogListItemModel>>> GetOrderObjectHistoryLogItems([FromBody]ObjectHistoryLogItemsFilter filter)
+        {
+            var result = await objectHistoryLogService.GetObjectHistoryLogItems(filter);
+            var toReturn = new PagedList<ObjectHistoryOrderLogListItemModel>
+            {
+                Items = result.Items.Select(p => new ObjectHistoryOrderLogListItemModel(p)).ToList(),
                 Count = result.Count,
             };
 

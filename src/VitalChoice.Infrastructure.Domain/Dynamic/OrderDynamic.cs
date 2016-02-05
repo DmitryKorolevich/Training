@@ -17,7 +17,11 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
 
         public int? IdAddedBy { get; set; }
 
-        public OrderStatus OrderStatus { get; set; }
+        public OrderStatus? OrderStatus { get; set; }
+
+        public OrderStatus? POrderStatus { get; set; }
+
+        public OrderStatus? NPOrderStatus { get; set; }
 
         //[NotLoggedInfo]
         public CustomerDynamic Customer { get; set; }

@@ -80,6 +80,37 @@ namespace VC.Admin.ModelConverters
                 model.ShipDelayType = ShipDelayType.None;
             }
 
+            if(model.OrderStatus.HasValue)
+            {
+                model.CombinedEditOrderStatus = model.OrderStatus.Value;
+            }
+            else
+            {
+                if(model.POrderStatus==OrderStatus.Cancelled || model.NPOrderStatus==OrderStatus.Cancelled)
+                {
+                    model.CombinedEditOrderStatus = OrderStatus.Cancelled;
+                } else if(model.POrderStatus == OrderStatus.Shipped || model.NPOrderStatus == OrderStatus.Shipped)
+                {
+                    model.CombinedEditOrderStatus = OrderStatus.Shipped;
+                }
+                else if (model.POrderStatus == OrderStatus.Exported || model.NPOrderStatus == OrderStatus.Exported)
+                {
+                    model.CombinedEditOrderStatus = OrderStatus.Exported;
+                }
+                else if (model.POrderStatus == OrderStatus.OnHold || model.NPOrderStatus == OrderStatus.OnHold)
+                {
+                    model.CombinedEditOrderStatus = OrderStatus.OnHold;
+                }
+                else if (model.POrderStatus == OrderStatus.Processed || model.NPOrderStatus == OrderStatus.Processed ||
+                    model.POrderStatus == OrderStatus.ShipDelayed || model.NPOrderStatus == OrderStatus.ShipDelayed)
+                {
+                    model.CombinedEditOrderStatus = OrderStatus.Processed;
+                } else if (model.POrderStatus == OrderStatus.Incomplete || model.NPOrderStatus == OrderStatus.Incomplete)
+                {
+                    model.CombinedEditOrderStatus = OrderStatus.Incomplete;
+                }
+            }
+
             model.Shipping = _addressMapper.ToModel<AddressModel>(dynamic.ShippingAddress);
             if (dynamic.PaymentMethod != null)
             {
@@ -147,6 +178,50 @@ namespace VC.Admin.ModelConverters
             ModelToPaymentDynamic(model, dynamic);
 
             UpdateCustomer(model, dynamic);
+
+            if(!model.ShouldSplit)
+            {
+                dynamic.OrderStatus = model.CombinedEditOrderStatus;
+                dynamic.POrderStatus = null;
+                dynamic.NPOrderStatus = null;
+                if(dynamic.OrderStatus== OrderStatus.Incomplete || dynamic.OrderStatus==OrderStatus.Processed || dynamic.OrderStatus == OrderStatus.ShipDelayed)
+                {
+                    if (model.ShipDelayType == ShipDelayType.EntireOrder && model.ShipDelayDate.HasValue)
+                    {
+                        dynamic.OrderStatus = OrderStatus.ShipDelayed;
+                    } 
+                }
+            }
+            else
+            {
+                dynamic.OrderStatus = null;
+                if (model.CombinedEditOrderStatus==OrderStatus.OnHold)
+                {
+                    dynamic.POrderStatus = dynamic.NPOrderStatus = OrderStatus.OnHold;
+                }
+                else if (model.ShipDelayType == ShipDelayType.EntireOrder)
+                {
+                    if(model.ShipDelayDate.HasValue)
+                    {
+                        dynamic.POrderStatus = OrderStatus.ShipDelayed;
+                        dynamic.NPOrderStatus = OrderStatus.ShipDelayed;
+                    }
+                } else if(model.ShipDelayType == ShipDelayType.PerishableAndNonPerishable)
+                {
+                    if (model.ShipDelayDateP.HasValue)
+                    {
+                        dynamic.POrderStatus = OrderStatus.ShipDelayed;
+                    }
+                    if (model.ShipDelayDateNP.HasValue)
+                    {
+                        dynamic.NPOrderStatus = OrderStatus.ShipDelayed;
+                    }
+                } else
+                {
+                    dynamic.POrderStatus = model.CombinedEditOrderStatus;
+                    dynamic.POrderStatus = model.CombinedEditOrderStatus;
+                }
+            }
         }
 
         private void UpdateCustomer(OrderManageModel model, OrderDynamic dynamic)

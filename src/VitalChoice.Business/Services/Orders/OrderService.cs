@@ -230,7 +230,7 @@ namespace VitalChoice.Business.Services.Orders
 
         protected override void LogItemInfoSetAfter(ObjectHistoryLogItem log, OrderDynamic model)
         {
-            log.IdObjectStatus = (int)model.OrderStatus;
+            log.OptionalData = $"All:{model.OrderStatus},P:{model.POrderStatus},NP:{model.NPOrderStatus}";
         }
 
         protected override bool LogObjectFullData => true;

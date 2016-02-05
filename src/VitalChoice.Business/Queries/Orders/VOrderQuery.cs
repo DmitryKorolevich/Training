@@ -40,7 +40,7 @@ namespace VitalChoice.Business.Queries.Orders
         {
             if (orderStatus.HasValue)
             {
-                Add(x => x.OrderStatus== orderStatus.Value);
+                Add(x => x.OrderStatus== orderStatus.Value || x.POrderStatus == orderStatus.Value || x.NPOrderStatus == orderStatus.Value);
             }
             return this;
         }

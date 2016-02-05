@@ -255,3 +255,19 @@ BEGIN
 END
 
 GO
+
+IF EXISTS(SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'Orders') AND Name = N'OrderStatus' AND is_nullable = 0)
+BEGIN
+	ALTER TABLE Orders
+	ALTER COLUMN OrderStatus INT NULL
+
+	ALTER TABLE Orders
+	ADD POrderStatus INT NULL
+		CONSTRAINT FK_OrdersPOrderStatusToUser FOREIGN KEY (POrderStatus) REFERENCES dbo.OrderStatuses (Id)
+
+	ALTER TABLE Orders
+	ADD NPOrderStatus INT NULL
+		CONSTRAINT FK_OrdersNPOrderStatusToUser FOREIGN KEY (NPOrderStatus) REFERENCES dbo.OrderStatuses (Id)
+END
+
+GO

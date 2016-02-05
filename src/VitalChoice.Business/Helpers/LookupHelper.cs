@@ -323,13 +323,6 @@ namespace VitalChoice.Business.Helpers
                             Text = "NC"
                         });
                         break;
-                    case 5:
-                        toReturn.Add(new LookupItem<int>()
-                        {
-                            Key = 5,
-                            Text = "PP"
-                        });
-                        break;
                     case 6:
                         toReturn.Add(new LookupItem<int>()
                         {
@@ -337,10 +330,17 @@ namespace VitalChoice.Business.Helpers
                             Text = "WT"
                         });
                         break;
+                    case 7:
+                        toReturn.Add(new LookupItem<int>()
+                        {
+                            Key = 8,
+                            Text = "Marketing"
+                        });
+                        break;
                     case 8:
                         toReturn.Add(new LookupItem<int>()
                         {
-                            Key = 7,
+                            Key = 8,
                             Text = "Employee"
                         });
                         break;

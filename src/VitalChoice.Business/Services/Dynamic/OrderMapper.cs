@@ -60,6 +60,8 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.IdAddedBy = entity.IdAddedBy;
                 dynamic.DiscountTotal = entity.DiscountTotal;
                 dynamic.OrderStatus = entity.OrderStatus;
+                dynamic.POrderStatus = entity.POrderStatus;
+                dynamic.NPOrderStatus = entity.NPOrderStatus;
                 dynamic.ProductsSubtotal = entity.ProductsSubtotal;
                 dynamic.ShippingTotal = entity.ShippingTotal;
                 dynamic.TaxTotal = entity.TaxTotal;
@@ -125,6 +127,8 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.IdAddedBy = entity.IdEditedBy;
                 entity.DiscountTotal = dynamic.DiscountTotal;
                 entity.OrderStatus = dynamic.OrderStatus;
+                entity.POrderStatus = dynamic.POrderStatus;
+                entity.NPOrderStatus = dynamic.NPOrderStatus;
                 entity.ProductsSubtotal = dynamic.ProductsSubtotal;
                 entity.ShippingTotal = dynamic.ShippingTotal;
                 entity.TaxTotal = dynamic.TaxTotal;
@@ -163,6 +167,8 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.IdAddedBy = entity.IdAddedBy;
                 entity.DiscountTotal = dynamic.DiscountTotal;
                 entity.OrderStatus = dynamic.OrderStatus;
+                entity.POrderStatus = dynamic.POrderStatus;
+                entity.NPOrderStatus = dynamic.NPOrderStatus;
                 entity.ProductsSubtotal = dynamic.ProductsSubtotal;
                 entity.ShippingTotal = dynamic.ShippingTotal;
                 entity.TaxTotal = dynamic.TaxTotal;

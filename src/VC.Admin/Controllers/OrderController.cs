@@ -222,7 +222,7 @@ namespace VC.Admin.Controllers
 
             await _customerService.UpdateAsync(item.Customer);
 
-            if (item.OrderStatus != OrderStatus.Cancelled && item.OrderStatus != OrderStatus.Exported && item.OrderStatus != OrderStatus.Shipped)
+            if (model.CombinedEditOrderStatus != OrderStatus.Cancelled && model.CombinedEditOrderStatus != OrderStatus.Exported && model.CombinedEditOrderStatus != OrderStatus.Shipped)
             {
                 var orderType = item.Data.MailOrder ? (int?)SourceOrderType.MailOrder : null;
                 if (model.Id > 0)

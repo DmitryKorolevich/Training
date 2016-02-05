@@ -8,7 +8,11 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
     {
         public string IdString { get; set; }
 
-        public OrderStatus OrderStatus { get; set; }
+        public OrderStatus? OrderStatus { get; set; }
+
+        public OrderStatus? POrderStatus { get; set; }
+
+        public OrderStatus? NPOrderStatus { get; set; }
 
         public int? IdOrderSource { get; set; }
 

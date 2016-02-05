@@ -13,7 +13,11 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Orders
     {
         public int? IdAddedBy { get; set; }
 
-        public OrderStatus OrderStatus { get; set; }
+        public OrderStatus? OrderStatus { get; set; }
+
+        public OrderStatus? POrderStatus { get; set; }
+
+        public OrderStatus? NPOrderStatus { get; set; }
 
         public int IdCustomer { get; set; }
 
