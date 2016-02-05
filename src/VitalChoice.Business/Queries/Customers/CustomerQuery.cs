@@ -23,7 +23,17 @@ namespace VitalChoice.Business.Queries.Customers
 			return this;
 		}
 
-		public CustomerQuery Excluding(int? id)
+        public CustomerQuery WithStatus(CustomerStatus? status)
+        {
+            if (status.HasValue)
+            {
+                Add(x => x.StatusCode == (int)status.Value);
+            }
+
+            return this;
+        }
+
+        public CustomerQuery Excluding(int? id)
 		{
 			if (id.HasValue && id > 0)
 				Add(p => p.Id != id.Value);

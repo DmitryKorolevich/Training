@@ -86,7 +86,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             {Keys.ObjectNotFound, "Object cannot be found"},
             {Keys.AffiliateMinPayCommisionsAmountNotMatch, "Affiliate balance is less than ${0}"},
             {Keys.WrongCaptcha, "The reCAPTCHA wasn't entered correctly"},
-            {Keys.CustomerWasModified, "The customer has been modified. Please refresh this page before making changes"},
+            {Keys.CustomerWasModified, "The customer has been activated by a store front user. Please refresh this page before making changes"},
             {Keys.SkuNotFound, "Product SKU has not been found in the database"},
             {Keys.OrderImportRowError, "Row number {0} error: {1}"},
             {Keys.ParseDateError, "{0} can't be parsed(format 'MM/dd/yyyy')"},
