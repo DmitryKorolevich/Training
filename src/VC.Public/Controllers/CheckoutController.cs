@@ -25,6 +25,7 @@ using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Users;
 using System.Linq;
+using Microsoft.AspNet.Mvc.ModelBinding;
 using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VC.Public.Controllers
@@ -60,7 +61,13 @@ namespace VC.Public.Controllers
 						((string)y.Data.CardNumber).Substring(((string)y.Data.CardNumber).Length - 4));
 		}
 
-	    public async Task<IActionResult> Welcome( bool forgot = false)
+		private void PopulateShippingAddressesLookup(IList<AddressDynamic> addresses)
+		{
+			ViewBag.ShippingAddresses = addresses.OrderBy(x=>(bool)x.Data.Default).ToDictionary(x => x.Id,
+					y => $"{y.Data.FirstName} {y.Data.LastName} {y.Data.Address1}" + ((bool)y.Data.Default ? " (Default)" : ""));
+		}
+
+		public async Task<IActionResult> Welcome( bool forgot = false)
 	    {
 			if (await CustomerLoggedIn())
 			{
@@ -147,6 +154,7 @@ namespace VC.Public.Controllers
 		}
 
 	    [HttpPost]
+		[ValidateAntiForgeryToken]
 	    public async Task<IActionResult> AddUpdateBillingAddress(AddUpdateBillingAddressModel model)
 	    {
 			if (ModelState.IsValid)
@@ -168,7 +176,23 @@ namespace VC.Public.Controllers
 		    return View(model);
 	    }
 
-	    [HttpGet]
+		[HttpGet]
+		[CustomerAuthorize]
+		public async Task<IActionResult> GetShippingAddress(int id)
+		{
+			var currentCustomer = await GetCurrentCustomerDynamic();
+
+			var shipping = currentCustomer.ShippingAddresses
+				.Single(p => p.Id == id);
+
+			var shippingModel = new AddUpdateShippingMethodModel();
+
+			_addressConverter.UpdateModel<ShippingInfoModel>(shippingModel, shipping);
+
+			return PartialView("_AddUpdateShippingMethod", shippingModel);
+		}
+
+		[HttpGet]
 		public async Task<IActionResult> AddUpdateShippingMethod()
 		{
 			if (await IsCartEmpty())
@@ -184,14 +208,54 @@ namespace VC.Public.Controllers
 			{
 				var currentCustomer = await GetCurrentCustomerDynamic();
 
-				var shippingAddresses = currentCustomer.ShippingAddresses;
+				var shippingAddresses = currentCustomer.ShippingAddresses.ToList();
 
-				//todo: populate model
+				var defaultShipping = shippingAddresses.FirstOrDefault(x => x.Data.Default == true);
+				if (defaultShipping!= null)
+				{
+					_addressConverter.UpdateModel<ShippingInfoModel>(shippingMethodModel, defaultShipping);
+
+					PopulateShippingAddressesLookup(shippingAddresses);
+				}
 			}
 
-			ViewBag.ShippingAddresses = null;
-
 			return View(shippingMethodModel);
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> AddUpdateShippingMethod(AddUpdateShippingMethodModel model)
+		{
+			if (model.UseBillingAddress)
+			{
+#if DNX451
+				foreach (var property in typeof(AddressModel).GetProperties())
+				{
+					var first = ModelState.SingleOrDefault(x => x.Key == property.Name);
+					if (!string.IsNullOrWhiteSpace(first.Key))
+					{
+						ModelState.Remove(first);
+					}
+				}
+#endif
+			}
+
+			if (ModelState.IsValid)
+			{
+				//todo:alex g please write your code here
+
+				return RedirectToAction("ReviewOrder");
+			}
+
+			if (await CustomerLoggedIn())
+			{
+				var currentCustomer = await GetCurrentCustomerDynamic();
+				var shippingAddresses = currentCustomer.ShippingAddresses.ToList();
+
+				PopulateShippingAddressesLookup(shippingAddresses);
+			}
+
+			return View(model);
 		}
 
 		[HttpGet]

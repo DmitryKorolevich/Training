@@ -252,6 +252,8 @@ var successMessage;
 var defaultModalSize = 461;
 
 $(function () {
+	registerRequiredIf();
+
 	//fix for IE7 and IE8
 	if (!$.support.placeholder) {
 		$("[placeholder]").focus(function () {
@@ -465,4 +467,29 @@ function getQueryParameterByName(name)
 {
     var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
     return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+}
+
+function registerRequiredIf() {
+	$.validator.unobtrusive.adapters.add('requiredif', ['dependentproperty', 'desiredvalue'], function (options) {
+		options.rules['requiredif'] = options.params;
+		options.messages['requiredif'] = options.message;
+	});
+
+	$.validator.addMethod('requiredif', function (value, element, parameters) {
+		var desiredvalue = parameters.desiredvalue;
+		desiredvalue = (desiredvalue == null ? '' : desiredvalue).toString();
+		var controlType = $("input[id$='" + parameters.dependentproperty + "']").attr("type");
+		var actualvalue = {}
+		if (controlType == "checkbox" || controlType == "radio") {
+			var control = $("input[id$='" + parameters.dependentproperty + "']:checked");
+			actualvalue = control.val();
+		} else {
+			actualvalue = $("#" + parameters.dependentproperty).val();
+		}
+		if ($.trim(desiredvalue).toLowerCase() === $.trim(actualvalue).toLocaleLowerCase()) {
+			var isValid = $.validator.methods.required.call(this, value, element, parameters);
+			return isValid;
+		}
+		return true;
+	});
 }

@@ -185,7 +185,7 @@ namespace VC.Public.Controllers
                 }
             }
             await FillModel(model, cart);
-            SetCartUid(cart.CartUid);
+            SetCartUid(cart.CartUid); 
             return model;
         }
 

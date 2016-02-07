@@ -1,10 +1,37 @@
-﻿$(function() {
+﻿$(function () {
+	controlSectionState("#ddShippingAddressesSelection", "#chkSelectOther");
+	controlSectionState("#GiftMessage", "#IsGiftCertificate");
+	controlUseBillingState(".form-two-column", "#UseBillingAddress");
+
+	$.each($("textarea"), function(index,elem) {
+		processCharcount({target: elem});
+	});
+
 	$("body").on("click", "#chkSelectOther", function() { controlSectionState("#ddShippingAddressesSelection", "#chkSelectOther"); });
 	$("body").on("click", "#IsGiftCertificate", function () { controlSectionState("#GiftMessage", "#IsGiftCertificate"); });
 	$("body").on("click", "#UseBillingAddress", function () { controlUseBillingState(".form-two-column", "#UseBillingAddress"); });
 
 	$('body').on("keyup", "textarea", function (elem) { processCharcount(elem); });
+
+	$("body").on("change", "#ddShippingAddressesSelection", function () {
+		changeSelection($("#ddShippingAddressesSelection").val());
+	});
 });
+
+function changeSelection(selId) {
+	$.ajax({
+		url: "/Checkout/GetShippingAddress/" + selId,
+		dataType: "html"
+	}).success(function (result) {
+		$("#dynamicArea").html(result);
+
+		refreshCountries();
+
+		reparseElementValidators("form");
+	}).error(function (result) {
+		notifyError();
+	});
+}
 
 function controlSectionState(selector, controlId) {
 	jSel = $(selector).closest(".form-group");
