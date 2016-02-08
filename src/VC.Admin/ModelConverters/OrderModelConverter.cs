@@ -86,6 +86,7 @@ namespace VC.Admin.ModelConverters
             }
             else
             {
+                model.ShouldSplit = true;
                 if(model.POrderStatus==OrderStatus.Cancelled || model.NPOrderStatus==OrderStatus.Cancelled)
                 {
                     model.CombinedEditOrderStatus = OrderStatus.Cancelled;
@@ -150,9 +151,19 @@ namespace VC.Admin.ModelConverters
 
             ModelToSkusDynamic(model, dynamic);
 
-            if(dynamic.DictionaryData.ContainsKey("ShipDelayType") && (ShipDelayType)dynamic.DictionaryData["ShipDelayType"] == ShipDelayType.None)
+            if(dynamic.SafeData.ShipDelayType!=null)
             {
-                dynamic.DictionaryData["ShipDelayType"] = null;
+                if (dynamic.SafeData.ShipDelayType == ShipDelayType.None)
+                {
+                    dynamic.Data.ShipDelayType = null;
+                }
+                if (dynamic.SafeData.ShipDelayType == ShipDelayType.PerishableAndNonPerishable && !model.ShouldSplit)
+                {
+                    dynamic.Data.ShipDelayType = null;
+                    dynamic.Data.ShipDelayDate = null;
+                    dynamic.Data.ShipDelayDateP = null;
+                    dynamic.Data.ShipDelayDateNP = null;
+                }
             }
 
             if (model.Id != 0)
@@ -178,36 +189,44 @@ namespace VC.Admin.ModelConverters
             ModelToPaymentDynamic(model, dynamic);
 
             UpdateCustomer(model, dynamic);
+        }
 
-            if(!model.ShouldSplit)
+        public static void SetOrderSplitStatuses(OrderManageModel model, OrderDynamic dynamic)
+        {
+            if (!model.ShouldSplit)
             {
                 dynamic.OrderStatus = model.CombinedEditOrderStatus;
                 dynamic.POrderStatus = null;
                 dynamic.NPOrderStatus = null;
-                if(dynamic.OrderStatus== OrderStatus.Incomplete || dynamic.OrderStatus==OrderStatus.Processed || dynamic.OrderStatus == OrderStatus.ShipDelayed)
+                if (dynamic.OrderStatus == OrderStatus.Incomplete || dynamic.OrderStatus == OrderStatus.Processed || dynamic.OrderStatus == OrderStatus.ShipDelayed)
                 {
                     if (model.ShipDelayType == ShipDelayType.EntireOrder && model.ShipDelayDate.HasValue)
                     {
                         dynamic.OrderStatus = OrderStatus.ShipDelayed;
-                    } 
+                    }
                 }
             }
             else
             {
                 dynamic.OrderStatus = null;
-                if (model.CombinedEditOrderStatus==OrderStatus.OnHold)
+                if (model.CombinedEditOrderStatus == OrderStatus.OnHold)
                 {
                     dynamic.POrderStatus = dynamic.NPOrderStatus = OrderStatus.OnHold;
                 }
                 else if (model.ShipDelayType == ShipDelayType.EntireOrder)
                 {
-                    if(model.ShipDelayDate.HasValue)
+                    dynamic.POrderStatus = model.CombinedEditOrderStatus;
+                    dynamic.NPOrderStatus = model.CombinedEditOrderStatus;
+                    if (model.ShipDelayDate.HasValue)
                     {
                         dynamic.POrderStatus = OrderStatus.ShipDelayed;
                         dynamic.NPOrderStatus = OrderStatus.ShipDelayed;
                     }
-                } else if(model.ShipDelayType == ShipDelayType.PerishableAndNonPerishable)
+                }
+                else if (model.ShipDelayType == ShipDelayType.PerishableAndNonPerishable)
                 {
+                    dynamic.POrderStatus = model.CombinedEditOrderStatus;
+                    dynamic.NPOrderStatus = model.CombinedEditOrderStatus;
                     if (model.ShipDelayDateP.HasValue)
                     {
                         dynamic.POrderStatus = OrderStatus.ShipDelayed;
@@ -216,10 +235,11 @@ namespace VC.Admin.ModelConverters
                     {
                         dynamic.NPOrderStatus = OrderStatus.ShipDelayed;
                     }
-                } else
+                }
+                else
                 {
                     dynamic.POrderStatus = model.CombinedEditOrderStatus;
-                    dynamic.POrderStatus = model.CombinedEditOrderStatus;
+                    dynamic.NPOrderStatus = model.CombinedEditOrderStatus;
                 }
             }
         }

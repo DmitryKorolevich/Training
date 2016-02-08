@@ -16,7 +16,9 @@
         {
             $scope.historyItems = null;
             $scope.historyItemsCount = 0;
-            settingService.getObjectHistoryLogItems($scope.historyFilter, $scope.tracker)
+
+            var loadFunction = $scope.historyFilter.IdObjectType == 2 ? settingService.getOrderObjectHistoryLogItems : settingService.getObjectHistoryLogItems;//order
+            loadFunction($scope.historyFilter, $scope.tracker)
                 .success(function (result)
                 {
                     if (result.Success)
@@ -59,8 +61,7 @@
         $scope.openHistoryReport = function (id)
         {
             $scope.historyFilter.IdBeforeObjectHistoryLogItem = id;
-            var loadFunction = $scope.historyFilter.IdObjectType == 6 ? $scope.service.getOrderObjectHistoryLogItems : $scope.service.getHistoryReport;//order
-            loadFunction($scope.historyFilter, $scope.tracker)
+            $scope.service.getHistoryReport($scope.historyFilter, $scope.tracker)
                 .success(function (result)
                 {
                     if (result.Success)

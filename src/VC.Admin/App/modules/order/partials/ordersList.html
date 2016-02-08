@@ -157,61 +157,26 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr data-ng-class="{'order-notes': item.OrderNotes}" data-ng-repeat="item in items">
+                    <tr data-ng-class="::{'order-notes': item.OrderNotes}" data-ng-repeat="item in items">
                         <td>
-                            <div data-ng-if="item.OrderStatus" data-ng-class="{'ban': item.OrderStatus==1, 'exclamation-triangle': item.OrderStatus==2, 'truck': item.OrderStatus==3, 'minus-circle': item.OrderStatus==4, 'check-circle': item.OrderStatus==5, 'calendar': item.OrderStatus==6, 'pause': item.OrderStatus==7}">
-                                <i data-ng-if="item.OrderStatus==1" class="fa fa-ban"></i>
-                                <i data-ng-if="item.OrderStatus==2" class="fa fa-exclamation-triangle"></i>
-                                <i data-ng-if="item.OrderStatus==3" class="fa fa-truck"></i>
-                                <i data-ng-if="item.OrderStatus==4" class="fa fa-minus-circle"></i>
-                                <i data-ng-if="item.OrderStatus==5" class="fa fa-check-circle"></i>
-                                <i data-ng-if="item.OrderStatus==6" class="fa fa-calendar"></i>
-                                <i data-ng-if="item.OrderStatus==7" class="fa fa-pause"></i>
-                                <span>{{getReferenceItem(ReferenceData.OrderStatuses, item.OrderStatus).Text}}</span>
-                            </div>
-                            <div data-ng-if="!item.OrderStatus && item.POrderStatus">
-                                P -
-                                <span data-ng-class="{'ban': item.POrderStatus==1, 'exclamation-triangle': item.POrderStatus==2, 'truck': item.POrderStatus==3, 'minus-circle': item.POrderStatus==4, 'check-circle': item.POrderStatus==5, 'calendar': item.POrderStatus==6, 'pause': item.POrderStatus==7}">
-                                    <i data-ng-if="item.POrderStatus==1" class="fa fa-ban"></i>
-                                    <i data-ng-if="item.POrderStatus==2" class="fa fa-exclamation-triangle"></i>
-                                    <i data-ng-if="item.POrderStatus==3" class="fa fa-truck"></i>
-                                    <i data-ng-if="item.POrderStatus==4" class="fa fa-minus-circle"></i>
-                                    <i data-ng-if="item.POrderStatus==5" class="fa fa-check-circle"></i>
-                                    <i data-ng-if="item.POrderStatus==6" class="fa fa-calendar"></i>
-                                    <i data-ng-if="item.POrderStatus==7" class="fa fa-pause"></i>
-                                    <span>{{getReferenceItem(ReferenceData.OrderStatuses, item.POrderStatus).Text}}</span>
-                                </span>
-                            </div>
-                            <div data-ng-if="!item.OrderStatus && item.NPOrderStatus">
-                                NP -
-                                <span data-ng-class="{'ban': item.NPOrderStatus==1, 'exclamation-triangle': item.NPOrderStatus==2, 'truck': item.NPOrderStatus==3, 'minus-circle': item.NPOrderStatus==4, 'check-circle': item.NPOrderStatus==5, 'calendar': item.NPOrderStatus==6, 'pause': item.NPOrderStatus==7}">
-                                    <i data-ng-if="item.NPOrderStatus==1" class="fa fa-ban"></i>
-                                    <i data-ng-if="item.NPOrderStatus==2" class="fa fa-exclamation-triangle"></i>
-                                    <i data-ng-if="item.NPOrderStatus==3" class="fa fa-truck"></i>
-                                    <i data-ng-if="item.NPOrderStatus==4" class="fa fa-minus-circle"></i>
-                                    <i data-ng-if="item.NPOrderStatus==5" class="fa fa-check-circle"></i>
-                                    <i data-ng-if="item.NPOrderStatus==6" class="fa fa-calendar"></i>
-                                    <i data-ng-if="item.NPOrderStatus==7" class="fa fa-pause"></i>
-                                    <span>{{getReferenceItem(ReferenceData.OrderStatuses, item.NPOrderStatus).Text}}</span>
-                                </span>
-                            </div>
+                            <div data-ng-include="'app/modules/order/partials/orderStatusSection.html'"></div>
                         </td>
                         <td class="order-source">
-                            <i data-ng-if="item.IdOrderSource==1" class="fa fa-globe"></i>
-                            <i data-ng-if="item.IdOrderSource==2" class="fa fa-phone"></i>
-                            <i data-ng-if="item.IdOrderSource==3" class="fa fa-envelope"></i>
-                            <span>{{getReferenceItem(orderTypes, item.IdOrderSource).Text}}</span>
+                            <i data-ng-if="::item.IdOrderSource==1" class="fa fa-globe"></i>
+                            <i data-ng-if="::item.IdOrderSource==2" class="fa fa-phone"></i>
+                            <i data-ng-if="::item.IdOrderSource==3" class="fa fa-envelope"></i>
+                            <span>{{::getReferenceItem(orderTypes, item.IdOrderSource).Text}}</span>
                         </td>
                         <td class="payment-methods">
-                            <i data-ng-if="item.IdPaymentMethod==1" class="fa fa-credit-card"></i>
-                            <i data-ng-if="item.IdPaymentMethod==2" class="fa fa-calendar-check-o"></i>
-                            <i data-ng-if="item.IdPaymentMethod==3" class="fa fa-envelope"></i>
-                            <i data-ng-if="item.IdPaymentMethod==4" class="fa fa-money"></i>
-                            <i data-ng-if="item.IdPaymentMethod==5" class="fa fa-money"></i>
-                            <i data-ng-if="item.IdPaymentMethod==6" class="fa fa-university"></i>
-                            <i data-ng-if="item.IdPaymentMethod==7" class="fa fa-gift"></i>
-                            <i data-ng-if="item.IdPaymentMethod==8" class="fa fa-users"></i>
-                            <span>{{getReferenceItem(ReferenceData.ShortPaymentMethods, item.IdPaymentMethod).Text}}</span>
+                            <i data-ng-if="::item.IdPaymentMethod==1" class="fa fa-credit-card"></i>
+                            <i data-ng-if="::item.IdPaymentMethod==2" class="fa fa-calendar-check-o"></i>
+                            <i data-ng-if="::item.IdPaymentMethod==3" class="fa fa-envelope"></i>
+                            <i data-ng-if="::item.IdPaymentMethod==4" class="fa fa-money"></i>
+                            <i data-ng-if="::item.IdPaymentMethod==5" class="fa fa-money"></i>
+                            <i data-ng-if="::item.IdPaymentMethod==6" class="fa fa-university"></i>
+                            <i data-ng-if="::item.IdPaymentMethod==7" class="fa fa-gift"></i>
+                            <i data-ng-if="::item.IdPaymentMethod==8" class="fa fa-users"></i>
+                            <span>{{::getReferenceItem(ReferenceData.ShortPaymentMethods, item.IdPaymentMethod).Text}}</span>
                         </td>
                         <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>
                         <td>
@@ -222,8 +187,8 @@
                         <td>{{::item.Company}}</td>
                         <td>{{::item.StateCode}}</td>
                         <td>
-                            <span data-ng-if="item.IdCustomerType == 1" class="label label-retail font-default">{{getReferenceItem(ReferenceData.ShortCustomerTypes, item.IdCustomerType).Text}}</span>
-                            <span data-ng-if="item.IdCustomerType == 2" class="label label-wholesale font-default">{{getReferenceItem(ReferenceData.ShortCustomerTypes, item.IdCustomerType).Text}}</span>
+                            <span data-ng-if="::item.IdCustomerType == 1" class="label label-retail font-default">{{::getReferenceItem(ReferenceData.ShortCustomerTypes, item.IdCustomerType).Text}}</span>
+                            <span data-ng-if="::item.IdCustomerType == 2" class="label label-wholesale font-default">{{::getReferenceItem(ReferenceData.ShortCustomerTypes, item.IdCustomerType).Text}}</span>
                         </td>
                         <td>
                             <a ui-sref="index.oneCol.customerDetail({id:item.IdCustomer})">{{::item.Customer}}</a>
@@ -240,7 +205,7 @@
                             <button title="Edit" class="btn btn-default btn-success btn-xs" data-ng-click="openOrder(item.Id);">
                                 <i class="glyphicon glyphicon-edit"></i>
                             </button>
-                            <button title="Delete" data-ng-if="item.OrderStatus==1 || item.OrderStatus==2 || item.OrderStatus==6 || item.OrderStatus==7" class="btn btn-default btn-danger btn-xs" ladda="deleteTracker.active()" data-ng-click="delete(item.Id);">
+                            <button title="Delete" data-ng-if="::(item.OrderStatus==1 || item.OrderStatus==2 || item.OrderStatus==6 || item.OrderStatus==7)" class="btn btn-default btn-danger btn-xs" ladda="deleteTracker.active()" data-ng-click="delete(item.Id);">
                                 <i class="glyphicon glyphicon-remove"></i>
                             </button>
                         </td>

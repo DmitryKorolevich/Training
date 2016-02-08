@@ -96,7 +96,12 @@ namespace VitalChoice.Business.Services.Healthwise
             Func<IQueryable<HealthwiseOrder>, IOrderedQueryable<HealthwiseOrder>> sortable = x => x.OrderByDescending(y => y.Order.DateCreated);
             return await _healthwiseOrderRepository.Query(p => p.IdHealthwisePeriod == idPeriod && p.Order.StatusCode != (int)RecordStatusCode.Deleted
                 && (p.Order.OrderStatus == OrderStatus.Processed || p.Order.OrderStatus == OrderStatus.Shipped ||
-                p.Order.OrderStatus == OrderStatus.Exported)).Include(p => p.Order).OrderBy(sortable).SelectAsync(false);
+                p.Order.OrderStatus == OrderStatus.Exported ||
+                ((p.Order.POrderStatus == OrderStatus.Processed || p.Order.POrderStatus == OrderStatus.Shipped ||
+                p.Order.POrderStatus == OrderStatus.Exported) &&
+                (p.Order.NPOrderStatus == OrderStatus.Processed || p.Order.NPOrderStatus == OrderStatus.Shipped ||
+                p.Order.NPOrderStatus == OrderStatus.Exported))
+                )).Include(p => p.Order).OrderBy(sortable).SelectAsync(false);
         }
 
         public async Task<ICollection<VHealthwisePeriod>> GetVHealthwisePeriodsAsync(VHealthwisePeriodFilter filter)

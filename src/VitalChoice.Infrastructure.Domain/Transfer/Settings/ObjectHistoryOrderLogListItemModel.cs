@@ -4,30 +4,39 @@ using VitalChoice.Ecommerce.Domain.Entities.History;
 
 namespace VitalChoice.Infrastructure.Domain.Transfer.Settings
 {
-    public class ObjectHistoryOrderLogListItemModel: ObjectHistoryLogListItemModel
+    public class ObjectHistoryOrderLogListItemModel : ObjectHistoryLogListItemModel
     {
-        public int? IdOrderStatus { get; set; }
+        public int? OrderStatus { get; set; }
 
-        public int? IdPOrderStatus { get; set; }
+        public int? POrderStatus { get; set; }
 
-        public int? IdNPOrderStatus { get; set; }
+        public int? NPOrderStatus { get; set; }
 
         public ObjectHistoryOrderLogListItemModel(ObjectHistoryLogItem item) :
             base(item)
         {
-            if(!string.IsNullOrEmpty(item.OptionalData))
+            if (!string.IsNullOrEmpty(item.OptionalData))
             {
                 var parts = item.OptionalData.Split(',');
-                foreach(var part in parts)
+                foreach (var part in parts)
                 {
-                    IdOrderStatus = GetOrderStatus(item.OptionalData, "All:");
-                    IdPOrderStatus = GetOrderStatus(item.OptionalData, "P:");
-                    IdNPOrderStatus = GetOrderStatus(item.OptionalData, "NP:");
+                    if (part.StartsWith("All:"))
+                    {
+                        OrderStatus = GetOrderStatus(part, "All:");
+                    }
+                    if (part.StartsWith("P:"))
+                    {
+                        POrderStatus = GetOrderStatus(part, "P:");
+                    }
+                    if (part.StartsWith("NP:"))
+                    {
+                        NPOrderStatus = GetOrderStatus(part, "NP:");
+                    }
                 }
             }
         }
 
-        private int? GetOrderStatus(string data,string tag)
+        private int? GetOrderStatus(string data, string tag)
         {
             int? toReturn = null;
             if (data.Contains(tag))

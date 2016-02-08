@@ -228,11 +228,6 @@ namespace VitalChoice.Business.Services.Orders
             }
         }
 
-        protected override void LogItemInfoSetAfter(ObjectHistoryLogItem log, OrderDynamic model)
-        {
-            log.OptionalData = $"All:{model.OrderStatus},P:{model.POrderStatus},NP:{model.NPOrderStatus}";
-        }
-
         protected override bool LogObjectFullData => true;
 
         public async Task<OrderDynamic> SelectWithCustomerAsync(int id, bool withDefaults = false)
@@ -807,6 +802,41 @@ namespace VitalChoice.Business.Services.Orders
             {
                 var context = await this.CalculateOrder(item.Order);
                 item.Order = context.Order;
+
+                if (item.Order.SafeData.ShipDelayDate!=null)
+                {
+                    item.Order.Data.ShipDelayType = ShipDelayType.EntireOrder;
+                    if (item.Order.OrderStatus != OrderStatus.OnHold)
+                    {
+                        if (context.SplitInfo?.ShouldSplit == null || context.SplitInfo?.ShouldSplit == false)
+                        {
+                            item.Order.OrderStatus = OrderStatus.ShipDelayed;
+                        }
+                        else
+                        {
+                            item.Order.OrderStatus = null;
+                            item.Order.POrderStatus = OrderStatus.ShipDelayed;
+                            item.Order.NPOrderStatus = OrderStatus.ShipDelayed;
+                        }
+                    }
+                    else
+                    {
+                        item.Order.POrderStatus = item.Order.OrderStatus;
+                        item.Order.NPOrderStatus = item.Order.OrderStatus;
+                        item.Order.OrderStatus = null;
+                    }
+                }
+                else
+                {
+                    item.Order.Data.ShipDelayType = ShipDelayType.None;
+                    if (context.SplitInfo?.ShouldSplit == true)
+                    {
+                        item.Order.POrderStatus = item.Order.OrderStatus;
+                        item.Order.NPOrderStatus = item.Order.OrderStatus;
+                        item.Order.OrderStatus = null;
+                    }
+                }
+
                 item.OrderImportItem.ErrorMessages.AddRange(context.Messages);
                 if (context.SkuOrdereds != null)
                 {
@@ -1113,6 +1143,10 @@ namespace VitalChoice.Business.Services.Orders
                 if (DateTime.TryParse(sShipDate, CultureInfo.InvariantCulture, DateTimeStyles.None, out shipDate))
                 {
                     toReturn = TimeZoneInfo.ConvertTime(shipDate, _pstTimeZoneInfo, TimeZoneInfo.Local);
+                    if(toReturn<DateTime.Now)
+                    {
+                        messages.Add(AddErrorMessage(columnName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.MustBeFutureDateError], columnName)));
+                    }
                 }
                 else
                 {
@@ -1267,7 +1301,12 @@ namespace VitalChoice.Business.Services.Orders
             {
                 toReturn.Add(new MessageInfo() { Message = "Invalid order #" });
             }
-            if (order == null || !(order.OrderStatus == OrderStatus.Processed || order.OrderStatus == OrderStatus.Exported || order.OrderStatus == OrderStatus.Shipped))
+            if (order == null || (order.OrderStatus == OrderStatus.Incomplete || order.OrderStatus == OrderStatus.Cancelled || 
+                order.OrderStatus == OrderStatus.ShipDelayed || order.OrderStatus == OrderStatus.OnHold ||
+                order.POrderStatus == OrderStatus.Incomplete || order.POrderStatus == OrderStatus.Cancelled ||
+                order.POrderStatus == OrderStatus.ShipDelayed || order.POrderStatus == OrderStatus.OnHold ||
+                order.NPOrderStatus == OrderStatus.Incomplete || order.NPOrderStatus == OrderStatus.Cancelled ||
+                order.NPOrderStatus == OrderStatus.ShipDelayed || order.NPOrderStatus == OrderStatus.OnHold))
             {
                 toReturn.Add(new MessageInfo() {Message = "The given order can'be flagged"});
                 throw new AppValidationException("The given order can'be flagged");

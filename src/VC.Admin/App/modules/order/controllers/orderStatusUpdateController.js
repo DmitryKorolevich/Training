@@ -9,7 +9,16 @@ function ($scope, $rootScope, $state, $stateParams, orderService, toaster, modal
     function successSaveHandler(result) {
         if (result.Success)
         {
-            $scope.order.CurrentIdStatus = $scope.order.Status;
+            if (!$scope.order.OrderPart)
+            {
+                $scope.order.CurrentIdStatus = $scope.order.Status;
+            } else if ($scope.order.OrderPart == 2)
+            {
+                $scope.order.CurrentIdPStatus = $scope.order.Status;
+            } if ($scope.order.OrderPart == 1)
+            {
+                $scope.order.CurrentIdNPStatus = $scope.order.Status;
+            }
             toaster.pop('success', "Success!", "Successfully updated.");
         } else {
             var messages = "";
@@ -34,10 +43,15 @@ function ($scope, $rootScope, $state, $stateParams, orderService, toaster, modal
     function initialize()
     {
         $scope.orderStatuses = angular.copy($rootScope.ReferenceData.OrderStatuses);
+        $scope.orderParts=[
+            {Key: 2, Text: 'P'},
+            {Key: 1, Text: 'NP'}
+        ];
 
         $scope.forms = {};
         $scope.order = {
             Status:2,
+            OrderPart: null,
         };
         $scope.filter = {
             Id: '',
@@ -59,7 +73,7 @@ function ($scope, $rootScope, $state, $stateParams, orderService, toaster, modal
             {
                 id = 0;
             }
-            orderService.updateOrderStatus(id, $scope.order.Status, $scope.refreshTracker).success(function (result)
+            orderService.updateOrderStatus(id, $scope.order.Status, $scope.order.OrderPart, $scope.refreshTracker).success(function (result)
             {
                 successSaveHandler(result);
             }).
@@ -91,6 +105,16 @@ function ($scope, $rootScope, $state, $stateParams, orderService, toaster, modal
     {
         $scope.loadedId=$scope.order.Id;
         $scope.order.CurrentIdStatus = item.OrderStatus;
+        $scope.order.CurrentIdPStatus = item.POrderStatus;
+        $scope.order.CurrentIdNPStatus = item.NPOrderStatus;
+        if ($scope.order.CurrentIdStatus)
+        {
+            $scope.order.OrderPart = null;
+        }
+        else
+        {
+            $scope.order.OrderPart = 2;//P
+        }
     };
 
     $scope.idChanged = function ()
@@ -105,6 +129,8 @@ function ($scope, $rootScope, $state, $stateParams, orderService, toaster, modal
                 }
             });
             $scope.order.CurrentIdStatus = null;
+            $scope.order.CurrentIdPStatus = null;
+            $scope.order.CurrentIdNPStatus = null;
             $scope.loadedId = null;
         }
     };

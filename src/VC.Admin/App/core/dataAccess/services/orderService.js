@@ -34,9 +34,9 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    {
 	        return $http.post(baseUrl + 'UpdateOrder', model, getConfig(tracker));
 	    },
-	    updateOrderStatus: function (id, status, tracker)
+	    updateOrderStatus: function (id, status, orderpart, tracker)
 	    {
-	        return $http.post(baseUrl + 'UpdateOrderStatus/' + id + '?status=' + status, null, getConfig(tracker));
+	        return $http.post(baseUrl + 'UpdateOrderStatus/{0}?status={1}&={2}'.format(id, status, orderpart), null, getConfig(tracker));
 	    },
 	    moveOrder: function (id, idCustomer, tracker)
 	    {

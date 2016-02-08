@@ -88,7 +88,8 @@ namespace VitalChoice.Business.Services.Settings
             item.IdEditedBy = model.IdEditedBy;
             if(objectType == ObjectType.Order)
             {
-                item.IdObjectStatus = (int)((OrderDynamic)model).OrderStatus;
+                OrderDynamic order = (OrderDynamic)model;
+                item.OptionalData = $"All:{(int?)order.OrderStatus},P:{(int?)order.POrderStatus},NP:{(int?)order.NPOrderStatus}";
             }
             return item;
         }

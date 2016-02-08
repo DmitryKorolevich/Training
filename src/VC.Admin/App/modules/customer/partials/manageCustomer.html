@@ -140,7 +140,7 @@
                                             <div data-ng-if="!options.OverrideEmail" class="form-group">
                                                 <label for="enterEmail" class="col-md-3 control-label">Enter Email</label>
                                                 <div class="col-md-9">
-                                                    <input type="email" name="Email" class="form-control" id="enterEmail" data-ng-model="currentCustomer.newEmail" placeholder="Enter Email" data-ng-required="!editMode" data-ng-maxlength="100" autocomplete="off">
+                                                    <input type="email" name="Email" class="form-control" id="enterEmail" data-ng-model="currentCustomer.newEmail" placeholder="Enter Email" data-ng-required="!editMode || !currentCustomer.Email" data-ng-maxlength="100" autocomplete="off">
                                                     <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.Email.$invalid">
                                                         <small class="error" ng-show="forms.profile.Email.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Email")}}</small>
                                                         <small class="error" ng-show="forms.profile.Email.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","GeneralFieldNames.Email")}}</small>
@@ -152,7 +152,7 @@
                                             <div data-ng-if="!options.OverrideEmail" class="form-group">
                                                 <label for="reEnterEmail" class="col-md-3 control-label">Re-enter Email</label>
                                                 <div class="col-md-9">
-                                                    <input type="email" name="EmailConfirm" class="form-control" id="reEnterEmail" data-ng-model="currentCustomer.uiEmailConfirm" placeholder="Re-enter Email" data-ng-required="!editMode" data-ng-maxlength="100" autocomplete="off">
+                                                    <input type="email" name="EmailConfirm" class="form-control" id="reEnterEmail" data-ng-model="currentCustomer.uiEmailConfirm" placeholder="Re-enter Email" data-ng-required="!editMode || !currentCustomer.Email" data-ng-maxlength="100" autocomplete="off">
                                                     <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.EmailConfirm.$invalid">
                                                         <small class="error" ng-show="forms.profile.EmailConfirm.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Email Confirmation")}}</small>
                                                         <small class="error" ng-show="forms.profile.EmailConfirm.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","Email Confirmation")}}</small>

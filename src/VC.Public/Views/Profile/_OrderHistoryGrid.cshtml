@@ -36,7 +36,24 @@
 			{
 				<tr>
 					<td><a href="#">@item.Id</a></td>
-					<td>@infrastructure.OrderStatuses.Single(x => x.Key == (int)item.OrderStatus).Text</td>
+					<td>
+                        @if (item.OrderStatus.HasValue)
+                        {
+                            @infrastructure.OrderStatuses.Single(x => x.Key == (int)item.OrderStatus.Value).Text
+                        } else
+                        {
+                            @if (item.POrderStatus.HasValue)
+                            {
+                                @:P - @infrastructure.OrderStatuses.Single(x => x.Key == (int)item.POrderStatus.Value).Text
+                                <br/>
+                            }
+                            @if (item.NPOrderStatus.HasValue)
+                            {
+                                @:NP - @infrastructure.OrderStatuses.Single(x => x.Key == (int)item.NPOrderStatus.Value).Text
+                                <br />
+                            }
+                        }
+                    </td>
 					<td>@item.Total.ToString("C2")</td>
 					<td>@item.DateCreated.ToString("MM/dd/yyyy")</td>
 					<td>@(item.Healthwise ? "Yes" : "No")</td>

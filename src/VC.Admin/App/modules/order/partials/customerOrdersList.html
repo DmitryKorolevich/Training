@@ -1,6 +1,6 @@
 ﻿<div class="well row customer-orders-list">
     <spinner-overlay data-loading="addEditTracker.active()">
-        <table class="table table-striped">
+        <table class="table table-striped order-statuses">
             <thead>
                 <tr>
                     <th class="sortable-column" data-ng-click="filter.Sorting.applySort('OrderStatus')">
@@ -56,16 +56,9 @@
                 </tr>
             </thead>
             <tbody>
-                <tr data-ng-class="{'order-notes': item.OrderNotes}" data-ng-repeat="item in ordersHistory">
-                    <td data-ng-class="{'ban': item.OrderStatus==1, 'exclamation-triangle': item.OrderStatus==2, 'truck': item.OrderStatus==3, 'minus-circle': item.OrderStatus==4, 'check-circle': item.OrderStatus==5, 'calendar': item.OrderStatus==6, 'pause': item.OrderStatus==7}">
-                        <i data-ng-if="item.OrderStatus==1" class="fa fa-ban"></i>
-                        <i data-ng-if="item.OrderStatus==2" class="fa fa-exclamation-triangle"></i>
-                        <i data-ng-if="item.OrderStatus==3" class="fa fa-truck"></i>
-                        <i data-ng-if="item.OrderStatus==4" class="fa fa-minus-circle"></i>
-                        <i data-ng-if="item.OrderStatus==5" class="fa fa-check-circle"></i>
-                        <i data-ng-if="item.OrderStatus==6" class="fa fa-calendar"></i>
-                        <i data-ng-if="item.OrderStatus==7" class="fa fa-pause"></i>
-                        <span>{{getReferenceItem(ReferenceData.OrderStatuses, item.OrderStatus).Text}}</span>
+                <tr data-ng-class="::{'order-notes': item.OrderNotes}" data-ng-repeat="item in ordersHistory">
+                    <td>
+                        <div data-ng-include="'app/modules/order/partials/orderStatusSection.html'"></div>
                     </td>
                     <td>{{::item.DateEdited | date:"MM/dd/yy"}}<br />{{::item.DateEdited | date:"h:mm a"}}<br />{{::item.EditedByAgentId}}</td>
                     <td class="order-source">

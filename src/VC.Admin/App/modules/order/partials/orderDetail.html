@@ -444,10 +444,10 @@
                                                                             <small class="error" ng-show="forms.GCs.i{{$index}}.Code.$error.server">{{calculateServerMessages.GetMessage('Code','GCs',$index)}}</small>
                                                                         </div>
                                                                     </div>
-                                                                    <div data-ng-if="$index==0" class="col-md-2 padding-0px">
+                                                                    <div data-ng-if="$index==0 && !orderEditDisabled" class="col-md-2 padding-0px">
                                                                         <a class="btn btn-success btn-xs" title="Add" data-ng-click="gcAdd();"><i class="glyphicon glyphicon-plus"></i></a>
                                                                     </div>
-                                                                    <div data-ng-if="$index!=0" class="col-md-2 padding-0px">
+                                                                    <div data-ng-if="$index!=0 && !orderEditDisabled" class="col-md-2 padding-0px">
                                                                         <a class="btn btn-danger btn-xs" title="Delete" data-ng-click="gcDelete($index);"><i class="glyphicon glyphicon-remove"></i></a>
                                                                     </div>
                                                                 </div>

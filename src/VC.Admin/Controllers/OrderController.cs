@@ -33,6 +33,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
+using VC.Admin.ModelConverters;
 
 namespace VC.Admin.Controllers
 {
@@ -90,7 +91,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> UpdateOrderStatus(int id, int status, [FromBody] object model)
+        public async Task<Result<bool>> UpdateOrderStatus(int id, int status, [FromBody] object model, int? orderpart = null)
         {
             var order = await _orderService.SelectAsync(id, false);
 
@@ -98,7 +99,17 @@ namespace VC.Admin.Controllers
             {
                 throw new AppValidationException("Id", "The given order doesn't exist.");
             }
-            order.OrderStatus = (OrderStatus)status;
+            if (!orderpart.HasValue)
+            {
+                order.OrderStatus = (OrderStatus)status;
+            }
+            else if(orderpart == 1)//NP
+            {
+                order.NPOrderStatus = (OrderStatus)status;
+            } if(orderpart == 2)//P
+            {
+                order.POrderStatus = (OrderStatus)status;
+            }
             order = await _orderService.UpdateAsync(order);
 
             return order != null;
@@ -248,6 +259,8 @@ namespace VC.Admin.Controllers
                         item.Data.OrderType = orderType ?? (int)SourceOrderType.Phone;
                     }
                     var context = await _orderService.CalculateOrder(item);
+                    model.ShouldSplit = context.SplitInfo?.ShouldSplit == true;
+                    OrderModelConverter.SetOrderSplitStatuses(model, item);
                     item = await _orderService.UpdateAsync(item);
                 }
                 else
@@ -264,6 +277,8 @@ namespace VC.Admin.Controllers
                     }
                     item.PaymentMethod.Id = 0;
                     var context = await _orderService.CalculateOrder(item);
+                    model.ShouldSplit = context.SplitInfo?.ShouldSplit == true;
+                    OrderModelConverter.SetOrderSplitStatuses(model, item);
                     item = await _orderService.InsertAsync(item);
                 }
             }

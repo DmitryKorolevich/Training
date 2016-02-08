@@ -585,28 +585,37 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         return model;
     }
 
+    var onHoldWatch = null;
+
     var initOrder = function ()
     {
         $scope.oldOrderStatus = $scope.order.CombinedEditOrderStatus;
         $scope.order.OnHold = $scope.order.CombinedEditOrderStatus == 7;//on hold status
         $scope.order.AutoShip = $scope.order.AutoShipFrequency ? true : false;
-        $scope.$watch('order.OnHold', function (newValue, oldValue)
+        if (onHoldWatch)
+            onHoldWatch();
+        onHoldWatch = $scope.$watch('order.OnHold', function (newValue, oldValue)
         {
-            if (newValue !== undefined && newValue !== null)
+            if ($scope.order.CombinedEditOrderStatus != 3 && $scope.order.CombinedEditOrderStatus != 4 &&
+                $scope.order.CombinedEditOrderStatus != 5)
             {
-                if (newValue)
+                if (newValue !== undefined && newValue !== null)
                 {
-                    $scope.order.CombinedEditOrderStatus = 7;
-                }
-                else
-                {
-                    if ($scope.order.CombinedEditOrderStatus != $scope.oldOrderStatus)
+                    if (newValue)
                     {
-                        $scope.order.CombinedEditOrderStatus = $scope.oldOrderStatus;
+                        $scope.order.CombinedEditOrderStatus = 7;
                     }
                     else
                     {
-                        $scope.order.CombinedEditOrderStatus = 2; //processed
+                        if ($scope.order.CombinedEditOrderStatus != $scope.oldOrderStatus)
+                        {
+                            $scope.order.CombinedEditOrderStatus = $scope.oldOrderStatus;
+                        }
+                        else
+                        {
+
+                            $scope.order.CombinedEditOrderStatus = 2; //processed
+                        }
                     }
                 }
             }
@@ -638,6 +647,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     }
                     legendOrderStatus += 'NP - {0}'.format($rootScope.getReferenceItem($rootScope.ReferenceData.OrderStatuses, $scope.order.NPOrderStatus).Text);
                 }
+                $scope.legend.OrderStatus = legendOrderStatus;
             }
         }
         else

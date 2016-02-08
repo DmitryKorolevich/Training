@@ -38,7 +38,7 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Orders
             order.Data.PreferredShipMethod = (int)PreferredShipMethod.Best;
             order.Data.OrderNotes = OrderNotes;
             order.Data.GiftMessage = GiftMessage;
-            order.Data.ShipDelayType = ShipDelayType.EntireOrder;
+            order.Data.ShipDelayType = ShipDelayDate.HasValue ? ShipDelayType.EntireOrder : ShipDelayType.None;
             order.Data.ShipDelayDate = ShipDelayDate;
         }
     }

@@ -49,7 +49,7 @@ namespace VitalChoice.Business.Queries.Orders
         {
             if (!orderStatus.HasValue || orderStatus!= OrderStatus.Incomplete)
             {
-                Add(x => x.OrderStatus != OrderStatus.Incomplete);
+                Add(x => x.OrderStatus != OrderStatus.Incomplete && x.POrderStatus != OrderStatus.Incomplete && x.NPOrderStatus != OrderStatus.Incomplete);
             }
             return this;
         }
