@@ -135,24 +135,28 @@ namespace VC.Public.Controllers
 			}
 
 			var addUpdateModel = new AddUpdateBillingAddressModel();
-			if (await CustomerLoggedIn())
-			{
-				var currentCustomer = await GetCurrentCustomerDynamic();
+	        if (await CustomerLoggedIn())
+	        {
+	            var currentCustomer = await GetCurrentCustomerDynamic();
 
-				var creditCards = currentCustomer.CustomerPaymentMethods
-					.Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard).ToList();
+	            var creditCards = currentCustomer.CustomerPaymentMethods
+	                .Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard).ToList();
 
-				var firstCreditCard = creditCards.FirstOrDefault();
-				if (firstCreditCard != null)
-				{
-					_addressConverter.UpdateModel(addUpdateModel, firstCreditCard.Address);
-					_paymentMethodConverter.UpdateModel<BillingInfoModel>(addUpdateModel, firstCreditCard);
+	            var firstCreditCard = creditCards.FirstOrDefault();
+	            if (firstCreditCard != null)
+	            {
+	                _addressConverter.UpdateModel(addUpdateModel, firstCreditCard.Address);
+	                _paymentMethodConverter.UpdateModel<BillingInfoModel>(addUpdateModel, firstCreditCard);
 
-					PopulateCreditCardsLookup(creditCards);
-				}
+	                PopulateCreditCardsLookup(creditCards);
+	            }
 
-				addUpdateModel.Email = currentCustomer.Email;
-			}
+	            addUpdateModel.Email = currentCustomer.Email;
+	        }
+	        else
+	        {
+                return RedirectToAction("Welcome");
+            }
 
 			return View(addUpdateModel);
 		}
@@ -165,7 +169,7 @@ namespace VC.Public.Controllers
 	        {
 	            if (ModelState.IsValid)
 	            {
-                    var existingUid = Request.GetCartUid();
+	                var existingUid = Request.GetCartUid();
 	                var cart = await _checkoutService.GetOrCreateCart(existingUid, GetInternalCustomerId());
 	                if (cart.Order.PaymentMethod == null)
 	                {
@@ -174,7 +178,7 @@ namespace VC.Public.Controllers
 	                }
 	                else
 	                {
-                        _orderPaymentMethodConverter.UpdateObject((BillingInfoModel)model, cart.Order.PaymentMethod);
+	                    _orderPaymentMethodConverter.UpdateObject((BillingInfoModel) model, cart.Order.PaymentMethod);
 	                    if (cart.Order.PaymentMethod.Address == null)
 	                    {
 	                        cart.Order.PaymentMethod.Address = new AddressDynamic {IdObjectType = (int) AddressType.Billing};
@@ -183,8 +187,8 @@ namespace VC.Public.Controllers
 	                }
 	                if (await _checkoutService.UpdateCart(cart))
 	                {
-                        return RedirectToAction("AddUpdateShippingMethod");
-                    }
+	                    return RedirectToAction("AddUpdateShippingMethod");
+	                }
 	            }
 
 	            var currentCustomer = await GetCurrentCustomerDynamic();
@@ -192,6 +196,10 @@ namespace VC.Public.Controllers
 	                .Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard).ToList();
 
 	            PopulateCreditCardsLookup(creditCards);
+	        }
+	        else
+	        {
+	            return RedirectToAction("Welcome");
 	        }
 
 	        return View(model);
@@ -225,20 +233,24 @@ namespace VC.Public.Controllers
 			{
 				AddressType = CheckoutAddressType.Residental
 			};
-			if (await CustomerLoggedIn())
-			{
-				var currentCustomer = await GetCurrentCustomerDynamic();
+		    if (await CustomerLoggedIn())
+		    {
+		        var currentCustomer = await GetCurrentCustomerDynamic();
 
-				var shippingAddresses = currentCustomer.ShippingAddresses.ToList();
+		        var shippingAddresses = currentCustomer.ShippingAddresses.ToList();
 
-				var defaultShipping = shippingAddresses.FirstOrDefault(x => x.Data.Default == true);
-				if (defaultShipping!= null)
-				{
-					_addressConverter.UpdateModel<ShippingInfoModel>(shippingMethodModel, defaultShipping);
+		        var defaultShipping = shippingAddresses.FirstOrDefault(x => x.Data.Default == true);
+		        if (defaultShipping != null)
+		        {
+		            _addressConverter.UpdateModel<ShippingInfoModel>(shippingMethodModel, defaultShipping);
 
-					PopulateShippingAddressesLookup(shippingAddresses);
-				}
-			}
+		            PopulateShippingAddressesLookup(shippingAddresses);
+		        }
+		    }
+		    else
+		    {
+                return RedirectToAction("Welcome");
+            }
 
 			return View(shippingMethodModel);
 		}
@@ -278,6 +290,10 @@ namespace VC.Public.Controllers
 
 		        PopulateShippingAddressesLookup(shippingAddresses);
 		    }
+		    else
+		    {
+                return RedirectToAction("Welcome");
+            }
 
 		    return View(model);
 		}
