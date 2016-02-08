@@ -27,35 +27,38 @@ using VitalChoice.Interfaces.Services.Users;
 using System.Linq;
 using System.Reflection;
 using Microsoft.AspNet.Mvc.ModelBinding;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VC.Public.Controllers
 {
-    public class CheckoutController : PublicControllerBase
-    {
+    public class CheckoutController : CheckoutControllerBase
+	{
         private readonly IStorefrontUserService _storefrontUserService;
         private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _paymentMethodConverter;
         private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _orderPaymentMethodConverter;
         private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
-		private readonly IProductService _productService;
-	    private readonly IOrderService _orderService;
-		private readonly ICheckoutService _checkoutService;
 		private readonly ReferenceData _appInfrastructure;
 
-		public CheckoutController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
-            ICustomerService customerService, IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter,
-			IOrderService orderService, IProductService productService, IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService, ICheckoutService checkoutService, IDynamicMapper<AddressDynamic, Address> addressConverter, IAppInfrastructureService appInfrastructureService, IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodConverter) :base(contextAccessor, customerService, infrastructureService, authorizationService, checkoutService)
-        {
-            _storefrontUserService = storefrontUserService;
-            _paymentMethodConverter = paymentMethodConverter;
-            _orderService = orderService;
-            _productService = productService;
-			_checkoutService = checkoutService;
-			_addressConverter = addressConverter;
+	    public CheckoutController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
+		    ICustomerService customerService,
+		    IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter,
+		    IOrderService orderService, IProductService productService, IAppInfrastructureService infrastructureService,
+		    IAuthorizationService authorizationService, ICheckoutService checkoutService,
+		    IDynamicMapper<AddressDynamic, Address> addressConverter, IAppInfrastructureService appInfrastructureService,
+		    IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodConverter,
+		    IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper)
+		    : base(
+			    contextAccessor, customerService, infrastructureService, authorizationService, checkoutService, orderService,
+			    skuMapper, productMapper)
+	    {
+		    _storefrontUserService = storefrontUserService;
+		    _paymentMethodConverter = paymentMethodConverter;
+		    _addressConverter = addressConverter;
 		    _orderPaymentMethodConverter = orderPaymentMethodConverter;
 		    _appInfrastructure = appInfrastructureService.Get();
-        }
+	    }
 
 	    private void PopulateCreditCardsLookup(IList<CustomerPaymentMethodDynamic> creditCards)
 	    {
@@ -170,7 +173,7 @@ namespace VC.Public.Controllers
 	            if (ModelState.IsValid)
 	            {
 	                var existingUid = Request.GetCartUid();
-	                var cart = await _checkoutService.GetOrCreateCart(existingUid, GetInternalCustomerId());
+	                var cart = await CheckoutService.GetOrCreateCart(existingUid, GetInternalCustomerId());
 	                if (cart.Order.PaymentMethod == null)
 	                {
 	                    cart.Order.PaymentMethod = _orderPaymentMethodConverter.FromModel((BillingInfoModel) model);
@@ -185,7 +188,7 @@ namespace VC.Public.Controllers
 	                    }
 	                    _addressConverter.UpdateObject(model, cart.Order.PaymentMethod.Address);
 	                }
-	                if (await _checkoutService.UpdateCart(cart))
+	                if (await CheckoutService.UpdateCart(cart))
 	                {
 	                    return RedirectToAction("AddUpdateShippingMethod");
 	                }
@@ -269,7 +272,7 @@ namespace VC.Public.Controllers
 		        if (ModelState.IsValid)
 		        {
 		            var existingUid = Request.GetCartUid();
-		            var cart = await _checkoutService.GetOrCreateCart(existingUid, GetInternalCustomerId());
+		            var cart = await CheckoutService.GetOrCreateCart(existingUid, GetInternalCustomerId());
 		            if (cart.Order.ShippingAddress == null)
 		            {
 		                cart.Order.ShippingAddress = _addressConverter.FromModel((AddressModel) model);
@@ -278,8 +281,8 @@ namespace VC.Public.Controllers
 		            {
 		                _addressConverter.UpdateObject(model, cart.Order.ShippingAddress);
 		            }
-		            await _orderService.CalculateOrder(cart.Order);
-		            if (await _checkoutService.UpdateCart(cart))
+		            await OrderService.CalculateOrder(cart.Order);
+		            if (await CheckoutService.UpdateCart(cart))
 		            {
 		                return RedirectToAction("ReviewOrder");
 		            }

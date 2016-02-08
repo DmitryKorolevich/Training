@@ -61,8 +61,8 @@ namespace VC.Public.Controllers
             IProductService productService,
             IHelpService helpService,
             IHealthwiseService healthwiseService, IAppInfrastructureService infrastructureService,
-            IAuthorizationService authorizationService, ICheckoutService checkoutService)
-            : base(contextAccessor, customerService, infrastructureService, authorizationService, checkoutService)
+            IAuthorizationService authorizationService)
+            : base(contextAccessor, customerService, infrastructureService, authorizationService)
         {
             _storefrontUserService = storefrontUserService;
             _addressConverter = addressConverter;
