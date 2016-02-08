@@ -27,15 +27,13 @@ using VitalChoice.Validation.Models;
 
 namespace VC.Public.Controllers
 {
-    public class CartController : PublicControllerBase
+    public class CartController : CheckoutControllerBase
     {
 	    private readonly IProductService _productService;
         private readonly ICheckoutService _checkoutService;
-        private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
-        private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
         private readonly IDiscountService _discountService;
         private readonly IGcService _gcService;
-        private readonly IOrderService _orderService;
+       
 
         public CartController(IHttpContextAccessor contextAccessor,
             ICustomerService customerService,
@@ -43,13 +41,10 @@ namespace VC.Public.Controllers
             IAuthorizationService authorizationService, IAppInfrastructureService appInfrastructureService,
             IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
             IDiscountService discountService, IGcService gcService)
-            : base(contextAccessor, customerService, appInfrastructureService, authorizationService, checkoutService)
+            : base(contextAccessor, customerService, appInfrastructureService, authorizationService, checkoutService, orderService, skuMapper,productMapper)
         {
-	        _orderService = orderService;
-            _productService = productService;
+	        _productService = productService;
             _checkoutService = checkoutService;
-            _skuMapper = skuMapper;
-            _productMapper = productMapper;
             _discountService = discountService;
             _gcService = gcService;
         }
@@ -227,103 +222,6 @@ namespace VC.Public.Controllers
             {
                 Expires = DateTime.Now.AddYears(1)
             });
-        }
-
-        private async Task FillModel(ViewCartModel cartModel, CustomerCartOrder cart)
-        {
-            await Calculate(cartModel, cart.Order);
-        }
-
-        private async Task Calculate(ViewCartModel cartModel, OrderDynamic order)
-        {
-            var context = await _orderService.CalculateOrder(order);
-            var gcMessages = context.GcMessageInfos.ToDictionary(m => m.Field);
-            if (!string.IsNullOrWhiteSpace(cartModel.PromoCode) && order.Discount == null)
-            {
-                context.Messages.Add(new MessageInfo
-                {
-                    Field = "DiscountCode",
-                    Message = "Discount not found"
-                });
-            }
-            cartModel.FreeShipDifference = context.FreeShippingThresholdDifference;
-            cartModel.DiscountDescription = context.Order?.Discount?.Description;
-	        cartModel.DiscountMessage = context.DiscountMessage;
-	        cartModel.Messages =
-		        context.Messages?.Select(x => new KeyValuePair<string, string>(x.Field, x.Message)).ToList();
-			cartModel.Skus.Clear();
-            cartModel.Skus.AddRange(
-                order.Skus?.Select(sku =>
-                {
-                    var result = _skuMapper.ToModel<CartSkuModel>(sku.Sku);
-                    _productMapper.UpdateModel(result, sku.ProductWithoutSkus);
-                    result.Price = sku.Amount;
-                    result.Quantity = sku.Quantity;
-                    result.SubTotal = sku.Quantity*sku.Amount;
-					return result;
-                }) ?? Enumerable.Empty<CartSkuModel>());
-            var gcsInCart = cartModel.GiftCertificateCodes.ToArray();
-            var hasEmpty = gcsInCart.Any(g => string.IsNullOrWhiteSpace(g.Value));
-            cartModel.GiftCertificateCodes.Clear();
-            foreach (var code in gcsInCart)
-            {
-                if (!string.IsNullOrWhiteSpace(code.Value) && order.GiftCertificates.All(g => g.GiftCertificate.Code != code.Value))
-                {
-                    cartModel.GiftCertificateCodes.Add(code);
-                    code.ErrorMessage = "Gift Certificate not Found";
-                }
-            }
-            cartModel.GiftCertificateCodes.AddRange(
-                order.GiftCertificates?.Select(g => g.GiftCertificate.Code).Select(x =>
-                {
-                    var message = gcMessages.ContainsKey(x) ?  gcMessages[x] : new MessageInfo();
-
-                    return new CartGcModel
-                    {
-                        Value = x,
-                        SuccessMessage = message.MessageLevel == MessageLevel.Info ? message.Message : string.Empty,
-                        ErrorMessage = message.MessageLevel == MessageLevel.Error ? message.Message : string.Empty
-                    };
-                }) ??
-                Enumerable.Empty<CartGcModel>());
-            if (hasEmpty)
-            {
-                cartModel.GiftCertificateCodes.Add(new CartGcModel() {Value = string.Empty});
-            }
-            cartModel.ShippingUpgradeNPOptions = context.ShippingUpgradeNpOptions;
-            cartModel.ShippingUpgradePOptions = context.ShippingUpgradePOptions;
-            cartModel.DiscountTotal = -context.DiscountTotal;
-            cartModel.GiftCertificatesTotal = context.GiftCertificatesSubtotal;
-            cartModel.PromoSkus.Clear();
-            cartModel.PromoSkus.AddRange(context.PromoSkus?.Select(sku =>
-            {
-                var result = _skuMapper.ToModel<CartSkuModel>(sku.Sku);
-                _productMapper.UpdateModel(result, sku.ProductWithoutSkus);
-                result.Price = sku.Amount;
-                result.Quantity = sku.Quantity;
-                result.SubTotal = sku.Quantity*sku.Amount;
-				return result;
-            }) ?? Enumerable.Empty<CartSkuModel>());
-            cartModel.OrderTotal = order.Total;
-            cartModel.PromoCode = order.Discount?.Code;
-            cartModel.ShippingCost = order.ShippingTotal;
-            cartModel.SubTotal = order.ProductsSubtotal;
-            if (((ShipDelayType?) order.SafeData.ShipDelayType ?? ShipDelayType.None) != ShipDelayType.None)
-            {
-                cartModel.ShipAsap = false;
-                cartModel.ShippingDate = order.SafeData.ShipDelayDateP;
-            }
-            else
-            {
-                cartModel.ShipAsap = true;
-            }
-            cartModel.ShippingUpgradeP = (ShippingUpgradeOption?)order.SafeData.ShippingUpgradeP;
-            cartModel.ShippingUpgradeNP = (ShippingUpgradeOption?)order.SafeData.ShippingUpgradeNP;
-
-	        if (!cartModel.GiftCertificateCodes.Any())
-	        {
-		        cartModel.GiftCertificateCodes.Add(new CartGcModel() { Value = string.Empty});
-	        }
         }
     }
 }
