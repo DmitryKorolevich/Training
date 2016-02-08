@@ -25,7 +25,9 @@ using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Users;
 using System.Linq;
+using System.Reflection;
 using Microsoft.AspNet.Mvc.ModelBinding;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VC.Public.Controllers
@@ -34,7 +36,8 @@ namespace VC.Public.Controllers
     {
         private readonly IStorefrontUserService _storefrontUserService;
         private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _paymentMethodConverter;
-		private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
+        private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _orderPaymentMethodConverter;
+        private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
 		private readonly IProductService _productService;
 	    private readonly IOrderService _orderService;
 		private readonly ICheckoutService _checkoutService;
@@ -42,7 +45,7 @@ namespace VC.Public.Controllers
 
 		public CheckoutController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
             ICustomerService customerService, IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter,
-			IOrderService orderService, IProductService productService, IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService, ICheckoutService checkoutService, IDynamicMapper<AddressDynamic, Address> addressConverter, IAppInfrastructureService appInfrastructureService) :base(contextAccessor, customerService, infrastructureService, authorizationService, checkoutService)
+			IOrderService orderService, IProductService productService, IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService, ICheckoutService checkoutService, IDynamicMapper<AddressDynamic, Address> addressConverter, IAppInfrastructureService appInfrastructureService, IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodConverter) :base(contextAccessor, customerService, infrastructureService, authorizationService, checkoutService)
         {
             _storefrontUserService = storefrontUserService;
             _paymentMethodConverter = paymentMethodConverter;
@@ -50,7 +53,8 @@ namespace VC.Public.Controllers
             _productService = productService;
 			_checkoutService = checkoutService;
 			_addressConverter = addressConverter;
-			_appInfrastructure = appInfrastructureService.Get();
+		    _orderPaymentMethodConverter = orderPaymentMethodConverter;
+		    _appInfrastructure = appInfrastructureService.Get();
         }
 
 	    private void PopulateCreditCardsLookup(IList<CustomerPaymentMethodDynamic> creditCards)
@@ -157,23 +161,40 @@ namespace VC.Public.Controllers
 		[ValidateAntiForgeryToken]
 	    public async Task<IActionResult> AddUpdateBillingAddress(AddUpdateBillingAddressModel model)
 	    {
-			if (ModelState.IsValid)
-		    {
-			    //todo:alex g please write your code here
+	        if (await CustomerLoggedIn())
+	        {
+	            if (ModelState.IsValid)
+	            {
+                    var existingUid = Request.GetCartUid();
+	                var cart = await _checkoutService.GetOrCreateCart(existingUid, GetInternalCustomerId());
+	                if (cart.Order.PaymentMethod == null)
+	                {
+	                    cart.Order.PaymentMethod = _orderPaymentMethodConverter.FromModel((BillingInfoModel) model);
+	                    cart.Order.PaymentMethod.Address = _addressConverter.FromModel((AddressModel) model);
+	                }
+	                else
+	                {
+                        _orderPaymentMethodConverter.UpdateObject((BillingInfoModel)model, cart.Order.PaymentMethod);
+	                    if (cart.Order.PaymentMethod.Address == null)
+	                    {
+	                        cart.Order.PaymentMethod.Address = new AddressDynamic {IdObjectType = (int) AddressType.Billing};
+	                    }
+	                    _addressConverter.UpdateObject(model, cart.Order.PaymentMethod.Address);
+	                }
+	                if (await _checkoutService.UpdateCart(cart))
+	                {
+                        return RedirectToAction("AddUpdateShippingMethod");
+                    }
+	            }
 
-			    return RedirectToAction("AddUpdateShippingMethod");
-		    }
+	            var currentCustomer = await GetCurrentCustomerDynamic();
+	            var creditCards = currentCustomer.CustomerPaymentMethods
+	                .Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard).ToList();
 
-		    if (await CustomerLoggedIn())
-		    {
-				var currentCustomer = await GetCurrentCustomerDynamic();
-				var creditCards = currentCustomer.CustomerPaymentMethods
-					.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard).ToList();
+	            PopulateCreditCardsLookup(creditCards);
+	        }
 
-			    PopulateCreditCardsLookup(creditCards);
-		    }
-
-		    return View(model);
+	        return View(model);
 	    }
 
 		[HttpGet]
@@ -226,36 +247,39 @@ namespace VC.Public.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> AddUpdateShippingMethod(AddUpdateShippingMethodModel model)
 		{
-			if (model.UseBillingAddress)
-			{
-#if DNX451
-				foreach (var property in typeof(AddressModel).GetProperties())
-				{
-					var first = ModelState.SingleOrDefault(x => x.Key == property.Name);
-					if (!string.IsNullOrWhiteSpace(first.Key))
-					{
-						ModelState.Remove(first);
-					}
-				}
-#endif
-			}
+		    if (model.UseBillingAddress)
+		    {
+		        HashSet<string> propertyNames = new HashSet<string>(typeof (AddressModel).GetTypeInfo().DeclaredProperties.Select(p => p.Name));
+		        ModelState.RemoveAll(pair => propertyNames.Contains(pair.Key));
+		    }
+		    if (await CustomerLoggedIn())
+		    {
+		        if (ModelState.IsValid)
+		        {
+		            var existingUid = Request.GetCartUid();
+		            var cart = await _checkoutService.GetOrCreateCart(existingUid, GetInternalCustomerId());
+		            if (cart.Order.ShippingAddress == null)
+		            {
+		                cart.Order.ShippingAddress = _addressConverter.FromModel((AddressModel) model);
+		            }
+		            else
+		            {
+		                _addressConverter.UpdateObject(model, cart.Order.ShippingAddress);
+		            }
+		            await _orderService.CalculateOrder(cart.Order);
+		            if (await _checkoutService.UpdateCart(cart))
+		            {
+		                return RedirectToAction("ReviewOrder");
+		            }
+		        }
 
-			if (ModelState.IsValid)
-			{
-				//todo:alex g please write your code here
+		        var currentCustomer = await GetCurrentCustomerDynamic();
+		        var shippingAddresses = currentCustomer.ShippingAddresses.ToList();
 
-				return RedirectToAction("ReviewOrder");
-			}
+		        PopulateShippingAddressesLookup(shippingAddresses);
+		    }
 
-			if (await CustomerLoggedIn())
-			{
-				var currentCustomer = await GetCurrentCustomerDynamic();
-				var shippingAddresses = currentCustomer.ShippingAddresses.ToList();
-
-				PopulateShippingAddressesLookup(shippingAddresses);
-			}
-
-			return View(model);
+		    return View(model);
 		}
 
 		[HttpGet]

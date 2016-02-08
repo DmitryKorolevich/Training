@@ -11,7 +11,6 @@ namespace VitalChoice.Interfaces.Services.Checkout
         Task<CustomerCartOrder> GetOrCreateCart(Guid? uid, int idCustomer);
         Task<bool> UpdateCart(CustomerCartOrder anonymCart);
         Task<OrderDataContext> CalculateCart(CustomerCartOrder cart);
-        Task<bool> SaveOrder(CustomerCartOrder cart);
         Task<int> GetCartItemsCount(Guid uid);
     }
 }

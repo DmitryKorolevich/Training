@@ -17,6 +17,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Content.Products;
@@ -206,11 +207,16 @@ namespace VitalChoice.Business.Services.Checkout
                     }
                     transaction.Commit();
                 }
+                catch (AppValidationException)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
                 catch (Exception e)
                 {
                     _logger.LogError(e.Message, e);
                     transaction.Rollback();
-                    return result;
+                    throw;
                 }
             }
 
@@ -230,8 +236,8 @@ namespace VitalChoice.Business.Services.Checkout
 
         public async Task<bool> UpdateCart(CustomerCartOrder cartOrder)
         {
-            if (cartOrder == null)
-                throw new ArgumentNullException(nameof(cartOrder));
+            if (cartOrder?.Order == null)
+                return false;
             using (var transaction = _context.BeginTransaction())
             {
                 try
@@ -244,8 +250,6 @@ namespace VitalChoice.Business.Services.Checkout
                                 .SelectFirstOrDefaultAsync();
 
                     if (cart == null)
-                        return false;
-                    if (cartOrder.Order == null)
                         return false;
                     if (cartOrder.Order.Customer?.Id != 0)
                     {
@@ -291,11 +295,16 @@ namespace VitalChoice.Business.Services.Checkout
                     await _context.SaveChangesAsync();
                     transaction.Commit();
                 }
+                catch (AppValidationException)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
                 catch (Exception e)
                 {
                     _logger.LogError(e.Message, e);
                     transaction.Rollback();
-                    return false;
+                    throw;
                 }
             }
             return true;
@@ -304,11 +313,6 @@ namespace VitalChoice.Business.Services.Checkout
         public Task<OrderDataContext> CalculateCart(CustomerCartOrder cartOrder)
         {
             return _orderService.CalculateOrder(cartOrder.Order);
-        }
-
-        public Task<bool> SaveOrder(CustomerCartOrder cart)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<int> GetCartItemsCount(Guid uid)
