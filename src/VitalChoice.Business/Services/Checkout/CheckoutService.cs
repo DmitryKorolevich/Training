@@ -199,6 +199,7 @@ namespace VitalChoice.Business.Services.Checkout
                     else
                     {
                         result.Order = await _orderService.SelectAsync(cart.IdOrder.Value, true);
+                        result.Order.Customer = await _customerService.SelectAsync(idCustomer, true);
                         foreach (var skuOrdered in result.Order.Skus)
                         {
                             var productUrl = _productContentRep.Query(p => p.Id == skuOrdered.Sku.IdProduct).Select(p => p.Url, false).FirstOrDefault();

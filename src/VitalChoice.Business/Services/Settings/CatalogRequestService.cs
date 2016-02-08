@@ -20,6 +20,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Data.Services;
 using VitalChoice.DynamicData.Helpers;
+using VitalChoice.Infrastructure.Context;
 
 namespace VitalChoice.Business.Services.Settings
 {
@@ -40,10 +41,10 @@ namespace VitalChoice.Business.Services.Settings
             DirectMapper<CatalogRequestAddress> directMapper, 
             DynamicExpressionVisitor queryVisitor,
             IObjectLogItemExternalService objectLogItemExternalService,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerProviderExtended loggerProvider, EcommerceContext dbContext)
             : base(
                 mapper, catalogRequestAddressRepository, catalogRequestAddressValueRepository,
-                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, dbContext)
         {
             _catalogRequestAddressRepository = catalogRequestAddressRepository;
             _countryService = countryService;
