@@ -177,12 +177,14 @@ namespace VitalChoice.Business.Services.Customers
                 
             }
 
+            //Don't allow to return a customer registered from the admin part(Not Active) to Not Active status from 
+            //Active(by a store front activation)
 	        if (model.StatusCode == (int)CustomerStatus.NotActive && model.Id > 0)
 	        {
 				var exists =
 				await
 					_customerRepositoryAsync.Query(
-						new CustomerQuery().NotDeleted().WithId(model.Id).NotInActive()).SelectAnyAsync();
+						new CustomerQuery().NotDeleted().WithId(model.Id).WithStatus(CustomerStatus.Active)).SelectAnyAsync();
 		        if (exists)
 		        {
 					throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CustomerWasModified]);

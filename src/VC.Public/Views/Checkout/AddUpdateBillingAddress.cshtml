@@ -1,5 +1,5 @@
 ﻿@using System.Threading.Tasks
-@using VC.Public.Helpers
+@using Microsoft.AspNet.Mvc.Rendering
 @model VC.Public.Models.Checkout.AddUpdateBillingAddressModel
 
 @section Meta {
@@ -18,12 +18,8 @@
 	<script src="@Url.Content("/app/modules/checkout/billingInfo.js")"></script>
 }
 
-<script>
-	successMessage = '@ViewBag.SuccessMessage';
-</script>
-
 <div class="checkout-step-container working-area-holder">
-	<img src="/assets/images/checkout/step2.jpg"/>
+	<img class="checkout-step-banner" src="/assets/images/checkout/step2.jpg"/>
 	<h4 class="checkout-step-heading">2. Billing Address Details</h4>
 	<span class="checkout-notification-important">Please enter your billing address below.</span>
 	<span class="checkout-notification-simple">An accurate billing address is essential to get your order to you quickly.</span>
@@ -31,29 +27,30 @@
 	<div class="columns-container checkout-columns-container">
 		@using (Html.BeginForm("AddUpdateBillingAddress", "Checkout", null, FormMethod.Post, new {@class = "form-regular medium-small", role = "form"}))
 		{
-			<input id="hdCountry" value="@Html.DisplayForEx(x => x.BillingAddress.IdCountry)" type="hidden">
-			<input id="hdState" value="@Html.DisplayForEx(x => x.BillingAddress.IdState)" type="hidden">
-			<input id="hdCardType" value="@Html.DisplayForEx(x => x.BillingAddress.CardType)" type="hidden">
-			@Html.HiddenFor(m => m.BillingAddress.Id, new { @id = "hdCreditCard" })
 			@Html.AntiForgeryToken()
 			@Html.ValidationSummary(true, "")
+			if (ViewBag.CreditCards != null && ViewBag.CreditCards.Count > 1)
+			 {
+				 <div class="form-group">
+					 @Html.Label("SavedCards", "Saved Cards", new {@class = "control-label"})
+					 <div class="input-group">
+						 @Html.DropDownListFor(x => x.Id, new SelectList(ViewBag.CreditCards, "Key", "Value"), new {id = "ddCreditCardsSelection", @class = "form-control"})
+					 </div>
+				 </div>
+				 <div class="form-group">
+					 <div class="checkout-sections-divider"></div>
+				 </div>
+			 }
 			<div class="form-group">
-				@Html.Label("SavedCards", "Saved Cards", new { @class = "control-label" })
-				<div class="input-group">
-					@*@Html.DropDownListFor(x=>x.BillingAddress.Id, null)*@ <!--, Model.CreditCards.-->
-				</div>
-			</div>
-			<div class="form-group">
-				<div class="checkout-sections-divider"></div>
-			</div>
-			<div class="form-group">
-				<label class="control-label control-label-big">Pay with Credit Card</label>
-				<div class="input-group">
+				<label class="control-label">Pay with Credit Card</label>
+				<div class="input-group checkout-acceptable-cards">
 					<img src="/Assets/images/checkout/ccicons.jpg" />
 				</div>
 			</div>
 
-			await Html.RenderPartialAsync("_AddUpdateBillingAddress", Model);
+			<div id="dynamicArea">
+				@await Html.PartialAsync("_AddUpdateBillingAddress", Model,ViewData)
+			</div>
 
 			<div class="form-group">
 				<div class="checkout-sections-divider"></div>
@@ -68,14 +65,14 @@
 					@Html.LabelFor(m => m.Password, new { @class = "control-label" })
 					<div class="input-group">
 						@Html.PasswordFor(m => m.Password, new { @class = "form-control" })
-						@Html.ValidationMessageFor(m => m.Password, "")
+						@Html.ValidationMessageFor(m => m.Password)
 					</div>
 				</div>
 				<div class="form-group">
 					@Html.LabelFor(m => m.ConfirmPassword, new { @class = "control-label" })
 					<div class="input-group">
 						@Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
-						@Html.ValidationMessageFor(m => m.ConfirmPassword, "")
+						@Html.ValidationMessageFor(m => m.ConfirmPassword)
 					</div>
 				</div>
 				<span id="spGuestNotify" style="display: none;" class="form-control-important-info">By checking out as a guest you will not be able to retrieve your order history or receive all the benefits of a registered user.</span>
@@ -88,6 +85,12 @@
 						</label>
 					</div>
 				</div>
+			}
+			else
+			{
+				@Html.HiddenFor(x => x.Email)
+				@Html.Hidden("Password", "password", new { @id = "loggedInPassword" })
+				@Html.Hidden("ConfirmPassword", "password", new { @id = "loggedInConfirmPassword"})
 			}
 			<img class="billing-advert-image" src="/Assets/images/checkout/subscribe-promo-bar-5-16-13-A.png"/>
 			<div class="form-group">
@@ -111,8 +114,8 @@
 				</div>
 			</div>
 			<div class="form-buttons-group">
-				<input class="arrow-left-red" type="button" value="Back" />
-				<input class="arrow-right-blue" type="submit" value="Continue" />
+				@(User.Identity.IsAuthenticated ? Html.ActionLink("Back", "ViewCart", "Cart", null, new {@class = "button arrow-left-red"}) : Html.ActionLink("Back", "Welcome", "Checkout", htmlAttributes: new {@class = "button arrow-left-red"}))
+				<input class="arrow-right-blue" type="submit" value="Continue"/>
 			</div>
 		}
 	</div>
