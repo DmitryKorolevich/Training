@@ -469,6 +469,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<TokenService>().As<ITokenService>();
             builder.RegisterType<TrackingService>().As<ITrackingService>();
             builder.RegisterType<CheckoutService>().As<ICheckoutService>();
+            builder.RegisterType<OrderSchedulerService>().As<IOrderSchedulerService>();
             builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
             builder.RegisterModelConverters(projectAssembly);
 

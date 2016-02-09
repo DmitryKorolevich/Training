@@ -21,6 +21,7 @@ using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Business.CsvExportMaps;
 using Microsoft.Net.Http.Headers;
 using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Interfaces.Services.Orders;
 
 namespace VC.Admin.Controllers
 {
@@ -28,15 +29,18 @@ namespace VC.Admin.Controllers
     public class GCController : BaseApiController
     {
         private readonly IGcService GCService;
+        private readonly IOrderSchedulerService OrderSchedulerService;
         private readonly ICsvExportService<GCWithOrderListItemModel, GCWithOrderListItemModelCsvMap> _gCWithOrderListItemModelCsvMapCSVExportService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly ILogger logger;
 
         public GCController(IGcService GCService,
+            IOrderSchedulerService OrderSchedulerService,
             ICsvExportService<GCWithOrderListItemModel, GCWithOrderListItemModelCsvMap> gCWithOrderListItemModelCsvMapCSVExportService,
             ILoggerProviderExtended loggerProvider)
         {
             this.GCService = GCService;
+            this.OrderSchedulerService = OrderSchedulerService;
             _gCWithOrderListItemModelCsvMapCSVExportService = gCWithOrderListItemModelCsvMapCSVExportService;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             this.logger = loggerProvider.CreateLoggerDefault();

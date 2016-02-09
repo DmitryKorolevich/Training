@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
+using VitalChoice.Data.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -19,6 +22,10 @@ namespace VitalChoice.Interfaces.Services.Orders
 	    Task<OrderDynamic> SelectWithCustomerAsync(int id, bool withDefaults = false);
 	    Task<OrderDataContext> CalculateOrder(OrderDynamic order);
 		Task<OrderDynamic> SelectLastOrderAsync(int customerId);
+
+        Task<List<OrderDynamic>> SelectAsync(Expression<Func<Order, bool>> query = null,
+            Func<IQueryLite<Order>, IQueryLite<Order>> includesOverride = null,
+            bool withDefaults = false);
 
         Task<OrderDynamic> CreateNewNormalOrder(OrderStatus status);
 
