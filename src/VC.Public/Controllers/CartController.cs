@@ -122,15 +122,10 @@ namespace VC.Public.Controllers
 		        ModelState.Clear();
 	        }
 
-            if (!ModelState.IsValid)
-            {
-                model.ShippingDateError = ModelState["ShippingDate"].Errors.Select(x => x.ErrorMessage).FirstOrDefault();
-                //return model;
-            }
-            else
-            { 
-                model.ShippingDateError = string.Empty;
-            }
+            model.ShippingDateError = !ModelState.IsValid
+                ? ModelState["ShippingDate"].Errors.Select(x => x.ErrorMessage).FirstOrDefault()
+                : string.Empty;
+
             var existingUid = Request.GetCartUid();
             CustomerCartOrder cart;
             if (await CustomerLoggedIn())
@@ -161,14 +156,12 @@ namespace VC.Public.Controllers
             if (!model.ShipAsap)
             {
                 cart.Order.Data.ShipDelayType = ShipDelayType.EntireOrder;
-                cart.Order.Data.ShipDelayDateP = model.ShippingDate;
-                cart.Order.Data.ShipDelayDateNP = model.ShippingDate;
+                cart.Order.Data.ShipDelayDate = model.ShippingDate;
             }
             else
             {
                 cart.Order.Data.ShipDelayType = ShipDelayType.None;
-                cart.Order.Data.ShipDelayDateP = null;
-                cart.Order.Data.ShipDelayDateNP = null;
+                cart.Order.Data.ShipDelayDate = null;
             }
             cart.Order.Data.ShippingUpgradeP = model.ShippingUpgradeP;
             cart.Order.Data.ShippingUpgradeNP = model.ShippingUpgradeNP;

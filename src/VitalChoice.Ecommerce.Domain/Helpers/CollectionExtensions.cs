@@ -90,7 +90,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             }
         }
 
-        public static void AddWhen<T>(this ICollection<T> main, ICollection<T> toAdd, Func<T, T, bool> addCondition)
+        public static void AddWhen<T>(this ICollection<T> main, IEnumerable<T> toAdd, Func<T, T, bool> addCondition)
         {
             if (main == null)
                 throw new ArgumentNullException(nameof(main));
@@ -100,7 +100,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             }
         }
 
-        public static void AddKeyed<T, TKey>(this ICollection<T> main, ICollection<T> toAdd, Func<T, TKey> keySelector)
+        public static void AddKeyed<T, TKey>(this ICollection<T> main, IEnumerable<T> toAdd, Func<T, TKey> keySelector)
         {
             if (main == null)
                 throw new ArgumentNullException(nameof(main));
@@ -110,7 +110,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             }
         }
 
-        public static void AddKeyed<T1, T2, TKey>(this ICollection<T1> main, ICollection<T2> toAdd,
+        public static void AddKeyed<T1, T2, TKey>(this ICollection<T1> main, IEnumerable<T2> toAdd,
             Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T2, T1> projection)
         {
             if (main == null)
@@ -121,7 +121,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             }
         }
 
-        public static void UpdateKeyed<T1, T2, TKey>(this ICollection<T1> main, ICollection<T2> toAdd,
+        public static void UpdateKeyed<T1, T2, TKey>(this ICollection<T1> main, IEnumerable<T2> toAdd,
             Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Action<T1, T2> updateAction)
         {
             if (main == null)
@@ -140,7 +140,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             }
         }
 
-        public static void UpdateKeyed<T, TKey>(this ICollection<T> main, ICollection<T> toAdd,
+        public static void UpdateKeyed<T, TKey>(this ICollection<T> main, IEnumerable<T> toAdd,
             Func<T, TKey> keySelector, Action<T, T> updateAction)
         {
             if (main == null)
