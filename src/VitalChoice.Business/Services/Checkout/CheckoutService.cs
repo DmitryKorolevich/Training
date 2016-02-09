@@ -44,19 +44,20 @@ namespace VitalChoice.Business.Services.Checkout
         private readonly IOrderService _orderService;
         private readonly EcommerceContext _context;
         private readonly ICustomerService _customerService;
-        private readonly IEcommerceRepositoryAsync<CartToSku> _skusRepository;
+        private readonly IEcommerceRepositoryAsync<CartToSku> _cartToSkusRepository;
+        private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
         private readonly IDynamicReadServiceAsync<AddressDynamic, OrderAddress> _addressService;
         private readonly ICountryService _countryService;
-        private readonly IEcommerceRepositoryAsync<OrderToSku> _skuRepository;
+        private readonly IEcommerceRepositoryAsync<OrderToSku> _orderToSkuRepository;
         private readonly IRepositoryAsync<ProductContent> _productContentRep;
         private readonly ILogger _logger;
 
         public CheckoutService(IEcommerceRepositoryAsync<CartExtended> cartRepository,
             DiscountMapper discountMapper,
             SkuMapper skuMapper, ProductMapper productMapper, IOrderService orderService, EcommerceContext context,
-            ILoggerProviderExtended loggerProvider, ICustomerService customerService, IEcommerceRepositoryAsync<CartToSku> skusRepository,
+            ILoggerProviderExtended loggerProvider, ICustomerService customerService, IEcommerceRepositoryAsync<CartToSku> cartToSkusRepository,
             IDynamicReadServiceAsync<AddressDynamic, OrderAddress> addressService, ICountryService countryService,
-            IEcommerceRepositoryAsync<OrderToSku> skuRepository, IRepositoryAsync<ProductContent> productContentRep)
+            IEcommerceRepositoryAsync<OrderToSku> orderToSkuRepository, IRepositoryAsync<ProductContent> productContentRep, IEcommerceRepositoryAsync<Sku> skuRepository)
         {
             _cartRepository = cartRepository;
             _discountMapper = discountMapper;
@@ -65,11 +66,12 @@ namespace VitalChoice.Business.Services.Checkout
             _orderService = orderService;
             _context = context;
             _customerService = customerService;
-            _skusRepository = skusRepository;
+            _cartToSkusRepository = cartToSkusRepository;
             _addressService = addressService;
             _countryService = countryService;
-            _skuRepository = skuRepository;
+            _orderToSkuRepository = orderToSkuRepository;
             _productContentRep = productContentRep;
+            _skuRepository = skuRepository;
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -123,7 +125,7 @@ namespace VitalChoice.Business.Services.Checkout
                 product.Url = productUrl;
                 return new SkuOrdered
                 {
-                    Amount = s.Amount,
+                    Amount = s.Sku.Price,
                     Sku = _skuMapper.FromEntity(s.Sku, true),
                     ProductWithoutSkus = product,
                     Quantity = s.Quantity
@@ -187,24 +189,38 @@ namespace VitalChoice.Business.Services.Checkout
                     {
                         var anonymCart = await GetOrCreateCart(uid);
 
-                        anonymCart.Order.Customer = await _customerService.SelectAsync(idCustomer);
+                        var customer = await _customerService.SelectAsync(idCustomer, true);
+                        anonymCart.Order.Customer = customer;
                         anonymCart.Order = await _orderService.InsertAsync(anonymCart.Order);
 
                         cart = await _cartRepository.Query(c => c.CartUid == anonymCart.CartUid).SelectFirstOrDefaultAsync();
                         cart.IdOrder = anonymCart.Order.Id;
                         await _context.SaveChangesAsync();
-                        anonymCart.Order.Customer = await _customerService.SelectAsync(idCustomer, true);
+                        anonymCart.Order.Customer = customer;
                         result.Order = anonymCart.Order;
                     }
                     else
                     {
                         result.Order = await _orderService.SelectAsync(cart.IdOrder.Value, true);
                         result.Order.Customer = await _customerService.SelectAsync(idCustomer, true);
-                        foreach (var skuOrdered in result.Order.Skus)
-                        {
-                            var productUrl = _productContentRep.Query(p => p.Id == skuOrdered.Sku.IdProduct).Select(p => p.Url, false).FirstOrDefault();
-                            skuOrdered.ProductWithoutSkus.Url = productUrl;
-                        }
+                        var products = result.Order.Skus.Select(s => s.Sku.IdProduct).Distinct().ToList();
+                        var skus = result.Order.Skus.Select(s => s.Sku.Id).ToList();
+                        var productUrls =
+                            await
+                                _productContentRep.Query(p => products.Contains(p.Id)).Distinct().SelectAsync(false);
+                        var skuAmounts =
+                            (await
+                                _skuRepository.Query(s => skus.Contains(s.Id))
+                                    .Distinct()
+                                    .SelectAsync(false)).ToDictionary(s => s.Id);
+                        result.Order.Skus.UpdateKeyed(productUrls, s => s.Sku.IdProduct, arg => arg.Id,
+                            (s, p) =>
+                            {
+                                s.ProductWithoutSkus.Url = p.Url;
+                                s.Amount = result.Order.Customer.IdObjectType == (int) CustomerType.Wholesale
+                                    ? skuAmounts[s.Sku.Id].WholesalePrice
+                                    : skuAmounts[s.Sku.Id].Price;
+                            });
                     }
                     transaction.Commit();
                 }
@@ -325,10 +341,10 @@ namespace VitalChoice.Business.Services.Checkout
             {
                 if (cart.IdOrder != null)
                 {
-                    var skusOrdered = await _skuRepository.Query(s => s.IdOrder == cart.IdOrder.Value).SelectAsync(false);
+                    var skusOrdered = await _orderToSkuRepository.Query(s => s.IdOrder == cart.IdOrder.Value).SelectAsync(false);
                     return skusOrdered.Sum(s => s.Quantity);
                 }
-                var skus = await _skusRepository.Query(s => s.IdCart == cart.Id).SelectAsync(false);
+                var skus = await _cartToSkusRepository.Query(s => s.IdCart == cart.Id).SelectAsync(false);
                 return skus.Sum(s => s.Quantity);
             }
             return 0;
