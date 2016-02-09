@@ -662,11 +662,6 @@ namespace VitalChoice.Business.Services.Customers
 
                     entity = await base.InsertAsync(model, uow);
 
-                    if (string.IsNullOrWhiteSpace(password) && model.StatusCode != suspendedCustomer && !String.IsNullOrEmpty(model.Email))
-                    {
-                        await _storefrontUserService.SendActivationAsync(model.Email);
-                    }
-
                     updatePaymentsTask = _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(paymentCopies);
 
                     transaction.Commit();

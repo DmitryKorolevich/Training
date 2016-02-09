@@ -324,6 +324,11 @@ namespace VC.Admin.Controllers
             else
             {
                 item = await _customerService.InsertAsync(item);
+
+                if (item.StatusCode != (int)CustomerStatus.Suspended && !String.IsNullOrEmpty(item.Email))
+                {
+                    await _storefrontUserService.SendActivationAsync(item.Email);
+                }
             }
             var toReturn = _customerMapper.ToModel<AddUpdateCustomerModel>(item);
 
