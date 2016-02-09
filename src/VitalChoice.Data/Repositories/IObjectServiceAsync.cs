@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Data.Entity.Storage;
 
 namespace VitalChoice.Data.Repositories
 {
     public interface IObjectServiceAsync<T>
     {
+        IRelationalTransaction BeginTransaction();
         Task<T> InsertAsync(T model);
         Task<T> UpdateAsync(T model);
         Task<List<T>> InsertRangeAsync(ICollection<T> models);

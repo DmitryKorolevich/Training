@@ -23,6 +23,7 @@ using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Content.Products;
@@ -165,10 +166,10 @@ namespace VitalChoice.Business.Services.Products
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             IOptions<AppOptions> options,
             ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<VCustomerFavorite> vCustomerRepositoryAsync,
-            DirectMapper<Product> directMapper, DynamicExpressionVisitor queryVisitor)
+            DirectMapper<Product> directMapper, DynamicExpressionVisitor queryVisitor, EcommerceContext dbContext)
             : base(
                 mapper, productRepository, productValueRepositoryAsync,
-                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, dbContext)
         {
             _vProductSkuRepository = vProductSkuRepository;
             _vSkuRepository = vSkuRepository;

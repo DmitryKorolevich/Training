@@ -436,9 +436,17 @@ namespace VitalChoice.DynamicData.Base
                     {
                         var value = TypeConverter.ConvertFromModelObject(pair.Value.PropertyType,
                             pair.Value.Get?.Invoke(model));
-                        if (value != null)
+
+                        if (value == null)
+                            continue;
+
+                        if (!data.ContainsKey(mappingName))
                         {
                             data.Add(mappingName, value);
+                        }
+                        else
+                        {
+                            data[mappingName] = value;
                         }
                     }
                 }
