@@ -51,6 +51,45 @@ namespace VC.Public.Controllers
 			return uid == null || await CheckoutService.GetCartItemsCount(uid.Value) == 0;
 		}
 
+		protected async Task<ViewCartModel> InitCartModelInternal(ViewCartModel cartModel)
+		{
+			await GetCart(cartModel);
+
+			if (!cartModel.GiftCertificateCodes.Any())
+			{
+				cartModel.GiftCertificateCodes.Add(new CartGcModel() { Value = string.Empty }); //needed to to force first input to appear
+			}
+			return cartModel;
+		}
+
+		protected async Task<ViewCartModel> GetCart(ViewCartModel cartModel)
+		{
+			var existingUid = Request.GetCartUid();
+			if (await CustomerLoggedIn())
+			{
+				var id = GetInternalCustomerId();
+				var cart = await CheckoutService.GetOrCreateCart(existingUid, id);
+				await FillModel(cartModel, cart);
+				SetCartUid(cart.CartUid);
+				return cartModel;
+			}
+			else
+			{
+				var cart = await CheckoutService.GetOrCreateCart(existingUid);
+				await FillModel(cartModel, cart);
+				SetCartUid(cart.CartUid);
+				return cartModel;
+			}
+		}
+
+		protected void SetCartUid(Guid uid)
+		{
+			Response.Cookies.Append(CheckoutConstants.CartUidCookieName, uid.ToString(), new CookieOptions
+			{
+				Expires = DateTime.Now.AddYears(1)
+			});
+		}
+
 		protected async Task FillModel(ViewCartModel cartModel, CustomerCartOrder cart)
 		{
 			await Calculate(cartModel, cart.Order);

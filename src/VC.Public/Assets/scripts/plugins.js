@@ -110,13 +110,15 @@ var getBaseHtml = function (title, body) {
         }
     });
 
-    google.load('search', '1', { language: 'en' });
-    google.setOnLoadCallback(function() {
-        google.search.CustomSearchControl.attachAutoCompletion(
-        googleSearchcx,
-        $('.search-area form input[type=text]').get(0),
-        'search-area-form');
-    });
+    if (window.google) {
+    	google.load('search', '1', { language: 'en' });
+    	google.setOnLoadCallback(function () {
+    		google.search.CustomSearchControl.attachAutoCompletion(
+			googleSearchcx,
+			$('.search-area form input[type=text]').get(0),
+			'search-area-form');
+    	});
+	}
 
     $(document).ready(function ()
     {
