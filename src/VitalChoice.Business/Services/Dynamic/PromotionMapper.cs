@@ -7,7 +7,7 @@ using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Data.Extensions;
-using VitalChoice.Ecommerce.Domain.Entities.Promotion;
+using VitalChoice.Ecommerce.Domain.Entities.Promotions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 
@@ -20,11 +20,6 @@ namespace VitalChoice.Business.Services.Dynamic
             IEcommerceRepositoryAsync<PromotionOptionType> promotionRepositoryAsync)
             : base(converter, converterService, promotionRepositoryAsync)
         {
-        }
-
-        protected override Expression<Func<PromotionOptionValue, int>> ObjectIdReferenceSelector
-        {
-            get { return c => c.IdPromotion; }
         }
 
         protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<PromotionDynamic, Promotion>> items, bool withDefaults = false)

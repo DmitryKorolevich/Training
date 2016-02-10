@@ -42,7 +42,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
         public OrderDataContext()
         {
             Messages = new List<MessageInfo>();
-            PromoSkus = new List<SkuOrdered>();
+            PromoSkus = new List<PromoOrdered>();
             GcMessageInfos = new List<MessageInfo>();
             SplitInfo = new SplitInfo();
         }
@@ -91,7 +91,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
 
         public ICollection<SkuOrdered> SkuOrdereds { get; set; }
 
-        public ICollection<SkuOrdered> PromoSkus { get; set; }
+        public ICollection<PromoOrdered> PromoSkus { get; set; }
 
         public ICollection<MessageInfo> Messages { get; set; }
 

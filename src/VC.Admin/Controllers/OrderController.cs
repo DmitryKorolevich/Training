@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
-using VC.Admin.Models.Product;
 using VitalChoice.Validation.Models;
 using System;
 using VitalChoice.Core.Base;
@@ -34,6 +33,7 @@ using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VC.Admin.ModelConverters;
+using VC.Admin.Models.Products;
 
 namespace VC.Admin.Controllers
 {

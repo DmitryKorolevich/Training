@@ -21,11 +21,6 @@ namespace VitalChoice.Business.Services.Dynamic
 
         }
 
-        protected override Expression<Func<SkuOptionValue, int>> ObjectIdReferenceSelector
-        {
-            get { return c => c.IdSku; }
-        }
-
         //public override IQueryOptionType<ProductOptionType> GetOptionTypeQuery()
         //{
         //    throw new ApiException("Cannot get sku option types as they inherited from product, please provide types with entity or as parameter");

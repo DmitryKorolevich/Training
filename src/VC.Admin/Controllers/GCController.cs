@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
-using VC.Admin.Models.Product;
 using VitalChoice.Validation.Models;
 using System.Security.Claims;
 using System;
@@ -20,6 +19,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Business.CsvExportMaps;
 using Microsoft.Net.Http.Headers;
+using VC.Admin.Models.Products;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Interfaces.Services.Orders;
 

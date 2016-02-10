@@ -1,10 +1,10 @@
 ﻿using System;
 using VitalChoice.Business.Helpers;
-using VitalChoice.Validation.Models;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
+using VitalChoice.Validation.Models;
 
-namespace VC.Admin.Models.Product
+namespace VC.Admin.Models.Products
 {
     public class GCListItemModel : BaseModel
     {

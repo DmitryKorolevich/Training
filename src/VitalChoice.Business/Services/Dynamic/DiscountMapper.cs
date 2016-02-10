@@ -26,11 +26,6 @@ namespace VitalChoice.Business.Services.Dynamic
             _productService = productService;
         }
 
-        protected override Expression<Func<DiscountOptionValue, int>> ObjectIdReferenceSelector
-        {
-            get { return c => c.IdDiscount; }
-        }
-
         protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<DiscountDynamic, Discount>> items, bool withDefaults = false)
         {
             items.ForEach(pair =>

@@ -169,6 +169,16 @@ namespace VitalChoice.Business.Services.Orders
                     .ThenInclude(d => d.OptionValues)
                     .Include(o => o.GiftCertificates)
                     .ThenInclude(g => g.GiftCertificate)
+                    .Include(o => o.PromoSkus)
+                    .ThenInclude(p => p.Sku)
+                    .ThenInclude(s => s.OptionValues)
+                    .Include(o => o.PromoSkus)
+                    .ThenInclude(p => p.Sku)
+                    .ThenInclude(s => s.Product)
+                    .ThenInclude(p => p.OptionValues)
+                    .Include(o => o.PromoSkus)
+                    .ThenInclude(p => p.Promo)
+                    .ThenInclude(s => s.OptionValues)
                     .Include(o => o.PaymentMethod)
                     .ThenInclude(p => p.BillingAddress)
                     .ThenInclude(a => a.OptionValues)
@@ -274,7 +284,7 @@ namespace VitalChoice.Business.Services.Orders
             order.DiscountTotal = dataContext.DiscountTotal;
             order.ShippingTotal = dataContext.ShippingTotal;
             order.ProductsSubtotal = dataContext.ProductsSubtotal;
-            //TODO: Add promo skus and skus to order
+            order.PromoSkus = dataContext.PromoSkus;
         }
 
         protected override Task<List<MessageInfo>> ValidateAsync(OrderDynamic dynamic)

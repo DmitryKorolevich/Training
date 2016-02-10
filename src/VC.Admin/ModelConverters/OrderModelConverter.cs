@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
 using VC.Admin.Models.Customer;
-using VC.Admin.Models.Product;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Base;
@@ -11,6 +10,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Products;
 using VC.Admin.Models.Orders;
+using VC.Admin.Models.Products;
 using VitalChoice.Business.Queries.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;

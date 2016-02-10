@@ -25,6 +25,8 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Orders
 
         public ICollection<OrderToSku> Skus { get; set; }
 
+        public ICollection<OrderToPromo> PromoSkus { get; set; }
+
         public int? IdDiscount { get; set; }
 
         public ICollection<OrderToGiftCertificate> GiftCertificates { get; set; }

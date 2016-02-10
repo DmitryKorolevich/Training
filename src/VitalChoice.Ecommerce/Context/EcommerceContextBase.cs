@@ -14,7 +14,7 @@ using VitalChoice.Ecommerce.Domain.Entities.History;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
-using VitalChoice.Ecommerce.Domain.Entities.Promotion;
+using VitalChoice.Ecommerce.Domain.Entities.Promotions;
 using VitalChoice.Ecommerce.Domain.Entities.Users;
 using VitalChoice.Ecommerce.Domain.Entities.Workflow;
 using VitalChoice.Ecommerce.Domain.Options;
@@ -907,6 +907,25 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey<OrderOptionType>(t => t.IdLookup)
                     .HasPrincipalKey<Lookup>(l => l.Id)
                     .IsRequired(false);
+            });
+
+            builder.Entity<OrderToPromo>(entity =>
+            {
+                entity.Ignore(p => p.Id);
+                entity.ToTable("OrderToPromos");
+                entity.HasKey(p => new {p.IdOrder, p.IdSku});
+                entity.HasOne(s => s.Order)
+                    .WithMany(o => o.PromoSkus)
+                    .HasForeignKey(s => s.IdOrder)
+                    .HasPrincipalKey(o => o.Id);
+                entity.HasOne(s => s.Sku)
+                    .WithOne()
+                    .HasForeignKey<OrderToPromo>(s => s.IdSku)
+                    .HasPrincipalKey<Sku>(s => s.Id);
+                entity.HasOne(p => p.Promo)
+                    .WithMany()
+                    .HasForeignKey(p => p.IdPromo)
+                    .HasPrincipalKey(p => p.Id);
             });
 
             builder.Entity<OrderToGiftCertificate>(entity =>

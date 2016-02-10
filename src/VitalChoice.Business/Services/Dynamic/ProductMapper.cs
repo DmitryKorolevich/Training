@@ -26,11 +26,6 @@ namespace VitalChoice.Business.Services.Dynamic
             _skuMapper = skuMapper;
         }
 
-        protected override Expression<Func<ProductOptionValue, int>> ObjectIdReferenceSelector
-        {
-            get { return c => c.IdProduct; }
-        }
-
         protected override async Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<ProductDynamic, Product>> items, bool withDefaults = false)
         {
             await items.ForEachAsync(async pair =>

@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using VC.Admin.Validators.Product;
 using VitalChoice.Ecommerce.Domain.Attributes;
-using VitalChoice.Validation.Models;
-using VitalChoice.Validation.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
-using VitalChoice.Ecommerce.Domain.Entities.Promotion;
+using VitalChoice.Ecommerce.Domain.Entities.Promotions;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
+using VitalChoice.Validation.Attributes;
+using VitalChoice.Validation.Models;
 
-namespace VC.Admin.Models.Product
+namespace VC.Admin.Models.Products
 {
     [ApiValidator(typeof(PromotionManageModelValidator))]
     public class PromotionManageModel : BaseModel

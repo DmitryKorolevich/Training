@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
-using VC.Admin.Models.Product;
+using VC.Admin.Models.Products;
 using VitalChoice.Validation.Logic;
 using VitalChoice.Core.Infrastructure.Helpers;
-using VitalChoice.Ecommerce.Domain.Entities.Promotion;
+using VitalChoice.Ecommerce.Domain.Entities.Promotions;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 

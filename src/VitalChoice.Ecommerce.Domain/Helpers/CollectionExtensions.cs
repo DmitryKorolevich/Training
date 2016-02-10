@@ -47,6 +47,9 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
 
         public static async Task AddRangeAsync<T>(this ICollection<T> collection, IEnumerable<Task<T>> items)
         {
+            if (collection == null)
+                throw new ArgumentNullException(nameof(collection));
+
             foreach (var item in items)
             {
                 collection.Add(await item);

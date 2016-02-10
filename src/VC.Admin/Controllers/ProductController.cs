@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
 using VC.Admin.Models;
-using VC.Admin.Models.Product;
 using VitalChoice.Validation.Models;
 using System;
 using VitalChoice.Core.Base;

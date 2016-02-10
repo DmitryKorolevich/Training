@@ -1,10 +1,10 @@
 ﻿using VC.Admin.Validators.Product;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
-using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Attributes;
+using VitalChoice.Validation.Models;
 
-namespace VC.Admin.Models.Product
+namespace VC.Admin.Models.Products
 {
     [ApiValidator(typeof(InventoryCategoryManageModelValidator))]
     public class InventoryCategoryManageModel : BaseModel

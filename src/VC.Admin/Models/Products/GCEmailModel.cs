@@ -1,11 +1,10 @@
 ﻿using VC.Admin.Validators.Product;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
-using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Attributes;
-using System;
+using VitalChoice.Validation.Models;
 
-namespace VC.Admin.Models.Product
+namespace VC.Admin.Models.Products
 {
     [ApiValidator(typeof(GCManageEmailModelValidator))]
     public class GCEmailModel : BaseModel

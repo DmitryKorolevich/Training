@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using VC.Admin.Models.Product;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Validation.Logic;
 using VitalChoice.Validation.Helpers;

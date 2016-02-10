@@ -55,9 +55,6 @@ namespace VitalChoice.DynamicData.Base
         protected abstract Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items, bool withDefaults = false);
         protected abstract Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
         protected abstract Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
-        protected abstract Expression<Func<TOptionValue, int>> ObjectIdReferenceSelector { get; }
-        private Action<TOptionValue, int> _valueSetter;
-        private Func<TOptionValue, int> _valueGetter;
         private static ICollection<TOptionType> _optionTypes;
 
         protected DynamicMapper(ITypeConverter typeConverter,
@@ -122,32 +119,6 @@ namespace VitalChoice.DynamicData.Base
 
         public ICollection<TOptionType> OptionTypes => _optionTypes;
 
-        public Action<TOptionValue, int> SetObjectReferenceId
-        {
-            get
-            {
-                if (_valueSetter == null)
-                {
-                    Interlocked.CompareExchange(ref _valueSetter, GetValueObjectIdSetter(ObjectIdReferenceSelector), null);
-                }
-                return _valueSetter;
-            }
-        }
-
-        public Func<TOptionValue, int> GetObjectReferenceId
-        {
-            get
-            {
-                if (_valueGetter == null)
-                {
-                    Interlocked.CompareExchange(ref _valueGetter, ObjectIdReferenceSelector.CacheCompile(), null);
-                }
-                return _valueGetter;
-            }
-        }
-
-        public Expression<Func<TOptionValue, int>> ObjectReferenceExpression => ObjectIdReferenceSelector;
-
         public ICollection<TOptionType> FilterByType(int? objectType)
         {
             var filterFunc = GetOptionTypeQuery().WithObjectType(objectType).Query()?.CacheCompile();
@@ -188,13 +159,6 @@ namespace VitalChoice.DynamicData.Base
 
             UpdateEntityItem(dynamic, entity);
             await UpdateEntityInternalAsync(dynamic, entity);
-            //if (dynamic.Id != 0)
-            //{
-            //    foreach (var value in entity.OptionValues)
-            //    {
-            //        SetObjectReferenceId(value, dynamic.Id);
-            //    }
-            //}
         }
 
 		public void UpdateEntity(TDynamic dynamic, TEntity entity)
@@ -264,18 +228,6 @@ namespace VitalChoice.DynamicData.Base
             }
 
             await UpdateEntityRangeInternalAsync(items);
-            //items.ForEach(item =>
-            //{
-            //    var entity = item.Entity;
-            //    var dynamic = item.Dynamic;
-            //    if (dynamic.Id != 0)
-            //    {
-            //        foreach (var value in entity.OptionValues)
-            //        {
-            //            SetObjectReferenceId(value, dynamic.Id);
-            //        }
-            //    }
-            //});
         }
 
         public async Task<List<TEntity>> ToEntityRangeAsync(ICollection<TDynamic> items,
