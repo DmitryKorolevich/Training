@@ -203,20 +203,20 @@ namespace VC.Public.Controllers
 
 			var item = _customerMapper.FromModel(model);
             var cookies = Request.Cookies[AffiliateConstants.AffiliatePublicIdParam];
-            if (!String.IsNullOrEmpty(cookies))
-            {
-                int idAffiliate = 0;
-                if (Int32.TryParse(cookies, out idAffiliate))
-                {
-                    var affiliate = await _affiliateService.SelectAsync(idAffiliate);
-                    if(affiliate!=null)
-                    {
-                        item.IdAffiliate = affiliate.Id;
-                    }
-                }
-            }
+		    if (!String.IsNullOrEmpty(cookies))
+		    {
+		        int idAffiliate = 0;
+		        if (Int32.TryParse(cookies, out idAffiliate))
+		        {
+		            var affiliate = await _affiliateService.SelectAsync(idAffiliate);
+		            if (affiliate != null)
+		            {
+		                item.IdAffiliate = affiliate.Id;
+		            }
+		        }
+		    }
 
-            item.IdObjectType = (int)CustomerType.Retail;
+		    item.IdObjectType = (int)CustomerType.Retail;
 			item.PublicId = Guid.NewGuid();
 			item.StatusCode = (int) CustomerStatus.Active;
 

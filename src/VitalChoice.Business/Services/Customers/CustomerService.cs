@@ -171,10 +171,10 @@ namespace VitalChoice.Business.Services.Customers
                     throw new AppValidationException("IdAffiliate",ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InvalidIdAffiliate]);
                 }
             }
-            foreach (var paymentMethod in model.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard))
-            {
+            //foreach (var paymentMethod in model.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard))
+            //{
                 
-            }
+            //}
 
             //Don't allow to return a customer registered from the admin part(Not Active) to Not Active status from 
             //Active(by a store front activation)

@@ -186,6 +186,14 @@ namespace VC.Public.Controllers
 
                     PopulateCreditCardsLookup(creditCards);
                 }
+                else
+                {
+                    if (cart.Order.PaymentMethod?.Address != null && cart.Order.PaymentMethod.Id != 0)
+                    {
+                        _addressConverter.UpdateModel(addUpdateModel, cart.Order.PaymentMethod.Address);
+                        _orderPaymentMethodConverter.UpdateModel<BillingInfoModel>(addUpdateModel, cart.Order.PaymentMethod);
+                    }
+                }
 
                 addUpdateModel.Email = currentCustomer.Email;
 
@@ -234,7 +242,7 @@ namespace VC.Public.Controllers
                     else
                     {
                         cart = await CheckoutService.GetOrCreateCart(existingUid);
-                        if ((cart.Order.Customer?.Id ?? 0) == 0 ||
+                        if ((cart.Order.Customer?.Id ?? 0) == 0 || !model.GuestCheckout ||
                             cart.Order.Customer?.StatusCode != (int) CustomerStatus.NotActive && model.GuestCheckout)
                         {
                             var newCustomer = await CreateAccount(model);
@@ -247,20 +255,20 @@ namespace VC.Public.Controllers
                                     throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
                                 }
                             }
-                        }
-                        if (model.GuestCheckout && ((bool?) cart.Order.Customer?.SafeData.Guest ?? false))
-                        {
-                            var appUser = await CustomerService.GetUser(cart.Order.Customer.Id);
-
-                            var user = await _storefrontUserService.SignInNoStatusCheckingAsync(appUser);
-                            if (user == null)
+                            else if (model.GuestCheckout && ((bool?)cart.Order.Customer?.SafeData.Guest ?? false))
                             {
-                                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+                                var appUser = await CustomerService.GetUser(cart.Order.Customer.Id);
+
+                                var user = await _storefrontUserService.SignInNoStatusCheckingAsync(appUser);
+                                if (user == null)
+                                {
+                                    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+                                }
                             }
-                        }
-                        else
-                        {
-                            return RedirectToAction("Welcome");
+                            else
+                            {
+                                return RedirectToAction("Welcome");
+                            }
                         }
                     }
                     if (model.SendCatalog)
@@ -455,9 +463,9 @@ namespace VC.Public.Controllers
 				new KeyValuePair<string, string>("Number", paymentMethod.Data.CardNumber),
 				//new KeyValuePair<string, string>("Expiration", $"{paymentMethod.Data.Month}/{paymentMethod.Data.Year % 2000}"), //uncomment this once get expdate fixed
 				new KeyValuePair<string, string>(string.Empty, $"{billingAddress.Data.FirstName} {billingAddress.Data.LastName}"),
-				new KeyValuePair<string, string>(string.Empty, billingAddress.Data.Company),
+				new KeyValuePair<string, string>(string.Empty, billingAddress.SafeData.Company),
 				new KeyValuePair<string, string>(string.Empty, billingAddress.Data.Address1),
-				new KeyValuePair<string, string>(string.Empty, billingAddress.Data.Address2),
+				new KeyValuePair<string, string>(string.Empty, billingAddress.SafeData.Address2),
 				new KeyValuePair<string, string>(string.Empty, $"{billingAddress.Data.City}, {ResolveStateOrCounty(countries, billingAddress)} {billingAddress.Data.Zip}"),
 				new KeyValuePair<string, string>("Phone", string.Format("{0:(###) ###-#### x#####}", billingAddress.Data.Phone)),
 				new KeyValuePair<string, string>("Email", cart.Order.Customer.Email),
@@ -468,9 +476,9 @@ namespace VC.Public.Controllers
 			reviewOrderModel.ShipToAddress = new List<KeyValuePair<string, string>>()
 			{
 				new KeyValuePair<string, string>(string.Empty, $"{shippingAddress.Data.FirstName} {shippingAddress.Data.LastName}"),
-				new KeyValuePair<string, string>(string.Empty, shippingAddress.Data.Company),
+				new KeyValuePair<string, string>(string.Empty, shippingAddress.SafeData.Company),
 				new KeyValuePair<string, string>(string.Empty, shippingAddress.Data.Address1),
-				new KeyValuePair<string, string>(string.Empty, shippingAddress.Data.Address2),
+				new KeyValuePair<string, string>(string.Empty, shippingAddress.SafeData.Address2),
 				new KeyValuePair<string, string>(string.Empty, $"{shippingAddress.Data.City}, {ResolveStateOrCounty(countries, shippingAddress)} {shippingAddress.Data.Zip}"),
 				new KeyValuePair<string, string>("Phone", string.Format("{0:(###) ###-#### x#####}", shippingAddress.Data.Phone)),
 			};
