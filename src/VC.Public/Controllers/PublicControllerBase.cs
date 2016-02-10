@@ -13,6 +13,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Core.Infrastructure.Helpers;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services.Checkout;
 

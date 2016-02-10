@@ -116,11 +116,11 @@ namespace VC.Public.Controllers
         [HttpPost]
         public async Task<Result<ViewCartModel>> UpdateCart([FromBody] ViewCartModel model)
         {
-	        if (model.ShipAsap && model.ShippingDate.HasValue)
-	        {
-		        model.ShippingDate = null;
-		        ModelState.Clear();
-	        }
+            if (model.ShipAsap && model.ShippingDate.HasValue)
+            {
+                model.ShippingDate = null;
+                ModelState.Clear();
+            }
 
             model.ShippingDateError = !ModelState.IsValid
                 ? ModelState["ShippingDate"].Errors.Select(x => x.ErrorMessage).FirstOrDefault()
@@ -156,6 +156,12 @@ namespace VC.Public.Controllers
             if (!model.ShipAsap)
             {
                 cart.Order.Data.ShipDelayType = ShipDelayType.EntireOrder;
+                if (model.ShippingDate == null)
+                {
+                    model.ShippingDateError = string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldIsRequired],
+                        "Shipping Date");
+                    return model;
+                }
                 cart.Order.Data.ShipDelayDate = model.ShippingDate;
             }
             else
@@ -173,7 +179,7 @@ namespace VC.Public.Controllers
                 }
             }
             await FillModel(model, cart);
-            SetCartUid(cart.CartUid); 
+            SetCartUid(cart.CartUid);
             return model;
         }
 

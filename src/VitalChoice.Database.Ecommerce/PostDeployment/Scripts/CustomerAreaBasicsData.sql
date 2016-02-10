@@ -505,4 +505,12 @@ BEGIN
 	(N'PersonTitle', 4, NULL, 4, NULL)
 END
 
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[CustomerOptionTypes] WHERE IdObjectType = 1 AND Name=N'Guest')
+BEGIN
+	INSERT INTO CustomerOptionTypes
+	(Name, IdFieldType, IdLookup, IdObjectType, DefaultValue)
+	VALUES
+	(N'Guest', 5, NULL, 1, NULL)
+END
+
 GO
