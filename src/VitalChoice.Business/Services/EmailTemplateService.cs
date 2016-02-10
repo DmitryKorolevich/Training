@@ -29,10 +29,8 @@ using Templates;
 using System.Dynamic;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using Templates.Runtime;
-using System.Reflection;
-using VitalChoice.Ecommerce.Domain.Attributes;
 
-namespace VitalChoice.Business.Services.Content
+namespace VitalChoice.Business.Services
 {
     public class EmailTemplateService : IEmailTemplateService
     {
@@ -42,7 +40,7 @@ namespace VitalChoice.Business.Services.Content
         private readonly ITtlGlobalCache _templatesCache;
         private readonly ILogger _logger;
 
-        private static List<Type> _modelTypes = new List<Type>();
+        private static Dictionary<string, Type> _modelTypes;
 
         public EmailTemplateService(
             IRepositoryAsync<EmailTemplate> emailTemplateRepository,
@@ -65,21 +63,21 @@ namespace VitalChoice.Business.Services.Content
                 .GetExportedTypes()
                 .Where(
                     t => t.GetTypeInfo().IsSubclassOf(typeof(EmailTemplateDataModel)) && !t.GetTypeInfo().IsAbstract &&
-                    !t.GetTypeInfo().IsGenericType).ToList();
+                    !t.GetTypeInfo().IsGenericType).ToDictionary(p=>p.FullName,x=>x);
             //Infrastructure
             assembly = typeof(PrivacyRequestEmail).GetTypeInfo().Assembly;
             _modelTypes.AddRange(assembly
                 .GetExportedTypes()
                 .Where(
                     t => t.GetTypeInfo().IsSubclassOf(typeof(EmailTemplateDataModel)) && !t.GetTypeInfo().IsAbstract &&
-                    !t.GetTypeInfo().IsGenericType));
+                    !t.GetTypeInfo().IsGenericType).ToDictionary(p => p.FullName, x => x));
         }
 
         private static ICollection<string> GetEmailTemplateModelPropertyNames(string typeName)
         {
             List<string> toReturn = new List<string>();
-            var modelType = _modelTypes.FirstOrDefault(p => p.Name == typeName);
-            if (modelType != null)
+            Type modelType = null;            
+            if (_modelTypes.TryGetValue(typeName, out modelType))
             {
                 var properties = modelType.GetProperties().ToList();
                 foreach(var property in properties)
@@ -117,17 +115,19 @@ namespace VitalChoice.Business.Services.Content
         private readonly string DefaultModelName = "Model";
         private readonly string SubjectMasterTemplate = "<%" + Environment.NewLine + "<default> -> (Model)" + Environment.NewLine + "{{ data }} :: dynamic" + Environment.NewLine + "%>";
 
-        public async Task<BasicEmail> GenerateEmailAsync(string name, EmailTemplateDataModel model)
+        public async Task<BasicEmail> GenerateEmailAsync<T>(string name, T model)
+            where T : EmailTemplateDataModel
         {
-            var result = await GenerateEmailsAsync(name, new List<EmailTemplateDataModel>() { model });
+            var result = await GenerateEmailsAsync(name, new List<T>() { model });
             return result.Count == 1 ? result.First().Value : null;
         }
 
-        public async Task<Dictionary<EmailTemplateDataModel, BasicEmail>> GenerateEmailsAsync(string name, ICollection<EmailTemplateDataModel> models)
+        public async Task<Dictionary<T, BasicEmail>> GenerateEmailsAsync<T>(string name, ICollection<T> models)
+            where T : EmailTemplateDataModel
         {
-            Dictionary<EmailTemplateDataModel, BasicEmail> toReturn = new Dictionary<EmailTemplateDataModel, BasicEmail>();
-            var emailTemplate = (await _emailTemplateRepository.Query(p => p.Name == name && p.StatusCode != RecordStatusCode.Deleted).
-                Include(p => p.ContentItem).Include(p => p.MasterContentItem).SelectAsync(false)).FirstOrDefault();
+            Dictionary<T, BasicEmail> toReturn = new Dictionary<T, BasicEmail>();
+            var emailTemplate = await _emailTemplateRepository.Query(p => p.Name == name && p.StatusCode != RecordStatusCode.Deleted).
+                Include(p => p.ContentItem).Include(p => p.MasterContentItem).SelectFirstOrDefaultAsync(false);
             if (emailTemplate != null && models.Count != 0)
             {
                 ITtlTemplate mainTemplate;
@@ -148,7 +148,7 @@ namespace VitalChoice.Business.Services.Content
                     mainTemplate = _templatesCache.GetOrCreateTemplate(templateCacheOptions);
 
                     var subjectTextTemplate = SubjectMasterTemplate.Replace("data", emailTemplate.ContentItem.Title ?? String.Empty);
-                    subjectTemplate = new TtlTemplate(subjectTextTemplate, new CompileContext(models.First().GetType()));
+                    subjectTemplate = new TtlTemplate(subjectTextTemplate, new CompileContext(typeof(T)));
                 }
                 catch (Exception e)
                 {

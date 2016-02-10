@@ -13,8 +13,10 @@ namespace VitalChoice.Interfaces.Services
     {
         Task<PagedList<EmailTemplate>> GetEmailTemplatesAsync(FilterBase filter);
         Task<EmailTemplate> GetEmailTemplateAsync(int id);
-        Task<BasicEmail> GenerateEmailAsync(string name, EmailTemplateDataModel model);
-        Task<Dictionary<EmailTemplateDataModel, BasicEmail>> GenerateEmailsAsync(string name, ICollection<EmailTemplateDataModel> models);
+        Task<BasicEmail> GenerateEmailAsync<T>(string name, T model)
+             where T : EmailTemplateDataModel; 
+        Task<Dictionary<T, BasicEmail>> GenerateEmailsAsync<T>(string name, ICollection<T> models)
+             where T : EmailTemplateDataModel;
         Task<EmailTemplate> UpdateEmailTemplateAsync(EmailTemplate recipe);
         Task<bool> DeleteEmailTemplateAsync(int id);
     }
