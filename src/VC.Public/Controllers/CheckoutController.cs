@@ -227,6 +227,7 @@ namespace VC.Public.Controllers
             }
             using (var transaction = CustomerService.BeginTransaction())
             {
+                ApplicationUser user = null;
                 try
                 {
                     CustomerCartOrder cart;
@@ -243,23 +244,24 @@ namespace VC.Public.Controllers
                     {
                         cart = await CheckoutService.GetOrCreateCart(existingUid);
                         if ((cart.Order.Customer?.Id ?? 0) == 0 || !model.GuestCheckout ||
-                            cart.Order.Customer?.StatusCode != (int) CustomerStatus.NotActive && model.GuestCheckout)
+                            cart.Order.Customer?.StatusCode != (int) CustomerStatus.PhoneOnly && model.GuestCheckout)
                         {
                             var newCustomer = await CreateAccount(model);
                             cart.Order.Customer = newCustomer;
                             if (!model.GuestCheckout)
                             {
-                                var user = await _storefrontUserService.SignInAsync(cart.Order.Customer.Email, model.Password);
+                                user = await _storefrontUserService.SignInAsync(cart.Order.Customer.Email, model.Password);
                                 if (user == null)
                                 {
                                     throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
                                 }
                             }
-                            else if (model.GuestCheckout && ((bool?)cart.Order.Customer?.SafeData.Guest ?? false))
+                            else if (model.GuestCheckout && ((bool?) cart.Order.Customer?.SafeData.Guest ?? false))
                             {
+                                await _storefrontUserService.SendActivationAsync(cart.Order.Customer.Email);
                                 var appUser = await CustomerService.GetUser(cart.Order.Customer.Id);
 
-                                var user = await _storefrontUserService.SignInNoStatusCheckingAsync(appUser);
+                                user = await _storefrontUserService.SignInNoStatusCheckingAsync(appUser);
                                 if (user == null)
                                 {
                                     throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
@@ -289,6 +291,7 @@ namespace VC.Public.Controllers
                     {
                         cart.Order.PaymentMethod = _orderPaymentMethodConverter.FromModel((BillingInfoModel) model);
                         cart.Order.PaymentMethod.Address = _addressConverter.FromModel(model);
+                        cart.Order.PaymentMethod.Address.IdObjectType = (int)AddressType.Billing;
                     }
                     else
                     {
@@ -308,6 +311,14 @@ namespace VC.Public.Controllers
                 catch
                 {
                     transaction.Rollback();
+                    if (user != null && user.Id != 0)
+                    {
+                        if (await CustomerLoggedIn())
+                        {
+                            await _storefrontUserService.SignOutAsync(user);
+                        }
+                        await _storefrontUserService.DeleteAsync(user);
+                    }
                     throw;
                 }
             }
@@ -319,10 +330,14 @@ namespace VC.Public.Controllers
         {
             var newCustomer = await CustomerService.CreatePrototypeAsync((int)CustomerType.Retail);
             newCustomer.IdDefaultPaymentMethod = (int)PaymentMethodType.CreditCard;
-            newCustomer.StatusCode = (int)CustomerStatus.Active;
             if (model.GuestCheckout)
             {
                 newCustomer.Data.Guest = true;
+                newCustomer.StatusCode = (int)CustomerStatus.PhoneOnly;
+            }
+            else
+            {
+                newCustomer.StatusCode = (int)CustomerStatus.Active;
             }
             newCustomer.Email = model.Email;
             newCustomer.PublicId = Guid.NewGuid();

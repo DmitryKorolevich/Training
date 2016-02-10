@@ -178,7 +178,7 @@ namespace VitalChoice.Business.Services.Customers
 
             //Don't allow to return a customer registered from the admin part(Not Active) to Not Active status from 
             //Active(by a store front activation)
-	        if (model.StatusCode == (int)CustomerStatus.NotActive && model.Id > 0)
+	        if (model.StatusCode == (int)CustomerStatus.PhoneOnly && model.Id > 0)
 	        {
 				var exists =
 				await
@@ -545,7 +545,7 @@ namespace VitalChoice.Business.Services.Customers
                 case (int)CustomerStatus.Active:
                     appUser.Status = UserStatus.Active;
                     break;
-                case (int)CustomerStatus.NotActive:
+                case (int)CustomerStatus.PhoneOnly:
                     appUser.Status = UserStatus.NotActive;
                     break;
                 case (int)CustomerStatus.Suspended:

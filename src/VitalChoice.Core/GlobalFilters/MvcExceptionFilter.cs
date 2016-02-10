@@ -15,8 +15,6 @@ namespace VitalChoice.Core.GlobalFilters
 	{
 		public override void OnException(ExceptionContext context)
 		{
-		    var logger = LoggerService.GetDefault();
-		    logger.LogError(context.Exception.Message, context.Exception);
             var acceptHeader = context.HttpContext.Request.Headers["Accept"];
             if (acceptHeader.Any() && acceptHeader.First().Contains("application/json"))
 			{
@@ -51,14 +49,18 @@ namespace VitalChoice.Core.GlobalFilters
 						result.ViewName = "Error";
 						result.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-						LoggerService.GetDefault().LogError(context.Exception.ToString());
-					}
+                        var logger = LoggerService.GetDefault();
+                        logger.LogError(context.Exception.Message, context.Exception);
+                    }
 				}
 				else
 				{
-					result.ViewName = apiException.Status == HttpStatusCode.NotFound ? "Error404" : "Error";
+                    result.ViewName = apiException.Status == HttpStatusCode.NotFound ? "Error404" : "Error";
 					result.StatusCode = (int)apiException.Status;
-				}
+
+                    var logger = LoggerService.GetDefault();
+                    logger.LogError(context.Exception.Message, context.Exception);
+                }
 				context.Result = result;
 			}
 		}

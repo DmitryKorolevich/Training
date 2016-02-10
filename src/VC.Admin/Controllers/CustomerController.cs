@@ -123,7 +123,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public async Task<Result<AddUpdateCustomerModel>> CreateCustomerPrototype([FromBody] object temp)
+        public async Task<Result<AddUpdateCustomerModel>> CreateCustomerPrototype()
         {
             var model = await _customerService.CreatePrototypeForAsync<AddUpdateCustomerModel>((int)CustomerType.Retail);
             model.PublicId = Guid.NewGuid();
@@ -135,7 +135,7 @@ namespace VC.Admin.Controllers
             model.ProfileAddress = new AddressModel();
             model.ProfileAddress.Country = new CountryListItemModel(_defaultCountry);
             model.Shipping = new List<AddressModel>() { new AddressModel() { AddressType = AddressType.Shipping, Country = new CountryListItemModel(_defaultCountry) } };
-            model.StatusCode = (int)CustomerStatus.NotActive;
+            model.StatusCode = (int)CustomerStatus.PhoneOnly;
 
 	        var defaultPaymentMethodId = (await _paymentMethodService.GetStorefrontDefaultPaymentMethod()).Id;
 
@@ -146,7 +146,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public Result<CreditCardModel> CreateCreditCardPrototype([FromBody] object model)
+        public Result<CreditCardModel> CreateCreditCardPrototype()
         {
             return new CreditCardModel
             {
@@ -157,7 +157,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public Result<OacPaymentModel> CreateOacPrototype([FromBody] object model)
+        public Result<OacPaymentModel> CreateOacPrototype()
         {
             return new OacPaymentModel
             {
@@ -169,7 +169,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public Result<CheckPaymentModel> CreateCheckPrototype([FromBody] object model)
+        public Result<CheckPaymentModel> CreateCheckPrototype()
         {
             return new CheckPaymentModel
             {
@@ -179,7 +179,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public Result<CheckPaymentModel> CreateWireTransferPrototype([FromBody] object model)
+        public Result<CheckPaymentModel> CreateWireTransferPrototype()
         {
             return new CheckPaymentModel
             {
@@ -189,7 +189,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public Result<CheckPaymentModel> CreateMarketingPrototype([FromBody] object model)
+        public Result<CheckPaymentModel> CreateMarketingPrototype()
         {
             return new CheckPaymentModel
             {
@@ -199,7 +199,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public Result<CheckPaymentModel> CreateVCWellnessPrototype([FromBody] object model)
+        public Result<CheckPaymentModel> CreateVCWellnessPrototype()
         {
             return new CheckPaymentModel
             {
@@ -209,14 +209,14 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public Result<AddressModel> CreateAddressPrototype([FromBody] object model)
+        public Result<AddressModel> CreateAddressPrototype()
         {
             return new AddressModel() {AddressType = AddressType.Shipping, Country = new CountryListItemModel(_defaultCountry)};
         }
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public async Task<Result<CustomerNoteModel>> CreateCustomerNotePrototype([FromBody] object model)
+        public async Task<Result<CustomerNoteModel>> CreateCustomerNotePrototype()
         {
             var toReturn = new CustomerNoteModel()
             {
@@ -263,7 +263,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public async Task<Result<bool>> DeleteNote(int idNote, [FromBody] object model)
+        public async Task<Result<bool>> DeleteNote(int idNote)
         {
             if (idNote > 0)
                 return await _notesService.DeleteAsync(idNote, true);

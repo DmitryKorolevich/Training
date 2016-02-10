@@ -155,7 +155,7 @@ namespace VitalChoice.Business.Helpers
             {
                 {(int) CustomerStatus.Active, "Active"},
                 {(int) CustomerStatus.Pending, "Pending"},
-                {(int) CustomerStatus.NotActive, "Phone Only"},
+                {(int) CustomerStatus.PhoneOnly, "Phone Only"},
                 {(int) CustomerStatus.Deleted, "Deleted"},
                 {(int) CustomerStatus.Suspended, "Suspended"},
             };

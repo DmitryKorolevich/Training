@@ -18,7 +18,7 @@ namespace VitalChoice.Business.Queries.Customers
 
 		public CustomerQuery NotInActive()
 		{
-			Add(x => x.StatusCode != (int)CustomerStatus.NotActive);
+			Add(x => x.StatusCode != (int)CustomerStatus.PhoneOnly);
 
 			return this;
 		}

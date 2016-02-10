@@ -111,25 +111,25 @@ namespace VC.Admin.Validators.Customer
 
 				RuleFor(model => model.Email)
 					.NotEmpty()
-                    .When(model=>model.Id!=0 && model.StatusCode!=(int)CustomerStatus.NotActive)
+                    .When(model=>model.Id!=0 && model.StatusCode!=(int)CustomerStatus.PhoneOnly)
 					.WithMessage(model => model.Email, ValidationMessages.FieldRequired)
 					.Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
 					.WithMessage(model => model.Email, ValidationMessages.FieldLength,
 						BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
 					.EmailAddress()
-                    .When(model => model.Id != 0 && model.StatusCode != (int)CustomerStatus.NotActive && !string.IsNullOrEmpty(model.Email))
+                    .When(model => model.Id != 0 && model.StatusCode != (int)CustomerStatus.PhoneOnly && !string.IsNullOrEmpty(model.Email))
                     .WithMessage(model => model.Email, ValidationMessages.EmailFormat);
 
 
 				RuleFor(model => model.EmailConfirm)
 					.NotEmpty()
-                    .When(model => model.Id != 0 && model.StatusCode != (int)CustomerStatus.NotActive)
+                    .When(model => model.Id != 0 && model.StatusCode != (int)CustomerStatus.PhoneOnly)
                     .WithMessage(model => model.EmailConfirm, ValidationMessages.FieldRequired)
 					.Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
 					.WithMessage(model => model.EmailConfirm, ValidationMessages.FieldLength,
 						BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
 					.EmailAddress()
-                    .When(model => model.Id != 0 && model.StatusCode != (int)CustomerStatus.NotActive && !string.IsNullOrEmpty(model.EmailConfirm))
+                    .When(model => model.Id != 0 && model.StatusCode != (int)CustomerStatus.PhoneOnly && !string.IsNullOrEmpty(model.EmailConfirm))
                     .WithMessage(model => model.EmailConfirm, ValidationMessages.EmailFormat)
 					.Equal(x => x.Email)
                     .When(model => !string.IsNullOrEmpty(model.Email) || !string.IsNullOrEmpty(model.EmailConfirm))
