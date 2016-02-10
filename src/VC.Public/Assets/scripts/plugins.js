@@ -310,7 +310,9 @@ $(function () {
 		notifySuccess(successMessage);
 	}
 
-	initLiveHelp();
+	if (document.getElementById('lhnContainer')) {
+		initLiveHelp();
+	}
 });
 
 function initLiveHelp() {
