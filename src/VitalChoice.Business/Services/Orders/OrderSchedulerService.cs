@@ -77,12 +77,16 @@ namespace VitalChoice.Business.Services.Orders
     public class OrderSchedulerService : IOrderSchedulerService
     {
         private readonly IOrderService _orderService;
+        private readonly ICustomerService _customerService;
         private readonly ILogger _logger;
 
-        public OrderSchedulerService(IOrderService orderService,
+        public OrderSchedulerService(
+            IOrderService orderService,
+            ICustomerService customerService,
             ILoggerProviderExtended loggerProvider)
         {
             _orderService = orderService;
+            _customerService = customerService;
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -122,7 +126,7 @@ namespace VitalChoice.Business.Services.Orders
                         pPartNeedUpdate = true;
                     }
 
-                    if (shipDelayedOrder.NPOrderStatus == OrderStatus.ShipDelayed && 
+                    if (shipDelayedOrder.NPOrderStatus == OrderStatus.ShipDelayed &&
                         ((shipDelayedOrder.SafeData.ShipDelayType == (int)ShipDelayType.EntireOrder && shipDelayedOrder.SafeData.ShipDelayDate != null && shipDelayedOrder.SafeData.ShipDelayDate < now)
                         || (shipDelayedOrder.SafeData.ShipDelayType == (int)ShipDelayType.PerishableAndNonPerishable && shipDelayedOrder.SafeData.ShipDelayDateNP != null && shipDelayedOrder.SafeData.ShipDelayDateNP < now)))
                     {
@@ -154,14 +158,59 @@ namespace VitalChoice.Business.Services.Orders
                     }
                 }
 
+                List<OrderDynamic> ordersForUpdateAfterCalculating = new List<OrderDynamic>();
+
                 if (ordersForUpdate.Count != 0)
                 {
-                    await _orderService.UpdateRangeAsync(ordersForUpdate);
+
+                    foreach (var order in ordersForUpdate)
+                    {
+                        try
+                        {
+                            order.Customer = await _customerService.SelectAsync(order.Customer.Id);
+                            var context = await _orderService.CalculateOrder(order);
+
+                            List<MessageInfo> messages =new List<MessageInfo>(context.Messages);
+                            if (context.SkuOrdereds != null)
+                            {
+                                messages.AddRange(context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages).Select(p =>
+                                          new MessageInfo()
+                                          {
+                                              Message = p
+                                          }));
+                            }
+                            if (context.PromoSkus != null)
+                            {
+                                messages.AddRange(context.PromoSkus.Where(p => p.Messages != null).SelectMany(p => p.Messages).Select(p =>
+                                          new MessageInfo()
+                                          {
+                                              Message = p
+                                          }));
+                            }
+                            if(messages.Count>0)
+                            {
+                                //TODO - add additioanl logic for this case
+                            }
+                            else
+                            {
+                                ordersForUpdateAfterCalculating.Add(context.Order);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.LogCritical($"Error till ShipDelayed orders updating - calculating order({order.Id})", e);
+                        }
+                    }
+                }
+
+                if (ordersForUpdateAfterCalculating.Count != 0)
+                {
+                    await _orderService.UpdateRangeAsync(ordersForUpdateAfterCalculating);
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                _logger.LogCritical("Error till ShipDelayed orders updating",e);
+                _logger.LogCritical("Error till ShipDelayed orders updating", e);
             }
         }
     }

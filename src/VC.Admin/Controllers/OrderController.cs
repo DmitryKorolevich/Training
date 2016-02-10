@@ -212,12 +212,6 @@ namespace VC.Admin.Controllers
 
             var item = _mapper.FromModel(model);
 
-            var pOrderType = _orderService.GetPOrderType(item);
-            if (pOrderType.HasValue)
-            {
-                item.Data.POrderType = (int)pOrderType;
-            }
-
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
             if (int.TryParse(sUserId, out userId))

@@ -338,6 +338,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 try
                 {
+                    SetPOrderType(new List<OrderDynamic>() { model });
                     await EnsurePaymentMethod(model);
                     model.PaymentMethod.IdOrder = model.Id;
                     var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
@@ -415,6 +416,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 try
                 {
+                    SetPOrderType(models);
                     entities = await base.InsertRangeAsync(models, uow);
                     foreach (var model in models)
                     {
@@ -446,6 +448,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 try
                 {
+                    SetPOrderType(new List<OrderDynamic>() { model });
                     await EnsurePaymentMethod(model);
                     model.PaymentMethod.IdOrder = model.Id;
                     var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
@@ -491,6 +494,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 try
                 {
+                    SetPOrderType(models);
                     entities = await base.UpdateRangeAsync(models, uow);
                     foreach (var model in models)
                     {
@@ -711,33 +715,36 @@ namespace VitalChoice.Business.Services.Orders
 
             return toReturn;
         }
-
-        public POrderType? GetPOrderType(OrderDynamic item)
+        
+        private void SetPOrderType(ICollection<OrderDynamic> items)
         {
-            POrderType? toReturn = null;
-            var pOrder = false;
-            var npOrder = false;
-            if (item != null)
+            if (items != null)
             {
-                foreach (var skuOrdered in item.Skus)
+                foreach (var item in items)
                 {
-                    pOrder = pOrder || skuOrdered?.ProductWithoutSkus.IdObjectType == (int)ProductType.Perishable;
-                    npOrder = npOrder || skuOrdered?.ProductWithoutSkus.IdObjectType == (int)ProductType.NonPerishable;
-                }
-                if (pOrder && npOrder)
-                {
-                    toReturn = POrderType.PNP;
-                }
-                else if (pOrder)
-                {
-                    toReturn = POrderType.P;
-                }
-                else if (npOrder)
-                {
-                    toReturn = POrderType.NP;
+                    POrderType? toReturn = null;
+                    var pOrder = false;
+                    var npOrder = false;
+                    foreach (var skuOrdered in item.Skus)
+                    {
+                        pOrder = pOrder || skuOrdered?.ProductWithoutSkus.IdObjectType == (int)ProductType.Perishable;
+                        npOrder = npOrder || skuOrdered?.ProductWithoutSkus.IdObjectType == (int)ProductType.NonPerishable;
+                    }
+                    if (pOrder && npOrder)
+                    {
+                        toReturn = POrderType.PNP;
+                    }
+                    else if (pOrder)
+                    {
+                        toReturn = POrderType.P;
+                    }
+                    else if (npOrder)
+                    {
+                        toReturn = POrderType.NP;
+                    }
+                    item.Data.POrderType = (int?)toReturn;
                 }
             }
-            return toReturn;
         }
 
         #region OrdersImport
@@ -864,11 +871,6 @@ namespace VitalChoice.Business.Services.Orders
             }
 
             var orders = map.Select(p => p.Order).ToList();
-            //set POrderType
-            foreach (var order in orders)
-            {
-                order.Data.POrderType = (int?)GetPOrderType(order);
-            }
             orders = await InsertRangeAsync(orders);
 
             if(orderType==OrderType.GiftList)

@@ -347,11 +347,17 @@ hr {
 .margin-top-30px {
   margin-top: 30px;
 }
+.margin-top-0px {
+  margin-top: 0px;
+}
 .margin-bottom-30px {
   margin-bottom: 30px;
 }
 .margin-bottom-15px {
   margin-bottom: 15px;
+}
+.margin-bottom-5px {
+  margin-bottom: 5px;
 }
 .margin-bottom-0px {
   margin-bottom: 0px;
@@ -1016,25 +1022,25 @@ th.sortable-column {
   margin-right: 5px;
 }
 .table.order-statuses > tbody > tr .ban {
-  color: red;
+  background: red;
 }
 .table.order-statuses > tbody > tr .exclamation-triangle {
-  color: orange;
+  background: orange;
 }
 .table.order-statuses > tbody > tr .truck {
-  color: green;
+  background: green;
 }
 .table.order-statuses > tbody > tr .minus-circle {
-  color: red;
+  background: red;
 }
 .table.order-statuses > tbody > tr .check-circle {
-  color: green;
+  background: green;
 }
 .table.order-statuses > tbody > tr .calendar {
-  color: blue;
+  background: blue;
 }
 .table.order-statuses > tbody > tr .pause {
-  color: blue;
+  background: blue;
 }
 .orders .table > thead > tr > th.actions {
   min-width: 75px;

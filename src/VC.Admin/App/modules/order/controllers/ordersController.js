@@ -24,6 +24,10 @@
                         {
                             item.AllowExport = item.OrderStatus == 2;
                             item.IsSelected = item.OrderStatus == 3;//Shipped
+                            item.PAllowExport = item.POrderStatus == 2;
+                            item.IsPSelected = item.POrderStatus == 3;//Shipped
+                            item.NPAllowExport = item.NPOrderStatus == 2;
+                            item.IsNPSelected = item.NPOrderStatus == 3;//Shipped
                         });
                         $scope.totalItems = result.Data.Count;
                     } else
@@ -145,12 +149,36 @@
                 {
                     item.IsSelected = $scope.settings.allExport;
                 }
+                if (item.PAllowExport)
+                {
+                    item.IsPSelected = $scope.settings.allExport;
+                }
+                if (item.NPAllowExport)
+                {
+                    item.IsNPSelected = $scope.settings.allExport;
+                }
             });
         };
 
         $scope.itemExportChanged = function (item)
         {
             if (!item.IsSelected && $scope.settings.allExport)
+            {
+                $scope.settings.allExport = false;
+            }
+        };
+
+        $scope.PItemExportChanged = function (item)
+        {
+            if (!item.IsPSelected && $scope.settings.allExport)
+            {
+                $scope.settings.allExport = false;
+            }
+        };
+
+        $scope.NPItemExportChanged = function (item)
+        {
+            if (!item.IsNPSelected && $scope.settings.allExport)
             {
                 $scope.settings.allExport = false;
             }

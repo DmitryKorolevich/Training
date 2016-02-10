@@ -1,36 +1,17 @@
-﻿<div data-ng-if="::item.OrderStatus" data-ng-class="::{'ban': item.OrderStatus==1, 'exclamation-triangle': item.OrderStatus==2, 'truck': item.OrderStatus==3, 'minus-circle': item.OrderStatus==4, 'check-circle': item.OrderStatus==5, 'calendar': item.OrderStatus==6, 'pause': item.OrderStatus==7}">
-    <i data-ng-if="::item.OrderStatus==1" class="fa fa-ban"></i>
-    <i data-ng-if="::item.OrderStatus==2" class="fa fa-exclamation-triangle"></i>
-    <i data-ng-if="::item.OrderStatus==3" class="fa fa-truck"></i>
-    <i data-ng-if="::item.OrderStatus==4" class="fa fa-minus-circle"></i>
-    <i data-ng-if="::item.OrderStatus==5" class="fa fa-check-circle"></i>
-    <i data-ng-if="::item.OrderStatus==6" class="fa fa-calendar"></i>
-    <i data-ng-if="::item.OrderStatus==7" class="fa fa-pause"></i>
-    <span>{{::getReferenceItem(ReferenceData.OrderStatuses, item.OrderStatus).Text}}</span>
+﻿<div data-ng-if="::item.OrderStatus">
+    <span class="label font-default" data-ng-class="::{'ban': item.OrderStatus==1, 'exclamation-triangle': item.OrderStatus==2, 'truck': item.OrderStatus==3, 'minus-circle': item.OrderStatus==4, 'check-circle': item.OrderStatus==5, 'calendar': item.OrderStatus==6, 'pause': item.OrderStatus==7}">
+        {{::getReferenceItem(ReferenceData.OrderStatuses, item.OrderStatus).Text}}
+    </span>
 </div>
-<div data-ng-if="::(!item.OrderStatus && item.POrderStatus)">
+<div class="margin-bottom-5px" data-ng-if="::(!item.OrderStatus && item.POrderStatus)">
     P -
-    <span data-ng-class="::{'ban': item.POrderStatus==1, 'exclamation-triangle': item.POrderStatus==2, 'truck': item.POrderStatus==3, 'minus-circle': item.POrderStatus==4, 'check-circle': item.POrderStatus==5, 'calendar': item.POrderStatus==6, 'pause': item.POrderStatus==7}">
-        <i data-ng-if="::item.POrderStatus==1" class="fa fa-ban"></i>
-        <i data-ng-if="::item.POrderStatus==2" class="fa fa-exclamation-triangle"></i>
-        <i data-ng-if="::item.POrderStatus==3" class="fa fa-truck"></i>
-        <i data-ng-if="::item.POrderStatus==4" class="fa fa-minus-circle"></i>
-        <i data-ng-if="::item.POrderStatus==5" class="fa fa-check-circle"></i>
-        <i data-ng-if="::item.POrderStatus==6" class="fa fa-calendar"></i>
-        <i data-ng-if="::item.POrderStatus==7" class="fa fa-pause"></i>
-        <span>{{::getReferenceItem(ReferenceData.OrderStatuses, item.POrderStatus).Text}}</span>
+    <span class="label font-default" data-ng-class="::{'ban': item.POrderStatus==1, 'exclamation-triangle': item.POrderStatus==2, 'truck': item.POrderStatus==3, 'minus-circle': item.POrderStatus==4, 'check-circle': item.POrderStatus==5, 'calendar': item.POrderStatus==6, 'pause': item.POrderStatus==7}">
+        {{::getReferenceItem(ReferenceData.OrderStatuses, item.POrderStatus).Text}}
     </span>
 </div>
 <div data-ng-if="::(!item.OrderStatus && item.NPOrderStatus)">
     NP -
-    <span data-ng-class="::{'ban': item.NPOrderStatus==1, 'exclamation-triangle': item.NPOrderStatus==2, 'truck': item.NPOrderStatus==3, 'minus-circle': item.NPOrderStatus==4, 'check-circle': item.NPOrderStatus==5, 'calendar': item.NPOrderStatus==6, 'pause': item.NPOrderStatus==7}">
-        <i data-ng-if="::item.NPOrderStatus==1" class="fa fa-ban"></i>
-        <i data-ng-if="::item.NPOrderStatus==2" class="fa fa-exclamation-triangle"></i>
-        <i data-ng-if="::item.NPOrderStatus==3" class="fa fa-truck"></i>
-        <i data-ng-if="::item.NPOrderStatus==4" class="fa fa-minus-circle"></i>
-        <i data-ng-if="::item.NPOrderStatus==5" class="fa fa-check-circle"></i>
-        <i data-ng-if="::item.NPOrderStatus==6" class="fa fa-calendar"></i>
-        <i data-ng-if="::item.NPOrderStatus==7" class="fa fa-pause"></i>
-        <span>{{::getReferenceItem(ReferenceData.OrderStatuses, item.NPOrderStatus).Text}}</span>
+    <span class="label font-default" data-ng-class="::{'ban': item.NPOrderStatus==1, 'exclamation-triangle': item.NPOrderStatus==2, 'truck': item.NPOrderStatus==3, 'minus-circle': item.NPOrderStatus==4, 'check-circle': item.NPOrderStatus==5, 'calendar': item.NPOrderStatus==6, 'pause': item.NPOrderStatus==7}">
+        {{::getReferenceItem(ReferenceData.OrderStatuses, item.NPOrderStatus).Text}}
     </span>
 </div>

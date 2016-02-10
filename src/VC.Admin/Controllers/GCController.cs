@@ -49,6 +49,8 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<PagedList<GCListItemModel>>> GetGiftCertificates([FromBody]GCFilter filter)
         {
+            await OrderSchedulerService.UpdateShipDelayedOrders();
+
             var result = await GCService.GetGiftCertificatesAsync(filter);
 
             var toReturn = new PagedList<GCListItemModel>

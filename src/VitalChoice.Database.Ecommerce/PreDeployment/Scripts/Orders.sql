@@ -271,3 +271,12 @@ BEGIN
 END
 
 GO
+
+IF EXISTS(SELECT * FROM OrderStatuses WHERE Name='Ship Delayed')
+BEGIN
+	UPDATE OrderStatuses
+	SET Name='Ship Delay'
+	WHERE Name='Ship Delayed' 
+END
+
+GO

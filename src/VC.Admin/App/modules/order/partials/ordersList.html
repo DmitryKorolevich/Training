@@ -210,7 +210,21 @@
                             </button>
                         </td>
                         <td>
-                            <input data-ng-disabled="!item.AllowExport" data-ng-model="item.IsSelected" type="checkbox" data-ng-change="itemExportChanged(item)">
+                            <div data-ng-if="::item.OrderStatus" class="checkbox margin-bottom-0px margin-top-0px">
+                                <label>
+                                    <input data-ng-disabled="!item.AllowExport" data-ng-model="item.IsSelected" type="checkbox" data-ng-change="itemExportChanged(item)">
+                                </label>
+                            </div>
+                            <div data-ng-if="::(!item.OrderStatus && item.POrderStatus)" class="checkbox margin-bottom-5px margin-top-0px">
+                                <label>
+                                    <input data-ng-disabled="!item.PAllowExport" data-ng-model="item.IsPSelected" type="checkbox" data-ng-change="PItemExportChanged(item)"> P
+                                </label>
+                            </div>
+                            <div data-ng-if="::(!item.OrderStatus && item.NPOrderStatus)" class="checkbox margin-bottom-0px margin-top-0px">
+                                <label>
+                                    <input data-ng-disabled="!item.NPAllowExport" data-ng-model="item.IsNPSelected" type="checkbox" data-ng-change="NPItemExportChanged(item)"> NP
+                                </label>
+                            </div>
                         </td>
                     </tr>
                 </tbody>

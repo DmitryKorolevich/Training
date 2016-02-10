@@ -28,9 +28,7 @@ namespace VitalChoice.Interfaces.Services.Orders
             bool withDefaults = false);
 
         Task<OrderDynamic> CreateNewNormalOrder(OrderStatus status);
-
-        POrderType? GetPOrderType(OrderDynamic item);
-
+        
         Task<bool> ImportOrders(byte[] file, string fileName, OrderType orderType, int idCustomer, int idPaymentMethod, int idAddedBy);
 
         #region AffiliatesOrders
