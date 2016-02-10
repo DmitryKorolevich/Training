@@ -74,8 +74,17 @@ namespace VC.Admin.ModelConverters
                     model.SkuOrdereds.Add(new SkuOrderedManageModel(item));
                 }
             }
+            
+            if (dynamic.PromoSkus != null)
+            {
+                model.PromoSkus = new List<PromoSkuOrderedManageModel>();
+                foreach (var item in dynamic.PromoSkus)
+                {
+                    model.PromoSkus.Add(new PromoSkuOrderedManageModel(item));
+                }
+            }
 
-            if(!model.ShipDelayType.HasValue)
+            if (!model.ShipDelayType.HasValue)
             {
                 model.ShipDelayType = ShipDelayType.None;
             }
