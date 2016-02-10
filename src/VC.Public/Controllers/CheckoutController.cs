@@ -35,6 +35,7 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using VitalChoice.Interfaces.Services.Settings;
+using VitalChoice.Validation.Models;
 
 namespace VC.Public.Controllers
 {
@@ -461,7 +462,7 @@ namespace VC.Public.Controllers
 			{
 				new KeyValuePair<string, string>("Credit Card", _appInfrastructure.CreditCardTypes.Single(z => z.Key == (int)paymentMethod.Data.CardType).Text),
 				new KeyValuePair<string, string>("Number", paymentMethod.Data.CardNumber),
-				//new KeyValuePair<string, string>("Expiration", $"{paymentMethod.Data.Month}/{paymentMethod.Data.Year % 2000}"), //uncomment this once get expdate fixed
+				new KeyValuePair<string, string>("Expiration", $"{paymentMethod.Data.ExpDate.Month}/{paymentMethod.Data.ExpDate.Year % 2000}"),
 				new KeyValuePair<string, string>(string.Empty, $"{billingAddress.Data.FirstName} {billingAddress.Data.LastName}"),
 				new KeyValuePair<string, string>(string.Empty, billingAddress.SafeData.Company),
 				new KeyValuePair<string, string>(string.Empty, billingAddress.Data.Address1),
@@ -486,7 +487,16 @@ namespace VC.Public.Controllers
 			return View(reviewOrderModel);
 		}
 
-		[HttpGet]
+	    [HttpPost]
+	    [CustomerAuthorize]
+	    public async Task<Result<string>> ReviewOrder([FromBody]ViewCartModel model)
+	    {
+			//todo: alex g please add logic to make order processed here
+
+		    return Url.Action("Receipt", "Checkout");
+	    }
+
+	    [HttpGet]
 		public async Task<IActionResult> Receipt()
 		{
 			var reviewOrderModel = new ReceiptModel()
