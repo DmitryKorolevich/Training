@@ -237,6 +237,39 @@ namespace VitalChoice.Business.Services.Orders
                     }
                 }
             }
+            if (entities.All(e => e.PromoSkus != null))
+            {
+                foreach (
+                    var orderToSku in
+                        entities.SelectMany(o => o.PromoSkus).Where(s => s.Sku?.Product != null && s.Sku.OptionTypes == null))
+                {
+                    var optionTypes = _productMapper.FilterByType(orderToSku.Sku.Product.IdObjectType);
+                    orderToSku.Sku.OptionTypes = optionTypes;
+                    orderToSku.Sku.Product.OptionTypes = optionTypes;
+                }
+                var invalidSkuOrdered =
+                    entities.SelectMany(o => o.Skus)
+                        .Where(s => s.Sku?.Product == null || s.Sku.OptionTypes == null)
+                        .ToArray();
+                var skuIds = new HashSet<int>(invalidSkuOrdered.Select(s => s.IdSku));
+                var invalidSkus = (await _skusRepository.Query(p => skuIds.Contains(p.Id))
+                    .Include(p => p.Product)
+                    .ThenInclude(s => s.OptionValues)
+                    .Include(p => p.OptionValues)
+                    .SelectAsync(false)).ToDictionary(s => s.Id);
+                foreach (var orderToSku in invalidSkuOrdered)
+                {
+                    Sku sku;
+                    if (invalidSkus.TryGetValue(orderToSku.IdSku, out sku))
+                    {
+                        var optionTypes = _productMapper.FilterByType(sku.Product.IdObjectType);
+                        orderToSku.Sku = sku;
+                        orderToSku.Sku.Product = sku.Product;
+                        orderToSku.Sku.OptionTypes = optionTypes;
+                        orderToSku.Sku.Product.OptionTypes = optionTypes;
+                    }
+                }
+            }
         }
 
         protected override bool LogObjectFullData => true;
