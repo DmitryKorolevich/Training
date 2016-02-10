@@ -2,6 +2,7 @@
 	Layout = "~/Views/Shared/_ViewCartLayout.cshtml";
 }
 
+@using VC.Public.Models.Cart
 @model VC.Public.Models.Checkout.ReceiptModel
 
 @section PageScripts {
@@ -30,7 +31,7 @@
 			enter recipient’s name, email address, and your message where indicated, then click “Send Email”.
 		</span>
 		<div class="margin-top-reasonable">
-			<a href="#" class="button arrow-left-red">Continue Shopping</a>
+			<a href="/" class="button arrow-left-red">Continue Shopping</a>
 		</div>
 	</div>
 	<div class="checkout-sections-divider margin-top-reasonable margin-bottom-small"></div>
@@ -97,14 +98,14 @@
 			<tbody>
 			@if (Model.Skus.Any())
 			{
-				for (int i = 0; i < Model.Skus.Count; i++)
+				foreach (var t in Model.Skus)
 				{
 					<tr>
-						<td>@Model.Skus[i].Quantity</td>
-						<td>@Model.Skus[i].Code</td>
-						<td>@Model.Skus[i].DisplayName</td>
-						<td>@(Model.Skus[i].Price.HasValue ? Model.Skus[i].Price.Value.ToString("C2") : string.Empty)</td>
-						<td>@(Model.Skus[i].SubTotal.HasValue ? Model.Skus[i].SubTotal.Value.ToString("C2") : string.Empty)</td>
+						<td>@t.Quantity</td>
+						<td>@t.Code</td>
+						<td>@t.DisplayName</td>
+						<td>@((t.Price ?? 0).ToString("C2"))</td>
+						<td>@((t.SubTotal ?? 0).ToString("C2"))</td>
 					</tr>
 				}
 			}
@@ -115,6 +116,45 @@
 			</tbody>
 		</table>
 	</div>
+	@if (Model.PromoSkus.Any())
+	{
+		<div class="receipt-sku-details">
+			<label class="receipt-promo-title">Promo Products</label>
+			<table class="standard-table cart-items-list">
+				<thead>
+				<tr>
+					<th>
+						Qty
+					</th>
+					<th>
+						SKU
+					</th>
+					<th>
+						Description
+					</th>
+					<th>
+						Unit Price
+					</th>
+					<th>
+						Price
+					</th>
+				</tr>
+				</thead>
+				<tbody>
+				@foreach (var t in Model.PromoSkus)
+				{
+					<tr>
+						<td>@t.Quantity</td>
+						<td>@t.Code</td>
+						<td>@t.DisplayName</td>
+						<td>@((t.Price ?? 0).ToString("C2"))</td>
+						<td>@((t.SubTotal ?? 0).ToString("C2"))</td>
+					</tr>
+				}
+				</tbody>
+			</table>
+		</div>
+	}
 	<div class="receipt-shipping-method">
 		<div class="receipt-shipping-line">
 			@Html.LabelFor(x => x.ShippingMethod, null, new { @class= "bold" }):
@@ -130,10 +170,28 @@
 				@Model.SubTotal.ToString("C2")
 			</label>
 		</div>
+		@if (Model.DiscountTotal.HasValue && Model.DiscountTotal.Value != 0)
+		{
+			<div class="cart-total-line">
+				@Html.LabelFor(x => x.DiscountTotal)
+				<label class="cart-total-value">
+					@Model.DiscountTotal.Value.ToString("C2")
+				</label>
+			</div>
+		}
+		@if (Model.GiftCertificatesTotal.HasValue && Model.GiftCertificatesTotal.Value != 0)
+		{
+			<div class="cart-total-line">
+				@Html.LabelFor(x => x.GiftCertificatesTotal)
+				<label class="cart-total-value">
+					@Model.GiftCertificatesTotal.Value.ToString("C2")
+				</label>
+			</div>
+		}
 		<div class="cart-total-line">
 			@Html.LabelFor(x => x.ShippingCost)
 			<label class="cart-total-value">
-				@Model.ShippingCost.ToString("C2")
+				@(Model.ShippingCost.HasValue ? Model.ShippingCost.Value.ToString("C2") : "FREE!")
 			</label>
 		</div>
 		<div class="cart-total-line">

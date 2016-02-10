@@ -26,17 +26,22 @@ namespace VC.Public.Models.Cart
 
         public string ShippingDateError { get; set; }
 
-	    public decimal SubTotal { get; set; }
+		[Display(Name = "Subtotal")]
+		public decimal SubTotal { get; set; }
 
-	    public decimal? ShippingCost { get; set; }
+		[Display(Name = "Shipping")]
+		public decimal? ShippingCost { get; set; }
 
         public decimal? FreeShipDifference { get; set; }
 
-	    public decimal OrderTotal { get; set; }
+		[Display(Name = "Order Total")]
+		public decimal OrderTotal { get; set; }
 
-	    public decimal? DiscountTotal { get; set; }
+		[Display(Name = "Discount")]
+		public decimal? DiscountTotal { get; set; }
 
-	    public decimal? GiftCertificatesTotal { get; set; }
+		[Display(Name = "Gift Certificates")]
+		public decimal? GiftCertificatesTotal { get; set; }
 
 	    public string PromoCode { get; set; }
 

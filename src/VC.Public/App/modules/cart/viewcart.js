@@ -37,8 +37,6 @@ $(function () {
 			recalculateCart(self);
 		};
 		self.submitCart = function() {
-			$("#viewCartForm").validate();
-
 			recalculateCart(self, function () {
 				var url = $("#viewCartForm").attr("action");
 
