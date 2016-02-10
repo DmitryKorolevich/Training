@@ -7,10 +7,6 @@ namespace VC.Public.ModelConverters.Customer
 {
 	public class BillingInfoModelConverter : BaseModelConverter<BillingInfoModel, CustomerPaymentMethodDynamic>
 	{
-		public BillingInfoModelConverter()
-		{
-		}
-
 		public override void DynamicToModel(BillingInfoModel model, CustomerPaymentMethodDynamic dynamic)
 		{
 			if (dynamic.DictionaryData.ContainsKey("ExpDate"))

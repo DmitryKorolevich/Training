@@ -315,7 +315,12 @@ namespace VitalChoice.Business.Services.Customers
 			}
 		}
 
-		public async Task<IList<OrderNote>> GetAvailableOrderNotesAsync(CustomerType customerType)
+        public Task<ApplicationUser> GetUser(int id)
+        {
+            return _storefrontUserService.GetAsync(id);
+        }
+
+        public async Task<IList<OrderNote>> GetAvailableOrderNotesAsync(CustomerType customerType)
 	    {
 			var condition = new OrderNoteQuery().NotDeleted().MatchByCustomerType(customerType);
 

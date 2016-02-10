@@ -186,18 +186,23 @@ namespace VitalChoice.Business.Services.Users
 			}
 		}
 
-		protected virtual async Task ValidateUserOnSignIn(string login)
-		{
-			var disabled = (await UserManager.Users.FirstOrDefaultAsync(x => x.Status == UserStatus.Disabled && x.Email.Equals(login))) != null;
+        protected virtual async Task DisabledValidateUserOnSignIn(string login)
+        {
+            var disabled = (await UserManager.Users.FirstOrDefaultAsync(x => x.Status == UserStatus.Disabled && x.Email.Equals(login))) != null;
 
-			if (disabled)
-			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsDisabled]);
-			}
+            if (disabled)
+            {
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsDisabled]);
+            }
+        }
 
-			var notConfirmed = await UserManager.Users.AnyAsync(x => (!x.IsConfirmed || x.Status != UserStatus.Active) && x.Email.Equals(login));
+        protected virtual async Task ValidateUserOnSignIn(string login)
+        {
+            await DisabledValidateUserOnSignIn(login);
 
-			if (notConfirmed)
+            var сonfirmed = await UserManager.Users.AnyAsync(x => x.IsConfirmed && x.Status == UserStatus.Active && x.Email.Equals(login));
+
+			if (!сonfirmed)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsNotConfirmed]);
 			}
@@ -349,7 +354,19 @@ namespace VitalChoice.Business.Services.Users
 			return user;
 		}
 
-		public async Task<ApplicationUser> SignInAsync(string login, string password)
+	    public async Task<ApplicationUser> SignInNoStatusCheckingAsync(ApplicationUser user)
+	    {
+            await DisabledValidateUserOnSignIn(user.UserName);
+
+            await signInManager.SignInAsync(user, false);
+
+            user.LastLoginDate = DateTime.Now;
+            user = await UpdateAsync(user);
+
+            return user;
+        }
+
+	    public async Task<ApplicationUser> SignInAsync(string login, string password)
 		{
 			await ValidateUserOnSignIn(login);
 
