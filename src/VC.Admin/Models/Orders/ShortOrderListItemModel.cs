@@ -9,7 +9,11 @@ namespace VC.Admin.Models.Orders
     {
         public int Id { get; set; }
 
-        public OrderStatus OrderStatus { get; set; }
+        public OrderStatus? OrderStatus { get; set; }
+
+        public OrderStatus? POrderStatus { get; set; }
+
+        public OrderStatus? NPOrderStatus { get; set; }
 
         public DateTime DateCreated { get; set; }
 
@@ -25,6 +29,8 @@ namespace VC.Admin.Models.Orders
             {
                 Id = item.Id;
                 OrderStatus = item.OrderStatus;
+                POrderStatus = item.POrderStatus;
+                NPOrderStatus = item.NPOrderStatus;
                 DateCreated = item.DateCreated;
                 Total = item.Total;
                 DateEdited = item.DateEdited;

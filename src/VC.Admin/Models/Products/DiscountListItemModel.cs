@@ -6,7 +6,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Validation.Models;
 
-namespace VC.Admin.Models.Product
+namespace VC.Admin.Models.Products
 {
     public class DiscountListItemModel : BaseModel
     {

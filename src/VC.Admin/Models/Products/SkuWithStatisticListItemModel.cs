@@ -1,7 +1,6 @@
-﻿using VitalChoice.Ecommerce.Domain.Entities.Products;
-using VitalChoice.Infrastructure.Domain.Transfer.Products;
+﻿using VitalChoice.Infrastructure.Domain.Transfer.Products;
 
-namespace VC.Admin.Models.Product
+namespace VC.Admin.Models.Products
 {
     public class SkuWithStatisticListItemModel : SkuListItemModel
     {

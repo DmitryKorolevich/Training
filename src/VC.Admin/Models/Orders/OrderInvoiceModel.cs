@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Attributes;
 using VC.Admin.Validators.Order;
-using VC.Admin.Models.Product;
 using VC.Admin.Models.Customer;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;

@@ -22,11 +22,6 @@ namespace VitalChoice.Business.Services.Dynamic
         {
         }
 
-        protected override Expression<Func<AffiliateOptionValue, int>> ObjectIdReferenceSelector
-        {
-            get { return a => a.IdAffiliate; }
-        }
-
         protected override Task FromEntityRangeInternalAsync(
             ICollection<DynamicEntityPair<AffiliateDynamic, Affiliate>> items, bool withDefaults = false)
         {

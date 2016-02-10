@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
@@ -12,12 +13,17 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
         public OrderDynamic()
         {
             Skus = new List<SkuOrdered>();
+            PromoSkus = new List<PromoOrdered>();
             GiftCertificates = new List<GiftCertificateInOrder>();
         }
 
         public int? IdAddedBy { get; set; }
 
-        public OrderStatus OrderStatus { get; set; }
+        public OrderStatus? OrderStatus { get; set; }
+
+        public OrderStatus? POrderStatus { get; set; }
+
+        public OrderStatus? NPOrderStatus { get; set; }
 
         //[NotLoggedInfo]
         public CustomerDynamic Customer { get; set; }
@@ -45,5 +51,6 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
         public AffiliateOrderPayment AffiliateOrderPayment { get; set; }
 
         public bool IsHealthwise { get; set; }
+        public ICollection<PromoOrdered> PromoSkus { get; set; }
     }
 }

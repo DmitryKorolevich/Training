@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Data.Entity.Storage;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
@@ -16,6 +17,11 @@ namespace VitalChoice.Business.Services.Ecommerce
         public EcommerceDynamicServiceDecorator(IDynamicServiceAsync<TDynamic, TEntity> extendedService) : base(extendedService)
         {
             _extendedService = extendedService;
+        }
+
+        public IRelationalTransaction BeginTransaction()
+        {
+            return _extendedService.BeginTransaction();
         }
 
         public Task<TDynamic> InsertAsync(TDynamic model)

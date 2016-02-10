@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
-using VitalChoice.Ecommerce.Domain.Entities.Promotion;
+using VitalChoice.Ecommerce.Domain.Entities.Promotions;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;

@@ -56,7 +56,14 @@ namespace VitalChoice.Business.Mail
 				SubjectEncoding = Encoding.UTF8,
 			};
 
-			await _client.SendMailAsync(mailmsg);
+            try
+            {
+                await _client.SendMailAsync(mailmsg);
+            }
+            catch(SmtpFailedRecipientException e)
+            {
+
+            }
 #else
             await Task.Delay(0);
 #endif

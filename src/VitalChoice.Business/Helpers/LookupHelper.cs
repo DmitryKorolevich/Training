@@ -6,7 +6,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
-using VitalChoice.Ecommerce.Domain.Entities.Promotion;
+using VitalChoice.Ecommerce.Domain.Entities.Promotions;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Entities.Help;
 using VitalChoice.Infrastructure.Domain.Transfer;
@@ -323,13 +323,6 @@ namespace VitalChoice.Business.Helpers
                             Text = "NC"
                         });
                         break;
-                    case 5:
-                        toReturn.Add(new LookupItem<int>()
-                        {
-                            Key = 5,
-                            Text = "PP"
-                        });
-                        break;
                     case 6:
                         toReturn.Add(new LookupItem<int>()
                         {
@@ -337,10 +330,17 @@ namespace VitalChoice.Business.Helpers
                             Text = "WT"
                         });
                         break;
+                    case 7:
+                        toReturn.Add(new LookupItem<int>()
+                        {
+                            Key = 8,
+                            Text = "Marketing"
+                        });
+                        break;
                     case 8:
                         toReturn.Add(new LookupItem<int>()
                         {
-                            Key = 7,
+                            Key = 8,
                             Text = "Employee"
                         });
                         break;

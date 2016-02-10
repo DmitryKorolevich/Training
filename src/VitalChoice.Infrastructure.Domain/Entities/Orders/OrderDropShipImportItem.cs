@@ -37,7 +37,7 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Orders
             order.Data.OrderType = (int)SourceOrderType.Web;
             order.Data.PoNumber = PoNumber;
             order.Data.OrderNotes = OrderNotes;
-            order.Data.ShipDelayType = ShipDelayType.EntireOrder;
+            order.Data.ShipDelayType = ShipDelayDate.HasValue ? ShipDelayType.EntireOrder : ShipDelayType.None;
             order.Data.ShipDelayDate = ShipDelayDate;
         }
     }

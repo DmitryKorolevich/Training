@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using VC.Admin.Models.Product;
+using VC.Admin.Models.Products;
 using VitalChoice.DynamicData.Base;
-using VitalChoice.Ecommerce.Domain.Entities.Promotion;
+using VitalChoice.Ecommerce.Domain.Entities.Promotions;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 

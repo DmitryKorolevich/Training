@@ -111,6 +111,7 @@
         <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].Phone.$invalid">
             <small class="error" ng-show="forms[model.formName].Phone.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Phone")}}</small>
             <small class="error" ng-show="forms[model.formName].Phone.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Phone", "100"])}}</small>
+            <small class="error" ng-show="forms[model.formName].Phone.$error.mask">{{getValidationMessage("ValidationMessages.FieldInvalid","Phone")}}</small>
             <small class="error" ng-show="forms[model.formName].Phone.$error.server">{{serverMessages.GetMessage('Phone', model.collectionName, model.index, model.formName)}}</small>
         </div>
     </div>
@@ -121,6 +122,7 @@
         <input type="text" name="Fax" class="form-control" data-ng-model="model.Address.Fax" id="{{::model.formName}}_model_fax" placeholder="Fax" data-mask="(999) 999-9999? x99999" data-clean="true" data-ng-maxlength="100" autocomplete="off" data-ng-disabled="orderEditDisabled"/>
         <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].Fax.$invalid">
             <small class="error" ng-show="forms[model.formName].Fax.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Fax", "100"])}}</small>
+            <small class="error" ng-show="forms[model.formName].Fax.$error.mask">{{getValidationMessage("ValidationMessages.FieldInvalid","Fax")}}</small>
             <small class="error" ng-show="forms[model.formName].Fax.$error.server">{{serverMessages.GetMessage('Fax', model.collectionName, model.index, model.formName)}}</small>
         </div>
     </div>

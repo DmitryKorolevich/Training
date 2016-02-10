@@ -73,6 +73,7 @@ using System.Text.RegularExpressions;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Infrastructure.Domain.Mail;
 using VitalChoice.Business.Mail;
+using VitalChoice.Infrastructure.Context;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -132,10 +133,10 @@ namespace VitalChoice.Business.Services.Orders
             IObjectMapper<AddressDynamic> addressMapper,
             IProductService productService,
             INotificationService notificationService,
-            ICountryService countryService)
+            ICountryService countryService, EcommerceContext dbContext)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
-                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, dbContext)
         {
             _orderRepository = orderRepository;
             _vOrderRepository = vOrderRepository;
@@ -170,6 +171,16 @@ namespace VitalChoice.Business.Services.Orders
                     .ThenInclude(d => d.OptionValues)
                     .Include(o => o.GiftCertificates)
                     .ThenInclude(g => g.GiftCertificate)
+                    .Include(o => o.PromoSkus)
+                    .ThenInclude(p => p.Sku)
+                    .ThenInclude(s => s.OptionValues)
+                    .Include(o => o.PromoSkus)
+                    .ThenInclude(p => p.Sku)
+                    .ThenInclude(s => s.Product)
+                    .ThenInclude(p => p.OptionValues)
+                    .Include(o => o.PromoSkus)
+                    .ThenInclude(p => p.Promo)
+                    .ThenInclude(s => s.OptionValues)
                     .Include(o => o.PaymentMethod)
                     .ThenInclude(p => p.BillingAddress)
                     .ThenInclude(a => a.OptionValues)
@@ -228,11 +239,39 @@ namespace VitalChoice.Business.Services.Orders
                     }
                 }
             }
-        }
-
-        protected override void LogItemInfoSetAfter(ObjectHistoryLogItem log, OrderDynamic model)
-        {
-            log.IdObjectStatus = (int)model.OrderStatus;
+            if (entities.All(e => e.PromoSkus != null))
+            {
+                foreach (
+                    var orderToSku in
+                        entities.SelectMany(o => o.PromoSkus).Where(s => s.Sku?.Product != null && s.Sku.OptionTypes == null))
+                {
+                    var optionTypes = _productMapper.FilterByType(orderToSku.Sku.Product.IdObjectType);
+                    orderToSku.Sku.OptionTypes = optionTypes;
+                    orderToSku.Sku.Product.OptionTypes = optionTypes;
+                }
+                var invalidSkuOrdered =
+                    entities.SelectMany(o => o.Skus)
+                        .Where(s => s.Sku?.Product == null || s.Sku.OptionTypes == null)
+                        .ToArray();
+                var skuIds = new HashSet<int>(invalidSkuOrdered.Select(s => s.IdSku));
+                var invalidSkus = (await _skusRepository.Query(p => skuIds.Contains(p.Id))
+                    .Include(p => p.Product)
+                    .ThenInclude(s => s.OptionValues)
+                    .Include(p => p.OptionValues)
+                    .SelectAsync(false)).ToDictionary(s => s.Id);
+                foreach (var orderToSku in invalidSkuOrdered)
+                {
+                    Sku sku;
+                    if (invalidSkus.TryGetValue(orderToSku.IdSku, out sku))
+                    {
+                        var optionTypes = _productMapper.FilterByType(sku.Product.IdObjectType);
+                        orderToSku.Sku = sku;
+                        orderToSku.Sku.Product = sku.Product;
+                        orderToSku.Sku.OptionTypes = optionTypes;
+                        orderToSku.Sku.Product.OptionTypes = optionTypes;
+                    }
+                }
+            }
         }
 
         protected override bool LogObjectFullData => true;
@@ -280,7 +319,7 @@ namespace VitalChoice.Business.Services.Orders
             order.DiscountTotal = dataContext.DiscountTotal;
             order.ShippingTotal = dataContext.ShippingTotal;
             order.ProductsSubtotal = dataContext.ProductsSubtotal;
-            //TODO: Add promo skus and skus to order
+            order.PromoSkus = dataContext.PromoSkus;
         }
 
         protected override Task<List<MessageInfo>> ValidateAsync(OrderDynamic dynamic)
@@ -344,6 +383,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 try
                 {
+                    SetPOrderType(new List<OrderDynamic>() { model });
                     await EnsurePaymentMethod(model);
                     model.PaymentMethod.IdOrder = model.Id;
                     var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
@@ -421,6 +461,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 try
                 {
+                    SetPOrderType(models);
                     entities = await base.InsertRangeAsync(models, uow);
                     foreach (var model in models)
                     {
@@ -452,6 +493,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 try
                 {
+                    SetPOrderType(new List<OrderDynamic>() { model });
                     await EnsurePaymentMethod(model);
                     model.PaymentMethod.IdOrder = model.Id;
                     var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
@@ -497,6 +539,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 try
                 {
+                    SetPOrderType(models);
                     entities = await base.UpdateRangeAsync(models, uow);
                     foreach (var model in models)
                     {
@@ -717,33 +760,36 @@ namespace VitalChoice.Business.Services.Orders
 
             return toReturn;
         }
-
-        public POrderType? GetPOrderType(OrderDynamic item)
+        
+        private void SetPOrderType(ICollection<OrderDynamic> items)
         {
-            POrderType? toReturn = null;
-            var pOrder = false;
-            var npOrder = false;
-            if (item != null)
+            if (items != null)
             {
-                foreach (var skuOrdered in item.Skus)
+                foreach (var item in items)
                 {
-                    pOrder = pOrder || skuOrdered?.ProductWithoutSkus.IdObjectType == (int)ProductType.Perishable;
-                    npOrder = npOrder || skuOrdered?.ProductWithoutSkus.IdObjectType == (int)ProductType.NonPerishable;
-                }
-                if (pOrder && npOrder)
-                {
-                    toReturn = POrderType.PNP;
-                }
-                else if (pOrder)
-                {
-                    toReturn = POrderType.P;
-                }
-                else if (npOrder)
-                {
-                    toReturn = POrderType.NP;
+                    POrderType? toReturn = null;
+                    var pOrder = false;
+                    var npOrder = false;
+                    foreach (var skuOrdered in item.Skus)
+                    {
+                        pOrder = pOrder || skuOrdered?.ProductWithoutSkus.IdObjectType == (int)ProductType.Perishable;
+                        npOrder = npOrder || skuOrdered?.ProductWithoutSkus.IdObjectType == (int)ProductType.NonPerishable;
+                    }
+                    if (pOrder && npOrder)
+                    {
+                        toReturn = POrderType.PNP;
+                    }
+                    else if (pOrder)
+                    {
+                        toReturn = POrderType.P;
+                    }
+                    else if (npOrder)
+                    {
+                        toReturn = POrderType.NP;
+                    }
+                    item.Data.POrderType = (int?)toReturn;
                 }
             }
-            return toReturn;
         }
 
         #region OrdersImport
@@ -809,6 +855,41 @@ namespace VitalChoice.Business.Services.Orders
             {
                 var context = await this.CalculateOrder(item.Order);
                 item.Order = context.Order;
+
+                if (item.Order.SafeData.ShipDelayDate!=null)
+                {
+                    item.Order.Data.ShipDelayType = ShipDelayType.EntireOrder;
+                    if (item.Order.OrderStatus != OrderStatus.OnHold)
+                    {
+                        if (context.SplitInfo?.ShouldSplit == null || context.SplitInfo?.ShouldSplit == false)
+                        {
+                            item.Order.OrderStatus = OrderStatus.ShipDelayed;
+                        }
+                        else
+                        {
+                            item.Order.OrderStatus = null;
+                            item.Order.POrderStatus = OrderStatus.ShipDelayed;
+                            item.Order.NPOrderStatus = OrderStatus.ShipDelayed;
+                        }
+                    }
+                    else
+                    {
+                        item.Order.POrderStatus = item.Order.OrderStatus;
+                        item.Order.NPOrderStatus = item.Order.OrderStatus;
+                        item.Order.OrderStatus = null;
+                    }
+                }
+                else
+                {
+                    item.Order.Data.ShipDelayType = ShipDelayType.None;
+                    if (context.SplitInfo?.ShouldSplit == true)
+                    {
+                        item.Order.POrderStatus = item.Order.OrderStatus;
+                        item.Order.NPOrderStatus = item.Order.OrderStatus;
+                        item.Order.OrderStatus = null;
+                    }
+                }
+
                 item.OrderImportItem.ErrorMessages.AddRange(context.Messages);
                 if (context.SkuOrdereds != null)
                 {
@@ -835,11 +916,6 @@ namespace VitalChoice.Business.Services.Orders
             }
 
             var orders = map.Select(p => p.Order).ToList();
-            //set POrderType
-            foreach (var order in orders)
-            {
-                order.Data.POrderType = (int?)GetPOrderType(order);
-            }
             orders = await InsertRangeAsync(orders);
 
             if(orderType==OrderType.GiftList)
@@ -1115,6 +1191,10 @@ namespace VitalChoice.Business.Services.Orders
                 if (DateTime.TryParse(sShipDate, CultureInfo.InvariantCulture, DateTimeStyles.None, out shipDate))
                 {
                     toReturn = TimeZoneInfo.ConvertTime(shipDate, _pstTimeZoneInfo, TimeZoneInfo.Local);
+                    if(toReturn<DateTime.Now)
+                    {
+                        messages.Add(AddErrorMessage(columnName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.MustBeFutureDateError], columnName)));
+                    }
                 }
                 else
                 {
@@ -1269,7 +1349,12 @@ namespace VitalChoice.Business.Services.Orders
             {
                 toReturn.Add(new MessageInfo() { Message = "Invalid order #" });
             }
-            if (order == null || !(order.OrderStatus == OrderStatus.Processed || order.OrderStatus == OrderStatus.Exported || order.OrderStatus == OrderStatus.Shipped))
+            if (order == null || (order.OrderStatus == OrderStatus.Incomplete || order.OrderStatus == OrderStatus.Cancelled || 
+                order.OrderStatus == OrderStatus.ShipDelayed || order.OrderStatus == OrderStatus.OnHold ||
+                order.POrderStatus == OrderStatus.Incomplete || order.POrderStatus == OrderStatus.Cancelled ||
+                order.POrderStatus == OrderStatus.ShipDelayed || order.POrderStatus == OrderStatus.OnHold ||
+                order.NPOrderStatus == OrderStatus.Incomplete || order.NPOrderStatus == OrderStatus.Cancelled ||
+                order.NPOrderStatus == OrderStatus.ShipDelayed || order.NPOrderStatus == OrderStatus.OnHold))
             {
                 toReturn.Add(new MessageInfo() {Message = "The given order can'be flagged"});
                 throw new AppValidationException("The given order can'be flagged");

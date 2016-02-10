@@ -21,9 +21,6 @@ namespace VitalChoice.Business.Services.Dynamic
     {
         private readonly OrderAddressMapper _orderAddressMapper;
 
-        protected override Expression<Func<OrderPaymentMethodOptionValue, int>> ObjectIdReferenceSelector
-            => v => v.IdOrderPaymentMethod;
-
         public OrderPaymentMethodMapper(ITypeConverter converter,
             IModelConverterService converterService,
             IEcommerceRepositoryAsync<CustomerPaymentMethodOptionType> optionTypeRepositoryAsync,

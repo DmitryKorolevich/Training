@@ -25,7 +25,9 @@ namespace VitalChoice.Interfaces.Services.Users
 
 	    Task<ApplicationUser> SignInAsync(ApplicationUser user);
 
-	    Task<ApplicationUser> FindAsync(string login);
+        Task<ApplicationUser> SignInNoStatusCheckingAsync(ApplicationUser user);
+
+        Task<ApplicationUser> FindAsync(string login);
 
 		Task<ApplicationUser> SignInAsync(string login, string password);
 

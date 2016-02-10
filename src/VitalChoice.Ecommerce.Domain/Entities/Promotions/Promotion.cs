@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 
-namespace VitalChoice.Ecommerce.Domain.Entities.Promotion
+namespace VitalChoice.Ecommerce.Domain.Entities.Promotions
 {
     public class Promotion : DynamicDataEntity<PromotionOptionValue, PromotionOptionType>
     {

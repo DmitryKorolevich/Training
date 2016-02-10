@@ -16,4 +16,24 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
         public int Quantity { get; set; }
         public IList<string> Messages { get; set; }
     }
+
+    public class PromoOrdered: SkuOrdered
+    {
+        public PromoOrdered()
+        {
+            
+        }
+
+        public PromoOrdered(SkuOrdered skuOrdered, PromotionDynamic promo)
+        {
+            Sku = skuOrdered.Sku;
+            ProductWithoutSkus = skuOrdered.ProductWithoutSkus;
+            Amount = skuOrdered.Amount;
+            Quantity = skuOrdered.Quantity;
+            Messages = skuOrdered.Messages;
+            Promotion = promo;
+        }
+
+        public PromotionDynamic Promotion { get; set; }
+    }
 }

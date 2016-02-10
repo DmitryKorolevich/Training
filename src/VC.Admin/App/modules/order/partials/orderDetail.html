@@ -444,10 +444,10 @@
                                                                             <small class="error" ng-show="forms.GCs.i{{$index}}.Code.$error.server">{{calculateServerMessages.GetMessage('Code','GCs',$index)}}</small>
                                                                         </div>
                                                                     </div>
-                                                                    <div data-ng-if="$index==0" class="col-md-2 padding-0px">
+                                                                    <div data-ng-if="$index==0 && !orderEditDisabled" class="col-md-2 padding-0px">
                                                                         <a class="btn btn-success btn-xs" title="Add" data-ng-click="gcAdd();"><i class="glyphicon glyphicon-plus"></i></a>
                                                                     </div>
-                                                                    <div data-ng-if="$index!=0" class="col-md-2 padding-0px">
+                                                                    <div data-ng-if="$index!=0 && !orderEditDisabled" class="col-md-2 padding-0px">
                                                                         <a class="btn btn-danger btn-xs" title="Delete" data-ng-click="gcDelete($index);"><i class="glyphicon glyphicon-remove"></i></a>
                                                                     </div>
                                                                 </div>
@@ -609,7 +609,7 @@
                                             <div data-ng-if="!options.OverrideEmail" class="form-group">
                                                 <label for="enterEmail" class="col-md-3 control-label">Enter Email</label>
                                                 <div class="col-md-9">
-                                                    <input type="email" name="Email" class="form-control" id="enterEmail" data-ng-model="currentCustomer.newEmail" placeholder="Enter Email" data-ng-maxlength="100" autocomplete="off" data-ng-disabled="orderEditDisabled">
+                                                    <input type="email" name="Email" class="form-control" id="enterEmail" data-ng-model="currentCustomer.newEmail" placeholder="Enter Email" data-ng-required="!currentCustomer.Email" data-ng-maxlength="100" autocomplete="off" data-ng-disabled="orderEditDisabled">
                                                     <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.Email.$invalid">
                                                         <small class="error" ng-show="forms.profile.Email.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Email")}}</small>
                                                         <small class="error" ng-show="forms.profile.Email.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","GeneralFieldNames.Email")}}</small>
@@ -621,7 +621,7 @@
                                             <div data-ng-if="!options.OverrideEmail" class="form-group">
                                                 <label for="reEnterEmail" class="col-md-3 control-label">Re-enter Email</label>
                                                 <div class="col-md-9">
-                                                    <input type="email" name="EmailConfirm" class="form-control" id="reEnterEmail" data-ng-model="currentCustomer.emailConfirm" placeholder="Re-enter Email" data-ng-maxlength="100" autocomplete="off" data-ng-disabled="orderEditDisabled">
+                                                    <input type="email" name="EmailConfirm" class="form-control" id="reEnterEmail" data-ng-model="currentCustomer.emailConfirm" placeholder="Re-enter Email" data-ng-required="!currentCustomer.Email" data-ng-maxlength="100" autocomplete="off" data-ng-disabled="orderEditDisabled">
                                                     <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.EmailConfirm.$invalid">
                                                         <small class="error" ng-show="forms.profile.EmailConfirm.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Email Confirmation")}}</small>
                                                         <small class="error" ng-show="forms.profile.EmailConfirm.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","Email Confirmation")}}</small>
@@ -691,8 +691,8 @@
                                                     </label>
                                                 </div>
                                             </div>
-                                            <span class="legend">Suspend User Account</span>
-                                            <div class="form-group">
+                                            <span data-ng-if="currentCustomer.Id && currentCustomer.StatusCode!=5" class="legend">Suspend User Account</span>
+                                            <div data-ng-if="currentCustomer.StatusCode!=5" class="form-group">
                                                 <label for="suspendUserAccount" class="col-md-3 control-label">Suspend User Account</label>
                                                 <div class="col-md-9">
                                                     <div class="checkbox">
@@ -772,7 +772,7 @@
                                                             data-ng-options="idx as (getCreditCardTypeName(creditCard.CardType) + ', ending in ' + getLast4(creditCard.CardNumber) + (creditCard.Default ? ' (Default)' : '')) for (idx, creditCard) in currentCustomer.CreditCards"></select>
                                                 </div>
                                                 <div class="col-md-3 padding-l-0px">
-                                                    <button class="btn btn-danger pull-right" data-ng-show="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex] && paymentInfoTab.PaymentMethodType == 1 && !currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].Default" data-ng-click="deleteSelectedCreditCard();">Delete</button>
+                                                    <button class="btn btn-danger pull-right" data-ng-show="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex] && paymentInfoTab.PaymentMethodType == 1 && (!currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].Default || currentCustomer.CreditCards.length==1)" data-ng-click="deleteSelectedCreditCard();">Delete</button>
                                                     <button class="btn btn-success pull-right margin-right-8px" data-ng-show="!currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].Default && paymentInfoTab.PaymentMethodType == 1 && currentCustomer.CreditCards && currentCustomer.CreditCards.length>0" data-ng-click="setDefaultCreditCard();">Set as Default</button>
                                                 </div>
                                             </div>

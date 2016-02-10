@@ -23,6 +23,10 @@ angular.module('app.core.dataAccess.services.settingService', [])
 		{
 		    return $http.post(baseUrl + 'GetObjectHistoryLogItems', filter, getConfig(tracker));
 		},
+		getOrderObjectHistoryLogItems: function (filter, tracker)
+		{
+		    return $http.post(baseUrl + 'GetOrderObjectHistoryLogItems', filter, getConfig(tracker));
+		},
 
         //countries/states
 	    getCountries: function (filter, tracker) {

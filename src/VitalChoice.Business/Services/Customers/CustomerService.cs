@@ -4,8 +4,6 @@ using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-#if DNX451
-#endif
 using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Business.Queries.Orders;
@@ -41,6 +39,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Users;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities;
@@ -94,11 +93,11 @@ namespace VitalChoice.Business.Services.Customers
             ILoggerProviderExtended loggerProvider, DirectMapper<Customer> directMapper, DynamicExtensionsRewriter queryVisitor,
             AddressOptionValueRepository addressOptionValueRepositoryAsync, CustomerAddressMapper customerAddressMapper,
             ICountryNameCodeResolver countryNameCode, IEncryptedOrderExportService encryptedOrderExportService,
-            IObjectMapper<CustomerPaymentMethodDynamic> paymentMapper, IPaymentMethodService paymentMethodService)
+            IObjectMapper<CustomerPaymentMethodDynamic> paymentMapper, IPaymentMethodService paymentMethodService, EcommerceContext dbContext)
             : base(
                 customerMapper, customerRepositoryAsync,
                 customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectLogItemExternalService, loggerProvider, directMapper,
-                queryVisitor)
+                queryVisitor, dbContext)
         {
             _orderNoteRepositoryAsync = orderNoteRepositoryAsync;
             _paymentMethodRepositoryAsync = paymentMethodRepositoryAsync;
@@ -174,17 +173,19 @@ namespace VitalChoice.Business.Services.Customers
                     throw new AppValidationException("IdAffiliate",ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InvalidIdAffiliate]);
                 }
             }
-            foreach (var paymentMethod in model.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard))
-            {
+            //foreach (var paymentMethod in model.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard))
+            //{
                 
-            }
+            //}
 
+            //Don't allow to return a customer registered from the admin part(Not Active) to Not Active status from 
+            //Active(by a store front activation)
 	        if (model.StatusCode == (int)CustomerStatus.NotActive && model.Id > 0)
 	        {
 				var exists =
 				await
 					_customerRepositoryAsync.Query(
-						new CustomerQuery().NotDeleted().WithId(model.Id).NotInActive()).SelectAnyAsync();
+						new CustomerQuery().NotDeleted().WithId(model.Id).WithStatus(CustomerStatus.Active)).SelectAnyAsync();
 		        if (exists)
 		        {
 					throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CustomerWasModified]);
@@ -316,7 +317,12 @@ namespace VitalChoice.Business.Services.Customers
 			}
 		}
 
-		public async Task<IList<OrderNote>> GetAvailableOrderNotesAsync(CustomerType customerType)
+        public Task<ApplicationUser> GetUser(int id)
+        {
+            return _storefrontUserService.GetAsync(id);
+        }
+
+        public async Task<IList<OrderNote>> GetAvailableOrderNotesAsync(CustomerType customerType)
 	    {
 			var condition = new OrderNoteQuery().NotDeleted().MatchByCustomerType(customerType);
 
@@ -662,11 +668,6 @@ namespace VitalChoice.Business.Services.Customers
                     await authTasks.ForEachAsync(async _ => (await _).Raise());
 
                     entity = await base.InsertAsync(model, uow);
-
-                    if (string.IsNullOrWhiteSpace(password) && model.StatusCode != suspendedCustomer && !String.IsNullOrEmpty(model.Email))
-                    {
-                        await _storefrontUserService.SendActivationAsync(model.Email);
-                    }
 
                     updatePaymentsTask = _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(paymentCopies);
 

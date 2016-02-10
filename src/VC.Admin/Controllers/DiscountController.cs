@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
-using VC.Admin.Models.Product;
 using VitalChoice.Validation.Models;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
@@ -19,6 +18,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 using VitalChoice.Interfaces.Services.Settings;
 using System.Linq;
+using VC.Admin.Models.Products;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 

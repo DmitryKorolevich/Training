@@ -23,6 +23,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer;
@@ -46,9 +47,9 @@ namespace VitalChoice.Business.Services.Products
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, DiscountMapper mapper,
             IObjectLogItemExternalService objectLogItemExternalService,
-            ILoggerProviderExtended loggerProvider, DirectMapper<Discount> directMapper, DynamicExtensionsRewriter queryVisitor)
+            ILoggerProviderExtended loggerProvider, DirectMapper<Discount> directMapper, DynamicExtensionsRewriter queryVisitor, EcommerceContext dbContext)
             : base(mapper, discountRepository, discountOptionValueRepository, bigStringRepositoryAsync, objectLogItemExternalService, 
-                  loggerProvider, directMapper, queryVisitor)
+                  loggerProvider, directMapper, queryVisitor, dbContext)
         {
             _discountRepository = discountRepository;
             _skuRepository = skuRepository;

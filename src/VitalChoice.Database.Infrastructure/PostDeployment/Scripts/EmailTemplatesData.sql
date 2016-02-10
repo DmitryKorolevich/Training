@@ -956,3 +956,17 @@ INSERT INTO [dbo].[EmailTemplates]
 END
 
 GO
+
+IF EXISTS(SELECT [Id] FROM [dbo].[EmailTemplates] WHERE [ModelType] = 'GLOrdersImportEmail')
+BEGIN
+
+UPDATE [dbo].[EmailTemplates]
+SET [ModelType]='VitalChoice.Ecommerce.Domain.Mail.'+[ModelType]
+
+UPDATE [dbo].[EmailTemplates] 
+SET [ModelType]=REPLACE([ModelType],'VitalChoice.Ecommerce.Domain.Mail.','VitalChoice.Infrastructure.Domain.Mail.')
+WHERE [ModelType] = 'VitalChoice.Ecommerce.Domain.Mail.GLOrdersImportEmail' OR [ModelType]='VitalChoice.Ecommerce.Domain.Mail.PrivacyRequestEmail'
+
+ENd
+
+GO

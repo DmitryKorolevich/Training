@@ -10,6 +10,7 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
@@ -26,6 +27,7 @@ namespace VitalChoice.Business.Services.Dynamic
         private readonly OrderPaymentMethodMapper _orderPaymentMethodMapper;
         private readonly SkuMapper _skuMapper;
         private readonly ProductMapper _productMapper;
+        private readonly PromotionMapper _promotionMapper;
         private readonly IProductService _productService;
 
         public OrderMapper(ITypeConverter converter,
@@ -33,7 +35,7 @@ namespace VitalChoice.Business.Services.Dynamic
             IEcommerceRepositoryAsync<OrderOptionType> orderRepositoryAsync, OrderAddressMapper orderAddressMapper,
             CustomerMapper customerMapper, DiscountMapper discountMapper,
             OrderPaymentMethodMapper orderPaymentMethodMapper, SkuMapper skuMapper, ProductMapper productMapper,
-            IProductService productService)
+            IProductService productService, PromotionMapper promotionMapper)
             : base(converter, converterService, orderRepositoryAsync)
         {
             _orderAddressMapper = orderAddressMapper;
@@ -43,11 +45,7 @@ namespace VitalChoice.Business.Services.Dynamic
             _skuMapper = skuMapper;
             _productMapper = productMapper;
             _productService = productService;
-        }
-
-        protected override Expression<Func<OrderOptionValue, int>> ObjectIdReferenceSelector
-        {
-            get { return v => v.IdOrder; }
+            _promotionMapper = promotionMapper;
         }
 
         protected override async Task FromEntityRangeInternalAsync(
@@ -61,6 +59,8 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.IdAddedBy = entity.IdAddedBy;
                 dynamic.DiscountTotal = entity.DiscountTotal;
                 dynamic.OrderStatus = entity.OrderStatus;
+                dynamic.POrderStatus = entity.POrderStatus;
+                dynamic.NPOrderStatus = entity.NPOrderStatus;
                 dynamic.ProductsSubtotal = entity.ProductsSubtotal;
                 dynamic.ShippingTotal = entity.ShippingTotal;
                 dynamic.TaxTotal = entity.TaxTotal;
@@ -112,6 +112,36 @@ namespace VitalChoice.Business.Services.Dynamic
                     }
                 }
 
+                if (entity.PromoSkus != null)
+                {
+                    if (dynamic.PromoSkus == null)
+                    {
+                        dynamic.PromoSkus = new List<PromoOrdered>();
+                    }
+
+                    await dynamic.PromoSkus.AddRangeAsync(entity.PromoSkus.Select(async s => new PromoOrdered
+                    {
+                        Amount = s.Amount,
+                        Quantity = s.Quantity,
+                        Sku = await _skuMapper.FromEntityAsync(s.Sku, withDefaults),
+                        ProductWithoutSkus = await _productMapper.FromEntityAsync(s.Sku?.Product, withDefaults),
+                        Promotion = await _promotionMapper.FromEntityAsync(s.Promo, withDefaults)
+                    }));
+
+                    if (dynamic.PromoSkus.Count != 0)
+                    {
+                        var productContents = await _productService.SelectProductContents(dynamic.PromoSkus.Select(p => p.ProductWithoutSkus.Id).ToList());
+                        foreach (var productContent in productContents)
+                        {
+                            var sku = dynamic.PromoSkus.FirstOrDefault(p => p.ProductWithoutSkus.Id == productContent.Id);
+                            if (sku != null)
+                            {
+                                sku.ProductWithoutSkus.Url = productContent.Url;
+                            }
+                        }
+                    }
+                }
+
                 dynamic.AffiliateOrderPayment = entity.AffiliateOrderPayment;
             });
         }
@@ -126,6 +156,8 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.IdAddedBy = entity.IdEditedBy;
                 entity.DiscountTotal = dynamic.DiscountTotal;
                 entity.OrderStatus = dynamic.OrderStatus;
+                entity.POrderStatus = dynamic.POrderStatus;
+                entity.NPOrderStatus = dynamic.NPOrderStatus;
                 entity.ProductsSubtotal = dynamic.ProductsSubtotal;
                 entity.ShippingTotal = dynamic.ShippingTotal;
                 entity.TaxTotal = dynamic.TaxTotal;
@@ -150,6 +182,15 @@ namespace VitalChoice.Business.Services.Dynamic
                     IdOrder = dynamic.Id,
                     IdSku = s.Sku.Id
                 }));
+
+                entity.PromoSkus = new List<OrderToPromo>(dynamic.PromoSkus.Select(s => new OrderToPromo
+                {
+                    Amount = s.Amount,
+                    Quantity = s.Quantity,
+                    IdOrder = dynamic.Id,
+                    IdSku = s.Sku.Id,
+                    IdPromo = s.Promotion?.Id
+                }));
             });
         }
 
@@ -164,6 +205,8 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.IdAddedBy = entity.IdAddedBy;
                 entity.DiscountTotal = dynamic.DiscountTotal;
                 entity.OrderStatus = dynamic.OrderStatus;
+                entity.POrderStatus = dynamic.POrderStatus;
+                entity.NPOrderStatus = dynamic.NPOrderStatus;
                 entity.ProductsSubtotal = dynamic.ProductsSubtotal;
                 entity.ShippingTotal = dynamic.ShippingTotal;
                 entity.TaxTotal = dynamic.TaxTotal;
@@ -182,39 +225,45 @@ namespace VitalChoice.Business.Services.Dynamic
                         IdGiftCertificate = g.GiftCertificate.Id
                     });
                 entity.IdDiscount = dynamic.Discount?.Id;
-                if(dynamic.PaymentMethod.Address!=null && entity.PaymentMethod.BillingAddress==null)
+                if (dynamic.PaymentMethod.Address != null && entity.PaymentMethod.BillingAddress == null)
                 {
-                    entity.PaymentMethod.BillingAddress = new VitalChoice.Ecommerce.Domain.Entities.Addresses.OrderAddress();
-                    entity.PaymentMethod.BillingAddress.OptionValues = new List<OrderAddressOptionValue>();
+                    entity.PaymentMethod.BillingAddress = new OrderAddress {OptionValues = new List<OrderAddressOptionValue>()};
                 }
                 await _orderPaymentMethodMapper.UpdateEntityAsync(dynamic.PaymentMethod, entity.PaymentMethod);
-                Dictionary<int, SkuOrdered> keyedSkus = new Dictionary<int, SkuOrdered>();
-                if (dynamic.Skus != null)
+                if (entity.Skus == null)
                 {
-                    keyedSkus = dynamic.Skus.Where(s => s.Sku?.Id > 0).ToDictionary(s => s.Sku.Id);
+                    entity.Skus = new List<OrderToSku>();
                 }
-                if (entity.Skus != null)
-                {
-                    //Update
-                    foreach (var sku in entity.Skus)
+                entity.Skus.MergeKeyed(dynamic.Skus.Where(s => (s.Sku?.Id ?? 0) != 0).ToArray(), sku => sku.IdSku, ordered => ordered.Sku.Id,
+                    s => new OrderToSku
                     {
-                        SkuOrdered skuOrdered;
-                        if (keyedSkus.TryGetValue(sku.IdSku, out skuOrdered))
-                        {
-                            sku.Amount = skuOrdered.Amount;
-                            sku.Quantity = skuOrdered.Quantity;
-                        }
-                    }
-                    //Add
-                    entity.Skus.MergeKeyed(dynamic.Skus, s => s.IdSku, ds => ds.Sku?.Id,
-                        s => new OrderToSku
-                        {
-                            Amount = s.Amount,
-                            Quantity = s.Quantity,
-                            IdOrder = dynamic.Id,
-                            IdSku = s.Sku.Id
-                        });
+                        Amount = s.Amount,
+                        Quantity = s.Quantity,
+                        IdOrder = dynamic.Id,
+                        IdSku = s.Sku.Id
+                    }, (sku, ordered) =>
+                    {
+                        sku.Amount = ordered.Amount;
+                        sku.Quantity = ordered.Quantity;
+                    });
+                if (entity.PromoSkus == null)
+                {
+                    entity.PromoSkus = new List<OrderToPromo>();
                 }
+                entity.PromoSkus.MergeKeyed(dynamic.PromoSkus.Where(s => (s.Sku?.Id ?? 0) != 0).ToArray(), sku => sku.IdSku,
+                    ordered => ordered.Sku.Id, s => new OrderToPromo
+                    {
+                        Amount = s.Amount,
+                        Quantity = s.Quantity,
+                        IdOrder = dynamic.Id,
+                        IdSku = s.Sku.Id,
+                        IdPromo = s.Promotion?.Id
+                    }, (sku, ordered) =>
+                    {
+                        sku.Amount = ordered.Amount;
+                        sku.Quantity = ordered.Quantity;
+                        sku.IdPromo = ordered.Promotion?.Id;
+                    });
             });
         }
     }

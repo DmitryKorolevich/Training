@@ -61,8 +61,8 @@ namespace VC.Public.Controllers
             IProductService productService,
             IHelpService helpService,
             IHealthwiseService healthwiseService, IAppInfrastructureService infrastructureService,
-            IAuthorizationService authorizationService, ICheckoutService checkoutService)
-            : base(contextAccessor, customerService, infrastructureService, authorizationService, checkoutService)
+            IAuthorizationService authorizationService)
+            : base(contextAccessor, customerService, infrastructureService, authorizationService)
         {
             _storefrontUserService = storefrontUserService;
             _addressConverter = addressConverter;
@@ -91,6 +91,8 @@ namespace VC.Public.Controllers
                     Total = p.Total,
                     Id = p.Id,
                     OrderStatus = p.OrderStatus,
+                    POrderStatus = p.POrderStatus,
+                    NPOrderStatus = p.NPOrderStatus,
                     Healthwise = p.Healthwise,
                 }).ToList(),
                 Count = orders.Count,
@@ -666,6 +668,8 @@ namespace VC.Public.Controllers
                     orderModel.Id = healthWiseOrder.Id;
                     orderModel.DateCreated = healthWiseOrder.Order.DateCreated;
                     orderModel.OrderStatus = healthWiseOrder.Order.OrderStatus;
+                    orderModel.POrderStatus = healthWiseOrder.Order.POrderStatus;
+                    orderModel.NPOrderStatus = healthWiseOrder.Order.NPOrderStatus;
                     orderModel.Total = healthWiseOrder.Order.ProductsSubtotal;
                     toReturn.Items.Add(orderModel);
                 }

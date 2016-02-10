@@ -13,6 +13,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Core.Infrastructure.Helpers;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services.Checkout;
 
@@ -24,16 +25,14 @@ namespace VC.Public.Controllers
         protected readonly IAuthorizationService AuthorizationService;
         protected readonly IHttpContextAccessor ContextAccessor;
         protected readonly ICustomerService CustomerService;
-        protected readonly ICheckoutService CheckoutService;
 
         protected PublicControllerBase(IHttpContextAccessor contextAccessor, ICustomerService customerService,
-            IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService, ICheckoutService checkoutService)
+            IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService)
         {
             InfrastructureService = infrastructureService;
             AuthorizationService = authorizationService;
             ContextAccessor = contextAccessor;
 			CustomerService = customerService;
-			CheckoutService = checkoutService;
         }
 
         protected async Task<bool> CustomerLoggedIn()
@@ -84,11 +83,5 @@ namespace VC.Public.Controllers
 
             return customer;
         }
-
-	    protected async Task<bool> IsCartEmpty()
-	    {
-			var uid = Request.GetCartUid();
-		    return uid == null || await CheckoutService.GetCartItemsCount(uid.Value) == 0;
-	    }
     }
 }

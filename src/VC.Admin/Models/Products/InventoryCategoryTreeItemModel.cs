@@ -1,10 +1,10 @@
-﻿using System.Linq;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Validation.Models;
 
-namespace VC.Admin.Models.Product
+namespace VC.Admin.Models.Products
 {
     public class InventoryCategoryTreeItemModel : BaseModel
 	{

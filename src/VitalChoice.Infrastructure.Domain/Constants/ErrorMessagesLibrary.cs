@@ -50,6 +50,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             public const string FieldMaxLength = "FieldMaxLength";
             public const string SkuNotFoundOrderImport = "SkuNotFoundOrderImport";
             public const string EmptyCart = "EmptyCart";
+            public const string MustBeFutureDateError = "MustBeFutureDateError";
         }
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
@@ -86,7 +87,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             {Keys.ObjectNotFound, "Object cannot be found"},
             {Keys.AffiliateMinPayCommisionsAmountNotMatch, "Affiliate balance is less than ${0}"},
             {Keys.WrongCaptcha, "The reCAPTCHA wasn't entered correctly"},
-            {Keys.CustomerWasModified, "The customer has been modified. Please refresh this page before making changes"},
+            {Keys.CustomerWasModified, "The customer has been activated by a store front user. Please refresh this page before making changes"},
             {Keys.SkuNotFound, "Product SKU has not been found in the database"},
             {Keys.OrderImportRowError, "Row number {0} error: {1}"},
             {Keys.ParseDateError, "{0} can't be parsed(format 'MM/dd/yyyy')"},
@@ -98,6 +99,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             {Keys.FieldMaxLength, "{0} exceeds length of {1} literals"},
             {Keys.SkuNotFoundOrderImport, "Field \"{0}\": the given product SKU has not been found in the database({1})"},
             {Keys.EmptyCart, "Your cart is empty"},
+            {Keys.MustBeFutureDateError,  "{0} should be future date. Please review."},
         };
     }
 }

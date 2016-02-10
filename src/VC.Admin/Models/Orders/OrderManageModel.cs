@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Attributes;
 using VC.Admin.Validators.Order;
-using VC.Admin.Models.Product;
 using VC.Admin.Models.Customer;
+using VC.Admin.Models.Products;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
@@ -162,7 +162,15 @@ namespace VC.Admin.Models.Orders
         public RecordStatusCode StatusCode { get; set; }
 
         [Map]
-        public OrderStatus OrderStatus { get; set; }
+        public OrderStatus? OrderStatus { get; set; }
+
+        [Map]
+        public OrderStatus? POrderStatus { get; set; }
+
+        [Map]
+        public OrderStatus? NPOrderStatus { get; set; }
+
+        public OrderStatus CombinedEditOrderStatus { get; set; }
 
         [Map]
         public bool GiftOrder { get; set; }
@@ -257,6 +265,8 @@ namespace VC.Admin.Models.Orders
         public IList<PromoSkuOrderedManageModel> PromoSkus { get; set; }
 
         public bool SignUpNewsletter { get; set; }
+
+        public bool ShouldSplit { get; set; }
 
         public OrderManageModel()
         {

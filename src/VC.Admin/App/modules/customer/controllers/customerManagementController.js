@@ -31,8 +31,10 @@ angular.module('app.modules.customer.controllers.customerManagementController', 
 		    {
 		        $scope.forms = {};
 
+		        $scope.address = {};
+
 		        $scope.filter = {
-                    Address: {},
+                    Address: null,
 		            SearchText: "",
 		            Paging: { PageIndex: 1, PageItemCount: 100 },
 		            Sorting: gridSorterUtil.resolve(refreshCustomers, 'Updated', 'Desc')
@@ -46,36 +48,34 @@ angular.module('app.modules.customer.controllers.customerManagementController', 
 
 		    $scope.pageChanged = function ()
 		    {
-		        if (!isCustomerFilterAllowSearch())
-		        {
-		            return;
-		        }
-
 		        refreshCustomers();
 		    };
 
-		    $scope.filterCustomers = function ()
+		    $scope.filterCustomers = function (event)
 		    {
 		        if (!isCustomerFilterAllowSearch())
 		        {                    
                     return;
 		        }
 
-		        $scope.filter.Paging.PageIndex = 1;
+		        $scope.filter.Address = angular.copy($scope.address);
+		        $scope.filter.Email = $scope.address.Email;
+		        $scope.filter.SearchText = $scope.address.SearchText;
+                $scope.filter.Paging.PageIndex = 1;
 
 		        refreshCustomers();
 		    };
 
 		    var isCustomerFilterAllowSearch = function ()
 		    {
-		        if ((!$scope.filter.Email || $scope.filter.Email.length < 3) &&
-                    (!$scope.filter.Address.LastName || $scope.filter.Address.LastName.length < 3) &&
-                    (!$scope.filter.Address.FirstName || $scope.filter.Address.FirstName.length < 3) &&
-                    (!$scope.filter.Address.Address1 || $scope.filter.Address.Address1.length < 3) &&
-                    (!$scope.filter.SearchText || $scope.filter.SearchText.length < 3) &&
-                    (!$scope.filter.Address.City || $scope.filter.Address.City.length < 3) &&
-                    (!$scope.filter.Address.Zip || $scope.filter.Address.Zip.length < 3) &&
-                    (!$scope.filter.Address.Phone || $scope.filter.Address.Phone.length < 3))
+		        if ((!$scope.address.Email || $scope.address.Email.length < 3) &&
+                    (!$scope.address.LastName || $scope.address.LastName.length < 3) &&
+                    (!$scope.address.FirstName || $scope.address.FirstName.length < 3) &&
+                    (!$scope.address.Address1 || $scope.address.Address1.length < 3) &&
+                    (!$scope.address.SearchText || $scope.address.SearchText.length < 3) &&
+                    (!$scope.address.City || $scope.address.City.length < 3) &&
+                    (!$scope.address.Zip || $scope.address.Zip.length < 3) &&
+                    (!$scope.address.Phone || $scope.address.Phone.length < 3))
 		        {
 		            toaster.pop('error', "Info", "At least one field should be filled with at least 3 characters.");
 		            return false;
@@ -119,12 +119,10 @@ angular.module('app.modules.customer.controllers.customerManagementController', 
 
 		    $scope.applySort = function (columnName)
 		    {
-		        if (!isCustomerFilterAllowSearch())
+		        if ($scope.filter.Address != null)
 		        {
-		            return;
+		            $scope.filter.Sorting.applySort(columnName);
 		        }
-
-		        $scope.filter.Sorting.applySort(columnName);
 		    };
 
 		    initialize();

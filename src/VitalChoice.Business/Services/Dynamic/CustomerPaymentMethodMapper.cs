@@ -29,11 +29,6 @@ namespace VitalChoice.Business.Services.Dynamic
             _customerAddressMapper = customerAddressMapper;
         }
 
-        protected override Expression<Func<CustomerPaymentMethodOptionValue, int>> ObjectIdReferenceSelector
-        {
-            get { return v => v.IdCustomerPaymentMethod; }
-        }
-
         protected override async Task FromEntityRangeInternalAsync(
             ICollection<DynamicEntityPair<CustomerPaymentMethodDynamic, CustomerPaymentMethod>> items,
             bool withDefaults = false)

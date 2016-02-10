@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using VitalChoice.Ecommerce.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
-using VitalChoice.Ecommerce.Domain.Entities.Promotion;
+using VitalChoice.Ecommerce.Domain.Entities.Promotions;
 
 namespace VitalChoice.Infrastructure.Domain.Dynamic
 {

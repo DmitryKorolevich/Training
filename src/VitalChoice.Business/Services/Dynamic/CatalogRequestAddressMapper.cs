@@ -68,9 +68,5 @@ namespace VitalChoice.Business.Services.Dynamic
             return Task.Delay(0);
         }
 
-        protected override Expression<Func<CatalogRequestAddressOptionValue, int>> ObjectIdReferenceSelector
-        {
-            get { return a => (int)AddressType.Shipping; }
-        }
     }
 }

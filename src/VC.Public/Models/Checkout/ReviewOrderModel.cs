@@ -12,13 +12,10 @@ namespace VC.Public.Models.Checkout
 	    {
 			BillToAddress = new List<KeyValuePair<string, string>>();
 			ShipToAddress = new List<KeyValuePair<string, string>>();
-			PaymentDetails = new List<KeyValuePair<string, string>>();
 		}
 
 	    public IList<KeyValuePair<string, string>> BillToAddress { get; set; }
 
 	    public IList<KeyValuePair<string, string>> ShipToAddress { get; set; }
-
-	    public IList<KeyValuePair<string, string>> PaymentDetails { get; set; }
     }
 }

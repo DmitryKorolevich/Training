@@ -1,4 +1,4 @@
-﻿namespace VitalChoice.Ecommerce.Domain.Entities.Promotion
+﻿namespace VitalChoice.Ecommerce.Domain.Entities.Promotions
 {
     public static class PromotionSortPath
     {

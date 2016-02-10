@@ -7,6 +7,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Customers;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Azure;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
@@ -15,7 +16,9 @@ namespace VitalChoice.Interfaces.Services.Customers
 {
 	public interface ICustomerService : IDynamicServiceAsync<CustomerDynamic, Customer>
 	{
-		Task<IList<OrderNote>> GetAvailableOrderNotesAsync(CustomerType customerType);
+	    Task<ApplicationUser> GetUser(int id);
+
+        Task<IList<OrderNote>> GetAvailableOrderNotesAsync(CustomerType customerType);
 
 		Task<IList<PaymentMethod>> GetAvailablePaymentMethodsAsync(CustomerType? customerType);
 

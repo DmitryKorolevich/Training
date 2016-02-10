@@ -585,41 +585,70 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         return model;
     }
 
+    var onHoldWatch = null;
+
     var initOrder = function ()
     {
-        $scope.oldOrderStatus = $scope.order.OrderStatus;
-        $scope.order.OnHold = $scope.order.OrderStatus == 7;//on hold status
+        $scope.oldOrderStatus = $scope.order.CombinedEditOrderStatus;
+        $scope.order.OnHold = $scope.order.CombinedEditOrderStatus == 7;//on hold status
         $scope.order.AutoShip = $scope.order.AutoShipFrequency ? true : false;
-        $scope.$watch('order.OnHold', function (newValue, oldValue)
+        if (onHoldWatch)
+            onHoldWatch();
+        onHoldWatch = $scope.$watch('order.OnHold', function (newValue, oldValue)
         {
-            if (newValue !== undefined && newValue !== null)
+            if ($scope.order.CombinedEditOrderStatus != 3 && $scope.order.CombinedEditOrderStatus != 4 &&
+                $scope.order.CombinedEditOrderStatus != 5)
             {
-                if (newValue)
+                if (newValue !== undefined && newValue !== null)
                 {
-                    $scope.order.OrderStatus = 7;
-                }
-                else
-                {
-                    if ($scope.order.OrderStatus != $scope.oldOrderStatus)
+                    if (newValue)
                     {
-                        $scope.order.OrderStatus = $scope.oldOrderStatus;
+                        $scope.order.CombinedEditOrderStatus = 7;
                     }
                     else
                     {
-                        $scope.order.OrderStatus = 2; //processed
+                        if ($scope.order.CombinedEditOrderStatus != $scope.oldOrderStatus)
+                        {
+                            $scope.order.CombinedEditOrderStatus = $scope.oldOrderStatus;
+                        }
+                        else
+                        {
+
+                            $scope.order.CombinedEditOrderStatus = 2; //processed
+                        }
                     }
                 }
             }
         });
-        $scope.orderEditDisabled = $scope.order.OrderStatus == 3 || $scope.order.OrderStatus == 4
-            || $scope.order.OrderStatus == 5;
+        $scope.orderEditDisabled = $scope.order.CombinedEditOrderStatus == 3 || $scope.order.CombinedEditOrderStatus == 4
+            || $scope.order.CombinedEditOrderStatus == 5;
 
         $scope.legend.CustomerName = $scope.currentCustomer.ProfileAddress.FirstName + " " + $scope.currentCustomer.ProfileAddress.LastName;
         if ($scope.id)
         {
             $scope.legend.OrderId = $scope.order.Id;
             $scope.legend.OrderDate = $scope.order.DateCreated;
-            $scope.legend.OrderStatus = $rootScope.getReferenceItem($rootScope.ReferenceData.OrderStatuses, $scope.order.OrderStatus).Text;
+            if ($scope.order.OrderStatus)
+            {
+                $scope.legend.OrderStatus = $rootScope.getReferenceItem($rootScope.ReferenceData.OrderStatuses, $scope.order.OrderStatus).Text;
+            }
+            else
+            {
+                var legendOrderStatus = '';
+                if($scope.order.POrderStatus)
+                {
+                    legendOrderStatus += 'P - {0}'.format($rootScope.getReferenceItem($rootScope.ReferenceData.OrderStatuses, $scope.order.POrderStatus).Text);
+                }
+                if ($scope.order.NPOrderStatus)
+                {
+                    if (legendOrderStatus.length > 0)
+                    {
+                        legendOrderStatus += ', ';
+                    }
+                    legendOrderStatus += 'NP - {0}'.format($rootScope.getReferenceItem($rootScope.ReferenceData.OrderStatuses, $scope.order.NPOrderStatus).Text);
+                }
+                $scope.legend.OrderStatus = legendOrderStatus;
+            }
         }
         else
         {

@@ -9,7 +9,11 @@ namespace VC.Admin.Models.Orders
     {
         public int Id { get; set; }
 
-        public OrderStatus OrderStatus { get; set; }
+        public OrderStatus? OrderStatus { get; set; }
+
+        public OrderStatus? POrderStatus { get; set; }
+
+        public OrderStatus? NPOrderStatus { get; set; }
 
         public int IdOrderSource { get; set; }
 
@@ -41,6 +45,8 @@ namespace VC.Admin.Models.Orders
             {
                 Id = item.Order.Id;
                 OrderStatus = item.Order.OrderStatus;
+                POrderStatus = item.Order.POrderStatus;
+                NPOrderStatus = item.Order.NPOrderStatus;
                 IdOrderSource = item.Order.SafeData.OrderType ?? 1;
                 DateCreated = item.Order.DateCreated;
                 Total = item.Order.Total;

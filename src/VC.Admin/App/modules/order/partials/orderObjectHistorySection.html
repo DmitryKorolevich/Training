@@ -13,15 +13,8 @@
         <tbody>
             <tr data-ng-repeat="item in historyItems">
                 <td class="date">{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}<br />{{::item.EditedBy}}</td>
-                <td class="status" data-ng-class="{'ban': item.IdObjectStatus==1, 'exclamation-triangle': item.IdObjectStatus==2, 'truck': item.IdObjectStatus==3, 'minus-circle': item.IdObjectStatus==4, 'check-circle': item.IdObjectStatus==5, 'calendar': item.IdObjectStatus==6, 'pause': item.IdObjectStatus==7}">
-                    <i data-ng-if="item.IdObjectStatus==1" class="fa fa-ban"></i>
-                    <i data-ng-if="item.IdObjectStatus==2" class="fa fa-exclamation-triangle"></i>
-                    <i data-ng-if="item.IdObjectStatus==3" class="fa fa-truck"></i>
-                    <i data-ng-if="item.IdObjectStatus==4" class="fa fa-minus-circle"></i>
-                    <i data-ng-if="item.IdObjectStatus==5" class="fa fa-check-circle"></i>
-                    <i data-ng-if="item.IdObjectStatus==6" class="fa fa-calendar"></i>
-                    <i data-ng-if="item.IdObjectStatus==7" class="fa fa-pause"></i>
-                    <span>{{getReferenceItem(ReferenceData.OrderStatuses, item.IdObjectStatus).Text}}</span>
+                <td class="status">
+                    <div data-ng-include="'app/modules/order/partials/orderStatusSection.html'"></div>
                 </td>
                 <td class="actions">
                     <button data-ng-if="!$first" title="View" class="btn btn-default btn-success btn-xs" data-ng-click="openHistoryReport(item.Id);">

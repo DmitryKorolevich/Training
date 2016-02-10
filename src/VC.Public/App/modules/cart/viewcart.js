@@ -40,7 +40,7 @@ $(function () {
 			$("#viewCartForm").validate();
 
 			recalculateCart(self, function () {
-				window.location.href = "/Checkout/Welcome";
+				window.location.href = $("#viewCartForm").data("url");
 			});
 		};
 
@@ -102,7 +102,7 @@ function recalculateCart(viewModel, successCallback) {
 			type: "POST"
 		}).success(function(result) {
 			if (result.Success) {
-				if (successCallback) {
+				if (successCallback && !result.Data.ShippingDateError) {
 					successCallback();
 				} else {
 					ko.mapping.fromJS(result.Data, { 'ignore': ["ShipAsap", "PromoCode", "ShippingDate"] }, viewModel.Model);

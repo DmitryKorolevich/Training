@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Data.Entity.Storage;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Services;
@@ -80,6 +81,8 @@ namespace VitalChoice.DynamicData.Base
         {
             return Task.FromResult(new List<MessageInfo>());
         }
+
+        public abstract IRelationalTransaction BeginTransaction();
 
         public async Task<TDynamic> InsertAsync(TDynamic model)
         {

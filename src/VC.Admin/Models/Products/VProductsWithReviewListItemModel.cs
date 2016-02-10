@@ -1,9 +1,8 @@
 ﻿using System;
-using VitalChoice.Validation.Models;
-using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
+using VitalChoice.Validation.Models;
 
-namespace VC.Admin.Models.Product
+namespace VC.Admin.Models.Products
 {
     public class VProductsWithReviewListItemModel : BaseModel
     {

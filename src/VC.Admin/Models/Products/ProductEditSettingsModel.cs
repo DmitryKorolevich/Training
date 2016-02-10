@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace VC.Admin.Models.Product
+namespace VC.Admin.Models.Products
 {
     public class ProductEditSettingsModel
     {

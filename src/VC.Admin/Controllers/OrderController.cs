@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
-using VC.Admin.Models.Product;
 using VitalChoice.Validation.Models;
 using System;
 using VitalChoice.Core.Base;
@@ -33,6 +32,8 @@ using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
+using VC.Admin.ModelConverters;
+using VC.Admin.Models.Products;
 
 namespace VC.Admin.Controllers
 {
@@ -90,7 +91,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> UpdateOrderStatus(int id, int status, [FromBody] object model)
+        public async Task<Result<bool>> UpdateOrderStatus(int id, int status, [FromBody] object model, int? orderpart = null)
         {
             var order = await _orderService.SelectAsync(id, false);
 
@@ -98,7 +99,17 @@ namespace VC.Admin.Controllers
             {
                 throw new AppValidationException("Id", "The given order doesn't exist.");
             }
-            order.OrderStatus = (OrderStatus)status;
+            if (!orderpart.HasValue)
+            {
+                order.OrderStatus = (OrderStatus)status;
+            }
+            else if(orderpart == 1)//NP
+            {
+                order.NPOrderStatus = (OrderStatus)status;
+            } if(orderpart == 2)//P
+            {
+                order.POrderStatus = (OrderStatus)status;
+            }
             order = await _orderService.UpdateAsync(order);
 
             return order != null;
@@ -201,12 +212,6 @@ namespace VC.Admin.Controllers
 
             var item = _mapper.FromModel(model);
 
-            var pOrderType = _orderService.GetPOrderType(item);
-            if (pOrderType.HasValue)
-            {
-                item.Data.POrderType = (int)pOrderType;
-            }
-
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
             if (int.TryParse(sUserId, out userId))
@@ -222,7 +227,7 @@ namespace VC.Admin.Controllers
 
             await _customerService.UpdateAsync(item.Customer);
 
-            if (item.OrderStatus != OrderStatus.Cancelled && item.OrderStatus != OrderStatus.Exported && item.OrderStatus != OrderStatus.Shipped)
+            if (model.CombinedEditOrderStatus != OrderStatus.Cancelled && model.CombinedEditOrderStatus != OrderStatus.Exported && model.CombinedEditOrderStatus != OrderStatus.Shipped)
             {
                 var orderType = item.Data.MailOrder ? (int?)SourceOrderType.MailOrder : null;
                 if (model.Id > 0)
@@ -248,6 +253,8 @@ namespace VC.Admin.Controllers
                         item.Data.OrderType = orderType ?? (int)SourceOrderType.Phone;
                     }
                     var context = await _orderService.CalculateOrder(item);
+                    model.ShouldSplit = context.SplitInfo?.ShouldSplit == true;
+                    OrderModelConverter.SetOrderSplitStatuses(model, item);
                     item = await _orderService.UpdateAsync(item);
                 }
                 else
@@ -264,6 +271,8 @@ namespace VC.Admin.Controllers
                     }
                     item.PaymentMethod.Id = 0;
                     var context = await _orderService.CalculateOrder(item);
+                    model.ShouldSplit = context.SplitInfo?.ShouldSplit == true;
+                    OrderModelConverter.SetOrderSplitStatuses(model, item);
                     item = await _orderService.InsertAsync(item);
                 }
             }

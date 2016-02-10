@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using VitalChoice.Ecommerce.Domain.Entities.Promotion;
+using VitalChoice.Ecommerce.Domain.Entities.Promotions;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
@@ -64,7 +64,7 @@ namespace VitalChoice.Business.Workflow.Actions.Promo
                     var promoGetSku = skuListCache[sku.Sku.Id];
                     sku.Amount = sku.Sku.Price - sku.Sku.Price*promoGetSku.Percent/100;
                     sku.Quantity = promoGetSku.Quantity*applyCount;
-                    context.PromoSkus.Add(sku);
+                    context.PromoSkus.Add(new PromoOrdered(sku, promo));
                 }
             }
         }

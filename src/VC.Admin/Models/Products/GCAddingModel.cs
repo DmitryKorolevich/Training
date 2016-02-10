@@ -1,4 +1,4 @@
-﻿namespace VC.Admin.Models
+﻿namespace VC.Admin.Models.Products
 {
     public class GCAddingModel
     {

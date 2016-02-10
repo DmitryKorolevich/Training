@@ -102,9 +102,7 @@ function changeSelection(id) {
 		return item.Id == id;
 	})[0];
 
-	setChangedData(selectedCreditCard, function (selectedCreditCard) {
-		changeSaveButtonLabel(selectedCreditCard.Id);
-	});
+	setChangedData(selectedCreditCard);
 
 	$("#ddCountry").trigger("change");
 }

@@ -1,6 +1,6 @@
 ﻿using VitalChoice.Ecommerce.Domain.Entities.Base;
 
-namespace VitalChoice.Ecommerce.Domain.Entities.Promotion
+namespace VitalChoice.Ecommerce.Domain.Entities.Promotions
 {
     public class PromotionOptionValue : OptionValue<PromotionOptionType>
     {
