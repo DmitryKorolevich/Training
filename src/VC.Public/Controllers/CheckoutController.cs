@@ -33,6 +33,8 @@ using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
+using VitalChoice.Infrastructure.Domain.Transfer.Country;
+using VitalChoice.Interfaces.Services.Settings;
 
 namespace VC.Public.Controllers
 {
@@ -42,17 +44,18 @@ namespace VC.Public.Controllers
         private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _paymentMethodConverter;
         private readonly IProductService _productService;
         private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _orderPaymentMethodConverter;
-        private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
+	    private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
 		private readonly ReferenceData _appInfrastructure;
+		private readonly ICountryService _countryService;
 
-	    public CheckoutController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
+		public CheckoutController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
 		    ICustomerService customerService,
 		    IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter,
 		    IOrderService orderService, IProductService productService, IAppInfrastructureService infrastructureService,
 		    IAuthorizationService authorizationService, ICheckoutService checkoutService,
 		    IDynamicMapper<AddressDynamic, Address> addressConverter, IAppInfrastructureService appInfrastructureService,
 		    IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodConverter,
-		    IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper)
+		    IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper, ICountryService countryService)
 		    : base(
 			    contextAccessor, customerService, infrastructureService, authorizationService, checkoutService, orderService,
 			    skuMapper, productMapper)
@@ -62,7 +65,8 @@ namespace VC.Public.Controllers
 	        _productService = productService;
 	        _addressConverter = addressConverter;
 		    _orderPaymentMethodConverter = orderPaymentMethodConverter;
-		    _appInfrastructure = appInfrastructureService.Get();
+			_countryService = countryService;
+			_appInfrastructure = appInfrastructureService.Get();
 	    }
 
 	    private void PopulateCreditCardsLookup(IEnumerable<CustomerPaymentMethodDynamic> creditCards)
@@ -79,7 +83,16 @@ namespace VC.Public.Controllers
 					y => $"{y.Data.FirstName} {y.Data.LastName} {y.Data.Address1}" + ((bool)y.Data.Default ? " (Default)" : ""));
 		}
 
-		public async Task<IActionResult> Welcome( bool forgot = false)
+	    private string ResolveStateOrCounty(ICollection<Country> countries, AddressDynamic address)
+	    {
+			var target = countries.Single(x => x.Id == address.IdCountry);
+
+			var stateOrCounty = address.IdState.HasValue ? target.States.Single(x => x.Id == address.IdState.Value).StateCode : address.County;
+
+		    return stateOrCounty;
+	    }
+
+	    public async Task<IActionResult> Welcome( bool forgot = false)
 	    {
 			if (await CustomerLoggedIn())
 			{
@@ -334,6 +347,7 @@ namespace VC.Public.Controllers
 		}
 
 		[HttpGet]
+		[CustomerAuthorize]
 		public async Task<IActionResult> AddUpdateShippingMethod()
 		{
 			if (await IsCartEmpty())
@@ -414,63 +428,51 @@ namespace VC.Public.Controllers
 		}
 
 		[HttpGet]
-	    public async Task<IActionResult> ReviewOrder()
+		[CustomerAuthorize]
+		public async Task<IActionResult> ReviewOrder()
 		{
-			var reviewOrderModel = new ReviewOrderModel()
+			if (await IsCartEmpty())
 			{
-				Skus = new List<CartSkuModel>()
-				{
-					new CartSkuModel()
-					{
-						ProductPageUrl = "url",
-						Code = "CWR712P",
-						DisplayName = "Wild Traditional Canned Sockeye Salmon 7.5 oz. - Easy Open (12)",
-						IconUrl = "/Assets/images/cart/NRT501_alabcore_pouched_30z_218.jpg",
-						Price = 72,
-						Quantity = 2,
-						InStock = true,
-						SubTotal = 144
-					},
-					new CartSkuModel()
-					{
-						ProductPageUrl = "url1",
-						Code = "PNC",
-						DisplayName = "Vital Choice Catalog",
-						IconUrl = "/Assets/images/cart/seaweedsalad_218.jpg",
-						Quantity = 1,
-						InStock = true
-					}
-				},
-				GiftCertificateCodes = new List<CartGcModel>() { new CartGcModel() { Value = string.Empty} },
-				OrderTotal = 169,
-				ShipAsap = true,
-				ShippingCost = 0,
-				SubTotal = 144,
-				BillToAddress = new List<KeyValuePair<string, string>>()
-				{
-					new KeyValuePair<string, string>(string.Empty, "first name last name"),
-					new KeyValuePair<string, string>(string.Empty, "company name"),
-					new KeyValuePair<string, string>(string.Empty, "address1"),
-					new KeyValuePair<string, string>(string.Empty, "address2"),
-					new KeyValuePair<string, string>(string.Empty, "city, AA 123456"),
-					new KeyValuePair<string, string>("Phone", "923112312323"),
-					new KeyValuePair<string, string>("Email", "mailforspam200@mailforspam.com"),
-				},
-				ShipToAddress = new List<KeyValuePair<string, string>>()
-				{
-					new KeyValuePair<string, string>(string.Empty, "first name last name"),
-					new KeyValuePair<string, string>(string.Empty, "company name"),
-					new KeyValuePair<string, string>(string.Empty, "address1"),
-					new KeyValuePair<string, string>(string.Empty, "address2"),
-					new KeyValuePair<string, string>(string.Empty, "city, AA 123456"),
-					new KeyValuePair<string, string>("Phone", "923112312323"),
-				},
-				PaymentDetails = new List<KeyValuePair<string, string>>()
-				{
-					new KeyValuePair<string, string>("Credit Card", "Visa"),
-					new KeyValuePair<string, string>("Number", "XXXX-XXXX-XXXX-7890"),
-					new KeyValuePair<string, string>("Expiration", "01/16")
-				}
+				return View("EmptyCart");
+			}
+
+			var reviewOrderModel = new ReviewOrderModel();
+
+			await InitCartModelInternal(reviewOrderModel);
+
+			var existingUid = Request.GetCartUid();
+			var id = GetInternalCustomerId();
+			var cart = await CheckoutService.GetOrCreateCart(existingUid, id);
+
+			var countries = await _countryService.GetCountriesAsync();
+
+			var paymentMethod = cart.Order.PaymentMethod;
+			var billingAddress = paymentMethod.Address;
+			
+			reviewOrderModel.BillToAddress = new List<KeyValuePair<string, string>>()
+			{
+				new KeyValuePair<string, string>("Credit Card", _appInfrastructure.CreditCardTypes.Single(z => z.Key == (int)paymentMethod.Data.CardType).Text),
+				new KeyValuePair<string, string>("Number", paymentMethod.Data.CardNumber),
+				//new KeyValuePair<string, string>("Expiration", $"{paymentMethod.Data.Month}/{paymentMethod.Data.Year % 2000}"), //uncomment this once get expdate fixed
+				new KeyValuePair<string, string>(string.Empty, $"{billingAddress.Data.FirstName} {billingAddress.Data.LastName}"),
+				new KeyValuePair<string, string>(string.Empty, billingAddress.Data.Company),
+				new KeyValuePair<string, string>(string.Empty, billingAddress.Data.Address1),
+				new KeyValuePair<string, string>(string.Empty, billingAddress.Data.Address2),
+				new KeyValuePair<string, string>(string.Empty, $"{billingAddress.Data.City}, {ResolveStateOrCounty(countries, billingAddress)} {billingAddress.Data.Zip}"),
+				new KeyValuePair<string, string>("Phone", string.Format("{0:(###) ###-#### x#####}", billingAddress.Data.Phone)),
+				new KeyValuePair<string, string>("Email", cart.Order.Customer.Email),
+			};
+
+			var shippingAddress = cart.Order.ShippingAddress;
+
+			reviewOrderModel.ShipToAddress = new List<KeyValuePair<string, string>>()
+			{
+				new KeyValuePair<string, string>(string.Empty, $"{shippingAddress.Data.FirstName} {shippingAddress.Data.LastName}"),
+				new KeyValuePair<string, string>(string.Empty, shippingAddress.Data.Company),
+				new KeyValuePair<string, string>(string.Empty, shippingAddress.Data.Address1),
+				new KeyValuePair<string, string>(string.Empty, shippingAddress.Data.Address2),
+				new KeyValuePair<string, string>(string.Empty, $"{shippingAddress.Data.City}, {ResolveStateOrCounty(countries, shippingAddress)} {shippingAddress.Data.Zip}"),
+				new KeyValuePair<string, string>("Phone", string.Format("{0:(###) ###-#### x#####}", shippingAddress.Data.Phone)),
 			};
 
 			return View(reviewOrderModel);

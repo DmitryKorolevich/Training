@@ -49,10 +49,12 @@ namespace VC.Public.Controllers
             _gcService = gcService;
         }
 
-        [HttpGet]
+		[HttpGet]
         public async Task<Result<ViewCartModel>> InitCartModel()
         {
-            return await InitCartModelInternal();
+			var cartModel = new ViewCartModel();
+
+			return await InitCartModelInternal(cartModel);
         }
 
         public async Task<IActionResult> ViewCart()
@@ -62,7 +64,9 @@ namespace VC.Public.Controllers
 		        return View("EmptyCart");
 	        }
 
-	        var cartModel = await InitCartModelInternal();
+			var cartModel = new ViewCartModel();
+
+			await InitCartModelInternal(cartModel);
 
             return View(cartModel);
         }
@@ -181,46 +185,6 @@ namespace VC.Public.Controllers
             await FillModel(model, cart);
             SetCartUid(cart.CartUid);
             return model;
-        }
-
-        private async Task<ViewCartModel> InitCartModelInternal()
-        {
-            var cartModel = await GetCart();
-
-            if (!cartModel.GiftCertificateCodes.Any())
-            {
-                cartModel.GiftCertificateCodes.Add(new CartGcModel() {Value = string.Empty}); //needed to to force first input to appear
-            }
-            return cartModel;
-        }
-
-        private async Task<ViewCartModel> GetCart()
-        {
-            var existingUid = Request.GetCartUid();
-            var cartModel = new ViewCartModel();
-            if (await CustomerLoggedIn())
-            {
-                var id = GetInternalCustomerId();
-                var cart = await _checkoutService.GetOrCreateCart(existingUid, id);
-                await FillModel(cartModel, cart);
-                SetCartUid(cart.CartUid);
-                return cartModel;
-            }
-            else
-            {
-                var cart = await _checkoutService.GetOrCreateCart(existingUid);
-                await FillModel(cartModel, cart);
-                SetCartUid(cart.CartUid);
-                return cartModel;
-            }
-        }
-
-        private void SetCartUid(Guid uid)
-        {
-            Response.Cookies.Append(CheckoutConstants.CartUidCookieName, uid.ToString(), new CookieOptions
-            {
-                Expires = DateTime.Now.AddYears(1)
-            });
         }
     }
 }
