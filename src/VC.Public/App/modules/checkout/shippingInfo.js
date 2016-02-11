@@ -1,6 +1,6 @@
 ﻿$(function () {
 	controlSectionState("#ddShippingAddressesSelection", "#chkSelectOther");
-	controlSectionState("#GiftMessage", "#IsGiftCertificate");
+	controlSectionState("#GiftMessage", "#IsGiftOrder");
 	controlUseBillingState(".form-two-column", "#UseBillingAddress");
 
 	$.each($("textarea"), function(index,elem) {
@@ -8,7 +8,7 @@
 	});
 
 	$("body").on("click", "#chkSelectOther", function() { controlSectionState("#ddShippingAddressesSelection", "#chkSelectOther"); });
-	$("body").on("click", "#IsGiftCertificate", function () { controlSectionState("#GiftMessage", "#IsGiftCertificate"); });
+	$("body").on("click", "#IsGiftOrder", function () { controlSectionState("#GiftMessage", "#IsGiftOrder"); });
 	$("body").on("click", "#UseBillingAddress", function () { controlUseBillingState(".form-two-column", "#UseBillingAddress"); });
 
 	$('body').on("keyup", "textarea", function (elem) { processCharcount(elem); });

@@ -335,6 +335,60 @@ namespace VitalChoice.Business.Services.Checkout
             return true;
         }
 
+        public async Task<bool> SaveOrder(CustomerCartOrder cartOrder)
+        {
+            if (cartOrder?.Order == null)
+                return false;
+
+            cartOrder.Order.OrderStatus = OrderStatus.Processed;
+            cartOrder.Order = (await _orderService.CalculateOrder(cartOrder.Order)).Order;
+            using (var transaction = _context.BeginTransaction())
+            {
+                try
+                {
+                    var cart =
+                        await
+                            _cartRepository.Query(c => c.CartUid == cartOrder.CartUid)
+                                .Include(c => c.GiftCertificates)
+                                .Include(c => c.Skus)
+                                .SelectFirstOrDefaultAsync();
+
+                    if (cart == null)
+                        return false;
+                    if (cartOrder.Order.Customer?.Id != 0)
+                    {
+                        if (cartOrder.Order.Id == 0)
+                        {
+                            throw new ApiException("Order haven't been created during checkout session.");
+                        }
+                        cartOrder.Order = await _orderService.UpdateAsync(cartOrder.Order);
+                        cart.IdCustomer = cartOrder.Order?.Customer?.Id;
+                        cart.IdOrder = null;
+                        cart.IdDiscount = null;
+                        cart.GiftCertificates.Clear();
+                        cart.Skus.Clear();
+                        cart.ShipDelayDate = null;
+                        cart.ShippingUpgradeNP = null;
+                        cart.ShippingUpgradeP = null;
+                    }
+                    await _context.SaveChangesAsync();
+                    transaction.Commit();
+                }
+                catch (AppValidationException)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e.Message, e);
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+            return true;
+        }
+
         public Task<OrderDataContext> CalculateCart(CustomerCartOrder cartOrder)
         {
             return _orderService.CalculateOrder(cartOrder.Order);

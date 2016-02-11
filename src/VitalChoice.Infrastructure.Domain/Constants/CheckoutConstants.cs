@@ -8,5 +8,6 @@ namespace VitalChoice.Infrastructure.Domain.Constants
     public static class CheckoutConstants
     {
         public const string CartUidCookieName = "CartUid";
+        public const string ReceiptSessionOrderId = "ReceiptId";
     }
 }

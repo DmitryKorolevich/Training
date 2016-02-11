@@ -121,6 +121,7 @@ namespace VC.Public.Controllers
             ViewCartModel result = new ViewCartModel();
             await FillModel(result, cart);
             SetCartUid(cart.CartUid);
+            ContextAccessor.HttpContext.Session.Remove(CheckoutConstants.ReceiptSessionOrderId);
             return result;
         }
 

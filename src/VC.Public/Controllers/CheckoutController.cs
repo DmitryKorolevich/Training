@@ -29,6 +29,7 @@ using System.Reflection;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Transfer;
@@ -145,7 +146,22 @@ namespace VC.Public.Controllers
 		    return cart;
 	    }
 
-	    public async Task<IActionResult> Welcome( bool forgot = false)
+        private async Task<OrderDynamic> PopulateReviewModel(ReviewOrderModel reviewOrderModel, int idOrder)
+        {
+            var order = await OrderService.SelectAsync(idOrder, true);
+
+            var countries = await _countryService.GetCountriesAsync();
+
+            var paymentMethod = order.PaymentMethod;
+            reviewOrderModel.BillToAddress = PopulateBillingAddressDetails(paymentMethod, countries, order.Customer.Email);
+
+            var shippingAddress = order.ShippingAddress;
+            reviewOrderModel.ShipToAddress = PopulateShippingAddressDetails(shippingAddress, countries);
+
+            return order;
+        }
+
+        public async Task<IActionResult> Welcome( bool forgot = false)
 	    {
 			if (await CustomerLoggedIn())
 			{
@@ -214,7 +230,8 @@ namespace VC.Public.Controllers
 
             var addUpdateModel = new AddUpdateBillingAddressModel();
             var cart = await GetCurrentCart();
-            if (await CustomerLoggedIn())
+            var loggedIn = await EnsureLoggedIn(cart);
+            if (loggedIn != null && loggedIn.Value)
             {
                 var currentCustomer = await GetCurrentCustomerDynamic();
 
@@ -248,14 +265,8 @@ namespace VC.Public.Controllers
 
                 addUpdateModel.Email = currentCustomer.Email;
             }
-            else if ((bool?) cart.Order.Customer?.SafeData.Guest ?? false)
+            else if (loggedIn != null)
             {
-                var user = await _storefrontUserService.GetAsync(cart.Order.Customer.Id);
-                user = await _storefrontUserService.SignInNoStatusCheckingAsync(user);
-                if (user == null)
-                {
-                    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
-                }
                 if (cart.Order.PaymentMethod?.Address != null && cart.Order.PaymentMethod.Id != 0)
                 {
                     _addressConverter.UpdateModel(addUpdateModel, cart.Order.PaymentMethod.Address);
@@ -308,32 +319,52 @@ namespace VC.Public.Controllers
                     else
                     {
                         cart = await CheckoutService.GetOrCreateCart(existingUid);
-                        if ((cart.Order.Customer?.Id ?? 0) == 0 || !model.GuestCheckout ||
-                            cart.Order.Customer?.StatusCode != (int) CustomerStatus.PhoneOnly && model.GuestCheckout)
+                        if (cart.Order.Customer?.Id != 0 && ((bool?) cart.Order.Customer?.SafeData.Guest ?? false) && cart.Order.Customer.StatusCode == (int)CustomerStatus.PhoneOnly)
+                        {
+                            if (model.GuestCheckout)
+                            {
+                                user = await _storefrontUserService.GetAsync(cart.Order.Customer.Id);
+                                user = await _storefrontUserService.SignInNoStatusCheckingAsync(user);
+                            }
+                            else
+                            {
+                                cart.Order.Customer.StatusCode = (int)CustomerStatus.Active;
+                                cart.Order.Customer.Data.Guest = null;
+                                cart.Order.Customer = await CustomerService.UpdateAsync(cart.Order.Customer, model.Password);
+                            }
+                            if (user == null)
+                            {
+                                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+                            }
+                        }
+                        else if ((cart.Order.Customer?.Id ?? 0) == 0 || !model.GuestCheckout)
                         {
                             var newCustomer = await CreateAccount(model);
                             cart.Order.Customer = newCustomer;
-                            if (!model.GuestCheckout)
+                            if (model.GuestCheckout)
+                            {
+                                if ((bool?) cart.Order.Customer?.SafeData.Guest ?? false)
+                                {
+                                    await _storefrontUserService.SendActivationAsync(cart.Order.Customer.Email);
+                                    user = await _storefrontUserService.GetAsync(cart.Order.Customer.Id);
+                                    user = await _storefrontUserService.SignInNoStatusCheckingAsync(user);
+                                    if (user == null)
+                                    {
+                                        throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+                                    }
+                                }
+                                else
+                                {
+                                    return RedirectToAction("Welcome");
+                                }
+                            }
+                            else
                             {
                                 user = await _storefrontUserService.SignInAsync(cart.Order.Customer.Email, model.Password);
                                 if (user == null)
                                 {
                                     throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
                                 }
-                            }
-                            else if (model.GuestCheckout && ((bool?) cart.Order.Customer?.SafeData.Guest ?? false))
-                            {
-                                await _storefrontUserService.SendActivationAsync(cart.Order.Customer.Email);
-                                user = await _storefrontUserService.GetAsync(cart.Order.Customer.Id);
-                                user = await _storefrontUserService.SignInNoStatusCheckingAsync(user);
-                                if (user == null)
-                                {
-                                    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
-                                }
-                            }
-                            else
-                            {
-                                return RedirectToAction("Welcome");
                             }
                         }
                     }
@@ -392,31 +423,6 @@ namespace VC.Public.Controllers
 
             return View(model);
         }
-
-        private async Task<CustomerDynamic> CreateAccount(AddUpdateBillingAddressModel model)
-        {
-            var newCustomer = await CustomerService.Mapper.CreatePrototypeAsync((int)CustomerType.Retail);
-            newCustomer.IdDefaultPaymentMethod = (int)PaymentMethodType.CreditCard;
-            if (model.GuestCheckout)
-            {
-                newCustomer.Data.Guest = true;
-                newCustomer.StatusCode = (int)CustomerStatus.PhoneOnly;
-            }
-            else
-            {
-                newCustomer.StatusCode = (int)CustomerStatus.Active;
-            }
-            newCustomer.Email = model.Email;
-            newCustomer.PublicId = Guid.NewGuid();
-            newCustomer.ProfileAddress = await _addressConverter.FromModelAsync(model, (int)AddressType.Profile);
-            var shipping = _addressConverter.FromModel(model, (int)AddressType.Shipping);
-            shipping.Data.Default = true;
-            newCustomer.ShippingAddresses = new List<AddressDynamic> { shipping };
-            newCustomer.ApprovedPaymentMethods = new List<int> { (int)PaymentMethodType.CreditCard };
-            newCustomer =
-                await CustomerService.InsertAsync(newCustomer, model.GuestCheckout ? null : model.Password);
-            return newCustomer;
-        }
         
         [HttpGet]
 		[CustomerAuthorize]
@@ -448,21 +454,25 @@ namespace VC.Public.Controllers
 				AddressType = CheckoutAddressType.Residental
 			};
             var cart = await GetCurrentCart();
-            if (await CustomerLoggedIn())
+		    var loggedIn = await EnsureLoggedIn(cart);
+            if (loggedIn != null)
 		    {
 		        var currentCustomer = await GetCurrentCustomerDynamic();
 
 		        var shippingAddresses = currentCustomer.ShippingAddresses.ToList();
 
-		        var defaultShipping = shippingAddresses.FirstOrDefault(x => x.Data.Default == true);
-                if (cart.Order.PaymentMethod?.Address != null && cart.Order.PaymentMethod.Id != 0)
+		        var defaultShipping = shippingAddresses.FirstOrDefault(x => (bool?)x.SafeData.Default == true);
+                if (cart.Order.ShippingAddress != null && cart.Order.ShippingAddress.Id != 0)
                 {
-                    _addressConverter.UpdateModel<ShippingInfoModel>(shippingMethodModel, cart.Order.PaymentMethod?.Address);
+                    _addressConverter.UpdateModel<ShippingInfoModel>(shippingMethodModel, cart.Order.ShippingAddress);
                 }
                 else if (defaultShipping != null)
 		        {
 		            _addressConverter.UpdateModel<ShippingInfoModel>(shippingMethodModel, defaultShipping);
 		        }
+                shippingMethodModel.IsGiftOrder = cart.Order.SafeData.GiftOrder;
+                shippingMethodModel.GiftMessage = cart.Order.SafeData.GiftMessage;
+		        shippingMethodModel.DeliveryInstructions = cart.Order.SafeData.DeliveryInstructions;
                 if (shippingAddresses.Any())
                     PopulateShippingAddressesLookup(shippingAddresses);
             }
@@ -478,24 +488,49 @@ namespace VC.Public.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> AddUpdateShippingMethod(AddUpdateShippingMethodModel model)
 		{
-		    if (model.UseBillingAddress)
+            if (await IsCartEmpty())
+            {
+                return View("EmptyCart");
+            }
+
+            if (model.UseBillingAddress)
 		    {
 		        HashSet<string> propertyNames = new HashSet<string>(typeof (AddressModel).GetRuntimeProperties().Select(p => p.Name));
 		        ModelState.RemoveAll(pair => propertyNames.Contains(pair.Key));
 		    }
-		    if (await CustomerLoggedIn())
-		    {
+            var cart = await GetCurrentCart();
+            var loggedIn = await EnsureLoggedIn(cart);
+            if (loggedIn != null)
+            {
 		        if (ModelState.IsValid)
 		        {
-		            var existingUid = Request.GetCartUid();
-		            var cart = await CheckoutService.GetOrCreateCart(existingUid, GetInternalCustomerId());
 		            if (cart.Order.ShippingAddress == null || cart.Order.ShippingAddress.Id == 0)
 		            {
-		                cart.Order.ShippingAddress = _addressConverter.FromModel((AddressModel) model);
+		                if (model.UseBillingAddress)
+		                {
+		                    cart.Order.ShippingAddress =
+		                        await _addressConverter.FromModelAsync(
+		                            _addressConverter.ToModel<AddUpdateShippingMethodModel>(cart.Order.PaymentMethod.Address),
+		                            (int) AddressType.Shipping);
+
+		                }
+		                else
+		                {
+		                    cart.Order.ShippingAddress = await _addressConverter.FromModelAsync(model, (int) AddressType.Shipping);
+		                }
 		            }
 		            else
 		            {
-		                _addressConverter.UpdateObject(model, cart.Order.ShippingAddress);
+		                if (model.UseBillingAddress)
+		                {
+		                    await _addressConverter.UpdateObjectAsync(
+		                        _addressConverter.ToModel<AddUpdateShippingMethodModel>(cart.Order.PaymentMethod.Address),
+		                        cart.Order.ShippingAddress, (int) AddressType.Shipping);
+		                }
+		                else
+		                {
+		                    await _addressConverter.UpdateObjectAsync(model, cart.Order.ShippingAddress, (int)AddressType.Shipping);
+		                }
 		            }
 		            cart.Order.Data.GiftOrder = model.IsGiftOrder;
 		            cart.Order.Data.GiftMessage = model.GiftMessage;
@@ -540,24 +575,85 @@ namespace VC.Public.Controllers
 	    [CustomerAuthorize]
 	    public async Task<Result<string>> ReviewOrder([FromBody]ViewCartModel model)
 	    {
-            //todo: alex g please add logic to make order processed here. If error occurs just return new Result(false)
-
-
-		    return Url.Action("Receipt", "Checkout");
+            var cart = await GetCurrentCart();
+            var loggedIn = await EnsureLoggedIn(cart);
+	        if (loggedIn != null)
+	        {
+	            if (await CheckoutService.SaveOrder(cart))
+	            {
+	                ContextAccessor.HttpContext.Session.SetInt32(CheckoutConstants.ReceiptSessionOrderId, cart.Order.Id);
+                    return Url.Action("Receipt", "Checkout");
+                }
+	        }
+            else
+            {
+                return Url.Action("Welcome", "Checkout");
+            }
+	        return new Result<string>(false);
 	    }
 
-	    [HttpGet]
-		public async Task<IActionResult> Receipt()
-		{
-			var receiptModel = new ReceiptModel();
+        [HttpGet]
+        public async Task<IActionResult> Receipt()
+        {
+            var idOrder = ContextAccessor.HttpContext.Session.GetInt32(CheckoutConstants.ReceiptSessionOrderId);
+            if (idOrder == null)
+            {
+                return View("EmptyCart");
+            }
+            var receiptModel = new ReceiptModel();
 
-			var cart = await PopulateReviewModel(receiptModel);
+            var order = await PopulateReviewModel(receiptModel, idOrder.Value);
 
-		    receiptModel.OrderNumber = cart.Order.Id.ToString();
-		    receiptModel.OrderDate = cart.Order.DateCreated;
-		    receiptModel.Tax = cart.Order.TaxTotal;
+            receiptModel.OrderNumber = order.Id.ToString();
+            receiptModel.OrderDate = order.DateCreated;
+            receiptModel.Tax = order.TaxTotal;
 
-			return View(receiptModel);
-		}
-	}
+            return View(receiptModel);
+        }
+
+        private async Task<bool?> EnsureLoggedIn(CustomerCartOrder cart)
+        {
+            if (await CustomerLoggedIn())
+            {
+                return true;
+            }
+
+            if ((bool?)cart.Order.Customer?.SafeData.Guest ?? false)
+            {
+                var user = await _storefrontUserService.GetAsync(cart.Order.Customer.Id);
+                user = await _storefrontUserService.SignInNoStatusCheckingAsync(user);
+                if (user == null)
+                {
+                    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+                }
+                return false;
+            }
+            return null;
+        }
+
+        private async Task<CustomerDynamic> CreateAccount(AddUpdateBillingAddressModel model)
+        {
+            var newCustomer = await CustomerService.Mapper.CreatePrototypeAsync((int)CustomerType.Retail);
+            newCustomer.IdDefaultPaymentMethod = (int)PaymentMethodType.CreditCard;
+            if (model.GuestCheckout)
+            {
+                newCustomer.Data.Guest = true;
+                newCustomer.StatusCode = (int)CustomerStatus.PhoneOnly;
+            }
+            else
+            {
+                newCustomer.StatusCode = (int)CustomerStatus.Active;
+            }
+            newCustomer.Email = model.Email;
+            newCustomer.PublicId = Guid.NewGuid();
+            newCustomer.ProfileAddress = await _addressConverter.FromModelAsync(model, (int)AddressType.Profile);
+            var shipping = await _addressConverter.FromModelAsync(model, (int) AddressType.Shipping);
+            shipping.Data.Default = true;
+            newCustomer.ShippingAddresses = new List<AddressDynamic> { shipping };
+            newCustomer.ApprovedPaymentMethods = new List<int> { (int)PaymentMethodType.CreditCard };
+            newCustomer =
+                await CustomerService.InsertAsync(newCustomer, model.GuestCheckout ? null : model.Password);
+            return newCustomer;
+        }
+    }
 }
