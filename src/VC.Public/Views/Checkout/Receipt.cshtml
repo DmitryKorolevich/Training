@@ -156,11 +156,29 @@
 		</div>
 	}
 	<div class="receipt-shipping-method">
-		<div class="receipt-shipping-line">
-			@Html.LabelFor(x => x.ShippingMethod, null, new { @class= "bold" }):
-			<label class="cart-total-value">
-				@Model.ShippingMethod
-			</label>
+		<label>Shipping:</label>
+		<div class="receipt-shipping-linecontainer">
+			<div class="receipt-shipping-line">
+				<label class="cart-total-value">
+					Standard Shipping
+				</label>
+			</div>
+			@if (Model.ShippingUpgradeNP.HasValue)
+			{
+				<div class="receipt-shipping-line">
+					<label class="cart-total-value">
+						@Model.ShippingUpgradeNPOptions.Single(x => x.Key == Model.ShippingUpgradeNP).Text
+					</label>
+				</div>
+			}
+			@if (Model.ShippingUpgradeP.HasValue)
+			{
+				<div class="receipt-shipping-line">
+					<label class="cart-total-value">
+						@Model.ShippingUpgradePOptions.Single(x => x.Key == Model.ShippingUpgradeP).Text
+					</label>
+				</div>
+			}
 		</div>
 	</div>
 	<div class="cart-order-totals">

@@ -99,9 +99,10 @@ namespace VC.Public.Controllers
 
 			return new List<KeyValuePair<string, string>>()
 			{
-				new KeyValuePair<string, string>("Credit Card", _appInfrastructure.CreditCardTypes.Single(z => z.Key == (int)paymentMethod.Data.CardType).Text),
-				new KeyValuePair<string, string>("Number", paymentMethod.Data.CardNumber),
-				new KeyValuePair<string, string>("Expiration", $"{paymentMethod.Data.ExpDate.Month}/{paymentMethod.Data.ExpDate.Year % 2000}"),
+				new KeyValuePair<string, string>(string.Empty, _appInfrastructure.CreditCardTypes.Single(z => z.Key == (int)paymentMethod.Data.CardType).Text),
+				new KeyValuePair<string, string>(string.Empty, paymentMethod.Data.CardNumber),
+				new KeyValuePair<string, string>(string.Empty, $"{paymentMethod.Data.ExpDate.Month}/{paymentMethod.Data.ExpDate.Year % 2000}"),
+				new KeyValuePair<string, string>(string.Empty, string.Empty),
 				new KeyValuePair<string, string>(string.Empty, $"{billingAddress.Data.FirstName} {billingAddress.Data.LastName}"),
 				new KeyValuePair<string, string>(string.Empty, billingAddress.SafeData.Company),
 				new KeyValuePair<string, string>(string.Empty, billingAddress.Data.Address1),
@@ -522,7 +523,7 @@ namespace VC.Public.Controllers
 	    [CustomerAuthorize]
 	    public async Task<Result<string>> ReviewOrder([FromBody]ViewCartModel model)
 	    {
-			//todo: alex g please add logic to make order processed here
+			//todo: alex g please add logic to make order processed here. If error occurs just return new Result(false)
 
 		    return Url.Action("Receipt", "Checkout");
 	    }
@@ -537,7 +538,6 @@ namespace VC.Public.Controllers
 		    receiptModel.OrderNumber = cart.Order.Id.ToString();
 		    receiptModel.OrderDate = cart.Order.DateCreated;
 		    receiptModel.Tax = cart.Order.TaxTotal;
-		    receiptModel.ShippingMethod = "Standard";//cart.Order.Data.PreferredShipMethod; //todo: add corresponding code here
 
 			return View(receiptModel);
 		}
