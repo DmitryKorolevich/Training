@@ -25,7 +25,7 @@ namespace VitalChoice.DynamicData.Base
         where TOptionValue : OptionValue<TOptionType>, new()
         where TDynamic : MappedObject, new()
     {
-        protected readonly IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> Mapper;
+        protected readonly IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> DynamicMapper;
         protected readonly IReadRepositoryAsync<TEntity> ObjectRepository;
         protected readonly IReadRepositoryAsync<TOptionValue> OptionValuesRepository;
         protected readonly IReadRepositoryAsync<BigStringValue> BigStringRepository;
@@ -41,7 +41,7 @@ namespace VitalChoice.DynamicData.Base
             IObjectLogItemExternalService objectLogItemExternalService,
             ILogger logger, DynamicExpressionVisitor queryVisitor)
         {
-            Mapper = mapper;
+            DynamicMapper = mapper;
             ObjectRepository = objectRepository;
             BigStringRepository = bigStringRepository;
             OptionValuesRepository = optionValuesRepository;
@@ -67,7 +67,7 @@ namespace VitalChoice.DynamicData.Base
         {
             var queryFluent = BuildQueryFluent(query, includesOverride, null);
             var entities = await queryFluent.SelectAsync(false);
-            await ProcessEntities(entities, Mapper.OptionTypes);
+            await ProcessEntities(entities, DynamicMapper.OptionTypes);
             return entities;
         }
 
@@ -79,7 +79,7 @@ namespace VitalChoice.DynamicData.Base
             var entity = await queryFluent.SelectFirstOrDefaultAsync(false);
 			if (entity != null)
 			{
-				await ProcessEntities(new[] { entity }, Mapper.OptionTypes);
+				await ProcessEntities(new[] { entity }, DynamicMapper.OptionTypes);
 			}
             return entity;
         }
@@ -91,24 +91,13 @@ namespace VitalChoice.DynamicData.Base
         {
             var queryFluent = BuildQueryFluent(query, includesOverride, orderBy);
             var entities = await queryFluent.SelectPageAsync(page, pageSize, false);
-            await ProcessEntities(entities.Items, Mapper.OptionTypes);
+            await ProcessEntities(entities.Items, DynamicMapper.OptionTypes);
             return entities;
         }
 
         #endregion
 
-        public virtual async Task<TDynamic> CreatePrototypeAsync(int idObjectType)
-        {
-            var optionTypes = Mapper.OptionTypes.Where(GetOptionTypeQuery(idObjectType).Query().CacheCompile()).ToList();
-            var entity = new TEntity {OptionTypes = optionTypes, IdObjectType = idObjectType, OptionValues = new List<TOptionValue>()};
-            return await Mapper.FromEntityAsync(entity, true);
-        }
-
-        public virtual async Task<TModel> CreatePrototypeForAsync<TModel>(int idObjectType)
-            where TModel : class, new()
-        {
-            return Mapper.ToModel<TModel>(await CreatePrototypeAsync(idObjectType));
-        }
+        public IDynamicMapper<TDynamic, TEntity> Mapper => DynamicMapper;
 
         Task<TDynamic> IDynamicReadServiceAsync<TDynamic, TEntity>.SelectAsync(int id, bool withDefaults)
         {
@@ -136,7 +125,7 @@ namespace VitalChoice.DynamicData.Base
         {
             return
                 await
-                    Mapper.FromEntityAsync(
+                    DynamicMapper.FromEntityAsync(
                         await
                             SelectEntityFirstAsync(o => o.Id == id && o.StatusCode != (int) RecordStatusCode.Deleted,
                                 includesOverride: includesOverride), withDefaults);
@@ -148,7 +137,7 @@ namespace VitalChoice.DynamicData.Base
         {
             return
                 await
-                    Mapper.FromEntityRangeAsync(
+                    DynamicMapper.FromEntityRangeAsync(
                         await
                             SelectEntitiesAsync(o => ids.Contains(o.Id) && o.StatusCode != (int) RecordStatusCode.Deleted,
                                 includesOverride: includesOverride), withDefaults);
@@ -164,7 +153,7 @@ namespace VitalChoice.DynamicData.Base
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
             bool withDefaults = false)
         {
-            return await Mapper.FromEntityRangeAsync(await SelectEntitiesAsync(query, includesOverride), withDefaults);
+            return await DynamicMapper.FromEntityRangeAsync(await SelectEntitiesAsync(query, includesOverride), withDefaults);
         }
 
         public Task<TDynamic> SelectFirstAsync( IQueryObject<TEntity> queryObject = null,
@@ -180,7 +169,7 @@ namespace VitalChoice.DynamicData.Base
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             bool withDefaults = false)
         {
-            return await Mapper.FromEntityAsync(await SelectEntityFirstAsync(query, includesOverride, orderBy), withDefaults);
+            return await DynamicMapper.FromEntityAsync(await SelectEntityFirstAsync(query, includesOverride, orderBy), withDefaults);
         }
 
         public Task<PagedList<TDynamic>> SelectPageAsync(int page, int pageSize, 
@@ -197,21 +186,10 @@ namespace VitalChoice.DynamicData.Base
             bool withDefaults = false)
         {
             var entities = await SelectEntityPageAsync(page, pageSize, query, includesOverride, orderBy);
-            return new PagedList<TDynamic>(await Mapper.FromEntityRangeAsync(entities.Items, withDefaults), entities.Count);
+            return new PagedList<TDynamic>(await DynamicMapper.FromEntityRangeAsync(entities.Items, withDefaults), entities.Count);
         }
 
         #region Synchronous Operations
-
-        public TDynamic CreatePrototype(int idObjectType)
-        {
-            return CreatePrototypeAsync(idObjectType).Result;
-        }
-
-        public TModel CreatePrototypeFor<TModel>(int idObjectType)
-            where TModel : class, new()
-        {
-            return CreatePrototypeForAsync<TModel>(idObjectType).Result;
-        }
 
         public List<TDynamic> Select(Expression<Func<TEntity, bool>> query = null,
             
@@ -281,12 +259,12 @@ namespace VitalChoice.DynamicData.Base
 
         public IQueryOptionType<TOptionType> GetOptionTypeQuery(TEntity entity)
         {
-            return Mapper.GetOptionTypeQuery().WithObjectType(entity.IdObjectType);
+            return DynamicMapper.GetOptionTypeQuery().WithObjectType(entity.IdObjectType);
         }
 
         public IQueryOptionType<TOptionType> GetOptionTypeQuery(int? idObjectType)
         {
-            return Mapper.GetOptionTypeQuery().WithObjectType(idObjectType);
+            return DynamicMapper.GetOptionTypeQuery().WithObjectType(idObjectType);
         }
 
         private async Task ProcessEntities(ICollection<TEntity> entities, ICollection<TOptionType> optionTypes)

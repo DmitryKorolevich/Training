@@ -229,12 +229,12 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             
-            var item = _mapper.FromModel(model);
+            var product = _mapper.FromModel(model);
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
-                item.IdEditedBy = userId;
+                product.IdEditedBy = userId;
             }
 
             ProductContentTransferEntity transferEntity = new ProductContentTransferEntity();
@@ -248,17 +248,17 @@ namespace VC.Admin.Controllers
 	        content.ContentItem.MetaDescription = model.MetaDescription;
 	        content.MasterContentItemId = model.MasterContentItemId;
             transferEntity.ProductContent = content;
-            transferEntity.ProductDynamic = item;
+            transferEntity.ProductDynamic = product;
 
 	        if (model.Id > 0)
-		        item = (await productService.UpdateAsync(transferEntity));
+		        product = (await productService.UpdateAsync(transferEntity));
 	        else
 	        {
 		        transferEntity.ProductDynamic.PublicId = Guid.NewGuid();
-				item = (await productService.InsertAsync(transferEntity));
+				product = (await productService.InsertAsync(transferEntity));
 			}
 
-			ProductManageModel toReturn = _mapper.ToModel<ProductManageModel>(item);
+			ProductManageModel toReturn = _mapper.ToModel<ProductManageModel>(product);
 	        toReturn.MasterContentItemId = transferEntity.ProductContent.MasterContentItemId;
 
 			return toReturn;

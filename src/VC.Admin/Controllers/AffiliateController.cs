@@ -158,24 +158,24 @@ namespace VC.Admin.Controllers
         {
             if (!Validate(model))
                 return null;
-            var item = _mapper.FromModel(model);
+            var affiliate = _mapper.FromModel(model);
 
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
-                item.IdEditedBy = userId;
+                affiliate.IdEditedBy = userId;
             }
-            if (item.Id > 0)
+            if (affiliate.Id > 0)
             {
-                item = await _affiliateService.UpdateAsync(item);
+                affiliate = await _affiliateService.UpdateAsync(affiliate);
             }
             else
             {
-                item = await _affiliateService.InsertAsync(item);
+                affiliate = await _affiliateService.InsertAsync(affiliate);
             }
 
-            var toReturn = _mapper.ToModel<AffiliateManageModel>(item);
+            var toReturn = _mapper.ToModel<AffiliateManageModel>(affiliate);
 
             toReturn.IsConfirmed = model.IsConfirmed;
             toReturn.PublicUserId = model.PublicUserId;

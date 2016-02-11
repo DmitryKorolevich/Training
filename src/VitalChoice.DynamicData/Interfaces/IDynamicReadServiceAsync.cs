@@ -10,10 +10,7 @@ namespace VitalChoice.DynamicData.Interfaces
         where TEntity: DynamicDataEntity
         where T: MappedObject
     {
-        Task<T> CreatePrototypeAsync(int idObjectType);
-
-        Task<TModel> CreatePrototypeForAsync<TModel>(int idObjectType)
-            where TModel : class, new();
+        IDynamicMapper<T, TEntity> Mapper { get; }
 
         Task<T> SelectAsync(int id, bool withDefaults = false);
 
@@ -22,10 +19,5 @@ namespace VitalChoice.DynamicData.Interfaces
         T Select(int id, bool withDefaults = false);
 
         List<T> Select(ICollection<int> ids, bool withDefaults = false);
-
-        T CreatePrototype(int idObjectType);
-
-        TModel CreatePrototypeFor<TModel>(int idObjectType)
-            where TModel : class, new();
     }
 }

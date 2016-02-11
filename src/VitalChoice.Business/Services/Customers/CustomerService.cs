@@ -296,8 +296,8 @@ namespace VitalChoice.Business.Services.Customers
 				var entity = await InsertAsync(model, uow, password);
                 int id = entity.Id;
                 entity = await SelectEntityFirstAsync(o => o.Id == id);
-                await LogItemChanges(new[] { await Mapper.FromEntityAsync(entity) });
-                return await Mapper.FromEntityAsync(entity);
+                await LogItemChanges(new[] { await DynamicMapper.FromEntityAsync(entity) });
+                return await DynamicMapper.FromEntityAsync(entity);
             }
 		}
 
@@ -310,8 +310,8 @@ namespace VitalChoice.Business.Services.Customers
 
                 int id = entity.Id;
                 entity = await SelectEntityFirstAsync(o => o.Id == id);
-                await LogItemChanges(new[] { await Mapper.FromEntityAsync(entity) });
-                return await Mapper.FromEntityAsync(entity);
+                await LogItemChanges(new[] { await DynamicMapper.FromEntityAsync(entity) });
+                return await DynamicMapper.FromEntityAsync(entity);
 			}
 		}
 

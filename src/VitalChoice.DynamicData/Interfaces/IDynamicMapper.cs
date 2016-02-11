@@ -12,7 +12,20 @@ namespace VitalChoice.DynamicData.Interfaces
         where TDynamic : MappedObject
         where TEntity: DynamicDataEntity
     {
+        TDynamic FromModel<TModel>(TModel model, int idObjectType);
+        void UpdateObject<TModel>(TModel model, TDynamic obj, int idObjectType)
+            where TModel : class, new();
 
+        Task<TDynamic> FromModelAsync<TModel>(TModel model, int idObjectType);
+        Task UpdateObjectAsync<TModel>(TModel model, TDynamic obj, int idObjectType)
+            where TModel : class, new();
+
+        Task<TDynamic> CreatePrototypeAsync(int idObjectType);
+        Task<TModel> CreatePrototypeForAsync<TModel>(int idObjectType)
+            where TModel : class, new();
+        TDynamic CreatePrototype(int idObjectType);
+        TModel CreatePrototypeFor<TModel>(int idObjectType)
+            where TModel : class, new();
     }
 
     public class DynamicEntityPair<TDynamic, TEntity>

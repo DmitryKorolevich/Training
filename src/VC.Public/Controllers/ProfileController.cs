@@ -223,8 +223,7 @@ namespace VC.Public.Controllers
 
             var oldEmail = customer.Email;
 
-            var newProfileAddress = _addressConverter.FromModel(model);
-            newProfileAddress.IdObjectType = (int) AddressType.Profile;
+            var newProfileAddress = await _addressConverter.FromModelAsync(model, (int)AddressType.Profile);
             customer.ProfileAddress = newProfileAddress;
             customer.Email =
                 newProfileAddress.Data.Email =
@@ -281,12 +280,10 @@ namespace VC.Public.Controllers
                 currentCustomer.CustomerPaymentMethods.Remove(creditCardToUpdate);
             }
 
-            var customerPaymentMethod = _paymentMethodConverter.FromModel(model);
-            customerPaymentMethod.IdObjectType = (int) PaymentMethodType.CreditCard;
+            var customerPaymentMethod = await _paymentMethodConverter.FromModelAsync(model, (int)PaymentMethodType.CreditCard);
             customerPaymentMethod.Data.SecurityCode = model.SecurityCode;
 
-            customerPaymentMethod.Address = _addressConverter.FromModel(model);
-            customerPaymentMethod.Address.IdObjectType = (int) AddressType.Billing;
+            customerPaymentMethod.Address = await _addressConverter.FromModelAsync(model, (int)AddressType.Billing);
 
             currentCustomer.CustomerPaymentMethods.Add(customerPaymentMethod);
             try
@@ -372,8 +369,7 @@ namespace VC.Public.Controllers
                 }
             }
 
-            var newAddress = _addressConverter.FromModel(model);
-            newAddress.IdObjectType = (int) AddressType.Shipping;
+            var newAddress = await _addressConverter.FromModelAsync(model, (int)AddressType.Shipping);
 
             currentCustomer.ShippingAddresses.Add(newAddress);
 

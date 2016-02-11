@@ -201,7 +201,7 @@ namespace VC.Public.Controllers
 			if (!ModelState.IsValid)
 				return View(model);
 
-			var item = _customerMapper.FromModel(model);
+			var customer = await _customerMapper.FromModelAsync(model, (int)CustomerType.Retail);
             var cookies = Request.Cookies[AffiliateConstants.AffiliatePublicIdParam];
 		    if (!String.IsNullOrEmpty(cookies))
 		    {
@@ -211,22 +211,20 @@ namespace VC.Public.Controllers
 		            var affiliate = await _affiliateService.SelectAsync(idAffiliate);
 		            if (affiliate != null)
 		            {
-		                item.IdAffiliate = affiliate.Id;
+		                customer.IdAffiliate = affiliate.Id;
 		            }
 		        }
 		    }
-
-		    item.IdObjectType = (int)CustomerType.Retail;
-			item.PublicId = Guid.NewGuid();
-			item.StatusCode = (int) CustomerStatus.Active;
+			customer.PublicId = Guid.NewGuid();
+			customer.StatusCode = (int) CustomerStatus.Active;
 
 			var defaultPaymentMethod = await _paymentMethodService.GetStorefrontDefaultPaymentMethod();
-            item.IdDefaultPaymentMethod = defaultPaymentMethod.Id;
-			item.ApprovedPaymentMethods = new List<int> {defaultPaymentMethod.Id};
-			item.IdEditedBy = null;
+            customer.IdDefaultPaymentMethod = defaultPaymentMethod.Id;
+			customer.ApprovedPaymentMethods = new List<int> {defaultPaymentMethod.Id};
+			customer.IdEditedBy = null;
 
-			item = await _customerService.InsertAsync(item, model.Password);
-			if (item == null || item.Id == 0)
+			customer = await _customerService.InsertAsync(customer, model.Password);
+			if (customer == null || customer.Id == 0)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
 			}
@@ -249,20 +247,19 @@ namespace VC.Public.Controllers
                 return PartialView("_RegisterWholesaleAccount", model);
             }
 
-            var item = _customerMapper.FromModel(model);
-
-            item.IdObjectType = (int)CustomerType.Wholesale;
-            item.PublicId = Guid.NewGuid();
-            item.StatusCode = (int)CustomerStatus.Pending;
+            var customer = await _customerMapper.FromModelAsync(model, (int)CustomerType.Wholesale);
+            
+            customer.PublicId = Guid.NewGuid();
+            customer.StatusCode = (int)CustomerStatus.Pending;
 
             var defaultPaymentMethod = await _paymentMethodService.GetStorefrontDefaultPaymentMethod();
-            item.IdDefaultPaymentMethod = defaultPaymentMethod.Id;
-            item.ApprovedPaymentMethods = new List<int> { defaultPaymentMethod.Id };
-            item.IdEditedBy = null;
+            customer.IdDefaultPaymentMethod = defaultPaymentMethod.Id;
+            customer.ApprovedPaymentMethods = new List<int> { defaultPaymentMethod.Id };
+            customer.IdEditedBy = null;
 
             try
             {
-                item = await _customerService.InsertAsync(item, model.Password);
+                customer = await _customerService.InsertAsync(customer, model.Password);
             }
             catch(AppValidationException e)
             {
@@ -272,7 +269,7 @@ namespace VC.Public.Controllers
                 }
                 return PartialView("_RegisterWholesaleAccount", model);
             }
-            if (item == null || item.Id == 0)
+            if (customer == null || customer.Id == 0)
             {
                 ModelState.AddModelError(String.Empty, ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
                 return PartialView("_RegisterWholesaleAccount", model);

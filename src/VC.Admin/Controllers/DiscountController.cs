@@ -97,23 +97,23 @@ namespace VC.Admin.Controllers
         {
             if (!Validate(model))
                 return null;
-            var item = _mapper.FromModel(model);
+            var discount = _mapper.FromModel(model);
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
-                item.IdEditedBy = userId;
+                discount.IdEditedBy = userId;
             }
-            if (item.Id > 0)
+            if (discount.Id > 0)
             {
-                item = await _discountService.UpdateAsync(item);
+                discount = await _discountService.UpdateAsync(discount);
             }
             else
             {
-                item = await _discountService.InsertAsync(item);
+                discount = await _discountService.InsertAsync(discount);
             }
 
-            return _mapper.ToModel<DiscountManageModel>(item);
+            return _mapper.ToModel<DiscountManageModel>(discount);
         }
 
         [HttpPost]

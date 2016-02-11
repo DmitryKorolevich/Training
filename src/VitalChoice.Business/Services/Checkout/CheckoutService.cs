@@ -101,7 +101,7 @@ namespace VitalChoice.Business.Services.Checkout
             {
                 cart = await CreateNew();
             }
-            var newOrder = await _orderService.CreatePrototypeAsync((int) OrderType.Normal);
+            var newOrder = await _orderService.Mapper.CreatePrototypeAsync((int) OrderType.Normal);
             if (newOrder.Customer != null)
             {
                 newOrder.Customer.IdObjectType = (int) CustomerType.Retail;
@@ -131,7 +131,7 @@ namespace VitalChoice.Business.Services.Checkout
                     Quantity = s.Quantity
                 };
             }).ToList() ?? new List<SkuOrdered>();
-            newOrder.ShippingAddress = await _addressService.CreatePrototypeAsync((int) AddressType.Shipping);
+            newOrder.ShippingAddress = await _addressService.Mapper.CreatePrototypeAsync((int) AddressType.Shipping);
             newOrder.ShippingAddress.IdCountry = (await _countryService.GetCountriesAsync(new CountryFilter
             {
                 CountryCode = "US"

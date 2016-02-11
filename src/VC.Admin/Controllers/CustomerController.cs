@@ -125,7 +125,7 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Customers)]
         public async Task<Result<AddUpdateCustomerModel>> CreateCustomerPrototype()
         {
-            var model = await _customerService.CreatePrototypeForAsync<AddUpdateCustomerModel>((int)CustomerType.Retail);
+            var model = await _customerService.Mapper.CreatePrototypeForAsync<AddUpdateCustomerModel>((int)CustomerType.Retail);
             model.PublicId = Guid.NewGuid();
             model.TaxExempt = TaxExempt.YesCurrentCertificate;
             model.Tier = Tier.Tier1;
@@ -304,38 +304,38 @@ namespace VC.Admin.Controllers
         {
             if (!Validate(addUpdateCustomerModel))
                 return null;
-            var item = _customerMapper.FromModel(addUpdateCustomerModel);
+            var customer = await _customerMapper.FromModelAsync(addUpdateCustomerModel, (int) CustomerType.Retail);
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
             if (int.TryParse(sUserId, out userId))
             {
-                item.IdEditedBy = userId;
-                foreach (var address in item.ShippingAddresses)
+                customer.IdEditedBy = userId;
+                foreach (var address in customer.ShippingAddresses)
                 {
                     address.IdEditedBy = userId;
                 }
-                item.ProfileAddress.IdEditedBy = userId;
+                customer.ProfileAddress.IdEditedBy = userId;
             }
-            item.IdEditedBy = userId;
-            if (item.Id > 0)
+            customer.IdEditedBy = userId;
+            if (customer.Id > 0)
             {
-                item = await _customerService.UpdateAsync(item);
+                customer = await _customerService.UpdateAsync(customer);
             }
             else
             {
-                item = await _customerService.InsertAsync(item);
+                customer = await _customerService.InsertAsync(customer);
 
-                if (item.StatusCode != (int)CustomerStatus.Suspended && !String.IsNullOrEmpty(item.Email))
+                if (customer.StatusCode != (int)CustomerStatus.Suspended && !String.IsNullOrEmpty(customer.Email))
                 {
-                    await _storefrontUserService.SendActivationAsync(item.Email);
+                    await _storefrontUserService.SendActivationAsync(customer.Email);
                 }
             }
-            var toReturn = _customerMapper.ToModel<AddUpdateCustomerModel>(item);
+            var toReturn = _customerMapper.ToModel<AddUpdateCustomerModel>(customer);
 
 			toReturn.IsConfirmed = addUpdateCustomerModel.IsConfirmed;
 			toReturn.PublicUserId = addUpdateCustomerModel.PublicUserId;
 
-            await PrepareCustomerNotes(item, toReturn);
+            await PrepareCustomerNotes(customer, toReturn);
 
             return toReturn;
         }

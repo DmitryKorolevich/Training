@@ -196,8 +196,8 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<OrderCalculateModel>> CalculateOrder([FromBody]OrderManageModel model)
         {
-            var item = _mapper.FromModel(model);
-            var orderContext = await _orderService.CalculateOrder(item);
+            var order = _mapper.FromModel(model);
+            var orderContext = await _orderService.CalculateOrder(order);
 
             OrderCalculateModel toReturn = new OrderCalculateModel(orderContext);
 
@@ -210,29 +210,29 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
 
-            var item = _mapper.FromModel(model);
+            var order = _mapper.FromModel(model);
 
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
             if (int.TryParse(sUserId, out userId))
             {
-                item.IdEditedBy = userId;
+                order.IdEditedBy = userId;
             }
-            item.Customer.IdEditedBy = userId;
-            foreach (var address in item.Customer.ShippingAddresses)
+            order.Customer.IdEditedBy = userId;
+            foreach (var address in order.Customer.ShippingAddresses)
             {
                 address.IdEditedBy = userId;
             }
-            item.Customer.ProfileAddress.IdEditedBy = userId;
+            order.Customer.ProfileAddress.IdEditedBy = userId;
 
-            await _customerService.UpdateAsync(item.Customer);
+            await _customerService.UpdateAsync(order.Customer);
 
             if (model.CombinedEditOrderStatus != OrderStatus.Cancelled && model.CombinedEditOrderStatus != OrderStatus.Exported && model.CombinedEditOrderStatus != OrderStatus.Shipped)
             {
-                var orderType = item.Data.MailOrder ? (int?)SourceOrderType.MailOrder : null;
+                var orderType = order.Data.MailOrder ? (int?)SourceOrderType.MailOrder : null;
                 if (model.Id > 0)
                 {
-                    var dbItem = (await _orderService.SelectAsync(item.Id));
+                    var dbItem = (await _orderService.SelectAsync(order.Id));
                     if (dbItem != null && dbItem.DictionaryData.ContainsKey("OrderType"))
                     {
                         if (dbItem.Data.OrderType == (int?)SourceOrderType.MailOrder)
@@ -241,21 +241,21 @@ namespace VC.Admin.Controllers
                             {
                                 orderType = (int)SourceOrderType.Phone;
                             }
-                            item.Data.OrderType = orderType.Value;
+                            order.Data.OrderType = orderType.Value;
                         }
                         else
                         {
-                            item.Data.OrderType = orderType ?? dbItem.Data.OrderType;
+                            order.Data.OrderType = orderType ?? dbItem.Data.OrderType;
                         }
                     }
                     else
                     {
-                        item.Data.OrderType = orderType ?? (int)SourceOrderType.Phone;
+                        order.Data.OrderType = orderType ?? (int)SourceOrderType.Phone;
                     }
-                    var context = await _orderService.CalculateOrder(item);
+                    var context = await _orderService.CalculateOrder(order);
                     model.ShouldSplit = context.SplitInfo?.ShouldSplit == true;
-                    OrderModelConverter.SetOrderSplitStatuses(model, item);
-                    item = await _orderService.UpdateAsync(item);
+                    OrderModelConverter.SetOrderSplitStatuses(model, order);
+                    order = await _orderService.UpdateAsync(order);
                 }
                 else
                 {
@@ -263,21 +263,21 @@ namespace VC.Admin.Controllers
                     {
                         orderType = (int)SourceOrderType.Phone;
                     }
-                    item.Data.OrderType = orderType.Value;
-                    item.ShippingAddress.Id = 0;
-                    if (item.PaymentMethod.Address != null)
+                    order.Data.OrderType = orderType.Value;
+                    order.ShippingAddress.Id = 0;
+                    if (order.PaymentMethod.Address != null)
                     {
-                        item.PaymentMethod.Address.Id = 0;
+                        order.PaymentMethod.Address.Id = 0;
                     }
-                    item.PaymentMethod.Id = 0;
-                    var context = await _orderService.CalculateOrder(item);
+                    order.PaymentMethod.Id = 0;
+                    var context = await _orderService.CalculateOrder(order);
                     model.ShouldSplit = context.SplitInfo?.ShouldSplit == true;
-                    OrderModelConverter.SetOrderSplitStatuses(model, item);
-                    item = await _orderService.InsertAsync(item);
+                    OrderModelConverter.SetOrderSplitStatuses(model, order);
+                    order = await _orderService.InsertAsync(order);
                 }
             }
 
-            OrderManageModel toReturn = _mapper.ToModel<OrderManageModel>(item);
+            OrderManageModel toReturn = _mapper.ToModel<OrderManageModel>(order);
 
             //TODO: - add sign up for newsletter(SignUpNewsletter)
 

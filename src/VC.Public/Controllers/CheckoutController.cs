@@ -342,21 +342,17 @@ namespace VC.Public.Controllers
                     }
                     if (cart.Order.PaymentMethod?.Address == null || cart.Order.PaymentMethod.Id == 0)
                     {
-                        cart.Order.PaymentMethod = _orderPaymentMethodConverter.FromModel((BillingInfoModel) model);
-                        cart.Order.PaymentMethod.Address = _addressConverter.FromModel(model);
-                        cart.Order.PaymentMethod.Address.IdObjectType = (int)AddressType.Billing;
-                        cart.Order.PaymentMethod.IdObjectType = (int)PaymentMethodType.CreditCard;
+                        cart.Order.PaymentMethod = await _orderPaymentMethodConverter.FromModelAsync((BillingInfoModel) model, (int)PaymentMethodType.CreditCard);
+                        cart.Order.PaymentMethod.Address = await _addressConverter.FromModelAsync(model, (int)AddressType.Billing);
                     }
                     else
                     {
-                        _orderPaymentMethodConverter.UpdateObject((BillingInfoModel) model, cart.Order.PaymentMethod);
-                        cart.Order.PaymentMethod.IdObjectType = (int)PaymentMethodType.CreditCard;
+                        await _orderPaymentMethodConverter.UpdateObjectAsync((BillingInfoModel) model, cart.Order.PaymentMethod, (int)PaymentMethodType.CreditCard);
                         if (cart.Order.PaymentMethod.Address == null)
                         {
                             cart.Order.PaymentMethod.Address = new AddressDynamic {IdObjectType = (int) AddressType.Billing};
                         }
-                        _addressConverter.UpdateObject(model, cart.Order.PaymentMethod.Address);
-                        cart.Order.PaymentMethod.Address.IdObjectType = (int)AddressType.Billing;
+                        await _addressConverter.UpdateObjectAsync(model, cart.Order.PaymentMethod.Address, (int)AddressType.Billing);
                     }
                     if (await CheckoutService.UpdateCart(cart))
                     {
@@ -381,7 +377,7 @@ namespace VC.Public.Controllers
 
         private async Task<CustomerDynamic> CreateAccount(AddUpdateBillingAddressModel model)
         {
-            var newCustomer = await CustomerService.CreatePrototypeAsync((int)CustomerType.Retail);
+            var newCustomer = await CustomerService.Mapper.CreatePrototypeAsync((int)CustomerType.Retail);
             newCustomer.IdDefaultPaymentMethod = (int)PaymentMethodType.CreditCard;
             if (model.GuestCheckout)
             {
@@ -394,11 +390,9 @@ namespace VC.Public.Controllers
             }
             newCustomer.Email = model.Email;
             newCustomer.PublicId = Guid.NewGuid();
-            newCustomer.ProfileAddress = _addressConverter.FromModel(model);
-            newCustomer.ProfileAddress.IdObjectType = (int)AddressType.Profile;
-            var shipping = _addressConverter.FromModel(model);
+            newCustomer.ProfileAddress = await _addressConverter.FromModelAsync(model, (int)AddressType.Profile);
+            var shipping = _addressConverter.FromModel(model, (int)AddressType.Shipping);
             shipping.Data.Default = true;
-            shipping.IdObjectType = (int)AddressType.Shipping;
             newCustomer.ShippingAddresses = new List<AddressDynamic> { shipping };
             newCustomer.ApprovedPaymentMethods = new List<int> { (int)PaymentMethodType.CreditCard };
             newCustomer =
