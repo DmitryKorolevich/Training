@@ -93,6 +93,58 @@ namespace VC.Public.Controllers
 		    return stateOrCounty;
 	    }
 
+	    private List<KeyValuePair<string, string>> PopulateBillingAddressDetails(OrderPaymentMethodDynamic paymentMethod, ICollection<Country> countries, string email)
+	    {
+			var billingAddress = paymentMethod.Address;
+
+			return new List<KeyValuePair<string, string>>()
+			{
+				new KeyValuePair<string, string>(string.Empty, _appInfrastructure.CreditCardTypes.Single(z => z.Key == (int)paymentMethod.Data.CardType).Text),
+				new KeyValuePair<string, string>(string.Empty, paymentMethod.Data.CardNumber),
+				new KeyValuePair<string, string>(string.Empty, $"{paymentMethod.Data.ExpDate.Month}/{paymentMethod.Data.ExpDate.Year % 2000}"),
+				new KeyValuePair<string, string>(string.Empty, string.Empty),
+				new KeyValuePair<string, string>(string.Empty, $"{billingAddress.Data.FirstName} {billingAddress.Data.LastName}"),
+				new KeyValuePair<string, string>(string.Empty, billingAddress.SafeData.Company),
+				new KeyValuePair<string, string>(string.Empty, billingAddress.Data.Address1),
+				new KeyValuePair<string, string>(string.Empty, billingAddress.SafeData.Address2),
+				new KeyValuePair<string, string>(string.Empty, $"{billingAddress.Data.City}, {ResolveStateOrCounty(countries, billingAddress)} {billingAddress.Data.Zip}"),
+				new KeyValuePair<string, string>("Phone", string.Format("{0:(###) ###-#### x#####}", billingAddress.Data.Phone)),
+				new KeyValuePair<string, string>("Email", email),
+			};
+		}
+
+		private List<KeyValuePair<string, string>> PopulateShippingAddressDetails(AddressDynamic shippingAddress, ICollection<Country> countries)
+		{
+			return new List<KeyValuePair<string, string>>()
+			{
+				new KeyValuePair<string, string>(string.Empty, $"{shippingAddress.Data.FirstName} {shippingAddress.Data.LastName}"),
+				new KeyValuePair<string, string>(string.Empty, shippingAddress.SafeData.Company),
+				new KeyValuePair<string, string>(string.Empty, shippingAddress.Data.Address1),
+				new KeyValuePair<string, string>(string.Empty, shippingAddress.SafeData.Address2),
+				new KeyValuePair<string, string>(string.Empty, $"{shippingAddress.Data.City}, {ResolveStateOrCounty(countries, shippingAddress)} {shippingAddress.Data.Zip}"),
+				new KeyValuePair<string, string>("Phone", string.Format("{0:(###) ###-#### x#####}", shippingAddress.Data.Phone)),
+			};
+		}
+
+	    private async Task<CustomerCartOrder> PopulateReviewModel(ReviewOrderModel reviewOrderModel)
+	    {
+			await InitCartModelInternal(reviewOrderModel);
+
+			var existingUid = Request.GetCartUid();
+			var id = GetInternalCustomerId();
+			var cart = await CheckoutService.GetOrCreateCart(existingUid, id);
+
+			var countries = await _countryService.GetCountriesAsync();
+
+			var paymentMethod = cart.Order.PaymentMethod;
+			reviewOrderModel.BillToAddress = PopulateBillingAddressDetails(paymentMethod, countries, cart.Order.Customer.Email);
+
+			var shippingAddress = cart.Order.ShippingAddress;
+			reviewOrderModel.ShipToAddress = PopulateShippingAddressDetails(shippingAddress, countries);
+
+		    return cart;
+	    }
+
 	    public async Task<IActionResult> Welcome( bool forgot = false)
 	    {
 			if (await CustomerLoggedIn())
@@ -462,42 +514,7 @@ namespace VC.Public.Controllers
 
 			var reviewOrderModel = new ReviewOrderModel();
 
-			await InitCartModelInternal(reviewOrderModel);
-
-			var existingUid = Request.GetCartUid();
-			var id = GetInternalCustomerId();
-			var cart = await CheckoutService.GetOrCreateCart(existingUid, id);
-
-			var countries = await _countryService.GetCountriesAsync();
-
-			var paymentMethod = cart.Order.PaymentMethod;
-			var billingAddress = paymentMethod.Address;
-			
-			reviewOrderModel.BillToAddress = new List<KeyValuePair<string, string>>()
-			{
-				new KeyValuePair<string, string>("Credit Card", _appInfrastructure.CreditCardTypes.Single(z => z.Key == (int)paymentMethod.Data.CardType).Text),
-				new KeyValuePair<string, string>("Number", paymentMethod.Data.CardNumber),
-				new KeyValuePair<string, string>("Expiration", $"{paymentMethod.Data.ExpDate.Month}/{paymentMethod.Data.ExpDate.Year % 2000}"),
-				new KeyValuePair<string, string>(string.Empty, $"{billingAddress.Data.FirstName} {billingAddress.Data.LastName}"),
-				new KeyValuePair<string, string>(string.Empty, billingAddress.SafeData.Company),
-				new KeyValuePair<string, string>(string.Empty, billingAddress.Data.Address1),
-				new KeyValuePair<string, string>(string.Empty, billingAddress.SafeData.Address2),
-				new KeyValuePair<string, string>(string.Empty, $"{billingAddress.Data.City}, {ResolveStateOrCounty(countries, billingAddress)} {billingAddress.Data.Zip}"),
-				new KeyValuePair<string, string>("Phone", string.Format("{0:(###) ###-#### x#####}", billingAddress.Data.Phone)),
-				new KeyValuePair<string, string>("Email", cart.Order.Customer.Email),
-			};
-
-			var shippingAddress = cart.Order.ShippingAddress;
-
-			reviewOrderModel.ShipToAddress = new List<KeyValuePair<string, string>>()
-			{
-				new KeyValuePair<string, string>(string.Empty, $"{shippingAddress.Data.FirstName} {shippingAddress.Data.LastName}"),
-				new KeyValuePair<string, string>(string.Empty, shippingAddress.SafeData.Company),
-				new KeyValuePair<string, string>(string.Empty, shippingAddress.Data.Address1),
-				new KeyValuePair<string, string>(string.Empty, shippingAddress.SafeData.Address2),
-				new KeyValuePair<string, string>(string.Empty, $"{shippingAddress.Data.City}, {ResolveStateOrCounty(countries, shippingAddress)} {shippingAddress.Data.Zip}"),
-				new KeyValuePair<string, string>("Phone", string.Format("{0:(###) ###-#### x#####}", shippingAddress.Data.Phone)),
-			};
+			await PopulateReviewModel(reviewOrderModel);
 
 			return View(reviewOrderModel);
 		}
@@ -506,7 +523,7 @@ namespace VC.Public.Controllers
 	    [CustomerAuthorize]
 	    public async Task<Result<string>> ReviewOrder([FromBody]ViewCartModel model)
 	    {
-			//todo: alex g please add logic to make order processed here
+			//todo: alex g please add logic to make order processed here. If error occurs just return new Result(false)
 
 		    return Url.Action("Receipt", "Checkout");
 	    }
@@ -514,60 +531,15 @@ namespace VC.Public.Controllers
 	    [HttpGet]
 		public async Task<IActionResult> Receipt()
 		{
-			var reviewOrderModel = new ReceiptModel()
-			{
-				Skus = new List<CartSkuModel>()
-				{
-					new CartSkuModel()
-					{
-						ProductPageUrl = "url",
-						Code = "CWR712P",
-						DisplayName = "Wild Traditional Canned Sockeye Salmon 7.5 oz. - Easy Open (12)",
-						IconUrl = "/Assets/images/cart/NRT501_alabcore_pouched_30z_218.jpg",
-						Price = 72,
-						Quantity = 2,
-						InStock = true,
-						SubTotal = 144
-					},
-					new CartSkuModel()
-					{
-						ProductPageUrl = "url1",
-						Code = "PNC",
-						DisplayName = "Vital Choice Catalog",
-						IconUrl = "/Assets/images/cart/seaweedsalad_218.jpg",
-						Quantity = 1,
-						InStock = true
-					}
-				},
-				BillToAddress = new List<KeyValuePair<string, string>>()
-				{
-					new KeyValuePair<string, string>(string.Empty, "first name last name"),
-					new KeyValuePair<string, string>(string.Empty, "company name"),
-					new KeyValuePair<string, string>(string.Empty, "address1"),
-					new KeyValuePair<string, string>(string.Empty, "address2"),
-					new KeyValuePair<string, string>(string.Empty, "city, AA 123456"),
-					new KeyValuePair<string, string>("Phone", "923112312323"),
-					new KeyValuePair<string, string>("Email", "mailforspam200@mailforspam.com"),
-				},
-				ShipToAddress = new List<KeyValuePair<string, string>>()
-				{
-					new KeyValuePair<string, string>(string.Empty, "first name last name"),
-					new KeyValuePair<string, string>(string.Empty, "company name"),
-					new KeyValuePair<string, string>(string.Empty, "address1"),
-					new KeyValuePair<string, string>(string.Empty, "address2"),
-					new KeyValuePair<string, string>(string.Empty, "city, AA 123456"),
-					new KeyValuePair<string, string>("Phone", "923112312323"),
-				},
-				ShippingCost = 100,
-				SubTotal = 50,
-				Tax = 10,
-				OrderTotal = 160,
-				OrderNumber = "1051135",
-				OrderDate = DateTime.Now,
-				ShippingMethod = "Standard Shipping"
-			};
+			var receiptModel = new ReceiptModel();
 
-			return View(reviewOrderModel);
+			var cart = await PopulateReviewModel(receiptModel);
+
+		    receiptModel.OrderNumber = cart.Order.Id.ToString();
+		    receiptModel.OrderDate = cart.Order.DateCreated;
+		    receiptModel.Tax = cart.Order.TaxTotal;
+
+			return View(receiptModel);
 		}
 	}
 }
