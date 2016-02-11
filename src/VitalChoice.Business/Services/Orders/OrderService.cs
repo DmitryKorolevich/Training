@@ -871,9 +871,12 @@ namespace VitalChoice.Business.Services.Orders
                     }
                     else
                     {
-                        item.Order.POrderStatus = item.Order.OrderStatus;
-                        item.Order.NPOrderStatus = item.Order.OrderStatus;
-                        item.Order.OrderStatus = null;
+                        if (context.SplitInfo?.ShouldSplit == true)
+                        {
+                            item.Order.POrderStatus = item.Order.OrderStatus;
+                            item.Order.NPOrderStatus = item.Order.OrderStatus;
+                            item.Order.OrderStatus = null;
+                        }
                     }
                 }
                 else

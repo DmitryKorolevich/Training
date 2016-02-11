@@ -4,14 +4,12 @@
     </span>
 </div>
 <div class="margin-bottom-5px" data-ng-if="::(!item.OrderStatus && item.POrderStatus)">
-    P -
     <span class="label font-default" data-ng-class="::{'ban': item.POrderStatus==1, 'exclamation-triangle': item.POrderStatus==2, 'truck': item.POrderStatus==3, 'minus-circle': item.POrderStatus==4, 'check-circle': item.POrderStatus==5, 'calendar': item.POrderStatus==6, 'pause': item.POrderStatus==7}">
         {{::getReferenceItem(ReferenceData.OrderStatuses, item.POrderStatus).Text}}
-    </span>
+    </span> P
 </div>
 <div data-ng-if="::(!item.OrderStatus && item.NPOrderStatus)">
-    NP -
     <span class="label font-default" data-ng-class="::{'ban': item.NPOrderStatus==1, 'exclamation-triangle': item.NPOrderStatus==2, 'truck': item.NPOrderStatus==3, 'minus-circle': item.NPOrderStatus==4, 'check-circle': item.NPOrderStatus==5, 'calendar': item.NPOrderStatus==6, 'pause': item.NPOrderStatus==7}">
         {{::getReferenceItem(ReferenceData.OrderStatuses, item.NPOrderStatus).Text}}
-    </span>
+    </span> NP
 </div>
