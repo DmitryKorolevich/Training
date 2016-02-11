@@ -366,10 +366,7 @@ namespace VC.Public.Controllers
                     transaction.Rollback();
                     if (user != null && user.Id != 0)
                     {
-                        if (await CustomerLoggedIn())
-                        {
-                            await _storefrontUserService.SignOutAsync(user);
-                        }
+                        await _storefrontUserService.SignOutAsync(user);
                         await _storefrontUserService.DeleteAsync(user);
                     }
                     throw;
