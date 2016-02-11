@@ -6,6 +6,11 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Base
 {
     public abstract class DynamicDataEntity : Entity
     {
+        protected DynamicDataEntity()
+        {
+            StatusCode = (int)RecordStatusCode.Active;
+        }
+
         public int StatusCode { get; set; }
 
         public DateTime DateCreated { get; set; }

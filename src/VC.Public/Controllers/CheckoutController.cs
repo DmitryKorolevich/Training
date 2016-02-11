@@ -213,11 +213,9 @@ namespace VC.Public.Controllers
             }
 
             var addUpdateModel = new AddUpdateBillingAddressModel();
+            var cart = await GetCurrentCart();
             if (await CustomerLoggedIn())
             {
-                var existingUid = Request.GetCartUid();
-                var cart = await CheckoutService.GetOrCreateCart(existingUid, GetInternalCustomerId());
-
                 var currentCustomer = await GetCurrentCustomerDynamic();
 
                 var creditCards = currentCustomer.CustomerPaymentMethods
@@ -249,7 +247,21 @@ namespace VC.Public.Controllers
                 }
 
                 addUpdateModel.Email = currentCustomer.Email;
-
+            }
+            else if ((bool?) cart.Order.Customer?.SafeData.Guest ?? false)
+            {
+                var user = await _storefrontUserService.GetAsync(cart.Order.Customer.Id);
+                user = await _storefrontUserService.SignInNoStatusCheckingAsync(user);
+                if (user == null)
+                {
+                    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+                }
+                if (cart.Order.PaymentMethod?.Address != null && cart.Order.PaymentMethod.Id != 0)
+                {
+                    _addressConverter.UpdateModel(addUpdateModel, cart.Order.PaymentMethod.Address);
+                    _orderPaymentMethodConverter.UpdateModel<BillingInfoModel>(addUpdateModel, cart.Order.PaymentMethod);
+                }
+                addUpdateModel.Email = cart.Order.Customer?.Email;
             }
 
             return View(addUpdateModel);
@@ -312,9 +324,8 @@ namespace VC.Public.Controllers
                             else if (model.GuestCheckout && ((bool?) cart.Order.Customer?.SafeData.Guest ?? false))
                             {
                                 await _storefrontUserService.SendActivationAsync(cart.Order.Customer.Email);
-                                var appUser = await CustomerService.GetUser(cart.Order.Customer.Id);
-
-                                user = await _storefrontUserService.SignInNoStatusCheckingAsync(appUser);
+                                user = await _storefrontUserService.GetAsync(cart.Order.Customer.Id);
+                                user = await _storefrontUserService.SignInNoStatusCheckingAsync(user);
                                 if (user == null)
                                 {
                                     throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
@@ -356,9 +367,16 @@ namespace VC.Public.Controllers
                     }
                     if (await CheckoutService.UpdateCart(cart))
                     {
+                        transaction.Commit();
                         return RedirectToAction("AddUpdateShippingMethod");
                     }
-                    transaction.Commit();
+                    ModelState.AddModelError(string.Empty, "Cannot update order");
+                    transaction.Rollback();
+                    if (user != null && user.Id != 0)
+                    {
+                        await _storefrontUserService.SignOutAsync(user);
+                        await _storefrontUserService.DeleteAsync(user);
+                    }
                 }
                 catch
                 {
@@ -429,26 +447,31 @@ namespace VC.Public.Controllers
 			{
 				AddressType = CheckoutAddressType.Residental
 			};
-		    if (await CustomerLoggedIn())
+            var cart = await GetCurrentCart();
+            if (await CustomerLoggedIn())
 		    {
 		        var currentCustomer = await GetCurrentCustomerDynamic();
 
 		        var shippingAddresses = currentCustomer.ShippingAddresses.ToList();
 
 		        var defaultShipping = shippingAddresses.FirstOrDefault(x => x.Data.Default == true);
-		        if (defaultShipping != null)
+                if (cart.Order.PaymentMethod?.Address != null && cart.Order.PaymentMethod.Id != 0)
+                {
+                    _addressConverter.UpdateModel<ShippingInfoModel>(shippingMethodModel, cart.Order.PaymentMethod?.Address);
+                }
+                else if (defaultShipping != null)
 		        {
 		            _addressConverter.UpdateModel<ShippingInfoModel>(shippingMethodModel, defaultShipping);
-
-		            PopulateShippingAddressesLookup(shippingAddresses);
 		        }
-		    }
-		    else
-		    {
+                if (shippingAddresses.Any())
+                    PopulateShippingAddressesLookup(shippingAddresses);
+            }
+            else
+            {
                 return RedirectToAction("Welcome");
             }
 
-			return View(shippingMethodModel);
+            return View(shippingMethodModel);
 		}
 
 		[HttpPost]
@@ -517,7 +540,8 @@ namespace VC.Public.Controllers
 	    [CustomerAuthorize]
 	    public async Task<Result<string>> ReviewOrder([FromBody]ViewCartModel model)
 	    {
-			//todo: alex g please add logic to make order processed here. If error occurs just return new Result(false)
+            //todo: alex g please add logic to make order processed here. If error occurs just return new Result(false)
+
 
 		    return Url.Action("Receipt", "Checkout");
 	    }

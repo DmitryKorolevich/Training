@@ -30,16 +30,15 @@ namespace VC.Public.Controllers
 {
     public abstract class CheckoutControllerBase : PublicControllerBase
     {
-		protected readonly ICheckoutService CheckoutService;
+		
 		protected readonly IOrderService OrderService;
 		protected readonly IDynamicMapper<SkuDynamic, Sku> SkuMapper;
 		protected readonly IDynamicMapper<ProductDynamic, Product> ProductMapper;
 
 		protected CheckoutControllerBase(IHttpContextAccessor contextAccessor, ICustomerService customerService,
             IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService, ICheckoutService checkoutService, IOrderService orderService, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper) :base(contextAccessor, customerService,
-			infrastructureService, authorizationService)
+			infrastructureService, authorizationService, checkoutService)
         {
-			CheckoutService = checkoutService;
 			OrderService = orderService;
 			SkuMapper = skuMapper;
 			ProductMapper = productMapper;
@@ -64,22 +63,10 @@ namespace VC.Public.Controllers
 
 		protected async Task<ViewCartModel> GetCart(ViewCartModel cartModel)
 		{
-			var existingUid = Request.GetCartUid();
-			if (await CustomerLoggedIn())
-			{
-				var id = GetInternalCustomerId();
-				var cart = await CheckoutService.GetOrCreateCart(existingUid, id);
-				await FillModel(cartModel, cart);
-				SetCartUid(cart.CartUid);
-				return cartModel;
-			}
-			else
-			{
-				var cart = await CheckoutService.GetOrCreateCart(existingUid);
-				await FillModel(cartModel, cart);
-				SetCartUid(cart.CartUid);
-				return cartModel;
-			}
+		    var cart = await GetCurrentCart();
+            await FillModel(cartModel, cart);
+            SetCartUid(cart.CartUid);
+            return cartModel;
 		}
 
 		protected void SetCartUid(Guid uid)

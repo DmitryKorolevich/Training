@@ -30,19 +30,23 @@ namespace VC.Public.Components.Menu
 			}).ToList();
 		}
 
-		public async Task<IViewComponentResult> InvokeAsync()
-		{
-			var rootCategory = await _productCategoryService.GetLiteCategoriesTreeAsync(new ProductCategoryLiteFilter()
-			{
-				Visibility = User.Identity.IsAuthenticated ? (User.IsInRole(IdentityConstants.WholesaleCustomer) ? new List<CustomerTypeCode>() { CustomerTypeCode.Wholesale, CustomerTypeCode.All } : new List<CustomerTypeCode>() { CustomerTypeCode.Retail, CustomerTypeCode.All })
-				: new List<CustomerTypeCode>() { CustomerTypeCode.Retail, CustomerTypeCode.All },
-				Statuses = new List<RecordStatusCode>() { RecordStatusCode.Active }
-			});
-			
-			return View("MainMenu", new MainMenuIItemModel()
-			{
-				SubItems = ConvertToModel(rootCategory.SubItems)
-			});
-		}
+	    public async Task<IViewComponentResult> InvokeAsync()
+	    {
+	        var rootCategory = await _productCategoryService.GetLiteCategoriesTreeAsync(new ProductCategoryLiteFilter()
+	        {
+	            Visibility =
+	                User.Identity.IsAuthenticated
+	                    ? (User.IsInRole(IdentityConstants.WholesaleCustomer)
+	                        ? new List<CustomerTypeCode>() {CustomerTypeCode.Wholesale, CustomerTypeCode.All}
+	                        : new List<CustomerTypeCode>() {CustomerTypeCode.Retail, CustomerTypeCode.All})
+	                    : new List<CustomerTypeCode>() {CustomerTypeCode.Retail, CustomerTypeCode.All},
+	            Statuses = new List<RecordStatusCode>() {RecordStatusCode.Active}
+	        });
+
+	        return View("MainMenu", new MainMenuIItemModel()
+	        {
+	            SubItems = ConvertToModel(rootCategory.SubItems)
+	        });
+	    }
 	}
 }

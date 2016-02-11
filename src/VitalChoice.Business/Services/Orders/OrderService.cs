@@ -442,7 +442,6 @@ namespace VitalChoice.Business.Services.Orders
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
-                model.PaymentMethod.StatusCode = (int)RecordStatusCode.Active;
             }
         }
 
