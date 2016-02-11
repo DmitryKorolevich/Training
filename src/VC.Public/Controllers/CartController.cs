@@ -71,14 +71,14 @@ namespace VC.Public.Controllers
             return View(cartModel);
         }
 
-		[HttpPost]
-	    public async Task<Result<string>> ViewCart([FromBody]ViewCartModel model)
-		{
-			return Url.Action("Welcome", "Checkout");
-		}
+        [HttpPost]
+        public Task<Result<string>> ViewCart([FromBody] ViewCartModel model)
+        {
+            return Task.FromResult<Result<string>>(Url.Action("Welcome", "Checkout"));
+        }
 
 
-	    [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> AddToCartView(string skuCode)
         {
             var cart = await AddToCart(skuCode);

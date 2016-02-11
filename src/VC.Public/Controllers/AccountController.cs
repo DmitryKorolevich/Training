@@ -109,7 +109,7 @@ namespace VC.Public.Controllers
 				var user = await _userService.FindAsync(context.User.GetUserName());
 				if (user == null)
 				{
-					throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+                    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
 				}
 
 				await _userService.SignOutAsync(user);

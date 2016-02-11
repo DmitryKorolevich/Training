@@ -25,13 +25,17 @@ namespace VC.Public.Components.Profile
 			var userId = Convert.ToInt32(_contextAccessor.HttpContext.User.GetUserId());
 
 			var user = await _storefrontUserService.GetAsync(userId);
-			
-			return View("Sidebar", new SidebarModel()
-			{
-				FirstName = user.FirstName,
-				LastName = user.LastName,
-				Id = user.Id
-			});
+		    if (user != null)
+		    {
+
+		        return View("Sidebar", new SidebarModel()
+		        {
+		            FirstName = user.FirstName,
+		            LastName = user.LastName,
+		            Id = user.Id
+		        });
+		    }
+		    return View("Sidebar", new SidebarModel());
 		}
 	}
 }

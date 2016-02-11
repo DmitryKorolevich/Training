@@ -172,11 +172,12 @@ namespace VC.Public.Controllers
 			if (((ShipDelayType?)order.SafeData.ShipDelayType ?? ShipDelayType.None) != ShipDelayType.None)
 			{
 				cartModel.ShipAsap = false;
-				cartModel.ShippingDate = order.SafeData.ShipDelayDateP;
+				cartModel.ShippingDate = order.SafeData.ShipDelayDate;
 			}
 			else
 			{
 				cartModel.ShipAsap = true;
+			    cartModel.ShippingDate = null;
 			}
 			cartModel.ShippingUpgradeP = (ShippingUpgradeOption?)order.SafeData.ShippingUpgradeP;
 			cartModel.ShippingUpgradeNP = (ShippingUpgradeOption?)order.SafeData.ShippingUpgradeNP;
