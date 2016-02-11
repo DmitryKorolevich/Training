@@ -345,15 +345,18 @@ namespace VC.Public.Controllers
                         cart.Order.PaymentMethod = _orderPaymentMethodConverter.FromModel((BillingInfoModel) model);
                         cart.Order.PaymentMethod.Address = _addressConverter.FromModel(model);
                         cart.Order.PaymentMethod.Address.IdObjectType = (int)AddressType.Billing;
+                        cart.Order.PaymentMethod.IdObjectType = (int)PaymentMethodType.CreditCard;
                     }
                     else
                     {
                         _orderPaymentMethodConverter.UpdateObject((BillingInfoModel) model, cart.Order.PaymentMethod);
+                        cart.Order.PaymentMethod.IdObjectType = (int)PaymentMethodType.CreditCard;
                         if (cart.Order.PaymentMethod.Address == null)
                         {
                             cart.Order.PaymentMethod.Address = new AddressDynamic {IdObjectType = (int) AddressType.Billing};
                         }
                         _addressConverter.UpdateObject(model, cart.Order.PaymentMethod.Address);
+                        cart.Order.PaymentMethod.Address.IdObjectType = (int)AddressType.Billing;
                     }
                     if (await CheckoutService.UpdateCart(cart))
                     {
