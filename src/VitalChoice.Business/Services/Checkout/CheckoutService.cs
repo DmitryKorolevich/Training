@@ -390,11 +390,6 @@ namespace VitalChoice.Business.Services.Checkout
             return true;
         }
 
-        public Task<OrderDataContext> CalculateCart(CustomerCartOrder cartOrder)
-        {
-            return _orderService.CalculateOrder(cartOrder.Order, OrderStatus.Processed);
-        }
-
         public async Task<int> GetCartItemsCount(Guid uid)
         {
             var cart =

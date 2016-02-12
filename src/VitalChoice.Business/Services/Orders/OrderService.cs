@@ -383,6 +383,22 @@ namespace VitalChoice.Business.Services.Orders
 
         private void SetOrderSplitStatuses(OrderDataContext model, OrderDynamic dynamic, OrderStatus combinedStatus)
         {
+            if (combinedStatus == OrderStatus.Incomplete)
+            {
+                if (model.SplitInfo?.ShouldSplit ?? false)
+                {
+                    dynamic.OrderStatus = null;
+                    dynamic.POrderStatus = combinedStatus;
+                    dynamic.NPOrderStatus = combinedStatus;
+                }
+                else
+                {
+                    dynamic.OrderStatus = combinedStatus;
+                    dynamic.POrderStatus = null;
+                    dynamic.NPOrderStatus = null;
+                }
+                return;
+            }
             if (model.SplitInfo?.ShouldSplit ?? false)
             {
                 dynamic.OrderStatus = null;
@@ -390,7 +406,7 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     dynamic.POrderStatus = dynamic.NPOrderStatus = OrderStatus.OnHold;
                 }
-                else if (dynamic.SafeData.ShipDelayType == ShipDelayType.EntireOrder)
+                else if ((int?)dynamic.SafeData.ShipDelayType == (int)ShipDelayType.EntireOrder)
                 {
                     dynamic.POrderStatus = combinedStatus;
                     dynamic.NPOrderStatus = combinedStatus;
@@ -400,7 +416,7 @@ namespace VitalChoice.Business.Services.Orders
                         dynamic.NPOrderStatus = OrderStatus.ShipDelayed;
                     }
                 }
-                else if (dynamic.SafeData.ShipDelayType == ShipDelayType.PerishableAndNonPerishable)
+                else if ((int?)dynamic.SafeData.ShipDelayType == (int)ShipDelayType.PerishableAndNonPerishable)
                 {
                     dynamic.POrderStatus = combinedStatus;
                     dynamic.NPOrderStatus = combinedStatus;
@@ -427,7 +443,7 @@ namespace VitalChoice.Business.Services.Orders
                 if (dynamic.OrderStatus == OrderStatus.Incomplete || dynamic.OrderStatus == OrderStatus.Processed ||
                     dynamic.OrderStatus == OrderStatus.ShipDelayed)
                 {
-                    if (dynamic.SafeData.ShipDelayType == ShipDelayType.EntireOrder && dynamic.SafeData.ShipDelayDate != null)
+                    if ((int?)dynamic.SafeData.ShipDelayType == (int)ShipDelayType.EntireOrder && dynamic.SafeData.ShipDelayDate != null)
                     {
                         dynamic.OrderStatus = OrderStatus.ShipDelayed;
                     }

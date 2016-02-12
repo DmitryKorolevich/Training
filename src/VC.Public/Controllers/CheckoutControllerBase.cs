@@ -78,7 +78,7 @@ namespace VC.Public.Controllers
 
 		protected async Task FillModel(ViewCartModel cartModel, OrderDynamic order)
 		{
-            var context = await OrderService.CalculateOrder(order, OrderStatus.Processed);
+            var context = await OrderService.CalculateOrder(order, OrderStatus.Incomplete);
             var gcMessages = context.GcMessageInfos.ToDictionary(m => m.Field);
             if (!string.IsNullOrWhiteSpace(cartModel.PromoCode) && order.Discount == null)
             {

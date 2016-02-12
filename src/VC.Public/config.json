@@ -29,14 +29,22 @@
       "Server": "vw4v86cs0h.database.windows.net"
     },
     "ExportService": {
-      "ConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=9bCmTJyWrS2//GpvV5A3+bsPHdyph0ndE8tE14gsD24=",
-      "PlainQueueName": "PlainQueue",
-      "EncryptedQueueName": "EncryptedQueue",
-      "CertThumbprint": "E2603D85F0E4B59448FD3D380FEFF740B28B3215",
-      "RootThumbprint": "89735BE3169BE34AB67B65C7D9EFFD2C230A9D98",
+      "ConnectionString": "",
+      "PlainQueueName": "",
+      "EncryptedQueueName": "",
+      "CertThumbprint": "",
       "EncryptionHostSessionExpire": false,
-      "ServerHostName": "export-server"
+      "ServerHostName": ""
     },
+    //"ExportService": {
+    //  "ConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=9bCmTJyWrS2//GpvV5A3+bsPHdyph0ndE8tE14gsD24=",
+    //  "PlainQueueName": "PlainQueue",
+    //  "EncryptedQueueName": "EncryptedQueue",
+    //  "CertThumbprint": "E2603D85F0E4B59448FD3D380FEFF740B28B3215",
+    //  "RootThumbprint": "89735BE3169BE34AB67B65C7D9EFFD2C230A9D98",
+    //  "EncryptionHostSessionExpire": false,
+    //  "ServerHostName": "export-server"
+    //},
     "FedExOptions": {
       "AccountNumber": "304955066",
       "MeterNumber": "104067734",
