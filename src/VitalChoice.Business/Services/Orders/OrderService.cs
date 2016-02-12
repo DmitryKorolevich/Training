@@ -71,6 +71,7 @@ using System.Text.RegularExpressions;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Infrastructure.Domain.Mail;
 using VitalChoice.Business.Mail;
+using VitalChoice.Data.Transaction;
 using VitalChoice.Infrastructure.Context;
 
 namespace VitalChoice.Business.Services.Orders
@@ -131,10 +132,10 @@ namespace VitalChoice.Business.Services.Orders
             IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
             IProductService productService,
             INotificationService notificationService,
-            ICountryService countryService, EcommerceContext dbContext)
+            ICountryService countryService, ITransactionAccessor<EcommerceContext> transactionAccessor)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
-                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, dbContext)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
         {
             _orderRepository = orderRepository;
             _vOrderRepository = vOrderRepository;

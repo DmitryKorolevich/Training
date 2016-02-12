@@ -27,11 +27,13 @@ using VitalChoice.Interfaces.Services.Users;
 using System.Linq;
 using System.Reflection;
 using Microsoft.AspNet.Mvc.ModelBinding;
+using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
@@ -49,29 +51,32 @@ namespace VC.Public.Controllers
 	    private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
 		private readonly ReferenceData _appInfrastructure;
 		private readonly ICountryService _countryService;
+        private readonly ITransactionAccessor<EcommerceContext> _transactionAccessor;
 
-		public CheckoutController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
-		    ICustomerService customerService,
-		    IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter,
-		    IOrderService orderService, IProductService productService, IAppInfrastructureService infrastructureService,
-		    IAuthorizationService authorizationService, ICheckoutService checkoutService,
-		    IDynamicMapper<AddressDynamic, Address> addressConverter, IAppInfrastructureService appInfrastructureService,
-		    IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodConverter,
-		    IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper, ICountryService countryService)
-		    : base(
-			    contextAccessor, customerService, infrastructureService, authorizationService, checkoutService, orderService,
-			    skuMapper, productMapper)
-	    {
-		    _storefrontUserService = storefrontUserService;
-		    _paymentMethodConverter = paymentMethodConverter;
-	        _productService = productService;
-	        _addressConverter = addressConverter;
-		    _orderPaymentMethodConverter = orderPaymentMethodConverter;
-			_countryService = countryService;
-			_appInfrastructure = appInfrastructureService.Get();
-	    }
+        public CheckoutController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
+            ICustomerService customerService,
+            IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter,
+            IOrderService orderService, IProductService productService, IAppInfrastructureService infrastructureService,
+            IAuthorizationService authorizationService, ICheckoutService checkoutService,
+            IDynamicMapper<AddressDynamic, Address> addressConverter, IAppInfrastructureService appInfrastructureService,
+            IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodConverter,
+            IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper, ICountryService countryService,
+            ITransactionAccessor<EcommerceContext> transactionAccessor)
+            : base(
+                contextAccessor, customerService, infrastructureService, authorizationService, checkoutService, orderService,
+                skuMapper, productMapper)
+        {
+            _storefrontUserService = storefrontUserService;
+            _paymentMethodConverter = paymentMethodConverter;
+            _productService = productService;
+            _addressConverter = addressConverter;
+            _orderPaymentMethodConverter = orderPaymentMethodConverter;
+            _countryService = countryService;
+            _transactionAccessor = transactionAccessor;
+            _appInfrastructure = appInfrastructureService.Get();
+        }
 
-	    private void PopulateCreditCardsLookup(IEnumerable<CustomerPaymentMethodDynamic> creditCards)
+        private void PopulateCreditCardsLookup(IEnumerable<CustomerPaymentMethodDynamic> creditCards)
 	    {
 			ViewBag.CreditCards = creditCards.ToDictionary(x => x.Id,
 					y =>
@@ -149,6 +154,7 @@ namespace VC.Public.Controllers
         private async Task<OrderDynamic> PopulateReviewModel(ReviewOrderModel reviewOrderModel, int idOrder)
         {
             var order = await OrderService.SelectAsync(idOrder, true);
+            await FillModel(reviewOrderModel, order);
 
             var countries = await _countryService.GetCountriesAsync();
 
@@ -286,8 +292,8 @@ namespace VC.Public.Controllers
             {
                 return View("EmptyCart");
             }
-            var existingUid = Request.GetCartUid();
             var loggedIn = await CustomerLoggedIn();
+            var cart = await GetCurrentCart(loggedIn);
 
             if (!ModelState.IsValid)
             {
@@ -301,15 +307,13 @@ namespace VC.Public.Controllers
                 }
                 return View(model);
             }
-            using (var transaction = CustomerService.BeginTransaction())
+            Func<Task<ApplicationUser>> loginTask = null;
+            using (var transaction = _transactionAccessor.BeginTransaction())
             {
-                ApplicationUser user = null;
                 try
                 {
-                    CustomerCartOrder cart;
                     if (loggedIn)
                     {
-                        cart = await CheckoutService.GetOrCreateCart(existingUid, GetInternalCustomerId());
                         var currentCustomer = await GetCurrentCustomerDynamic();
                         var creditCards = currentCustomer.CustomerPaymentMethods
                             .Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard);
@@ -318,23 +322,29 @@ namespace VC.Public.Controllers
                     }
                     else
                     {
-                        cart = await CheckoutService.GetOrCreateCart(existingUid);
-                        if (cart.Order.Customer?.Id != 0 && ((bool?) cart.Order.Customer?.SafeData.Guest ?? false) && cart.Order.Customer.StatusCode == (int)CustomerStatus.PhoneOnly)
+                        if (cart.Order.Customer?.Id != 0 && ((bool?) cart.Order.Customer?.SafeData.Guest ?? false) &&
+                            cart.Order.Customer.StatusCode == (int) CustomerStatus.PhoneOnly)
                         {
                             if (model.GuestCheckout)
                             {
-                                user = await _storefrontUserService.GetAsync(cart.Order.Customer.Id);
-                                user = await _storefrontUserService.SignInNoStatusCheckingAsync(user);
+                                loginTask = async () =>
+                                {
+                                    var user = await _storefrontUserService.GetAsync(cart.Order.Customer.Id);
+                                    user = await _storefrontUserService.SignInNoStatusCheckingAsync(user);
+                                    if (user == null)
+                                    {
+                                        throw new AppValidationException(
+                                            ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+                                    }
+                                    return user;
+                                };
+
                             }
                             else
                             {
-                                cart.Order.Customer.StatusCode = (int)CustomerStatus.Active;
+                                cart.Order.Customer.StatusCode = (int) CustomerStatus.Active;
                                 cart.Order.Customer.Data.Guest = null;
                                 cart.Order.Customer = await CustomerService.UpdateAsync(cart.Order.Customer, model.Password);
-                            }
-                            if (user == null)
-                            {
-                                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
                             }
                         }
                         else if ((cart.Order.Customer?.Id ?? 0) == 0 || !model.GuestCheckout)
@@ -345,13 +355,18 @@ namespace VC.Public.Controllers
                             {
                                 if ((bool?) cart.Order.Customer?.SafeData.Guest ?? false)
                                 {
-                                    await _storefrontUserService.SendActivationAsync(cart.Order.Customer.Email);
-                                    user = await _storefrontUserService.GetAsync(cart.Order.Customer.Id);
-                                    user = await _storefrontUserService.SignInNoStatusCheckingAsync(user);
-                                    if (user == null)
+                                    loginTask = async () =>
                                     {
-                                        throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
-                                    }
+                                        await _storefrontUserService.SendActivationAsync(cart.Order.Customer.Email);
+                                        var user = await _storefrontUserService.GetAsync(cart.Order.Customer.Id);
+                                        user = await _storefrontUserService.SignInNoStatusCheckingAsync(user);
+                                        if (user == null)
+                                        {
+                                            throw new AppValidationException(
+                                                ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+                                        }
+                                        return user;
+                                    };
                                 }
                                 else
                                 {
@@ -360,11 +375,15 @@ namespace VC.Public.Controllers
                             }
                             else
                             {
-                                user = await _storefrontUserService.SignInAsync(cart.Order.Customer.Email, model.Password);
-                                if (user == null)
+                                loginTask = async () =>
                                 {
-                                    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
-                                }
+                                    var user = await _storefrontUserService.SignInAsync(cart.Order.Customer.Email, model.Password);
+                                    if (user == null)
+                                    {
+                                        throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+                                    }
+                                    return user;
+                                };
                             }
                         }
                     }
@@ -384,38 +403,47 @@ namespace VC.Public.Controllers
                     }
                     if (cart.Order.PaymentMethod?.Address == null || cart.Order.PaymentMethod.Id == 0)
                     {
-                        cart.Order.PaymentMethod = await _orderPaymentMethodConverter.FromModelAsync((BillingInfoModel) model, (int)PaymentMethodType.CreditCard);
-                        cart.Order.PaymentMethod.Address = await _addressConverter.FromModelAsync(model, (int)AddressType.Billing);
+                        cart.Order.PaymentMethod =
+                            await _orderPaymentMethodConverter.FromModelAsync((BillingInfoModel) model, (int) PaymentMethodType.CreditCard);
+                        cart.Order.PaymentMethod.Address = await _addressConverter.FromModelAsync(model, (int) AddressType.Billing);
                     }
                     else
                     {
-                        await _orderPaymentMethodConverter.UpdateObjectAsync((BillingInfoModel) model, cart.Order.PaymentMethod, (int)PaymentMethodType.CreditCard);
+                        await
+                            _orderPaymentMethodConverter.UpdateObjectAsync((BillingInfoModel) model, cart.Order.PaymentMethod,
+                                (int) PaymentMethodType.CreditCard);
                         if (cart.Order.PaymentMethod.Address == null)
                         {
                             cart.Order.PaymentMethod.Address = new AddressDynamic {IdObjectType = (int) AddressType.Billing};
                         }
-                        await _addressConverter.UpdateObjectAsync(model, cart.Order.PaymentMethod.Address, (int)AddressType.Billing);
+                        await _addressConverter.UpdateObjectAsync(model, cart.Order.PaymentMethod.Address, (int) AddressType.Billing);
                     }
                     if (await CheckoutService.UpdateCart(cart))
                     {
                         transaction.Commit();
+                        if (loginTask != null)
+                            await loginTask();
                         return RedirectToAction("AddUpdateShippingMethod");
                     }
                     ModelState.AddModelError(string.Empty, "Cannot update order");
                     transaction.Rollback();
-                    if (user != null && user.Id != 0)
+                    if (loginTask != null)
                     {
-                        await _storefrontUserService.SignOutAsync(user);
-                        await _storefrontUserService.DeleteAsync(user);
+                        if (cart.Order.Customer != null && cart.Order.Customer.Id != 0)
+                        {
+                            await _storefrontUserService.RemoveAsync(cart.Order.Customer.Id);
+                        }
                     }
                 }
                 catch
                 {
                     transaction.Rollback();
-                    if (user != null && user.Id != 0)
+                    if (loginTask != null)
                     {
-                        await _storefrontUserService.SignOutAsync(user);
-                        await _storefrontUserService.DeleteAsync(user);
+                        if (cart.Order.Customer != null && cart.Order.Customer.Id != 0)
+                        {
+                            await _storefrontUserService.RemoveAsync(cart.Order.Customer.Id);
+                        }
                     }
                     throw;
                 }
@@ -423,7 +451,7 @@ namespace VC.Public.Controllers
 
             return View(model);
         }
-        
+
         [HttpGet]
 		[CustomerAuthorize]
 		public async Task<IActionResult> GetShippingAddress(int id)

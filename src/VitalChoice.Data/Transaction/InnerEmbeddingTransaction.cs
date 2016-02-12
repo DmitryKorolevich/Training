@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Data.Common;
 using Microsoft.Data.Entity.Storage;
+using VitalChoice.Data.Context;
 
 namespace VitalChoice.Data.Transaction
 {
-    public class InnerEmbeddingTransaction : IRelationalTransaction
+    public class InnerEmbeddingTransaction : IInnerEmbeddingTransaction
     {
         private readonly IRelationalTransaction _transaction;
+        public IDataContextAsync DbContext { get; }
         private int _referenceCount;
 
-        public InnerEmbeddingTransaction(IRelationalTransaction transaction)
+        public InnerEmbeddingTransaction(IRelationalTransaction transaction, IDataContextAsync dbContext)
         {
             _transaction = transaction;
+            DbContext = dbContext;
         }
 
         public void Dispose()
@@ -21,6 +24,7 @@ namespace VitalChoice.Data.Transaction
                 Closed = true;
                 _referenceCount--;
                 _transaction.Dispose();
+                DbContext.Dispose();
             }
             else
             {

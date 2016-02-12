@@ -18,6 +18,8 @@ using VitalChoice.Infrastructure.Domain.Entities.Users;
 using System;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Data.Repositories;
+using VitalChoice.Data.Transaction;
+using VitalChoice.Infrastructure.Context;
 
 namespace VitalChoice.Business.Services.Users
 {
@@ -27,13 +29,13 @@ namespace VitalChoice.Business.Services.Users
 
         public AdminUserService(UserManager<ApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,
-            IDataContextAsync context, SignInManager<ApplicationUser> signInManager, 
+            VitalChoiceContext context, SignInManager<ApplicationUser> signInManager, 
             IAppInfrastructureService appInfrastructureService, INotificationService notificationService, 
             IOptions<AppOptions> options,
             IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
-            IUserValidator<ApplicationUser> userValidator) : 
-            base(userManager, roleManager, context, signInManager, appInfrastructureService, notificationService, options, ecommerceRepositoryAsync, userValidator)
+            IUserValidator<ApplicationUser> userValidator, ITransactionAccessor<VitalChoiceContext> transactionAccessor) : 
+            base(userManager, roleManager, context, signInManager, appInfrastructureService, notificationService, options, ecommerceRepositoryAsync, userValidator, transactionAccessor)
 		{
             _adminProfileRepository = adminProfileRepository;
 		}

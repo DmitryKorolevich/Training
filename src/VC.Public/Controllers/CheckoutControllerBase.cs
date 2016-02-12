@@ -52,7 +52,7 @@ namespace VC.Public.Controllers
 
 		protected async Task<ViewCartModel> InitCartModelInternal(ViewCartModel cartModel)
 		{
-			await GetCart(cartModel);
+			await FillCartModel(cartModel);
 
 			if (!cartModel.GiftCertificateCodes.Any())
 			{
@@ -61,12 +61,11 @@ namespace VC.Public.Controllers
 			return cartModel;
 		}
 
-		protected async Task<ViewCartModel> GetCart(ViewCartModel cartModel)
+		protected async Task FillCartModel(ViewCartModel cartModel)
 		{
 		    var cart = await GetCurrentCart();
-            await FillModel(cartModel, cart);
+            await FillModel(cartModel, cart.Order);
             SetCartUid(cart.CartUid);
-            return cartModel;
 		}
 
 		protected void SetCartUid(Guid uid)
@@ -77,102 +76,97 @@ namespace VC.Public.Controllers
 			});
 		}
 
-		protected async Task FillModel(ViewCartModel cartModel, CustomerCartOrder cart)
+		protected async Task FillModel(ViewCartModel cartModel, OrderDynamic order)
 		{
-			await Calculate(cartModel, cart.Order);
-		}
+            var context = await OrderService.CalculateOrder(order);
+            var gcMessages = context.GcMessageInfos.ToDictionary(m => m.Field);
+            if (!string.IsNullOrWhiteSpace(cartModel.PromoCode) && order.Discount == null)
+            {
+                context.Messages.Add(new MessageInfo
+                {
+                    Field = "DiscountCode",
+                    Message = "Discount not found"
+                });
+            }
+            cartModel.FreeShipDifference = context.FreeShippingThresholdDifference;
+            cartModel.DiscountDescription = context.Order?.Discount?.Description;
+            cartModel.DiscountMessage = context.DiscountMessage;
+            cartModel.Messages =
+                context.Messages?.Select(x => new KeyValuePair<string, string>(x.Field, x.Message)).ToList();
+            cartModel.Skus.Clear();
+            cartModel.Skus.AddRange(
+                order.Skus?.Select(sku =>
+                {
+                    var result = SkuMapper.ToModel<CartSkuModel>(sku.Sku);
+                    ProductMapper.UpdateModel(result, sku.ProductWithoutSkus);
+                    result.Price = sku.Amount;
+                    result.Quantity = sku.Quantity;
+                    result.SubTotal = sku.Quantity * sku.Amount;
+                    return result;
+                }) ?? Enumerable.Empty<CartSkuModel>());
+            var gcsInCart = cartModel.GiftCertificateCodes.ToArray();
+            var hasEmpty = gcsInCart.Any(g => string.IsNullOrWhiteSpace(g.Value));
+            cartModel.GiftCertificateCodes.Clear();
+            foreach (var code in gcsInCart)
+            {
+                if (!string.IsNullOrWhiteSpace(code.Value) && order.GiftCertificates.All(g => g.GiftCertificate.Code != code.Value))
+                {
+                    cartModel.GiftCertificateCodes.Add(code);
+                    code.ErrorMessage = "Gift Certificate not found";
+                }
+            }
+            cartModel.GiftCertificateCodes.AddRange(
+                order.GiftCertificates?.Select(g => g.GiftCertificate.Code).Select(x =>
+                {
+                    var message = gcMessages.ContainsKey(x) ? gcMessages[x] : new MessageInfo();
 
-		protected async Task Calculate(ViewCartModel cartModel, OrderDynamic order)
-		{
-			var context = await OrderService.CalculateOrder(order);
-			var gcMessages = context.GcMessageInfos.ToDictionary(m => m.Field);
-			if (!string.IsNullOrWhiteSpace(cartModel.PromoCode) && order.Discount == null)
-			{
-				context.Messages.Add(new MessageInfo
-				{
-					Field = "DiscountCode",
-					Message = "Discount not found"
-				});
-			}
-			cartModel.FreeShipDifference = context.FreeShippingThresholdDifference;
-			cartModel.DiscountDescription = context.Order?.Discount?.Description;
-			cartModel.DiscountMessage = context.DiscountMessage;
-			cartModel.Messages =
-				context.Messages?.Select(x => new KeyValuePair<string, string>(x.Field, x.Message)).ToList();
-			cartModel.Skus.Clear();
-			cartModel.Skus.AddRange(
-				order.Skus?.Select(sku =>
-				{
-					var result = SkuMapper.ToModel<CartSkuModel>(sku.Sku);
-					ProductMapper.UpdateModel(result, sku.ProductWithoutSkus);
-					result.Price = sku.Amount;
-					result.Quantity = sku.Quantity;
-					result.SubTotal = sku.Quantity * sku.Amount;
-					return result;
-				}) ?? Enumerable.Empty<CartSkuModel>());
-			var gcsInCart = cartModel.GiftCertificateCodes.ToArray();
-			var hasEmpty = gcsInCart.Any(g => string.IsNullOrWhiteSpace(g.Value));
-			cartModel.GiftCertificateCodes.Clear();
-			foreach (var code in gcsInCart)
-			{
-				if (!string.IsNullOrWhiteSpace(code.Value) && order.GiftCertificates.All(g => g.GiftCertificate.Code != code.Value))
-				{
-					cartModel.GiftCertificateCodes.Add(code);
-					code.ErrorMessage = "Gift Certificate not found";
-				}
-			}
-			cartModel.GiftCertificateCodes.AddRange(
-				order.GiftCertificates?.Select(g => g.GiftCertificate.Code).Select(x =>
-				{
-					var message = gcMessages.ContainsKey(x) ? gcMessages[x] : new MessageInfo();
+                    return new CartGcModel
+                    {
+                        Value = x,
+                        SuccessMessage = message.MessageLevel == MessageLevel.Info ? message.Message : string.Empty,
+                        ErrorMessage = message.MessageLevel == MessageLevel.Error ? message.Message : string.Empty
+                    };
+                }) ??
+                Enumerable.Empty<CartGcModel>());
+            if (hasEmpty)
+            {
+                cartModel.GiftCertificateCodes.Add(new CartGcModel() { Value = string.Empty });
+            }
+            cartModel.ShippingUpgradeNPOptions = context.ShippingUpgradeNpOptions;
+            cartModel.ShippingUpgradePOptions = context.ShippingUpgradePOptions;
+            cartModel.DiscountTotal = -context.DiscountTotal;
+            cartModel.GiftCertificatesTotal = context.GiftCertificatesSubtotal;
+            cartModel.PromoSkus.Clear();
+            cartModel.PromoSkus.AddRange(context.PromoSkus?.Select(sku =>
+            {
+                var result = SkuMapper.ToModel<CartSkuModel>(sku.Sku);
+                ProductMapper.UpdateModel(result, sku.ProductWithoutSkus);
+                result.Price = sku.Amount;
+                result.Quantity = sku.Quantity;
+                result.SubTotal = sku.Quantity * sku.Amount;
+                return result;
+            }) ?? Enumerable.Empty<CartSkuModel>());
+            cartModel.OrderTotal = order.Total;
+            cartModel.PromoCode = order.Discount?.Code;
+            cartModel.ShippingCost = order.ShippingTotal;
+            cartModel.SubTotal = order.ProductsSubtotal;
+            if (((ShipDelayType?)order.SafeData.ShipDelayType ?? ShipDelayType.None) != ShipDelayType.None)
+            {
+                cartModel.ShipAsap = false;
+                cartModel.ShippingDate = order.SafeData.ShipDelayDate;
+            }
+            else
+            {
+                cartModel.ShipAsap = true;
+                cartModel.ShippingDate = null;
+            }
+            cartModel.ShippingUpgradeP = (ShippingUpgradeOption?)order.SafeData.ShippingUpgradeP;
+            cartModel.ShippingUpgradeNP = (ShippingUpgradeOption?)order.SafeData.ShippingUpgradeNP;
 
-					return new CartGcModel
-					{
-						Value = x,
-						SuccessMessage = message.MessageLevel == MessageLevel.Info ? message.Message : string.Empty,
-						ErrorMessage = message.MessageLevel == MessageLevel.Error ? message.Message : string.Empty
-					};
-				}) ??
-				Enumerable.Empty<CartGcModel>());
-			if (hasEmpty)
-			{
-				cartModel.GiftCertificateCodes.Add(new CartGcModel() { Value = string.Empty });
-			}
-			cartModel.ShippingUpgradeNPOptions = context.ShippingUpgradeNpOptions;
-			cartModel.ShippingUpgradePOptions = context.ShippingUpgradePOptions;
-			cartModel.DiscountTotal = -context.DiscountTotal;
-			cartModel.GiftCertificatesTotal = context.GiftCertificatesSubtotal;
-			cartModel.PromoSkus.Clear();
-			cartModel.PromoSkus.AddRange(context.PromoSkus?.Select(sku =>
-			{
-				var result = SkuMapper.ToModel<CartSkuModel>(sku.Sku);
-				ProductMapper.UpdateModel(result, sku.ProductWithoutSkus);
-				result.Price = sku.Amount;
-				result.Quantity = sku.Quantity;
-				result.SubTotal = sku.Quantity * sku.Amount;
-				return result;
-			}) ?? Enumerable.Empty<CartSkuModel>());
-			cartModel.OrderTotal = order.Total;
-			cartModel.PromoCode = order.Discount?.Code;
-			cartModel.ShippingCost = order.ShippingTotal;
-			cartModel.SubTotal = order.ProductsSubtotal;
-			if (((ShipDelayType?)order.SafeData.ShipDelayType ?? ShipDelayType.None) != ShipDelayType.None)
-			{
-				cartModel.ShipAsap = false;
-				cartModel.ShippingDate = order.SafeData.ShipDelayDate;
-			}
-			else
-			{
-				cartModel.ShipAsap = true;
-			    cartModel.ShippingDate = null;
-			}
-			cartModel.ShippingUpgradeP = (ShippingUpgradeOption?)order.SafeData.ShippingUpgradeP;
-			cartModel.ShippingUpgradeNP = (ShippingUpgradeOption?)order.SafeData.ShippingUpgradeNP;
-
-			if (!cartModel.GiftCertificateCodes.Any())
-			{
-				cartModel.GiftCertificateCodes.Add(new CartGcModel() { Value = string.Empty });
-			}
-		}
+            if (!cartModel.GiftCertificateCodes.Any())
+            {
+                cartModel.GiftCertificateCodes.Add(new CartGcModel() { Value = string.Empty });
+            }
+        }
 	}
 }

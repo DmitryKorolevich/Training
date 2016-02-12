@@ -5,21 +5,20 @@ using Microsoft.Data.Entity.Storage;
 using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Options;
 
-namespace VitalChoice.Ecommerce.UnitOfWork
+namespace VitalChoice.Data.UnitOfWork
 {
-    public abstract class UnitOfWorkBase : IUnitOfWorkAsync
+    public class UnitOfWorkBase : IUnitOfWorkAsync
 	{
 		private readonly IUnitOfWorkAsync _uow;
 
         protected static IOptions<AppOptionsBase> Options;
 
-        protected UnitOfWorkBase(IDataContextAsync context)
+        public UnitOfWorkBase(IDataContextAsync context)
 	    {
-	        _uow = new Data.UnitOfWork.UnitOfWork(context);
+	        _uow = new UnitOfWork(context);
 	    }
 
         public static void SetOptions(IOptions<AppOptionsBase> options)
