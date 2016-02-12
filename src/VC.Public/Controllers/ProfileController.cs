@@ -38,6 +38,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Healthwise;
 using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Checkout;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
 
 namespace VC.Public.Controllers
 {
@@ -50,6 +51,7 @@ namespace VC.Public.Controllers
         private readonly IStorefrontUserService _storefrontUserService;
         private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
         private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _paymentMethodConverter;
+        private readonly IDynamicMapper<OrderDynamic, Order> _orderConverter;
         private readonly IProductService _productService;
         private readonly IOrderService _orderService;
         private readonly IHelpService _helpService;
@@ -57,7 +59,9 @@ namespace VC.Public.Controllers
 
         public ProfileController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
             ICustomerService customerService, IDynamicMapper<AddressDynamic, Address> addressConverter,
-            IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter, IOrderService orderService,
+            IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter,
+            IDynamicMapper<OrderDynamic, Order> orderConverter,
+            IOrderService orderService,
             IProductService productService,
             IHelpService helpService,
             IHealthwiseService healthwiseService, IAppInfrastructureService infrastructureService,
@@ -68,6 +72,7 @@ namespace VC.Public.Controllers
             _addressConverter = addressConverter;
             _paymentMethodConverter = paymentMethodConverter;
             _orderService = orderService;
+            _orderConverter = orderConverter;
             _productService = productService;
             _helpService = helpService;
             _healthwiseService = healthwiseService;
@@ -520,6 +525,24 @@ namespace VC.Public.Controllers
             var model = await PopulateHistoryModel(filter);
 
             return PartialView("_OrderHistoryGrid", model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> OrderInvoice(int id)
+        {
+            var internalId = GetInternalCustomerId();
+            var order = await _orderService.SelectAsync(id, true);
+            if (order != null && order.Customer.Id==internalId)
+            {
+                order.Customer = await CustomerService.SelectAsync(order.Customer.Id, true);
+                var model = _orderConverter.ToModel<OrderViewModel>(order);
+
+                return View(model);
+            }
+            else
+            {
+                return GetItemNotAccessibleResult();
+            }
         }
 
         [HttpGet]

@@ -303,6 +303,7 @@ namespace VC.Admin.Controllers
             var contentCategories =
                 await productCategoryService.GetLiteCategoriesTreeAsync(productCategory, new ProductCategoryLiteFilter
                 {
+                    ShowAll=true,
                     Statuses = filter.Statuses,
                     Paging = filter.Paging,
                     SearchText = filter.SearchText,

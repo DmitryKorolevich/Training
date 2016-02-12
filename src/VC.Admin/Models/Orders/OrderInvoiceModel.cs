@@ -50,9 +50,7 @@ namespace VC.Admin.Models.Orders
 
         [Map]
         public DateTime DateCreated { get; set; }
-
-        public AddressModel Shipping { get; set; }
-
+        
         [Map]
         public int? IdObjectType { get; set; }
 
@@ -265,7 +263,7 @@ namespace VC.Admin.Models.Orders
             }
 
             SkuOrdereds = order.Skus?.Select(item => new SkuOrderedManageModel(item)).ToList() ?? new List<SkuOrderedManageModel>();
-            PromoSkuOrdereds= new List<SkuOrderedManageModel>();//TODO - add reading promos after adding save to DB by Alex g
+            PromoSkuOrdereds= order.PromoSkus?.Select(item => new SkuOrderedManageModel(item)).ToList() ?? new List<SkuOrderedManageModel>();
 
             GCs = order.GiftCertificates?.Select(item => new GCInvoiceEntity() {
                 Amount = item.Amount,
