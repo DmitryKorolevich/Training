@@ -71,7 +71,11 @@
                         </div>
                         <div data-ng-if="!contentPage.Categories || contentPage.Categories.length==0">No Categories</div>
                     </td>
-                    <td>{{contentPage.Status}}</td>
+                    <td>
+                        <span data-ng-if="contentPage.Status == 'Draft'" class="label label-draft font-default ng-binding ng-scope">{{contentPage.Status}}</span>
+                        <span data-ng-if="contentPage.Status == 'Published - All'" class="label label-info font-default ng-binding ng-scope">{{contentPage.Status}}</span> 
+                        <span data-ng-if="contentPage.Status == 'Published - Wholesale Only'" class="label label-wholesale font-default">{{contentPage.Status}}</span>              
+                    </td>
                     <td>{{contentPage.Updated | date:"MM/dd/yy"}}<br />{{contentPage.Updated | date:"h:mm a"}}<br />{{contentPage.AgentId}}</td>
                     <td>
                         <button title="Edit" class="btn btn-default btn-success btn-xs" data-ng-click="open(contentPage.Id);">

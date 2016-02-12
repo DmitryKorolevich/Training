@@ -242,6 +242,9 @@ img.thumb {
 .label-retail {
   background-color: #717171;
 }
+.label-draft {
+  background-color: #717171;
+}
 .label-future {
   background-color: #9a43b0;
 }
@@ -1022,25 +1025,25 @@ th.sortable-column {
   margin-right: 5px;
 }
 .table.order-statuses > tbody > tr .ban {
-  background: red;
+  background: #ea3a3a;
 }
 .table.order-statuses > tbody > tr .exclamation-triangle {
-  background: orange;
+  background: #f88b41;
 }
 .table.order-statuses > tbody > tr .truck {
-  background: green;
+  background: #54ab3a;
 }
 .table.order-statuses > tbody > tr .minus-circle {
-  background: red;
+  background: #ea3a3a;
 }
 .table.order-statuses > tbody > tr .check-circle {
-  background: green;
+  background: #54ab3a;
 }
 .table.order-statuses > tbody > tr .calendar {
-  background: blue;
+  background: #2b8aec;
 }
 .table.order-statuses > tbody > tr .pause {
-  background: blue;
+  background: #2b8aec;
 }
 .orders .table > thead > tr > th.actions {
   min-width: 75px;

@@ -1,4 +1,4 @@
-﻿using VitalChoice.Ecommerce.UnitOfWork;
+﻿using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Infrastructure.Context;
 
 namespace VitalChoice.Infrastructure.UnitOfWork

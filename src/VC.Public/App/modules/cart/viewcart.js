@@ -37,10 +37,28 @@ $(function () {
 			recalculateCart(self);
 		};
 		self.submitCart = function() {
-			$("#viewCartForm").validate();
-
 			recalculateCart(self, function () {
-				window.location.href = $("#viewCartForm").data("url");
+				var url = $("#viewCartForm").attr("action");
+
+				self.refreshing(true);
+
+				$.ajax({
+					url: url,
+					dataType: "json",
+					data: ko.toJSON(self.Model),
+					contentType: "application/json; charset=utf-8",
+					type: "POST"
+				}).success(function (result) {
+					if (result.Success) {
+						window.location.href = result.Data;
+					} else {
+						notifyError(result.Messages[0]);
+					}
+					self.refreshing(false);
+				}).error(function (result) {
+					notifyError();
+					self.refreshing(false);
+				});
 			});
 		};
 

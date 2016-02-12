@@ -97,24 +97,24 @@ namespace VC.Admin.Controllers
         {
             if (!Validate(model))
                 return null;
-            var item = _mapper.FromModel(model);
+            var promotion = _mapper.FromModel(model);
 
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
-                item.IdEditedBy = userId;
+                promotion.IdEditedBy = userId;
             }
-            if (item.Id > 0)
+            if (promotion.Id > 0)
             {
-                item = await _promotionService.UpdateAsync(item);
+                promotion = await _promotionService.UpdateAsync(promotion);
             }
             else
             {
-                item = await _promotionService.InsertAsync(item);
+                promotion = await _promotionService.InsertAsync(promotion);
             }
 
-            return _mapper.ToModel<PromotionManageModel>(item);
+            return _mapper.ToModel<PromotionManageModel>(promotion);
         }
 
         [HttpPost]

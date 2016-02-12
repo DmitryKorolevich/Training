@@ -13,6 +13,7 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Services;
+using VitalChoice.Data.Transaction;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Helpers;
@@ -167,10 +168,10 @@ namespace VitalChoice.Business.Services.Products
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             IOptions<AppOptions> options,
             ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<VCustomerFavorite> vCustomerRepositoryAsync,
-            DirectMapper<Product> directMapper, DynamicExtensionsRewriter queryVisitor, EcommerceContext dbContext)
+            DirectMapper<Product> directMapper, DynamicExtensionsRewriter queryVisitor, ITransactionAccessor<EcommerceContext> transactionAccessor)
             : base(
                 mapper, productRepository, productValueRepositoryAsync,
-                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, dbContext)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
         {
             _vProductSkuRepository = vProductSkuRepository;
             _vSkuRepository = vSkuRepository;
@@ -278,7 +279,7 @@ namespace VitalChoice.Business.Services.Products
             return new SkuOrdered
             {
                 Sku = skuDynamic,
-                ProductWithoutSkus = await Mapper.FromEntityAsync(sku.Product, true),
+                ProductWithoutSkus = await DynamicMapper.FromEntityAsync(sku.Product, true),
             };
         }
 
@@ -298,7 +299,7 @@ namespace VitalChoice.Business.Services.Products
             return new SkuOrdered
             {
                 Sku = await _skuMapper.FromEntityAsync(sku, true),
-                ProductWithoutSkus = await Mapper.FromEntityAsync(sku.Product, true)
+                ProductWithoutSkus = await DynamicMapper.FromEntityAsync(sku.Product, true)
             };
         }
 
@@ -329,7 +330,7 @@ namespace VitalChoice.Business.Services.Products
             return skus.Select(sku => new SkuOrdered
             {
                 Sku = _skuMapper.FromEntity(sku, true),
-                ProductWithoutSkus = Mapper.FromEntity(sku.Product, true)
+                ProductWithoutSkus = DynamicMapper.FromEntity(sku.Product, true)
             }).ToList();
         }
 
@@ -359,7 +360,7 @@ namespace VitalChoice.Business.Services.Products
             return skus.Select(sku => new SkuOrdered
             {
                 Sku = _skuMapper.FromEntity(sku, true),
-                ProductWithoutSkus = Mapper.FromEntity(sku.Product, true)
+                ProductWithoutSkus = DynamicMapper.FromEntity(sku.Product, true)
             }).ToList();
         }
 
@@ -656,8 +657,8 @@ namespace VitalChoice.Business.Services.Products
                 var entity = await InsertAsync(model.ProductDynamic, uow, model.ProductContent);
                 int id = entity.Id;
                 entity = await SelectEntityFirstAsync(o => o.Id == id);
-                await LogItemChanges(new[] { await Mapper.FromEntityAsync(entity) });
-                return await Mapper.FromEntityAsync(entity);
+                await LogItemChanges(new[] { await DynamicMapper.FromEntityAsync(entity) });
+                return await DynamicMapper.FromEntityAsync(entity);
             }
         }
 
@@ -669,8 +670,8 @@ namespace VitalChoice.Business.Services.Products
                 var entity = await UpdateAsync(model.ProductDynamic, uow, model.ProductContent);
                 int id = entity.Id;
                 entity = await SelectEntityFirstAsync(o => o.Id == id);
-                await LogItemChanges(new[] { await Mapper.FromEntityAsync(entity) });
-                return await Mapper.FromEntityAsync(entity);
+                await LogItemChanges(new[] { await DynamicMapper.FromEntityAsync(entity) });
+                return await DynamicMapper.FromEntityAsync(entity);
             }
         }
 
@@ -835,7 +836,7 @@ namespace VitalChoice.Business.Services.Products
 		{
 			var toReturn = new ProductContentTransferEntity
 			{
-				ProductDynamic = await Mapper.FromEntityAsync(
+				ProductDynamic = await DynamicMapper.FromEntityAsync(
 					await
 						SelectEntityFirstAsync(o => o.PublicId == id && o.StatusCode != (int) RecordStatusCode.Deleted), withDefaults)
 			};
@@ -852,7 +853,7 @@ namespace VitalChoice.Business.Services.Products
 
 			var toReturn = new ProductContentTransferEntity
 			{
-				ProductDynamic = productContent != null ? await Mapper.FromEntityAsync(
+				ProductDynamic = productContent != null ? await DynamicMapper.FromEntityAsync(
 					await
 						SelectEntityFirstAsync(o => o.Id == productContent.Id && o.StatusCode != (int)RecordStatusCode.Deleted), withDefaults) : null,
 				ProductContent = productContent

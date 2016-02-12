@@ -14,6 +14,7 @@ using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Domain.Entities.Users;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Permissions;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
@@ -28,12 +29,13 @@ namespace VitalChoice.Business.Services.Users
 {
 	public abstract class UserService : IUserService
 	{
-		private readonly SignInManager<ApplicationUser> signInManager;
+		private readonly SignInManager<ApplicationUser> _signInManager;
 
-		private readonly IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync;
-		private readonly IUserValidator<ApplicationUser> userValidator;
+		private readonly IEcommerceRepositoryAsync<User> _ecommerceRepositoryAsync;
+		private readonly IUserValidator<ApplicationUser> _userValidator;
+	    private readonly ITransactionAccessor<VitalChoiceContext> _transactionAccessor;
 
-		protected IAppInfrastructureService AppInfrastructureService { get; }
+	    protected IAppInfrastructureService AppInfrastructureService { get; }
 
 		protected UserManager<ApplicationUser> UserManager { get; }
 
@@ -45,20 +47,24 @@ namespace VitalChoice.Business.Services.Users
 
 		protected IDataContextAsync Context { get; }
 
-		protected UserService(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, IDataContextAsync context, SignInManager<ApplicationUser> signInManager, IAppInfrastructureService appInfrastructureService, INotificationService notificationService, IOptions<AppOptions> options, IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync, IUserValidator<ApplicationUser> userValidator)
-		{
-			UserManager = userManager;
-			RoleManager = roleManager;
-			Context = context;
-			this.signInManager = signInManager;
-			AppInfrastructureService = appInfrastructureService;
-			NotificationService = notificationService;
-			this.ecommerceRepositoryAsync = ecommerceRepositoryAsync;
-			this.userValidator = userValidator;
-			Options = options.Value;
-		}
+	    protected UserService(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, VitalChoiceContext context,
+	        SignInManager<ApplicationUser> signInManager, IAppInfrastructureService appInfrastructureService,
+	        INotificationService notificationService, IOptions<AppOptions> options, IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync,
+	        IUserValidator<ApplicationUser> userValidator, ITransactionAccessor<VitalChoiceContext> transactionAccessor)
+	    {
+	        UserManager = userManager;
+	        RoleManager = roleManager;
+	        Context = context;
+	        this._signInManager = signInManager;
+	        AppInfrastructureService = appInfrastructureService;
+	        NotificationService = notificationService;
+	        this._ecommerceRepositoryAsync = ecommerceRepositoryAsync;
+	        this._userValidator = userValidator;
+	        _transactionAccessor = transactionAccessor;
+	        Options = options.Value;
+	    }
 
-		protected abstract Task SendActivationInternalAsync(ApplicationUser dbUser);
+	    protected abstract Task SendActivationInternalAsync(ApplicationUser dbUser);
 
 		protected abstract Task SendResetPasswordInternalAsync(ApplicationUser dbUser, string token);
 
@@ -68,7 +74,7 @@ namespace VitalChoice.Business.Services.Users
 
 		protected virtual async Task ValidateUserInternalAsync(ApplicationUser user)
 		{
-			var validateResult = await userValidator.ValidateAsync(UserManager, user);
+			var validateResult = await _userValidator.ValidateAsync(UserManager, user);
 			if (!validateResult.Succeeded)
 			{
 				throw new AppValidationException(AggregateIdentityErrors(validateResult.Errors));
@@ -212,7 +218,7 @@ namespace VitalChoice.Business.Services.Users
 		{
 			await PrepareForAdd(user, roles);
 
-			using (var transaction = new TransactionAccessor(Context).BeginTransaction())
+			using (var transaction = _transactionAccessor.BeginTransaction())
 			{
 				try
 				{
@@ -240,7 +246,7 @@ namespace VitalChoice.Business.Services.Users
 
 						if (createEcommerceUser)
 						{
-							await ecommerceRepositoryAsync.InsertAsync(new User() { Id = user.Id });
+							await _ecommerceRepositoryAsync.InsertAsync(new User() { Id = user.Id });
 
 						}
 
@@ -287,13 +293,18 @@ namespace VitalChoice.Business.Services.Users
 			throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UpdateUserGeneral]);
 		}
 
-		public async Task<ApplicationUser> UpdateAsync(ApplicationUser user, IList<RoleType> roleIds = null, string password = null)
+	    public async Task<IdentityResult> RemoveAsync(int idInternal)
+	    {
+	        return await UserManager.DeleteAsync(await GetAsync(idInternal));
+	    }
+
+	    public async Task<ApplicationUser> UpdateAsync(ApplicationUser user, IList<RoleType> roleIds = null, string password = null)
 		{
 			await ValidateUserInternalAsync(user);
 
 			ValidateRoleAssignments(user, roleIds);
 
-			using (var transaction = new TransactionAccessor(Context).BeginTransaction())
+			using (var transaction = _transactionAccessor.BeginTransaction())
 			{
 				try
 				{
@@ -346,7 +357,7 @@ namespace VitalChoice.Business.Services.Users
 		{
 			await ValidateUserOnSignIn(user.UserName);
 
-			await signInManager.SignInAsync(user, false);
+			await _signInManager.SignInAsync(user, false);
 
 			user.LastLoginDate = DateTime.Now;
 			user = await UpdateAsync(user);
@@ -358,7 +369,7 @@ namespace VitalChoice.Business.Services.Users
 	    {
             await DisabledValidateUserOnSignIn(user.UserName);
 
-            await signInManager.SignInAsync(user, false);
+            await _signInManager.SignInAsync(user, false);
 
             user.LastLoginDate = DateTime.Now;
             user = await UpdateAsync(user);
@@ -370,7 +381,7 @@ namespace VitalChoice.Business.Services.Users
 		{
 			await ValidateUserOnSignIn(login);
 
-			var result = await signInManager.PasswordSignInAsync(login,password, false, true);
+			var result = await _signInManager.PasswordSignInAsync(login,password, false, true);
 			if (!result.Succeeded)
 			{
 				throw new AppValidationException(result.IsLockedOut ? ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserLockedOut] : ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.IncorrectUserPassword]);
@@ -386,7 +397,7 @@ namespace VitalChoice.Business.Services.Users
 
 		public async Task<ApplicationUser> RefreshSignInAsync(ApplicationUser user)
 		{
-			await signInManager.SignInAsync(user, false);
+			await _signInManager.SignInAsync(user, false);
 
 			return user;
 		}
@@ -411,7 +422,7 @@ namespace VitalChoice.Business.Services.Users
 
 		public async Task SignOutAsync(ApplicationUser user)
 		{
-			await signInManager.SignOutAsync();
+			await _signInManager.SignOutAsync();
 		}
 
 		public async Task ResendActivationAsync(Guid id)
@@ -443,7 +454,7 @@ namespace VitalChoice.Business.Services.Users
 
 			ValidateRoleAssignments(user, roleIds);
 
-			using (var transaction = new TransactionAccessor(Context).BeginTransaction())
+			using (var transaction = _transactionAccessor.BeginTransaction())
 			{
 				try
 				{

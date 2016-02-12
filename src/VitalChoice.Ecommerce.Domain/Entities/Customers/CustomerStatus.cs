@@ -2,7 +2,7 @@
 {
     public enum CustomerStatus
     {
-		NotActive = 1,
+		PhoneOnly = 1,
 		Active = 2,
 		Deleted = 3,
 		Suspended = 4,

@@ -19,6 +19,7 @@ using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Data.Services;
+using VitalChoice.Data.Transaction;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.ObjectMapping.Base;
 using VitalChoice.Infrastructure.Context;
@@ -28,7 +29,6 @@ namespace VitalChoice.Business.Services.Settings
     public class CatalogRequestAddressService : ExtendedEcommerceDynamicService<AddressDynamic, CatalogRequestAddress, AddressOptionType, CatalogRequestAddressOptionValue>, 
         ICatalogRequestAddressService
     {
-        private readonly IDynamicMapper<AddressDynamic, CatalogRequestAddress> _catalogRequestAddressMapper;
         private readonly ICountryService _countryService;
         private readonly IEcommerceRepositoryAsync<CatalogRequestAddress> _catalogRequestAddressRepository;
         private readonly ILogger logger;
@@ -42,10 +42,10 @@ namespace VitalChoice.Business.Services.Settings
             DirectMapper<CatalogRequestAddress> directMapper, 
             DynamicExtensionsRewriter queryVisitor,
             IObjectLogItemExternalService objectLogItemExternalService,
-            ILoggerProviderExtended loggerProvider, EcommerceContext dbContext)
+            ILoggerProviderExtended loggerProvider, ITransactionAccessor<EcommerceContext> transactionAccessor)
             : base(
                 mapper, catalogRequestAddressRepository, catalogRequestAddressValueRepository,
-                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, dbContext)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
         {
             _catalogRequestAddressRepository = catalogRequestAddressRepository;
             _countryService = countryService;

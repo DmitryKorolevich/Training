@@ -21,6 +21,7 @@ using System.Globalization;
 using VitalChoice.Business.Queries.Affiliates;
 using VitalChoice.Business.Queries.Customers;
 using VitalChoice.Business.Services.Ecommerce;
+using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
@@ -74,10 +75,11 @@ namespace VitalChoice.Business.Services.Affiliates
             INotificationService notificationService,
             IAffiliateUserService affiliateUserService,
             IOptions<AppOptions> appOptions,
-            ILoggerProviderExtended loggerProvider, DirectMapper<Affiliate> directMapper, DynamicExtensionsRewriter queryVisitor, EcommerceContext dbContext)
+            ILoggerProviderExtended loggerProvider, DirectMapper<Affiliate> directMapper, DynamicExtensionsRewriter queryVisitor, 
+            ITransactionAccessor<EcommerceContext> transactionAccessor)
             : base(
                 mapper, affiliateRepository, affiliateValueRepositoryAsync,
-                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, dbContext)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
         {
             _vAffiliateRepository = vAffiliateRepository;
             _vAffiliateNotPaidCommissionRepository = vAffiliateNotPaidCommissionRepository;
@@ -224,8 +226,8 @@ namespace VitalChoice.Business.Services.Affiliates
                 var entity = await InsertAsync(model, uow, password);
                 int id = entity.Id;
                 entity = await SelectEntityFirstAsync(o => o.Id == id);
-                await LogItemChanges(new[] { await Mapper.FromEntityAsync(entity) });
-                return await Mapper.FromEntityAsync(entity);
+                await LogItemChanges(new[] { await DynamicMapper.FromEntityAsync(entity) });
+                return await DynamicMapper.FromEntityAsync(entity);
             }
         }
 
@@ -237,8 +239,8 @@ namespace VitalChoice.Business.Services.Affiliates
                 var entity = await UpdateAsync(model, uow, password);
                 int id = entity.Id;
                 entity = await SelectEntityFirstAsync(o => o.Id == id);
-                await LogItemChanges(new[] { await Mapper.FromEntityAsync(entity) });
-                return await Mapper.FromEntityAsync(entity);
+                await LogItemChanges(new[] { await DynamicMapper.FromEntityAsync(entity) });
+                return await DynamicMapper.FromEntityAsync(entity);
             }
         }
 

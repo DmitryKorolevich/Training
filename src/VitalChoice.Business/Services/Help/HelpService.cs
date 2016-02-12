@@ -47,6 +47,8 @@ namespace VitalChoice.Business.Services.HelpService
         private static string _bugTicketFilesContainerName;
         private static string _bugTicketCommentFilesContainerName;
         private readonly ILogger _logger;
+        private readonly ITransactionAccessor<EcommerceContext> _ecommerceTransactionAccessor;
+        private readonly ITransactionAccessor<VitalChoiceContext> _infrastructureTransactionAccessor;
 
         public HelpService(IEcommerceRepositoryAsync<HelpTicket> helpTicketRepository,
             IEcommerceRepositoryAsync<HelpTicketComment> helpTicketCommentRepository,
@@ -62,7 +64,8 @@ namespace VitalChoice.Business.Services.HelpService
             INotificationService notificationService,
             IBlobStorageClient storageClient,
             IOptions<AppOptions> appOptions,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerProviderExtended loggerProvider, ITransactionAccessor<EcommerceContext> ecommerceTransactionAccessor,
+            ITransactionAccessor<VitalChoiceContext> infrastructureTransactionAccessor)
         {
             _helpTicketRepository = helpTicketRepository;
             _helpTicketCommentRepository = helpTicketCommentRepository;
@@ -77,6 +80,8 @@ namespace VitalChoice.Business.Services.HelpService
             _customerService = customerService;
             _notificationService = notificationService;
             _storageClient = storageClient;
+            _ecommerceTransactionAccessor = ecommerceTransactionAccessor;
+            _infrastructureTransactionAccessor = infrastructureTransactionAccessor;
             _bugTicketFilesContainerName = appOptions.Value.AzureStorage.BugTicketFilesContainerName;
             _bugTicketCommentFilesContainerName = appOptions.Value.AzureStorage.BugTicketCommentFilesContainerName;
             _logger = loggerProvider.CreateLoggerDefault();
@@ -208,7 +213,7 @@ namespace VitalChoice.Business.Services.HelpService
 
         public async Task<HelpTicket> UpdateHelpTicketAsync(HelpTicket item, int? adminId)
         {
-            using (var transaction = new TransactionAccessor(_context).BeginTransaction())
+            using (var transaction = _ecommerceTransactionAccessor.BeginTransaction())
             {
                 try
                 {
@@ -281,7 +286,7 @@ namespace VitalChoice.Business.Services.HelpService
         {
             item.StatusCode = RecordStatusCode.Active;
 
-            using (var transaction = new TransactionAccessor(_context).BeginTransaction())
+            using (var transaction = _ecommerceTransactionAccessor.BeginTransaction())
             {
                 try
                 {
@@ -534,7 +539,7 @@ namespace VitalChoice.Business.Services.HelpService
 
         public async Task<BugTicket> UpdateBugTicketAsync(BugTicket item, int adminId, bool? isSuperAdmin = null)
         {
-            using (var transaction = new TransactionAccessor(_infrastructureContext).BeginTransaction())
+            using (var transaction = _infrastructureTransactionAccessor.BeginTransaction())
             {
                 try
                 {
@@ -635,7 +640,7 @@ namespace VitalChoice.Business.Services.HelpService
             item.StatusCode = RecordStatusCode.Active;
             BugTicket bugTicket = null;
 
-            using (var transaction = new TransactionAccessor(_infrastructureContext).BeginTransaction())
+            using (var transaction = _infrastructureTransactionAccessor.BeginTransaction())
             {
                 try
                 {

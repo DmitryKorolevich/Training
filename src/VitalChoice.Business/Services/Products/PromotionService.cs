@@ -13,6 +13,7 @@ using VitalChoice.DynamicData.Base;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Data.Services;
+using VitalChoice.Data.Transaction;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
@@ -45,9 +46,9 @@ namespace VitalChoice.Business.Services.Products
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, PromotionMapper mapper,
             IObjectLogItemExternalService objectLogItemExternalService,
-            ILoggerProviderExtended loggerProvider, DirectMapper<Promotion> directMapper, DynamicExtensionsRewriter queryVisitor, EcommerceContext dbContext)
+            ILoggerProviderExtended loggerProvider, DirectMapper<Promotion> directMapper, DynamicExtensionsRewriter queryVisitor, ITransactionAccessor<EcommerceContext> transactionAccessor)
             : base(mapper, promotionRepository, promotionOptionValueRepository, bigStringRepositoryAsync, objectLogItemExternalService,
-                loggerProvider, directMapper, queryVisitor, dbContext)
+                loggerProvider, directMapper, queryVisitor, transactionAccessor)
         {
             _promotionRepository = promotionRepository;
             _skuRepository = skuRepository;

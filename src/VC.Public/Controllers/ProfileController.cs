@@ -38,6 +38,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Healthwise;
 using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Checkout;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
 
 namespace VC.Public.Controllers
 {
@@ -50,6 +51,7 @@ namespace VC.Public.Controllers
         private readonly IStorefrontUserService _storefrontUserService;
         private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
         private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _paymentMethodConverter;
+        private readonly IDynamicMapper<OrderDynamic, Order> _orderConverter;
         private readonly IProductService _productService;
         private readonly IOrderService _orderService;
         private readonly IHelpService _helpService;
@@ -57,17 +59,20 @@ namespace VC.Public.Controllers
 
         public ProfileController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
             ICustomerService customerService, IDynamicMapper<AddressDynamic, Address> addressConverter,
-            IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter, IOrderService orderService,
+            IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter,
+            IDynamicMapper<OrderDynamic, Order> orderConverter,
+            IOrderService orderService,
             IProductService productService,
             IHelpService helpService,
             IHealthwiseService healthwiseService, IAppInfrastructureService infrastructureService,
-            IAuthorizationService authorizationService)
-            : base(contextAccessor, customerService, infrastructureService, authorizationService)
+            IAuthorizationService authorizationService, ICheckoutService checkoutService)
+            : base(contextAccessor, customerService, infrastructureService, authorizationService, checkoutService)
         {
             _storefrontUserService = storefrontUserService;
             _addressConverter = addressConverter;
             _paymentMethodConverter = paymentMethodConverter;
             _orderService = orderService;
+            _orderConverter = orderConverter;
             _productService = productService;
             _helpService = helpService;
             _healthwiseService = healthwiseService;
@@ -223,8 +228,7 @@ namespace VC.Public.Controllers
 
             var oldEmail = customer.Email;
 
-            var newProfileAddress = _addressConverter.FromModel(model);
-            newProfileAddress.IdObjectType = (int) AddressType.Profile;
+            var newProfileAddress = await _addressConverter.FromModelAsync(model, (int)AddressType.Profile);
             customer.ProfileAddress = newProfileAddress;
             customer.Email =
                 newProfileAddress.Data.Email =
@@ -281,12 +285,10 @@ namespace VC.Public.Controllers
                 currentCustomer.CustomerPaymentMethods.Remove(creditCardToUpdate);
             }
 
-            var customerPaymentMethod = _paymentMethodConverter.FromModel(model);
-            customerPaymentMethod.IdObjectType = (int) PaymentMethodType.CreditCard;
+            var customerPaymentMethod = await _paymentMethodConverter.FromModelAsync(model, (int)PaymentMethodType.CreditCard);
             customerPaymentMethod.Data.SecurityCode = model.SecurityCode;
 
-            customerPaymentMethod.Address = _addressConverter.FromModel(model);
-            customerPaymentMethod.Address.IdObjectType = (int) AddressType.Billing;
+            customerPaymentMethod.Address = await _addressConverter.FromModelAsync(model, (int)AddressType.Billing);
 
             currentCustomer.CustomerPaymentMethods.Add(customerPaymentMethod);
             try
@@ -372,8 +374,7 @@ namespace VC.Public.Controllers
                 }
             }
 
-            var newAddress = _addressConverter.FromModel(model);
-            newAddress.IdObjectType = (int) AddressType.Shipping;
+            var newAddress = await _addressConverter.FromModelAsync(model, (int)AddressType.Shipping);
 
             currentCustomer.ShippingAddresses.Add(newAddress);
 
@@ -524,6 +525,24 @@ namespace VC.Public.Controllers
             var model = await PopulateHistoryModel(filter);
 
             return PartialView("_OrderHistoryGrid", model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> OrderInvoice(int id)
+        {
+            var internalId = GetInternalCustomerId();
+            var order = await _orderService.SelectAsync(id, true);
+            if (order != null && order.Customer.Id==internalId)
+            {
+                order.Customer = await CustomerService.SelectAsync(order.Customer.Id, true);
+                var model = _orderConverter.ToModel<OrderViewModel>(order);
+
+                return View(model);
+            }
+            else
+            {
+                return GetItemNotAccessibleResult();
+            }
         }
 
         [HttpGet]

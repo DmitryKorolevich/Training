@@ -18,15 +18,7 @@ namespace VitalChoice.Business.Services.Ecommerce
             _extendedReadService = extendedService;
         }
 
-        public Task<TDynamic> CreatePrototypeAsync(int idObjectType)
-        {
-            return _extendedReadService.CreatePrototypeAsync(idObjectType);
-        }
-
-        public Task<TModel> CreatePrototypeForAsync<TModel>(int idObjectType) where TModel : class, new()
-        {
-            return _extendedReadService.CreatePrototypeForAsync<TModel>(idObjectType);
-        }
+        public IDynamicMapper<TDynamic, TEntity> Mapper => _extendedReadService.Mapper;
 
         public Task<TDynamic> SelectAsync(int id, bool withDefaults = false)
         {
@@ -46,16 +38,6 @@ namespace VitalChoice.Business.Services.Ecommerce
         public List<TDynamic> Select(ICollection<int> ids, bool withDefaults = false)
         {
             return _extendedReadService.Select(ids, withDefaults);
-        }
-
-        public TDynamic CreatePrototype(int idObjectType)
-        {
-            return _extendedReadService.CreatePrototype(idObjectType);
-        }
-
-        public TModel CreatePrototypeFor<TModel>(int idObjectType) where TModel : class, new()
-        {
-            return _extendedReadService.CreatePrototypeFor<TModel>(idObjectType);
         }
     }
 }

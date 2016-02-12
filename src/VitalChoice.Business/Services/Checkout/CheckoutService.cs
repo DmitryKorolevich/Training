@@ -49,15 +49,18 @@ namespace VitalChoice.Business.Services.Checkout
         private readonly IDynamicReadServiceAsync<AddressDynamic, OrderAddress> _addressService;
         private readonly ICountryService _countryService;
         private readonly IEcommerceRepositoryAsync<OrderToSku> _orderToSkuRepository;
+        private readonly IEcommerceRepositoryAsync<OrderToPromo> _promoOrderedRepository;
         private readonly IRepositoryAsync<ProductContent> _productContentRep;
         private readonly ILogger _logger;
 
         public CheckoutService(IEcommerceRepositoryAsync<CartExtended> cartRepository,
             DiscountMapper discountMapper,
             SkuMapper skuMapper, ProductMapper productMapper, IOrderService orderService, EcommerceContext context,
-            ILoggerProviderExtended loggerProvider, ICustomerService customerService, IEcommerceRepositoryAsync<CartToSku> cartToSkusRepository,
+            ILoggerProviderExtended loggerProvider, ICustomerService customerService,
+            IEcommerceRepositoryAsync<CartToSku> cartToSkusRepository,
             IDynamicReadServiceAsync<AddressDynamic, OrderAddress> addressService, ICountryService countryService,
-            IEcommerceRepositoryAsync<OrderToSku> orderToSkuRepository, IRepositoryAsync<ProductContent> productContentRep, IEcommerceRepositoryAsync<Sku> skuRepository)
+            IEcommerceRepositoryAsync<OrderToSku> orderToSkuRepository, IRepositoryAsync<ProductContent> productContentRep,
+            IEcommerceRepositoryAsync<Sku> skuRepository, IEcommerceRepositoryAsync<OrderToPromo> promoOrderedRepository)
         {
             _cartRepository = cartRepository;
             _discountMapper = discountMapper;
@@ -72,6 +75,7 @@ namespace VitalChoice.Business.Services.Checkout
             _orderToSkuRepository = orderToSkuRepository;
             _productContentRep = productContentRep;
             _skuRepository = skuRepository;
+            _promoOrderedRepository = promoOrderedRepository;
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -101,7 +105,8 @@ namespace VitalChoice.Business.Services.Checkout
             {
                 cart = await CreateNew();
             }
-            var newOrder = await _orderService.CreatePrototypeAsync((int) OrderType.Normal);
+            var newOrder = await _orderService.Mapper.CreatePrototypeAsync((int) OrderType.Normal);
+            newOrder.Data.OrderType = (int) SourceOrderType.Web;
             if (newOrder.Customer != null)
             {
                 newOrder.Customer.IdObjectType = (int) CustomerType.Retail;
@@ -131,7 +136,7 @@ namespace VitalChoice.Business.Services.Checkout
                     Quantity = s.Quantity
                 };
             }).ToList() ?? new List<SkuOrdered>();
-            newOrder.ShippingAddress = await _addressService.CreatePrototypeAsync((int) AddressType.Shipping);
+            newOrder.ShippingAddress = await _addressService.Mapper.CreatePrototypeAsync((int) AddressType.Shipping);
             newOrder.ShippingAddress.IdCountry = (await _countryService.GetCountriesAsync(new CountryFilter
             {
                 CountryCode = "US"
@@ -278,6 +283,8 @@ namespace VitalChoice.Business.Services.Checkout
                         {
                             cartOrder.Order = await _orderService.UpdateAsync(cartOrder.Order);
                         }
+                        cart.IdCustomer = cartOrder.Order?.Customer?.Id;
+                        cart.IdOrder = cartOrder.Order?.Id;
                         cart.IdDiscount = null;
                         cart.GiftCertificates.Clear();
                         cart.Skus.Clear();
@@ -308,6 +315,62 @@ namespace VitalChoice.Business.Services.Checkout
                             : null;
                         cart.ShippingUpgradeP = cartOrder.Order.SafeData.ShippingUpgradeP;
                         cart.ShippingUpgradeNP = cartOrder.Order.SafeData.ShippingUpgradeNP;
+                        cart.IdCustomer = null;
+                        cart.IdOrder = null;
+                    }
+                    await _context.SaveChangesAsync();
+                    transaction.Commit();
+                }
+                catch (AppValidationException)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e.Message, e);
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+            return true;
+        }
+
+        public async Task<bool> SaveOrder(CustomerCartOrder cartOrder)
+        {
+            if (cartOrder?.Order == null)
+                return false;
+
+            cartOrder.Order.OrderStatus = OrderStatus.Processed;
+            cartOrder.Order = (await _orderService.CalculateOrder(cartOrder.Order, OrderStatus.Processed)).Order;
+            using (var transaction = _context.BeginTransaction())
+            {
+                try
+                {
+                    var cart =
+                        await
+                            _cartRepository.Query(c => c.CartUid == cartOrder.CartUid)
+                                .Include(c => c.GiftCertificates)
+                                .Include(c => c.Skus)
+                                .SelectFirstOrDefaultAsync();
+
+                    if (cart == null)
+                        return false;
+                    if (cartOrder.Order.Customer?.Id != 0)
+                    {
+                        if (cartOrder.Order.Id == 0)
+                        {
+                            throw new ApiException("Order haven't been created during checkout session.");
+                        }
+                        cartOrder.Order = await _orderService.UpdateAsync(cartOrder.Order);
+                        cart.IdCustomer = cartOrder.Order?.Customer?.Id;
+                        cart.IdOrder = null;
+                        cart.IdDiscount = null;
+                        cart.GiftCertificates.Clear();
+                        cart.Skus.Clear();
+                        cart.ShipDelayDate = null;
+                        cart.ShippingUpgradeNP = null;
+                        cart.ShippingUpgradeP = null;
                     }
                     await _context.SaveChangesAsync();
                     transaction.Commit();
@@ -329,7 +392,7 @@ namespace VitalChoice.Business.Services.Checkout
 
         public Task<OrderDataContext> CalculateCart(CustomerCartOrder cartOrder)
         {
-            return _orderService.CalculateOrder(cartOrder.Order);
+            return _orderService.CalculateOrder(cartOrder.Order, OrderStatus.Processed);
         }
 
         public async Task<int> GetCartItemsCount(Guid uid)
@@ -342,7 +405,8 @@ namespace VitalChoice.Business.Services.Checkout
                 if (cart.IdOrder != null)
                 {
                     var skusOrdered = await _orderToSkuRepository.Query(s => s.IdOrder == cart.IdOrder.Value).SelectAsync(false);
-                    return skusOrdered.Sum(s => s.Quantity);
+                    var promoOrdered = await _promoOrderedRepository.Query(s => s.IdOrder == cart.IdOrder.Value).SelectAsync(false);
+                    return skusOrdered.Sum(s => s.Quantity) + promoOrdered.Sum(p => p.Quantity);
                 }
                 var skus = await _cartToSkusRepository.Query(s => s.IdCart == cart.Id).SelectAsync(false);
                 return skus.Sum(s => s.Quantity);

@@ -24,15 +24,18 @@ namespace VitalChoice.Business.Queries.Product
             return this;
         }
 
-		public ProductCategoryContentQuery WithVisibility(IList<CustomerTypeCode> codes)
+		public ProductCategoryContentQuery WithVisibility(IList<CustomerTypeCode> codes, bool showAll=false)
 		{
-            if (codes != null)
+            if (!showAll)
             {
-                Add(x => x.NavIdVisible.HasValue && codes.Contains(x.NavIdVisible.Value));
-            }
-            else
-            {
-                Add(x => x.NavIdVisible.HasValue);
+                if (codes != null)
+                {
+                    Add(x => x.NavIdVisible.HasValue && codes.Contains(x.NavIdVisible.Value));
+                }
+                else
+                {
+                    Add(x => x.NavIdVisible.HasValue);
+                }
             }
 
 			return this;

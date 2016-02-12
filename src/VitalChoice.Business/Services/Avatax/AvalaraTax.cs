@@ -235,7 +235,7 @@ namespace VitalChoice.Business.Services.Avatax
                     DestinationCode = "02",
                     OriginCode = "01",
                     Discounted = order.DiscountTotal > 0,
-                    TaxCode = p.ProductWithoutSkus.Data.TaxCode,
+                    TaxCode = p.ProductWithoutSkus.SafeData.TaxCode,
                     Qty = p.Quantity,
                     ItemCode = p.Sku.Code,
                     LineNo = (startNumber++).ToString(CultureInfo.InvariantCulture),

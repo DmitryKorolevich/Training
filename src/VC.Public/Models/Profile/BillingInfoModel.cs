@@ -25,12 +25,14 @@ namespace VC.Public.Models.Profile
 
 		[Required]
 		[Display(Name = "Month")]
+        [Range(1, 12)]
 		[Map]
 		public int? ExpirationDateMonth { get; set; }
 
 		[Required]
 		[Display(Name = "Year")]
-		[Map]
+        [Range(1, 99)]
+        [Map]
         public int? ExpirationDateYear { get; set; }
 
 		[Required]

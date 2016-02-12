@@ -19,11 +19,6 @@ namespace VitalChoice.Business.Services.Ecommerce
             _extendedService = extendedService;
         }
 
-        public IRelationalTransaction BeginTransaction()
-        {
-            return _extendedService.BeginTransaction();
-        }
-
         public Task<TDynamic> InsertAsync(TDynamic model)
         {
             return _extendedService.InsertAsync(model);

@@ -24,13 +24,11 @@ namespace VC.Public.ModelConverters.Customer
 
 	    public override void ModelToDynamic(RegisterAccountModel model, CustomerDynamic dynamic)
 	    {
-			var profileAddress = _addressMapper.FromModel(model);
+			var profileAddress = _addressMapper.FromModel(model, (int)AddressType.Profile);
 				
-			profileAddress.IdObjectType = (int)AddressType.Profile;
 			dynamic.ProfileAddress = profileAddress;
 
-		    var shippingAddress = _addressMapper.FromModel(model);
-            shippingAddress.IdObjectType = (int)AddressType.Shipping;
+		    var shippingAddress = _addressMapper.FromModel(model, (int)AddressType.Shipping);
 		    shippingAddress.Data.Default = true;
 			dynamic.ShippingAddresses.Add(shippingAddress);
 

@@ -31,6 +31,7 @@ namespace VitalChoice.Ecommerce.Domain.Dynamic
 
         [DataMember]
         public int Id { get; set; }
+
         [DataMember]
         public int StatusCode { get; set; }
         [DataMember]
@@ -41,6 +42,7 @@ namespace VitalChoice.Ecommerce.Domain.Dynamic
         public int? IdEditedBy { get; set; }
 
         public Type ModelType { get; set; }
+
         [DataMember]
         public virtual int IdObjectType { get; set; }
 
@@ -74,7 +76,7 @@ namespace VitalChoice.Ecommerce.Domain.Dynamic
             {
                 if (result is T)
                     return (T) result;
-                throw new ApiException($"Value type of {name} is <{result.GetType()}> but trying to cast to <{typeof (T)}>");
+                throw new ApiException($"Value type of {name} is <{result.GetType()}> cannot be cast to <{typeof (T)}>");
             }
             throw new ApiException($"Value {name} not found in <{GetType()}>");
         }

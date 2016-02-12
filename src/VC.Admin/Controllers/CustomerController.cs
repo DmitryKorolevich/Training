@@ -123,9 +123,9 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public async Task<Result<AddUpdateCustomerModel>> CreateCustomerPrototype([FromBody] object temp)
+        public async Task<Result<AddUpdateCustomerModel>> CreateCustomerPrototype()
         {
-            var model = await _customerService.CreatePrototypeForAsync<AddUpdateCustomerModel>((int)CustomerType.Retail);
+            var model = await _customerService.Mapper.CreatePrototypeForAsync<AddUpdateCustomerModel>((int)CustomerType.Retail);
             model.PublicId = Guid.NewGuid();
             model.TaxExempt = TaxExempt.YesCurrentCertificate;
             model.Tier = Tier.Tier1;
@@ -135,7 +135,7 @@ namespace VC.Admin.Controllers
             model.ProfileAddress = new AddressModel();
             model.ProfileAddress.Country = new CountryListItemModel(_defaultCountry);
             model.Shipping = new List<AddressModel>() { new AddressModel() { AddressType = AddressType.Shipping, Country = new CountryListItemModel(_defaultCountry) } };
-            model.StatusCode = (int)CustomerStatus.NotActive;
+            model.StatusCode = (int)CustomerStatus.PhoneOnly;
 
 	        var defaultPaymentMethodId = (await _paymentMethodService.GetStorefrontDefaultPaymentMethod()).Id;
 
@@ -146,7 +146,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public Result<CreditCardModel> CreateCreditCardPrototype([FromBody] object model)
+        public Result<CreditCardModel> CreateCreditCardPrototype()
         {
             return new CreditCardModel
             {
@@ -157,7 +157,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public Result<OacPaymentModel> CreateOacPrototype([FromBody] object model)
+        public Result<OacPaymentModel> CreateOacPrototype()
         {
             return new OacPaymentModel
             {
@@ -169,7 +169,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public Result<CheckPaymentModel> CreateCheckPrototype([FromBody] object model)
+        public Result<CheckPaymentModel> CreateCheckPrototype()
         {
             return new CheckPaymentModel
             {
@@ -179,9 +179,9 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public Result<CheckPaymentModel> CreateWireTransferPrototype([FromBody] object model)
+        public Result<WireTransferPaymentModel> CreateWireTransferPrototype()
         {
-            return new CheckPaymentModel
+            return new WireTransferPaymentModel
             {
                 Address = new AddressModel { AddressType = AddressType.Billing, Country = new CountryListItemModel(_defaultCountry) }
             };
@@ -189,9 +189,9 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public Result<CheckPaymentModel> CreateMarketingPrototype([FromBody] object model)
+        public Result<MarketingPaymentModel> CreateMarketingPrototype()
         {
-            return new CheckPaymentModel
+            return new MarketingPaymentModel
             {
                 Address = new AddressModel { AddressType = AddressType.Billing, Country = new CountryListItemModel(_defaultCountry) }
             };
@@ -199,9 +199,9 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public Result<CheckPaymentModel> CreateVCWellnessPrototype([FromBody] object model)
+        public Result<VCWellnessEmployeeProgramPaymentModel> CreateVCWellnessPrototype()
         {
-            return new CheckPaymentModel
+            return new VCWellnessEmployeeProgramPaymentModel
             {
                 Address = new AddressModel { AddressType = AddressType.Billing, Country = new CountryListItemModel(_defaultCountry) }
             };
@@ -209,14 +209,14 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public Result<AddressModel> CreateAddressPrototype([FromBody] object model)
+        public Result<AddressModel> CreateAddressPrototype()
         {
             return new AddressModel() {AddressType = AddressType.Shipping, Country = new CountryListItemModel(_defaultCountry)};
         }
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public async Task<Result<CustomerNoteModel>> CreateCustomerNotePrototype([FromBody] object model)
+        public async Task<Result<CustomerNoteModel>> CreateCustomerNotePrototype()
         {
             var toReturn = new CustomerNoteModel()
             {
@@ -263,7 +263,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public async Task<Result<bool>> DeleteNote(int idNote, [FromBody] object model)
+        public async Task<Result<bool>> DeleteNote(int idNote)
         {
             if (idNote > 0)
                 return await _notesService.DeleteAsync(idNote, true);
@@ -304,38 +304,38 @@ namespace VC.Admin.Controllers
         {
             if (!Validate(addUpdateCustomerModel))
                 return null;
-            var item = _customerMapper.FromModel(addUpdateCustomerModel);
+            var customer = await _customerMapper.FromModelAsync(addUpdateCustomerModel, (int) CustomerType.Retail);
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
             if (int.TryParse(sUserId, out userId))
             {
-                item.IdEditedBy = userId;
-                foreach (var address in item.ShippingAddresses)
+                customer.IdEditedBy = userId;
+                foreach (var address in customer.ShippingAddresses)
                 {
                     address.IdEditedBy = userId;
                 }
-                item.ProfileAddress.IdEditedBy = userId;
+                customer.ProfileAddress.IdEditedBy = userId;
             }
-            item.IdEditedBy = userId;
-            if (item.Id > 0)
+            customer.IdEditedBy = userId;
+            if (customer.Id > 0)
             {
-                item = await _customerService.UpdateAsync(item);
+                customer = await _customerService.UpdateAsync(customer);
             }
             else
             {
-                item = await _customerService.InsertAsync(item);
+                customer = await _customerService.InsertAsync(customer);
 
-                if (item.StatusCode != (int)CustomerStatus.Suspended && !String.IsNullOrEmpty(item.Email))
+                if (customer.StatusCode != (int)CustomerStatus.Suspended && !String.IsNullOrEmpty(customer.Email))
                 {
-                    await _storefrontUserService.SendActivationAsync(item.Email);
+                    await _storefrontUserService.SendActivationAsync(customer.Email);
                 }
             }
-            var toReturn = _customerMapper.ToModel<AddUpdateCustomerModel>(item);
+            var toReturn = _customerMapper.ToModel<AddUpdateCustomerModel>(customer);
 
 			toReturn.IsConfirmed = addUpdateCustomerModel.IsConfirmed;
 			toReturn.PublicUserId = addUpdateCustomerModel.PublicUserId;
 
-            await PrepareCustomerNotes(item, toReturn);
+            await PrepareCustomerNotes(customer, toReturn);
 
             return toReturn;
         }

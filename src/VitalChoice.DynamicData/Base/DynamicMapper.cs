@@ -645,5 +645,65 @@ namespace VitalChoice.DynamicData.Base
                     new DynamicEntityPair<TDynamic, TEntity>(dynamic, entity)
                 });
         }
+
+        public virtual TDynamic FromModel<TModel>(TModel model, int idObjectType)
+        {
+            var result = CreatePrototype(idObjectType);
+            UpdateObject(model, result);
+            return result;
+        }
+
+        public virtual void UpdateObject<TModel>(TModel model, TDynamic obj, int idObjectType)
+            where TModel : class, new()
+        {
+            var defaultModel = CreatePrototypeFor<TModel>(idObjectType);
+            if (obj != null)
+                obj.IdObjectType = idObjectType;
+
+            UpdateObject(defaultModel, obj);           
+            UpdateObject(model, obj);
+        }
+
+        public virtual async Task<TDynamic> FromModelAsync<TModel>(TModel model, int idObjectType)
+        {
+            var result = await CreatePrototypeAsync(idObjectType);
+            UpdateObject(model, result);
+            return result;
+        }
+
+        public virtual async Task UpdateObjectAsync<TModel>(TModel model, TDynamic obj, int idObjectType)
+            where TModel : class, new()
+        {
+            var defaultModel = await CreatePrototypeForAsync<TModel>(idObjectType);
+            if (obj != null)
+                obj.IdObjectType = idObjectType;
+
+            UpdateObject(defaultModel, obj);
+            UpdateObject(model, obj);
+        }
+
+        public TDynamic CreatePrototype(int idObjectType)
+        {
+            return CreatePrototypeAsync(idObjectType).Result;
+        }
+
+        public TModel CreatePrototypeFor<TModel>(int idObjectType)
+            where TModel : class, new()
+        {
+            return CreatePrototypeForAsync<TModel>(idObjectType).Result;
+        }
+
+        public virtual async Task<TDynamic> CreatePrototypeAsync(int idObjectType)
+        {
+            var optionTypes = OptionTypes.Where(GetOptionTypeQuery().WithObjectType(idObjectType).Query().CacheCompile()).ToList();
+            var entity = new TEntity {OptionTypes = optionTypes, IdObjectType = idObjectType, OptionValues = new List<TOptionValue>()};
+            return await FromEntityAsync(entity, true);
+        }
+
+        public virtual async Task<TModel> CreatePrototypeForAsync<TModel>(int idObjectType)
+            where TModel : class, new()
+        {
+            return ToModel<TModel>(await CreatePrototypeAsync(idObjectType));
+        }
     }
 }

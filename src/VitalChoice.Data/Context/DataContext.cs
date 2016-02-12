@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace VitalChoice.Data.Context
 {
     public abstract class DataContext : DbContext, IDataContextAsync
     {
-        private InnerEmbeddingTransaction _transaction;
+        private IInnerEmbeddingTransaction _transaction;
 
         protected DataContext()
         {
@@ -23,13 +24,14 @@ namespace VitalChoice.Data.Context
             InstanceId = Guid.NewGuid();
         }
 
-        public Guid InstanceId { get; }
+	    
+	    public Guid InstanceId { get; }
 
-        public IRelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted)
-        {
-            if (_transaction == null || _transaction.Closed)
-            {
-                _transaction = new InnerEmbeddingTransaction(Database.BeginTransaction(isolation));
+	    public IInnerEmbeddingTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted)
+	    {
+	        if (_transaction == null || _transaction.Closed)
+	        {
+                _transaction = new InnerEmbeddingTransaction(Database.BeginTransaction(isolation), this);
                 _transaction.TransactionCommit += OnTransactionCommit;
             }
             _transaction.IncReference();
@@ -38,7 +40,17 @@ namespace VitalChoice.Data.Context
 
         public bool InTransaction => _transaction != null && !_transaction.Closed;
 
-        public event Action TransactionCommit;
+        public override void Dispose()
+        {
+            if (_transaction == null || _transaction.Closed)
+                base.Dispose();
+        }
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+		{
+			var changesAsync = await base.SaveChangesAsync(cancellationToken);
+			return changesAsync;
+		}
 
         public override int SaveChanges()
         {

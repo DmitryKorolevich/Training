@@ -11,6 +11,11 @@
 @purple-color: #9a43b0;
 @grey-color:#717171;
 
+@green-color: #54ab3a;
+@orange-color: #f88b41;
+@blue-color: #2b8aec;
+@red-color: #ea3a3a;
+
 body{
 	min-width: 1100px;
 }
@@ -281,6 +286,10 @@ img.thumb {
 }
 
 .label-retail {
+  background-color: @grey-color;
+}
+
+.label-draft {
   background-color: @grey-color;
 }
 
@@ -1127,13 +1136,13 @@ th.sortable-column {
 }
 
 .table.order-statuses > tbody > tr > td > i { margin-right: 5px;}
-.table.order-statuses > tbody > tr .ban { background: red;}
-.table.order-statuses > tbody > tr .exclamation-triangle { background: orange;}
-.table.order-statuses > tbody > tr .truck { background: green;}
-.table.order-statuses > tbody > tr .minus-circle{ background:red;}
-.table.order-statuses > tbody > tr .check-circle{ background:green;}
-.table.order-statuses > tbody > tr .calendar{ background:blue;}
-.table.order-statuses > tbody > tr .pause{ background:blue;}
+.table.order-statuses > tbody > tr .ban { background: @red-color;}
+.table.order-statuses > tbody > tr .exclamation-triangle { background: @orange-color;}
+.table.order-statuses > tbody > tr .truck { background: @green-color;}
+.table.order-statuses > tbody > tr .minus-circle{ background:@red-color;}
+.table.order-statuses > tbody > tr .check-circle{ background:@green-color;}
+.table.order-statuses > tbody > tr .calendar{ background:@blue-color;}
+.table.order-statuses > tbody > tr .pause{ background:@blue-color;}
 
 .orders .table > thead > tr > th.actions { min-width: 75px;}
 

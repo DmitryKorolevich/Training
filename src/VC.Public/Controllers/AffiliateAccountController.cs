@@ -255,16 +255,16 @@ namespace VC.Public.Controllers
                     return RedirectToAction("Login", new { alreadyTakenEmail = model.Email });
                 }
 
-                var item = _affiliateMapper.FromModel(model);
+                //BUG: affiliate type 1?! WTF?
+                var affiliate = await _affiliateMapper.FromModelAsync(model, 1);
 
-                item.IdObjectType = 1;
-                item.StatusCode = (int)AffiliateStatus.Pending;
-                item.CommissionAll = AffiliateConstants.DefaultCommissionAll;
-                item.CommissionFirst = AffiliateConstants.DefaultCommissionFirst;
-                item.Data.Tier = AffiliateConstants.DefaultTier;
+                affiliate.StatusCode = (int)AffiliateStatus.Pending;
+                affiliate.CommissionAll = AffiliateConstants.DefaultCommissionAll;
+                affiliate.CommissionFirst = AffiliateConstants.DefaultCommissionFirst;
+                affiliate.Data.Tier = AffiliateConstants.DefaultTier;
 
-                item = await _affiliateService.InsertAsync(item, model.Password);
-                if (item == null || item.Id == 0)
+                affiliate = await _affiliateService.InsertAsync(affiliate, model.Password);
+                if (affiliate == null || affiliate.Id == 0)
                 {
                     throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
                 }

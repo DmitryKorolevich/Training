@@ -162,27 +162,16 @@
                             <div data-ng-include="'app/modules/order/partials/orderStatusSection.html'"></div>
                         </td>
                         <td class="order-source">
-                            <i data-ng-if="::item.IdOrderSource==1" class="fa fa-globe"></i>
-                            <i data-ng-if="::item.IdOrderSource==2" class="fa fa-phone"></i>
-                            <i data-ng-if="::item.IdOrderSource==3" class="fa fa-envelope"></i>
                             <span>{{::getReferenceItem(orderTypes, item.IdOrderSource).Text}}</span>
                         </td>
                         <td class="payment-methods">
-                            <i data-ng-if="::item.IdPaymentMethod==1" class="fa fa-credit-card"></i>
-                            <i data-ng-if="::item.IdPaymentMethod==2" class="fa fa-calendar-check-o"></i>
-                            <i data-ng-if="::item.IdPaymentMethod==3" class="fa fa-envelope"></i>
-                            <i data-ng-if="::item.IdPaymentMethod==4" class="fa fa-money"></i>
-                            <i data-ng-if="::item.IdPaymentMethod==5" class="fa fa-money"></i>
-                            <i data-ng-if="::item.IdPaymentMethod==6" class="fa fa-university"></i>
-                            <i data-ng-if="::item.IdPaymentMethod==7" class="fa fa-gift"></i>
-                            <i data-ng-if="::item.IdPaymentMethod==8" class="fa fa-users"></i>
                             <span>{{::getReferenceItem(ReferenceData.ShortPaymentMethods, item.IdPaymentMethod).Text}}</span>
                         </td>
                         <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>
                         <td>
-                            <span data-ng-if="item.DateShipped">All - {{::item.DateShipped | date:"MM/dd/yy"}}</span>
-                            <span data-ng-if="!item.DateShipped && item.PDateShipped">P - {{::item.PDateShipped | date:"MM/dd/yy"}}<br /></span>
-                            <span data-ng-if="!item.DateShipped && item.NPDateShipped">NP - {{::item.NPDateShipped | date:"MM/dd/yy"}}</span>
+                            <span data-ng-if="item.DateShipped">{{::item.DateShipped | date:"MM/dd/yy"}}</span>
+                            <span data-ng-if="!item.DateShipped && item.PDateShipped">{{::item.PDateShipped | date:"MM/dd/yy"}} - P<br /></span>
+                            <span data-ng-if="!item.DateShipped && item.NPDateShipped">{{::item.NPDateShipped | date:"MM/dd/yy"}} - NP</span>
                         </td>
                         <td>{{::item.Company}}</td>
                         <td>{{::item.StateCode}}</td>

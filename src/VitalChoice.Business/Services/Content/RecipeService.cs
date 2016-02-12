@@ -20,6 +20,7 @@ using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Content.Recipes;
 using VitalChoice.Infrastructure.Domain.Transfer;
@@ -42,6 +43,7 @@ namespace VitalChoice.Business.Services.Content
         private readonly ITtlGlobalCache templatesCache;
 	    private readonly IDataContextAsync _context;
 	    private readonly ILogger logger;
+        private readonly ITransactionAccessor<VitalChoiceContext> _transactionAccessor;
 
         public RecipeService(IRepositoryAsync<Recipe> recipeRepository, IRepositoryAsync<RecipeCrossSell> crossSellRepository, IRepositoryAsync<RelatedRecipe> relatedRecipeRepository,
 			IRepositoryAsync<ContentCategory> contentCategoryRepository,
@@ -51,7 +53,7 @@ namespace VitalChoice.Business.Services.Content
             IRepositoryAsync<RecipeToProduct> recipeToProductRepository,
 			IRepositoryAsync<RecipeDefaultSetting> recipeSettingRepository,
 			IEcommerceRepositoryAsync<Product> productRepository,
-            ILoggerProviderExtended loggerProvider, ITtlGlobalCache templatesCache, IDataContextAsync context)
+            ILoggerProviderExtended loggerProvider, ITtlGlobalCache templatesCache, IDataContextAsync context, ITransactionAccessor<VitalChoiceContext> transactionAccessor)
         {
             this.recipeRepository = recipeRepository;
 	        _crossSellRepository = crossSellRepository;
@@ -65,7 +67,8 @@ namespace VitalChoice.Business.Services.Content
 	        this._productRepository = productRepository;
             this.templatesCache = templatesCache;
 			_context = context;
-	        logger = loggerProvider.CreateLoggerDefault();
+            _transactionAccessor = transactionAccessor;
+            logger = loggerProvider.CreateLoggerDefault();
         }
 
         public async Task<PagedList<Recipe>> GetRecipesAsync(RecipeListFilter filter)
@@ -253,7 +256,7 @@ namespace VitalChoice.Business.Services.Content
 			    }
 			    dbItem.RecipesToProducts = null;
 
-			    using (var transaction = new TransactionAccessor(_context).BeginTransaction())
+			    using (var transaction = _transactionAccessor.BeginTransaction())
 			    {
 				    try
 				    {

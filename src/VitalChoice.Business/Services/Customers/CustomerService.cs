@@ -24,6 +24,7 @@ using VitalChoice.Business.Queries.Customers;
 using VitalChoice.Business.Repositories;
 using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Data.Extensions;
+using VitalChoice.Data.Transaction;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
@@ -93,11 +94,11 @@ namespace VitalChoice.Business.Services.Customers
             ILoggerProviderExtended loggerProvider, DirectMapper<Customer> directMapper, DynamicExtensionsRewriter queryVisitor,
             AddressOptionValueRepository addressOptionValueRepositoryAsync, CustomerAddressMapper customerAddressMapper,
             ICountryNameCodeResolver countryNameCode, IEncryptedOrderExportService encryptedOrderExportService,
-            IObjectMapper<CustomerPaymentMethodDynamic> paymentMapper, IPaymentMethodService paymentMethodService, EcommerceContext dbContext)
+            IObjectMapper<CustomerPaymentMethodDynamic> paymentMapper, IPaymentMethodService paymentMethodService, ITransactionAccessor<EcommerceContext> transactionAccessor)
             : base(
                 customerMapper, customerRepositoryAsync,
                 customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectLogItemExternalService, loggerProvider, directMapper,
-                queryVisitor, dbContext)
+                queryVisitor, transactionAccessor)
         {
             _orderNoteRepositoryAsync = orderNoteRepositoryAsync;
             _paymentMethodRepositoryAsync = paymentMethodRepositoryAsync;
@@ -180,7 +181,7 @@ namespace VitalChoice.Business.Services.Customers
 
             //Don't allow to return a customer registered from the admin part(Not Active) to Not Active status from 
             //Active(by a store front activation)
-	        if (model.StatusCode == (int)CustomerStatus.NotActive && model.Id > 0)
+	        if (model.StatusCode == (int)CustomerStatus.PhoneOnly && model.Id > 0)
 	        {
 				var exists =
 				await
@@ -298,8 +299,8 @@ namespace VitalChoice.Business.Services.Customers
 				var entity = await InsertAsync(model, uow, password);
                 int id = entity.Id;
                 entity = await SelectEntityFirstAsync(o => o.Id == id);
-                await LogItemChanges(new[] { await Mapper.FromEntityAsync(entity) });
-                return await Mapper.FromEntityAsync(entity);
+                await LogItemChanges(new[] { await DynamicMapper.FromEntityAsync(entity) });
+                return await DynamicMapper.FromEntityAsync(entity);
             }
 		}
 
@@ -312,8 +313,8 @@ namespace VitalChoice.Business.Services.Customers
 
                 int id = entity.Id;
                 entity = await SelectEntityFirstAsync(o => o.Id == id);
-                await LogItemChanges(new[] { await Mapper.FromEntityAsync(entity) });
-                return await Mapper.FromEntityAsync(entity);
+                await LogItemChanges(new[] { await DynamicMapper.FromEntityAsync(entity) });
+                return await DynamicMapper.FromEntityAsync(entity);
 			}
 		}
 
@@ -547,7 +548,7 @@ namespace VitalChoice.Business.Services.Customers
                 case (int)CustomerStatus.Active:
                     appUser.Status = UserStatus.Active;
                     break;
-                case (int)CustomerStatus.NotActive:
+                case (int)CustomerStatus.PhoneOnly:
                     appUser.Status = UserStatus.NotActive;
                     break;
                 case (int)CustomerStatus.Suspended:

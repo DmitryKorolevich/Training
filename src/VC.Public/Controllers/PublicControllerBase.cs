@@ -14,6 +14,7 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services.Checkout;
 
@@ -25,10 +26,12 @@ namespace VC.Public.Controllers
         protected readonly IAuthorizationService AuthorizationService;
         protected readonly IHttpContextAccessor ContextAccessor;
         protected readonly ICustomerService CustomerService;
+        protected readonly ICheckoutService CheckoutService;
 
         protected PublicControllerBase(IHttpContextAccessor contextAccessor, ICustomerService customerService,
-            IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService)
+            IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService, ICheckoutService checkoutService)
         {
+            CheckoutService = checkoutService;
             InfrastructureService = infrastructureService;
             AuthorizationService = authorizationService;
             ContextAccessor = contextAccessor;
@@ -63,6 +66,24 @@ namespace VC.Public.Controllers
             var internalId = Convert.ToInt32(context.User.GetUserId());
 
             return internalId;
+        }
+
+        protected async Task<CustomerCartOrder> GetCurrentCart(bool? loggedIn = null)
+        {
+            if (loggedIn == null)
+            {
+                loggedIn = await CustomerLoggedIn();
+            }
+            if (loggedIn.Value)
+            {
+                var existingUid = Request.GetCartUid();
+                return await CheckoutService.GetOrCreateCart(existingUid, GetInternalCustomerId());
+            }
+            else
+            {
+                var existingUid = Request.GetCartUid();
+                return await CheckoutService.GetOrCreateCart(existingUid);
+            }
         }
 
         protected async Task<CustomerDynamic> GetCurrentCustomerDynamic()

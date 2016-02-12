@@ -4,12 +4,15 @@ using Microsoft.Data.Entity;
 using System;
 using System.Data;
 using Microsoft.Data.Entity.Storage;
+using VitalChoice.Data.Transaction;
 
 namespace VitalChoice.Data.Context
 {
     public interface IDataContext : IDisposable
     {
-        IRelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted);
+        Guid InstanceId { get; }
+
+        IInnerEmbeddingTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted);
 
         bool InTransaction { get; }
 

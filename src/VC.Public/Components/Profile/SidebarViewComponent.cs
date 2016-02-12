@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
 using VC.Public.Models.Profile;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Interfaces.Services.Users;
 
 namespace VC.Public.Components.Profile
@@ -25,13 +26,17 @@ namespace VC.Public.Components.Profile
 			var userId = Convert.ToInt32(_contextAccessor.HttpContext.User.GetUserId());
 
 			var user = await _storefrontUserService.GetAsync(userId);
-			
-			return View("Sidebar", new SidebarModel()
-			{
-				FirstName = user.FirstName,
-				LastName = user.LastName,
-				Id = user.Id
-			});
+		    if (user != null && user.IsConfirmed && user.Status == UserStatus.Active)
+		    {
+
+		        return View("Sidebar", new SidebarModel()
+		        {
+		            FirstName = user.FirstName,
+		            LastName = user.LastName,
+		            Id = user.Id
+		        });
+		    }
+		    return View("Sidebar", new SidebarModel());
 		}
 	}
 }

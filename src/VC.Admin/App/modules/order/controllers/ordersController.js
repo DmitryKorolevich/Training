@@ -23,11 +23,11 @@
                         $.each($scope.items, function (index, item)
                         {
                             item.AllowExport = item.OrderStatus == 2;
-                            item.IsSelected = item.OrderStatus == 3;//Shipped
+                            item.IsSelected = item.OrderStatus == 3 || item.OrderStatus == 5;//Shipped
                             item.PAllowExport = item.POrderStatus == 2;
-                            item.IsPSelected = item.POrderStatus == 3;//Shipped
+                            item.IsPSelected = item.POrderStatus == 3 || item.POrderStatus==5;//Shipped
                             item.NPAllowExport = item.NPOrderStatus == 2;
-                            item.IsNPSelected = item.NPOrderStatus == 3;//Shipped
+                            item.IsNPSelected = item.NPOrderStatus == 3 || item.NPOrderStatus == 5;//Shipped
                         });
                         $scope.totalItems = result.Data.Count;
                     } else

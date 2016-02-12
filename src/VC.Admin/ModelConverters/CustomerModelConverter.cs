@@ -88,15 +88,13 @@ namespace VC.Admin.ModelConverters
 
 	        if (model.ProfileAddress != null)
 	        {
-	            dynamic.ProfileAddress = _addressMapper.FromModel(model.ProfileAddress);
-	            dynamic.ProfileAddress.IdObjectType = (int) AddressType.Profile;
+	            dynamic.ProfileAddress = _addressMapper.FromModel(model.ProfileAddress, (int)AddressType.Profile);
 	            dynamic.ProfileAddress.Data.Email = model.Email;
 	        }
 	        if (model.Shipping.Any())
 			{
-				foreach (var addressDynamic in model.Shipping.Select(shipping => _addressMapper.FromModel(shipping)))
+				foreach (var addressDynamic in model.Shipping.Select(shipping => _addressMapper.FromModel(shipping, (int)AddressType.Shipping)))
 				{
-					addressDynamic.IdObjectType = (int)AddressType.Shipping;
 					dynamic.ShippingAddresses.Add(addressDynamic);
 				}
 			}
