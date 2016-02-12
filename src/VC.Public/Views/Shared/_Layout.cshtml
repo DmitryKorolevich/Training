@@ -123,6 +123,10 @@
 				</form>
 			</div>
 			@await Component.InvokeAsync("Menu")
+            @if (ViewBag.HideMenuShadow != true)
+            {
+                <div class="nav-shadow"></div>
+            }
 		</header>
 		<div class="content">
             <div class="alert-banner">

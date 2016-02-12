@@ -107,9 +107,6 @@
                                                 </td>
                                                 <td>{{::item.DateEdited | date:"MM/dd/yy"}}<br />{{::item.DateEdited | date:"h:mm a"}}<br />{{::item.EditedBy}}</td>
                                                 <td class="order-source">
-                                                    <i data-ng-if="item.IdOrderSource==1" class="fa fa-globe"></i>
-                                                    <i data-ng-if="item.IdOrderSource==2" class="fa fa-phone"></i>
-                                                    <i data-ng-if="item.IdOrderSource==3" class="fa fa-envelope"></i>
                                                     <span>{{getReferenceItem(ReferenceData.OrderTypes, item.IdOrderSource).Text}}</span>
                                                 </td>
                                                 <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>

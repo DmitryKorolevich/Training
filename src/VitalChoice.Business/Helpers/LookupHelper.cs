@@ -327,13 +327,13 @@ namespace VitalChoice.Business.Helpers
                         toReturn.Add(new LookupItem<int>()
                         {
                             Key = 6,
-                            Text = "WT"
+                            Text = "Wire"
                         });
                         break;
                     case 7:
                         toReturn.Add(new LookupItem<int>()
                         {
-                            Key = 8,
+                            Key = 7,
                             Text = "Marketing"
                         });
                         break;

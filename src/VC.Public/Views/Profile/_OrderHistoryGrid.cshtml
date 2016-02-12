@@ -35,7 +35,7 @@
 			foreach (var item in Model.Items)
 			{
 				<tr>
-					<td><a href="#">@item.Id</a></td>
+					<td>@Html.ActionLink(item.Id.ToString(), "OrderInvoice", new { id = item.Id })</td>
 					<td>
                         @if (item.OrderStatus.HasValue)
                         {

@@ -179,9 +179,9 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public Result<CheckPaymentModel> CreateWireTransferPrototype()
+        public Result<WireTransferPaymentModel> CreateWireTransferPrototype()
         {
-            return new CheckPaymentModel
+            return new WireTransferPaymentModel
             {
                 Address = new AddressModel { AddressType = AddressType.Billing, Country = new CountryListItemModel(_defaultCountry) }
             };
@@ -189,9 +189,9 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public Result<CheckPaymentModel> CreateMarketingPrototype()
+        public Result<MarketingPaymentModel> CreateMarketingPrototype()
         {
-            return new CheckPaymentModel
+            return new MarketingPaymentModel
             {
                 Address = new AddressModel { AddressType = AddressType.Billing, Country = new CountryListItemModel(_defaultCountry) }
             };
@@ -199,9 +199,9 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public Result<CheckPaymentModel> CreateVCWellnessPrototype()
+        public Result<VCWellnessEmployeeProgramPaymentModel> CreateVCWellnessPrototype()
         {
-            return new CheckPaymentModel
+            return new VCWellnessEmployeeProgramPaymentModel
             {
                 Address = new AddressModel { AddressType = AddressType.Billing, Country = new CountryListItemModel(_defaultCountry) }
             };

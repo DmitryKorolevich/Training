@@ -1,0 +1,25 @@
+﻿@using VitalChoice.Interfaces.Services
+@model VC.Public.Models.Profile.OrderViewModel
+@inject IAppInfrastructureService appInfrastructureService;
+
+@{
+    var infrastructure = appInfrastructureService.Get();
+}
+
+@section Meta {
+    <title>Vital Choice | Order Invoice</title>
+}
+
+<div class="working-area-holder">
+    <div class="left-pane clean-border">
+        @await Component.InvokeAsync("ProfileSidebar")
+    </div>
+    <div class="right-pane clean-indent order-invoice">
+        <div class="border-form-left">
+            @if (Model != null)
+            {
+                <h4>Order #@Model.Id</h4>
+            }
+        </div>
+    </div>
+</div>

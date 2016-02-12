@@ -303,7 +303,7 @@ namespace VitalChoice.Business.Services.Products
         public async Task<ProductNavCategoryLite> GetLiteCategoriesTreeAsync(ProductCategory productRootCategory,
             ProductCategoryLiteFilter liteFilter)
         {
-            var contentCategoryQuery = new ProductCategoryContentQuery().WithVisibility(liteFilter.Visibility);
+            var contentCategoryQuery = new ProductCategoryContentQuery().WithVisibility(liteFilter.Visibility, liteFilter.ShowAll);
             var contentCategories =
                 (await productCategoryRepository.Query(contentCategoryQuery).SelectAsync(p => new ProductCategoryLite
                 {
