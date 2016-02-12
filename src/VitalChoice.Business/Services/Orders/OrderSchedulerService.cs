@@ -168,7 +168,7 @@ namespace VitalChoice.Business.Services.Orders
                         try
                         {
                             order.Customer = await _customerService.SelectAsync(order.Customer.Id);
-                            var context = await _orderService.CalculateOrder(order);
+                            var context = await _orderService.CalculateOrder(order, OrderStatus.Processed);
 
                             List<MessageInfo> messages =new List<MessageInfo>(context.Messages);
                             if (context.SkuOrdereds != null)

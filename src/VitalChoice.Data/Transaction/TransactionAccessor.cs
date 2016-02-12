@@ -22,7 +22,7 @@ namespace VitalChoice.Data.Transaction
         private readonly TContext _context;
         private IInnerEmbeddingTransaction _transaction;
 
-        protected TransactionAccessor(IOptions<AppOptionsBase> appOptions, TContext context)
+        public TransactionAccessor(IOptions<AppOptionsBase> appOptions, TContext context)
         {
             _appOptions = appOptions;
             _context = context;

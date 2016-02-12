@@ -5,6 +5,7 @@ using Microsoft.Data.Entity.Storage;
 using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories;
+using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Options;
 
@@ -36,7 +37,7 @@ namespace VitalChoice.Data.UnitOfWork
 			_uow.Dispose(disposing);
 		}
 
-	    public IRelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadCommitted)
+	    public IInnerEmbeddingTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadCommitted)
 	    {
 		    return _uow.BeginTransaction(isolation);
 	    }

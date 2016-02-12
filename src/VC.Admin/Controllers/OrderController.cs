@@ -197,7 +197,7 @@ namespace VC.Admin.Controllers
         public async Task<Result<OrderCalculateModel>> CalculateOrder([FromBody]OrderManageModel model)
         {
             var order = _mapper.FromModel(model);
-            var orderContext = await _orderService.CalculateOrder(order);
+            var orderContext = await _orderService.CalculateOrder(order, model.CombinedEditOrderStatus);
 
             OrderCalculateModel toReturn = new OrderCalculateModel(orderContext);
 
@@ -229,50 +229,14 @@ namespace VC.Admin.Controllers
 
             if (model.CombinedEditOrderStatus != OrderStatus.Cancelled && model.CombinedEditOrderStatus != OrderStatus.Exported && model.CombinedEditOrderStatus != OrderStatus.Shipped)
             {
-                var orderType = order.Data.MailOrder ? (int?)SourceOrderType.MailOrder : null;
+                await _orderService.OrderTypeSetup(order);
+                await _orderService.CalculateOrder(order, model.CombinedEditOrderStatus);
                 if (model.Id > 0)
                 {
-                    var dbItem = (await _orderService.SelectAsync(order.Id));
-                    if (dbItem != null && dbItem.DictionaryData.ContainsKey("OrderType"))
-                    {
-                        if (dbItem.Data.OrderType == (int?)SourceOrderType.MailOrder)
-                        {
-                            if (!orderType.HasValue)
-                            {
-                                orderType = (int)SourceOrderType.Phone;
-                            }
-                            order.Data.OrderType = orderType.Value;
-                        }
-                        else
-                        {
-                            order.Data.OrderType = orderType ?? dbItem.Data.OrderType;
-                        }
-                    }
-                    else
-                    {
-                        order.Data.OrderType = orderType ?? (int)SourceOrderType.Phone;
-                    }
-                    var context = await _orderService.CalculateOrder(order);
-                    model.ShouldSplit = context.SplitInfo?.ShouldSplit == true;
-                    OrderModelConverter.SetOrderSplitStatuses(model, order);
                     order = await _orderService.UpdateAsync(order);
                 }
                 else
                 {
-                    if (!orderType.HasValue)
-                    {
-                        orderType = (int)SourceOrderType.Phone;
-                    }
-                    order.Data.OrderType = orderType.Value;
-                    order.ShippingAddress.Id = 0;
-                    if (order.PaymentMethod.Address != null)
-                    {
-                        order.PaymentMethod.Address.Id = 0;
-                    }
-                    order.PaymentMethod.Id = 0;
-                    var context = await _orderService.CalculateOrder(order);
-                    model.ShouldSplit = context.SplitInfo?.ShouldSplit == true;
-                    OrderModelConverter.SetOrderSplitStatuses(model, order);
                     order = await _orderService.InsertAsync(order);
                 }
             }

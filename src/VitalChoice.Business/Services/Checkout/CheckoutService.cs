@@ -106,6 +106,7 @@ namespace VitalChoice.Business.Services.Checkout
                 cart = await CreateNew();
             }
             var newOrder = await _orderService.Mapper.CreatePrototypeAsync((int) OrderType.Normal);
+            newOrder.Data.OrderType = (int) SourceOrderType.Web;
             if (newOrder.Customer != null)
             {
                 newOrder.Customer.IdObjectType = (int) CustomerType.Retail;
@@ -341,7 +342,7 @@ namespace VitalChoice.Business.Services.Checkout
                 return false;
 
             cartOrder.Order.OrderStatus = OrderStatus.Processed;
-            cartOrder.Order = (await _orderService.CalculateOrder(cartOrder.Order)).Order;
+            cartOrder.Order = (await _orderService.CalculateOrder(cartOrder.Order, OrderStatus.Processed)).Order;
             using (var transaction = _context.BeginTransaction())
             {
                 try
@@ -391,7 +392,7 @@ namespace VitalChoice.Business.Services.Checkout
 
         public Task<OrderDataContext> CalculateCart(CustomerCartOrder cartOrder)
         {
-            return _orderService.CalculateOrder(cartOrder.Order);
+            return _orderService.CalculateOrder(cartOrder.Order, OrderStatus.Processed);
         }
 
         public async Task<int> GetCartItemsCount(Guid uid)

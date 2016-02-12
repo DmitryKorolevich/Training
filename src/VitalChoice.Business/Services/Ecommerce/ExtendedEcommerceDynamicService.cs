@@ -26,7 +26,7 @@ namespace VitalChoice.Business.Services.Ecommerce
         where TOptionValue : OptionValue<TOptionType>, new()
         where TDynamic : MappedObject, new()
     {
-        private readonly ITransactionAccessor<EcommerceContext> _transactionAccessor;
+        protected readonly ITransactionAccessor<EcommerceContext> TransactionAccessor;
 
         public ExtendedEcommerceDynamicService(IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> mapper,
             IEcommerceRepositoryAsync<TEntity> objectRepository,
@@ -38,12 +38,12 @@ namespace VitalChoice.Business.Services.Ecommerce
                 mapper, objectRepository, optionValueRepositoryAsync, bigStringRepository, objectLogItemExternalService, queryVisitor,
                 directMapper, loggerProvider.CreateLoggerDefault())
         {
-            _transactionAccessor = transactionAccessor;
+            TransactionAccessor = transactionAccessor;
         }
 
         protected sealed override IUnitOfWorkAsync CreateUnitOfWork()
         {
-            return _transactionAccessor.CreateUnitOfWork();
+            return TransactionAccessor.CreateUnitOfWork();
         }
     }
 }

@@ -37,13 +37,10 @@ namespace VitalChoice.Data.Context
 			return changes;
 		}
 
-        public bool LateDisposed { get; private set; }
-
         public override void Dispose()
         {
-            if (_transaction == null)
+            if (_transaction == null || _transaction.Closed)
                 base.Dispose();
-            LateDisposed = true;
         }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))

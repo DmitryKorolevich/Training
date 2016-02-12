@@ -12,8 +12,6 @@ namespace VitalChoice.Data.Context
     {
         Guid InstanceId { get; }
 
-        bool LateDisposed { get; }
-
         IInnerEmbeddingTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted);
 
         int SaveChanges();

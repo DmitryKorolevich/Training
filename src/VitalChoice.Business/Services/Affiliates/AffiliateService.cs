@@ -74,7 +74,8 @@ namespace VitalChoice.Business.Services.Affiliates
             INotificationService notificationService,
             IAffiliateUserService affiliateUserService,
             IOptions<AppOptions> appOptions,
-            ILoggerProviderExtended loggerProvider, DirectMapper<Affiliate> directMapper, DynamicExpressionVisitor queryVisitor, ITransactionAccessor<EcommerceContext> transactionAccessor)
+            ILoggerProviderExtended loggerProvider, DirectMapper<Affiliate> directMapper, DynamicExpressionVisitor queryVisitor,
+            ITransactionAccessor<EcommerceContext> transactionAccessor)
             : base(
                 mapper, affiliateRepository, affiliateValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)

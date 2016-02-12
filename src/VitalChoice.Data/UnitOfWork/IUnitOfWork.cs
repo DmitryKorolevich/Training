@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Data;
 using Microsoft.Data.Entity.Storage;
+using VitalChoice.Data.Transaction;
 
 namespace VitalChoice.Data.UnitOfWork
 {
     public interface IUnitOfWork : IDisposable
     {
         int SaveChanges();
+        IInnerEmbeddingTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadCommitted);
         void Dispose(bool disposing);
-	    IRelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted);
     }
 }

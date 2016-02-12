@@ -46,7 +46,7 @@ namespace VitalChoice.Data.UnitOfWork
             _disposed = true;
         }
 
-	    public IRelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadCommitted)
+	    public IInnerEmbeddingTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadCommitted)
 		{
 			return _dataContext.BeginTransaction(isolation);
 		}

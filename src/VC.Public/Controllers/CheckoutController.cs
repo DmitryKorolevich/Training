@@ -563,7 +563,7 @@ namespace VC.Public.Controllers
 		            cart.Order.Data.GiftOrder = model.IsGiftOrder;
 		            cart.Order.Data.GiftMessage = model.GiftMessage;
 		            cart.Order.Data.DeliveryInstructions = model.DeliveryInstructions;
-                    await OrderService.CalculateOrder(cart.Order);
+                    await OrderService.CalculateOrder(cart.Order, OrderStatus.Processed);
 		            if (await CheckoutService.UpdateCart(cart))
 		            {
 		                return RedirectToAction("ReviewOrder");

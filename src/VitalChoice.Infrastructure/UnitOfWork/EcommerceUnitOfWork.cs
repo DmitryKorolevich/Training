@@ -9,10 +9,5 @@ namespace VitalChoice.Infrastructure.UnitOfWork
         {
 
         }
-
-        public EcommerceUnitOfWork(EcommerceContext context) : base(context)
-        {
-
-        }
     }
 }

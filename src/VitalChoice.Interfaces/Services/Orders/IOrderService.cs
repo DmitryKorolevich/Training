@@ -20,8 +20,8 @@ namespace VitalChoice.Interfaces.Services.Orders
         Task<int?> GetOrderIdCustomer(int id);
         Task<PagedList<VOrder>> GetOrdersAsync(VOrderFilter filter);
 	    Task<OrderDynamic> SelectWithCustomerAsync(int id, bool withDefaults = false);
-	    Task<OrderDataContext> CalculateOrder(OrderDynamic order);
-		Task<OrderDynamic> SelectLastOrderAsync(int customerId);
+	    Task<OrderDataContext> CalculateOrder(OrderDynamic order, OrderStatus combinedStatus);
+        Task<OrderDynamic> SelectLastOrderAsync(int customerId);
 
         Task<List<OrderDynamic>> SelectAsync(Expression<Func<Order, bool>> query = null,
             Func<IQueryLite<Order>, IQueryLite<Order>> includesOverride = null,
@@ -30,6 +30,8 @@ namespace VitalChoice.Interfaces.Services.Orders
         Task<OrderDynamic> CreateNewNormalOrder(OrderStatus status);
         
         Task<bool> ImportOrders(byte[] file, string fileName, OrderType orderType, int idCustomer, int idPaymentMethod, int idAddedBy);
+
+	    Task OrderTypeSetup(OrderDynamic order);
 
         #region AffiliatesOrders
 
