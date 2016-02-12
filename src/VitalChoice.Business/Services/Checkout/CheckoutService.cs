@@ -144,8 +144,7 @@ namespace VitalChoice.Business.Services.Checkout
             if (cart.ShipDelayDate != null)
             {
                 newOrder.Data.ShipDelayType = ShipDelayType.EntireOrder;
-                newOrder.Data.ShipDelayDateP = cart.ShipDelayDate;
-                newOrder.Data.ShipDelayDateNP = cart.ShipDelayDate;
+                newOrder.Data.ShipDelayDate = cart.ShipDelayDate;
             }
             newOrder.Data.ShippingUpgradeP = cart.ShippingUpgradeP;
             newOrder.Data.ShippingUpgradeNP = cart.ShippingUpgradeNP;
