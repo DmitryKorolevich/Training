@@ -275,6 +275,7 @@ namespace VitalChoice.Business.Services.Checkout
                         return false;
                     if (cartOrder.Order.Customer?.Id != 0)
                     {
+                        var customerBackup = cartOrder.Order.Customer;
                         if (cartOrder.Order.Id == 0)
                         {
                             cartOrder.Order = await _orderService.InsertAsync(cartOrder.Order);
@@ -283,6 +284,7 @@ namespace VitalChoice.Business.Services.Checkout
                         {
                             cartOrder.Order = await _orderService.UpdateAsync(cartOrder.Order);
                         }
+                        cartOrder.Order.Customer = customerBackup;
                         cart.IdCustomer = cartOrder.Order?.Customer?.Id;
                         cart.IdOrder = cartOrder.Order?.Id;
                         cart.IdDiscount = null;
@@ -311,7 +313,7 @@ namespace VitalChoice.Business.Services.Checkout
                             Quantity = so.Quantity
                         }, (sku, ordered) => sku.Quantity = ordered.Quantity);
                         cart.ShipDelayDate = cartOrder.Order.SafeData.ShipDelayType == ShipDelayType.EntireOrder
-                            ? cartOrder.Order.Data.ShipDelayDateP
+                            ? cartOrder.Order.Data.ShipDelayDate
                             : null;
                         cart.ShippingUpgradeP = cartOrder.Order.SafeData.ShippingUpgradeP;
                         cart.ShippingUpgradeNP = cartOrder.Order.SafeData.ShippingUpgradeNP;

@@ -328,16 +328,17 @@ namespace VC.Public.Controllers
                     {
                         if (cart.Order.Customer?.Id != 0)
                         {
+                            CustomerDynamic newCustomer;
                             if (((bool?) cart.Order.Customer?.SafeData.Guest ?? false) &&
                                 cart.Order.Customer.StatusCode == (int) CustomerStatus.PhoneOnly)
                             {
-                                cart.Order.Customer = await ReplaceAccount(model, cart.Order.Customer) ?? await CreateAccount(model);
+                                newCustomer = await ReplaceAccount(model, cart.Order.Customer) ?? await CreateAccount(model);
                             }
                             else
                             {
-                                cart.Order.Customer = await CreateAccount(model);
+                                newCustomer = await CreateAccount(model);
                             }
-
+                            cart.Order.Customer = newCustomer;
                             if (model.GuestCheckout)
                             {
                                 loginTask = async () =>
@@ -368,13 +369,14 @@ namespace VC.Public.Controllers
                         }
                         else
                         {
-                            cart.Order.Customer = await CreateAccount(model);
+                            var newCustomer = await CreateAccount(model);
+                            cart.Order.Customer = newCustomer;
                             if (model.GuestCheckout)
                             {
                                 loginTask = async () =>
                                 {
-                                    await _storefrontUserService.SendActivationAsync(cart.Order.Customer.Email);
-                                    var user = await _storefrontUserService.GetAsync(cart.Order.Customer.Id);
+                                    await _storefrontUserService.SendActivationAsync(newCustomer.Email);
+                                    var user = await _storefrontUserService.GetAsync(newCustomer.Id);
                                     user = await _storefrontUserService.SignInNoStatusCheckingAsync(user);
                                     if (user == null)
                                     {
@@ -388,7 +390,7 @@ namespace VC.Public.Controllers
                             {
                                 loginTask = async () =>
                                 {
-                                    var user = await _storefrontUserService.SignInAsync(cart.Order.Customer.Email, model.Password);
+                                    var user = await _storefrontUserService.SignInAsync(newCustomer.Email, model.Password);
                                     if (user == null)
                                     {
                                         throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
@@ -431,9 +433,9 @@ namespace VC.Public.Controllers
                     }
                     if (await CheckoutService.UpdateCart(cart))
                     {
-                        transaction.Commit();
                         if (loginTask != null)
                             await loginTask();
+                        transaction.Commit();
                         return RedirectToAction("AddUpdateShippingMethod");
                     }
                     ModelState.AddModelError(string.Empty, "Cannot update order");
@@ -446,7 +448,19 @@ namespace VC.Public.Controllers
                         }
                     }
                 }
-                catch
+                catch (AppValidationException e)
+                {
+                    transaction.Rollback();
+                    if (loginTask != null)
+                    {
+                        if (cart.Order.Customer != null && cart.Order.Customer.Id != 0)
+                        {
+                            await _storefrontUserService.RemoveAsync(cart.Order.Customer.Id);
+                        }
+                    }
+                    throw;
+                }
+                catch(Exception e)
                 {
                     transaction.Rollback();
                     if (loginTask != null)
