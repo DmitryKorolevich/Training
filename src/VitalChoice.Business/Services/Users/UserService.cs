@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.Data.Entity;
@@ -369,7 +370,7 @@ namespace VitalChoice.Business.Services.Users
 	    {
             await DisabledValidateUserOnSignIn(user.UserName);
 
-            await _signInManager.SignInAsync(user, false);
+		    await _signInManager.SignInAsync(user, false);
 
             user.LastLoginDate = DateTime.Now;
             user = await UpdateAsync(user);

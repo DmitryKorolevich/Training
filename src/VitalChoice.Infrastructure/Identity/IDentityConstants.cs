@@ -21,5 +21,7 @@
         public const string LoginFromAdminPurpose = "LoginFromAdminPurpose";
 
         public const string TokenProviderName = "Default";
+
+        public const string NotConfirmedClaimType = "NotConfirmed";
     }
 }

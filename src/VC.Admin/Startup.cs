@@ -62,19 +62,7 @@ namespace VC.Admin
 
 			app.UseIdentity();
 
-			app.UseCookieAuthentication();
-
 			app.UseMvc(RouteConfig.RegisterRoutes);
-
-		    app.UseCookieAuthentication(x =>
-		    {
-		        x.AuthenticationScheme = IdentityCookieOptions.ApplicationCookieAuthenticationType;
-		        x.LogoutPath = PathString.Empty;
-		        x.AccessDeniedPath = PathString.Empty;
-		        x.LoginPath = PathString.Empty;
-		        x.ReturnUrlParameter = null;
-		        x.CookieName = "VitalChoice.Admin";
-		    });
         }
 	}
 }
