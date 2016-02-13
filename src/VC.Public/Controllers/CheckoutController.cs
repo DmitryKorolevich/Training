@@ -85,48 +85,6 @@ namespace VC.Public.Controllers
 					y => $"{y.Data.FirstName} {y.Data.LastName} {y.Data.Address1}" + ((bool)y.Data.Default ? " (Default)" : ""));
 		}
 
-	    private string ResolveStateOrCounty(ICollection<Country> countries, AddressDynamic address)
-	    {
-			var target = countries.Single(x => x.Id == address.IdCountry);
-
-			var stateOrCounty = address.IdState.HasValue ? target.States.Single(x => x.Id == address.IdState.Value).StateCode : address.County;
-
-		    return stateOrCounty;
-	    }
-
-	    private List<KeyValuePair<string, string>> PopulateBillingAddressDetails(OrderPaymentMethodDynamic paymentMethod, ICollection<Country> countries, string email)
-	    {
-			var billingAddress = paymentMethod.Address;
-
-			return new List<KeyValuePair<string, string>>()
-			{
-				new KeyValuePair<string, string>(string.Empty, _appInfrastructure.CreditCardTypes.Single(z => z.Key == (int)paymentMethod.Data.CardType).Text),
-				new KeyValuePair<string, string>(string.Empty, paymentMethod.Data.CardNumber),
-				new KeyValuePair<string, string>(string.Empty, $"{paymentMethod.Data.ExpDate.Month}/{paymentMethod.Data.ExpDate.Year % 2000}"),
-				new KeyValuePair<string, string>(string.Empty, string.Empty),
-				new KeyValuePair<string, string>(string.Empty, $"{billingAddress.Data.FirstName} {billingAddress.Data.LastName}"),
-				new KeyValuePair<string, string>(string.Empty, billingAddress.SafeData.Company),
-				new KeyValuePair<string, string>(string.Empty, billingAddress.Data.Address1),
-				new KeyValuePair<string, string>(string.Empty, billingAddress.SafeData.Address2),
-				new KeyValuePair<string, string>(string.Empty, $"{billingAddress.Data.City}, {ResolveStateOrCounty(countries, billingAddress)} {billingAddress.Data.Zip}"),
-				new KeyValuePair<string, string>("Phone", string.Format("{0:(###) ###-#### x#####}", billingAddress.Data.Phone)),
-				new KeyValuePair<string, string>("Email", email),
-			};
-		}
-
-		private List<KeyValuePair<string, string>> PopulateShippingAddressDetails(AddressDynamic shippingAddress, ICollection<Country> countries)
-		{
-			return new List<KeyValuePair<string, string>>()
-			{
-				new KeyValuePair<string, string>(string.Empty, $"{shippingAddress.Data.FirstName} {shippingAddress.Data.LastName}"),
-				new KeyValuePair<string, string>(string.Empty, shippingAddress.SafeData.Company),
-				new KeyValuePair<string, string>(string.Empty, shippingAddress.Data.Address1),
-				new KeyValuePair<string, string>(string.Empty, shippingAddress.SafeData.Address2),
-				new KeyValuePair<string, string>(string.Empty, $"{shippingAddress.Data.City}, {ResolveStateOrCounty(countries, shippingAddress)} {shippingAddress.Data.Zip}"),
-				new KeyValuePair<string, string>("Phone", string.Format("{0:(###) ###-#### x#####}", shippingAddress.Data.Phone)),
-			};
-		}
-
 	    private async Task<CustomerCartOrder> PopulateReviewModel(ReviewOrderModel reviewOrderModel)
 	    {
 			await InitCartModelInternal(reviewOrderModel);
@@ -138,10 +96,11 @@ namespace VC.Public.Controllers
 			var countries = await _countryService.GetCountriesAsync();
 
 			var paymentMethod = cart.Order.PaymentMethod;
-			reviewOrderModel.BillToAddress = PopulateBillingAddressDetails(paymentMethod, countries, cart.Order.Customer.Email);
+			reviewOrderModel.BillToAddress = paymentMethod.Address.PopulateBillingAddressDetails(countries, cart.Order.Customer.Email);
+	        reviewOrderModel.CreditCardDetails = paymentMethod.PopulateCreditCardDetails(_appInfrastructure);
 
 			var shippingAddress = cart.Order.ShippingAddress;
-			reviewOrderModel.ShipToAddress = PopulateShippingAddressDetails(shippingAddress, countries);
+			reviewOrderModel.ShipToAddress = shippingAddress.PopulateShippingAddressDetails(countries);
 
 		    return cart;
 	    }
@@ -153,10 +112,11 @@ namespace VC.Public.Controllers
             var countries = await _countryService.GetCountriesAsync();
 
             var paymentMethod = order.PaymentMethod;
-            reviewOrderModel.BillToAddress = PopulateBillingAddressDetails(paymentMethod, countries, order.Customer.Email);
+            reviewOrderModel.BillToAddress = paymentMethod.Address.PopulateBillingAddressDetails(countries, order.Customer.Email);
+            reviewOrderModel.CreditCardDetails = paymentMethod.PopulateCreditCardDetails(_appInfrastructure);
 
             var shippingAddress = order.ShippingAddress;
-            reviewOrderModel.ShipToAddress = PopulateShippingAddressDetails(shippingAddress, countries);
+            reviewOrderModel.ShipToAddress = shippingAddress.PopulateShippingAddressDetails(countries);
 
             return order;
         }

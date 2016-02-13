@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -7,9 +6,7 @@ using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.ModelBinding;
-using Newtonsoft.Json;
 using VC.Public.Models.Profile;
-using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -122,7 +119,7 @@ namespace VC.Public.Controllers
 
             ViewBag.CreditCards = null;
 
-            BillingInfoModel model = null;
+            BillingInfoModel model;
             if (creditCards.Any())
             {
                 model = selectedId > 0 ? creditCards.Single(x => x.Id == selectedId) : creditCards.First();
@@ -548,7 +545,7 @@ namespace VC.Public.Controllers
         [HttpGet]
         public async Task<IActionResult> HelpTickets(int idorder, bool ignore = false)
         {
-            ICollection<HelpTicketListItemModel> toReturn = new List<HelpTicketListItemModel>();
+            ICollection<HelpTicketListItemModel> toReturn;
             ViewBag.IdOrder = (int?) null;
             var customerId = GetInternalCustomerId();
             var orderCustomerId = await _orderService.GetOrderIdCustomer(idorder);
@@ -560,7 +557,7 @@ namespace VC.Public.Controllers
                 var items = (await _helpService.GetHelpTicketsAsync(filter)).Items;
                 if (items.Count == 0 && !ignore)
                 {
-                    return RedirectToAction("HelpTicket", new {idorder = idorder});
+                    return RedirectToAction("HelpTicket", new {idorder});
                 }
                 ViewBag.IdOrder = (int?) idorder;
                 toReturn = items.Select(p => new HelpTicketListItemModel(p)).ToList();
@@ -633,8 +630,7 @@ namespace VC.Public.Controllers
             var item = model.Convert();
 
             item = await _helpService.UpdateHelpTicketCommentAsync(item);
-
-            var toReturn = new HelpTicketManageModel(await _helpService.GetHelpTicketAsync(item.IdHelpTicket));
+            
             if (model.Id == 0)
             {
                 TempData[TicketCommentMessageTempData] = "New comment was successfully added.";
@@ -649,7 +645,7 @@ namespace VC.Public.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteHelpTicketComment(HelpTicketCommentManageModel model)
         {
-            var result = await _helpService.DeleteHelpTicketCommentAsync(model.Id, null);
+            await _helpService.DeleteHelpTicketCommentAsync(model.Id, null);
             TempData[TicketCommentMessageTempData] = "Comment was successfully deleted.";
             return RedirectToAction("HelpTicket", new {id = model.IdHelpTicket});
         }

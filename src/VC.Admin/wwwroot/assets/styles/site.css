@@ -1048,12 +1048,6 @@ th.sortable-column {
 .orders .table > thead > tr > th.actions {
   min-width: 75px;
 }
-.orders .table > tbody > tr > td.order-source {
-  color: grey;
-}
-.orders .table > tbody > tr > td.payment-methods {
-  color: grey;
-}
 .help-tickets .table > tbody > tr.success > td {
   background-color: #99ff99;
 }

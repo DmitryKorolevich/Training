@@ -58,7 +58,13 @@ namespace VC.Admin.Models.Orders
         public RecordStatusCode StatusCode { get; set; }
 
         [Map]
-        public OrderStatus OrderStatus { get; set; }
+        public OrderStatus? OrderStatus { get; set; }
+
+        [Map]
+        public OrderStatus? POrderStatus { get; set; }
+
+        [Map]
+        public OrderStatus? NPOrderStatus { get; set; }
 
         [Map]
         public bool GiftOrder { get; set; }

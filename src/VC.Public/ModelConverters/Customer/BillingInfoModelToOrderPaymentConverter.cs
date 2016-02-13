@@ -1,5 +1,6 @@
 ﻿using System;
 using VC.Public.Models.Profile;
+using VitalChoice.Business.Helpers;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -20,6 +21,9 @@ namespace VC.Public.ModelConverters.Customer
 
         public override void ModelToDynamic(BillingInfoModel model, OrderPaymentMethodDynamic dynamic)
         {
+            dynamic.Data.Phone = model.Phone?.ClearPhone();
+            dynamic.Data.Fax = model.Fax?.ClearPhone();
+
             if (model.ExpirationDateYear.HasValue && model.ExpirationDateMonth.HasValue)
             {
                 DateTime exp = new DateTime(model.ExpirationDateYear.Value + 2000, model.ExpirationDateMonth.Value, 1);

@@ -1,4 +1,5 @@
-﻿@using VitalChoice.Interfaces.Services
+﻿@using VitalChoice.Ecommerce.Domain.Entities.Payment
+@using VitalChoice.Interfaces.Services
 @model VC.Public.Models.Profile.OrderViewModel
 @inject IAppInfrastructureService appInfrastructureService;
 
@@ -14,11 +15,150 @@
     <div class="left-pane clean-border">
         @await Component.InvokeAsync("ProfileSidebar")
     </div>
-    <div class="right-pane clean-indent order-invoice">
+    <div class="right-pane clean-indent order-info-section-fonts order-invoice">
         <div class="border-form-left">
             @if (Model != null)
             {
                 <h4>Order #@Model.Id</h4>
+                <div class="reivew-order-info">
+                    <div class="reivew-info-box">
+                        <div class="review-header-container">
+                            <span>Status</span>
+                        </div>
+                        <div class="review-box-line">
+                            <span class="review-info-value">@Html.LabelFor(x => x.DateCreated, null, new { @class = "bold" }):<span>@Model.DateCreated.ToString("MM/dd/yyyy")</span>
+                        </div>
+                        @if (Model.OrderStatus.HasValue)
+                        {
+                            <div class="review-box-line">
+                                <span class="review-info-value">@infrastructure.OrderStatuses.Single(x => x.Key == (int) Model.OrderStatus.Value).Text</span>
+                            </div>
+                        }
+                        else
+                        {
+                            if (Model.POrderStatus.HasValue)
+                            {
+                                <div class="review-box-line">
+                                    <span class="review-info-label">Perishable:</span>
+                                    <span class="review-info-value">@infrastructure.OrderStatuses.Single(x => x.Key == (int) Model.POrderStatus.Value).Text</span>
+                                </div>
+                            }
+                            if (Model.NPOrderStatus.HasValue)
+                            {
+                                <div class="review-box-line">
+                                    <span class="review-info-label">Perishable:</span>
+                                    <span class="review-info-value">@infrastructure.OrderStatuses.Single(x => x.Key == (int) Model.NPOrderStatus.Value).Text</span>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="reivew-order-info receipt-step">
+                    <div class="reivew-info-box">
+                        <div class="review-header-container">
+                            <span>Bill to Details</span>
+                        </div>
+                        @foreach (var item in Model.BillToAddress)
+                        {
+                            if (!string.IsNullOrEmpty(item.Value))
+                            {
+                                <div class="review-box-line">
+                                    @if (!string.IsNullOrWhiteSpace(item.Key))
+                                    {
+                                        <span class="review-info-label">@item.Key:</span>
+                                    }
+                                    <span class="review-info-value">@item.Value</span>
+                                </div>
+                            }
+                        }
+                    </div>
+                    <div class="reivew-info-box">
+                        <div class="review-header-container">
+                            <span>Ship to Details</span>
+                        </div>
+                        @foreach (var item in Model.ShipToAddress)
+                        {
+                            if (!string.IsNullOrEmpty(item.Value))
+                            {
+                                <div class="review-box-line">
+                                    @if (!string.IsNullOrWhiteSpace(item.Key))
+                                    {
+                                        <span class="review-info-label">@item.Key:</span>
+                                    }
+                                    <span class="review-info-value">@item.Value</span>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+                if (Model.IdPaymentMethodType.HasValue)
+                {
+                    <div class="reivew-order-info">
+                        <div class="reivew-info-box">
+                            <div class="review-header-container">
+                                <span>Payment Details</span>
+                            </div>
+                            @if (Model.IdPaymentMethodType.Value == (int)PaymentMethodType.CreditCard)
+                            {
+                                foreach (var item in Model.CreditCardDetails)
+                                {
+                                    <div class="review-box-line">
+                                        @if (!string.IsNullOrWhiteSpace(item.Key))
+                                        {
+                                            <span class="review-info-label">@item.Key:</span>
+                                        }
+                                        <span class="review-info-value">@item.Value</span>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="review-box-line">
+                                    <span class="review-info-value">@infrastructure.PaymentMethods.Single(x => x.Key == (int)Model.IdPaymentMethodType.Value).Text</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+                if (!string.IsNullOrEmpty(Model.DeliveryInstructions))
+                {
+                    <div class="reivew-order-info">
+                        <div class="reivew-info-box">
+                            <div class="review-header-container">
+                                <span>Delivery Instruction</span>
+                            </div>
+                            <div class="review-box-line">
+                                @Model.DeliveryInstructions
+                            </div>
+                        </div>
+                    </div>
+                }
+                if (!string.IsNullOrEmpty(Model.GiftMessage))
+                {
+                    <div class="reivew-order-info">
+                        <div class="reivew-info-box">
+                            <div class="review-header-container">
+                                <span>Gift Message</span>
+                            </div>
+                            <div class="review-box-line">
+                                @Model.GiftMessage
+                            </div>
+                        </div>
+                    </div>
+                }
+                //TODO - should be added after adding storing Tracking info
+                if (false)
+                {
+                    <div class="reivew-order-info">
+                        <div class="reivew-info-box">
+                            <div class="review-header-container">
+                                <span>Tracking Information</span>
+                            </div>
+                            <div class="review-box-line">
+                            </div>
+                        </div>
+                    </div>
+                }
             }
         </div>
     </div>

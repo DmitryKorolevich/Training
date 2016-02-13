@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
@@ -15,6 +17,7 @@ namespace VC.Public.Models.Profile
         public int IdCustomer { get; set; }
 
         [Map]
+        [Display(Name = "Order Date")]
         public DateTime DateCreated { get; set; }
 
         public AddressModel Shipping { get; set; }
@@ -26,7 +29,13 @@ namespace VC.Public.Models.Profile
         public RecordStatusCode StatusCode { get; set; }
 
         [Map]
-        public OrderStatus OrderStatus { get; set; }
+        public OrderStatus? OrderStatus { get; set; }
+
+        [Map]
+        public OrderStatus? POrderStatus { get; set; }
+
+        [Map]
+        public OrderStatus? NPOrderStatus { get; set; }
 
         [Map]
         public bool GiftOrder { get; set; }
@@ -103,9 +112,19 @@ namespace VC.Public.Models.Profile
         [Map]
         public decimal Total { get; set; }
         
-        [Map]
-        public AddressModel ShippingAddress { get; set; }
-        
-        public AddressModel BillingAddress { get; set; }
+        public int? IdPaymentMethodType { get; set; }
+
+        public IList<KeyValuePair<string, string>> BillToAddress { get; set; }
+
+        public IList<KeyValuePair<string, string>> CreditCardDetails { get; set; }
+
+        public IList<KeyValuePair<string, string>> ShipToAddress { get; set; }
+
+        public OrderViewModel()
+        {
+            BillToAddress = new List<KeyValuePair<string, string>>();
+            CreditCardDetails = new List<KeyValuePair<string, string>>();
+            ShipToAddress = new List<KeyValuePair<string, string>>();
+        }
     }
 }
