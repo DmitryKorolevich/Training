@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using VC.Public.Models.Cart;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
@@ -120,11 +121,17 @@ namespace VC.Public.Models.Profile
 
         public IList<KeyValuePair<string, string>> ShipToAddress { get; set; }
 
+        public IList<CartSkuModel> Skus { get; set; }
+
+        public IList<CartSkuModel> PromoSkus { get; set; }
+
         public OrderViewModel()
         {
             BillToAddress = new List<KeyValuePair<string, string>>();
             CreditCardDetails = new List<KeyValuePair<string, string>>();
             ShipToAddress = new List<KeyValuePair<string, string>>();
+            Skus = new List<CartSkuModel>();
+            PromoSkus = new List<CartSkuModel>();
         }
     }
 }

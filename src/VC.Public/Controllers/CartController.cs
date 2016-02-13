@@ -119,7 +119,7 @@ namespace VC.Public.Controllers
             if (!await _checkoutService.UpdateCart(cart))
                 return null;
             ViewCartModel result = new ViewCartModel();
-            await FillModel(result, cart);
+            await FillModel(result, cart.Order);
             SetCartUid(cart.CartUid);
             ContextAccessor.HttpContext.Session.Remove(CheckoutConstants.ReceiptSessionOrderId);
             return result;
@@ -190,7 +190,7 @@ namespace VC.Public.Controllers
                     return new Result<ViewCartModel>(false, model);
                 }
             }
-            await FillModel(model, cart);
+            await FillModel(model, cart.Order);
             SetCartUid(cart.CartUid);
             return model;
         }

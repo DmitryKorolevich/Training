@@ -27,20 +27,20 @@ namespace VitalChoice.Business.Services.Orders
 	{
 		private readonly IEcommerceRepositoryAsync<OrderNote> _orderNoteRepository;
 		private readonly IHttpContextAccessor _contextAccessor;
-		private readonly EcommerceContext _context;
 		private readonly IEcommerceRepositoryAsync<OrderNoteToCustomerType> _orderNoteToCustomerTypeRepository;
 		private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
 		private readonly ILogger _logger;
+	    private readonly ITransactionAccessor<EcommerceContext> _infrastructureTransactionAccessor;
 
-		public OrderNoteService(IEcommerceRepositoryAsync<OrderNote> orderNoteRepository, IHttpContextAccessor contextAccessor,
-			EcommerceContext context, IEcommerceRepositoryAsync<OrderNoteToCustomerType> orderNoteToCustomerTypeRepository, IRepositoryAsync<AdminProfile> adminProfileRepository, ILoggerProviderExtended loggerProvider)
+	    public OrderNoteService(IEcommerceRepositoryAsync<OrderNote> orderNoteRepository, IHttpContextAccessor contextAccessor,
+			IEcommerceRepositoryAsync<OrderNoteToCustomerType> orderNoteToCustomerTypeRepository, IRepositoryAsync<AdminProfile> adminProfileRepository, ILoggerProviderExtended loggerProvider, ITransactionAccessor<EcommerceContext> infrastructureTransactionAccessor)
 		{
 			_orderNoteRepository = orderNoteRepository;
 			_contextAccessor = contextAccessor;
-			_context = context;
 			_orderNoteToCustomerTypeRepository = orderNoteToCustomerTypeRepository;
 			_adminProfileRepository = adminProfileRepository;
-		    _logger = loggerProvider.CreateLoggerDefault();
+	        _infrastructureTransactionAccessor = infrastructureTransactionAccessor;
+	        _logger = loggerProvider.CreateLoggerDefault();
 		}
 
 		public async Task<PagedList<ExtendedOrderNote>> GetOrderNotesAsync(FilterBase filter)
@@ -155,7 +155,7 @@ namespace VitalChoice.Business.Services.Orders
 			orderNote.StatusCode = RecordStatusCode.Active;
 			orderNote.DateEdited = DateTime.Now;
 			orderNote.IdEditedBy = Convert.ToInt32(_contextAccessor.HttpContext.User.GetUserId());
-			using (var transaction = new TransactionAccessor(_context).BeginTransaction())
+			using (var transaction = _infrastructureTransactionAccessor.BeginTransaction())
 			{
 				try
 				{

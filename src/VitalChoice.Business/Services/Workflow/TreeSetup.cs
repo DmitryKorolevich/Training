@@ -21,8 +21,8 @@ namespace VitalChoice.Business.Services.Workflow
         private readonly IEcommerceRepositoryAsync<WorkflowResolverPath> _resolverPathsRepository;
         private readonly IEcommerceRepositoryAsync<WorkflowActionDependency> _actionDependenciesRepository;
         private readonly IEcommerceRepositoryAsync<WorkflowActionAggregation> _actionAggregationsRepository;
-        private readonly EcommerceContext _context;
         private readonly ILogger _logger;
+        private ITransactionAccessor<EcommerceContext> _transactionAccessor;
 
         public TreeSetup(
             IEcommerceRepositoryAsync<WorkflowTree> treeRepository,
@@ -30,14 +30,14 @@ namespace VitalChoice.Business.Services.Workflow
             IEcommerceRepositoryAsync<WorkflowResolverPath> resolverPathsRepository,
             IEcommerceRepositoryAsync<WorkflowActionDependency> actionDependenciesRepository,
             IEcommerceRepositoryAsync<WorkflowActionAggregation> actionAggregationsRepository, EcommerceContext context,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerProviderExtended loggerProvider, ITransactionAccessor<EcommerceContext> transactionAccessor)
         {
             _treeRepository = treeRepository;
             _executorsRepository = executorsRepository;
             _resolverPathsRepository = resolverPathsRepository;
             _actionDependenciesRepository = actionDependenciesRepository;
             _actionAggregationsRepository = actionAggregationsRepository;
-            _context = context;
+            _transactionAccessor = transactionAccessor;
             _logger = loggerProvider.CreateLoggerDefault();
             Trees = new Dictionary<Type, WorkflowTreeDefinition>();
             Actions = new Dictionary<Type, WorkflowActionDefinition>();
@@ -101,7 +101,7 @@ namespace VitalChoice.Business.Services.Workflow
             var aggregations = await _actionAggregationsRepository.Query().SelectAsync();
             var resolverPaths = await _resolverPathsRepository.Query().SelectAsync();
             var executors = await _executorsRepository.Query().SelectAsync();
-            using (var transaction = new TransactionAccessor(_context).BeginTransaction())
+            using (var transaction = _transactionAccessor.BeginTransaction())
             {
                 try
                 {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Identity;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Entities.Permissions;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
@@ -15,7 +16,9 @@ namespace VitalChoice.Interfaces.Services.Users
 
 	    Task DeleteAsync(ApplicationUser user);
 
-	    Task<ApplicationUser> UpdateAsync(ApplicationUser user, IList<RoleType> roleIds = null, string password = null);
+        Task<IdentityResult> RemoveAsync(int idInternal);
+
+        Task<ApplicationUser> UpdateAsync(ApplicationUser user, IList<RoleType> roleIds = null, string password = null);
 
 	    Task<ApplicationUser> GetAsync(Guid publicId);
 

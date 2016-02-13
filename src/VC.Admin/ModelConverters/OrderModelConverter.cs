@@ -198,59 +198,6 @@ namespace VC.Admin.ModelConverters
             UpdateCustomer(model, dynamic);
         }
 
-        public static void SetOrderSplitStatuses(OrderManageModel model, OrderDynamic dynamic)
-        {
-            if (!model.ShouldSplit)
-            {
-                dynamic.OrderStatus = model.CombinedEditOrderStatus;
-                dynamic.POrderStatus = null;
-                dynamic.NPOrderStatus = null;
-                if (dynamic.OrderStatus == OrderStatus.Incomplete || dynamic.OrderStatus == OrderStatus.Processed || dynamic.OrderStatus == OrderStatus.ShipDelayed)
-                {
-                    if (model.ShipDelayType == ShipDelayType.EntireOrder && model.ShipDelayDate.HasValue)
-                    {
-                        dynamic.OrderStatus = OrderStatus.ShipDelayed;
-                    }
-                }
-            }
-            else
-            {
-                dynamic.OrderStatus = null;
-                if (model.CombinedEditOrderStatus == OrderStatus.OnHold)
-                {
-                    dynamic.POrderStatus = dynamic.NPOrderStatus = OrderStatus.OnHold;
-                }
-                else if (model.ShipDelayType == ShipDelayType.EntireOrder)
-                {
-                    dynamic.POrderStatus = model.CombinedEditOrderStatus;
-                    dynamic.NPOrderStatus = model.CombinedEditOrderStatus;
-                    if (model.ShipDelayDate.HasValue)
-                    {
-                        dynamic.POrderStatus = OrderStatus.ShipDelayed;
-                        dynamic.NPOrderStatus = OrderStatus.ShipDelayed;
-                    }
-                }
-                else if (model.ShipDelayType == ShipDelayType.PerishableAndNonPerishable)
-                {
-                    dynamic.POrderStatus = model.CombinedEditOrderStatus;
-                    dynamic.NPOrderStatus = model.CombinedEditOrderStatus;
-                    if (model.ShipDelayDateP.HasValue)
-                    {
-                        dynamic.POrderStatus = OrderStatus.ShipDelayed;
-                    }
-                    if (model.ShipDelayDateNP.HasValue)
-                    {
-                        dynamic.NPOrderStatus = OrderStatus.ShipDelayed;
-                    }
-                }
-                else
-                {
-                    dynamic.POrderStatus = model.CombinedEditOrderStatus;
-                    dynamic.NPOrderStatus = model.CombinedEditOrderStatus;
-                }
-            }
-        }
-
         private void UpdateCustomer(OrderManageModel model, OrderDynamic dynamic)
         {
             if (model.Customer != null)

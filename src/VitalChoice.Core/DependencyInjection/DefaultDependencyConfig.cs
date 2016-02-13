@@ -74,7 +74,6 @@ using VitalChoice.Ecommerce.Context;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Options;
-using VitalChoice.Ecommerce.UnitOfWork;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Options;
@@ -84,6 +83,8 @@ using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Services.Checkout;
 using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.ContentProcessing.Cache;
+using VitalChoice.Data.Transaction;
+using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Infrastructure.ServiceBus;
 using VitalChoice.Interfaces.Services.Checkout;
 
@@ -509,6 +510,7 @@ namespace VitalChoice.Core.DependencyInjection
                     (pi, cc) => cc.Resolve<ILoggerProviderExtended>().CreateLogger(typeof (ObjectEncryptionHost)))
                 .SingleInstance();
             builder.RegisterType<EncryptedOrderExportService>().As<IEncryptedOrderExportService>();
+            builder.RegisterGeneric(typeof (TransactionAccessor<>)).As(typeof (ITransactionAccessor<>)).InstancePerLifetimeScope();
             FinishCustomRegistrations(builder);
 
             var container = builder.Build();

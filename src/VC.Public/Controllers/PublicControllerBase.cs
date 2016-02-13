@@ -68,9 +68,13 @@ namespace VC.Public.Controllers
             return internalId;
         }
 
-        protected async Task<CustomerCartOrder> GetCurrentCart()
+        protected async Task<CustomerCartOrder> GetCurrentCart(bool? loggedIn = null)
         {
-            if (await CustomerLoggedIn())
+            if (loggedIn == null)
+            {
+                loggedIn = await CustomerLoggedIn();
+            }
+            if (loggedIn.Value)
             {
                 var existingUid = Request.GetCartUid();
                 return await CheckoutService.GetOrCreateCart(existingUid, GetInternalCustomerId());

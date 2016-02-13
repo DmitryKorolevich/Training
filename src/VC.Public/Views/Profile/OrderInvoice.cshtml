@@ -26,7 +26,7 @@
                             <span>Status</span>
                         </div>
                         <div class="review-box-line">
-                            <span class="review-info-value">@Html.LabelFor(x => x.DateCreated, null, new { @class = "bold" }):<span>@Model.DateCreated.ToString("MM/dd/yyyy")</span>
+                            <span class="review-info-value">@Html.LabelFor(x => x.DateCreated, null, new { @class = "bold" }): <span>@Model.DateCreated.ToString("MM/dd/yyyy")</span></span>
                         </div>
                         @if (Model.OrderStatus.HasValue)
                         {
@@ -91,6 +91,92 @@
                         }
                     </div>
                 </div>
+                <table class="standard-table cart-items-list">
+                    <thead>
+                        <tr>
+                            <th colspan="2">
+                                Item
+                            </th>
+                            <th>
+                                Price
+                            </th>
+                            <th>
+                                Quantity
+                            </th>
+                            <th>
+                                Subtotal
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Skus)
+                        {
+                            <tr>
+                                <td class="cart-image-link">
+                                    <a title="@item.DisplayName" href="@item.ProductPageUrl">
+                                        <img title="@item.DisplayName" src="@item.IconUrl" />
+                                    </a>
+                                </td>
+                                <td class="cart-line-info">
+                                    <a class="cart-text-link" title="@item.DisplayName" href="@item.ProductPageUrl">@item.DisplayName</a>
+                                    @if (!string.IsNullOrEmpty(item.Code))
+                                    {
+                                        <span class="cart-sku-code">@("(" + item.Code + ")")</span>
+                                    }
+                                    <span class="stock-presence-note">&nbsp;</span>
+                                </td>
+                                <td>@((item.Price ?? 0).ToString("C2"))</td>
+                                <td class="width-cart-quantity">@item.Quantity</td>
+                                <td>@((item.SubTotal ?? 0).ToString("C2"))</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                if (Model.PromoSkus.Count > 0)
+                {
+                    <span class="shipping-instructions-title margin-top-small">Promo Products</span>
+                    <table class="standard-table cart-items-list">
+                        <thead>
+                        <tr>
+                            <th colspan="2">
+                                Item
+                            </th>
+                            <th>
+                                Price
+                            </th>
+                            <th>
+                                Quantity
+                            </th>
+                            <th>
+                                Subtotal
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.PromoSkus)
+                            {
+                                <tr>
+                                    <td class="cart-image-link">
+                                        <a title="@item.DisplayName" href="@item.ProductPageUrl">
+                                            <img title="@item.DisplayName" src="@item.IconUrl"/>
+                                        </a>
+                                    </td>
+                                    <td class="cart-line-info">
+                                        <a class="cart-text-link" title="@item.DisplayName" href="@item.ProductPageUrl">@item.DisplayName</a>
+                                        @if (!string.IsNullOrEmpty(item.Code))
+                                        {
+                                            <span class="cart-sku-code">@("("+item.Code+")")</span>
+                                        }
+                                        <span class="stock-presence-note">&nbsp;</span>
+                                    </td>
+                                    <td>@((item.Price ?? 0).ToString("C2"))</td>
+                                    <td class="width-cart-quantity">@item.Quantity</td>
+                                    <td>@((item.SubTotal ?? 0).ToString("C2"))</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
                 if (Model.IdPaymentMethodType.HasValue)
                 {
                     <div class="reivew-order-info">

@@ -71,6 +71,7 @@ using System.Text.RegularExpressions;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Infrastructure.Domain.Mail;
 using VitalChoice.Business.Mail;
+using VitalChoice.Data.Transaction;
 using VitalChoice.Infrastructure.Context;
 
 namespace VitalChoice.Business.Services.Orders
@@ -131,10 +132,10 @@ namespace VitalChoice.Business.Services.Orders
             IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
             IProductService productService,
             INotificationService notificationService,
-            ICountryService countryService, EcommerceContext dbContext)
+            ICountryService countryService, ITransactionAccessor<EcommerceContext> transactionAccessor)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
-                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, dbContext)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
         {
             _orderRepository = orderRepository;
             _vOrderRepository = vOrderRepository;
@@ -281,7 +282,7 @@ namespace VitalChoice.Business.Services.Orders
             return order;
         }
 
-        public async Task<OrderDataContext> CalculateOrder(OrderDynamic order)
+        public async Task<OrderDataContext> CalculateOrder(OrderDynamic order, OrderStatus combinedStatus)
         {
             var context = new OrderDataContext
             {
@@ -289,7 +290,7 @@ namespace VitalChoice.Business.Services.Orders
             };
             var tree = await _treeFactory.CreateTreeAsync<OrderDataContext, decimal>("Order");
             await tree.ExecuteAsync(context);
-            UpdateOrderFromCalculationContext(order, context);
+            UpdateOrderFromCalculationContext(order, context, combinedStatus);
             return context;
         }
 
@@ -310,7 +311,7 @@ namespace VitalChoice.Business.Services.Orders
             //return await SelectFirstAsync(queryObject: orderQuery, orderBy: o => o.OrderByDescending(x => x.DateCreated));
         }
 
-        private void UpdateOrderFromCalculationContext(OrderDynamic order, OrderDataContext dataContext)
+        private void UpdateOrderFromCalculationContext(OrderDynamic order, OrderDataContext dataContext, OrderStatus combinedStatus)
         {
             order.TaxTotal = dataContext.TaxTotal;
             order.Total = dataContext.Total;
@@ -318,6 +319,136 @@ namespace VitalChoice.Business.Services.Orders
             order.ShippingTotal = dataContext.ShippingTotal;
             order.ProductsSubtotal = dataContext.ProductsSubtotal;
             order.PromoSkus = dataContext.PromoSkus;
+            SetOrderSplitStatuses(dataContext, order, combinedStatus);
+        }
+
+        public async Task OrderTypeSetup(OrderDynamic order)
+        {
+            var orderType = order.Data.MailOrder ? (int?)SourceOrderType.MailOrder : null;
+            var idOrder = order.Id;
+            if (idOrder != 0)
+            {
+                var optionType = DynamicMapper.FilterByType(order.IdObjectType).FirstOrDefault(o => o.Name == "OrderType")?.Id;
+                if (optionType != null)
+                {
+                    var dbItem =
+                        await
+                            OptionValuesRepository.Query()
+                                .Where(v => v.IdOrder == idOrder && v.IdOptionType == optionType.Value)
+                                .SelectFirstOrDefaultAsync(false);
+                    if (dbItem != null)
+                    {
+                        if (dbItem.Value == ((int) SourceOrderType.MailOrder).ToString())
+                        {
+                            if (!orderType.HasValue)
+                            {
+                                orderType = (int) SourceOrderType.Phone;
+                            }
+                            order.Data.OrderType = orderType.Value;
+                        }
+                        else
+                        {
+                            int value;
+                            if (int.TryParse(dbItem.Value, out value))
+                            {
+                                order.Data.OrderType = orderType ?? value;
+                            }
+                            else
+                            {
+                                order.Data.OrderType = orderType;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        order.Data.OrderType = orderType ?? (int) SourceOrderType.Phone;
+                    }
+                }
+            }
+            else
+            {
+                if (!orderType.HasValue)
+                {
+                    orderType = (int)SourceOrderType.Phone;
+                }
+                order.Data.OrderType = orderType.Value;
+                order.ShippingAddress.Id = 0;
+                if (order.PaymentMethod.Address != null)
+                {
+                    order.PaymentMethod.Address.Id = 0;
+                }
+                order.PaymentMethod.Id = 0;
+            }
+        }
+
+        private void SetOrderSplitStatuses(OrderDataContext model, OrderDynamic dynamic, OrderStatus combinedStatus)
+        {
+            if (combinedStatus == OrderStatus.Incomplete)
+            {
+                if (model.SplitInfo?.ShouldSplit ?? false)
+                {
+                    dynamic.OrderStatus = null;
+                    dynamic.POrderStatus = combinedStatus;
+                    dynamic.NPOrderStatus = combinedStatus;
+                }
+                else
+                {
+                    dynamic.OrderStatus = combinedStatus;
+                    dynamic.POrderStatus = null;
+                    dynamic.NPOrderStatus = null;
+                }
+                return;
+            }
+            if (model.SplitInfo?.ShouldSplit ?? false)
+            {
+                dynamic.OrderStatus = null;
+                if (combinedStatus == OrderStatus.OnHold)
+                {
+                    dynamic.POrderStatus = dynamic.NPOrderStatus = OrderStatus.OnHold;
+                }
+                else if ((int?)dynamic.SafeData.ShipDelayType == (int)ShipDelayType.EntireOrder)
+                {
+                    dynamic.POrderStatus = combinedStatus;
+                    dynamic.NPOrderStatus = combinedStatus;
+                    if (dynamic.SafeData.ShipDelayDate != null)
+                    {
+                        dynamic.POrderStatus = OrderStatus.ShipDelayed;
+                        dynamic.NPOrderStatus = OrderStatus.ShipDelayed;
+                    }
+                }
+                else if ((int?)dynamic.SafeData.ShipDelayType == (int)ShipDelayType.PerishableAndNonPerishable)
+                {
+                    dynamic.POrderStatus = combinedStatus;
+                    dynamic.NPOrderStatus = combinedStatus;
+                    if (dynamic.SafeData.ShipDelayDateP != null)
+                    {
+                        dynamic.POrderStatus = OrderStatus.ShipDelayed;
+                    }
+                    if (dynamic.SafeData.ShipDelayDateNP != null)
+                    {
+                        dynamic.NPOrderStatus = OrderStatus.ShipDelayed;
+                    }
+                }
+                else
+                {
+                    dynamic.POrderStatus = combinedStatus;
+                    dynamic.NPOrderStatus = combinedStatus;
+                }
+            }
+            else
+            {
+                dynamic.OrderStatus = combinedStatus;
+                dynamic.POrderStatus = null;
+                dynamic.NPOrderStatus = null;
+                if (dynamic.OrderStatus == OrderStatus.Incomplete || dynamic.OrderStatus == OrderStatus.Processed ||
+                    dynamic.OrderStatus == OrderStatus.ShipDelayed)
+                {
+                    if ((int?)dynamic.SafeData.ShipDelayType == (int)ShipDelayType.EntireOrder && dynamic.SafeData.ShipDelayDate != null)
+                    {
+                        dynamic.OrderStatus = OrderStatus.ShipDelayed;
+                    }
+                }
+            }
         }
 
         protected override Task<List<MessageInfo>> ValidateAsync(OrderDynamic dynamic)
@@ -850,7 +981,7 @@ namespace VitalChoice.Business.Services.Orders
 
             foreach (var item in map)
             {
-                var context = await this.CalculateOrder(item.Order);
+                var context = await this.CalculateOrder(item.Order, OrderStatus.Processed);
                 item.Order = context.Order;
 
                 if (item.Order.SafeData.ShipDelayDate!=null)

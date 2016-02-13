@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
-using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 
 namespace VitalChoice.Interfaces.Services.Checkout
 {
@@ -11,7 +10,6 @@ namespace VitalChoice.Interfaces.Services.Checkout
         Task<CustomerCartOrder> GetOrCreateCart(Guid? uid, int idCustomer);
         Task<bool> UpdateCart(CustomerCartOrder anonymCart);
         Task<bool> SaveOrder(CustomerCartOrder anonymCart);
-        Task<OrderDataContext> CalculateCart(CustomerCartOrder cart);
         Task<int> GetCartItemsCount(Guid uid);
     }
 }

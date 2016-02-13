@@ -33,26 +33,25 @@ namespace VitalChoice.Business.Services.Payment
 	{
 		private readonly IEcommerceRepositoryAsync<PaymentMethod> _paymentMethodRepository;
 		private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
-		private readonly EcommerceContext _context;
 		private readonly IEcommerceRepositoryAsync<PaymentMethodToCustomerType> _paymentMethodToCustomerTypeRepository;
 		private readonly IHttpContextAccessor _contextAccessor;
 	    private readonly IOptions<AppOptions> _options;
 	    private readonly ICountryNameCodeResolver _countryNameCode;
 	    private readonly ILogger _logger;
+	    private readonly ITransactionAccessor<EcommerceContext> _transactionAccessor;
 
 	    public PaymentMethodService(IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository,
 	        IHttpContextAccessor contextAccessor, IRepositoryAsync<AdminProfile> adminProfileRepository,
-	        EcommerceContext context,
 	        IEcommerceRepositoryAsync<PaymentMethodToCustomerType> paymentMethodToCustomerTypeRepository,
-	        ILoggerProviderExtended loggerProvider, IOptions<AppOptions> options, ICountryNameCodeResolver countryNameCode)
+	        ILoggerProviderExtended loggerProvider, IOptions<AppOptions> options, ICountryNameCodeResolver countryNameCode, ITransactionAccessor<EcommerceContext> transactionAccessor)
 	    {
 	        _paymentMethodRepository = paymentMethodRepository;
 	        _contextAccessor = contextAccessor;
 	        _adminProfileRepository = adminProfileRepository;
-	        _context = context;
 	        _paymentMethodToCustomerTypeRepository = paymentMethodToCustomerTypeRepository;
 	        _options = options;
 	        _countryNameCode = countryNameCode;
+	        _transactionAccessor = transactionAccessor;
 	        _logger = loggerProvider.CreateLoggerDefault();
 	    }
 
@@ -97,7 +96,7 @@ namespace VitalChoice.Business.Services.Payment
 						.Include(x => x.CustomerTypes)
 						.SelectAsync(false);
 
-			using (var transaction = new TransactionAccessor(_context).BeginTransaction())
+			using (var transaction = _transactionAccessor.BeginTransaction())
 			{
 				try
 				{

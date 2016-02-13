@@ -94,7 +94,7 @@
     </div>
     <div class="margin-bottom-small"></div>
     <div class="receipt-sku-details">
-        <table class="standard-table cart-items-list">
+        <table class="standard-table cart-items-list cart-items-list-readonly">
             <thead>
                 <tr>
                     <th>
@@ -120,11 +120,11 @@
                     foreach (var t in Model.Skus)
                     {
                         <tr>
-                            <td>@t.Quantity</td>
-                            <td>@t.Code</td>
+                            <td class="qty">@t.Quantity</td>
+                            <td class="sku">@t.Code</td>
                             <td>@t.DisplayName</td>
-                            <td>@((t.Price ?? 0).ToString("C2"))</td>
-                            <td>@((t.SubTotal ?? 0).ToString("C2"))</td>
+                            <td class="unit-price">@((t.Price ?? 0).ToString("C2"))</td>
+                            <td class="price">@((t.SubTotal ?? 0).ToString("C2"))</td>
                         </tr>
                     }
                 }
@@ -139,7 +139,7 @@
     {
         <div class="receipt-sku-details">
             <label class="receipt-promo-title">Promo Products</label>
-            <table class="standard-table cart-items-list">
+            <table class="standard-table cart-items-list cart-items-list-readonly">
                 <thead>
                     <tr>
                         <th>
@@ -163,11 +163,11 @@
                     @foreach (var t in Model.PromoSkus)
                     {
                         <tr>
-                            <td>@t.Quantity</td>
-                            <td>@t.Code</td>
+                            <td class="qty">@t.Quantity</td>
+                            <td class="sku">@t.Code</td>
                             <td>@t.DisplayName</td>
-                            <td>@((t.Price ?? 0).ToString("C2"))</td>
-                            <td>@((t.SubTotal ?? 0).ToString("C2"))</td>
+                            <td class="unit-price">@((t.Price ?? 0).ToString("C2"))</td>
+                            <td class="price">@((t.SubTotal ?? 0).ToString("C2"))</td>
                         </tr>
                     }
                 </tbody>

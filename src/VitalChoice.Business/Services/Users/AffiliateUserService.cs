@@ -7,12 +7,14 @@ using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Business.Mail;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Data.Transaction;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 using VitalChoice.Ecommerce.Domain.Entities.Users;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Mail;
+using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
@@ -29,14 +31,14 @@ namespace VitalChoice.Business.Services.Users
         public AffiliateUserService(
             UserManager<ApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,
-            IDataContextAsync context, 
+            VitalChoiceContext context, 
             SignInManager<ApplicationUser> signInManager, 
             IAppInfrastructureService appInfrastructureService,
             INotificationService notificationService,
             IOptions<AppOptions> options, 
             IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync,
             IEcommerceRepositoryAsync<Affiliate> affiliateRepositoryAsync,
-            IUserValidator<ApplicationUser> userValidator) :
+            IUserValidator<ApplicationUser> userValidator, ITransactionAccessor<VitalChoiceContext> transactionAccessor) :
             base(
                 userManager,
                 roleManager,
@@ -46,7 +48,7 @@ namespace VitalChoice.Business.Services.Users
                 notificationService, 
                 options, 
                 ecommerceRepositoryAsync,
-                userValidator)
+                userValidator, transactionAccessor)
 		{
             _affiliateRepositoryAsync = affiliateRepositoryAsync;
         }

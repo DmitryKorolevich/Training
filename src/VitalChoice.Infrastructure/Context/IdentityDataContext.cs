@@ -12,9 +12,9 @@ using VitalChoice.Infrastructure.Domain.Entities.Users;
 
 namespace VitalChoice.Infrastructure.Context
 {
-	public class IdentityDataContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>, IDataContext, IDataContextAsync
+	public class IdentityDataContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>, IDataContextAsync
 	{
-        private InnerEmbeddingTransaction _transaction;
+        private IInnerEmbeddingTransaction _transaction;
 
         public IdentityDataContext()
 		{
@@ -22,15 +22,23 @@ namespace VitalChoice.Infrastructure.Context
         }
 
 		public Guid InstanceId { get; }
+	    public bool LateDisposed { get; private set; }
 
-        public IRelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted)
+	    public IInnerEmbeddingTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted)
         {
             if (_transaction == null || _transaction.Closed)
             {
-                _transaction = new InnerEmbeddingTransaction(Database.BeginTransaction(isolation));
+                _transaction = new InnerEmbeddingTransaction(Database.BeginTransaction(isolation), this);
             }
             _transaction.IncReference();
             return _transaction;
+        }
+
+        public override void Dispose()
+        {
+            if (_transaction == null || _transaction.Closed)
+                base.Dispose();
+            LateDisposed = true;
         }
 
         public override int SaveChanges()

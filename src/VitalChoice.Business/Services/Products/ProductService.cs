@@ -13,6 +13,7 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Services;
+using VitalChoice.Data.Transaction;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Validation;
@@ -166,10 +167,10 @@ namespace VitalChoice.Business.Services.Products
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             IOptions<AppOptions> options,
             ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<VCustomerFavorite> vCustomerRepositoryAsync,
-            DirectMapper<Product> directMapper, DynamicExpressionVisitor queryVisitor, EcommerceContext dbContext)
+            DirectMapper<Product> directMapper, DynamicExpressionVisitor queryVisitor, ITransactionAccessor<EcommerceContext> transactionAccessor)
             : base(
                 mapper, productRepository, productValueRepositoryAsync,
-                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, dbContext)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
         {
             _vProductSkuRepository = vProductSkuRepository;
             _vSkuRepository = vSkuRepository;

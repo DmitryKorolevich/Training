@@ -1,9 +1,14 @@
-﻿using VC.Public.Helpers;
+﻿using System.Linq;
+using VC.Public.Helpers;
+using VC.Public.Models.Cart;
 using VC.Public.Models.Profile;
+using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Interfaces.Services;
@@ -16,15 +21,21 @@ namespace VC.Public.ModelConverters.Order
         private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
         private readonly ICountryService _countryService;
         private readonly ReferenceData _referenceData;
+        protected readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
+        protected readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
 
         public OrderViewModelConverter(
             IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
             ICountryService countryService,
-            IAppInfrastructureService appInfrastructureService)
+            IAppInfrastructureService appInfrastructureService,
+            IDynamicMapper<SkuDynamic, Sku> skuMapper,
+            IDynamicMapper<ProductDynamic, Product> productMapper)
         {
             _addressMapper = addressMapper;
             _countryService = countryService;
             _referenceData = appInfrastructureService.Get();
+            _skuMapper = skuMapper;
+            _productMapper = productMapper;
         }
 
         public override void DynamicToModel(OrderViewModel model, OrderDynamic dynamic)
@@ -52,6 +63,26 @@ namespace VC.Public.ModelConverters.Order
             }
             
             model.IdPaymentMethodType = dynamic?.PaymentMethod.IdObjectType;
+
+            model.Skus.AddRange(dynamic?.Skus?.Select(sku =>
+                {
+                    var result = _skuMapper.ToModel<CartSkuModel>(sku.Sku);
+                    _productMapper.UpdateModel(result, sku.ProductWithoutSkus);
+                    result.Price = sku.Amount;
+                    result.Quantity = sku.Quantity;
+                    result.SubTotal = sku.Quantity * sku.Amount;
+                    return result;
+                }) ?? Enumerable.Empty<CartSkuModel>());
+
+            model.PromoSkus.AddRange(dynamic?.PromoSkus?.Select(sku =>
+            {
+                var result = _skuMapper.ToModel<CartSkuModel>(sku.Sku);
+                _productMapper.UpdateModel(result, sku.ProductWithoutSkus);
+                result.Price = sku.Amount;
+                result.Quantity = sku.Quantity;
+                result.SubTotal = sku.Quantity * sku.Amount;
+                return result;
+            }) ?? Enumerable.Empty<CartSkuModel>());
         }
 
         public override void ModelToDynamic(OrderViewModel model, OrderDynamic dynamic)
