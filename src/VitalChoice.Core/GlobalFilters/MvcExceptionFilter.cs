@@ -81,7 +81,21 @@ namespace VitalChoice.Core.GlobalFilters
 				}
 				else
 				{
-                    result.ViewName = apiException.Status == HttpStatusCode.NotFound ? "Error404" : "Error";
+					string viewName;
+					switch (apiException.Status)
+					{
+						case HttpStatusCode.NotFound:
+							viewName = "Error404";
+							break;
+						case HttpStatusCode.Forbidden:
+							viewName = "AccessDenied";
+								break;
+						default:
+							viewName = "Error";
+							break;
+					}
+
+                    result.ViewName = viewName;
 					result.StatusCode = (int)apiException.Status;
 
                     var logger = LoggerService.GetDefault();

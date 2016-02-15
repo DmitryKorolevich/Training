@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
@@ -18,7 +17,6 @@ using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
-using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services.Products;
 using System.Linq;
 
@@ -72,16 +70,6 @@ namespace VC.Public.Controllers
 			};
 
 		    return reviewsModel;
-	    }
-
-	    private IList<CustomerTypeCode> GetCategoryMenuAvailability()
-	    {
-		    return User.Identity.IsAuthenticated
-			    ? (User.IsInRole(IdentityConstants.WholesaleCustomer)
-				    ? new List<CustomerTypeCode>() {CustomerTypeCode.Wholesale, CustomerTypeCode.All}
-				    : new List<CustomerTypeCode>() {CustomerTypeCode.Retail, CustomerTypeCode.All})
-			    : new List<CustomerTypeCode>() {CustomerTypeCode.Retail, CustomerTypeCode.All};
-			    //todo: refactor when authentication mechanism gets ready
 	    }
 
 	    [HttpGet]

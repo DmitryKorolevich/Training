@@ -59,6 +59,11 @@ namespace VitalChoice.ContentProcessing.Base
             }
             var viewContext = await GetData(GetParameters(context, bindingContext, parameters), user, context);
             var contentEntity = viewContext.Entity;
+	        if (contentEntity == null)
+	        {
+		        return null;
+	        }
+
             ITtlTemplate template;
             try
             {
