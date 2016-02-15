@@ -261,7 +261,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
         {
             return productCategoryLites?.Select(x => new TtlSidebarMenuItemModel()
             {
-                Label = x.NavLabel,
+                Label = !string.IsNullOrWhiteSpace(x.NavLabel) ? x.NavLabel : x.ProductCategory.Name,
                 Url = x.Url,
                 SubItems = ConvertToSideMenuModelLevel(x.SubItems)
             }).ToList();
