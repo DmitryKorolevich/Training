@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using VC.Public.Helpers;
 using VC.Public.Models.Cart;
@@ -20,7 +21,7 @@ namespace VC.Public.ModelConverters.Order
 {
     public class OrderViewModelConverter : BaseModelConverter<OrderViewModel, OrderDynamic>
     {
-        private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
+        private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly ICountryService _countryService;
         private readonly ReferenceData _referenceData;
         protected readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
@@ -33,7 +34,7 @@ namespace VC.Public.ModelConverters.Order
             IDynamicMapper<SkuDynamic, Sku> skuMapper,
             IDynamicMapper<ProductDynamic, Product> productMapper)
         {
-            _addressMapper = addressMapper;
+            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             _countryService = countryService;
             _referenceData = appInfrastructureService.Get();
             _skuMapper = skuMapper;
@@ -104,6 +105,21 @@ namespace VC.Public.ModelConverters.Order
                 Amount = item.Amount,
                 Code = item.GiftCertificate.Code,
             }).ToList() ?? new List<GCInvoiceEntity>();
+
+            //Dates in the needed timezone
+            model.DateCreated = TimeZoneInfo.ConvertTime(model.DateCreated, TimeZoneInfo.Local, _pstTimeZoneInfo);
+            if (model.ShipDelayDate.HasValue)
+            {
+                model.ShipDelayDate = TimeZoneInfo.ConvertTime(model.ShipDelayDate.Value, TimeZoneInfo.Local, _pstTimeZoneInfo);
+            }
+            if (model.ShipDelayDateP.HasValue)
+            {
+                model.ShipDelayDateP = TimeZoneInfo.ConvertTime(model.ShipDelayDateP.Value, TimeZoneInfo.Local, _pstTimeZoneInfo);
+            }
+            if (model.ShipDelayDateNP.HasValue)
+            {
+                model.ShipDelayDateNP = TimeZoneInfo.ConvertTime(model.ShipDelayDateNP.Value, TimeZoneInfo.Local, _pstTimeZoneInfo);
+            }
         }
 
         public override void ModelToDynamic(OrderViewModel model, OrderDynamic dynamic)
