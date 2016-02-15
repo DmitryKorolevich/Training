@@ -21,5 +21,7 @@
         public const string AffiliateTiers = "AffiliateTiers";
 
         public const string PromotionBuyTypes = "PromotionBuyTypes";
+
+        public const string ShippingUpgrades = "ShippingUpgrade";
     }
 }

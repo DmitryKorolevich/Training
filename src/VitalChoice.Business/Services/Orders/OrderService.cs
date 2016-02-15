@@ -980,45 +980,18 @@ namespace VitalChoice.Business.Services.Orders
 
             foreach (var item in map)
             {
-                var context = await this.CalculateOrder(item.Order, OrderStatus.Processed);
-                item.Order = context.Order;
-
-                if (item.Order.SafeData.ShipDelayDate!=null)
+                var orderCombinedStatus= item.Order.OrderStatus ?? OrderStatus.Processed;
+                if (item.Order.SafeData.ShipDelayDate != null)
                 {
                     item.Order.Data.ShipDelayType = ShipDelayType.EntireOrder;
-                    if (item.Order.OrderStatus != OrderStatus.OnHold)
-                    {
-                        if (context.SplitInfo?.ShouldSplit == null || context.SplitInfo?.ShouldSplit == false)
-                        {
-                            item.Order.OrderStatus = OrderStatus.ShipDelayed;
-                        }
-                        else
-                        {
-                            item.Order.OrderStatus = null;
-                            item.Order.POrderStatus = OrderStatus.ShipDelayed;
-                            item.Order.NPOrderStatus = OrderStatus.ShipDelayed;
-                        }
-                    }
-                    else
-                    {
-                        if (context.SplitInfo?.ShouldSplit == true)
-                        {
-                            item.Order.POrderStatus = item.Order.OrderStatus;
-                            item.Order.NPOrderStatus = item.Order.OrderStatus;
-                            item.Order.OrderStatus = null;
-                        }
-                    }
                 }
                 else
                 {
                     item.Order.Data.ShipDelayType = ShipDelayType.None;
-                    if (context.SplitInfo?.ShouldSplit == true)
-                    {
-                        item.Order.POrderStatus = item.Order.OrderStatus;
-                        item.Order.NPOrderStatus = item.Order.OrderStatus;
-                        item.Order.OrderStatus = null;
-                    }
                 }
+
+                var context = await this.CalculateOrder(item.Order, orderCombinedStatus);
+                item.Order = context.Order;
 
                 item.OrderImportItem.ErrorMessages.AddRange(context.Messages);
                 if (context.SkuOrdereds != null)

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using VC.Public.Helpers;
 using VC.Public.Models.Cart;
 using VC.Public.Models.Profile;
@@ -6,6 +7,7 @@ using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
+using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
@@ -59,7 +61,7 @@ namespace VC.Public.ModelConverters.Order
 
             if (dynamic?.ShippingAddress != null)
             {
-                model.ShipToAddress = dynamic.PaymentMethod.Address.PopulateShippingAddressDetails(countries);
+                model.ShipToAddress = dynamic.ShippingAddress.PopulateShippingAddressDetails(countries);
             }
             
             model.IdPaymentMethodType = dynamic?.PaymentMethod.IdObjectType;
@@ -83,6 +85,25 @@ namespace VC.Public.ModelConverters.Order
                 result.SubTotal = sku.Quantity * sku.Amount;
                 return result;
             }) ?? Enumerable.Empty<CartSkuModel>());
+
+            model.ShippingSurcharge = model.AlaskaHawaiiSurcharge + model.CanadaSurcharge - model.SurchargeOverride;
+            model.TotalShipping = model.ShippingTotal - model.ShippingSurcharge;
+
+            if (dynamic.GiftCertificates != null)
+            {
+                model.GiftCertificatesTotal = dynamic.GiftCertificates.Sum(p => p.Amount);
+            }
+
+            if (dynamic.Discount != null)
+            {
+                model.DiscountCode = dynamic.Discount.Code;
+            }
+
+            model.GCs = dynamic.GiftCertificates?.Select(item => new GCInvoiceEntity()
+            {
+                Amount = item.Amount,
+                Code = item.GiftCertificate.Code,
+            }).ToList() ?? new List<GCInvoiceEntity>();
         }
 
         public override void ModelToDynamic(OrderViewModel model, OrderDynamic dynamic)

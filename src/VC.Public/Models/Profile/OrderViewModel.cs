@@ -9,6 +9,13 @@ using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 
 namespace VC.Public.Models.Profile
 {
+    public class GCInvoiceEntity
+    {
+        public string Code { get; set; }
+
+        public decimal Amount { get; set; }
+    }
+
     public class OrderViewModel
     {
         [Map]
@@ -18,7 +25,6 @@ namespace VC.Public.Models.Profile
         public int IdCustomer { get; set; }
 
         [Map]
-        [Display(Name = "Order Date")]
         public DateTime DateCreated { get; set; }
 
         public AddressModel Shipping { get; set; }
@@ -124,6 +130,19 @@ namespace VC.Public.Models.Profile
         public IList<CartSkuModel> Skus { get; set; }
 
         public IList<CartSkuModel> PromoSkus { get; set; }
+
+        public decimal ShippingSurcharge { get; set; }
+
+        public decimal GiftCertificatesTotal { get; set; }
+
+        public string DiscountCode { get; set; }
+
+        public string DiscountCodeMessage { get; set; }
+
+        public ICollection<GCInvoiceEntity> GCs { get; set; }
+
+        //Only shipping with ovveride and without surcharge part
+        public decimal TotalShipping { get; set; }
 
         public OrderViewModel()
         {

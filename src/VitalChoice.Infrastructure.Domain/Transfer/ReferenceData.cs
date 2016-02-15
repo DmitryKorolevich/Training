@@ -102,5 +102,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer
         public IList<LookupItem<string>> PersonTitles { get; set; }
 
 	    public IList<LookupItem<int>> CartShippingOptions { get; set; }
+
+        public IList<LookupItem<int>> ShippingUpgrades { get; set; }
     }
 }
