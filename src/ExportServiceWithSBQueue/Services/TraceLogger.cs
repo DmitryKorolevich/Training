@@ -3,7 +3,7 @@ using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
-namespace ExportWorkerRoleWithSBQueue.Services
+namespace ExportServiceWithSBQueue.Services
 {
     public class TraceLogger<T> : TraceLogger, ILogger<T>
     {

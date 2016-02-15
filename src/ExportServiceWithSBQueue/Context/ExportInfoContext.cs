@@ -1,10 +1,10 @@
 ﻿using System.Data.SqlClient;
-using ExportWorkerRoleWithSBQueue.Entities;
+using ExportServiceWithSBQueue.Entities;
 using Microsoft.Data.Entity;
 using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Data.Context;
 
-namespace ExportWorkerRoleWithSBQueue.Context
+namespace ExportServiceWithSBQueue.Context
 {
     public class ExportInfoContext : DataContext
     {

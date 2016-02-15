@@ -2,9 +2,8 @@
 using System.Threading.Tasks;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
-using VitalChoice.Infrastructure.ServiceBus;
 
-namespace ExportWorkerRoleWithSBQueue.Services
+namespace ExportServiceWithSBQueue.Services
 {
     public interface IOrderExportService
     {

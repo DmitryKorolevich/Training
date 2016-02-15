@@ -1,17 +1,17 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using ExportWorkerRoleWithSBQueue.Context;
-using ExportWorkerRoleWithSBQueue.Entities;
+using ExportServiceWithSBQueue.Context;
+using ExportServiceWithSBQueue.Entities;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
-using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.ServiceBus;
+using System.Linq;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
-namespace ExportWorkerRoleWithSBQueue.Services
+namespace ExportServiceWithSBQueue.Services
 {
     public class OrderExportService : IOrderExportService
     {

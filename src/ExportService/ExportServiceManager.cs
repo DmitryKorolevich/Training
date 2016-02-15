@@ -1,37 +1,33 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
+using System.ServiceProcess;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Autofac;
-using ExportWorkerRoleWithSBQueue;
-using ExportWorkerRoleWithSBQueue.Services;
+using ExportServiceWithSBQueue;
+using ExportServiceWithSBQueue.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
 using Microsoft.ServiceBus;
-using Microsoft.WindowsAzure.ServiceRuntime;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.ServiceBus;
 
-namespace ExportWorker
+namespace ExportService
 {
-    public class WorkerRole : RoleEntryPoint
+    public partial class ExportServiceManager : ServiceBase
     {
         private readonly ManualResetEvent _completedEvent = new ManualResetEvent(false);
-        private IOptions<AppOptions> _options;
-        private ILogger _logger;
-        private IObjectEncryptionHost _encryptionHost;
-        private IContainer _container;
+        private readonly IOptions<AppOptions> _options;
+        private readonly ILogger _logger;
+        private readonly IObjectEncryptionHost _encryptionHost;
+        private readonly IContainer _container;
 
-        public override void Run()
-        {
-            Trace.WriteLine("Starting processing of messages");
-            using (new EncryptedServiceBusHostServer(_options, _logger, _container, _encryptionHost))
-            {
-                _completedEvent.WaitOne();
-            }
-        }
-
-        public override bool OnStart()
+        public ExportServiceManager()
         {
             try
             {
@@ -69,10 +65,20 @@ namespace ExportWorker
                     throw e.InnerException;
                 throw;
             }
-            return base.OnStart();
+            InitializeComponent();
         }
 
-        public override void OnStop()
+        protected override void OnStart(string[] args)
+        {
+            base.OnStart(args);
+            Trace.WriteLine("Starting processing of messages");
+            using (new EncryptedServiceBusHostServer(_options, _logger, _container, _encryptionHost))
+            {
+                _completedEvent.WaitOne();
+            }
+        }
+
+        protected override void OnStop()
         {
             _completedEvent.Set();
             _container.Dispose();

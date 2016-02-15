@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using Autofac;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
-using Microsoft.ServiceBus.Messaging;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus;
 
-namespace ExportWorkerRoleWithSBQueue.Services
+namespace ExportServiceWithSBQueue.Services
 {
     public sealed class EncryptedServiceBusHostServer : EncryptedServiceBusHost
     {
