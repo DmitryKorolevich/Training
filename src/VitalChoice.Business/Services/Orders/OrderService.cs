@@ -692,19 +692,18 @@ namespace VitalChoice.Business.Services.Orders
             return entities;
         }
 
-        private async Task UpdateAffiliateOrderPayment(OrderDynamic model, IUnitOfWorkAsync uow)
+        private async Task UpdateAffiliateOrderPayment(OrderDynamic dynamic, IUnitOfWorkAsync uow)
         {
-            if (!model.IdAddedBy.HasValue && model.Customer.IdAffiliate.HasValue)
+            if (!dynamic.IdAddedBy.HasValue && dynamic.Customer.IdAffiliate.HasValue &&
+                dynamic.AffiliatePaymentAmount.HasValue && dynamic.AffiliateNewCustomerOrder.HasValue)
             {
                 AffiliateOrderPayment payment = new AffiliateOrderPayment();
-                payment.Id = model.Id;
+                payment.Id = dynamic.Id;
                 payment.Status = AffiliateOrderPaymentStatus.NotPaid;
-                payment.IdAffiliate = model.Customer.IdAffiliate.Value;
+                payment.IdAffiliate = dynamic.Customer.IdAffiliate.Value;
                 //TODO - calculate commission and set is a first order or no the given customer
-                //payment.Amount =
-                //payment.NewCustomerOrder =
-
-                return;
+                payment.Amount = dynamic.AffiliatePaymentAmount.Value;
+                payment.NewCustomerOrder = dynamic.AffiliateNewCustomerOrder.Value;
 
                 var affiliateOrderPaymentRepository = uow.RepositoryAsync<AffiliateOrderPayment>();
                 var dbItem = (await affiliateOrderPaymentRepository.Query(p => p.Id == payment.Id).SelectAsync(false)).FirstOrDefault();
