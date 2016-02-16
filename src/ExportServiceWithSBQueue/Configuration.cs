@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Reflection;
 using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using Avalara.Avatax.Rest.Services;
 using Azure.ApplicationHost.Host;
-using ExportWorkerRoleWithSBQueue.Context;
-using ExportWorkerRoleWithSBQueue.Services;
+using ExportServiceWithSBQueue.Context;
+using ExportServiceWithSBQueue.Services;
 using Microsoft.AspNet.Identity;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Business.Mail;
 using VitalChoice.Business.Repositories;
@@ -19,7 +17,6 @@ using VitalChoice.Business.Services;
 using VitalChoice.Business.Services.Affiliates;
 using VitalChoice.Business.Services.Avatax;
 using VitalChoice.Business.Services.Content;
-using VitalChoice.Business.Services.Content.ContentProcessors;
 using VitalChoice.Business.Services.Customers;
 using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Business.Services.FedEx;
@@ -31,15 +28,12 @@ using VitalChoice.Business.Services.Settings;
 using VitalChoice.Business.Services.Users;
 using VitalChoice.Business.Services.Workflow;
 using VitalChoice.ContentProcessing.Cache;
-using VitalChoice.ContentProcessing.Helpers;
 using VitalChoice.ContentProcessing.Interfaces;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Services;
-using VitalChoice.DynamicData.Extensions;
-using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Cache;
 using VitalChoice.Ecommerce.Context;
@@ -56,19 +50,23 @@ using VitalChoice.Interfaces.Services.Affiliates;
 using VitalChoice.Interfaces.Services.Avatax;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Interfaces.Services.Customers;
-using VitalChoice.Interfaces.Services.Help;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Workflow.Core;
+using Autofac.Extensions.DependencyInjection;
+using VitalChoice.DynamicData.Helpers;
+using VitalChoice.Interfaces.Services.Help;
+using VitalChoice.DynamicData.Extensions;
+using VitalChoice.ContentProcessing.Helpers;
 
-namespace ExportWorkerRoleWithSBQueue
+namespace ExportServiceWithSBQueue
 {
-    internal class Configuration
+    public class Configuration
     {
-        internal static IContainer BuildContainer()
+        public static IContainer BuildContainer()
         {
             DnxHostedApplication.Init();
             var configurationBuilder = new ConfigurationBuilder()

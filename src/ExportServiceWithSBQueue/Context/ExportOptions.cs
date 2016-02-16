@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using VitalChoice.Infrastructure.Domain.Options;
+﻿using VitalChoice.Infrastructure.Domain.Options;
 
-namespace ExportWorkerRoleWithSBQueue.Context
+namespace ExportServiceWithSBQueue.Context
 {
     public class ExportDbConnection
     {
