@@ -7,6 +7,8 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
         function($scope, $injector, $filter, customerService, toaster, promiseTracker, $rootScope, $q, $state, $stateParams, customerEditService, $window, 
         Upload, modalUtil)
         {
+            var baseValidationMessage = "Validation errors, please correct field values.";
+
 			$scope.addEditTracker = promiseTracker("addEdit");
 			$scope.resetTracker = promiseTracker("reset");
 			$scope.resendTracker = promiseTracker("resend");
@@ -355,12 +357,21 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 									});
 								}
 							}
-							messages += value.Message + "<br />";
+
+							if (!value.Field)
+							{
+							    messages += value.Message + "<br />";
+							}
 						});
 
-						if (formForShowing) {
-							activateTab(formForShowing);
+						if (formForShowing)
+						{
+						    activateTab(formForShowing);
 						}
+					}
+					if (messages == "" && result.Messages && result.Messages.length > 0)
+					{
+					    messages = baseValidationMessage;
 					}
 					toaster.pop('error', "Error!", messages, null, 'trustedHtml');
 			    }
@@ -450,7 +461,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 					$scope.forms.submitted['wiretransfer'] = true;
 					$scope.forms.submitted['marketing'] = true;
 					$scope.forms.submitted['vcwellness'] = true;
-					toaster.pop('error', "Error!", "Validation errors, please correct field values.", null, 'trustedHtml');
+					toaster.pop('error', "Error!", baseValidationMessage, null, 'trustedHtml');
 				}
 			};
 
