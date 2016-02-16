@@ -455,23 +455,27 @@ namespace VC.Public.Controllers
 
                     foreach (var skuOrdered in lastOrder.Skus)
                     {
-                        var skuInDB = skus.FirstOrDefault(p => p.SkuId == skuOrdered.Sku.Id);
+                        //Ignore hidden in the storefront skus and products in this view
+                        var skuInDB = skus.FirstOrDefault(p => p.SkuId == skuOrdered.Sku.Id && !p.Hidden && !p.ProductHidden);
 
-                        var orderLineModel = new LastOrderLineModel()
+                        if (skuInDB != null)
                         {
-                            ProductUrl = ProductBaseUrl + skuOrdered.ProductWithoutSkus.Url,
-                            IconLink = skuOrdered.ProductWithoutSkus.SafeData.Thumbnail,
-                            ProductName = skuOrdered.ProductWithoutSkus.Name,
-                            PortionsCount = skuOrdered.Sku.Data.QTY,
-                            Quantity = skuOrdered.Quantity,
-                            SkuCode = skuOrdered.Sku.Code,
-                            ProductSubTitle = skuInDB?.SubTitle,
-                            SelectedPrice =
-                                customer.IdObjectType == (int) CustomerType.Retail
-                                    ? skuInDB?.Price?.ToString("C2")
-                                    : skuInDB?.WholesalePrice?.ToString("C2"),
-                        };
-                        lines.Add(orderLineModel);
+                            var orderLineModel = new LastOrderLineModel()
+                            {
+                                ProductUrl = ProductBaseUrl + skuOrdered.ProductWithoutSkus.Url,
+                                IconLink = skuOrdered.ProductWithoutSkus.SafeData.Thumbnail,
+                                ProductName = skuOrdered.ProductWithoutSkus.Name,
+                                PortionsCount = skuOrdered.Sku.Data.QTY,
+                                Quantity = skuOrdered.Quantity,
+                                SkuCode = skuOrdered.Sku.Code,
+                                ProductSubTitle = skuInDB?.SubTitle,
+                                SelectedPrice =
+                                    customer.IdObjectType == (int) CustomerType.Retail
+                                        ? skuInDB?.Price?.ToString("C2")
+                                        : skuInDB?.WholesalePrice?.ToString("C2"),
+                            };
+                            lines.Add(orderLineModel);
+                        }
                     }
                 }
             }
