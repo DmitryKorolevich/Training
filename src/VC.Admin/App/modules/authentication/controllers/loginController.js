@@ -29,22 +29,25 @@ angular.module('app.modules.authentication.controllers.loginController', [])
 
 							infrastructureService.getReferenceData().success(function(res) {
 								if (res.Success) {
-								    $rootScope.ReferenceData = res.Data;
-								    if ($rootScope.currentUser.IsSuperAdmin || $.inArray(2, $rootScope.currentUser.Permissions)>=0)//orders
-								    {
-								        $rootScope.$state.go("index.oneCol.manageOrders");
-								    }
+									$rootScope.ReferenceData = res.Data;
+
+									var stateToRedirect = $state.previous != null
+										&& $state.previous.name !== ''
+										&& !$rootScope.unauthorizedArea($state.href($state.previous))
+										? $state.previous.name : "index.oneCol.dashboard";
+
+									if (stateToRedirect == 'index.oneCol.dashboard' && ($rootScope.currentUser.IsSuperAdmin || $.inArray(2, $rootScope.currentUser.Permissions) >= 0)) //orders
+									{
+										stateToRedirect = "index.oneCol.manageOrders";
+									}
+
+									$state.go(stateToRedirect);
 								} else {
 									toaster.pop('error', 'Error!', "Unable to refresh reference data");
 								}
 							}).error(function(res) {
 								toaster.pop('error', "Error!", "Server error occured");
 							});
-
-							$state.go($state.previous != null
-                                && $state.previous.name !== '' 
-                                && !$rootScope.unauthorizedArea($state.href($state.previous))
-                                ? $state.previous.name : "index.oneCol.dashboard");
 						} else {
 							var messages = "";
 							if (res.Messages) {
