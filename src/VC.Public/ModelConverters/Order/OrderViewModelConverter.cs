@@ -4,6 +4,7 @@ using System.Linq;
 using VC.Public.Helpers;
 using VC.Public.Models.Cart;
 using VC.Public.Models.Profile;
+using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
@@ -90,17 +91,18 @@ namespace VC.Public.ModelConverters.Order
             model.ShippingSurcharge = model.AlaskaHawaiiSurcharge + model.CanadaSurcharge - model.SurchargeOverride;
             model.TotalShipping = model.ShippingTotal - model.ShippingSurcharge;
 
-            if (dynamic.GiftCertificates != null)
+            if (dynamic?.GiftCertificates != null)
             {
                 model.GiftCertificatesTotal = dynamic.GiftCertificates.Sum(p => p.Amount);
             }
 
-            if (dynamic.Discount != null)
+            if (dynamic?.Discount != null)
             {
                 model.DiscountCode = dynamic.Discount.Code;
+                model.DiscountCodeMessage = dynamic.Discount.GetDiscountMessage((int?)dynamic.SafeData.IdDiscountTier);
             }
 
-            model.GCs = dynamic.GiftCertificates?.Select(item => new GCInvoiceEntity()
+            model.GCs = dynamic?.GiftCertificates?.Select(item => new GCInvoiceEntity()
             {
                 Amount = item.Amount,
                 Code = item.GiftCertificate.Code,

@@ -27,6 +27,7 @@ using VitalChoice.Interfaces.Services.Users;
 using System.Linq;
 using System.Reflection;
 using Microsoft.AspNet.Mvc.ModelBinding;
+using VitalChoice.Business.Helpers;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;

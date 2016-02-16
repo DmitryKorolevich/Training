@@ -312,3 +312,14 @@ BEGIN
 	(N'PoNumber', 4, NULL, 1, NULL)
 END
 GO
+
+IF NOT EXISTS(SELECT * FROM OrderOptionTypes WHERE IdObjectType=4 AND Name='IdDiscountTier')
+BEGIN
+
+	INSERT INTO [dbo].[OrderOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'IdDiscountTier', 3, NULL, NULL, NULL)
+
+END
+GO

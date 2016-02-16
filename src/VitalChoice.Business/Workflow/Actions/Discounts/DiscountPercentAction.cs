@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using VitalChoice.Business.Helpers;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Core;
@@ -13,7 +14,7 @@ namespace VitalChoice.Business.Workflow.Actions.Discounts
 
         public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            dataContext.DiscountMessage = $"Percent Discount ({(decimal)dataContext.Order.Discount.Data.Percent / 100:P0})";
+            dataContext.DiscountMessage = dataContext.Order.Discount.GetDiscountMessage();
             dataContext.FreeShipping = dataContext.Order.Discount.Data.FreeShipping;
             return
                 Task.FromResult<decimal>(-dataContext.Order.Discount.Data.Percent*

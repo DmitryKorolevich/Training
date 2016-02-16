@@ -14,6 +14,7 @@ using VC.Admin.Models.Products;
 using VitalChoice.Business.Queries.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Business.Helpers;
 
 namespace VC.Admin.ModelConverters
 {
@@ -48,6 +49,7 @@ namespace VC.Admin.ModelConverters
             if(dynamic.Discount!=null)
             {
                 model.DiscountCode = dynamic.Discount.Code;
+                model.DiscountMessage = dynamic.Discount.GetDiscountMessage((int?)dynamic.SafeData.IdDiscountTier);
             }
 
             if(dynamic.GiftCertificates!=null && dynamic.GiftCertificates.Count>0)

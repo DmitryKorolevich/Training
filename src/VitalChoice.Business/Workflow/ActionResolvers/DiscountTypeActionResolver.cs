@@ -15,6 +15,10 @@ namespace VitalChoice.Business.Workflow.ActionResolvers
 
         public override Task<int> GetActionKeyAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
+            //Reset discount tier setting
+            if (dataContext.Order.DictionaryData.ContainsKey("IdDiscountTier"))
+                dataContext.Order.DictionaryData.Remove("IdDiscountTier");
+
             if (dataContext.Order.Discount == null)
                 return Task.FromResult(0);
             if (!ValidateDiscount(dataContext))

@@ -168,6 +168,8 @@ namespace VitalChoice.Business.Services.Orders
             return
                 query.Include(o => o.Discount)
                     .ThenInclude(d => d.OptionValues)
+                    .Include(o => o.Discount)
+                    .ThenInclude(d => d.DiscountTiers)
                     .Include(o => o.GiftCertificates)
                     .ThenInclude(g => g.GiftCertificate)
                     .Include(o => o.PromoSkus)
