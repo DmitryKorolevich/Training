@@ -51,6 +51,13 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
         public AffiliateOrderPayment AffiliateOrderPayment { get; set; }
 
         public bool IsHealthwise { get; set; }
+
         public ICollection<PromoOrdered> PromoSkus { get; set; }
+
+        //Don't storing in DB, should be set be calculating logic
+        public decimal? AffiliatePaymentAmount { get; set; }
+
+        //Don't storing in DB, should be set be calculating logic
+        public bool? AffiliateNewCustomerOrder { get; set; }
     }
 }

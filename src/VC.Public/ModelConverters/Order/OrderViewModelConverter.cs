@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using VC.Public.Helpers;
 using VC.Public.Models.Cart;
 using VC.Public.Models.Profile;
@@ -6,6 +8,7 @@ using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
+using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
@@ -18,7 +21,7 @@ namespace VC.Public.ModelConverters.Order
 {
     public class OrderViewModelConverter : BaseModelConverter<OrderViewModel, OrderDynamic>
     {
-        private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
+        private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly ICountryService _countryService;
         private readonly ReferenceData _referenceData;
         protected readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
@@ -31,7 +34,7 @@ namespace VC.Public.ModelConverters.Order
             IDynamicMapper<SkuDynamic, Sku> skuMapper,
             IDynamicMapper<ProductDynamic, Product> productMapper)
         {
-            _addressMapper = addressMapper;
+            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             _countryService = countryService;
             _referenceData = appInfrastructureService.Get();
             _skuMapper = skuMapper;
@@ -59,7 +62,7 @@ namespace VC.Public.ModelConverters.Order
 
             if (dynamic?.ShippingAddress != null)
             {
-                model.ShipToAddress = dynamic.PaymentMethod.Address.PopulateShippingAddressDetails(countries);
+                model.ShipToAddress = dynamic.ShippingAddress.PopulateShippingAddressDetails(countries);
             }
             
             model.IdPaymentMethodType = dynamic?.PaymentMethod.IdObjectType;
@@ -83,6 +86,40 @@ namespace VC.Public.ModelConverters.Order
                 result.SubTotal = sku.Quantity * sku.Amount;
                 return result;
             }) ?? Enumerable.Empty<CartSkuModel>());
+
+            model.ShippingSurcharge = model.AlaskaHawaiiSurcharge + model.CanadaSurcharge - model.SurchargeOverride;
+            model.TotalShipping = model.ShippingTotal - model.ShippingSurcharge;
+
+            if (dynamic.GiftCertificates != null)
+            {
+                model.GiftCertificatesTotal = dynamic.GiftCertificates.Sum(p => p.Amount);
+            }
+
+            if (dynamic.Discount != null)
+            {
+                model.DiscountCode = dynamic.Discount.Code;
+            }
+
+            model.GCs = dynamic.GiftCertificates?.Select(item => new GCInvoiceEntity()
+            {
+                Amount = item.Amount,
+                Code = item.GiftCertificate.Code,
+            }).ToList() ?? new List<GCInvoiceEntity>();
+
+            //Dates in the needed timezone
+            model.DateCreated = TimeZoneInfo.ConvertTime(model.DateCreated, TimeZoneInfo.Local, _pstTimeZoneInfo);
+            if (model.ShipDelayDate.HasValue)
+            {
+                model.ShipDelayDate = TimeZoneInfo.ConvertTime(model.ShipDelayDate.Value, TimeZoneInfo.Local, _pstTimeZoneInfo);
+            }
+            if (model.ShipDelayDateP.HasValue)
+            {
+                model.ShipDelayDateP = TimeZoneInfo.ConvertTime(model.ShipDelayDateP.Value, TimeZoneInfo.Local, _pstTimeZoneInfo);
+            }
+            if (model.ShipDelayDateNP.HasValue)
+            {
+                model.ShipDelayDateNP = TimeZoneInfo.ConvertTime(model.ShipDelayDateNP.Value, TimeZoneInfo.Local, _pstTimeZoneInfo);
+            }
         }
 
         public override void ModelToDynamic(OrderViewModel model, OrderDynamic dynamic)

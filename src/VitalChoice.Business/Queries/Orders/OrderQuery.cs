@@ -19,7 +19,9 @@ namespace VitalChoice.Business.Queries.Orders
 
 		public OrderQuery WithActualStatusOnly()
 		{
-			Add(x => x.OrderStatus == OrderStatus.Exported || x.OrderStatus == OrderStatus.Processed || x.OrderStatus == OrderStatus.Shipped || x.OrderStatus == OrderStatus.ShipDelayed);
+			Add(x => x.OrderStatus == OrderStatus.Exported || x.OrderStatus == OrderStatus.Processed || x.OrderStatus == OrderStatus.Shipped || x.OrderStatus == OrderStatus.ShipDelayed ||
+                x.POrderStatus == OrderStatus.Exported || x.POrderStatus == OrderStatus.Processed || x.POrderStatus == OrderStatus.Shipped || x.POrderStatus == OrderStatus.ShipDelayed ||
+                x.NPOrderStatus == OrderStatus.Exported || x.NPOrderStatus == OrderStatus.Processed || x.NPOrderStatus == OrderStatus.Shipped || x.NPOrderStatus == OrderStatus.ShipDelayed);
 
 			return this;
 		}

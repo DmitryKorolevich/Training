@@ -9,9 +9,16 @@ SELECT temp.Id, temp.ProductName, ISNULL(val.Value, opt.DefaultValue) AS Product
 	temp.IdCustomer, ISNULL(stval.Value, stopt.DefaultValue) AS ProductSubTitle, temp.Quantity FROM
 	(SELECT p.Id, p.IdObjectType, p.Name AS ProductName, o.IdCustomer, SUM(ots.Quantity) AS Quantity
 	FROM            dbo.OrderToSkus AS ots INNER JOIN
-							 dbo.Orders AS o ON ots.IdOrder = o.Id AND (o.OrderStatus = 2 OR
+							 dbo.Orders AS o ON ots.IdOrder = o.Id AND (
+							 o.OrderStatus = 2 OR
 							 o.OrderStatus = 3 OR
-							 o.OrderStatus = 5) INNER JOIN
+							 o.OrderStatus = 5 OR
+							 o.POrderStatus = 2 OR
+							 o.POrderStatus = 3 OR
+							 o.POrderStatus = 5 OR
+							 o.NPOrderStatus = 2 OR
+							 o.NPOrderStatus = 3 OR
+							 o.NPOrderStatus = 5) INNER JOIN
 							 dbo.Skus AS s ON ots.IdSku = s.Id INNER JOIN
 							 dbo.Products AS p ON s.IdProduct = p.Id AND p.Hidden = 0
 	GROUP BY p.Id, p.IdObjectType, p.Name, o.IdCustomer) temp

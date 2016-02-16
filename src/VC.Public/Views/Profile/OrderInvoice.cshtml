@@ -1,4 +1,5 @@
-﻿@using VitalChoice.Ecommerce.Domain.Entities.Payment
+﻿@using System.Linq
+@using VitalChoice.Ecommerce.Domain.Entities.Payment
 @using VitalChoice.Interfaces.Services
 @model VC.Public.Models.Profile.OrderViewModel
 @inject IAppInfrastructureService appInfrastructureService;
@@ -20,34 +21,36 @@
             @if (Model != null)
             {
                 <h4>Order #@Model.Id</h4>
+                <div>
+                    <span>
+                        <label class="bold" >Order Date</label>: <span>@Model.DateCreated.ToString("MM/dd/yyyy")</span>
+                    </span>
+                </div>
                 <div class="reivew-order-info">
                     <div class="reivew-info-box">
                         <div class="review-header-container">
                             <span>Status</span>
                         </div>
-                        <div class="review-box-line">
-                            <span class="review-info-value">@Html.LabelFor(x => x.DateCreated, null, new { @class = "bold" }): <span>@Model.DateCreated.ToString("MM/dd/yyyy")</span></span>
-                        </div>
                         @if (Model.OrderStatus.HasValue)
                         {
                             <div class="review-box-line">
-                                <span class="review-info-value">@infrastructure.OrderStatuses.Single(x => x.Key == (int) Model.OrderStatus.Value).Text</span>
+                                <span class="review-info-value">@infrastructure.OrderStatuses.Single(x => x.Key == (int)Model.OrderStatus.Value).Text</span>
                             </div>
                         }
                         else
                         {
+                            if (Model.NPOrderStatus.HasValue)
+                            {
+                                <div class="review-box-line">
+                                    <span class="review-info-label">Non-Perishable:</span>
+                                    <span class="review-info-value">@infrastructure.OrderStatuses.Single(x => x.Key == (int)Model.NPOrderStatus.Value).Text</span>
+                                </div>
+                            }
                             if (Model.POrderStatus.HasValue)
                             {
                                 <div class="review-box-line">
                                     <span class="review-info-label">Perishable:</span>
-                                    <span class="review-info-value">@infrastructure.OrderStatuses.Single(x => x.Key == (int) Model.POrderStatus.Value).Text</span>
-                                </div>
-                            }
-                            if (Model.NPOrderStatus.HasValue)
-                            {
-                                <div class="review-box-line">
-                                    <span class="review-info-label">Perishable:</span>
-                                    <span class="review-info-value">@infrastructure.OrderStatuses.Single(x => x.Key == (int) Model.NPOrderStatus.Value).Text</span>
+                                    <span class="review-info-value">@infrastructure.OrderStatuses.Single(x => x.Key == (int)Model.POrderStatus.Value).Text</span>
                                 </div>
                             }
                         }
@@ -137,20 +140,20 @@
                     <span class="shipping-instructions-title margin-top-small">Promo Products</span>
                     <table class="standard-table cart-items-list">
                         <thead>
-                        <tr>
-                            <th colspan="2">
-                                Item
-                            </th>
-                            <th>
-                                Price
-                            </th>
-                            <th>
-                                Quantity
-                            </th>
-                            <th>
-                                Subtotal
-                            </th>
-                        </tr>
+                            <tr>
+                                <th colspan="2">
+                                    Item
+                                </th>
+                                <th>
+                                    Price
+                                </th>
+                                <th>
+                                    Quantity
+                                </th>
+                                <th>
+                                    Subtotal
+                                </th>
+                            </tr>
                         </thead>
                         <tbody>
                             @foreach (var item in Model.PromoSkus)
@@ -158,14 +161,14 @@
                                 <tr>
                                     <td class="cart-image-link">
                                         <a title="@item.DisplayName" href="@item.ProductPageUrl">
-                                            <img title="@item.DisplayName" src="@item.IconUrl"/>
+                                            <img title="@item.DisplayName" src="@item.IconUrl" />
                                         </a>
                                     </td>
                                     <td class="cart-line-info">
                                         <a class="cart-text-link" title="@item.DisplayName" href="@item.ProductPageUrl">@item.DisplayName</a>
                                         @if (!string.IsNullOrEmpty(item.Code))
                                         {
-                                            <span class="cart-sku-code">@("("+item.Code+")")</span>
+                                            <span class="cart-sku-code">@("(" + item.Code + ")")</span>
                                         }
                                         <span class="stock-presence-note">&nbsp;</span>
                                     </td>
@@ -177,6 +180,140 @@
                         </tbody>
                     </table>
                 }
+                <div class="cart-order-details">
+                    <div class="cart-shipping-instructions">
+                        <span class="shipping-instructions-title">
+                            Shipping Instructions:
+                        </span>
+                        @if (Model.ShipDelayDate.HasValue)
+                        {
+                            <div class="cart-shipping-option">
+                                <label class="cart-total-value">
+                                    Ship delay date: @Model.ShipDelayDate.Value.ToString("MM/dd/yyyy")
+                                </label>
+                            </div>
+                        }
+                        else
+                        {
+                            if (Model.ShipDelayDateNP.HasValue)
+                            {
+                                <div class="cart-shipping-option">
+                                    <label class="cart-total-value">
+                                        Non-Perishable ship delay date: @Model.ShipDelayDateNP.Value.ToString("MM/dd/yyyy")
+                                    </label>
+                                </div>
+                            }
+                            if (Model.ShipDelayDateP.HasValue)
+                            {
+                                <div class="cart-shipping-option">
+                                    <label class="cart-total-value">
+                                        Perishable ship delay date: @Model.ShipDelayDateP.Value.ToString("MM/dd/yyyy")
+                                    </label>
+                                </div>
+                            }
+                        }
+                    </div>
+                    <div class="cart-order-totals">
+                        <div class="cart-total-line">
+                            Subtotal
+                            <label class="cart-total-value">
+                                @Model.ProductsSubtotal.ToString("C2")
+                            </label>
+                        </div>
+                        @if (Model.ShippingUpgradeNP.HasValue)
+                        {
+                            <div class="cart-total-line">
+                                Upgrade Non-Perishable Items
+                                <label class="cart-total-value">
+                                    @infrastructure.ShippingUpgrades.FirstOrDefault(x => x.Key == (int)Model.ShippingUpgradeNP.Value).Text
+                                </label>
+                            </div>
+                        }
+                        @if (Model.ShippingUpgradeP.HasValue)
+                        {
+                            <div class="cart-total-line">
+                                Upgrade Perishable Items
+                                <label class="cart-total-value">
+                                    @infrastructure.ShippingUpgrades.FirstOrDefault(x => x.Key == (int)Model.ShippingUpgradeP.Value).Text
+                                </label>
+                            </div>
+                        }
+                        @if (Model.DiscountTotal != 0)
+                        {
+                            <div class="cart-total-line">
+                                Discount
+                                <label class="cart-total-value">
+                                    -@Model.DiscountTotal.ToString("C2")
+                                </label>
+                            </div>
+                        }
+                        @if (Model.GiftCertificatesTotal != 0)
+                        {
+                            <div class="cart-total-line">
+                                Gift Certificates
+                                <label class="cart-total-value">
+                                    -@Model.GiftCertificatesTotal.ToString("C2")
+                                </label>
+                            </div>
+                        }
+                        <div class="cart-total-line">
+                            Shipping
+                            <label class="cart-total-value">
+                                @Model.TotalShipping.ToString("C2")
+                            </label>
+                        </div>
+                        @if (Model.ShippingSurcharge != 0)
+                        {
+                            <div class="cart-total-line">
+                                Shipping Surcharge
+                                <label class="cart-total-value">
+                                    @Model.ShippingSurcharge.ToString("C2")
+                                </label>
+                            </div>
+                        }
+                        <div class="cart-total-line">
+                            Tax
+                            <label class="cart-total-value">
+                                @Model.TaxTotal.ToString("C2")
+                            </label>
+                        </div>
+                        <div class="cart-total-line cart-order-summary margin-bottom-medium">
+                            Order Total
+                            <label class="cart-total-value">
+                                @Model.Total.ToString("C2")
+                            </label>
+                        </div>
+                        @if (Model.DiscountTotal != 0 && !string.IsNullOrEmpty(Model.DiscountCode))
+                        {
+                            <div class="cart-total-line">
+                                <strong>Promo Code</strong>
+                                <label class="cart-total-value">
+                                    @Model.DiscountCode
+                                </label>
+                            </div>
+                            <div class="cart-total-line">
+                                @Model.DiscountCodeMessage
+                            </div>
+                        }
+                        @if (Model.GCs.Count != 0)
+                        {
+                            <div class="cart-total-line">
+                                <strong>Gift Certificate Code</strong>
+                                <label class="cart-total-value">
+                                    @Model.GCs.First().Code
+                                </label>
+                            </div>
+                            foreach (var item in Model.GCs.Where((p, i) => i != 0))
+                            {
+                                <div class="cart-total-line">
+                                    <label class="cart-total-value">
+                                        @item.Code
+                                    </label>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
                 if (Model.IdPaymentMethodType.HasValue)
                 {
                     <div class="reivew-order-info">

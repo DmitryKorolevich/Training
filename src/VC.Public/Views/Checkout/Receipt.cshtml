@@ -186,16 +186,18 @@
             {
                 <div class="receipt-shipping-line">
                     <label class="cart-total-value">
-                        @Model.ShippingUpgradeNPOptions.Single(x => x.Key == Model.ShippingUpgradeNP).Text
+                        Non-Perishable: @Model.ShippingUpgradeNPOptions.Single(x => x.Key == Model.ShippingUpgradeNP).Text
                     </label>
-                </div>}
+                </div>
+            }
             @if (Model.ShippingUpgradeP.HasValue)
             {
                 <div class="receipt-shipping-line">
                     <label class="cart-total-value">
-                        @Model.ShippingUpgradePOptions.Single(x => x.Key == Model.ShippingUpgradeP).Text
+                        Perishable: @Model.ShippingUpgradePOptions.Single(x => x.Key == Model.ShippingUpgradeP).Text
                     </label>
-                </div>}
+                </div>
+            }
         </div>
     </div>
     <div class="cart-order-totals">

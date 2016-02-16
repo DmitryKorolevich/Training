@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.Data.Repositories;
@@ -11,11 +12,18 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.TypeConverters;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Content.Products;
+using VitalChoice.Infrastructure.Domain.Entities.Roles;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.TemplateModels;
+using VitalChoice.Infrastructure.Identity;
+using VitalChoice.Interfaces.Services;
+using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Content.ContentProcessors
@@ -35,22 +43,68 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
         private readonly IRepositoryAsync<ProductContent> _productContentRepository;
         private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoryEcommerceRepository;
         private readonly VProductSkuRepository _productRepository;
+	    private readonly ICustomerService _customerService;
+	    private readonly ReferenceData _referenceData;
 
-        public ProductCategoryProcessor(IObjectMapper<ProductCategoryParameters> mapper,
+	    public ProductCategoryProcessor(IObjectMapper<ProductCategoryParameters> mapper,
             IProductCategoryService productCategoryService,
             IRepositoryAsync<ProductCategoryContent> productCategoryRepository,
             IRepositoryAsync<ProductContent> productContentRepository,
             IEcommerceRepositoryAsync<ProductToCategory> productToCategoryEcommerceRepository,
-            VProductSkuRepository productRepository) : base(mapper)
+            VProductSkuRepository productRepository, IAppInfrastructureService infrastructureService, ICustomerService customerService) : base(mapper)
         {
             _productCategoryService = productCategoryService;
             _productCategoryRepository = productCategoryRepository;
             _productContentRepository = productContentRepository;
             _productToCategoryEcommerceRepository = productToCategoryEcommerceRepository;
             _productRepository = productRepository;
+		    _customerService = customerService;
+		    _referenceData = infrastructureService.Get();
         }
 
-        protected override async Task<TtlCategoryModel> ExecuteAsync(ProcessorViewContext viewContext)
+	    private IList<CustomerTypeCode> GetCustomerVisibility(ProcessorViewContext viewContext)
+	    {
+		    return viewContext.User.Identity.IsAuthenticated
+			    ? (viewContext.User.IsInRole(IdentityConstants.WholesaleCustomer)
+				    ? new List<CustomerTypeCode>() {CustomerTypeCode.Wholesale, CustomerTypeCode.All}
+				    : new List<CustomerTypeCode>() {CustomerTypeCode.Retail, CustomerTypeCode.All})
+			    : new List<CustomerTypeCode>() {CustomerTypeCode.Retail, CustomerTypeCode.All};
+	    }
+
+	    private void DenyAccessIfRetailRuleApplied(ProductCategory category, ProcessorViewContext viewContext, bool wholesaleCustomer)
+	    {
+			if (category.Assigned == CustomerTypeCode.Retail || viewContext.Entity.NavIdVisible == CustomerTypeCode.Retail)
+			{
+				if (!wholesaleCustomer)
+				{
+					return;
+				}
+
+				throw new ApiException("Access denied", HttpStatusCode.Forbidden);
+			}
+		}
+
+	    private async Task DenyAccessIfWholesaleRuleApplied(ProductCategory category, ProcessorViewContext viewContext, bool wholesaleCustomer)
+	    {
+		    if (category.Assigned == CustomerTypeCode.Wholesale ||
+		        viewContext.Entity.NavIdVisible == CustomerTypeCode.Wholesale)
+		    {
+			    if (wholesaleCustomer)
+			    {
+				    var customer = await _customerService.SelectAsync(Convert.ToInt32(viewContext.User.GetUserId()));
+
+				    var wholesaleActiveCustomer = customer.StatusCode == (int) CustomerStatus.Active;
+				    if (wholesaleActiveCustomer)
+				    {
+					    return;
+				    }
+			    }
+
+			    throw new ApiException("Access denied", HttpStatusCode.Forbidden);
+		    }
+	    }
+
+	    protected override async Task<TtlCategoryModel> ExecuteAsync(ProcessorViewContext viewContext)
         {
             if (viewContext.Entity == null)
             {
@@ -76,16 +130,33 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
 
             var category = FindTargetCategory(rootCategory, viewContext.Entity.Id);
 
-            var subCategoriesContent = new List<ProductCategoryContent>();
-            if (category != null)
+	        var subCategoriesContent = new List<ProductCategoryContent>();
+
+			var customerVisibility = GetCustomerVisibility(viewContext);
+
+			if (category != null)
             {
-                foreach (var subCategory in category.SubCategories)
+				if (!viewContext.Entity.NavIdVisible.HasValue)
+				{
+					throw new ApiException("Category not found", HttpStatusCode.NotFound);
+				}
+
+				var wholesaleCustomer =
+				viewContext.User.IsInRole(IdentityConstants.WholesaleCustomer);
+
+				await DenyAccessIfWholesaleRuleApplied(category, viewContext, wholesaleCustomer);
+	            DenyAccessIfRetailRuleApplied(category, viewContext, wholesaleCustomer);
+
+				foreach (var subCategory in category.SubCategories)
                 {
                     var subCategoryContent =
-                        (await _productCategoryRepository.Query(p => p.Id == subCategory.Id).SelectAsync(false)).Single();
-                    subCategoryContent.ProductCategory = subCategory;
+                        (await _productCategoryRepository.Query(p => p.Id == subCategory.Id && p.NavIdVisible.HasValue && customerVisibility.Contains(p.NavIdVisible.Value)).SelectAsync(false)).SingleOrDefault();
+	                if (subCategoryContent != null)
+	                {
+						subCategoryContent.ProductCategory = subCategory;
 
-                    subCategoriesContent.Add(subCategoryContent);
+						subCategoriesContent.Add(subCategoryContent);
+					}
                 }
             }
 
@@ -108,8 +179,8 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             var rootNavCategory =
                 await _productCategoryService.GetLiteCategoriesTreeAsync(rootCategory, new ProductCategoryLiteFilter()
                 {
-                    Visibility = viewContext.Parameters.CustomerTypeCodes,
-                    Statuses = targetStatuses
+                    Visibility = customerVisibility,
+					Statuses = targetStatuses
                 });
 
             return PopulateCategoryTemplateModel(viewContext.Entity, subCategoriesContent, products, productContents, rootNavCategory);
@@ -190,7 +261,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
         {
             return productCategoryLites?.Select(x => new TtlSidebarMenuItemModel()
             {
-                Label = x.NavLabel,
+                Label = !string.IsNullOrWhiteSpace(x.NavLabel) ? x.NavLabel : x.ProductCategory.Name,
                 Url = x.Url,
                 SubItems = ConvertToSideMenuModelLevel(x.SubItems)
             }).ToList();

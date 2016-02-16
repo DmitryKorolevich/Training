@@ -104,6 +104,7 @@ namespace VitalChoice.Business.Services
             var affiliateMonthlyEmailsSentOptions = lookupRepository.Query(x => x.Name == LookupNames.AffiliateMonthlyEmailsSentOptions).Select(false).Single().Id;
             var affiliateTiers = lookupRepository.Query(x => x.Name == LookupNames.AffiliateTiers).Select(false).Single().Id;
             var promotionBuyTypes = lookupRepository.Query(x => x.Name == LookupNames.PromotionBuyTypes).Select(false).Single().Id;
+            var shippingUpgrades = lookupRepository.Query(x => x.Name == LookupNames.ShippingUpgrades).Select(false).Single().Id;
 
             var referenceData = new ReferenceData();
             referenceData.DefaultCountry = _backendSettingsService.GetDefaultCountry();
@@ -359,6 +360,14 @@ namespace VitalChoice.Business.Services
 			}).ToList();
             referenceData.PromotionBuyTypes = lookupVariantRepository.Query()
                 .Where(x => x.IdLookup == promotionBuyTypes)
+                .Select(false)
+                .Select(x => new LookupItem<int>()
+                {
+                    Key = x.Id,
+                    Text = x.ValueVariant
+                }).ToList();
+            referenceData.ShippingUpgrades = lookupVariantRepository.Query()
+                .Where(x => x.IdLookup == shippingUpgrades)
                 .Select(false)
                 .Select(x => new LookupItem<int>()
                 {

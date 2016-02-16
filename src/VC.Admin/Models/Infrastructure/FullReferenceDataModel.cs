@@ -56,6 +56,7 @@ namespace VC.Admin.Models.Infrastructure
         public IList<LookupItem<int?>> ExpiredTypes { get; set; }
         public IList<LookupItem<int?>> DateStatuses { get; set; }
         public IList<LookupItem<int>> PromotionBuyTypes { get; set; }
+        public IList<LookupItem<int>> ShippingUpgrades { get; set; }
         public IList<LookupItem<string>> PersonTitles { get; set; }
     }
 }

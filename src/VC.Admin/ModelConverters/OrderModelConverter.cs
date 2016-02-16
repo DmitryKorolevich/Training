@@ -165,13 +165,24 @@ namespace VC.Admin.ModelConverters
                 if (dynamic.SafeData.ShipDelayType == ShipDelayType.None)
                 {
                     dynamic.Data.ShipDelayType = null;
-                }
-                if (dynamic.SafeData.ShipDelayType == ShipDelayType.PerishableAndNonPerishable && !model.ShouldSplit)
-                {
-                    dynamic.Data.ShipDelayType = null;
                     dynamic.Data.ShipDelayDate = null;
                     dynamic.Data.ShipDelayDateP = null;
                     dynamic.Data.ShipDelayDateNP = null;
+                }
+                if (dynamic.SafeData.ShipDelayType == ShipDelayType.EntireOrder)
+                {
+                    dynamic.Data.ShipDelayDateP = null;
+                    dynamic.Data.ShipDelayDateNP = null;
+                }
+                if (dynamic.SafeData.ShipDelayType == ShipDelayType.PerishableAndNonPerishable)
+                {
+                    dynamic.Data.ShipDelayDate = null;
+                    if (!model.ShouldSplit)
+                    {
+                        dynamic.Data.ShipDelayType = null;
+                        dynamic.Data.ShipDelayDateP = null;
+                        dynamic.Data.ShipDelayDateNP = null;
+                    }
                 }
             }
 

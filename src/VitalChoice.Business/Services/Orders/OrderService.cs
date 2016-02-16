@@ -692,19 +692,18 @@ namespace VitalChoice.Business.Services.Orders
             return entities;
         }
 
-        private async Task UpdateAffiliateOrderPayment(OrderDynamic model, IUnitOfWorkAsync uow)
+        private async Task UpdateAffiliateOrderPayment(OrderDynamic dynamic, IUnitOfWorkAsync uow)
         {
-            if (!model.IdAddedBy.HasValue && model.Customer.IdAffiliate.HasValue)
+            if (!dynamic.IdAddedBy.HasValue && dynamic.Customer.IdAffiliate.HasValue &&
+                dynamic.AffiliatePaymentAmount.HasValue && dynamic.AffiliateNewCustomerOrder.HasValue)
             {
                 AffiliateOrderPayment payment = new AffiliateOrderPayment();
-                payment.Id = model.Id;
+                payment.Id = dynamic.Id;
                 payment.Status = AffiliateOrderPaymentStatus.NotPaid;
-                payment.IdAffiliate = model.Customer.IdAffiliate.Value;
+                payment.IdAffiliate = dynamic.Customer.IdAffiliate.Value;
                 //TODO - calculate commission and set is a first order or no the given customer
-                //payment.Amount =
-                //payment.NewCustomerOrder =
-
-                return;
+                payment.Amount = dynamic.AffiliatePaymentAmount.Value;
+                payment.NewCustomerOrder = dynamic.AffiliateNewCustomerOrder.Value;
 
                 var affiliateOrderPaymentRepository = uow.RepositoryAsync<AffiliateOrderPayment>();
                 var dbItem = (await affiliateOrderPaymentRepository.Query(p => p.Id == payment.Id).SelectAsync(false)).FirstOrDefault();
@@ -981,45 +980,18 @@ namespace VitalChoice.Business.Services.Orders
 
             foreach (var item in map)
             {
-                var context = await this.CalculateOrder(item.Order, OrderStatus.Processed);
-                item.Order = context.Order;
-
-                if (item.Order.SafeData.ShipDelayDate!=null)
+                var orderCombinedStatus= item.Order.OrderStatus ?? OrderStatus.Processed;
+                if (item.Order.SafeData.ShipDelayDate != null)
                 {
                     item.Order.Data.ShipDelayType = ShipDelayType.EntireOrder;
-                    if (item.Order.OrderStatus != OrderStatus.OnHold)
-                    {
-                        if (context.SplitInfo?.ShouldSplit == null || context.SplitInfo?.ShouldSplit == false)
-                        {
-                            item.Order.OrderStatus = OrderStatus.ShipDelayed;
-                        }
-                        else
-                        {
-                            item.Order.OrderStatus = null;
-                            item.Order.POrderStatus = OrderStatus.ShipDelayed;
-                            item.Order.NPOrderStatus = OrderStatus.ShipDelayed;
-                        }
-                    }
-                    else
-                    {
-                        if (context.SplitInfo?.ShouldSplit == true)
-                        {
-                            item.Order.POrderStatus = item.Order.OrderStatus;
-                            item.Order.NPOrderStatus = item.Order.OrderStatus;
-                            item.Order.OrderStatus = null;
-                        }
-                    }
                 }
                 else
                 {
                     item.Order.Data.ShipDelayType = ShipDelayType.None;
-                    if (context.SplitInfo?.ShouldSplit == true)
-                    {
-                        item.Order.POrderStatus = item.Order.OrderStatus;
-                        item.Order.NPOrderStatus = item.Order.OrderStatus;
-                        item.Order.OrderStatus = null;
-                    }
                 }
+
+                var context = await this.CalculateOrder(item.Order, orderCombinedStatus);
+                item.Order = context.Order;
 
                 item.OrderImportItem.ErrorMessages.AddRange(context.Messages);
                 if (context.SkuOrdereds != null)
