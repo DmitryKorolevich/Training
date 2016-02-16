@@ -556,6 +556,10 @@ namespace VitalChoice.Business.Services.Users
 			}
 			else
 			{
+				if (!user.IsConfirmed && user.Status == UserStatus.NotActive) // the case when guest checkout user wants to activate himself
+				{
+					user.Status = UserStatus.Active;
+				}
 				user.ConfirmationToken = Guid.Empty;
 				user.IsConfirmed = true;
 				await UpdateAsync(user);
