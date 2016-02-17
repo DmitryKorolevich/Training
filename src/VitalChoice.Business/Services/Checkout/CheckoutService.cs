@@ -251,7 +251,7 @@ namespace VitalChoice.Business.Services.Checkout
                 CartUid = Guid.NewGuid(),
                 IdCustomer = idCustomer
             };
-            await _cartRepository.InsertAsync(cart);
+            await _cartRepository.InsertGraphAsync(cart);
             return cart;
         }
 

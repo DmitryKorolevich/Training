@@ -37,5 +37,7 @@ namespace VitalChoice.Interfaces.Services.Customers
         Task<ICollection<string>> GetCustomerStaticFieldValuesByValue(ValuesByFieldValueFilter filter);
 
         Task<string> GetNewOrderNotesBasedOnCustomer(int idCustomer);
-    }
+
+	    Task<CustomerDynamic> GetByEmailAsync(string email);
+	}
 }

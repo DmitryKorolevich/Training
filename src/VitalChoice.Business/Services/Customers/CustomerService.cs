@@ -705,5 +705,10 @@ namespace VitalChoice.Business.Services.Customers
 
             return toReturn;
         }
+
+        public Task<CustomerDynamic> GetByEmailAsync(string email)
+        {
+            return SelectFirstAsync(c => c.Email == email && c.StatusCode != (int) RecordStatusCode.Deleted, withDefaults: true);
+        }
     }
 }
