@@ -710,5 +710,50 @@ namespace VitalChoice.Business.Services.Customers
         {
             return SelectFirstAsync(c => c.Email == email && c.StatusCode != (int) RecordStatusCode.Deleted, withDefaults: true);
         }
+
+	    public async Task ActivateGuestAsync(string email, string token, string newPassword)
+	    {
+		    CustomerDynamic customer = null;
+		    ApplicationUser applicationUser;
+			using (var tran = TransactionAccessor.BeginTransaction())
+			{
+				var customerUpdated = false;
+			    try
+			    {
+				    customer = await SelectFirstAsync(x => x.Email.Equals(email));
+
+				    if (customer == null)
+				    {
+					    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+				    }
+
+				    customer.StatusCode = (int) CustomerStatus.Active;
+					await UpdateAsync(customer);
+
+				    customerUpdated = true;
+
+					applicationUser = await _storefrontUserService.ResetPasswordAsync(email, token, newPassword);
+
+					tran.Commit();
+
+				}
+			    catch (Exception)
+			    {
+					tran.Rollback();
+				    if (customerUpdated) //this needs to be done since distributed transactions not supported yet
+						//todo: refactor this once distributed transactions arrive
+				    {
+					    applicationUser = await _storefrontUserService.FindAsync(email);
+
+						applicationUser.Status = UserStatus.NotActive;
+
+						await _storefrontUserService.UpdateAsync(applicationUser);
+					}
+				    throw;
+			    }
+		    }
+
+			await _storefrontUserService.SendSuccessfulRegistration(customer.Email, applicationUser.FirstName, applicationUser.LastName);
+		}
     }
 }

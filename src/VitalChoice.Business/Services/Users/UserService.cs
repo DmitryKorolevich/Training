@@ -536,7 +536,7 @@ namespace VitalChoice.Business.Services.Users
 			return new PagedList<ApplicationUser>(items, overallCount);
 		}
 
-		public async Task ResetPasswordAsync(string email, string token, string newPassword)
+		public async Task<ApplicationUser> ResetPasswordAsync(string email, string token, string newPassword)
 		{
 			var user = await FindAsync(email);
 			if (user == null)
@@ -556,13 +556,9 @@ namespace VitalChoice.Business.Services.Users
 			}
 			else
 			{
-				if (!user.IsConfirmed && user.Status == UserStatus.NotActive) // the case when guest checkout user wants to activate himself
-				{
-					user.Status = UserStatus.Active;
-				}
 				user.ConfirmationToken = Guid.Empty;
 				user.IsConfirmed = true;
-				await UpdateAsync(user);
+				return await UpdateAsync(user);
 			}
 		}
 	}
