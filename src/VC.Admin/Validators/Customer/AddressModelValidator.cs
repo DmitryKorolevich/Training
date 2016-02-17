@@ -69,10 +69,10 @@ namespace VC.Admin.Validators.Customer
 				.When(model => model.Country.States.Any())
 				.WithMessage(model => model.State, ValidationMessages.FieldRequired);
 
-			RuleFor(model => model.County)
-				.NotEmpty()
-				.When(model => !model.Country.States.Any())
-				.WithMessage(model => model.County, ValidationMessages.FieldRequired);
+			//RuleFor(model => model.County)
+			//	.NotEmpty()
+			//	.When(model => !model.Country.States.Any())
+			//	.WithMessage(model => model.County, ValidationMessages.FieldRequired);
 
 			RuleFor(model => model.Zip)
 				.NotEmpty()
