@@ -51,7 +51,7 @@ namespace VitalChoice.Interfaces.Services.Users
 
         Task SendForgotPasswordAsync(Guid publicId);
 
-        Task ResetPasswordAsync(string email, string token, string newPassword);
+		Task<ApplicationUser> ResetPasswordAsync(string email, string token, string newPassword);
 
 	    Task SendActivationAsync(string email);
 
