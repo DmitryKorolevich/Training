@@ -1046,7 +1046,7 @@ th.sortable-column {
   background: #2b8aec;
 }
 .orders .table > thead > tr > th.actions {
-  min-width: 75px;
+  min-width: 105px;
 }
 .help-tickets .table > tbody > tr.success > td {
   background-color: #99ff99;

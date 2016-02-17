@@ -6,6 +6,7 @@ using VC.Public.Models.Cart;
 using VC.Public.Models.Profile;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Services.Dynamic;
+using VitalChoice.Data.Extensions;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
@@ -78,6 +79,16 @@ namespace VC.Public.ModelConverters.Order
                     return result;
                 }) ?? Enumerable.Empty<CartSkuModel>());
 
+            model.Skus.ForEach(p =>
+            {
+                p.DisplayName = p.DisplayName ?? String.Empty;
+                if (!string.IsNullOrEmpty(p.SubTitle))
+                {
+                    p.DisplayName += " " + p.SubTitle;
+                }
+                p.DisplayName += $" ({p.Quantity})";
+            });
+
             model.PromoSkus.AddRange(dynamic?.PromoSkus?.Select(sku =>
             {
                 var result = _skuMapper.ToModel<CartSkuModel>(sku.Sku);
@@ -87,6 +98,16 @@ namespace VC.Public.ModelConverters.Order
                 result.SubTotal = sku.Quantity * sku.Amount;
                 return result;
             }) ?? Enumerable.Empty<CartSkuModel>());
+
+            model.PromoSkus.ForEach(p =>
+            {
+                p.DisplayName = p.DisplayName ?? String.Empty;
+                if (!string.IsNullOrEmpty(p.SubTitle))
+                {
+                    p.DisplayName += " " + p.SubTitle;
+                }
+                p.DisplayName += $" ({p.Quantity})";
+            });
 
             model.ShippingSurcharge = model.AlaskaHawaiiSurcharge + model.CanadaSurcharge - model.SurchargeOverride;
             model.TotalShipping = model.ShippingTotal - model.ShippingSurcharge;

@@ -416,6 +416,10 @@ namespace VC.Admin.ModelConverters
                     }
                 }
             }
+            if (dynamic?.PaymentMethod?.Address != null)
+            {
+                dynamic.PaymentMethod.Address.IdObjectType = (int)AddressType.Billing;
+            }
         }
 
         private void ModelToGcsDynamic(OrderManageModel model, OrderDynamic dynamic)

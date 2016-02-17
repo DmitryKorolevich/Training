@@ -94,9 +94,6 @@ namespace VC.Admin.Validators.Customer
 					BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
 
 			RuleFor(model => model.Email)
-				.NotEmpty()
-				.When(x => x.AddressType == AddressType.Billing)
-				.WithMessage(model => model.Email, ValidationMessages.FieldRequired)
 				.Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
 				.WithMessage(model => model.Email, ValidationMessages.FieldLength,
 					BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)

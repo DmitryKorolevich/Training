@@ -23,7 +23,7 @@
                 <h4>Order #@Model.Id</h4>
                 <div>
                     <span>
-                        <label class="bold" >Order Date</label>: <span>@Model.DateCreated.ToString("MM/dd/yyyy")</span>
+                        <label class="bold">Order Date</label>: <span>@Model.DateCreated.ToString("MM/dd/yyyy")</span>
                     </span>
                 </div>
                 <div class="reivew-order-info">
@@ -193,7 +193,7 @@
                                 </label>
                             </div>
                         }
-                        else
+                        else if (Model.ShipDelayDateNP.HasValue || Model.ShipDelayDateP.HasValue)
                         {
                             if (Model.ShipDelayDateNP.HasValue)
                             {
@@ -212,6 +212,32 @@
                                 </div>
                             }
                         }
+                        else
+                        {
+                            <div class="cart-shipping-option">
+                                <label class="cart-total-value">
+                                    Standard Shipping
+                                </label>
+                            </div>
+                        }
+                        @if (Model.ShippingUpgradeNP.HasValue)
+                        {
+                            <div class="cart-shipping-option">
+                                Upgrade Non-Perishable Items:
+                                <label class="cart-total-value">
+                                    @infrastructure.ShippingUpgrades.FirstOrDefault(x => x.Key == (int)Model.ShippingUpgradeNP.Value).Text
+                                </label>
+                            </div>
+                        }
+                        @if (Model.ShippingUpgradeP.HasValue)
+                        {
+                            <div class="cart-shipping-option">
+                                Upgrade Perishable Items:
+                                <label class="cart-total-value">
+                                    @infrastructure.ShippingUpgrades.FirstOrDefault(x => x.Key == (int)Model.ShippingUpgradeP.Value).Text
+                                </label>
+                            </div>
+                        }
                     </div>
                     <div class="cart-order-totals">
                         <div class="cart-total-line">
@@ -220,24 +246,6 @@
                                 @Model.ProductsSubtotal.ToString("C2")
                             </label>
                         </div>
-                        @if (Model.ShippingUpgradeNP.HasValue)
-                        {
-                            <div class="cart-total-line">
-                                Upgrade Non-Perishable Items
-                                <label class="cart-total-value">
-                                    @infrastructure.ShippingUpgrades.FirstOrDefault(x => x.Key == (int)Model.ShippingUpgradeNP.Value).Text
-                                </label>
-                            </div>
-                        }
-                        @if (Model.ShippingUpgradeP.HasValue)
-                        {
-                            <div class="cart-total-line">
-                                Upgrade Perishable Items
-                                <label class="cart-total-value">
-                                    @infrastructure.ShippingUpgrades.FirstOrDefault(x => x.Key == (int)Model.ShippingUpgradeP.Value).Text
-                                </label>
-                            </div>
-                        }
                         @if (Model.DiscountTotal != 0)
                         {
                             <div class="cart-total-line">

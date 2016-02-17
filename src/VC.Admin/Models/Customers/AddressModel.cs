@@ -18,9 +18,6 @@ namespace VC.Admin.Models.Customer
         [Map]
 	    public int Id { get; set; }
 
-		[Map("IdObjectType")]
-		public AddressType AddressType { get; set; }
-
 		[Map]
 	    public string Company { get; set; }
 
