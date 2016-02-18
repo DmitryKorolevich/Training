@@ -86,7 +86,7 @@ namespace VC.Public.ModelConverters.Order
                 {
                     p.DisplayName += " " + p.SubTitle;
                 }
-                p.DisplayName += $" ({p.Quantity})";
+                p.DisplayName += $" ({p.PortionsCount})";
             });
 
             model.PromoSkus.AddRange(dynamic?.PromoSkus?.Select(sku =>

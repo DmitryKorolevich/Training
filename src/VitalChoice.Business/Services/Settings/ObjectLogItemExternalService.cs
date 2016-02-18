@@ -13,6 +13,7 @@ using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.History;
+using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VitalChoice.Business.Services.Settings
@@ -47,6 +48,7 @@ namespace VitalChoice.Business.Services.Settings
             {
                 var type = models.First().GetType();
                 var isDynamic = type.GetTypeInfo().IsSubclassOf(typeof(MappedObject));
+                var isContentDataItem = type.GetTypeInfo().IsSubclassOf(typeof(ContentDataItem));
                 var isEntity = type.GetTypeInfo().IsSubclassOf(typeof(Entity));
                 var objectType = GetObjectType(type.Name, isDynamic, isEntity);
 
@@ -59,8 +61,10 @@ namespace VitalChoice.Business.Services.Settings
                     if (isDynamic)
                     {
                         TransformForDynamic(item, (MappedObject)model, objectType);
-                    }
-                    if (isEntity)
+                    } else if (isContentDataItem)
+                    {
+                        TransformForContentDataItem(item, (ContentDataItem)model, objectType);
+                    } else if (isEntity)
                     {
                         TransformForEntity(item, (Entity)model, objectType);
                     }
@@ -91,6 +95,14 @@ namespace VitalChoice.Business.Services.Settings
                 OrderDynamic order = (OrderDynamic)model;
                 item.OptionalData = $"All:{(int?)order.OrderStatus},P:{(int?)order.POrderStatus},NP:{(int?)order.NPOrderStatus}";
             }
+            return item;
+        }
+
+        private ObjectHistoryLogItem TransformForContentDataItem(ObjectHistoryLogItem item, ContentDataItem model, ObjectType objectType)
+        {
+            item.IdObject = model.Id;
+            item.IdObjectStatus = (int)model.StatusCode;
+            item.IdEditedBy = model.UserId;
             return item;
         }
 

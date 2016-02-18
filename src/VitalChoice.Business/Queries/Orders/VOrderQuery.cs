@@ -45,11 +45,15 @@ namespace VitalChoice.Business.Queries.Orders
             return this;
         }
 
-        public VOrderQuery WithoutIncomplete(OrderStatus? orderStatus)
+        public VOrderQuery WithoutIncomplete(OrderStatus? orderStatus, bool ignoreNotShowingIncomplete=false)
         {
-            if (!orderStatus.HasValue || orderStatus!= OrderStatus.Incomplete)
+            if (!ignoreNotShowingIncomplete)
             {
-                Add(x => x.OrderStatus != OrderStatus.Incomplete && x.POrderStatus != OrderStatus.Incomplete && x.NPOrderStatus != OrderStatus.Incomplete);
+                if (!orderStatus.HasValue || orderStatus != OrderStatus.Incomplete)
+                {
+                    Add(x => (x.OrderStatus != OrderStatus.Incomplete && !x.POrderStatus.HasValue && !x.NPOrderStatus.HasValue)
+                            || (!x.OrderStatus.HasValue && (x.POrderStatus != OrderStatus.Incomplete || x.NPOrderStatus != OrderStatus.Incomplete)));
+                }
             }
             return this;
         }

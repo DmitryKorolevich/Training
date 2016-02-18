@@ -799,7 +799,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 conditions = conditions.WithShippedDate(filter.From, filter.To);
             }
-            conditions = conditions.WithOrderStatus(filter.OrderStatus).WithoutIncomplete(filter.OrderStatus).WithId(filter.IdString) //TODO - should be redone after adding - https://github.com/aspnet/EntityFramework/issues/2850
+            conditions = conditions.WithOrderStatus(filter.OrderStatus).WithoutIncomplete(filter.OrderStatus, filter.IgnoreNotShowingIncomplete).WithId(filter.IdString) //TODO - should be redone after adding - https://github.com/aspnet/EntityFramework/issues/2850
                 .WithOrderSource(filter.IdOrderSource).WithPOrderType(filter.POrderType).WithCustomerType(filter.IdCustomerType).WithShippingMethod(filter.IdShippingMethod);
 
             var query = _vOrderRepository.Query(conditions);
