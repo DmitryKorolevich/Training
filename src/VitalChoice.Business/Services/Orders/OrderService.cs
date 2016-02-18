@@ -300,7 +300,7 @@ namespace VitalChoice.Business.Services.Orders
         {
             //TODO - should be redone on standart reading with dynamics after fixing missing data(Skus) with sort of operations
             OrderDynamic toReturn = null;
-            var orderQuery = new OrderQuery().WithActualStatusOnly().WithCustomerId(customerId);
+            var orderQuery = new OrderQuery().NotDeleted().WithActualStatusOnly().WithCustomerId(customerId);
             var order = (await _orderRepository.Query(orderQuery).OrderBy(p => p.OrderByDescending(x => x.DateCreated)).SelectAsync(false)).FirstOrDefault();
             if (order != null)
             {

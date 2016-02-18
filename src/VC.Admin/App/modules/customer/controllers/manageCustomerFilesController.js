@@ -32,7 +32,7 @@
 
             if ($scope.uploadFile)
             {
-                logRequest.name = $scope.uploadFile.FileName;
+                logRequest.name = $scope.uploadFile.name;
 
                 $scope.uploading = true;
                 Upload.upload({
