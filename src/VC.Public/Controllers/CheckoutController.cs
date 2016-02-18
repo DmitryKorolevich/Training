@@ -425,7 +425,7 @@ namespace VC.Public.Controllers
                         throw new ApiException("Customer couldn't be created");
                     }
                 }
-                loginTask = CreateLoginForActive(model);
+                loginTask = CreateLoginForNewActive(model);
             }
             return new CreateResult
             {
@@ -465,10 +465,11 @@ namespace VC.Public.Controllers
             };
         }
 
-        private Func<Task<ApplicationUser>> CreateLoginForActive(AddUpdateBillingAddressModel model)
+        private Func<Task<ApplicationUser>> CreateLoginForNewActive(AddUpdateBillingAddressModel model)
         {
             return async () =>
             {
+                await _storefrontUserService.SendSuccessfulRegistration(model.Email, model.FirstName, model.LastName);
                 var user = await _storefrontUserService.SignInAsync(model.Email, model.Password);
                 if (user == null)
                 {
