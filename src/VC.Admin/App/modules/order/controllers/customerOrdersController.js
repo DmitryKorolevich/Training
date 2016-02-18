@@ -7,6 +7,7 @@
             $scope.idCustomer = args.idCustomer;
             $scope.ordersFilter = {
                 idCustomer: $scope.idCustomer,
+                IgnoreNotShowingIncomplete: true,
                 Paging: { PageIndex: 1, PageItemCount: 20 },
                 Sorting: gridSorterUtil.resolve(refreshOrdersHistory, "DateCreated", "Desc")
             };

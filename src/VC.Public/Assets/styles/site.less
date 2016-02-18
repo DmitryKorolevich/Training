@@ -9,6 +9,9 @@
 @bgcolor-danger: #c71c22;
 @bg-color-light-yellow: #FFFFCC;
 @border-color-light-grey: #E1E1E1;
+@base-link-color: #2b6c82;
+@base-footer-link-color: #979aa1;
+@base-footer-link-hover-color: #900;
 
 @font-face {
   font-family: 'Glyphicons Halflings';
@@ -1229,13 +1232,13 @@ footer {
 
                     a {
                         font-size: 11px;
-                        color: #979aa1;
+                        color: @base-footer-link-color;
                         text-decoration: none;
                     }
 
                     a:hover,
                     a:active {
-                        color: #900;
+                        color: @base-footer-link-hover-color;
                     }
                 }
             }
@@ -1989,7 +1992,7 @@ footer {
     padding-right: 15px;
 
     .info-text {
-        color: #2B6C82;
+        color: @base-link-color;
     }
 
     .bottom-indent-small {
@@ -2038,12 +2041,12 @@ footer {
     }
 
     a:visited {
-        color: #2b6c82;
+        color: @base-link-color;
         text-decoration: none;
     }
 
     a:link {
-        color: #2b6c82;
+        color: @base-link-color;
         text-decoration: none;
         outline: none;
     }
@@ -2512,7 +2515,7 @@ footer {
                         }
 
                         .cross-sell-title{
-                            color: #2b6c82;
+                            color: @base-link-color;
                             font-size: 12px;
                         }
 
@@ -2624,7 +2627,7 @@ footer {
     .center-content-pane{
 
         .faq-title {
-            color: #2B6C82;
+            color: @base-link-color;
         }
     }
 }
@@ -4042,12 +4045,12 @@ a.product-recipe-link {
     line-height: 14px;
 
     &:visited {
-        color: #2b6c82;
+        color: @base-link-color;
         text-decoration: none;
     }
 
     &:link {
-        color: #2b6c82;
+        color: @base-link-color;
         text-decoration: none;
         outline: none;
     }
@@ -4452,7 +4455,7 @@ body.view-cart-background
 
 	a,
 	.working-area-holder a{
-		color: #a30100;
+		color: @base-link-color;
 		text-decoration: none;
 
 		&:hover{
@@ -4650,11 +4653,12 @@ body.view-cart-background
 					}
 
 					a{
-						color: #a30000;
+                        font-size: 11px;
+                        color: @base-footer-link-color;
 						text-decoration: none;
 
 						&:hover{
-							text-decoration: underline;
+                            color: @base-footer-link-hover-color;
 						}
 					}
 				}
@@ -4704,7 +4708,7 @@ body.view-cart-background
 	}
 
 	.proposals-item-link{
-		color: #a30100;
+		color: @base-link-color;
 		font-size:12px;
 		text-align:center;
 		width: 150px;
@@ -4786,7 +4790,7 @@ body.view-cart-background
 }
 
 .shopping-notice-note{
-	color:#990000;
+	color: #990000;
 	margin-right:5px;
 }
 

@@ -17,6 +17,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 
         public OrderStatus? OrderStatus { get; set; }
 
+        public bool IgnoreNotShowingIncomplete { get; set; }
+
         public int? POrderType { get; set; }
 
         public int? IdOrderSource { get; set; }

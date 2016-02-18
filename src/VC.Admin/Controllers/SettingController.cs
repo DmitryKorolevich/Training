@@ -17,7 +17,11 @@ using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 using VitalChoice.Infrastructure.Domain.Transfer.CatalogRequests;
 using Microsoft.Net.Http.Headers;
 using System;
+using Newtonsoft.Json;
+using VC.Admin.Models.Orders;
 using VitalChoice.Business.CsvExportMaps;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VC.Admin.Controllers
 {
@@ -167,6 +171,45 @@ namespace VC.Admin.Controllers
         #endregion
 
         #region ObjectHistoryLogs
+
+        //[HttpPost]
+        //public async Task<Result<ObjectHistoryReportModel>> GetHistoryReportForContentItem([FromBody]ObjectHistoryLogItemsFilter filter)
+        //{
+        //    var toReturn = await objectHistoryLogService.GetObjectHistoryReport(filter);
+
+        //    if (toReturn.Main != null && !string.IsNullOrEmpty(toReturn.Main.Data))
+        //    {
+        //        var dynamic = (OrderDynamic)JsonConvert.DeserializeObject(toReturn.Main.Data, typeof(OrderDynamic));
+        //        var model = _mapper.ToModel<OrderManageModel>(dynamic);
+        //        toReturn.Main.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
+        //        {
+        //            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+        //            NullValueHandling = NullValueHandling.Include,
+        //        });
+        //    }
+        //    if (toReturn.Before != null && !string.IsNullOrEmpty(toReturn.Before.Data))
+        //    {
+        //        var dynamic = (OrderDynamic)JsonConvert.DeserializeObject(toReturn.Before.Data, typeof(OrderDynamic));
+        //        var model = _mapper.ToModel<OrderManageModel>(dynamic);
+        //        toReturn.Before.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
+        //        {
+        //            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+        //            NullValueHandling = NullValueHandling.Include,
+        //        });
+        //    }
+
+        //    return toReturn;
+        //}
+
+        //private KeyValuePair<Type, Type> GetObjectHistoryLogTypesForObjectType(ObjectType idObjectType)
+        //{
+        //    //KeyValuePair<Type, Type> toReturn;
+        //    //switch (idObjectType)
+        //    //{
+        //    //    case ObjectType
+        //    //}
+        //    //return toReturn;
+        //}
 
         [HttpPost]
         public async Task<Result<PagedList<ObjectHistoryLogListItemModel>>> GetObjectHistoryLogItems([FromBody]ObjectHistoryLogItemsFilter filter)
