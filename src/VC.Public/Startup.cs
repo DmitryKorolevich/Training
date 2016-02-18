@@ -17,6 +17,7 @@ using System.Globalization;
 using Microsoft.AspNet.Http.Features;
 using Microsoft.AspNet.Mvc;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Authentication.Cookies;
 using VitalChoice.Interfaces.Services;
 
 namespace VC.Public
@@ -68,8 +69,6 @@ namespace VC.Public
             // Add cookie-based authentication to the request pipeline.
             app.UseIdentity();
 
-			app.UseCookieAuthentication();
-
             app.UseSession();
             app.Use(async (context, next) =>
             {
@@ -83,15 +82,6 @@ namespace VC.Public
             });
             app.UseStatusCodePagesWithReExecute("/help/error/{0}");
             app.UseMvc(RouteConfig.RegisterRoutes);
-            app.UseCookieAuthentication(x =>
-            {
-                x.AuthenticationScheme = IdentityCookieOptions.ApplicationCookieAuthenticationType;
-                x.LogoutPath = "/Account/Logout";
-                x.AccessDeniedPath = "/Shared/AccessDenied";
-                x.LoginPath = "/Account/Login";
-                x.ReturnUrlParameter = "returnUrl";
-                x.CookieName = "VitalChoice.Public";
-            });
         }
     }
 }

@@ -128,6 +128,13 @@ namespace VC.Admin.ModelConverters
                 model.VCWellness.PaymentMethodType = PaymentMethodType.VCWellnessEmployeeProgram;
                 dynamic.CustomerPaymentMethods.Add(_paymentMethodMapper.FromModel(model.VCWellness));
             }
+	        foreach (var customerPaymentMethodDynamic in dynamic.CustomerPaymentMethods)
+	        {
+	            if (customerPaymentMethodDynamic.Address != null)
+	            {
+	                customerPaymentMethodDynamic.Address.IdObjectType = (int) AddressType.Billing;
+	            }
+	        }
 
             if (model.Files.Any())
 			{

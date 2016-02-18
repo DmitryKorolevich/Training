@@ -6,7 +6,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 
 namespace VitalChoice.Infrastructure.Domain.Dynamic
 {
-    public class DiscountDynamic: MappedObject
+    public class DiscountDynamic : MappedObject
     {
         public int? IdAddedBy { get; set; }
 
@@ -29,7 +29,7 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
         public ICollection<DiscountToSku> SkusFilter { get; set; }
 
         public ICollection<DiscountToSelectedSku> SkusAppliedOnlyTo { get; set; }
-        
+
         public ICollection<int> CategoryIdsAppliedOnlyTo { get; set; }
 
         public ICollection<DiscountTier> DiscountTiers { get; set; }

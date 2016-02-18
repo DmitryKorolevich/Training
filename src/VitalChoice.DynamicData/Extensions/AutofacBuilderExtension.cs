@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Autofac;
@@ -6,6 +7,7 @@ using Autofac.Builder;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.ObjectMapping.Base;
 using VitalChoice.ObjectMapping.Interfaces;
@@ -88,17 +90,22 @@ namespace VitalChoice.DynamicData.Extensions
             var converters =
                 containAssembly.ExportedTypes.Where(
                     t => t.IsImplementGeneric(typeof (IModelConverter<,>)) && !t.GetTypeInfo().IsAbstract);
+            HashSet<TypePair> typeSet = new HashSet<TypePair>();
             foreach (var converter in converters)
             {
                 var types = converter.TryGetTypeArguments(typeof (IModelConverter<,>));
                 if (types != null && types.Length == 2)
                 {
+                    var pair = new TypePair(types[0], types[1]);
+                    if (typeSet.Contains(pair))
+                        throw new ApiException($"IModelConverter{pair} already registered");
+                    typeSet.Add(pair);
                     builder.RegisterType(converter)
                         .As(
                             typeof (IModelConverter<,>).MakeGenericType(
                                 converter.TryGetTypeArguments(typeof (IModelConverter<,>))))
                         .AsSelf()
-                        .Keyed<IModelConverter>(new TypePair(types[0], types[1])).InstancePerLifetimeScope();
+                        .Keyed<IModelConverter>(pair).InstancePerLifetimeScope();
                 }
             }
             return builder;

@@ -144,8 +144,7 @@ namespace VitalChoice.Business.Services.Checkout
             if (cart.ShipDelayDate != null)
             {
                 newOrder.Data.ShipDelayType = ShipDelayType.EntireOrder;
-                newOrder.Data.ShipDelayDateP = cart.ShipDelayDate;
-                newOrder.Data.ShipDelayDateNP = cart.ShipDelayDate;
+                newOrder.Data.ShipDelayDate = cart.ShipDelayDate;
             }
             newOrder.Data.ShippingUpgradeP = cart.ShippingUpgradeP;
             newOrder.Data.ShippingUpgradeNP = cart.ShippingUpgradeNP;
@@ -252,7 +251,7 @@ namespace VitalChoice.Business.Services.Checkout
                 CartUid = Guid.NewGuid(),
                 IdCustomer = idCustomer
             };
-            await _cartRepository.InsertAsync(cart);
+            await _cartRepository.InsertGraphAsync(cart);
             return cart;
         }
 
@@ -275,6 +274,7 @@ namespace VitalChoice.Business.Services.Checkout
                         return false;
                     if (cartOrder.Order.Customer?.Id != 0)
                     {
+                        var customerBackup = cartOrder.Order.Customer;
                         if (cartOrder.Order.Id == 0)
                         {
                             cartOrder.Order = await _orderService.InsertAsync(cartOrder.Order);
@@ -283,6 +283,7 @@ namespace VitalChoice.Business.Services.Checkout
                         {
                             cartOrder.Order = await _orderService.UpdateAsync(cartOrder.Order);
                         }
+                        cartOrder.Order.Customer = customerBackup;
                         cart.IdCustomer = cartOrder.Order?.Customer?.Id;
                         cart.IdOrder = cartOrder.Order?.Id;
                         cart.IdDiscount = null;
@@ -311,7 +312,7 @@ namespace VitalChoice.Business.Services.Checkout
                             Quantity = so.Quantity
                         }, (sku, ordered) => sku.Quantity = ordered.Quantity);
                         cart.ShipDelayDate = cartOrder.Order.SafeData.ShipDelayType == ShipDelayType.EntireOrder
-                            ? cartOrder.Order.Data.ShipDelayDateP
+                            ? cartOrder.Order.Data.ShipDelayDate
                             : null;
                         cart.ShippingUpgradeP = cartOrder.Order.SafeData.ShippingUpgradeP;
                         cart.ShippingUpgradeNP = cartOrder.Order.SafeData.ShippingUpgradeNP;
@@ -388,11 +389,6 @@ namespace VitalChoice.Business.Services.Checkout
                 }
             }
             return true;
-        }
-
-        public Task<OrderDataContext> CalculateCart(CustomerCartOrder cartOrder)
-        {
-            return _orderService.CalculateOrder(cartOrder.Order, OrderStatus.Processed);
         }
 
         public async Task<int> GetCartItemsCount(Guid uid)

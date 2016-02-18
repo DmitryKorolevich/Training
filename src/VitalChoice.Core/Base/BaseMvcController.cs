@@ -9,7 +9,7 @@ namespace VitalChoice.Core.Base
     {
         protected IActionResult GetItemNotAccessibleResult()
         {
-            return View("ItemNotAccessible");
+            return View("AccessDenied");
         }
     }
 }

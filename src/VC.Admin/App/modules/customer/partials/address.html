@@ -86,10 +86,10 @@
         </div>
     </div>
     <div class="col-md-9" data-ng-if="!(model.Address.Country.States && model.Address.Country.States.length > 0)">
-        <input type="text" name="County" id="{{::model.formName}}_model_county" class="form-control" data-ng-model="model.Address.County" placeholder="State" data-ng-maxlength="100" autocomplete="off" data-ng-disabled="orderEditDisabled" />
+        <input type="text" name="County" id="{{::model.formName}}_model_county" class="form-control" data-ng-model="model.Address.County" placeholder="State" data-ng-maxlength="100" autocomplete="off" data-ng-disabled="orderEditDisabled"/>
         <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].County.$invalid">
             <small class="error" ng-show="forms[model.formName].County.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["State", "100"])}}</small>
-            <small class="error" ng-show="forms[model.formName].County.$error.server">{{serverMessages.GetMessage('State', model.collectionName, model.index, model.formName)}}</small>
+            <small class="error" ng-show="forms[model.formName].County.$error.server">{{serverMessages.GetMessage('County', model.collectionName, model.index, model.formName)}}</small>
         </div>
     </div>
 </div>

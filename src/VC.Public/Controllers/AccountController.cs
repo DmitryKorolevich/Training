@@ -304,15 +304,23 @@ namespace VC.Public.Controllers
 			if (!ModelState.IsValid)
 				return View(model);
 
-			await _userService.ResetPasswordAsync(model.Email, model.Token, model.Password);
-
 			var user = await _userService.FindAsync(model.Email);
 			if (user == null)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
 			}
 
-			await _userService.SignInAsync(user);
+			if (!user.IsConfirmed && user.Status == UserStatus.NotActive)
+				// the case when guest checkout user wants to activate himself
+			{
+				await _customerService.ActivateGuestAsync(model.Email, model.Token, model.Password);
+			}
+			else
+			{
+				await _userService.ResetPasswordAsync(model.Email, model.Token, model.Password);
+			}
+
+			await _userService.SignInAsync(await _userService.FindAsync(model.Email));
 
 			return await Login(new LoginModel() { Email = model.Email, Password = model.Password }, string.Empty);
 		}

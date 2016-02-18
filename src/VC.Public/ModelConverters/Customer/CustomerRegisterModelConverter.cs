@@ -1,5 +1,6 @@
 ﻿using System;
 using VC.Public.Models.Auth;
+using VitalChoice.Business.Helpers;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -24,7 +25,10 @@ namespace VC.Public.ModelConverters.Customer
 
 	    public override void ModelToDynamic(RegisterAccountModel model, CustomerDynamic dynamic)
 	    {
-			var profileAddress = _addressMapper.FromModel(model, (int)AddressType.Profile);
+            dynamic.Data.Phone = model.Phone?.ClearPhone();
+            dynamic.Data.Fax = model.Fax?.ClearPhone();
+
+            var profileAddress = _addressMapper.FromModel(model, (int)AddressType.Profile);
 				
 			dynamic.ProfileAddress = profileAddress;
 

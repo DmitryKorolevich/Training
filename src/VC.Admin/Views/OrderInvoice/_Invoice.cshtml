@@ -87,7 +87,7 @@ else
                                         <span>@Model.ShippingAddress.Company</span><br />
                                         <span>@Model.ShippingAddress.FirstName @Model.ShippingAddress.LastName</span><br />
                                         <span>@Model.ShippingAddress.Address1</span><br />
-                                        @if (!string.IsNullOrEmpty(Model.ShippingAddress.Address2))
+                                        if (!string.IsNullOrEmpty(Model.ShippingAddress.Address2))
                                         {
                                             <span>@Model.ShippingAddress.Address2</span><br />
                                         }
@@ -343,7 +343,7 @@ else
             }
             <tr>
                 <td>
-                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <table class="sku-items" width="100%" border="0" cellspacing="0" cellpadding="0">
                         <thead>
                             <tr>
                                 <td class="title-text">
@@ -367,22 +367,22 @@ else
                             @foreach (var skuOrdered in Model.SkuOrdereds)
                             {
                             <tr>
-                                <td valign="top" class="entry-text">
+                                <td valign="top" class="qty entry-text">
                                     @skuOrdered.QTY
                                 </td>
-                                <td valign="top" class="entry-text">
+                                <td valign="top" class="sku entry-text">
                                     @skuOrdered.Code
                                 </td>
                                 <td valign="top" class="entry-text">
                                     @skuOrdered.ProductName
                                 </td>
-                                <td valign="top" class="entry-text">
+                                <td valign="top" class="unit-price entry-text">
                                     @if (skuOrdered.Price.HasValue)
                                     {
                                     @skuOrdered.Price.Value.ToString("c")
                                     }
                                 </td>
-                                <td valign="top" class="entry-text-right">
+                                <td valign="top" class="total entry-text-right">
                                     @if (skuOrdered.Amount.HasValue)
                                     {
                                     @skuOrdered.Amount.Value.ToString("c")
@@ -401,7 +401,7 @@ else
             <tr class="empty"><td>Promo products:</td></tr>
             <tr>
                 <td>
-                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <table class="sku-items" width="100%" border="0" cellspacing="0" cellpadding="0">
                         <thead>
                             <tr>
                                 <td class="title-text">
@@ -425,22 +425,22 @@ else
                             @foreach (var skuOrdered in Model.PromoSkuOrdereds)
                             {
                                 <tr>
-                                    <td valign="top" class="entry-text">
+                                    <td valign="top" class="qty entry-text">
                                         @skuOrdered.QTY
                                     </td>
-                                    <td valign="top" class="entry-text">
+                                    <td valign="top" class="sku entry-text">
                                         @skuOrdered.Code
                                     </td>
                                     <td valign="top" class="entry-text">
                                         @skuOrdered.ProductName
                                     </td>
-                                    <td valign="top" class="entry-text">
+                                    <td valign="top" class="unit-price entry-text">
                                         @if (skuOrdered.Price.HasValue)
                                         {
                                             @skuOrdered.Price.Value.ToString("c")
                                         }
                                     </td>
-                                    <td valign="top" class="entry-text-right">
+                                    <td valign="top" class="total entry-text-right">
                                         @if (skuOrdered.Amount.HasValue)
                                         {
                                             @skuOrdered.Amount.Value.ToString("c")

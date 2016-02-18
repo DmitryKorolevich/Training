@@ -7,6 +7,8 @@
 @bgcolor-info: #033c73;
 @bgcolor-warning: #dd5600;
 @bgcolor-danger: #c71c22;
+@bg-color-light-yellow: #FFFFCC;
+@border-color-light-grey: #E1E1E1;
 
 @font-face {
   font-family: 'Glyphicons Halflings';
@@ -1917,7 +1919,7 @@ footer {
             vertical-align: top;
 
             img {
-                border: 0px solid #E1E1E1;
+                border: 0px solid @border-color-light-grey;
                 padding: 6px 0 8px 0;
                 width: inherit;
             }
@@ -2194,7 +2196,7 @@ footer {
     }
 
     .panel.panel-border {
-        border: 1px solid #e1e1e1;
+        border: 1px solid @border-color-light-grey;
     }
 
     .left-content-pane {
@@ -2991,7 +2993,7 @@ footer {
     box-sizing: border-box;
 
     &:focus {
-        background-color: #FFFFCC;
+        background-color: @bg-color-light-yellow;
     }
 }
 
@@ -3322,7 +3324,7 @@ footer {
             vertical-align: top;
 
             img {
-                border: 0px solid #E1E1E1;
+                border: 0px solid @border-color-light-grey;
                 padding: 6px 0 8px 0;
             }
         }
@@ -3383,11 +3385,11 @@ footer {
 }
 
 .standard-table > thead > tr > th {
-    background-color: #FFFFCC;
+    background-color: @bg-color-light-yellow;
     font-size: 13px;
     font-weight: bold;
     padding: 6px 12px;
-    border-bottom: 1px solid #E1E1E1;
+    border-bottom: 1px solid @border-color-light-grey;
     text-align: left;
 }
 
@@ -3469,7 +3471,7 @@ footer {
     z-index: 2;
     color: #000;
     cursor: default;
-    background-color: #FFFFCC;
+    background-color: @bg-color-light-yellow;
     border-color: #CCCCCC;
     text-decoration: none;
 }
@@ -3738,7 +3740,7 @@ footer {
     padding: 0px;
 
     .ui-tabs-panel {
-        border: solid 1px #E1E1E1;
+        border: solid 1px @border-color-light-grey;
         overflow: auto;
         padding: 30px;
         height: 370px;
@@ -3756,10 +3758,10 @@ footer {
             margin: 0px 4px 0px 0px;
             font: bold 11px Arial;
             background-color: #F3F2F0;
-            border-left: solid 1px #E1E1E1;
-            border-bottom: 1px solid #e1e1e1;
-            border-top: solid 1px #E1E1E1;
-            border-right: solid 1px #E1E1E1;
+            border-left: solid 1px @border-color-light-grey;
+            border-bottom: 1px solid @border-color-light-grey;
+            border-top: solid 1px @border-color-light-grey;
+            border-right: solid 1px @border-color-light-grey;
             -moz-user-select: none;
             -khtml-user-select: none;
             cursor: pointer;
@@ -3790,7 +3792,7 @@ footer {
     padding: 0 30px;
 
     .product-accessories-title {
-        border-bottom: 1px solid #e1e1e1;
+        border-bottom: 1px solid @border-color-light-grey;
         color: #666666;
         font-size: 21px;
         margin-bottom: 15px;
@@ -4375,16 +4377,23 @@ a.product-recipe-link {
 
 /*--------View cart Layout--------------*/
 
-body.view-cart-layout{
-	font-family: Tahoma;
-    font-size: 12px;
-    color: #000000;
+body.view-cart-background
+{
     background-color: #FFFFFF;
-    margin: 8px;
-    padding: 0;
 	background-image: none;
     background-position:initial;
     background-repeat: no-repeat;
+}
+
+.order-info-section-fonts{
+	font-family: Tahoma;
+    font-size: 12px;
+}
+
+.view-cart-layout{
+    color: #000000;
+    margin: 8px;
+    padding: 0;
 
 	.view-cart-content{
 		width: 100%;
@@ -4812,6 +4821,21 @@ body.view-cart-layout{
 	}
 }
 
+.cart-items-list-readonly{
+    .qty{
+        width: 30px;
+    }
+    .sku{
+        width: 110px;
+    }
+    .unit-price{
+        width: 70px;
+    }  
+    .price{
+        width: 70px;
+    }
+}
+
 .cart-order-totals{
 		float:right;
 		text-align: right;
@@ -4854,6 +4878,10 @@ body.view-cart-layout{
 
 	.receipt-shipping-line{
 		.cart-order-totals .cart-total-line;
+
+		.cart-total-value{
+			width: 200px;
+		}
 	}
 }
 
@@ -5095,9 +5123,9 @@ body.view-cart-layout{
 		margin:10px 0;
 
 		.review-header-container{
-			background-color: #FFFFCC;
+			background-color: @bg-color-light-yellow;
 			padding: 6px 0px;
-			border-bottom: 1px solid #E1E1E1;
+			border-bottom: 1px solid @border-color-light-grey;
 			float: left;
 			width:100%;
 
@@ -5254,3 +5282,5 @@ body.view-cart-layout{
 	margin-top:20px;
 	margin-bottom:10px;
 }
+
+.order-invoice .reivew-order-info .reivew-info-box .review-header-container span { padding: 0; }

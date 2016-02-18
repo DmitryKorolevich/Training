@@ -80,6 +80,7 @@ namespace VC.Admin.Controllers
                     ExpiredTypes = referenceData.ExpiredTypes,
                     DateStatuses = referenceData.DateStatuses,
                     PromotionBuyTypes = referenceData.PromotionBuyTypes,
+                    ShippingUpgrades = referenceData.ShippingUpgrades,
                     PersonTitles=referenceData.PersonTitles,
 					CartShippingOptions = referenceData.CartShippingOptions
 				};

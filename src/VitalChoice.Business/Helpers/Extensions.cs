@@ -7,6 +7,18 @@ namespace VitalChoice.Business.Helpers
 {
     public static class Extensions
     {
+        public static string ClearPhone(this string data)
+        {
+            return !string.IsNullOrEmpty(data)
+                ? data.Replace("(", "")
+                    .Replace(")", "")
+                    .Replace(" ", "")
+                    .Replace("-", "")
+                    .Replace("x", "")
+                    .Replace("_", "")
+                : data;
+        }
+
         public static string FormatAsPhone(this string data, string mask)
         {
             if(!string.IsNullOrEmpty(data) && !string.IsNullOrEmpty(mask))

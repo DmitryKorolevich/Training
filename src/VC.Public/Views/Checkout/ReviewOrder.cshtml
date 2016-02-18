@@ -1,80 +1,98 @@
 ﻿@{
-	Layout = "~/Views/Shared/_ViewCartLayout.cshtml";
+    Layout = "~/Views/Shared/_ViewCartLayout.cshtml";
 }
 
 @model VC.Public.Models.Checkout.ReviewOrderModel
 
 @section PageScripts {
-	<script src="@Url.Content("/app/modules/checkout/checkoutMain.js")"></script>
-	<script src="@Url.Content("/app/modules/cart/viewcart.js")"></script>
-	<script src="@Url.Content("/app/modules/checkout/reviewOrder.js")"></script>
+    <script src="@Url.Content("/app/modules/checkout/checkoutMain.js")"></script>
+    <script src="@Url.Content("/app/modules/cart/viewcart.js")"></script>
+    <script src="@Url.Content("/app/modules/checkout/reviewOrder.js")"></script>
 }
 
 @section Meta {
-	<title>Wild Seafood & Organics - Vital Choice</title>
+    <title>Wild Seafood & Organics - Vital Choice</title>
 }
 
 <div class="checkout-step-container working-area-holder">
-	<img class="checkout-step-banner" src="/assets/images/checkout/step4.jpg"/>
-	<h4 class="checkout-step-heading">4. Review & Submit Your Order</h4>
-	<div class="review-order-notifications">
-		<span class="checkout-notification-simple">1. Review your Cart, Shipping, Billing, and Payment info, and make any needed changes.</span>
-		<span class="checkout-notification-simple">2. Enter any Gift Certificate Code you may have, then click the Place Your Order button to finalize your order.</span>
-	</div>
-	<div class="review-order-certificates">
-		<a name="trustlink" href="http://secure.trust-guard.com/certificates/5867" target="_blank"
-		   onclick="var nonwin = navigator.appName != 'Microsoft Internet Explorer' ? 'yes' : 'no'; window.open(this.href.replace('http', 'https'), 'welcome', 'location=' + nonwin + ',scrollbars=yes,width=517,height=' + screen.availHeight + ',menubar=no,toolbar=no'); return false;"
-		   oncontextmenu="var d = new Date(); alert('Copying Prohibited by Law - This image and all included logos are copyrighted by trust-guard \251 '+d.getFullYear()+'.'); return false;">
-			<img name="trustseal" alt="Security Seal" style="border: 0;" src="https://secure.trust-guard.com/seals/5867/scanned/mini/gray"/>
-		</a>
-	</div>
-	<div class="cart-overlay-container">
-		<div class="overlay" data-bind="visible:refreshing">
-			<div class="loading">Loading…</div>
-		</div>
-		<div class="review-order-cart">
-			@using (Html.BeginForm("ReviewOrder", "Checkout", null, FormMethod.Post, new {@class = "form-cart", role = "form", @id = "viewCartForm", data_bind = "submit: submitCart" }))
-			{
-				@await Html.PartialAsync("_ViewCart", Model, ViewData)
-			}
-		</div>
-		<div class="reivew-order-info">
-			<div class="reivew-info-box">
-				<div class="review-header-container">
-					<span>Bill to Details</span>
-					@Html.ActionLink("Edit", "AddUpdateBillingAddress", "Checkout", null, new { @class = "button" })
-				</div>
-				@foreach (var item in Model.BillToAddress)
-				{
-					<div class="review-box-line">
-						@if (!string.IsNullOrWhiteSpace(item.Key))
-						{
-							<span class="review-info-label">@item.Key:</span>
-						}
-						<span class="review-info-value">@item.Value</span>
-					</div>
-				}
-			</div>
-			<div class="reivew-info-box">
-				<div class="review-header-container">
-					<span>Ship to Details</span>
-					@Html.ActionLink("Edit","AddUpdateShippingMethod", "Checkout", null, new { @class = "button" })
-				</div>
-				@foreach (var item in Model.ShipToAddress)
-				{
-					<div class="review-box-line">
-						@if (!string.IsNullOrWhiteSpace(item.Key))
-						{
-							<span class="review-info-label">@item.Key:</span>
-						}
-						<span class="review-info-value">@item.Value</span>
-					</div>
-				}
-			</div>
-		</div>
-		<div class="form-buttons-group">
-			@Html.ActionLink("Back", "AddUpdateShippingMethod", "Checkout", null, new { @class = "button arrow-left-red" })
-			<input id="btnPlaceOrder" class="arrow-right-blue" type="button" value="Place Your Order"/>
-		</div>
-	</div>
+    <img class="checkout-step-banner" src="/assets/images/checkout/step4.jpg" />
+    <h4 class="checkout-step-heading">4. Review & Submit Your Order</h4>
+    <div class="review-order-notifications">
+        <span class="checkout-notification-simple">1. Review your Cart, Shipping, Billing, and Payment info, and make any needed changes.</span>
+        <span class="checkout-notification-simple">2. Enter any Gift Certificate Code you may have, then click the Place Your Order button to finalize your order.</span>
+    </div>
+    <div class="review-order-certificates">
+        <a name="trustlink" href="http://secure.trust-guard.com/certificates/5867" target="_blank"
+           onclick="var nonwin = navigator.appName != 'Microsoft Internet Explorer' ? 'yes' : 'no'; window.open(this.href.replace('http', 'https'), 'welcome', 'location=' + nonwin + ',scrollbars=yes,width=517,height=' + screen.availHeight + ',menubar=no,toolbar=no'); return false;"
+           oncontextmenu="var d = new Date(); alert('Copying Prohibited by Law - This image and all included logos are copyrighted by trust-guard \251 '+d.getFullYear()+'.'); return false;">
+            <img name="trustseal" alt="Security Seal" style="border: 0;" src="https://secure.trust-guard.com/seals/5867/scanned/mini/gray" />
+        </a>
+    </div>
+    <div class="cart-overlay-container">
+        <div class="overlay" data-bind="visible:refreshing">
+            <div class="loading">Loading…</div>
+        </div>
+        <div class="review-order-cart">
+            @using (Html.BeginForm("ReviewOrder", "Checkout", null, FormMethod.Post, new { @class = "form-cart", role = "form", @id = "viewCartForm", data_bind = "submit: submitCart" }))
+            {
+                @await Html.PartialAsync("_ViewCart", Model, ViewData)
+            }
+        </div>
+        <div class="reivew-order-info">
+            <div class="reivew-info-box">
+                <div class="review-header-container">
+                    <span>Bill to Details</span>
+                    @Html.ActionLink("Edit", "AddUpdateBillingAddress", "Checkout", null, new { @class = "button" })
+                </div>
+                @foreach (var item in Model.CreditCardDetails)
+                {
+                    <div class="review-box-line">
+                        @if (!string.IsNullOrWhiteSpace(item.Key))
+                        {
+                            <span class="review-info-label">@item.Key:</span>
+                        }
+                        <span class="review-info-value">@item.Value</span>
+                    </div>
+                }
+                <div class="review-box-line">
+                </div>
+                @foreach (var item in Model.BillToAddress)
+                {
+                    if (!string.IsNullOrEmpty(item.Value))
+                    {
+                        <div class="review-box-line">
+                            @if (!string.IsNullOrWhiteSpace(item.Key))
+                            {
+                                <span class="review-info-label">@item.Key:</span>
+                            }
+                            <span class="review-info-value">@item.Value</span>
+                        </div>
+                    }
+                }
+            </div>
+            <div class="reivew-info-box">
+                <div class="review-header-container">
+                    <span>Ship to Details</span>
+                    @Html.ActionLink("Edit", "AddUpdateShippingMethod", "Checkout", null, new { @class = "button" })
+                </div>
+                @foreach (var item in Model.ShipToAddress)
+                {
+                    if (!string.IsNullOrEmpty(item.Value))
+                    {
+                        <div class="review-box-line">
+                            @if (!string.IsNullOrWhiteSpace(item.Key))
+                            {
+                                <span class="review-info-label">@item.Key:</span>
+                            }
+                            <span class="review-info-value">@item.Value</span>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+        <div class="form-buttons-group">
+            @Html.ActionLink("Back", "AddUpdateShippingMethod", "Checkout", null, new { @class = "button arrow-left-red" })
+            <input id="btnPlaceOrder" class="arrow-right-blue" type="button" value="Place Your Order" />
+        </div>
+    </div>
 </div>

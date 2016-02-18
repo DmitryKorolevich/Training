@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using VitalChoice.Business.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
@@ -22,13 +23,13 @@ namespace VitalChoice.Business.Workflow.Actions.Discounts
             {
                 if (discountableSubtotal >= tier.From && tier.To == null || discountableSubtotal <= tier.To)
                 {
+                    dataContext.Order.Data.IdDiscountTier = tier.Id;
+                    dataContext.DiscountMessage = dataContext.Order.Discount.GetDiscountMessage(tier.Id);
                     switch (tier.IdDiscountType)
                     {
                         case DiscountType.PriceDiscount:
-                            dataContext.DiscountMessage = $"Tiered Discount, Tier from {tier.From:C} to {tier.To:C} ({tier.Amount ?? 0:C})";
                             return Task.FromResult<decimal>(-Math.Min(discountableSubtotal, tier.Amount ?? 0));
                         case DiscountType.PercentDiscount:
-                            dataContext.DiscountMessage = $"Tiered Discount, Tier from {tier.From:C} to {tier.To:C} ({(tier.Percent ?? 0) / 100:P0})";
                             return Task.FromResult(-tier.Percent ?? 0*(decimal) discountableSubtotal/100);
                         default:
                             throw new ArgumentOutOfRangeException();

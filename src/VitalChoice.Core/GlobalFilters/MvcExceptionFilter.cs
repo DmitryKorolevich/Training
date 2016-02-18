@@ -14,6 +14,7 @@ using Microsoft.AspNet.Mvc.ViewFeatures;
 using Microsoft.AspNet.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Constants;
 
 namespace VitalChoice.Core.GlobalFilters
 {
@@ -81,10 +82,17 @@ namespace VitalChoice.Core.GlobalFilters
 				}
 				else
 				{
-                    result.ViewName = apiException.Status == HttpStatusCode.NotFound ? "Error404" : "Error";
+					if (apiException.Status == HttpStatusCode.NotFound)
+					{
+						context.Result = new RedirectResult("/content/" + ContentConstants.NOT_FOUND_PAGE_URL);
+						return;
+					}
+					var viewName = apiException.Status == HttpStatusCode.Forbidden ? "AccessDenied" : "Error";
+
+					result.ViewName = viewName;
 					result.StatusCode = (int)apiException.Status;
 
-                    var logger = LoggerService.GetDefault();
+					var logger = LoggerService.GetDefault();
                     logger.LogError(context.Exception.Message, context.Exception);
                 }
 				context.Result = result;

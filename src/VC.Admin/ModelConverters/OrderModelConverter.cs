@@ -14,6 +14,7 @@ using VC.Admin.Models.Products;
 using VitalChoice.Business.Queries.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Business.Helpers;
 
 namespace VC.Admin.ModelConverters
 {
@@ -48,6 +49,7 @@ namespace VC.Admin.ModelConverters
             if(dynamic.Discount!=null)
             {
                 model.DiscountCode = dynamic.Discount.Code;
+                model.DiscountMessage = dynamic.Discount.GetDiscountMessage((int?)dynamic.SafeData.IdDiscountTier);
             }
 
             if(dynamic.GiftCertificates!=null && dynamic.GiftCertificates.Count>0)
@@ -165,13 +167,24 @@ namespace VC.Admin.ModelConverters
                 if (dynamic.SafeData.ShipDelayType == ShipDelayType.None)
                 {
                     dynamic.Data.ShipDelayType = null;
-                }
-                if (dynamic.SafeData.ShipDelayType == ShipDelayType.PerishableAndNonPerishable && !model.ShouldSplit)
-                {
-                    dynamic.Data.ShipDelayType = null;
                     dynamic.Data.ShipDelayDate = null;
                     dynamic.Data.ShipDelayDateP = null;
                     dynamic.Data.ShipDelayDateNP = null;
+                }
+                if (dynamic.SafeData.ShipDelayType == ShipDelayType.EntireOrder)
+                {
+                    dynamic.Data.ShipDelayDateP = null;
+                    dynamic.Data.ShipDelayDateNP = null;
+                }
+                if (dynamic.SafeData.ShipDelayType == ShipDelayType.PerishableAndNonPerishable)
+                {
+                    dynamic.Data.ShipDelayDate = null;
+                    if (!model.ShouldSplit)
+                    {
+                        dynamic.Data.ShipDelayType = null;
+                        dynamic.Data.ShipDelayDateP = null;
+                        dynamic.Data.ShipDelayDateNP = null;
+                    }
                 }
             }
 
@@ -402,6 +415,10 @@ namespace VC.Admin.ModelConverters
                             break;
                     }
                 }
+            }
+            if (dynamic?.PaymentMethod?.Address != null)
+            {
+                dynamic.PaymentMethod.Address.IdObjectType = (int)AddressType.Billing;
             }
         }
 

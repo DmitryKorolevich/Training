@@ -63,6 +63,7 @@ using VitalChoice.Workflow.Base;
 using VitalChoice.ContentProcessing.Helpers;
 using VitalChoice.DynamicData.Extensions;
 using Autofac.Extensions.DependencyInjection;
+using Microsoft.AspNet.Authentication.Cookies;
 using VitalChoice.Business.Repositories;
 using VitalChoice.Core.Infrastructure.Helpers.ReCaptcha;
 using VitalChoice.DynamicData.Interfaces;
@@ -109,6 +110,8 @@ namespace VitalChoice.Core.DependencyInjection
                 x.Password.RequiredLength = 8;
                 x.Password.RequireDigit = true;
                 x.Password.RequireNonLetterOrDigit = true;
+
+	            PopulateCookieIdentityOptions(x.Cookies.ApplicationCookie);
             })
                 .AddEntityFrameworkStores<VitalChoiceContext, int>()
                 .AddErrorDescriber<ExtendedIdentityErrorDescriber>()
@@ -358,7 +361,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<EcommerceContext>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<LogsContext>().InstancePerLifetimeScope();
-            builder.RegisterGeneric(typeof (RepositoryAsync<>))
+	        builder.RegisterGeneric(typeof (RepositoryAsync<>))
                 .As(typeof (IRepositoryAsync<>)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof (ReadRepositoryAsync<>))
                 .As(typeof (IReadRepositoryAsync<>)).InstancePerLifetimeScope(); 
@@ -525,7 +528,10 @@ namespace VitalChoice.Core.DependencyInjection
                 .SingleInstance();
             builder.RegisterType<EncryptedOrderExportService>().As<IEncryptedOrderExportService>().InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof (TransactionAccessor<>)).As(typeof (ITransactionAccessor<>)).InstancePerLifetimeScope();
-            FinishCustomRegistrations(builder);
+			builder.RegisterType<ExtendedClaimsPrincipalFactory>().As<IUserClaimsPrincipalFactory<ApplicationUser>>();
+
+
+			FinishCustomRegistrations(builder);
 
             var container = builder.Build();
             return container;
@@ -544,5 +550,10 @@ namespace VitalChoice.Core.DependencyInjection
         {
             services.AddMvc();
         }
+
+	    protected virtual void PopulateCookieIdentityOptions(CookieAuthenticationOptions options)
+	    {
+			options.AuthenticationScheme = IdentityCookieOptions.ApplicationCookieAuthenticationType;
+		}
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using VitalChoice.Business.Helpers;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Core;
@@ -13,7 +14,7 @@ namespace VitalChoice.Business.Workflow.Actions.Discounts
 
         public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            dataContext.DiscountMessage = "Free Shipping Discount";
+            dataContext.DiscountMessage = dataContext.Order.Discount.GetDiscountMessage();
             dataContext.FreeShipping = true;
             return Task.FromResult((decimal)0);
         }

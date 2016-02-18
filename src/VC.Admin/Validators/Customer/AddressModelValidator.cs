@@ -69,10 +69,10 @@ namespace VC.Admin.Validators.Customer
 				.When(model => model.Country.States.Any())
 				.WithMessage(model => model.State, ValidationMessages.FieldRequired);
 
-			RuleFor(model => model.County)
-				.NotEmpty()
-				.When(model => !model.Country.States.Any())
-				.WithMessage(model => model.County, ValidationMessages.FieldRequired);
+			//RuleFor(model => model.County)
+			//	.NotEmpty()
+			//	.When(model => !model.Country.States.Any())
+			//	.WithMessage(model => model.County, ValidationMessages.FieldRequired);
 
 			RuleFor(model => model.Zip)
 				.NotEmpty()
@@ -94,9 +94,6 @@ namespace VC.Admin.Validators.Customer
 					BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
 
 			RuleFor(model => model.Email)
-				.NotEmpty()
-				.When(x => x.AddressType == AddressType.Billing)
-				.WithMessage(model => model.Email, ValidationMessages.FieldRequired)
 				.Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
 				.WithMessage(model => model.Email, ValidationMessages.FieldLength,
 					BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)

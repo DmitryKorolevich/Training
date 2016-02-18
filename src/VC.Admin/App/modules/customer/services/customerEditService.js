@@ -75,6 +75,13 @@ angular.module('app.modules.customer.services.customerEditService', [])
             {
                 uiScope.paymentInfoTab.CreditCardIndex = undefined;
             }
+            $.each(uiScope.forms.card, function (index, element)
+            {
+                if (element && element.$name == index)
+                {
+                    element.$setValidity("server", true);
+                }
+            });
         };
 
         uiScope.makeBillingAsProfileAddress = function ()
@@ -140,6 +147,17 @@ angular.module('app.modules.customer.services.customerEditService', [])
 
     var initCustomerEdit = function (uiScope)
     {
+        uiScope.cardChanged = function ()
+        {
+            $.each(uiScope.forms.card, function (index, element)
+            {
+                if (element && element.$name == index)
+                {
+                    element.$setValidity("server", true);
+                }
+            });
+        }
+
         uiScope.buildShippingAddressForPartial = function (collection, index, disableValidation, forOrder) {
             if (collection === undefined || collection[index] === undefined || uiScope.shippingAddressTab.ShippingEditModels === undefined)
                 return undefined;

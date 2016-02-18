@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using VitalChoice.Business.Helpers;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
@@ -26,7 +27,7 @@ namespace VitalChoice.Business.Workflow.Actions.Discounts
                 });
                 return Task.FromResult((decimal)0);
             }
-            dataContext.DiscountMessage = $"Threshold Discount ({dataContext.Order.Discount.Data.ProductSKU})";
+            dataContext.DiscountMessage = dataContext.Order.Discount.GetDiscountMessage();
             var item = (SkuOrdered) dataContext.Order.Discount.Data.ThresholdSku;
             item.Quantity = 1;
             item.Amount = 0;

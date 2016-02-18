@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using VC.Public.Models.Cart;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
@@ -6,6 +9,13 @@ using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 
 namespace VC.Public.Models.Profile
 {
+    public class GCInvoiceEntity
+    {
+        public string Code { get; set; }
+
+        public decimal Amount { get; set; }
+    }
+
     public class OrderViewModel
     {
         [Map]
@@ -26,7 +36,13 @@ namespace VC.Public.Models.Profile
         public RecordStatusCode StatusCode { get; set; }
 
         [Map]
-        public OrderStatus OrderStatus { get; set; }
+        public OrderStatus? OrderStatus { get; set; }
+
+        [Map]
+        public OrderStatus? POrderStatus { get; set; }
+
+        [Map]
+        public OrderStatus? NPOrderStatus { get; set; }
 
         [Map]
         public bool GiftOrder { get; set; }
@@ -103,9 +119,38 @@ namespace VC.Public.Models.Profile
         [Map]
         public decimal Total { get; set; }
         
-        [Map]
-        public AddressModel ShippingAddress { get; set; }
-        
-        public AddressModel BillingAddress { get; set; }
+        public int? IdPaymentMethodType { get; set; }
+
+        public IList<KeyValuePair<string, string>> BillToAddress { get; set; }
+
+        public IList<KeyValuePair<string, string>> CreditCardDetails { get; set; }
+
+        public IList<KeyValuePair<string, string>> ShipToAddress { get; set; }
+
+        public IList<CartSkuModel> Skus { get; set; }
+
+        public IList<CartSkuModel> PromoSkus { get; set; }
+
+        public decimal ShippingSurcharge { get; set; }
+
+        public decimal GiftCertificatesTotal { get; set; }
+
+        public string DiscountCode { get; set; }
+
+        public string DiscountCodeMessage { get; set; }
+
+        public ICollection<GCInvoiceEntity> GCs { get; set; }
+
+        //Only shipping with ovveride and without surcharge part
+        public decimal TotalShipping { get; set; }
+
+        public OrderViewModel()
+        {
+            BillToAddress = new List<KeyValuePair<string, string>>();
+            CreditCardDetails = new List<KeyValuePair<string, string>>();
+            ShipToAddress = new List<KeyValuePair<string, string>>();
+            Skus = new List<CartSkuModel>();
+            PromoSkus = new List<CartSkuModel>();
+        }
     }
 }

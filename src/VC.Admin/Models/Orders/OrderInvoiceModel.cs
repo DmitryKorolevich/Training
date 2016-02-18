@@ -58,7 +58,13 @@ namespace VC.Admin.Models.Orders
         public RecordStatusCode StatusCode { get; set; }
 
         [Map]
-        public OrderStatus OrderStatus { get; set; }
+        public OrderStatus? OrderStatus { get; set; }
+
+        [Map]
+        public OrderStatus? POrderStatus { get; set; }
+
+        [Map]
+        public OrderStatus? NPOrderStatus { get; set; }
 
         [Map]
         public bool GiftOrder { get; set; }
@@ -239,6 +245,18 @@ namespace VC.Admin.Models.Orders
         {
             IdCustomer = customer.Id;
             DateCreated = TimeZoneInfo.ConvertTime(DateCreated, TimeZoneInfo.Local, pstTimeZoneInfo);
+            if (ShipDelayDate.HasValue)
+            {
+                ShipDelayDate = TimeZoneInfo.ConvertTime(ShipDelayDate.Value, TimeZoneInfo.Local, pstTimeZoneInfo);
+            }
+            if (ShipDelayDateP.HasValue)
+            {
+                ShipDelayDateP = TimeZoneInfo.ConvertTime(ShipDelayDateP.Value, TimeZoneInfo.Local, pstTimeZoneInfo);
+            }
+            if (ShipDelayDateNP.HasValue)
+            {
+                ShipDelayDateNP = TimeZoneInfo.ConvertTime(ShipDelayDateNP.Value, TimeZoneInfo.Local, pstTimeZoneInfo);
+            }
             IdEditAgent = adminProfile == null ? "--" : adminProfile.AgentId;
             if (order.IdObjectType == (int)OrderType.Refund)
             {

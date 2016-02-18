@@ -9,22 +9,16 @@ using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services;
 using AuthorizationContext = Microsoft.AspNet.Mvc.Filters.AuthorizationContext;
 using Microsoft.AspNet.Mvc.Filters;
-using VitalChoice.Ecommerce.Domain.Entities.Customers;
 
 namespace VitalChoice.Core.Infrastructure
 {
 	public class CustomerAuthorizeAttribute : AuthorizationFilterAttribute
 	{
-		private readonly IList<int> _roles;
+		private readonly bool _notConfirmedAllowed;
 
-		public CustomerAuthorizeAttribute()
+		public CustomerAuthorizeAttribute(bool notConfirmedAllowed = false)
 		{
-			_roles = null;
-		}
-
-		public CustomerAuthorizeAttribute(params CustomerType[] roles):this()
-		{
-			_roles = roles.Select(x => Convert.ToInt32(x)).ToList();
+			_notConfirmedAllowed = notConfirmedAllowed;
 		}
 
 		protected override void Fail(AuthorizationContext context)
@@ -42,6 +36,11 @@ namespace VitalChoice.Core.Infrastructure
 			var result = await authorizationService.AuthorizeAsync(claimUser, null, IdentityConstants.IdentityBasicProfile);
 			if (result)
 			{
+				if (!_notConfirmedAllowed && claimUser.HasClaim(x => x.Type == IdentityConstants.NotConfirmedClaimType))
+				{
+					Fail(context);
+				}
+
 				if (claimUser.HasClaim(x=>x.Type == IdentityConstants.CustomerRoleType))
 				{
 					var customerRoles =

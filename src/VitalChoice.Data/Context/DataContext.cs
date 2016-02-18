@@ -42,7 +42,7 @@ namespace VitalChoice.Data.Context
 
         public override void Dispose()
         {
-            if (_transaction == null || _transaction.Closed)
+            if (_transaction == null)
                 base.Dispose();
         }
 

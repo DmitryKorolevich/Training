@@ -42,6 +42,11 @@ namespace VitalChoice.ObjectMapping.Base
 
         public Type ModelType { get; }
         public Type DynamicType { get; }
+
+        public override string ToString()
+        {
+            return $"<{ModelType},{DynamicType}>";
+        }
     }
 
     public struct GenericTypePair : IEquatable<GenericTypePair>

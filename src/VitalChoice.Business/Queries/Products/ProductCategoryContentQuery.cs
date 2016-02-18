@@ -3,7 +3,7 @@ using VitalChoice.Data.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Content.Products;
 
-namespace VitalChoice.Business.Queries.Product
+namespace VitalChoice.Business.Queries.Products
 {
     public class ProductCategoryContentQuery : QueryObject<ProductCategoryContent>
     {

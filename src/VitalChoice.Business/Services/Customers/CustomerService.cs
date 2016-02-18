@@ -150,6 +150,7 @@ namespace VitalChoice.Business.Services.Customers
                     await
                         _customerRepositoryAsync.Query(
                             new CustomerQuery().NotDeleted().Excluding(model.Id).WithEmail(model.Email))
+                            .Include(c => c.OptionValues)
                             .SelectAsync(false);
 
                 if (customerSameEmail.Any())
@@ -317,11 +318,6 @@ namespace VitalChoice.Business.Services.Customers
                 return await DynamicMapper.FromEntityAsync(entity);
 			}
 		}
-
-        public Task<ApplicationUser> GetUser(int id)
-        {
-            return _storefrontUserService.GetAsync(id);
-        }
 
         public async Task<IList<OrderNote>> GetAvailableOrderNotesAsync(CustomerType customerType)
 	    {
@@ -566,7 +562,10 @@ namespace VitalChoice.Business.Services.Customers
                 appUser.ConfirmationToken = Guid.Empty;
             }
 
-            var email = string.IsNullOrEmpty(password) && string.IsNullOrEmpty(model.Email) && appUser.Email==BaseAppConstants.FAKE_CUSTOMER_EMAIL ? BaseAppConstants.FAKE_CUSTOMER_EMAIL : model.Email;
+            var email = string.IsNullOrEmpty(password) && string.IsNullOrEmpty(model.Email) &&
+                        appUser.Email == BaseAppConstants.FAKE_CUSTOMER_EMAIL
+                ? BaseAppConstants.FAKE_CUSTOMER_EMAIL
+                : model.Email;
             appUser.Email = email;
             appUser.UserName = email;
 
@@ -712,5 +711,55 @@ namespace VitalChoice.Business.Services.Customers
 
             return toReturn;
         }
+
+        public Task<CustomerDynamic> GetByEmailAsync(string email)
+        {
+            return SelectFirstAsync(c => c.Email == email && c.StatusCode != (int) RecordStatusCode.Deleted, withDefaults: true);
+        }
+
+	    public async Task ActivateGuestAsync(string email, string token, string newPassword)
+	    {
+		    CustomerDynamic customer = null;
+		    ApplicationUser applicationUser;
+			using (var tran = TransactionAccessor.BeginTransaction())
+			{
+				var customerUpdated = false;
+			    try
+			    {
+				    customer = await SelectFirstAsync(x => x.Email.Equals(email));
+
+				    if (customer == null)
+				    {
+					    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+				    }
+
+				    customer.StatusCode = (int) CustomerStatus.Active;
+					await UpdateAsync(customer);
+
+				    customerUpdated = true;
+
+					applicationUser = await _storefrontUserService.ResetPasswordAsync(email, token, newPassword);
+
+					tran.Commit();
+
+				}
+			    catch (Exception)
+			    {
+					tran.Rollback();
+				    if (customerUpdated) //this needs to be done since distributed transactions not supported yet
+						//todo: refactor this once distributed transactions arrive
+				    {
+					    applicationUser = await _storefrontUserService.FindAsync(email);
+
+						applicationUser.Status = UserStatus.NotActive;
+
+						await _storefrontUserService.UpdateAsync(applicationUser);
+					}
+				    throw;
+			    }
+		    }
+
+			await _storefrontUserService.SendSuccessfulRegistration(customer.Email, applicationUser.FirstName, applicationUser.LastName);
+		}
     }
 }

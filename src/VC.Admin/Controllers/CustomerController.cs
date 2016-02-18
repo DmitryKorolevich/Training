@@ -134,7 +134,7 @@ namespace VC.Admin.Controllers
             model.CustomerNotes = new List<CustomerNoteModel>();
             model.ProfileAddress = new AddressModel();
             model.ProfileAddress.Country = new CountryListItemModel(_defaultCountry);
-            model.Shipping = new List<AddressModel>() { new AddressModel() { AddressType = AddressType.Shipping, Country = new CountryListItemModel(_defaultCountry) } };
+            model.Shipping = new List<AddressModel>() { new AddressModel() { Country = new CountryListItemModel(_defaultCountry) } };
             model.StatusCode = (int)CustomerStatus.PhoneOnly;
 
 	        var defaultPaymentMethodId = (await _paymentMethodService.GetStorefrontDefaultPaymentMethod()).Id;
@@ -150,7 +150,7 @@ namespace VC.Admin.Controllers
         {
             return new CreditCardModel
             {
-                Address = new AddressModel {AddressType = AddressType.Billing, Country = new CountryListItemModel(_defaultCountry) },
+                Address = new AddressModel { Country = new CountryListItemModel(_defaultCountry) },
                 CardType = CreditCardType.MasterCard
             };
         }
@@ -161,7 +161,7 @@ namespace VC.Admin.Controllers
         {
             return new OacPaymentModel
             {
-                Address = new AddressModel { AddressType = AddressType.Billing, Country = new CountryListItemModel(_defaultCountry) },
+                Address = new AddressModel { Country = new CountryListItemModel(_defaultCountry) },
                 Fob = 1,
                 Terms = 1
             };
@@ -173,7 +173,7 @@ namespace VC.Admin.Controllers
         {
             return new CheckPaymentModel
             {
-                Address = new AddressModel {AddressType = AddressType.Billing, Country = new CountryListItemModel(_defaultCountry) }
+                Address = new AddressModel {Country = new CountryListItemModel(_defaultCountry) }
             };
         }
 
@@ -183,7 +183,7 @@ namespace VC.Admin.Controllers
         {
             return new WireTransferPaymentModel
             {
-                Address = new AddressModel { AddressType = AddressType.Billing, Country = new CountryListItemModel(_defaultCountry) }
+                Address = new AddressModel { Country = new CountryListItemModel(_defaultCountry) }
             };
         }
 
@@ -193,7 +193,7 @@ namespace VC.Admin.Controllers
         {
             return new MarketingPaymentModel
             {
-                Address = new AddressModel { AddressType = AddressType.Billing, Country = new CountryListItemModel(_defaultCountry) }
+                Address = new AddressModel { Country = new CountryListItemModel(_defaultCountry) }
             };
         }
 
@@ -203,7 +203,7 @@ namespace VC.Admin.Controllers
         {
             return new VCWellnessEmployeeProgramPaymentModel
             {
-                Address = new AddressModel { AddressType = AddressType.Billing, Country = new CountryListItemModel(_defaultCountry) }
+                Address = new AddressModel { Country = new CountryListItemModel(_defaultCountry) }
             };
         }
 
@@ -211,7 +211,7 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Customers)]
         public Result<AddressModel> CreateAddressPrototype()
         {
-            return new AddressModel() {AddressType = AddressType.Shipping, Country = new CountryListItemModel(_defaultCountry)};
+            return new AddressModel() { Country = new CountryListItemModel(_defaultCountry)};
         }
 
         [HttpPost]

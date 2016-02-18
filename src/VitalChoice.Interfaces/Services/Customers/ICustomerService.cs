@@ -16,9 +16,7 @@ namespace VitalChoice.Interfaces.Services.Customers
 {
 	public interface ICustomerService : IDynamicServiceAsync<CustomerDynamic, Customer>
 	{
-	    Task<ApplicationUser> GetUser(int id);
-
-        Task<IList<OrderNote>> GetAvailableOrderNotesAsync(CustomerType customerType);
+	    Task<IList<OrderNote>> GetAvailableOrderNotesAsync(CustomerType customerType);
 
 		Task<IList<PaymentMethod>> GetAvailablePaymentMethodsAsync(CustomerType? customerType);
 
@@ -39,5 +37,8 @@ namespace VitalChoice.Interfaces.Services.Customers
         Task<ICollection<string>> GetCustomerStaticFieldValuesByValue(ValuesByFieldValueFilter filter);
 
         Task<string> GetNewOrderNotesBasedOnCustomer(int idCustomer);
-    }
+	    Task<CustomerDynamic> GetByEmailAsync(string email);
+
+		Task ActivateGuestAsync(string email, string token, string newPassword);
+	}
 }
