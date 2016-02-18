@@ -9,8 +9,6 @@ namespace VitalChoice.Caching.Relational.Base
         {
             if (valueInfo == null)
                 throw new ArgumentNullException(nameof(valueInfo));
-            if (value == null)
-                throw new ArgumentNullException(nameof(value));
 
             ValueInfo = valueInfo;
             Value = value;
@@ -18,15 +16,15 @@ namespace VitalChoice.Caching.Relational.Base
 
         public bool Equals(EntityValue<TInfo> other)
         {
-            if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Value.Equals(other.Value);
+            if (ReferenceEquals(null, other)) return false;
+            return Value?.Equals(other.Value) ?? false;
         }
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
+            if (ReferenceEquals(null, obj)) return false;
             var entityKey = obj as EntityValue<TInfo>;
             if (entityKey != null)
                 return Equals(entityKey);

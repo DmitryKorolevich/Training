@@ -40,6 +40,8 @@ namespace VitalChoice.Data.Context
 
         public bool InTransaction => _transaction != null && !_transaction.Closed;
 
+        public event Action TransactionCommit;
+
         public override void Dispose()
         {
             if (_transaction == null)
@@ -56,12 +58,6 @@ namespace VitalChoice.Data.Context
         {
             var changes = base.SaveChanges();
             return changes;
-        }
-
-        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
-        {
-            var changesAsync = await base.SaveChangesAsync(cancellationToken);
-            return changesAsync;
         }
 
         public void SetState(object entity, EntityState state)

@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Entity.Storage;
+﻿using System;
+using Microsoft.Data.Entity.Storage;
 using VitalChoice.Data.Context;
 
 namespace VitalChoice.Data.Transaction
@@ -7,6 +8,7 @@ namespace VitalChoice.Data.Transaction
     {
         IDataContextAsync DbContext { get; }
         bool Closed { get; }
+        event Action TransactionCommit;
         void IncReference();
     }
 }

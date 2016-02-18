@@ -8,8 +8,7 @@ namespace VitalChoice.Caching.Relational.Base
     public abstract class EntityValueInfo : IEquatable<EntityValueInfo>, IClrPropertyGetter
     {
         private readonly IClrPropertyGetter _property;
-        public Type PropertyType { get; }
-        private readonly TypeInfo _propertyTypeInfo;
+        private readonly Func<object, object> _valueConvert;
 
         protected EntityValueInfo(string name, IClrPropertyGetter property, Type propertyType)
         {
@@ -17,8 +16,17 @@ namespace VitalChoice.Caching.Relational.Base
                 throw new ArgumentNullException(nameof(name));
 
             _property = property;
-            PropertyType = propertyType;
-            _propertyTypeInfo = propertyType.GetTypeInfo();
+            if (propertyType.GetTypeInfo().IsEnum)
+            {
+#if !DOTNET5_4
+                var enumTypeCode = Enum.GetUnderlyingType(propertyType).GetTypeCode();
+                _valueConvert = value => Convert.ChangeType(value, enumTypeCode);
+#else
+                var enumType = Enum.GetUnderlyingType(propertyType);
+                _valueConvert = value => Convert.ChangeType(value, enumType);
+#endif
+            }
+
             Name = name;
         }
 
@@ -58,18 +66,7 @@ namespace VitalChoice.Caching.Relational.Base
 
         public object GetClrValue(object instance)
         {
-            if (_propertyTypeInfo.IsEnum)
-            {
-#if !DOTNET5_4
-                var enumTypeCode = Enum.GetUnderlyingType(PropertyType).GetTypeCode();
-                return Convert.ChangeType(_property.GetClrValue(instance), enumTypeCode);
-#else
-                var enumType = Enum.GetUnderlyingType(PropertyType);
-                return Convert.ChangeType(_property.GetClrValue(instance), enumType);
-#endif
-            }
-
-            return _property.GetClrValue(instance);
+            return _valueConvert == null ? _property.GetClrValue(instance) : _valueConvert(_property.GetClrValue(instance));
         }
     }
 }

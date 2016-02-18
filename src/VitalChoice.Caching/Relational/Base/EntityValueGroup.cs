@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Relational.Base
 {
@@ -8,24 +10,22 @@ namespace VitalChoice.Caching.Relational.Base
         where TValue: EntityValue<TInfo>
         where TInfo: EntityValueInfo
     {
-        internal readonly Dictionary<string, TValue> Values;
+        internal readonly TValue[] Values;
 
         protected EntityValueGroup(IEnumerable<TValue> values)
         {
-            Values = values.ToDictionary(v => v.ValueInfo.Name);
+            Values = values.OrderBy(v => v.ValueInfo.Name, StringComparer.Ordinal).ToArray();
         }
 
         public bool Equals(EntityValueGroup<TValue, TInfo> other)
         {
-            if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) return false;
 
             // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (var entityKey in Values)
+            for (var index = 0; index < Values.Length; index++)
             {
-                var thisKey = entityKey.Value;
-                var otherKey = other.Values[entityKey.Key];
-                if (!thisKey.Equals(otherKey))
+                if (!Values[index].Value.Equals(other.Values[index].Value))
                 {
                     return false;
                 }
@@ -35,8 +35,8 @@ namespace VitalChoice.Caching.Relational.Base
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
+            if (ReferenceEquals(null, obj)) return false;
             var primaryKey = obj as EntityValueGroup<TValue, TInfo>;
             if (primaryKey != null)
                 return Equals(primaryKey);
@@ -47,7 +47,7 @@ namespace VitalChoice.Caching.Relational.Base
         {
             unchecked
             {
-                return Values.Aggregate(0, (current, entityKey) => (current*397) ^ entityKey.Value.GetHashCode());
+                return Values.Aggregate(0, (current, entityKey) => (current*397) ^ entityKey.GetHashCode());
             }
         }
 
