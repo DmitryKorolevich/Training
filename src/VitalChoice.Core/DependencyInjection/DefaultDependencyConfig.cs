@@ -518,7 +518,6 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<ObjectLogItemExternalService>().As<IObjectLogItemExternalService>().InstancePerLifetimeScope();
             builder.RegisterType<ReCaptchaValidator>().AsSelf().SingleInstance();
             builder.RegisterType<CountryNameCodeResolver>().As<ICountryNameCodeResolver>()
-                //little optimization on instance count, since it's self hosted data
                 .InstancePerLifetimeScope();
             builder.RegisterType<EncryptedServiceBusHostClient>().As<IEncryptedServiceBusHostClient>().SingleInstance();
             builder.RegisterType<ObjectEncryptionHost>()
@@ -528,10 +527,10 @@ namespace VitalChoice.Core.DependencyInjection
                 .SingleInstance();
             builder.RegisterType<EncryptedOrderExportService>().As<IEncryptedOrderExportService>().InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof (TransactionAccessor<>)).As(typeof (ITransactionAccessor<>)).InstancePerLifetimeScope();
-			builder.RegisterType<ExtendedClaimsPrincipalFactory>().As<IUserClaimsPrincipalFactory<ApplicationUser>>();
+			builder.RegisterType<ExtendedClaimsPrincipalFactory>().As<IUserClaimsPrincipalFactory<ApplicationUser>>().InstancePerLifetimeScope();
 
 
-			FinishCustomRegistrations(builder);
+            FinishCustomRegistrations(builder);
 
             var container = builder.Build();
             return container;
