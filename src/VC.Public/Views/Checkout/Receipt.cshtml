@@ -215,32 +215,37 @@
         </div>
         @if (Model.DiscountTotal.HasValue && Model.DiscountTotal.Value != 0)
         {
-            <div class="cart-total-line">
-                @Html.LabelFor(x => x.DiscountTotal)
-                <label class="cart-total-value">
-                    @Model.DiscountTotal.Value.ToString("C2")
-                </label>
-            </div>}
+	        <div class="cart-total-line">
+		        @Html.LabelFor(x => x.DiscountTotal)
+		        <label class="cart-total-value">
+			        @Model.DiscountTotal.Value.ToString("C2")
+		        </label>
+	        </div>
+        }
         @if (Model.GiftCertificatesTotal.HasValue && Model.GiftCertificatesTotal.Value != 0)
         {
-            <div class="cart-total-line">
-                @Html.LabelFor(x => x.GiftCertificatesTotal)
-                <label class="cart-total-value">
-                    @Model.GiftCertificatesTotal.Value.ToString("C2")
-                </label>
-            </div>}
+	        <div class="cart-total-line">
+		        @Html.LabelFor(x => x.GiftCertificatesTotal)
+		        <label class="cart-total-value">
+			        @Model.GiftCertificatesTotal.Value.ToString("C2")
+		        </label>
+	        </div>
+        }
         <div class="cart-total-line">
             @Html.LabelFor(x => x.ShippingCost)
             <label class="cart-total-value">
                 @(Model.ShippingCost.HasValue ? Model.ShippingCost.Value.ToString("C2") : "FREE!")
             </label>
         </div>
-        <div class="cart-total-line">
-            @Html.LabelFor(x => x.Tax)
-            <label class="cart-total-value">
-                @Model.Tax.ToString("C2")
-            </label>
-        </div>
+	    @if (Model.Tax != 0)
+	    {
+		    <div class="cart-total-line">
+			    @Html.LabelFor(x => x.Tax)
+			    <label class="cart-total-value">
+				    @Model.Tax.ToString("C2")
+			    </label>
+		    </div>
+	    }
         <div class="cart-total-line cart-order-summary">
             @Html.LabelFor(x => x.OrderTotal)
             <label class="cart-total-value">

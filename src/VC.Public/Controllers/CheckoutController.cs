@@ -673,7 +673,6 @@ namespace VC.Public.Controllers
 
             receiptModel.OrderNumber = order.Id.ToString();
             receiptModel.OrderDate = order.DateCreated;
-            receiptModel.Tax = order.TaxTotal;
 
             return View(receiptModel);
         }

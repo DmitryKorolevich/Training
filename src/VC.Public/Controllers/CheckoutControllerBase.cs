@@ -146,7 +146,8 @@ namespace VC.Public.Controllers
                 result.SubTotal = sku.Quantity * sku.Amount;
                 return result;
             }) ?? Enumerable.Empty<CartSkuModel>());
-            cartModel.OrderTotal = order.Total;
+			cartModel.Tax = order.TaxTotal;
+			cartModel.OrderTotal = order.Total;
             cartModel.PromoCode = order.Discount?.Code;
             cartModel.ShippingCost = order.ShippingTotal;
             cartModel.SubTotal = order.ProductsSubtotal;
