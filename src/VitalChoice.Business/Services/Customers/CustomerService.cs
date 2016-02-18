@@ -148,6 +148,7 @@ namespace VitalChoice.Business.Services.Customers
                     await
                         _customerRepositoryAsync.Query(
                             new CustomerQuery().NotDeleted().Excluding(model.Id).WithEmail(model.Email))
+                            .Include(c => c.OptionValues)
                             .SelectAsync(false);
 
                 if (customerSameEmail.Any())
@@ -559,7 +560,10 @@ namespace VitalChoice.Business.Services.Customers
                 appUser.ConfirmationToken = Guid.Empty;
             }
 
-            var email = string.IsNullOrEmpty(password) && string.IsNullOrEmpty(model.Email) && appUser.Email==BaseAppConstants.FAKE_CUSTOMER_EMAIL ? BaseAppConstants.FAKE_CUSTOMER_EMAIL : model.Email;
+            var email = string.IsNullOrEmpty(password) && string.IsNullOrEmpty(model.Email) &&
+                        appUser.Email == BaseAppConstants.FAKE_CUSTOMER_EMAIL
+                ? BaseAppConstants.FAKE_CUSTOMER_EMAIL
+                : model.Email;
             appUser.Email = email;
             appUser.UserName = email;
 

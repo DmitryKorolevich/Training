@@ -317,17 +317,22 @@ namespace VC.Public.Controllers
                     }
                     if (await CheckoutService.UpdateCart(cart))
                     {
+                        if (loginTask != null)
+                            await loginTask();
                         transaction.Commit();
                         return RedirectToAction("AddUpdateShippingMethod");
                     }
-                    ModelState.AddModelError(string.Empty, "Cannot update order");
-                    transaction.Rollback();
-                    if (loginTask != null)
+                    else
                     {
-                        if (cart.Order.Customer != null && cart.Order.Customer.Id != 0)
+                        ModelState.AddModelError(string.Empty, "Cannot update order");
+                        if (loginTask != null)
                         {
-                            await _storefrontUserService.RemoveAsync(cart.Order.Customer.Id);
+                            if (cart.Order.Customer != null && cart.Order.Customer.Id != 0)
+                            {
+                                await _storefrontUserService.RemoveAsync(cart.Order.Customer.Id);
+                            }
                         }
+                        transaction.Rollback();
                     }
                 }
                 catch (AppValidationException)
@@ -354,8 +359,6 @@ namespace VC.Public.Controllers
                     }
                     throw;
                 }
-                if (loginTask != null)
-                    await loginTask();
             }
 
             return View(model);
@@ -371,24 +374,24 @@ namespace VC.Public.Controllers
         {
             Func<Task<ApplicationUser>> loginTask;
             CustomerDynamic newCustomer;
-            if (existing != null && existing.Id != 0)
-            {
-                if (((bool?) existing.SafeData.Guest ?? false) &&
-                    existing.StatusCode == (int) CustomerStatus.PhoneOnly)
-                {
-                    newCustomer = await ReplaceAccount(model, existing);
-                    if (newCustomer == null)
-                    {
-                        throw new ApiException("Customer couldn't be created");
-                    }
-                    loginTask = model.GuestCheckout ? CreateLoginForNewGuest(newCustomer) : CreateLoginForActive(model, newCustomer);
-                    return new CreateResult
-                    {
-                        Customer = newCustomer,
-                        LoginTask = loginTask
-                    };
-                }
-            }
+            //if (existing != null && existing.Id != 0)
+            //{
+            //    if (((bool?) existing.SafeData.Guest ?? false) &&
+            //        existing.StatusCode == (int) CustomerStatus.PhoneOnly)
+            //    {
+            //        newCustomer = await ReplaceAccount(model, existing);
+            //        if (newCustomer == null)
+            //        {
+            //            throw new ApiException("Customer couldn't be created");
+            //        }
+            //        loginTask = model.GuestCheckout ? CreateLoginForNewGuest(newCustomer) : CreateLoginForActive(model, newCustomer);
+            //        return new CreateResult
+            //        {
+            //            Customer = newCustomer,
+            //            LoginTask = loginTask
+            //        };
+            //    }
+            //}
             if (model.GuestCheckout)
             {
                 existing = await CustomerService.GetByEmailAsync(model.Email);
@@ -409,8 +412,20 @@ namespace VC.Public.Controllers
             }
             else
             {
-                newCustomer = await CreateAccount(model);
-                loginTask = CreateLoginForActive(model, newCustomer);
+                existing = await CustomerService.GetByEmailAsync(model.Email);
+                if (existing == null || existing.StatusCode != (int) CustomerStatus.PhoneOnly)
+                {
+                    newCustomer = await CreateAccount(model);
+                }
+                else
+                {
+                    newCustomer = await ReplaceAccount(model, existing);
+                    if (newCustomer == null)
+                    {
+                        throw new ApiException("Customer couldn't be created");
+                    }
+                }
+                loginTask = CreateLoginForActive(model);
             }
             return new CreateResult
             {
@@ -450,11 +465,11 @@ namespace VC.Public.Controllers
             };
         }
 
-        private Func<Task<ApplicationUser>> CreateLoginForActive(AddUpdateBillingAddressModel model, CustomerDynamic newCustomer)
+        private Func<Task<ApplicationUser>> CreateLoginForActive(AddUpdateBillingAddressModel model)
         {
             return async () =>
             {
-                var user = await _storefrontUserService.SignInAsync(newCustomer.Email, model.Password);
+                var user = await _storefrontUserService.SignInAsync(model.Email, model.Password);
                 if (user == null)
                 {
                     throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
