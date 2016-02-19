@@ -110,7 +110,9 @@ namespace VC.Public.Controllers
         private async Task<OrderDynamic> PopulateReviewModel(ReviewOrderModel reviewOrderModel, int idOrder)
         {
             var order = await OrderService.SelectAsync(idOrder, true);
-            await FillModel(reviewOrderModel, order);
+            order.Customer = await CustomerService.SelectAsync(order.Customer.Id, true);
+            var context = await OrderService.CalculateOrder(order, OrderStatus.Processed);
+            FillModel(reviewOrderModel, order, context);
 
             var countries = await _countryService.GetCountriesAsync();
 
