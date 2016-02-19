@@ -16,6 +16,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Validation.Models;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 
@@ -251,6 +252,8 @@ namespace VC.Public.Controllers
             
             customer.PublicId = Guid.NewGuid();
             customer.StatusCode = (int)CustomerStatus.Pending;
+            customer.Data.InceptionDate = DateTime.Now;
+            customer.Data.TaxExempt = TaxExempt.SalesTaxWillBePaid;
 
             var defaultPaymentMethod = await _paymentMethodService.GetStorefrontDefaultPaymentMethod();
             customer.IdDefaultPaymentMethod = defaultPaymentMethod.Id;

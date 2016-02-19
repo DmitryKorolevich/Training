@@ -18,7 +18,7 @@
             successMessage = '@ViewBag.SuccessMessage';
             var captchaSiteKey = "@appOptions.Value.GoogleCaptcha.PublicKey";
         </script>
-        <form asp-controller="Account" asp-action="RegisterWholesaleAccount" data-ajax-success="registerWholesaleFormSubmitSuccess" data-ajax-failure="ajaxFormSubmitError" data-ajax="true" data-method="post" data-ajax-mode="replace" data-ajax-update="#registerWholesaleAccountFormWrapperInner" class="form-regular medium content-ajax-form">
+        <form asp-controller="Account" asp-action="RegisterWholesaleAccount" data-ajax-begin="registerWholesaleFormSubmitBegin" data-ajax-complete="registerWholesaleFormSubmitComplete" data-ajax-success="registerWholesaleFormSubmitSuccess" data-ajax-failure="ajaxFormSubmitError" data-ajax="true" data-method="post" data-ajax-mode="replace" data-ajax-update="#registerWholesaleAccountFormWrapperInner" class="form-regular medium content-ajax-form">
             <input id="hdCountry" value="@Html.DisplayForEx(x=>x.IdCountry)" type="hidden">
             <input id="hdState" value="@Html.DisplayForEx(x=>x.IdState)" type="hidden">
             @Html.HiddenFor(m => m.Email)
@@ -44,7 +44,7 @@
             <div class="form-group">
                 @Html.LabelFor(m => m.TradeClass, new { @class = "control-label" })
                 <div class="input-group">
-                    @Html.DropDownListFor(m => m.TradeClass, infrastructure.TradeClasses.Select(p => new SelectListItem() { Text = p.Text, Value = p.Key.ToString(), }).ToList(), "None", new { @class = "form-control" })
+                    @Html.DropDownListFor(m => m.TradeClass, infrastructure.TradeClasses.Select(p => new SelectListItem() { Text = p.Text, Value = p.Key.ToString(), }).ToList(), String.Empty, new { @class = "form-control" })
                     @Html.ValidationMessageFor(m => m.TradeClass, "")
                 </div>
             </div>
