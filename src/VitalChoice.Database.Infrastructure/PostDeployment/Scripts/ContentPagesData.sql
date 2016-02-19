@@ -1067,7 +1067,7 @@ INSERT INTO [dbo].[ContentItems]
                 <p>
                     <strong>A Vital Choice wholesale account</strong>
                      allows you to purchase canned wild seafood and premium bottled supplements in full-case quantities
-                    at a significant discount for resale to your customers. Signup is simple. Just fill in your email address and the short form that follows, and we'll get the ball rolling!
+                    at a significant discount for resale to your customers. Signup is simple. Just fill in your email address and the short form that follows, and we''ll get the ball rolling!
                 </p>
                 <strong><em>Benefits of our Wholesale Program include:</em></strong><br/>
                 <ul>
@@ -1089,7 +1089,7 @@ INSERT INTO [dbo].[ContentItems]
                     <div class="margin-top-medium margin-bottom-medium important">
                         <p>
                             <strong>
-                                Interested in opening a wholesale account to enhance your business and your customers' health? Simply provide your email, and let's get started!
+                                Interested in opening a wholesale account to enhance your business and your customers'' health? Simply provide your email, and let''s get started!
                             </strong>
                         </p>
                     </div>
@@ -1098,7 +1098,7 @@ INSERT INTO [dbo].[ContentItems]
                             <div class="form-group">
     			                <label class="control-label" for="Email">Email Address:</label>
                     			<div class="input-group margin-right-small">
-                    				<input class="form-control" id="Email" name="Email" type="text" data-val="true" data-val-email="The Email field is not a valid e-mail address." data-val-maxlength="The field Email must be a string or array type with a maximum length of '100'." data-val-maxlength-max="100" data-val-required="The Email field is required.">
+                    				<input class="form-control" id="Email" name="Email" type="text" data-val="true" data-val-email="The Email field is not a valid e-mail address." data-val-maxlength="The field Email must be a string or array type with a maximum length of ''100''." data-val-maxlength-max="100" data-val-required="The Email field is required.">
                     			    <span class="field-validation-valid" data-valmsg-for="Email" data-valmsg-replace="true"></span>
                     			</div>
                     			<div class="input-group">
@@ -1112,7 +1112,7 @@ INSERT INTO [dbo].[ContentItems]
                             <em>
                                 If you prefer to speak to a real person, we have those! Just call <a href="tel:866-482-5887">866-482-5887</a> or email 
                                 <a href="mailto:wholesale@{@}@vitalchoice.com.">wholesale@{@}@vitalchoice.com</a>.
-                                We'll contact you with further details.
+                                We''ll contact you with further details.
                             </em>
                         </p>
                         <p>
