@@ -207,9 +207,9 @@ namespace VitalChoice.Business.Services.Users
         {
             await DisabledValidateUserOnSignIn(login);
 
-            var сonfirmed = await UserManager.Users.AnyAsync(x => x.IsConfirmed && x.Status == UserStatus.Active && x.Email.Equals(login));
+            var user = await UserManager.Users.FirstOrDefaultAsync(x => x.Status == UserStatus.Active && x.Email.Equals(login));
 
-			if (!сonfirmed)
+			if (user!=null && !user.IsConfirmed)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsNotConfirmed]);
 			}
