@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Data.Repositories;
@@ -21,22 +22,25 @@ namespace VitalChoice.Business.Services.Settings
             logger = loggerProvider.CreateLoggerDefault();
         }
 
-        public async Task<ICollection<AppSettingItem>> GetAppSettingItemsAsync(ICollection<string> names)
+        public Task<List<AppSettingItem>> GetAppSettingItemsAsync(ICollection<string> names)
         {
-            var appSettingItems = (await appSettingRepository.Query(p => names.Contains(p.Name)).SelectAsync(false)).ToArray();
-
-            return appSettingItems;
+            return appSettingRepository.Query(p => names.Contains(p.Name)).SelectAsync(false);
         }
 
-        public async Task<ICollection<AppSettingItem>> UpdateAppSettingItemsAsync(ICollection<AppSettingItem> items)
+        public Task<AppSettingItem> GetAppSettingAsync(string name)
+        {
+            return appSettingRepository.Query(p => p.Name == name).SelectFirstOrDefaultAsync(false);
+        }
+
+        public async Task<List<AppSettingItem>> UpdateAppSettingItemsAsync(ICollection<AppSettingItem> items)
         {
             var names = items.Select(p => p.Name).ToArray();
-            var dbItems = (await appSettingRepository.Query(p => names.Contains(p.Name)).SelectAsync(true)).ToArray();
-            foreach(var dbItem in dbItems)
+            var dbItems = await appSettingRepository.Query(p => names.Contains(p.Name)).SelectAsync(true);
+            foreach (var dbItem in dbItems)
             {
-                foreach(var item in items)
+                foreach (var item in items)
                 {
-                    if(dbItem.Name==item.Name)
+                    if (dbItem.Name == item.Name)
                     {
                         dbItem.Value = item.Value;
                     }
@@ -59,8 +63,7 @@ namespace VitalChoice.Business.Services.Settings
         private AppSettings CreateAppSettings(ICollection<AppSettingItem> items)
         {
             AppSettings toReturn = new AppSettings();
-#if DNX451
-            foreach (var property in typeof(AppSettings).GetProperties())
+            foreach (var property in typeof(AppSettings).GetTypeInfo().GetProperties())
             {
                 AppSettingItem setting = items.FirstOrDefault(p => p.Name == property.Name);
                 if (setting != null)
@@ -95,7 +98,6 @@ namespace VitalChoice.Business.Services.Settings
                     }
                 }
             }
-#endif
             return toReturn;
         }
     }

@@ -26,6 +26,7 @@ using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer.PaymentMethod;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Payments;
+using VitalChoice.Interfaces.Services.Settings;
 
 namespace VitalChoice.Business.Services.Payment
 {
@@ -39,11 +40,12 @@ namespace VitalChoice.Business.Services.Payment
 	    private readonly ICountryNameCodeResolver _countryNameCode;
 	    private readonly ILogger _logger;
 	    private readonly ITransactionAccessor<EcommerceContext> _transactionAccessor;
+	    private readonly ISettingService _settingService;
 
 	    public PaymentMethodService(IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository,
 	        IHttpContextAccessor contextAccessor, IRepositoryAsync<AdminProfile> adminProfileRepository,
 	        IEcommerceRepositoryAsync<PaymentMethodToCustomerType> paymentMethodToCustomerTypeRepository,
-	        ILoggerProviderExtended loggerProvider, IOptions<AppOptions> options, ICountryNameCodeResolver countryNameCode, ITransactionAccessor<EcommerceContext> transactionAccessor)
+	        ILoggerProviderExtended loggerProvider, IOptions<AppOptions> options, ICountryNameCodeResolver countryNameCode, ITransactionAccessor<EcommerceContext> transactionAccessor, ISettingService settingService)
 	    {
 	        _paymentMethodRepository = paymentMethodRepository;
 	        _contextAccessor = contextAccessor;
@@ -52,6 +54,7 @@ namespace VitalChoice.Business.Services.Payment
 	        _options = options;
 	        _countryNameCode = countryNameCode;
 	        _transactionAccessor = transactionAccessor;
+	        _settingService = settingService;
 	        _logger = loggerProvider.CreateLoggerDefault();
 	    }
 
@@ -198,7 +201,7 @@ namespace VitalChoice.Business.Services.Payment
                 return errors;
             }
 
-            if (_options.Value.AuthorizeNet.TestEnv || paymentMethod.IdObjectType != (int)PaymentMethodType.CreditCard)
+            if (_options.Value.AuthorizeNet.TestEnv || paymentMethod.IdObjectType != (int)PaymentMethodType.CreditCard || !(await _settingService.GetAppSettingsAsync()).CreditCardAuthorizations)
                 return errors;
 
             creditCardType creditCard;
