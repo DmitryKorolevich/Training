@@ -578,14 +578,24 @@ namespace VitalChoice.Business.Services.Customers
                 try
                 {
 
-                    var authTasks = model.CustomerPaymentMethods.Select(method => _paymentMethodService.AuthorizeCreditCard(method)).ToArray();
                     var paymentCopies = model.CustomerPaymentMethods.Select(method => _paymentMapper.Clone<ExpandoObject>(method, o =>
                     {
                         var result = new ExpandoObject();
                         result.AddRange(o);
                         return result;
                     })).ToArray();
-                    await authTasks.ForEachAsync(async _ => (await _).Raise());
+                    int index = 0;
+                    await model.CustomerPaymentMethods.ForEachAsync(async method =>
+                    {
+                        index++;
+                        var errors = await _paymentMethodService.AuthorizeCreditCard(method);
+                        errors.Select(error => new MessageInfo
+                        {
+                            Field = ErrorFieldFormatter.Form("card", ErrorFieldFormatter.Collection("CreditCards", index, error.Field)),
+                            Message = error.Message,
+                            MessageLevel = error.MessageLevel
+                        }).ToList().Raise();
+                    });
 
                     entity = await base.UpdateAsync(model, uow);
 
@@ -656,14 +666,24 @@ namespace VitalChoice.Business.Services.Customers
                     model.Id = appUser.Id;
                     //model.User.Id = appUser.Id;
 
-                    var authTasks = model.CustomerPaymentMethods.Select(method => _paymentMethodService.AuthorizeCreditCard(method)).ToArray();
                     var paymentCopies = model.CustomerPaymentMethods.Select(method => _paymentMapper.Clone<ExpandoObject>(method, o =>
                     {
                         var result = new ExpandoObject();
                         result.AddRange(o);
                         return result;
                     })).ToArray();
-                    await authTasks.ForEachAsync(async _ => (await _).Raise());
+                    int index = 0;
+                    await model.CustomerPaymentMethods.ForEachAsync(async method =>
+                    {
+                        index++;
+                        var errors = await _paymentMethodService.AuthorizeCreditCard(method);
+                        errors.Select(error => new MessageInfo
+                        {
+                            Field = ErrorFieldFormatter.Form("card", ErrorFieldFormatter.Collection("CreditCards", index, error.Field)),
+                            Message = error.Message,
+                            MessageLevel = error.MessageLevel
+                        }).ToList().Raise();
+                    });
 
                     entity = await base.InsertAsync(model, uow);
 
