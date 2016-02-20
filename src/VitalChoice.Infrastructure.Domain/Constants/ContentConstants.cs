@@ -25,5 +25,7 @@
         public const string NOT_FOUND_PAGE_URL = "not-found";
         public const string ACESS_DENIED_PAGE_URL = "access-denied";
         public const string CONTENT_PAGE_TITLE_GENERAL_FORMAT = "{0} - Vital Choice Wild Seafood & Organics";
-    }
+
+		public const int CONTENT_CROSS_SELL_LIMIT = 4;
+	}
 }
