@@ -593,6 +593,12 @@
                                                     <a target="_blank" href="/assets/templates/gl_template.csv">Get a template</a>
                                                 </div>
                                             </div>
+                                            <div data-ng-if="options.selectedOrderImportFile" class="form-group">
+                                                <label class="col-md-3 control-label">File Name</label>
+                                                <div class="col-md-9 form-control-static">
+                                                    <span>{{options.selectedOrderImportFile.name}}</span>
+                                                </div>
+                                            </div>
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">File</label>
                                                 <div class="col-md-9">

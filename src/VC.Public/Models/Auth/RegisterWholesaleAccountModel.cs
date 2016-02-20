@@ -7,6 +7,7 @@ namespace VC.Public.Models.Auth
     public class RegisterWholesaleAccountModel : RegisterAccountModel
     {
 		[Display(Name = "Trade Class")]
+        [Required]
 		[Map]
 		public int? TradeClass { get; set; }
 

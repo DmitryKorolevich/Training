@@ -254,7 +254,13 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                 }
             }
 
-            return false;
+			var lastRoot = breadcrumbItems.LastOrDefault();
+			if (lastRoot != null)
+			{
+				breadcrumbItems.Remove(lastRoot);
+			}
+
+			return false;
         }
 
         private IList<TtlSidebarMenuItemModel> ConvertToSideMenuModelLevel(

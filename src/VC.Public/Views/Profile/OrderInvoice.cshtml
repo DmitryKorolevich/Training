@@ -20,7 +20,10 @@
         <div class="border-form-left">
             @if (Model != null)
             {
-                <h4>Order #@Model.Id</h4>
+                <h4>
+                    Order #@Model.Id
+                    @Html.ActionLink("Help Desk", "HelpTickets", new { idorder = Model.Id }, new { @class = "button yellow pull-right" })
+                </h4>
                 <div>
                     <span>
                         <label class="bold">Order Date</label>: <span>@Model.DateCreated.ToString("MM/dd/yyyy")</span>
@@ -356,7 +359,7 @@
                     <div class="reivew-order-info">
                         <div class="reivew-info-box">
                             <div class="review-header-container">
-                                <span>Delivery Instruction</span>
+                                <span>Delivery Instructions</span>
                             </div>
                             <div class="review-box-line">
                                 @Model.DeliveryInstructions

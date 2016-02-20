@@ -10,6 +10,12 @@
                             <input type="text" class="form-control" maxlength="500" placeholder="Description" data-ng-model="options.currentFileDescription">
                         </div>
                     </div>
+                    <div data-ng-if="uploadFile" class="form-group">
+                        <label class="col-md-2 control-label">File Name</label>
+                        <div class="col-md-9 form-control-static">
+                            <span>{{uploadFile.name}}</span>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label class="col-md-2 control-label"></label>
                         <div class="col-md-9">

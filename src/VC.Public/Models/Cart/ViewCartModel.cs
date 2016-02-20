@@ -26,6 +26,9 @@ namespace VC.Public.Models.Cart
 
         public string ShippingDateError { get; set; }
 
+		[Display(Name = "Tax")]
+		public decimal Tax { get; set; }
+
 		[Display(Name = "Subtotal")]
 		public decimal SubTotal { get; set; }
 

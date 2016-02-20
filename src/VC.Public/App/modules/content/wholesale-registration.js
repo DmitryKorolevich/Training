@@ -3,13 +3,19 @@
     var root = $('.wholesale.registration');
     reInitFormValidation(".wholesale.registration form");
 
-    root.on('click', '#step1go', function ()
+    $(document).ready(function ()
     {
-        var form = root.find('#Email').closest('form');
+        root.find('#Email').focus();
+    });
+
+    root.on('submit', '.body-inner-step1 form', function ()
+    {
+        var form = $(this);
         if (form.valid())
         {
             executeStep1(root.find('#Email').val());
         }
+        return false;
     });
 
     var executeStep1 = function (email)
@@ -40,6 +46,16 @@
         });
     };
 });
+
+var registerWholesaleFormSubmitBegin = function (data)
+{
+    $('.wholesale.registration .overlay').show();
+}
+
+var registerWholesaleFormSubmitComplete = function (data)
+{
+    $('.wholesale.registration .overlay').hide();
+}
 
 var registerWholesaleFormSubmitSuccess = function (data)
 {

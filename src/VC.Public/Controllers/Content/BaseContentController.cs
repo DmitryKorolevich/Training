@@ -14,10 +14,5 @@ namespace VC.Public.Controllers.Content
         {
             return View("~/Views/Content/ContentPage.cshtml", model);
         }
-
-        public virtual IActionResult BaseNotFoundView()
-        {
-            return Redirect("/content/"+ ContentConstants.NOT_FOUND_PAGE_URL);
-        }
-    }
+	}
 }

@@ -1102,7 +1102,7 @@ INSERT INTO [dbo].[ContentItems]
                     			    <span class="field-validation-valid" data-valmsg-for="Email" data-valmsg-replace="true"></span>
                     			</div>
                     			<div class="input-group">
-                    			    <input class="yellow" id="step1go" type="button" value="Go">
+                    			    <input class="yellow" id="step1go" type="submit" value="Go">
                     			</div>
     		                </div>
 		                </form>

@@ -9,15 +9,6 @@ namespace VC.Public.ModelConverters.Order
     {
         public override void DynamicToModel(CartSkuModel model, SkuDynamic dynamic)
         {
-            model.DisplayName = dynamic.SafeData.DisplayName ?? string.Empty;
-            if (dynamic.SafeData.SubTitle != null)
-            {
-                model.DisplayName += " " + dynamic.Data.SubTitle;
-            }
-            if (dynamic.SafeData.QTY != null)
-            {
-                model.DisplayName +=$" ({dynamic.Data.QTY})";
-            }
             model.InStock = ((bool?)dynamic.SafeData.DisregardStock ?? false) || ((int?)dynamic.SafeData.Stock ?? 0) > 0;
         }
 

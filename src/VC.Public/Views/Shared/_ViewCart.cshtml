@@ -146,6 +146,12 @@
 				</label>
 				<label class="cart-total-value" data-bind="text: Model.ShippingCost() ? formatCurrency(Model.ShippingCost()) : 'FREE!'">@(Model.ShippingCost.HasValue ? Model.ShippingCost.Value.ToString("C2") : "FREE!")</label>
 			</div>
+			<div class="cart-total-line" data-bind="visible: Model.Tax() != null && Model.Tax() != 0">
+				<label>
+					Tax
+				</label>
+				<label class="cart-total-value" data-bind="text: Model.Tax() ? formatCurrency(Model.Tax()) : ''">@(Model.Tax.ToString("C2"))</label>
+			</div>
 			<div class="cart-total-line cart-order-summary">
 				<label>
 					Order Total

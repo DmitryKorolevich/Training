@@ -24,7 +24,8 @@ namespace VitalChoice.Business.Repositories
 
         public async Task<List<CustomerOrderStatistic>> GetCustomerOrderStatistics(ICollection<int> ids)
         {
-            var query = this.DbSet.Where(p => ids.Contains(p.IdCustomer) && p.StatusCode!=(int)RecordStatusCode.Deleted);
+            var orderQuery = new OrderQuery().WithCustomerIds(ids).NotDeleted().WithActualStatusOnly();
+            var query = this.DbSet.Where(orderQuery.Query());
             
             var result = await query.GroupBy(p => p.IdCustomer).Select(g => new CustomerOrderStatistic()
             {

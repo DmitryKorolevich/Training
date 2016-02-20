@@ -57,14 +57,32 @@ namespace VC.Public.Controllers.Content
         public async Task<IActionResult> ContentPage(string url)
         {
             var toReturn = await _contentPageViewService.GetContentAsync(ActionContext, BindingContext, User);
-            if (toReturn?.Body != null)
+
+			switch (url)
+			{
+				case ContentConstants.NOT_FOUND_PAGE_URL:
+					Response.StatusCode = (int)HttpStatusCode.NotFound;
+					break;
+				case ContentConstants.ACESS_DENIED_PAGE_URL:
+					Response.StatusCode = (int)HttpStatusCode.Forbidden;
+					break;
+			}
+
+			if (toReturn?.Body != null)
             {
-                if(url ==ContentConstants.NOT_FOUND_PAGE_URL)
-                {
-                    Response.StatusCode = (int)HttpStatusCode.NotFound;
-                }
-                return BaseView(new ContentPageViewModel(toReturn));
+	            return BaseView(new ContentPageViewModel(toReturn));
             }
+            else
+            {
+				switch (url)
+				{
+					case ContentConstants.NOT_FOUND_PAGE_URL:
+						return View("NotFound");
+					case ContentConstants.ACESS_DENIED_PAGE_URL:
+						Response.StatusCode = (int)HttpStatusCode.Forbidden;
+						return View("AccessDenied");
+				}
+			}
             return BaseNotFoundView();
         }
 

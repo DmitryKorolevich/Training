@@ -2,9 +2,13 @@
 using cloudscribe.Web.Pagination;
 using Microsoft.AspNet.Authentication.Cookies;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Mvc;
+using Microsoft.AspNet.Mvc.ViewFeatures;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using VitalChoice.Business.Services;
 using VitalChoice.Core.GlobalFilters;
+using VitalChoice.Core.Services;
 using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Core.DependencyInjection
@@ -15,6 +19,7 @@ namespace VitalChoice.Core.DependencyInjection
         {
             services.AddCaching();
             services.AddSession();
+            services.Replace(new ServiceDescriptor(typeof (IHtmlGenerator), typeof (StoreFrontHtmlGenerator), ServiceLifetime.Scoped));
         }
 
         protected override void FinishCustomRegistrations(ContainerBuilder builder)
