@@ -30,12 +30,12 @@ namespace VitalChoice.ContentProcessing.Extensions
 
         public override ExType InitStart(InitContext initContext, ExType dataType, ExType chainedType, ExType parent)
         {
-            var contentViewContext = initContext.Context.Options.Data as ContentViewContext;
+            var contentViewContext = initContext.CompileScope.Options.Data as ContentViewContext;
             if (contentViewContext == null)
             {
                 throw new TemplateProcessingException("ContentViewContext not found in options value");
             }
-            _namespaces = initContext.Context.Namespaces.ToArray();
+            _namespaces = initContext.CompileScope.Namespaces.ToArray();
             return new ExType(typeof(Type));
         }
 
