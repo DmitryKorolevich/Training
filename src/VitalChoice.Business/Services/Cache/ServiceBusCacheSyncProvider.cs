@@ -37,18 +37,18 @@ namespace VitalChoice.Business.Services.Cache
                 }
                 if (_serviceBusClient == null && _enabled)
                 {
-                    var namespaceManager =
-                        NamespaceManager.CreateFromConnectionString(options.Value.CacheSyncOptions?.ConnectionString);
+                    //var namespaceManager =
+                    //    NamespaceManager.CreateFromConnectionString(options.Value.CacheSyncOptions?.ConnectionString);
                     var queName = options.Value.CacheSyncOptions?.ServiceBusQueueName;
-                    if (!namespaceManager.QueueExists(queName))
-                    {
-                        namespaceManager.CreateQueue(new QueueDescription(queName)
-                        {
-                            DefaultMessageTimeToLive = TimeSpan.FromMinutes(5),
-                            EnableBatchedOperations = true,
-                            EnablePartitioning = true,
-                        });
-                    }
+                    //if (!namespaceManager.QueueExists(queName))
+                    //{
+                    //    namespaceManager.CreateQueue(new QueueDescription(queName)
+                    //    {
+                    //        DefaultMessageTimeToLive = TimeSpan.FromMinutes(5),
+                    //        EnableBatchedOperations = true,
+                    //        EnablePartitioning = true,
+                    //    });
+                    //}
                     var factory = MessagingFactory.CreateFromConnectionString(options.Value.CacheSyncOptions?.ConnectionString);
                     _serviceBusClient = factory.CreateQueueClient(queName, ReceiveMode.PeekLock);
                     new Thread(ReceivingThreadProc).Start(logger);
@@ -68,7 +68,8 @@ namespace VitalChoice.Business.Services.Cache
             {
                 SendQue.Enqueue(new BrokeredMessage(operation)
                 {
-                    CorrelationId = ClientUid.ToString()
+                    CorrelationId = ClientUid.ToString(),
+                    TimeToLive = TimeSpan.FromMinutes(5)
                 });
             }
             TouchQueEvent.Set();
