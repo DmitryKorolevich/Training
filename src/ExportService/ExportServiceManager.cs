@@ -46,18 +46,18 @@ namespace ExportService
                 _logger = _container.Resolve<ILogger>();
                 _encryptionHost = _container.Resolve<IObjectEncryptionHost>();
 
-                var namespaceManager =
-                    NamespaceManager.CreateFromConnectionString(_options.Value.ExportService.ConnectionString);
-                var plainQueName = _options.Value.ExportService.PlainQueueName;
-                var encryptedQueName = _options.Value.ExportService.EncryptedQueueName;
-                if (!namespaceManager.QueueExists(plainQueName))
-                {
-                    namespaceManager.CreateQueue(plainQueName);
-                }
-                if (!namespaceManager.QueueExists(encryptedQueName))
-                {
-                    namespaceManager.CreateQueue(encryptedQueName);
-                }
+                //var namespaceManager =
+                //    NamespaceManager.CreateFromConnectionString(_options.Value.ExportService.ConnectionString);
+                //var plainQueName = _options.Value.ExportService.PlainQueueName;
+                //var encryptedQueName = _options.Value.ExportService.EncryptedQueueName;
+                //if (!namespaceManager.QueueExists(plainQueName))
+                //{
+                //    namespaceManager.CreateQueue(plainQueName);
+                //}
+                //if (!namespaceManager.QueueExists(encryptedQueName))
+                //{
+                //    namespaceManager.CreateQueue(encryptedQueName);
+                //}
             }
             catch (Exception e)
             {

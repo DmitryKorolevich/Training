@@ -20,7 +20,8 @@
       "Server": "vw4v86cs0h.database.windows.net"
     },
     "ExportService": {
-      "ConnectionString": "",
+      "PlainConnectionString": "",
+      "EncryptedConnectionString": "",
       "PlainQueueName": "",
       "EncryptedQueueName": "",
       "CertThumbprint": "",
@@ -28,7 +29,8 @@
       "ServerHostName": ""
     },
     //"ExportService": {
-    //  "ConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=9bCmTJyWrS2//GpvV5A3+bsPHdyph0ndE8tE14gsD24=",
+    //  "PlainConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=8btEfIO+srlpmg9AF0evGubknnuzetZZ70bKDOH7gps=",
+    //  "EncryptedConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=fnKDZwxtFlGCxePFOXdX5//2Js1fkgMFHJDDz7uN5PE=",
     //  "PlainQueueName": "PlainQueue",
     //  "EncryptedQueueName": "EncryptedQueue",
     //  "CertThumbprint": "E2603D85F0E4B59448FD3D380FEFF740B28B3215",
@@ -89,7 +91,7 @@
       "CacheScanPeriodSeconds": 900 //15 minutes
     },
     "CacheSyncOptions": {
-      "ConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=9bCmTJyWrS2//GpvV5A3+bsPHdyph0ndE8tE14gsD24=",
+      "ConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=CacheConnectors;SharedAccessKey=pCiNJKmuaN4Z6OtfoFT4Pv33Yqj832sE//Dfa8WGQow=",
       "ServiceBusQueueName": "PlainCache",
       "Enabled": true
     }

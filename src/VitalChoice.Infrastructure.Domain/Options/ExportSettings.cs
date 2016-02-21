@@ -7,7 +7,8 @@ namespace VitalChoice.Infrastructure.Domain.Options
 {
     public class ExportService
     {
-        public string ConnectionString { get; set; }
+        public string PlainConnectionString { get; set; }
+        public string EncryptedConnectionString { get; set; }
         public string PlainQueueName { get; set; }
         public string EncryptedQueueName { get; set; }
         public string CertThumbprint { get; set; }

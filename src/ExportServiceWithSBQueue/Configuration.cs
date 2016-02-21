@@ -103,7 +103,8 @@ namespace ExportServiceWithSBQueue
                 };
                 options.ExportService = new ExportService
                 {
-                    ConnectionString = configuration.GetSection("App:ExportService:ConnectionString").Value,
+                    PlainConnectionString = configuration.GetSection("App:ExportService:PlainConnectionString").Value,
+                    EncryptedConnectionString = configuration.GetSection("App:ExportService:EncryptedConnectionString").Value,
                     EncryptedQueueName = configuration.GetSection("App:ExportService:EncryptedQueueName").Value,
                     PlainQueueName = configuration.GetSection("App:ExportService:PlainQueueName").Value,
                     CertThumbprint = configuration.GetSection("App:ExportService:CertThumbprint").Value,
@@ -142,7 +143,8 @@ namespace ExportServiceWithSBQueue
                 };
                 options.ExportService = new ExportService
                 {
-                    ConnectionString = configuration.GetSection("App:ExportService:ConnectionString").Value,
+                    PlainConnectionString = configuration.GetSection("App:ExportService:PlainConnectionString").Value,
+                    EncryptedConnectionString = configuration.GetSection("App:ExportService:EncryptedConnectionString").Value,
                     EncryptedQueueName = configuration.GetSection("App:ExportService:EncryptedQueueName").Value,
                     PlainQueueName = configuration.GetSection("App:ExportService:PlainQueueName").Value,
                     CertThumbprint = configuration.GetSection("App:ExportService:CertThumbprint").Value,

@@ -56,8 +56,8 @@ namespace VitalChoice.Infrastructure.ServiceBus
             try
             {
                 _sendQue = new ConcurrentQueue<BrokeredMessage>();
-                var plainFactory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.ConnectionString);
-                var encryptedFactory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.ConnectionString);
+                var plainFactory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.PlainConnectionString);
+                var encryptedFactory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.EncryptedConnectionString);
 
                 _encryptedClient = plainFactory.CreateQueueClient(appOptions.Value.ExportService.EncryptedQueueName, ReceiveMode.PeekLock);
                 _plainClient = encryptedFactory.CreateQueueClient(appOptions.Value.ExportService.PlainQueueName, ReceiveMode.PeekLock);

@@ -15,10 +15,11 @@
       "Encrypt": true
     },
     "ExportService": {
-      "ConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=9bCmTJyWrS2//GpvV5A3+bsPHdyph0ndE8tE14gsD24=",
+      "PlainConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=8btEfIO+srlpmg9AF0evGubknnuzetZZ70bKDOH7gps=",
+      "EncryptedConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=fnKDZwxtFlGCxePFOXdX5//2Js1fkgMFHJDDz7uN5PE=",
       "PlainQueueName": "PlainQueue",
       "EncryptedQueueName": "EncryptedQueue",
-      "CertThumbprint": "505BDC22499CF0F4692CF18D69CDC32F0F285545",
+      "CertThumbprint": "E2603D85F0E4B59448FD3D380FEFF740B28B3215",
       "RootThumbprint": "89735BE3169BE34AB67B65C7D9EFFD2C230A9D98",
       "EncryptionHostSessionExpire": true,
       "ServerHostName": "export-server"
