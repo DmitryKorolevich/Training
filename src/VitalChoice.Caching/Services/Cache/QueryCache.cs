@@ -19,7 +19,7 @@ namespace VitalChoice.Caching.Services.Cache
         private readonly IndexAnalyzer<T> _indexAnalyzer;
         private readonly ICollection<ConditionalIndexAnalyzer<T>> _conditionalIndexAnalyzers;
 
-        public QueryCache(IInternalEntityInfoStorage entityInfo)
+        public QueryCache(IEntityInfoStorage entityInfo)
         {
             _primaryKeyAnalyzer = new PrimaryKeyAnalyzer<T>(entityInfo.GetPrimaryKeyInfo<T>());
             _indexAnalyzer = new IndexAnalyzer<T>(entityInfo.GetIndexInfo<T>());

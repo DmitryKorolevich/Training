@@ -12,28 +12,30 @@ namespace VitalChoice.Caching.Extensions
 {
     public static class EntityFrameworkBuilderExtension
     {
-        public static EntityFrameworkServicesBuilder AddEntityFrameworkCache(this EntityFrameworkServicesBuilder builder)
+        public static EntityFrameworkServicesBuilder AddEntityFrameworkCache<TInfoStorage>(this EntityFrameworkServicesBuilder builder)
+            where TInfoStorage: class, IEntityInfoStorage
         {
             var services = builder.GetInfrastructure();
             services.Replace(ServiceDescriptor.Scoped(typeof(IStateManager), typeof(CacheStateManager)));
             services.Replace(ServiceDescriptor.Scoped(typeof(IAsyncQueryProvider), typeof(CacheEntityQueryProvider)));
             services.AddScoped<IQueryCacheFactory, QueryCacheFactory>();
             services.AddScoped<IInternalEntityCacheFactory, InternalEntityCacheFactory>();
-            services.AddScoped<IInternalEntityInfoStorage, InternalEntityInfoStorage>();
             services.AddScoped<ICacheSyncProvider, CacheSyncProvider>();
+            services.AddSingleton<IEntityInfoStorage, TInfoStorage>();
             return builder;
         }
 
-        public static EntityFrameworkServicesBuilder AddEntityFrameworkCache<TSyncProvider>(this EntityFrameworkServicesBuilder builder)
+        public static EntityFrameworkServicesBuilder AddEntityFrameworkCache<TSyncProvider, TInfoStorage>(this EntityFrameworkServicesBuilder builder)
             where TSyncProvider: class, ICacheSyncProvider
+            where TInfoStorage : class, IEntityInfoStorage
         {
             var services = builder.GetInfrastructure();
             services.Replace(ServiceDescriptor.Scoped(typeof(IStateManager), typeof(CacheStateManager)));
             services.Replace(ServiceDescriptor.Scoped(typeof(IAsyncQueryProvider), typeof(CacheEntityQueryProvider)));
             services.AddScoped<IQueryCacheFactory, QueryCacheFactory>();
             services.AddScoped<IInternalEntityCacheFactory, InternalEntityCacheFactory>();
-            services.AddScoped<IInternalEntityInfoStorage, InternalEntityInfoStorage>();
             services.AddScoped<ICacheSyncProvider, TSyncProvider>();
+            services.AddSingleton<IEntityInfoStorage, TInfoStorage>();
             return builder;
         }
     }

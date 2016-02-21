@@ -11,9 +11,9 @@ namespace VitalChoice.Caching.Services.Cache
     {
         private static readonly ConcurrentDictionary<Type, object> QueryCaches = new ConcurrentDictionary<Type, object>();
 
-        private readonly IInternalEntityInfoStorage _entityInfo;
+        private readonly IEntityInfoStorage _entityInfo;
 
-        public QueryCacheFactory(IInternalEntityInfoStorage entityInfo)
+        public QueryCacheFactory(IEntityInfoStorage entityInfo)
         {
             _entityInfo = entityInfo;
         }

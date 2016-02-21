@@ -14,12 +14,12 @@ namespace VitalChoice.Caching.Services.Cache
 {
     public class EntityInternalCache<T> : IInternalEntityCache<T>
     {
-        protected readonly IInternalEntityInfoStorage KeyStorage;
+        protected readonly IEntityInfoStorage KeyStorage;
         protected readonly IInternalEntityCacheFactory CacheFactory;
 
         protected readonly CacheStorage<T> CacheStorage;
 
-        public EntityInternalCache(IInternalEntityInfoStorage keyStorage, IInternalEntityCacheFactory cacheFactory)
+        public EntityInternalCache(IEntityInfoStorage keyStorage, IInternalEntityCacheFactory cacheFactory)
         {
             KeyStorage = keyStorage;
             CacheFactory = cacheFactory;

@@ -9,6 +9,8 @@ using VitalChoice.Caching.Relational.Base;
 using VitalChoice.Caching.Services;
 using System.Collections.Concurrent;
 using System.Threading;
+using Autofac;
+using Autofac.Core.Lifetime;
 using Microsoft.Extensions.OptionsModel;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
@@ -24,8 +26,9 @@ namespace VitalChoice.Business.Services.Cache
         private static readonly Guid ClientUid = Guid.NewGuid();
         private static readonly AutoResetEvent TouchQueEvent = new AutoResetEvent(false);
         private static readonly ConcurrentQueue<BrokeredMessage> SendQue = new ConcurrentQueue<BrokeredMessage>();
+        private static ILifetimeScope _rootScope;
 
-        public ServiceBusCacheSyncProvider(IInternalEntityCacheFactory cacheFactory, IInternalEntityInfoStorage keyStorage, ILogger logger,
+        public ServiceBusCacheSyncProvider(ILifetimeScope serviceProvider, IInternalEntityCacheFactory cacheFactory, IEntityInfoStorage keyStorage, ILogger logger,
             IOptions<AppOptions> options)
             : base(cacheFactory, keyStorage, logger)
         {
@@ -37,6 +40,7 @@ namespace VitalChoice.Business.Services.Cache
                 }
                 if (_serviceBusClient == null && _enabled)
                 {
+                    _rootScope = ((LifetimeScope)serviceProvider).RootLifetimeScope;
                     //var namespaceManager =
                     //    NamespaceManager.CreateFromConnectionString(options.Value.CacheSyncOptions?.ConnectionString);
                     var queName = options.Value.CacheSyncOptions?.ServiceBusQueueName;
@@ -55,8 +59,6 @@ namespace VitalChoice.Business.Services.Cache
                     new Thread(SendingThreadProc).Start(logger);
                 }
             }
-            if (_enabled)
-                ProcessBatch += AcceptChanges;
         }
 
         public override void SendChanges(IEnumerable<SyncOperation> syncOperations)
@@ -86,15 +88,12 @@ namespace VitalChoice.Business.Services.Cache
             {
                 GC.SuppressFinalize(this);
             }
-            ProcessBatch -= AcceptChanges;
         }
 
         public void Dispose()
         {
             Dispose(true);
         }
-
-        private static event Action<IEnumerable<SyncOperation>> ProcessBatch;
 
         private static void ReceivingThreadProc(object parameter)
         {
@@ -105,7 +104,11 @@ namespace VitalChoice.Business.Services.Cache
             {
                 try
                 {
-                    OnProcessBatch(GetBatch().ToList());
+                    using (var scope = _rootScope.BeginLifetimeScope())
+                    {
+                        var cacheSyncProvider = scope.Resolve<ICacheSyncProvider>();
+                        cacheSyncProvider.AcceptChanges(GetBatch());
+                    }
                 }
                 catch (Exception e)
                 {
@@ -160,11 +163,6 @@ namespace VitalChoice.Business.Services.Cache
                     message.Complete();
                 }
             }
-        }
-
-        private static void OnProcessBatch(IEnumerable<SyncOperation> batch)
-        {
-            ProcessBatch?.Invoke(batch);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace VitalChoice.Caching.GC
+﻿namespace VitalChoice.Caching.Interfaces
 {
     public interface IEntityCollectorInfo
     {

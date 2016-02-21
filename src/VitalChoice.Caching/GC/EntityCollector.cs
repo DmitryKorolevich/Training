@@ -10,14 +10,14 @@ namespace VitalChoice.Caching.GC
 {
     public class EntityCollector : IEntityCollectorInfo, IDisposable
     {
-        private readonly IInternalEntityInfoStorage _entityInfoStorage;
+        private readonly IEntityInfoStorage _entityInfoStorage;
         private readonly IInternalEntityCacheFactory _cacheFactory;
         private readonly ILogger _logger;
         private readonly TimeSpan _timeToLeave;
         private readonly TimeSpan _scanPeriod;
         private readonly long _maxSize;
 
-        public EntityCollector(IInternalEntityInfoStorage entityInfoStorage, IInternalEntityCacheFactory cacheFactory,
+        public EntityCollector(IEntityInfoStorage entityInfoStorage, IInternalEntityCacheFactory cacheFactory,
             IOptions<AppOptionsBase> options, ILogger logger)
         {
             _entityInfoStorage = entityInfoStorage;

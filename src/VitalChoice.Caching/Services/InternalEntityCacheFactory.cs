@@ -10,12 +10,12 @@ namespace VitalChoice.Caching.Services
 {
     internal class InternalEntityCacheFactory : IInternalEntityCacheFactory
     {
-        private readonly IInternalEntityInfoStorage _keyStorage;
+        private readonly IEntityInfoStorage _keyStorage;
 
         private static readonly ConcurrentDictionary<Type, IInternalEntityCache> EntityCaches =
             new ConcurrentDictionary<Type, IInternalEntityCache>();
 
-        public InternalEntityCacheFactory(IInternalEntityInfoStorage keyStorage)
+        public InternalEntityCacheFactory(IEntityInfoStorage keyStorage)
         {
             _keyStorage = keyStorage;
         }

@@ -18,28 +18,26 @@ using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Caching.Services
 {
-    internal class InternalEntityInfoStorage : IInternalEntityInfoStorage
+    public abstract class EntityInfoStorage : IEntityInfoStorage
     {
-        internal static readonly ConcurrentDictionary<Type, ModelCache> ContextModelCaches = new ConcurrentDictionary<Type, ModelCache>();
+        protected readonly IOptions<AppOptionsBase> Options;
+        protected readonly ILogger Logger;
+        private IReadOnlyDictionary<Type, EntityInfo> _entityInfos;
+        private IEntityCollectorInfo _gcCollector;
 
-        private readonly IOptions<AppOptionsBase> _options;
-        private readonly ILogger _logger;
-        private readonly IReadOnlyDictionary<Type, EntityInfo> _entityInfos;
-        private readonly IEntityCollectorInfo _gcCollector;
-
-        public InternalEntityInfoStorage(DbContext context, IOptions<AppOptionsBase> options, ILogger logger)
+        protected EntityInfoStorage(IOptions<AppOptionsBase> options, ILogger logger)
         {
-            _options = options;
-            _logger = logger;
-            var modelInfo = ContextModelCaches.GetOrAdd(context.GetType(), key => Initialize(context.Model));
-            _entityInfos = modelInfo.EntityCache;
-            _gcCollector = modelInfo.EntityCollector;
+            Options = options;
+            Logger = logger;
+            Initialize();
         }
 
-        private ModelCache Initialize(IModel dataModel)
+        protected abstract IEnumerable<IModel> GetCachableContextModels();
+
+        private void Initialize()
         {
             var entityInfos = new Dictionary<Type, EntityInfo>();
-            foreach (var entityType in dataModel.GetEntityTypes())
+            foreach (var entityType in GetCachableContextModels().SelectMany(m => m.GetEntityTypes()))
             {
                 if (entityType.ClrType == null) continue;
 
@@ -75,20 +73,16 @@ namespace VitalChoice.Caching.Services
                                 entityType.ClrType, conditionAnnotation.Value as LambdaExpression));
                     }
                 }
-
-                entityInfos.Add(entityType.ClrType, new EntityInfo
-                {
-                    PrimaryKey = new EntityPrimaryKeyInfo(keyInfos),
-                    UniqueIndex = uniqueIndex,
-                    ConditionalIndexes = nonUniqueList
-                });
+                if (!entityInfos.ContainsKey(entityType.ClrType))
+                    entityInfos.Add(entityType.ClrType, new EntityInfo
+                    {
+                        PrimaryKey = new EntityPrimaryKeyInfo(keyInfos),
+                        UniqueIndex = uniqueIndex,
+                        ConditionalIndexes = nonUniqueList
+                    });
             }
-
-            return new ModelCache
-            {
-                EntityCache = entityInfos,
-                EntityCollector = new EntityCollector(this, new InternalEntityCacheFactory(this), _options, _logger)
-            };
+            _entityInfos = entityInfos;
+            _gcCollector = new EntityCollector(this, new InternalEntityCacheFactory(this), Options, Logger);
         }
 
         public bool HaveKeys(Type entityType)
@@ -162,11 +156,5 @@ namespace VitalChoice.Caching.Services
         {
             return _gcCollector.CanAddUpCache();
         }
-    }
-
-    internal struct ModelCache
-    {
-        public IReadOnlyDictionary<Type, EntityInfo> EntityCache;
-        public EntityCollector EntityCollector;
     }
 }

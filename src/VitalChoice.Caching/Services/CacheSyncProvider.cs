@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Autofac;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
@@ -11,10 +13,10 @@ namespace VitalChoice.Caching.Services
     public class CacheSyncProvider : ICacheSyncProvider
     {
         protected readonly IInternalEntityCacheFactory CacheFactory;
-        protected readonly IInternalEntityInfoStorage KeyStorage;
+        protected readonly IEntityInfoStorage KeyStorage;
         protected readonly ILogger Logger;
 
-        protected CacheSyncProvider(IInternalEntityCacheFactory cacheFactory, IInternalEntityInfoStorage keyStorage, ILogger logger)
+        protected CacheSyncProvider(IInternalEntityCacheFactory cacheFactory, IEntityInfoStorage keyStorage, ILogger logger)
         {
             CacheFactory = cacheFactory;
             KeyStorage = keyStorage;
@@ -26,7 +28,7 @@ namespace VitalChoice.Caching.Services
             
         }
 
-        public virtual void AcceptChanges(IEnumerable<SyncOperation> syncOperations)
+        public void AcceptChanges(IEnumerable<SyncOperation> syncOperations)
         {
             foreach (var group in syncOperations.GroupBy(s => s.EntityType))
             {

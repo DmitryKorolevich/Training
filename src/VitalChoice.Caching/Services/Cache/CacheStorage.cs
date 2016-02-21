@@ -18,7 +18,7 @@ namespace VitalChoice.Caching.Services.Cache
         private readonly EntityUniqueIndexInfo _indexInfo;
         private readonly ICollection<EntityConditionalIndexInfo> _conditionalIndexes;
 
-        public CacheStorage(IInternalEntityInfoStorage keyStorage, IInternalEntityCacheFactory cacheFactory)
+        public CacheStorage(IEntityInfoStorage keyStorage, IInternalEntityCacheFactory cacheFactory)
         {
             _cacheFactory = cacheFactory;
             _primaryKeyInfo = keyStorage.GetPrimaryKeyInfo<T>();
