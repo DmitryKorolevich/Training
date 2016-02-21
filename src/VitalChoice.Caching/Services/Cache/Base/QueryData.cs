@@ -16,7 +16,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
         public ICollection<EntityIndex> UniqueIndexes { get; set; }
         public ICollection<EntityKey> PrimaryKeys { get; set; }
 
-        public bool IsEmpty => WhereExpression == null && RelationInfo == null && OrderByFunction == null;
+        public bool IsEmpty => WhereExpression == null && RelationInfo == null && OrderByFunction == null || PrimaryKeys == null;
 
         public static readonly QueryData<T> Empty = new QueryData<T>();
     }

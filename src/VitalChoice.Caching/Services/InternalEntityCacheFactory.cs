@@ -11,15 +11,13 @@ namespace VitalChoice.Caching.Services
     internal class InternalEntityCacheFactory : IInternalEntityCacheFactory
     {
         private readonly IInternalEntityInfoStorage _keyStorage;
-        private readonly ITypeConverter _typeConverter;
 
         private static readonly ConcurrentDictionary<Type, IInternalEntityCache> EntityCaches =
             new ConcurrentDictionary<Type, IInternalEntityCache>();
 
-        public InternalEntityCacheFactory(IInternalEntityInfoStorage keyStorage, ITypeConverter typeConverter)
+        public InternalEntityCacheFactory(IInternalEntityInfoStorage keyStorage)
         {
             _keyStorage = keyStorage;
-            _typeConverter = typeConverter;
         }
 
         public bool CacheExist(Type entityType)
@@ -34,8 +32,7 @@ namespace VitalChoice.Caching.Services
             return EntityCaches.GetOrAdd(entityType,
                 cache =>
                     (IInternalEntityCache)
-                        Activator.CreateInstance(typeof (EntityInternalCache<>).MakeGenericType(entityType), _keyStorage, this,
-                            _typeConverter));
+                        Activator.CreateInstance(typeof (EntityInternalCache<>).MakeGenericType(entityType), _keyStorage, this));
         }
 
         public IInternalEntityCache<T> GetCache<T>()

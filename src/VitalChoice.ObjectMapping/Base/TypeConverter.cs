@@ -181,7 +181,7 @@ namespace VitalChoice.ObjectMapping.Base
             }
         }
 
-        protected virtual object CloneInternal(object obj, Type objectType, Type baseTypeToMemberwiseClone, Dictionary<object, object> objects)
+        protected static object CloneInternal(object obj, Type objectType, Type baseTypeToMemberwiseClone, Dictionary<object, object> objects)
         {
             if (obj == null)
                 return null;
@@ -233,13 +233,13 @@ namespace VitalChoice.ObjectMapping.Base
             return result;
         }
 
-        public object Clone(object obj, Type objectType, Type baseTypeToMemberwiseClone)
+        public static object Clone(object obj, Type objectType, Type baseTypeToMemberwiseClone)
         {
             Dictionary<object, object> objects = new Dictionary<object, object>();
             return CloneInternal(obj, objectType, baseTypeToMemberwiseClone, objects);
         }
 
-        protected virtual object CloneInternal(object obj, Type objectType, Type baseTypeToMemberwiseClone, Func<object, object> cloneBase,
+        public static object CloneInternal(object obj, Type objectType, Type baseTypeToMemberwiseClone, Func<object, object> cloneBase,
             Dictionary<object, object> objects)
         {
             if (obj == null)
@@ -292,13 +292,13 @@ namespace VitalChoice.ObjectMapping.Base
             return result;
         }
 
-        public object Clone(object obj, Type objectType, Type baseTypeToMemberwiseClone, Func<object, object> cloneBase)
+        public static object Clone(object obj, Type objectType, Type baseTypeToMemberwiseClone, Func<object, object> cloneBase)
         {
             Dictionary<object, object> objects = new Dictionary<object, object>();
             return CloneInternal(obj, objectType, baseTypeToMemberwiseClone, cloneBase, objects);
         }
 
-        protected virtual void CloneIntoInternal(object dest, object src, Type objectType, Type baseTypeToMemberwiseClone,
+        public static void CloneIntoInternal(object dest, object src, Type objectType, Type baseTypeToMemberwiseClone,
             HashSet<object> objects)
         {
             if (dest == null)
@@ -332,13 +332,13 @@ namespace VitalChoice.ObjectMapping.Base
             }
         }
 
-        public void CloneInto(object dest, object src, Type objectType, Type baseTypeToMemberwiseClone)
+        public static void CloneInto(object dest, object src, Type objectType, Type baseTypeToMemberwiseClone)
         {
             HashSet<object> objects = new HashSet<object>();
             CloneIntoInternal(dest, src, objectType, baseTypeToMemberwiseClone, objects);
         }
 
-        public void CopyInto(object dest, object src, Type objectType)
+        public static void CopyInto(object dest, object src, Type objectType)
         {
             if (dest == null)
                 return;

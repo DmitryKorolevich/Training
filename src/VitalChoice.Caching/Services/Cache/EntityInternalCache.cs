@@ -19,12 +19,11 @@ namespace VitalChoice.Caching.Services.Cache
 
         protected readonly CacheStorage<T> CacheStorage;
 
-        public EntityInternalCache(IInternalEntityInfoStorage keyStorage, IInternalEntityCacheFactory cacheFactory,
-            ITypeConverter typeConverter)
+        public EntityInternalCache(IInternalEntityInfoStorage keyStorage, IInternalEntityCacheFactory cacheFactory)
         {
             KeyStorage = keyStorage;
             CacheFactory = cacheFactory;
-            CacheStorage = new CacheStorage<T>(keyStorage, cacheFactory, typeConverter);
+            CacheStorage = new CacheStorage<T>(keyStorage, cacheFactory);
         }
 
         public CacheResult<T> TryGetEntity(EntityKey key, RelationInfo relations)
@@ -194,11 +193,7 @@ namespace VitalChoice.Caching.Services.Cache
             if (entity == null)
                 return;
 
-            var datas = CacheStorage.AllCacheDatas;
-            foreach (var data in datas)
-            {
-                data.Update(entity, true);
-            }
+            MarkForUpdate(entity);
         }
 
         public CachedEntity<T> Update(RelationInfo relations, T entity)
@@ -287,6 +282,9 @@ namespace VitalChoice.Caching.Services.Cache
 
         public void MarkForUpdate(EntityKey pk)
         {
+            if (pk == null) 
+                return;
+
             foreach (var data in CacheStorage.AllCacheDatas)
             {
                 CachedEntity<T> cached;
@@ -316,6 +314,8 @@ namespace VitalChoice.Caching.Services.Cache
 
         public bool TryRemove(EntityKey pk)
         {
+            if (pk == null)
+                return false;
             var datas = CacheStorage.AllCacheDatas;
             return datas.Aggregate(true, (current, data) => current && data.TryRemove(pk));
         }

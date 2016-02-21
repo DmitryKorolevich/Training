@@ -242,12 +242,12 @@ namespace VitalChoice.ObjectMapping.Base
 
         public TObject Clone<TBase>(TObject obj)
         {
-            return (TObject)_typeConverter.Clone(obj, typeof(TObject), typeof(TBase));
+            return (TObject)TypeConverter.Clone(obj, typeof(TObject), typeof(TBase));
         }
 
         public TObject Clone<TBase>(TObject obj, Func<TBase, TBase> cloneBaseFunc)
         {
-            return (TObject) _typeConverter.Clone(obj, typeof (TObject), typeof (TBase), o => cloneBaseFunc((TBase) o));
+            return (TObject)TypeConverter.Clone(obj, typeof (TObject), typeof (TBase), o => cloneBaseFunc((TBase) o));
         }
 
         public void CloneInto<TBase>(TObject dest, TObject src)

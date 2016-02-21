@@ -14,15 +14,13 @@ namespace VitalChoice.Caching.Services.Cache
     public sealed class CacheStorage<T> : ICacheKeysStorage<T>, IDisposable
     {
         private readonly IInternalEntityCacheFactory _cacheFactory;
-        private readonly ITypeConverter _typeConverter;
         private readonly EntityPrimaryKeyInfo _primaryKeyInfo;
         private readonly EntityUniqueIndexInfo _indexInfo;
         private readonly ICollection<EntityConditionalIndexInfo> _conditionalIndexes;
 
-        public CacheStorage(IInternalEntityInfoStorage keyStorage, IInternalEntityCacheFactory cacheFactory, ITypeConverter typeConverter)
+        public CacheStorage(IInternalEntityInfoStorage keyStorage, IInternalEntityCacheFactory cacheFactory)
         {
             _cacheFactory = cacheFactory;
-            _typeConverter = typeConverter;
             _primaryKeyInfo = keyStorage.GetPrimaryKeyInfo<T>();
             _indexInfo = keyStorage.GetIndexInfo<T>();
             _conditionalIndexes = keyStorage.GetConditionalIndexInfos<T>();
@@ -36,7 +34,7 @@ namespace VitalChoice.Caching.Services.Cache
         public ICacheData<T> GetCacheData(RelationInfo relationInfo)
         {
             return _cacheData.GetOrAdd(relationInfo,
-                r => new CacheData<T>(_cacheFactory, _typeConverter, this, _conditionalIndexes, relationInfo));
+                r => new CacheData<T>(_cacheFactory, this, _conditionalIndexes, relationInfo));
         }
 
         public ICollection<CacheData<T>> AllCacheDatas => _cacheData.Values;

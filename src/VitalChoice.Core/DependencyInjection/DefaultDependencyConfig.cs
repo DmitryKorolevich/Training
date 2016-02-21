@@ -97,7 +97,7 @@ namespace VitalChoice.Core.DependencyInjection
             Assembly projectAssembly)
         {
             // Add EF services to the services container.
-            services.AddEntityFramework().AddEntityFrameworkCache() //.AddMigrations()
+            services.AddEntityFramework()//.AddEntityFrameworkCache() //.AddMigrations()
                 .AddSqlServer();
 
             // Add Identity services to the services container.

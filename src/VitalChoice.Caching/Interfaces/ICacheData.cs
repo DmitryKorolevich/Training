@@ -25,7 +25,7 @@ namespace VitalChoice.Caching.Interfaces
         bool Get(EntityConditionalIndexInfo conditionalIndex, EntityIndex index, out CachedEntity<T> entity);
         ICollection<CachedEntity<T>> GetAll();
         bool TryRemove(EntityKey key, out CachedEntity<T> removed);
-        CachedEntity<T> Update(T entity, bool ignoreState = false);
+        CachedEntity<T> Update(T entity);
         void Update(IEnumerable<T> entity);
         void UpdateAll(IEnumerable<T> entity);
         void SetNull(EntityKey key);

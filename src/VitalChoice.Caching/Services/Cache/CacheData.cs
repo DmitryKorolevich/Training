@@ -8,6 +8,7 @@ using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.ObjectMapping.Base;
 using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Caching.Services.Cache
@@ -15,7 +16,6 @@ namespace VitalChoice.Caching.Services.Cache
     public sealed class CacheData<T> : ICacheData<T>
     {
         private readonly IInternalEntityCacheFactory _cacheFactory;
-        private readonly ITypeConverter _typeConverter;
         private readonly CacheStorage<T> _cacheStorage;
         private readonly RelationInfo _relationInfo;
 
@@ -30,11 +30,10 @@ namespace VitalChoice.Caching.Services.Cache
         private readonly Dictionary<EntityConditionalIndexInfo, ConcurrentDictionary<EntityIndex, CachedEntity<T>>>
             _conditionalIndexedDictionary;
 
-        public CacheData(IInternalEntityCacheFactory cacheFactory, ITypeConverter typeConverter, CacheStorage<T> cacheStorage,
+        public CacheData(IInternalEntityCacheFactory cacheFactory, CacheStorage<T> cacheStorage,
             ICollection<EntityConditionalIndexInfo> conditionalIndexes, RelationInfo relationInfo)
         {
             _cacheFactory = cacheFactory;
-            _typeConverter = typeConverter;
             _cacheStorage = cacheStorage;
             _relationInfo = relationInfo;
             _conditionalIndexedDictionary = new Dictionary<EntityConditionalIndexInfo, ConcurrentDictionary<EntityIndex, CachedEntity<T>>>();
@@ -114,7 +113,7 @@ namespace VitalChoice.Caching.Services.Cache
             return TryRemove(key, out removed);
         }
 
-        public CachedEntity<T> Update(T entity, bool ignoreState = false)
+        public CachedEntity<T> Update(T entity)
         {
             if (entity == null)
                 return null;
@@ -125,10 +124,10 @@ namespace VitalChoice.Caching.Services.Cache
                 var conditional =
                     _conditionalIndexedDictionary.Keys.Where(c => c.CheckCondition(entity))
                         .ToDictionary(c => c, c => _cacheStorage.GetConditionalIndexValue(entity, c));
-                
+
                 var result = _entityDictionary.AddOrUpdate(pk,
                     key => CreateNew(entity, conditional, indexValue),
-                    (key, _) => UpdateExist(_, entity, _relationInfo.Relations, indexValue, conditional, ignoreState));
+                    (key, _) => UpdateExist(_, entity, _relationInfo.Relations, indexValue, conditional));
 
                 return result;
             }
@@ -266,53 +265,48 @@ namespace VitalChoice.Caching.Services.Cache
         }
 
         private CachedEntity<T> UpdateExist(CachedEntity<T> exist, T newEntity, IEnumerable<RelationInfo> newRelations,
-            EntityIndex indexValue, Dictionary<EntityConditionalIndexInfo, EntityIndex> conditional, bool ignoreState = false)
+            EntityIndex indexValue, Dictionary<EntityConditionalIndexInfo, EntityIndex> conditional)
         {
             lock (exist)
             {
-                if (exist.NeedUpdate || ignoreState)
+                if (exist.UniqueIndex != null && indexValue != exist.UniqueIndex)
                 {
-                    if (exist.UniqueIndex != null && indexValue != exist.UniqueIndex)
+                    CachedEntity<T> temp;
+                    _indexedDictionary.TryRemove(exist.UniqueIndex, out temp);
+                }
+                if (indexValue != null)
+                    _indexedDictionary.AddOrUpdate(indexValue, exist, (index, _) => exist);
+                IEnumerable<EntityConditionalIndexInfo> removeList;
+                if (conditional == null)
+                {
+                    removeList = _conditionalIndexedDictionary.Keys.ToArray();
+                }
+                else
+                {
+                    foreach (var conditionalIndex in conditional)
                     {
-                        CachedEntity<T> temp;
-                        _indexedDictionary.TryRemove(exist.UniqueIndex, out temp);
+                        _conditionalIndexedDictionary[conditionalIndex.Key].AddOrUpdate(conditionalIndex.Value, exist, (index, _) => exist);
                     }
-                    if (indexValue != null)
-                        _indexedDictionary.AddOrUpdate(indexValue, exist, (index, _) => exist);
-                    IEnumerable<EntityConditionalIndexInfo> removeList;
-                    if (conditional == null)
+                    removeList = _conditionalIndexedDictionary.Keys.Where(key => !conditional.ContainsKey(key)).ToArray();
+                }
+                foreach (var indexInfo in removeList)
+                {
+                    CachedEntity<T> temp;
+                    _conditionalIndexedDictionary[indexInfo].TryRemove(_cacheStorage.GetConditionalIndexValue(exist, indexInfo), out temp);
+                }
+                exist.UniqueIndex = indexValue;
+                exist.ConditionalIndexes = conditional;
+                exist.NeedUpdate = false;
+                if (exist.EntityUntyped != (object) newEntity)
+                {
+                    if (newEntity != null)
                     {
-                        removeList = _conditionalIndexedDictionary.Keys.ToArray();
+                        TypeConverter.CopyInto(exist.Entity, newEntity, typeof (T));
+                        UpdateRelations(exist, newEntity, newRelations);
                     }
                     else
                     {
-                        foreach (var conditionalIndex in conditional)
-                        {
-                            _conditionalIndexedDictionary[conditionalIndex.Key].AddOrUpdate(conditionalIndex.Value, exist,
-                                (index, _) => exist);
-                        }
-                        removeList = _conditionalIndexedDictionary.Keys.Where(key => !conditional.ContainsKey(key)).ToArray();
-                    }
-                    foreach (var indexInfo in removeList)
-                    {
-                        CachedEntity<T> temp;
-                        _conditionalIndexedDictionary[indexInfo].TryRemove(_cacheStorage.GetConditionalIndexValue(exist, indexInfo),
-                            out temp);
-                    }
-                    exist.UniqueIndex = indexValue;
-                    exist.ConditionalIndexes = conditional;
-                    exist.NeedUpdate = false;
-                    if (exist.EntityUntyped != (object) newEntity)
-                    {
-                        if (newEntity != null)
-                        {
-                            _typeConverter.CopyInto(exist.Entity, newEntity, typeof (T));
-                            UpdateRelations(exist, newEntity, newRelations);
-                        }
-                        else
-                        {
-                            exist.Entity = default(T);
-                        }
+                        exist.Entity = default(T);
                     }
                 }
             }

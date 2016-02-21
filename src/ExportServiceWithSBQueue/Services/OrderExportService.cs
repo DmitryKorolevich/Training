@@ -9,24 +9,25 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.ServiceBus;
 using System.Linq;
+using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace ExportServiceWithSBQueue.Services
 {
     public class OrderExportService : IOrderExportService
     {
-        private readonly ExportInfoContext _context;
+        private readonly IOptions<ExportOptions> _options;
         private readonly IObjectEncryptionHost _encryptionHost;
 
-        public OrderExportService(ExportInfoContext context, IObjectEncryptionHost encryptionHost)
+        public OrderExportService(IOptions<ExportOptions> options, IObjectEncryptionHost encryptionHost)
         {
-            _context = context;
+            _options = options;
             _encryptionHost = encryptionHost;
         }
 
         public async Task UpdateCustomerPaymentMethods(CustomerPaymentMethodDynamic[] paymentMethods)
         {
-            using (var uow = new UnitOfWork(_context))
+            using (var uow = new UnitOfWork(new ExportInfoContext(_options)))
             {
                 var customerIds = paymentMethods.Select(p => p.IdCustomer).Distinct().ToList();
                 var rep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
@@ -49,7 +50,7 @@ namespace ExportServiceWithSBQueue.Services
 
         public async Task UpdateOrderPaymentMethod(OrderPaymentMethodDynamic paymentMethod)
         {
-            using (var uow = new UnitOfWork(_context))
+            using (var uow = new UnitOfWork(new ExportInfoContext(_options)))
             {
                 if (DynamicMapper.IsValuesMasked(paymentMethod) && paymentMethod.IdCustomerPaymentMethod > 0 &&
                     paymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
@@ -88,7 +89,7 @@ namespace ExportServiceWithSBQueue.Services
 
         public Task<bool> ExportOrder(int idOrder, POrderType orderType, out ICollection<string> errors)
         {
-            using (var uow = new UnitOfWork(_context))
+            using (var uow = new UnitOfWork(new ExportInfoContext(_options)))
             {
                 errors = new List<string>();
                 return Task.FromResult(true);

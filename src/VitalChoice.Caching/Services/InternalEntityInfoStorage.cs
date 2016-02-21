@@ -22,15 +22,13 @@ namespace VitalChoice.Caching.Services
     {
         internal static readonly ConcurrentDictionary<Type, ModelCache> ContextModelCaches = new ConcurrentDictionary<Type, ModelCache>();
 
-        private readonly ITypeConverter _typeConverter;
         private readonly IOptions<AppOptionsBase> _options;
         private readonly ILogger _logger;
         private readonly IReadOnlyDictionary<Type, EntityInfo> _entityInfos;
         private readonly IEntityCollectorInfo _gcCollector;
 
-        public InternalEntityInfoStorage(DbContext context, ITypeConverter typeConverter, IOptions<AppOptionsBase> options, ILogger logger)
+        public InternalEntityInfoStorage(DbContext context, IOptions<AppOptionsBase> options, ILogger logger)
         {
-            _typeConverter = typeConverter;
             _options = options;
             _logger = logger;
             var modelInfo = ContextModelCaches.GetOrAdd(context.GetType(), key => Initialize(context.Model));
@@ -89,7 +87,7 @@ namespace VitalChoice.Caching.Services
             return new ModelCache
             {
                 EntityCache = entityInfos,
-                EntityCollector = new EntityCollector(this, new InternalEntityCacheFactory(this, _typeConverter), _options, _logger)
+                EntityCollector = new EntityCollector(this, new InternalEntityCacheFactory(this), _options, _logger)
             };
         }
 
