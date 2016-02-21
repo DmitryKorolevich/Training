@@ -11,6 +11,7 @@ using VitalChoice.Ecommerce.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Content;
 using VitalChoice.Infrastructure.Domain.Content.Articles;
 using VitalChoice.Infrastructure.Domain.Content.Base;
+using VitalChoice.Infrastructure.Domain.Content.ContentCrossSells;
 using VitalChoice.Infrastructure.Domain.Content.ContentPages;
 using VitalChoice.Infrastructure.Domain.Content.Faq;
 using VitalChoice.Infrastructure.Domain.Content.Products;
@@ -95,7 +96,13 @@ namespace VitalChoice.Infrastructure.Context
 
             #region Contents
 
-            builder.Entity<ContentTypeEntity>(entity =>
+			builder.Entity<ContentCrossSell>(entity =>
+			{
+				entity.HasKey(p => p.Id);
+				entity.ToTable("ContentCrossSells");
+			});
+
+			builder.Entity<ContentTypeEntity>(entity =>
             {
                 entity.HasKey(p => p.Id);
                 entity.ToTable("ContentTypes");

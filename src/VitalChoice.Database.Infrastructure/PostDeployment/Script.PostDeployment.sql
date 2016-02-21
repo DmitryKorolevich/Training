@@ -9,7 +9,7 @@ Post-Deployment Script Template
                SELECT * FROM [$(TableName)]					
 --------------------------------------------------------------------------------------
 */
-
+set dateformat mdy
 
 :r .\Scripts\StartInit.sql
 :r .\Scripts\LocalizationItems.sql
@@ -53,3 +53,4 @@ Post-Deployment Script Template
 :r .\Scripts\EmailTemplatesData.sql
 
 :r .\Scripts\Tokens.sql
+:r .\Scripts\ContentCrossSellsDefaultData.sql
