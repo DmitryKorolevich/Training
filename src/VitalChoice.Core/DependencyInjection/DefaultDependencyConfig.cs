@@ -97,7 +97,7 @@ namespace VitalChoice.Core.DependencyInjection
             Assembly projectAssembly)
         {
             // Add EF services to the services container.
-            services.AddEntityFramework()//.AddEntityFrameworkCache() //.AddMigrations()
+            services.AddEntityFramework().AddEntityFrameworkCache() //.AddMigrations()
                 .AddSqlServer();
 
             // Add Identity services to the services container.
@@ -327,6 +327,13 @@ namespace VitalChoice.Core.DependencyInjection
                 ApiKey = configuration.GetSection("App:AuthorizeNet:ApiKey").Value,
                 ApiLogin = configuration.GetSection("App:AuthorizeNet:ApiLogin").Value,
                 TestEnv = Convert.ToBoolean(configuration.GetSection("App:AuthorizeNet:TestEnv").Value)
+            };
+            var section = configuration.GetSection("App:CacheSyncOptions");
+            options.CacheSyncOptions = new CacheSyncOptions
+            {
+                ConnectionString = section["ConnectionString"],
+                ServiceBusQueueName = section["ServiceBusQueueName"],
+                Enabled = Convert.ToBoolean(section["Enabled"])
             };
         }
 

@@ -80,7 +80,7 @@ namespace VitalChoice.Caching.Services
                             {
                                 Key = primaryKey.ToExportable(group.Key),
                                 SyncType = SyncType.Update,
-                                EntityType = group.Key
+                                EntityType = group.Key.FullName
                             });
                             break;
                         case EntityState.Deleted:
@@ -90,7 +90,7 @@ namespace VitalChoice.Caching.Services
                             {
                                 Key = primaryKey.ToExportable(group.Key),
                                 SyncType = SyncType.Delete,
-                                EntityType = group.Key
+                                EntityType = group.Key.FullName
                             });
                             break;
                         case EntityState.Added:
@@ -100,7 +100,7 @@ namespace VitalChoice.Caching.Services
                             {
                                 Key = primaryKey.ToExportable(group.Key),
                                 SyncType = SyncType.Add,
-                                EntityType = group.Key
+                                EntityType = group.Key.FullName
                             });
                             break;
                     }

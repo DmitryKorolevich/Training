@@ -49,7 +49,8 @@ namespace VitalChoice.Business.Services.Cache
                             EnablePartitioning = true,
                         });
                     }
-                    _serviceBusClient = QueueClient.Create(queName, ReceiveMode.PeekLock);
+                    var factory = MessagingFactory.CreateFromConnectionString(options.Value.CacheSyncOptions?.ConnectionString);
+                    _serviceBusClient = factory.CreateQueueClient(queName, ReceiveMode.PeekLock);
                     new Thread(ReceivingThreadProc).Start(logger);
                     new Thread(SendingThreadProc).Start(logger);
                 }
@@ -103,7 +104,7 @@ namespace VitalChoice.Business.Services.Cache
             {
                 try
                 {
-                    OnProcessBatch(GetBatch());
+                    OnProcessBatch(GetBatch().ToList());
                 }
                 catch (Exception e)
                 {
@@ -153,6 +154,10 @@ namespace VitalChoice.Business.Services.Cache
                     message.Complete();
                     yield return syncOp;
                 }
+                else
+                {
+                    message.Complete();
+                }
             }
         }
 
@@ -162,4 +167,5 @@ namespace VitalChoice.Business.Services.Cache
         }
     }
 }
+
 #endif

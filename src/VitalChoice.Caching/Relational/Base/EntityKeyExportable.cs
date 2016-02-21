@@ -10,7 +10,7 @@ namespace VitalChoice.Caching.Relational.Base
     public class EntityKeyExportable
     {
         [DataMember]
-        public Type EntityType { get; set; }
+        public string EntityType { get; set; }
 
         [DataMember]
         public ICollection<EntityValueExportable> Values { get; set; }

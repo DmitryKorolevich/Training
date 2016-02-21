@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational.Base;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Services
 {
@@ -29,8 +30,11 @@ namespace VitalChoice.Caching.Services
         {
             foreach (var group in syncOperations.GroupBy(s => s.EntityType))
             {
-                var internalCache = CacheFactory.GetCache(group.Key);
-                var pkInfo = KeyStorage.GetPrimaryKeyInfo(group.Key);
+                var type = ReflectionHelper.ResolveType(group.Key);
+                var internalCache = CacheFactory.GetCache(type);
+                var pkInfo = KeyStorage.GetPrimaryKeyInfo(type);
+                if (pkInfo == null)
+                    continue;
                 foreach (var op in group)
                 {
                     switch (op.SyncType)

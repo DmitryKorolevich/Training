@@ -87,6 +87,11 @@
       "MaxProcessHeapsSizeBytes": 805306368, //768 Mb, entire application
       "CacheTimeToLeaveSeconds": 1800, //30 minutes
       "CacheScanPeriodSeconds": 900 //15 minutes
+    },
+    "CacheSyncOptions": {
+      "ConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=9bCmTJyWrS2//GpvV5A3+bsPHdyph0ndE8tE14gsD24=",
+      "ServiceBusQueueName": "PlainCache",
+      "Enabled": true
     }
   }
 }

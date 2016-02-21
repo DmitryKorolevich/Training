@@ -27,11 +27,4 @@ namespace VitalChoice.Infrastructure.Domain.Options
         public AuthorizeNet AuthorizeNet { get; set; }
         public PDFMyUrl PDFMyUrl { get; set; }
     }
-
-    public class CacheSyncOptions
-    {
-        public string ConnectionString { get; set; }
-        public string ServiceBusQueueName { get; set; }
-        public bool Enabled { get; set; }
-    }
 }

@@ -12,7 +12,7 @@ namespace VitalChoice.Caching.Relational.Base
         [DataMember]
         public SyncType SyncType { get; set; }
         [DataMember]
-        public Type EntityType { get; set; }
+        public string EntityType { get; set; }
         [DataMember]
         public EntityKeyExportable Key { get; set; }
     }
