@@ -69,7 +69,7 @@
     "AuthorizeNet": {
       "ApiLogin": "36qq5ECXB",
       "ApiKey": "4r5Zv38R56BY6tLW",
-      "TestEnv": true
+      "TestEnv": false
     },
     "AzureStorage": {
       "StorageConnectionString": "DefaultEndpointsProtocol=https;AccountName=vcdatabases;AccountKey=ERNr+5Hrxekm8nRWhgs8zXhPNyzBoU8KAJ1JyUe6nX4zSvUoSVFLhYa/Fk1jVxkUCXvG8riZdMVGbGutVugdrg==",

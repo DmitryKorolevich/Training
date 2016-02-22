@@ -41,7 +41,7 @@
     "AuthorizeNet": {
       "ApiLogin": "36qq5ECXB",
       "ApiKey": "4r5Zv38R56BY6tLW",
-      "TestEnv": true
+      "TestEnv": false
     },
     "PublicHost": "staging.g2-dg.com",
     "AdminHost": "admin.staging.g2-dg.com",
