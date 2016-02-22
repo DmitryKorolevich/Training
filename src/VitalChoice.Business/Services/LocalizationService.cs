@@ -75,7 +75,7 @@ namespace VitalChoice.Business.Services
         {
             List<LookupItem<string>> toReturn = new List<LookupItem<string>>();
 
-#if DNX451
+#if NET451
             if (_localizationData != null)
             {
                 var assembly =

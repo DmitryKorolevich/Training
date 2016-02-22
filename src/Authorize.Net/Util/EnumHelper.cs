@@ -11,7 +11,7 @@ namespace Authorize.Net.Util
         {
             var description = value.ToString();
 
-#if DNX451 || NET451
+#if NET451
             var fi = value.GetType().GetTypeInfo().GetDeclaredField(value.ToString());
             var attributes = (DescriptionAttribute[]) fi.GetCustomAttributes(typeof (DescriptionAttribute), false);
             if (attributes.Length > 0)

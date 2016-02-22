@@ -4,7 +4,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 
 namespace VitalChoice.Infrastructure.Domain.ServiceBus
 {
-#if DNX451 || NET451
+#if NET451
     [Serializable]
 #endif
     public class OrderExportItem
@@ -14,7 +14,7 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
         public POrderType OrderType { get; set; }
     }
 
-#if DNX451 || NET451
+#if NET451
     [Serializable]
 #endif
     public class OrderExportData
@@ -22,7 +22,7 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
         public ICollection<OrderExportItem> ExportInfo { get; set; }
     }
 
-#if DNX451 || NET451
+#if NET451
     [Serializable]
 #endif
     public class OrderExportItemResult

@@ -27,7 +27,7 @@
   },
 
   "frameworks": {
-    "dnx451": {
+    "net451": {
       "dependencies": {
         "NLog": "4.0.1"
       }

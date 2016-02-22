@@ -345,14 +345,14 @@ namespace VitalChoice.Caching.Services.Cache
             {
                 if (queryData.Tracked)
                 {
-                    AttachNotTracked(entities, cacheIterator.Tracked);
+                    AttachNotTracked(entities, cacheIterator.Tracked, queryData.RelationInfo);
                 }
                 return CacheGetResult.Found;
             }
             return !_cacheFactory.CanAddUpCache() ? CacheGetResult.NotFound : CacheGetResult.Update;
         }
 
-        private void AttachNotTracked(IEnumerable<T> items, Dictionary<EntityKey, EntityEntry<T>> tracked)
+        private void AttachNotTracked(IEnumerable<T> items, Dictionary<EntityKey, EntityEntry<T>> tracked, RelationInfo relationInfo)
         {
             foreach (var item in items)
             {
@@ -362,12 +362,36 @@ namespace VitalChoice.Caching.Services.Cache
                 {
                     if (entry.State == EntityState.Detached)
                     {
-                        _context.Attach(item);
+                        AttachGraph(item, relationInfo);
                     }
                 }
                 else
                 {
-                    _context.Attach(item);
+                    AttachGraph(item, relationInfo);
+                }
+            }
+        }
+
+        private void AttachGraph<TObj>(TObj item, RelationInfo relationInfo) 
+            where TObj : class
+        {
+            _context.Attach(item, GraphBehavior.SingleObject);
+            foreach (var relation in relationInfo.Relations)
+            {
+                var value = relation.GetRelatedObject(item);
+                if (value != null)
+                {
+                    if (value.GetType().IsImplementGeneric(typeof (ICollection<>)))
+                    {
+                        foreach (var singleValue in (IEnumerable) value)
+                        {
+                            AttachGraph(singleValue, relation);
+                        }
+                    }
+                    else
+                    {
+                        AttachGraph(value, relation);
+                    }
                 }
             }
         }

@@ -5,7 +5,7 @@ namespace Authorize.Net
 {
 #pragma warning disable 1591
 
-#if DNX451 || NET451
+#if NET451
     [Serializable]
 #endif
     public class Merchant
