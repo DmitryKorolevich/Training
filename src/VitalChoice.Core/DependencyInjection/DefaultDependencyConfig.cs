@@ -361,10 +361,6 @@ namespace VitalChoice.Core.DependencyInjection
 
         public IContainer BuildContainer(Assembly projectAssembly, ContainerBuilder builder)
         {
-#if NET451
-            //replace default sync provider
-            builder.RegisterType<ServiceBusCacheSyncProvider>().As<ICacheSyncProvider>();
-#endif
             builder.RegisterType<VitalChoiceContext>()
                 .As<IDataContextAsync>()
                 .AsSelf()
