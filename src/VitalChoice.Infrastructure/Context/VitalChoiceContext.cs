@@ -527,21 +527,6 @@ namespace VitalChoice.Infrastructure.Context
 
             #region Settings
 
-            builder.Entity<Country>(entity =>
-            {
-                entity.HasKey(p => p.Id);
-                entity.ToTable("Countries");
-                entity.Ignore(p => p.States);
-            });
-
-
-            builder.Entity<State>(entity =>
-            {
-                entity.HasKey(p => p.Id);
-                entity.ToTable("States");
-            });
-
-
             builder.Entity<AppSettingItem>(entity =>
             {
                 entity.HasKey(p => p.Id);

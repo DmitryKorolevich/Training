@@ -90,6 +90,10 @@ namespace VitalChoice.Caching.Services
                                 ConditionalIndexes = nonUniqueList
                             });
                         }
+                        else
+                        {
+                            throw new Exception($"{entityType.ClrType.FullName} was already exist in different context");
+                        }
                     }
                 }
                 finally

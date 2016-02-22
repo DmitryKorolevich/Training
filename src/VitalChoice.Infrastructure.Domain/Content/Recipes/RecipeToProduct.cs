@@ -1,4 +1,5 @@
-﻿using VitalChoice.Ecommerce.Domain;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 
 namespace VitalChoice.Infrastructure.Domain.Content.Recipes
@@ -9,6 +10,7 @@ namespace VitalChoice.Infrastructure.Domain.Content.Recipes
 
         public int IdProduct { get; set; }
 
+        [NotMapped]
         public ShortProductInfo ShortProductInfo { get; set; }
     }
 }

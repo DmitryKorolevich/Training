@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Content.Base;
@@ -29,8 +30,10 @@ namespace VitalChoice.Infrastructure.Domain.Content.Products
         
         public CustomerTypeCode? NavIdVisible { get; set; }
 
+        [NotMapped]
         public ProductCategory ProductCategory { get; set; }
 
+        [NotMapped]
         public ICollection<ProductNavCategoryLite> SubCategories { get; set; }
     }
 }
