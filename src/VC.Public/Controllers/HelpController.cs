@@ -71,15 +71,15 @@ namespace VC.Public.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Error(int id)
+        public Task<IActionResult> Error(int id)
         {
             if((HttpStatusCode)id==HttpStatusCode.NotFound)
             {
-                return Redirect("/content/"+ ContentConstants.NOT_FOUND_PAGE_URL);
+                return Task.FromResult<IActionResult>(Redirect("/content/"+ ContentConstants.NOT_FOUND_PAGE_URL));
             }
             else
             {
-                return Redirect("~/Shared/Error");
+                return Task.FromResult<IActionResult>(Redirect("~/Shared/Error"));
             }
         }
 

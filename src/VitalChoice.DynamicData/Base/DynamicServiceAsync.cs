@@ -469,8 +469,6 @@ namespace VitalChoice.DynamicData.Base
             entity.StatusCode = (int) RecordStatusCode.Deleted;
             return await repository.UpdateAsync(entity);
         }
-
-        public IDynamicMapper<TDynamic, TEntity> Mapper => DynamicMapper;
     }
 
     public partial class DynamicServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue>
