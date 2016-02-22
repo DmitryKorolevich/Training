@@ -8,6 +8,7 @@ using VitalChoice.Business.Queries.Contents;
 using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
+using VitalChoice.Data.Services;
 using VitalChoice.Ecommerce.Cache;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -37,6 +38,7 @@ namespace VitalChoice.Business.Services.Content
         private readonly IRepositoryAsync<Article> articleRepository;
         private readonly IRepositoryAsync<ContentPageToContentCategory> contentPageToContentCategory;
         private readonly IRepositoryAsync<ContentPage> contentPageRepository;
+        private readonly IObjectLogItemExternalService objectLogItemExternalService;
         private readonly ITtlGlobalCache templatesCache;
         private readonly ILogger logger;
 
@@ -47,7 +49,12 @@ namespace VitalChoice.Business.Services.Content
             IRepositoryAsync<RecipeToContentCategory> recipeToContentCategory, IRepositoryAsync<Recipe> recipeRepository,
             IRepositoryAsync<FAQToContentCategory> faqToContentCategory, IRepositoryAsync<FAQ> faqRepository,
             IRepositoryAsync<ArticleToContentCategory> articleToContentCategory,
-            IRepositoryAsync<Article> articleRepository, ILoggerProviderExtended logger, IRepositoryAsync<ContentPageToContentCategory> contentPageToContentCategory, IRepositoryAsync<ContentPage> contentPageRepository, ITtlGlobalCache templatesCache)
+            IRepositoryAsync<Article> articleRepository,
+            IObjectLogItemExternalService objectLogItemExternalService,
+            ILoggerProviderExtended logger, 
+            IRepositoryAsync<ContentPageToContentCategory> contentPageToContentCategory, 
+            IRepositoryAsync<ContentPage> contentPageRepository, 
+            ITtlGlobalCache templatesCache)
         {
             this.contentCategoryRepository = contentCategoryRepository;
             this.contentItemRepository = contentItemRepository;
@@ -61,6 +68,7 @@ namespace VitalChoice.Business.Services.Content
             this.articleRepository = articleRepository;
             this.contentPageToContentCategory = contentPageToContentCategory;
             this.contentPageRepository = contentPageRepository;
+            this.objectLogItemExternalService = objectLogItemExternalService;
             this.templatesCache = templatesCache;
             this.logger = logger.CreateLoggerDefault();
         }
@@ -223,6 +231,8 @@ namespace VitalChoice.Business.Services.Content
                 {
                     await contentCategoryRepository.UpdateAsync(dbItem);
                 }
+                
+                await objectLogItemExternalService.LogItems(new object[] { dbItem }, true);
             }
 
             return dbItem;

@@ -10,6 +10,10 @@
         Customer = 6,
         Affiliate = 7,
         Article = 8,
-        ArticleCategory = 9,
+        FAQ = 9,
+        Recipe = 10,
+        ContentPage = 11,
+        ContentCategory = 12,
+        ProductCategoryContent = 14,
     }
 }

@@ -18,9 +18,18 @@ using VitalChoice.Infrastructure.Domain.Transfer.CatalogRequests;
 using Microsoft.Net.Http.Headers;
 using System;
 using Newtonsoft.Json;
+using VC.Admin.Models.ContentManagement;
 using VC.Admin.Models.Orders;
+using VC.Admin.Models.Products;
 using VitalChoice.Business.CsvExportMaps;
 using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.Content.Articles;
+using VitalChoice.Infrastructure.Domain.Content.Base;
+using VitalChoice.Infrastructure.Domain.Content.ContentPages;
+using VitalChoice.Infrastructure.Domain.Content.Faq;
+using VitalChoice.Infrastructure.Domain.Content.Products;
+using VitalChoice.Infrastructure.Domain.Content.Recipes;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VC.Admin.Controllers
@@ -172,44 +181,67 @@ namespace VC.Admin.Controllers
 
         #region ObjectHistoryLogs
 
-        //[HttpPost]
-        //public async Task<Result<ObjectHistoryReportModel>> GetHistoryReportForContentItem([FromBody]ObjectHistoryLogItemsFilter filter)
-        //{
-        //    var toReturn = await objectHistoryLogService.GetObjectHistoryReport(filter);
+        [HttpPost]
+        public async Task<Result<ObjectHistoryReportModel>> GetHistoryReport([FromBody]ObjectHistoryLogItemsFilter filter)
+        {
+            var toReturn = await objectHistoryLogService.GetObjectHistoryReport(filter);
 
-        //    if (toReturn.Main != null && !string.IsNullOrEmpty(toReturn.Main.Data))
-        //    {
-        //        var dynamic = (OrderDynamic)JsonConvert.DeserializeObject(toReturn.Main.Data, typeof(OrderDynamic));
-        //        var model = _mapper.ToModel<OrderManageModel>(dynamic);
-        //        toReturn.Main.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
-        //        {
-        //            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-        //            NullValueHandling = NullValueHandling.Include,
-        //        });
-        //    }
-        //    if (toReturn.Before != null && !string.IsNullOrEmpty(toReturn.Before.Data))
-        //    {
-        //        var dynamic = (OrderDynamic)JsonConvert.DeserializeObject(toReturn.Before.Data, typeof(OrderDynamic));
-        //        var model = _mapper.ToModel<OrderManageModel>(dynamic);
-        //        toReturn.Before.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
-        //        {
-        //            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-        //            NullValueHandling = NullValueHandling.Include,
-        //        });
-        //    }
+            if (toReturn != null)
+            {
+                var settings = GetObjectHistoryLogTypesForObjectType(filter.IdObjectType);
+                if (toReturn.Main != null && !string.IsNullOrEmpty(toReturn.Main.Data))
+                {
+                    var contentItem = Convert.ChangeType(JsonConvert.DeserializeObject(toReturn.Main.Data, settings.Key), settings.Key);
+                    var model = Activator.CreateInstance(settings.Value, contentItem);
+                    toReturn.Main.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
+                    {
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                        NullValueHandling = NullValueHandling.Include,
+                    });
+                }
+                if (toReturn.Before != null && !string.IsNullOrEmpty(toReturn.Before.Data))
+                {
+                    var contentItem = Convert.ChangeType(JsonConvert.DeserializeObject(toReturn.Before.Data, settings.Key), settings.Key);
+                    var model = Activator.CreateInstance(settings.Value, contentItem);
+                    toReturn.Before.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
+                    {
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                        NullValueHandling = NullValueHandling.Include,
+                    });
+                }
+            }
 
-        //    return toReturn;
-        //}
+            return toReturn;
+        }
 
-        //private KeyValuePair<Type, Type> GetObjectHistoryLogTypesForObjectType(ObjectType idObjectType)
-        //{
-        //    //KeyValuePair<Type, Type> toReturn;
-        //    //switch (idObjectType)
-        //    //{
-        //    //    case ObjectType
-        //    //}
-        //    //return toReturn;
-        //}
+        private KeyValuePair<Type, Type> GetObjectHistoryLogTypesForObjectType(ObjectType idObjectType)
+        {
+            KeyValuePair<Type, Type> toReturn;
+            switch (idObjectType)
+            {
+                case ObjectType.Article:
+                    toReturn = new KeyValuePair<Type, Type>(typeof (Article), typeof (ArticleManageModel));
+                    break;
+                case ObjectType.FAQ:
+                    toReturn = new KeyValuePair<Type, Type>(typeof(FAQ), typeof(FAQManageModel));
+                    break;
+                case ObjectType.Recipe:
+                    toReturn = new KeyValuePair<Type, Type>(typeof(Recipe), typeof(RecipeManageModel));
+                    break;
+                case ObjectType.ContentPage:
+                    toReturn = new KeyValuePair<Type, Type>(typeof(ContentPage), typeof(ContentPageManageModel));
+                    break;
+                case ObjectType.ContentCategory:
+                    toReturn = new KeyValuePair<Type, Type>(typeof(ContentCategory), typeof(CategoryManageModel));
+                    break;
+                case ObjectType.ProductCategoryContent:
+                    toReturn = new KeyValuePair<Type, Type>(typeof(ProductCategoryContent), typeof(ProductCategoryManageModel));
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+            return toReturn;
+        }
 
         [HttpPost]
         public async Task<Result<PagedList<ObjectHistoryLogListItemModel>>> GetObjectHistoryLogItems([FromBody]ObjectHistoryLogItemsFilter filter)

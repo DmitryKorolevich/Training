@@ -1,10 +1,24 @@
 ﻿'use strict';
 
 angular.module('app.modules.product.controllers.productCategoryManageController', [])
-.controller('productCategoryManageController', ['$scope', '$rootScope', '$state', '$stateParams', 'productService', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
-    function ($scope, $rootScope, $state, $stateParams, productService, contentService, toaster, confirmUtil, promiseTracker) {
+.controller('productCategoryManageController', ['$scope', '$rootScope', '$state', '$stateParams', 'productService', 'contentService', 'settingService', 'toaster', 'confirmUtil', 'promiseTracker',
+    function ($scope, $rootScope, $state, $stateParams, productService, contentService, settingService, toaster, confirmUtil, promiseTracker)
+    {
         $scope.refreshTracker = promiseTracker("get");
         $scope.editTracker = promiseTracker("edit");
+
+        function refreshHistory()
+        {
+            if ($scope.productCategory && $scope.productCategory.Id)
+            {
+                var data = {};
+                data.service = settingService;
+                data.tracker = $scope.refreshTracker;
+                data.idObject = $scope.productCategory.Id;
+                data.idObjectType = 14//product category
+                $scope.$broadcast('objectHistorySection#in#refresh', data);
+            }
+        }
 
         function successSaveHandler(result) {
             if (result.Success) {
@@ -13,6 +27,7 @@ angular.module('app.modules.product.controllers.productCategoryManageController'
                 $scope.productCategory.Id = result.Data.Id;
                 $scope.productCategory.MasterContentItemId = result.Data.MasterContentItemId;
                 $scope.previewUrl = $scope.baseUrl.format($scope.productCategory.Url);
+                refreshHistory();
             } else {
                 var messages = "";
                 if (result.Messages) {
@@ -79,6 +94,7 @@ angular.module('app.modules.product.controllers.productCategoryManageController'
                         };
                         setUIstatus($scope.productCategory);
                         $scope.loaded = true;
+                        refreshHistory();
                     } else
                     {
                         errorHandler(result);

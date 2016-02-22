@@ -36,6 +36,7 @@
     "lib/json-formatter/json-formatter.js",
     "lib/jsondiffpatch/jsondiffpatch.js",
     "lib/jsondiffpatch/jsondiffpatch-formatters.js",
+    "lib/jsondiffpatch/diff_match_patch_uncompressed.js",
     "app/templates.js",
     "app/app.common.js",
     "app/app.js",

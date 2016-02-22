@@ -1,10 +1,24 @@
 ﻿'use strict';
 
 angular.module('app.modules.content.controllers.recipeCategoryManageController', [])
-.controller('recipeCategoryManageController', ['$scope', '$rootScope', '$state', '$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
-    function ($scope, $rootScope, $state, $stateParams, contentService, toaster, confirmUtil, promiseTracker) {
+.controller('recipeCategoryManageController', ['$scope', '$rootScope', '$state', '$stateParams', 'contentService', 'settingService', 'toaster', 'confirmUtil', 'promiseTracker',
+    function ($scope, $rootScope, $state, $stateParams, contentService, settingService, toaster, confirmUtil, promiseTracker)
+    {
         $scope.refreshTracker = promiseTracker("get");
         $scope.editTracker = promiseTracker("edit");
+
+        function refreshHistory()
+        {
+            if ($scope.recipeCategory && $scope.recipeCategory.Id)
+            {
+                var data = {};
+                data.service = settingService;
+                data.tracker = $scope.refreshTracker;
+                data.idObject = $scope.recipeCategory.Id;
+                data.idObjectType = 12//content category
+                $scope.$broadcast('objectHistorySection#in#refresh', data);
+            }
+        }
 
         function successSaveHandler(result) {
             if (result.Success) {
@@ -13,6 +27,7 @@ angular.module('app.modules.content.controllers.recipeCategoryManageController',
                 $scope.recipeCategory.Id = result.Data.Id;
                 $scope.recipeCategory.MasterContentItemId = result.Data.MasterContentItemId;
                 $scope.previewUrl = $scope.baseUrl.format($scope.recipeCategory.Url);
+                refreshHistory();
             } else {
                 var messages = "";
                 if (result.Messages) {
@@ -72,6 +87,7 @@ angular.module('app.modules.content.controllers.recipeCategoryManageController',
                             $scope.recipeCategory.ParentId = $stateParams.categoryid;
                         }
                         $scope.loaded = true;
+                        refreshHistory();
                     } else
                     {
                         errorHandler(result);

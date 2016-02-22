@@ -14,6 +14,7 @@ using System.Threading;
 using VitalChoice.Business.Queries.Contents;
 using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.Data.Context;
+using VitalChoice.Data.Services;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Cache;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -44,6 +45,7 @@ namespace VitalChoice.Business.Services.Content
 	    private readonly IDataContextAsync _context;
 	    private readonly ILogger logger;
         private readonly ITransactionAccessor<VitalChoiceContext> _transactionAccessor;
+        private readonly IObjectLogItemExternalService _objectLogItemExternalService;
 
         public RecipeService(IRepositoryAsync<Recipe> recipeRepository, IRepositoryAsync<RecipeCrossSell> crossSellRepository, IRepositoryAsync<RelatedRecipe> relatedRecipeRepository,
 			IRepositoryAsync<ContentCategory> contentCategoryRepository,
@@ -53,7 +55,11 @@ namespace VitalChoice.Business.Services.Content
             IRepositoryAsync<RecipeToProduct> recipeToProductRepository,
 			IRepositoryAsync<RecipeDefaultSetting> recipeSettingRepository,
 			IEcommerceRepositoryAsync<Product> productRepository,
-            ILoggerProviderExtended loggerProvider, ITtlGlobalCache templatesCache, IDataContextAsync context, ITransactionAccessor<VitalChoiceContext> transactionAccessor)
+            ILoggerProviderExtended loggerProvider, 
+            ITtlGlobalCache templatesCache, 
+            IDataContextAsync context,
+            ITransactionAccessor<VitalChoiceContext> transactionAccessor,
+            IObjectLogItemExternalService objectLogItemExternalService)
         {
             this.recipeRepository = recipeRepository;
 	        _crossSellRepository = crossSellRepository;
@@ -68,6 +74,7 @@ namespace VitalChoice.Business.Services.Content
             this.templatesCache = templatesCache;
 			_context = context;
             _transactionAccessor = transactionAccessor;
+            _objectLogItemExternalService = objectLogItemExternalService;
             logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -309,7 +316,9 @@ namespace VitalChoice.Business.Services.Content
 					    dbItem.RecipesToProducts = recipesToProducts;
 
 					    transaction.Commit();
-				    }
+
+                        await _objectLogItemExternalService.LogItems(new object[] { dbItem }, true);
+                    }
 				    catch (Exception)
 				    {
 					    transaction.Rollback();

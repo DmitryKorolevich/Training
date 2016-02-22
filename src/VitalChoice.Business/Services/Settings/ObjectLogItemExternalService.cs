@@ -20,17 +20,6 @@ namespace VitalChoice.Business.Services.Settings
 {
     public class ObjectLogItemExternalService : IObjectLogItemExternalService
     {
-        //private class PublicPropertiesResolver : DefaultContractResolver
-        //{
-        //    protected override List<MemberInfo> GetSerializableMembers(Type objectType)
-        //    {
-        //        return objectType.GetProperties(BindingFlags.Instance | BindingFlags.Public)
-        //            .Where(p => p.GetIndexParameters().Length == 0)
-        //            .Cast<MemberInfo>()
-        //            .ToList();
-        //    }
-        //}
-
         private readonly IEcommerceRepositoryAsync<ObjectHistoryLogItem> _objectHistoryLogItemRepository;
         private readonly ILogger _logger;
 

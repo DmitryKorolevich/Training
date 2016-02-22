@@ -1,10 +1,24 @@
 ﻿'use strict';
 
 angular.module('app.modules.content.controllers.contentPageManageController', [])
-.controller('contentPageManageController', ['$scope', '$rootScope', '$state', '$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
-    function ($scope, $rootScope, $state, $stateParams, contentService, toaster, confirmUtil, promiseTracker) {
+.controller('contentPageManageController', ['$scope', '$rootScope', '$state', '$stateParams', 'contentService', 'settingService', 'toaster', 'confirmUtil', 'promiseTracker',
+    function ($scope, $rootScope, $state, $stateParams, contentService, settingService, toaster, confirmUtil, promiseTracker)
+    {
         $scope.refreshTracker = promiseTracker("get");
         $scope.editTracker = promiseTracker("edit");
+
+        function refreshHistory()
+        {
+            if ($scope.contentPage && $scope.contentPage.Id)
+            {
+                var data = {};
+                data.service = settingService;
+                data.tracker = $scope.refreshTracker;
+                data.idObject = $scope.contentPage.Id;
+                data.idObjectType = 11//content page
+                $scope.$broadcast('objectHistorySection#in#refresh', data);
+            }
+        }
 
         function successSaveHandler(result) {
             if (result.Success) {
@@ -13,6 +27,7 @@ angular.module('app.modules.content.controllers.contentPageManageController', []
                 $scope.contentPage.Id = result.Data.Id;
                 $scope.contentPage.MasterContentItemId = result.Data.MasterContentItemId;
                 $scope.previewUrl = $scope.baseUrl.format($scope.contentPage.Url);
+                refreshHistory();
             } else {
                 var messages = "";
                 if (result.Messages) {
@@ -112,6 +127,7 @@ angular.module('app.modules.content.controllers.contentPageManageController', []
                             setUIstatus($scope.contentPage);
                             setSelected($scope.rootCategory, $scope.contentPage.CategoryIds);
                             $scope.loaded = true;
+                            refreshHistory();
                         } else {
                             errorHandler(result);
                         }
