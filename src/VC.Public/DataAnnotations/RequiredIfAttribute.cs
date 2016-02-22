@@ -24,7 +24,7 @@ namespace VC.Public.DataAnnotations
 
 		protected override ValidationResult IsValid(object value, ValidationContext context)
 		{
-#if NET451
+#if !DOTNET5_4
 			var dependentValue = context.ObjectInstance.GetType().GetProperty(PropertyName).GetValue(context.ObjectInstance, null);
 
 			if (dependentValue.Equals(DesiredValue))

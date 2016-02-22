@@ -63,8 +63,7 @@ namespace VC.Admin.Models.Setting
         public List<AppSettingItem> Convert()
         {
             List<AppSettingItem> toReturn = new List<AppSettingItem>();
-#if NET451
-            foreach (var property in typeof(GlobalSettingsManageModel).GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public))
+            foreach (var property in typeof(GlobalSettingsManageModel).GetTypeInfo().DeclaredProperties)
             {
                 string value = null;
                 value = property.GetValue(this)?.ToString();
@@ -74,7 +73,6 @@ namespace VC.Admin.Models.Setting
                     Value=value,
                 });
             }
-#endif
             return toReturn;
         }
     }
