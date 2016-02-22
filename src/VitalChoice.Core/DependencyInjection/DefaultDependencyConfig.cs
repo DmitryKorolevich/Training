@@ -494,7 +494,8 @@ namespace VitalChoice.Core.DependencyInjection
 			builder.RegisterType<EmailTemplateService>().As<IEmailTemplateService>().InstancePerLifetimeScope();
             builder.RegisterType<CheckoutService>().As<ICheckoutService>().InstancePerLifetimeScope();
             builder.RegisterType<TrackingService>().As<ITrackingService>().InstancePerLifetimeScope();
-            builder.RegisterType<OrderSchedulerService>().As<IOrderSchedulerService>();
+            builder.RegisterType<OrderSchedulerService>().As<IOrderSchedulerService>().InstancePerLifetimeScope();
+            builder.RegisterType<TokenService>().As<ITokenService>().InstancePerLifetimeScope();
             builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
             builder.RegisterModelConverters(projectAssembly);
 
