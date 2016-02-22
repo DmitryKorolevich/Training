@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Autofac;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Metadata.Internal;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Caching.Extensions;
@@ -20,77 +22,82 @@ namespace VitalChoice.Caching.Services
         protected readonly IOptions<AppOptionsBase> Options;
         protected readonly ILogger Logger;
         private readonly IContextTypeContainer _contextTypeContainer;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly ILifetimeScope _serviceProvider;
         private IReadOnlyDictionary<Type, EntityInfo> _entityInfos;
         private IEntityCollectorInfo _gcCollector;
 
-        protected EntityInfoStorage(IOptions<AppOptionsBase> options, ILogger logger, IContextTypeContainer contextTypeContainer,
-            IServiceProvider serviceProvider)
+        public EntityInfoStorage(IOptions<AppOptionsBase> options, ILogger logger, IContextTypeContainer contextTypeContainer,
+            ILifetimeScope scope)
         {
             Options = options;
             Logger = logger;
             _contextTypeContainer = contextTypeContainer;
-            _serviceProvider = serviceProvider;
+            _serviceProvider = scope;
             Initialize();
         }
 
         private void Initialize()
         {
             var entityInfos = new Dictionary<Type, EntityInfo>();
-            var contexts = _contextTypeContainer.ContextTypes.Select(t => _serviceProvider.GetService(t)).Cast<DbContext>().ToArray();
-            try
+            using (var scope = _serviceProvider.BeginLifetimeScope())
             {
-                foreach (var entityType in contexts.SelectMany(m => m.Model.GetEntityTypes()))
+                var contexts = _contextTypeContainer.ContextTypes.Select(t => scope.Resolve(t)).Cast<DbContext>().ToArray();
+                try
                 {
-                    if (entityType.ClrType == null) continue;
-
-                    var key = entityType.FindPrimaryKey();
-                    if (key == null) continue;
-
-                    var keyInfos =
-                        key.Properties.Select(property => new EntityKeyInfo(property.Name, property.GetGetter(), property.ClrType));
-
-                    var indexes = entityType.GetIndexes().Where(index => index.IsUnique);
-
-                    var uniqueIndex =
-                        indexes.Select(
-                            index =>
-                                new EntityUniqueIndexInfo(
-                                    index.Properties.Select(
-                                        property =>
-                                            new EntityIndexInfo(property.Name, property.GetGetter(), property.ClrType))))
-                            .FirstOrDefault();
-
-                    List<EntityConditionalIndexInfo> nonUniqueList = new List<EntityConditionalIndexInfo>();
-
-                    // ReSharper disable once LoopCanBeConvertedToQuery
-                    foreach (var index in entityType.GetIndexes())
+                    foreach (var entityType in contexts.SelectMany(m => m.Model.GetEntityTypes()))
                     {
-                        var conditionAnnotation = index.FindAnnotation(IndexBuilderExtension.UniqueIndexAnnotationName);
-                        if (conditionAnnotation != null)
+                        if (entityType.ClrType == null) continue;
+
+                        var key = entityType.FindPrimaryKey();
+                        if (key == null) continue;
+
+                        var keyInfos =
+                            key.Properties.Select(property => new EntityKeyInfo(property.Name, property.GetGetter(), property.ClrType));
+
+                        var indexes = entityType.GetIndexes().Where(index => index.IsUnique);
+
+                        var uniqueIndex =
+                            indexes.Select(
+                                index =>
+                                    new EntityUniqueIndexInfo(
+                                        index.Properties.Select(
+                                            property =>
+                                                new EntityIndexInfo(property.Name, property.GetGetter(), property.ClrType))))
+                                .FirstOrDefault();
+
+                        List<EntityConditionalIndexInfo> nonUniqueList = new List<EntityConditionalIndexInfo>();
+
+                        // ReSharper disable once LoopCanBeConvertedToQuery
+                        foreach (var index in entityType.GetIndexes())
                         {
-                            nonUniqueList.Add(
-                                new EntityConditionalIndexInfo(
-                                    index.Properties.Select(
-                                        property =>
-                                            new EntityIndexInfo(property.Name, property.GetGetter(), property.ClrType)),
-                                    entityType.ClrType, conditionAnnotation.Value as LambdaExpression));
+                            var conditionAnnotation = index.FindAnnotation(IndexBuilderExtension.UniqueIndexAnnotationName);
+                            if (conditionAnnotation != null)
+                            {
+                                nonUniqueList.Add(
+                                    new EntityConditionalIndexInfo(
+                                        index.Properties.Select(
+                                            property =>
+                                                new EntityIndexInfo(property.Name, property.GetGetter(), property.ClrType)),
+                                        entityType.ClrType, conditionAnnotation.Value as LambdaExpression));
+                            }
+                        }
+                        if (!entityInfos.ContainsKey(entityType.ClrType))
+                        {
+                            entityInfos.Add(entityType.ClrType, new EntityInfo
+                            {
+                                PrimaryKey = new EntityPrimaryKeyInfo(keyInfos),
+                                UniqueIndex = uniqueIndex,
+                                ConditionalIndexes = nonUniqueList
+                            });
                         }
                     }
-                    if (!entityInfos.ContainsKey(entityType.ClrType))
-                        entityInfos.Add(entityType.ClrType, new EntityInfo
-                        {
-                            PrimaryKey = new EntityPrimaryKeyInfo(keyInfos),
-                            UniqueIndex = uniqueIndex,
-                            ConditionalIndexes = nonUniqueList
-                        });
                 }
-            }
-            finally
-            {
-                foreach (var context in contexts)
+                finally
                 {
-                    context.Dispose();
+                    foreach (var context in contexts)
+                    {
+                        context.Dispose();
+                    }
                 }
             }
             _entityInfos = entityInfos;

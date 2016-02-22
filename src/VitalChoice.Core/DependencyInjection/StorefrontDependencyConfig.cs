@@ -24,7 +24,7 @@ namespace VitalChoice.Core.DependencyInjection
 
         protected override void FinishCustomRegistrations(ContainerBuilder builder)
 	    {
-            builder.RegisterType<PaginationLinkBuilder>().As<IBuildPaginationLinks>();
+            builder.RegisterType<PaginationLinkBuilder>().As<IBuildPaginationLinks>().SingleInstance();
             builder.RegisterType<RedirectViewService>().As<IRedirectViewService>().InstancePerLifetimeScope();
         }
 
