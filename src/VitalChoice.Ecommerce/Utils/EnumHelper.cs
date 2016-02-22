@@ -13,7 +13,7 @@ namespace VitalChoice.Ecommerce.Utils
 
             return values.Cast<object>().ToDictionary(value => (T) value, value =>
 		    {
-#if DNX451
+#if NET451
 			    return ((Enum) value).GetAttributeOfType<DescriptionAttribute>().Description;
 #else
 				return Enum.GetName(enumType, value);
@@ -30,7 +30,7 @@ namespace VitalChoice.Ecommerce.Utils
 
         public static T GetAttributeOfType<T>(this Enum enumVal) where T : System.Attribute
 		{
-#if DNX451
+#if NET451
 			var type = enumVal.GetType();
 			var memInfo = type.GetMember(enumVal.ToString());
 			var attributes = memInfo[0].GetCustomAttributes(typeof(T), false);

@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
-#if NET451 || DNX451
+#if NET451
 using Microsoft.ServiceBus.Messaging;
 #endif
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -24,7 +24,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
     public abstract class EncryptedServiceBusHost : IEncryptedServiceBusHost
     {
         
-#if NET451 || DNX451
+#if NET451
         private readonly QueueClient _plainClient;
         private readonly QueueClient _encryptedClient;
         private readonly ConcurrentQueue<BrokeredMessage> _sendQue;
@@ -52,7 +52,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             _readyToDisposeEncrypted = new ManualResetEvent(true);
             Logger = logger;
             _commands = new Dictionary<CommandItem, WeakReference<ServiceBusCommandBase>>();
-#if NET451 || DNX451
+#if NET451
             try
             {
                 _sendQue = new ConcurrentQueue<BrokeredMessage>();
@@ -77,7 +77,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         protected void SendPlainCommand(ServiceBusCommandBase command)
         {
-#if NET451 || DNX451
+#if NET451
             if (SendPlain(command))
 #endif
             Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
@@ -87,7 +87,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
         {
             command.OnComplete = CommandComplete;
             TrackCommand(command);
-#if NET451 || DNX451
+#if NET451
             if (SendPlain(command))
 #endif
             {
@@ -109,7 +109,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         public void SendCommand(ServiceBusCommandBase command)
         {
-#if NET451 || DNX451
+#if NET451
             if (SendEncrypted(command))
 #endif
             Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
@@ -119,7 +119,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
         {
             command.OnComplete = CommandComplete;
             TrackCommand(command);
-#if NET451 || DNX451
+#if NET451
             if (SendEncrypted(command))
 #endif
             {
@@ -143,7 +143,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
         {
             TrackCommand(command);
             command.RequestAcqureAction = commandResultAction;
-#if NET451 || DNX451
+#if NET451
             if (SendEncrypted(command))
 #endif
             Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
@@ -154,7 +154,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             return EncryptionHost.SessionExist(sessionId);
         }
 
-#if NET451 || DNX451
+#if NET451
         protected virtual BrokeredMessage CreatePlainMessage(ServiceBusCommandBase command)
         {
             return new BrokeredMessage(EncryptionHost.RsaSignWithConvert(command))
@@ -199,7 +199,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         private void ReceivePlainMessages()
         {
-#if NET451 || DNX451
+#if NET451
             while (!_terminated)
             {
                 var message = _plainClient.Receive();
@@ -211,7 +211,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         private void ReceiveEncryptedMessages()
         {
-#if NET451 || DNX451
+#if NET451
             while (!_terminated)
             {
                 var message = _encryptedClient.Receive();
@@ -223,7 +223,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         private void SendMessages()
         {
-#if NET451 || DNX451
+#if NET451
             while (!_terminated)
             {
                 BrokeredMessage message;
@@ -244,7 +244,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 #endif
         }
 
-#if NET451 || DNX451
+#if NET451
         private void ProcessEncryptedMessage(BrokeredMessage message)
         {
             if (message.CorrelationId == null)
@@ -405,7 +405,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
         public virtual void Dispose()
         {
             _terminated = true;
-#if NET451 || DNX451
+#if NET451
             _plainClient?.Close();
             _encryptedClient?.Close();
 #endif

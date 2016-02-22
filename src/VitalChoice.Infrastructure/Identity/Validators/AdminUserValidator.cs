@@ -6,7 +6,7 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 
-#if DNX451
+#if NET451
 
 #endif
 

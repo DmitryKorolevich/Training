@@ -17,7 +17,7 @@ namespace Authorize.Net.Api.Contracts.V1
 {
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
     [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -35,7 +35,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -66,7 +66,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -118,7 +118,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -161,7 +161,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -189,7 +189,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -205,7 +205,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -230,7 +230,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -247,7 +247,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -273,7 +273,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -298,7 +298,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -344,7 +344,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -363,7 +363,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -391,7 +391,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -425,7 +425,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -462,7 +462,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -493,7 +493,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -527,7 +527,7 @@ namespace Authorize.Net.Api.Contracts.V1
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (customerPaymentProfileType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (customerPaymentProfileExType))]
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -558,7 +558,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -575,7 +575,7 @@ namespace Authorize.Net.Api.Contracts.V1
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (customerAddressExType))]
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -597,7 +597,7 @@ namespace Authorize.Net.Api.Contracts.V1
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (customerAddressType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (customerAddressExType))]
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -643,7 +643,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -658,7 +658,7 @@ namespace Authorize.Net.Api.Contracts.V1
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (customerPaymentProfileExType))]
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -678,7 +678,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -703,7 +703,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -752,7 +752,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -776,7 +776,7 @@ namespace Authorize.Net.Api.Contracts.V1
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (creditCardType))]
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -804,7 +804,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -829,7 +829,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -854,7 +854,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -885,7 +885,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -901,7 +901,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -920,7 +920,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -946,7 +946,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -981,7 +981,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -994,7 +994,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1023,7 +1023,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1049,7 +1049,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1075,7 +1075,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1116,7 +1116,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1145,7 +1145,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd", IncludeInSchema = false)]
@@ -1161,7 +1161,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1193,7 +1193,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1210,7 +1210,7 @@ namespace Authorize.Net.Api.Contracts.V1
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (customerProfileMaskedType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (subscriptionCustomerProfileType))]
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1229,7 +1229,7 @@ namespace Authorize.Net.Api.Contracts.V1
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (subscriptionCustomerProfileType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (customerProfileType))]
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1261,7 +1261,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1279,7 +1279,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1298,7 +1298,7 @@ namespace Authorize.Net.Api.Contracts.V1
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (orderExType))]
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1327,7 +1327,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1342,7 +1342,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1377,7 +1377,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1406,7 +1406,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -1419,7 +1419,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1445,7 +1445,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1483,7 +1483,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1557,7 +1557,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -1576,7 +1576,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1605,7 +1605,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1634,7 +1634,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -1671,7 +1671,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1697,7 +1697,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1738,7 +1738,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1779,7 +1779,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -1795,7 +1795,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1866,7 +1866,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1895,7 +1895,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1930,7 +1930,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1959,7 +1959,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -1975,7 +1975,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2005,7 +2005,7 @@ namespace Authorize.Net.Api.Contracts.V1
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (emailSettingsType))]
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2031,7 +2031,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2060,7 +2060,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2075,7 +2075,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2109,7 +2109,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2138,7 +2138,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2167,7 +2167,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2205,7 +2205,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2312,7 +2312,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2344,7 +2344,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2388,7 +2388,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2420,7 +2420,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2461,7 +2461,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2490,7 +2490,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2528,7 +2528,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2653,7 +2653,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2706,7 +2706,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2735,7 +2735,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2887,7 +2887,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2971,7 +2971,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3003,7 +3003,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3032,7 +3032,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3061,7 +3061,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3111,7 +3111,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3140,7 +3140,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3181,7 +3181,7 @@ namespace Authorize.Net.Api.Contracts.V1
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (profileTransAuthOnlyType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (profileTransAuthCaptureType))]
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3219,7 +3219,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3255,7 +3255,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3282,7 +3282,7 @@ namespace Authorize.Net.Api.Contracts.V1
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (profileTransAuthOnlyType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (profileTransAuthCaptureType))]
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3324,7 +3324,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3339,7 +3339,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3351,7 +3351,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3363,7 +3363,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3389,7 +3389,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3436,7 +3436,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3492,7 +3492,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3545,7 +3545,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3583,7 +3583,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3612,7 +3612,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3647,7 +3647,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd", IncludeInSchema = false)]
@@ -3672,7 +3672,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3701,7 +3701,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3726,7 +3726,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3759,7 +3759,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3786,7 +3786,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3799,7 +3799,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3812,7 +3812,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3825,7 +3825,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3841,7 +3841,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3857,7 +3857,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3876,7 +3876,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3889,7 +3889,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3905,7 +3905,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3918,7 +3918,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3934,7 +3934,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3953,7 +3953,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3975,7 +3975,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -3997,7 +3997,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4022,7 +4022,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4047,7 +4047,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4069,7 +4069,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4088,7 +4088,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4107,7 +4107,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4123,7 +4123,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4139,7 +4139,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4155,7 +4155,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4180,7 +4180,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4196,7 +4196,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4215,7 +4215,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4231,7 +4231,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4247,7 +4247,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4260,7 +4260,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4285,7 +4285,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4301,7 +4301,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4320,7 +4320,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4333,7 +4333,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4349,7 +4349,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4362,7 +4362,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4381,7 +4381,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4394,7 +4394,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4413,7 +4413,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4426,7 +4426,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4445,7 +4445,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4464,7 +4464,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4492,7 +4492,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4508,7 +4508,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4521,7 +4521,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4537,7 +4537,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4556,7 +4556,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -4575,7 +4575,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4588,7 +4588,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4604,7 +4604,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4620,7 +4620,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4636,7 +4636,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4655,7 +4655,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4671,7 +4671,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4687,7 +4687,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4718,7 +4718,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4734,7 +4734,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4750,7 +4750,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4766,7 +4766,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4785,7 +4785,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4801,7 +4801,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4814,7 +4814,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4830,7 +4830,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4846,7 +4846,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4859,7 +4859,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4872,7 +4872,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4894,7 +4894,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4907,7 +4907,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4920,7 +4920,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4942,7 +4942,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4955,7 +4955,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4977,7 +4977,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -4999,7 +4999,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -5021,7 +5021,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -5075,7 +5075,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -5106,7 +5106,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -5134,7 +5134,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -5159,7 +5159,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -5184,7 +5184,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -5242,7 +5242,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -5261,7 +5261,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -5343,7 +5343,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -5380,7 +5380,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -5405,7 +5405,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -5418,7 +5418,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -5437,7 +5437,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -5453,7 +5453,7 @@ namespace Authorize.Net.Api.Contracts.V1
 
     /// <remarks/>
     
-#if DNX451 || NET451
+#if NET451
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
