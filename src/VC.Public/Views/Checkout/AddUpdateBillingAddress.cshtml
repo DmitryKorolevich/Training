@@ -28,7 +28,7 @@
 		@using (Html.BeginForm("AddUpdateBillingAddress", "Checkout", null, FormMethod.Post, new {@class = "form-regular medium-small", role = "form"}))
 		{
 			@Html.AntiForgeryToken()
-			@Html.ValidationSummary(true, "", new {@class = "form-control-summary-errors" })
+			@Html.ValidationSummary(true, "")
 			if (ViewBag.CreditCards != null && ViewBag.CreditCards.Count > 1)
 			 {
 				 <div class="form-group">

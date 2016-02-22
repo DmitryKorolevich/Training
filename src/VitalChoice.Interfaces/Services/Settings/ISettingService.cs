@@ -6,9 +6,11 @@ namespace VitalChoice.Interfaces.Services.Settings
 {
 	public interface ISettingService
     {
-        Task<ICollection<AppSettingItem>> GetAppSettingItemsAsync(ICollection<string> names);
+        Task<List<AppSettingItem>> GetAppSettingItemsAsync(ICollection<string> names);
 
-        Task<ICollection<AppSettingItem>> UpdateAppSettingItemsAsync(ICollection<AppSettingItem> items);
+        Task<AppSettingItem> GetAppSettingAsync(string name);
+
+        Task<List<AppSettingItem>> UpdateAppSettingItemsAsync(ICollection<AppSettingItem> items);
 
         Task<AppSettings> GetAppSettingsAsync();
     }

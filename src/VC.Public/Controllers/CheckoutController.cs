@@ -110,7 +110,9 @@ namespace VC.Public.Controllers
         private async Task<OrderDynamic> PopulateReviewModel(ReviewOrderModel reviewOrderModel, int idOrder)
         {
             var order = await OrderService.SelectAsync(idOrder, true);
-            await FillModel(reviewOrderModel, order);
+            order.Customer = await CustomerService.SelectAsync(order.Customer.Id, true);
+            var context = await OrderService.CalculateOrder(order, OrderStatus.Processed);
+            FillModel(reviewOrderModel, order, context);
 
             var countries = await _countryService.GetCountriesAsync();
 
@@ -335,9 +337,15 @@ namespace VC.Public.Controllers
                         transaction.Rollback();
                     }
                 }
-                catch (AppValidationException)
+                catch (AppValidationException e)
                 {
                     transaction.Rollback();
+                    var newMessages = e.Messages.Select(error => new MessageInfo
+                    {
+                        Field = string.Empty,
+                        Message = error.Message,
+                        MessageLevel = error.MessageLevel
+                    });
                     if (loginTask != null)
                     {
                         if (cart.Order.Customer != null && cart.Order.Customer.Id != 0)
@@ -345,7 +353,7 @@ namespace VC.Public.Controllers
                             await _storefrontUserService.RemoveAsync(cart.Order.Customer.Id);
                         }
                     }
-                    throw;
+                    throw new AppValidationException(newMessages);
                 }
                 catch (Exception)
                 {
@@ -374,24 +382,6 @@ namespace VC.Public.Controllers
         {
             Func<Task<ApplicationUser>> loginTask;
             CustomerDynamic newCustomer;
-            //if (existing != null && existing.Id != 0)
-            //{
-            //    if (((bool?) existing.SafeData.Guest ?? false) &&
-            //        existing.StatusCode == (int) CustomerStatus.PhoneOnly)
-            //    {
-            //        newCustomer = await ReplaceAccount(model, existing);
-            //        if (newCustomer == null)
-            //        {
-            //            throw new ApiException("Customer couldn't be created");
-            //        }
-            //        loginTask = model.GuestCheckout ? CreateLoginForNewGuest(newCustomer) : CreateLoginForActive(model, newCustomer);
-            //        return new CreateResult
-            //        {
-            //            Customer = newCustomer,
-            //            LoginTask = loginTask
-            //        };
-            //    }
-            //}
             if (model.GuestCheckout)
             {
                 existing = await CustomerService.GetByEmailAsync(model.Email);

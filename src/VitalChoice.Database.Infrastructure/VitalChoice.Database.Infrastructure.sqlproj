@@ -178,4 +178,10 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\Tokens.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\ContentCrossSellsDefaultData.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\ContentCrossSells.sql" />
+  </ItemGroup>
 </Project>

@@ -21,6 +21,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
+using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services.Checkout;
@@ -64,7 +65,8 @@ namespace VC.Public.Controllers
 		protected async Task FillCartModel(ViewCartModel cartModel)
 		{
 		    var cart = await GetCurrentCart();
-            await FillModel(cartModel, cart.Order);
+            var context = await OrderService.CalculateOrder(cart.Order, OrderStatus.Incomplete);
+            FillModel(cartModel, cart.Order, context);
             SetCartUid(cart.CartUid);
 		}
 
@@ -76,9 +78,8 @@ namespace VC.Public.Controllers
 			});
 		}
 
-		protected async Task FillModel(ViewCartModel cartModel, OrderDynamic order)
+		protected void FillModel(ViewCartModel cartModel, OrderDynamic order, OrderDataContext context)
 		{
-            var context = await OrderService.CalculateOrder(order, OrderStatus.Incomplete);
             var gcMessages = context.GcMessageInfos.ToDictionary(m => m.Field);
             if (!string.IsNullOrWhiteSpace(cartModel.PromoCode) && order.Discount == null)
             {
