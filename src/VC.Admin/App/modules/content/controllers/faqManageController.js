@@ -1,10 +1,24 @@
 ﻿'use strict';
 
 angular.module('app.modules.content.controllers.faqManageController', [])
-.controller('faqManageController', ['$scope', '$rootScope', '$state', '$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
-function ($scope, $rootScope, $state, $stateParams, contentService, toaster, confirmUtil, promiseTracker) {
+.controller('faqManageController', ['$scope', '$rootScope', '$state', '$stateParams', 'contentService', 'settingService', 'toaster', 'confirmUtil', 'promiseTracker',
+function ($scope, $rootScope, $state, $stateParams, contentService, settingService, toaster, confirmUtil, promiseTracker)
+{
     $scope.refreshTracker = promiseTracker("get");
     $scope.editTracker = promiseTracker("edit");
+
+    function refreshHistory()
+    {
+        if ($scope.faq && $scope.faq.Id)
+        {
+            var data = {};
+            data.service = settingService;
+            data.tracker = $scope.refreshTracker;
+            data.idObject = $scope.faq.Id;
+            data.idObjectType = 9//faq
+            $scope.$broadcast('objectHistorySection#in#refresh', data);
+        }
+    }
 
     function successSaveHandler(result) {
         if (result.Success) {
@@ -13,6 +27,7 @@ function ($scope, $rootScope, $state, $stateParams, contentService, toaster, con
             $scope.faq.Id = result.Data.Id;
             $scope.faq.MasterContentItemId = result.Data.MasterContentItemId;
             $scope.previewUrl = $scope.baseUrl.format($scope.faq.Url);
+            refreshHistory();
         } else {
             var messages = "";
             if (result.Messages) {
@@ -107,6 +122,7 @@ function ($scope, $rootScope, $state, $stateParams, contentService, toaster, con
                     };
                     setSelected($scope.rootCategory, $scope.faq.CategoryIds);
                     $scope.loaded = true;
+                    refreshHistory();
                 } else
                 {
                     errorHandler(result);

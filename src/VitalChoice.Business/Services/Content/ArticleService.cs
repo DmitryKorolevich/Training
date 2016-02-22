@@ -12,6 +12,7 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.Infrastructure.UnitOfWork;
 using System.Threading;
 using VitalChoice.ContentProcessing.Cache;
+using VitalChoice.Data.Services;
 using VitalChoice.Ecommerce.Cache;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
@@ -36,6 +37,7 @@ namespace VitalChoice.Business.Services.Content
         private readonly IRepositoryAsync<ArticleToProduct> _articleToProductRepository;
         private readonly IEcommerceRepositoryAsync<Product> _productRepository;
         private readonly ITtlGlobalCache _templatesCache;
+        private readonly IObjectLogItemExternalService _objectLogItemExternalService;
         private readonly ILogger _logger;
 
         public ArticleService(IEcommerceRepositoryAsync<ProductOptionType> optionTypeRepository,
@@ -46,7 +48,9 @@ namespace VitalChoice.Business.Services.Content
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             IRepositoryAsync<ArticleToProduct> articleToProductRepository,
             IEcommerceRepositoryAsync<Product> productRepository,
-            ILoggerProviderExtended logger, ITtlGlobalCache templatesCache)
+            IObjectLogItemExternalService objectLogItemExternalService,
+            ILoggerProviderExtended logger, 
+            ITtlGlobalCache templatesCache)
         {
             this._optionTypeRepository = optionTypeRepository;
 
@@ -59,6 +63,7 @@ namespace VitalChoice.Business.Services.Content
             this._articleToProductRepository = articleToProductRepository;
             this._productRepository = productRepository;
             this._templatesCache = templatesCache;
+            this._objectLogItemExternalService = objectLogItemExternalService;
             this._logger = logger.CreateLoggerDefault();
         }
 
@@ -240,6 +245,8 @@ namespace VitalChoice.Business.Services.Content
                 await _articleToProductRepository.DeleteAllAsync(dbProducts);
                 await _articleToProductRepository.InsertRangeAsync(articlesToProducts);
                 dbItem.ArticlesToProducts = articlesToProducts;
+
+                await _objectLogItemExternalService.LogItems(new object[] {dbItem}, true);
             }
 
             return dbItem;

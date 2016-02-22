@@ -20,6 +20,7 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Infrastructure.Domain.Entities.Products;
 using VitalChoice.Data.Repositories.Customs;
+using VitalChoice.Data.Services;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -31,6 +32,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
         private readonly SPEcommerceRepository sPEcommerceRepository;
+        private readonly IObjectLogItemExternalService objectLogItemExternalService;
         private readonly ITtlGlobalCache templatesCache;
         private readonly ILogger logger;
 
@@ -40,6 +42,7 @@ namespace VitalChoice.Business.Services.Products
             IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             SPEcommerceRepository sPEcommerceRepository,
+            IObjectLogItemExternalService objectLogItemExternalService,
             ILoggerProviderExtended loggerProvider,
             ITtlGlobalCache templatesCache)
         {
@@ -49,6 +52,7 @@ namespace VitalChoice.Business.Services.Products
             this.contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
             this.contentTypeRepository = contentTypeRepository;
             this.sPEcommerceRepository = sPEcommerceRepository;
+            this.objectLogItemExternalService = objectLogItemExternalService;
             this.templatesCache = templatesCache;
             logger = loggerProvider.CreateLoggerDefault();
         }
@@ -201,6 +205,8 @@ namespace VitalChoice.Business.Services.Products
                     await contentItemRepository.UpdateAsync(categoryContent.ContentItem);
                 }
             }
+
+            await objectLogItemExternalService.LogItems(new object[] { categoryContent }, true);
         }
 
         public async Task<ProductCategoryContent> UpdateCategoryAsync(ProductCategoryContent model)

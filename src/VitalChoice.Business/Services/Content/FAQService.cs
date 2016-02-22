@@ -7,6 +7,7 @@ using VitalChoice.Business.Queries.Content;
 using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
+using VitalChoice.Data.Services;
 using VitalChoice.Ecommerce.Cache;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -29,6 +30,7 @@ namespace VitalChoice.Business.Services.Content
         private readonly IRepositoryAsync<FAQToContentCategory> faqToContentCategoryRepository;
         private readonly IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
+        private readonly IObjectLogItemExternalService objectLogItemExternalService;
         private readonly ITtlGlobalCache templatesCache;
         private readonly ILogger logger;
 
@@ -37,7 +39,10 @@ namespace VitalChoice.Business.Services.Content
             IRepositoryAsync<ContentItem> contentItemRepository,
             IRepositoryAsync<FAQToContentCategory> faqToContentCategoryRepository,
             IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
-            IRepositoryAsync<ContentTypeEntity> contentTypeRepository, ILoggerProviderExtended loggerProvider, ITtlGlobalCache templatesCache)
+            IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
+            IObjectLogItemExternalService objectLogItemExternalService,
+            ILoggerProviderExtended loggerProvider,
+            ITtlGlobalCache templatesCache)
         {
             this.faqRepository = faqRepository;
             this.contentCategoryRepository = contentCategoryRepository;
@@ -45,6 +50,7 @@ namespace VitalChoice.Business.Services.Content
             this.faqToContentCategoryRepository = faqToContentCategoryRepository;
             this.contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
             this.contentTypeRepository = contentTypeRepository;
+            this.objectLogItemExternalService = objectLogItemExternalService;
             this.templatesCache = templatesCache;
             logger = loggerProvider.CreateLoggerDefault();
         }
@@ -185,6 +191,8 @@ namespace VitalChoice.Business.Services.Content
                 {
                     await faqRepository.UpdateAsync(dbItem);
                 }
+
+                await objectLogItemExternalService.LogItems(new object[] { dbItem }, true);
             }
 
             return dbItem;

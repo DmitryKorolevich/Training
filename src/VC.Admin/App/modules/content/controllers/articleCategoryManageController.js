@@ -1,10 +1,23 @@
 ﻿'use strict';
 
 angular.module('app.modules.content.controllers.articleCategoryManageController', [])
-.controller('articleCategoryManageController', ['$scope', '$rootScope', '$state', '$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
-function ($scope, $rootScope, $state, $stateParams, contentService, toaster, confirmUtil, promiseTracker) {
+.controller('articleCategoryManageController', ['$scope', '$rootScope', '$state', '$stateParams', 'contentService', 'settingService', 'toaster', 'confirmUtil', 'promiseTracker',
+function ($scope, $rootScope, $state, $stateParams, contentService, settingService, toaster, confirmUtil, promiseTracker) {
     $scope.refreshTracker = promiseTracker("get");
     $scope.editTracker = promiseTracker("edit");
+
+    function refreshHistory()
+    {
+        if ($scope.articleCategory && $scope.articleCategory.Id)
+        {
+            var data = {};
+            data.service = settingService;
+            data.tracker = $scope.refreshTracker;
+            data.idObject = $scope.articleCategory.Id;
+            data.idObjectType = 12//content category
+            $scope.$broadcast('objectHistorySection#in#refresh', data);
+        }
+    }
 
     function successSaveHandler(result) {
         if (result.Success) {
@@ -13,6 +26,7 @@ function ($scope, $rootScope, $state, $stateParams, contentService, toaster, con
             $scope.articleCategory.Id = result.Data.Id;
             $scope.articleCategory.MasterContentItemId = result.Data.MasterContentItemId;
             $scope.previewUrl = $scope.baseUrl.format($scope.articleCategory.Url);
+            refreshHistory();
         } else {
             var messages = "";
             if (result.Messages) {
@@ -73,6 +87,7 @@ function ($scope, $rootScope, $state, $stateParams, contentService, toaster, con
                         $scope.articleCategory.MasterContentItemId = $scope.MasterContentItemId;
                     };
                     $scope.loaded = true;
+                    refreshHistory();
                 } else
                 {
                     errorHandler(result);
