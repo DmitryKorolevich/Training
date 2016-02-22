@@ -9,7 +9,6 @@
     "VitalChoice.Ecommerce.Domain": "",
     "VitalChoice.ObjectMapping": "",
     "EntityFramework.Relational": "7.0.0-*",
-    "Autofac.Extensions.DependencyInjection": "4.0.0-*",
     "VitalChoice.Data": "",
     "EntityFramework.Core": "7.0.0-*"
   },
