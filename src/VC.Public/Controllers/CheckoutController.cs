@@ -655,6 +655,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpGet]
+        [CustomerStatusCheck]
         public async Task<IActionResult> Receipt()
         {
             var idOrder = ContextAccessor.HttpContext.Session.GetInt32(CheckoutConstants.ReceiptSessionOrderId);
