@@ -20,6 +20,8 @@ namespace VitalChoice.Interfaces.Services.Customers
 
 		Task<IList<PaymentMethod>> GetAvailablePaymentMethodsAsync(CustomerType? customerType);
 
+	    Task<CustomerStatus?> GetCustomerStatusAsync(int idCustomer);
+
         Task<PagedList<ExtendedVCustomer>> GetCustomersAsync(CustomerFilter filter);
 
         Task<ICollection<CustomerOrderStatistic>> GetCustomerOrderStatistics(ICollection<int> ids);
@@ -37,6 +39,7 @@ namespace VitalChoice.Interfaces.Services.Customers
         Task<ICollection<string>> GetCustomerStaticFieldValuesByValue(ValuesByFieldValueFilter filter);
 
         Task<string> GetNewOrderNotesBasedOnCustomer(int idCustomer);
+
 	    Task<CustomerDynamic> GetByEmailAsync(string email);
 
 		Task ActivateGuestAsync(string email, string token, string newPassword);

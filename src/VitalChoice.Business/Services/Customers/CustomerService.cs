@@ -333,6 +333,14 @@ namespace VitalChoice.Business.Services.Customers
 		    return await _paymentMethodRepositoryAsync.Query(condition).Include(x => x.CustomerTypes).SelectAsync(false);
 		}
 
+        public async Task<CustomerStatus?> GetCustomerStatusAsync(int idCustomer)
+        {
+            var query = new CustomerQuery().NotDeleted().WithId(idCustomer);
+            var idStatus = (await this.ObjectRepository.Query(query).SelectAsync(p => p.StatusCode, false)).FirstOrDefault();
+
+            return idStatus!=0 ? (CustomerStatus?) idStatus : null;
+        }
+
         public async Task<PagedList<ExtendedVCustomer>> GetCustomersAsync(CustomerFilter filter)
         {
             Func<IQueryable<Customer>, IOrderedQueryable<Customer>> sortable = x => x.OrderByDescending(y => y.DateEdited);

@@ -40,6 +40,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Orders;
 namespace VC.Public.Controllers
 {
     [CustomerAuthorize]
+    [CustomerStatusCheck]
     public class ProfileController : PublicControllerBase
     {
         private const string TicketCommentMessageTempData = "ticket-comment-messsage";

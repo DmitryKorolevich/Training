@@ -26,7 +26,8 @@ using VitalChoice.Infrastructure.Domain.Transfer.Products;
 namespace VC.Public.Controllers
 {
 	[CustomerAuthorize]
-	public class GCController : BaseMvcController
+    [CustomerStatusCheck]
+    public class GCController : BaseMvcController
 	{
 		private readonly IHttpContextAccessor _contextAccessor;
 		private readonly IGcService _gcService;

@@ -166,6 +166,7 @@ namespace VC.Public.Controllers
 
         [HttpGet]
         [CustomerAuthorize]
+        [CustomerStatusCheck]
         public async Task<IActionResult> GetBillingAddress(int id)
         {
             if (await CustomerLoggedIn())
@@ -471,6 +472,7 @@ namespace VC.Public.Controllers
 
         [HttpGet]
         [CustomerAuthorize]
+        [CustomerStatusCheck]
         public async Task<IActionResult> GetShippingAddress(int id)
         {
             var currentCustomer = await GetCurrentCustomerDynamic();
@@ -486,6 +488,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpGet]
+        [CustomerStatusCheck]
         //[CustomerAuthorize]
         public async Task<IActionResult> AddUpdateShippingMethod()
         {
@@ -605,6 +608,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpGet]
+        [CustomerStatusCheck]
         //[CustomerAuthorize]
         public async Task<IActionResult> ReviewOrder()
         {
@@ -629,6 +633,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpPost]
+        [CustomerStatusCheck]
         //[CustomerAuthorize]
         public async Task<Result<string>> ReviewOrder([FromBody] ViewCartModel model)
         {
