@@ -154,6 +154,7 @@ namespace VitalChoice.Business.Services.Products
             }
 
             categoryContent.Url = model.Url;
+            categoryContent.UserId = model.UserId;
             if (model.StatusCode != RecordStatusCode.Deleted)
             {
                 categoryContent.StatusCode = model.StatusCode;

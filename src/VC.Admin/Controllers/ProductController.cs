@@ -348,6 +348,12 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var item = model.Convert();
+            var sUserId = Request.HttpContext.User.GetUserId();
+            int userId;
+            if (Int32.TryParse(sUserId, out userId))
+            {
+                item.UserId = userId;
+            }
             item = await productCategoryService.UpdateCategoryAsync(item);
 
             return new ProductCategoryManageModel(item);

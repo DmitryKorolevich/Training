@@ -589,7 +589,6 @@ namespace VitalChoice.Business.Services.Customers
                     int index = 0;
                     await model.CustomerPaymentMethods.ForEachAsync(async method =>
                     {
-                        index++;
                         var errors = await _paymentMethodService.AuthorizeCreditCard(method);
                         errors.Select(error => new MessageInfo
                         {
@@ -597,6 +596,7 @@ namespace VitalChoice.Business.Services.Customers
                             Message = error.Message,
                             MessageLevel = error.MessageLevel
                         }).ToList().Raise();
+                        index++;
                     });
 
                     entity = await base.UpdateAsync(model, uow);

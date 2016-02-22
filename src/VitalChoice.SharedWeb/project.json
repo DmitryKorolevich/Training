@@ -15,7 +15,7 @@
     "System.Net.Http": "4.0.1-*"
   },
   "frameworks": {
-    "net451": {
+    "dnx451": {
     },
     "dotnet5.4": {
       "dependencies": {

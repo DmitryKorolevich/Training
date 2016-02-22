@@ -188,7 +188,6 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.HasKey(p => p.Id);
                 entity.Ignore(c => c.User);
-                entity.Ignore(c => c.UserId);
                 entity.ToTable("ContentCategories");
                 entity
                     .HasOne(p => p.MasterContentItem)
@@ -460,7 +459,6 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(p => p.Id);
                 entity.ToTable("ProductCategories");
                 entity.Ignore(p => p.Name);
-                entity.Ignore(p => p.UserId);
                 entity.Ignore(p => p.User);
                 entity.Ignore(p => p.ProductCategory);
                 entity

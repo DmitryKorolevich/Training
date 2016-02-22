@@ -208,6 +208,7 @@ namespace VitalChoice.Business.Services.Content
                 dbItem.Name = model.Name;
                 dbItem.Url = model.Url;
                 dbItem.FileUrl = model.FileUrl;
+                dbItem.UserId = model.UserId;
                 if (model.MasterContentItemId != 0)
                 {
                     dbItem.MasterContentItemId = model.MasterContentItemId;

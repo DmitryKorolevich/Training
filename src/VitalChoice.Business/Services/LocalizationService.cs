@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using VitalChoice.Data.Repositories;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Ecommerce.Utils;
 using VitalChoice.Infrastructure.Context;
@@ -73,6 +74,7 @@ namespace VitalChoice.Business.Services
         public IList<LookupItem<string>> GetStrings(string cultureId)
         {
             List<LookupItem<string>> toReturn = new List<LookupItem<string>>();
+
 #if DNX451
             if (_localizationData != null)
             {

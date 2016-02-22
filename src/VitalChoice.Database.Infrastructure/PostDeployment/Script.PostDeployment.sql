@@ -49,6 +49,7 @@ set dateformat mdy
 :r .\Scripts\ContentIndexes.sql
 :r .\Scripts\Redirects.sql
 
+:r .\Scripts\CategoriesHistoryLogUpdate.sql
 :r .\Scripts\EmailTemplates.sql
 :r .\Scripts\EmailTemplatesData.sql
 
