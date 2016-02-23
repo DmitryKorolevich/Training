@@ -120,5 +120,13 @@ angular.module('app.core.dataAccess.services.contentService', [])
 		deleteContentPage: function (id, tracker) {
 		    return $http.post(baseUrl + 'DeleteContentPage/' + id, null, getConfig(tracker));
 		},
+
+		//content cross sells
+		getContentCrossSells: function (type, tracker) {
+			return $http.get(baseUrl + 'GetContentCrossSells/' + type, getConfig(tracker));
+		},
+		updateContentCrossSells: function (model, tracker) {
+			return $http.post(baseUrl + 'UpdateContentCrossSells', model, getConfig(tracker));
+		}
 	};
 }]);

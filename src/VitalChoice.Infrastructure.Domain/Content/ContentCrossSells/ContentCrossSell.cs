@@ -15,7 +15,7 @@ namespace VitalChoice.Infrastructure.Domain.Content.ContentCrossSells
 
 		public int? IdSku { get; set; }
 
-		public int IdEditedBy { get; set; }
+		public int? IdEditedBy { get; set; }
 
 		public DateTime DateCreated { get; set; }
 

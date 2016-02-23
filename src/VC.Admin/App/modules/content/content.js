@@ -23,7 +23,8 @@ angular.module('app.modules.content', [
 	'app.modules.content.controllers.contentAreaDetailController',
 	'app.modules.content.controllers.manageStylesController',
 	'app.modules.content.controllers.emailTemplatesController',
-	'app.modules.content.controllers.emailTemplateManageController'
+	'app.modules.content.controllers.emailTemplateManageController',
+	'app.modules.content.controllers.contentCrossSellsManageController'
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -201,6 +202,17 @@ angular.module('app.modules.content', [
 		            url: '/content/emailtemplates/{id:int}',
 		            templateUrl: 'app/modules/content/partials/emailTemplateDetail.html',
 		            controller: 'emailTemplateManageController'
-		        });
+		        })
+				/*content cross sells*/
+				.state('index.oneCol.manageAddToCartCs', {
+		    		url: '/content/managecross',
+		    		templateUrl: 'app/modules/content/partials/contentCrossSells.html',
+		    		controller: 'contentCrossSellsManageController'
+				})
+				.state('index.oneCol.manageViewCartCs', {
+					url: '/content/managecross',
+					templateUrl: 'app/modules/content/partials/contentCrossSells.html',
+					controller: 'contentCrossSellsManageController'
+				})
 		}
 ]);

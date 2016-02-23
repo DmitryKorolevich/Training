@@ -42,6 +42,13 @@ namespace VitalChoice.Business.Services.Content
 			return res.OrderBy(x=>x.Order).ToList();
 		}
 
+		public async Task<IList<ContentCrossSell>> GetDefaultContentCrossSells()
+		{
+			var crossLines = await _repository.Query(x => x.Type == ContentCrossSellType.Default).SelectAsync();
+
+			return crossLines;
+		}
+
 		public async Task<IList<ContentCrossSell>> UpdateContentCrossSells(IList<ContentCrossSell> contentCrossSells, ContentCrossSellType type)
 		{
 			var toWork = contentCrossSells.Where(x => x.Type == type).ToList();

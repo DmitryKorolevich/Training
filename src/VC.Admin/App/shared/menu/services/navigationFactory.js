@@ -135,6 +135,8 @@ angular.module('app.shared.menu.services.navigationFactory', [])
                 { name: 'manageStyles', stateName: 'index.oneCol.manageStyles', stateLabel: 'Manage Custom CSS', access: 6 },
 				{ name: 'filesManagement', stateName: 'index.oneCol.filesManagement', stateLabel: 'Manage Media', access: 12 },
                 { name: 'manageEmailTemplate', stateName: 'index.oneCol.manageEmailTemplates', stateLabel: 'Manage Email Templates', access: 6 },
+                { name: 'manageAddToCartCs', stateName: 'index.oneCol.manageAddToCartCs', stateLabel: 'Manage Add To Cart Cross Selling', access: 6 },
+                { name: 'manageViewCartCs', stateName: 'index.oneCol.manageViewCartCs', stateLabel: 'Manage View Cart Cross Selling', access: 6 }
 			]
 		},
 		{
