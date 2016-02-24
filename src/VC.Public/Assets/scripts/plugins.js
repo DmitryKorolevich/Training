@@ -412,7 +412,6 @@ function reInitFormValidation(form)
     }
 };
 
-
 String.prototype.format = function ()
 {
     return String.format(this, arguments.length == 1 ? arguments[0] : arguments);

@@ -13,8 +13,10 @@ using Microsoft.AspNet.Mvc.Routing;
 using Microsoft.AspNet.Mvc.ViewFeatures;
 using Microsoft.AspNet.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using VitalChoice.Core.Infrastructure;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Exceptions;
 
 namespace VitalChoice.Core.GlobalFilters
 {
@@ -25,7 +27,12 @@ namespace VitalChoice.Core.GlobalFilters
             var acceptHeader = context.HttpContext.Request.Headers["Accept"];
             if (acceptHeader.Any() && acceptHeader.First().Contains("application/json"))
 			{
-				new ApiExceptionFilterAttribute().OnException(context);
+			    if (context.Exception is CustomerSuspendException)
+			    {
+                    context.Result = CustomerStatusCheckAttribute.CreateJsonResponse();
+                    return;
+			    }
+    	        new ApiExceptionFilterAttribute().OnException(context);
 			}
 			else
             {

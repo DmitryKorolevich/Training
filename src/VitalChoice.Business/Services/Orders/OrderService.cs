@@ -75,6 +75,7 @@ using VitalChoice.Infrastructure.Domain.Mail;
 using VitalChoice.Business.Mail;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Infrastructure.Context;
+using VitalChoice.Infrastructure.Domain.Exceptions;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -129,7 +130,7 @@ namespace VitalChoice.Business.Services.Orders
             SPEcommerceRepository sPEcommerceRepository,
             IPaymentMethodService paymentMethodService,
             IObjectMapper<OrderPaymentMethodDynamic> paymentMapper,
-            IEcommerceRepositoryAsync<OrderToGiftCertificate> orderToGiftCertificateRepositoryAsync, 
+            IEcommerceRepositoryAsync<OrderToGiftCertificate> orderToGiftCertificateRepositoryAsync,
             IExtendedDynamicServiceAsync<OrderPaymentMethodDynamic, OrderPaymentMethod, CustomerPaymentMethodOptionType, OrderPaymentMethodOptionValue> paymentGenericService,
             IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
             IProductService productService,
@@ -342,11 +343,11 @@ namespace VitalChoice.Business.Services.Orders
                                 .SelectFirstOrDefaultAsync(false);
                     if (dbItem != null)
                     {
-                        if (dbItem.Value == ((int) SourceOrderType.MailOrder).ToString())
+                        if (dbItem.Value == ((int)SourceOrderType.MailOrder).ToString())
                         {
                             if (!orderType.HasValue)
                             {
-                                orderType = (int) SourceOrderType.Phone;
+                                orderType = (int)SourceOrderType.Phone;
                             }
                             order.Data.OrderType = orderType.Value;
                         }
@@ -365,7 +366,7 @@ namespace VitalChoice.Business.Services.Orders
                     }
                     else
                     {
-                        order.Data.OrderType = orderType ?? (int) SourceOrderType.Phone;
+                        order.Data.OrderType = orderType ?? (int)SourceOrderType.Phone;
                     }
                 }
             }
@@ -459,8 +460,7 @@ namespace VitalChoice.Business.Services.Orders
         {
             if (dynamic.Customer.StatusCode == (int)CustomerStatus.Suspended)
             {
-                throw new AppValidationException(
-                    ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SuspendedCustomer]);
+                throw new CustomerSuspendException();
             }
             return base.ValidateAsync(dynamic);
         }
@@ -554,25 +554,25 @@ namespace VitalChoice.Business.Services.Orders
         {
             if (model.PaymentMethod == null)
             {
-                switch ((OrderType) model.IdObjectType)
+                switch ((OrderType)model.IdObjectType)
                 {
                     case OrderType.Normal:
-                        model.PaymentMethod = await _paymentGenericService.Mapper.CreatePrototypeAsync((int) PaymentMethodType.CreditCard);
+                        model.PaymentMethod = await _paymentGenericService.Mapper.CreatePrototypeAsync((int)PaymentMethodType.CreditCard);
                         break;
                     case OrderType.AutoShip:
-                        model.PaymentMethod = await _paymentGenericService.Mapper.CreatePrototypeAsync((int) PaymentMethodType.CreditCard);
+                        model.PaymentMethod = await _paymentGenericService.Mapper.CreatePrototypeAsync((int)PaymentMethodType.CreditCard);
                         break;
                     case OrderType.DropShip:
-                        model.PaymentMethod = await _paymentGenericService.Mapper.CreatePrototypeAsync((int) PaymentMethodType.NoCharge);
+                        model.PaymentMethod = await _paymentGenericService.Mapper.CreatePrototypeAsync((int)PaymentMethodType.NoCharge);
                         break;
                     case OrderType.GiftList:
-                        model.PaymentMethod = await _paymentGenericService.Mapper.CreatePrototypeAsync((int) PaymentMethodType.NoCharge);
+                        model.PaymentMethod = await _paymentGenericService.Mapper.CreatePrototypeAsync((int)PaymentMethodType.NoCharge);
                         break;
                     case OrderType.Reship:
-                        model.PaymentMethod = await _paymentGenericService.Mapper.CreatePrototypeAsync((int) PaymentMethodType.CreditCard);
+                        model.PaymentMethod = await _paymentGenericService.Mapper.CreatePrototypeAsync((int)PaymentMethodType.CreditCard);
                         break;
                     case OrderType.Refund:
-                        model.PaymentMethod = await _paymentGenericService.Mapper.CreatePrototypeAsync((int) PaymentMethodType.CreditCard);
+                        model.PaymentMethod = await _paymentGenericService.Mapper.CreatePrototypeAsync((int)PaymentMethodType.CreditCard);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -762,7 +762,8 @@ namespace VitalChoice.Business.Services.Orders
                             {
                                 healthwiseOrder = new HealthwiseOrder()
                                 {
-                                    Id = model.Id, IdHealthwisePeriod = period.Id
+                                    Id = model.Id,
+                                    IdHealthwisePeriod = period.Id
                                 };
                                 _healthwiseOrderRepositoryAsync.Insert(healthwiseOrder);
                                 addedToPeriod = true;
@@ -877,7 +878,7 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<OrderDynamic> CreateNewNormalOrder(OrderStatus status)
         {
-            var toReturn = await Mapper.CreatePrototypeAsync((int) OrderType.Normal);
+            var toReturn = await Mapper.CreatePrototypeAsync((int)OrderType.Normal);
 
             toReturn.StatusCode = (int)RecordStatusCode.Active;
             if (status != OrderStatus.Processed && status != OrderStatus.Incomplete)
@@ -886,12 +887,12 @@ namespace VitalChoice.Business.Services.Orders
             }
             toReturn.OrderStatus = status;
             toReturn.DateCreated = DateTime.Now;
-            toReturn.Data.PreferredShipMethod = (int) PreferredShipMethod.Best;
-            toReturn.Data.ShipDelayType = (int) ShipDelayType.None;
+            toReturn.Data.PreferredShipMethod = (int)PreferredShipMethod.Best;
+            toReturn.Data.ShipDelayType = (int)ShipDelayType.None;
 
             return toReturn;
         }
-        
+
         private void SetPOrderType(ICollection<OrderDynamic> items)
         {
             if (items != null)
@@ -901,10 +902,21 @@ namespace VitalChoice.Business.Services.Orders
                     POrderType? toReturn = null;
                     var pOrder = false;
                     var npOrder = false;
-                    foreach (var skuOrdered in item.Skus)
+                    if (item.Skus != null)
                     {
-                        pOrder = pOrder || skuOrdered?.ProductWithoutSkus.IdObjectType == (int)ProductType.Perishable;
-                        npOrder = npOrder || skuOrdered?.ProductWithoutSkus.IdObjectType == (int)ProductType.NonPerishable;
+                        foreach (var skuOrdered in item.Skus)
+                        {
+                            pOrder = pOrder || skuOrdered?.ProductWithoutSkus.IdObjectType == (int)ProductType.Perishable;
+                            npOrder = npOrder || skuOrdered?.ProductWithoutSkus.IdObjectType == (int)ProductType.NonPerishable;
+                        }
+                    }
+                    if (item.PromoSkus != null)
+                    {
+                        foreach (var skuOrdered in item.PromoSkus)
+                        {
+                            pOrder = pOrder || skuOrdered?.ProductWithoutSkus.IdObjectType == (int)ProductType.Perishable;
+                            npOrder = npOrder || skuOrdered?.ProductWithoutSkus.IdObjectType == (int)ProductType.NonPerishable;
+                        }
                     }
                     if (pOrder && npOrder)
                     {
@@ -936,7 +948,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 throw new AppValidationException("Payment method \"No Charge\" should be allowed");
             }
-            if(orderType!=OrderType.GiftList && orderType!=OrderType.DropShip)
+            if (orderType != OrderType.GiftList && orderType != OrderType.DropShip)
             {
                 throw new ApiException("Orders import with the given orderType isn't implemented");
             }
@@ -984,7 +996,7 @@ namespace VitalChoice.Business.Services.Orders
 
             foreach (var item in map)
             {
-                var orderCombinedStatus= item.Order.OrderStatus ?? OrderStatus.Processed;
+                var orderCombinedStatus = item.Order.OrderStatus ?? OrderStatus.Processed;
                 if (item.Order.SafeData.ShipDelayDate != null)
                 {
                     item.Order.Data.ShipDelayType = ShipDelayType.EntireOrder;
@@ -1001,7 +1013,8 @@ namespace VitalChoice.Business.Services.Orders
                 if (context.SkuOrdereds != null)
                 {
                     item.OrderImportItem.ErrorMessages.AddRange(context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages).Select(p =>
-                              new MessageInfo() {
+                              new MessageInfo()
+                              {
                                   Message = p
                               }));
                 }
@@ -1016,7 +1029,7 @@ namespace VitalChoice.Business.Services.Orders
             }
 
             //throw calculating errors
-            messages = FormatRowsRecordErrorMessages(map.Select(p=>p.OrderImportItem).ToList());
+            messages = FormatRowsRecordErrorMessages(map.Select(p => p.OrderImportItem).ToList());
             if (messages.Count > 0)
             {
                 throw new AppValidationException(messages);
@@ -1025,7 +1038,7 @@ namespace VitalChoice.Business.Services.Orders
             var orders = map.Select(p => p.Order).ToList();
             orders = await InsertRangeAsync(orders);
 
-            if(orderType==OrderType.GiftList)
+            if (orderType == OrderType.GiftList)
             {
                 await SendGLOrdersImportEmailAsync(orders, customer, idPaymentMethod, idAddedBy);
             }
@@ -1041,14 +1054,14 @@ namespace VitalChoice.Business.Services.Orders
             model.CustomerFirstName = customer.ProfileAddress.SafeData.FirstName;
             model.CustomerLastName = customer.ProfileAddress.SafeData.LastName;
             var creditCard = customer.CustomerPaymentMethods.FirstOrDefault(p => p.Id == idPaymentMethod);
-            if(creditCard!=null)
+            if (creditCard != null)
             {
                 model.CardNumber = creditCard.SafeData.CardNumber;
             }
-            var profile = (await _adminProfileRepository.Query(p => p.Id==idAddedBy).SelectAsync(false)).FirstOrDefault();
+            var profile = (await _adminProfileRepository.Query(p => p.Id == idAddedBy).SelectAsync(false)).FirstOrDefault();
             model.Agent = profile?.AgentId;
             model.ImportedOrdersCount = orders.Count;
-            model.ImportedOrdersAmount = orders.Sum(p=>p.Total);
+            model.ImportedOrdersAmount = orders.Sum(p => p.Total);
             model.OrderIds = orders.Select(p => p.Id).ToList();
 
             await _notificationService.SendGLOrdersImportEmailAsync(model);
@@ -1056,7 +1069,7 @@ namespace VitalChoice.Business.Services.Orders
 
         private async Task LoadSkusDynamic(List<OrderImportItemOrderDynamic> map, CustomerDynamic customer)
         {
-            List<string> requestCodes = map.Select(p=>p.Order).Where(p => p.Skus != null).SelectMany(p => p.Skus).Where(p => p.Sku != null).Select(p => p.Sku.Code).ToList();
+            List<string> requestCodes = map.Select(p => p.Order).Where(p => p.Skus != null).SelectMany(p => p.Skus).Where(p => p.Sku != null).Select(p => p.Sku.Code).ToList();
 
             var dbSkus = await _productService.GetSkusOrderedAsync(requestCodes);
             foreach (var item in map)
@@ -1067,7 +1080,7 @@ namespace VitalChoice.Business.Services.Orders
                     foreach (var sku in item.Order.Skus)
                     {
                         var dbSku = dbSkus.FirstOrDefault(p => p.Sku.Code == sku.Sku.Code);
-                        if(dbSku==null)
+                        if (dbSku == null)
                         {
                             item.OrderImportItem.ErrorMessages.Add(AddErrorMessage("SKU " + index, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SkuNotFoundOrderImport],
                                 "SKU " + index, sku.Sku.Code)));
@@ -1077,7 +1090,7 @@ namespace VitalChoice.Business.Services.Orders
                         {
                             sku.ProductWithoutSkus = dbSku.ProductWithoutSkus;
                             sku.Sku = dbSku.Sku;
-                            if(sku.Sku!=null)
+                            if (sku.Sku != null)
                             {
                                 sku.Amount = customer.IdObjectType == (int)CustomerType.Retail ? sku.Sku.Price :
                                     customer.IdObjectType == (int)CustomerType.Wholesale ? sku.Sku.WholesalePrice : 0;
@@ -1161,7 +1174,7 @@ namespace VitalChoice.Business.Services.Orders
                     item.IdState = idState;
                     item.IdCountry = idCountry;
 
-                    if(!String.IsNullOrEmpty(item.Phone))
+                    if (!String.IsNullOrEmpty(item.Phone))
                     {
                         item.Phone = item.Phone.Replace(" ", "").Replace("+", "").Replace("-", "");
                     }
@@ -1297,7 +1310,7 @@ namespace VitalChoice.Business.Services.Orders
                 if (DateTime.TryParse(sShipDate, CultureInfo.InvariantCulture, DateTimeStyles.None, out shipDate))
                 {
                     toReturn = TimeZoneInfo.ConvertTime(shipDate, _pstTimeZoneInfo, TimeZoneInfo.Local);
-                    if(toReturn<DateTime.Now)
+                    if (toReturn < DateTime.Now)
                     {
                         messages.Add(AddErrorMessage(columnName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.MustBeFutureDateError], columnName)));
                     }
@@ -1455,19 +1468,19 @@ namespace VitalChoice.Business.Services.Orders
             {
                 toReturn.Add(new MessageInfo() { Message = "Invalid order #" });
             }
-            if (order == null || (order.OrderStatus == OrderStatus.Incomplete || order.OrderStatus == OrderStatus.Cancelled || 
+            if (order == null || (order.OrderStatus == OrderStatus.Incomplete || order.OrderStatus == OrderStatus.Cancelled ||
                 order.OrderStatus == OrderStatus.ShipDelayed || order.OrderStatus == OrderStatus.OnHold ||
                 order.POrderStatus == OrderStatus.Incomplete || order.POrderStatus == OrderStatus.Cancelled ||
                 order.POrderStatus == OrderStatus.ShipDelayed || order.POrderStatus == OrderStatus.OnHold ||
                 order.NPOrderStatus == OrderStatus.Incomplete || order.NPOrderStatus == OrderStatus.Cancelled ||
                 order.NPOrderStatus == OrderStatus.ShipDelayed || order.NPOrderStatus == OrderStatus.OnHold))
             {
-                toReturn.Add(new MessageInfo() {Message = "The given order can'be flagged"});
+                toReturn.Add(new MessageInfo() { Message = "The given order can'be flagged" });
                 throw new AppValidationException("The given order can'be flagged");
             }
-            if (!order.DictionaryData.ContainsKey("OrderType") || order.Data.OrderType != (int?) SourceOrderType.Web)
+            if (!order.DictionaryData.ContainsKey("OrderType") || order.Data.OrderType != (int?)SourceOrderType.Web)
             {
-                toReturn.Add(new MessageInfo() {Message = "The given order can'be flagged"});
+                toReturn.Add(new MessageInfo() { Message = "The given order can'be flagged" });
             }
             return toReturn;
         }
@@ -1517,7 +1530,8 @@ namespace VitalChoice.Business.Services.Orders
                         {
                             healthwiseOrder = new HealthwiseOrder()
                             {
-                                Id = order.Id, IdHealthwisePeriod = period.Id
+                                Id = order.Id,
+                                IdHealthwisePeriod = period.Id
                             };
                             _healthwiseOrderRepositoryAsync.Insert(healthwiseOrder);
                             addedToPeriod = true;

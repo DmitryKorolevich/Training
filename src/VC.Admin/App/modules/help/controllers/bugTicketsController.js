@@ -9,8 +9,20 @@
             toaster.pop('error', "Error!", "Server error occured");
         };
 
-        function refreshItems() {
-            helpService.getBugTickets($scope.filter, $scope.refreshTracker)
+        function refreshItems()
+        {
+            var data = {};
+            angular.copy($scope.filter, data);
+            if (data.To)
+            {
+                data.To = data.To.toServerDateTime();
+            }
+            if (data.From)
+            {
+                data.From = data.From.toServerDateTime();
+            }
+
+            helpService.getBugTickets(data, $scope.refreshTracker)
                 .success(function (result) {
                     if (result.Success) {
                         $scope.items = result.Data.Items;

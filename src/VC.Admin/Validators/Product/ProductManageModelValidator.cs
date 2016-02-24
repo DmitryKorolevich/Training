@@ -86,6 +86,8 @@ namespace VC.Admin.Validators.Product
 
         private class ProductModelValidator : AbstractValidator<ProductManageModel>
         {
+            private const int MAX_SKU_PRODUCT_GROUP_NAME_LENGTH = 32;
+
             public ProductModelValidator()
             {
                 RuleFor(model => model.Name)
@@ -139,8 +141,8 @@ namespace VC.Admin.Validators.Product
                     .WithMessage(model => model.ShippingTitleOverride, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
 
                 RuleFor(model => model.SubProductGroupName)
-                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
-                    .WithMessage(model => model.SubProductGroupName, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+                    .Length(0, MAX_SKU_PRODUCT_GROUP_NAME_LENGTH)
+                    .WithMessage(model => model.SubProductGroupName, ValidationMessages.FieldLength, MAX_SKU_PRODUCT_GROUP_NAME_LENGTH);
 
                 RuleFor(model => model.NutritionalTitle)
                     .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
@@ -224,11 +226,10 @@ namespace VC.Admin.Validators.Product
                 RuleFor(model => model.Name)
                     .NotEmpty()
                     .WithMessage(model => model.Name, ValidationMessages.FieldRequired)
+                    .Matches("^[A-Za-z0-9-]*")
+                    .WithMessage(model => model.Name, ValidationMessages.FieldInvalid)
                     .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
                     .WithMessage(model => model.Name, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
-                //RuleFor(model => model.QTY)
-                //    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
-                //    .WithMessage(model => model.QTY, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
             }
         }
     }

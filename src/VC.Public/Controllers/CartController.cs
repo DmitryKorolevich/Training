@@ -7,6 +7,7 @@ using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
 using VC.Public.Helpers;
 using VC.Public.Models.Cart;
+using VitalChoice.Core.Infrastructure;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
@@ -20,6 +21,7 @@ using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
+using VitalChoice.Infrastructure.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
@@ -27,6 +29,7 @@ using VitalChoice.Validation.Models;
 
 namespace VC.Public.Controllers
 {
+    [CustomerStatusCheck]
     public class CartController : CheckoutControllerBase
     {
 	    private readonly IProductService _productService;

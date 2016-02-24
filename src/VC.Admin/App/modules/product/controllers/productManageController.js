@@ -309,7 +309,8 @@ angular.module('app.modules.product.controllers.productManageController', [])
 
             valid = valid && validateAutoShiplFrequency();
 
-            if (valid) {
+            if (valid)
+            {
                 var categoryIds = [];
                 getSelected($scope.rootCategory, categoryIds);
                 $scope.product.CategoryIds = categoryIds;
@@ -541,7 +542,8 @@ angular.module('app.modules.product.controllers.productManageController', [])
 
         function activateTab(formName) {
             $.each($scope.tabs, function (index, item) {
-                if (formName.indexOf('SKUs') == 0) {
+                if (formName.indexOf('SKUs') == 0 || formName == 'skusDetails')
+                {
                     formName = 'SKUs';
                 }
                 if (formName.indexOf('CrossSellProducts') == 0) {

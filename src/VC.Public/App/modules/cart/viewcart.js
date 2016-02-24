@@ -51,12 +51,14 @@ $(function () {
 				}).success(function (result) {
 					if (result.Success) {
 						window.location.href = result.Data;
-					} else {
-						notifyError(result.Messages[0]);
+					} else
+					{
+					    processErrorResponse(result);
 					}
 					self.refreshing(false);
-				}).error(function (result) {
-					notifyError();
+				}).error(function (result)
+				{
+				    processErrorResponse();
 					self.refreshing(false);
 				});
 			});
@@ -126,12 +128,14 @@ function recalculateCart(viewModel, successCallback) {
 					ko.mapping.fromJS(result.Data, { 'ignore': ["ShipAsap", "PromoCode", "ShippingDate"] }, viewModel.Model);
 					processServerMessages(viewModel.Model);
 				}
-			} else {
-				notifyError(result.Messages[0]);
+			} else
+			{
+			    processErrorResponse(result);
 			}
 			viewModel.refreshing(false);
-		}).error(function(result) {
-			notifyError();
+		}).error(function (result)
+		{
+		    processErrorResponse();
 			viewModel.refreshing(false);
 		});
 	}
@@ -150,8 +154,9 @@ function initCart() {
 			viewModel = new Cart(result.Data);
 
 			processServerMessages(viewModel.Model);
-		} else {
-			notifyError(result.Messages[0]);
+		} else
+		{
+		    processErrorResponse(result);
 		}
 
 		ko.applyBindings(viewModel);
@@ -160,8 +165,9 @@ function initCart() {
 
 		viewModel.refreshing(false);
 		viewModel.initializing = false;
-	}).error(function (result) {
-		notifyError();
+	}).error(function (result)
+	{
+	    processErrorResponse();
 		viewModel.refreshing(false);
 		viewModel.initializing = false;
 	});
@@ -213,4 +219,26 @@ function isGcValid(model, index) {
 		}
 	}
 	return true;
+}
+
+function processErrorResponse(result)
+{
+    if (result)
+    {
+        if (result.Command != null)
+        {
+            if (result.Command == 'redirect' && result.Data)
+            {
+                window.location = result.Data;
+            }
+        }
+        else
+        {
+            notifyError(result.Messages[0]);
+        }
+    }
+    else
+    {
+        notifyError();
+    }
 }

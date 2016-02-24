@@ -392,11 +392,17 @@
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
                                     <span class="legend">Sub Product Group Name</span>
-                                    <div class="row form-group">
-                                        <div class="col-md-12">
-                                            <input type="text" class="form-control" placeholder="Example: Number of Portions" data-ng-model="product.SubProductGroupName">
+                                    <form class="form-horizontal" name="forms.skusDetails" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted}" novalidate unsaved-warning-form>
+                                        <div class="row form-group">
+                                            <div class="col-md-12">
+                                                <input type="text" class="form-control"  name="SubProductGroupName" placeholder="Example: Number of Portions" data-ng-model="product.SubProductGroupName" data-ng-maxlength="32">
+                                                <div class="error-container" ng-show="forms.submitted && forms.skusDetails.SubProductGroupName.$invalid">
+                                                    <small class="error" ng-show="forms.skusDetails.SubProductGroupName.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength","Sub Product Group Name")}}</small>
+                                                    <small class="error" ng-show="forms.skusDetails.SubProductGroupName.$error.server">{{serverMessages.GetMessage('SubProductGroupName')}}</small>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </form>
                                     <span class="legend">Sub Products</span>
                                     <div class="form-group">
                                         <button data-ng-click="addSKU();" class="btn btn-info">Add New SKU</button>
@@ -420,7 +426,7 @@
                                                                                     <div class="fixed-accordion-row margin-zero">
                                                                                         <div class="sortable-move btn btn-info">
                                                                                             <i class="glyphicon glyphicon-sort"></i>
-                                                                                        </div>  
+                                                                                        </div>
                                                                                         <div data-ng-if="!subSku.IsOpen" class="btn btn-primary-orange margin-left-8px" data-ng-click="toggleOpen(subSku, $event)">
                                                                                             <i class="glyphicon glyphicon-plus"></i>
                                                                                         </div>
@@ -431,10 +437,11 @@
                                                                                     <div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">
                                                                                         <label class="control-label">SKU</label>
                                                                                         <div class="col-md-1">
-                                                                                            <input type="text" name="Name" class="form-control sku" placeholder="SKU" data-ng-model="subSku.Name" required>
+                                                                                            <input type="text" name="Name" class="form-control sku" placeholder="SKU" data-ng-model="subSku.Name" required data-ng-pattern="/^[A-Za-z0-9-]+$/">
                                                                                             <div class="error-container small-block" ng-show="forms.skussubmitted && forms.SKUs.i{{$index}}.Name.$invalid">
                                                                                                 <small class="error" ng-show="forms.SKUs.i{{$index}}.Name.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.SKU")}}</small>
                                                                                                 <small class="error" ng-show="forms.SKUs.i{{$index}}.Name.$error.exist">{{getValidationMessage("ValidationMessages.Exist","GeneralFieldNames.SKU")}}</small>
+                                                                                                <small class="error" ng-show="forms.SKUs.i{{$index}}.Name.$error.pattern">{{getValidationMessage("ValidationMessages.FieldInvalid","GeneralFieldNames.SKU")}}</small>
                                                                                                 <small class="error" ng-show="forms.SKUs.i{{$index}}.Name.$error.server">{{serverMessages.GetMessage('Name','SKUs',$index)}}</small>
                                                                                             </div>
                                                                                         </div>

@@ -454,8 +454,8 @@ namespace VitalChoice.Business.Services.HelpService
                     sortable =
                         (x) =>
                             sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.IdAddedBy)
-                                : x.OrderByDescending(y => y.IdAddedBy);
+                                ? x.OrderBy(y => y.AddedByUser.FirstName).ThenBy(y => y.AddedByUser.LastName)
+                                : x.OrderByDescending(y => y.AddedByUser.FirstName).ThenByDescending(y => y.AddedByUser.LastName);
                     break;
                 case BugTicketSortPath.StatusCode:
                     sortable =

@@ -97,11 +97,12 @@ namespace VitalChoice.Core.DependencyInjection
             Assembly projectAssembly)
         {
             // Add EF services to the services container.
-#if !DOTNET5_4
-            services.AddEntityFramework().AddEntityFrameworkCache<ServiceBusCacheSyncProvider>(new [] {typeof(VitalChoiceContext), typeof(EcommerceContext) }).AddSqlServer();
-#else
-            services.AddEntityFramework().AddEntityFrameworkCache(new [] {typeof(VitalChoiceContext), typeof(EcommerceContext) }).AddSqlServer();
-#endif
+            services.AddEntityFramework().AddSqlServer();
+//#if !DOTNET5_4
+//            services.AddEntityFramework().AddEntityFrameworkCache<ServiceBusCacheSyncProvider>(new [] {typeof(VitalChoiceContext), typeof(EcommerceContext) }).AddSqlServer();
+//#else
+//            services.AddEntityFramework().AddEntityFrameworkCache(new [] {typeof(VitalChoiceContext), typeof(EcommerceContext) }).AddSqlServer();
+//#endif
 
             // Add Identity services to the services container.
             services.AddIdentity<ApplicationUser, ApplicationRole>(x =>

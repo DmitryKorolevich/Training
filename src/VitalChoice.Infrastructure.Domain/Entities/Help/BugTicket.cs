@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
 
 namespace VitalChoice.Infrastructure.Domain.Entities.Help
 {
     public class BugTicket : Entity
     {
         public int IdAddedBy { get; set; }
+
+        public ApplicationUser AddedByUser { get; set; }
 
         public string AddedBy { get; set; }
 

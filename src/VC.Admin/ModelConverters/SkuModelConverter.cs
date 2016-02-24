@@ -15,6 +15,7 @@ namespace VC.Admin.ModelConverters
         public override void ModelToDynamic(SKUManageModel model, SkuDynamic dynamic)
         {
             dynamic.StatusCode = model.Active ? (int)RecordStatusCode.Active : (int)RecordStatusCode.NotActive;
+            dynamic.Code = dynamic?.Code.Trim();
             if (!dynamic.Data.AutoShipProduct)
             {
                 dynamic.DictionaryData.Remove("AutoShipFrequency1");

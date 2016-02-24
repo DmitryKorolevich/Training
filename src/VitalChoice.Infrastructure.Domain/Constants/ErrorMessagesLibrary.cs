@@ -64,7 +64,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
 		    {Keys.CantFindUser, "User not found"},
 		    {Keys.CantFindLogin, "Login information not found"},
 		    {Keys.CantSignIn, "User cannot be signed in"},
-		    {Keys.UserIsDisabled, "User is disabled"},
+		    {Keys.UserIsDisabled, "There seems to be an issue accessing your account. Please contact customer care at 800-608-4825 for more information. Thank you."},
             {Keys.EmailIsTakenAlready, "Email '{0}' is already in use"},
             {Keys.AgentIdIsTakenAlready, "Agent ID is already in use"},
 			{Keys.CurrentUserRemoval, "Currently logged in user can't be deleted"},
