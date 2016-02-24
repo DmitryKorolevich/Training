@@ -60,7 +60,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
 		    {Keys.UserAlreadyConfirmed, "User already activated or deleted"},
 		    {Keys.ActivationTokenExpired, "Activation token has expired"},
 		    {Keys.UserLockedOut, "User is locked out"},
-		    {Keys.IncorrectUserPassword, "Incorrect email or password"},
+		    {Keys.IncorrectUserPassword, "Incorrect email or password. Trouble logging in? Please use the password reminder tool to retrieve the password associated with this email account."},
 		    {Keys.CantFindUser, "User not found"},
 		    {Keys.CantFindLogin, "Login information not found"},
 		    {Keys.CantSignIn, "User cannot be signed in"},
