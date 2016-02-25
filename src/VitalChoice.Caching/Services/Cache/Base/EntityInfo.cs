@@ -9,7 +9,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
         public Type ContextType;
         public ICollection<EntityForeignKeyInfo> ForeignKeys;
         public ICollection<EntityCacheableIndexInfo> NonUniqueIndexes;
-        public Dictionary<Type, EntityCacheableIndexRelationInfo> DependentTypes;
+        public ICollection<KeyValuePair<Type, EntityCacheableIndexRelationInfo>> DependentTypes;
         public EntityPrimaryKeyInfo PrimaryKey;
         public EntityCacheableIndexInfo CacheableIndex;
         public ICollection<EntityConditionalIndexInfo> ConditionalIndexes;

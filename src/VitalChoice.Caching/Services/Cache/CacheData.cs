@@ -105,7 +105,7 @@ namespace VitalChoice.Caching.Services.Cache
         public IEnumerable<CachedEntity> GetUntyped(EntityCacheableIndexInfo nonUniqueIndexInfo, EntityIndex index)
         {
             var cluster = Get(nonUniqueIndexInfo, index);
-            return cluster.GetItems();
+            return cluster?.GetItems();
         }
 
         public CachedEntity GetUntyped(EntityKey pk)
@@ -140,15 +140,18 @@ namespace VitalChoice.Caching.Services.Cache
                     _indexedCluster.Remove(removed.UniqueIndex);
                 removed.ConditionalIndexes.ForEach(
                     conditionalIndex => _conditionalIndexedDictionary[conditionalIndex.Key].Remove(conditionalIndex.Value));
-                foreach (var nonUniquePartition in removed.NonUniqueIndexes)
+                if (removed.NonUniqueIndexes != null)
                 {
-                    CacheCluster<EntityKey, T> cluster;
-                    if (_nonUniqueIndexedDictionary[nonUniquePartition.Key].TryGetValue(nonUniquePartition.Value, out cluster))
+                    foreach (var nonUniquePartition in removed.NonUniqueIndexes)
                     {
-                        cluster.Remove(key);
-                        if (cluster.IsEmpty)
+                        CacheCluster<EntityKey, T> cluster;
+                        if (_nonUniqueIndexedDictionary[nonUniquePartition.Key].TryGetValue(nonUniquePartition.Value, out cluster))
                         {
-                            _nonUniqueIndexedDictionary[nonUniquePartition.Key].TryRemove(nonUniquePartition.Value, out cluster);
+                            cluster.Remove(key);
+                            if (cluster.IsEmpty)
+                            {
+                                _nonUniqueIndexedDictionary[nonUniquePartition.Key].TryRemove(nonUniquePartition.Value, out cluster);
+                            }
                         }
                     }
                 }
@@ -320,15 +323,18 @@ namespace VitalChoice.Caching.Services.Cache
                     {
                         _conditionalIndexedDictionary[indexInfo].Remove(_cacheStorage.GetConditionalIndexValue(exist, indexInfo));
                     }
-                    foreach (var nonUniquePartition in exist.NonUniqueIndexes)
+                    if (exist.NonUniqueIndexes != null)
                     {
-                        CacheCluster<EntityKey, T> cluster;
-                        if (_nonUniqueIndexedDictionary[nonUniquePartition.Key].TryGetValue(nonUniquePartition.Value, out cluster))
+                        foreach (var nonUniquePartition in exist.NonUniqueIndexes)
                         {
-                            cluster.Remove(pk);
-                            if (cluster.IsEmpty)
+                            CacheCluster<EntityKey, T> cluster;
+                            if (_nonUniqueIndexedDictionary[nonUniquePartition.Key].TryGetValue(nonUniquePartition.Value, out cluster))
                             {
-                                _nonUniqueIndexedDictionary[nonUniquePartition.Key].TryRemove(nonUniquePartition.Value, out cluster);
+                                cluster.Remove(pk);
+                                if (cluster.IsEmpty)
+                                {
+                                    _nonUniqueIndexedDictionary[nonUniquePartition.Key].TryRemove(nonUniquePartition.Value, out cluster);
+                                }
                             }
                         }
                     }

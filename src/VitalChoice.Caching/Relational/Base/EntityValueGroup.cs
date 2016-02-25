@@ -25,7 +25,7 @@ namespace VitalChoice.Caching.Relational.Base
             // ReSharper disable once LoopCanBeConvertedToQuery
             for (var index = 0; index < Values.Length; index++)
             {
-                if (!Values[index].Value.Equals(other.Values[index].Value))
+                if (!Values[index].Value?.Equals(other.Values[index].Value) ?? false)
                 {
                     return false;
                 }

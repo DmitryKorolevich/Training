@@ -83,8 +83,8 @@ namespace VitalChoice.Caching.Services
                             }
 
                             var nonUniqueList = new HashSet<EntityCacheableIndexInfo>();
-                            var externalForeignKeys = new HashSet<EntityForeignKeyInfo>();
-                            var externalDependentTypes = new Dictionary<Type, EntityCacheableIndexRelationInfo>();
+                            var externalForeignKeys = new List<KeyValuePair<Type, EntityForeignKeyInfo>>();
+                            var externalDependentTypes = new List<KeyValuePair<Type, EntityCacheableIndexRelationInfo>>();
                             var localForeignKeys = new HashSet<EntityForeignKeyInfo>();
 
                             foreach (var foreignKey in entityType.GetForeignKeys())
@@ -98,7 +98,9 @@ namespace VitalChoice.Caching.Services
                                             foreignKey.DependentToPrincipal.Name,
                                             CreateValueInfos(foreignKey.PrincipalKey.Properties));
                                         nonUniqueList.Add(index);
-                                        externalDependentTypes.Add(foreignKey.DependentToPrincipal.GetTargetType().ClrType, index);
+                                        externalDependentTypes.Add(
+                                            new KeyValuePair<Type, EntityCacheableIndexRelationInfo>(
+                                                foreignKey.DependentToPrincipal.GetTargetType().ClrType, index));
                                     }
                                 }
                                 else
@@ -106,11 +108,13 @@ namespace VitalChoice.Caching.Services
                                     if (foreignKey.PrincipalToDependent.IsCollection())
                                     {
                                         externalForeignKeys.Add(
-                                            new EntityForeignKeyCollectionInfo(foreignKey.PrincipalToDependent.Name,
-                                                foreignKey.PrincipalToDependent.GetGetter(),
-                                                foreignKey.PrincipalToDependent.GetTargetType().ClrType));
+                                            new KeyValuePair<Type, EntityForeignKeyInfo>(
+                                                foreignKey.PrincipalToDependent.DeclaringEntityType.ClrType,
+                                                new EntityForeignKeyCollectionInfo(foreignKey.PrincipalToDependent.Name,
+                                                    foreignKey.PrincipalToDependent.GetGetter(),
+                                                    foreignKey.PrincipalToDependent.GetTargetType().ClrType)));
                                     }
-                                    else if (foreignKey.DependentToPrincipal != null)
+                                    if (foreignKey.DependentToPrincipal != null)
                                     {
                                         var foreignValues = CreateValueInfos(foreignKey.Properties).ToArray();
                                         localForeignKeys.Add(new EntityForeignKeyInfo(foreignValues,
@@ -123,23 +127,27 @@ namespace VitalChoice.Caching.Services
                             externalDependentTypes.ForEach(externalType => entityInfos.AddOrUpdate(externalType.Key, () => new EntityInfo
                             {
                                 DependentTypes =
-                                    new Dictionary<Type, EntityCacheableIndexRelationInfo> {{entityType.ClrType, externalType.Value}}
+                                    new List<KeyValuePair<Type, EntityCacheableIndexRelationInfo>>
+                                    {
+                                        new KeyValuePair<Type, EntityCacheableIndexRelationInfo>(entityType.ClrType, externalType.Value)
+                                    }
                             }, info =>
                             {
                                 if (info.DependentTypes == null)
-                                    info.DependentTypes = new Dictionary<Type, EntityCacheableIndexRelationInfo>();
-                                info.DependentTypes.Add(entityType.ClrType, externalType.Value);
+                                    info.DependentTypes = new List<KeyValuePair<Type, EntityCacheableIndexRelationInfo>>();
+                                info.DependentTypes.Add(new KeyValuePair<Type, EntityCacheableIndexRelationInfo>(entityType.ClrType,
+                                    externalType.Value));
                                 return info;
                             }));
 
-                            externalForeignKeys.ForEach(external => entityInfos.AddOrUpdate(external.DependentType, () => new EntityInfo
+                            externalForeignKeys.ForEach(external => entityInfos.AddOrUpdate(external.Key, () => new EntityInfo
                             {
-                                ForeignKeys = new HashSet<EntityForeignKeyInfo> {external}
+                                ForeignKeys = new HashSet<EntityForeignKeyInfo> {external.Value}
                             }, info =>
                             {
                                 if (info.ForeignKeys == null)
                                     info.ForeignKeys = new HashSet<EntityForeignKeyInfo>();
-                                info.ForeignKeys.Add(external);
+                                info.ForeignKeys.Add(external.Value);
                                 return info;
                             }));
 
@@ -266,7 +274,7 @@ namespace VitalChoice.Caching.Services
                         {
                             var part =
                                 Expression.Lambda<Func<T, bool>>(Expression.Equal(
-                                    Expression.MakeMemberAccess(parameter, typeof (T).GetTypeInfo().GetProperty(keyValue.Name)),
+                                    Expression.MakeMemberAccess(parameter, typeof (T).GetRuntimeProperty(keyValue.Name)),
                                     Expression.Constant(keyValue.Value)), parameter);
                             conditionalExpression = conditionalExpression == null ? part : conditionalExpression.And(part);
                         }

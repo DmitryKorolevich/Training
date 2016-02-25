@@ -16,7 +16,7 @@ namespace VitalChoice.Caching.Services
         protected readonly IEntityInfoStorage KeyStorage;
         protected readonly ILogger Logger;
 
-        protected CacheSyncProvider(IInternalEntityCacheFactory cacheFactory, IEntityInfoStorage keyStorage, ILogger logger)
+        public CacheSyncProvider(IInternalEntityCacheFactory cacheFactory, IEntityInfoStorage keyStorage, ILogger logger)
         {
             CacheFactory = cacheFactory;
             KeyStorage = keyStorage;

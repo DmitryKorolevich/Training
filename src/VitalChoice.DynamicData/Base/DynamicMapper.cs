@@ -59,14 +59,13 @@ namespace VitalChoice.DynamicData.Base
 
         protected abstract Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
         protected abstract Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
-        private readonly ICollection<TOptionType> _optionTypes;
 
         protected DynamicMapper(ITypeConverter typeConverter,
             IModelConverterService converterService,
             IReadRepositoryAsync<TOptionType> optionTypeRepositoryAsync) : base(typeConverter, converterService)
         {
             _typeConverter = typeConverter;
-            _optionTypes = optionTypeRepositoryAsync.Query().Include(o => o.Lookup).ThenInclude(l => l.LookupVariants).Select(false);
+            OptionTypes = optionTypeRepositoryAsync.Query().Include(o => o.Lookup).ThenInclude(l => l.LookupVariants).Select(false);
         }
 
         public virtual void SyncCollections(ICollection<TDynamic> dynamics, ICollection<TEntity> entities,
@@ -119,7 +118,7 @@ namespace VitalChoice.DynamicData.Base
             return new OptionTypeQuery<TOptionType>();
         }
 
-        public ICollection<TOptionType> OptionTypes => _optionTypes;
+        public ICollection<TOptionType> OptionTypes { get; }
 
         public ICollection<TOptionType> FilterByType(int? objectType)
         {
@@ -451,10 +450,14 @@ namespace VitalChoice.DynamicData.Base
             base.SecureObjectInternal(obj, processedObjectsSet);
         }
 
-        private static void UpdateEntityItem(TDynamic dynamic, TEntity entity)
+        private void UpdateEntityItem(TDynamic dynamic, TEntity entity)
         {
             if (dynamic == null || entity == null)
                 return;
+            if (dynamic.IdObjectType != entity.IdObjectType)
+            {
+                entity.OptionTypes = FilterByType(dynamic.IdObjectType);
+            }
             if (entity.OptionTypes == null)
             {
                 throw new ApiException($"UpdateEntityItem<{typeof (TEntity)}> have no OptionTypes, are you forgot to pass them?");
@@ -532,7 +535,7 @@ namespace VitalChoice.DynamicData.Base
             return result;
         }
 
-        private static void UpdateEntityItem(DynamicEntityPair<TDynamic, TEntity> pair)
+        private void UpdateEntityItem(DynamicEntityPair<TDynamic, TEntity> pair)
         {
             UpdateEntityItem(pair.Dynamic, pair.Entity);
         }

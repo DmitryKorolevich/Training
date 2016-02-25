@@ -448,6 +448,9 @@ namespace VitalChoice.Caching.Services.Cache
 
         private void MarkForUpdateDependent(EntityKey pk)
         {
+            if (DependentTypes == null)
+                return;
+
             foreach (var dependentType in DependentTypes)
             {
                 if (CacheFactory.CacheExist(dependentType.Key))
@@ -457,9 +460,12 @@ namespace VitalChoice.Caching.Services.Cache
                     foreach (var data in cacheDatas)
                     {
                         var cachedItems = data.GetUntyped(dependentType.Value, dependentType.Value.KeyMapping.MapPrincipalToForeign(pk));
-                        foreach (var entity in cachedItems)
+                        if (cachedItems != null)
                         {
-                            entity.NeedUpdate = true;
+                            foreach (var entity in cachedItems)
+                            {
+                                entity.NeedUpdate = true;
+                            }
                         }
                     }
                 }
@@ -468,6 +474,9 @@ namespace VitalChoice.Caching.Services.Cache
 
         private void MarkForUpdateForeignKeys(IEnumerable<KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>> foreignKeys)
         {
+            if (foreignKeys == null)
+                return;
+
             foreach (var foreignKey in foreignKeys)
             {
                 if (CacheFactory.CacheExist(foreignKey.Key.DependentType))
