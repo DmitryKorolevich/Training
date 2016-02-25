@@ -33,6 +33,11 @@ namespace VitalChoice.Caching.Relational.Base
             return true;
         }
 
+        public override string ToString()
+        {
+            return $"({string.Join(", ", Values.Select(v => v.ToString()))})";
+        }
+
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(this, obj)) return true;

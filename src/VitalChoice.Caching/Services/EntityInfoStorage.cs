@@ -4,16 +4,19 @@ using System.Linq;
 using System.Linq.Expressions;
 using Autofac;
 using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Metadata.Internal;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.GC;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
+using VitalChoice.Caching.Relational.Base;
 using VitalChoice.Caching.Services.Cache.Base;
+using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain.Options;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Services
 {
@@ -38,6 +41,7 @@ namespace VitalChoice.Caching.Services
 
         private void Initialize()
         {
+            var parsedEntities = new HashSet<Type>();
             var entityInfos = new Dictionary<Type, EntityInfo>();
             using (var scope = _serviceProvider.BeginLifetimeScope())
             {
@@ -51,21 +55,17 @@ namespace VitalChoice.Caching.Services
                         var key = entityType.FindPrimaryKey();
                         if (key == null) continue;
 
-                        var keyInfos =
-                            key.Properties.Select(property => new EntityKeyInfo(property.Name, property.GetGetter(), property.ClrType));
+                        var keyInfos = CreateValueInfos(key.Properties);
 
                         var indexes = entityType.GetIndexes().Where(index => index.IsUnique);
 
                         var uniqueIndex =
                             indexes.Select(
                                 index =>
-                                    new EntityUniqueIndexInfo(
-                                        index.Properties.Select(
-                                            property =>
-                                                new EntityIndexInfo(property.Name, property.GetGetter(), property.ClrType))))
+                                    new EntityCacheableIndexInfo(CreateValueInfos(index.Properties)))
                                 .FirstOrDefault();
 
-                        List<EntityConditionalIndexInfo> nonUniqueList = new List<EntityConditionalIndexInfo>();
+                        List<EntityConditionalIndexInfo> conditionalList = new List<EntityConditionalIndexInfo>();
 
                         // ReSharper disable once LoopCanBeConvertedToQuery
                         foreach (var index in entityType.GetIndexes())
@@ -73,21 +73,89 @@ namespace VitalChoice.Caching.Services
                             var conditionAnnotation = index.FindAnnotation(IndexBuilderExtension.UniqueIndexAnnotationName);
                             if (conditionAnnotation != null)
                             {
-                                nonUniqueList.Add(
-                                    new EntityConditionalIndexInfo(
-                                        index.Properties.Select(
-                                            property =>
-                                                new EntityIndexInfo(property.Name, property.GetGetter(), property.ClrType)),
-                                        entityType.ClrType, conditionAnnotation.Value as LambdaExpression));
+                                conditionalList.Add(new EntityConditionalIndexInfo(CreateValueInfos(index.Properties), entityType.ClrType,
+                                    conditionAnnotation.Value as LambdaExpression));
                             }
                         }
-                        if (!entityInfos.ContainsKey(entityType.ClrType))
+
+                        var nonUniqueList = new HashSet<EntityCacheableIndexInfo>();
+                        var externalForeignKeys = new HashSet<EntityForeignKeyInfo>();
+                        var externalDependentTypes = new Dictionary<Type, EntityCacheableIndexRelationInfo>();
+                        var localForeignKeys = new HashSet<EntityForeignKeyInfo>();
+
+                        foreach (var foreignKey in entityType.GetForeignKeys())
                         {
-                            entityInfos.Add(entityType.ClrType, new EntityInfo
+                            if (foreignKey.PrincipalToDependent == null)
                             {
+                                if (foreignKey.DependentToPrincipal != null)
+                                {
+                                    var index = new EntityCacheableIndexRelationInfo(CreateValueInfos(foreignKey.Properties),
+                                        foreignKey.DependentToPrincipal.Name,
+                                        new KeyMap(CreateValueInfos(foreignKey.PrincipalKey.Properties),
+                                            CreateValueInfos(foreignKey.Properties)));
+                                    nonUniqueList.Add(index);
+                                    externalDependentTypes.Add(foreignKey.DependentToPrincipal.GetTargetType().ClrType, index);
+                                }
+                            }
+                            else
+                            {
+                                if (foreignKey.PrincipalToDependent.IsCollection())
+                                {
+                                    externalForeignKeys.Add(
+                                        new EntityForeignKeyCollectionInfo(foreignKey.PrincipalToDependent.Name,
+                                            foreignKey.PrincipalToDependent.GetGetter(),
+                                            foreignKey.PrincipalToDependent.GetTargetType().ClrType));
+                                }
+                                else if (foreignKey.DependentToPrincipal != null)
+                                {
+                                    localForeignKeys.Add(new EntityForeignKeyInfo(CreateValueInfos(foreignKey.Properties),
+                                        foreignKey.PrincipalToDependent.GetTargetType().ClrType));
+                                }
+                            }
+                        }
+
+                        externalDependentTypes.ForEach(externalType => entityInfos.AddOrUpdate(externalType.Key, () => new EntityInfo
+                        {
+                            DependentTypes = new Dictionary<Type, EntityCacheableIndexRelationInfo> {{entityType.ClrType, externalType.Value}}
+                        }, info =>
+                        {
+                            if (info.DependentTypes == null)
+                                info.DependentTypes = new Dictionary<Type, EntityCacheableIndexRelationInfo>();
+                            info.DependentTypes.Add(entityType.ClrType, externalType.Value);
+                            return info;
+                        }));
+
+                        externalForeignKeys.ForEach(external => entityInfos.AddOrUpdate(external.DependentType, () => new EntityInfo
+                        {
+                            ForeignKeys = new HashSet<EntityForeignKeyInfo> {external}
+                        }, info =>
+                        {
+                            if (info.ForeignKeys == null)
+                                info.ForeignKeys = new HashSet<EntityForeignKeyInfo>();
+                            info.ForeignKeys.Add(external);
+                            return info;
+                        }));
+
+                        if (!parsedEntities.Contains(entityType.ClrType))
+                        {
+                            parsedEntities.Add(entityType.ClrType);
+                            entityInfos.AddOrUpdate(entityType.ClrType, () => new EntityInfo
+                            {
+                                ForeignKeys = localForeignKeys,
+                                NonUniqueIndexes = nonUniqueList,
                                 PrimaryKey = new EntityPrimaryKeyInfo(keyInfos),
-                                UniqueIndex = uniqueIndex,
-                                ConditionalIndexes = nonUniqueList
+                                CacheableIndex = uniqueIndex,
+                                ConditionalIndexes = conditionalList
+                            }, info =>
+                            {
+                                if (info.ForeignKeys == null)
+                                    info.ForeignKeys = new HashSet<EntityForeignKeyInfo>();
+                                info.ForeignKeys.AddRange(localForeignKeys);
+                                info.NonUniqueIndexes = nonUniqueList;
+                                info.PrimaryKey = new EntityPrimaryKeyInfo(keyInfos);
+                                info.CacheableIndex = uniqueIndex;
+                                info.ConditionalIndexes = conditionalList;
+                                return info;
                             });
                         }
                         else
@@ -113,6 +181,36 @@ namespace VitalChoice.Caching.Services
             return _entityInfos.ContainsKey(entityType);
         }
 
+        public bool GetEntityInfo(Type entityType, out EntityInfo info)
+        {
+            return _entityInfos.TryGetValue(entityType, out info);
+        }
+
+        public ICollection<EntityCacheableIndexInfo> GetNonUniqueIndexInfos(Type entityType)
+        {
+            EntityInfo entityInfo;
+            if (_entityInfos.TryGetValue(entityType, out entityInfo))
+            {
+                return entityInfo.NonUniqueIndexes;
+            }
+            return new EntityCacheableIndexInfo[0];
+        }
+
+        public ICollection<KeyValuePair<Type, EntityCacheableIndexRelationInfo>> GetDependentTypes(Type entityType)
+        {
+            EntityInfo entityInfo;
+            if (_entityInfos.TryGetValue(entityType, out entityInfo))
+            {
+                return entityInfo.DependentTypes;
+            }
+            return new KeyValuePair<Type, EntityCacheableIndexRelationInfo>[0];
+        }
+
+        public bool GetEntityInfo<T>(out EntityInfo info)
+        {
+            return _entityInfos.TryGetValue(typeof(T), out info);
+        }
+
         public EntityPrimaryKeyInfo GetPrimaryKeyInfo<T>()
         {
             EntityInfo entityInfo;
@@ -123,12 +221,12 @@ namespace VitalChoice.Caching.Services
             return null;
         }
 
-        public EntityUniqueIndexInfo GetIndexInfo<T>()
+        public EntityCacheableIndexInfo GetIndexInfo<T>()
         {
             EntityInfo entityInfo;
             if (_entityInfos.TryGetValue(typeof (T), out entityInfo))
             {
-                return entityInfo.UniqueIndex;
+                return entityInfo.CacheableIndex;
             }
             return null;
         }
@@ -143,6 +241,36 @@ namespace VitalChoice.Caching.Services
             return new EntityConditionalIndexInfo[0];
         }
 
+        public ICollection<EntityForeignKeyInfo> GetForeignKeyInfos<T>()
+        {
+            EntityInfo entityInfo;
+            if (_entityInfos.TryGetValue(typeof(T), out entityInfo))
+            {
+                return entityInfo.ForeignKeys;
+            }
+            return new EntityForeignKeyInfo[0];
+        }
+
+        public ICollection<EntityCacheableIndexInfo> GetNonUniqueIndexInfos<T>()
+        {
+            EntityInfo entityInfo;
+            if (_entityInfos.TryGetValue(typeof(T), out entityInfo))
+            {
+                return entityInfo.NonUniqueIndexes;
+            }
+            return new EntityCacheableIndexInfo[0];
+        }
+
+        public ICollection<KeyValuePair<Type, EntityCacheableIndexRelationInfo>> GetDependentTypes<T>()
+        {
+            EntityInfo entityInfo;
+            if (_entityInfos.TryGetValue(typeof(T), out entityInfo))
+            {
+                return entityInfo.DependentTypes;
+            }
+            return new KeyValuePair<Type, EntityCacheableIndexRelationInfo>[0];
+        }
+
         public EntityPrimaryKeyInfo GetPrimaryKeyInfo(Type entityType)
         {
             EntityInfo entityInfo;
@@ -153,12 +281,12 @@ namespace VitalChoice.Caching.Services
             return null;
         }
 
-        public EntityUniqueIndexInfo GetIndexInfo(Type entityType)
+        public EntityCacheableIndexInfo GetIndexInfo(Type entityType)
         {
             EntityInfo entityInfo;
             if (_entityInfos.TryGetValue(entityType, out entityInfo))
             {
-                return entityInfo.UniqueIndex;
+                return entityInfo.CacheableIndex;
             }
             return null;
         }
@@ -173,11 +301,28 @@ namespace VitalChoice.Caching.Services
             return new EntityConditionalIndexInfo[0];
         }
 
+        public ICollection<EntityForeignKeyInfo> GetForeignKeyInfos(Type entityType)
+        {
+            EntityInfo entityInfo;
+            if (_entityInfos.TryGetValue(entityType, out entityInfo))
+            {
+                return entityInfo.ForeignKeys;
+            }
+            return new EntityForeignKeyInfo[0];
+        }
+
         public IEnumerable<Type> TrackedTypes => _entityInfos.Keys;
 
         public bool CanAddUpCache()
         {
             return _gcCollector.CanAddUpCache();
+        }
+
+        private static IEnumerable<EntityValueInfo> CreateValueInfos(IEnumerable<IProperty> properties)
+        {
+            return properties.Select(
+                property =>
+                    new EntityValueInfo(property.Name, property.GetGetter(), property.ClrType));
         }
     }
 }

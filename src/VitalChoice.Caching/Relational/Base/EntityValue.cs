@@ -2,10 +2,10 @@
 
 namespace VitalChoice.Caching.Relational.Base
 {
-    public abstract class EntityValue<TInfo> : IEquatable<EntityValue<TInfo>>
+    public class EntityValue<TInfo> : IEquatable<EntityValue<TInfo>>
         where TInfo: EntityValueInfo
     {
-        protected EntityValue(TInfo valueInfo, object value)
+        public EntityValue(TInfo valueInfo, object value)
         {
             if (valueInfo == null)
                 throw new ArgumentNullException(nameof(valueInfo));
@@ -29,6 +29,11 @@ namespace VitalChoice.Caching.Relational.Base
             if (entityKey != null)
                 return Equals(entityKey);
             return false;
+        }
+
+        public override string ToString()
+        {
+            return $"{ValueInfo.Name}: {Value}";
         }
 
         public override int GetHashCode()

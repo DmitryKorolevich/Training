@@ -28,9 +28,9 @@ namespace VitalChoice.Caching.Services.Cache
 
         public CacheResult<T> TryGetEntity(EntityKey key, RelationInfo relations)
         {
-            CachedEntity<T> cached;
             var data = CacheStorage.GetCacheData(relations);
-            if (data.Get(key, out cached))
+            var cached = data.Get(key);
+            if (cached != null)
             {
                 return cached;
             }
@@ -42,8 +42,8 @@ namespace VitalChoice.Caching.Services.Cache
             var data = CacheStorage.GetCacheData(relations);
             foreach (var key in primaryKeys)
             {
-                CachedEntity<T> cached;
-                if (data.Get(key, out cached))
+                var cached = data.Get(key);
+                if (cached != null)
                 {
                     if (cached.NeedUpdate)
                     {
@@ -60,9 +60,9 @@ namespace VitalChoice.Caching.Services.Cache
 
         public CacheResult<T> TryGetEntity(EntityIndex key, RelationInfo relationInfo)
         {
-            CachedEntity<T> cached;
             var data = CacheStorage.GetCacheData(relationInfo);
-            if (data.Get(key, out cached))
+            var cached = data.Get(key);
+            if (cached != null)
             {
                 return cached;
             }
@@ -74,8 +74,8 @@ namespace VitalChoice.Caching.Services.Cache
             var data = CacheStorage.GetCacheData(relations);
             foreach (var index in indexes)
             {
-                CachedEntity<T> cached;
-                if (data.Get(index, out cached))
+                var cached = data.Get(index);
+                if (cached != null)
                 {
                     if (cached.NeedUpdate)
                         yield return CacheGetResult.Update;
@@ -90,9 +90,9 @@ namespace VitalChoice.Caching.Services.Cache
 
         public CacheResult<T> TryGetEntity(EntityIndex key, EntityConditionalIndexInfo conditionalInfo, RelationInfo relations)
         {
-            CachedEntity<T> cached;
             var data = CacheStorage.GetCacheData(relations);
-            if (data.Get(conditionalInfo, key, out cached))
+            var cached = data.Get(conditionalInfo, key);
+            if (cached != null)
             {
                 return cached;
             }
@@ -104,8 +104,8 @@ namespace VitalChoice.Caching.Services.Cache
             var data = CacheStorage.GetCacheData(relations);
             foreach (var index in indexes)
             {
-                CachedEntity<T> cached;
-                if (data.Get(conditionalInfo, index, out cached))
+                var cached = data.Get(conditionalInfo, index);
+                if (cached != null)
                 {
                     if (cached.NeedUpdate)
                         yield return CacheGetResult.Update;
@@ -160,8 +160,8 @@ namespace VitalChoice.Caching.Services.Cache
             var datas = CacheStorage.AllCacheDatas;
             foreach (var data in datas)
             {
-                CachedEntity<T> removed;
-                if (!data.TryRemove(pk, out removed))
+                var removed = data.TryRemove(pk);
+                if (removed == null)
                     yield return CacheGetResult.NotFound;
                 yield return removed;
             }
@@ -214,18 +214,36 @@ namespace VitalChoice.Caching.Services.Cache
             data.UpdateAll(entities);
         }
 
-        public void MarkForUpdate(T entity)
+        public EntityKey MarkForUpdate(T entity)
         {
             var pk = CacheStorage.GetPrimaryKeyValue(entity);
             MarkForUpdate(pk);
+            return pk;
         }
 
-        public void MarkForUpdate(IEnumerable<T> entities)
+        public IEnumerable<EntityKey> MarkForUpdate(IEnumerable<T> entities)
         {
-            foreach (var entity in entities)
-            {
-                MarkForUpdate(entity);
-            }
+            return entities.Select(MarkForUpdate);
+        }
+
+        public EntityKey MarkForAdd(T entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<EntityKey> MarkForAdd(IEnumerable<T> entities)
+        {
+            throw new NotImplementedException();
+        }
+
+        public EntityKey MarkForDelete(T entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<EntityKey> MarkForDelete(IEnumerable<T> entities)
+        {
+            throw new NotImplementedException();
         }
 
         public CachedEntity Update(RelationInfo relations, object entity)
@@ -270,14 +288,14 @@ namespace VitalChoice.Caching.Services.Cache
             UpdateAll(entities.Cast<T>(), relationInfo);
         }
 
-        public void MarkForUpdate(object entity)
+        public EntityKey MarkForUpdate(object entity)
         {
-            MarkForUpdate((T) entity);
+            return MarkForUpdate((T) entity);
         }
 
-        public void MarkForUpdate(IEnumerable<object> entities)
+        public IEnumerable<EntityKey> MarkForUpdate(IEnumerable<object> entities)
         {
-            MarkForUpdate(entities.Cast<T>());
+            return MarkForUpdate(entities.Cast<T>());
         }
 
         public void MarkForUpdate(EntityKey pk)
@@ -287,14 +305,35 @@ namespace VitalChoice.Caching.Services.Cache
 
             foreach (var data in CacheStorage.AllCacheDatas)
             {
-                CachedEntity<T> cached;
-                if (data.Get(pk, out cached))
+                var cached = data.Get(pk);
+                if (cached != null)
                 {
                     cached.NeedUpdate = true;
+                    //TODO: Foreign keys values update expand
+                    foreach (var foreignKey in cached.ForeignKeys)
+                    {
+                        
+                    }
                 }
                 else if (data.FullCollection)
                 {
                     data.NeedUpdate = true;
+                }
+            }
+            foreach (var dependentType in DependentTypes)
+            {
+                if (CacheFactory.CacheExist(dependentType.Key))
+                {
+                    var cache = CacheFactory.GetCache(dependentType.Key);
+                    var cacheDatas = cache.GetAllCaches().Where(c => !c.Empty && c.GetHasRelation(dependentType.Value.Name));
+                    foreach (var data in cacheDatas)
+                    {
+                        var cachedItems = data.GetUntyped(dependentType.Value, dependentType.Value.MapPrincipalToForeignValues(pk));
+                        foreach (var entity in cachedItems)
+                        {
+                            entity.NeedUpdate = true;
+                        }
+                    }
                 }
             }
         }
@@ -307,6 +346,26 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
+        public EntityKey MarkForAdd(object entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<EntityKey> MarkForAdd(IEnumerable<object> entities)
+        {
+            throw new NotImplementedException();
+        }
+
+        public EntityKey MarkForDelete(object entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<EntityKey> MarkForDelete(IEnumerable<object> entities)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool TryRemove(object entity)
         {
             return TryRemove((T) entity);
@@ -317,7 +376,7 @@ namespace VitalChoice.Caching.Services.Cache
             if (pk == null)
                 return false;
             var datas = CacheStorage.AllCacheDatas;
-            return datas.Aggregate(true, (current, data) => current && data.TryRemove(pk));
+            return datas.Aggregate(true, (current, data) => current && data.TryRemove(pk) != null);
         }
 
         public bool GetCacheExist(RelationInfo relationInfo)
@@ -335,6 +394,26 @@ namespace VitalChoice.Caching.Services.Cache
             return CacheStorage.AllCacheDatas;
         }
 
+        public EntityForeignKey GetForeignKeyValue(T entity, EntityForeignKeyInfo foreignKeyInfo)
+        {
+            return CacheStorage.GetForeignKeyValue(entity, foreignKeyInfo);
+        }
+
+        public ICollection<KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>> GetForeignKeyValues(T entity)
+        {
+            return CacheStorage.GetForeignKeyValues(entity);
+        }
+
+        public EntityIndex GetNonUniqueIndexValue(T entity, EntityCacheableIndexInfo indexInfo)
+        {
+            return CacheStorage.GetNonUniqueIndexValue(entity, indexInfo);
+        }
+
+        public ICollection<KeyValuePair<EntityCacheableIndexInfo, EntityIndex>> GetNonUniqueIndexValues(T entity)
+        {
+            return CacheStorage.GetNonUniqueIndexValues(entity);
+        }
+
         public EntityKey GetPrimaryKeyValue(T entity)
         {
             return CacheStorage.GetPrimaryKeyValue(entity);
@@ -348,6 +427,26 @@ namespace VitalChoice.Caching.Services.Cache
         public EntityIndex GetConditionalIndexValue(T entity, EntityConditionalIndexInfo conditionalInfo)
         {
             return CacheStorage.GetConditionalIndexValue(entity, conditionalInfo);
+        }
+
+        public EntityForeignKey GetForeignKeyValue(object entity, EntityForeignKeyInfo foreignKeyInfo)
+        {
+            return CacheStorage.GetForeignKeyValue(entity, foreignKeyInfo);
+        }
+
+        public ICollection<KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>> GetForeignKeyValues(object entity)
+        {
+            return CacheStorage.GetForeignKeyValues(entity);
+        }
+
+        public EntityIndex GetNonUniqueIndexValue(object entity, EntityCacheableIndexInfo indexInfo)
+        {
+            return CacheStorage.GetNonUniqueIndexValue(entity, indexInfo);
+        }
+
+        public ICollection<KeyValuePair<EntityCacheableIndexInfo, EntityIndex>> GetNonUniqueIndexValues(object entity)
+        {
+            return CacheStorage.GetNonUniqueIndexValues(entity);
         }
 
         public EntityKey GetPrimaryKeyValue(object entity)
@@ -364,6 +463,8 @@ namespace VitalChoice.Caching.Services.Cache
         {
             return CacheStorage.GetConditionalIndexValue(entity, conditionalInfo);
         }
+
+        public ICollection<KeyValuePair<Type, EntityCacheableIndexRelationInfo>> DependentTypes => CacheStorage.DependentTypes;
 
         public void Dispose()
         {

@@ -5,9 +5,9 @@ using VitalChoice.Caching.Relational.Base;
 
 namespace VitalChoice.Caching.Relational
 {
-    public class EntityIndex : EntityValueGroup<EntityIndexValue, EntityIndexInfo>, IEquatable<EntityIndex>
+    public class EntityIndex : EntityValueGroup<EntityValue<EntityValueInfo>, EntityValueInfo>, IEquatable<EntityIndex>
     {
-        public EntityIndex(IEnumerable<EntityIndexValue> values):base(values)
+        public EntityIndex(IEnumerable<EntityValue<EntityValueInfo>> values):base(values)
         {
         }
 

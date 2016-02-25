@@ -17,10 +17,14 @@ namespace VitalChoice.Caching.Interfaces
         void SetNull(IEnumerable<EntityKey> keys, RelationInfo relationInfo);
         void SetNull(EntityKey key, RelationInfo relationInfo);
         void UpdateAll(IEnumerable<object> entities, RelationInfo relationInfo);
-        void MarkForUpdate(object entity);
-        void MarkForUpdate(IEnumerable<object> entities);
+        EntityKey MarkForUpdate(object entity);
+        IEnumerable<EntityKey> MarkForUpdate(IEnumerable<object> entities);
         void MarkForUpdate(EntityKey pk);
         void MarkForUpdate(IEnumerable<EntityKey> pks);
+        EntityKey MarkForAdd(object entity);
+        IEnumerable<EntityKey> MarkForAdd(IEnumerable<object> entities);
+        EntityKey MarkForDelete(object entity);
+        IEnumerable<EntityKey> MarkForDelete(IEnumerable<object> entities);
         bool TryRemove(object entity);
         bool TryRemove(EntityKey pk);
         bool GetCacheExist(RelationInfo relationInfo);
@@ -54,7 +58,11 @@ namespace VitalChoice.Caching.Interfaces
         CachedEntity<T> Update(RelationInfo relations, T entity);
         IEnumerable<CachedEntity<T>> Update(RelationInfo relations, IEnumerable<T> entities);
         void UpdateAll(IEnumerable<T> entities, RelationInfo relationInfo);
-        void MarkForUpdate(T entity);
-        void MarkForUpdate(IEnumerable<T> entities);
+        EntityKey MarkForUpdate(T entity);
+        IEnumerable<EntityKey> MarkForUpdate(IEnumerable<T> entities);
+        EntityKey MarkForAdd(T entity);
+        IEnumerable<EntityKey> MarkForAdd(IEnumerable<T> entities);
+        EntityKey MarkForDelete(T entity);
+        IEnumerable<EntityKey> MarkForDelete(IEnumerable<T> entities);
     }
 }

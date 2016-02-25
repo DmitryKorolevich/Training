@@ -11,7 +11,7 @@ namespace VitalChoice.Caching.Relational.Base
 
         internal readonly Dictionary<string, TInfo> ValuesDictionary;
 
-        public ICollection<TInfo> InfoCollection => ValuesDictionary.Values;
+        public virtual ICollection<TInfo> InfoCollection => ValuesDictionary.Values;
 
         protected EntityValueGroupInfo(IEnumerable<TInfo> valueInfos)
         {
@@ -43,13 +43,14 @@ namespace VitalChoice.Caching.Relational.Base
             return Equals((EntityValueGroupInfo<TInfo>) obj);
         }
 
-        private int? _hashCode;
+        public override string ToString()
+        {
+            return $"({string.Join(", ", ValuesDictionary.Values.Select(v => v.ToString()))})";
+        }
 
         public override int GetHashCode()
         {
-            if (!_hashCode.HasValue)
-                _hashCode = ValuesDictionary.Values.Aggregate(0, (current, indexInfo) => (current*397) ^ indexInfo.GetHashCode());
-            return _hashCode.Value;
+            return ValuesDictionary.Values.Aggregate(0, (current, indexInfo) => (current*397) ^ indexInfo.GetHashCode());
         }
 
         public static bool operator ==(EntityValueGroupInfo<TInfo> left, EntityValueGroupInfo<TInfo> right)

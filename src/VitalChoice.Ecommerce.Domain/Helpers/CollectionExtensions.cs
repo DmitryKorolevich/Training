@@ -9,6 +9,21 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
 {
     public static class CollectionExtensions
     {
+        public static IEnumerable<KeyValuePair<T1, T2>> SimpleJoin<T1, T2>(this IEnumerable<T1> left, IEnumerable<T2> right)
+        {
+            using (var enumerator = right.GetEnumerator())
+            {
+                foreach (var leftItem in left)
+                {
+                    if (!enumerator.MoveNext())
+                    {
+                        throw new AggregateException("Collections has different number of items");
+                    }
+                    yield return new KeyValuePair<T1, T2>(leftItem, enumerator.Current);
+                }
+            }
+        }
+
         public static void AddCast(this IList results, IEnumerable items, Type srcType, Type destType)
         {
             if (srcType == null)
@@ -353,6 +368,40 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
                 throw new ArgumentNullException(nameof(src));
 
             return string.Join("\r\n", src.Select(pair => $"[{pair.Key} = {pair.Value}]"));
+        }
+
+        public static void AddOrUpdate<T1, T2>(this Dictionary<T1, T2> src, T1 key, Func<T2> valueFactory, Action<T2> updateAction)
+            where T2: class
+        {
+            if (src == null)
+                throw new ArgumentNullException(nameof(src));
+
+            T2 existValue;
+            if (src.TryGetValue(key, out existValue))
+            {
+                updateAction(existValue);
+            }
+            else
+            {
+                src.Add(key, valueFactory());
+            }
+        }
+
+        public static void AddOrUpdate<T1, T2>(this Dictionary<T1, T2> src, T1 key, Func<T2> valueFactory, Func<T2, T2> updateAction)
+            where T2 : struct
+        {
+            if (src == null)
+                throw new ArgumentNullException(nameof(src));
+
+            T2 existValue;
+            if (src.TryGetValue(key, out existValue))
+            {
+                src[key] = updateAction(existValue);
+            }
+            else
+            {
+                src.Add(key, valueFactory());
+            }
         }
     }
 }

@@ -11,7 +11,7 @@ namespace VitalChoice.Caching.Relational
         bool CheckCondition(object entity);
     }
 
-    public class EntityConditionalIndexInfo : EntityValueGroupInfo<EntityIndexInfo>, IConditionChecker, IEquatable<EntityConditionalIndexInfo>
+    public class EntityConditionalIndexInfo : EntityValueGroupInfo<EntityValueInfo>, IConditionChecker, IEquatable<EntityConditionalIndexInfo>
     {
         public bool Equals(EntityConditionalIndexInfo other)
         {
@@ -22,7 +22,7 @@ namespace VitalChoice.Caching.Relational
         private readonly IConditionChecker _conditionChecker;
         private static readonly IConditionChecker NullChecker = new NullConditionChecker();
 
-        public EntityConditionalIndexInfo(IEnumerable<EntityIndexInfo> indexInfos, Type ownedType,
+        public EntityConditionalIndexInfo(IEnumerable<EntityValueInfo> indexInfos, Type ownedType,
             LambdaExpression logicalUniquenessCondition) : base(indexInfos)
         {
             LogicalUniquenessCondition = logicalUniquenessCondition;

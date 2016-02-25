@@ -16,20 +16,20 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Expressions.Analyzers
 {
-    public class PrimaryKeyAnalyzer<T>: GenericAnalyzer<T, EntityKey, EntityKeyValue, EntityKeyInfo>
+    public class PrimaryKeyAnalyzer<T>: GenericAnalyzer<T, EntityKey, EntityValue<EntityValueInfo>, EntityValueInfo>
     {
-        public PrimaryKeyAnalyzer(EntityValueGroupInfo<EntityKeyInfo> indexInfo): base(indexInfo)
+        public PrimaryKeyAnalyzer(EntityValueGroupInfo<EntityValueInfo> indexInfo): base(indexInfo)
         {
         }
 
-        protected override EntityKey GroupFactory(IEnumerable<EntityKeyValue> values)
+        protected override EntityKey GroupFactory(IEnumerable<EntityValue<EntityValueInfo>> values)
         {
             return new EntityKey(values);
         }
 
-        protected override EntityKeyValue ValueFactory(EntityKeyInfo info, object value)
+        protected override EntityValue<EntityValueInfo> ValueFactory(EntityValueInfo info, object value)
         {
-            return new EntityKeyValue(info, value);
+            return new EntityValue<EntityValueInfo>(info, value);
         }
     }
 }

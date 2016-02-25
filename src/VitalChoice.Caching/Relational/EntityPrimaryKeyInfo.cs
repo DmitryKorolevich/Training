@@ -6,14 +6,14 @@ using VitalChoice.Caching.Relational.Base;
 
 namespace VitalChoice.Caching.Relational
 {
-    public class EntityPrimaryKeyInfo : EntityValueGroupInfo<EntityKeyInfo>, IEquatable<EntityPrimaryKeyInfo>
+    public class EntityPrimaryKeyInfo : EntityValueGroupInfo<EntityValueInfo>, IEquatable<EntityPrimaryKeyInfo>
     {
         public bool Equals(EntityPrimaryKeyInfo other)
         {
             return base.Equals(other);
         }
 
-        public EntityPrimaryKeyInfo(IEnumerable<EntityKeyInfo> keyInfos): base(keyInfos)
+        public EntityPrimaryKeyInfo(IEnumerable<EntityValueInfo> keyInfos): base(keyInfos)
         {
         }
     }

@@ -11,8 +11,10 @@ namespace VitalChoice.Caching.Interfaces
     public interface ICacheData
     {
         void Clear();
+        IEnumerable<CachedEntity> GetUntyped(EntityCacheableIndexInfo nonUniqueIndexInfo, EntityIndex index);
         IEnumerable<CachedEntity> GetAllUntyped();
-        bool TryRemove(EntityKey key);
+        CachedEntity TryRemoveUntyped(EntityKey key);
+        bool GetHasRelation(string name);
         bool FullCollection { get; }
         bool NeedUpdate { get; set; }
         bool Empty { get; }
@@ -20,11 +22,12 @@ namespace VitalChoice.Caching.Interfaces
 
     public interface ICacheData<T> : ICacheData
     {
-        bool Get(EntityKey key, out CachedEntity<T> entity);
-        bool Get(EntityIndex key, out CachedEntity<T> entity);
-        bool Get(EntityConditionalIndexInfo conditionalIndex, EntityIndex index, out CachedEntity<T> entity);
+        CacheCluster<EntityKey, T> Get(EntityCacheableIndexInfo nonUniqueIndexInfo, EntityIndex index);
+        CachedEntity<T> Get(EntityKey key);
+        CachedEntity<T> Get(EntityIndex key);
+        CachedEntity<T> Get(EntityConditionalIndexInfo conditionalIndex, EntityIndex index);
         ICollection<CachedEntity<T>> GetAll();
-        bool TryRemove(EntityKey key, out CachedEntity<T> removed);
+        CachedEntity<T> TryRemove(EntityKey key);
         CachedEntity<T> Update(T entity);
         void Update(IEnumerable<T> entity);
         void UpdateAll(IEnumerable<T> entity);

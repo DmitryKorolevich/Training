@@ -19,7 +19,7 @@ namespace VitalChoice.Caching.Extensions
 
         public static EntityKey ToPrimaryKey(this EntityKeyExportable key, EntityPrimaryKeyInfo keyInfo)
         {
-            return new EntityKey(key.Values.Select(v => new EntityKeyValue(keyInfo.ValuesDictionary[v.Name], v.Value)));
+            return new EntityKey(key.Values.Select(v => new EntityValue<EntityValueInfo>(keyInfo.ValuesDictionary[v.Name], v.Value)));
         }
     }
 }

@@ -6,30 +6,36 @@ using VitalChoice.Caching.Relational;
 
 namespace VitalChoice.Caching.Services.Cache.Base
 {
-    public abstract class CachedEntity
+    public interface ICachedEntity
+    {
+        DateTime LastAccessTime { get; }
+        bool NeedUpdate { get; set; }
+        object EntityUntyped { get; }
+    }
+
+    public interface ICachedEntity<T>
+    {
+        T Entity { get; set; }
+    }
+
+    public abstract class CachedEntity : ICachedEntity
     {
         protected DateTime LastAccess = DateTime.Now;
         protected object ValueInternal;
         private volatile bool _needUpdate;
 
-        protected CachedEntity(object valueInternal, ICollection<RelationInstance> relations,
-            ICollection<KeyValuePair<EntityConditionalIndexInfo, EntityIndex>> conditionalIndexes, EntityIndex uniqueIndex = null)
+        protected CachedEntity(object valueInternal)
         {
-            Relations = relations;
-            ConditionalIndexes = conditionalIndexes;
-            UniqueIndex = uniqueIndex;
             ValueInternal = valueInternal;
         }
 
         public DateTime LastAccessTime => LastAccess;
 
-        protected bool NeedUpdateRelations
+        public virtual bool NeedUpdate
         {
-            get { return _needUpdate || Relations.Any(r => r.RelatedObject?.NeedUpdate ?? r.RelatedList?.Any(e => e.NeedUpdate) ?? false); }
+            get { return _needUpdate; }
             set { _needUpdate = value; }
         }
-
-        public abstract bool NeedUpdate { get; set; }
 
         public object EntityUntyped
         {
@@ -43,21 +49,20 @@ namespace VitalChoice.Caching.Services.Cache.Base
             }
         }
 
-        public ICollection<RelationInstance> Relations { get; set; }
         public EntityIndex UniqueIndex { get; internal set; }
         public ICollection<KeyValuePair<EntityConditionalIndexInfo, EntityIndex>> ConditionalIndexes { get; internal set; }
+        public ICollection<KeyValuePair<EntityCacheableIndexInfo, EntityIndex>> NonUniqueIndexes { get; internal set; }
+        public ICollection<KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>> ForeignKeys { get; internal set; }
     }
 
-    public class CachedEntity<T> : CachedEntity
+    public class CachedEntity<T> : CachedEntity, ICachedEntity<T>
     {
         private readonly ICacheData<T> _cacheData;
 
-        public CachedEntity(T valueInternal, ICollection<RelationInstance> relations,
-            ICollection<KeyValuePair<EntityConditionalIndexInfo, EntityIndex>> conditionalIndexes, ICacheData<T> cacheData, EntityIndex uniqueIndex = null)
-            : base(valueInternal, relations, conditionalIndexes, uniqueIndex)
+        public CachedEntity(T valueInternal, ICacheData<T> cacheData)
+            : base(valueInternal)
         {
             _cacheData = cacheData;
-            Relations = relations;
         }
 
         public T Entity
@@ -82,8 +87,8 @@ namespace VitalChoice.Caching.Services.Cache.Base
 
         public override bool NeedUpdate
         {
-            get { return _cacheData.FullCollection && _cacheData.NeedUpdate || NeedUpdateRelations; }
-            set { NeedUpdateRelations = value; }
+            get { return _cacheData.FullCollection && _cacheData.NeedUpdate || base.NeedUpdate; }
+            set { base.NeedUpdate = value; }
         }
 
         public static implicit operator T(CachedEntity<T> cached)

@@ -5,17 +5,19 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Relational.Base
 {
-    public abstract class EntityValueInfo : IEquatable<EntityValueInfo>, IClrPropertyGetter
+    public class EntityValueInfo : IEquatable<EntityValueInfo>, IClrPropertyGetter
     {
         private readonly IClrPropertyGetter _property;
+        private readonly Type _propertyType;
         private readonly Func<object, object> _valueConvert;
 
-        protected EntityValueInfo(string name, IClrPropertyGetter property, Type propertyType)
+        public EntityValueInfo(string name, IClrPropertyGetter property, Type propertyType)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
 
             _property = property;
+            _propertyType = propertyType;
             if (propertyType.GetTypeInfo().IsEnum)
             {
 #if !DOTNET5_4
@@ -43,6 +45,11 @@ namespace VitalChoice.Caching.Relational.Base
         public override int GetHashCode()
         {
             return Name.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return $"[{_propertyType}] {Name}";
         }
 
         public static bool operator ==(EntityValueInfo left, EntityValueInfo right)

@@ -2,12 +2,10 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
-using VitalChoice.Ecommerce.Domain;
-using VitalChoice.ObjectMapping.Interfaces;
+using VitalChoice.Caching.Services.Cache.Base;
 
 namespace VitalChoice.Caching.Services.Cache
 {
@@ -15,33 +13,42 @@ namespace VitalChoice.Caching.Services.Cache
     {
         private readonly IInternalEntityCacheFactory _cacheFactory;
         private readonly EntityPrimaryKeyInfo _primaryKeyInfo;
-        private readonly EntityUniqueIndexInfo _indexInfo;
+        private readonly EntityCacheableIndexInfo _indexInfo;
+        private readonly ICollection<EntityForeignKeyInfo> _foreignKeyInfos;
         private readonly ICollection<EntityConditionalIndexInfo> _conditionalIndexes;
+        private readonly ICollection<EntityCacheableIndexInfo> _nonUniqueIndexes;
 
         public CacheStorage(IEntityInfoStorage keyStorage, IInternalEntityCacheFactory cacheFactory)
         {
             _cacheFactory = cacheFactory;
-            _primaryKeyInfo = keyStorage.GetPrimaryKeyInfo<T>();
-            _indexInfo = keyStorage.GetIndexInfo<T>();
-            _conditionalIndexes = keyStorage.GetConditionalIndexInfos<T>();
+            EntityInfo entityInfo;
+            if (keyStorage.GetEntityInfo<T>(out entityInfo))
+            {
+                _primaryKeyInfo = entityInfo.PrimaryKey;
+                _indexInfo = entityInfo.CacheableIndex;
+                _conditionalIndexes = entityInfo.ConditionalIndexes;
+                _foreignKeyInfos = entityInfo.ForeignKeys;
+                _nonUniqueIndexes = entityInfo.NonUniqueIndexes;
+                DependentTypes = entityInfo.DependentTypes;
+            }
         }
 
-        private readonly ConcurrentDictionary<RelationInfo, CacheData<T>> _cacheData =
-            new ConcurrentDictionary<RelationInfo, CacheData<T>>();
+        private readonly ConcurrentDictionary<RelationInfo, ICacheData<T>> _cacheData =
+            new ConcurrentDictionary<RelationInfo, ICacheData<T>>();
 
 
 
         public ICacheData<T> GetCacheData(RelationInfo relationInfo)
         {
             return _cacheData.GetOrAdd(relationInfo,
-                r => new CacheData<T>(_cacheFactory, this, _conditionalIndexes, relationInfo));
+                r => new CacheData<T>(_cacheFactory, this, _conditionalIndexes, _nonUniqueIndexes, relationInfo));
         }
 
-        public ICollection<CacheData<T>> AllCacheDatas => _cacheData.Values;
+        public ICollection<ICacheData<T>> AllCacheDatas => _cacheData.Values;
 
         public bool GetCacheExist(RelationInfo relationInfo)
         {
-            CacheData<T> data;
+            ICacheData<T> data;
             if (_cacheData.TryGetValue(relationInfo, out data))
             {
                 return !data.Empty;
@@ -51,7 +58,7 @@ namespace VitalChoice.Caching.Services.Cache
 
         public bool GetIsCacheFullCollection(RelationInfo relationInfo)
         {
-            CacheData<T> data;
+            ICacheData<T> data;
             if (_cacheData.TryGetValue(relationInfo, out data))
             {
                 return data.FullCollection;
@@ -59,23 +66,61 @@ namespace VitalChoice.Caching.Services.Cache
             return false;
         }
 
+        public EntityForeignKey GetForeignKeyValue(T entity, EntityForeignKeyInfo foreignKeyInfo)
+        {
+            return foreignKeyInfo.GetForeignKeyValue(entity);
+        }
+
+        public ICollection<KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>> GetForeignKeyValues(T entity)
+        {
+            return
+                _foreignKeyInfos.Select(f => new KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>(f, f.GetForeignKeyValue(entity)))
+                    .ToArray();
+        }
+
+        public EntityIndex GetNonUniqueIndexValue(T entity, EntityCacheableIndexInfo indexInfo)
+        {
+            return indexInfo.GetIndexValue(entity);
+        }
+
+        public ICollection<KeyValuePair<EntityCacheableIndexInfo, EntityIndex>> GetNonUniqueIndexValues(T entity)
+        {
+            return _nonUniqueIndexes.Select(f => new KeyValuePair<EntityCacheableIndexInfo, EntityIndex>(f, f.GetIndexValue(entity))).ToArray();
+        }
+
         public EntityKey GetPrimaryKeyValue(T entity)
         {
-            return entity.GetPrimaryKeyValue(_primaryKeyInfo);
+            return _primaryKeyInfo.GetPrimaryKeyValue(entity);
         }
 
         public EntityIndex GetIndexValue(T entity)
         {
-            if (_indexInfo != null)
-            {
-                return entity.GetIndexValue(_indexInfo);
-            }
-            return null;
+            return _indexInfo?.GetIndexValue(entity);
         }
 
         public EntityIndex GetConditionalIndexValue(T entity, EntityConditionalIndexInfo conditionalInfo)
         {
-            return entity.GetConditionalIndexValue(conditionalInfo);
+            return conditionalInfo.GetConditionalIndexValue(entity);
+        }
+
+        public EntityForeignKey GetForeignKeyValue(object entity, EntityForeignKeyInfo foreignKeyInfo)
+        {
+            return GetForeignKeyValue((T) entity, foreignKeyInfo);
+        }
+
+        public ICollection<KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>> GetForeignKeyValues(object entity)
+        {
+            return GetForeignKeyValues((T) entity);
+        }
+
+        public EntityIndex GetNonUniqueIndexValue(object entity, EntityCacheableIndexInfo indexInfo)
+        {
+            return GetNonUniqueIndexValue((T) entity, indexInfo);
+        }
+
+        public ICollection<KeyValuePair<EntityCacheableIndexInfo, EntityIndex>> GetNonUniqueIndexValues(object entity)
+        {
+            return GetNonUniqueIndexValues((T) entity);
         }
 
         public EntityKey GetPrimaryKeyValue(object entity)
@@ -92,6 +137,8 @@ namespace VitalChoice.Caching.Services.Cache
         {
             return GetConditionalIndexValue((T) entity, conditionalInfo);
         }
+
+        public ICollection<KeyValuePair<Type, EntityCacheableIndexRelationInfo>> DependentTypes { get; }
 
         public void Dispose()
         {

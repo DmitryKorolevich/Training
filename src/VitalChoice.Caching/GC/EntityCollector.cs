@@ -76,7 +76,7 @@ namespace VitalChoice.Caching.GC
                             {
                                 foreach (var entity in cache.GetAllUntyped().Where(entity => now - entity.LastAccessTime > _timeToLeave))
                                 {
-                                    cache.TryRemove(internalCache.GetPrimaryKeyValue(entity.EntityUntyped));
+                                    cache.TryRemoveUntyped(internalCache.GetPrimaryKeyValue(entity.EntityUntyped));
                                 }
                             }
                         }
