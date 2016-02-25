@@ -85,7 +85,6 @@ namespace VitalChoice.Caching.Services
                             var nonUniqueList = new HashSet<EntityCacheableIndexInfo>();
                             var externalForeignKeys = new List<KeyValuePair<Type, EntityForeignKeyInfo>>();
                             var externalDependentTypes = new List<KeyValuePair<Type, EntityCacheableIndexRelationInfo>>();
-                            var localForeignKeys = new HashSet<EntityForeignKeyInfo>();
 
                             foreach (var foreignKey in entityType.GetForeignKeys())
                             {
@@ -117,9 +116,13 @@ namespace VitalChoice.Caching.Services
                                     if (foreignKey.DependentToPrincipal != null)
                                     {
                                         var foreignValues = CreateValueInfos(foreignKey.Properties).ToArray();
-                                        localForeignKeys.Add(new EntityForeignKeyInfo(foreignValues,
-                                            CreateValueInfos(foreignKey.PrincipalKey.Properties), foreignKey.DependentToPrincipal.Name,
-                                            foreignKey.PrincipalToDependent.GetTargetType().ClrType));
+                                        externalForeignKeys.Add(
+                                            new KeyValuePair<Type, EntityForeignKeyInfo>(
+                                                foreignKey.DependentToPrincipal.DeclaringEntityType.ClrType,
+                                                new EntityForeignKeyInfo(foreignValues,
+                                                    CreateValueInfos(foreignKey.PrincipalKey.Properties),
+                                                    foreignKey.DependentToPrincipal.Name,
+                                                    foreignKey.PrincipalToDependent.GetTargetType().ClrType)));
                                     }
                                 }
                             }
@@ -156,7 +159,6 @@ namespace VitalChoice.Caching.Services
                                 parsedEntities.Add(entityType.ClrType);
                                 entityInfos.AddOrUpdate(entityType.ClrType, () => new EntityInfo
                                 {
-                                    ForeignKeys = localForeignKeys,
                                     NonUniqueIndexes = nonUniqueList,
                                     PrimaryKey = new EntityPrimaryKeyInfo(keyInfos),
                                     CacheableIndex = uniqueIndex,
@@ -166,7 +168,6 @@ namespace VitalChoice.Caching.Services
                                 {
                                     if (info.ForeignKeys == null)
                                         info.ForeignKeys = new HashSet<EntityForeignKeyInfo>();
-                                    info.ForeignKeys.AddRange(localForeignKeys);
                                     info.NonUniqueIndexes = nonUniqueList;
                                     info.PrimaryKey = new EntityPrimaryKeyInfo(keyInfos);
                                     info.CacheableIndex = uniqueIndex;
@@ -269,20 +270,20 @@ namespace VitalChoice.Caching.Services
                     {
                         var set = context.Set<T>();
                         var parameter = Expression.Parameter(typeof (T));
-                        Expression<Func<T, bool>> conditionalExpression = null;
+                        Expression conditionalExpression = null;
                         foreach (var keyValue in keyValues)
                         {
                             var part =
-                                Expression.Lambda<Func<T, bool>>(Expression.Equal(
+                                Expression.Equal(
                                     Expression.MakeMemberAccess(parameter, typeof (T).GetRuntimeProperty(keyValue.Name)),
-                                    Expression.Constant(keyValue.Value)), parameter);
-                            conditionalExpression = conditionalExpression == null ? part : conditionalExpression.And(part);
+                                    Expression.Constant(keyValue.Value));
+                            conditionalExpression = conditionalExpression == null ? part : Expression.And(conditionalExpression, part);
                         }
 
                         if (conditionalExpression == null)
                             return null;
 
-                        return set.FirstOrDefault(conditionalExpression);
+                        return set.FirstOrDefault(Expression.Lambda<Func<T, bool>>(conditionalExpression, parameter));
                     }
                 }
             }
