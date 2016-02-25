@@ -74,8 +74,8 @@ namespace VitalChoice.Caching.Services.Cache
         public ICollection<KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>> GetForeignKeyValues(T entity)
         {
             return
-                _foreignKeyInfos.Select(f => new KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>(f, f.GetForeignKeyValue(entity)))
-                    .ToArray();
+                _foreignKeyInfos?.Select(f => new KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>(f, f.GetForeignKeyValue(entity)))
+                    .ToArray() ?? new KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>[0];
         }
 
         public EntityIndex GetNonUniqueIndexValue(T entity, EntityCacheableIndexInfo indexInfo)
@@ -85,7 +85,9 @@ namespace VitalChoice.Caching.Services.Cache
 
         public ICollection<KeyValuePair<EntityCacheableIndexInfo, EntityIndex>> GetNonUniqueIndexValues(T entity)
         {
-            return _nonUniqueIndexes.Select(f => new KeyValuePair<EntityCacheableIndexInfo, EntityIndex>(f, f.GetIndexValue(entity))).ToArray();
+            return
+                _nonUniqueIndexes?.Select(f => new KeyValuePair<EntityCacheableIndexInfo, EntityIndex>(f, f.GetIndexValue(entity)))
+                    .ToArray() ?? new KeyValuePair<EntityCacheableIndexInfo, EntityIndex>[0];
         }
 
         public EntityKey GetPrimaryKeyValue(T entity)
