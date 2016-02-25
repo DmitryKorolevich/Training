@@ -457,37 +457,43 @@
 
                                                     <div class="total-section">
                                                         <div data-ng-if="order.IdObjectType!=3" class="form-group margin-bottom-0px">
-                                                            <label for="type" class="col-md-6 control-label">Discount</label>
+                                                            <label class="col-md-6 control-label">Discount</label>
                                                             <div class="col-md-6 form-control-static">
                                                                 <span>{{order.DiscountMessage}}</span>
                                                             </div>
                                                         </div>
                                                         <div data-ng-if="order.IdObjectType!=3" class="form-group margin-bottom-0px">
-                                                            <label for="type" class="col-md-6 control-label">Discount Amount</label>
+                                                            <label class="col-md-6 control-label">Discount Amount</label>
                                                             <div class="col-md-6 form-control-static">
                                                                 <span>{{order.DiscountTotal | currency}}</span>
                                                             </div>
                                                         </div>
                                                         <div data-ng-if="order.IdObjectType!=3" class="form-group margin-bottom-0px">
-                                                            <label for="type" class="col-md-6 control-label">Discounted Subtotal</label>
+                                                            <label class="col-md-6 control-label">Discounted Subtotal</label>
                                                             <div class="col-md-6 form-control-static">
                                                                 <span>{{order.DiscountedSubtotal | currency}}</span>
                                                             </div>
                                                         </div>
                                                         <div class="form-group margin-bottom-0px">
-                                                            <label for="type" class="col-md-6 control-label">Shipping Total</label>
+                                                            <label class="col-md-6 control-label">Shipping Total</label>
                                                             <div class="col-md-6 form-control-static">
                                                                 <span>{{order.ShippingTotal | currency}}</span>
                                                             </div>
                                                         </div>
                                                         <div class="form-group margin-bottom-0px">
-                                                            <label for="type" class="col-md-6 control-label">Tax</label>
+                                                            <label class="col-md-6 control-label">Tax</label>
                                                             <div class="col-md-6 form-control-static">
                                                                 <span>{{order.TaxTotal | currency}}</span>
                                                             </div>
                                                         </div>
                                                         <div class="form-group margin-bottom-0px">
-                                                            <label for="type" class="col-md-6 control-label">Grand Total</label>
+                                                            <label class="col-md-6 control-label">Gift Certificates</label>
+                                                            <div class="col-md-6 form-control-static">
+                                                                <span>{{order.GiftCertificatesSubtotal | currency}}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group margin-bottom-0px">
+                                                            <label class="col-md-6 control-label">Grand Total</label>
                                                             <div class="col-md-6 form-control-static">
                                                                 <span>{{order.Total | currency}}</span>
                                                             </div>
@@ -779,7 +785,7 @@
                                             <div class="form-group ng-scope" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(1) >= 0 && paymentInfoTab.PaymentMethodType==1">
                                                 <div class="col-md-3"></div>
                                                 <div class="col-md-9">
-                                                    <strong>Notice: Credit card data is only validated when adding or replacing masked credit card data. Otherwise data is not validated with credit card processor.</strong>
+                                                    <strong>Credit card data is only validated when adding or replacing masked credit card data.</strong>
                                                 </div>
                                             </div>
                                             <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(2) >= 0">
@@ -1218,7 +1224,7 @@
                                             <div class="form-group ng-scope" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(1) >= 0 && paymentInfoTab.PaymentMethodType==1">
                                                 <div class="col-md-3"></div>
                                                 <div class="col-md-9">
-                                                    <strong>Notice: Credit card data is only validated when adding or replacing masked credit card data. Otherwise data is not validated with credit card processor.</strong>
+                                                    <strong>Credit card data is only validated when adding or replacing masked credit card data.</strong>
                                                 </div>
                                             </div>
                                             <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(2) >= 0">

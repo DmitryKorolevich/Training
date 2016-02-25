@@ -6,6 +6,7 @@ using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 using VC.Public.Models.Profile;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.DynamicData.Interfaces;
@@ -36,6 +37,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VC.Public.Controllers
 {
@@ -54,6 +56,7 @@ namespace VC.Public.Controllers
         private readonly IOrderService _orderService;
         private readonly IHelpService _helpService;
         private readonly IHealthwiseService _healthwiseService;
+        private readonly ILogger _logger;
 
         public ProfileController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
             ICustomerService customerService, IDynamicMapper<AddressDynamic, Address> addressConverter,
@@ -63,7 +66,8 @@ namespace VC.Public.Controllers
             IProductService productService,
             IHelpService helpService,
             IHealthwiseService healthwiseService, IAppInfrastructureService infrastructureService,
-            IAuthorizationService authorizationService, ICheckoutService checkoutService)
+            IAuthorizationService authorizationService, ICheckoutService checkoutService,
+            ILoggerProviderExtended loggerProvider)
             : base(contextAccessor, customerService, infrastructureService, authorizationService, checkoutService)
         {
             _storefrontUserService = storefrontUserService;
@@ -74,6 +78,7 @@ namespace VC.Public.Controllers
             _productService = productService;
             _helpService = helpService;
             _healthwiseService = healthwiseService;
+            _logger = loggerProvider.CreateLoggerDefault();
         }
 
         private async Task<PagedListEx<OrderHistoryItemModel>> PopulateHistoryModel(VOrderFilter filter)
@@ -452,6 +457,10 @@ namespace VC.Public.Controllers
                 {
                     VProductSkuFilter filter = new VProductSkuFilter();
                     filter.Ids = lastOrder.Skus.Select(p => p.Sku.Id).ToList();
+                    if (lastOrder.PromoSkus != null)
+                    {
+                        filter.Ids.AddRange(lastOrder.PromoSkus.Select(p => p.Sku.Id));
+                    }
                     var skus = await _productService.GetSkusAsync(filter);
 
                     foreach (var skuOrdered in lastOrder.Skus)

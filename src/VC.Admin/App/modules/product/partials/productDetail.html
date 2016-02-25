@@ -395,9 +395,9 @@
                                     <form class="form-horizontal" name="forms.skusDetails" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted}" novalidate unsaved-warning-form>
                                         <div class="row form-group">
                                             <div class="col-md-12">
-                                                <input type="text" class="form-control"  name="SubProductGroupName" placeholder="Example: Number of Portions" data-ng-model="product.SubProductGroupName" data-ng-maxlength="32">
+                                                <input type="text" class="form-control"  name="SubProductGroupName" placeholder="Example: Number of Portions" data-ng-model="product.SubProductGroupName" data-ng-maxlength="32"  data-max-characters="32">
                                                 <div class="error-container" ng-show="forms.submitted && forms.skusDetails.SubProductGroupName.$invalid">
-                                                    <small class="error" ng-show="forms.skusDetails.SubProductGroupName.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength","Sub Product Group Name")}}</small>
+                                                    <small class="error" ng-show="forms.skusDetails.SubProductGroupName.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength",["Sub Product Group Name", "32"])}}</small>
                                                     <small class="error" ng-show="forms.skusDetails.SubProductGroupName.$error.server">{{serverMessages.GetMessage('SubProductGroupName')}}</small>
                                                 </div>
                                             </div>

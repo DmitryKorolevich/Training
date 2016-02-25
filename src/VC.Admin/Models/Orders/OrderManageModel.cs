@@ -242,6 +242,8 @@ namespace VC.Admin.Models.Orders
 
         public IList<GCListItemModel> GCs { get; set; }
 
+        public decimal GiftCertificatesSubtotal { get; set; }
+
         public decimal DiscountedSubtotal { get; set; }
 
         public string DiscountMessage { get; set; }
