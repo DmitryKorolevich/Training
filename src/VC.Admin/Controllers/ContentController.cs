@@ -528,7 +528,7 @@ namespace VC.Admin.Controllers
 
 		private async Task<ContentCrossSellModel> PopulateContentCrossSellModel(IList<ContentCrossSell> contentCrossSells, ContentCrossSellType type)
 		{
-			var model = new ContentCrossSellModel();
+			var model = new ContentCrossSellModel() { Type = type};
 
 			for (var i = 0; i < ContentConstants.CONTENT_CROSS_SELL_LIMIT; i++)
 			{
@@ -565,7 +565,7 @@ namespace VC.Admin.Controllers
 		    for (var i = 0; i < contentCrossSellsModel.Items.Count; i++)
 		    {
 			    ContentCrossSell item;
-			    if (contentCrossSellsModel.Items[i].Id > 0 && alreadyExists.Any(x => x.IdSku == contentCrossSellsModel.Items[i].Id))
+			    if (contentCrossSellsModel.Items[i].Id > 0)
 			    {
 				    item = alreadyExists.Single(x => x.Id == contentCrossSellsModel.Items[i].Id);
 				    item.Title = contentCrossSellsModel.Items[i].Title;
