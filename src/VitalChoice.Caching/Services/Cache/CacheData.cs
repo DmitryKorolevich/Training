@@ -108,6 +108,11 @@ namespace VitalChoice.Caching.Services.Cache
             return cluster.GetItems();
         }
 
+        public CachedEntity GetUntyped(EntityKey pk)
+        {
+            return Get(pk);
+        }
+
         public IEnumerable<CachedEntity> GetAllUntyped()
         {
             // ReSharper disable once InconsistentlySynchronizedField

@@ -89,10 +89,10 @@ namespace VitalChoice.Caching.Services
                             {
                                 if (foreignKey.DependentToPrincipal != null)
                                 {
-                                    var index = new EntityCacheableIndexRelationInfo(CreateValueInfos(foreignKey.Properties),
+                                    var foreignValues = CreateValueInfos(foreignKey.Properties).ToArray();
+                                    var index = new EntityCacheableIndexRelationInfo(foreignValues,
                                         foreignKey.DependentToPrincipal.Name,
-                                        new KeyMap(CreateValueInfos(foreignKey.PrincipalKey.Properties),
-                                            CreateValueInfos(foreignKey.Properties)));
+                                        CreateValueInfos(foreignKey.PrincipalKey.Properties));
                                     nonUniqueList.Add(index);
                                     externalDependentTypes.Add(foreignKey.DependentToPrincipal.GetTargetType().ClrType, index);
                                 }
@@ -108,7 +108,9 @@ namespace VitalChoice.Caching.Services
                                 }
                                 else if (foreignKey.DependentToPrincipal != null)
                                 {
-                                    localForeignKeys.Add(new EntityForeignKeyInfo(CreateValueInfos(foreignKey.Properties),
+                                    var foreignValues = CreateValueInfos(foreignKey.Properties).ToArray();
+                                    localForeignKeys.Add(new EntityForeignKeyInfo(foreignValues,
+                                        CreateValueInfos(foreignKey.PrincipalKey.Properties), foreignKey.DependentToPrincipal.Name,
                                         foreignKey.PrincipalToDependent.GetTargetType().ClrType));
                                 }
                             }

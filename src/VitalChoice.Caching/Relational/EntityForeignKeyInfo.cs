@@ -16,17 +16,27 @@ namespace VitalChoice.Caching.Relational
 
         public override int GetHashCode()
         {
-            return (base.GetHashCode() * 397) ^ DependentType.GetHashCode();
+            return (base.GetHashCode()*397) ^ DependentType.GetHashCode();
         }
 
-        public EntityForeignKeyInfo(IEnumerable<EntityValueInfo> keyInfos, Type dependentType) : base(keyInfos)
+        public EntityForeignKeyInfo(ICollection<EntityValueInfo> foreignValues, IEnumerable<EntityValueInfo> principalValues, string name,
+            Type dependentType) : base(foreignValues)
         {
             if (dependentType == null)
                 throw new ArgumentNullException(nameof(dependentType));
 
+            if (principalValues != null)
+            {
+                KeyMapping = new ForeignToPrincipalMap(foreignValues, principalValues);
+            }
+
+            Name = name;
             DependentType = dependentType;
         }
 
+        public ForeignToPrincipalMap KeyMapping { get; }
+
+        public string Name { get; }
         public Type DependentType { get; }
     }
 
@@ -38,7 +48,7 @@ namespace VitalChoice.Caching.Relational
         }
 
         public EntityForeignKeyCollectionInfo(string name, IClrPropertyGetter propertyGetter, Type dependentType)
-            : base(Enumerable.Repeat(new EntityValueInfo(name, propertyGetter, dependentType), 1), dependentType)
+            : base(new[] {new EntityValueInfo(name, propertyGetter, dependentType)}, null, name, dependentType)
         {
         }
     }

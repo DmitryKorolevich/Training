@@ -12,6 +12,7 @@ namespace VitalChoice.Caching.Interfaces
     {
         void Clear();
         IEnumerable<CachedEntity> GetUntyped(EntityCacheableIndexInfo nonUniqueIndexInfo, EntityIndex index);
+        CachedEntity GetUntyped(EntityKey pk);
         IEnumerable<CachedEntity> GetAllUntyped();
         CachedEntity TryRemoveUntyped(EntityKey key);
         bool GetHasRelation(string name);

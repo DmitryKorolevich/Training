@@ -8,18 +8,13 @@ namespace VitalChoice.Caching.Relational
 {
     public class EntityCacheableIndexRelationInfo : EntityCacheableIndexInfo
     {
-        private readonly KeyMap _keyMapping;
+        public PrincipalToIndexMap KeyMapping { get; }
         public string Name { get; }
 
-        public EntityCacheableIndexRelationInfo(IEnumerable<EntityValueInfo> valueInfos, string name, KeyMap keyMapping) : base(valueInfos)
+        public EntityCacheableIndexRelationInfo(ICollection<EntityValueInfo> foreignValues, string name, IEnumerable<EntityValueInfo> principalValues) : base(foreignValues)
         {
-            _keyMapping = keyMapping;
+            KeyMapping = new PrincipalToIndexMap(principalValues, foreignValues);
             Name = name;
-        }
-
-        public EntityIndex MapPrincipalToForeignValues(EntityKey pk)
-        {
-            return _keyMapping.MapPrincipalToForeignValues(pk);
         }
     }
 }

@@ -309,33 +309,14 @@ namespace VitalChoice.Caching.Services.Cache
                 if (cached != null)
                 {
                     cached.NeedUpdate = true;
-                    //TODO: Foreign keys values update expand
-                    foreach (var foreignKey in cached.ForeignKeys)
-                    {
-                        
-                    }
+                    MarkForUpdateForeignKeys(cached);
                 }
                 else if (data.FullCollection)
                 {
                     data.NeedUpdate = true;
                 }
             }
-            foreach (var dependentType in DependentTypes)
-            {
-                if (CacheFactory.CacheExist(dependentType.Key))
-                {
-                    var cache = CacheFactory.GetCache(dependentType.Key);
-                    var cacheDatas = cache.GetAllCaches().Where(c => !c.Empty && c.GetHasRelation(dependentType.Value.Name));
-                    foreach (var data in cacheDatas)
-                    {
-                        var cachedItems = data.GetUntyped(dependentType.Value, dependentType.Value.MapPrincipalToForeignValues(pk));
-                        foreach (var entity in cachedItems)
-                        {
-                            entity.NeedUpdate = true;
-                        }
-                    }
-                }
-            }
+            MarkForUpdateDependent(pk);
         }
 
         public void MarkForUpdate(IEnumerable<EntityKey> pks)
@@ -469,6 +450,65 @@ namespace VitalChoice.Caching.Services.Cache
         public void Dispose()
         {
             CacheStorage.Dispose();
+        }
+
+
+        private void MarkForUpdateDependent(EntityKey pk)
+        {
+            foreach (var dependentType in DependentTypes)
+            {
+                if (CacheFactory.CacheExist(dependentType.Key))
+                {
+                    var cache = CacheFactory.GetCache(dependentType.Key);
+                    var cacheDatas = cache.GetAllCaches().Where(c => !c.Empty && c.GetHasRelation(dependentType.Value.Name));
+                    foreach (var data in cacheDatas)
+                    {
+                        var cachedItems = data.GetUntyped(dependentType.Value, dependentType.Value.KeyMapping.MapPrincipalToForeign(pk));
+                        foreach (var entity in cachedItems)
+                        {
+                            entity.NeedUpdate = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void MarkForUpdateForeignKeys(CachedEntity<T> cached)
+        {
+            foreach (var foreignKey in cached.ForeignKeys)
+            {
+                if (CacheFactory.CacheExist(foreignKey.Key.DependentType))
+                {
+                    var cache = CacheFactory.GetCache(foreignKey.Key.DependentType);
+                    var collectionForeignKey = foreignKey.Key as EntityForeignKeyCollectionInfo;
+                    var cacheDatas = cache.GetAllCaches().Where(c => !c.Empty && c.GetHasRelation(foreignKey.Key.Name)).ToArray();
+                    if (collectionForeignKey != null)
+                    {
+                        var collection = foreignKey.Value.Values[0].Value as IEnumerable;
+                        if (collection != null)
+                        {
+                            foreach (var item in collection)
+                            {
+                                var itemPk = cache.GetPrimaryKeyValue(item);
+                                foreach (var cacheData in cacheDatas)
+                                {
+                                    var cachedItem = cacheData.GetUntyped(itemPk);
+                                    cachedItem.NeedUpdate = true;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var itemPk = foreignKey.Key.KeyMapping.MapForeignToPrincipal(foreignKey.Value);
+                        foreach (var cacheData in cacheDatas)
+                        {
+                            var cachedItem = cacheData.GetUntyped(itemPk);
+                            cachedItem.NeedUpdate = true;
+                        }
+                    }
+                }
+            }
         }
     }
 }
