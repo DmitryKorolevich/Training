@@ -88,8 +88,7 @@ namespace VitalChoice.Caching.Services
                             });
                             break;
                         case EntityState.Added:
-                            primaryKey = cache.GetPrimaryKeyValue(entry.Entity);
-                            cache.MarkForUpdate(primaryKey);
+                            primaryKey = cache.MarkForAdd(entry.Entity);
                             syncOperations.Add(new SyncOperation
                             {
                                 Key = primaryKey.ToExportable(group.Key),

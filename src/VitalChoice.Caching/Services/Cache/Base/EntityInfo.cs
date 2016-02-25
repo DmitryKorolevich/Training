@@ -6,6 +6,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
 {
     public struct EntityInfo
     {
+        public Type ContextType;
         public ICollection<EntityForeignKeyInfo> ForeignKeys;
         public ICollection<EntityCacheableIndexInfo> NonUniqueIndexes;
         public Dictionary<Type, EntityCacheableIndexRelationInfo> DependentTypes;

@@ -20,6 +20,7 @@ namespace VitalChoice.Caching.Relational
         public Type RelationType { get; }
         public Type OwnedType { get; }
         internal Dictionary<RelationCacheInfo, RelationInfo> RelationsDict { get; set; }
+        public IDictionary<string, RelationInfo> RelationsByName { get; }
         public ICollection<RelationInfo> Relations => RelationsDict.Values;
         private readonly IRelationGetter _relationGetter;
         private static readonly IRelationGetter NullGetter = new NullRelationGetter();
@@ -32,6 +33,7 @@ namespace VitalChoice.Caching.Relational
             Name = name;
             RelationsDict = subRelations?.ToDictionary(r => new RelationCacheInfo(r.Name, r.RelationType, r.RelationType)) ??
                             new Dictionary<RelationCacheInfo, RelationInfo>();
+            RelationsByName = RelationsDict.Values.ToDictionary(r => r.Name);
             if (relationExpression != null)
             {
                 _relationGetter =

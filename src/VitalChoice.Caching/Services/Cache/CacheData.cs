@@ -126,7 +126,7 @@ namespace VitalChoice.Caching.Services.Cache
 
         public bool GetHasRelation(string name)
         {
-            throw new NotImplementedException();
+            return _relationInfo?.RelationsByName.ContainsKey(name) ?? false;
         }
 
         public CachedEntity<T> TryRemove(EntityKey key)

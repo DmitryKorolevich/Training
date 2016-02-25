@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Services.Cache.Base;
+using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.ObjectMapping.Interfaces;
 
@@ -228,22 +229,16 @@ namespace VitalChoice.Caching.Services.Cache
 
         public EntityKey MarkForAdd(T entity)
         {
-            throw new NotImplementedException();
+            var pk = GetPrimaryKeyValue(entity);
+            var foreignKeys = GetForeignKeyValues(entity);
+            MarkForUpdateForeignKeys(foreignKeys);
+            MarkForUpdateDependent(pk);
+            return pk;
         }
 
         public IEnumerable<EntityKey> MarkForAdd(IEnumerable<T> entities)
         {
-            throw new NotImplementedException();
-        }
-
-        public EntityKey MarkForDelete(T entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<EntityKey> MarkForDelete(IEnumerable<T> entities)
-        {
-            throw new NotImplementedException();
+            return entities.Select(MarkForAdd);
         }
 
         public CachedEntity Update(RelationInfo relations, object entity)
@@ -309,7 +304,7 @@ namespace VitalChoice.Caching.Services.Cache
                 if (cached != null)
                 {
                     cached.NeedUpdate = true;
-                    MarkForUpdateForeignKeys(cached);
+                    MarkForUpdateForeignKeys(cached.ForeignKeys);
                 }
                 else if (data.FullCollection)
                 {
@@ -329,22 +324,12 @@ namespace VitalChoice.Caching.Services.Cache
 
         public EntityKey MarkForAdd(object entity)
         {
-            throw new NotImplementedException();
+            return MarkForAdd((T) entity);
         }
 
         public IEnumerable<EntityKey> MarkForAdd(IEnumerable<object> entities)
         {
-            throw new NotImplementedException();
-        }
-
-        public EntityKey MarkForDelete(object entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<EntityKey> MarkForDelete(IEnumerable<object> entities)
-        {
-            throw new NotImplementedException();
+            return MarkForAdd(entities.Cast<T>());
         }
 
         public bool TryRemove(object entity)
@@ -356,8 +341,17 @@ namespace VitalChoice.Caching.Services.Cache
         {
             if (pk == null)
                 return false;
+            MarkForUpdateDependent(pk);
             var datas = CacheStorage.AllCacheDatas;
-            return datas.Aggregate(true, (current, data) => current && data.TryRemove(pk) != null);
+            datas.ForEach(data =>
+            {
+                var cached = data.TryRemove(pk);
+                if (cached != null)
+                {
+                    MarkForUpdateForeignKeys(cached.ForeignKeys);
+                }
+            });
+            return true;
         }
 
         public bool GetCacheExist(RelationInfo relationInfo)
@@ -452,7 +446,6 @@ namespace VitalChoice.Caching.Services.Cache
             CacheStorage.Dispose();
         }
 
-
         private void MarkForUpdateDependent(EntityKey pk)
         {
             foreach (var dependentType in DependentTypes)
@@ -473,9 +466,9 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        private void MarkForUpdateForeignKeys(CachedEntity<T> cached)
+        private void MarkForUpdateForeignKeys(IEnumerable<KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>> foreignKeys)
         {
-            foreach (var foreignKey in cached.ForeignKeys)
+            foreach (var foreignKey in foreignKeys)
             {
                 if (CacheFactory.CacheExist(foreignKey.Key.DependentType))
                 {

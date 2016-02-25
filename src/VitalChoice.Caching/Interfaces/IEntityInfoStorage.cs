@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using VitalChoice.Caching.GC;
 using VitalChoice.Caching.Relational;
+using VitalChoice.Caching.Relational.Base;
 using VitalChoice.Caching.Services.Cache.Base;
 
 namespace VitalChoice.Caching.Interfaces
@@ -10,6 +11,8 @@ namespace VitalChoice.Caching.Interfaces
     {
         bool HaveKeys(Type entityType);
         bool GetEntityInfo(Type entityType, out EntityInfo info);
+        Type GetContextType(Type entityType);
+        object GetEntity(Type entityType, ICollection<EntityValueExportable> keyValues);
 
         EntityPrimaryKeyInfo GetPrimaryKeyInfo(Type entityType);
         EntityCacheableIndexInfo GetIndexInfo(Type entityType);
@@ -19,6 +22,9 @@ namespace VitalChoice.Caching.Interfaces
         ICollection<KeyValuePair<Type, EntityCacheableIndexRelationInfo>> GetDependentTypes(Type entityType);
 
         bool GetEntityInfo<T>(out EntityInfo info);
+        Type GetContextType<T>();
+        T GetEntity<T>(ICollection<EntityValueExportable> keyValues)
+            where T : class;
 
         EntityPrimaryKeyInfo GetPrimaryKeyInfo<T>();
         EntityCacheableIndexInfo GetIndexInfo<T>();

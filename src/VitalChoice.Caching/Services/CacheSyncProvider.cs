@@ -48,7 +48,8 @@ namespace VitalChoice.Caching.Services
                             internalCache.TryRemove(op.Key.ToPrimaryKey(pkInfo));
                             break;
                         case SyncType.Add:
-                            internalCache.MarkForUpdate(op.Key.ToPrimaryKey(pkInfo));
+                            var entity = KeyStorage.GetEntity(type, op.Key.Values);
+                            internalCache.MarkForAdd(entity);
                             break;
                         default:
                             Logger.LogWarning("Invalid SyncType was sent over.");

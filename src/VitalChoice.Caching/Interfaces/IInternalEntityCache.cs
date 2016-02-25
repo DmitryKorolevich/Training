@@ -23,8 +23,6 @@ namespace VitalChoice.Caching.Interfaces
         void MarkForUpdate(IEnumerable<EntityKey> pks);
         EntityKey MarkForAdd(object entity);
         IEnumerable<EntityKey> MarkForAdd(IEnumerable<object> entities);
-        EntityKey MarkForDelete(object entity);
-        IEnumerable<EntityKey> MarkForDelete(IEnumerable<object> entities);
         bool TryRemove(object entity);
         bool TryRemove(EntityKey pk);
         bool GetCacheExist(RelationInfo relationInfo);
@@ -62,7 +60,5 @@ namespace VitalChoice.Caching.Interfaces
         IEnumerable<EntityKey> MarkForUpdate(IEnumerable<T> entities);
         EntityKey MarkForAdd(T entity);
         IEnumerable<EntityKey> MarkForAdd(IEnumerable<T> entities);
-        EntityKey MarkForDelete(T entity);
-        IEnumerable<EntityKey> MarkForDelete(IEnumerable<T> entities);
     }
 }
