@@ -7,8 +7,7 @@ namespace VitalChoice.Infrastructure.Domain.Content.ContentCrossSells
 {
     public enum ContentCrossSellType:byte
     {
-		Default = 1,
-		AddToCart = 2,
-		ViewCart = 3
+		AddToCart = 1,
+		ViewCart = 2
     }
 }

@@ -70,7 +70,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
 			{Keys.CurrentUserRemoval, "Currently logged in user can't be deleted"},
 			{Keys.CurrentUserStatusUpdate, "Status of currently logged in user can't be updated"},
 			{Keys.GenerateSecurityStampError, "Cannot generate security token"},
-			{Keys.UserIsNotConfirmed, "User not confirmed"},
+			{Keys.UserIsNotConfirmed, "There seems to be an issue accessing your account. Please contact customer care at 800-608-4825 for more information. Thank you."},
 			{Keys.CantFindRecord, "Record not found"},
 			{Keys.TitleTakenAlready, "Title is already in use"},
 			{Keys.LabelTakenAlready, "Label is already in use"},

@@ -42,6 +42,8 @@ window.addEventListener("load", function ()
 	$("body").on("click", "#lnkAddToCart", addToCart);
 	$("body").on("click", "#lnkClose", closeCartLite);
 
+	$("body").on("click", ".proposals-item-link", addCrossToCart);
+
 	$(".product-action-right .out-of-stock a").click(function (e)
 	{
 	    $.ajax({
@@ -234,9 +236,11 @@ function playVideo(index) {
 	players[index].playVideo();
 }
 
-function addToCart() {
-	var jChecked = $("input[name=sku]:checked");
-	var sku = jChecked.val();
+function addToCart(event, sku) {
+	if (!sku) {
+		var jChecked = $("input[name=sku]:checked");
+		sku = jChecked.val();
+	}
 
 	$.ajax({
 		url: "/Cart/AddToCartView?skuCode=" + sku,
@@ -247,7 +251,7 @@ function addToCart() {
 			resizable: false,
 			modal: true,
 			minWidth: 520,
-			close: function () {
+			close: function() {
 				$(this).dialog('destroy').remove();
 			}
 		});
@@ -255,6 +259,12 @@ function addToCart() {
 		notifyError();
 	});
 
+	return false;
+}
+
+function addCrossToCart() {
+	closeCartLite();
+	addToCart(null, $(this).attr("data-sku-code"));
 	return false;
 }
 

@@ -20,10 +20,14 @@ namespace VC.Admin.Models.ContentManagement
 
 		public string Title { get; set; }
 
-		public decimal Price { get; set; }
-
 		public string ImageUrl { get; set; }
 
-		public int? IdSku { get; set; }
+		public int IdSku { get; set; }
+
+	    public string SkuCode { get; set; }
+
+	    public decimal? WholesalePrice { get; set; }
+
+	    public decimal? RetailPrice { get; set; }
     }
 }

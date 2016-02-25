@@ -67,41 +67,22 @@
 	}
 </div>
 <div class="cart-content-bottom">
-	<div class="best-proposals-container">
-		<span class="best-proposals-title">
-			Great products. Great value. Add these to your cart.
-		</span>
-		<div class="best-proposals-item">
-			<span class="proposals-item-title">$6.50</span>
-			<a class="proposals-item-link" href="#">
-				<img src="/Assets/images/cart/NRT501_alabcore_pouched_30z_218.jpg" />
-				Wild Albacore Tuna
-				Grab 'n Go Pouch
-			</a>
+	@if (Model.CrossSells.Any())
+	{
+		<div class="best-proposals-container">
+			<span class="best-proposals-title">
+				Great products. Great value. Add these to your cart.
+			</span>
+			@foreach (var item in Model.CrossSells)
+			{
+				<div class="best-proposals-item">
+					<span class="proposals-item-title">@item.Price.ToString("C2")</span>
+					<a class="proposals-item-link" href="#" data-sku-code = '@item.SkuCode'>
+						<img src="@item.ImageUrl" />
+						@item.Title
+					</a>
+				</div>
+			}
 		</div>
-		<div class="best-proposals-item">
-			<span class="proposals-item-title">$6.50</span>
-			<a class="proposals-item-link" href="#">
-				<img src="/Assets/images/cart/ntm1_trail-mix_no_pistachio_218.jpg" />
-				Organic Super Antioxidant
-				Trail Mix - 16 oz
-			</a>
-		</div>
-		<div class="best-proposals-item">
-			<span class="proposals-item-title">$6.50</span>
-			<a class="proposals-item-link" href="#">
-				<img src="/Assets/images/cart/seaweedsalad_218.jpg" />
-				Wakame Seaweed Salad
-				8 oz tub
-			</a>
-		</div>
-		<div class="best-proposals-item">
-			<span class="proposals-item-title">$6.50</span>
-			<a class="proposals-item-link" href="#">
-				<img src="/Assets/images/cart/NSC201_salmonoil_1000mg_90_218.jpg" />
-				1000 mg Sockeye Salmon Oil
-				Softgels - 90 Caps
-			</a>
-		</div>
-	</div>
+	}
 </div>

@@ -16,3 +16,13 @@ BEGIN
 		[Id] ASC
 	))
 END
+
+GO
+
+IF COL_LENGTH('[dbo].[ContentCrossSells]','Price') IS NOT NULL
+BEGIN
+	ALTER TABLE [dbo].[ContentCrossSells]
+	DROP COLUMN [Price]
+END
+
+GO

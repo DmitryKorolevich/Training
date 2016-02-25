@@ -74,6 +74,8 @@ $(function () {
 	initCart();
 
 	$(".date-picker").datepicker("option", "minDate", 1);
+
+
 });
 
 function formatCurrency(value) {
@@ -154,6 +156,8 @@ function initCart() {
 			viewModel = new Cart(result.Data);
 
 			processServerMessages(viewModel.Model);
+
+			$("body").on("click", ".proposals-item-link", function () { addToCart($(this), viewModel); return false;});
 		} else
 		{
 		    processErrorResponse(result);
@@ -241,4 +245,34 @@ function processErrorResponse(result)
     {
         notifyError();
     }
+}
+
+function addToCart(jElem, viewModel) {
+	if (viewModel.refreshing()) {
+		return false;
+	}
+
+	var sku = jElem.attr("data-sku-code");
+
+	viewModel.refreshing(true);
+
+	$.ajax({
+		url: "/Cart/AddToCart?skuCode=" + sku,
+		dataType: "json",
+		contentType: "application/json; charset=utf-8",
+		type: "POST"
+	}).success(function (result) {
+		if (result.Success) {
+				ko.mapping.fromJS(result.Data, { 'ignore': ["ShipAsap", "PromoCode", "ShippingDate"] }, viewModel.Model);
+				processServerMessages(viewModel.Model);
+		} else {
+			processErrorResponse(result);
+		}
+		viewModel.refreshing(false);
+	}).error(function (result) {
+		processErrorResponse();
+		viewModel.refreshing(false);
+	});
+
+	return false;
 }

@@ -952,7 +952,7 @@
                                                                                     <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
                                                                                         <label class="control-label">Cross Sell Image</label>
                                                                                         <div class="col-md-1" data-ng-if="crossSellProduct.ImageUse">
-                                                                                            <filefield name="Image" placeholder="Cross Sell Image" ng-model="crossSellProduct.Image" requided></filefield>
+                                                                                            <filefield name="Image" placeholder="Cross Sell Image" ng-model="crossSellProduct.Image" required></filefield>
                                                                                             <div class="error-container" ng-show="forms.crossessubmitted && forms.CrossSellProducts.i{{$index}}.Image.$invalid">
                                                                                                 <small class="error" ng-show="forms.CrossSellProducts.i{{$index}}.Image.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Image")}}</small>
                                                                                                 <small class="error" ng-show="forms.CrossSellProducts.i{{$index}}.Image.$error.server">{{serverMessages.GetMessage('Image','CrossSellProducts',$index)}}</small>

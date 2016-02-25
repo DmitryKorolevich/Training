@@ -20,11 +20,14 @@ using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.Content.ContentCrossSells;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
+using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Validation.Models;
 
 namespace VC.Public.Controllers
@@ -36,21 +39,48 @@ namespace VC.Public.Controllers
         private readonly ICheckoutService _checkoutService;
         private readonly IDiscountService _discountService;
         private readonly IGcService _gcService;
-       
+	    private readonly IContentCrossSellService _contentCrossSellService;
 
-        public CartController(IHttpContextAccessor contextAccessor,
+
+	    public CartController(IHttpContextAccessor contextAccessor,
             ICustomerService customerService,
             IOrderService orderService, IProductService productService, ICheckoutService checkoutService,
             IAuthorizationService authorizationService, IAppInfrastructureService appInfrastructureService,
             IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
-            IDiscountService discountService, IGcService gcService)
+            IDiscountService discountService, IGcService gcService, IContentCrossSellService contentCrossSellService)
             : base(contextAccessor, customerService, appInfrastructureService, authorizationService, checkoutService, orderService, skuMapper,productMapper)
         {
 	        _productService = productService;
             _checkoutService = checkoutService;
             _discountService = discountService;
             _gcService = gcService;
+		    _contentCrossSellService = contentCrossSellService;
         }
+
+		private async Task<IList<CartCrossSellModel>> PopulateCartCrossSells(ContentCrossSellType type)
+		{
+			var crossSellModels = new List<CartCrossSellModel>();
+
+			var crossSells = await _contentCrossSellService.GetContentCrossSells(type);
+			if (crossSells.Any())
+			{
+				var skus = await _productService.GetSkusAsync(new VProductSkuFilter() { Ids = crossSells.Select(x => x.IdSku).ToList() });
+
+				var wholesale = await CustomerLoggedIn() && HasRole(RoleType.Wholesale);
+
+				crossSellModels.AddRange(from crossSell in crossSells
+										 let targetSku = skus.Single(x => x.SkuId == crossSell.IdSku)
+										 select new CartCrossSellModel()
+										 {
+											 Title = crossSell.Title,
+											 ImageUrl = crossSell.ImageUrl,
+											 Price = wholesale ? targetSku.WholesalePrice ?? 0 : targetSku.Price ?? 0,
+											 SkuCode = targetSku.Code
+										 });
+			}
+
+			return crossSellModels;
+		}
 
 		[HttpGet]
         public async Task<Result<ViewCartModel>> InitCartModel()
@@ -71,7 +101,9 @@ namespace VC.Public.Controllers
 
 			await InitCartModelInternal(cartModel);
 
-            return View(cartModel);
+	        cartModel.CrossSells = await PopulateCartCrossSells(ContentCrossSellType.ViewCart);
+
+			return View(cartModel);
         }
 
         [HttpPost]
@@ -80,20 +112,22 @@ namespace VC.Public.Controllers
             return Task.FromResult<Result<string>>(Url.Action("Welcome", "Checkout"));
         }
 
-
-        [HttpPost]
+	    [HttpPost]
         public async Task<IActionResult> AddToCartView(string skuCode)
         {
-            var cart = await AddToCart(skuCode);
-            if (cart == null)
+            var cartRes = await AddToCart(skuCode);
+            if (!cartRes.Success || cartRes.Data == null)
             {
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SkuNotFound]);
             }
-            return PartialView("_CartLite", cart);
+
+			cartRes.Data.CrossSells = await PopulateCartCrossSells(ContentCrossSellType.AddToCart);       
+
+			return PartialView("_CartLite", cartRes.Data);
         }
 
         [HttpPost]
-        public async Task<ViewCartModel> AddToCart(string skuCode)
+        public async Task<Result<ViewCartModel>> AddToCart(string skuCode)
         {
             var existingUid = Request.GetCartUid();
             var sku = await _productService.GetSkuOrderedAsync(skuCode);

@@ -28,33 +28,15 @@ namespace VitalChoice.Business.Services.Content
 
 		public async Task<IList<ContentCrossSell>> GetContentCrossSells(ContentCrossSellType type)
 		{
-			var crossLines = await _repository.Query(x => x.Type == ContentCrossSellType.Default || x.Type == type).SelectAsync();
+			var crossLines = await _repository.Query(x => x.Type == type).SelectAsync();
 
-			var res = new List<ContentCrossSell>();
-			for (var i = 0; i < ContentConstants.CONTENT_CROSS_SELL_LIMIT; i++)
-			{
-				var toAdd = crossLines.FirstOrDefault(x => x.Type == type && x.Order == i + 1) ??
-				            crossLines.Single(x => x.Order == i + 1);
-
-				res.Add(toAdd);
-			}
-
-			return res.OrderBy(x=>x.Order).ToList();
+			return crossLines.OrderBy(x=>x.Order).ToList();
 		}
 
-		public async Task<IList<ContentCrossSell>> GetDefaultContentCrossSells()
+		public async Task<IList<ContentCrossSell>> AddUpdateContentCrossSells(IList<ContentCrossSell> contentCrossSells)
 		{
-			var crossLines = await _repository.Query(x => x.Type == ContentCrossSellType.Default).SelectAsync();
-
-			return crossLines;
-		}
-
-		public async Task<IList<ContentCrossSell>> UpdateContentCrossSells(IList<ContentCrossSell> contentCrossSells, ContentCrossSellType type)
-		{
-			var toWork = contentCrossSells.Where(x => x.Type == type).ToList();
-
-			var toAdd = toWork.Where(x => x.Id != 0);
-			var toUpdate = toWork.Where(x => x.Id == 0);
+			var toAdd = contentCrossSells.Where(x => x.Id == 0).ToList();
+			var toUpdate = contentCrossSells.Where(x => x.Id != 0).ToList();
 
 			using (var uow = new UnitOfWork(new VitalChoiceContext(_options)))
 			{
@@ -64,16 +46,20 @@ namespace VitalChoice.Business.Services.Content
 				{
 					try
 					{
-						var updateRes = false;
-
-						var addRes = await uowRepo.InsertRangeAsync(toAdd);
-						if (addRes)
+						var addRes = true;
+						var updateRes = true;
+						if (toAdd.Any())
+						{
+							addRes = await uowRepo.InsertRangeAsync(toAdd);
+						}
+						if (addRes && toUpdate.Any())
 						{
 							updateRes = await uowRepo.UpdateRangeAsync(toUpdate);
 						}
 
 						if (addRes && updateRes)
 						{
+							await uow.SaveChangesAsync();
 							transaction.Commit();
 						}
 					}

@@ -16,7 +16,7 @@
 					<div class="well row">
 						<spinner-overlay data-loading="refreshTracker.active()">
 							<span class="legend">{{title}}</span>
-							<form data-ng-submit="save()" name="csForm" data-ng-class="{submitted: csForm.submitted}" novalidate unsaved-warning-form>
+							<form data-ng-submit="save()" name="forms.Items" data-ng-class="{submitted: forms.submitted}" novalidate unsaved-warning-form>
 								<div class="panel-group sortable-accordion">
 									<div ui-sortable="sortableOptions" data-ng-model="model.Items">
 										<div data-ng-repeat="crossSellProduct in model.Items" class="panel panel-default">
@@ -26,78 +26,67 @@
 														<h4 class="panel-title">
 															<div class="accordion-toggle">
 																<div class="form-horizontal">
-																	<div class="row">
-																		<div class="col-md-11">
-																			<div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
-																				<label class="control-label">Title</label>
-																				<div class="col-md-1" data-ng-if="crossSellProduct.TitleUse">
-																					<input type="text" name="Title" class="form-control" placeholder="Cross Sell Title" data-ng-model="crossSellProduct.Title" required>
-																					<div class="error-container" ng-show="csForm.submitted && csForm.Items.i{{$index}}.Title.$invalid">
-																						<small class="error" ng-show="csForm.Items.i{{$index}}.Title.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Title")}}</small>
-																						<small class="error" ng-show="csForm.Items.i{{$index}}.Title.$error.server">{{serverMessages.GetMessage('Title','Items', $index)}}</small>
-																					</div>
-																				</div>
-																				<div class="col-md-1" data-ng-if="!crossSellProduct.TitleUse">
-																					<input type="text" name="DefaultTitle" class="form-control" placeholder="Cross Sell Title" data-ng-model="model.DefaultItems[$index].Title" readonly>
+																	<div class="form-group">
+																		<div class="" data-ng-click="$event.stopPropagation()">
+																			<label class="control-label col-md-3">Title</label>
+																			<div class="col-md-9">
+																				<input type="text" name="Title" class="form-control" placeholder="Cross Sell Title" data-ng-model="crossSellProduct.Title" required>
+																				<div class="error-container" ng-show="forms.submitted && forms.Items.i{{$index}}.Title.$invalid">
+																					<small class="error" ng-show="forms.Items.i{{$index}}.Title.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Title")}}</small>
+																					<small class="error" ng-show="forms.Items.i{{$index}}.Title.$error.server">{{serverMessages.GetMessage('Title','Items', $index)}}</small>
 																				</div>
 																			</div>
 																		</div>
 																	</div>
-																	<div class="row">
-																		<div class="col-md-11">
-																			<div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
-																				<label class="control-label">Price</label>
-																				<div class="col-md-1" data-ng-if="crossSellProduct.PriceUse">
-																					<input type="text" name="Price" class="form-control" placeholder="Cross Sell Price" data-ng-model="crossSellProduct.Price" required>
-																					<div class="error-container" ng-show="csForm.submitted && csForm.Items.i{{$index}}.Price.$invalid">
-																						<small class="error" ng-show="csForm.Items.i{{$index}}.Price.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Price")}}</small>
-																						<small class="error" ng-show="csForm.Items.i{{$index}}.Price.$error.server">{{serverMessages.GetMessage('Price','Items', $index)}}</small>
-																					</div>
-																				</div>
-																				<div class="col-md-1" data-ng-if="!crossSellProduct.PriceUse">
-																					<input type="text" name="DefaultPrice" class="form-control" placeholder="Cross Sell Price" data-ng-model="model.DefaultItems[$index].Price" readonly>
+
+																	<div class="form-group">
+																		<div class="" data-ng-click="$event.stopPropagation()">
+																			<label class="control-label col-md-3">Image</label>
+																			<div class="col-md-9">
+																				<filefield name="Image" placeholder="Cross Sell Image" ng-model="crossSellProduct.ImageUrl" required></filefield>
+																				<div class="error-container" ng-show="forms.submitted && forms.Items.i{{$index}}.ImageUrl.$invalid">
+																					<small class="error" ng-show="forms.Items.i{{$index}}.ImageUrl.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Image")}}</small>
+																					<small class="error" ng-show="forms.Items.i{{$index}}.ImageUrl.$error.server">{{serverMessages.GetMessage('ImageUrl','Items',$index)}}</small>
 																				</div>
 																			</div>
 																		</div>
 																	</div>
-																	<div class="row">
-																		<div class="col-md-11">
-																			<div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
-																				<label class="control-label">Image</label>
-																				<div class="col-md-1" data-ng-if="crossSellProduct.ImageUse">
-																					<filefield name="Image" placeholder="Cross Sell Image" ng-model="crossSellProduct.ImageUrl" requided></filefield>
-																					<div class="error-container" ng-show="csForm.submitted && csForm.Items.i{{$index}}.ImageUrl.$invalid">
-																						<small class="error" ng-show="csForm.Items.i{{$index}}.ImageUrl.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","ImageUrl")}}</small>
-																						<small class="error" ng-show="csForm.Items.i{{$index}}.ImageUrl.$error.server">{{serverMessages.GetMessage('ImageUrl','Items',$index)}}</small>
-																					</div>
-																				</div>
-																				<div class="col-md-1" data-ng-if="!crossSellProduct.ImageUse">
-																					<filefield name="DefaultImage" placeholder="Cross Sell Image" ng-model="model.DefaultItems[$index].ImageUrl" disabled></filefield>
+
+
+																	<div class="form-group">
+																		<div class="" data-ng-click="$event.stopPropagation()">
+																			<label class="control-label col-md-3">SKU Associated</label>
+																			<div class="col-md-9">
+																				<input type="text" name="Sku" class="form-control" placeholder="Cross Sell SKU" data-ng-model="crossSellProduct.SkuCode" typeahead-min-length="1" typeahead="sku.Code as sku.Code for sku in getSku($viewValue)" typeahead-loading="loadingSKUsBySKU" typeahead-on-select="skuChanged($item,$index)" data-ng-change="cleaerTypeaheadBox(crossSellProduct)" typeahead-wait-ms="100" typeahead-editable="false" required>
+																				<div class="error-container" ng-show="forms.submitted && (forms.Items.i{{$index}}.SkuCode.$invalid || crossSellProduct.IdSku == 0)">
+																					<small class="error" ng-show="forms.Items.i{{$index}}.SkuCode.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","SKU")}}</small>
+																					<small class="error" ng-show="forms.Items.i{{$index}}.SkuCode.$error.server">{{serverMessages.GetMessage('SkuCode','Items', $index)}}</small>
+																					<small class="error" ng-show="crossSellProduct.IdSku == 0 && !forms.Items.i{{$index}}.SkuCode.$invalid">{{getValidationMessage("ValidationMessages.FieldRequired","SKU")}}</small>
 																				</div>
 																			</div>
 																		</div>
 																	</div>
-																	<div class="row">
-																		<div class="col-md-12">
-																			<div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
-																				<label class="control-label">SKU Associated</label>
-																				<div class="col-md-1" data-ng-if="crossSellProduct.IdSkuUse">
-																					<input type="text" name="Price" class="form-control" placeholder="Cross Sell SKU" data-ng-model="crossSellProduct.IdSku" required>
-																					<div class="error-container" ng-show="csForm.submitted && csForm.Items.i{{$index}}.IdSku.$invalid">
-																						<small class="error" ng-show="csForm.Items.i{{$index}}.IdSku.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.IdSku")}}</small>
-																						<small class="error" ng-show="csForm.Items.i{{$index}}.IdSku.$error.server">{{serverMessages.GetMessage('IdSku','Items', $index)}}</small>
-																					</div>
-																				</div>
-																				<div class="col-md-1" data-ng-if="!crossSellProduct.IdSkuUse">
-																					<input type="text" name="DefaultSku" class="form-control" placeholder="Cross Sell SKU" data-ng-model="model.DefaultItems[$index].IdSku" readonly>
+
+
+																	<div class="form-group">
+																		<label class="control-label col-md-3">Retail Price</label>
+																		<div class="" data-ng-click="$event.stopPropagation()">
+																			<div class="col-md-3">
+																				<div class="input-group">
+																					<span class="input-group-addon">$</span>
+																					<input type="text" name="RetailPrice" class="form-control" money="" placeholder="Retail Price" data-ng-model="crossSellProduct.RetailPrice" readonly>
 																				</div>
 																			</div>
-																			<div class="fixed-accordion-row pull-right" data-ng-click="$event.stopPropagation()">
-																				<button data-ng-if="!crossSellmodel.TitleUse" class="btn btn-info width-80px" data-ng-click="setCustomCross(crossSellProduct)">Set</button>
-																				<button data-ng-if="crossSellmodel.TitleUse" class="btn btn-info width-80px" data-ng-click="removeCustomCross(crossSellProduct)">Remove</button>
+																			<label class="control-label col-md-3">Wholesale Price</label>
+																			<div class="col-md-3">
+																				<div class="input-group">
+																					<span class="input-group-addon">$</span>
+																					<input type="text" name="WholesalePrice" class="form-control" money="" placeholder="Wholesale Price" data-ng-model="crossSellProduct.WholesalePrice" readonly>
+																				</div>
 																			</div>
 																		</div>
 																	</div>
+
 																</div>
 															</div>
 														</h4>

@@ -8,9 +8,6 @@ namespace VitalChoice.Interfaces.Services.Content
 	{
 	    Task<IList<ContentCrossSell>> GetContentCrossSells(ContentCrossSellType type);
 
-	    Task<IList<ContentCrossSell>> GetDefaultContentCrossSells();
-
-	    Task<IList<ContentCrossSell>> UpdateContentCrossSells(IList<ContentCrossSell> contentCrossSells,
-		    ContentCrossSellType type);
+	    Task<IList<ContentCrossSell>> AddUpdateContentCrossSells(IList<ContentCrossSell> contentCrossSells);
 	}
 }
