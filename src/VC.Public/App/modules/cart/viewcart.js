@@ -51,12 +51,14 @@ $(function () {
 				}).success(function (result) {
 					if (result.Success) {
 						window.location.href = result.Data;
-					} else {
-						notifyError(result.Messages[0]);
+					} else
+					{
+					    processErrorResponse(result);
 					}
 					self.refreshing(false);
-				}).error(function (result) {
-					notifyError();
+				}).error(function (result)
+				{
+				    processErrorResponse();
 					self.refreshing(false);
 				});
 			});
@@ -72,6 +74,8 @@ $(function () {
 	initCart();
 
 	$(".date-picker").datepicker("option", "minDate", 1);
+
+
 });
 
 function formatCurrency(value) {
@@ -126,12 +130,14 @@ function recalculateCart(viewModel, successCallback) {
 					ko.mapping.fromJS(result.Data, { 'ignore': ["ShipAsap", "PromoCode", "ShippingDate"] }, viewModel.Model);
 					processServerMessages(viewModel.Model);
 				}
-			} else {
-				notifyError(result.Messages[0]);
+			} else
+			{
+			    processErrorResponse(result);
 			}
 			viewModel.refreshing(false);
-		}).error(function(result) {
-			notifyError();
+		}).error(function (result)
+		{
+		    processErrorResponse();
 			viewModel.refreshing(false);
 		});
 	}
@@ -150,8 +156,11 @@ function initCart() {
 			viewModel = new Cart(result.Data);
 
 			processServerMessages(viewModel.Model);
-		} else {
-			notifyError(result.Messages[0]);
+
+			$("body").on("click", ".proposals-item-link", function () { addToCart($(this), viewModel); return false;});
+		} else
+		{
+		    processErrorResponse(result);
 		}
 
 		ko.applyBindings(viewModel);
@@ -160,8 +169,9 @@ function initCart() {
 
 		viewModel.refreshing(false);
 		viewModel.initializing = false;
-	}).error(function (result) {
-		notifyError();
+	}).error(function (result)
+	{
+	    processErrorResponse();
 		viewModel.refreshing(false);
 		viewModel.initializing = false;
 	});
@@ -213,4 +223,56 @@ function isGcValid(model, index) {
 		}
 	}
 	return true;
+}
+
+function processErrorResponse(result)
+{
+    if (result)
+    {
+        if (result.Command != null)
+        {
+            if (result.Command == 'redirect' && result.Data)
+            {
+                window.location = result.Data;
+            }
+        }
+        else
+        {
+            notifyError(result.Messages[0]);
+        }
+    }
+    else
+    {
+        notifyError();
+    }
+}
+
+function addToCart(jElem, viewModel) {
+	if (viewModel.refreshing()) {
+		return false;
+	}
+
+	var sku = jElem.attr("data-sku-code");
+
+	viewModel.refreshing(true);
+
+	$.ajax({
+		url: "/Cart/AddToCart?skuCode=" + sku,
+		dataType: "json",
+		contentType: "application/json; charset=utf-8",
+		type: "POST"
+	}).success(function (result) {
+		if (result.Success) {
+				ko.mapping.fromJS(result.Data, { 'ignore': ["ShipAsap", "PromoCode", "ShippingDate"] }, viewModel.Model);
+				processServerMessages(viewModel.Model);
+		} else {
+			processErrorResponse(result);
+		}
+		viewModel.refreshing(false);
+	}).error(function (result) {
+		processErrorResponse();
+		viewModel.refreshing(false);
+	});
+
+	return false;
 }

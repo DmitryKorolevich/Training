@@ -773,6 +773,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         $scope.order.DiscountedSubtotal = data.DiscountedSubtotal;
         $scope.order.DiscountMessage = data.DiscountMessage;
         $scope.order.TaxTotal = data.TaxTotal;
+        $scope.order.GiftCertificatesSubtotal = data.GiftCertificatesSubtotal;
         $scope.order.Total = data.Total;
 
         $scope.order.ShouldSplit = data.ShouldSplit;

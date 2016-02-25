@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using VitalChoice.Validation.Models;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Transfer;
@@ -42,6 +44,8 @@ namespace VC.Admin.Models.Orders
 
         public decimal TaxTotal { get; set; }
 
+        public decimal GiftCertificatesSubtotal { get; set; }
+
         public decimal Total { get; set; }
 
         public bool ProductsPerishableThresholdIssue { get; set; }
@@ -67,6 +71,7 @@ namespace VC.Admin.Models.Orders
             DiscountedSubtotal = dataContext.DiscountedSubtotal;
             DiscountMessage = dataContext.DiscountMessage;
             TaxTotal = dataContext.TaxTotal;
+            GiftCertificatesSubtotal = Math.Abs(dataContext.GiftCertificatesSubtotal);
             Total = dataContext.Total;
             ShippingOverride = dataContext.ShippingOverride;
             SurchargeOverride = dataContext.SurchargeOverride;

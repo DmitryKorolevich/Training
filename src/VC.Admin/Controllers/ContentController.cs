@@ -23,6 +23,7 @@ using VC.Admin.Models.EmailTemplates;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Content.ContentCrossSells;
+using VitalChoice.Interfaces.Services.Products;
 
 namespace VC.Admin.Controllers
 {
@@ -36,11 +37,12 @@ namespace VC.Admin.Controllers
         private readonly IContentPageService contentPageService;
         private readonly IEmailTemplateService emailTemplateService;
 	    private readonly IContentCrossSellService contentCrossSellService;
+	    private readonly IProductService productService;
 	    private readonly ILogger logger;
 
         public ContentController(IMasterContentService masterContentService, ICategoryService categoryService,
             IRecipeService recipeService, IFAQService faqService, IArticleService articleService, IContentPageService contentPageService,
-            IEmailTemplateService emailTemplateService, ILoggerProviderExtended loggerProvider, IContentCrossSellService contentCrossSellService)
+            IEmailTemplateService emailTemplateService, ILoggerProviderExtended loggerProvider, IContentCrossSellService contentCrossSellService, IProductService productService)
         {
             this.masterContentService = masterContentService;
             this.categoryService = categoryService;
@@ -50,6 +52,7 @@ namespace VC.Admin.Controllers
             this.contentPageService = contentPageService;
             this.emailTemplateService = emailTemplateService;
 	        this.contentCrossSellService = contentCrossSellService;
+	        this.productService = productService;
 	        this.logger = loggerProvider.CreateLoggerDefault();
         }
         
@@ -506,37 +509,45 @@ namespace VC.Admin.Controllers
 
 		#region
 
-	    private ContentCrossSellItemModel PopulateContentCrossSellItemModel(ContentCrossSell item)
+	    private async Task<ContentCrossSellItemModel> PopulateContentCrossSellItemModel(ContentCrossSell item)
 	    {
+		    var sku = await productService.GetSkuAsync(item.IdSku);
+
 		    return new ContentCrossSellItemModel()
 		    {
 			    Type = item.Type,
 			    Title = item.Title,
-			    Price = item.Price,
 			    ImageUrl = item.ImageUrl,
 			    IdSku = item.IdSku,
-			    Id = item.Id
+			    Id = item.Id,
+				SkuCode = sku.Code,
+				RetailPrice = sku.Price,
+				WholesalePrice = sku.WholesalePrice
 		    };
 	    }
 
-	    private async Task<ContentCrossSellModel> PopulateContentCrossSellModel(IList<ContentCrossSell> contentCrossSells)
-	    {
-			var model = new ContentCrossSellModel
+		private async Task<ContentCrossSellModel> PopulateContentCrossSellModel(IList<ContentCrossSell> contentCrossSells, ContentCrossSellType type)
+		{
+			var model = new ContentCrossSellModel() { Type = type};
+
+			for (var i = 0; i < ContentConstants.CONTENT_CROSS_SELL_LIMIT; i++)
 			{
-				Items = contentCrossSells.Select(PopulateContentCrossSellItemModel).ToList(),
-				DefaultItems = (await contentCrossSellService.GetDefaultContentCrossSells()).Select(PopulateContentCrossSellItemModel).ToList()
-			};
+				var item = contentCrossSells.SingleOrDefault(x => x.Order == i + 1);
+				var modelItem = item != null ? await PopulateContentCrossSellItemModel(item) : new ContentCrossSellItemModel() { Type = type };
+
+				model.Items.Add(modelItem);
+			}
 
 			return model;
 		}
 
-	    [HttpGet]
+		[HttpGet]
 	    [AdminAuthorize(PermissionType.Content)]
 	    public async Task<Result<ContentCrossSellModel>> GetContentCrossSells(ContentCrossSellType id)
 	    {
 		    var contentCrossSells = await contentCrossSellService.GetContentCrossSells(id);
 
-		    return await PopulateContentCrossSellModel(contentCrossSells);
+		    return await PopulateContentCrossSellModel(contentCrossSells, id);
 	    }
 
 	    [HttpPost]
@@ -551,43 +562,40 @@ namespace VC.Admin.Controllers
 
 			var alreadyExists = await contentCrossSellService.GetContentCrossSells(contentCrossSellsModel.Type);
 			var itemsToStore = new List<ContentCrossSell>();
-		    foreach (var modelItem in contentCrossSellsModel.Items)
+		    for (var i = 0; i < contentCrossSellsModel.Items.Count; i++)
 		    {
 			    ContentCrossSell item;
-				if (modelItem.Id > 0 && alreadyExists.Any(x=>x.Id == modelItem.Id))
+			    if (contentCrossSellsModel.Items[i].Id > 0)
 			    {
-					item = alreadyExists.Single(x => x.Id == modelItem.Id);
-				    if (item.Type != ContentCrossSellType.Default)
-				    {
-						item.Title = modelItem.Title;
-						item.Price = modelItem.Price;
-						item.ImageUrl = modelItem.ImageUrl;
-						item.IdSku = modelItem.IdSku;
-						item.IdEditedBy = userId;
-						item.DateEdited = DateTime.Now;
-					}
-				}
+				    item = alreadyExists.Single(x => x.Id == contentCrossSellsModel.Items[i].Id);
+				    item.Title = contentCrossSellsModel.Items[i].Title;
+				    item.ImageUrl = contentCrossSellsModel.Items[i].ImageUrl;
+				    item.IdSku = contentCrossSellsModel.Items[i].IdSku;
+				    item.IdEditedBy = userId;
+				    item.DateEdited = DateTime.Now;
+				    item.Order = i + 1;
+			    }
 			    else
-				{
-					item = new ContentCrossSell()
-					{
-						Type = modelItem.Type,
-						Title = modelItem.Title,
-						Price = modelItem.Price,
-						ImageUrl = modelItem.ImageUrl,
-						IdSku = modelItem.IdSku,
-						IdEditedBy = userId,
-						DateCreated = DateTime.Now,
-						DateEdited = DateTime.Now
-					};
-				}
+			    {
+				    item = new ContentCrossSell()
+				    {
+					    Type = contentCrossSellsModel.Items[i].Type,
+					    Title = contentCrossSellsModel.Items[i].Title,
+					    ImageUrl = contentCrossSellsModel.Items[i].ImageUrl,
+					    IdSku = contentCrossSellsModel.Items[i].IdSku,
+					    IdEditedBy = userId,
+					    DateCreated = DateTime.Now,
+					    DateEdited = DateTime.Now,
+						Order = i + 1
+				    };
+			    }
 
-				itemsToStore.Add(item);
+			    itemsToStore.Add(item);
 			}
 			
-			var contentCrossSells =  await contentCrossSellService.UpdateContentCrossSells(itemsToStore, contentCrossSellsModel.Type);
+			var contentCrossSells =  await contentCrossSellService.AddUpdateContentCrossSells(itemsToStore);
 
-			return await PopulateContentCrossSellModel(contentCrossSells);
+			return await PopulateContentCrossSellModel(contentCrossSells, contentCrossSellsModel.Type);
 		}
 
 		#endregion

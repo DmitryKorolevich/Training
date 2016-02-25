@@ -12,6 +12,7 @@ using AuthorizationContext = Microsoft.AspNet.Mvc.Filters.AuthorizationContext;
 using Microsoft.AspNet.Mvc.Filters;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Interfaces.Services.Customers;
+using VitalChoice.Validation.Models;
 
 namespace VitalChoice.Core.Infrastructure
 {
@@ -35,11 +36,24 @@ namespace VitalChoice.Core.Infrastructure
                         var status = customerService.GetCustomerStatusAsync(userId).Result;
                         if (status == CustomerStatus.Suspended)
                         {
-                            context.Result = new RedirectResult("/content/issues-with-account");
+                            var acceptHeader = context.HttpContext.Request.Headers["Accept"];
+                            if (acceptHeader.Any() && acceptHeader.First().Contains("application/json"))
+                            {
+                                context.Result = CreateJsonResponse();
+                            }
+                            else
+                            {
+                                context.Result = new RedirectResult("/content/issues-with-account");
+                            }
                         }
                     }
                 }
 			}
 		}
+
+	    public static IActionResult CreateJsonResponse()
+	    {
+	        return new JsonResult(new Result<string>(false, "/content/issues-with-account", "redirect"));
+        }
 	}
 }

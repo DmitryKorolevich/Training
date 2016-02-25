@@ -239,13 +239,14 @@ namespace VitalChoice.DynamicData.Base
                 return new List<TEntity>();
 
             ICollection<DynamicEntityPair<TDynamic, TEntity>> results;
+            DateTime now=DateTime.Now;
             if (optionTypes == null)
             {
                 results =
                     items.Where(d => d != null).Select(
                         dynamic =>
                         {
-                            var entity = ToEntityItem(dynamic, FilterByType(dynamic.IdObjectType));
+                            var entity = ToEntityItem(dynamic, FilterByType(dynamic.IdObjectType), now);
                             return new DynamicEntityPair<TDynamic, TEntity>(dynamic, entity);
                         })
                         .ToArray();
@@ -254,7 +255,7 @@ namespace VitalChoice.DynamicData.Base
             {
                 results =
                     items.Where(d => d != null).Select(
-                        dynamic => new DynamicEntityPair<TDynamic, TEntity>(dynamic, ToEntityItem(dynamic, optionTypes)))
+                        dynamic => new DynamicEntityPair<TDynamic, TEntity>(dynamic, ToEntityItem(dynamic, optionTypes, now)))
                         .ToArray();
             }
             await ToEntityRangeInternalAsync(results);
@@ -271,10 +272,11 @@ namespace VitalChoice.DynamicData.Base
             {
                 pair.Value2 = FilterByType(pair.Value1.IdObjectType);
             }
+            DateTime now=DateTime.Now;
             var results =
                 items.Where(d => d.Value1 != null).Select(
                     pair =>
-                        new DynamicEntityPair<TDynamic, TEntity>(pair.Value1, ToEntityItem(pair.Value1, pair.Value2)))
+                        new DynamicEntityPair<TDynamic, TEntity>(pair.Value1, ToEntityItem(pair.Value1, pair.Value2, now)))
                     .ToArray();
             await ToEntityRangeInternalAsync(results);
             return results;
@@ -470,7 +472,7 @@ namespace VitalChoice.DynamicData.Base
             entity.IdObjectType = dynamic.IdObjectType;
         }
 
-        private static TEntity ToEntityItem(TDynamic dynamic, ICollection<TOptionType> optionTypes)
+        private static TEntity ToEntityItem(TDynamic dynamic, ICollection<TOptionType> optionTypes, DateTime now)
         {
             if (dynamic == null)
                 return null;
@@ -481,8 +483,8 @@ namespace VitalChoice.DynamicData.Base
             var entity = new TEntity {OptionValues = new List<TOptionValue>(), OptionTypes = optionTypes};
             FillEntityOptions(dynamic, optionTypes, entity);
             entity.Id = dynamic.Id;
-            entity.DateCreated = DateTime.Now;
-            entity.DateEdited = DateTime.Now;
+            entity.DateCreated = now;
+            entity.DateEdited = now;
             entity.StatusCode = dynamic.StatusCode;
             entity.IdEditedBy = dynamic.IdEditedBy;
             entity.IdObjectType = dynamic.IdObjectType;

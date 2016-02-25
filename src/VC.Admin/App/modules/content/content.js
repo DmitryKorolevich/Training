@@ -205,12 +205,12 @@ angular.module('app.modules.content', [
 		        })
 				/*content cross sells*/
 				.state('index.oneCol.manageAddToCartCs', {
-		    		url: '/content/managecross',
+		    		url: '/content/managecross/addtocart',
 		    		templateUrl: 'app/modules/content/partials/contentCrossSells.html',
 		    		controller: 'contentCrossSellsManageController'
 				})
 				.state('index.oneCol.manageViewCartCs', {
-					url: '/content/managecross',
+					url: '/content/managecross/viewcart',
 					templateUrl: 'app/modules/content/partials/contentCrossSells.html',
 					controller: 'contentCrossSellsManageController'
 				})

@@ -136,6 +136,8 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<PagedList<BugTicketListItemModel>>> GetBugTickets([FromBody]VHelpTicketFilter filter)
         {
+            if (filter.To.HasValue)
+                filter.To = filter.To.Value.AddDays(1);
             var result = await _helpService.GetBugTicketsAsync(filter);
 
             var toReturn = new PagedList<BugTicketListItemModel>

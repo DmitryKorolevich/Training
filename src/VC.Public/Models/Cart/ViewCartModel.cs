@@ -17,7 +17,8 @@ namespace VC.Public.Models.Cart
 			ShippingUpgradePOptions = new List<LookupItem<ShippingUpgradeOption>>();
 			ShippingUpgradeNPOptions = new List<LookupItem<ShippingUpgradeOption>>();
 			ShipAsap = true;
-	    }
+			CrossSells = new List<CartCrossSellModel>();
+		}
 
 	    public bool ShipAsap { get; set; }
 
@@ -67,5 +68,7 @@ namespace VC.Public.Models.Cart
 	    public string DiscountDescription { get; set; }
 
 	    public IList<KeyValuePair<string, string>> Messages { get; set; }
-    }
+
+		public IList<CartCrossSellModel> CrossSells { get; set; }
+	}
 }

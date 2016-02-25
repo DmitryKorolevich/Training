@@ -9,11 +9,9 @@ namespace VitalChoice.Infrastructure.Domain.Content.ContentCrossSells
 
 		public string Title { get; set; }
 
-		public decimal Price { get; set; }
-
 		public string ImageUrl { get; set; }
 
-		public int? IdSku { get; set; }
+		public int IdSku { get; set; }
 
 		public int? IdEditedBy { get; set; }
 

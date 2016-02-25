@@ -550,6 +550,11 @@ namespace VitalChoice.Infrastructure.Context
                     .HasForeignKey(p => p.IdBugTicket)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
+                entity.HasOne(p => p.AddedByUser)
+                    .WithMany()
+                    .HasForeignKey(p => p.IdAddedBy)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired();
                 entity.Ignore(p => p.AddedBy);
                 entity.Ignore(p => p.AddedByEmail);
                 entity.Ignore(p => p.AddedByAgent);

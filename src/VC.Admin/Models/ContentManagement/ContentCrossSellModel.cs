@@ -20,11 +20,8 @@ namespace VC.Admin.Models.ContentManagement
 		public ContentCrossSellModel()
 	    {
 			Items = new List<ContentCrossSellItemModel>();
-			DefaultItems = new List<ContentCrossSellItemModel>();
 		}
 
 	    public IList<ContentCrossSellItemModel> Items { get; set; }
-
-	    public IList<ContentCrossSellItemModel> DefaultItems { get; set; }
     }
 }

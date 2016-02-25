@@ -1217,3 +1217,9 @@ th.sortable-column {
   text-align: right;
   display: inline-block;
 }
+.jsondiffpatch-delta pre {
+  white-space: normal;
+}
+.json-formatter-row .string {
+  white-space: normal;
+}

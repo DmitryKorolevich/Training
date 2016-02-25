@@ -1,4 +1,6 @@
-﻿using FluentValidation;
+﻿using System.Collections.Generic;
+using FluentValidation;
+using FluentValidation.Results;
 using VC.Admin.Models.ContentManagement;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
@@ -13,6 +15,16 @@ namespace VC.Admin.Validators.ContentManagement
 		public override void Validate(ContentCrossSellModel value)
 		{
 			ValidationErrors.Clear();
+
+			if (value.Items.Count != ContentConstants.CONTENT_CROSS_SELL_LIMIT)
+			{
+				ParseResults(
+					new ValidationResult(new List<ValidationFailure>()
+					{
+						new ValidationFailure(string.Empty, "Incorrect amount of cross sells")
+					}));
+			}
+
 			foreach (var item in value.Items)
 			{
 				ParseResults(ValidatorsFactory.GetValidator<ContentCrossSellRules>().Validate(item));
@@ -37,12 +49,8 @@ namespace VC.Admin.Validators.ContentManagement
 					.WithMessage(model => model.Title, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
 
 				RuleFor(model => model.IdSku)
-					.NotNull()
-					.WithMessage(model => model.IdSku, ValidationMessages.FieldRequired);
-
-				RuleFor(model => model.Price)
 					.NotEqual(0)
-					.WithMessage(model => model.Price, ValidationMessages.FieldRequired);
+					.WithMessage(model => model.IdSku, ValidationMessages.FieldRequired);
 			}
 		}
 	}

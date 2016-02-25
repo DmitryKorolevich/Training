@@ -61,6 +61,7 @@ namespace VC.Admin.ModelConverters
                 foreach(var item in dynamic.GiftCertificates)
                 {
                     model.GCs.Add(new GCListItemModel(item.GiftCertificate));
+                    model.GiftCertificatesSubtotal += item.Amount;
                 }
             }
             else
