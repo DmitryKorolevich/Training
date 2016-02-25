@@ -12,7 +12,6 @@ using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Base;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Data.Context;
-using VitalChoice.ObjectMapping.Extensions;
 
 namespace VitalChoice.Caching.Services
 {
@@ -69,32 +68,41 @@ namespace VitalChoice.Caching.Services
                     {
                         case EntityState.Modified:
                             primaryKey = cache.GetPrimaryKeyValue(entry.Entity);
-                            cache.MarkForUpdate(primaryKey);
-                            syncOperations.Add(new SyncOperation
+                            if (primaryKey.IsValid)
                             {
-                                Key = primaryKey.ToExportable(group.Key),
-                                SyncType = SyncType.Update,
-                                EntityType = group.Key.FullName
-                            });
+                                cache.MarkForUpdate(primaryKey);
+                                syncOperations.Add(new SyncOperation
+                                {
+                                    Key = primaryKey.ToExportable(group.Key),
+                                    SyncType = SyncType.Update,
+                                    EntityType = group.Key.FullName
+                                });
+                            }
                             break;
                         case EntityState.Deleted:
                             primaryKey = cache.GetPrimaryKeyValue(entry.Entity);
-                            cache.TryRemove(primaryKey);
-                            syncOperations.Add(new SyncOperation
+                            if (primaryKey.IsValid)
                             {
-                                Key = primaryKey.ToExportable(group.Key),
-                                SyncType = SyncType.Delete,
-                                EntityType = group.Key.FullName
-                            });
+                                cache.TryRemove(primaryKey);
+                                syncOperations.Add(new SyncOperation
+                                {
+                                    Key = primaryKey.ToExportable(group.Key),
+                                    SyncType = SyncType.Delete,
+                                    EntityType = group.Key.FullName
+                                });
+                            }
                             break;
                         case EntityState.Added:
                             primaryKey = cache.MarkForAdd(entry.Entity);
-                            syncOperations.Add(new SyncOperation
+                            if (primaryKey.IsValid)
                             {
-                                Key = primaryKey.ToExportable(group.Key),
-                                SyncType = SyncType.Add,
-                                EntityType = group.Key.FullName
-                            });
+                                syncOperations.Add(new SyncOperation
+                                {
+                                    Key = primaryKey.ToExportable(group.Key),
+                                    SyncType = SyncType.Add,
+                                    EntityType = group.Key.FullName
+                                });
+                            }
                             break;
                     }
                 }
