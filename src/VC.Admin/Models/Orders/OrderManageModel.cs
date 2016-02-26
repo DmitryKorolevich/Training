@@ -81,8 +81,18 @@ namespace VC.Admin.Models.Orders
         {
             if (model != null)
             {
-                IsEnabled = true;
-                IsAllowDisable = true;
+                var promoOrdered = model as PromoOrdered;
+                if (promoOrdered != null)
+                {
+                    IsEnabled = promoOrdered.Enabled;
+                    IsAllowDisable = true;
+                    Id = promoOrdered.Promotion?.Id;
+                }
+                else
+                {
+                    IsEnabled = true;
+                    IsAllowDisable = false;
+                }
             }
         }
     }

@@ -24,7 +24,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
             
         }
 
-        public PromoOrdered(SkuOrdered skuOrdered, PromotionDynamic promo)
+        public PromoOrdered(SkuOrdered skuOrdered, PromotionDynamic promo, bool enabled)
         {
             Sku = skuOrdered.Sku;
             ProductWithoutSkus = skuOrdered.ProductWithoutSkus;
@@ -32,7 +32,10 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
             Quantity = skuOrdered.Quantity;
             Messages = skuOrdered.Messages;
             Promotion = promo;
+            Enabled = enabled;
         }
+
+        public bool Enabled { get; set; }
 
         public PromotionDynamic Promotion { get; set; }
     }

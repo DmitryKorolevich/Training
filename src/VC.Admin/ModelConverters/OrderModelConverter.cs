@@ -24,12 +24,13 @@ namespace VC.Admin.ModelConverters
         private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
         private readonly ICustomerService _customerService;
         private readonly IDiscountService _discountService;
+        private readonly IPromotionService _promotionService;
         private readonly IGcService _gcService;
         private readonly IProductService _productService;
 
         public OrderModelConverter(IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
             IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> paymentMethodMapper, ICustomerService customerService,
-            IDiscountService discountService, IGcService gcService, IProductService productService)
+            IDiscountService discountService, IGcService gcService, IProductService productService, IPromotionService promotionService)
         {
             _addressMapper = addressMapper;
             _paymentMethodMapper = paymentMethodMapper;
@@ -37,6 +38,7 @@ namespace VC.Admin.ModelConverters
             _discountService = discountService;
             _gcService = gcService;
             _productService = productService;
+            _promotionService = promotionService;
         }
 
         public override void DynamicToModel(OrderManageModel model, OrderDynamic dynamic)
@@ -163,7 +165,7 @@ namespace VC.Admin.ModelConverters
 
             ModelToSkusDynamic(model, dynamic);
 
-            if(dynamic.SafeData.ShipDelayType!=null)
+            if (dynamic.SafeData.ShipDelayType!=null)
             {
                 if (dynamic.SafeData.ShipDelayType == ShipDelayType.None)
                 {
@@ -445,6 +447,13 @@ namespace VC.Admin.ModelConverters
         {
             if (model.SkuOrdereds != null)
             {
+                var promotionIds = model.PromoSkus.Where(p => p.Id.HasValue && p.IsAllowDisable).Select(p => p.Id.Value).ToList();
+                var promotions = _promotionService.Select(promotionIds, true);
+                dynamic.PromoSkus = promotions.Select(p => new PromoOrdered
+                {
+                    Promotion = p,
+                    Enabled = model.PromoSkus?.FirstOrDefault(m => m.Id.HasValue && m.Id.Value == p.Id)?.IsEnabled ?? true
+                }).ToList();
                 model.SkuOrdereds = model.SkuOrdereds.Where(s => !(s.Promo ?? false)).ToList();
 
                 var validList = model.SkuOrdereds.Where(s => s.Id.HasValue).Select(s => s.Id.Value).ToList();

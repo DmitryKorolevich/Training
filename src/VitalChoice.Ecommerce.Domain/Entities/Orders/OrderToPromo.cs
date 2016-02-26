@@ -17,5 +17,6 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Orders
         public Promotion Promo { get; set; }
         public decimal Amount { get; set; }
         public int Quantity { get; set; }
+        public bool Disabled { get; set; }
     }
 }

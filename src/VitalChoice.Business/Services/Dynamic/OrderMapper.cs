@@ -125,7 +125,8 @@ namespace VitalChoice.Business.Services.Dynamic
                         Quantity = s.Quantity,
                         Sku = await _skuMapper.FromEntityAsync(s.Sku, withDefaults),
                         ProductWithoutSkus = await _productMapper.FromEntityAsync(s.Sku?.Product, withDefaults),
-                        Promotion = await _promotionMapper.FromEntityAsync(s.Promo, withDefaults)
+                        Promotion = await _promotionMapper.FromEntityAsync(s.Promo, withDefaults),
+                        Enabled = !s.Disabled
                     }));
 
                     if (dynamic.PromoSkus.Count != 0)
@@ -189,7 +190,8 @@ namespace VitalChoice.Business.Services.Dynamic
                     Quantity = s.Quantity,
                     IdOrder = dynamic.Id,
                     IdSku = s.Sku.Id,
-                    IdPromo = s.Promotion?.Id
+                    IdPromo = s.Promotion?.Id,
+                    Disabled = !s.Enabled
                 }));
             });
         }
@@ -257,11 +259,13 @@ namespace VitalChoice.Business.Services.Dynamic
                         Quantity = s.Quantity,
                         IdOrder = dynamic.Id,
                         IdSku = s.Sku.Id,
-                        IdPromo = s.Promotion?.Id
+                        IdPromo = s.Promotion?.Id,
+                        Disabled = !s.Enabled
                     }, (sku, ordered) =>
                     {
                         sku.Amount = ordered.Amount;
                         sku.Quantity = ordered.Quantity;
+                        sku.Disabled = !ordered.Enabled;
                         sku.IdPromo = ordered.Promotion?.Id;
                     });
             });

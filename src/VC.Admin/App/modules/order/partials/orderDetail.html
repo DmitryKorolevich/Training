@@ -166,7 +166,7 @@
                                                             <div class="amount">{{item.Amount | currency}}</div>
                                                         </td>
                                                         <td class="enabled">
-                                                            <input type="checkbox" data-ng-model="item.IsEnabled" data-ng-disabled="!item.IsAllowDisable || orderEditDisabled">
+                                                            <input type="checkbox" data-ng-model="item.IsEnabled" data-ng-disabled="!item.IsAllowDisable || orderEditDisabled" data-ng-change="requestRecalculate()">
                                                         </td>
                                                     </tr>
                                                     <tr data-ng-repeat-end class="warning" data-ng-if="item.Messages.length>0">

@@ -31,7 +31,7 @@ namespace VitalChoice.Business.Workflow.Actions.Discounts
             var item = (SkuOrdered) dataContext.Order.Discount.Data.ThresholdSku;
             item.Quantity = 1;
             item.Amount = 0;
-            dataContext.PromoSkus.Add(new PromoOrdered(item, null));
+            dataContext.PromoSkus.Add(new PromoOrdered(item, null, true));
             return Task.FromResult((decimal)0);
         }
     }

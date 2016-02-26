@@ -26,7 +26,7 @@ namespace VitalChoice.Business.Workflow.Actions.Promo
             var productService = executionContext.Resolve<IProductService>();
             foreach (var promo in eligiable)
             {
-                if (promo.Data.PromotionBuyType == (int)PromoBuyType.Any)
+                if (promo.Data.PromotionBuyType == (int) PromoBuyType.Any)
                 {
                     Dictionary<int, PromotionToBuySku> promoskuIds = promo.PromotionsToBuySkus.ToDictionary(s => s.IdSku);
                     var applyCount =
@@ -34,12 +34,12 @@ namespace VitalChoice.Business.Workflow.Actions.Promo
                             .Sum(s => s.Quantity/promoskuIds[s.Sku.Id].Quantity);
                     await AddPromoProducts(context, productService, promo, applyCount);
                 }
-                else if (promo.Data.PromotionBuyType == (int)PromoBuyType.All)
+                else if (promo.Data.PromotionBuyType == (int) PromoBuyType.All)
                 {
                     Dictionary<int, SkuOrdered> orderSkuIds = context.Order.Skus.ToDictionary(s => s.Sku.Id);
                     if (promo.PromotionsToBuySkus.All(s => orderSkuIds.ContainsKey(s.IdSku)))
                     {
-                        var applyCount = promo.PromotionsToBuySkus.Min(s => orderSkuIds[s.IdSku].Quantity / s.Quantity);
+                        var applyCount = promo.PromotionsToBuySkus.Min(s => orderSkuIds[s.IdSku].Quantity/s.Quantity);
                         await AddPromoProducts(context, productService, promo, applyCount);
                     }
                 }
@@ -64,9 +64,15 @@ namespace VitalChoice.Business.Workflow.Actions.Promo
                     var promoGetSku = skuListCache[sku.Sku.Id];
                     sku.Amount = sku.Sku.Price - sku.Sku.Price*promoGetSku.Percent/100;
                     sku.Quantity = promoGetSku.Quantity*applyCount;
-                    context.PromoSkus.Add(new PromoOrdered(sku, promo));
+                    context.PromoSkus.Add(new PromoOrdered(sku, promo, GetPromoEnabled(context.Order.PromoSkus, promo.Id)));
                 }
             }
+        }
+
+        private static bool GetPromoEnabled(ICollection<PromoOrdered> promos, int id)
+        {
+            var inOrder = promos?.FirstOrDefault(p => p.Promotion?.Id == id);
+            return inOrder == null || inOrder.Enabled;
         }
     }
 }
