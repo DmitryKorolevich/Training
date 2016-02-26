@@ -20,7 +20,9 @@ namespace VitalChoice.Caching.Interfaces
         EntityKey MarkForUpdate(object entity);
         IEnumerable<EntityKey> MarkForUpdate(IEnumerable<object> entities);
         void MarkForUpdate(EntityKey pk);
+        void MarkForUpdate(EntityKey pk, string hasRelation);
         void MarkForUpdate(IEnumerable<EntityKey> pks);
+        void MarkForUpdate(IEnumerable<EntityKey> pks, string hasRelation);
         EntityKey MarkForAdd(object entity);
         IEnumerable<EntityKey> MarkForAdd(IEnumerable<object> entities);
         bool TryRemove(object entity);

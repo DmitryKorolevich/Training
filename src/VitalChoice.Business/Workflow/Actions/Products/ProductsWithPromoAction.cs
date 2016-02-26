@@ -14,7 +14,7 @@ namespace VitalChoice.Business.Workflow.Actions.Products
 
         public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            var promoAmount = dataContext.PromoSkus.Sum(p => p.Amount*p.Quantity);
+            var promoAmount = dataContext.PromoSkus.Where(p => p.Enabled).Sum(p => p.Amount*p.Quantity);
             dataContext.ProductsSubtotal = dataContext.Data.Products + promoAmount;
             return Task.FromResult(promoAmount);
         }

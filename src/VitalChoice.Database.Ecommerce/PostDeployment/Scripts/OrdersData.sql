@@ -324,6 +324,16 @@ BEGIN
 END
 GO
 
+IF EXISTS(SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'OrderToPromos') AND Name = N'Disabled' AND is_nullable = 1)
+BEGIN
+	UPDATE OrderToPromos
+	SET [Disabled] = 0
+
+	ALTER TABLE OrderToPromos
+	ALTER COLUMN [Disabled] BIT NOT NULL
+END
+GO
+
 IF NOT EXISTS(SELECT * FROM OrderOptionTypes WHERE Name='ConfirmationEmailSent')
 BEGIN
 

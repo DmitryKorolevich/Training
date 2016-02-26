@@ -20,11 +20,16 @@ namespace VitalChoice.Workflow.Configuration
         {
             setup.Action<TotalAction>("Total", action =>
             {
+                action.Aggregate<PayableTotalAction>();
+                action.Aggregate<GiftCertificatesPaymentAction>();
+            });
+
+            setup.Action<PayableTotalAction>("PayableTotal", action =>
+            {
                 action.Dependency<PerishableProductsAction>();
 
-                action.Aggregate<OrderSubTotalAction>();
-                action.Aggregate<GiftCertificatesPaymentAction>();
                 action.Aggregate<GetTaxAction>();
+                action.Aggregate<OrderSubTotalAction>();
             });
 
             setup.Action<GetTaxAction>("TaxTotal", action =>

@@ -29,6 +29,7 @@ namespace VitalChoice.Caching.Services.Cache
         private readonly Dictionary<EntityConditionalIndexInfo, CacheCluster<EntityIndex, T>> _conditionalIndexedDictionary;
 
         private readonly Dictionary<EntityCacheableIndexInfo, ConcurrentDictionary<EntityIndex, CacheCluster<EntityKey, T>>> _nonUniqueIndexedDictionary;
+        private volatile bool _needUpdate;
 
         public CacheData(IInternalEntityCacheFactory cacheFactory, CacheStorage<T> cacheStorage,
             ICollection<EntityConditionalIndexInfo> conditionalIndexes, ICollection<EntityCacheableIndexInfo> nonUniqueIndexes, RelationInfo relationInfo)
@@ -204,7 +205,13 @@ namespace VitalChoice.Caching.Services.Cache
         }
 
         public bool FullCollection { get; private set; }
-        public bool NeedUpdate { get; set; }
+
+        public bool NeedUpdate
+        {
+            get { return _needUpdate; }
+            set { _needUpdate = value; }
+        }
+
         public bool Empty => _mainCluster.IsEmpty;
 
         #region Helper Methods
