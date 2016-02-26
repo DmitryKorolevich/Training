@@ -127,7 +127,9 @@ namespace VitalChoice.Caching.Services.Cache
 
         public bool GetHasRelation(string name)
         {
-            return _relationInfo?.RelationsByName.ContainsKey(name) ?? false;
+            if (string.IsNullOrWhiteSpace(name))
+                return true;
+            return _relationInfo?.RelationsDict.ContainsKey(name) ?? false;
         }
 
         public CachedEntity<T> TryRemove(EntityKey key)

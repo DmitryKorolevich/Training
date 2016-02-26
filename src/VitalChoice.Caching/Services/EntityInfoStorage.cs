@@ -88,7 +88,18 @@ namespace VitalChoice.Caching.Services
 
                             foreach (var foreignKey in entityType.GetForeignKeys())
                             {
-                                if (foreignKey.PrincipalToDependent == null)
+                                if (foreignKey.PrincipalToDependent != null && foreignKey.PrincipalToDependent.IsCollection())
+                                {
+                                    var foreignValues = CreateValueInfos(foreignKey.Properties).ToArray();
+                                    externalForeignKeys.Add(
+                                        new KeyValuePair<Type, EntityForeignKeyInfo>(
+                                            foreignKey.DeclaringEntityType.ClrType,
+                                            new EntityForeignKeyInfo(foreignValues,
+                                                CreateValueInfos(foreignKey.PrincipalKey.Properties),
+                                                null,
+                                                foreignKey.PrincipalToDependent.DeclaringEntityType.ClrType)));
+                                }
+                                else if (foreignKey.PrincipalToDependent == null)
                                 {
                                     if (foreignKey.DependentToPrincipal != null)
                                     {
@@ -102,20 +113,19 @@ namespace VitalChoice.Caching.Services
                                                 foreignKey.DependentToPrincipal.GetTargetType().ClrType, index));
                                     }
                                 }
-                                else
+                                else if (foreignKey.PrincipalToDependent != null)
                                 {
-                                    if (foreignKey.PrincipalToDependent.IsCollection())
-                                    {
-                                        externalForeignKeys.Add(
-                                            new KeyValuePair<Type, EntityForeignKeyInfo>(
-                                                foreignKey.PrincipalToDependent.DeclaringEntityType.ClrType,
-                                                new EntityForeignKeyCollectionInfo(foreignKey.PrincipalToDependent.Name,
-                                                    foreignKey.PrincipalToDependent.GetGetter(),
-                                                    foreignKey.PrincipalToDependent.GetTargetType().ClrType)));
-                                    }
+                                    var foreignValues = CreateValueInfos(foreignKey.Properties).ToArray();
+                                    externalForeignKeys.Add(
+                                        new KeyValuePair<Type, EntityForeignKeyInfo>(
+                                            foreignKey.DeclaringEntityType.ClrType,
+                                            new EntityForeignKeyInfo(foreignValues,
+                                                CreateValueInfos(foreignKey.PrincipalKey.Properties),
+                                                foreignKey.PrincipalToDependent.Name,
+                                                foreignKey.PrincipalToDependent.DeclaringEntityType.ClrType)));
                                     if (foreignKey.DependentToPrincipal != null)
                                     {
-                                        var foreignValues = CreateValueInfos(foreignKey.Properties).ToArray();
+                                        foreignValues = CreateValueInfos(foreignKey.Properties).ToArray();
                                         externalForeignKeys.Add(
                                             new KeyValuePair<Type, EntityForeignKeyInfo>(
                                                 foreignKey.DependentToPrincipal.DeclaringEntityType.ClrType,

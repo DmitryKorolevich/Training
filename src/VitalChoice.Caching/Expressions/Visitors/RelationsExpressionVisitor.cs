@@ -43,19 +43,22 @@ namespace VitalChoice.Caching.Expressions.Visitors
                 var lambdaExpression = (node.Arguments[1] as UnaryExpression)?.Operand as LambdaExpression;
                 var memberExpression = lambdaExpression?.Body as MemberExpression;
                 var name = memberExpression?.Member.Name;
+                if (name == null)
+                {
+                    throw new InvalidOperationException("ThenInclude contains invalid relation name");
+                }
                 var relationType = memberExpression?.Type;
 
-                var elementType = relationType.TryGetElementType(typeof(ICollection<>)) ?? relationType;
+                var elementType = relationType.TryGetElementType(typeof (ICollection<>)) ?? relationType;
 
                 if (_currentRelation == null)
                     throw new InvalidOperationException("ThenInclude used before Include, need investigation");
 
-                var searchKey = new RelationCacheInfo(name, elementType, _currentRelation.RelationType);
                 RelationInfo newCurrent;
-                if (!_currentRelation.RelationsDict.TryGetValue(searchKey, out newCurrent))
+                if (!_currentRelation.RelationsDict.TryGetValue(name, out newCurrent))
                 {
                     var relationInfo = new RelationInfo(name, elementType, _currentRelation.RelationType, lambdaExpression);
-                    _currentRelation.RelationsDict.Add(searchKey, relationInfo);
+                    _currentRelation.RelationsDict.Add(name, relationInfo);
                     newCurrent = relationInfo;
                 }
                 _currentRelation = newCurrent;

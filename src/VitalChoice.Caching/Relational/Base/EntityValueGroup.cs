@@ -65,5 +65,28 @@ namespace VitalChoice.Caching.Relational.Base
         {
             return !Equals(left, right);
         }
+
+        public virtual bool IsValid
+        {
+            get
+            {
+                if (Values == null || !Values.Any())
+                    return false;
+                foreach (var value in Values)
+                {
+                    if (value.Value == null)
+                        return false;
+                    if ((value.Value as long?) <= 0)
+                    {
+                        return false;
+                    }
+                    if ((value.Value as int?) <= 0)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
     }
 }
