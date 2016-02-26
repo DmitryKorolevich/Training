@@ -43,5 +43,7 @@ namespace VitalChoice.Business.Mail
         Task SendPrivacyRequestEmailAsync(string email, PrivacyRequestEmail model);
 
         Task SendGLOrdersImportEmailAsync(GLOrdersImportEmail model);
+
+        Task SendOrderConfirmationEmailAsync(string email, OrderConfirmationEmail model);
     }
 }

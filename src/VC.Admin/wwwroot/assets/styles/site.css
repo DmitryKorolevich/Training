@@ -248,6 +248,13 @@ img.thumb {
 .label-future {
   background-color: #9a43b0;
 }
+.btn-purple,
+.btn-purple:hover,
+.btn-purple:focus {
+  color: #ffffff;
+  border-color: #9a43b0;
+  background-color: #9a43b0;
+}
 .legend {
   display: block;
   width: 100%;

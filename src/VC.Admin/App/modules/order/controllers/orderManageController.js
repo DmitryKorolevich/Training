@@ -273,6 +273,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             if ($scope.id) {
                 $scope.idCustomer = $scope.order.IdCustomer;
                 customerEditService.initOrderEditCustomerParts($scope);
+                initAutoShipOptions();
             }
             else {
                 if ($scope.idCustomer == 0) {
@@ -886,31 +887,36 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             });
         }
 
+        initAutoShipOptions();
+    }
+
+    var initAutoShipOptions = function ()
+    {
         //show/hide autoship option
         $scope.autoShipOrderOptionShow = ($scope.order.SkuOrdereds.length == 1 || ($scope.order.SkuOrdereds.length == 2 && !$scope.order.SkuOrdereds[1].Code))
             && $scope.order.PromoSkus.length == 0 && $scope.order.SkuOrdereds[0].AutoShipProduct;
         if ($scope.autoShipOrderOptionShow)
         {
             var items = [];
-            if($scope.order.SkuOrdereds[0].AutoShipFrequency1)
+            if ($scope.order.SkuOrdereds[0].AutoShipFrequency1)
             {
                 items.push({ Key: 1, Text: '1 Month' });
             }
-            if($scope.order.SkuOrdereds[0].AutoShipFrequency2)
+            if ($scope.order.SkuOrdereds[0].AutoShipFrequency2)
             {
                 items.push({ Key: 2, Text: '2 Months' });
             }
-            if($scope.order.SkuOrdereds[0].AutoShipFrequency3)
+            if ($scope.order.SkuOrdereds[0].AutoShipFrequency3)
             {
                 items.push({ Key: 3, Text: '3 Months' });
             }
-            if($scope.order.SkuOrdereds[0].AutoShipFrequency6)
+            if ($scope.order.SkuOrdereds[0].AutoShipFrequency6)
             {
                 items.push({ Key: 6, Text: '6 Months' });
             }
             $scope.autoShipOrderFrequencies = items;
         }
-    }
+    };
 
     var clearServerValidation = function ()
     {
@@ -1531,6 +1537,18 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 			}).error(function () {
 				toaster.pop('error', "Error!", "Server error occured");
 			});
+    };
+
+    $scope.sendOrderConfirmationEmail = function ()
+    {
+        modalUtil.open('app/modules/order/partials/sendOrderConfirmationPopup.html', 'sendOrderConfirmationController', {
+            email: $scope.currentCustomer.Email,
+            id: $scope.order.Id,
+            thenCallback: function (data)
+            {
+                
+            }
+        }, { size: 'xs'});
     };
 
     initialize();

@@ -13,6 +13,9 @@
             <div class="margin-top-10px">
                 <button class="btn btn-info width-160px" data-ng-click="goToCustomer();">Manage Customer</button>
             </div>
+            <div data-ng-show="currentCustomer && order.Id" class="margin-top-10px">
+                <button class="btn btn-purple width-160px" data-ng-click="sendOrderConfirmationEmail();">Resend Confirmation</button>
+            </div>
         </div>
         <div ng-controller="objectHistorySectionController" onload="name = 'History'" data-ng-include="'app/modules/order/partials/orderObjectHistorySection.html'"></div>
     </div>
