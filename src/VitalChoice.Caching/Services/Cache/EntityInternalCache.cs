@@ -311,24 +311,6 @@ namespace VitalChoice.Caching.Services.Cache
             MarkForUpdateInternal(pk, cacheDatas);
         }
 
-        private void MarkForUpdateInternal(EntityKey pk, IEnumerable<ICacheData<T>> cacheDatas)
-        {
-            foreach (var data in cacheDatas)
-            {
-                var cached = data.Get(pk);
-                if (cached != null && !cached.NeedUpdate)
-                {
-                    cached.NeedUpdate = true;
-                    MarkForUpdateForeignKeys(cached.ForeignKeys);
-                }
-                else if (data.FullCollection)
-                {
-                    data.NeedUpdate = true;
-                }
-            }
-            MarkForUpdateDependent(pk);
-        }
-
         public void MarkForUpdate(IEnumerable<EntityKey> pks)
         {
             foreach (var pk in pks)
@@ -474,6 +456,27 @@ namespace VitalChoice.Caching.Services.Cache
         public void Dispose()
         {
             CacheStorage.Dispose();
+        }
+
+        private void MarkForUpdateInternal(EntityKey pk, IEnumerable<ICacheData<T>> cacheDatas)
+        {
+            foreach (var data in cacheDatas)
+            {
+                var cached = data.Get(pk);
+                if (cached != null)
+                {
+                    if (!cached.NeedUpdate)
+                    {
+                        cached.NeedUpdate = true;
+                        MarkForUpdateForeignKeys(cached.ForeignKeys);
+                    }
+                }
+                else if (data.FullCollection)
+                {
+                    data.NeedUpdate = true;
+                }
+            }
+            MarkForUpdateDependent(pk);
         }
 
         private void MarkForUpdateDependent(EntityKey pk)
