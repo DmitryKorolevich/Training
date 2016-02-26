@@ -501,6 +501,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<ContentCrossSellService>().As<IContentCrossSellService>().InstancePerLifetimeScope();
             builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
             builder.RegisterModelConverters(projectAssembly);
+            builder.RegisterModelConverters(typeof(OrderService).GetTypeInfo().Assembly);
 
             builder.RegisterGeneric(typeof(ExtendedEcommerceDynamicService<,,,>))
                 .As(typeof(IExtendedDynamicServiceAsync<,,,>)).InstancePerLifetimeScope();

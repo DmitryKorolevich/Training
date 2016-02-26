@@ -34,6 +34,8 @@ using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VC.Admin.ModelConverters;
 using VC.Admin.Models.Products;
+using VitalChoice.Business.Mail;
+using VitalChoice.Ecommerce.Domain.Mail;
 
 namespace VC.Admin.Controllers
 {
@@ -49,6 +51,7 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> _ordersZipStatisticItemCSVExportService;
         private readonly ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> _vOrderWithRegionInfoItemCSVExportService;
         private readonly IProductService _productService;
+        private readonly INotificationService _notificationService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly ILogger logger;
 
@@ -62,6 +65,7 @@ namespace VC.Admin.Controllers
             ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> ordersZipStatisticItemCSVExportService,
             ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> vOrderWithRegionInfoItemCSVExportService,
             IProductService productService,
+            INotificationService notificationService,
             IObjectHistoryLogService objectHistoryLogService)
         {
             _orderService = orderService;
@@ -72,6 +76,7 @@ namespace VC.Admin.Controllers
             _ordersZipStatisticItemCSVExportService = ordersZipStatisticItemCSVExportService;
             _vOrderWithRegionInfoItemCSVExportService = vOrderWithRegionInfoItemCSVExportService;
             _productService = productService;
+            _notificationService = notificationService;
             _objectHistoryLogService = objectHistoryLogService;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             this.logger = loggerProvider.CreateLoggerDefault();
@@ -422,6 +427,23 @@ namespace VC.Admin.Controllers
                 
                 return toReturn;
             }
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> SendOrderConfirmationEmail(int id, [FromBody]OrderManualSendConfirmationModel model)
+        {
+            var order = await _orderService.SelectAsync(id, true);
+            if (order == null || order.OrderStatus == OrderStatus.Cancelled)
+            {
+                return false;
+            }
+
+            var emailModel = _mapper.ToModel<OrderConfirmationEmail>(order);
+            if (model == null)
+                return false;
+
+            await _notificationService.SendOrderConfirmationEmailAsync(model.Email, emailModel);
+            return true;
         }
     }
 }

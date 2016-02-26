@@ -323,3 +323,14 @@ BEGIN
 
 END
 GO
+
+IF NOT EXISTS(SELECT * FROM OrderOptionTypes WHERE Name='ConfirmationEmailSent')
+BEGIN
+
+	INSERT INTO [dbo].[OrderOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'ConfirmationEmailSent', 5, NULL, NULL, 'False')
+
+END
+GO

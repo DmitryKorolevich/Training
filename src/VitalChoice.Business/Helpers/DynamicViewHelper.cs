@@ -66,11 +66,11 @@ namespace VitalChoice.Business.Helpers
             };
         }
 
-        private static string ResolveStateOrCounty(ICollection<Country> countries, AddressDynamic address)
+        public static string ResolveStateOrCounty(ICollection<Country> countries, AddressDynamic address)
         {
             var target = countries.Single(x => x.Id == address.IdCountry);
 
-            var stateOrCounty = address.IdState.HasValue ? target.States.Single(x => x.Id == address.IdState.Value).StateCode : address.County;
+            var stateOrCounty = address.IdState.HasValue ? target.States.FirstOrDefault(x => x.Id == address.IdState.Value)?.StateCode : address.County;
 
             return stateOrCounty;
         }
