@@ -15,6 +15,7 @@ using Microsoft.Extensions.PlatformAbstractions;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
+using VitalChoice.Ecommerce.Context;
 using VitalChoice.Ecommerce.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
@@ -116,6 +117,7 @@ namespace VitalChoice.Workflow.Configuration
                 .As(typeof(ILogger<>));
 
             var container = new AdminDependencyConfig().BuildContainer(typeof (Program).GetTypeInfo().Assembly, builder);
+            EcommerceContextBase.ServiceProvider = container.Resolve<IServiceProvider>();
             LoggerService.Build(container.Resolve<IOptions<AppOptions>>(), container.Resolve<IApplicationEnvironment>());
             return container;
         }
