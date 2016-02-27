@@ -7,6 +7,7 @@ using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Ecommerce.Domain;
 using VitalChoice.ObjectMapping.Base;
+using VitalChoice.ObjectMapping.Extensions;
 
 namespace VitalChoice.Caching.Iterators
 {
@@ -17,7 +18,6 @@ namespace VitalChoice.Caching.Iterators
         public Func<T, bool> Predicate;
         public Dictionary<EntityKey, EntityEntry<T>> Tracked;
         public ICacheKeysStorage<T> KeysStorage;
-        public DirectMapper<T> DirectMapper;
     }
 
     internal class CacheIterator<TSource> : SimpleIterator<TSource>
@@ -29,7 +29,6 @@ namespace VitalChoice.Caching.Iterators
         private readonly ICacheKeysStorage<TSource> _keysStorage;
         public Dictionary<EntityKey, EntityEntry<TSource>> Tracked { get; }
         private IEnumerator<CacheResult<TSource>> _enumerator;
-        private readonly DirectMapper<TSource> _directMapper;
 
         public CacheIterator(IEnumerable<CacheResult<TSource>> source, Func<TSource, bool> predicate)
         {
@@ -43,7 +42,6 @@ namespace VitalChoice.Caching.Iterators
             _source = trackedParams.Source;
             _predicate = trackedParams.Predicate;
             _keysStorage = trackedParams.KeysStorage;
-            _directMapper = trackedParams.DirectMapper;
             Tracked = trackedParams.Tracked;
         }
 
@@ -116,11 +114,11 @@ namespace VitalChoice.Caching.Iterators
             EntityEntry<TSource> entry;
             if (Tracked.TryGetValue(pk, out entry))
             {
-                item = entry.State == EntityState.Detached ? _directMapper.Clone<Entity>(item) : entry.Entity;
+                item = entry.State == EntityState.Detached ? item.Clone<TSource, Entity>() : entry.Entity;
             }
             else
             {
-                item = _directMapper.Clone<Entity>(item);
+                item = item.Clone<TSource, Entity>();
             }
             return item;
         }

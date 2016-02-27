@@ -11,6 +11,7 @@ using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.ObjectMapping.Base;
+using VitalChoice.ObjectMapping.Extensions;
 
 namespace VitalChoice.Caching.Services.Cache
 {
@@ -19,13 +20,11 @@ namespace VitalChoice.Caching.Services.Cache
     {
         private readonly IInternalEntityCache<T> _internalCache;
         private readonly IInternalEntityCacheFactory _cacheFactory;
-        private readonly DirectMapper<T> _directMapper;
         private readonly DbContext _context;
 
-        public EntityCache(IInternalEntityCacheFactory cacheFactory, DirectMapper<T> directMapper, DbContext context)
+        public EntityCache(IInternalEntityCacheFactory cacheFactory, DbContext context)
         {
             _cacheFactory = cacheFactory;
-            _directMapper = directMapper;
             _context = context;
             _internalCache = cacheFactory.GetCache<T>();
         }
@@ -122,7 +121,7 @@ namespace VitalChoice.Caching.Services.Cache
 
             if (queryData.Tracked)
             {
-                entities = entities.Select(e => _directMapper.Clone<Entity>(e));
+                entities = entities.Select(e => e.Clone<T, Entity>());
             }
 
             if (fullCollection)
@@ -155,7 +154,7 @@ namespace VitalChoice.Caching.Services.Cache
             {
                 if (queryData.Tracked)
                 {
-                    entity = _directMapper.Clone<Entity>(entity);
+                    entity = entity.Clone<T, Entity>();
                 }
                 if (fullCollection)
                 {
@@ -291,7 +290,6 @@ namespace VitalChoice.Caching.Services.Cache
                 Tracked = _context.ChangeTracker.Entries<T>()
                     .ToDictionary(e => _internalCache.GetPrimaryKeyValue(e.Entity), e => e),
                 KeysStorage = _internalCache,
-                DirectMapper = _directMapper,
                 Predicate = compiled,
                 Source = results
             });
@@ -317,7 +315,6 @@ namespace VitalChoice.Caching.Services.Cache
                 Tracked = _context.ChangeTracker.Entries<T>()
                             .ToDictionary(e => _internalCache.GetPrimaryKeyValue(e.Entity), e => e),
                 KeysStorage = _internalCache,
-                DirectMapper = _directMapper,
                 Predicate = compiled,
                 Source = results
             });

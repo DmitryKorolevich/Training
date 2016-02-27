@@ -13,8 +13,6 @@ using VitalChoice.Caching.Services.Cache;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Helpers;
-using VitalChoice.ObjectMapping.Base;
-using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Caching.Services
 {
@@ -22,19 +20,14 @@ namespace VitalChoice.Caching.Services
     {
         private readonly IQueryCacheFactory _queryCacheFactory;
         private readonly IInternalEntityCacheFactory _cacheFactory;
-        private readonly ITypeConverter _typeConverter;
-        private readonly IModelConverterService _modelConverterService;
         private readonly DbContext _context;
         private readonly ILogger<CacheEntityQueryProvider> _logger;
 
         public CacheEntityQueryProvider(IQueryCompiler queryCompiler, IQueryCacheFactory queryCacheFactory,
-            IInternalEntityCacheFactory cacheFactory, ITypeConverter typeConverter,
-            IModelConverterService modelConverterService, DbContext context, ILogger<CacheEntityQueryProvider> logger) : base(queryCompiler)
+            IInternalEntityCacheFactory cacheFactory, DbContext context, ILogger<CacheEntityQueryProvider> logger) : base(queryCompiler)
         {
             _queryCacheFactory = queryCacheFactory;
             _cacheFactory = cacheFactory;
-            _typeConverter = typeConverter;
-            _modelConverterService = modelConverterService;
             _context = context;
             _logger = logger;
         }
@@ -52,7 +45,7 @@ namespace VitalChoice.Caching.Services
                 var cacheExecutor =
                     (ICacheExecutor)
                         Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
-                            _context, _queryCacheFactory, _cacheFactory, _typeConverter, _modelConverterService, _logger);
+                            _context, _queryCacheFactory, _cacheFactory, _logger);
                 CacheGetResult cacheGetResult;
                 var result = elementType != null
                     ? cacheExecutor.Execute(out cacheGetResult)
@@ -82,7 +75,7 @@ namespace VitalChoice.Caching.Services
                 var cacheExecutor =
                     (ICacheExecutor)
                         Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
-                            _context, _queryCacheFactory, _cacheFactory, _typeConverter, _modelConverterService, _logger);
+                            _context, _queryCacheFactory, _cacheFactory, _logger);
                 CacheGetResult cacheGetResult;
                 var result = (List<TResult>)cacheExecutor.Execute(out cacheGetResult);
                 switch (cacheGetResult)
@@ -112,7 +105,7 @@ namespace VitalChoice.Caching.Services
                 var cacheExecutor =
                     (ICacheExecutor)
                         Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
-                            _context, _queryCacheFactory, _cacheFactory, _typeConverter, _modelConverterService, _logger);
+                            _context, _queryCacheFactory, _cacheFactory, _logger);
                 CacheGetResult cacheGetResult;
                 var result = elementType != null
                     ? cacheExecutor.Execute(out cacheGetResult)
@@ -143,7 +136,7 @@ namespace VitalChoice.Caching.Services
             void UpdateList(object entities);
         }
 
-        private class CacheExecutor<T> : ICacheExecutor
+        private struct CacheExecutor<T> : ICacheExecutor
             where T : Entity, new()
         {
             private readonly ILogger _logger;
@@ -151,11 +144,9 @@ namespace VitalChoice.Caching.Services
             private readonly IEntityCache<T> _cache;
 
             public CacheExecutor(Expression expression, DbContext context, IQueryCacheFactory queryCacheFactory,
-                IInternalEntityCacheFactory cacheFactory, ITypeConverter typeConverter,
-                IModelConverterService modelConverterService, ILogger logger)
+                IInternalEntityCacheFactory cacheFactory, ILogger logger)
             {
-                _cache = new EntityCache<T>(cacheFactory,
-                    new DirectMapper<T>(typeConverter, modelConverterService), context);
+                _cache = new EntityCache<T>(cacheFactory, context);
                 _logger = logger;
                 var queryCache = queryCacheFactory.GetQueryCache<T>();
                 _queryData = queryCache.GerOrAdd(expression);
