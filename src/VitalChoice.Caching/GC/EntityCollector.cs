@@ -52,6 +52,10 @@ namespace VitalChoice.Caching.GC
             {
                 try
                 {
+                    if (System.GC.GetTotalMemory(false) < _maxSize)
+                    {
+                        continue;
+                    }
                     if (System.GC.GetTotalMemory(true) < _maxSize)
                     {
                         continue;
