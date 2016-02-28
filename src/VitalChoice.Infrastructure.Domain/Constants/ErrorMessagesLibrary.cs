@@ -27,6 +27,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
 		    public const string LabelTakenAlready = "LabelTakenAlready";
 		    public const string HasAssignments = "HasAssignments";
 		    public const string AtLeastOneDefaultShipping = "AtLeastOneDefaultShipping";
+		    public const string AtLeastOneDefaultCreditCard = "AtLeastOneDefaultCreditCard";
 		    public const string AttemptToUpdateUsingWrongService = "AttemptToUpdateUsingWrongService";
 		    public const string AttemptToAssignWrongRole = "AttemptToAssignWrongRole";
 		    public const string IncorrectCustomerRole = "IncorrectCustomerRole";
@@ -75,7 +76,8 @@ namespace VitalChoice.Infrastructure.Domain.Constants
 			{Keys.TitleTakenAlready, "Title is already in use"},
 			{Keys.LabelTakenAlready, "Label is already in use"},
 			{Keys.HasAssignments, "Record cannot be removed because there are references to it"},
-			{Keys.AtLeastOneDefaultShipping, "At least one shipping address should be default"},
+			{Keys.AtLeastOneDefaultShipping, "One shipping address should be selected as default"},
+			{Keys.AtLeastOneDefaultCreditCard, "One credit card should be selected as default"},
 			{Keys.AttemptToUpdateUsingWrongService, "Attempt to update user using forbidden operation"},
 			{Keys.AttemptToAssignWrongRole, "Attempt to assign forbidden role"},
 			{Keys.IncorrectCustomerRole, "Incorrect customer type"},

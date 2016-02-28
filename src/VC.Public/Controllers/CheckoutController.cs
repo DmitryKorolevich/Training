@@ -205,8 +205,10 @@ namespace VC.Public.Controllers
                 var creditCards = currentCustomer.CustomerPaymentMethods
                     .Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard).ToList();
 
-                var firstCreditCard = creditCards.FirstOrDefault();
-                if (firstCreditCard != null)
+	            var firstCreditCard = creditCards.FirstOrDefault(x => (bool?) x.SafeData.Default == true) ??
+	                                  creditCards.FirstOrDefault();
+
+	            if (firstCreditCard != null)
                 {
                     if (cart.Order.PaymentMethod?.Address == null || cart.Order.PaymentMethod.Id == 0)
                     {

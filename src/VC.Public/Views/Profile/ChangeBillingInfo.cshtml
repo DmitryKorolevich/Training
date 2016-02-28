@@ -30,6 +30,7 @@
             <input id="hdState" value="@Html.DisplayForEx(x => x.IdState)" type="hidden">
             <input id="hdCardType" value="@Html.DisplayForEx(x => x.CardType)" type="hidden">
             @Html.HiddenFor(m => m.Id, new {@id = "hdCreditCard"})
+			@Html.HiddenFor(m => m.Default, new { @id = "hdDefault" })
             @Html.AntiForgeryToken()
             <h4>Manage Billing Addresses</h4>
             <span class="form-control-important-info">You must provide all credit card details to add or update any saved credit card billing information.</span>
@@ -42,7 +43,8 @@
                 @Html.Label("SavedCards", "Saved Cards", new {@class = "control-label"})
                 <div class="input-group">
                     <select class="form-control" id="ddCreditCardsSelection"></select>
-                    <input id="delSelected" class="red left-indent-small inline-button" type="button" value="Delete Card"/>
+					<input id="setDefaultSelected" class="left-indent-small inline-button" type="button" value="Set as Default" style="display:none;" />
+					<input id="delSelected" class="red left-indent-small inline-button" type="button" value="Delete Card"/>
                 </div>
             </div>
             <div class="form-group">

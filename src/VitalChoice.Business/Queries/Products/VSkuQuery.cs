@@ -110,5 +110,25 @@ namespace VitalChoice.Business.Queries.Product
 
             return this;
         }
-    }
+
+	    public VSkuQuery NotHiddenOnly(bool notHidden)
+	    {
+			if (notHidden)
+			{
+				Add(x => !x.Hidden && !x.ProductHidden);
+			}
+
+			return this;
+		}
+
+		public VSkuQuery ActiveOnly(bool active)
+		{
+			if (active)
+			{
+				Add(x => x.StatusCode == RecordStatusCode.Active && x.SkuStatusCode == RecordStatusCode.Active);
+			}
+
+			return this;
+		}
+	}
 }

@@ -23,6 +23,8 @@ angular.module('app.modules.content.controllers.contentCrossSellsManageControlle
 				if (val) {
 					$scope.skusFilter.Code = val;
 					$scope.skusFilter.DescriptionName = '';
+					$scope.skusFilter.NotHiddenOnly = true;
+					$scope.skusFilter.ActiveOnly = true;
 					return productService.getSkus($scope.skusFilter)
 						.then(function (result) {
 							$scope.bufferedSkus =  result.data.Data.map(function (item) {

@@ -94,7 +94,12 @@ namespace VitalChoice.Core.GlobalFilters
 						context.Result = new RedirectResult("/content/" + ContentConstants.NOT_FOUND_PAGE_URL);
 						return;
 					}
-					var viewName = apiException.Status == HttpStatusCode.Forbidden ? "AccessDenied" : "Error";
+					if (apiException.Status == HttpStatusCode.Forbidden)
+					{
+						context.Result = new RedirectResult("/content/" + ContentConstants.ACESS_DENIED_PAGE_URL);
+						return;
+					}
+					var viewName = "Error";
 
 					result.ViewName = viewName;
 					result.StatusCode = (int)apiException.Status;

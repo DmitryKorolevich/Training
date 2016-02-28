@@ -6,8 +6,8 @@ namespace VitalChoice.Interfaces.Services.Content
 {
     public interface IContentCrossSellService
 	{
-	    Task<IList<ContentCrossSell>> GetContentCrossSells(ContentCrossSellType type);
+	    Task<IList<ContentCrossSell>> GetContentCrossSellsAsync(ContentCrossSellType type);
 
-	    Task<IList<ContentCrossSell>> AddUpdateContentCrossSells(IList<ContentCrossSell> contentCrossSells);
+	    Task<IList<ContentCrossSell>> AddUpdateContentCrossSellsAsync(IList<ContentCrossSell> contentCrossSells);
 	}
 }

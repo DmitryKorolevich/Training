@@ -43,7 +43,7 @@ $(function () {
 				}
 
 			}, function (errorResult) {
-				//todo: handle result
+				notifyError();
 			});
 		}
 

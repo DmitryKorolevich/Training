@@ -1,4 +1,6 @@
-﻿$(function () {
+﻿var creditCards = null;
+
+$(function () {
 	changeSaveButtonLabel($("#hdCreditCard").val());
 
 	creditCards = [];
@@ -10,12 +12,49 @@
 
 	populateCardTypes(function() {
 		populateCreditCardsSelection(creditCards, false);
+
+		syncDefaultBtnState();
 	});
 
 	$("body").on("change", "#ddCreditCardsSelection", function() {
 		changeSelection($("#ddCreditCardsSelection").val());
 
+		syncDefaultBtnState();
+
 		$("#delSelected").show();
+
+		$(".validation-summary-errors").hide();
+	});
+
+	$("body").on("click", "#setDefaultSelected", function () {
+		$("#hdDefault").val(true);
+
+		$.each(creditCards, function (index, item) {
+			item.Default = false;
+		});
+
+		var selectedCreditCard = $.grep(creditCards, function (item) {
+			return item.Id == $("#hdCreditCard").val();
+		})[0];
+
+		if (selectedCreditCard) {
+			setDefaultCreditCard($("#hdCreditCard").val(), function (result, creditCards) {
+				if (result.Success) {
+					selectedCreditCard.Default = true;
+
+					updateOptionsText();
+
+					notifySuccess("Successfully updated");
+				} else {
+					notifyError(result.Messages[0].Message);
+				}
+
+			}, function (errorResult) {
+				notifyError();
+			});
+		}
+
+		$('#setDefaultSelected').hide();
 	});
 
 	$("body").on("click", "#addNew", function() {
@@ -37,7 +76,8 @@
 			County: "",
 			PostalCode: "",
 			Phone: "",
-			Fax: ""
+			Fax: "",
+			Default:false
 		}
 
 		$("#ddCreditCardsSelection").val("");
@@ -83,8 +123,8 @@ function populateCreditCardsSelection(creditCards, setDefault) {
 
 	if (creditCards && creditCards.length > 0) {
 		$.each(creditCards, function (creditCardIndex, creditCard) {
-			var option = $('<option></option>').val(creditCard.Id).html($.grep(creditCardTypes, function (cardType) { return cardType.Key == creditCard.CardType })[0].Text + ', ending in ' + getLast4(creditCard.CardNumber));
-			if ((setDefault && creditCardIndex == 0) || (!setDefault && creditCard.Id == $("#hdCreditCard").val())) {
+			var option = $('<option></option>').val(creditCard.Id).html($.grep(creditCardTypes, function (cardType) { return cardType.Key == creditCard.CardType })[0].Text + ', ending in ' + getLast4(creditCard.CardNumber) + " " + (creditCard.Default ? "(Default)" : ""));
+			if ((setDefault && creditCard.Default) || (!setDefault && creditCard.Id == $("#hdCreditCard").val())) {
 				$(option).attr("selected", "selected")
 			}
 
@@ -94,6 +134,22 @@ function populateCreditCardsSelection(creditCards, setDefault) {
 
 	if ($("#hdCreditCard").val() == 0) {
 		$("#ddCreditCardsSelection").val("");
+	}
+}
+
+function syncDefaultBtnState() {
+	var selectedCreditCard = $.grep(creditCards, function (item) {
+		return item.Id == $("#ddCreditCardsSelection").val();
+	})[0];
+
+	if (!selectedCreditCard) {
+		$('#setDefaultSelected').show();
+	} else {
+		if (selectedCreditCard.Default) {
+			$('#setDefaultSelected').hide();
+		} else {
+			$('#setDefaultSelected').show();
+		}
 	}
 }
 
@@ -138,6 +194,7 @@ function setChangedData(selectedCreditCard) {
 	$("#hdCardType").val(selectedCreditCard.CardType);
 	$("#hdCountry").val(selectedCreditCard.IdCountry);
 	$("#hdState").val(selectedCreditCard.IdState);
+	$("#hdDefault").val(selectedCreditCard.Default);
 
 	$("#ddCardType").val(selectedCreditCard.CardType);
 	$("input[name=CardNumber]").val(selectedCreditCard.CardNumber);
@@ -162,4 +219,34 @@ function setChangedData(selectedCreditCard) {
 	$("form").removeData("validator");
 	$("form").removeData("unobtrusiveValidation");
 	$.validator.unobtrusive.parse("form");
+}
+
+function setDefaultCreditCard(idAddress, successCallback, errorCallback) {
+	$.ajax({
+		type: "POST",
+		url: "/Profile/SetDefaultCreditCard/" + idAddress,
+		dataType: "json"
+	}).success(function (result) {
+		if (successCallback) {
+			successCallback(result);
+		}
+	}).error(function (result) {
+		if (errorCallback) {
+			errorCallback(result);
+		}
+	});
+}
+
+function updateOptionsText() {
+	$.each($("#ddCreditCardsSelection option"), function (index, option) {
+		var creditCard = $.grep(creditCards, function (item) {
+			return item.Id == $(option).val();
+		})[0];
+
+		var text = $.grep(creditCardTypes, function(cardType) {
+			 return cardType.Key == creditCard.CardType
+		})[0].Text + ', ending in ' + getLast4(creditCard.CardNumber);
+
+		$(option).html(text + " " + (creditCard.Default ? "(Default)" : ""));
+	});
 }
