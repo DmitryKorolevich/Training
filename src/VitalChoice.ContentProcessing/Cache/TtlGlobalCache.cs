@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -11,11 +12,11 @@ namespace VitalChoice.ContentProcessing.Cache
 {
     public class TtlGlobalCache : ITtlGlobalCache
     {
-        private readonly ILogger _logger;
+        //private readonly ILogger _logger;
 
-        public TtlGlobalCache(ILoggerFactory loggerFactory)
+        public TtlGlobalCache(/*ILoggerFactory loggerFactory*/)
         {
-            _logger = loggerFactory.CreateLogger<TtlGlobalCache>();
+            //_logger = loggerFactory.CreateLogger<TtlGlobalCache>();
         }
 
         private class CachedTemplate
@@ -25,8 +26,8 @@ namespace VitalChoice.ContentProcessing.Cache
             public DateTime TemplateDate { get; set; }
         }
 
-        private readonly Dictionary<IdPair, CachedTemplate> _cache = new Dictionary<IdPair, CachedTemplate>();
-        private readonly object _lockObject = new object();
+        private readonly ConcurrentDictionary<IdPair, CachedTemplate> _cache = new ConcurrentDictionary<IdPair, CachedTemplate>();
+        private readonly ConcurrentDictionary<string, ITtlTemplate> _compiledCache = new ConcurrentDictionary<string, ITtlTemplate>();
 
         private struct IdPair : IEquatable<IdPair>
         {
@@ -70,14 +71,10 @@ namespace VitalChoice.ContentProcessing.Cache
         private void RemoveFromCacheNoBroadCast(int idMaster, int idContent)
         {
             var searchValue = new IdPair(idMaster, idContent);
-            lock (_lockObject)
+            CachedTemplate ttlTemplate;
+            if (_cache.TryRemove(searchValue, out ttlTemplate))
             {
-                if (_cache.ContainsKey(searchValue))
-                {
-                    var ttlTemplate = _cache[searchValue];
-                    _cache.Remove(searchValue);
-                    ttlTemplate.Template.Dispose();
-                }
+                //ttlTemplate.Template.Dispose();
             }
         }
 
@@ -91,60 +88,44 @@ namespace VitalChoice.ContentProcessing.Cache
         {
             CachedTemplate cache;
             var searchValue = new IdPair(cacheParams.IdMaster, string.IsNullOrWhiteSpace(cacheParams.Template) ? 0 : cacheParams.IdTemplate);
-            lock (_lockObject)
+            return _cache.AddOrUpdate(searchValue, _ =>
             {
-                if (_cache.TryGetValue(searchValue, out cache))
+                cache = new CachedTemplate
                 {
-                    if (cache.TemplateDate < cacheParams.TemplateUpdateDate || cache.MasterDate < cacheParams.MasterUpdateDate)
-                    {
-                        if (
-                            !cache.Template.Recompile(cacheParams.WholeTemplate,
-                                new CompileContext(new TemplateOptions
-                                {
-                                    AllowCSharp = true,
-                                    ForceRemoveWhitespace = true,
-                                    Data = cacheParams.ViewContext
-                                })).Success)
-                        {
-                            //Update dates so old template using in runtime next request ok
-                            cache.MasterDate = cacheParams.MasterUpdateDate;
-                            cache.TemplateDate = cacheParams.TemplateUpdateDate;
-                            _logger.LogError("Template recompilation error",
-                                new TemplateCompileException(cache.Template.CompileResult.ErrorList));
-                        }
-                        cache.MasterDate = cacheParams.MasterUpdateDate;
-                        cache.TemplateDate = cacheParams.TemplateUpdateDate;
-                    }
-                    return cache.Template;
-                }
-            }
-            cache = new CachedTemplate
+                    Template = GetTemplate(cacheParams),
+                    MasterDate = cacheParams.MasterUpdateDate,
+                    TemplateDate = cacheParams.TemplateUpdateDate
+                };
+                return cache;
+            }, (_, cached) =>
             {
-                Template = new TtlTemplate(cacheParams.WholeTemplate,
-                    new CompileContext(new TemplateOptions
-                    {
-                        AllowCSharp = true,
-                        ForceRemoveWhitespace = true,
-                        Data = cacheParams.ViewContext
-                    })),
-                MasterDate = cacheParams.MasterUpdateDate,
-                TemplateDate = cacheParams.TemplateUpdateDate
-            };
-            if (!cache.Template.CompileResult.Success)
-                throw new TemplateCompileException(cache.Template.CompileResult.ErrorList);
-            cache.MasterDate = cacheParams.MasterUpdateDate;
-            cache.TemplateDate = cacheParams.TemplateUpdateDate;
-            lock (_lockObject)
-            {
-                CachedTemplate cachedResult;
-                if (_cache.TryGetValue(searchValue, out cachedResult))
+                if (cached.TemplateDate < cacheParams.TemplateUpdateDate || cached.MasterDate < cacheParams.MasterUpdateDate)
                 {
-                    cache.Template.Dispose();
-                    return cachedResult.Template;
+                    cached.Template = GetTemplate(cacheParams);
+                    cached.MasterDate = cacheParams.MasterUpdateDate;
+                    cached.TemplateDate = cacheParams.TemplateUpdateDate;
                 }
-                _cache.Add(searchValue, cache);
-            }
-            return cache.Template;
+                return cached;
+            }).Template;
+        }
+
+        private ITtlTemplate GetTemplate(TemplateCacheParam cacheParams)
+        {
+            return _compiledCache.GetOrAdd(cacheParams.WholeTemplate, whole => CompileNew(cacheParams, whole));
+        }
+
+        private static ITtlTemplate CompileNew(TemplateCacheParam cacheParams, string whole)
+        {
+            var template = new TtlTemplate(whole,
+                new CompileContext(new TemplateOptions
+                {
+                    AllowCSharp = true,
+                    ForceRemoveWhitespace = true,
+                    Data = cacheParams.ViewContext
+                }));
+            if (!template.CompileResult.Success)
+                throw new TemplateCompileException(template.CompileResult.ErrorList);
+            return template;
         }
 
         #region IDisposable
@@ -157,12 +138,9 @@ namespace VitalChoice.ContentProcessing.Cache
             {
                 if (disposing)
                 {
-                }
-                _disposed = true;
-                lock (_lockObject)
-                {
                     _cache.Clear();
                 }
+                _disposed = true;
             }
         }
 
