@@ -9,6 +9,9 @@ namespace VC.Public.Models.Profile
     public class BillingInfoModel: AddressModel
     {
 		[Map]
+		public bool Default { get; set; }
+
+		[Map]
 		public int Id { get; set; }
 
 		[Required]

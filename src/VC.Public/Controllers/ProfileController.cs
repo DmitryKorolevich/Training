@@ -128,8 +128,8 @@ namespace VC.Public.Controllers
             BillingInfoModel model;
             if (creditCards.Any())
             {
-                model = selectedId > 0 ? creditCards.Single(x => x.Id == selectedId) : creditCards.First();
-                ViewBag.CreditCards = creditCards.ToJson();
+                model = selectedId > 0 ? creditCards.Single(x => x.Id == selectedId) : creditCards.FirstOrDefault(x => x.Default) ?? creditCards.FirstOrDefault();
+				ViewBag.CreditCards = creditCards.ToJson();
             }
             else
             {
@@ -288,7 +288,16 @@ namespace VC.Public.Controllers
                 currentCustomer.CustomerPaymentMethods.Remove(creditCardToUpdate);
             }
 
-            var customerPaymentMethod = await _paymentMethodConverter.FromModelAsync(model, (int)PaymentMethodType.CreditCard);
+			if (model.Default)
+			{
+				var otherAddresses = currentCustomer.CustomerPaymentMethods.Where(x=>x.IdObjectType == (int)PaymentMethodType.CreditCard).ToList();
+				foreach (var otherAddress in otherAddresses)
+				{
+					otherAddress.Data.Default = false;
+				}
+			}
+
+			var customerPaymentMethod = await _paymentMethodConverter.FromModelAsync(model, (int)PaymentMethodType.CreditCard);
             customerPaymentMethod.Data.SecurityCode = model.SecurityCode;
 
             customerPaymentMethod.Address = await _addressConverter.FromModelAsync(model, (int)AddressType.Billing);
@@ -443,7 +452,37 @@ namespace VC.Public.Controllers
             return true;
         }
 
-        [HttpGet]
+		[HttpPost]
+		public async Task<Result<bool>> SetDefaultCreditCard(int id)
+		{
+			var currentCustomer = await GetCurrentCustomerDynamic();
+
+			var found = false;
+			var addresses = currentCustomer.CustomerPaymentMethods.Where(x => x.IdObjectType == (int)PaymentMethodType.CreditCard);
+			foreach (var address in addresses)
+			{
+				if (address.Id == id)
+				{
+					address.Data.Default = true;
+					found = true;
+				}
+				else
+				{
+					address.Data.Default = false;
+				}
+			}
+
+			if (!found)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
+			}
+
+			await CustomerService.UpdateAsync(currentCustomer);
+
+			return true;
+		}
+
+		[HttpGet]
         public async Task<IActionResult> LastOrderPlaced()
         {
             var lines = new List<LastOrderLineModel>();

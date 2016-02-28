@@ -166,7 +166,13 @@ namespace VitalChoice.Business.Services.Customers
                     ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AtLeastOneDefaultShipping]);
             }
 
-            if(model.IdAffiliate.HasValue)
+			if (model.CustomerPaymentMethods.Where(x => x.IdObjectType == (int)PaymentMethodType.CreditCard && x.StatusCode != (int)RecordStatusCode.Deleted).All(x => !x.Data.Default))
+			{
+				throw new AppValidationException(
+					ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AtLeastOneDefaultCreditCard]);
+			}
+
+			if (model.IdAffiliate.HasValue)
             {
                 AffiliateQuery conditions = new AffiliateQuery().NotDeleted().WithDirectId(model.IdAffiliate.Value);
                 var exist = await _affiliateRepositoryAsync.Query(conditions).SelectAnyAsync();
