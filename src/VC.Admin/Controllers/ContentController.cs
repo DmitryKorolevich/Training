@@ -545,7 +545,7 @@ namespace VC.Admin.Controllers
 	    [AdminAuthorize(PermissionType.Content)]
 	    public async Task<Result<ContentCrossSellModel>> GetContentCrossSells(ContentCrossSellType id)
 	    {
-		    var contentCrossSells = await contentCrossSellService.GetContentCrossSells(id);
+		    var contentCrossSells = await contentCrossSellService.GetContentCrossSellsAsync(id);
 
 		    return await PopulateContentCrossSellModel(contentCrossSells, id);
 	    }
@@ -560,7 +560,7 @@ namespace VC.Admin.Controllers
 			var sUserId = Request.HttpContext.User.GetUserId();
 			var userId = Convert.ToInt32(sUserId);
 
-			var alreadyExists = await contentCrossSellService.GetContentCrossSells(contentCrossSellsModel.Type);
+			var alreadyExists = await contentCrossSellService.GetContentCrossSellsAsync(contentCrossSellsModel.Type);
 			var itemsToStore = new List<ContentCrossSell>();
 		    for (var i = 0; i < contentCrossSellsModel.Items.Count; i++)
 		    {
@@ -593,7 +593,7 @@ namespace VC.Admin.Controllers
 			    itemsToStore.Add(item);
 			}
 			
-			var contentCrossSells =  await contentCrossSellService.AddUpdateContentCrossSells(itemsToStore);
+			var contentCrossSells =  await contentCrossSellService.AddUpdateContentCrossSellsAsync(itemsToStore);
 
 			return await PopulateContentCrossSellModel(contentCrossSells, contentCrossSellsModel.Type);
 		}

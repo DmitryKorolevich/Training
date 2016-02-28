@@ -73,7 +73,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             }
 
             var eProduct = viewContext.Parameters.Product;
-            if (eProduct.Hidden)
+            if (eProduct.Hidden || targetStatuses.All(x => x != (RecordStatusCode) eProduct.StatusCode))
             {
                 throw new ApiException("Product not found", HttpStatusCode.NotFound);
             }
@@ -108,7 +108,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 
             return
                 await
-                    PopulateProductPageTemplateModel(viewContext, rootNavCategory, lastProductReviews, reviewsCount, ratingsAverage);
+                    PopulateProductPageTemplateModel(viewContext, rootNavCategory, lastProductReviews, reviewsCount, ratingsAverage, targetStatuses);
         }
 
         private bool BuildBreadcrumb(ProductNavCategoryLite rootCategory, int categoryId,
@@ -160,7 +160,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 
         private async Task<TtlProductPageModel> PopulateProductPageTemplateModel(
             ProcessorViewContext viewContext, ProductNavCategoryLite rootNavCategory,
-            PagedList<ProductReview> lastProductReviews, int reviewsCount, int ratingsAverage)
+            PagedList<ProductReview> lastProductReviews, int reviewsCount, int ratingsAverage, IList<RecordStatusCode> targetStatusCodes)
         {
             IList<TtlBreadcrumbItemModel> breadcrumbItems = new List<TtlBreadcrumbItemModel>();
 
@@ -186,7 +186,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             toReturn.SpecialIcon = eProduct.Data.SpecialIcon;
             toReturn.SubProductGroupName = eProduct.Data.SubProductGroupName;
             toReturn.BreadcrumbOrderedItems = breadcrumbItems;
-            toReturn.Skus = eProduct.Skus.Where(x => !x.Hidden).OrderBy(x => x.Order).Select(x => new TtlProductPageSkuModel()
+            toReturn.Skus = eProduct.Skus.Where(x => !x.Hidden && targetStatusCodes.Contains((RecordStatusCode)x.StatusCode)).OrderBy(x => x.Order).Select(x => new TtlProductPageSkuModel()
             {
                 Code = x.Code,
                 SalesText = x.Data.SalesText,

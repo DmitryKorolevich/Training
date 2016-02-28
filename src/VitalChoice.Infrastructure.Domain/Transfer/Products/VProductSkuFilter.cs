@@ -17,5 +17,9 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Products
         public IList<int> Ids { get; set; }
 
         public IList<int> IdProducts { get; set; }
+
+	    public bool ActiveOnly { get; set; }
+
+	    public bool NotHiddenOnly { get; set; }
     }
 }
