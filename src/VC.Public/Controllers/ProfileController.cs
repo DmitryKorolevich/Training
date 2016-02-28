@@ -288,14 +288,19 @@ namespace VC.Public.Controllers
                 currentCustomer.CustomerPaymentMethods.Remove(creditCardToUpdate);
             }
 
+			var otherAddresses = currentCustomer.CustomerPaymentMethods.Where(x => x.IdObjectType == (int)PaymentMethodType.CreditCard).ToList();
 			if (model.Default)
 			{
-				var otherAddresses = currentCustomer.CustomerPaymentMethods.Where(x=>x.IdObjectType == (int)PaymentMethodType.CreditCard).ToList();
 				foreach (var otherAddress in otherAddresses)
 				{
 					otherAddress.Data.Default = false;
 				}
 			}
+
+	        if (!otherAddresses.Any())
+	        {
+		        model.Default = true;
+	        }
 
 			var customerPaymentMethod = await _paymentMethodConverter.FromModelAsync(model, (int)PaymentMethodType.CreditCard);
             customerPaymentMethod.Data.SecurityCode = model.SecurityCode;
@@ -311,9 +316,12 @@ namespace VC.Public.Controllers
             {
                 foreach (var message in e.Messages)
                 {
-                    ModelState.AddModelError(message.Field, message.Message);
+                    ModelState.AddModelError(string.Empty, message.Message);
                 }
-                return View(PopulateCreditCard(currentCustomer, model.Id));
+
+	            PopulateCreditCard(await GetCurrentCustomerDynamic(), model.Id);
+
+                return View(model);
             }
 
             ViewBag.SuccessMessage = model.Id > 0

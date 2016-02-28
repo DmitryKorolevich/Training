@@ -22,6 +22,8 @@ $(function () {
 		syncDefaultBtnState();
 
 		$("#delSelected").show();
+
+		$(".validation-summary-errors").hide();
 	});
 
 	$("body").on("click", "#setDefaultSelected", function () {
@@ -74,7 +76,8 @@ $(function () {
 			County: "",
 			PostalCode: "",
 			Phone: "",
-			Fax: ""
+			Fax: "",
+			Default:false
 		}
 
 		$("#ddCreditCardsSelection").val("");
@@ -120,8 +123,8 @@ function populateCreditCardsSelection(creditCards, setDefault) {
 
 	if (creditCards && creditCards.length > 0) {
 		$.each(creditCards, function (creditCardIndex, creditCard) {
-			var option = $('<option></option>').val(creditCard.Id).html($.grep(creditCardTypes, function (cardType) { return cardType.Key == creditCard.CardType })[0].Text + ', ending in ' + getLast4(creditCard.CardNumber));
-			if ((setDefault && creditCardIndex == 0) || (!setDefault && creditCard.Id == $("#hdCreditCard").val())) {
+			var option = $('<option></option>').val(creditCard.Id).html($.grep(creditCardTypes, function (cardType) { return cardType.Key == creditCard.CardType })[0].Text + ', ending in ' + getLast4(creditCard.CardNumber) + " " + (creditCard.Default ? "(Default)" : ""));
+			if ((setDefault && creditCard.Default) || (!setDefault && creditCard.Id == $("#hdCreditCard").val())) {
 				$(option).attr("selected", "selected")
 			}
 
@@ -191,6 +194,7 @@ function setChangedData(selectedCreditCard) {
 	$("#hdCardType").val(selectedCreditCard.CardType);
 	$("#hdCountry").val(selectedCreditCard.IdCountry);
 	$("#hdState").val(selectedCreditCard.IdState);
+	$("#hdDefault").val(selectedCreditCard.Default);
 
 	$("#ddCardType").val(selectedCreditCard.CardType);
 	$("input[name=CardNumber]").val(selectedCreditCard.CardNumber);
