@@ -93,17 +93,15 @@ namespace VitalChoice.Caching.Services
                                     var foreignValues = CreateValueInfos(foreignKey.Properties).ToArray();
                                     externalForeignKeys.Add(
                                         new KeyValuePair<Type, EntityForeignKeyInfo>(
-                                            foreignKey.DeclaringEntityType.ClrType,
+                                            foreignKey.PrincipalToDependent.GetTargetType().ClrType,
                                             new EntityForeignKeyInfo(foreignValues,
                                                 CreateValueInfos(foreignKey.PrincipalKey.Properties),
-                                                null,
+                                                foreignKey.PrincipalToDependent.Name,
                                                 foreignKey.PrincipalToDependent.DeclaringEntityType.ClrType)));
-                                }
-                                else if (foreignKey.PrincipalToDependent == null)
-                                {
-                                    if (foreignKey.DependentToPrincipal != null)
+
+                                    if (foreignKey.DependentToPrincipal != null &&
+                                        foreignKey.DependentToPrincipal.DeclaringEntityType.ClrType == entityType.ClrType)
                                     {
-                                        var foreignValues = CreateValueInfos(foreignKey.Properties).ToArray();
                                         var index = new EntityCacheableIndexRelationInfo(foreignValues,
                                             foreignKey.DependentToPrincipal.Name,
                                             CreateValueInfos(foreignKey.PrincipalKey.Properties));
@@ -118,22 +116,35 @@ namespace VitalChoice.Caching.Services
                                     var foreignValues = CreateValueInfos(foreignKey.Properties).ToArray();
                                     externalForeignKeys.Add(
                                         new KeyValuePair<Type, EntityForeignKeyInfo>(
-                                            foreignKey.DeclaringEntityType.ClrType,
+                                            foreignKey.PrincipalToDependent.GetTargetType().ClrType,
                                             new EntityForeignKeyInfo(foreignValues,
                                                 CreateValueInfos(foreignKey.PrincipalKey.Properties),
                                                 foreignKey.PrincipalToDependent.Name,
                                                 foreignKey.PrincipalToDependent.DeclaringEntityType.ClrType)));
-                                    if (foreignKey.DependentToPrincipal != null)
+                                    if (foreignKey.DependentToPrincipal != null &&
+                                        foreignKey.DependentToPrincipal.DeclaringEntityType.ClrType == entityType.ClrType)
                                     {
-                                        foreignValues = CreateValueInfos(foreignKey.Properties).ToArray();
-                                        externalForeignKeys.Add(
-                                            new KeyValuePair<Type, EntityForeignKeyInfo>(
-                                                foreignKey.DependentToPrincipal.DeclaringEntityType.ClrType,
-                                                new EntityForeignKeyInfo(foreignValues,
-                                                    CreateValueInfos(foreignKey.PrincipalKey.Properties),
-                                                    foreignKey.DependentToPrincipal.Name,
-                                                    foreignKey.PrincipalToDependent.GetTargetType().ClrType)));
+                                        var index = new EntityCacheableIndexRelationInfo(foreignValues,
+                                            foreignKey.DependentToPrincipal.Name,
+                                            CreateValueInfos(foreignKey.PrincipalKey.Properties));
+                                        nonUniqueList.Add(index);
+                                        externalDependentTypes.Add(
+                                            new KeyValuePair<Type, EntityCacheableIndexRelationInfo>(
+                                                foreignKey.DependentToPrincipal.GetTargetType().ClrType, index));
                                     }
+                                }
+                                else if (foreignKey.PrincipalToDependent == null && foreignKey.DependentToPrincipal != null &&
+                                                                                     foreignKey.DependentToPrincipal.DeclaringEntityType
+                                                                                         .ClrType == entityType.ClrType)
+                                {
+                                    var foreignValues = CreateValueInfos(foreignKey.Properties).ToArray();
+                                    var index = new EntityCacheableIndexRelationInfo(foreignValues,
+                                        foreignKey.DependentToPrincipal.Name,
+                                        CreateValueInfos(foreignKey.PrincipalKey.Properties));
+                                    nonUniqueList.Add(index);
+                                    externalDependentTypes.Add(
+                                        new KeyValuePair<Type, EntityCacheableIndexRelationInfo>(
+                                            foreignKey.DependentToPrincipal.GetTargetType().ClrType, index));
                                 }
                             }
 
