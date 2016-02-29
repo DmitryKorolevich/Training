@@ -21,7 +21,7 @@ namespace VitalChoice.Business.Workflow.Actions.GiftCertificates
             {
                 return Task.FromResult<decimal>(0);
             }
-            decimal orderSubTotal = dataContext.Data.SubTotal;
+            decimal orderSubTotal = dataContext.Data.PayableTotal;
             foreach (var gc in dataContext.Order.GiftCertificates)
             {
                 if (gc.GiftCertificate.StatusCode != RecordStatusCode.Active)
@@ -54,7 +54,7 @@ namespace VitalChoice.Business.Workflow.Actions.GiftCertificates
                     MessageLevel = MessageLevel.Info
                 });
             }
-            dataContext.GiftCertificatesSubtotal = orderSubTotal - (decimal) dataContext.Data.SubTotal;
+            dataContext.GiftCertificatesSubtotal = orderSubTotal - (decimal) dataContext.Data.PayableTotal;
             return Task.FromResult(dataContext.GiftCertificatesSubtotal);
         }
     }
