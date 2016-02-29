@@ -214,18 +214,18 @@ namespace VitalChoice.Business.Services.Avatax
             if (taxGetType.HasFlag(TaxGetType.PerishableOnly))
             {
                 items =
-                    order.SkuOrdereds.Union(order.PromoSkus)
+                    order.SkuOrdereds.Union(order.PromoSkus.Where(p => p.Enabled))
                         .Where(s => s.ProductWithoutSkus.IdObjectType != (int) ProductType.NonPerishable);
             }
             else if (taxGetType.HasFlag(TaxGetType.NonPerishableOnly))
             {
                 items =
-                    order.SkuOrdereds.Union(order.PromoSkus)
+                    order.SkuOrdereds.Union(order.PromoSkus.Where(p => p.Enabled))
                         .Where(s => s.ProductWithoutSkus.IdObjectType == (int) ProductType.NonPerishable);
             }
             else
             {
-                items = order.SkuOrdereds.Union(order.PromoSkus);
+                items = order.SkuOrdereds.Union(order.PromoSkus.Where(p => p.Enabled));
             }
             return items.Select(
                 p => new Line
