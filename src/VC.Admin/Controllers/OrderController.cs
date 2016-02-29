@@ -35,6 +35,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VC.Admin.ModelConverters;
 using VC.Admin.Models.Products;
 using VitalChoice.Business.Mail;
+using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Ecommerce.Domain.Mail;
 
 namespace VC.Admin.Controllers
@@ -43,7 +44,7 @@ namespace VC.Admin.Controllers
     public class OrderController : BaseApiController
     {
         private readonly IOrderService _orderService;
-        private readonly IDynamicMapper<OrderDynamic, Order> _mapper;
+        private readonly OrderMapper _mapper;
         private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
         private readonly ICustomerService _customerService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
@@ -58,7 +59,7 @@ namespace VC.Admin.Controllers
         public OrderController(
             IOrderService orderService,
             ILoggerProviderExtended loggerProvider,
-            IDynamicMapper<OrderDynamic, Order> mapper,
+            OrderMapper mapper,
             ICustomerService customerService,
             IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
             ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> ordersRegionStatisticItemCSVExportService,
@@ -232,10 +233,21 @@ namespace VC.Admin.Controllers
 
             await _customerService.UpdateAsync(order.Customer);
 
+            var sendOrderConfirm = false;
             if (model.CombinedEditOrderStatus != OrderStatus.Cancelled && model.CombinedEditOrderStatus != OrderStatus.Exported && model.CombinedEditOrderStatus != OrderStatus.Shipped)
             {
                 await _orderService.OrderTypeSetup(order);
                 await _orderService.CalculateOrder(order, model.CombinedEditOrderStatus);
+
+                if (!model.ConfirmationEmailSent &&
+                    (model.CombinedEditOrderStatus == OrderStatus.Processed ||
+                     model.CombinedEditOrderStatus == OrderStatus.ShipDelayed) &&
+                    !string.IsNullOrEmpty(model.Customer.Email))
+                {
+                    sendOrderConfirm = true;
+                    order.Data.ConfirmationEmailSent = true;
+                }
+
                 if (model.Id > 0)
                 {
                     order = await _orderService.UpdateAsync(order);
@@ -243,6 +255,15 @@ namespace VC.Admin.Controllers
                 else
                 {
                     order = await _orderService.InsertAsync(order);
+                }
+            }
+
+            if (sendOrderConfirm && !string.IsNullOrEmpty(model.Customer?.Email))
+            {
+                var emailModel = _mapper.ToModel<OrderConfirmationEmail>(order);
+                if (emailModel != null)
+                {
+                    await _notificationService.SendOrderConfirmationEmailAsync(model.Customer.Email, emailModel);
                 }
             }
 
@@ -439,7 +460,7 @@ namespace VC.Admin.Controllers
             }
 
             var emailModel = _mapper.ToModel<OrderConfirmationEmail>(order);
-            if (model == null)
+            if (emailModel == null)
                 return false;
 
             await _notificationService.SendOrderConfirmationEmailAsync(model.Email, emailModel);
