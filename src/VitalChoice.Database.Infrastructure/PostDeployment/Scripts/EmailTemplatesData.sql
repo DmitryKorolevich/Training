@@ -977,7 +977,31 @@ BEGIN
 INSERT [dbo].[MasterContentItems] ([Name], [TypeId], [Template], [Created], [Updated], [StatusCode], [UserId])
 VALUES 
 ('StoreFront Email Template', 11, 
-N'<%
+N'<%    
+<body>
+{{
+}}
+    
+<default> -> (Model)
+{{
+	@body()
+}} :: dynamic
+%>', GETDATE(), GETDATE(),2, NULL)
+
+DECLARE @contentItemId int
+
+INSERT INTO [dbo].[ContentItems]
+           ([Created]
+           ,[Updated]
+           ,[Template]
+           ,[Description]
+           ,[Title]
+           ,[MetaKeywords]
+           ,[MetaDescription])
+     VALUES
+           (GETDATE()
+           ,GETDATE()
+           ,'<<%
 <body:body>
 {{
     <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -1230,6 +1254,7 @@ N'<%
                                 <td>&nbsp;</td>
                             </tr>
                             }}
+                            @list(PromoSkus){{
                             <tr>
                                 <td>&nbsp;</td>
                                 <td>&nbsp;</td>
@@ -1247,7 +1272,6 @@ N'<%
                                 <td>&nbsp;</td>
                                 <td colspan="10">Promo items</td>
                             </tr>
-                            @list(PromoSkus){{
                             <tr>
                                 <td>&nbsp;</td>
                                 <td valign="top"><div align="left">@(Code)</div></td>
@@ -1453,26 +1477,6 @@ N'<%
     </body>
     
     </html>
-}}
-%>', GETDATE(), GETDATE(),2, NULL)
-
-DECLARE @contentItemId int
-
-INSERT INTO [dbo].[ContentItems]
-           ([Created]
-           ,[Updated]
-           ,[Template]
-           ,[Description]
-           ,[Title]
-           ,[MetaKeywords]
-           ,[MetaDescription])
-     VALUES
-           (GETDATE()
-           ,GETDATE()
-           ,'<%
-<body:body>
-{{
-
 }}
 %>'
            ,''

@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using VitalChoice.Business.Mail;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Business.Services.Orders;
 using VitalChoice.Data.Helpers;
@@ -19,6 +20,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -41,6 +43,7 @@ namespace VitalChoice.Business.Services.Checkout
         private readonly DiscountMapper _discountMapper;
         private readonly SkuMapper _skuMapper;
         private readonly ProductMapper _productMapper;
+        private readonly OrderMapper _orderMapper;
         private readonly IOrderService _orderService;
         private readonly EcommerceContext _context;
         private readonly ICustomerService _customerService;
@@ -51,21 +54,27 @@ namespace VitalChoice.Business.Services.Checkout
         private readonly IEcommerceRepositoryAsync<OrderToSku> _orderToSkuRepository;
         private readonly IEcommerceRepositoryAsync<OrderToPromo> _promoOrderedRepository;
         private readonly IRepositoryAsync<ProductContent> _productContentRep;
+        private readonly IEcommerceRepositoryAsync<Customer> _customerRepository;
+        private readonly INotificationService _notificationService;
         private readonly ILogger _logger;
 
         public CheckoutService(IEcommerceRepositoryAsync<CartExtended> cartRepository,
             DiscountMapper discountMapper,
-            SkuMapper skuMapper, ProductMapper productMapper, IOrderService orderService, EcommerceContext context,
+            SkuMapper skuMapper, ProductMapper productMapper, OrderMapper orderMapper,
+            IOrderService orderService, EcommerceContext context,
             ILoggerProviderExtended loggerProvider, ICustomerService customerService,
             IEcommerceRepositoryAsync<CartToSku> cartToSkusRepository,
             IDynamicReadServiceAsync<AddressDynamic, OrderAddress> addressService, ICountryService countryService,
             IEcommerceRepositoryAsync<OrderToSku> orderToSkuRepository, IRepositoryAsync<ProductContent> productContentRep,
-            IEcommerceRepositoryAsync<Sku> skuRepository, IEcommerceRepositoryAsync<OrderToPromo> promoOrderedRepository)
+            IEcommerceRepositoryAsync<Sku> skuRepository, IEcommerceRepositoryAsync<OrderToPromo> promoOrderedRepository,
+            IEcommerceRepositoryAsync<Customer> customerRepository,
+            INotificationService notificationService)
         {
             _cartRepository = cartRepository;
             _discountMapper = discountMapper;
             _skuMapper = skuMapper;
             _productMapper = productMapper;
+            _orderMapper = orderMapper;
             _orderService = orderService;
             _context = context;
             _customerService = customerService;
@@ -76,6 +85,8 @@ namespace VitalChoice.Business.Services.Checkout
             _productContentRep = productContentRep;
             _skuRepository = skuRepository;
             _promoOrderedRepository = promoOrderedRepository;
+            _customerRepository = customerRepository;
+            _notificationService = notificationService;
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -357,12 +368,18 @@ namespace VitalChoice.Business.Services.Checkout
 
                     if (cart == null)
                         return false;
+
+                    var sendOrderConfirm = false;
                     if (cartOrder.Order.Customer?.Id != 0)
                     {
                         if (cartOrder.Order.Id == 0)
                         {
                             throw new ApiException("Order haven't been created during checkout session.");
                         }
+
+                        sendOrderConfirm = true;
+                        cartOrder.Order.Data.ConfirmationEmailSent = true;
+
                         cartOrder.Order = await _orderService.UpdateAsync(cartOrder.Order);
                         cart.IdCustomer = cartOrder.Order?.Customer?.Id;
                         cart.IdOrder = null;
@@ -375,6 +392,19 @@ namespace VitalChoice.Business.Services.Checkout
                     }
                     await _context.SaveChangesAsync();
                     transaction.Commit();
+
+                    if (sendOrderConfirm && cartOrder?.Order?.Customer!=null)
+                    {
+                        var customer = await _customerRepository.Query(p => p.Id == cartOrder.Order.Customer.Id).SelectFirstOrDefaultAsync(false);
+                        if (!string.IsNullOrEmpty(customer?.Email))
+                        {
+                            var emailModel = _orderMapper.ToModel<OrderConfirmationEmail>(cartOrder.Order);
+                            if (emailModel != null)
+                            {
+                                await _notificationService.SendOrderConfirmationEmailAsync(customer.Email, emailModel);
+                            }
+                        }
+                    }
                 }
                 catch (AppValidationException)
                 {

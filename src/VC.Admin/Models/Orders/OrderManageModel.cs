@@ -276,6 +276,9 @@ namespace VC.Admin.Models.Orders
         [Map]
         public IList<PromoSkuOrderedManageModel> PromoSkus { get; set; }
 
+        [Map]
+        public bool ConfirmationEmailSent { get; set; }
+
         public bool SignUpNewsletter { get; set; }
 
         public bool ShouldSplit { get; set; }
