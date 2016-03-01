@@ -16,7 +16,7 @@ namespace VitalChoice.Business.Workflow.Actions.Products
         public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
             return
-                Task.FromResult(dataContext.SkuOrdereds.Union(dataContext.PromoSkus).Where(s =>
+                Task.FromResult(dataContext.SkuOrdereds.Union(dataContext.PromoSkus.Where(p => p.Enabled)).Where(s =>
                     s.ProductWithoutSkus.IdObjectType == (int) ProductType.Perishable ||
                     s.ProductWithoutSkus.IdObjectType == (int) ProductType.NonPerishable).Sum(s => s.Amount*s.Quantity));
         }

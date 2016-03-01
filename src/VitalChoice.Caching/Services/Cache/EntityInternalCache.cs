@@ -511,7 +511,7 @@ namespace VitalChoice.Caching.Services.Cache
 
             foreach (var foreignKey in foreignKeys)
             {
-                if (foreignKey.Value.IsValid && CacheFactory.CacheExist(foreignKey.Key.DependentType))
+                if (foreignKey.Value != null && foreignKey.Value.IsValid && CacheFactory.CacheExist(foreignKey.Key.DependentType))
                 {
                     var cache = CacheFactory.GetCache(foreignKey.Key.DependentType);
                     var collectionForeignKey = foreignKey.Key as EntityForeignKeyCollectionInfo;

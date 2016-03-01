@@ -1020,7 +1020,7 @@ namespace VitalChoice.Business.Services.Orders
                 }
                 if (context.PromoSkus != null)
                 {
-                    item.OrderImportItem.ErrorMessages.AddRange(context.PromoSkus.Where(p => p.Messages != null).SelectMany(p => p.Messages).Select(p =>
+                    item.OrderImportItem.ErrorMessages.AddRange(context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages).Select(p =>
                               new MessageInfo()
                               {
                                   Message = p
