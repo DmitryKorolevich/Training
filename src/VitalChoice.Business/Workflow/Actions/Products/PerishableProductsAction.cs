@@ -16,11 +16,14 @@ namespace VitalChoice.Business.Workflow.Actions.Products
 
         public override async Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            var perishableAmount = dataContext.SkuOrdereds.Where(s => s.ProductWithoutSkus.IdObjectType == (int) ProductType.Perishable)
+            var perishableList =
+                dataContext.SkuOrdereds.Where(s => s.ProductWithoutSkus.IdObjectType == (int) ProductType.Perishable).ToArray();
+            var perishableAmount = perishableList
                 .Sum(s => s.Amount*s.Quantity);
+            var perishableCount = perishableList.Length;
             var settingsService = executionContext.Resolve<ISettingService>();
             var settings = await settingsService.GetAppSettingsAsync();
-            if (perishableAmount < settings.GlobalPerishableThreshold)
+            if (perishableCount > 0 && perishableAmount < settings.GlobalPerishableThreshold)
             {
                 dataContext.ProductsPerishableThresholdIssue = true;
             }
