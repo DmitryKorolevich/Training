@@ -4,12 +4,12 @@ using VitalChoice.Ecommerce.Domain.Entities.Products;
 
 namespace VitalChoice.Business.Queries.Product
 {
-    public class ProductOptionTypeQuery : OptionTypeQuery<ProductOptionType>
-    {
-        public override IQueryOptionType<ProductOptionType> WithObjectType(int? objectType)
-        {
-            Add(d => d.IdObjectType == objectType);
-            return this;
-        }
-    }
+    //public class ProductOptionTypeQuery : OptionTypeQuery<ProductOptionType>
+    //{
+    //    public override IQueryOptionType<ProductOptionType> WithObjectType(int? objectType)
+    //    {
+    //        Add(d => d.IdObjectType == objectType);
+    //        return this;
+    //    }
+    //}
 }

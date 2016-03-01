@@ -21,21 +21,19 @@ namespace VitalChoice.Business.Services.Settings
     public class ObjectLogItemExternalService : IObjectLogItemExternalService
     {
         private readonly IEcommerceRepositoryAsync<ObjectHistoryLogItem> _objectHistoryLogItemRepository;
-        private readonly ILogger _logger;
 
         public ObjectLogItemExternalService(
-            IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository,
-            ILoggerProviderExtended loggerProvider)
+            IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository)
         {
             _objectHistoryLogItemRepository = objectHistoryLogItemRepository;
-            _logger = loggerProvider.CreateLoggerDefault();
         }
 
-        public async Task LogItems(ICollection<object> models, bool logFullObjects)
+        public async Task LogItems<T>(IEnumerable<T> models, bool logFullObjects = true)
+            where T: class
         {
-            if (models != null && models.Count > 0)
+            if (models != null)
             {
-                var type = models.First().GetType();
+                var type = typeof(T);
                 var isDynamic = type.GetTypeInfo().IsSubclassOf(typeof(MappedObject));
                 var isContentDataItem = type.GetTypeInfo().IsSubclassOf(typeof(ContentDataItem));
                 var isEntity = type.GetTypeInfo().IsSubclassOf(typeof(Entity));
@@ -44,18 +42,20 @@ namespace VitalChoice.Business.Services.Settings
                 List<ObjectHistoryLogItem> items = new List<ObjectHistoryLogItem>();
                 foreach (var model in models)
                 {
-                    ObjectHistoryLogItem item = new ObjectHistoryLogItem();
-                    item.IdObjectType = (int)objectType;
-                    item.DateCreated = DateTime.Now;
+                    ObjectHistoryLogItem item;
                     if (isDynamic)
                     {
-                        TransformForDynamic(item, (MappedObject)model, objectType);
+                        item = TransformForDynamic(model as MappedObject, objectType);
                     } else if (isContentDataItem)
                     {
-                        TransformForContentDataItem(item, (ContentDataItem)model, objectType);
+                        item = TransformForContentDataItem(model as ContentDataItem, objectType);
                     } else if (isEntity)
                     {
-                        TransformForEntity(item, (Entity)model, objectType);
+                        item = TransformForEntity(model as Entity, objectType);
+                    }
+                    else
+                    {
+                        item = TransformForOther(model, objectType);
                     }
                     if (logFullObjects)
                     {
@@ -74,11 +74,26 @@ namespace VitalChoice.Business.Services.Settings
             }
         }
 
-        private ObjectHistoryLogItem TransformForDynamic(ObjectHistoryLogItem item, MappedObject model, ObjectType objectType)
+        public Task LogItems<T>(bool logFullObjects, params T[] models) where T : class
         {
-            item.IdObject = model.Id;
-            item.IdObjectStatus = model.StatusCode;
-            item.IdEditedBy = model.IdEditedBy;
+            return LogItems(models, logFullObjects);
+        }
+
+        public Task LogItem<T>(T model, bool logFullObjects = true) where T : class
+        {
+            return LogItems(logFullObjects, model);
+        }
+
+        private ObjectHistoryLogItem TransformForDynamic(MappedObject model, ObjectType objectType)
+        {
+            ObjectHistoryLogItem item = new ObjectHistoryLogItem
+            {
+                IdObjectType = (int) objectType,
+                DateCreated = DateTime.Now,
+                IdObject = model.Id,
+                IdObjectStatus = model.StatusCode,
+                IdEditedBy = model.IdEditedBy
+            };
             if(objectType == ObjectType.Order)
             {
                 OrderDynamic order = (OrderDynamic)model;
@@ -87,17 +102,38 @@ namespace VitalChoice.Business.Services.Settings
             return item;
         }
 
-        private ObjectHistoryLogItem TransformForContentDataItem(ObjectHistoryLogItem item, ContentDataItem model, ObjectType objectType)
+        private ObjectHistoryLogItem TransformForContentDataItem(ContentDataItem model, ObjectType objectType)
         {
-            item.IdObject = model.Id;
-            item.IdObjectStatus = (int)model.StatusCode;
-            item.IdEditedBy = model.UserId;
+            ObjectHistoryLogItem item = new ObjectHistoryLogItem
+            {
+                IdObjectType = (int) objectType,
+                DateCreated = DateTime.Now,
+                IdObject = model.Id,
+                IdObjectStatus = (int) model.StatusCode,
+                IdEditedBy = model.UserId
+            };
             return item;
         }
 
-        private ObjectHistoryLogItem TransformForEntity(ObjectHistoryLogItem item, Entity model, ObjectType objectType)
+        private ObjectHistoryLogItem TransformForEntity(Entity model, ObjectType objectType)
         {
-            item.IdObject = model.Id;
+            ObjectHistoryLogItem item = new ObjectHistoryLogItem
+            {
+                IdObjectType = (int) objectType,
+                DateCreated = DateTime.Now,
+                IdObject = model.Id
+            };
+            //TODO - add needed fields to general implementiotn of Entity
+            return item;
+        }
+
+        private ObjectHistoryLogItem TransformForOther(object model, ObjectType objectType)
+        {
+            ObjectHistoryLogItem item = new ObjectHistoryLogItem
+            {
+                IdObjectType = (int)objectType,
+                DateCreated = DateTime.Now
+            };
             //TODO - add needed fields to general implementiotn of Entity
             return item;
         }

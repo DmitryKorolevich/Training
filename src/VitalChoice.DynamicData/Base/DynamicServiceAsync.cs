@@ -158,7 +158,7 @@ namespace VitalChoice.DynamicData.Base
                         DynamicMapper.SecureObject(model);
                     }
                     await
-                        ObjectLogItemExternalService.LogItems(models.Select(p => (object) p).ToList(), LogObjectFullData);
+                        ObjectLogItemExternalService.LogItems(models, LogObjectFullData);
                 }
             }
             catch (Exception e)

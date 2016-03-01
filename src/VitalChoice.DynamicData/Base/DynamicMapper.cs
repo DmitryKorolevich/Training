@@ -53,6 +53,7 @@ namespace VitalChoice.DynamicData.Base
         where TDynamic : MappedObject, new()
     {
         private readonly ITypeConverter _typeConverter;
+        private readonly Dictionary<int, ICollection<TOptionType>> _optionTypesByType;
 
         protected abstract Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items,
             bool withDefaults = false);
@@ -66,6 +67,7 @@ namespace VitalChoice.DynamicData.Base
         {
             _typeConverter = typeConverter;
             OptionTypes = optionTypeRepositoryAsync.Query().Include(o => o.Lookup).ThenInclude(l => l.LookupVariants).Select(false);
+            _optionTypesByType = new Dictionary<int, ICollection<TOptionType>>();
         }
 
         public virtual void SyncCollections(ICollection<TDynamic> dynamics, ICollection<TEntity> entities,
@@ -113,19 +115,39 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        public virtual IQueryOptionType<TOptionType> GetOptionTypeQuery()
-        {
-            return new OptionTypeQuery<TOptionType>();
-        }
+        //public virtual IQueryOptionType<TOptionType> GetOptionTypeQuery()
+        //{
+        //    return new OptionTypeQuery<TOptionType>();
+        //}
 
         public ICollection<TOptionType> OptionTypes { get; }
 
+        public virtual Func<TOptionType, int?, bool> FilterFunc
+            => (t, type) => t.IdObjectType == type || type != null && t.IdObjectType == null;
+
         public ICollection<TOptionType> FilterByType(int? objectType)
         {
-            var filterFunc = GetOptionTypeQuery().WithObjectType(objectType).Query()?.CacheCompile();
+            var filterFunc = FilterFunc;
             if (filterFunc != null)
-                return OptionTypes.Where(filterFunc).ToArray();
-            return OptionTypes.ToArray();
+            {
+                ICollection<TOptionType> optionTypes;
+                if (_optionTypesByType.TryGetValue(objectType ?? 0, out optionTypes))
+                {
+                    return optionTypes;
+                }
+                optionTypes = OptionTypes.Where(t => filterFunc(t, objectType)).ToList();
+                _optionTypesByType.Add(objectType ?? 0, optionTypes);
+                return optionTypes;
+            }
+            return OptionTypes;
+        }
+
+        public IEnumerable<TOptionType> OptionsForType(int? objectType)
+        {
+            var filterFunc = FilterFunc;
+            if (filterFunc != null)
+                return OptionTypes.Where(t => filterFunc(t, objectType));
+            return OptionTypes;
         }
 
         public TDynamic FromEntity(TEntity entity, bool withDefaults = false)
@@ -700,7 +722,7 @@ namespace VitalChoice.DynamicData.Base
 
         public virtual async Task<TDynamic> CreatePrototypeAsync(int idObjectType)
         {
-            var optionTypes = OptionTypes.Where(GetOptionTypeQuery().WithObjectType(idObjectType).Query().CacheCompile()).ToList();
+            var optionTypes = FilterByType(idObjectType);
             var entity = new TEntity {OptionTypes = optionTypes, IdObjectType = idObjectType, OptionValues = new List<TOptionValue>()};
             return await FromEntityAsync(entity, true);
         }

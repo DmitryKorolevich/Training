@@ -207,7 +207,7 @@ namespace VitalChoice.Business.Services.Products
                 }
             }
 
-            await objectLogItemExternalService.LogItems(new object[] { categoryContent }, true);
+            await objectLogItemExternalService.LogItem(categoryContent);
         }
 
         public async Task<ProductCategoryContent> UpdateCategoryAsync(ProductCategoryContent model)

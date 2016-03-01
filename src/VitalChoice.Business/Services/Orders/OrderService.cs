@@ -287,6 +287,17 @@ namespace VitalChoice.Business.Services.Orders
             return order;
         }
 
+        public async Task<OrderDataContext> CalculateOrder(OrderDynamic order, OrderStatus combinedStatus, IWorkflowTree<OrderDataContext, decimal> tree)
+        {
+            var context = new OrderDataContext
+            {
+                Order = order
+            };
+            await tree.ExecuteAsync(context);
+            UpdateOrderFromCalculationContext(order, context, combinedStatus);
+            return context;
+        }
+
         public async Task<OrderDataContext> CalculateOrder(OrderDynamic order, OrderStatus combinedStatus)
         {
             var context = new OrderDataContext
@@ -333,7 +344,7 @@ namespace VitalChoice.Business.Services.Orders
             var idOrder = order.Id;
             if (idOrder != 0)
             {
-                var optionType = DynamicMapper.FilterByType(order.IdObjectType).FirstOrDefault(o => o.Name == "OrderType")?.Id;
+                var optionType = DynamicMapper.OptionsForType(order.IdObjectType).FirstOrDefault(o => o.Name == "OrderType")?.Id;
                 if (optionType != null)
                 {
                     var dbItem =
@@ -994,42 +1005,38 @@ namespace VitalChoice.Business.Services.Orders
                 throw new AppValidationException(messages);
             }
 
+            var tree = await _treeFactory.CreateTreeAsync<OrderDataContext, decimal>("Order");
+
             foreach (var item in map)
             {
                 var orderCombinedStatus = item.Order.OrderStatus ?? OrderStatus.Processed;
-                if (item.Order.SafeData.ShipDelayDate != null)
-                {
-                    item.Order.Data.ShipDelayType = ShipDelayType.EntireOrder;
-                }
-                else
-                {
-                    item.Order.Data.ShipDelayType = ShipDelayType.None;
-                }
+                item.Order.Data.ShipDelayType = item.Order.SafeData.ShipDelayDate != null ? ShipDelayType.EntireOrder : ShipDelayType.None;
 
-                var context = await this.CalculateOrder(item.Order, orderCombinedStatus);
-                item.Order = context.Order;
+                var context = await CalculateOrder(item.Order, orderCombinedStatus, tree);
 
                 item.OrderImportItem.ErrorMessages.AddRange(context.Messages);
                 if (context.SkuOrdereds != null)
                 {
-                    item.OrderImportItem.ErrorMessages.AddRange(context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages).Select(p =>
-                              new MessageInfo()
-                              {
-                                  Message = p
-                              }));
+                    item.OrderImportItem.ErrorMessages.AddRange(
+                        context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages).Select(p =>
+                            new MessageInfo()
+                            {
+                                Message = p
+                            }));
                 }
                 if (context.PromoSkus != null)
                 {
-                    item.OrderImportItem.ErrorMessages.AddRange(context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages).Select(p =>
-                              new MessageInfo()
-                              {
-                                  Message = p
-                              }));
+                    item.OrderImportItem.ErrorMessages.AddRange(
+                        context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages).Select(p =>
+                            new MessageInfo()
+                            {
+                                Message = p
+                            }));
                 }
             }
 
             //throw calculating errors
-            messages = FormatRowsRecordErrorMessages(map.Select(p => p.OrderImportItem).ToList());
+            messages = FormatRowsRecordErrorMessages(map.Select(p => p.OrderImportItem));
             if (messages.Count > 0)
             {
                 throw new AppValidationException(messages);
@@ -1368,7 +1375,7 @@ namespace VitalChoice.Business.Services.Orders
             return toReturn;
         }
 
-        private ICollection<MessageInfo> FormatRowsRecordErrorMessages(ICollection<OrderBaseImportItem> items)
+        private ICollection<MessageInfo> FormatRowsRecordErrorMessages(IEnumerable<OrderBaseImportItem> items)
         {
             List<MessageInfo> toReturn = new List<MessageInfo>();
             foreach (var item in items)

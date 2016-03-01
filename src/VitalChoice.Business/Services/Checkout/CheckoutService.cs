@@ -133,8 +133,7 @@ namespace VitalChoice.Business.Services.Checkout
             newOrder.Skus = cart.Skus?.Select(s =>
             {
                 s.Sku.OptionTypes =
-                    _productMapper.OptionTypes.Where(
-                        _productMapper.GetOptionTypeQuery().WithObjectType(s.Sku.Product.IdObjectType).Query().CacheCompile()).ToList();
+                    _productMapper.FilterByType(s.Sku.Product.IdObjectType);
                 s.Sku.Product.OptionTypes = s.Sku.OptionTypes;
                 var productUrl = _productContentRep.Query(p => p.Id == s.Sku.IdProduct).Select(p => p.Url, false).FirstOrDefault();
                 var product = _productMapper.FromEntity(s.Sku.Product, true);

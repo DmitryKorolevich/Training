@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using VitalChoice.Business.Queries.Customer;
+using VitalChoice.Business.Queries.Customers;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.DynamicData.Base;
@@ -24,10 +25,7 @@ namespace VitalChoice.Business.Services.Dynamic
         {
         }
 
-        public override IQueryOptionType<CustomerNoteOptionType> GetOptionTypeQuery()
-        {
-            return new CustomerNoteOptionTypeQuery();
-        }
+        public override Func<CustomerNoteOptionType, int?, bool> FilterFunc => null;
 
         protected override Task FromEntityRangeInternalAsync(
             ICollection<DynamicEntityPair<CustomerNoteDynamic, CustomerNote>> items, bool withDefaults = false)

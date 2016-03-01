@@ -246,7 +246,7 @@ namespace VitalChoice.Business.Services.Content
                 await _articleToProductRepository.InsertRangeAsync(articlesToProducts);
                 dbItem.ArticlesToProducts = articlesToProducts;
 
-                await _objectLogItemExternalService.LogItems(new object[] {dbItem}, true);
+                await _objectLogItemExternalService.LogItem(dbItem);
             }
 
             return dbItem;

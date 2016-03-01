@@ -317,7 +317,7 @@ namespace VitalChoice.Business.Services.Content
 
 					    transaction.Commit();
 
-                        await _objectLogItemExternalService.LogItems(new object[] { dbItem }, true);
+                        await _objectLogItemExternalService.LogItem(dbItem);
                     }
 				    catch (Exception)
 				    {

@@ -233,7 +233,7 @@ namespace VitalChoice.Business.Services.Content
                     await contentCategoryRepository.UpdateAsync(dbItem);
                 }
                 
-                await objectLogItemExternalService.LogItems(new object[] { dbItem }, true);
+                await objectLogItemExternalService.LogItem(dbItem);
             }
 
             return dbItem;

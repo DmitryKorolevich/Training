@@ -77,8 +77,7 @@ namespace VitalChoice.DynamicData.Base
             //{
             conditionExpression =
                 CreateValuesSelector(BuildSearchValues(filterDictionary,
-                    FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
-                        idObjectType, lookObjectId)));
+                    FilterOptionTypes(filterDictionary, optionTypesProvider, idObjectType, lookObjectId)));
             //}
             if (conditionExpression == null)
                 return Expression.Constant(true);
@@ -106,9 +105,8 @@ namespace VitalChoice.DynamicData.Base
             //}
             //else
             //{
-                conditionExpression = CreateValuesSelector(BuildSearchValues(filterDictionary,
-                    FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
-                        idObjectType, lookObjectId)));
+            conditionExpression = CreateValuesSelector(BuildSearchValues(filterDictionary,
+                FilterOptionTypes(filterDictionary, optionTypesProvider, idObjectType, lookObjectId)));
             //}
             if (conditionExpression == null)
                 return Expression.Constant(true);
@@ -163,14 +161,14 @@ namespace VitalChoice.DynamicData.Base
             return optionTypesProvider;
         }
 
-        private IEnumerable<TOptionType> FilterOptionTypes(IEnumerable<TOptionType> optionTypes, IDictionary<string, object> values,
-            IQueryOptionType<TOptionType> optionTypeQuery, int? idObjectType, bool lookForObjectType)
+        private IEnumerable<TOptionType> FilterOptionTypes(IDictionary<string, object> values,
+            IOptionTypeQueryProvider<TEntity, TOptionType, TOptionValue> optionTypeQuery, int? idObjectType, bool lookForObjectType)
         {
             var valueNames = new HashSet<string>(values.Keys);
             if (lookForObjectType)
-                return optionTypes.Where(optionTypeQuery.WithNames(valueNames).WithObjectType(idObjectType).Query().CacheCompile());
+                return optionTypeQuery.OptionsForType(idObjectType).Where(t => valueNames.Contains(t.Name));
 
-            return optionTypes.Where(optionTypeQuery.WithNames(valueNames).Query().CacheCompile());
+            return optionTypeQuery.OptionTypes.Where(t => valueNames.Contains(t.Name));
         }
 
         private static List<OptionGroup<TOptionType>> BuildSearchValues(

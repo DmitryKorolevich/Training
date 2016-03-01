@@ -91,9 +91,10 @@ namespace VitalChoice.DynamicData.Interfaces
         where TOptionType : OptionType
         where TOptionValue: OptionValue<TOptionType>
     {
-        IQueryOptionType<TOptionType> GetOptionTypeQuery();
+        //IQueryOptionType<TOptionType> GetOptionTypeQuery();
         ICollection<TOptionType> OptionTypes { get; }
         ICollection<TOptionType> FilterByType(int? objectType);
+        IEnumerable<TOptionType> OptionsForType(int? objectType);
     }
 
     public interface IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> : IDynamicMapper<TDynamic, TEntity>, IOptionTypeQueryProvider<TEntity, TOptionType, TOptionValue>

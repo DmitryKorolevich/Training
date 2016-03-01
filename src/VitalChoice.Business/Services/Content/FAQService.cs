@@ -192,7 +192,7 @@ namespace VitalChoice.Business.Services.Content
                     await faqRepository.UpdateAsync(dbItem);
                 }
 
-                await objectLogItemExternalService.LogItems(new object[] { dbItem }, true);
+                await objectLogItemExternalService.LogItem(dbItem);
             }
 
             return dbItem;

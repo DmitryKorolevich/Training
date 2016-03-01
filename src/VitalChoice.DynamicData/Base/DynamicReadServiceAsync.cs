@@ -67,7 +67,7 @@ namespace VitalChoice.DynamicData.Base
         {
             var queryFluent = BuildQueryFluent(query, includesOverride, null);
             var entities = await queryFluent.SelectAsync(false);
-            await ProcessEntities(entities, DynamicMapper.OptionTypes);
+            await ProcessEntities(entities);
             return entities;
         }
 
@@ -79,7 +79,7 @@ namespace VitalChoice.DynamicData.Base
             var entity = await queryFluent.SelectFirstOrDefaultAsync(false);
 			if (entity != null)
 			{
-				await ProcessEntities(new[] { entity }, DynamicMapper.OptionTypes);
+				await ProcessEntities(new[] { entity });
 			}
             return entity;
         }
@@ -91,7 +91,7 @@ namespace VitalChoice.DynamicData.Base
         {
             var queryFluent = BuildQueryFluent(query, includesOverride, orderBy);
             var entities = await queryFluent.SelectPageAsync(page, pageSize, false);
-            await ProcessEntities(entities.Items, DynamicMapper.OptionTypes);
+            await ProcessEntities(entities.Items);
             return entities;
         }
 
@@ -257,21 +257,11 @@ namespace VitalChoice.DynamicData.Base
             return (BuildQuery(new QueryLite<TEntity>(query)) as QueryLite<TEntity>)?.Query;
         }
 
-        public IQueryOptionType<TOptionType> GetOptionTypeQuery(TEntity entity)
-        {
-            return DynamicMapper.GetOptionTypeQuery().WithObjectType(entity.IdObjectType);
-        }
-
-        public IQueryOptionType<TOptionType> GetOptionTypeQuery(int? idObjectType)
-        {
-            return DynamicMapper.GetOptionTypeQuery().WithObjectType(idObjectType);
-        }
-
-        private async Task ProcessEntities(ICollection<TEntity> entities, ICollection<TOptionType> optionTypes)
+        private async Task ProcessEntities(ICollection<TEntity> entities)
         {
             foreach (var entity in entities)
             {
-                entity.OptionTypes = optionTypes.Where(GetOptionTypeQuery(entity).Query().CacheCompile()).ToList();
+                entity.OptionTypes = DynamicMapper.FilterByType(entity.IdObjectType);
             }
             await SetBigValuesAsync(entities);
             await AfterSelect(entities);
