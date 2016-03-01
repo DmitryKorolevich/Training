@@ -91,7 +91,7 @@ namespace VitalChoice.Business.ModelConverters
                 p.DisplayName += $" ({p.PortionsCount})";
             });
 
-            model.PromoSkus.AddRange(dynamic?.PromoSkus?.Select(sku =>
+            model.PromoSkus.AddRange(dynamic?.PromoSkus.Where(p => p.Enabled)?.Select(sku =>
             {
                 var result = _skuMapper.ToModel<SkuEmailItem>(sku.Sku);
                 _productMapper.UpdateModel(result, sku.ProductWithoutSkus);

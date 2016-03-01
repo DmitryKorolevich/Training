@@ -60,6 +60,9 @@ namespace VitalChoice.Ecommerce.Domain.Mail
         [Map]
         public string GiftMessage { get; set; }
 
+        [Map]
+        public string DeliveryInstructions { get; set; }
+
         public AddressEmailItem BillToAddress { get; set; }
 
         public AddressEmailItem ShipToAddress { get; set; }

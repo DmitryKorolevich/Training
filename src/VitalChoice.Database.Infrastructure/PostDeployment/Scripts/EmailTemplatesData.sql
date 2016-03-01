@@ -977,7 +977,9 @@ BEGIN
 INSERT [dbo].[MasterContentItems] ([Name], [TypeId], [Template], [Created], [Updated], [StatusCode], [UserId])
 VALUES 
 ('StoreFront Email Template', 11, 
-N'<%    
+N'@model() {{dynamic}}
+
+<%    
 <body>
 {{
 }}
@@ -985,7 +987,7 @@ N'<%
 <default> -> (Model)
 {{
 	@body()
-}} :: dynamic
+}}
 %>', GETDATE(), GETDATE(),2, NULL)
 
 DECLARE @contentItemId int
@@ -1001,483 +1003,560 @@ INSERT INTO [dbo].[ContentItems]
      VALUES
            (GETDATE()
            ,GETDATE()
-           ,'<<%
+           ,'<%
 <body:body>
 {{
-    <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-    <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Vital Choice Order Confirmation</title>
-    </head>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vital Choice: Wild Seafood & Organics</title>
 
-    <body style="background-color: #e3e2e2;font-family: Tahoma, Geneva, sans-serif;font-size: 13px;color: #333;">
-        <div align="center">
-            <table width="800" border="0" cellspacing="0" cellpadding="0">
-                <tr>
-                    <td valign="top">
-                        <table width="800" border="0" cellspacing="0" cellpadding="0">
-                            <tr>
-                                <td width="550" valign="top" bgcolor="#FFFFFF">
-                                    <div align="left"><img src="https://@(PublicHost)/Assets/images/logo_email.jpg" width="215" height="76" border="0" usemap="#Map"></div>
-                                </td>
-                                <td width="250" bgcolor="#FFFFFF">
-                                    <div align="left">
-                                        <span style="font-size:20px;color:#c21722;">Order Confirmation</span><br />
-                                        <span style="font-size:15px;">Ordered @date(DateCreated){{MM''/''dd''/''yyyy}}</span><br />
-    		                            @if(ShipDelayDate){{
-    		                                <span style="font-size:15px;">Ship Delay @date(ShipDelayDate){{MM''/''dd''/''yyyy}}</span><br />
-    		                            }}
-    		                            @ifnot(ShipDelayDate){{
-    		                                @if(ShipDelayDateNP){{
-    		                                    <span style="font-size:15px;">Non-Perishable Ship Delay @date(ShipDelayDateNP){{MM''/''dd''/''yyyy}}</span><br />
-    		                                }}
-    		                                @if(ShipDelayDateP){{
-    		                                    <span style="font-size:15px;">Perishable Ship Delay @date(ShipDelayDateP){{MM''/''dd''/''yyyy}}</span><br />
-    		                                }}
-    		                            }}
-                                        <span style="font-size:15px;">Order Number(s):</span> 
-                                        <span style="color:#c21722;font-size:15px;">@(Id)</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-                <tr>
-                    <td valign="top" bgcolor="#FFFFFF">
-                		<div align="center">
-                			<table width="760" border="0" cellspacing="0" cellpadding="0">
-                				<tr>
-                					<td width="530" valign="middle">
-                						<div align="left">
-                							<strong>Thank you for shopping at Vital Choice!</strong><br />
-                							You''ve made a wise decision by choosing the finest<br />
-                    						all-natural foods available, backed by our <a href="https://@(PublicHost)/content/the-vital-choice-guarantee">100% Guarantee</a>.<br /><br />
-                    						&#8226; Please send corrections or questions to <a href="mailto:info@{@}@vitalchoice.com">info@{@}@vitalchoice.com</a> or call 866-482-5887, Monday thru Friday, from 7am-4pm Pacific Time. Replies to this email will NOT be received or seen.<br />
-                    						&#8226; We will send your tracking number(s) after your order has been shipped.
-                    					</div>
-                    				</td>
-                    				<td width="230" valign="top">
-                    					<div align="center">
-                    						<a href="https://@(PublicHost)/content/request-catalog">
-                    							<img src="https://@(PublicHost)/Assets/images/fall-catalog170.jpg" width="143" height="193" border="0">
-                    						</a>
-                    					</div>
-                    				</td>
-                    			</tr>
-                    		</table>
-                        </div>
-                    </td>
-                </tr>
-                @if(AutoShipFrequency){{
-    		    <tr> 
-    		        <td valign="top" bgcolor="#FFFFFF">
-                		<div align="center">
-                			<table width="760" border="0" cellspacing="0" cellpadding="0">
-                				<tr>
-                                	<td colspan="2" valign="middle">
-                                	    <strong>About Your Auto-Ship Order</strong><br /><br />
-                                        You asked us to ship @(AutoShipFrequencyProductName) to you every @(AutoShipFrequency) month(s).<br />
-                                        As a courtesy, we''ll send you a reminder email 7 days before your next shipment of this product.<br />
-                                        That reminder email will show the last 4 digits of the credit card you used, and tell you how to:<br />
-                                        &nbsp;&#8226; Change your Shipping Address <br />
-                                        &nbsp;&#8226; Pause or Cancel your Auto-Ship Order<br />
-                                        &nbsp;&#8226; Change your Payment Method (credit card)<br />
-                                        &nbsp;&#8226; Change the Frequency of your Auto-Ship order<br /><br />
-                                        It''s easy to make changes ... our reminder email will walk you through the steps.
-                                    </td>
-                    			</tr>
-                    		</table>
-                        </div>
-                    </td>
-                </tr>
-    		    }}
-                <tr>
-                    <td valign="top">&nbsp;</td>
-                    <td valign="top">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td valign="top" bgcolor="#FFFFFF">
-                        <table width="800" border="0" cellspacing="0" cellpadding="0">
-                            <tr>
-                                <td width="20" valign="top">&nbsp;</td>
-                                <td width="260" valign="top">&nbsp;</td>
-                                <td width="20" valign="top">&nbsp;</td>
-                                <td width="260" valign="top">&nbsp;</td>
-                                <td width="18" valign="top">&nbsp;</td>
-                                <td valign="top">&nbsp;</td>
-                                <td width="20" valign="top">&nbsp;</td>
-                            </tr>
-                            <tr>
-                                <td width="20" valign="top">
-                                    <img src="https://@(PublicHost)/Assets/images/spacer.gif" width="20" height="20">
-                                </td>
-                                <td width="260" valign="top">
-                                    <table width="260" border="0" cellspacing="0" cellpadding="0">
+</head>
+
+<body style="padding:0; -webkit-text-size-adjust:none; -ms-text-size-adjust:none;" yahoo="fix">
+    <div id="body_style" style="text-align:center; width:100%;">
+        <!-- Outer Container -->
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse; ">
+            <tr>
+                <td bgcolor="#f0f0f0">
+
+                    <!-- Message Body -->
+                    <table class="message" align="center" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+                        <tr>
+                            <td class="message" width="640" bgcolor="#ffffff">
+
+                                <!-- Preheader Outer -->
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                                    <tr>
+                                        <td bgcolor="#ffffff">
+
+                                            <!-- Preheader Inner -->
+                                            <table class="stack" align="center" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+                                                <tr align="center" style="display:block; font-size:0;">
+                                                    <td width="320" align="center" valign="top" style="display:inline-block; max-width:320px;">
+
+                                                        <!-- Content Left -->
+                                                        <table class="content" align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                                                            <tr>
+                                                                <td align="left" class="center" style="padding:5px; color:#6d6e72; font-family:Arial, Helvetica, sans-serif; font-size:11px;"></td>
+                                                            </tr>
+                                                        </table>
+                                                        <!-- End Content Left -->
+
+                                                    </td>
+                                                    <td width="320" align="center" valign="top" style="display:inline-block; max-width:320px;">
+
+                                                        <!-- Content Right -->
+                                                        <table class="content" align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                                                            <tr>
+                                                                <td align="right" class="center" style="padding:5px; font-family:Arial, Helvetica, sans-serif; font-size:11px;"></td>
+                                                            </tr>
+                                                        </table>
+                                                        <!-- End Content Right -->
+
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <!-- End Preheader Inner-->
+
+                                        </td>
+                                    </tr>
+                                </table>
+                                <!-- End Preheader Outer -->
+                                <!-- Full-Width Scalable Header Outer -->
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                                    <tr>
+                                        <td bgcolor="#ffffff">
+
+                                            <!--Full-Width Scalable Header Inner -->
+                                            <table align="center" border="0" cellpadding="0" width="100%" cellspacing="0" style="border-collapse:collapse;">
+                                                <tr>
+                                                    <td align="center" valign="top" bgcolor="#ffffff" style="display:inline-block; max-width:640px;"></td>
+                                                </tr>
+                                            </table>
+                                            <!-- End Full-Width Scalable Header Inner-->
+
+                                        </td>
+                                    </tr>
+                                </table>
+                                <!-- End Full-Width Scalable Header Outer -->
+                                <!-- Full-Width Swappable Header Outer -->
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                                    <tr>
+                                        <td bgcolor="#ffffff">
+
+                                            <!--Full-Width Swappable Header Inner -->
+                                            <table class="stack" align="center" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+                                                <tr>
+                                                    <td align="center" valign="top" bgcolor="#ffffff" style="display:inline-block; max-width:640px;">
+
+                                                        <!--Full-Width Swappable Content -->
+                                                        <table align="center" border="0" cellpadding="10" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                                                            <tr>
+                                                                <td class="content">
+                                                                    <a href="https://@(PublicHost)/">
+                                                                        <img src="https://@(PublicHost)/assets/images/header-logo.png" width="100%" style="display:block; max-width:100%; height:auto;" border="0" />
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                        <!-- EndFull-Width Swappable Content -->
+
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <!-- End Full-Width Swappable Header Inner-->
+
+                                        </td>
+                                    </tr>
+                                </table>
+                                <!-- End Full-Width Swappable Header Outer -->
+                                <!-- Mobile Hidden Navigation -->
+                                <table border="0" cellpadding="0" cellspacing="0" align="center" width="100%" style="border-collapse:collapse;">
+                                    <tr>
+                                        <td bgcolor="#ffffff" class="mobhide" align="center">
+
+                                            <!-- Mobile Hidden Navigation Cells -->
+                                            <table class="stack" align="center" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+                                                <tr align="center" style="display:block; font-size:0;">
+                                                    <td align="center" valign="top" style="display:inline-block; padding:5px 8px; font-family:Arial, Helvetica, sans-serif; font-size:11px; font-weight:bold; border-right:1px solid #6d6e71 !important;">
+                                                        <a href="https://@(PublicHost)/products/wild-salmon" class="embiggen" style="text-decoration:none; color:#6d6e71;">Wild Salmon</a>
+                                                    </td>
+                                                    <td align="center" valign="top" style="display:inline-block; padding:5px 8px; font-family:Arial, Helvetica, sans-serif; font-size:11px; font-weight:bold; border-right:1px solid #6d6e71 !important;">
+                                                        <a href="https://@(PublicHost)/products/wild-cod-tuna-halibut-more" class="embiggen" style="text-decoration:none; color:#6d6e71;">Wild Cod, Tuna & Halibut</a>
+                                                    </td>
+                                                    <td align="center" valign="top" style="display:inline-block; padding:5px 8px; font-family:Arial, Helvetica, sans-serif; font-size:11px; font-weight:bold; border-right:1px solid #6d6e71 !important;">
+                                                        <a href="https://@(PublicHost)/products/wild-shrimp-shellfish" class="embiggen" style="text-decoration:none; color:#6d6e71;">Shellfish</a>
+                                                    </td>
+                                                    <td align="center" valign="top" style="display:inline-block; padding:5px 8px; font-family:Arial, Helvetica, sans-serif; font-size:11px; font-weight:bold; border-right:1px solid #6d6e71 !important;">
+                                                        <a href="https://@(PublicHost)/products/canned-pouched-wild-seafood" class="embiggen" style="text-decoration:none; color:#6d6e71;">Canned Seafood</a>
+                                                    </td>
+                                                    <td align="center" valign="top" style="display:inline-block; padding:5px 8px; font-family:Arial, Helvetica, sans-serif; font-size:11px; font-weight:bold; border-right:1px solid #6d6e71 !important;">
+                                                        <a href="#" class="embiggen" style="text-decoration:none; color:#6d6e71;">Omega-3''s & Supplements</a>
+                                                    </td>
+                                                    <td align="center" valign="top" style="display:inline-block; padding:5px 8px; font-family:Arial, Helvetica, sans-serif; font-size:11px; font-weight:bold;">
+                                                        <a href="https://@(PublicHost)/products/specials-top-sellers" class="embiggen" style="text-decoration:none; color:#6d6e71;">Top Sellers</a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <!--End Mobile Hidden Navigation Cells -->
+
+                                        </td>
+                                    </tr>
+                                </table>
+                                <!-- End Mobile Hidden Navigation -->
+                                <!--Full-Width WYSIWYG Inner -->
+                                <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                                    <tr>
+                                        <td align="center" valign="top" bgcolor="#ffffff" style="font-family: Arial, Helvetica, sans-serif; font-size:14px; color:#000000; padding:0 1px;">
+
+                                            <div><img src="https://@(PublicHost)/Assets/images/order-confirmation-hero.jpg" alt="Thank you for your order!" width="638" style="display:block; max-width:100%; height:auto;" border="0" /></div>
+
+                                        </td>
+                                    </tr>
+                                </table>
+                                <!-- End Full-Width WYSIWYG Inner-->
+                                <!-- Full-Width WYSIWYG Outer -->
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                                    <tr>
+                                        <td bgcolor="#edf7f9" style="padding: 0;">
+
+                                            <!--Full-Width WYSIWYG Inner -->
+                                            <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                                                <tr>
+                                                    <td align="center" valign="top" bgcolor="#ffffff" style="font-family: Arial, Helvetica, sans-serif; font-size:14px; color:#000000; padding:0 1px;">
+
+                                                        <div>
+                                                            <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+
+
+
+                                                                <tr>
+                                                                    <td align="center" style="color: #6d6e72; font-family: Helvetica,Arial,sans-serif; font-size: 14px; line-height: 20px; font-weight: 300; padding:8px;">
+                                                                        <p>
+                                                                            Thank you for your purchase from Vital Choice Wild Seafood &amp; Organics! <br />
+                                                                            We suggest you print out this Order Confirmation, or save it for future reference.
+                                                                        </p>
+                                                                    </td>
+                                                                </tr>
+
+                                                            </table>
+                                                        </div>
+
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <!-- End Full-Width WYSIWYG Inner-->
+
+                                        </td>
+                                    </tr>
+                                </table>
+                                <!-- End Full-Width WYSIWYG Outer -->
+                                <!-- Stacking Thirds Outer -->
+                                <div>
+                                    <table width="639" style="border-collapse: collapse;">
                                         <tr>
-                                            <td valign="top" style="font-size:15px;">
-                                                <div align="left">
-                                                    Ordered by:<br />
-                                                    @(BillToAddress.FirstName) @(BillToAddress.LastName)<br />
-                                                    @(BillToAddress.Company)<br />
-                                                    @(BillToAddress.Address1)<br />
-                                                    @(BillToAddress.Address2)<br />
-                                                    @(BillToAddress.City), @(BillToAddress.StateCodeOrCounty) @(BillToAddress.Zip) @(BillToAddress.Country)
-                                    			</div>
-    			                            </td>
-                                        </tr>
+                        					<td width="203" bgcolor="#f15c22" align="left" style="border-collapse:collapse;border:1px solid #ffffff;padding: 5px 5px 5px 5px; font-size: 16px; color: #FFFFFF; font-weight: bold; font-family: Arial, helvetica, sans-serif;">
+                                                Bill To
+                                            </td>
+                        					<td width="203" bgcolor="#f15c22" align="left" style="border-collapse:collapse;border:1px solid #ffffff;padding: 5px 5px 5px 5px; font-size: 16px; color: #FFFFFF; font-weight: bold; font-family: Arial, helvetica, sans-serif;">
+                                                Ship To
+                                            </td>
+                        					<td width="203" align="left" valign="top" bgcolor="#f15c22" style="border-collapse:collapse;border:1px solid #ffffff;padding: 5px 5px 5px 5px; font-size: 16px; color: #FFFFFF; font-weight: bold; font-family: Arial, helvetica, sans-serif;">
+                        						Order Info
+                        					</td>
+                        				</tr>
+                        				<tr>
+                        					<td align="left" valign="top" style="padding: 5px 25px 5px 10px; font-size: 13px; color: #6d6e72; font-family: Arial, helvetica, sans-serif;">
+                                                @(BillToAddress.FirstName) @(BillToAddress.LastName)<br />
+                                                @(BillToAddress.Company)<br />
+                                                @(BillToAddress.Address1)<br />
+                                                @(BillToAddress.Address2)<br />
+                                                @(BillToAddress.City), @(BillToAddress.StateCodeOrCounty) @(BillToAddress.Zip) @(BillToAddress.Country)
+                                            </td>
+                        					<td align="left" valign="top" style="padding: 5px 25px 5px 10px; font-size: 13px; color: #6d6e72; font-family: Arial, helvetica, sans-serif;">
+                                                @(ShipToAddress.FirstName) @(ShipToAddress.LastName)<br />
+                                                @(ShipToAddress.Company)<br />
+                                                @(ShipToAddress.Address1)<br />
+                                                @(ShipToAddress.Address2)<br />
+                                                @(ShipToAddress.City), @(ShipToAddress.StateCodeOrCounty) @(ShipToAddress.Zip) @(ShipToAddress.Country)
+                                            </td>
+                        					<td align="left" valign="top" style="padding: 5px 0 5px 5px; font-size: 13px; color: #6d6e72; font-family: Arial, helvetica, sans-serif;">
+                                                Order#: <br/>
+                                                @(Id) <br/>
+                                                See "Additional Information"<br />below for shipping guidance.<br/>
+                                                Purchase Date: <br/>
+                                                @date(DateCreated){{MM''/''dd''/''yyyy}}<br/>
+                        					</td>
+                        				</tr>
+                                    <!-- End Stacking Thirds Inner-->
+                        			@if(@(!string.IsNullOrEmpty(model.GiftMessage) || model.ShipDelayDate!=null || model.ShipDelayDateP!=null || model.ShipDelayDateNP!=null || !string.IsNullOrEmpty(model.DeliveryInstructions)))
+                        			{{
                                         <tr>
-                                            <td><img src="https://@(PublicHost)/Assets/images/spacer.gif" width="20" height="20"></td>
-                                        </tr>
-                                        <tr>
-                                            <td valign="top">
-                                                <div align="left">
-                                                    <span style="color:#666;">
-                                                        &#8226; Frozen and dry goods ship separately.<br />
-                                                        &#8226; If your order includes both frozen and dry goods, you will receive a separate Shipping Confirmation for each.
-                                                    </span>
-                                                </div>
+                        					<td bgcolor="#f15c22" align="left" style="border-collapse:collapse;border:1px solid #ffffff;padding: 5px 5px 5px 5px; font-size: 15px; color: #FFFFFF; font-weight: bold; font-family: Arial, helvetica, sans-serif;">
+                                                Gift Message
+                                            </td>
+                        					<td bgcolor="#f15c22" align="left" style="border-collapse:collapse;border:1px solid #ffffff;padding: 5px 5px 5px 5px; font-size: 15px; color: #FFFFFF; font-weight: bold; font-family: Arial, helvetica, sans-serif;">
+                                                Requested Ship Date
+                                            </td>
+                        					<td bgcolor="#f15c22" align="left" style="border-collapse:collapse;border:1px solid #ffffff;padding: 5px 5px 5px 5px; font-size: 15px; color: #FFFFFF; font-weight: bold; font-family: Arial, helvetica, sans-serif;">
+                                                Driver Delivery Instructions
+                                            </td>
+                        				</tr>
+                        				<tr>
+                        					<td align="left" valign="top" style="padding: 5px 25px 5px 10px; font-size: 13px; color: #6d6e72; font-family: Arial, helvetica, sans-serif;">
+                        						@(GiftMessage)
+                                            </td>
+                                            <td align="left" valign="top" style="padding: 5px 25px 5px 10px; font-size: 13px; color: #6d6e72; font-family: Arial, helvetica, sans-serif; text-align: center;">
+                                                Week of<br/>
+            		                            @if(ShipDelayDate){{
+            		                                @date(ShipDelayDate){{MM''/''dd''/''yyyy}}
+            		                            }}
+            		                            @ifnot(ShipDelayDate){{
+            		                                @if(ShipDelayDateNP){{
+            		                                    Perishable Foods <br />
+            		                                    @date(ShipDelayDateNP){{MM''/''dd''/''yyyy}}<br />
+            		                                }}
+            		                                @if(ShipDelayDateP){{
+            		                                    Non-Perishable Goods <br />
+            		                                    @date(ShipDelayDateP){{MM''/''dd''/''yyyy}}<br />
+            		                                }}
+            		                            }}
+                                            </td>
+                        					<td align="left" valign="top" style="padding: 5px 0 5px 5px; font-size: 13px; color: #6d6e72; font-family: Arial, helvetica, sans-serif;">
+                        						@(DeliveryInstructions)
                                             </td>
                                         </tr>
-                                    </table>
-                                </td>
-                                <td><img src="https://@(PublicHost)/Assets/images/spacer.gif" width="20" height="20"></td>
-                                <td width="260" valign="top">
-                                    <table width="260" border="0" cellspacing="0" cellpadding="0">
-                                        <tr>
-                                            <td valign="top" style="font-size:15px;">
-                                                <div align="left">
-                                                    Shipped to:<br />
-                                                    @(ShipToAddress.FirstName) @(ShipToAddress.LastName)<br />
-                                                    @(ShipToAddress.Company)<br />
-                                                    @(ShipToAddress.Address1)<br />
-                                                    @(ShipToAddress.Address2)<br />
-                                                    @(ShipToAddress.City), @(ShipToAddress.StateCodeOrCounty) @(ShipToAddress.Zip) @(ShipToAddress.Country)
-                                    			</div>
-    			                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><img src="https://@(PublicHost)/Assets/images/spacer.gif" width="20" height="20"></td>
-                                        </tr>
-                                        <tr>
-                                            <td valign="top">
-                                                <div align="left">
-                                                    <span style="color:#666;">
-                                                        &#8226; Frozen items ship by 2nd Day Air or 1-3 Day Express Ground service, unless you upgraded to Overnight service.<br />
-                                                        &#8226; Non-perishable goods ship by Ground, unless you upgraded to 2nd Day Air or Overnight.
-                                                    </span>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                                <td><img src="https://@(PublicHost)/Assets/images/spacer.gif" width="20" height="20"></td>
-                                <td width="200" valign="top" style="font-size:15px;">
-                                    @if(GiftMessage){{
-                            		<table width="200" border="0" cellspacing="0" cellpadding="0">
-                                        <tr>
-                                            <td valign="top" style="font-size:15px;"><div align="left">Gift Message:</div></td>
-                                        </tr>
-                                        <tr>
-                                            <td><img src="https://@(PublicHost)/Assets/images/spacer.gif" width="20" height="20"></td>
-                                        </tr>
-                                        <tr>
-                                            <td valign="top">
-                                                <div align="left">
-                                                    <span style="color:#666;font-family: Tahoma, Geneva, sans-serif;font-size: 13px;">
-                                                        @(GiftMessage)
-                                                    </span>
-                                                </div>
-                                            </td>
-                                          </tr>
-                                    </table>
                                     }}
-    		                    </td>
-                                <td><img src="https://@(PublicHost)/Assets/images/spacer.gif" width="20" height="20"></td>
-                            </tr>
-                            <tr>
-                                <td valign="top">&nbsp;</td>
-                                <td valign="top">&nbsp;</td>
-                                <td valign="top">&nbsp;</td>
-                                <td valign="top">&nbsp;</td>
-                                <td valign="top">&nbsp;</td>
-                                <td valign="top">&nbsp;</td>
-                                <td valign="top">&nbsp;</td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-                <tr>
-                    <td valign="top" bgcolor="#FFFFFF">
-                        <table width="800" border="0" cellspacing="0" cellpadding="0">
-                            <tr>
-                                <td><img src="https://@(PublicHost)/Assets/images/spacer.gif" width="20" height="20"></td>
-                                <td width="780">
-                                    <div align="left">
-                                        These items were included in your Order Number(s): <span style="color:#c21722;">@(Id)</span><br />
-                                        <i>Please note that changes made after submitting your order may not be reflected below.</i>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                            </tr>
-                        </table>
-                        <table width="800" border="0" cellspacing="0" cellpadding="0">
-                            <tr>
-                                <td width="20"><img src="https://@(PublicHost)/Assets/images/spacer.gif" width="20" height="20"></td>
-                                <td width="76"><div align="left"><u>SKU</u></div></td>
-                                <td width="20"><img src="https://@(PublicHost)/Assets/images/spacer.gif" width="20" height="20"></td>
-                                <td width="359"><div align="left"><u>Description</u></div></td>
-                                <td width="20"><img src="https://@(PublicHost)/Assets/images/spacer.gif" width="20" height="20"></td>
-                                <td width="40"><div align="left"><u>Qty</u></div></td>
-                                <td width="20"><img src="https://@(PublicHost)/Assets/images/spacer.gif" width="20" height="20"></td>
-                                <td width="96"><div align="right"><u>Price</u></div></td>
-                                <td width="20"><img src="https://@(PublicHost)/Assets/images/spacer.gif" width="20" height="20"></td>
-                                <td width="52"><div align="right"><u>Subtotal</u></div></td>
-                                <td width="20"><img src="https://@(PublicHost)/Assets/images/spacer.gif" width="20" height="20"></td>
-                            </tr>
-                            @list(Skus){{
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td valign="top"><div align="left">@(Code)</div></td>
-                                <td>&nbsp;</td>
-                                <td><div align="left">@(DisplayName)</div></td>
-                                <td>&nbsp;</td>
-                                <td valign="top"><div align="left">@(Quantity)</div></td>
-                                <td>&nbsp;</td>
-                                <td valign="top"><div align="right">@money(Price)</div></td>
-                                <td>&nbsp;</td>
-                                <td valign="top"><div align="right">@money(SubTotal)</div></td>
-                                <td>&nbsp;</td>
-                            </tr>
-                            }}
-                            @list(PromoSkus){{
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                            </tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td colspan="10">Promo items</td>
-                            </tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td valign="top"><div align="left">@(Code)</div></td>
-                                <td>&nbsp;</td>
-                                <td><div align="left">@(DisplayName)</div></td>
-                                <td>&nbsp;</td>
-                                <td valign="top"><div align="left">@(Quantity)</div></td>
-                                <td>&nbsp;</td>
-                                <td valign="top"><div align="right">@money(Price)</div></td>
-                                <td>&nbsp;</td>
-                                <td valign="top"><div align="right">@money(SubTotal)</div></td>
-                                <td>&nbsp;</td>
-                            </tr>
-                            }}
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                            </tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td><div align="left">Order Subtotal</div></td>
-                                <td>&nbsp;</td>
-                                <td><div align="right">@money(ProductsSubtotal)</div></td>
-                                <td>&nbsp;</td>
-                            </tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td><div align="left">Discount</div></td>
-                                <td>&nbsp;</td>
-                                <td><div align="right">@money(DiscountTotal)</div></td>
-                                <td>&nbsp;</td>
-                            </tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td><div align="left">Shipping*</div></td>
-                                <td>&nbsp;</td>
-                                <td><div align="right">@money(ShippingTotal)</div></td>
-                                <td>&nbsp;</td>
-                            </tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td><div align="left">Tax</div></td>
-                                <td>&nbsp;</td>
-                                <td><div align="right">@money(TaxTotal)</div></td>
-                                <td>&nbsp;</td>
-                            </tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                            </tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td><div align="left">Order Total**</div></td>
-                                <td>&nbsp;</td>
-                                <td><div align="right">@money(Total)</div></td>
-                                <td>&nbsp;</td>
-                            </tr>
-                        </table>
-                        <br /><br />
-                        <div align="right">
-                            <table width="300" border="0" cellpadding="0" cellspacing="0">
+                        		    </table>
+                                </div>
+                            <!-- End Stacking Thirds Outer -->
+                            <!-- Full Width Body -->
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;" bgcolor="#f15c22">
                                 <tr>
                                     <td>
-                                        <div align="left">@(PaymentTypeMessage)</div>
-                                    </td>
-                                    <td width="20"><img src="https://@(PublicHost)/Assets/images/spacer.gif" width="20" height="20"></td>
-                                </tr>
-                            </table>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td valign="top" bgcolor="#FFFFFF">
-                        <div align="center">
-                            <table width="760" border="0" cellspacing="0" cellpadding="0">
-                                <tr>
-                                    <td width="485">
-                                        <div align="left">
-                                            <span style="font-size:11px;">
-                                                <a href="#" style="font-size:11px;color:#39F;">Answers to Common Shipping Questions</a><br />
-                                                <a href="#" style="font-size:11px;color:#39F;">Answers to Common Storage &amp; Cooking Questions</a><br />
-                                                Still have questions? Send an email to <a href="https://@(PublicHost)/content/contact-customer-service" style="font-size:11px;color:#39F;">Customer Service</a><br />
-                                                or call us toll-free at 866-482-5887
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td width="275" height="63"><div align="center">Thank you for your order!</div></td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2">
-                                        <div align="left">
-                                            <span style="font-size:11px;">
-                                                <br />*ABOUT SHIPPING CHARGES:
-                                                <ul style="margin:5px; padding-left:15px;">
-                                                    <li>
-                                                        IF this is an Auto-Ship or E-Gift Certificate order, you will NOT be charged for Standard Shipping (normally $4.95 or $9.95,<br />
-                                                        depending on the dollar total of an order), so the Order Total $ figure will NOT include any Standard Shipping charge displayed above.
-                                                    </li>
-                                                    <li>
-                                                        IF you chose to upgrade to Premium Shipping Service during checkout, you will be charged for shipping. If so, your<br />
-                                                        Total $ figure will include that shipping upgrade charge. Premium Shipping Service charges are shown on our <a href="#" style="font-size:11px;">Shipping page</a>.
-                                                    </li>
-                                                </ul>
-                                                **NOTE: Your total does not reflect the $1.00 "test" charge applied during checkout to validate your card, which is removed within 7 days.
-                                            </span>
-                                        </div>
+                                        <!-- Full Width Body Content -->
+                                        <table class="content" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                                            <tr>
+                                                <td align="center" style="padding:5px 10px 5px 20px; font-size:16px; color:#FFFFFF; font-weight:bold; font-family:Arial, helvetica, sans-serif; min-width:110px;">
+                                                    Your Order Details
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <!-- End Full Width Body Content -->
                                     </td>
                                 </tr>
                             </table>
-                        </div>
-                    </td>
-                </tr>    
-                <tr>
-                    <td valign="top" bgcolor="#FFFFFF">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td valign="top"><img src="https://@(PublicHost)/Assets/images/spacer.gif" width="20" height="20"></td>
-                </tr>
-                <tr>
-                    <td valign="top">
-                        <table width="800" border="0" cellspacing="0" cellpadding="0">
-                            <tr>
-                                <td width="20" valign="top" bgcolor="#FFFFFF">&nbsp;</td>
-                                <td valign="top" bgcolor="#FFFFFF">&nbsp;</td>
-                                <td valign="bottom" bgcolor="#FFFFFF">&nbsp;</td>
-                            </tr>
-                            <tr>
-                                <td width="20"><img src="https://@(PublicHost)/Assets/images/spacer.gif" width="20" height="20"></td>
-                                <td width="760" valign="top" bgcolor="#FFFFFF"><img src="https://@(PublicHost)/Assets/images/btm-ship-conf2.jpg" width="760" height="146" border="0" usemap="#Map2"></td>
-                                <td width="20"><img src="https://@(PublicHost)/Assets/images/spacer.gif" width="20" height="20"></td>
-                            </tr>
-                            <tr>
-                                <td valign="top" bgcolor="#FFFFFF">&nbsp;</td>
-                                <td valign="top" bgcolor="#FFFFFF">&nbsp;</td>
-                                <td valign="bottom" bgcolor="#FFFFFF">&nbsp;</td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        
-        <map name="Map">
-            <area shape="rect" coords="16,13,217,66" href="http://www.vitalchoice.com">
-        </map>
-    
-        <map name="Map2">
-            <area shape="rect" coords="461,93,502,135" href="https://plus.google.com/+VitalchoiceWildSeafood/posts">
-            <area shape="rect" coords="410,94,451,136" href="http://www.youtube.com/user/VitalChoiceSeafood">
-            <area shape="rect" coords="360,93,401,135" href="http://www.pinterest.com/vitalchoice/">
-            <area shape="rect" coords="310,93,351,135" href="https://twitter.com/vitalchoice">
-            <area shape="rect" coords="0,1,759,85" href="https://@(PublicHost)/content/newsletter-sign-up">
-            <area shape="rect" coords="258,93,299,135" href="https://www.facebook.com/vitalchoice">
-        </map>
-    </body>
-    
-    </html>
-}}
+                            <!-- End Full Width Body -->
+                            <!-- Stacking Halves -->
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;margin-top:5px;" bgcolor="#ffffff">
+                                <tr>
+                                    <td>
+                                        <!-- Full Width Body Content -->
+                                        <table class="content" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                                            <tr>
+                                                <td width="85" align="left" style="font-size: 13px; color: #6d6e72; font-family: Arial, helvetica, sans-serif; text-decoration: underline;"></td>
+                                                <td width="90" align="left" style="font-size: 13px; color: #6d6e72; font-family: Arial, helvetica, sans-serif; text-decoration: underline;">
+                                                    Product ID #
+                                                </td>
+                                                <td width="269" align="left" style="font-size: 13px; color: #6d6e72; font-family: Arial, helvetica, sans-serif; text-decoration: underline;">
+                                                    Description
+                                                </td>
+                                                <td width="65" align="left" style="font-size: 13px; color: #6d6e72; font-family: Arial, helvetica, sans-serif; text-decoration: underline;">
+                                                    Quantity
+                                                </td>
+                                                <td width="65" align="left" style="font-size: 13px; color: #6d6e72; font-family: Arial, helvetica, sans-serif; text-decoration: underline;">
+                                                    Price
+                                                </td>
+                                                <td width="65" align="left" style="font-size: 13px; color: #6d6e72; font-family: Arial, helvetica, sans-serif; text-decoration: underline;">
+                                                    Subtotal
+                                                </td>
+                                            </tr>
+                                        @list(Skus){{
+                                            <tr>
+                                                <td align="left">
+                                                    <a href="https://@(@root.Model.PublicHost)/@(ProductPageUrl)">
+                                                        <img src="https://@(@root.Model.PublicHost)/@(IconUrl)" border="0" width="75" />
+                                                    </a>
+                                                </td>
+                                                <td align="left" style="padding:0 5px 0 0; font-size:13px; color:#6d6e72; font-family:Arial, helvetica, sans-serif;">
+                                                    @(Code)
+                                                </td>
+                                                <td align="left" style="padding:0 10px 0 0; font-size:13px; color:#6d6e72; font-family:Arial, helvetica, sans-serif; min-width:100px">
+                                                    @(DisplayName)
+                                                </td>
+                                                <td align="left" style="padding:0 5px 0 5px; font-size:13px; color:#6d6e72; font-family:Arial, helvetica, sans-serif;">
+                                                    @(Quantity)
+                                                </td>
+                                                <td align="left" style="padding:0 5px 0 0; font-size:13px; color:#6d6e72; font-family:Arial, helvetica, sans-serif;">
+                                                    @money(Price)
+                                                </td>
+                                                <td align="left" style="padding:0 5px 0 0; font-size:13px; color:#6d6e72; font-family:Arial, helvetica, sans-serif;">
+                                                    @money(SubTotal)
+                                                </td>
+                                            </tr>
+                        				}}
+                                        @if(@model.PromoSkus.Count>0)
+                                        {{
+                                            <tr>
+                                                <td colspan="6" style="text-align:left; padding:0 5px 0 0; font-size:13px; color:#6d6e72; font-family:Arial, helvetica, sans-serif;">
+                                                    Promo Items
+                                                </td>
+                                            </tr>
+                                            @list(PromoSkus){{
+                                                <tr>
+                                                    <td align="left">
+                                                        <a href="https://@(@root.Model.PublicHost)/@(ProductPageUrl)">
+                                                            <img src="https://@(@root.Model.PublicHost)/@(IconUrl)" border="0" width="75" />
+                                                        </a>
+                                                    </td>
+                                                    <td align="left" style="padding:0 5px 0 0; font-size:13px; color:#6d6e72; font-family:Arial, helvetica, sans-serif;">
+                                                        @(Code)
+                                                    </td>
+                                                    <td align="left" style="padding:0 10px 0 0; font-size:13px; color:#6d6e72; font-family:Arial, helvetica, sans-serif; min-width:100px">
+                                                        @(DisplayName)
+                                                    </td>
+                                                    <td align="left" style="padding:0 5px 0 5px; font-size:13px; color:#6d6e72; font-family:Arial, helvetica, sans-serif;">
+                                                        @(Quantity)
+                                                    </td>
+                                                    <td align="left" style="padding:0 5px 0 0; font-size:13px; color:#6d6e72; font-family:Arial, helvetica, sans-serif;">
+                                                        @money(Price)
+                                                    </td>
+                                                    <td align="left" style="padding:0 5px 0 0; font-size:13px; color:#6d6e72; font-family:Arial, helvetica, sans-serif;">
+                                                        @money(SubTotal)
+                                                    </td>
+                                                </tr>
+                            				}}
+                            			}}
+                                        </table>
+                                        <!-- End Full Width Body Content -->
+                                    </td>
+                                </tr>
+                            </table>
+                            <!-- End Stacking Halves -->
+                            <!-- Total -->
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                                <tr>
+                                    <td>
+                                        <!-- Total Content -->
+                                        <table class="content" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                                            <tr>
+                                                <td align="right" valign="top" style="font-family:Arial, helvetica, sans-serif; color:#6d6e72; font-size:13px; padding:10px;">
+                                                    Subtotal: @money(ProductsSubtotal)<br />
+                                                    Discount: @money(DiscountTotal)<br />
+                                                    Shipping: @money(ShippingTotal)<br />
+                                                    Tax: @money(TaxTotal)<br />
+                                                    <br />
+                                                    <strong>Total: @money(Total)</strong>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <!-- End Total Content -->
+                                    </td>
+                                </tr>
+                            </table>
+                            <!-- End Total -->
+                            <!-- Order Info Header -->
+                            <table bgcolor="#f15c22" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">
+                                <tr>
+                                    <td align="center" valign="top" style="font-family:Helvetica, Arial, sans-serif; color:#ffffff; padding:10px; font-weight:bold; text-align: center;font-size:16px;">Need Further Assistance?</td>
+                                </tr>
+                            </table>
+                            <!-- End Order Info Header -->
+                            <!-- Further Assistance Text -->
+                            <br />
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                                <tr>
+                                    <td bgcolor="#edf7f9" style="padding: 0;">
+                        
+                                        <!--Full-Width WYSIWYG Inner -->
+                                        <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                                            <tr>
+                                                <td align="center" valign="top" bgcolor="#ffffff" style="font-family: Arial, Helvetica, sans-serif; font-size:13px; color:#000000; padding:0 1px;">
+                                                    <div>
+                                                        <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+                        
+                                                            <tr>
+                                                                <td style="color: #6d6e72; font-family: Helvetica,Arial,sans-serif; font-size: 13px; line-height: 20px; font-weight: 300; padding:8px;">
+                                                                    <li>Replies to this email WILL NOT be received or seen.</li>
+                                                                    <li>Please send corrections or questions to info@{@}@vitalchoice.com or call 866-482-5887, Monday through Friday, from 7AM-4PM Pacific Time.</li>
+                                                                    <li>We will send you your Tracking Number(s) after your order has been shipped.</li>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <!-- End Full-Width WYSIWYG Inner-->
+                                    </td>
+                                </tr>
+                            </table>
+                            <br />
+                            <!-- End Further Assistance Text -->
+                            <!-- Additional Info Header -->
+                            <table bgcolor="#f15c22" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">
+                                <tr>
+                                    <td align="center" valign="top" style="font-family:Helvetica, Arial, sans-serif; color:#ffffff; padding:10px; font-weight:bold; text-align: center;font-size:16px;">Additional Information</td>
+                                </tr>
+                            </table>
+                            <!-- End Additional Info Header -->
+                            <!-- Additional Info Text -->
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                                <tr>
+                                    <td bgcolor="#edf7f9" style="padding: 0;">
+                        
+                                        <!--Full-Width WYSIWYG Inner -->
+                                        <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                                            <tr>
+                                                <td align="center" valign="top" bgcolor="#ffffff" style="font-family: Arial, Helvetica, sans-serif; font-size:14px; color:#000000; padding:0 1px;">
+                        
+                                                    <div>
+                                                        <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+                        
+                                                            <tr>
+                                                                <td style="color: #6d6e72; font-family: Helvetica,Arial,sans-serif; font-size: 13px; line-height: 20px; font-weight: 300; padding:0 8px;">
+                                                                    <span style="font-weight:bold; font-size:16px;">
+                                                                        <br />
+                                                                        General Shipping Info:
+                                                                    </span><br />
+                                                                    <li>There are NO Saturday or Sunday deliveries.</li>
+                                                                    <li>Gift Certificates ship free; eGift Certificates are delivered free by email.</li>
+                                                                    <li>Standard and Premium Shipping Service charges are shown on our Shipping Page.</li>
+                                                                    <li>Website Orders placed on Saturday or Sunday will be sent on Tuesday (Monday if upgraded to 2nd Day Air or Overnight service).</li>
+                                                                    <li>If you have other delivery date questions or concerns, please call our Customer Service team at 866-482-5887 Monday-Friday, 7AM-4PM Pacific Time.</li>
+                                                                    <br />
+                                                                    <u>Frozen Foods</u> (most of our non-canned foods) ship Monday through Wednesday by 1-3 Day Express Ground service (most orders) or 2nd Day Air. Frozen Items ordered on Wednesday after 10 AM Pacific time and upgraded to Overnight Service will ship on Thursday.
+                                                                    <br /><br />
+                                                                    <u>Non-Perishable Goods</u> (such as supplements and canned foods) ship by Ground service Monday through Friday. Non-Perishable Items typically arrive in 1-7 days, depending on destination, unless you upgraded to 2nd Day Air or Overnight service.
+                                                                    <br /><br />
+                                                                    <u>Chilled Foods</u> (such as live shellfish) ship Overnight (Tuesday through Thursday only), on cold gel packs.
+                        
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="color: #6d6e72; font-family: Helvetica,Arial,sans-serif; font-size: 11px; line-height: 20px; font-weight: 300; padding:0 8px;">
+                                                                    <br />
+                                                                    <a href="#" target="_blank" style="font-size:13px; text-decoration:underline; color:#f15c22">Answers to Common Shipping Questions ></a><br />
+                                                                    <br />
+                                                                    <a href="#" target="_blank" style="font-size:13px; text-decoration:underline; color:#f15c22">Answers to Common Storage &amp; Cooking Questions ></a>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                        
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <!-- End Full-Width WYSIWYG Inner-->
+                        
+                                    </td>
+                                </tr>
+                            </table>
+                            <br />
+                            <!-- End Additional Info Text -->
+                            <!--Full-Width WYSIWYG Inner -->
+                            <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                                <tr>
+                                    <td align="center" valign="top" bgcolor="#ffffff" style="font-family: Arial, Helvetica, sans-serif; font-size:14px; color:#000000; padding:0 1px;">
+                                        <div>
+                                            <a href="https://@(PublicHost)/content/newsletter-sign-up">
+                                                <img src="https://@(PublicHost)/Assets/images/cart-recovery-newslettersignup_v2.jpg" width="638" style="display:block; max-width:100%; height:auto;" border="0" />
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                            <!-- End Full-Width WYSIWYG Inner-->
+                        </td>
+                    </tr>
+                </table>
+                <!-- End Message Body-->
+                
+                <!-- Begin Social Icons -->
+                <div><br /></div>
+                    <table align="center" border="0" cellpadding="5" cellspacing="0" style="border-collapse:collapse;">
+                        <tr>
+                            <td colspan="7" align="center"><span style="font-size:15px; font-weight:bold; color:#6d6e72; font-family:Arial, Helvetica, sans-serif;">FEELING SOCIAL?</span></td>
+                        </tr>
+                        <tr>
+                            <td align="center" valign="middle"><a href="https://www.facebook.com/vitalchoice" target="blank"><img src="https://@(PublicHost)/Assets/images/VC-Facebook.png" height="40" width="40" style="border:none; display:block;" alt="Facebook" /></a></td>
+                            <td align="center" valign="middle"><a href="#" target="blank"><img src="https://@(PublicHost)/Assets/images/VC-Blog.png" height="40" width="40" style="border:none; display:block;" alt="Blogt" /></a></td>
+                            <td align="center" valign="middle"><a href="https://twitter.com/vitalchoice" target="blank"><img src="https://@(PublicHost)/Assets/images/VC-Twitter.png" height="40" width="40" style="border:none; display:block;" alt="Twitter" /></a></td>
+                            <td align="center" valign="middle"><a href="https://plus.google.com/109701577970251794205/posts" target="blank"><img src="https://@(PublicHost)/Assets/images/VC-Google.png" height="40" width="40" style="border:none; display:block;" alt="Google Plus" /></a></td>
+                            <td align="center" valign="middle"><a href="https://www.pinterest.com/vitalchoice/" target="blank"><img src="https://@(PublicHost)/Assets/images/VC-Pinterest.png" height="40" width="40" style="border:none; display:block;" alt="Pinterest" /></a></td>
+                            <td align="center" valign="middle"><a href="https://instagram.com/vitalchoice/" target="blank"><img src="https://@(PublicHost)/Assets/images/social-icons-Insta.png" height="40" width="40" style="border:none; display:block;" alt="Instagram" /></a></td>
+                            <td align="center" valign="middle"><a href="https://www.bcorporation.net/community/vital-choice" target="blank"><img src="https://@(PublicHost)/Assets/images/VC-BCorp.png" height="40" width="40" style="border:none; display:block;" alt="B Corp" /></a></td>
+                        </tr>
+                    </table>
+                    <!-- End Social Icons -->
+                    <!-- Footer Outer -->
+                    <table border="0" align="center" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                        <tr>
+                            <td align="center">
+                                <!--Footer Inner -->
+                                <table align="center" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+                                    <tr>
+                                        <td align="center" valign="top" style="padding:10px; color:#000000; font-family:Arial, Helvetica, sans-serif; font-size:10px; line-height:18px;">
+                                            <span style="font-size:12px; font-weight:bold; color:#6d6e72;">These items were included in your Order Number: @(Id)<br />Please note that changes made after submitting your order may not be reflected in this confirmation.</span><br /><br />
+                                        </td>
+                                    </tr>
+                                </table>
+                                <!-- End Footer Inner-->
+                            </td>
+                        </tr>
+                    </table>
+                    <!-- End Footer Outer -->
+                    <img src="https://@(PublicHost)/Assets/images/spacer.gif" style="display:block;" height="1" width="1" />
+                </td>
+            </tr>
+        </table>
+    <!-- End Outer Container -->
+    </div>
+</body>
+</html>
+}} :: VitalChoice.Ecommerce.Domain.Mail.OrderConfirmationEmail
 %>'
            ,''
            ,'Vital Choice - Order Confirmation Email'

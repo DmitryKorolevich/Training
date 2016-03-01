@@ -89,7 +89,7 @@ namespace VC.Public.ModelConverters.Order
                 p.DisplayName += $" ({p.PortionsCount})";
             });
 
-            model.PromoSkus.AddRange(dynamic?.PromoSkus?.Select(sku =>
+            model.PromoSkus.AddRange(dynamic?.PromoSkus?.Where(p => p.Enabled).Select(sku =>
             {
                 var result = _skuMapper.ToModel<CartSkuModel>(sku.Sku);
                 _productMapper.UpdateModel(result, sku.ProductWithoutSkus);

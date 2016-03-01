@@ -281,7 +281,7 @@ namespace VC.Admin.Models.Orders
             }
 
             SkuOrdereds = order.Skus?.Select(item => new SkuOrderedManageModel(item)).ToList() ?? new List<SkuOrderedManageModel>();
-            PromoSkuOrdereds= order.PromoSkus?.Select(item => new SkuOrderedManageModel(item)).ToList() ?? new List<SkuOrderedManageModel>();
+            PromoSkuOrdereds= order.PromoSkus?.Where(p=>p.Enabled).Select(item => new SkuOrderedManageModel(item)).ToList() ?? new List<SkuOrderedManageModel>();
 
             GCs = order.GiftCertificates?.Select(item => new GCInvoiceEntity() {
                 Amount = item.Amount,
