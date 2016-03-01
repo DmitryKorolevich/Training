@@ -24,7 +24,10 @@ namespace VitalChoice.Ecommerce.Domain.Mail
         [Map("Name")]
         public string DisplayName { get; set; }
 
-	    public decimal? Price { get; set; }
+        [Map("Thumbnail")]
+        public string IconUrl { get; set; }
+
+        public decimal? Price { get; set; }
 
 		public int Quantity { get; set; }
 
