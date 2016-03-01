@@ -53,135 +53,20 @@ namespace VitalChoice.Caching.Services
                     {
                         foreach (var entityType in context.Model.GetEntityTypes())
                         {
-                            if (entityType.ClrType == null) continue;
-
-                            var key = entityType.FindPrimaryKey();
-                            if (key == null) continue;
-
-                            var keyInfos = CreateValueInfos(key.Properties);
-
-                            var indexes = entityType.GetIndexes().Where(index => index.IsUnique);
-
-                            var uniqueIndex =
-                                indexes.Select(
-                                    index =>
-                                        new EntityCacheableIndexInfo(CreateValueInfos(index.Properties)))
-                                    .FirstOrDefault();
-
-                            List<EntityConditionalIndexInfo> conditionalList = new List<EntityConditionalIndexInfo>();
-
-                            // ReSharper disable once LoopCanBeConvertedToQuery
-                            foreach (var index in entityType.GetIndexes())
-                            {
-                                var conditionAnnotation = index.FindAnnotation(IndexBuilderExtension.UniqueIndexAnnotationName);
-                                if (conditionAnnotation != null)
-                                {
-                                    conditionalList.Add(new EntityConditionalIndexInfo(CreateValueInfos(index.Properties),
-                                        entityType.ClrType,
-                                        conditionAnnotation.Value as LambdaExpression));
-                                }
-                            }
-
-                            var nonUniqueList = new HashSet<EntityCacheableIndexInfo>();
-                            var externalForeignKeys = new List<KeyValuePair<Type, EntityForeignKeyInfo>>();
-                            var externalDependentTypes = new List<KeyValuePair<Type, EntityCacheableIndexRelationInfo>>();
-
-                            foreach (var foreignKey in entityType.GetForeignKeys())
-                            {
-                                if (foreignKey.PrincipalToDependent != null && foreignKey.PrincipalToDependent.IsCollection())
-                                {
-                                    var foreignValues = CreateValueInfos(foreignKey.Properties).ToArray();
-                                    externalForeignKeys.Add(
-                                        new KeyValuePair<Type, EntityForeignKeyInfo>(
-                                            foreignKey.PrincipalToDependent.GetTargetType().ClrType,
-                                            new EntityForeignKeyInfo(foreignValues,
-                                                CreateValueInfos(foreignKey.PrincipalKey.Properties),
-                                                foreignKey.PrincipalToDependent.Name,
-                                                foreignKey.PrincipalToDependent.DeclaringEntityType.ClrType)));
-
-                                    if (foreignKey.DependentToPrincipal != null &&
-                                        foreignKey.DependentToPrincipal.DeclaringEntityType.ClrType == entityType.ClrType)
-                                    {
-                                        var index = new EntityCacheableIndexRelationInfo(foreignValues,
-                                            foreignKey.DependentToPrincipal.Name,
-                                            CreateValueInfos(foreignKey.PrincipalKey.Properties));
-                                        nonUniqueList.Add(index);
-                                        externalDependentTypes.Add(
-                                            new KeyValuePair<Type, EntityCacheableIndexRelationInfo>(
-                                                foreignKey.DependentToPrincipal.GetTargetType().ClrType, index));
-                                    }
-                                }
-                                else if (foreignKey.PrincipalToDependent != null)
-                                {
-                                    var foreignValues = CreateValueInfos(foreignKey.Properties).ToArray();
-                                    externalForeignKeys.Add(
-                                        new KeyValuePair<Type, EntityForeignKeyInfo>(
-                                            foreignKey.PrincipalToDependent.GetTargetType().ClrType,
-                                            new EntityForeignKeyInfo(foreignValues,
-                                                CreateValueInfos(foreignKey.PrincipalKey.Properties),
-                                                foreignKey.PrincipalToDependent.Name,
-                                                foreignKey.PrincipalToDependent.DeclaringEntityType.ClrType)));
-                                    if (foreignKey.DependentToPrincipal != null &&
-                                        foreignKey.DependentToPrincipal.DeclaringEntityType.ClrType == entityType.ClrType)
-                                    {
-                                        var index = new EntityCacheableIndexRelationInfo(foreignValues,
-                                            foreignKey.DependentToPrincipal.Name,
-                                            CreateValueInfos(foreignKey.PrincipalKey.Properties));
-                                        nonUniqueList.Add(index);
-                                        externalDependentTypes.Add(
-                                            new KeyValuePair<Type, EntityCacheableIndexRelationInfo>(
-                                                foreignKey.DependentToPrincipal.GetTargetType().ClrType, index));
-                                    }
-                                }
-                                else if (foreignKey.PrincipalToDependent == null && foreignKey.DependentToPrincipal != null &&
-                                                                                     foreignKey.DependentToPrincipal.DeclaringEntityType
-                                                                                         .ClrType == entityType.ClrType)
-                                {
-                                    var foreignValues = CreateValueInfos(foreignKey.Properties).ToArray();
-                                    var index = new EntityCacheableIndexRelationInfo(foreignValues,
-                                        foreignKey.DependentToPrincipal.Name,
-                                        CreateValueInfos(foreignKey.PrincipalKey.Properties));
-                                    nonUniqueList.Add(index);
-                                    externalDependentTypes.Add(
-                                        new KeyValuePair<Type, EntityCacheableIndexRelationInfo>(
-                                            foreignKey.DependentToPrincipal.GetTargetType().ClrType, index));
-                                }
-                            }
-
-                            externalDependentTypes.ForEach(externalType => entityInfos.AddOrUpdate(externalType.Key, () => new EntityInfo
-                            {
-                                DependentTypes =
-                                    new List<KeyValuePair<Type, EntityCacheableIndexRelationInfo>>
-                                    {
-                                        new KeyValuePair<Type, EntityCacheableIndexRelationInfo>(entityType.ClrType, externalType.Value)
-                                    }
-                            }, info =>
-                            {
-                                if (info.DependentTypes == null)
-                                    info.DependentTypes = new List<KeyValuePair<Type, EntityCacheableIndexRelationInfo>>();
-                                info.DependentTypes.Add(new KeyValuePair<Type, EntityCacheableIndexRelationInfo>(entityType.ClrType,
-                                    externalType.Value));
-                                return info;
-                            }));
-
-                            externalForeignKeys.ForEach(external => entityInfos.AddOrUpdate(external.Key, () => new EntityInfo
-                            {
-                                ForeignKeys = new HashSet<EntityForeignKeyInfo> {external.Value}
-                            }, info =>
-                            {
-                                if (info.ForeignKeys == null)
-                                    info.ForeignKeys = new HashSet<EntityForeignKeyInfo>();
-                                info.ForeignKeys.Add(external.Value);
-                                return info;
-                            }));
+                            EntityPrimaryKeyInfo primaryKey;
+                            if (!TryGetPrimaryKey(entityType, out primaryKey))
+                                continue;
+                            var uniqueIndex = GetFirstUniqueIndex(entityType);
+                            var conditionalList = GetyConditionalIndexes(entityType);
+                            var nonUniqueIndexes = SetupForeignKeys(entityType, entityInfos);
 
                             if (!parsedEntities.Contains(entityType.ClrType))
                             {
                                 parsedEntities.Add(entityType.ClrType);
                                 entityInfos.AddOrUpdate(entityType.ClrType, () => new EntityInfo
                                 {
-                                    NonUniqueIndexes = nonUniqueList,
-                                    PrimaryKey = new EntityPrimaryKeyInfo(keyInfos),
+                                    NonUniqueIndexes = nonUniqueIndexes,
+                                    PrimaryKey = primaryKey,
                                     CacheableIndex = uniqueIndex,
                                     ConditionalIndexes = conditionalList,
                                     ContextType = context.GetType()
@@ -189,8 +74,8 @@ namespace VitalChoice.Caching.Services
                                 {
                                     if (info.ForeignKeys == null)
                                         info.ForeignKeys = new HashSet<EntityForeignKeyInfo>();
-                                    info.NonUniqueIndexes = nonUniqueList;
-                                    info.PrimaryKey = new EntityPrimaryKeyInfo(keyInfos);
+                                    info.NonUniqueIndexes = nonUniqueIndexes;
+                                    info.PrimaryKey = primaryKey;
                                     info.CacheableIndex = uniqueIndex;
                                     info.ConditionalIndexes = conditionalList;
                                     info.ContextType = context.GetType();
@@ -215,6 +100,152 @@ namespace VitalChoice.Caching.Services
 
             _entityInfos = entityInfos;
             _gcCollector = new EntityCollector(this, new InternalEntityCacheFactory(this), Options, Logger);
+        }
+
+        private static bool TryGetPrimaryKey(IEntityType entityType, out EntityPrimaryKeyInfo primaryKey)
+        {
+            if (entityType.ClrType == null)
+            {
+                primaryKey = null;
+                return false;
+            }
+
+            var key = entityType.FindPrimaryKey();
+            if (key == null)
+            {
+                primaryKey = null;
+                return false;
+            }
+
+            primaryKey = new EntityPrimaryKeyInfo(CreateValueInfos(key.Properties));
+            return true;
+        }
+
+        private static EntityCacheableIndexInfo GetFirstUniqueIndex(IEntityType entityType)
+        {
+            var indexes = entityType.GetIndexes().Where(index => index.IsUnique);
+
+            var uniqueIndex =
+                indexes.Select(
+                    index =>
+                        new EntityCacheableIndexInfo(CreateValueInfos(index.Properties)))
+                    .FirstOrDefault();
+            return uniqueIndex;
+        }
+
+        private static HashSet<EntityCacheableIndexInfo> SetupForeignKeys(IEntityType entityType, Dictionary<Type, EntityInfo> entityInfos)
+        {
+            var nonUniqueList = new HashSet<EntityCacheableIndexInfo>();
+            var externalForeignKeys = new List<KeyValuePair<Type, EntityForeignKeyInfo>>();
+            var externalDependentTypes = new List<KeyValuePair<Type, EntityCacheableIndexRelationInfo>>();
+
+            foreach (var foreignKey in entityType.GetForeignKeys())
+            {
+                if (foreignKey.PrincipalToDependent != null && foreignKey.PrincipalToDependent.IsCollection())
+                {
+                    var foreignValues = CreateValueInfos(foreignKey.Properties).ToArray();
+                    externalForeignKeys.Add(
+                        new KeyValuePair<Type, EntityForeignKeyInfo>(
+                            foreignKey.PrincipalToDependent.GetTargetType().ClrType,
+                            new EntityForeignKeyInfo(foreignValues,
+                                CreateValueInfos(foreignKey.PrincipalKey.Properties),
+                                foreignKey.PrincipalToDependent.Name,
+                                foreignKey.PrincipalToDependent.DeclaringEntityType.ClrType)));
+
+                    if (foreignKey.DependentToPrincipal != null &&
+                        foreignKey.DependentToPrincipal.DeclaringEntityType.ClrType == entityType.ClrType)
+                    {
+                        var index = new EntityCacheableIndexRelationInfo(foreignValues,
+                            foreignKey.DependentToPrincipal.Name,
+                            CreateValueInfos(foreignKey.PrincipalKey.Properties));
+                        nonUniqueList.Add(index);
+                        externalDependentTypes.Add(
+                            new KeyValuePair<Type, EntityCacheableIndexRelationInfo>(
+                                foreignKey.DependentToPrincipal.GetTargetType().ClrType, index));
+                    }
+                }
+                else if (foreignKey.PrincipalToDependent != null)
+                {
+                    var foreignValues = CreateValueInfos(foreignKey.Properties).ToArray();
+                    externalForeignKeys.Add(
+                        new KeyValuePair<Type, EntityForeignKeyInfo>(
+                            foreignKey.PrincipalToDependent.GetTargetType().ClrType,
+                            new EntityForeignKeyInfo(foreignValues,
+                                CreateValueInfos(foreignKey.PrincipalKey.Properties),
+                                foreignKey.PrincipalToDependent.Name,
+                                foreignKey.PrincipalToDependent.DeclaringEntityType.ClrType)));
+                    if (foreignKey.DependentToPrincipal != null &&
+                        foreignKey.DependentToPrincipal.DeclaringEntityType.ClrType == entityType.ClrType)
+                    {
+                        var index = new EntityCacheableIndexRelationInfo(foreignValues,
+                            foreignKey.DependentToPrincipal.Name,
+                            CreateValueInfos(foreignKey.PrincipalKey.Properties));
+                        nonUniqueList.Add(index);
+                        externalDependentTypes.Add(
+                            new KeyValuePair<Type, EntityCacheableIndexRelationInfo>(
+                                foreignKey.DependentToPrincipal.GetTargetType().ClrType, index));
+                    }
+                }
+                else if (foreignKey.PrincipalToDependent == null && foreignKey.DependentToPrincipal != null &&
+                         foreignKey.DependentToPrincipal.DeclaringEntityType
+                             .ClrType == entityType.ClrType)
+                {
+                    var foreignValues = CreateValueInfos(foreignKey.Properties).ToArray();
+                    var index = new EntityCacheableIndexRelationInfo(foreignValues,
+                        foreignKey.DependentToPrincipal.Name,
+                        CreateValueInfos(foreignKey.PrincipalKey.Properties));
+                    nonUniqueList.Add(index);
+                    externalDependentTypes.Add(
+                        new KeyValuePair<Type, EntityCacheableIndexRelationInfo>(
+                            foreignKey.DependentToPrincipal.GetTargetType().ClrType, index));
+                }
+            }
+
+            externalDependentTypes.ForEach(externalType => entityInfos.AddOrUpdate(externalType.Key, () => new EntityInfo
+            {
+                DependentTypes =
+                    new List<KeyValuePair<Type, EntityCacheableIndexRelationInfo>>
+                    {
+                        new KeyValuePair<Type, EntityCacheableIndexRelationInfo>(entityType.ClrType, externalType.Value)
+                    }
+            }, info =>
+            {
+                if (info.DependentTypes == null)
+                    info.DependentTypes = new List<KeyValuePair<Type, EntityCacheableIndexRelationInfo>>();
+                info.DependentTypes.Add(new KeyValuePair<Type, EntityCacheableIndexRelationInfo>(entityType.ClrType,
+                    externalType.Value));
+                return info;
+            }));
+
+            externalForeignKeys.ForEach(external => entityInfos.AddOrUpdate(external.Key, () => new EntityInfo
+            {
+                ForeignKeys = new HashSet<EntityForeignKeyInfo> {external.Value}
+            }, info =>
+            {
+                if (info.ForeignKeys == null)
+                    info.ForeignKeys = new HashSet<EntityForeignKeyInfo>();
+                info.ForeignKeys.Add(external.Value);
+                return info;
+            }));
+            return nonUniqueList;
+        }
+
+        private static List<EntityConditionalIndexInfo> GetyConditionalIndexes(IEntityType entityType)
+        {
+            List<EntityConditionalIndexInfo> conditionalList = new List<EntityConditionalIndexInfo>();
+
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (var index in entityType.GetIndexes())
+            {
+                var conditionAnnotation = index.FindAnnotation(IndexBuilderExtension.UniqueIndexAnnotationName);
+                if (conditionAnnotation != null)
+                {
+                    conditionalList.Add(new EntityConditionalIndexInfo(CreateValueInfos(index.Properties),
+                        entityType.ClrType,
+                        conditionAnnotation.Value as LambdaExpression));
+                }
+            }
+            return conditionalList;
         }
 
         public bool HaveKeys(Type entityType)
