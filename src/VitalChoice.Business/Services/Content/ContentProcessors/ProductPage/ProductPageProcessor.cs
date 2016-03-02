@@ -174,6 +174,10 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
                     Label = eProduct.Name,
                     Url = productContent.Url
                 });
+                if(!string.IsNullOrEmpty(eProduct.SafeData.SubTitle))
+                {
+                    breadcrumbItems.Last().Label += " " + eProduct.Data.SubTitle;
+                }
             }
 
             var toReturn = new TtlProductPageModel();
