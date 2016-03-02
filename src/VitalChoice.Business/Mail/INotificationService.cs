@@ -45,5 +45,7 @@ namespace VitalChoice.Business.Mail
         Task SendGLOrdersImportEmailAsync(GLOrdersImportEmail model);
 
         Task SendOrderConfirmationEmailAsync(string email, OrderConfirmationEmail model);
+
+        Task SendOrderShippingConfirmationEmailAsync(string email, OrderShippingConfirmationEmail model);
     }
 }

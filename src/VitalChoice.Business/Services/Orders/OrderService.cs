@@ -923,7 +923,7 @@ namespace VitalChoice.Business.Services.Orders
                     }
                     if (item.PromoSkus != null)
                     {
-                        foreach (var skuOrdered in item.PromoSkus)
+                        foreach (var skuOrdered in item.PromoSkus.Where(p=>p.Enabled))
                         {
                             pOrder = pOrder || skuOrdered?.ProductWithoutSkus.IdObjectType == (int)ProductType.Perishable;
                             npOrder = npOrder || skuOrdered?.ProductWithoutSkus.IdObjectType == (int)ProductType.NonPerishable;

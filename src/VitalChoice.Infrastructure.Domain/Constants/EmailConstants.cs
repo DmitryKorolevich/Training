@@ -21,5 +21,6 @@
         public const string PrivacyRequestEmail = "PrivacyRequestEmail";
         public const string GLOrdersImportEmail = "GLOrdersImportEmail";
         public const string OrderConfirmationEmail = "OrderConfirmationEmail";
+        public const string OrderShippingConfirmationEmail = "OrderShippingConfirmationEmail";
     }
 }

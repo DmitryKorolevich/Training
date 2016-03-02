@@ -466,5 +466,22 @@ namespace VC.Admin.Controllers
             await _notificationService.SendOrderConfirmationEmailAsync(model.Email, emailModel);
             return true;
         }
+
+        [HttpPost]
+        public async Task<Result<bool>> SendOrderShippingConfirmationEmail(int id, [FromBody]OrderManualSendConfirmationModel model)
+        {
+            var order = await _orderService.SelectAsync(id, true);
+            if (order == null || order.OrderStatus == OrderStatus.Cancelled)
+            {
+                return false;
+            }
+
+            var emailModel = _mapper.ToModel<OrderShippingConfirmationEmail>(order);
+            if (emailModel == null)
+                return false;
+
+            await _notificationService.SendOrderShippingConfirmationEmailAsync(model.Email, emailModel);
+            return true;
+        }
     }
 }

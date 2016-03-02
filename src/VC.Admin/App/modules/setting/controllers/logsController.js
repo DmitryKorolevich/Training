@@ -19,8 +19,20 @@
         toaster.pop('error', "Error!", "Server error occured");
     };
 
-    function refreshLogs() {
-    	settingService.getLogItems($scope.filter, $scope.refreshTracker)
+    function refreshLogs()
+    {
+        var data = {};
+        angular.copy($scope.filter, data);
+        if (data.From)
+        {
+            data.From = data.From.toServerDateTime();
+        }
+        if (data.To)
+        {
+            data.To = data.To.toServerDateTime();
+        }
+
+        settingService.getLogItems(data, $scope.refreshTracker)
 			.success(function (result) {
 			    if (result.Success) {
 			        $scope.logs = result.Data.Items;

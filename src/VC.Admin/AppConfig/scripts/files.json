@@ -189,6 +189,7 @@
     "app/modules/order/controllers/ordersRegionStatisticController.js",
     "app/modules/order/controllers/ordersRegionStatisticDetailController.js",
     "app/modules/order/controllers/sendOrderConfirmationController.js",
+    "app/modules/order/controllers/sendOrderShippingConfirmationController.js",
     "app/modules/order/order.js",
     "app/modules/affiliate/controllers/affiliatesController.js",
     "app/modules/affiliate/controllers/affiliateManageController.js",

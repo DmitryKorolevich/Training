@@ -235,5 +235,15 @@ namespace VitalChoice.Business.Mail
                 await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body);
             }
         }
+
+        public async Task SendOrderShippingConfirmationEmailAsync(string email, OrderShippingConfirmationEmail model)
+        {
+            var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.OrderShippingConfirmationEmail, model);
+
+            if (generatedEmail != null)
+            {
+                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body);
+            }
+        }
     }
 }

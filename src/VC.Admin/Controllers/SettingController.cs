@@ -166,6 +166,10 @@ namespace VC.Admin.Controllers
         {
             var items = await _catalogRequestAddressService.GetCatalogRequestsAsync();
 
+            if (filter.To.HasValue)
+            {
+                filter.To = filter.To.Value.AddDays(1);
+            }
             var result = await logViewService.GetCommonItemsAsync(filter.LogLevel, filter.Message, filter.Source, filter.From, filter.To?.AddDays(1),
                 filter.Paging.PageIndex, filter.Paging.PageItemCount, filter.Sorting);
             var toReturn = new PagedList<LogListItemModel>

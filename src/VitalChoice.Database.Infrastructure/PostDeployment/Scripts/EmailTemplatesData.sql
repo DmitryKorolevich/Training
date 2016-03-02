@@ -1249,7 +1249,9 @@ INSERT INTO [dbo].[ContentItems]
                         						@(GiftMessage)
                                             </td>
                                             <td align="left" valign="top" style="padding: 5px 25px 5px 10px; font-size: 13px; color: #6d6e72; font-family: Arial, helvetica, sans-serif; text-align: center;">
-                                                Week of<br/>
+                                                @if(@(model.ShipDelayDate!=null || model.ShipDelayDateP!=null || model.ShipDelayDateNP!=null))
+                        			            {{
+												Week of<br/>
             		                            @if(ShipDelayDate){{
             		                                @date(ShipDelayDate){{MM''/''dd''/''yyyy}}
             		                            }}
@@ -1263,6 +1265,7 @@ INSERT INTO [dbo].[ContentItems]
             		                                    @date(ShipDelayDateP){{MM''/''dd''/''yyyy}}<br />
             		                                }}
             		                            }}
+												}}
                                             </td>
                         					<td align="left" valign="top" style="padding: 5px 0 5px 5px; font-size: 13px; color: #6d6e72; font-family: Arial, helvetica, sans-serif;">
                         						@(DeliveryInstructions)
@@ -1581,6 +1584,51 @@ INSERT INTO [dbo].[EmailTemplates]
            ,NULL
            ,'VitalChoice.Ecommerce.Domain.Mail.OrderConfirmationEmail'
            ,'Order Confirmation Email')
+
+END
+
+GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[EmailTemplates] WHERE [Name] = 'OrderShippingConfirmationEmail')
+BEGIN
+
+DECLARE @contentItemId int
+
+INSERT INTO [dbo].[ContentItems]
+           ([Created]
+           ,[Updated]
+           ,[Template]
+           ,[Description]
+           ,[Title]
+           ,[MetaKeywords]
+           ,[MetaDescription])
+     VALUES
+           (GETDATE()
+           ,GETDATE()
+           ,''
+           ,''
+           ,'Vital Choice - Order Shipping Confirmation Email'
+           ,NULL
+           ,NULL)
+
+SET @contentItemId=@@identity
+
+INSERT INTO [dbo].[EmailTemplates]
+           ([Name]
+           ,[ContentItemId]
+           ,[MasterContentItemId]
+           ,[StatusCode]
+           ,[UserId]
+           ,[ModelType]
+           ,[EmailDescription])
+     VALUES
+           ('OrderShippingConfirmationEmail'
+           ,@contentItemId
+           ,(SELECT Id FROM MasterContentItems WHERE Name='StoreFront Email Template')
+           ,2
+           ,NULL
+           ,'VitalChoice.Ecommerce.Domain.Mail.OrderShippingConfirmationEmail'
+           ,'Order Shipping Confirmation Email')
 
 END
 

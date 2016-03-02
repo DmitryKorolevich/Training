@@ -9,6 +9,7 @@ angular.module('app.modules.order',[
 	'app.modules.order.controllers.ordersRegionStatisticController',
 	'app.modules.order.controllers.ordersRegionStatisticDetailController',
 	'app.modules.order.controllers.sendOrderConfirmationController',
+	'app.modules.order.controllers.sendOrderShippingConfirmationController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',

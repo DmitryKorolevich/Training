@@ -27,6 +27,7 @@ using System.Reflection;
 using VitalChoice.Infrastructure.Domain.Mail;
 using Templates;
 using System.Dynamic;
+using Templates.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using Templates.Runtime;
 
@@ -149,6 +150,16 @@ namespace VitalChoice.Business.Services
 
                     var subjectTextTemplate = SubjectMasterTemplate.Replace("data", emailTemplate.ContentItem.Title ?? String.Empty);
                     subjectTemplate = new TtlTemplate(subjectTextTemplate, new CompileContext(typeof(T)));
+                }
+                catch (TemplateCompileException e)
+                {
+                    var messages = String.Empty;
+                    foreach (var ttlCompileError in e.Errors)
+                    {
+                        messages += ttlCompileError.Error + Environment.NewLine;
+                    }
+                    _logger.LogError(messages, e);
+                    return toReturn;
                 }
                 catch (Exception e)
                 {

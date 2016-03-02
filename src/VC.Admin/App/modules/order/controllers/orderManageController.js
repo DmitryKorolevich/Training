@@ -1551,6 +1551,18 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         }, { size: 'xs'});
     };
 
+    $scope.sendOrderShippingConfirmationEmail = function ()
+    {
+        modalUtil.open('app/modules/order/partials/sendOrderShippingConfirmationPopup.html', 'sendOrderShippingConfirmationController', {
+            email: $scope.currentCustomer.Email,
+            id: $scope.order.Id,
+            thenCallback: function (data)
+            {
+
+            }
+        }, { size: 'xs' });
+    };
+
     initialize();
 
 }]);
