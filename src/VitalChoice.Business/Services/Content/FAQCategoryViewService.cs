@@ -22,18 +22,14 @@ namespace VitalChoice.Business.Services.Content
 {
     public class FAQCategoryViewService : ContentViewService<ContentCategory, CategoryContentParametersModel>, IFAQCategoryViewService
     {
-        private readonly ICategoryService _categoryService;
-
         public FAQCategoryViewService(ITtlGlobalCache templatesCache,
             ILoggerProviderExtended loggerProvider,
             IContentProcessorService processorService,
             IRepositoryAsync<ContentCategory> contentRepository,
             IObjectMapper<CategoryContentParametersModel> mapper,
-            IObjectMapperFactory mapperFactory,
-            ICategoryService categoryService)
+            IObjectMapperFactory mapperFactory)
             : base(templatesCache, loggerProvider.CreateLoggerDefault(), processorService, contentRepository, mapper, mapperFactory)
         {
-            _categoryService = categoryService;
         }
 
         #region Public

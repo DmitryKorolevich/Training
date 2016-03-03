@@ -42,7 +42,6 @@ namespace VitalChoice.Business.Services.Content
 	    private readonly IRepositoryAsync<RecipeDefaultSetting> _recipeSettingRepository;
 	    private readonly IEcommerceRepositoryAsync<Product> _productRepository;
         private readonly ITtlGlobalCache templatesCache;
-	    private readonly IDataContextAsync _context;
 	    private readonly ILogger logger;
         private readonly ITransactionAccessor<VitalChoiceContext> _transactionAccessor;
         private readonly IObjectLogItemExternalService _objectLogItemExternalService;
@@ -56,8 +55,7 @@ namespace VitalChoice.Business.Services.Content
 			IRepositoryAsync<RecipeDefaultSetting> recipeSettingRepository,
 			IEcommerceRepositoryAsync<Product> productRepository,
             ILoggerProviderExtended loggerProvider, 
-            ITtlGlobalCache templatesCache, 
-            IDataContextAsync context,
+            ITtlGlobalCache templatesCache,
             ITransactionAccessor<VitalChoiceContext> transactionAccessor,
             IObjectLogItemExternalService objectLogItemExternalService)
         {
@@ -72,7 +70,6 @@ namespace VitalChoice.Business.Services.Content
 			_recipeSettingRepository = recipeSettingRepository;
 	        this._productRepository = productRepository;
             this.templatesCache = templatesCache;
-			_context = context;
             _transactionAccessor = transactionAccessor;
             _objectLogItemExternalService = objectLogItemExternalService;
             logger = loggerProvider.CreateLoggerDefault();
@@ -168,8 +165,8 @@ namespace VitalChoice.Business.Services.Content
 		        Include(p => p.RecipesToProducts).
 		        SelectAsync(false)).FirstOrDefault();
 
-            var productIds = toReturn.RecipesToProducts.Select(p => p.IdProduct).ToList();
-	        if (productIds.Count > 0)
+            var productIds = toReturn?.RecipesToProducts.Select(p => p.IdProduct).ToList();
+	        if (productIds?.Count > 0)
 	        {
 		        var shortProducts =
 			        (await _productRepository.Query(p => productIds.Contains(p.Id) && p.StatusCode != (int)RecordStatusCode.Deleted)

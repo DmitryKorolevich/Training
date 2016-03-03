@@ -33,7 +33,6 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
     {
         public IList<CustomerTypeCode> CustomerTypeCodes { get; set; }
 
-        //[ConvertWith(typeof(StringToBoolConverter))]
         public bool Preview { get; set; }
     }
 
@@ -45,14 +44,14 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
         private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoryEcommerceRepository;
         private readonly VProductSkuRepository _productRepository;
 	    private readonly ICustomerService _customerService;
-	    private readonly ReferenceData _referenceData;
 
 	    public ProductCategoryProcessor(IObjectMapper<ProductCategoryParameters> mapper,
             IProductCategoryService productCategoryService,
             IRepositoryAsync<ProductCategoryContent> productCategoryRepository,
             IRepositoryAsync<ProductContent> productContentRepository,
             IEcommerceRepositoryAsync<ProductToCategory> productToCategoryEcommerceRepository,
-            VProductSkuRepository productRepository, IAppInfrastructureService infrastructureService, ICustomerService customerService) : base(mapper)
+            VProductSkuRepository productRepository, 
+            ICustomerService customerService) : base(mapper)
         {
             _productCategoryService = productCategoryService;
             _productCategoryRepository = productCategoryRepository;
@@ -60,7 +59,6 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             _productToCategoryEcommerceRepository = productToCategoryEcommerceRepository;
             _productRepository = productRepository;
 		    _customerService = customerService;
-		    _referenceData = infrastructureService.Get();
         }
 
 	    private IList<CustomerTypeCode> GetCustomerVisibility(ProcessorViewContext viewContext)

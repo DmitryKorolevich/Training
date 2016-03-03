@@ -29,11 +29,9 @@ namespace VitalChoice.Business.Services.Products
         private readonly IRepositoryAsync<ProductCategoryContent> productCategoryRepository;
         private readonly IEcommerceRepositoryAsync<ProductCategory> productCategoryEcommerceRepository;
         private readonly IRepositoryAsync<ContentItem> contentItemRepository;
-        private readonly IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
         private readonly SPEcommerceRepository sPEcommerceRepository;
         private readonly IObjectLogItemExternalService objectLogItemExternalService;
-        private readonly ITtlGlobalCache templatesCache;
         private readonly ILogger logger;
 
         public ProductCategoryService(IRepositoryAsync<ProductCategoryContent> productCategoryRepository,
@@ -49,11 +47,9 @@ namespace VitalChoice.Business.Services.Products
             this.productCategoryRepository = productCategoryRepository;
             this.productCategoryEcommerceRepository = productCategoryEcommerceRepository;
             this.contentItemRepository = contentItemRepository;
-            this.contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
             this.contentTypeRepository = contentTypeRepository;
             this.sPEcommerceRepository = sPEcommerceRepository;
             this.objectLogItemExternalService = objectLogItemExternalService;
-            this.templatesCache = templatesCache;
             logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -292,11 +288,12 @@ namespace VitalChoice.Business.Services.Products
                 await productCategoryEcommerceRepository.UpdateAsync(dbItem);
 
                 var dbContentCategoryPart = (await productCategoryRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).FirstOrDefault();
-                dbContentCategoryPart.StatusCode = RecordStatusCode.Deleted;
-                await productCategoryRepository.UpdateAsync(dbContentCategoryPart);
-
-
-                toReturn = true;
+                if (dbContentCategoryPart != null)
+                {
+                    dbContentCategoryPart.StatusCode = RecordStatusCode.Deleted;
+                    await productCategoryRepository.UpdateAsync(dbContentCategoryPart);
+                    toReturn = true;
+                }
             }
             return toReturn;
         }

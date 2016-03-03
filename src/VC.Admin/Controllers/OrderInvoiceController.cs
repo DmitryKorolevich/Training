@@ -90,12 +90,7 @@ namespace VC.Admin.Controllers
         public async Task<IActionResult> Base(int id)
         {
             var order = await _orderService.SelectAsync(id,true);
-            CustomerDynamic customer = null;
-            if (order != null)
-            {
-                customer = await _customerService.SelectAsync(order.Customer.Id, true);
-            }
-            if(order==null || customer==null)
+            if(order==null)
             {
                 return View(null);
             }
@@ -111,7 +106,7 @@ namespace VC.Admin.Controllers
                 return View(null);
             }
 
-            OrderInvoiceModel model = await GenerateOrderInvoiceModel(order, customer);
+            OrderInvoiceModel model = _mapper.ToModel<OrderInvoiceModel>(order);
             string invoicePageUrl = String.Format(BaseAppConstants.ORDER_INVOICE_PAGE_URL_TEMPLATE, _options.Value.AdminHost, token.IdToken.ToString().ToLower());
             model.PDFUrl = String.Format(BaseAppConstants.PDF_URL_GENERATE_ORDER_INVOICE_TEMPLATE,_options.Value.PDFMyUrl.ServiceUrl,
                 _options.Value.PDFMyUrl.LicenseKey, WebUtility.UrlEncode(invoicePageUrl), order.Id);
@@ -144,30 +139,13 @@ namespace VC.Admin.Controllers
             }
 
             var order = await _orderService.SelectAsync(idOrder, true);
-            CustomerDynamic customer = null;
-            if (order != null)
-            {
-                customer = await _customerService.SelectAsync(order.Customer.Id, true);
-            }
-            if (order == null || customer == null)
+            if (order == null)
             {
                 return View(null);
             }
 
-            OrderInvoiceModel model = await GenerateOrderInvoiceModel(order, customer);
+            OrderInvoiceModel model = _mapper.ToModel<OrderInvoiceModel>(order);
             return View(model);
-        }
-
-        private async Task<OrderInvoiceModel> GenerateOrderInvoiceModel(OrderDynamic order, CustomerDynamic customer)
-        {
-            AdminProfile adminProfile = null;
-            if(order.IdEditedBy.HasValue)
-            {
-                adminProfile = await _adminUserService.GetAdminProfileAsync(order.IdEditedBy.Value);
-            }
-            OrderInvoiceModel toReturn = _mapper.ToModel<OrderInvoiceModel>(order);
-            toReturn.FillAdditionalFields(order, customer, adminProfile, _appInfrastructureService,_pstTimeZoneInfo, _trackingService,_addressMapper, _countryService);
-            return toReturn;
-        }     
+        } 
     }
 }

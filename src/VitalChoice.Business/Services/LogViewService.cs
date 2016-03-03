@@ -26,7 +26,7 @@ namespace VitalChoice.Business.Services
             query = query.GetItems(logLevel, message, source, from, to);
 
 			Func<IQueryable<CommonLogItem>, IOrderedQueryable<CommonLogItem>> sortable = x => x.OrderByDescending(pp => pp.Date);
-			if (sorting.SortOrder != SortOrder.None)
+			if (sorting != null && sorting.SortOrder != SortOrder.None)
 	        {
 				var sortOrder = sorting.SortOrder;
 				switch (sorting.Path)

@@ -54,19 +54,16 @@ namespace VitalChoice.Business.Services.Affiliates
         private readonly IEcommerceRepositoryAsync<AffiliatePayment> _affiliatePaymentRepository;
         private readonly INotificationService _notificationService;
         private readonly IAffiliateUserService _affiliateUserService;
-        private readonly IEcommerceRepositoryAsync<VCustomer> _vCustomerRepositoryAsync;
         private readonly IEcommerceRepositoryAsync<Customer> _customerRepositoryAsync;
         private readonly IOptions<AppOptions> _appOptions;
 
         public AffiliateService(IEcommerceRepositoryAsync<VAffiliate> vAffiliateRepository,
             IEcommerceRepositoryAsync<VAffiliateNotPaidCommission> vAffiliateNotPaidCommissionRepository,
-            IEcommerceRepositoryAsync<Lookup> lookupRepository,
             IEcommerceRepositoryAsync<Affiliate> affiliateRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
             IEcommerceRepositoryAsync<VCustomerInAffiliate> vCustomerInAffiliateRepository,
             AffiliateOrderPaymentRepository affiliateOrderPaymentRepository,
             IEcommerceRepositoryAsync<AffiliatePayment> affiliatePaymentRepository,
-            IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync,
             IEcommerceRepositoryAsync<Customer> customerRepositoryAsync,
             AffiliateMapper mapper,
             IObjectLogItemExternalService objectLogItemExternalService,
@@ -89,7 +86,6 @@ namespace VitalChoice.Business.Services.Affiliates
             _adminProfileRepository = adminProfileRepository;
             _notificationService = notificationService;
             _affiliateUserService = affiliateUserService;
-            _vCustomerRepositoryAsync = vCustomerRepositoryAsync;
             _customerRepositoryAsync = customerRepositoryAsync;
             _appOptions = appOptions;
         }

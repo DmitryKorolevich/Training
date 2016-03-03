@@ -26,7 +26,6 @@ namespace VitalChoice.Business.Services.Content
     {
         private readonly IRepositoryAsync<FAQ> faqRepository;
         private readonly IRepositoryAsync<ContentCategory> contentCategoryRepository;
-        private readonly IRepositoryAsync<ContentItem> contentItemRepository;
         private readonly IRepositoryAsync<FAQToContentCategory> faqToContentCategoryRepository;
         private readonly IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
@@ -36,7 +35,6 @@ namespace VitalChoice.Business.Services.Content
 
         public FAQService(IRepositoryAsync<FAQ> faqRepository,
             IRepositoryAsync<ContentCategory> contentCategoryRepository,
-            IRepositoryAsync<ContentItem> contentItemRepository,
             IRepositoryAsync<FAQToContentCategory> faqToContentCategoryRepository,
             IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
@@ -46,7 +44,6 @@ namespace VitalChoice.Business.Services.Content
         {
             this.faqRepository = faqRepository;
             this.contentCategoryRepository = contentCategoryRepository;
-            this.contentItemRepository = contentItemRepository;
             this.faqToContentCategoryRepository = faqToContentCategoryRepository;
             this.contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
             this.contentTypeRepository = contentTypeRepository;

@@ -20,18 +20,14 @@ namespace VitalChoice.Business.Services.Content
 {
     public class ArticleViewService : ContentViewService<Article, ContentParametersModel>, IArticleViewService
     {
-        private readonly IArticleService _articleService;
-
         public ArticleViewService(ITtlGlobalCache templatesCache,
             ILoggerProviderExtended loggerProvider,
             IContentProcessorService processorService,
             IRepositoryAsync<Article> contentRepository,
             IObjectMapper<ContentParametersModel> mapper,
-            IObjectMapperFactory mapperFactory,
-            IArticleService articleService)
+            IObjectMapperFactory mapperFactory)
             : base(templatesCache, loggerProvider.CreateLoggerDefault(), processorService, contentRepository, mapper, mapperFactory)
         {
-            _articleService = articleService;
         }
 	}
 }

@@ -25,9 +25,7 @@ namespace VitalChoice.Business.Services.Content
     {
         private readonly IRepositoryAsync<ContentPage> contentPageRepository;
         private readonly IRepositoryAsync<ContentCategory> contentCategoryRepository;
-        private readonly IRepositoryAsync<ContentItem> contentItemRepository;
         private readonly IRepositoryAsync<ContentPageToContentCategory> contentPageToContentCategoryRepository;
-        private readonly IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
         private readonly IObjectLogItemExternalService objectLogItemExternalService;
         private readonly ITtlGlobalCache templatesCache;
@@ -45,9 +43,7 @@ namespace VitalChoice.Business.Services.Content
         {
             this.contentPageRepository = contentPageRepository;
             this.contentCategoryRepository = contentCategoryRepository;
-            this.contentItemRepository = contentItemRepository;
             this.contentPageToContentCategoryRepository = contentPageToContentCategoryRepository;
-            this.contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
             this.contentTypeRepository = contentTypeRepository;
             this.objectLogItemExternalService = objectLogItemExternalService;
             this.templatesCache = templatesCache;

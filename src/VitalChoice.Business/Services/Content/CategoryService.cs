@@ -27,7 +27,6 @@ namespace VitalChoice.Business.Services.Content
     public class CategoryService : ICategoryService
     {
         private readonly IRepositoryAsync<ContentCategory> contentCategoryRepository;
-        private readonly IRepositoryAsync<ContentItem> contentItemRepository;
         private readonly IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
         private readonly IRepositoryAsync<RecipeToContentCategory> recipeToContentCategory;
@@ -43,7 +42,6 @@ namespace VitalChoice.Business.Services.Content
         private readonly ILogger logger;
 
         public CategoryService(IRepositoryAsync<ContentCategory> contentCategoryRepository,
-            IRepositoryAsync<ContentItem> contentItemRepository,
             IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             IRepositoryAsync<RecipeToContentCategory> recipeToContentCategory, IRepositoryAsync<Recipe> recipeRepository,
@@ -57,7 +55,6 @@ namespace VitalChoice.Business.Services.Content
             ITtlGlobalCache templatesCache)
         {
             this.contentCategoryRepository = contentCategoryRepository;
-            this.contentItemRepository = contentItemRepository;
             this.contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
             this.contentTypeRepository = contentTypeRepository;
             this.recipeToContentCategory = recipeToContentCategory;

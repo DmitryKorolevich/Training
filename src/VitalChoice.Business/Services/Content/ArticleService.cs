@@ -29,11 +29,9 @@ namespace VitalChoice.Business.Services.Content
     {
         private readonly IRepositoryAsync<Article> _articleRepository;
         private readonly IRepositoryAsync<ContentCategory> _contentCategoryRepository;
-        private readonly IRepositoryAsync<ContentItem> _contentItemRepository;
         private readonly IRepositoryAsync<ArticleToContentCategory> _articleToContentCategoryRepository;
         private readonly IRepositoryAsync<ContentItemToContentProcessor> _contentItemToContentProcessorRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> _contentTypeRepository;
-        private readonly IEcommerceRepositoryAsync<ProductOptionType> _optionTypeRepository;
         private readonly IRepositoryAsync<ArticleToProduct> _articleToProductRepository;
         private readonly IEcommerceRepositoryAsync<Product> _productRepository;
         private readonly ITtlGlobalCache _templatesCache;
@@ -52,11 +50,8 @@ namespace VitalChoice.Business.Services.Content
             ILoggerProviderExtended logger, 
             ITtlGlobalCache templatesCache)
         {
-            this._optionTypeRepository = optionTypeRepository;
-
             this._articleRepository = articleRepository;
             this._contentCategoryRepository = contentCategoryRepository;
-            this._contentItemRepository = contentItemRepository;
             this._articleToContentCategoryRepository = articleToContentCategoryRepository;
             this._contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
             this._contentTypeRepository = contentTypeRepository;

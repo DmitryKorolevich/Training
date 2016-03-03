@@ -37,11 +37,7 @@ namespace VitalChoice.Business.Services.HelpService
         private readonly IRepositoryAsync<BugTicket> _bugTicketRepository;
         private readonly IRepositoryAsync<BugTicketComment> _bugTicketCommentRepository;
         private readonly IRepositoryAsync<BugFile> _bugFileRepository;
-        private readonly IHttpContextAccessor _contextAccessor;
-        private readonly EcommerceContext _context;
-        private readonly VitalChoiceContext _infrastructureContext;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
-        private readonly ICustomerService _customerService;
         private readonly INotificationService _notificationService;
         private readonly IBlobStorageClient _storageClient;
         private static string _bugTicketFilesContainerName;
@@ -56,11 +52,7 @@ namespace VitalChoice.Business.Services.HelpService
             IRepositoryAsync<BugTicket> bugTicketRepository,
             IRepositoryAsync<BugTicketComment> bugTicketCommentRepository,
             IRepositoryAsync<BugFile> bugFileRepository,
-            IHttpContextAccessor contextAccessor,
-            EcommerceContext context,
-            VitalChoiceContext infrastructureContext,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
-            ICustomerService customerService,
             INotificationService notificationService,
             IBlobStorageClient storageClient,
             IOptions<AppOptions> appOptions,
@@ -73,11 +65,7 @@ namespace VitalChoice.Business.Services.HelpService
             _bugTicketRepository = bugTicketRepository;
             _bugTicketCommentRepository = bugTicketCommentRepository;
             _bugFileRepository = bugFileRepository;
-            _contextAccessor = contextAccessor;
-            _context = context;
-            _infrastructureContext = infrastructureContext;
             _adminProfileRepository = adminProfileRepository;
-            _customerService = customerService;
             _notificationService = notificationService;
             _storageClient = storageClient;
             _ecommerceTransactionAccessor = ecommerceTransactionAccessor;
@@ -226,10 +214,13 @@ namespace VitalChoice.Business.Services.HelpService
                     else
                     {
                         var dbItem = (await _helpTicketRepository.Query(p => p.Id == item.Id).SelectAsync(false)).FirstOrDefault();
-                        item.IdOrder = dbItem.IdOrder;
-                        item.DateCreated = dbItem.DateCreated;
-                        item.DateEdited = DateTime.Now;
-                        await _helpTicketRepository.UpdateAsync(item);
+                        if (dbItem != null)
+                        {
+                            item.IdOrder = dbItem.IdOrder;
+                            item.DateCreated = dbItem.DateCreated;
+                            item.DateEdited = DateTime.Now;
+                            await _helpTicketRepository.UpdateAsync(item);
+                        }
                     }
 
                     transaction.Commit();
@@ -276,7 +267,7 @@ namespace VitalChoice.Business.Services.HelpService
                 item.HelpTicket = await GetHelpTicketAsync(item.IdHelpTicket);
 
                 var adminProfile = (await _adminProfileRepository.Query(p => p.Id == item.IdEditedBy).SelectAsync(false)).FirstOrDefault();
-                item.EditedBy = adminProfile.AgentId;
+                item.EditedBy = adminProfile?.AgentId;
             }
 
             return item;
@@ -310,22 +301,29 @@ namespace VitalChoice.Business.Services.HelpService
                     {
                         var dbItem = (await _helpTicketCommentRepository.Query(p => p.Id == item.Id).SelectAsync(false)).FirstOrDefault();
 
-                        if ((dbItem.IdEditedBy.HasValue && !item.IdEditedBy.HasValue) || (!dbItem.IdEditedBy.HasValue && item.IdEditedBy.HasValue))
+                        if (dbItem != null)
                         {
-                            throw new Exception("The help ticket can't be updated by the given user.");
-                        }
+                            if ((dbItem.IdEditedBy.HasValue && !item.IdEditedBy.HasValue) ||
+                                (!dbItem.IdEditedBy.HasValue && item.IdEditedBy.HasValue))
+                            {
+                                throw new Exception("The help ticket can't be updated by the given user.");
+                            }
 
-                        item.Order = dbItem.Order;
-                        item.IdHelpTicket = dbItem.IdHelpTicket;
-                        item.DateCreated = dbItem.DateCreated;
-                        item.DateEdited = now;
-                        await _helpTicketCommentRepository.UpdateAsync(item);
+                            item.Order = dbItem.Order;
+                            item.IdHelpTicket = dbItem.IdHelpTicket;
+                            item.DateCreated = dbItem.DateCreated;
+                            item.DateEdited = now;
+                            await _helpTicketCommentRepository.UpdateAsync(item);
+                        }
                     }
 
                     var condition = new HelpTicketQuery().NotDeleted().WithId(item.IdHelpTicket);
                     var helpTicket = (await _helpTicketRepository.Query(condition).SelectAsync()).FirstOrDefault();
-                    helpTicket.DateEdited = now;
-                    await _helpTicketRepository.UpdateAsync(helpTicket);
+                    if (helpTicket != null)
+                    {
+                        helpTicket.DateEdited = now;
+                        await _helpTicketRepository.UpdateAsync(helpTicket);
+                    }
 
                     transaction.Commit();
                 }
@@ -369,15 +367,17 @@ namespace VitalChoice.Business.Services.HelpService
 
                 var condition = new HelpTicketQuery().NotDeleted().WithId(item.IdHelpTicket);
                 var helpTicket = (await _helpTicketRepository.Query(condition).SelectAsync()).FirstOrDefault();
-                helpTicket.DateEdited = DateTime.Now;
-                await _helpTicketRepository.UpdateAsync(helpTicket);
-
-                if (adminId.HasValue)
+                if (helpTicket != null)
                 {
-                    await NotifyCustomer(item.IdHelpTicket);
-                }
+                    helpTicket.DateEdited = DateTime.Now;
+                    await _helpTicketRepository.UpdateAsync(helpTicket);
 
-                return true;
+                    if (adminId.HasValue)
+                    {
+                        await NotifyCustomer(item.IdHelpTicket);
+                    }
+                    return true;
+                }
             }
 
             return false;
@@ -562,16 +562,19 @@ namespace VitalChoice.Business.Services.HelpService
                     else
                     {
                         var dbItem = (await _bugTicketRepository.Query(p => p.Id == item.Id).SelectAsync(false)).FirstOrDefault();
-                        if (isSuperAdmin.HasValue && !isSuperAdmin.Value && adminId != dbItem.IdAddedBy)
+                        if (dbItem != null)
                         {
-                            return item;
+                            if (isSuperAdmin.HasValue && !isSuperAdmin.Value && adminId != dbItem.IdAddedBy)
+                            {
+                                return item;
+                            }
+                            item.DateCreated = dbItem.DateCreated;
+                            item.PublicId = dbItem.PublicId;
+                            item.IdAddedBy = dbItem.IdAddedBy;
+                            item.DateEdited = DateTime.Now;
+                            item.IdEditedBy = adminId;
+                            await _bugTicketRepository.UpdateAsync(item);
                         }
-                        item.DateCreated = dbItem.DateCreated;
-                        item.PublicId = dbItem.PublicId;
-                        item.IdAddedBy = dbItem.IdAddedBy;
-                        item.DateEdited = DateTime.Now;
-                        item.IdEditedBy = adminId;
-                        await _bugTicketRepository.UpdateAsync(item);
                     }
 
                     transaction.Commit();
@@ -663,23 +666,29 @@ namespace VitalChoice.Business.Services.HelpService
                     else
                     {
                         var dbItem = (await _bugTicketCommentRepository.Query(p => p.Id == item.Id).SelectAsync(false)).FirstOrDefault();
-                        item.Order = dbItem.Order;
-                        item.IdBugTicket = dbItem.IdBugTicket;
-                        item.DateCreated = dbItem.DateCreated;
-                        item.PublicId = dbItem.PublicId;
-                        item.DateEdited = now;
-                        await _bugTicketCommentRepository.UpdateAsync(item);
+                        if (dbItem != null)
+                        {
+                            item.Order = dbItem.Order;
+                            item.IdBugTicket = dbItem.IdBugTicket;
+                            item.DateCreated = dbItem.DateCreated;
+                            item.PublicId = dbItem.PublicId;
+                            item.DateEdited = now;
+                            await _bugTicketCommentRepository.UpdateAsync(item);
+                        }
                     }
 
                     var condition = new BugTicketQuery().NotDeleted().WithId(item.IdBugTicket);
                     bugTicket = (await _bugTicketRepository.Query(condition).SelectAsync()).FirstOrDefault();
-                    bugTicket.DateEdited = now;
-                    bugTicket.IdEditedBy = item.IdEditedBy;
-                    await _bugTicketRepository.UpdateAsync(bugTicket);
+                    if (bugTicket != null)
+                    {
+                        bugTicket.DateEdited = now;
+                        bugTicket.IdEditedBy = item.IdEditedBy;
+                        await _bugTicketRepository.UpdateAsync(bugTicket);
+                    }
 
                     transaction.Commit();
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     transaction.Rollback();
                     throw;
@@ -694,7 +703,7 @@ namespace VitalChoice.Business.Services.HelpService
                 item.EditedByAgent = adminProfile.AgentId;
             }
 
-            if (bugTicket.IdAddedBy != item.IdEditedBy)
+            if (bugTicket != null && bugTicket.IdAddedBy != item.IdEditedBy)
             {
                 await NotifyAuthor(item.IdBugTicket);
             }
@@ -716,16 +725,19 @@ namespace VitalChoice.Business.Services.HelpService
 
                 var condition = new BugTicketQuery().NotDeleted().WithId(item.IdBugTicket);
                 var bugTicket = (await _bugTicketRepository.Query(condition).SelectAsync()).FirstOrDefault();
-                bugTicket.DateEdited = DateTime.Now;
-                bugTicket.IdEditedBy = adminId;
-                await _bugTicketRepository.UpdateAsync(bugTicket);
-
-                if (bugTicket.IdAddedBy != adminId)
+                if (bugTicket != null)
                 {
-                    await NotifyAuthor(item.IdBugTicket);
-                }
+                    bugTicket.DateEdited = DateTime.Now;
+                    bugTicket.IdEditedBy = adminId;
+                    await _bugTicketRepository.UpdateAsync(bugTicket);
 
-                return true;
+                    if (bugTicket.IdAddedBy != adminId)
+                    {
+                        await NotifyAuthor(item.IdBugTicket);
+                    }
+
+                    return true;
+                }
             }
 
             return false;

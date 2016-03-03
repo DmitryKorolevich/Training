@@ -24,27 +24,7 @@ namespace VitalChoice.Business.Services
         private readonly ILogger logger;
         private readonly IOptions<AppOptions> appOptions;
         private static string error = "";
-
-        //public static void Init(string rootDir)
-        //{
-        //    if (!String.IsNullOrEmpty(rootDir))
-        //    {
-        //        try
-        //        {
-        //            _rootDir = rootDir.ToLower();
-        //            DirectoryInfo dirInfo = new DirectoryInfo(rootDir);
-        //            if (!dirInfo.Exists)
-        //            {
-        //                dirInfo.Create();
-        //            }
-        //        }
-        //        catch(Exception e)
-        //        {
-        //            error += e.ToString();
-        //        }
-        //    }
-        //}
-
+        
         public FileService(IOptions<AppOptions> appOptions, ILoggerProviderExtended loggerProvider)
         {
             this.logger = loggerProvider.CreateLoggerDefault();
@@ -190,7 +170,7 @@ namespace VitalChoice.Business.Services
             {
                 resDir = "/";
             }
-            toReturn = new FileInfoObject(Path.GetFileName(path).ToLower(), ConvertPathToUrl(path), resDir, content.Length, fileInfo.LastWriteTime,
+            toReturn = new FileInfoObject(Path.GetFileName(path)?.ToLower(), ConvertPathToUrl(path), resDir, content.Length, fileInfo.LastWriteTime,
                 appOptions.Value.FilesRelativePath);
 
             return toReturn;

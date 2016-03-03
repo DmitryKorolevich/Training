@@ -1134,7 +1134,7 @@ namespace VitalChoice.Business.Services.Orders
         {
             List<OrderBaseImportItem> toReturn = new List<OrderBaseImportItem>();
 
-            Type orderImportItemType = null;
+            Type orderImportItemType;
             if (orderType == OrderType.GiftList)
             {
                 orderImportItemType = typeof(OrderGiftListImportItem);
@@ -1157,8 +1157,7 @@ namespace VitalChoice.Business.Services.Orders
             var skuProperty = skuProperties.FirstOrDefault(p => p.Name == nameof(OrderSkuImportItem.SKU));
             var skuBaseHeader = skuProperty?.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault()?.Name;
             var qtyProperty = skuProperties.FirstOrDefault(p => p.Name == nameof(OrderSkuImportItem.QTY));
-            // TODO -1
-            var qtyBaseHeader = qtyProperty?.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault().Name;// ReSharper disable all
+            var qtyBaseHeader = qtyProperty?.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault()?.Name;// ReSharper disable all
 
             int rowNumber = 1;
             try

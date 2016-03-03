@@ -43,6 +43,7 @@ namespace VitalChoice.Business.Repositories
             VOrderWithRegionInfoItemQuery conditions = new VOrderWithRegionInfoItemQuery().WithDates(filter.From, filter.To).
                 WithIdCustomerType(filter.IdCustomerType).WithIdOrderType(filter.IdOrderType).WithRegion(filter.Region).WithZip(filter.Zip);
 
+            // ReSharper disable once PossibleNullReferenceException
             var toReturn = await (this.Context as DbContext).Set<VOrderWithRegionInfoItem>().Where(conditions.Query()).SumAsync(p => p.Total);
             return toReturn;
         }

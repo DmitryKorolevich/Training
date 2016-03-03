@@ -386,15 +386,18 @@ namespace VitalChoice.Business.Services
         private void SetupAppSettings()
         {
             var affiliateReportDateOption = appOptionRepository.Query(p => p.OptionName == AffiliateConstants.AffiliateOrderPaymentsCountToDateOptionName).Select().FirstOrDefault();
-            var firstDayOfCurrentMonth = DateTime.Now;
-            firstDayOfCurrentMonth = new DateTime(firstDayOfCurrentMonth.Year, firstDayOfCurrentMonth.Month, 1);
-            var date = TimeZoneInfo.ConvertTime(firstDayOfCurrentMonth, _pstTimeZoneInfo, TimeZoneInfo.Local);
-            var dbDate = DateTime.MinValue;
-            DateTime.TryParse(affiliateReportDateOption.OptionValue, out dbDate);
-            if(date!= dbDate)
+            if (affiliateReportDateOption != null)
             {
-                affiliateReportDateOption.OptionValue = date.ToString("yyyy-MM-dd hh:mm:ss.fff");
-                appOptionRepository.Update(affiliateReportDateOption);
+                var firstDayOfCurrentMonth = DateTime.Now;
+                firstDayOfCurrentMonth = new DateTime(firstDayOfCurrentMonth.Year, firstDayOfCurrentMonth.Month, 1);
+                var date = TimeZoneInfo.ConvertTime(firstDayOfCurrentMonth, _pstTimeZoneInfo, TimeZoneInfo.Local);
+                var dbDate = DateTime.MinValue;
+                DateTime.TryParse(affiliateReportDateOption.OptionValue, out dbDate);
+                if (date != dbDate)
+                {
+                    affiliateReportDateOption.OptionValue = date.ToString("yyyy-MM-dd hh:mm:ss.fff");
+                    appOptionRepository.Update(affiliateReportDateOption);
+                }
             }
         }
 

@@ -24,18 +24,14 @@ namespace VitalChoice.Business.Services.Content
 {
     public class FAQViewService : ContentViewService<FAQ, ContentParametersModel>, IFAQViewService
     {
-        private readonly IRecipeService _recipeService;
-
         public FAQViewService(ITtlGlobalCache templatesCache,
             ILoggerProviderExtended loggerProvider,
             IContentProcessorService processorService,
             IRepositoryAsync<FAQ> contentRepository,
             IObjectMapper<ContentParametersModel> mapper,
-            IObjectMapperFactory mapperFactory,
-            IRecipeService recipeService)
+            IObjectMapperFactory mapperFactory)
             : base(templatesCache, loggerProvider.CreateLoggerDefault(), processorService, contentRepository, mapper, mapperFactory)
         {
-            _recipeService = recipeService;
         }
     }
 }

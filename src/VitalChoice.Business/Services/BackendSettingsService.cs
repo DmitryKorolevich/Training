@@ -10,18 +10,15 @@ namespace VitalChoice.Business.Services
 {
     public class BackendSettingsService : IBackendSettingsService
     {
-        private readonly IOptions<AppOptions> _appOptions;
         private readonly IEcommerceRepositoryAsync<Country> _countryRepository;
         private readonly IEcommerceRepositoryAsync<State> _stateRepository;
         private readonly ILogger _logger;
 
         public BackendSettingsService(
-            IOptions<AppOptions> appOptions,
             IEcommerceRepositoryAsync<Country> countryRepository,
             IEcommerceRepositoryAsync<State> stateRepository,
             ILoggerProviderExtended loggerProvider)
         {
-            _appOptions = appOptions;
             _countryRepository = countryRepository;
             _stateRepository = stateRepository;
             _logger = loggerProvider.CreateLoggerDefault();

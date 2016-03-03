@@ -13,16 +13,13 @@ namespace VitalChoice.Business.Services
     {
         private readonly IRepositoryAsync<FedExZone> _fedExZoneRepository;
         private readonly IRepositoryAsync<VitalGreenRequest> _vitalGreenRequestRepository;
-        private readonly IFedExService _fedExService;
 
         public VitalGreenService(
             IRepositoryAsync<FedExZone> fedExZoneRepository,
-            IRepositoryAsync<VitalGreenRequest> vitalGreenRequestRepository,
-            IFedExService fedExService)
+            IRepositoryAsync<VitalGreenRequest> vitalGreenRequestRepository)
         {
             _fedExZoneRepository = fedExZoneRepository;
             _vitalGreenRequestRepository = vitalGreenRequestRepository;
-            _fedExService = fedExService;
         }
 
         public async Task<VitalGreenReportModel> GetVitalGreenReport(DateTime start)
@@ -44,7 +41,7 @@ namespace VitalChoice.Business.Services
             {
                 VitalGreenReportZoneStatisticModel model = new VitalGreenReportZoneStatisticModel();
                 model.Zone = zone;
-                model.CompletedCount = requests.Where(p => p.ZoneId == zone.Id).Count();
+                model.CompletedCount = requests.Count(p => p.ZoneId == zone.Id);
                 toReturn.Zones.Add(model);
             }
 

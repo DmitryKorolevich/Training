@@ -25,10 +25,7 @@ namespace VitalChoice.Business.ModelConverters
         private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly ICountryService _countryService;
         private readonly ICustomerService _customerService;
-        private readonly ReferenceData _referenceData;
         private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
-        private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
-        private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
         private readonly IOptions<AppOptions> _options;
 
         public OrderShippingConfirmationEmailModelConverter(
@@ -43,10 +40,7 @@ namespace VitalChoice.Business.ModelConverters
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             _countryService = countryService;
             _customerService = customerService;
-            _referenceData = appInfrastructureService.Get();
             _addressMapper = addressMapper;
-            _skuMapper = skuMapper;
-            _productMapper = productMapper;
             _options = options;
         }
 

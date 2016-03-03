@@ -36,7 +36,6 @@ namespace VitalChoice.Business.Services
     public class EmailTemplateService : IEmailTemplateService
     {
         private readonly IRepositoryAsync<EmailTemplate> _emailTemplateRepository;
-        private readonly IRepositoryAsync<ContentItem> _contentItemRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> _contentTypeRepository;
         private readonly ITtlGlobalCache _templatesCache;
         private readonly ILogger _logger;
@@ -45,12 +44,10 @@ namespace VitalChoice.Business.Services
 
         public EmailTemplateService(
             IRepositoryAsync<EmailTemplate> emailTemplateRepository,
-            IRepositoryAsync<ContentItem> contentItemRepository,
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             ILoggerProviderExtended logger, ITtlGlobalCache templatesCache)
         {
             this._emailTemplateRepository = emailTemplateRepository;
-            this._contentItemRepository = contentItemRepository;
             this._contentTypeRepository = contentTypeRepository;
             this._templatesCache = templatesCache;
             this._logger = logger.CreateLoggerDefault();
