@@ -1249,9 +1249,7 @@ INSERT INTO [dbo].[ContentItems]
                         						@(GiftMessage)
                                             </td>
                                             <td align="left" valign="top" style="padding: 5px 25px 5px 10px; font-size: 13px; color: #6d6e72; font-family: Arial, helvetica, sans-serif; text-align: center;">
-                                                @if(@(model.ShipDelayDate!=null || model.ShipDelayDateP!=null || model.ShipDelayDateNP!=null))
-                        			            {{
-												Week of<br/>
+                                                Week of<br/>
             		                            @if(ShipDelayDate){{
             		                                @date(ShipDelayDate){{MM''/''dd''/''yyyy}}
             		                            }}
@@ -1265,7 +1263,6 @@ INSERT INTO [dbo].[ContentItems]
             		                                    @date(ShipDelayDateP){{MM''/''dd''/''yyyy}}<br />
             		                                }}
             		                            }}
-												}}
                                             </td>
                         					<td align="left" valign="top" style="padding: 5px 0 5px 5px; font-size: 13px; color: #6d6e72; font-family: Arial, helvetica, sans-serif;">
                         						@(DeliveryInstructions)
@@ -1343,8 +1340,22 @@ INSERT INTO [dbo].[ContentItems]
                                         @if(@model.PromoSkus.Count>0)
                                         {{
                                             <tr>
-                                                <td colspan="6" style="text-align:left; padding:0 5px 0 0; font-size:13px; color:#6d6e72; font-family:Arial, helvetica, sans-serif;">
-                                                    Promo Items
+                                                <td colspan="6">
+                                                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;" bgcolor="#f15c22">
+                                                        <tr>
+                                                            <td>
+                                                                <!-- Full Width Body Content -->
+                                                                <table class="content" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                                                                    <tr>
+                                                                        <td align="center" style="padding:5px 10px 5px 20px; font-size:16px; color:#FFFFFF; font-weight:bold; font-family:Arial, helvetica, sans-serif; min-width:110px;">
+                                                                            Promo Products
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                                <!-- End Full Width Body Content -->
+                                                            </td>
+                                                        </tr>
+                                                    </table>
                                                 </td>
                                             </tr>
                                             @list(PromoSkus){{
@@ -1390,6 +1401,7 @@ INSERT INTO [dbo].[ContentItems]
                                                     Discount: @money(DiscountTotal)<br />
                                                     Shipping: @money(ShippingTotal)<br />
                                                     Tax: @money(TaxTotal)<br />
+                                                    Gift Certificates: @money(GiftCertificatesTotal)<br />
                                                     <br />
                                                     <strong>Total: @money(Total)</strong>
                                                 </td>

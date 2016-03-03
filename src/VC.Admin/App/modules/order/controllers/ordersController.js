@@ -14,7 +14,19 @@
         {
             var filter = $scope.forms.IsActive ? $scope.filter : $scope.directOrdersfilter;
             filter.Sorting = $scope.filter.Sorting;
-            orderService.getOrders(filter, $scope.refreshTracker)
+
+            var data = {};
+            angular.copy(filter, data);
+            if (data.From)
+            {
+                data.From = data.From.toServerDateTime();
+            }
+            if (data.To)
+            {
+                data.To = data.To.toServerDateTime();
+            }
+
+            orderService.getOrders(data, $scope.refreshTracker)
                 .success(function (result)
                 {
                     if (result.Success)

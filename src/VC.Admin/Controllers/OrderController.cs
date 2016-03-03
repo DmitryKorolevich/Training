@@ -144,6 +144,11 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<PagedList<OrderListItemModel>>> GetOrders([FromBody]VOrderFilter filter)
         {
+            if (filter.To.HasValue)
+            {
+                filter.To = filter.To.Value.AddDays(1);
+            }
+
             var result = await _orderService.GetOrdersAsync(filter);
 
             var toReturn = new PagedList<OrderListItemModel>

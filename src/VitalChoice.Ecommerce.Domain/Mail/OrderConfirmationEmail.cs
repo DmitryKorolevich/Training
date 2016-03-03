@@ -86,6 +86,8 @@ namespace VitalChoice.Ecommerce.Domain.Mail
         [Map]
         public decimal Total { get; set; }
 
+        public decimal GiftCertificatesTotal { get; set; }
+
         public string PaymentTypeMessage { get; set; }
     }
 }

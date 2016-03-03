@@ -1139,21 +1139,26 @@ namespace VitalChoice.Business.Services.Orders
             {
                 orderImportItemType = typeof(OrderGiftListImportItem);
             }
-            if (orderType == OrderType.DropShip)
+            else if (orderType == OrderType.DropShip)
             {
-                orderImportItemType = typeof(OrderDropShipImportItem);
+                orderImportItemType = typeof (OrderDropShipImportItem);
+            }
+            else
+            {
+                throw new ApiException("Orders import with the given orderType isn't implemented");
             }
             PropertyInfo[] modelProperties = orderImportItemType.GetProperties();
             validationSettings = GetOrderImportValidationSettings(modelProperties);
 
             var shipDateProperty = modelProperties.FirstOrDefault(p => p.Name == nameof(OrderGiftListImportItem.ShipDelayDate));
-            var shipDateHeader = shipDateProperty.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault().Name;
+            var shipDateHeader = shipDateProperty?.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault()?.Name;
 
             var skuProperties = typeof(OrderSkuImportItem).GetProperties();
             var skuProperty = skuProperties.FirstOrDefault(p => p.Name == nameof(OrderSkuImportItem.SKU));
-            var skuBaseHeader = skuProperty.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault().Name;
+            var skuBaseHeader = skuProperty?.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault()?.Name;
             var qtyProperty = skuProperties.FirstOrDefault(p => p.Name == nameof(OrderSkuImportItem.QTY));
-            var qtyBaseHeader = qtyProperty.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault().Name;
+            // TODO -1
+            var qtyBaseHeader = qtyProperty?.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault().Name;// ReSharper disable all
 
             int rowNumber = 1;
             try
@@ -1230,8 +1235,7 @@ namespace VitalChoice.Business.Services.Orders
                             if (!emailRegex.IsMatch(value))
                             {
                                 model.ErrorMessages.Add(AddErrorMessage(setting.DisplayName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldIsInvalidEmail],
-                                    setting.DisplayName, setting.MaxLength.Value)));
-                                valid = false;
+                                    setting.DisplayName)));
                             }
                         }
                     }

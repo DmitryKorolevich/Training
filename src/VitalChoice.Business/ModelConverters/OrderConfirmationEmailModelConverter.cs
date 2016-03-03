@@ -176,6 +176,11 @@ namespace VitalChoice.Business.ModelConverters
                 default:
                     break;
             }
+
+            if (dynamic?.GiftCertificates != null)
+            {
+                model.GiftCertificatesTotal = dynamic.GiftCertificates.Sum(p => p.Amount);
+            }
         }
 
         public override void ModelToDynamic(OrderConfirmationEmail model, OrderDynamic dynamic)

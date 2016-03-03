@@ -142,8 +142,8 @@ namespace VitalChoice.Business.Services.Content
                 Include(p => p.ArticlesToProducts).
                 SelectAsync(false)).FirstOrDefault();
 
-            var productIds = toReturn.ArticlesToProducts.Select(p => p.IdProduct).ToList();
-            if (productIds.Count > 0)
+            var productIds = toReturn?.ArticlesToProducts.Select(p => p.IdProduct).ToList();
+            if (productIds?.Count > 0)
             {
                 var shortProducts = (await _productRepository.Query(p => productIds.Contains(p.Id) && p.StatusCode != (int)RecordStatusCode.Deleted)
                     .SelectAsync(false)).Select(p => new ShortProductInfo(p)).ToList();
