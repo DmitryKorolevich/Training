@@ -3,7 +3,7 @@ using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 
-namespace VitalChoice.Infrastructure.Domain.Entities.Healthwise
+namespace VitalChoice.Ecommerce.Domain.Entities.Healthwise
 {
     public class HealthwiseOrder : Entity
 	{

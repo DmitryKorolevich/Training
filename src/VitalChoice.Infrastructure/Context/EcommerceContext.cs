@@ -195,33 +195,6 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("VHelpTickets");
             });
 
-            builder.Entity<HealthwiseOrder>(entity =>
-            {
-                entity.HasKey(t => t.Id);
-                entity.ToTable("HealthwiseOrders");
-                entity.HasOne(p => p.Order)
-                    .WithOne()
-                    .HasForeignKey<HealthwiseOrder>(p => p.Id)
-                    .HasPrincipalKey<Order>(p => p.Id)
-                    .IsRequired();
-            });
-
-            builder.Entity<HealthwisePeriod>(entity =>
-            {
-                entity.HasKey(t => t.Id);
-                entity.ToTable("HealthwisePeriods");
-                entity.HasMany(p => p.HealthwiseOrders)
-                    .WithOne(p=>p.HealthwisePeriod)
-                    .HasForeignKey(o => o.IdHealthwisePeriod)
-                    .HasPrincipalKey(p => p.Id)
-                    .IsRequired();
-                entity.HasOne(p => p.Customer)
-                    .WithMany()
-                    .HasForeignKey(o => o.IdCustomer)
-                    .HasPrincipalKey(p => p.Id)
-                    .IsRequired();
-            });
-
             builder.Entity<VHealthwisePeriod>(entity =>
             {
                 entity.HasKey(t => t.Id);

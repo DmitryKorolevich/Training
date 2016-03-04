@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 
-namespace VitalChoice.Infrastructure.Domain.Entities.Healthwise
+namespace VitalChoice.Ecommerce.Domain.Entities.Healthwise
 {
     public class HealthwisePeriod : Entity
 	{

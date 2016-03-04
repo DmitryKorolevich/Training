@@ -226,3 +226,13 @@ ALTER TABLE dbo.Customers ADD CONSTRAINT
 END
 
 GO
+
+IF (100 = (SELECT TOP 1 max_length FROM sys.columns WHERE name = 'Name' AND [object_id] = OBJECT_ID(N'[dbo].[Affiliates]', N'U')))
+BEGIN
+
+	ALTER TABLE dbo.Affiliates
+	ALTER COLUMN Name NVARCHAR(100) NOT NULL
+
+END
+
+GO

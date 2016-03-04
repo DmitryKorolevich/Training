@@ -8,6 +8,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
@@ -19,7 +20,8 @@ namespace VitalChoice.Interfaces.Services.Orders
         Task<PagedList<Order>> GetShortOrdersAsync(ShortOrderFilter filter);
         Task<int?> GetOrderIdCustomer(int id);
         Task<PagedList<VOrder>> GetOrdersAsync(VOrderFilter filter);
-	    Task<OrderDynamic> SelectWithCustomerAsync(int id, bool withDefaults = false);
+	    Task<PagedList<OrderInfoItem>> GetOrdersAsync2(VOrderFilter filter);
+        Task<OrderDynamic> SelectWithCustomerAsync(int id, bool withDefaults = false);
 	    Task<OrderDataContext> CalculateOrder(OrderDynamic order, OrderStatus combinedStatus);
         Task<OrderDynamic> SelectLastOrderAsync(int customerId);
 

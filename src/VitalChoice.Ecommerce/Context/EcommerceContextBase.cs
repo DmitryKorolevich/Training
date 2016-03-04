@@ -23,6 +23,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Users;
 using VitalChoice.Ecommerce.Domain.Entities.Workflow;
 using VitalChoice.Ecommerce.Domain.Options;
 using System.Threading;
+using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 
 namespace VitalChoice.Ecommerce.Context
 {
@@ -1201,6 +1202,37 @@ namespace VitalChoice.Ecommerce.Context
             Carts(builder);
             CartToSkus(builder);
             CartToGiftCertificates(builder);
+
+            #endregion
+
+            #region HealthWise
+
+            builder.Entity<HealthwiseOrder>(entity =>
+            {
+                entity.HasKey(t => t.Id);
+                entity.ToTable("HealthwiseOrders");
+                entity.HasOne(p => p.Order)
+                    .WithOne(p=>p.HealthwiseOrder)
+                    .HasForeignKey<HealthwiseOrder>(p => p.Id)
+                    .HasPrincipalKey<Order>(p => p.Id)
+                    .IsRequired();
+            });
+
+            builder.Entity<HealthwisePeriod>(entity =>
+            {
+                entity.HasKey(t => t.Id);
+                entity.ToTable("HealthwisePeriods");
+                entity.HasMany(p => p.HealthwiseOrders)
+                    .WithOne(p => p.HealthwisePeriod)
+                    .HasForeignKey(o => o.IdHealthwisePeriod)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired();
+                entity.HasOne(p => p.Customer)
+                    .WithMany()
+                    .HasForeignKey(o => o.IdCustomer)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired();
+            });
 
             #endregion
         }

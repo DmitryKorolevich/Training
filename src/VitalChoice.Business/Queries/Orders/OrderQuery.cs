@@ -4,9 +4,21 @@ using VitalChoice.Data.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.DynamicData.Extensions;
 
 namespace VitalChoice.Business.Queries.Orders
 {
+    public class OrderDynamicFilter
+    {
+        public int? OrderType { get; set; }
+
+        public int? POrderType { get; set; }
+
+        public int? ShippingUpgradeP { get; set; }
+
+        public int? ShippingUpgradeNP { get; set; }
+    }
+
     public class OrderQuery : QueryObject<Order>
     {
         public OrderQuery WithCustomerId(int? idCustomer)
@@ -48,6 +60,93 @@ namespace VitalChoice.Business.Queries.Orders
 
 			return this;
 		}
+
+        public OrderQuery WithId(int? id)
+        {
+            if (id.HasValue)
+            {
+                Add(x => x.Id >= id.Value);
+            }
+            return this;
+        }
+
+        public OrderQuery WithCreatedDate(DateTime? from, DateTime? to)
+        {
+            if (from.HasValue)
+            {
+                Add(x => x.DateCreated >= from.Value);
+            }
+            if (to.HasValue)
+            {
+                Add(x =>x.DateCreated <= to.Value);
+            }
+            return this;
+        }
+
+        public OrderQuery WithShippedDate(DateTime? from, DateTime? to)
+        {
+            if (from.HasValue)
+            {
+                //
+            }
+            if (to.HasValue)
+            {
+            }
+            return this;
+        }
+
+        public OrderQuery WithOrderStatus(OrderStatus? orderStatus)
+        {
+            if (orderStatus.HasValue)
+            {
+                Add(x => x.OrderStatus == orderStatus.Value || x.POrderStatus == orderStatus.Value || x.NPOrderStatus == orderStatus.Value);
+            }
+            return this;
+        }
+
+        public OrderQuery WithoutIncomplete(OrderStatus? orderStatus, bool ignoreNotShowingIncomplete = false)
+        {
+            if (!ignoreNotShowingIncomplete)
+            {
+                if (!orderStatus.HasValue || orderStatus != OrderStatus.Incomplete)
+                {
+                    Add(x => (x.OrderStatus != OrderStatus.Incomplete && !x.POrderStatus.HasValue && !x.NPOrderStatus.HasValue)
+                            || (!x.OrderStatus.HasValue && (x.POrderStatus != OrderStatus.Incomplete || x.NPOrderStatus != OrderStatus.Incomplete)));
+                }
+            }
+            return this;
+        }
+
+        public OrderQuery WithOrderdynamicValues(int? idOrderSource, int? pOrderType, int? idShippingMethod)
+        {
+            var filter = new OrderDynamicFilter();
+            if (idOrderSource.HasValue)
+            {
+                filter.OrderType = idOrderSource.Value;
+            }
+            if (pOrderType.HasValue)
+            {
+                filter.POrderType = pOrderType.Value;
+            }
+            if (idShippingMethod.HasValue)
+            {
+
+            }
+            if (idOrderSource.HasValue || pOrderType.HasValue || idShippingMethod.HasValue)
+            {
+                Add(c => c.WhenValues(filter));
+            }
+            return this;
+        }
+
+        public OrderQuery WithCustomerType(int? idCustomerType)
+        {
+            if (idCustomerType.HasValue)
+            {
+                Add(x => x.Customer.IdObjectType == idCustomerType.Value);
+            }
+            return this;
+        }
 
         #region AffiliateOrders
 

@@ -520,7 +520,8 @@ namespace VitalChoice.DynamicData.Base
                 return null;
             if (entity.OptionValues == null)
             {
-                throw new ApiException($"FromEntityItem<{typeof (TEntity)}> have no OptionValues, are you forgot to include them in query?");
+                entity.OptionValues=new List<TOptionValue>();
+                //throw new ApiException($"FromEntityItem<{typeof (TEntity)}> have no OptionValues, are you forgot to include them in query?");
             }
             if (entity.OptionTypes == null)
             {

@@ -74,6 +74,7 @@ using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Infrastructure.Domain.Mail;
 using VitalChoice.Business.Mail;
 using VitalChoice.Data.Transaction;
+using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Exceptions;
 
@@ -205,7 +206,8 @@ namespace VitalChoice.Business.Services.Orders
                     .ThenInclude(s => s.Sku)
                     .ThenInclude(s => s.Product)
                     .ThenInclude(s => s.OptionValues)
-                    .Include(p => p.OptionValues);
+                    .Include(p => p.OptionValues)
+                    .Include(o => o.HealthwiseOrder);
         }
 
         protected override async Task AfterSelect(ICollection<Order> entities)
@@ -798,6 +800,111 @@ namespace VitalChoice.Business.Services.Orders
                     }
                 }
             }
+        }
+
+        public async Task<PagedList<OrderInfoItem>> GetOrdersAsync2(VOrderFilter filter)
+        {
+            var conditions= new OrderQuery();
+            conditions = conditions.WithCustomerId(filter.IdCustomer).NotDeleted();
+
+            if (!filter.ShipDate)
+            {
+                conditions = conditions.WithCreatedDate(filter.From, filter.To);
+            }
+            else
+            {
+                conditions = conditions.WithShippedDate(filter.From, filter.To);
+            }
+            conditions = conditions.WithOrderStatus(filter.OrderStatus)
+                .WithoutIncomplete(filter.OrderStatus, filter.IgnoreNotShowingIncomplete)
+                .WithId(filter.Id)//TODO - should be redone after adding - https://github.com/aspnet/EntityFramework/issues/2850
+                .WithOrderdynamicValues(filter.IdOrderSource, filter.POrderType, filter.IdShippingMethod)
+                .WithCustomerType(filter.IdCustomerType);
+
+            Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable = x => x.OrderByDescending(y => y.DateCreated);
+            var sortOrder = filter.Sorting.SortOrder;
+            switch (filter.Sorting.Path)
+            {
+                case VOrderSortPath.IdPaymentMethod:
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.PaymentMethod.IdObjectType) : x.OrderByDescending(y => y.PaymentMethod.IdObjectType);
+                    break;
+                case VOrderSortPath.DateCreated:
+                    sortable =
+                        (x) =>
+                            sortOrder == SortOrder.Asc
+                                ? x.OrderBy(y => y.DateCreated).ThenBy(y => y.Id)
+                                : x.OrderByDescending(y => y.DateCreated).ThenByDescending(y => y.Id);
+                    break;
+                case VOrderSortPath.IdCustomerType:
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.Customer.IdObjectType) : x.OrderByDescending(y => y.Customer.IdObjectType);
+                    break;
+                case VOrderSortPath.Id:
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.Id) : x.OrderByDescending(y => y.Id);
+                    break;
+                case VOrderSortPath.Total:
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.Total) : x.OrderByDescending(y => y.Total);
+                    break;
+                case VOrderSortPath.DateEdited:
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.DateEdited) : x.OrderByDescending(y => y.DateEdited);
+                    break;
+            }
+
+            var orders = await SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, conditions,
+                    includes => includes.Include(c => c.OptionValues).Include(c=>c.PaymentMethod).
+                    Include(c => c.ShippingAddress).ThenInclude(c => c.OptionValues).
+                    Include(c=>c.Customer).ThenInclude(p=>p.ProfileAddress).ThenInclude(c => c.OptionValues).
+                    Include(c=>c.HealthwiseOrder), 
+                    orderBy: sortable, withDefaults: true);
+
+            var countries = await _countryService.GetCountriesAsync(new CountryFilter());
+
+            PagedList<OrderInfoItem> toReturn = new PagedList<OrderInfoItem>()
+            {
+                Items = orders.Items.Select(p=>new OrderInfoItem()
+                {
+                    Id =p.Id,
+                    OrderStatus = p.OrderStatus,
+                    POrderStatus = p.POrderStatus,
+                    NPOrderStatus = p.NPOrderStatus,
+                    IdOrderSource =p.SafeData.OrderType,
+                    OrderNotes = p.SafeData.OrderNotes,
+                    IdPaymentMethod = p.PaymentMethod?.IdObjectType,
+                    DateCreated=p.DateCreated,
+                    DateShipped = p.SafeData.ShipDelayDate,
+                    PDateShipped = p.SafeData.ShipDelayDateP,
+                    NPDateShipped = p.SafeData.ShipDelayDateNP,
+                    Total=p.Total,
+                    IdEditedBy = p.IdEditedBy,
+                    DateEdited = p.DateEdited,
+                    POrderType = p.SafeData.POrderType,
+                    IdCustomerType = p.Customer.IdObjectType,
+                    IdCustomer = p.Customer.Id,
+                    Company = p.Customer?.ProfileAddress.SafeData.Company,
+                    Customer = p.Customer?.ProfileAddress.SafeData.FirstName + " "+ p.Customer?.ProfileAddress.SafeData.LastName,
+                    StateCode = countries.SelectMany(pp=>pp.States).FirstOrDefault(pp=>pp.Id== p.ShippingAddress?.IdState)?.StateCode,
+                    ShipTo = p?.ShippingAddress.SafeData.FirstName + " " + p?.ShippingAddress.SafeData.LastName,
+                    Healthwise = p.IsHealthwise,
+                }).ToList(),
+                Count = orders.Count
+            };
+
+            if (toReturn.Items.Any())
+            {
+                var ids = toReturn.Items.Select(p => p.IdEditedBy).ToList();
+                var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
+                foreach (var item in toReturn.Items)
+                {
+                    foreach (var profile in profiles)
+                    {
+                        if (item.IdEditedBy == profile.Id)
+                        {
+                            item.EditedByAgentId = profile.AgentId;
+                        }
+                    }
+                }
+            }
+
+            return toReturn;
         }
 
         public async Task<PagedList<VOrder>> GetOrdersAsync(VOrderFilter filter)

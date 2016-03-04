@@ -141,6 +141,25 @@ namespace VC.Admin.Controllers
             return order != null;
         }
 
+        //[HttpPost]
+        //public async Task<Result<PagedList<OrderListItemModel>>> GetOrders([FromBody]VOrderFilter filter)
+        //{
+        //    if (filter.To.HasValue)
+        //    {
+        //        filter.To = filter.To.Value.AddDays(1);
+        //    }
+
+        //    var result = await _orderService.GetOrdersAsync(filter);
+
+        //    var toReturn = new PagedList<OrderListItemModel>
+        //    {
+        //        Items = result.Items.Select(p => new OrderListItemModel(p)).ToList(),
+        //        Count = result.Count,
+        //    };
+
+        //    return toReturn;
+        //}
+
         [HttpPost]
         public async Task<Result<PagedList<OrderListItemModel>>> GetOrders([FromBody]VOrderFilter filter)
         {
@@ -149,7 +168,7 @@ namespace VC.Admin.Controllers
                 filter.To = filter.To.Value.AddDays(1);
             }
 
-            var result = await _orderService.GetOrdersAsync(filter);
+            var result = await _orderService.GetOrdersAsync2(filter);
 
             var toReturn = new PagedList<OrderListItemModel>
             {

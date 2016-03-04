@@ -30,9 +30,8 @@
                 .success(function (result)
                 {
                     if (result.Success)
-                    {
-                        $scope.items = result.Data.Items;
-                        $.each($scope.items, function (index, item)
+                    {                        
+                        $.each(result.Data.Items, function (index, item)
                         {
                             item.AllowExport = item.OrderStatus == 2;
                             item.IsSelected = item.OrderStatus == 3 || item.OrderStatus == 5;//Shipped
@@ -41,6 +40,8 @@
                             item.NPAllowExport = item.NPOrderStatus == 2;
                             item.IsNPSelected = item.NPOrderStatus == 3 || item.NPOrderStatus == 5;//Shipped
                         });
+
+                        $scope.items = result.Data.Items;
                         $scope.totalItems = result.Data.Count;
                     } else
                     {
@@ -76,6 +77,8 @@
             $scope.settings.allExport = false;
 
             $scope.forms = {};
+
+            $scope.items=[];
 
             var currentDate = new Date();
             currentDate.setHours(0, 0, 0, 0);
@@ -172,7 +175,7 @@
             });
         };
 
-        $scope.itemExportChanged = function (item)
+        $scope.itemExportChanged = function (item, event)
         {
             if (!item.IsSelected && $scope.settings.allExport)
             {
@@ -180,7 +183,7 @@
             }
         };
 
-        $scope.PItemExportChanged = function (item)
+        $scope.PItemExportChanged = function (item, event)
         {
             if (!item.IsPSelected && $scope.settings.allExport)
             {
@@ -188,7 +191,7 @@
             }
         };
 
-        $scope.NPItemExportChanged = function (item)
+        $scope.NPItemExportChanged = function (item, event)
         {
             if (!item.IsNPSelected && $scope.settings.allExport)
             {

@@ -5,6 +5,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 {
     public class VOrderFilter : FilterBase
     {
+        public int? Id { get; set; }
+
         public string IdString { get; set; }
 
         public int? IdCustomer { get; set; }

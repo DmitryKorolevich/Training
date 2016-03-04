@@ -66,6 +66,8 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.TaxTotal = entity.TaxTotal;
                 dynamic.Total = entity.Total;
 
+                dynamic.IsHealthwise = entity.HealthwiseOrder != null;
+
                 dynamic.ShippingAddress =
                     await _orderAddressMapper.FromEntityAsync(entity.ShippingAddress, withDefaults);
                 dynamic.Customer = await _customerMapper.FromEntityAsync(entity.Customer, withDefaults);

@@ -83,6 +83,10 @@ namespace VC.Admin.Validators.Affiliate
                     .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
                     .WithMessage(model => model.Address2, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
 
+                RuleFor(model => model.Company)
+                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                    .WithMessage(model => model.Company, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+
                 RuleFor(model => model.IdCountry)
                     .Must(model => model.HasValue)
                     .WithMessage(model => model.IdCountry, ValidationMessages.FieldRequired);
