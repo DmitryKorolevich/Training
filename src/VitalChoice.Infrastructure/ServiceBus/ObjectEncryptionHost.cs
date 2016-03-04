@@ -4,13 +4,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
 using System.Text;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
+using Microsoft.Win32;
 using Newtonsoft.Json;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 
@@ -20,8 +24,21 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
     public class ObjectEncryptionHost : IDisposable, IObjectEncryptionHost
     {
+        private readonly string _localEncryptionPath;
         private readonly ILogger _logger;
         public X509Certificate2 RootCert { get; }
+
+        public void UpdateLocalKey(KeyExchange key)
+        {
+            _localAes.Key = key.Key;
+            _localAes.IV = key.IV;
+        }
+
+        public KeyExchange GetLocalKey()
+        {
+            return new KeyExchange(_localAes.Key, _localAes.IV);
+        }
+
         public X509Certificate2 LocalCert { get; }
 #if NET451
         private readonly RSACryptoServiceProvider _signProvider;
@@ -38,6 +55,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
         /// </summary>
         public ObjectEncryptionHost(IOptions<AppOptions> options, ILogger logger)
         {
+            _localEncryptionPath = options.Value.LocalEncryptionKeyPath;
             _logger = logger;
             try
             {
@@ -161,7 +179,8 @@ namespace VitalChoice.Infrastructure.ServiceBus
         public bool RsaVerifyWithConvert<T>(TransportCommandData command, out T result)
             where T: ServiceBusCommandBase
         {
-            if (command == null) throw new ArgumentNullException(nameof(command));
+            if (command == null)
+                throw new ArgumentNullException(nameof(command));
             if (command.Data?.Length > 0)
             {
                 if (RsaVerifyCommandSign(command))
@@ -284,18 +303,14 @@ namespace VitalChoice.Infrastructure.ServiceBus
             }
         }
 
-        public bool RegisterSession(Guid session, string hostName, byte[] keyCombined)
+        public bool RegisterSession(Guid session, string hostName, KeyExchange keyExchange)
         {
             Aes aes = Aes.Create();
             if (aes == null)
                 throw new InvalidOperationException("Cannot initialize AES encryption");
             aes.KeySize = 256;
-            var key = new byte[32];
-            var iv = new byte[16];
-            Array.Copy(keyCombined, iv, 16);
-            Array.Copy(keyCombined, 16, key, 0, 32);
-            aes.Key = key;
-            aes.IV = iv;
+            aes.Key = keyExchange.Key;
+            aes.IV = keyExchange.IV;
             aes.Padding = PaddingMode.PKCS7;
             SessionInfo encryption = new SessionInfo
             {
@@ -352,11 +367,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 aes.GenerateKey();
                 aes.GenerateIV();
                 aes.Padding = PaddingMode.PKCS7;
-                return new KeyExchange
-                {
-                    Key = aes.Key,
-                    IV = aes.IV
-                };
+                return new KeyExchange(aes.Key, aes.IV);
             }
         }
 
@@ -406,6 +417,8 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 {
                     _logger.LogCritical(
                         $"Cannot find Certificate in Store <{certStore.Name}:{certStore.Location}> with thumbprint <{thumbprint}>");
+                    var certs = certStore.Certificates.Cast<X509Certificate2>();
+                    _logger.LogInformation(storeName + "\n" + string.Join("\n", certs.Select(c => $"{c.SubjectName.Name}:[{c.Thumbprint}]")));
                     return null;
                 }
                 var cert = localCerts[0];
@@ -455,10 +468,50 @@ namespace VitalChoice.Infrastructure.ServiceBus
             var aes = Aes.Create();
             if (aes != null)
             {
-                aes.KeySize = 256;
-                aes.IV = Take(GetPublicKeyHash(), 16);
-                aes.Key = GetPrivateKeyHash();
-                aes.Padding = PaddingMode.PKCS7;
+                if (!string.IsNullOrWhiteSpace(_localEncryptionPath))
+                {
+                    KeyExchange exchange;
+#if NET451
+                    if (!File.Exists(_localEncryptionPath))
+                    {
+                        var directory = Path.GetDirectoryName(Path.GetFullPath(_localEncryptionPath));
+                        if (!string.IsNullOrEmpty(directory))
+                        {
+                            var security = new DirectorySecurity();
+                            var currentUser = WindowsIdentity.GetCurrent()?.User;
+                            if (currentUser == null)
+                                throw new AccessDeniedException("Cannot get current User");
+                            security.SetOwner(currentUser);
+                            security.AddAccessRule(new FileSystemAccessRule(currentUser, FileSystemRights.Modify,
+                                AccessControlType.Allow));
+                            Directory.CreateDirectory(directory, security);
+                        }
+                        exchange = new KeyExchange(GetPrivateKeyHash(), Take(GetPublicKeyHash(), 16));
+                        File.WriteAllBytes(_localEncryptionPath, RsaEncrypt(exchange.ToCombined(), _signProvider));
+                    }
+                    else
+                    {
+                        var key = File.ReadAllBytes(_localEncryptionPath);
+                        var combined = RsaDecrypt(key, _signProvider);
+                        exchange = new KeyExchange(combined);
+                    }
+#else
+                    var key = File.ReadAllBytes(_localEncryptionPath);
+                    var combined = RsaDecrypt(key, _signProvider);
+                    exchange = new KeyExchange(combined);
+#endif
+                    aes.KeySize = 256;
+                    aes.IV = exchange.IV;
+                    aes.Key = exchange.Key;
+                    aes.Padding = PaddingMode.PKCS7;
+                }
+                else
+                {
+                    aes.KeySize = 256;
+                    aes.IV = Take(GetPublicKeyHash(), 16);
+                    aes.Key = GetPrivateKeyHash();
+                    aes.Padding = PaddingMode.PKCS7;
+                }
             }
             return aes;
         }
@@ -467,6 +520,16 @@ namespace VitalChoice.Infrastructure.ServiceBus
         {
             if (commandData == null)
                 throw new ArgumentNullException(nameof(commandData));
+
+#if NET451
+            if (commandData.Certificate?.PublicKey.Key == null || commandData.Sign == null)
+#else
+            if (commandData.Certificate == null || commandData.Sign == null)
+#endif
+            {
+                _logger.LogWarning("Incoming signature is invalid");
+                return false;
+            }
 #if NET451
             var rsa = new RSACryptoServiceProvider();
             rsa.ImportParameters(((RSACryptoServiceProvider)commandData.Certificate.PublicKey.Key).ExportParameters(false));

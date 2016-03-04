@@ -59,15 +59,12 @@ namespace VitalChoice.Business.Services
                 EncryptionHost.RemoveSession(sessionId);
                 keys = EncryptionHost.CreateSession(sessionId);
             }
-            var keyCombined = new byte[keys.IV.Length + keys.Key.Length];
-            Array.Copy(keys.IV, keyCombined, keys.IV.Length);
-            Array.Copy(keys.Key, 0, keyCombined, keys.IV.Length, keys.Key.Length);
             if (
                 await
                     ExecutePlainCommand<bool>(new ServiceBusCommandWithResult(sessionId, ServiceBusCommandConstants.SetSessionKey,
                         ServerHostName, LocalHostName)
                     {
-                        Data = EncryptionHost.RsaEncrypt(keyCombined, keyExchangeProvider)
+                        Data = EncryptionHost.RsaEncrypt(keys.ToCombined(), keyExchangeProvider)
                     }))
             {
                 return EncryptionHost.RegisterSession(sessionId, keys);

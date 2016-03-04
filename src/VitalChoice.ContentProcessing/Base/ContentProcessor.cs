@@ -9,6 +9,7 @@ using VitalChoice.ObjectMapping.Interfaces;
 namespace VitalChoice.ContentProcessing.Base
 {
     public abstract class ContentProcessor<TResult, TModel> : IContentProcessor<TResult>
+        where TModel: class, new()
     {
         protected class ProcessorViewContext
         {
@@ -56,6 +57,7 @@ namespace VitalChoice.ContentProcessing.Base
 
     public abstract class ContentProcessor<TResult, TModel, TEntity> : IContentProcessor<TResult>
         where TEntity : ContentDataItem
+        where TModel: class, new()
     {
         protected class ProcessorViewContext
         {

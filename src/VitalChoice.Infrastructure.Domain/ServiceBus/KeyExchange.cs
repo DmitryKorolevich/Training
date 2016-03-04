@@ -25,8 +25,36 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
 #endif
     public class KeyExchange
     {
-        public byte[] Key { get; set; }
+        public KeyExchange()
+        {
+            Key = new byte[32];
+            IV = new byte[16];
+        }
 
-        public byte[] IV { get; set; }
+        public KeyExchange(byte[] key, byte[] iv)
+        {
+            Key = key;
+            IV = iv;
+        }
+
+        public KeyExchange(byte[] keyCombined)
+        {
+            Key = new byte[32];
+            IV = new byte[16];
+            Array.Copy(keyCombined, IV, 16);
+            Array.Copy(keyCombined, 16, Key, 0, 32);
+        }
+
+        public byte[] Key { get; }
+
+        public byte[] IV { get; }
+
+        public byte[] ToCombined()
+        {
+            var keyCombined = new byte[IV.Length + Key.Length];
+            Array.Copy(IV, keyCombined, IV.Length);
+            Array.Copy(Key, 0, keyCombined, IV.Length, Key.Length);
+            return keyCombined;
+        }
     }
 }

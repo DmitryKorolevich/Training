@@ -56,11 +56,13 @@ namespace VitalChoice.Infrastructure.ServiceBus
             try
             {
                 _sendQue = new ConcurrentQueue<BrokeredMessage>();
+
                 var plainFactory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.PlainConnectionString);
                 var encryptedFactory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.EncryptedConnectionString);
 
-                _encryptedClient = plainFactory.CreateQueueClient(appOptions.Value.ExportService.EncryptedQueueName, ReceiveMode.PeekLock);
-                _plainClient = encryptedFactory.CreateQueueClient(appOptions.Value.ExportService.PlainQueueName, ReceiveMode.PeekLock);
+                _encryptedClient = encryptedFactory.CreateQueueClient(appOptions.Value.ExportService.EncryptedQueueName, ReceiveMode.PeekLock);
+                _plainClient = plainFactory.CreateQueueClient(appOptions.Value.ExportService.PlainQueueName, ReceiveMode.PeekLock);
+
                 new Thread(ReceivePlainMessages).Start();
                 new Thread(ReceiveEncryptedMessages).Start();
 
@@ -202,9 +204,17 @@ namespace VitalChoice.Infrastructure.ServiceBus
 #if NET451
             while (!_terminated)
             {
-                var message = _plainClient.Receive();
-                if (message != null)
-                    ProcessPlainMessage(message);
+                try
+                {
+                    var message = _plainClient.Receive();
+                    if (message != null)
+                        ProcessPlainMessage(message);
+                }
+                catch (Exception e)
+                {
+                    Logger.LogError(e.Message, e);
+                    throw;
+                }
             }
 #endif
         }
@@ -214,9 +224,17 @@ namespace VitalChoice.Infrastructure.ServiceBus
 #if NET451
             while (!_terminated)
             {
-                var message = _encryptedClient.Receive();
-                if (message != null)
-                    ProcessEncryptedMessage(message);
+                try
+                {
+                    var message = _encryptedClient.Receive();
+                    if (message != null)
+                        ProcessEncryptedMessage(message);
+                }
+                catch (Exception e)
+                {
+                    Logger.LogError(e.Message, e);
+                    throw;
+                }
             }
 #endif
         }
@@ -226,19 +244,27 @@ namespace VitalChoice.Infrastructure.ServiceBus
 #if NET451
             while (!_terminated)
             {
-                BrokeredMessage message;
-                if (!_sendQue.TryDequeue(out message))
+                try
                 {
-                    _newMessageSent.WaitOne();
-                    continue;
+                    BrokeredMessage message;
+                    if (!_sendQue.TryDequeue(out message))
+                    {
+                        _newMessageSent.WaitOne();
+                        continue;
+                    }
+                    if (message.SessionId != null)
+                    {
+                        _encryptedClient.Send(message);
+                    }
+                    else
+                    {
+                        _plainClient.Send(message);
+                    }
                 }
-                if (message.SessionId != null)
+                catch (Exception e)
                 {
-                    _encryptedClient.Send(message);
-                }
-                else
-                {
-                    _plainClient.Send(message);
+                    Logger.LogError(e.Message, e);
+                    throw;
                 }
             }
 #endif
@@ -303,7 +329,6 @@ namespace VitalChoice.Infrastructure.ServiceBus
             catch (Exception e)
             {
                 Logger.LogError("<ProcessEncryptedMessage> Error while processing incoming message", e);
-                throw;
             }
             finally
             {
@@ -371,7 +396,6 @@ namespace VitalChoice.Infrastructure.ServiceBus
             catch (Exception e)
             {
                 Logger.LogError("<ProcessPlainMessage> Error while processing incoming message", e);
-                throw;
             }
             finally
             {

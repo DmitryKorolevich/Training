@@ -34,7 +34,8 @@ namespace VitalChoice.DynamicData.Extensions
                     t =>
                         t.IsImplementGeneric(typeof (DynamicMapper<,,,>)) && !t.GetTypeInfo().IsAbstract &&
                         !t.GetTypeInfo().IsGenericType);
-            builder.RegisterGeneric(typeof(ObjectMapper<>)).As(typeof(IObjectMapper<>)).InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof (ObjectMapper<>)).As(typeof (IObjectMapper<>)).InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof (ObjectUpdater<>)).As(typeof (IObjectUpdater<>)).InstancePerLifetimeScope();
             foreach (var mapperType in mapperTypes)
             {
                 var types = mapperType.TryGetTypeArguments(typeof (IOptionTypeQueryProvider<,,>));

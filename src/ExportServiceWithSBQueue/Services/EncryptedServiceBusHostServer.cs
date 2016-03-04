@@ -37,7 +37,8 @@ namespace ExportServiceWithSBQueue.Services
                 case ServiceBusCommandConstants.SetSessionKey:
                     var keyCombined = (byte[]) command.Data;
                     SendPlainCommand(new ServiceBusCommandBase(command,
-                        EncryptionHost.RegisterSession(command.SessionId, command.Source, EncryptionHost.RsaDecrypt(keyCombined, _keyExchangeProvider))));
+                        EncryptionHost.RegisterSession(command.SessionId, command.Source,
+                            new KeyExchange(EncryptionHost.RsaDecrypt(keyCombined, _keyExchangeProvider)))));
                     break;
                 case ServiceBusCommandConstants.CheckSessionKey:
                     SendPlainCommand(new ServiceBusCommandBase(command, EncryptionHost.SessionExist(command.SessionId)));

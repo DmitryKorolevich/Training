@@ -7,6 +7,8 @@ namespace VitalChoice.Infrastructure.ServiceBus
 {
     public interface IObjectEncryptionHost
     {
+        void UpdateLocalKey(KeyExchange key);
+        KeyExchange GetLocalKey();
         X509Certificate2 LocalCert { get; }
         T LocalDecrypt<T>(byte[] data);
         byte[] LocalEncrypt(object obj);
@@ -29,7 +31,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         TransportCommandData AesEncryptSign(ServiceBusCommandBase command, Guid session);
         bool SessionExist(Guid session);
-        bool RegisterSession(Guid session, string hostName, byte[] keyCombined);
+        bool RegisterSession(Guid session, string hostName, KeyExchange keyCombined);
         bool RegisterSession(Guid session, KeyExchange keyCombined);
         KeyExchange CreateSession(Guid session);
         bool RemoveSession(Guid session);

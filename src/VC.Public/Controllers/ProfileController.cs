@@ -13,6 +13,7 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Transfer;

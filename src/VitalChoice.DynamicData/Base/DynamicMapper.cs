@@ -335,7 +335,7 @@ namespace VitalChoice.DynamicData.Base
                 {
                     if (!dynamicCache.Properties.ContainsKey(pair.Key))
                     {
-                        var value = TypeConverter.ConvertFromModelObject(pair.Value.GetType(), pair.Value);
+                        var value = ObjectMapping.Base.TypeConverter.ConvertFromModelObject(pair.Value.GetType(), pair.Value);
                         if (value != null)
                         {
                             data.Add(pair.Key, value);
@@ -414,7 +414,7 @@ namespace VitalChoice.DynamicData.Base
                     var mappingName = pair.Value.Map?.Name ?? pair.Key;
                     if (!dynamicCache.Properties.ContainsKey(mappingName))
                     {
-                        var value = TypeConverter.ConvertFromModelObject(pair.Value.PropertyType,
+                        var value = ObjectMapping.Base.TypeConverter.ConvertFromModelObject(pair.Value.PropertyType,
                             pair.Value.Get?.Invoke(model));
 
                         if (value == null)
@@ -487,7 +487,6 @@ namespace VitalChoice.DynamicData.Base
                 throw new ApiException($"UpdateEntityItem<{typeof (TEntity)}> have no OptionTypes, are you forgot to pass them?");
             }
             FillEntityOptions(dynamic, entity.OptionTypes, entity);
-            entity.DateCreated = entity.DateCreated;
             entity.DateEdited = DateTime.Now;
             entity.StatusCode = dynamic.StatusCode;
             entity.IdEditedBy = dynamic.IdEditedBy;

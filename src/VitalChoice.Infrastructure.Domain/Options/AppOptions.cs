@@ -4,6 +4,7 @@ namespace VitalChoice.Infrastructure.Domain.Options
 {
     public class AppOptions : AppOptionsBase
     {
+        public string LocalEncryptionKeyPath { get; set; }
         public bool GenerateLowercaseUrls { get; set; }
         public bool EnableBundlingAndMinification { get; set; }
         public int DefaultCacheExpirationTermMinutes { get; set; }

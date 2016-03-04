@@ -153,9 +153,9 @@ namespace VitalChoice.DynamicData.Base
                 filterDictionary = (IDictionary<string, object>) model;
                 return optionTypesProvider;
             }
-            IObjectMapper mapper =
-                (IObjectMapper)
-                    Activator.CreateInstance(typeof (ObjectMapper<>).MakeGenericType(modelType), _typeConverter, _converterService);
+            IObjectUpdater mapper =
+                (IObjectUpdater)
+                    Activator.CreateInstance(typeof (ObjectUpdater<>).MakeGenericType(modelType), _typeConverter, _converterService);
 
             filterDictionary = mapper.ToDictionary(model);
             return optionTypesProvider;
@@ -203,6 +203,84 @@ namespace VitalChoice.DynamicData.Base
                 });
             }
             return result;
+        }
+
+        private static Expression<Func<TEntity, bool>> CreateValuesSelector(
+            List<OptionGroup<TOptionType>> optionGroups)
+        {
+            Expression<Func<TEntity, bool>> result = null;
+            foreach (var optionGroup in optionGroups)
+            {
+                Expression<Func<TEntity, bool>> valuesSelector = null;
+                foreach (
+                    var value in
+                        optionGroup.Values.Where(
+                            value => !string.IsNullOrEmpty(value.Value) && value.OptionType.IdFieldType != (int) FieldType.LargeString))
+                {
+                    valuesSelector = valuesSelector == null ? CreateExpression(value) : valuesSelector.And(CreateExpression(value));
+                }
+                if (optionGroup.IdObjectType == null)
+                {
+                    result = result == null ? valuesSelector : result.And(valuesSelector);
+                }
+                else
+                {
+                    result = result == null ? valuesSelector : result.Or(valuesSelector);
+                }
+            }
+
+            return result;
+        }
+
+        private static Expression<Func<TEntity, bool>> CreateExpression(OptionValueItem<TOptionType> value)
+        {
+            Expression<Func<TEntity, bool>> valuesSelector;
+            if (value.Value == null)
+            {
+                valuesSelector =
+                    e => e.OptionValues.All(v => v.IdOptionType != value.IdType);
+            }
+            else if (value.OptionType.IdFieldType == (int) FieldType.String && !string.IsNullOrEmpty(value.Value))
+            {
+                valuesSelector =
+                    e => e.OptionValues.Any(v => v.IdOptionType == value.IdType && v.Value.Contains(value.Value));
+            }
+            else
+            {
+                valuesSelector =
+                    e => e.OptionValues.Any(v => v.IdOptionType == value.IdType && v.Value == value.Value);
+            }
+            return valuesSelector;
+        }
+
+        private class SwapVisitor : ExpressionVisitor
+        {
+            private readonly Expression _from, _to;
+            public SwapVisitor(Expression from, Expression to)
+            {
+                _from = from;
+                _to = to;
+            }
+            public override Expression Visit(Expression node)
+            {
+                return node == _from ? _to : base.Visit(node);
+            }
+        }
+
+        private struct OptionValueItem<T>
+        {
+            public int IdType { get; set; }
+
+            public string Value { get; set; }
+
+            public T OptionType { get; set; }
+        }
+
+        private struct OptionGroup<T>
+        {
+            public IEnumerable<OptionValueItem<T>> Values { get; set; }
+
+            public int? IdObjectType { get; set; }
         }
 
         private static Expression<Func<TOptionValue, bool>> CreateValuesSelectorWorkaround(
@@ -257,90 +335,6 @@ namespace VitalChoice.DynamicData.Base
             }
 
             return result;
-        }
-
-        private static Expression<Func<TEntity, bool>> CreateValuesSelector(
-            List<OptionGroup<TOptionType>> optionGroups)
-        {
-            Expression<Func<TEntity, bool>> result = null;
-            foreach (var optionGroup in optionGroups)
-            {
-                Expression<Func<TEntity, bool>> valuesSelector = null;
-                foreach (
-                    var value in
-                        optionGroup.Values.Where(
-                            value => !string.IsNullOrEmpty(value.Value) && value.OptionType.IdFieldType != (int) FieldType.LargeString))
-                {
-                    if (valuesSelector == null)
-                    {
-                        if (value.OptionType.IdFieldType == (int) FieldType.String)
-                        {
-                            valuesSelector =
-                                e => e.OptionValues.Any(v => v.IdOptionType == value.IdType && v.Value.Contains(value.Value));
-                        }
-                        else
-                        {
-                            valuesSelector =
-                                e => e.OptionValues.Any(v => v.IdOptionType == value.IdType && v.Value == value.Value);
-                        }
-                    }
-                    else
-                    {
-                        if (value.OptionType.IdFieldType == (int) FieldType.String)
-                        {
-                            valuesSelector =
-                                valuesSelector.And(
-                                    e => e.OptionValues.Any(v => v.IdOptionType == value.IdType && v.Value.Contains(value.Value)));
-                        }
-                        else
-                        {
-                            valuesSelector =
-                                valuesSelector.And(
-                                    e => e.OptionValues.Any(v => v.IdOptionType == value.IdType && v.Value == value.Value));
-                        }
-                    }
-                }
-                if (optionGroup.IdObjectType == null)
-                {
-                    result = result == null ? valuesSelector : result.And(valuesSelector);
-                }
-                else
-                {
-                    result = result == null ? valuesSelector : result.Or(valuesSelector);
-                }
-            }
-
-            return result;
-        }
-
-        private class SwapVisitor : ExpressionVisitor
-        {
-            private readonly Expression _from, _to;
-            public SwapVisitor(Expression from, Expression to)
-            {
-                _from = from;
-                _to = to;
-            }
-            public override Expression Visit(Expression node)
-            {
-                return node == _from ? _to : base.Visit(node);
-            }
-        }
-
-        private struct OptionValueItem<T>
-        {
-            public int IdType { get; set; }
-
-            public string Value { get; set; }
-
-            public T OptionType { get; set; }
-        }
-
-        private struct OptionGroup<T>
-        {
-            public IEnumerable<OptionValueItem<T>> Values { get; set; }
-
-            public int? IdObjectType { get; set; }
         }
     }
 }

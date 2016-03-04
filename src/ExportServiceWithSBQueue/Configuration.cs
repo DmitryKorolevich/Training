@@ -93,6 +93,7 @@ namespace ExportServiceWithSBQueue
 
             services.Configure<AppOptions>(options =>
             {
+                options.LocalEncryptionKeyPath = configuration.GetSection("App:LocalEncryptionKeyPath").Value;
                 options.LogPath = configuration.GetSection("App:LogPath").Value;
                 options.DefaultCultureId = configuration.GetSection("App:DefaultCultureId").Value;
                 options.Connection = new Connection
@@ -126,6 +127,7 @@ namespace ExportServiceWithSBQueue
 
             services.Configure<ExportOptions>(options =>
             {
+                options.LocalEncryptionKeyPath = configuration.GetSection("App:LocalEncryptionKeyPath").Value;
                 options.LogPath = configuration.GetSection("App:LogPath").Value;
                 options.DefaultCultureId = configuration.GetSection("App:DefaultCultureId").Value;
                 options.Connection = new Connection

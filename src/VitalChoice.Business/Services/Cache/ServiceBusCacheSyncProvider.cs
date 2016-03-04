@@ -113,6 +113,7 @@ namespace VitalChoice.Business.Services.Cache
                 catch (Exception e)
                 {
                     logger.LogError(e.Message, e);
+                    throw;
                 }
             }
         }
@@ -137,6 +138,7 @@ namespace VitalChoice.Business.Services.Cache
                 catch (Exception e)
                 {
                     logger.LogError(e.Message, e);
+                    throw;
                 }
             }
         }
