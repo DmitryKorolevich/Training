@@ -8,17 +8,6 @@ using VitalChoice.DynamicData.Extensions;
 
 namespace VitalChoice.Business.Queries.Orders
 {
-    public class OrderDynamicFilter
-    {
-        public int? OrderType { get; set; }
-
-        public int? POrderType { get; set; }
-
-        public int? ShippingUpgradeP { get; set; }
-
-        public int? ShippingUpgradeNP { get; set; }
-    }
-
     public class OrderQuery : QueryObject<Order>
     {
         public OrderQuery WithCustomerId(int? idCustomer)
@@ -65,7 +54,7 @@ namespace VitalChoice.Business.Queries.Orders
         {
             if (id.HasValue)
             {
-                Add(x => x.Id >= id.Value);
+                Add(x => x.Id == id.Value);
             }
             return this;
         }
@@ -117,24 +106,76 @@ namespace VitalChoice.Business.Queries.Orders
             return this;
         }
 
-        public OrderQuery WithOrderdynamicValues(int? idOrderSource, int? pOrderType, int? idShippingMethod)
+        public OrderQuery WithOrderDynamicValues(int? idOrderSource, int? pOrderType, int? idShippingMethod)
         {
-            var filter = new OrderDynamicFilter();
             if (idOrderSource.HasValue)
             {
-                filter.OrderType = idOrderSource.Value;
+                Add(c => c.WhenValues(new
+                {
+                    OrderType= idOrderSource.Value
+                }));
             }
             if (pOrderType.HasValue)
             {
-                filter.POrderType = pOrderType.Value;
+                Add(c => c.WhenValues(new
+                {
+                    POrderType = pOrderType.Value
+                }));
             }
-            if (idShippingMethod.HasValue)
+            if (idShippingMethod.HasValue && idShippingMethod.Value==1)//upgraded
             {
+                Add(c => c.WhenValues(new
+                {
+                    ShippingUpgradeP = 1
+                }) ||
+                c.WhenValues(new
+                {
+                    ShippingUpgradeP = 2
+                })||
+                c.WhenValues(new
+                {
+                    ShippingUpgradeNP = 1
+                }) ||
+                c.WhenValues(new
+                {
+                    ShippingUpgradeNP = 2
+                }));
+            }
+            return this;
+        }
 
-            }
-            if (idOrderSource.HasValue || pOrderType.HasValue || idShippingMethod.HasValue)
+        public OrderQuery WithCustomerDynamicValues(string firstName, string lastName, string company)
+        {
+            if (!string.IsNullOrEmpty(firstName))
             {
-                Add(c => c.WhenValues(filter));
+                Add(c => c.Customer.ProfileAddress.WhenValues(new
+                {
+                    FirstName = firstName
+                }));
+            }
+            if (!string.IsNullOrEmpty(lastName))
+            {
+                Add(c => c.Customer.ProfileAddress.WhenValues(new
+                {
+                    LastName = lastName
+                }));
+            }
+            if (!string.IsNullOrEmpty(company))
+            {
+                Add(c => c.Customer.ProfileAddress.WhenValues(new
+                {
+                    Company = company
+                }));
+            }
+
+            return this;
+        }
+
+        public OrderQuery WithShipState(int? idShipState)
+        {
+            if (idShipState.HasValue)
+            {
+                Add(x => x.ShippingAddress.IdState== idShipState.Value);
             }
             return this;
         }

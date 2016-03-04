@@ -143,11 +143,12 @@ namespace VitalChoice.Workflow.Configuration
 
             setup.Action<ShippingUpgradesUsCaAction>("ShippingUpgradeUsCa", action =>
             {
-                action.Dependency<ProductsSplitAction>();
             });
 
             setup.ActionResolver<ShippingUpgradesActionResolver>("ShippingUpgrade", action =>
             {
+                action.Dependency<ProductsSplitAction>();
+
                 action.ResolvePath<ShippingUpgradesUsCaAction>((int) ShippingUpgradeGroup.UsCa, "ShippingUpgradeUsCa");
             });
 

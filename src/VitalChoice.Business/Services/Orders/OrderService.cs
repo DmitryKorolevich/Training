@@ -815,11 +815,14 @@ namespace VitalChoice.Business.Services.Orders
             {
                 conditions = conditions.WithShippedDate(filter.From, filter.To);
             }
-            conditions = conditions.WithOrderStatus(filter.OrderStatus)
-                .WithoutIncomplete(filter.OrderStatus, filter.IgnoreNotShowingIncomplete)
+            conditions = conditions
                 .WithId(filter.Id)//TODO - should be redone after adding - https://github.com/aspnet/EntityFramework/issues/2850
-                .WithOrderdynamicValues(filter.IdOrderSource, filter.POrderType, filter.IdShippingMethod)
-                .WithCustomerType(filter.IdCustomerType);
+                .WithOrderStatus(filter.OrderStatus)
+                .WithCustomerType(filter.IdCustomerType)
+                .WithoutIncomplete(filter.OrderStatus, filter.IgnoreNotShowingIncomplete)
+                .WithShipState(filter.IdShipState)
+                .WithOrderDynamicValues(filter.IdOrderSource, filter.POrderType, filter.IdShippingMethod)
+                .WithCustomerDynamicValues(filter.CustomerFirstName, filter.CustomerLastName, filter.CustomerCompany);
 
             Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable = x => x.OrderByDescending(y => y.DateCreated);
             var sortOrder = filter.Sorting.SortOrder;

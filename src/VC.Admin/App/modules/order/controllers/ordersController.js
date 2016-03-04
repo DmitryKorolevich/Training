@@ -1,6 +1,6 @@
 ﻿angular.module('app.modules.order.controllers.ordersController', [])
-.controller('ordersController', ['$scope', '$rootScope', '$state', 'orderService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
-    function ($scope, $rootScope, $state, orderService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil)
+.controller('ordersController', ['$scope', '$rootScope', '$state', 'orderService', 'settingService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
+    function ($scope, $rootScope, $state, orderService, settingService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil)
     {
         $scope.refreshTracker = promiseTracker("refresh");
         $scope.deleteTracker = promiseTracker("delete");
@@ -78,7 +78,8 @@
 
             $scope.forms = {};
 
-            $scope.items=[];
+            $scope.items = [];
+            $scope.states = [];
 
             var currentDate = new Date();
             currentDate.setHours(0, 0, 0, 0);
@@ -91,6 +92,10 @@
                 POrderType: null,
                 IdCustomerType: null,
                 IdShippingMethod: null,
+                IdShipState: null,
+                CustomerFirstName: null,
+                CustomerLastName: null,
+                CustomerCompany: null,
                 Paging: { PageIndex: 1, PageItemCount: 100 },
                 Sorting: gridSorterUtil.resolve(refreshOrders, "DateCreated", "Desc"),
                 IsActive: true,
@@ -122,7 +127,31 @@
             });
 
             $scope.forms.IsActive = true;
-            refreshOrders();
+
+            settingService.getCountries({}, $scope.refreshTracker)
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        $scope.state = result.Data;
+                        $.each(result.Data, function (index, country)
+                        {
+                            if (country.CountryCode == 'US')
+                            {
+                                $scope.states = country.States;
+                                $scope.states.splice(0, 0, { Id: null, StateName: 'All'});
+                            }
+                        });
+                        refreshOrders();
+                    } else
+                    {
+                        errorHandler(result);
+                    }
+                })
+                .error(function (result)
+                {
+                    errorHandler(result);
+                });
         }
 
         $scope.filterOrders = function ()
