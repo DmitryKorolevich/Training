@@ -5,6 +5,7 @@ using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.DynamicData.Extensions;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 
 namespace VitalChoice.Business.Queries.Orders
 {
@@ -151,21 +152,21 @@ namespace VitalChoice.Business.Queries.Orders
                 Add(c => c.Customer.ProfileAddress.WhenValues(new
                 {
                     FirstName = firstName
-                }));
+                }, (int)AddressType.Profile));
             }
             if (!string.IsNullOrEmpty(lastName))
             {
                 Add(c => c.Customer.ProfileAddress.WhenValues(new
                 {
                     LastName = lastName
-                }));
+                },(int) AddressType.Profile));
             }
             if (!string.IsNullOrEmpty(company))
             {
                 Add(c => c.Customer.ProfileAddress.WhenValues(new
                 {
                     Company = company
-                }));
+                }, (int)AddressType.Profile));
             }
 
             return this;
