@@ -5,8 +5,9 @@
             <fieldset>
                 <div class="row form-group">
                     <div class="col-md-2">
-                        <input type="text" name="IdString" class="form-control" placeholder="Order #" data-numbers-only="true" data-ng-model="directOrdersfilter.Id" autocomplete="off" data-ng-minlength="3">
+                        <input type="text" name="IdString" class="form-control" placeholder="Order #" data-numbers-only="true" data-ng-model="directOrdersfilter.Id" autocomplete="off" ng-required="true" data-ng-minlength="3">
                         <div class="error-container" ng-show="forms.form.submitted && forms.form.IdString.$invalid">
+                            <small class="error" ng-show="forms.form.IdString.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Order #")}}</small>
                             <small class="error" ng-show="forms.form.IdString.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Order #")}}</small>
                         </div>
                     </div>
@@ -14,24 +15,28 @@
                         <button class="btn btn-info" data-ng-click="directFilterOrders();" type="button">Locate Order</button>
                     </div>
                 </div>
-                <hr />
+            <hr/>
+            </fieldset>
+        </form>
+        <form class="form-horizontal" name="forms.filterForm" data-ng-submit="save()" data-ng-class="{submitted: forms.filterForm.submitted}" novalidate>
+            <fieldset>
                 <div class="row form-group">
                     <div class="col-md-2">
                         <input type="text" class="form-control" name="CustomerCompany" placeholder="Customer Company" data-ng-model="filter.CustomerCompany" data-ng-minlength="3" autocomplete="off">
-                        <div class="error-container" ng-show="forms.form.submitted && forms.form.CustomerCompany.$invalid">
-                            <small class="error" ng-show="forms.form.CustomerCompany.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Customer Company")}}</small>
+                        <div class="error-container" ng-show="forms.filterForm.submitted && forms.filterForm.CustomerCompany.$invalid">
+                            <small class="error" ng-show="forms.filterForm.CustomerCompany.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Customer Company")}}</small>
                         </div>
                     </div>
                     <div class="col-md-2">
                         <input type="text" class="form-control" name="CustomerLastName" placeholder="Customer Last Name" data-ng-model="filter.CustomerLastName" data-ng-minlength="3" autocomplete="off">
-                        <div class="error-container" ng-show="forms.form.submitted && forms.form.CustomerLastName.$invalid">
-                            <small class="error" ng-show="forms.form.CustomerLastName.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Customer Last Name")}}</small>
+                        <div class="error-container" ng-show="forms.filterForm.submitted && forms.filterForm.CustomerLastName.$invalid">
+                            <small class="error" ng-show="forms.filterForm.CustomerLastName.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Customer Last Name")}}</small>
                         </div>
                     </div>
                     <div class="col-md-2">
                         <input type="text" class="form-control" name="CustomerFirstName" placeholder="Customer First Name" data-ng-model="filter.CustomerFirstName" data-ng-minlength="3" autocomplete="off">
-                        <div class="error-container" ng-show="forms.form.submitted && forms.form.CustomerFirstName.$invalid">
-                            <small class="error" ng-show="forms.form.CustomerFirstName.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Customer First Name")}}</small>
+                        <div class="error-container" ng-show="forms.filterForm.submitted && forms.filterForm.CustomerFirstName.$invalid">
+                            <small class="error" ng-show="forms.filterForm.CustomerFirstName.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Customer First Name")}}</small>
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -41,24 +46,24 @@
                 <div class="row form-group">
                     <div class="col-md-2">
                         <p class="input-group">
-                            <input type="text" class="form-control" name="From" datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" ng-required="true"/>
+                            <input type="text" class="form-control" name="From" datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
                             <span class="input-group-btn">
                                 <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                             </span>
                         </p>
-                        <div class="error-container" ng-show="forms.form.submitted && forms.form.From.$invalid">
-                            <small class="error" ng-show="forms.form.From.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","From")}}</small>
+                        <div class="error-container" ng-show="forms.filterForm.submitted && forms.filterForm.From.$invalid">
+                            <small class="error" ng-show="forms.filterForm.From.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","From")}}</small>
                         </div>
                     </div>
                     <div class="col-md-2">
                         <p class="input-group">
-                            <input type="text" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" ng-required="true"/>
+                            <input type="text" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" ng-required="true" />
                             <span class="input-group-btn">
                                 <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                             </span>
                         </p>
-                        <div class="error-container" ng-show="forms.form.submitted && forms.form.To.$invalid">
-                            <small class="error" ng-show="forms.form.To.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","To")}}</small>
+                        <div class="error-container" ng-show="forms.filterForm.submitted && forms.filterForm.To.$invalid">
+                            <small class="error" ng-show="forms.filterForm.To.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","To")}}</small>
                         </div>
                     </div>
                     <div class="col-md-2">
