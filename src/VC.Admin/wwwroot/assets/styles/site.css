@@ -193,6 +193,9 @@ img.thumb {
 .inline-block {
   display: inline-block;
 }
+.text-break-message {
+  word-break: break-all;
+}
 .ya-treeview {
   padding-left: 10px;
 }
