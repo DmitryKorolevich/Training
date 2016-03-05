@@ -60,11 +60,14 @@ namespace VitalChoice.Caching.Expressions.Visitors
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             var result = base.VisitMethodCall(node);
-            if ((node.Method.DeclaringType == typeof (Enumerable) || node.Method.DeclaringType.TryGetElementType(typeof (ICollection<>)) != null) &&
-                node.Method.Name == "Contains")
+            if (node.Method.Name == "Contains" && node.Method.DeclaringType.TryGetElementType(typeof (ICollection<>)) != null)
             {
                 _condition = new Condition(node.NodeType, node);
                 _conditions.Push(_condition);
+            }
+            if (node.Method.Name == "Equals" && node.Arguments.Count == 2)
+            {
+                VisitBinary(Expression.Equal(node.Arguments.First(), node.Arguments.Last()));
             }
             return result;
         }

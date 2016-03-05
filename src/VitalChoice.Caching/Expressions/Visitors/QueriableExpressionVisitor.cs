@@ -7,15 +7,13 @@ namespace VitalChoice.Caching.Expressions.Visitors
 {
     internal class QueriableExpressionVisitor<T> : ExpressionVisitor
     {
-        private bool _inWhereExpression;
-
         public WhereExpression<T> WhereExpression { get; private set; }
 
         public bool Tracking { get; private set; } = true;
 
         protected override Expression VisitLambda<T1>(Expression<T1> node)
         {
-            if (!_inWhereExpression || typeof (T1) != typeof (Func<T, bool>))
+            if (typeof (T1) != typeof (Func<T, bool>))
                 return base.VisitLambda(node);
 
             LambdaExpressionVisitor<T> lambdaVisitor = new LambdaExpressionVisitor<T>();
@@ -23,8 +21,10 @@ namespace VitalChoice.Caching.Expressions.Visitors
 
             if (WhereExpression != null)
             {
-                WhereExpression.Expression = Expression.Lambda<Func<T, bool>>(Expression.AndAlso(Expression.Invoke(WhereExpression.Expression, WhereExpression.Expression.Parameters), Expression.Invoke(node, node.Parameters)),
-                    WhereExpression.Expression.Parameters);
+                WhereExpression.Expression =
+                    Expression.Lambda<Func<T, bool>>(
+                        Expression.AndAlso(Expression.Invoke(WhereExpression.Expression, WhereExpression.Expression.Parameters), node.Body),
+                        node.Parameters);
                 WhereExpression.Condition = new BinaryCondition(ExpressionType.AndAlso, WhereExpression.Expression)
                 {
                     Left = WhereExpression.Condition,
@@ -43,21 +43,12 @@ namespace VitalChoice.Caching.Expressions.Visitors
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if (node.Method.DeclaringType == typeof (Queryable) && node.Method.Name == "Where")
-            {
-                if (!_inWhereExpression)
-                {
-                    _inWhereExpression = true;
-                    var result = base.VisitMethodCall(node);
-                    _inWhereExpression = false;
-                    return result;
-                }
-            }
+            var result = base.VisitMethodCall(node);
             if (node.Method.DeclaringType == typeof (EntityFrameworkQueryableExtensions) && node.Method.Name == "AsNoTracking")
             {
                 Tracking = false;
             }
-            return base.VisitMethodCall(node);
+            return result;
         }
     }
 }

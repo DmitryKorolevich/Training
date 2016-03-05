@@ -35,13 +35,15 @@ namespace VitalChoice.Caching.Services
         public override TResult Execute<TResult>(Expression expression)
         {
             var cacheObjectType = typeof (TResult);
-            var elementType = typeof (TResult).TryGetElementType(typeof (ICollection<>));
+            var elementType = typeof (TResult).TryGetElementType(typeof (IEnumerable<>));
             if (elementType != null)
             {
                 cacheObjectType = elementType;
             }
-            if (cacheObjectType.GetTypeInfo().IsSubclassOf(typeof (Entity)))
+            if (_cacheFactory.CanCache(cacheObjectType))
             {
+                //if (cacheObjectType.GetTypeInfo().IsSubclassOf(typeof (Entity)))
+                //{
                 var cacheExecutor =
                     (ICacheExecutor)
                         Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
@@ -60,9 +62,13 @@ namespace VitalChoice.Caching.Services
                         {
                             cacheExecutor.UpdateList(result);
                         }
-                        cacheExecutor.Update(result);
+                        else
+                        {
+                            cacheExecutor.Update(result);
+                        }
                         return (TResult) result;
                 }
+                //}
             }
             return base.Execute<TResult>(expression);
         }
@@ -70,14 +76,16 @@ namespace VitalChoice.Caching.Services
         public override IAsyncEnumerable<TResult> ExecuteAsync<TResult>(Expression expression)
         {
             var cacheObjectType = typeof (TResult);
-            if (cacheObjectType.GetTypeInfo().IsSubclassOf(typeof (Entity)))
+            if (_cacheFactory.CanCache(cacheObjectType))
             {
+                //if (cacheObjectType.GetTypeInfo().IsSubclassOf(typeof (Entity)))
+                //{
                 var cacheExecutor =
                     (ICacheExecutor)
                         Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
                             _context, _queryCacheFactory, _cacheFactory, _logger);
                 CacheGetResult cacheGetResult;
-                var result = (List<TResult>)cacheExecutor.Execute(out cacheGetResult);
+                var result = (List<TResult>) cacheExecutor.Execute(out cacheGetResult);
                 switch (cacheGetResult)
                 {
                     case CacheGetResult.Found:
@@ -88,20 +96,23 @@ namespace VitalChoice.Caching.Services
                         cacheExecutor.UpdateList(results);
                         return results.ToAsyncEnumerable();
                 }
+                //}
             }
             return base.ExecuteAsync<TResult>(expression);
         }
 
-        public override Task<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken)
+        public override async Task<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken)
         {
             var cacheObjectType = typeof (TResult);
-            var elementType = typeof(TResult).TryGetElementType(typeof(ICollection<>));
+            var elementType = typeof(TResult).TryGetElementType(typeof(IEnumerable<>));
             if (elementType != null)
             {
                 cacheObjectType = elementType;
             }
-            if (cacheObjectType.GetTypeInfo().IsSubclassOf(typeof (Entity)))
+            if (_cacheFactory.CanCache(cacheObjectType))
             {
+                //if (cacheObjectType.GetTypeInfo().IsSubclassOf(typeof (Entity)))
+                //{
                 var cacheExecutor =
                     (ICacheExecutor)
                         Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
@@ -113,19 +124,22 @@ namespace VitalChoice.Caching.Services
                 switch (cacheGetResult)
                 {
                     case CacheGetResult.Found:
-                        return Task.FromResult((TResult) result);
+                        return (TResult) result;
                     case CacheGetResult.Update:
-                        var asyncResult = base.ExecuteAsync<TResult>(expression, cancellationToken);
-                        var results = asyncResult.GetAwaiter().GetResult();
+                        var results = await base.ExecuteAsync<TResult>(expression, cancellationToken);
                         if (elementType != null)
                         {
                             cacheExecutor.UpdateList(results);
                         }
-                        cacheExecutor.Update(results);
-                        return Task.FromResult(results);
+                        else
+                        {
+                            cacheExecutor.Update(results);
+                        }
+                        return results;
                 }
+                //}
             }
-            return base.ExecuteAsync<TResult>(expression, cancellationToken);
+            return await base.ExecuteAsync<TResult>(expression, cancellationToken);
         }
 
         private interface ICacheExecutor
@@ -137,7 +151,7 @@ namespace VitalChoice.Caching.Services
         }
 
         private struct CacheExecutor<T> : ICacheExecutor
-            where T : Entity, new()
+            where T : class, new()
         {
             private readonly ILogger _logger;
             private readonly QueryData<T> _queryData;
@@ -154,7 +168,7 @@ namespace VitalChoice.Caching.Services
 
             public object Execute(out CacheGetResult cacheResult)
             {
-                if (_queryData.IsEmpty)
+                if (!_queryData.CanCollectionCache)
                 {
                     cacheResult = CacheGetResult.NotFound;
                     return null;
@@ -175,7 +189,7 @@ namespace VitalChoice.Caching.Services
 
             public object ExecuteFirst(out CacheGetResult cacheResult)
             {
-                if (_queryData.IsEmpty)
+                if (!_queryData.CanCache)
                 {
                     cacheResult = CacheGetResult.NotFound;
                     return null;
@@ -196,7 +210,7 @@ namespace VitalChoice.Caching.Services
 
             public void Update(object entity)
             {
-                if (_queryData.IsEmpty)
+                if (!_queryData.CanCache)
                 {
                     return;
                 }
@@ -212,7 +226,7 @@ namespace VitalChoice.Caching.Services
 
             public void UpdateList(object entities)
             {
-                if (_queryData.IsEmpty)
+                if (!_queryData.CanCollectionCache)
                 {
                     return;
                 }

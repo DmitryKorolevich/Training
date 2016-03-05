@@ -140,6 +140,8 @@ namespace VitalChoice.Caching.Services.Cache
 
         public IEnumerable<CacheResult<T>> GetAll(RelationInfo relations)
         {
+            if (!CacheStorage.GetCacheExist(relations))
+                yield return CacheGetResult.Update;
             var data = CacheStorage.GetCacheData(relations);
             if (!data.FullCollection)
             {

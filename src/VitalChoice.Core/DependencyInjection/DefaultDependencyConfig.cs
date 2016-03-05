@@ -79,6 +79,7 @@ using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Services.Checkout;
 using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Caching.Extensions;
+using VitalChoice.Caching.Services;
 using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Data.UnitOfWork;
@@ -99,10 +100,10 @@ namespace VitalChoice.Core.DependencyInjection
             // Add EF services to the services container.
 #if !DOTNET5_4
             services.AddEntityFramework()
-                .AddEntityFrameworkCache<ServiceBusCacheSyncProvider>(new[] {typeof (VitalChoiceContext), typeof (EcommerceContext)})
+                .AddEntityFrameworkCache<CacheSyncProvider>(new[] {typeof (VitalChoiceContext), typeof (EcommerceContext)})
                 .AddSqlServer();
 #else
-            services.AddEntityFramework().AddEntityFrameworkCache(new [] {typeof(VitalChoiceContext), typeof(EcommerceContext) }).AddSqlServer();
+            services.AddEntityFramework().AddEntityFrameworkCache<CacheSyncProvider>(new [] {typeof(VitalChoiceContext), typeof(EcommerceContext) }).AddSqlServer();
 #endif
 
             // Add Identity services to the services container.

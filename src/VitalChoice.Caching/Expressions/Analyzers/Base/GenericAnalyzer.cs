@@ -52,6 +52,12 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
             HashSet<TValueGroup> itemsSet,
             HashSet<TValue> valuesSet)
         {
+            if (top == null)
+            {
+                ContainsAdditionalConditions = true;
+                return true;
+            }
+
             switch (top.Operator)
             {
                 case ExpressionType.Equal:
@@ -80,14 +86,20 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
                     return false;
                 case ExpressionType.Call:
                     var method = top.Expression as MethodCallExpression;
-
-                    var memberSelector =
-                        ((method?.Arguments.Last() as UnaryExpression)?.Operand as LambdaExpression)?.Body as MemberExpression;
-                    var values = (method?.Arguments.Last() as UnaryExpression)?.Operand.GetValue();
-                    if (values != null && memberSelector != null && memberSelector.Expression.Type == typeof (T) &&
-                        GroupInfo.TryGet(memberSelector.Member.Name, out info) && GroupInfo.Count == 1)
+                    if (method != null)
                     {
-                        AddNewKeys(itemsSet, info, values);
+                        var suspect = method.Arguments.Last().RemoveConvert();
+
+                        var memberSelector =
+                            suspect as MemberExpression ?? (suspect as LambdaExpression)?.Body as MemberExpression;
+
+                        var values = method.Object != null ? method.Object.GetValue() : method.Arguments.First().RemoveConvert().GetValue();
+
+                        if (values != null && memberSelector != null && memberSelector.Expression.Type == typeof (T) &&
+                            GroupInfo.TryGet(memberSelector.Member.Name, out info) && GroupInfo.Count == 1)
+                        {
+                            AddNewKeys(itemsSet, info, values);
+                        }
                     }
                     ContainsAdditionalConditions = true;
                     return true;

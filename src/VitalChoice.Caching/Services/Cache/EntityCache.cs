@@ -16,7 +16,8 @@ using VitalChoice.ObjectMapping.Extensions;
 namespace VitalChoice.Caching.Services.Cache
 {
     public class EntityCache<T> : IEntityCache<T>
-        where T : Entity, new()
+        //where T : Entity, new()
+        where T : class, new()
     {
         private readonly IInternalEntityCache<T> _internalCache;
         private readonly IInternalEntityCacheFactory _cacheFactory;

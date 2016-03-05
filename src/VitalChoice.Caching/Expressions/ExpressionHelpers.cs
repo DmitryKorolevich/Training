@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
+using VitalChoice.Caching.Expressions.Visitors;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Expressions
@@ -14,6 +15,16 @@ namespace VitalChoice.Caching.Expressions
         {
             var left = condition.Left.Expression.RemoveConvert();
             var right = condition.Right.Expression.RemoveConvert();
+            if (left is ConstantExpression)
+            {
+                member = right as MemberExpression;
+                return GetValue(left);
+            }
+            if (right is ConstantExpression)
+            {
+                member = left as MemberExpression;
+                return GetValue(right);
+            }
             member = left as MemberExpression;
             if (member != null && !(member.Expression is ConstantExpression))
             {
@@ -47,8 +58,11 @@ namespace VitalChoice.Caching.Expressions
                     var value = GetValue(accessObject);
                     return value == null ? null : accessor(value);
                 }
-
-                Expression.Lambda(expression).Compile().DynamicInvoke(null);
+                var evaluator = new EvaluatorExpressionVisitor();
+                evaluator.Visit(expression);
+                if (!evaluator.ContainsParameter)
+                    return Expression.Lambda(expression).Compile().DynamicInvoke(null);
+                return null;
             }
             return null;
         }

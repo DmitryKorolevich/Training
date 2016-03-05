@@ -186,6 +186,7 @@ namespace VitalChoice.Caching.Services.Cache
             Clear();
             Update(entities);
             FullCollection = true;
+            NeedUpdate = false;
         }
 
         public void SetNull(EntityKey pk)

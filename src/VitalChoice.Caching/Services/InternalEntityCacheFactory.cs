@@ -20,6 +20,11 @@ namespace VitalChoice.Caching.Services
             _keyStorage = keyStorage;
         }
 
+        public bool CanCache(Type entityType)
+        {
+            return _keyStorage.HaveKeys(entityType);
+        }
+
         public bool CacheExist(Type entityType)
         {
             return EntityCaches.ContainsKey(entityType);
@@ -37,7 +42,9 @@ namespace VitalChoice.Caching.Services
 
         public IInternalEntityCache<T> GetCache<T>()
         {
-            return (IInternalEntityCache<T>) GetCache(typeof (T));
+            if (!_keyStorage.HaveKeys(typeof(T)))
+                return null;
+            return new EntityInternalCache<T>(_keyStorage, this);
         }
 
         public bool CanAddUpCache()
