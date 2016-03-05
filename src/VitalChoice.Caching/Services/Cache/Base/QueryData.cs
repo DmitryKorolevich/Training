@@ -17,9 +17,11 @@ namespace VitalChoice.Caching.Services.Cache.Base
         public ICollection<EntityKey> PrimaryKeys { get; set; }
         public bool HasFullCollectionCacheCondition { get; set; }
 
-        public bool CanCache => PrimaryKeys != null || UniqueIndexes != null || ConditionalIndexes != null;
+        public bool CanCache => PrimaryKeys != null && PrimaryKeys.Any() || UniqueIndexes != null && UniqueIndexes.Any() || ConditionalIndexes != null && ConditionalIndexes.Any();
 
-        public bool CanCollectionCache => WhereExpression == null || CanCache || HasFullCollectionCacheCondition;
+        public bool CanCollectionCache => CanCache || FullCollection;
+
+        public bool FullCollection => WhereExpression == null || HasFullCollectionCacheCondition;
 
         public static readonly QueryData<T> Empty = new QueryData<T>();
     }

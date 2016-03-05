@@ -980,7 +980,7 @@ namespace VitalChoice.Business.Services.Orders
             var toReturn = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
             if (toReturn.Items.Any())
             {
-                var ids = toReturn.Items.Select(p => p.IdEditedBy).ToList();
+                var ids = toReturn.Items.Select(p => p.IdEditedBy).Distinct().ToList();
                 var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
                 foreach (var item in toReturn.Items)
                 {

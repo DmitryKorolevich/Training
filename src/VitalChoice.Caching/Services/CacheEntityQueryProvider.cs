@@ -47,7 +47,7 @@ namespace VitalChoice.Caching.Services
                 var cacheExecutor =
                     (ICacheExecutor)
                         Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
-                            _context, _queryCacheFactory, _cacheFactory, _logger);
+                            _context, _queryCacheFactory, _cacheFactory, _logger, elementType != null);
                 CacheGetResult cacheGetResult;
                 var results = elementType != null
                     ? cacheExecutor.Execute(out cacheGetResult)
@@ -83,7 +83,7 @@ namespace VitalChoice.Caching.Services
                 var cacheExecutor =
                     (ICacheExecutor)
                         Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
-                            _context, _queryCacheFactory, _cacheFactory, _logger);
+                            _context, _queryCacheFactory, _cacheFactory, _logger, true);
                 CacheGetResult cacheGetResult;
                 var result = (List<TResult>) cacheExecutor.Execute(out cacheGetResult);
                 switch (cacheGetResult)
@@ -116,7 +116,7 @@ namespace VitalChoice.Caching.Services
                 var cacheExecutor =
                     (ICacheExecutor)
                         Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
-                            _context, _queryCacheFactory, _cacheFactory, _logger);
+                            _context, _queryCacheFactory, _cacheFactory, _logger, elementType != null);
                 CacheGetResult cacheGetResult;
                 var result = elementType != null
                     ? cacheExecutor.Execute(out cacheGetResult)
@@ -158,17 +158,31 @@ namespace VitalChoice.Caching.Services
             private readonly IEntityCache<T> _cache;
 
             public CacheExecutor(Expression expression, DbContext context, IQueryCacheFactory queryCacheFactory,
-                IInternalEntityCacheFactory cacheFactory, ILogger logger)
+                IInternalEntityCacheFactory cacheFactory, ILogger logger, bool collection)
             {
-                _cache = new EntityCache<T>(cacheFactory, context, logger);
                 _logger = logger;
                 var queryCache = queryCacheFactory.GetQueryCache<T>();
                 _queryData = queryCache.GerOrAdd(expression);
+                _cache = null;
+                if (collection)
+                {
+                    if (_queryData.CanCollectionCache)
+                    {
+                        _cache = new EntityCache<T>(cacheFactory, context, logger);
+                    }
+                }
+                else
+                {
+                    if (_queryData.CanCache)
+                    {
+                        _cache = new EntityCache<T>(cacheFactory, context, logger);
+                    }
+                }
             }
 
             public object Execute(out CacheGetResult cacheResult)
             {
-                if (!_queryData.CanCollectionCache)
+                if (_cache == null)
                 {
                     cacheResult = CacheGetResult.NotFound;
                     return null;
@@ -189,7 +203,7 @@ namespace VitalChoice.Caching.Services
 
             public object ExecuteFirst(out CacheGetResult cacheResult)
             {
-                if (!_queryData.CanCache)
+                if (_cache == null)
                 {
                     cacheResult = CacheGetResult.NotFound;
                     return null;
@@ -210,7 +224,7 @@ namespace VitalChoice.Caching.Services
 
             public bool Update(object entity)
             {
-                if (!_queryData.CanCache)
+                if (_cache == null)
                 {
                     return false;
                 }
@@ -227,7 +241,7 @@ namespace VitalChoice.Caching.Services
 
             public bool UpdateList(object entities)
             {
-                if (!_queryData.CanCollectionCache)
+                if (_cache == null)
                 {
                     return false;
                 }

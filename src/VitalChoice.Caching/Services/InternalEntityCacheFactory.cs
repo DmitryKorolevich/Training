@@ -42,9 +42,9 @@ namespace VitalChoice.Caching.Services
 
         public IInternalEntityCache<T> GetCache<T>()
         {
-            if (!_keyStorage.HaveKeys(typeof(T)))
+            if (!_keyStorage.HaveKeys(typeof (T)))
                 return null;
-            return new EntityInternalCache<T>(_keyStorage, this);
+            return (IInternalEntityCache<T>) EntityCaches.GetOrAdd(typeof (T), cache => new EntityInternalCache<T>(_keyStorage, this));
         }
 
         public bool CanAddUpCache()

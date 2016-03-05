@@ -273,6 +273,11 @@ namespace VitalChoice.Infrastructure.ServiceBus
 #if NET451
         private void ProcessEncryptedMessage(BrokeredMessage message)
         {
+            if (message.ExpiresAtUtc < DateTime.UtcNow)
+            {
+                message.Complete();
+                return;
+            }
             if (message.CorrelationId == null)
             {
                 message.Complete();
@@ -340,6 +345,11 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         private void ProcessPlainMessage(BrokeredMessage message)
         {
+            if (message.ExpiresAtUtc < DateTime.UtcNow)
+            {
+                message.Complete();
+                return;
+            }
             if (message.CorrelationId == null)
             {
                 message.Complete();

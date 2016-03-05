@@ -151,6 +151,11 @@ namespace VitalChoice.Business.Services.Cache
                 Guid senderUid;
                 if (Guid.TryParse(message.CorrelationId, out senderUid))
                 {
+                    if (message.ExpiresAtUtc < DateTime.UtcNow)
+                    {
+                        message.Complete();
+                        continue;
+                    }
                     if (senderUid == ClientUid)
                     {
                         message.Abandon();

@@ -45,7 +45,7 @@ namespace VitalChoice.Caching.Services.Cache
             if (_internalCache.GetCacheExist(query.RelationInfo))
             {
                 IEnumerable<CacheResult<T>> results;
-                if (query.WhereExpression == null)
+                if (query.FullCollection)
                 {
                     results = _internalCache.GetAll(query.RelationInfo);
                     return TranslateResult(query, results,
@@ -86,7 +86,7 @@ namespace VitalChoice.Caching.Services.Cache
             if (_internalCache.GetCacheExist(query.RelationInfo))
             {
                 IEnumerable<CacheResult<T>> results;
-                if (query.WhereExpression == null)
+                if (query.FullCollection)
                 {
                     results = _internalCache.GetAll(query.RelationInfo);
                     return TranslateFirstResult(query, results,
@@ -123,9 +123,9 @@ namespace VitalChoice.Caching.Services.Cache
                 return false;
             }
 
-            bool fullCollection;
+            bool fullCollection = queryData.FullCollection;
 
-            if (!CanUpdate(queryData, out fullCollection))
+            if (!fullCollection && !queryData.CanCollectionCache)
             {
                 _logger.LogWarning($"<Cache Update> can't update cache, preconditions not met: {typeof(T)}\r\n{queryData.WhereExpression?.Expression.AsString()}");
                 return false;
@@ -152,9 +152,7 @@ namespace VitalChoice.Caching.Services.Cache
                 return false;
             }
 
-            bool fullCollection;
-
-            if (!CanUpdate(queryData, out fullCollection))
+            if (!queryData.CanCache)
             {
                 _logger.LogWarning($"<Cache Update> can't update cache, preconditions not met: {typeof(T)}\r\nExpression:\r\n{queryData.WhereExpression?.Expression.AsString()}");
                 return false;
@@ -169,24 +167,7 @@ namespace VitalChoice.Caching.Services.Cache
             {
                 entity = entity.Clone<T, Entity>();
             }
-            if (fullCollection)
-            {
-                return _internalCache.UpdateAll(Enumerable.Repeat(entity, 1), queryData.RelationInfo);
-            }
             return _internalCache.Update(entity, queryData.RelationInfo);
-        }
-
-        private bool CanUpdate(QueryData<T> queryData, out bool fullCollection)
-        {
-            if (queryData.WhereExpression == null || queryData.HasFullCollectionCacheCondition)
-            {
-                fullCollection = true;
-                return true;
-            }
-
-            fullCollection = false;
-            return queryData.PrimaryKeys.Count > 0 || queryData.UniqueIndexes.Count > 0 ||
-                   queryData.ConditionalIndexes.Any(c => c.Value.Count > 0);
         }
 
         private bool TryConditionalIndexes(QueryData<T> queryData,
