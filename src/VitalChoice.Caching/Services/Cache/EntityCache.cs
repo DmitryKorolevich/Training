@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.ChangeTracking;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Iterators;
 using VitalChoice.Caching.Relational;
@@ -22,11 +23,13 @@ namespace VitalChoice.Caching.Services.Cache
         private readonly IInternalEntityCache<T> _internalCache;
         private readonly IInternalEntityCacheFactory _cacheFactory;
         private readonly DbContext _context;
+        private readonly ILogger _logger;
 
-        public EntityCache(IInternalEntityCacheFactory cacheFactory, DbContext context)
+        public EntityCache(IInternalEntityCacheFactory cacheFactory, DbContext context, ILogger logger)
         {
             _cacheFactory = cacheFactory;
             _context = context;
+            _logger = logger;
             _internalCache = cacheFactory.GetCache<T>();
         }
 
@@ -34,6 +37,7 @@ namespace VitalChoice.Caching.Services.Cache
         {
             if (_internalCache == null)
             {
+                _logger.LogInformation($"Cache doesn't exist for type: {typeof(T)}");
                 entities = null;
                 return CacheGetResult.NotFound;
             }
@@ -65,6 +69,7 @@ namespace VitalChoice.Caching.Services.Cache
                 return TranslateResult(query,
                     results, out entities);
             }
+            _logger.LogVerbose($"Cache miss, type: {typeof(T)}");
             entities = null;
             return CacheGetResult.Update;
         }
@@ -73,6 +78,7 @@ namespace VitalChoice.Caching.Services.Cache
         {
             if (_internalCache == null)
             {
+                _logger.LogInformation($"Cache doesn't exist for type: {typeof (T)}");
                 entity = null;
                 return CacheGetResult.NotFound;
             }
@@ -104,21 +110,26 @@ namespace VitalChoice.Caching.Services.Cache
                 return TranslateFirstResult(query,
                     results, out entity);
             }
+            _logger.LogVerbose($"Cache miss, type: {typeof(T)}");
             entity = default(T);
             return CacheGetResult.Update;
         }
 
-        public void Update(QueryData<T> queryData, IEnumerable<T> entities)
+        public bool Update(QueryData<T> queryData, IEnumerable<T> entities)
         {
             if (_internalCache == null)
             {
-                return;
+                _logger.LogWarning($"<Cache Update> Cache doesn't exist for type: {typeof(T)}");
+                return false;
             }
 
             bool fullCollection;
 
             if (!CanUpdate(queryData, out fullCollection))
-                return;
+            {
+                _logger.LogWarning($"<Cache Update> can't update cache, preconditions not met: {typeof(T)}\r\n{queryData.WhereExpression?.Expression.AsString()}");
+                return false;
+            }
 
             if (queryData.Tracked)
             {
@@ -127,50 +138,47 @@ namespace VitalChoice.Caching.Services.Cache
 
             if (fullCollection)
             {
-                _internalCache.UpdateAll(entities, queryData.RelationInfo);
+                return _internalCache.UpdateAll(entities, queryData.RelationInfo);
             }
-            else
-            {
-                _internalCache.Update(entities, queryData.RelationInfo);
-            }
+
+            return _internalCache.Update(entities, queryData.RelationInfo);
         }
 
-        public void Update(QueryData<T> queryData, T entity)
+        public bool Update(QueryData<T> queryData, T entity)
         {
             if (_internalCache == null)
             {
-                return;
+                _logger.LogWarning($"<Cache Update> Cache doesn't exist for type: {typeof(T)}");
+                return false;
             }
 
             bool fullCollection;
 
             if (!CanUpdate(queryData, out fullCollection))
-                return;
+            {
+                _logger.LogWarning($"<Cache Update> can't update cache, preconditions not met: {typeof(T)}\r\nExpression:\r\n{queryData.WhereExpression?.Expression.AsString()}");
+                return false;
+            }
 
             if (entity == null)
             {
                 _internalCache.SetNull(queryData.PrimaryKeys, queryData.RelationInfo);
+                return true;
             }
-            else
+            if (queryData.Tracked)
             {
-                if (queryData.Tracked)
-                {
-                    entity = entity.Clone<T, Entity>();
-                }
-                if (fullCollection)
-                {
-                    _internalCache.UpdateAll(Enumerable.Repeat(entity, 1), queryData.RelationInfo);
-                }
-                else
-                {
-                    _internalCache.Update(entity, queryData.RelationInfo);
-                }
+                entity = entity.Clone<T, Entity>();
             }
+            if (fullCollection)
+            {
+                return _internalCache.UpdateAll(Enumerable.Repeat(entity, 1), queryData.RelationInfo);
+            }
+            return _internalCache.Update(entity, queryData.RelationInfo);
         }
 
         private bool CanUpdate(QueryData<T> queryData, out bool fullCollection)
         {
-            if (queryData.WhereExpression == null)
+            if (queryData.WhereExpression == null || queryData.HasFullCollectionCacheCondition)
             {
                 fullCollection = true;
                 return true;

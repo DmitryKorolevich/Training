@@ -16,7 +16,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
     {
         EntityValueGroupInfo<TInfo> GroupInfo { get; }
         bool ContainsAdditionalConditions { get; }
-        ICollection<TValueGroup> GetValuesFunction(WhereExpression<T> expression);
+        ICollection<TValueGroup> ParseValues(WhereExpression<T> expression);
     }
 
     public abstract class GenericAnalyzer<T, TValueGroup, TValue, TInfo> : IConditionAnalyzer<T, TValueGroup, TValue, TInfo>
@@ -32,7 +32,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
             GroupInfo = indexInfo;
         }
 
-        public virtual ICollection<TValueGroup> GetValuesFunction(WhereExpression<T> expression)
+        public virtual ICollection<TValueGroup> ParseValues(WhereExpression<T> expression)
         {
             if (GroupInfo == null || expression?.Condition == null)
                 return new TValueGroup[0];

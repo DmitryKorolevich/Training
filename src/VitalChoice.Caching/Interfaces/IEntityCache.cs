@@ -9,7 +9,7 @@ namespace VitalChoice.Caching.Interfaces
     {
         CacheGetResult TryGetCached(QueryData<T> query, out List<T> entities);
         CacheGetResult TryGetCachedFirstOrDefault(QueryData<T> query, out T entity);
-        void Update(QueryData<T> query, IEnumerable<T> entities);
-        void Update(QueryData<T> query, T entity);
+        bool Update(QueryData<T> query, IEnumerable<T> entities);
+        bool Update(QueryData<T> query, T entity);
     }
 }

@@ -21,11 +21,11 @@ namespace VitalChoice.Caching.Expressions.Visitors
 
             if (WhereExpression != null)
             {
+                ExpressionSwapVisitor swapVisitor = new ExpressionSwapVisitor(WhereExpression.Expression.Parameters[0], node.Parameters[0]);
+                var newExpression = (Expression<Func<T, bool>>) swapVisitor.Visit(WhereExpression.Expression);
                 WhereExpression.Expression =
-                    Expression.Lambda<Func<T, bool>>(
-                        Expression.AndAlso(Expression.Invoke(WhereExpression.Expression, WhereExpression.Expression.Parameters), node.Body),
-                        node.Parameters);
-                WhereExpression.Condition = new BinaryCondition(ExpressionType.AndAlso, WhereExpression.Expression)
+                    Expression.Lambda<Func<T, bool>>(Expression.AndAlso(newExpression.Body, node.Body), node.Parameters);
+                WhereExpression.Condition = new BinaryCondition(ExpressionType.AndAlso, newExpression)
                 {
                     Left = WhereExpression.Condition,
                     Right = lambdaVisitor.Condition

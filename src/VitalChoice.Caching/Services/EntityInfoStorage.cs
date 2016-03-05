@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Autofac;
 using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.Infrastructure;
 using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Metadata.Internal;
 using Microsoft.Extensions.Logging;
@@ -57,7 +58,8 @@ namespace VitalChoice.Caching.Services
                             if (!TryGetPrimaryKey(entityType, out primaryKey))
                                 continue;
                             var uniqueIndex = GetFirstUniqueIndex(entityType);
-                            var conditionalList = GetyConditionalIndexes(entityType);
+                            var conditionalList = GetConditionalIndexes(entityType);
+                            var cacheCondition = GetCacheCondition(entityType);
                             var nonUniqueIndexes = SetupForeignKeys(entityType, entityInfos);
 
                             if (!parsedEntities.Contains(entityType.ClrType))
@@ -69,7 +71,8 @@ namespace VitalChoice.Caching.Services
                                     PrimaryKey = primaryKey,
                                     CacheableIndex = uniqueIndex,
                                     ConditionalIndexes = conditionalList,
-                                    ContextType = context.GetType()
+                                    ContextType = context.GetType(),
+                                    CacheCondition = cacheCondition
                                 }, info =>
                                 {
                                     if (info.ForeignKeys == null)
@@ -79,6 +82,7 @@ namespace VitalChoice.Caching.Services
                                     info.CacheableIndex = uniqueIndex;
                                     info.ConditionalIndexes = conditionalList;
                                     info.ContextType = context.GetType();
+                                    info.CacheCondition = cacheCondition;
                                     return info;
                                 });
                             }
@@ -230,14 +234,14 @@ namespace VitalChoice.Caching.Services
             return nonUniqueList;
         }
 
-        private static List<EntityConditionalIndexInfo> GetyConditionalIndexes(IEntityType entityType)
+        private static List<EntityConditionalIndexInfo> GetConditionalIndexes(IEntityType entityType)
         {
             List<EntityConditionalIndexInfo> conditionalList = new List<EntityConditionalIndexInfo>();
 
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var index in entityType.GetIndexes())
             {
-                var conditionAnnotation = index.FindAnnotation(IndexBuilderExtension.UniqueIndexAnnotationName);
+                var conditionAnnotation = index.FindAnnotation(EntityBuilderExtensions.UniqueIndexAnnotationName);
                 if (conditionAnnotation != null)
                 {
                     conditionalList.Add(new EntityConditionalIndexInfo(CreateValueInfos(index.Properties),
@@ -246,6 +250,12 @@ namespace VitalChoice.Caching.Services
                 }
             }
             return conditionalList;
+        }
+
+        private static LambdaExpression GetCacheCondition(IAnnotatable entityType)
+        {
+            var fullCacheAnnotation = entityType.FindAnnotation(EntityBuilderExtensions.FullCollectionAnnotationName);
+            return (LambdaExpression) fullCacheAnnotation?.Value;
         }
 
         public bool HaveKeys(Type entityType)

@@ -173,20 +173,18 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        public void Update(IEnumerable<T> entities)
+        public bool Update(IEnumerable<T> entities)
         {
-            foreach (var entity in entities)
-            {
-                Update(entity);
-            }
+            return entities.Aggregate(true, (current, next) => current && Update(next) != null);
         }
 
-        public void UpdateAll(IEnumerable<T> entities)
+        public bool UpdateAll(IEnumerable<T> entities)
         {
             Clear();
-            Update(entities);
+            var result = Update(entities);
             FullCollection = true;
             NeedUpdate = false;
+            return result;
         }
 
         public void SetNull(EntityKey pk)

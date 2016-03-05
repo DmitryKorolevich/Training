@@ -18,12 +18,18 @@ namespace VitalChoice.Caching.Services.Cache
         private readonly PrimaryKeyAnalyzer<T> _primaryKeyAnalyzer;
         private readonly IndexAnalyzer<T> _indexAnalyzer;
         private readonly ICollection<ConditionalIndexAnalyzer<T>> _conditionalIndexAnalyzers;
+        private readonly LambdaExpression _cacheCondition;
 
         public QueryCache(IEntityInfoStorage entityInfo)
         {
-            _primaryKeyAnalyzer = new PrimaryKeyAnalyzer<T>(entityInfo.GetPrimaryKeyInfo<T>());
-            _indexAnalyzer = new IndexAnalyzer<T>(entityInfo.GetIndexInfo<T>());
-            _conditionalIndexAnalyzers = entityInfo.GetConditionalIndexInfos<T>().Select(i => new ConditionalIndexAnalyzer<T>(i)).ToArray();
+            EntityInfo info;
+            if (entityInfo.GetEntityInfo<T>(out info))
+            {
+                _primaryKeyAnalyzer = new PrimaryKeyAnalyzer<T>(info.PrimaryKey);
+                _indexAnalyzer = new IndexAnalyzer<T>(info.CacheableIndex);
+                _conditionalIndexAnalyzers = info.ConditionalIndexes.Select(i => new ConditionalIndexAnalyzer<T>(i)).ToArray();
+                _cacheCondition = info.CacheCondition;
+            }
         }
 
         public QueryData<T> GerOrAdd(Expression query)
@@ -52,15 +58,16 @@ namespace VitalChoice.Caching.Services.Cache
 
             if (result.WhereExpression != null)
             {
-                result.PrimaryKeys = _primaryKeyAnalyzer.GetValuesFunction(result.WhereExpression);
-                result.UniqueIndexes = _indexAnalyzer.GetValuesFunction(result.WhereExpression);
+                result.PrimaryKeys = _primaryKeyAnalyzer.ParseValues(result.WhereExpression);
+                result.UniqueIndexes = _indexAnalyzer.ParseValues(result.WhereExpression);
                 result.ConditionalIndexes =
                     _conditionalIndexAnalyzers.Select(
                         analyzer =>
                             new KeyValuePair<EntityConditionalIndexInfo, ICollection<EntityIndex>>(
                                 (EntityConditionalIndexInfo) analyzer.GroupInfo,
-                                analyzer.GetValuesFunction(result.WhereExpression)))
+                                analyzer.ParseValues(result.WhereExpression)))
                         .ToArray();
+                result.HasFullCollectionCacheCondition = _cacheCondition.EqualsToCondition(result.WhereExpression.Expression);
             }
 
             return result;

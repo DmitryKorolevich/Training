@@ -381,6 +381,8 @@ namespace VitalChoice.Ecommerce.Context
                 entity.HasKey(p => p.Id);
                 entity.ToTable("Countries");
                 entity.Ignore(p => p.States);
+                entity.CacheWhen(c => c.StatusCode != RecordStatusCode.Deleted);
+                entity.HasIndex(c => c.CountryCode).IsUnique();
             });
 
 
@@ -388,6 +390,8 @@ namespace VitalChoice.Ecommerce.Context
             {
                 entity.HasKey(p => p.Id);
                 entity.ToTable("States");
+                entity.CacheWhen(c => c.StatusCode != RecordStatusCode.Deleted);
+                entity.HasIndex(c => new {c.StateCode, c.CountryCode}).IsUnique();
             });
 
 

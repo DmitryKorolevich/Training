@@ -1,7 +1,10 @@
 ﻿using Microsoft.Data.Entity;
 using System.Data.SqlClient;
 using Microsoft.Extensions.OptionsModel;
+using VitalChoice.Caching.Extensions;
 using VitalChoice.Ecommerce.Context;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Options;
@@ -237,11 +240,6 @@ namespace VitalChoice.Infrastructure.Context
                     .IsRequired();
                 entity.Ignore(v => v.BigValue);
                 entity.Ignore(v => v.IdBigString);
-            });
-
-            builder.Entity<CartExtended>(entity =>
-            {
-                //entity.
             });
         }
     }

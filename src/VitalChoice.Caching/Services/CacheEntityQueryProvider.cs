@@ -49,24 +49,24 @@ namespace VitalChoice.Caching.Services
                         Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
                             _context, _queryCacheFactory, _cacheFactory, _logger);
                 CacheGetResult cacheGetResult;
-                var result = elementType != null
+                var results = elementType != null
                     ? cacheExecutor.Execute(out cacheGetResult)
                     : cacheExecutor.ExecuteFirst(out cacheGetResult);
                 switch (cacheGetResult)
                 {
                     case CacheGetResult.Found:
-                        return (TResult) result;
+                        return (TResult) results;
                     case CacheGetResult.Update:
-                        result = base.Execute<TResult>(expression);
+                        results = base.Execute<TResult>(expression);
                         if (elementType != null)
                         {
-                            cacheExecutor.UpdateList(result);
+                            cacheExecutor.UpdateList(results);
                         }
                         else
                         {
-                            cacheExecutor.Update(result);
+                            cacheExecutor.Update(results);
                         }
-                        return (TResult) result;
+                        return (TResult) results;
                 }
                 //}
             }
@@ -146,8 +146,8 @@ namespace VitalChoice.Caching.Services
         {
             object Execute(out CacheGetResult cacheResult);
             object ExecuteFirst(out CacheGetResult cacheResult);
-            void Update(object entity);
-            void UpdateList(object entities);
+            bool Update(object entity);
+            bool UpdateList(object entities);
         }
 
         private struct CacheExecutor<T> : ICacheExecutor
@@ -160,7 +160,7 @@ namespace VitalChoice.Caching.Services
             public CacheExecutor(Expression expression, DbContext context, IQueryCacheFactory queryCacheFactory,
                 IInternalEntityCacheFactory cacheFactory, ILogger logger)
             {
-                _cache = new EntityCache<T>(cacheFactory, context);
+                _cache = new EntityCache<T>(cacheFactory, context, logger);
                 _logger = logger;
                 var queryCache = queryCacheFactory.GetQueryCache<T>();
                 _queryData = queryCache.GerOrAdd(expression);
@@ -208,36 +208,38 @@ namespace VitalChoice.Caching.Services
                 }
             }
 
-            public void Update(object entity)
+            public bool Update(object entity)
             {
                 if (!_queryData.CanCache)
                 {
-                    return;
+                    return false;
                 }
                 try
                 {
-                    _cache.Update(_queryData, (T) entity);
+                    return _cache.Update(_queryData, (T) entity);
                 }
                 catch (Exception e)
                 {
                     _logger.LogError(e.Message, e);
                 }
+                return false;
             }
 
-            public void UpdateList(object entities)
+            public bool UpdateList(object entities)
             {
                 if (!_queryData.CanCollectionCache)
                 {
-                    return;
+                    return false;
                 }
                 try
                 {
-                    _cache.Update(_queryData, (IEnumerable<T>)entities);
+                    return _cache.Update(_queryData, (IEnumerable<T>)entities);
                 }
                 catch (Exception e)
                 {
                     _logger.LogError(e.Message, e);
                 }
+                return false;
             }
         }
     }

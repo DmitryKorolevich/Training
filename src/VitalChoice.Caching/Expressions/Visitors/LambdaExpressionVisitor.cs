@@ -65,9 +65,16 @@ namespace VitalChoice.Caching.Expressions.Visitors
                 _condition = new Condition(node.NodeType, node);
                 _conditions.Push(_condition);
             }
-            if (node.Method.Name == "Equals" && node.Arguments.Count == 2)
+            if (node.Method.Name == "Equals")
             {
-                VisitBinary(Expression.Equal(node.Arguments.First(), node.Arguments.Last()));
+                if (node.Arguments.Count == 2)
+                {
+                    VisitBinary(Expression.Equal(node.Arguments.First(), node.Arguments.Last()));
+                }
+                else if (node.Arguments.Count == 1 && node.Object != null)
+                {
+                    VisitBinary(Expression.Equal(node.Arguments[0], node.Object));
+                }
             }
             return result;
         }

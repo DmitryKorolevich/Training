@@ -177,27 +177,28 @@ namespace VitalChoice.Caching.Services.Cache
             return TryRemove(pk);
         }
 
-        public void Update(IEnumerable<T> entities, RelationInfo relationInfo)
+        public bool Update(IEnumerable<T> entities, RelationInfo relationInfo)
         {
             var data = CacheStorage.GetCacheData(relationInfo);
-            data.Update(entities);
+            return data.Update(entities);
         }
 
-        public void Update(T entity, RelationInfo relationInfo)
+        public bool Update(T entity, RelationInfo relationInfo)
         {
             if (entity == null)
-                return;
+                return false;
 
             var data = CacheStorage.GetCacheData(relationInfo);
-            data.Update(entity);
+            return data.Update(entity) != null;
         }
 
-        public void Update(T entity)
+        public bool Update(T entity)
         {
             if (entity == null)
-                return;
+                return false;
 
             MarkForUpdate(entity);
+            return false;
         }
 
         public CachedEntity<T> Update(RelationInfo relations, T entity)
@@ -212,10 +213,10 @@ namespace VitalChoice.Caching.Services.Cache
             return entities.Select(entity => data.Update(entity));
         }
 
-        public void UpdateAll(IEnumerable<T> entities, RelationInfo relationInfo)
+        public bool UpdateAll(IEnumerable<T> entities, RelationInfo relationInfo)
         {
             var data = CacheStorage.GetCacheData(relationInfo);
-            data.UpdateAll(entities);
+            return data.UpdateAll(entities);
         }
 
         public EntityKey MarkForUpdate(T entity)
@@ -254,19 +255,19 @@ namespace VitalChoice.Caching.Services.Cache
             return Update(relations, entity.Cast<T>());
         }
 
-        public void Update(IEnumerable<object> entities, RelationInfo relationInfo)
+        public bool Update(IEnumerable<object> entities, RelationInfo relationInfo)
         {
-            Update(entities.Cast<T>(), relationInfo);
+            return Update(entities.Cast<T>(), relationInfo);
         }
 
-        public void Update(object entity, RelationInfo relationInfo)
+        public bool Update(object entity, RelationInfo relationInfo)
         {
-            Update((T) entity, relationInfo);
+            return Update((T) entity, relationInfo);
         }
 
-        public void Update(object entity)
+        public bool Update(object entity)
         {
-            Update((T) entity);
+            return Update((T) entity);
         }
 
         public void SetNull(IEnumerable<EntityKey> keys, RelationInfo relationInfo)
@@ -281,9 +282,9 @@ namespace VitalChoice.Caching.Services.Cache
             data.SetNull(key);
         }
 
-        public void UpdateAll(IEnumerable<object> entities, RelationInfo relationInfo)
+        public bool UpdateAll(IEnumerable<object> entities, RelationInfo relationInfo)
         {
-            UpdateAll(entities.Cast<T>(), relationInfo);
+            return UpdateAll(entities.Cast<T>(), relationInfo);
         }
 
         public EntityKey MarkForUpdate(object entity)

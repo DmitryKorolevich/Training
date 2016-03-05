@@ -15,10 +15,11 @@ namespace VitalChoice.Caching.Services.Cache.Base
         public ICollection<KeyValuePair<EntityConditionalIndexInfo, ICollection<EntityIndex>>> ConditionalIndexes { get; set; }
         public ICollection<EntityIndex> UniqueIndexes { get; set; }
         public ICollection<EntityKey> PrimaryKeys { get; set; }
+        public bool HasFullCollectionCacheCondition { get; set; }
 
-        public bool CanCache => PrimaryKeys != null;
+        public bool CanCache => PrimaryKeys != null || UniqueIndexes != null || ConditionalIndexes != null;
 
-        public bool CanCollectionCache => WhereExpression == null || PrimaryKeys != null;
+        public bool CanCollectionCache => WhereExpression == null || CanCache || HasFullCollectionCacheCondition;
 
         public static readonly QueryData<T> Empty = new QueryData<T>();
     }

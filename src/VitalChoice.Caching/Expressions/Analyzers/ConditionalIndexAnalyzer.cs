@@ -14,10 +14,10 @@ namespace VitalChoice.Caching.Expressions.Analyzers
             _indexInfo = indexInfo;
         }
 
-        public override ICollection<EntityIndex> GetValuesFunction(WhereExpression<T> expression)
+        public override ICollection<EntityIndex> ParseValues(WhereExpression<T> expression)
         {
             if (expression.Expression.ContainsCondition(_indexInfo.LogicalUniquenessCondition))
-                return base.GetValuesFunction(expression);
+                return base.ParseValues(expression);
             return new EntityIndex[0];
         }
     }
