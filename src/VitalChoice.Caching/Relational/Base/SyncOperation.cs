@@ -15,6 +15,11 @@ namespace VitalChoice.Caching.Relational.Base
         public string EntityType { get; set; }
         [DataMember]
         public EntityKeyExportable Key { get; set; }
+
+        public override string ToString()
+        {
+            return $"[{SyncType}:{EntityType}]{Key}";
+        }
     }
 
     public enum SyncType

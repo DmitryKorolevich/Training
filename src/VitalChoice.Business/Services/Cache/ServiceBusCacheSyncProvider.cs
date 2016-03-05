@@ -107,7 +107,7 @@ namespace VitalChoice.Business.Services.Cache
                     using (var scope = _rootScope.BeginLifetimeScope())
                     {
                         var cacheSyncProvider = scope.Resolve<ICacheSyncProvider>();
-                        cacheSyncProvider.AcceptChanges(GetBatch());
+                        cacheSyncProvider.AcceptChanges(GetBatch(logger));
                     }
                 }
                 catch (Exception e)
@@ -143,19 +143,22 @@ namespace VitalChoice.Business.Services.Cache
             }
         }
 
-        private static IEnumerable<SyncOperation> GetBatch()
+        private static IEnumerable<SyncOperation> GetBatch(ILogger logger)
         {
             var incomingItems = _serviceBusClient.ReceiveBatch(100);
             foreach (var message in incomingItems)
             {
+                if (message.ExpiresAtUtc < DateTime.UtcNow)
+                {
+                    var syncOp = message.GetBody<SyncOperation>();
+                    logger.LogWarning(
+                        $"{syncOp} Cache update message expired, sender id: {message.CorrelationId}, current instance id: {ClientUid}");
+                    message.Complete();
+                    continue;
+                }
                 Guid senderUid;
                 if (Guid.TryParse(message.CorrelationId, out senderUid))
                 {
-                    if (message.ExpiresAtUtc < DateTime.UtcNow)
-                    {
-                        message.Complete();
-                        continue;
-                    }
                     if (senderUid == ClientUid)
                     {
                         message.Abandon();
@@ -163,6 +166,7 @@ namespace VitalChoice.Business.Services.Cache
                     }
                     var syncOp = message.GetBody<SyncOperation>();
                     message.Complete();
+                    logger.LogInformation($"{syncOp} Message lag: {DateTime.UtcNow - message.EnqueuedTimeUtc}");
                     yield return syncOp;
                 }
                 else
