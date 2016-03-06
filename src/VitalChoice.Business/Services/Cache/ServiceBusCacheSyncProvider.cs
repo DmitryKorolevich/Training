@@ -150,10 +150,12 @@ namespace VitalChoice.Business.Services.Cache
                     var syncOp = message.GetBody<SyncOperation>();
                     message.Complete();
 
-                    var ping = (DateTime.UtcNow - message.ScheduledEnqueueTimeUtc).Milliseconds;
-                    Logger.LogInformation($"{syncOp} Message lag: {ping} ms");
-
-                    Ping(_applicationEnvironment, ping);
+                    if (syncOp.SyncType != SyncType.Ping)
+                    {
+                        var ping = (DateTime.UtcNow - message.ScheduledEnqueueTimeUtc).Milliseconds;
+                        Logger.LogInformation($"{syncOp} Message lag: {ping} ms");
+                        Ping(_applicationEnvironment, ping);
+                    }
 
                     int remoteAveragePing;
                     if (syncOp.SyncType == SyncType.Ping && int.TryParse(syncOp.Key.EntityType, out remoteAveragePing))
