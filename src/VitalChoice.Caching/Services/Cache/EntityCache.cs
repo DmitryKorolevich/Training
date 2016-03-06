@@ -69,9 +69,12 @@ namespace VitalChoice.Caching.Services.Cache
                 return TranslateResult(query,
                     results, out entities);
             }
-            _logger.LogVerbose($"Cache miss, type: {typeof(T)}");
+            if (_logger.IsEnabled(LogLevel.Verbose))
+                _logger.LogVerbose($"Cache miss, type: {typeof(T)}");
             entities = null;
-            return CacheGetResult.Update;
+            if (query.CanCollectionCache)
+                return CacheGetResult.Update;
+            return CacheGetResult.NotFound;
         }
 
         public CacheGetResult TryGetCachedFirstOrDefault(QueryData<T> query, out T entity)
@@ -112,7 +115,9 @@ namespace VitalChoice.Caching.Services.Cache
             }
             _logger.LogVerbose($"Cache miss, type: {typeof(T)}");
             entity = default(T);
-            return CacheGetResult.Update;
+            if (query.CanCache)
+                return CacheGetResult.Update;
+            return CacheGetResult.NotFound;
         }
 
         public bool Update(QueryData<T> queryData, IEnumerable<T> entities)

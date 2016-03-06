@@ -47,7 +47,7 @@ namespace VitalChoice.Caching.Services
                 var cacheExecutor =
                     (ICacheExecutor)
                         Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
-                            _context, _queryCacheFactory, _cacheFactory, _logger, elementType != null);
+                            _context, _queryCacheFactory, _cacheFactory, _logger);
                 CacheGetResult cacheGetResult;
                 var results = elementType != null
                     ? cacheExecutor.Execute(out cacheGetResult)
@@ -83,7 +83,7 @@ namespace VitalChoice.Caching.Services
                 var cacheExecutor =
                     (ICacheExecutor)
                         Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
-                            _context, _queryCacheFactory, _cacheFactory, _logger, true);
+                            _context, _queryCacheFactory, _cacheFactory, _logger);
                 CacheGetResult cacheGetResult;
                 var result = (List<TResult>) cacheExecutor.Execute(out cacheGetResult);
                 switch (cacheGetResult)
@@ -116,7 +116,7 @@ namespace VitalChoice.Caching.Services
                 var cacheExecutor =
                     (ICacheExecutor)
                         Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
-                            _context, _queryCacheFactory, _cacheFactory, _logger, elementType != null);
+                            _context, _queryCacheFactory, _cacheFactory, _logger);
                 CacheGetResult cacheGetResult;
                 var result = elementType != null
                     ? cacheExecutor.Execute(out cacheGetResult)
@@ -158,35 +158,16 @@ namespace VitalChoice.Caching.Services
             private readonly IEntityCache<T> _cache;
 
             public CacheExecutor(Expression expression, DbContext context, IQueryCacheFactory queryCacheFactory,
-                IInternalEntityCacheFactory cacheFactory, ILogger logger, bool collection)
+                IInternalEntityCacheFactory cacheFactory, ILogger logger)
             {
                 _logger = logger;
                 var queryCache = queryCacheFactory.GetQueryCache<T>();
                 _queryData = queryCache.GerOrAdd(expression);
-                _cache = null;
-                if (collection)
-                {
-                    if (_queryData.CanCollectionCache)
-                    {
-                        _cache = new EntityCache<T>(cacheFactory, context, logger);
-                    }
-                }
-                else
-                {
-                    if (_queryData.CanCache)
-                    {
-                        _cache = new EntityCache<T>(cacheFactory, context, logger);
-                    }
-                }
+                _cache = new EntityCache<T>(cacheFactory, context, logger);
             }
 
             public object Execute(out CacheGetResult cacheResult)
             {
-                if (_cache == null)
-                {
-                    cacheResult = CacheGetResult.NotFound;
-                    return null;
-                }
                 try
                 {
                     List<T> entities;
@@ -203,11 +184,6 @@ namespace VitalChoice.Caching.Services
 
             public object ExecuteFirst(out CacheGetResult cacheResult)
             {
-                if (_cache == null)
-                {
-                    cacheResult = CacheGetResult.NotFound;
-                    return null;
-                }
                 try
                 {
                     T entity;
@@ -224,7 +200,7 @@ namespace VitalChoice.Caching.Services
 
             public bool Update(object entity)
             {
-                if (_cache == null)
+                if (!_queryData.CanCache)
                 {
                     return false;
                 }
@@ -241,7 +217,7 @@ namespace VitalChoice.Caching.Services
 
             public bool UpdateList(object entities)
             {
-                if (_cache == null)
+                if (!_queryData.CanCollectionCache)
                 {
                     return false;
                 }
