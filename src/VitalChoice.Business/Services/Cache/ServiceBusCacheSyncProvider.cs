@@ -94,7 +94,9 @@ namespace VitalChoice.Business.Services.Cache
             {
                 try
                 {
-                    AcceptChanges(GetBatch());
+                    var batch = GetBatch();
+                    if (batch.Any())
+                        AcceptChanges(batch);
                 }
                 catch (Exception e)
                 {
@@ -124,11 +126,12 @@ namespace VitalChoice.Business.Services.Cache
             }
         }
 
-        private IEnumerable<SyncOperation> GetBatch()
+        private ICollection<SyncOperation> GetBatch()
         {
             var incomingItems = _serviceBusClient.ReceiveBatch(100);
             if (incomingItems == null)
-                yield break;
+                return new SyncOperation[0];
+            List<SyncOperation> syncOperations = new List<SyncOperation>();
             foreach (var message in incomingItems)
             {
                 if (message.ExpiresAtUtc < DateTime.UtcNow)
@@ -164,7 +167,7 @@ namespace VitalChoice.Business.Services.Cache
                     }
                     else
                     {
-                        yield return syncOp;
+                        syncOperations.Add(syncOp);
                     }
                 }
                 else
@@ -191,6 +194,7 @@ namespace VitalChoice.Business.Services.Cache
                     ScheduledEnqueueTimeUtc = DateTime.UtcNow
                 });
             }
+            return syncOperations;
         }
 
         private void Ping(int ping)
