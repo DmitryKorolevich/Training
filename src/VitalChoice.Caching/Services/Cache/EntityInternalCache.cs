@@ -197,8 +197,14 @@ namespace VitalChoice.Caching.Services.Cache
             if (entity == null)
                 return false;
 
-            MarkForUpdate(entity);
-            return false;
+            var result = CacheStorage.AllCacheDatas.Any();
+
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (var data in CacheStorage.AllCacheDatas)
+            {
+                result = result && data.UpdateKeepRelations(entity) != null;
+            }
+            return result;
         }
 
         public CachedEntity<T> Update(RelationInfo relations, T entity)

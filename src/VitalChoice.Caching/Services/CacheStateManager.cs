@@ -70,7 +70,7 @@ namespace VitalChoice.Caching.Services
                             primaryKey = cache.GetPrimaryKeyValue(entry.Entity);
                             if (primaryKey.IsValid)
                             {
-                                cache.MarkForUpdate(primaryKey);
+                                cache.Update(entry.Entity);
                                 syncOperations.Add(new SyncOperation
                                 {
                                     Key = primaryKey.ToExportable(group.Key),

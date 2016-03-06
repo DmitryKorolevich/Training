@@ -338,13 +338,35 @@ namespace VitalChoice.ObjectMapping.Base
             CloneIntoInternal(dest, src, objectType, baseTypeToMemberwiseClone, objects);
         }
 
-        public static void CopyInto(object dest, object src, Type objectType)
+        public static void SetObjectsNull(object dest, Type objectType, Func<Type, bool> setNullSkipCondition = null)
         {
             if (dest == null)
                 return;
             var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
             foreach (var pair in objectCache.Properties)
             {
+                if (!pair.Value.PropertyType.GetTypeInfo().IsValueType)
+                {
+                    if (setNullSkipCondition != null && setNullSkipCondition(pair.Value.PropertyType))
+                    {
+                        continue;
+                    }
+                    pair.Value.Set?.Invoke(dest, null);
+                }
+            }
+        }
+
+        public static void CopyInto(object dest, object src, Type objectType, Func<Type, bool> copySkipCondition = null)
+        {
+            if (dest == null)
+                return;
+            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+            foreach (var pair in objectCache.Properties)
+            {
+                if (copySkipCondition != null && copySkipCondition(pair.Value.PropertyType))
+                {
+                    continue;
+                }
                 var srcProperty = src == null ? null : pair.Value.Get?.Invoke(src);
                 pair.Value.Set?.Invoke(dest, srcProperty);
             }

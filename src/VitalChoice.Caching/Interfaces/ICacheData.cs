@@ -30,6 +30,7 @@ namespace VitalChoice.Caching.Interfaces
         ICollection<CachedEntity<T>> GetAll();
         CachedEntity<T> TryRemove(EntityKey key);
         CachedEntity<T> Update(T entity);
+        CachedEntity<T> UpdateKeepRelations(T entity);
         bool Update(IEnumerable<T> entity);
         bool UpdateAll(IEnumerable<T> entity);
         void SetNull(EntityKey key);
