@@ -154,7 +154,7 @@ namespace VitalChoice.Business.Services.Cache
                     {
                         var ping = (DateTime.UtcNow - message.ScheduledEnqueueTimeUtc).Milliseconds;
                         Logger.LogInformation($"{syncOp} Message lag: {ping} ms");
-                        Ping(_applicationEnvironment, ping);
+                        Ping(ping);
                     }
 
                     int remoteAveragePing;
@@ -172,20 +172,14 @@ namespace VitalChoice.Business.Services.Cache
                     message.Complete();
                 }
             }
-        }
-
-        private void Ping(IApplicationEnvironment app, int ping)
-        {
             lock (_lockObject)
             {
-                _pingMilliseconds[_totalMessagesReceived] = ping;
-                _totalMessagesReceived = (_totalMessagesReceived + 1)%PingAverageMaxCount;
                 var averagePing = (int) _pingMilliseconds.Where(p => p > 0).Average();
-                _averagePing.AddOrUpdate(app.ApplicationName, averagePing, (s, i) => averagePing);
+                _averagePing.AddOrUpdate(_applicationEnvironment.ApplicationName, averagePing, (s, i) => averagePing);
                 _sendQue.Enqueue(new BrokeredMessage(new SyncOperation
                 {
                     SyncType = SyncType.Ping,
-                    EntityType = app.ApplicationName,
+                    EntityType = _applicationEnvironment.ApplicationName,
                     Key = new EntityKeyExportable
                     {
                         EntityType = averagePing.ToString()
@@ -196,6 +190,15 @@ namespace VitalChoice.Business.Services.Cache
                     TimeToLive = TimeSpan.FromMinutes(5),
                     ScheduledEnqueueTimeUtc = DateTime.UtcNow
                 });
+            }
+        }
+
+        private void Ping(int ping)
+        {
+            lock (_lockObject)
+            {
+                _pingMilliseconds[_totalMessagesReceived] = ping;
+                _totalMessagesReceived = (_totalMessagesReceived + 1)%PingAverageMaxCount;
             }
         }
     }
