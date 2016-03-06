@@ -535,5 +535,10 @@ namespace VitalChoice.Caching.Services.Cache
                 }
             }
         }
+
+        public bool CanAddUpCache()
+        {
+            return CacheFactory.CanAddUpCache();
+        }
     }
 }

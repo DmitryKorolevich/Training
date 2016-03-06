@@ -132,8 +132,10 @@ namespace VitalChoice.Business.Services.Cache
             if (incomingItems == null)
                 return new SyncOperation[0];
             List<SyncOperation> syncOperations = new List<SyncOperation>();
+            var anyIncoming = false;
             foreach (var message in incomingItems)
             {
+                anyIncoming = true;
                 if (message.ExpiresAtUtc < DateTime.UtcNow)
                 {
                     var syncOp = message.GetBody<SyncOperation>();
@@ -175,24 +177,32 @@ namespace VitalChoice.Business.Services.Cache
                     message.Complete();
                 }
             }
-            lock (_lockObject)
+            if (anyIncoming)
             {
-                var averagePing = (int) _pingMilliseconds.Where(p => p > 0).Average();
-                _averagePing.AddOrUpdate(_applicationEnvironment.ApplicationName, averagePing, (s, i) => averagePing);
-                _sendQue.Enqueue(new BrokeredMessage(new SyncOperation
+                int[] pings;
+                lock (_lockObject)
                 {
-                    SyncType = SyncType.Ping,
-                    EntityType = _applicationEnvironment.ApplicationName,
-                    Key = new EntityKeyExportable
+                    pings = _pingMilliseconds.Where(p => p > 0).ToArray();
+                }
+                if (pings.Length > 0)
+                {
+                    var averagePing = (int) pings.Average();
+                    _averagePing.AddOrUpdate(_applicationEnvironment.ApplicationName, averagePing, (s, i) => averagePing);
+                    _sendQue.Enqueue(new BrokeredMessage(new SyncOperation
                     {
-                        EntityType = averagePing.ToString()
-                    }
-                })
-                {
-                    CorrelationId = _clientUid.ToString(),
-                    TimeToLive = TimeSpan.FromMinutes(5),
-                    ScheduledEnqueueTimeUtc = DateTime.UtcNow
-                });
+                        SyncType = SyncType.Ping,
+                        EntityType = _applicationEnvironment.ApplicationName,
+                        Key = new EntityKeyExportable
+                        {
+                            EntityType = averagePing.ToString()
+                        }
+                    })
+                    {
+                        CorrelationId = _clientUid.ToString(),
+                        TimeToLive = TimeSpan.FromMinutes(5),
+                        ScheduledEnqueueTimeUtc = DateTime.UtcNow
+                    });
+                }
             }
             return syncOperations;
         }

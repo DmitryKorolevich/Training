@@ -7,20 +7,22 @@ using VitalChoice.Caching.Interfaces;
 
 namespace VitalChoice.Caching.Services.Cache
 {
-    public class QueryCacheFactory : IQueryCacheFactory
+    public class QueryParserFactory : IQueryParserFactory
     {
         private readonly ConcurrentDictionary<Type, object> _queryCaches = new ConcurrentDictionary<Type, object>();
 
         private readonly IEntityInfoStorage _entityInfo;
+        private readonly IInternalEntityCacheFactory _cacheFactory;
 
-        public QueryCacheFactory(IEntityInfoStorage entityInfo)
+        public QueryParserFactory(IEntityInfoStorage entityInfo, IInternalEntityCacheFactory cacheFactory)
         {
             _entityInfo = entityInfo;
+            _cacheFactory = cacheFactory;
         }
 
-        public IQueryCache<T> GetQueryCache<T>()
+        public IQueryParser<T> GetQueryCache<T>()
         {
-            return (IQueryCache<T>) _queryCaches.GetOrAdd(typeof (T), key => new QueryCache<T>(_entityInfo));
+            return (IQueryParser<T>) _queryCaches.GetOrAdd(typeof (T), key => new QueryParser<T>(_entityInfo, _cacheFactory.GetCache<T>()));
         }
     }
 }

@@ -6,8 +6,8 @@ using VitalChoice.Caching.Services.Cache;
 
 namespace VitalChoice.Caching.Interfaces
 {
-    public interface IQueryCacheFactory
+    public interface IQueryParserFactory
     {
-        IQueryCache<T> GetQueryCache<T>();
+        IQueryParser<T> GetQueryCache<T>();
     }
 }

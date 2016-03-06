@@ -21,16 +21,14 @@ namespace VitalChoice.Caching.Services.Cache
         where T : class, new()
     {
         private readonly IInternalEntityCache<T> _internalCache;
-        private readonly IInternalEntityCacheFactory _cacheFactory;
         private readonly DbContext _context;
         private readonly ILogger _logger;
 
-        public EntityCache(IInternalEntityCacheFactory cacheFactory, DbContext context, ILogger logger)
+        public EntityCache(IInternalEntityCache<T> internalCache, DbContext context, ILogger logger)
         {
-            _cacheFactory = cacheFactory;
             _context = context;
             _logger = logger;
-            _internalCache = cacheFactory.GetCache<T>();
+            _internalCache = internalCache;
         }
 
         public CacheGetResult TryGetCached(QueryData<T> query, out List<T> entities)
@@ -113,7 +111,8 @@ namespace VitalChoice.Caching.Services.Cache
                 return TranslateFirstResult(query,
                     results, out entity);
             }
-            _logger.LogVerbose($"Cache miss, type: {typeof(T)}");
+            if (_logger.IsEnabled(LogLevel.Verbose))
+                _logger.LogVerbose($"Cache miss, type: {typeof(T)}");
             entity = default(T);
             if (query.CanCache)
                 return CacheGetResult.Update;
@@ -331,7 +330,7 @@ namespace VitalChoice.Caching.Services.Cache
         {
             if (cacheIterator.AggregatedResult != CacheGetResult.Found)
             {
-                return !_cacheFactory.CanAddUpCache() ? CacheGetResult.NotFound : cacheIterator.AggregatedResult;
+                return _internalCache.CanAddUpCache() ? cacheIterator.AggregatedResult : CacheGetResult.NotFound;
             }
             if (cacheIterator.Found)
             {
@@ -341,7 +340,7 @@ namespace VitalChoice.Caching.Services.Cache
                 }
                 return CacheGetResult.Found;
             }
-            return !_cacheFactory.CanAddUpCache() ? CacheGetResult.NotFound : CacheGetResult.Update;
+            return _internalCache.CanAddUpCache() ? CacheGetResult.Update : CacheGetResult.NotFound;
         }
 
         private void AttachNotTracked(IEnumerable<T> items, Dictionary<EntityKey, EntityEntry<T>> tracked, RelationInfo relationInfo)

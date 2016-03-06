@@ -7,7 +7,7 @@ using VitalChoice.Caching.Services.Cache.Base;
 
 namespace VitalChoice.Caching.Interfaces
 {
-    public interface IInternalEntityCache: ICacheKeysStorage, IDisposable
+    public interface IInternalEntityCache: ICacheKeysStorage, IEntityCollectorInfo, IDisposable
     {
         CachedEntity Update(RelationInfo relations, object entity);
         IEnumerable<CachedEntity> Update(RelationInfo relations, IEnumerable<object> entity);

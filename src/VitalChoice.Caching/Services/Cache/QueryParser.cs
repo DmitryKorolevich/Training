@@ -3,25 +3,30 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Microsoft.Data.Entity.Query.ExpressionVisitors.Internal;
 using VitalChoice.Caching.Expressions.Analyzers;
 using VitalChoice.Caching.Expressions.Visitors;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
+using VitalChoice.Caching.Relational.Ordering;
 using VitalChoice.Caching.Services.Cache.Base;
 
 namespace VitalChoice.Caching.Services.Cache
 {
-    public class QueryCache<T> : IQueryCache<T>
+    public class QueryParser<T> : IQueryParser<T>
     {
-        private readonly ConcurrentDictionary<string, QueryInternalCache> _queryCaches = new ConcurrentDictionary<string, QueryInternalCache>();
+        public IInternalEntityCache<T> InternalEntityCache { get; }
+
+        private readonly ConcurrentDictionary<OrderBy, QueryInternalCache> _orderByCaches =
+            new ConcurrentDictionary<OrderBy, QueryInternalCache>();
+
         private readonly PrimaryKeyAnalyzer<T> _primaryKeyAnalyzer;
         private readonly IndexAnalyzer<T> _indexAnalyzer;
         private readonly ICollection<ConditionalIndexAnalyzer<T>> _conditionalIndexAnalyzers;
         private readonly LambdaExpression _cacheCondition;
 
-        public QueryCache(IEntityInfoStorage entityInfo)
+        public QueryParser(IEntityInfoStorage entityInfo, IInternalEntityCache<T> internalEntityCache)
         {
+            InternalEntityCache = internalEntityCache;
             EntityInfo info;
             if (entityInfo.GetEntityInfo<T>(out info))
             {
@@ -32,28 +37,31 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        public QueryData<T> GerOrAdd(Expression query)
+        public QueryData<T> ParseQuery(Expression query)
         {
-            var cacheKey = new ExpressionStringBuilder().Build(query);
-            var cached = _queryCaches.GetOrAdd(cacheKey, key =>
+            QueryCacheVisitor cacheVisitor = new QueryCacheVisitor(typeof (T));
+            cacheVisitor.Visit(query);
+
+            Func<IEnumerable<T>, IOrderedEnumerable<T>> orderByFunc = null;
+
+            if (cacheVisitor.OrderBy != null)
             {
-                var relations = GetRelations(query);
-                OrderByExpressionVisitor<T> orderByVisitor = new OrderByExpressionVisitor<T>();
-                orderByVisitor.Visit(query);
-                if (orderByVisitor.Ordered)
+                orderByFunc = _orderByCaches.GetOrAdd(cacheVisitor.OrderBy, key =>
                 {
-                    return new QueryInternalCache(relations, orderByVisitor.GetOrderByFunction());
-                }
-                return new QueryInternalCache(relations);
-            });
+                    OrderByExpressionVisitor<T> orderByVisitor = new OrderByExpressionVisitor<T>();
+                    orderByVisitor.Visit(query);
+                    return orderByVisitor.Ordered ? new QueryInternalCache(orderByVisitor.GetOrderByFunction()) : new QueryInternalCache();
+                }).OrderByFunction;
+            }
+
             QueriableExpressionVisitor<T> queryAnalyzer = new QueriableExpressionVisitor<T>();
             queryAnalyzer.Visit(query);
             var result = new QueryData<T>
             {
-                RelationInfo = cached.Relations,
+                RelationInfo = cacheVisitor.Relations,
                 Tracked = queryAnalyzer.Tracking,
                 WhereExpression = queryAnalyzer.WhereExpression,
-                OrderByFunction = cached.OrderByFunction
+                OrderByFunction = orderByFunc
             };
 
             if (result.WhereExpression != null)
@@ -73,24 +81,13 @@ namespace VitalChoice.Caching.Services.Cache
             return result;
         }
 
-        private static RelationInfo GetRelations(Expression query)
-        {
-            RelationsExpressionVisitor relationsExpressionVisitor = new RelationsExpressionVisitor();
-            relationsExpressionVisitor.Visit(query);
-            var relationInfo = new RelationInfo(string.Empty, typeof(T), typeof(T), null,
-                relationsExpressionVisitor.Relations);
-            return relationInfo;
-        }
-
         private struct QueryInternalCache
         {
             public readonly Func<IEnumerable<T>, IOrderedEnumerable<T>> OrderByFunction;
-            public readonly RelationInfo Relations;
 
-            public QueryInternalCache(RelationInfo relations, Func<IEnumerable<T>, IOrderedEnumerable<T>> orderByFunction = null)
+            public QueryInternalCache(Func<IEnumerable<T>, IOrderedEnumerable<T>> orderByFunction = null)
             {
                 OrderByFunction = orderByFunction;
-                Relations = relations;
             }
         }
     }
