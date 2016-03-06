@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.core.utils.appBootstrap', [])
-	.service('appBootstrap', ['infrastructureService', '$rootScope', 'toaster', 'authenticationService', '$location', 'ngProgress', 'webStorageUtil', 'confirmUtil', function (infrastructureService, $rootScope, toaster, authenticationService, $location, ngProgress, webStorageUtil, confirmUtil) {
+	.service('appBootstrap', ['infrastructureService', '$rootScope', 'toaster', 'authenticationService', 'cacheService', '$location', 'ngProgress', 'webStorageUtil', 'confirmUtil', function (infrastructureService, $rootScope, toaster, authenticationService, cacheService, $location, ngProgress, webStorageUtil, confirmUtil) {
 	    function getReferenceItem(lookup, key) {
 	        return $.grep(lookup, function (elem) {
 	            return elem.Key === key;
@@ -89,6 +89,22 @@ angular.module('app.core.utils.appBootstrap', [])
 	        return path.indexOf("/authentication/activate") > -1 || path.indexOf("/authentication/login") > -1 || path.indexOf("/authentication/passwordreset") > -1;
 	    };
 
+	    function cacheStatus() {
+	        cacheService.getCacheStatus()
+            .success(function (cacheResult) {
+                if (cacheResult.Success && cacheResult.Data) {
+                    $rootScope.cacheState = cacheResult.Data;
+                }
+                if ($rootScope.authenticated)
+                    setTimeout(cacheStatus, 10000);
+            })
+            .error(function () {
+                toaster.pop('error', "Error!", "Can't get cache status");
+                if ($rootScope.authenticated)
+                    setTimeout(cacheStatus, 60000);
+            });
+	    }
+
 	    function initialize() {
 	        bindRootScope();
 
@@ -105,6 +121,9 @@ angular.module('app.core.utils.appBootstrap', [])
                                 if (res.Success && res.Data) {
                                     $rootScope.authenticated = true;
                                     $rootScope.currentUser = res.Data;
+
+                                    cacheStatus();
+
                                 } else {
                                     $rootScope.authenticated = false;
 

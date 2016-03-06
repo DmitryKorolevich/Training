@@ -12,7 +12,7 @@ namespace VitalChoice.Caching.Services
     {
         private readonly IEntityInfoStorage _keyStorage;
 
-        private static readonly ConcurrentDictionary<Type, IInternalEntityCache> EntityCaches =
+        private readonly ConcurrentDictionary<Type, IInternalEntityCache> _entityCaches =
             new ConcurrentDictionary<Type, IInternalEntityCache>();
 
         public InternalEntityCacheFactory(IEntityInfoStorage keyStorage)
@@ -27,14 +27,14 @@ namespace VitalChoice.Caching.Services
 
         public bool CacheExist(Type entityType)
         {
-            return EntityCaches.ContainsKey(entityType);
+            return _entityCaches.ContainsKey(entityType);
         }
 
         public IInternalEntityCache GetCache(Type entityType)
         {
             if (!_keyStorage.HaveKeys(entityType))
                 return null;
-            return EntityCaches.GetOrAdd(entityType,
+            return _entityCaches.GetOrAdd(entityType,
                 cache =>
                     (IInternalEntityCache)
                         Activator.CreateInstance(typeof (EntityInternalCache<>).MakeGenericType(entityType), _keyStorage, this));
@@ -44,7 +44,7 @@ namespace VitalChoice.Caching.Services
         {
             if (!_keyStorage.HaveKeys(typeof (T)))
                 return null;
-            return (IInternalEntityCache<T>) EntityCaches.GetOrAdd(typeof (T), cache => new EntityInternalCache<T>(_keyStorage, this));
+            return (IInternalEntityCache<T>) _entityCaches.GetOrAdd(typeof (T), cache => new EntityInternalCache<T>(_keyStorage, this));
         }
 
         public bool CanAddUpCache()

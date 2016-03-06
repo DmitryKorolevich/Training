@@ -23,9 +23,11 @@ namespace VitalChoice.Caching.Services
             Logger = logger;
         }
 
+        public virtual ICollection<KeyValuePair<string, int>> AverageLatency => null;
+
         public virtual void SendChanges(IEnumerable<SyncOperation> syncOperations)
         {
-            
+
         }
 
         public void AcceptChanges(IEnumerable<SyncOperation> syncOperations)
@@ -50,9 +52,6 @@ namespace VitalChoice.Caching.Services
                         case SyncType.Add:
                             var entity = KeyStorage.GetEntity(type, op.Key.Values);
                             internalCache.MarkForAdd(entity);
-                            break;
-                        default:
-                            Logger.LogWarning("Invalid SyncType was sent over.");
                             break;
                     }
                 }
