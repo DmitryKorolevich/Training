@@ -178,20 +178,6 @@ namespace VitalChoice.Caching.Services.Cache
             out IEnumerable<CacheResult<T>> results)
         {
             var conditionalIndexes = queryData.ConditionalIndexes;
-            //if (conditionalIndexes.Count == 1)
-            //{
-            //    var indexes = conditionalIndexes.First().Value();
-            //    if (indexes.Count == 1)
-            //    {
-            //        var result = _internalCache.TryGetEntity(indexes.First(),
-            //            conditionalIndexes.First().Key, queryData.RelationInfo, queryData.WhereExpression.Compiled);
-            //        results = Enumerable.Repeat(result, 1);
-            //        return true;
-            //    }
-            //    results = _internalCache.TryGetEntities(indexes,
-            //        conditionalIndexes.First().Key, queryData.RelationInfo, queryData.WhereExpression.Compiled);
-            //    return true;
-            //}
             if (conditionalIndexes.Count > 0)
             {
                 var entityList = Enumerable.Empty<CacheResult<T>>();
@@ -211,12 +197,6 @@ namespace VitalChoice.Caching.Services.Cache
             out IEnumerable<CacheResult<T>> results)
         {
             var indexes = query.UniqueIndexes;
-            //if (indexes.Count == 1)
-            //{
-            //    var result = _internalCache.TryGetEntity(indexes.First(), queryCache.RelationInfo);
-            //    results = Enumerable.Repeat(result, 1);
-            //    return true;
-            //}
             if (indexes.Count > 0)
             {
                 results = _internalCache.TryGetEntities(indexes, query.RelationInfo);
@@ -230,12 +210,6 @@ namespace VitalChoice.Caching.Services.Cache
             out IEnumerable<CacheResult<T>> results)
         {
             var pks = query.PrimaryKeys;
-            //if (pks.Count == 1)
-            //{
-            //    var result = _internalCache.TryGetEntity(pks.First(), queryCache.RelationInfo);
-            //    results = Enumerable.Repeat(result, 1);
-            //    return true;
-            //}
             if (pks.Count > 0)
             {
                 results = _internalCache.TryGetEntities(pks, query.RelationInfo);
