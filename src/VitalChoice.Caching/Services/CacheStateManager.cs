@@ -34,11 +34,14 @@ namespace VitalChoice.Caching.Services
         {
             var immutableList = new List<ImmutableEntryState>(entriesToSave.Select(e => new ImmutableEntryState(e)));
             var result = base.SaveChanges(entriesToSave);
-            _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
             if (DataContext.InTransaction)
             {
                 DataContext.TransactionCommit += () => _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
                 DataContext.TransactionRollback += () => _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
+            }
+            else
+            {
+                _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
             }
             return result;
         }
@@ -48,11 +51,14 @@ namespace VitalChoice.Caching.Services
         {
             var immutableList = new List<ImmutableEntryState>(entriesToSave.Select(e => new ImmutableEntryState(e)));
             var result = await base.SaveChangesAsync(entriesToSave, cancellationToken);
-            _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
             if (DataContext.InTransaction)
             {
                 DataContext.TransactionCommit += () => _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
                 DataContext.TransactionRollback += () => _cacheSyncProvider.SendChanges(UpdateRollback(immutableList));
+            }
+            else
+            {
+                _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
             }
             return result;
         }
