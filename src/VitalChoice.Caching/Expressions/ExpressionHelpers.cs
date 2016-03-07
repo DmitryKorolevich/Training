@@ -58,7 +58,7 @@ namespace VitalChoice.Caching.Expressions
                     var value = GetValue(accessObject);
                     return value == null ? null : accessor(value);
                 }
-                var evaluator = new EvaluatorExpressionVisitor();
+                var evaluator = new ParameterVisitor();
                 evaluator.Visit(expression);
                 if (!evaluator.ContainsParameter)
                     return Expression.Lambda(expression).Compile().DynamicInvoke(null);

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace VitalChoice.Caching.Expressions.Visitors
 {
-    public class EvaluatorExpressionVisitor : ExpressionVisitor
+    public class ParameterVisitor : ExpressionVisitor
     {
         public bool ContainsParameter { get; private set; }
 

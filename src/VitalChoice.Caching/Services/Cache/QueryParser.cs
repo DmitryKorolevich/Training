@@ -39,14 +39,14 @@ namespace VitalChoice.Caching.Services.Cache
 
         public QueryData<T> ParseQuery(Expression query)
         {
-            QueryCacheVisitor cacheVisitor = new QueryCacheVisitor(typeof (T));
-            cacheVisitor.Visit(query);
+            QueryParseVisitor<T> parseVisitor = new QueryParseVisitor<T>();
+            parseVisitor.Visit(query);
 
             Func<IEnumerable<T>, IOrderedEnumerable<T>> orderByFunc = null;
 
-            if (cacheVisitor.OrderBy != null)
+            if (parseVisitor.OrderBy != null)
             {
-                orderByFunc = _orderByCaches.GetOrAdd(cacheVisitor.OrderBy, key =>
+                orderByFunc = _orderByCaches.GetOrAdd(parseVisitor.OrderBy, key =>
                 {
                     OrderByExpressionVisitor<T> orderByVisitor = new OrderByExpressionVisitor<T>();
                     orderByVisitor.Visit(query);
@@ -54,13 +54,11 @@ namespace VitalChoice.Caching.Services.Cache
                 }).OrderByFunction;
             }
 
-            QueriableExpressionVisitor<T> queryAnalyzer = new QueriableExpressionVisitor<T>();
-            queryAnalyzer.Visit(query);
             var result = new QueryData<T>
             {
-                RelationInfo = cacheVisitor.Relations,
-                Tracked = queryAnalyzer.Tracking,
-                WhereExpression = queryAnalyzer.WhereExpression,
+                RelationInfo = parseVisitor.Relations,
+                Tracked = parseVisitor.Tracking,
+                WhereExpression = parseVisitor.WhereExpression,
                 OrderByFunction = orderByFunc
             };
 

@@ -6,17 +6,19 @@ using System.Linq.Expressions;
 using Microsoft.Data.Entity;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Ordering;
+using VitalChoice.Caching.Services.Cache;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Expressions.Visitors
 {
-    public class QueryCacheVisitor : ExpressionVisitor
+    public class QueryParseVisitor<T> : ExpressionVisitor
     {
-        public QueryCacheVisitor(Type ownedType)
+        public QueryParseVisitor()
         {
-            Relations = new RelationInfo(string.Empty, ownedType, ownedType, null);
+            Relations = new RelationInfo(string.Empty, typeof(T), typeof(T));
         }
 
+        // ReSharper disable once StaticMemberInGenericType
         private static readonly HashSet<string> MethodNames = new HashSet<string>
         {
             "OrderBy",
@@ -25,11 +27,45 @@ namespace VitalChoice.Caching.Expressions.Visitors
             "ThenByDescending"
         };
 
+        public bool Tracking { get; private set; } = true;
         public OrderBy OrderBy { get; private set; }
         public RelationInfo Relations { get; }
 
-        private static readonly ConcurrentDictionary<RelationCacheInfo, RelationInfo> RelationsUsed = new ConcurrentDictionary<RelationCacheInfo, RelationInfo>();
+        
         private RelationInfo _currentRelation;
+
+        public WhereExpression<T> WhereExpression { get; private set; }
+
+
+        protected override Expression VisitLambda<T1>(Expression<T1> node)
+        {
+            if (typeof(T1) != typeof(Func<T, bool>))
+                return base.VisitLambda(node);
+
+            LambdaExpressionVisitor<T> lambdaVisitor = new LambdaExpressionVisitor<T>();
+            lambdaVisitor.Visit(node.Body);
+
+            if (WhereExpression != null)
+            {
+                ExpressionSwapVisitor swapVisitor = new ExpressionSwapVisitor(WhereExpression.Expression.Parameters[0], node.Parameters[0]);
+                var newExpression = (Expression<Func<T, bool>>)swapVisitor.Visit(WhereExpression.Expression);
+                WhereExpression.Expression =
+                    Expression.Lambda<Func<T, bool>>(Expression.AndAlso(newExpression.Body, node.Body), node.Parameters);
+                WhereExpression.Condition = new BinaryCondition(ExpressionType.AndAlso, newExpression)
+                {
+                    Left = WhereExpression.Condition,
+                    Right = lambdaVisitor.Condition
+                };
+            }
+            else
+            {
+                WhereExpression = new WhereExpression<T>((Expression<Func<T, bool>>)(object)node)
+                {
+                    Condition = lambdaVisitor.Condition
+                };
+            }
+            return node;
+        }
 
         private LambdaExpression GetOrderExpression(ICollection<Expression> arguments, out Expression comparer)
         {
@@ -51,7 +87,6 @@ namespace VitalChoice.Caching.Expressions.Visitors
                 string name;
                 Type relationType;
                 Type elementType;
-                RelationCacheInfo searchKey;
                 switch (node.Method.Name)
                 {
                     case "Include":
@@ -63,9 +98,8 @@ namespace VitalChoice.Caching.Expressions.Visitors
 
                         elementType = relationType.TryGetElementType(typeof (ICollection<>)) ?? relationType;
 
-                        searchKey = new RelationCacheInfo(name, elementType, ownType);
-                        _currentRelation = RelationsUsed.GetOrAdd(searchKey, _ => new RelationInfo(name, elementType, ownType, lambda));
-
+                        _currentRelation = CompiledRelationsCache.GetOrAdd(name, elementType, ownType, lambda);
+                        
                         if (!Relations.RelationsDict.ContainsKey(_currentRelation.Name))
                         {
                             Relations.RelationsDict.Add(_currentRelation.Name, _currentRelation);
@@ -79,7 +113,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
                         {
                             throw new InvalidOperationException("ThenInclude contains invalid relation name");
                         }
-                        relationType = memberExpression?.Type;
+                        relationType = memberExpression.Type;
 
                         elementType = relationType.TryGetElementType(typeof(ICollection<>)) ?? relationType;
 
@@ -89,13 +123,15 @@ namespace VitalChoice.Caching.Expressions.Visitors
                         RelationInfo newCurrent;
                         if (!_currentRelation.RelationsDict.TryGetValue(name, out newCurrent))
                         {
-                            searchKey = new RelationCacheInfo(name, elementType, _currentRelation.RelationType);
-                            var relationInfo = RelationsUsed.GetOrAdd(searchKey,
-                                _ => new RelationInfo(name, elementType, _currentRelation.RelationType, lambdaExpression));
+                            var relationInfo = CompiledRelationsCache.GetOrAdd(name, elementType, _currentRelation.RelationType,
+                                lambdaExpression);
                             _currentRelation.RelationsDict.Add(name, relationInfo);
                             newCurrent = relationInfo;
                         }
                         _currentRelation = newCurrent;
+                        break;
+                    case "AsNoTracking":
+                        Tracking = false;
                         break;
                 }
             }
