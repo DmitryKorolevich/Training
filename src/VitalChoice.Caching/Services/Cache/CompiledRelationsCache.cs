@@ -11,12 +11,12 @@ namespace VitalChoice.Caching.Services.Cache
 {
     internal static class CompiledRelationsCache
     {
-        private static readonly ConcurrentDictionary<RelationCacheInfo, RelationInfo> Cache = new ConcurrentDictionary<RelationCacheInfo, RelationInfo>();
+        private static readonly ConcurrentDictionary<RelationCacheInfo, IRelationAccessor> Cache = new ConcurrentDictionary<RelationCacheInfo, IRelationAccessor>();
 
-        public static RelationInfo GetOrAdd(string name, Type relatedType, Type ownedType, LambdaExpression lambda)
+        public static RelationInfo GetRelation(string name, Type relatedType, Type ownedType, LambdaExpression lambda)
         {
             var searchKey = new RelationCacheInfo(name, ownedType);
-            return Cache.GetOrAdd(searchKey, _ => new RelationInfo(name, relatedType, ownedType, lambda));
+            return new RelationInfo(name, relatedType, ownedType, Cache.GetOrAdd(searchKey, RelationInfo.CreateAccessor(ownedType, lambda)));
         }
 
         private struct RelationCacheInfo : IEquatable<RelationCacheInfo>

@@ -233,6 +233,26 @@ namespace VitalChoice.ObjectMapping.Base
             return result;
         }
 
+        public static object Clone(object obj, Type objectType)
+        {
+            return CloneInternal(obj, objectType);
+        }
+
+        public static object CloneInternal(object obj, Type objectType)
+        {
+            if (obj == null)
+                return null;
+
+            var result = Activator.CreateInstance(objectType);
+
+            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+            foreach (var pair in objectCache.Properties)
+            {
+                pair.Value.Set?.Invoke(result, pair.Value.Get?.Invoke(obj));
+            }
+            return result;
+        }
+
         public static object Clone(object obj, Type objectType, Type baseTypeToMemberwiseClone)
         {
             Dictionary<object, object> objects = new Dictionary<object, object>();

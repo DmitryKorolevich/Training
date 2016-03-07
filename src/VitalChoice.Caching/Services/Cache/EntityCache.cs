@@ -137,7 +137,7 @@ namespace VitalChoice.Caching.Services.Cache
 
             if (queryData.Tracked)
             {
-                entities = entities.Select(e => e.Clone<T, Entity>());
+                entities = DeepCloneList(queryData.RelationInfo, entities);
             }
 
             if (fullCollection)
@@ -146,6 +146,47 @@ namespace VitalChoice.Caching.Services.Cache
             }
 
             return _internalCache.Update(entities, queryData.RelationInfo);
+        }
+
+        private static IEnumerable<T> DeepCloneList(RelationInfo relations, IEnumerable<T> entities)
+        {
+            return entities.Select(item => DeepCloneItem(relations, item));
+        }
+
+        private static T DeepCloneItem(RelationInfo relations, T item)
+        {
+            var newItem = item.Clone();
+            CloneRelations(relations, newItem);
+            return newItem;
+        }
+
+        private static void CloneRelations(RelationInfo relations, object newItem, Action<object, RelationInfo> onCloned = null)
+        {
+            foreach (var relation in relations.Relations)
+            {
+                var value = relation.GetRelatedObject(newItem);
+                if (value != null)
+                {
+                    object replacementValue;
+                    if (value.GetType().IsImplementGeneric(typeof (ICollection<>)))
+                    {
+                        var newValue = (IList) Activator.CreateInstance(typeof (List<>).MakeGenericType(relation.RelationType));
+                        foreach (var singleValue in (IEnumerable) value)
+                        {
+                            var clonedItem = singleValue.Clone(relation.RelationType);
+                            newValue.Add(clonedItem);
+                            onCloned?.Invoke(clonedItem, relation);
+                        }
+                        replacementValue = newValue;
+                    }
+                    else
+                    {
+                        replacementValue = value.Clone(relation.RelationType);
+                        onCloned?.Invoke(replacementValue, relation);
+                    }
+                    relation.SetRelatedObject(newItem, replacementValue);
+                }
+            }
         }
 
         public bool Update(QueryData<T> queryData, T entity)
@@ -169,7 +210,7 @@ namespace VitalChoice.Caching.Services.Cache
             }
             if (queryData.Tracked)
             {
-                entity = entity.Clone<T, Entity>();
+                entity = DeepCloneItem(queryData.RelationInfo, entity);
             }
             return _internalCache.Update(entity, queryData.RelationInfo);
         }
@@ -337,28 +378,10 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        private void AttachGraph<TObj>(TObj item, RelationInfo relationInfo) 
-            where TObj : class
+        private void AttachGraph(object item, RelationInfo relationInfo) 
         {
+            CloneRelations(relationInfo, item, AttachGraph);
             _context.Attach(item, GraphBehavior.SingleObject);
-            foreach (var relation in relationInfo.Relations)
-            {
-                var value = relation.GetRelatedObject(item);
-                if (value != null)
-                {
-                    if (value.GetType().IsImplementGeneric(typeof (ICollection<>)))
-                    {
-                        foreach (var singleValue in (IEnumerable) value)
-                        {
-                            AttachGraph(singleValue, relation);
-                        }
-                    }
-                    else
-                    {
-                        AttachGraph(value, relation);
-                    }
-                }
-            }
         }
     }
 }

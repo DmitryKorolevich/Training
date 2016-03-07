@@ -27,6 +27,17 @@ namespace VitalChoice.Caching.Relational
         private readonly IRelationAccessor _relationAccessor;
         private static readonly IRelationAccessor NullAccessor = new NullRelationAccessor();
 
+        internal RelationInfo(string name, Type relatedType, Type ownedType, IRelationAccessor relationAccessor,
+            IEnumerable<RelationInfo> subRelations = null)
+        {
+            Name = name;
+            RelationType = relatedType;
+            OwnedType = ownedType;
+            _relationAccessor = relationAccessor;
+            RelationsDict = subRelations?.ToDictionary(r => r.Name) ??
+                            new Dictionary<string, RelationInfo>();
+        }
+
         public RelationInfo(string name, Type relatedType, Type ownedType, LambdaExpression relationExpression = null,
             IEnumerable<RelationInfo> subRelations = null)
         {
@@ -35,17 +46,14 @@ namespace VitalChoice.Caching.Relational
             Name = name;
             RelationsDict = subRelations?.ToDictionary(r => r.Name) ??
                             new Dictionary<string, RelationInfo>();
-            if (relationExpression != null)
-            {
-                _relationAccessor =
-                    (IRelationAccessor)
-                        Activator.CreateInstance(typeof (RelationAccessor<,>).MakeGenericType(ownedType, relationExpression.ReturnType),
-                            relationExpression);
-            }
-            else
-            {
-                _relationAccessor = NullAccessor;
-            }
+            _relationAccessor = relationExpression != null ? CreateAccessor(ownedType, relationExpression) : NullAccessor;
+        }
+
+        internal static IRelationAccessor CreateAccessor(Type ownedType, LambdaExpression relationExpression)
+        {
+            return (IRelationAccessor)
+                Activator.CreateInstance(typeof (RelationAccessor<,>).MakeGenericType(ownedType, relationExpression.ReturnType),
+                    relationExpression);
         }
 
         public bool Equals(RelationInfo other)

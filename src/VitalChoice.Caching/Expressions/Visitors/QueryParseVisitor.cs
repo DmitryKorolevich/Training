@@ -98,7 +98,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
 
                         elementType = relationType.TryGetElementType(typeof (ICollection<>)) ?? relationType;
 
-                        _currentRelation = CompiledRelationsCache.GetOrAdd(name, elementType, ownType, lambda);
+                        _currentRelation = CompiledRelationsCache.GetRelation(name, elementType, ownType, lambda);
                         
                         if (!Relations.RelationsDict.ContainsKey(_currentRelation.Name))
                         {
@@ -123,7 +123,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
                         RelationInfo newCurrent;
                         if (!_currentRelation.RelationsDict.TryGetValue(name, out newCurrent))
                         {
-                            var relationInfo = CompiledRelationsCache.GetOrAdd(name, elementType, _currentRelation.RelationType,
+                            var relationInfo = CompiledRelationsCache.GetRelation(name, elementType, _currentRelation.RelationType,
                                 lambdaExpression);
                             _currentRelation.RelationsDict.Add(name, relationInfo);
                             newCurrent = relationInfo;

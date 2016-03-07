@@ -19,5 +19,16 @@ namespace VitalChoice.ObjectMapping.Extensions
         {
             return (T) TypeConverter.Clone(obj, typeof (T), typeof (TBase));
         }
+
+        public static T Clone<T>(this T obj)
+            where T : new()
+        {
+            return (T)TypeConverter.Clone(obj, typeof(T));
+        }
+
+        public static object Clone(this object obj, Type objectType)
+        {
+            return TypeConverter.Clone(obj, objectType);
+        }
     }
 }
