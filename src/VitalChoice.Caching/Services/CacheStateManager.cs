@@ -36,8 +36,9 @@ namespace VitalChoice.Caching.Services
             var result = base.SaveChanges(entriesToSave);
             if (DataContext.InTransaction)
             {
+                UpdateCache(immutableList);
                 DataContext.TransactionCommit += () => _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
-                //DataContext.TransactionRollback += () => _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
+                DataContext.TransactionRollback += () => UpdateRollback(immutableList);
             }
             else
             {
@@ -53,8 +54,9 @@ namespace VitalChoice.Caching.Services
             var result = await base.SaveChangesAsync(entriesToSave, cancellationToken);
             if (DataContext.InTransaction)
             {
+                UpdateCache(immutableList);
                 DataContext.TransactionCommit += () => _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
-                //DataContext.TransactionRollback += () => _cacheSyncProvider.SendChanges(UpdateRollback(immutableList));
+                DataContext.TransactionRollback += () => UpdateRollback(immutableList);
             }
             else
             {
@@ -78,7 +80,7 @@ namespace VitalChoice.Caching.Services
                             primaryKey = cache.GetPrimaryKeyValue(entry.Entity);
                             if (primaryKey.IsValid)
                             {
-                                cache.MarkForUpdate(primaryKey);
+                                cache.Update(entry.Entity);
                                 syncOperations.Add(new SyncOperation
                                 {
                                     Key = primaryKey.ToExportable(group.Key),
