@@ -37,7 +37,7 @@ namespace VitalChoice.Caching.Services
             if (DataContext.InTransaction)
             {
                 DataContext.TransactionCommit += () => _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
-                DataContext.TransactionRollback += () => _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
+                //DataContext.TransactionRollback += () => _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
             }
             else
             {
@@ -54,7 +54,7 @@ namespace VitalChoice.Caching.Services
             if (DataContext.InTransaction)
             {
                 DataContext.TransactionCommit += () => _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
-                DataContext.TransactionRollback += () => _cacheSyncProvider.SendChanges(UpdateRollback(immutableList));
+                //DataContext.TransactionRollback += () => _cacheSyncProvider.SendChanges(UpdateRollback(immutableList));
             }
             else
             {
