@@ -53,8 +53,11 @@ namespace VitalChoice.Data.Transaction
             {
                 _referenceCount = 0;
                 _transaction.Rollback();
+                OnTransactionRollback();
             }
         }
+
+        public event Action TransactionRollback;
 
         public void IncReference()
         {
@@ -70,6 +73,11 @@ namespace VitalChoice.Data.Transaction
         protected virtual void OnTransactionCommit()
         {
             TransactionCommit?.Invoke();
+        }
+
+        protected virtual void OnTransactionRollback()
+        {
+            TransactionRollback?.Invoke();
         }
     }
 }

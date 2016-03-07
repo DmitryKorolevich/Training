@@ -9,6 +9,7 @@ namespace VitalChoice.Data.Transaction
         IDataContextAsync DbContext { get; }
         bool Closed { get; }
         event Action TransactionCommit;
+        event Action TransactionRollback;
         void IncReference();
     }
 }
