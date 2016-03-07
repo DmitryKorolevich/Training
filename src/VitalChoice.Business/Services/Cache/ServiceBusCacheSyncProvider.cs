@@ -165,10 +165,9 @@ namespace VitalChoice.Business.Services.Cache
                         RecordRemotePing(ping);
                     }
 
-                    int remoteAveragePing;
-                    if (syncOp.SyncType == SyncType.Ping && int.TryParse(syncOp.Key.EntityType, out remoteAveragePing))
+                    if (syncOp.SyncType == SyncType.Ping && syncOp.AveragePing > 0)
                     {
-                        _averagePing.AddOrUpdate(syncOp.EntityType, remoteAveragePing, (s, i) => remoteAveragePing);
+                        _averagePing.AddOrUpdate(syncOp.AppName, syncOp.AveragePing, (s, i) => syncOp.AveragePing);
                     }
                     else
                     {
@@ -194,11 +193,8 @@ namespace VitalChoice.Business.Services.Cache
                     _sendQue.Enqueue(new BrokeredMessage(new SyncOperation
                     {
                         SyncType = SyncType.Ping,
-                        EntityType = _applicationEnvironment.ApplicationName,
-                        Key = new EntityKeyExportable
-                        {
-                            EntityType = averagePing.ToString()
-                        }
+                        AppName = _applicationEnvironment.ApplicationName,
+                        AveragePing = averagePing
                     })
                     {
                         CorrelationId = _clientUid.ToString(),

@@ -10,6 +10,10 @@ namespace VitalChoice.Caching.Relational.Base
     public class SyncOperation
     {
         [DataMember]
+        public string AppName { get; set; }
+        [DataMember]
+        public int AveragePing { get; set; }
+        [DataMember]
         public SyncType SyncType { get; set; }
         [DataMember]
         public string EntityType { get; set; }
