@@ -90,10 +90,9 @@ namespace VitalChoice.Caching.Services
                             }
                             break;
                         case EntityState.Deleted:
-                            primaryKey = cache.GetPrimaryKeyValue(entry.Entity);
+                            primaryKey = cache.MarkForAdd(entry.Entity);
                             if (primaryKey.IsValid)
                             {
-                                cache.MarkForAdd(primaryKey);
                                 syncOperations.Add(new SyncOperation
                                 {
                                     Key = primaryKey.ToExportable(group.Key),

@@ -198,7 +198,7 @@ namespace VitalChoice.Caching.Services.Cache
                 return false;
 
             var result = CacheStorage.AllCacheDatas.Any();
-
+            MarkForUpdate(entity);
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var data in CacheStorage.AllCacheDatas)
             {
