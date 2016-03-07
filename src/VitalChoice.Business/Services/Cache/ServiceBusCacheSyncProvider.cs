@@ -7,6 +7,7 @@ using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational.Base;
 using VitalChoice.Caching.Services;
 using System.Collections.Concurrent;
+using System.Globalization;
 using System.Threading;
 using Microsoft.Extensions.OptionsModel;
 using Microsoft.Extensions.PlatformAbstractions;
@@ -61,7 +62,7 @@ namespace VitalChoice.Business.Services.Cache
                 {
                     CorrelationId = _clientUid.ToString(),
                     TimeToLive = TimeSpan.FromMinutes(5),
-                    ScheduledEnqueueTimeUtc = DateTime.UtcNow
+                    ContentType = DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)
                 });
             }
             _touchQueEvent.Set();
@@ -155,11 +156,13 @@ namespace VitalChoice.Business.Services.Cache
                     var syncOp = message.GetBody<SyncOperation>();
                     message.Complete();
 
-                    if (syncOp.SyncType != SyncType.Ping)
+                    DateTime timeSent;
+                    if (syncOp.SyncType != SyncType.Ping &&
+                        DateTime.TryParse(message.ContentType, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out timeSent))
                     {
-                        var ping = (DateTime.UtcNow - message.ScheduledEnqueueTimeUtc).Milliseconds;
+                        var ping = (DateTime.UtcNow - timeSent).Milliseconds;
                         Logger.LogInformation($"{syncOp} Message lag: {ping} ms");
-                        Ping(ping);
+                        RecordRemotePing(ping);
                     }
 
                     int remoteAveragePing;
@@ -200,14 +203,14 @@ namespace VitalChoice.Business.Services.Cache
                     {
                         CorrelationId = _clientUid.ToString(),
                         TimeToLive = TimeSpan.FromMinutes(5),
-                        ScheduledEnqueueTimeUtc = DateTime.UtcNow
+                        ContentType = DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)
                     });
                 }
             }
             return syncOperations;
         }
 
-        private void Ping(int ping)
+        private void RecordRemotePing(int ping)
         {
             lock (_lockObject)
             {
