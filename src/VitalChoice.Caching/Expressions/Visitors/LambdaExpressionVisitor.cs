@@ -67,7 +67,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
             }
             if (node.Method.Name == "Equals")
             {
-                if (node.Arguments.Count == 2)
+                if (node.Object == null)
                 {
                     VisitBinary(Expression.Equal(node.Arguments.First(), node.Arguments.Last()));
                 }
