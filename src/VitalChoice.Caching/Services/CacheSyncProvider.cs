@@ -41,16 +41,18 @@ namespace VitalChoice.Caching.Services
                     continue;
                 foreach (var op in group)
                 {
+                    object entity;
                     switch (op.SyncType)
                     {
                         case SyncType.Update:
-                            internalCache.MarkForUpdate(op.Key.ToPrimaryKey(pkInfo));
+                            entity = KeyStorage.GetEntity(type, op.Key.Values);
+                            internalCache.Update(entity);
                             break;
                         case SyncType.Delete:
                             internalCache.TryRemove(op.Key.ToPrimaryKey(pkInfo));
                             break;
                         case SyncType.Add:
-                            var entity = KeyStorage.GetEntity(type, op.Key.Values);
+                            entity = KeyStorage.GetEntity(type, op.Key.Values);
                             internalCache.MarkForAdd(entity);
                             break;
                     }
