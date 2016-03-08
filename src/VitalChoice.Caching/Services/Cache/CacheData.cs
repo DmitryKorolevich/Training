@@ -209,7 +209,10 @@ namespace VitalChoice.Caching.Services.Cache
                         _entityInfo.RelationReferences?.TryGetValue(pair.Key.Name, out relationReference);
                         if (relationReference == null)
                         {
-                            pair.Key.SetRelatedObject(oldEntity, newRelated);
+                            if (newRelated != null)
+                            {
+                                pair.Key.SetRelatedObject(oldEntity, newRelated);
+                            }
                         }
                         else
                         {
