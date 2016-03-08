@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Business.Queries.Orders;
+using VitalChoice.Caching.Extensions;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -25,7 +26,7 @@ namespace VitalChoice.Business.Repositories
         public async Task<List<CustomerOrderStatistic>> GetCustomerOrderStatistics(ICollection<int> ids)
         {
             var orderQuery = new OrderQuery().WithCustomerIds(ids).NotDeleted().WithActualStatusOnly();
-            var query = this.DbSet.Where(orderQuery.Query());
+            var query = this.DbSet.AsNoTracking().Where(orderQuery.Query());
             
             var result = await query.GroupBy(p => p.IdCustomer).Select(g => new CustomerOrderStatistic()
             {

@@ -382,7 +382,7 @@ namespace VitalChoice.Caching.Services
                         if (conditionalExpression == null)
                             return null;
 
-                        return set.FirstOrDefault(Expression.Lambda<Func<T, bool>>(conditionalExpression, parameter));
+                        return set.AsNoTracking().AsNonCached().FirstOrDefault(Expression.Lambda<Func<T, bool>>(conditionalExpression, parameter));
                     }
                 }
             }

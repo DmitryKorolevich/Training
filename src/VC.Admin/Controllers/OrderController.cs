@@ -22,6 +22,8 @@ using VitalChoice.Infrastructure.Domain.Entities.Permissions;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 using System.Linq;
+using Microsoft.Data.Entity;
+using Microsoft.Extensions.OptionsModel;
 using VC.Admin.Models.Orders;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -36,7 +38,10 @@ using VC.Admin.ModelConverters;
 using VC.Admin.Models.Products;
 using VitalChoice.Business.Mail;
 using VitalChoice.Business.Services.Dynamic;
+using VitalChoice.Caching.Extensions;
 using VitalChoice.Ecommerce.Domain.Mail;
+using VitalChoice.Infrastructure.Context;
+using VitalChoice.Infrastructure.Domain.Options;
 
 namespace VC.Admin.Controllers
 {
@@ -48,6 +53,7 @@ namespace VC.Admin.Controllers
         private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
         private readonly ICustomerService _customerService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
+        private readonly IOptions<AppOptions> _options;
         private readonly ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> _ordersRegionStatisticItemCSVExportService;
         private readonly ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> _ordersZipStatisticItemCSVExportService;
         private readonly ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> _vOrderWithRegionInfoItemCSVExportService;
@@ -67,7 +73,7 @@ namespace VC.Admin.Controllers
             ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> vOrderWithRegionInfoItemCSVExportService,
             IProductService productService,
             INotificationService notificationService,
-            IObjectHistoryLogService objectHistoryLogService)
+            IObjectHistoryLogService objectHistoryLogService, IOptions<AppOptions> options)
         {
             _orderService = orderService;
             _mapper = mapper;
@@ -79,6 +85,7 @@ namespace VC.Admin.Controllers
             _productService = productService;
             _notificationService = notificationService;
             _objectHistoryLogService = objectHistoryLogService;
+            _options = options;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             this.logger = loggerProvider.CreateLoggerDefault();
         }
@@ -180,7 +187,7 @@ namespace VC.Admin.Controllers
         //}
 
         [HttpGet]
-        public async Task<Result<OrderManageModel>> GetOrder(int id, int? idcustomer = null, bool refreshprices=false)
+        public async Task<Result<OrderManageModel>> GetOrder(int id, int? idcustomer = null, bool refreshprices = false)
         {
             if (id == 0)
             {
@@ -192,8 +199,8 @@ namespace VC.Admin.Controllers
 
                 var model = _mapper.ToModel<OrderManageModel>(order);
 
-                model.GCs = new List<GCListItemModel>() { new GCListItemModel(null) };
-                model.SkuOrdereds = new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) };
+                model.GCs = new List<GCListItemModel>() {new GCListItemModel(null)};
+                model.SkuOrdereds = new List<SkuOrderedManageModel>() {new SkuOrderedManageModel(null)};
                 model.UpdateShippingAddressForCustomer = true;
                 model.UpdateCardForCustomer = true;
                 model.UpdateCheckForCustomer = true;
@@ -206,14 +213,16 @@ namespace VC.Admin.Controllers
             }
 
             var item = await _orderService.SelectAsync(id);
-            if(id!=0 && refreshprices && item.Skus!=null)
+            if (id != 0 && refreshprices && item.Skus != null)
             {
                 var customer = await _customerService.SelectAsync(item.Customer.Id);
-                foreach(var orderSku in item.Skus)
+                foreach (var orderSku in item.Skus)
                 {
-                    if(orderSku.Sku!=null)
+                    if (orderSku.Sku != null)
                     {
-                        orderSku.Amount = customer.IdObjectType == (int)CustomerType.Retail ? orderSku.Sku.Price : orderSku.Sku.WholesalePrice;
+                        orderSku.Amount = customer.IdObjectType == (int) CustomerType.Retail
+                            ? orderSku.Sku.Price
+                            : orderSku.Sku.WholesalePrice;
                     }
                 }
             }
