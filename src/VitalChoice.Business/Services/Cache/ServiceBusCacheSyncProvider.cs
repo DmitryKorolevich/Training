@@ -202,6 +202,7 @@ namespace VitalChoice.Business.Services.Cache
                         TimeToLive = TimeSpan.FromMinutes(5),
                         ContentType = DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)
                     });
+                    _touchQueEvent.Set();
                 }
             }
             return syncOperations;
