@@ -364,25 +364,30 @@ namespace VitalChoice.Caching.Services
                 var contextType = GetContextType<T>();
                 if (contextType != null)
                 {
-                    var context = scope.Resolve(contextType) as DbContext;
-                    if (context != null)
+                    using (var context = scope.Resolve(contextType) as DbContext)
                     {
-                        var set = context.Set<T>();
-                        var parameter = Expression.Parameter(typeof (T));
-                        Expression conditionalExpression = null;
-                        foreach (var keyValue in keyValues)
+                        if (context != null)
                         {
-                            var part =
-                                Expression.Equal(
-                                    Expression.MakeMemberAccess(parameter, typeof (T).GetRuntimeProperty(keyValue.Name)),
-                                    Expression.Constant(keyValue.Value));
-                            conditionalExpression = conditionalExpression == null ? part : Expression.And(conditionalExpression, part);
+                            var set = context.Set<T>();
+                            var parameter = Expression.Parameter(typeof (T));
+                            Expression conditionalExpression = null;
+                            foreach (var keyValue in keyValues)
+                            {
+                                var part =
+                                    Expression.Equal(
+                                        Expression.MakeMemberAccess(parameter, typeof (T).GetRuntimeProperty(keyValue.Name)),
+                                        Expression.Constant(keyValue.Value));
+                                conditionalExpression = conditionalExpression == null ? part : Expression.And(conditionalExpression, part);
+                            }
+
+                            if (conditionalExpression == null)
+                                return null;
+
+                            return
+                                set.AsNoTracking()
+                                    .AsNonCached()
+                                    .FirstOrDefault(Expression.Lambda<Func<T, bool>>(conditionalExpression, parameter));
                         }
-
-                        if (conditionalExpression == null)
-                            return null;
-
-                        return set.AsNoTracking().AsNonCached().FirstOrDefault(Expression.Lambda<Func<T, bool>>(conditionalExpression, parameter));
                     }
                 }
             }
