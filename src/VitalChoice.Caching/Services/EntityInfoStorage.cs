@@ -142,9 +142,29 @@ namespace VitalChoice.Caching.Services
             var nonUniqueList = new HashSet<EntityCacheableIndexInfo>();
             var externalForeignKeys = new List<KeyValuePair<Type, EntityForeignKeyInfo>>();
             var externalDependentTypes = new List<KeyValuePair<Type, EntityCacheableIndexRelationInfo>>();
+            var relationalReferences =
+                new List<KeyValuePair<Type, KeyValuePair<string, EntityRelationalReferenceInfo>>>();
 
             foreach (var foreignKey in entityType.GetForeignKeys())
             {
+                if (foreignKey.PrincipalToDependent != null && !foreignKey.PrincipalToDependent.IsCollection())
+                {
+                    relationalReferences.Add(
+                        new KeyValuePair<Type, KeyValuePair<string, EntityRelationalReferenceInfo>>(
+                            foreignKey.PrincipalToDependent.DeclaringEntityType.ClrType,
+                            new KeyValuePair<string, EntityRelationalReferenceInfo>(
+                                foreignKey.PrincipalToDependent.Name,
+                                new EntityRelationalReferenceInfo(CreateValueInfos(foreignKey.PrincipalKey.Properties)))));
+                }
+                if (foreignKey.DependentToPrincipal != null && !foreignKey.DependentToPrincipal.IsCollection())
+                {
+                    relationalReferences.Add(
+                        new KeyValuePair<Type, KeyValuePair<string, EntityRelationalReferenceInfo>>(
+                            foreignKey.DependentToPrincipal.DeclaringEntityType.ClrType,
+                            new KeyValuePair<string, EntityRelationalReferenceInfo>(
+                                foreignKey.DependentToPrincipal.Name,
+                                new EntityRelationalReferenceInfo(CreateValueInfos(foreignKey.Properties)))));
+                }
                 if (foreignKey.PrincipalToDependent != null && foreignKey.PrincipalToDependent.IsCollection())
                 {
                     var foreignValues = CreateValueInfos(foreignKey.Properties).ToArray();
@@ -231,6 +251,23 @@ namespace VitalChoice.Caching.Services
                 info.ForeignKeys.Add(external.Value);
                 return info;
             }));
+            relationalReferences.ForEach(external => entityInfos.AddOrUpdate(external.Key, () => new EntityInfo
+            {
+                RelationReferences =
+                    new Dictionary<string, EntityRelationalReferenceInfo> {{external.Value.Key, external.Value.Value}}
+            },
+                info =>
+                {
+                    if (info.RelationReferences == null)
+                    {
+                        info.RelationReferences = new Dictionary<string, EntityRelationalReferenceInfo>();
+                    }
+                    if (!info.RelationReferences.ContainsKey(external.Value.Key))
+                    {
+                        info.RelationReferences.Add(external.Value.Key, external.Value.Value);
+                    }
+                    return info;
+                }));
             return nonUniqueList;
         }
 

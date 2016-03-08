@@ -15,21 +15,19 @@ namespace VitalChoice.Caching.Services.Cache
         private readonly EntityPrimaryKeyInfo _primaryKeyInfo;
         private readonly EntityCacheableIndexInfo _indexInfo;
         private readonly ICollection<EntityForeignKeyInfo> _foreignKeyInfos;
-        private readonly ICollection<EntityConditionalIndexInfo> _conditionalIndexes;
         private readonly ICollection<EntityCacheableIndexInfo> _nonUniqueIndexes;
+        private readonly EntityInfo _entityInfo;
 
         public CacheStorage(IEntityInfoStorage keyStorage, IInternalEntityCacheFactory cacheFactory)
         {
             _cacheFactory = cacheFactory;
-            EntityInfo entityInfo;
-            if (keyStorage.GetEntityInfo<T>(out entityInfo))
+            if (keyStorage.GetEntityInfo<T>(out _entityInfo))
             {
-                _primaryKeyInfo = entityInfo.PrimaryKey;
-                _indexInfo = entityInfo.CacheableIndex;
-                _conditionalIndexes = entityInfo.ConditionalIndexes;
-                _foreignKeyInfos = entityInfo.ForeignKeys;
-                _nonUniqueIndexes = entityInfo.NonUniqueIndexes;
-                DependentTypes = entityInfo.DependentTypes;
+                _primaryKeyInfo = _entityInfo.PrimaryKey;
+                _indexInfo = _entityInfo.CacheableIndex;
+                _foreignKeyInfos = _entityInfo.ForeignKeys;
+                _nonUniqueIndexes = _entityInfo.NonUniqueIndexes;
+                DependentTypes = _entityInfo.DependentTypes;
             }
         }
 
@@ -41,7 +39,7 @@ namespace VitalChoice.Caching.Services.Cache
         public ICacheData<T> GetCacheData(RelationInfo relationInfo)
         {
             return _cacheData.GetOrAdd(relationInfo,
-                r => new CacheData<T>(_cacheFactory, this, _conditionalIndexes, _nonUniqueIndexes, relationInfo));
+                r => new CacheData<T>(_cacheFactory, this, _entityInfo, relationInfo));
         }
 
         public ICollection<ICacheData<T>> AllCacheDatas => _cacheData.Values;

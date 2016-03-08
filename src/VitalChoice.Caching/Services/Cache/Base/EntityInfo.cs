@@ -7,6 +7,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
 {
     public struct EntityInfo
     {
+        public IDictionary<string, EntityRelationalReferenceInfo> RelationReferences;
         public Type ContextType;
         public LambdaExpression CacheCondition;
         public ICollection<EntityForeignKeyInfo> ForeignKeys;

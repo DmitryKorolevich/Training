@@ -99,7 +99,7 @@ angular.module('app.core.utils.appBootstrap', [])
                     setTimeout(cacheStatus, 5000);
             })
             .error(function () {
-                toaster.pop('error', "Error!", "Can't get cache status");
+                $rootScope.cacheState = [{"Error": 0}];
                 if ($rootScope.authenticated)
                     setTimeout(cacheStatus, 60000);
             });

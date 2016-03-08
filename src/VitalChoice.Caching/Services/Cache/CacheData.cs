@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Services.Cache.Base;
@@ -19,6 +20,7 @@ namespace VitalChoice.Caching.Services.Cache
     {
         private readonly IInternalEntityCacheFactory _cacheFactory;
         private readonly CacheStorage<T> _cacheStorage;
+        private readonly EntityInfo _entityInfo;
         private readonly RelationInfo _relationInfo;
 
         private readonly object _lockObj = new object();
@@ -32,21 +34,21 @@ namespace VitalChoice.Caching.Services.Cache
         private readonly Dictionary<EntityCacheableIndexInfo, ConcurrentDictionary<EntityIndex, CacheCluster<EntityKey, T>>> _nonUniqueIndexedDictionary;
         private volatile bool _needUpdate;
 
-        public CacheData(IInternalEntityCacheFactory cacheFactory, CacheStorage<T> cacheStorage,
-            ICollection<EntityConditionalIndexInfo> conditionalIndexes, ICollection<EntityCacheableIndexInfo> nonUniqueIndexes, RelationInfo relationInfo)
+        public CacheData(IInternalEntityCacheFactory cacheFactory, CacheStorage<T> cacheStorage, EntityInfo entityInfo, RelationInfo relationInfo)
         {
             _mainCluster = new CacheCluster<EntityKey, T>();
             _indexedCluster = new CacheCluster<EntityIndex, T>();
             _cacheFactory = cacheFactory;
             _cacheStorage = cacheStorage;
+            _entityInfo = entityInfo;
             _relationInfo = relationInfo;
             _conditionalIndexedDictionary = new Dictionary<EntityConditionalIndexInfo, CacheCluster<EntityIndex, T>>();
-            foreach (var conditionalIndex in conditionalIndexes)
+            foreach (var conditionalIndex in entityInfo.ConditionalIndexes)
             {
                 _conditionalIndexedDictionary.Add(conditionalIndex, new CacheCluster<EntityIndex, T>());
             }
             _nonUniqueIndexedDictionary = new Dictionary<EntityCacheableIndexInfo, ConcurrentDictionary<EntityIndex, CacheCluster<EntityKey, T>>>();
-            foreach (var nonUniqueIndex in nonUniqueIndexes)
+            foreach (var nonUniqueIndex in entityInfo.NonUniqueIndexes)
             {
                 _nonUniqueIndexedDictionary.Add(nonUniqueIndex, new ConcurrentDictionary<EntityIndex, CacheCluster<EntityKey, T>>());
             }
@@ -189,17 +191,51 @@ namespace VitalChoice.Caching.Services.Cache
                 lock (cached)
                 {
                     var oldEntity = cached.Entity;
-                    var relations = _relationInfo.Relations;
 
-                    var relatedObjects = relations.Select(relation => relation.GetRelatedObject(oldEntity)).ToArray();
+                    var relatedObjects =
+                        _relationInfo.Relations.Select(
+                            relation =>
+                                new KeyValuePair<RelationInfo, object>(relation, relation.GetRelatedObject(oldEntity)))
+                            .ToArray();
 
                     SyncInternalCache(pk, entity, cached);
-                    TypeConverter.CopyInto(oldEntity, entity, typeof (T), type => !type.GetTypeInfo().IsValueType && type != typeof(string));
+                    TypeConverter.CopyInto(oldEntity, entity, typeof (T),
+                        type => !type.GetTypeInfo().IsValueType && type != typeof (string));
 
-                    foreach (var pair in relations.SimpleJoin(relatedObjects))
+                    foreach (var pair in relatedObjects)
                     {
-                        pair.Key.SetRelatedObject(oldEntity, pair.Value);
+                        var newRelated = pair.Key.GetRelatedObject(entity);
+                        EntityRelationalReferenceInfo relationReference = null;
+                        _entityInfo.RelationReferences?.TryGetValue(pair.Key.Name, out relationReference);
+                        if (relationReference == null)
+                        {
+                            pair.Key.SetRelatedObject(oldEntity, newRelated);
+                        }
+                        else
+                        {
+                            var newRelatedKey = relationReference.GetPrimaryKeyValue(entity);
+                            var oldRelatedKey = relationReference.GetPrimaryKeyValue(oldEntity);
+                            if (newRelated != null)
+                            {
+                                if (newRelatedKey != oldRelatedKey)
+                                {
+                                    pair.Key.SetRelatedObject(oldEntity, newRelated);
+                                }
+                            }
+                            else
+                            {
+                                if (newRelatedKey.IsValid)
+                                {
+                                    cached.NeedUpdate = true;
+                                }
+                                else
+                                {
+                                    pair.Key.SetRelatedObject(oldEntity, null);
+                                }
+                            }
+                        }
                     }
+                    UpdateRelations(oldEntity);
                 }
                 return cached;
             }
