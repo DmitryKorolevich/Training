@@ -98,10 +98,14 @@ namespace VitalChoice.Caching.Expressions.Visitors
 
                         elementType = relationType.TryGetElementType(typeof (ICollection<>)) ?? relationType;
 
-                        _currentRelation = CompiledRelationsCache.GetRelation(name, elementType, ownType, lambda);
-                        
-                        if (!Relations.RelationsDict.ContainsKey(_currentRelation.Name))
+                        if (name == null)
                         {
+                            throw new InvalidOperationException("Include contains invalid relation name");
+                        }
+
+                        if (!Relations.RelationsDict.TryGetValue(name, out _currentRelation))
+                        {
+                            _currentRelation = CompiledRelationsCache.GetRelation(name, elementType, ownType, lambda);
                             Relations.RelationsDict.Add(_currentRelation.Name, _currentRelation);
                         }
                         break;
