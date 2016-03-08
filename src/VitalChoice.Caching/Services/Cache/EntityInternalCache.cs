@@ -24,7 +24,7 @@ namespace VitalChoice.Caching.Services.Cache
         {
             KeyStorage = keyStorage;
             CacheFactory = cacheFactory;
-            CacheStorage = new CacheStorage<T>(keyStorage, cacheFactory);
+            CacheStorage = new CacheStorage<T>(keyStorage, cacheFactory, this);
         }
 
         public CacheResult<T> TryGetEntity(EntityKey key, RelationInfo relations)
@@ -197,8 +197,9 @@ namespace VitalChoice.Caching.Services.Cache
             if (entity == null)
                 return false;
 
-            var result = CacheStorage.AllCacheDatas.Any();
             MarkForUpdate(entity);
+
+            var result = CacheStorage.AllCacheDatas.Any();
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var data in CacheStorage.AllCacheDatas)
             {

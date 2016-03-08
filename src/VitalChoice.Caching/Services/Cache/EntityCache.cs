@@ -360,21 +360,9 @@ namespace VitalChoice.Caching.Services.Cache
                 var value = relation.GetRelatedObject(newItem);
                 if (value != null)
                 {
-                    object replacementValue;
-                    if (value.GetType().IsImplementGeneric(typeof (ICollection<>)))
-                    {
-                        var newValue = (IList) Activator.CreateInstance(typeof (List<>).MakeGenericType(relation.RelationType));
-                        foreach (var singleValue in (IEnumerable) value)
-                        {
-                            var clonedItem = singleValue.Clone(relation.RelationType);
-                            newValue.Add(clonedItem);
-                        }
-                        replacementValue = newValue;
-                    }
-                    else
-                    {
-                        replacementValue = value.Clone(relation.RelationType);
-                    }
+                    var replacementValue = value.GetType().IsImplementGeneric(typeof (ICollection<>))
+                        ? ((IEnumerable) value).Clone(relation.RelationType)
+                        : value.Clone(relation.RelationType);
                     relation.SetRelatedObject(newItem, replacementValue);
                 }
             }

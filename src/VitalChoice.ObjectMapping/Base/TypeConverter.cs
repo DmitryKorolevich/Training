@@ -233,6 +233,33 @@ namespace VitalChoice.ObjectMapping.Base
             return result;
         }
 
+        public static IList Clone(IEnumerable obj, Type objectType)
+        {
+            return CloneInternal(obj, objectType);
+        }
+
+        public static IList CloneInternal(IEnumerable obj, Type objectType)
+        {
+            if (obj == null)
+                return null;
+
+            var resultList = (IList) Activator.CreateInstance(typeof (List<>).MakeGenericType(objectType));
+            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+
+            foreach (var item in obj)
+            {
+                var result = Activator.CreateInstance(objectType);
+
+                foreach (var pair in objectCache.Properties)
+                {
+                    pair.Value.Set?.Invoke(result, pair.Value.Get?.Invoke(item));
+                }
+                resultList.Add(result);
+            }
+
+            return resultList;
+        }
+
         public static object Clone(object obj, Type objectType)
         {
             return CloneInternal(obj, objectType);

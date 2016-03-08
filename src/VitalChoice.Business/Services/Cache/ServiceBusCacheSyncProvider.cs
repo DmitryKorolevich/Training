@@ -46,6 +46,7 @@ namespace VitalChoice.Business.Services.Cache
                 var queName = options.Value.CacheSyncOptions?.ServiceBusQueueName;
                 var factory = MessagingFactory.CreateFromConnectionString(options.Value.CacheSyncOptions?.ConnectionString);
                 _serviceBusClient = factory.CreateQueueClient(queName, ReceiveMode.PeekLock);
+                _serviceBusClient.PrefetchCount = 100;
                 new Thread(ReceivingThreadProc).Start();
                 new Thread(SendingThreadProc).Start();
             }
