@@ -10,6 +10,7 @@ using System.Collections.Concurrent;
 using System.Globalization;
 using Microsoft.Extensions.OptionsModel;
 using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.ServiceBus.Base;
@@ -24,7 +25,7 @@ namespace VitalChoice.Business.Services.Cache
         private readonly IApplicationEnvironment _applicationEnvironment;
         private readonly bool _enabled;
         private readonly object _lockObject = new object();
-        private readonly ServiceBusHost _serviceBusClient;
+        private readonly ServiceBusHostOneToMany _serviceBusClient;
         private readonly Guid _clientUid = Guid.NewGuid();
         private readonly ConcurrentDictionary<string, int> _averagePing;
         private readonly int[] _pingMilliseconds = new int[PingAverageMaxCount];
@@ -41,13 +42,40 @@ namespace VitalChoice.Business.Services.Cache
                 _enabled = true;
                 _averagePing = new ConcurrentDictionary<string, int>();
 
-                _serviceBusClient = new ServiceBusHost(Logger, () =>
+                var queName = options.Value.CacheSyncOptions?.ServiceBusQueueName;
+                var ns = NamespaceManager.CreateFromConnectionString(options.Value.CacheSyncOptions?.ConnectionString);
+                if (!ns.TopicExists(queName))
+                {
+                    TopicDescription topic = new TopicDescription(queName)
+                    {
+                        EnableExpress = true,
+                        EnablePartitioning = true,
+                        EnableBatchedOperations = true,
+                        DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
+                        RequiresDuplicateDetection = false
+                    };
+
+                    ns.CreateTopic(topic);
+                }
+                if (!ns.SubscriptionExists(queName, applicationEnvironment.ApplicationName))
+                {
+                    SubscriptionDescription subscription = new SubscriptionDescription(queName, applicationEnvironment.ApplicationName)
+                    {
+                        EnableBatchedOperations = true,
+                        DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
+                        RequiresSession = false
+                    };
+                    ns.CreateSubscription(subscription);
+                }
+
+                _serviceBusClient = new ServiceBusHostOneToMany(Logger, () =>
                 {
                     var factory = MessagingFactory.CreateFromConnectionString(options.Value.CacheSyncOptions?.ConnectionString);
-                    var queName = options.Value.CacheSyncOptions?.ServiceBusQueueName;
-                    var result = factory.CreateQueueClient(queName, ReceiveMode.PeekLock);
-                    result.PrefetchCount = 100;
-                    return result;
+                    return factory.CreateTopicClient(queName);
+                }, () =>
+                {
+                    var factory = MessagingFactory.CreateFromConnectionString(options.Value.CacheSyncOptions?.ConnectionString);
+                    return factory.CreateSubscriptionClient(queName, applicationEnvironment.ApplicationName, ReceiveMode.PeekLock);
                 })
                 {
                     EnableBatching = true
@@ -62,13 +90,14 @@ namespace VitalChoice.Business.Services.Cache
             if (!_enabled)
                 return;
 
+            var now = DateTime.UtcNow;
             foreach (var operation in syncOperations)
             {
+                operation.SendTime = now;
                 _serviceBusClient.EnqueueMessage(new BrokeredMessage(operation)
                 {
                     CorrelationId = _clientUid.ToString(),
-                    TimeToLive = TimeSpan.FromMinutes(5),
-                    ContentType = DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)
+                    TimeToLive = TimeSpan.FromMinutes(5)
                 });
             }
             _serviceBusClient.SendNow();
@@ -110,11 +139,9 @@ namespace VitalChoice.Business.Services.Cache
                     var syncOp = message.GetBody<SyncOperation>();
                     message.Complete();
 
-                    DateTime timeSent;
-                    if (syncOp.SyncType != SyncType.Ping &&
-                        DateTime.TryParse(message.ContentType, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out timeSent))
+                    if (syncOp.SyncType != SyncType.Ping)
                     {                      
-                        var ping = (DateTime.UtcNow - timeSent).Milliseconds;
+                        var ping = (DateTime.UtcNow - syncOp.SendTime).Milliseconds;
                         Logger.LogInformation($"{syncOp} Message lag: {ping} ms");
                         lock (_lockObject)
                         {
@@ -152,12 +179,12 @@ namespace VitalChoice.Business.Services.Cache
                     {
                         SyncType = SyncType.Ping,
                         AppName = _applicationEnvironment.ApplicationName,
-                        AveragePing = averagePing
+                        AveragePing = averagePing,
+                        SendTime = DateTime.UtcNow
                     })
                     {
                         CorrelationId = _clientUid.ToString(),
-                        TimeToLive = TimeSpan.FromMinutes(5),
-                        ContentType = DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)
+                        TimeToLive = TimeSpan.FromMinutes(5)
                     });
                     _serviceBusClient.SendNow();
                 }

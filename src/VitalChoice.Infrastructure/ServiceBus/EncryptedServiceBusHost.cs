@@ -17,8 +17,8 @@ namespace VitalChoice.Infrastructure.ServiceBus
     public abstract class EncryptedServiceBusHost : IEncryptedServiceBusHost
     {
         
-        private readonly ServiceBusHost _plainClient;
-        private readonly ServiceBusHost _encryptedClient;
+        private readonly ServiceBusHostOneToOne _plainClient;
+        private readonly ServiceBusHostOneToOne _encryptedClient;
         private readonly ConcurrentDictionary<CommandItem, WeakReference<ServiceBusCommandBase>> _commands;
 
         protected readonly IObjectEncryptionHost EncryptionHost;
@@ -35,12 +35,12 @@ namespace VitalChoice.Infrastructure.ServiceBus
             _commands = new ConcurrentDictionary<CommandItem, WeakReference<ServiceBusCommandBase>>();
             try
             {
-                _plainClient = new ServiceBusHost(logger, () =>
+                _plainClient = new ServiceBusHostOneToOne(logger, () =>
                 {
                     var plainFactory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.PlainConnectionString);
                     return plainFactory.CreateQueueClient(appOptions.Value.ExportService.PlainQueueName, ReceiveMode.PeekLock);
                 });
-                _encryptedClient = new ServiceBusHost(logger, () =>
+                _encryptedClient = new ServiceBusHostOneToOne(logger, () =>
                 {
                     var encryptedFactory =
                         MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.EncryptedConnectionString);

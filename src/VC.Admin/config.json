@@ -90,8 +90,8 @@
       "CacheScanPeriodSeconds": 900 //15 minutes
     },
     "CacheSyncOptions": {
-      "ConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=CacheConnectors;SharedAccessKey=pCiNJKmuaN4Z6OtfoFT4Pv33Yqj832sE//Dfa8WGQow=",
-      "ServiceBusQueueName": "PlainCache",
+      "ConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=EHD98MDUnATxygjflXQa+0wgOPXRrnjnbs2/YL7U160=",
+      "ServiceBusQueueName": "caching",
       "Enabled": true
     }
   }

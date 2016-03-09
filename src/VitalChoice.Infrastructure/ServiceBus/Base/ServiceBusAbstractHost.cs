@@ -1,4 +1,4 @@
-﻿#if NET451
+#if NET451
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -9,10 +9,8 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace VitalChoice.Infrastructure.ServiceBus.Base
 {
-    public class ServiceBusHost : IDisposable
+    public abstract class ServiceBusAbstractHost : IDisposable
     {
-        private readonly QueueClient _sendClient;
-        private readonly QueueClient _receiveClient;
         private readonly ConcurrentQueue<BrokeredMessage> _sendQue = new ConcurrentQueue<BrokeredMessage>();
         private readonly ManualResetEvent _readyToDisposeReceive = new ManualResetEvent(true);
         private readonly ManualResetEvent _readyToDisposeSend = new ManualResetEvent(true);
@@ -21,18 +19,17 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         private readonly List<Thread> _runningThreads = new List<Thread>();
 
         protected readonly ILogger Logger;
+        protected readonly IServiceBusSender Sender;
+        protected readonly IServiceBusReceiver Receiver;
 
-        public ServiceBusHost(ILogger logger, Func<QueueClient> clientFactory)
+        protected ServiceBusAbstractHost(ILogger logger, IServiceBusSender sender, IServiceBusReceiver receiver)
         {
             if (logger == null)
                 throw new ArgumentNullException(nameof(logger));
-            if (clientFactory == null)
-                throw new ArgumentNullException(nameof(clientFactory));
-
-            _sendClient = clientFactory();
-            _receiveClient = clientFactory();
 
             Logger = logger;
+            Sender = sender;
+            Receiver = receiver;
         }
 
         public virtual void Start()
@@ -55,8 +52,8 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         {
             _terminated = true;
             WaitHandle.WaitAll(new WaitHandle[] { _readyToDisposeReceive, _readyToDisposeSend }, TimeSpan.FromSeconds(20));
-            _receiveClient.Close();
-            _sendClient.Close();
+            Receiver.Dispose();
+            Sender.Dispose();
             ReceiveMessagesEvent = null;
             _runningThreads.ForEach(t => t.Abort());
             _runningThreads.Clear();
@@ -78,7 +75,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 {
                     if (EnableBatching)
                     {
-                        var messages = _receiveClient.ReceiveBatch(BatchSize);
+                        var messages = Receiver.ReceiveBatch(BatchSize);
                         if (messages != null)
                         {
                             _readyToDisposeReceive.Reset();
@@ -88,7 +85,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                     }
                     else
                     {
-                        var message = _receiveClient.Receive();
+                        var message = Receiver.Receive();
                         if (message != null)
                         {
                             _readyToDisposeReceive.Reset();
@@ -102,6 +99,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 {
                     Logger.LogError(e.Message, e);
                     _readyToDisposeReceive.Set();
+                    Thread.Sleep(TimeSpan.FromSeconds(1));
                 }
             }
             _readyToDisposeReceive.Set();
@@ -121,6 +119,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
 
         private void SendMessages()
         {
+            List<BrokeredMessage> messages = new List<BrokeredMessage>();
             while (!_terminated)
             {
                 try
@@ -128,23 +127,30 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                     BrokeredMessage message;
                     if (!_sendQue.TryDequeue(out message))
                     {
+                        if (messages.Any())
+                        {
+                            Sender.SendBatch(messages);
+                            messages.Clear();
+                        }
                         _readyToDisposeReceive.Set();
                         _newMessageSignal.WaitOne();
                         _newMessageSignal.Reset();
                         continue;
                     }
+                    messages.Add(message);
                     _readyToDisposeReceive.Reset();
-                    _sendClient.Send(message);
                 }
                 catch (Exception e)
                 {
                     Logger.LogError(e.Message, e);
+                    _readyToDisposeReceive.Set();
+                    Thread.Sleep(TimeSpan.FromSeconds(1));
                 }
             }
             _readyToDisposeReceive.Set();
         }
 
-        ~ServiceBusHost()
+        ~ServiceBusAbstractHost()
         {
             Dispose(false);
         }
