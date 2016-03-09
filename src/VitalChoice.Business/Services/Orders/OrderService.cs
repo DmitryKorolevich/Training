@@ -207,7 +207,8 @@ namespace VitalChoice.Business.Services.Orders
                     .ThenInclude(s => s.Product)
                     .ThenInclude(s => s.OptionValues)
                     .Include(p => p.OptionValues)
-                    .Include(o => o.HealthwiseOrder);
+                    .Include(o => o.HealthwiseOrder)
+                    .Include(o => o.GiftCertificatesGenerated);
         }
 
         protected override async Task AfterSelect(ICollection<Order> entities)

@@ -30,6 +30,6 @@ namespace VitalChoice.Interfaces.Services.Products
 
 	    Task<List<GiftCertificate>> GetGiftCertificatesAsync(Expression<Func<GiftCertificate, bool>> expression);
 
-        string GenerateGCCode();
+        Task<string> GenerateGCCode();
     }
 }

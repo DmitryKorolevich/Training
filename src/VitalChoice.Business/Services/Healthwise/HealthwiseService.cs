@@ -146,7 +146,7 @@ namespace VitalChoice.Business.Services.Healthwise
                                 gc.FirstName = healthwise.CustomerFirstName;
                                 gc.LastName = healthwise.CustomerLastName;
                                 gc.Balance = amount;
-                                gc.Code = _gcService.GenerateGCCode();
+                                gc.Code = await _gcService.GenerateGCCode();
                                 gc.UserId = userId;
 
                                 giftCertificateRepository.Insert(gc);

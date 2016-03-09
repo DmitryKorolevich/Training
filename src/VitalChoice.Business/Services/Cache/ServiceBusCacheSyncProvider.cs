@@ -92,15 +92,10 @@ namespace VitalChoice.Business.Services.Cache
         private void ReceiveMessages(IEnumerable<BrokeredMessage> incomingItems)
         {
             List<SyncOperation> syncOperations = new List<SyncOperation>();
-            var anyIncoming = false;
             foreach (var message in incomingItems)
             {
-                anyIncoming = true;
                 if (message.ExpiresAtUtc < DateTime.UtcNow)
                 {
-                    var syncOp = message.GetBody<SyncOperation>();
-                    Logger.LogWarning(
-                        $"{syncOp} Cache update message expired, sender id: {message.CorrelationId}, current instance id: {_clientUid}");
                     message.Complete();
                     continue;
                 }
@@ -118,7 +113,7 @@ namespace VitalChoice.Business.Services.Cache
                     DateTime timeSent;
                     if (syncOp.SyncType != SyncType.Ping &&
                         DateTime.TryParse(message.ContentType, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out timeSent))
-                    {
+                    {                      
                         var ping = (DateTime.UtcNow - timeSent).Milliseconds;
                         Logger.LogInformation($"{syncOp} Message lag: {ping} ms");
                         lock (_lockObject)
@@ -142,7 +137,7 @@ namespace VitalChoice.Business.Services.Cache
                     message.Complete();
                 }
             }
-            if (anyIncoming)
+            if (syncOperations.Any())
             {
                 int[] pings;
                 lock (_lockObject)

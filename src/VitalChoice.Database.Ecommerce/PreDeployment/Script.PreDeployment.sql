@@ -54,3 +54,4 @@
 :r .\Scripts\CatalogRequests.sql
 
 :r .\Scripts\Checkout.sql
+:r .\Scripts\GiftCetfificatesUpdateSku.sql
