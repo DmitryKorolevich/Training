@@ -138,11 +138,17 @@ namespace VitalChoice.Caching.Relational
 
         public object GetRelatedObject(object entity)
         {
+            if (entity == null)
+                return null;
+
             return _relationAccessor.GetRelatedObject(entity);
         }
 
         public void SetRelatedObject(object entity, object relation)
         {
+            if (entity == null)
+                return;
+
             _relationAccessor.SetRelatedObject(entity, relation);
         }
 
