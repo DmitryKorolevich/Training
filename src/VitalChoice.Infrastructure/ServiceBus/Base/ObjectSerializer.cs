@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 using System.IO;
 using System.Runtime.Serialization;
 
-namespace VitalChoice.Infrastructure.ServiceBus
+namespace VitalChoice.Infrastructure.ServiceBus.Base
 {
     public static class ObjectSerializer
     {

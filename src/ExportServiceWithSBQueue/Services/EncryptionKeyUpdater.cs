@@ -15,6 +15,7 @@ using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus;
 using VitalChoice.Infrastructure.Extensions;
+using VitalChoice.Infrastructure.ServiceBus.Base;
 
 namespace ExportServiceWithSBQueue.Services
 {

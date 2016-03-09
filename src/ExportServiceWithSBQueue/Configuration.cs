@@ -61,6 +61,7 @@ using VitalChoice.DynamicData.Helpers;
 using VitalChoice.Interfaces.Services.Help;
 using VitalChoice.DynamicData.Extensions;
 using VitalChoice.ContentProcessing.Helpers;
+using VitalChoice.Infrastructure.ServiceBus.Base;
 
 namespace ExportServiceWithSBQueue
 {

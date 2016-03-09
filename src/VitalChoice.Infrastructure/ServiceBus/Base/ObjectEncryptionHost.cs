@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,13 +11,11 @@ using System.Text;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
-using Microsoft.Win32;
-using Newtonsoft.Json;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 
-namespace VitalChoice.Infrastructure.ServiceBus
+namespace VitalChoice.Infrastructure.ServiceBus.Base
 {
     public delegate void SessionExpiredEventHandler(Guid session, string hostName);
 
