@@ -13,5 +13,7 @@
 	    public bool BestValue { get; set; }
 
         public bool InStock { get; set; }
+
+	    public bool AutoShip { get; set; }
     }
 }
