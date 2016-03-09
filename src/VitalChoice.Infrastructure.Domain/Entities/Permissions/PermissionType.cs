@@ -16,5 +16,6 @@
         Files = 12,
         Marketing = 14,
         SuperAdminSettings = 15,
+        InventorySkus = 17,
     }
 }

@@ -29,6 +29,7 @@ using VitalChoice.Business.CsvExportMaps;
 using Microsoft.Net.Http.Headers;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Products;
+using VitalChoice.Interfaces.Services.InventorySkus;
 
 namespace VC.Admin.Controllers
 {
@@ -72,17 +73,22 @@ namespace VC.Admin.Controllers
 
         [HttpGet]
         [AdminAuthorize(PermissionType.Products)]
-        public Task<Result<ProductEditSettingsModel>> GetProductEditSettings()
+        public async Task<Result<ProductEditSettingsModel>> GetProductEditSettings()
         {
             var lookups = productService.GetProductLookupsAsync().Select(
                         p => new LookupViewModel(p.Name, p.IdObjectType, p.DefaultValue, p.Lookup)).ToList();
+            var inventoryChannelLookup = (await settingService.GetLookupsAsync(new [] { SettingConstants.INVENTORY_SKU_LOOKUP_CHANNEL_NAME })).FirstOrDefault();
+            if (inventoryChannelLookup != null)
+            {
+                lookups.Add(new LookupViewModel(inventoryChannelLookup.Name, null, null, inventoryChannelLookup));
+            }
             var defaultValues = productService.GetProductEditDefaultSettingsAsync();
             ProductEditSettingsModel toReturn = new ProductEditSettingsModel()
             {
                 Lookups = lookups,
                 DefaultValues = defaultValues
             };
-            return Task.FromResult<Result<ProductEditSettingsModel>>(toReturn);
+            return toReturn;
         }
 
         [HttpPost]

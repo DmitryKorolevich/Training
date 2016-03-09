@@ -73,7 +73,11 @@ namespace VitalChoice.Business.Services.Products
 
         protected override IQueryLite<Product> BuildQuery(IQueryLite<Product> query)
         {
-            return query.Include(p => p.Skus).ThenInclude(s => s.OptionValues).Include(p => p.ProductsToCategories);
+            return query.Include(p => p.Skus)
+                .ThenInclude(s => s.OptionValues)
+                .Include(p => p.Skus)
+                .ThenInclude(s => s.SkusToInventorySkus)
+                .Include(p => p.ProductsToCategories);
         }
 
         protected override Task AfterSelect(ICollection<Product> entities)

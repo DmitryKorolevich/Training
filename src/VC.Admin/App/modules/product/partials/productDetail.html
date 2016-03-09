@@ -395,7 +395,7 @@
                                     <form class="form-horizontal" name="forms.skusDetails" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted}" novalidate unsaved-warning-form>
                                         <div class="row form-group">
                                             <div class="col-md-12">
-                                                <input type="text" class="form-control"  name="SubProductGroupName" placeholder="Example: Number of Portions" data-ng-model="product.SubProductGroupName" data-ng-maxlength="32"  data-max-characters="32">
+                                                <input type="text" class="form-control" name="SubProductGroupName" placeholder="Example: Number of Portions" data-ng-model="product.SubProductGroupName" data-ng-maxlength="32" data-max-characters="32">
                                                 <div class="error-container" ng-show="forms.submitted && forms.skusDetails.SubProductGroupName.$invalid">
                                                     <small class="error" ng-show="forms.skusDetails.SubProductGroupName.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength",["Sub Product Group Name", "32"])}}</small>
                                                     <small class="error" ng-show="forms.skusDetails.SubProductGroupName.$error.server">{{serverMessages.GetMessage('SubProductGroupName')}}</small>
@@ -409,7 +409,7 @@
                                     </div>
                                     <span class="help-block">*Drag and drop using icon to reorder sub products</span>
                                     <!--<accordion class="sortable-accordion">-->
-                                    <form name="forms.SKUs" data-ng-submit="save()" data-ng-class="{submitted: forms.skussubmitted}" novalidate unsaved-warning-form>
+                                    <form name="forms.SKUs" data-ng-class="{submitted: forms.skussubmitted}" novalidate unsaved-warning-form>
                                         <div class="panel-group sortable-accordion">
                                             <div ui-sortable="sortableOptionsSKU" data-ng-model="product.SKUs">
                                                 <!--<accordion-group>
@@ -657,6 +657,31 @@
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.SalesText.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Sales Text", "15"])}}</small>
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.SalesText.$error.server">{{getValidationMessage("ValidationMessages.FieldNumber","SalesText",'SKUs',$index)}}</small>
                                                                                         </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div data-ng-if="validatePermission(17)">
+                                                                            <span class="legend">Parts Settings</span>
+                                                                            <div class="form-group">
+                                                                                <div class="col-md-12">
+                                                                                    <div class="fixed-accordion-row extra-spacing">
+                                                                                        <label class="control-label">Channel</label>
+                                                                                        <div class="col-md-1">
+                                                                                            <select class="form-control" name="InventorySkuChannel" data-ng-model="subSku.InventorySkuChannel" ng-options="item.Key as item.Text for item in inventorySkuChannels"></select>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="fixed-accordion-row">
+                                                                                        <label for="lblAssemble{{subSku.Id}}" class="control-label">Assemble</label>
+                                                                                        <div class="checkbox">
+                                                                                            <label>
+                                                                                                <input id="lblAssemble{{subSku.Id}}" type="checkbox" data-ng-model="subSku.Assemble">
+                                                                                            </label>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">
+                                                                                        <button data-ng-click="assignInventorySkus(subSku,$event);" class="btn btn-info">Assign Parts</button>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>

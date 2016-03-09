@@ -1,4 +1,5 @@
-﻿using VitalChoice.Ecommerce.Domain.Entities.Base;
+﻿using System.Collections.Generic;
+using VitalChoice.Ecommerce.Domain.Entities.Base;
 
 namespace VitalChoice.Ecommerce.Domain.Entities.Products
 {
@@ -17,5 +18,7 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Products
         public decimal WholesalePrice { get; set; }
 
         public int Order { get; set; }
+
+        public ICollection<SkuToInventorySku> SkusToInventorySkus { get; set; }
     }
 }

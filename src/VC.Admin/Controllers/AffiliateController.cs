@@ -31,6 +31,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 using Microsoft.Extensions.OptionsModel;
+using VC.Admin.Models.Affiliates;
 using VitalChoice.Infrastructure.Domain.Options;
 
 namespace VC.Admin.Controllers

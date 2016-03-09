@@ -239,4 +239,10 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\VCustomerFavorites.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\InventorySkus.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\InventorySkuData.sql" />
+  </ItemGroup>
 </Project>

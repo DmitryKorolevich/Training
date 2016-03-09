@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.ObjectMapping.Interfaces;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
@@ -40,6 +42,8 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.WholesalePrice = entity.WholesalePrice;
                 dynamic.Order = entity.Order;
                 dynamic.IdProduct = entity.IdProduct;
+
+                dynamic.InventorySkuIds = entity.SkusToInventorySkus?.Select(p => p.IdInventorySku).ToList();
             });
             return Task.Delay(0);
         }
@@ -56,6 +60,13 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.Price = dynamic.Price;
                 entity.WholesalePrice = dynamic.WholesalePrice;
                 entity.Order = dynamic.Order;
+
+                entity.SkusToInventorySkus.MergeKeyed(dynamic.InventorySkuIds, p => p.IdInventorySku, i => i,
+                    i => new SkuToInventorySku
+                    {
+                        IdInventorySku = i,
+                        IdSku = dynamic.Id
+                    });
             });
             return Task.Delay(0);
         }
@@ -72,6 +83,13 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.Price = dynamic.Price;
                 entity.WholesalePrice = dynamic.WholesalePrice;
                 entity.Order = dynamic.Order;
+
+                entity.SkusToInventorySkus.MergeKeyed(dynamic.InventorySkuIds, p => p.IdInventorySku, i => i,
+                    i => new SkuToInventorySku
+                    {
+                        IdInventorySku = i,
+                        IdSku = dynamic.Id
+                    });
             });
             return Task.Delay(0);
         }

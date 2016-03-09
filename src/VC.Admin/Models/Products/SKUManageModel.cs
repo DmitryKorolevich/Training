@@ -1,5 +1,7 @@
-﻿using VitalChoice.Ecommerce.Domain.Attributes;
+﻿using System.Collections.Generic;
+using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
+using VitalChoice.Infrastructure.Domain.Transfer.InventorySkus;
 using VitalChoice.Validation.Models;
 
 namespace VC.Admin.Models.Products
@@ -73,5 +75,13 @@ namespace VC.Admin.Models.Products
 
         [Map]
         public string SalesText { get; set; }
+
+        [Map]
+        public int? InventorySkuChannel { get; set; }
+
+        [Map]
+        public bool? Assemble { get; set; }
+
+        public ICollection<InventorySkuListItemModel> InventorySkus { get; set; }
     }
 }

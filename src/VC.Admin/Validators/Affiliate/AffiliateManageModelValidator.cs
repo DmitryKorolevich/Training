@@ -2,7 +2,7 @@
 using VitalChoice.Validation.Logic;
 using VitalChoice.Core.Infrastructure.Helpers;
 using System;
-using VC.Admin.Models.Affiliate;
+using VC.Admin.Models.Affiliates;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 
@@ -77,8 +77,10 @@ namespace VC.Admin.Validators.Affiliate
 
                 RuleFor(model => model.Address1)
                     .NotEmpty()
-                    .WithMessage(model => model.Address1, ValidationMessages.FieldRequired);
-                
+                    .WithMessage(model => model.Address1, ValidationMessages.FieldRequired)
+                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                    .WithMessage(model => model.Address2, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+
                 RuleFor(model => model.Address2)
                     .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
                     .WithMessage(model => model.Address2, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
