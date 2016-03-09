@@ -43,29 +43,36 @@ namespace VitalChoice.Business.Services.Cache
                 _averagePing = new ConcurrentDictionary<string, int>();
 
                 var queName = options.Value.CacheSyncOptions?.ServiceBusQueueName;
-                var ns = NamespaceManager.CreateFromConnectionString(options.Value.CacheSyncOptions?.ConnectionString);
-                if (!ns.TopicExists(queName))
+                try
                 {
-                    TopicDescription topic = new TopicDescription(queName)
+                    var ns = NamespaceManager.CreateFromConnectionString(options.Value.CacheSyncOptions?.ConnectionString);
+                    if (!ns.TopicExists(queName))
                     {
-                        EnableExpress = true,
-                        EnablePartitioning = true,
-                        EnableBatchedOperations = true,
-                        DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
-                        RequiresDuplicateDetection = false
-                    };
+                        TopicDescription topic = new TopicDescription(queName)
+                        {
+                            EnableExpress = true,
+                            EnablePartitioning = true,
+                            EnableBatchedOperations = true,
+                            DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
+                            RequiresDuplicateDetection = false
+                        };
 
-                    ns.CreateTopic(topic);
-                }
-                if (!ns.SubscriptionExists(queName, applicationEnvironment.ApplicationName))
-                {
-                    SubscriptionDescription subscription = new SubscriptionDescription(queName, applicationEnvironment.ApplicationName)
+                        ns.CreateTopic(topic);
+                    }
+                    if (!ns.SubscriptionExists(queName, applicationEnvironment.ApplicationName))
                     {
-                        EnableBatchedOperations = true,
-                        DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
-                        RequiresSession = false
-                    };
-                    ns.CreateSubscription(subscription);
+                        SubscriptionDescription subscription = new SubscriptionDescription(queName, applicationEnvironment.ApplicationName)
+                        {
+                            EnableBatchedOperations = true,
+                            DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
+                            RequiresSession = false
+                        };
+                        ns.CreateSubscription(subscription);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.LogInformation(e.Message, e);
                 }
 
                 _serviceBusClient = new ServiceBusHostOneToMany(Logger, () =>
