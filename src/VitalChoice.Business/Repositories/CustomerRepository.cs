@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VitalChoice.Caching.Extensions;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -27,9 +28,9 @@ namespace VitalChoice.Business.Repositories
             {
                 case "Id":
                     //BUG: should be redone on standart logic after adding normal LIKE support from EF7
-                    var data = this.Context.Set<IdModel>().FromSql("SELECT DISTINCT TOP(20) [p].[Id] As Id FROM [Customers] AS [p]" +
+                    var data = await this.Context.Set<IdModel>().FromSql("SELECT DISTINCT TOP(20) [p].[Id] As Id FROM [Customers] AS [p]" +
                                         "WHERE([p].[StatusCode] <> 3) AND [p].[Id] LIKE ({0}+ '%')" +
-                                        "ORDER BY [p].[Id]",filter.FieldValue).ToList();
+                                        "ORDER BY [p].[Id]",filter.FieldValue).ToListAsync();
                     return data.Select(p => p.Id.ToString()).ToList();
                 case "Email":
                     temp = temp.Where(p => p.StatusCode != (int)RecordStatusCode.Deleted && p.Email.StartsWith(filter.FieldValue));

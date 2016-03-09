@@ -12,6 +12,7 @@ using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.ObjectMapping.Base;
+using VitalChoice.ObjectMapping.Extensions;
 using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Caching.Services.Cache
@@ -20,6 +21,7 @@ namespace VitalChoice.Caching.Services.Cache
     {
         private readonly IInternalEntityCacheFactory _cacheFactory;
         private readonly CacheStorage<T> _cacheStorage;
+        private readonly IInternalEntityCache<T> _internalCache;
         private readonly EntityInfo _entityInfo;
         private readonly RelationInfo _relationInfo;
 
@@ -34,12 +36,13 @@ namespace VitalChoice.Caching.Services.Cache
         private readonly Dictionary<EntityCacheableIndexInfo, ConcurrentDictionary<EntityIndex, CacheCluster<EntityKey, T>>> _nonUniqueIndexedDictionary;
         private volatile bool _needUpdate;
 
-        public CacheData(IInternalEntityCacheFactory cacheFactory, CacheStorage<T> cacheStorage, EntityInfo entityInfo, RelationInfo relationInfo)
+        public CacheData(IInternalEntityCacheFactory cacheFactory, CacheStorage<T> cacheStorage, IInternalEntityCache<T> internalCache, EntityInfo entityInfo, RelationInfo relationInfo)
         {
             _mainCluster = new CacheCluster<EntityKey, T>();
             _indexedCluster = new CacheCluster<EntityIndex, T>();
             _cacheFactory = cacheFactory;
             _cacheStorage = cacheStorage;
+            _internalCache = internalCache;
             _entityInfo = entityInfo;
             _relationInfo = relationInfo;
             _conditionalIndexedDictionary = new Dictionary<EntityConditionalIndexInfo, CacheCluster<EntityIndex, T>>();
@@ -192,6 +195,9 @@ namespace VitalChoice.Caching.Services.Cache
                 {
                     var oldEntity = cached.Entity;
 
+                    if (oldEntity == null)
+                        return null;
+
                     var relatedObjects =
                         _relationInfo.Relations.Select(
                             relation =>
@@ -207,31 +213,33 @@ namespace VitalChoice.Caching.Services.Cache
                         var newRelated = pair.Key.GetRelatedObject(entity);
                         EntityRelationalReferenceInfo relationReference = null;
                         _entityInfo.RelationReferences?.TryGetValue(pair.Key.Name, out relationReference);
+
+                        //Collection reference, update always if not null
                         if (relationReference == null)
                         {
-                            pair.Key.SetRelatedObject(oldEntity, newRelated);
+                            if (newRelated is IEnumerable)
+                            {
+                                pair.Key.SetRelatedObject(oldEntity, (newRelated as IEnumerable).Clone(pair.Key.RelationType));
+                            }
                         }
                         else
                         {
                             var newRelatedKey = relationReference.GetPrimaryKeyValue(entity);
-                            var oldRelatedKey = relationReference.GetPrimaryKeyValue(oldEntity);
-                            if (newRelated != null)
+                            if (newRelatedKey.IsValid)
                             {
-                                if (newRelatedKey != oldRelatedKey)
+                                if (newRelated != null)
                                 {
-                                    pair.Key.SetRelatedObject(oldEntity, newRelated);
+                                    pair.Key.SetRelatedObject(oldEntity, newRelated.Clone(pair.Key.RelationType));
+                                }
+                                else
+                                {
+                                    cached.NeedUpdate = true;
+                                    return null;
                                 }
                             }
                             else
                             {
-                                if (newRelatedKey.IsValid)
-                                {
-                                    cached.NeedUpdate = true;
-                                }
-                                else
-                                {
-                                    pair.Key.SetRelatedObject(oldEntity, null);
-                                }
+                                pair.Key.SetRelatedObject(oldEntity, null);
                             }
                         }
                     }

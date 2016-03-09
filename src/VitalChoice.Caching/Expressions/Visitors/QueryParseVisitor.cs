@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.Data.Entity;
+using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Ordering;
 using VitalChoice.Caching.Services.Cache;
@@ -27,6 +28,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
             "ThenByDescending"
         };
 
+        public bool NonCached { get; private set; }
         public bool Tracking { get; private set; } = true;
         public OrderBy OrderBy { get; private set; }
         public RelationInfo Relations { get; }
@@ -80,6 +82,15 @@ namespace VitalChoice.Caching.Expressions.Visitors
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
+            if (node.Method.DeclaringType == typeof (QueriableExtension))
+            {
+                switch (node.Method.Name)
+                {
+                    case "AsNonCached":
+                        NonCached = true;
+                        return node.Arguments[0];
+                }
+            }
             var result = base.VisitMethodCall(node);
             if (node.Method.DeclaringType == typeof (EntityFrameworkQueryableExtensions))
             {
@@ -98,10 +109,14 @@ namespace VitalChoice.Caching.Expressions.Visitors
 
                         elementType = relationType.TryGetElementType(typeof (ICollection<>)) ?? relationType;
 
-                        _currentRelation = CompiledRelationsCache.GetRelation(name, elementType, ownType, lambda);
-                        
-                        if (!Relations.RelationsDict.ContainsKey(_currentRelation.Name))
+                        if (name == null)
                         {
+                            throw new InvalidOperationException("Include contains invalid relation name");
+                        }
+
+                        if (!Relations.RelationsDict.TryGetValue(name, out _currentRelation))
+                        {
+                            _currentRelation = CompiledRelationsCache.GetRelation(name, elementType, ownType, lambda);
                             Relations.RelationsDict.Add(_currentRelation.Name, _currentRelation);
                         }
                         break;

@@ -131,6 +131,11 @@ namespace VitalChoice.Caching.Relational
             }
         }
 
+        public override string ToString()
+        {
+            return $"{Name}->\n\t{string.Join("\n", Relations)}";
+        }
+
         public object GetRelatedObject(object entity)
         {
             return _relationAccessor.GetRelatedObject(entity);

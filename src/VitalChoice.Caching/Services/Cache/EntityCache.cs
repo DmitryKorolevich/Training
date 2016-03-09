@@ -35,7 +35,7 @@ namespace VitalChoice.Caching.Services.Cache
         {
             if (_internalCache == null)
             {
-                _logger.LogInformation($"Cache doesn't exist for type: {typeof(T)}");
+                _logger.LogInformation($"Cache doesn't exist for type: {typeof (T)}");
                 entities = null;
                 return CacheGetResult.NotFound;
             }
@@ -68,7 +68,7 @@ namespace VitalChoice.Caching.Services.Cache
                     results, out entities);
             }
             if (_logger.IsEnabled(LogLevel.Verbose))
-                _logger.LogVerbose($"Cache miss, type: {typeof(T)}");
+                _logger.LogVerbose($"Cache miss, type: {typeof (T)}");
             entities = null;
             if (query.CanCollectionCache)
                 return CacheGetResult.Update;
@@ -112,7 +112,7 @@ namespace VitalChoice.Caching.Services.Cache
                     results, out entity);
             }
             if (_logger.IsEnabled(LogLevel.Verbose))
-                _logger.LogVerbose($"Cache miss, type: {typeof(T)}");
+                _logger.LogVerbose($"Cache miss, type: {typeof (T)}");
             entity = default(T);
             if (query.CanCache)
                 return CacheGetResult.Update;
@@ -123,7 +123,7 @@ namespace VitalChoice.Caching.Services.Cache
         {
             if (_internalCache == null)
             {
-                _logger.LogWarning($"<Cache Update> Cache doesn't exist for type: {typeof(T)}");
+                _logger.LogWarning($"<Cache Update> Cache doesn't exist for type: {typeof (T)}");
                 return false;
             }
 
@@ -131,7 +131,8 @@ namespace VitalChoice.Caching.Services.Cache
 
             if (!fullCollection && !queryData.CanCollectionCache)
             {
-                _logger.LogWarning($"<Cache Update> can't update cache, preconditions not met: {typeof(T)}\r\n{queryData.WhereExpression?.Expression.AsString()}");
+                _logger.LogWarning(
+                    $"<Cache Update> can't update cache, preconditions not met: {typeof (T)}\r\n{queryData.WhereExpression?.Expression.AsString()}");
                 return false;
             }
 
@@ -152,13 +153,14 @@ namespace VitalChoice.Caching.Services.Cache
         {
             if (_internalCache == null)
             {
-                _logger.LogWarning($"<Cache Update> Cache doesn't exist for type: {typeof(T)}");
+                _logger.LogWarning($"<Cache Update> Cache doesn't exist for type: {typeof (T)}");
                 return false;
             }
 
             if (!queryData.CanCache)
             {
-                _logger.LogWarning($"<Cache Update> can't update cache, preconditions not met: {typeof(T)}\r\nExpression:\r\n{queryData.WhereExpression?.Expression.AsString()}");
+                _logger.LogWarning(
+                    $"<Cache Update> can't update cache, preconditions not met: {typeof (T)}\r\nExpression:\r\n{queryData.WhereExpression?.Expression.AsString()}");
                 return false;
             }
 
@@ -281,7 +283,7 @@ namespace VitalChoice.Caching.Services.Cache
             CacheIterator<T> cacheIterator = new CacheIterator<T>(new TrackedIteratorParams<T>
             {
                 Tracked = _context.ChangeTracker.Entries<T>()
-                            .ToDictionary(e => _internalCache.GetPrimaryKeyValue(e.Entity), e => e),
+                    .ToDictionary(e => _internalCache.GetPrimaryKeyValue(e.Entity), e => e),
                 KeysStorage = _internalCache,
                 Predicate = compiled,
                 Source = results
@@ -327,11 +329,13 @@ namespace VitalChoice.Caching.Services.Cache
                 {
                     if (entry.State == EntityState.Detached)
                     {
+                        CloneRelations(relationInfo, item);
                         AttachGraph(item, relationInfo);
                     }
                 }
                 else
                 {
+                    CloneRelations(relationInfo, item);
                     AttachGraph(item, relationInfo);
                 }
             }
@@ -349,39 +353,42 @@ namespace VitalChoice.Caching.Services.Cache
             return newItem;
         }
 
-        private void CloneRelations(RelationInfo relations, object newItem, Action<object, RelationInfo> onCloned = null)
+        private void CloneRelations(RelationInfo relations, object newItem)
         {
             foreach (var relation in relations.Relations)
             {
                 var value = relation.GetRelatedObject(newItem);
                 if (value != null)
                 {
-                    object replacementValue;
-                    if (value.GetType().IsImplementGeneric(typeof(ICollection<>)))
-                    {
-                        var newValue = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(relation.RelationType));
-                        foreach (var singleValue in (IEnumerable)value)
-                        {
-                            var clonedItem = singleValue.Clone(relation.RelationType);
-                            newValue.Add(clonedItem);
-                            onCloned?.Invoke(clonedItem, relation);
-                        }
-                        replacementValue = newValue;
-                    }
-                    else
-                    {
-                        replacementValue = value.Clone(relation.RelationType);
-                        onCloned?.Invoke(replacementValue, relation);
-                    }
+                    var replacementValue = value.GetType().IsImplementGeneric(typeof (ICollection<>))
+                        ? ((IEnumerable) value).Clone(relation.RelationType)
+                        : value.Clone(relation.RelationType);
                     relation.SetRelatedObject(newItem, replacementValue);
                 }
             }
         }
 
-        private void AttachGraph(object item, RelationInfo relationInfo) 
+        private void AttachGraph(object item, RelationInfo relationInfo)
         {
-            CloneRelations(relationInfo, item, AttachGraph);
             _context.Attach(item, GraphBehavior.SingleObject);
+            foreach (var relation in relationInfo.Relations)
+            {
+                var value = relation.GetRelatedObject(item);
+                if (value != null)
+                {
+                    if (value.GetType().IsImplementGeneric(typeof (ICollection<>)))
+                    {
+                        foreach (var singleValue in (IEnumerable) value)
+                        {
+                            AttachGraph(singleValue, relation);
+                        }
+                    }
+                    else
+                    {
+                        AttachGraph(value, relation);
+                    }
+                }
+            }
         }
     }
 }

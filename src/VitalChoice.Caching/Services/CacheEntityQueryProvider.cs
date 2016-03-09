@@ -48,6 +48,8 @@ namespace VitalChoice.Caching.Services
                     (ICacheExecutor)
                         Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
                             _context, _queryParserFactory, _logger);
+                if (cacheExecutor.ReparsedExpression != null)
+                    return base.Execute<TResult>(cacheExecutor.ReparsedExpression);
                 CacheGetResult cacheGetResult;
                 var results = elementType != null
                     ? cacheExecutor.Execute(out cacheGetResult)
@@ -84,6 +86,8 @@ namespace VitalChoice.Caching.Services
                     (ICacheExecutor)
                         Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
                             _context, _queryParserFactory, _logger);
+                if (cacheExecutor.ReparsedExpression != null)
+                    return base.ExecuteAsync<TResult>(cacheExecutor.ReparsedExpression);
                 CacheGetResult cacheGetResult;
                 var result = (List<TResult>) cacheExecutor.Execute(out cacheGetResult);
                 switch (cacheGetResult)
@@ -117,6 +121,8 @@ namespace VitalChoice.Caching.Services
                     (ICacheExecutor)
                         Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
                             _context, _queryParserFactory, _logger);
+                if (cacheExecutor.ReparsedExpression != null)
+                    return await base.ExecuteAsync<TResult>(cacheExecutor.ReparsedExpression, cancellationToken);
                 CacheGetResult cacheGetResult;
                 var result = elementType != null
                     ? cacheExecutor.Execute(out cacheGetResult)
@@ -144,6 +150,7 @@ namespace VitalChoice.Caching.Services
 
         private interface ICacheExecutor
         {
+            Expression ReparsedExpression { get; }
             object Execute(out CacheGetResult cacheResult);
             object ExecuteFirst(out CacheGetResult cacheResult);
             bool Update(object entity);
@@ -156,14 +163,17 @@ namespace VitalChoice.Caching.Services
             private readonly ILogger _logger;
             private readonly QueryData<T> _queryData;
             private readonly IEntityCache<T> _cache;
+            private readonly Expression _reparsedExpression;
 
             public CacheExecutor(Expression expression, DbContext context, IQueryParserFactory queryParserFactory, ILogger logger)
             {
                 _logger = logger;
                 var queryCache = queryParserFactory.GetQueryCache<T>();
                 _cache = new EntityCache<T>(queryCache.InternalEntityCache, context, logger);
-                _queryData = queryCache.ParseQuery(expression);
+                _queryData = queryCache.ParseQuery(expression, out _reparsedExpression);
             }
+
+            public Expression ReparsedExpression => _reparsedExpression;
 
             public object Execute(out CacheGetResult cacheResult)
             {

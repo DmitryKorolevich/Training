@@ -37,10 +37,16 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        public QueryData<T> ParseQuery(Expression query)
+        public QueryData<T> ParseQuery(Expression query, out Expression newExpression)
         {
             QueryParseVisitor<T> parseVisitor = new QueryParseVisitor<T>();
-            parseVisitor.Visit(query);
+            query = parseVisitor.Visit(query);
+
+            if (parseVisitor.NonCached)
+            {
+                newExpression = query;
+                return null;
+            }
 
             Func<IEnumerable<T>, IOrderedEnumerable<T>> orderByFunc = null;
 
@@ -76,6 +82,7 @@ namespace VitalChoice.Caching.Services.Cache
                 result.HasFullCollectionCacheCondition = _cacheCondition.EqualsToCondition(result.WhereExpression.Expression);
             }
 
+            newExpression = null;
             return result;
         }
 
