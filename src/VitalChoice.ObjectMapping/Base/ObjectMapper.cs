@@ -13,7 +13,7 @@ namespace VitalChoice.ObjectMapping.Base
     {
         public static bool IsValuesMasked(object obj)
         {
-            var outerCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, obj.GetType(), true);
+            var outerCache = DynamicTypeCache.GetTypeCache(obj.GetType(), true);
 
             if (!outerCache.MaskProperties.Any())
                 return false;

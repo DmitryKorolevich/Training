@@ -157,7 +157,7 @@ namespace VitalChoice.ObjectMapping.Base
             if (!processedObjectsSet.Contains(obj))
             {
                 processedObjectsSet.Add(obj);
-                var outerCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, obj.GetType(), true);
+                var outerCache = DynamicTypeCache.GetTypeCache(obj.GetType(), true);
                 foreach (var masker in outerCache.MaskProperties)
                 {
                     GenericProperty property;
@@ -213,7 +213,7 @@ namespace VitalChoice.ObjectMapping.Base
             if (!processedObjectsSet.Contains(obj))
             {
                 processedObjectsSet.Add(obj);
-                var outerCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, obj.GetType(), true);
+                var outerCache = DynamicTypeCache.GetTypeCache(obj.GetType(), true);
                 foreach (var masker in outerCache.MaskProperties)
                 {
                     GenericProperty property;
@@ -284,7 +284,7 @@ namespace VitalChoice.ObjectMapping.Base
             {
                 model = model.ToDictionary(m => m.Key, m => m.Value, StringComparer.OrdinalIgnoreCase);
             }
-            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+            var objectCache = DynamicTypeCache.GetTypeCache(objectType, true);
             foreach (var pair in objectCache.Properties)
             {
                 GenericProperty dynamicProperty = pair.Value;
@@ -312,7 +312,7 @@ namespace VitalChoice.ObjectMapping.Base
             if (model == null)
                 return;
 
-            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+            var objectCache = DynamicTypeCache.GetTypeCache(objectType, true);
             foreach (var pair in objectCache.Properties)
             {
                 GenericProperty dynamicProperty = pair.Value;
@@ -331,10 +331,10 @@ namespace VitalChoice.ObjectMapping.Base
                 return;
 
             var modelCache = UseMapAttribute
-                ? DynamicTypeCache.GetTypeCache(DynamicTypeCache.ModelTypeMappingCache, modelType)
-                : DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, modelType, true);
+                ? DynamicTypeCache.GetTypeCache(modelType)
+                : DynamicTypeCache.GetTypeCache(modelType, true);
 
-            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+            var objectCache = DynamicTypeCache.GetTypeCache(objectType, true);
             foreach (var pair in modelCache.Properties)
             {
                 var mappingName = pair.Value.Map?.Name ?? pair.Key;
@@ -360,10 +360,10 @@ namespace VitalChoice.ObjectMapping.Base
                 return;
 
             var modelCache = UseMapAttribute
-                ? DynamicTypeCache.GetTypeCache(DynamicTypeCache.ModelTypeMappingCache, modelType)
-                : DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, modelType, true);
+                ? DynamicTypeCache.GetTypeCache(modelType)
+                : DynamicTypeCache.GetTypeCache(modelType, true);
 
-            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+            var objectCache = DynamicTypeCache.GetTypeCache(objectType, true);
             foreach (var pair in modelCache.Properties)
             {
                 var mappingName = pair.Value.Map?.Name ?? pair.Key;

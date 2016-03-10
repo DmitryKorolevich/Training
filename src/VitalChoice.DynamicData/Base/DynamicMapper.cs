@@ -25,7 +25,7 @@ namespace VitalChoice.DynamicData.Base
     {
         public static bool IsValuesMasked(MappedObject obj)
         {
-            var outerCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, obj.GetType(), true);
+            var outerCache = DynamicTypeCache.GetTypeCache(obj.GetType(), true);
 
             if (!outerCache.MaskProperties.Any())
                 return false;
@@ -328,8 +328,7 @@ namespace VitalChoice.DynamicData.Base
             if (dynamic != null)
             {
                 dynamic.ModelType = model.GetType();
-                var dynamicCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType,
-                    true);
+                var dynamicCache = DynamicTypeCache.GetTypeCache(objectType, true);
                 var data = dynamic.DictionaryData;
                 foreach (var pair in model)
                 {
@@ -372,9 +371,8 @@ namespace VitalChoice.DynamicData.Base
             {
                 dynamic.ModelType = modelType;
                 var data = dynamic.DictionaryData;
-                var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ModelTypeMappingCache, modelType);
-                var dynamicCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType,
-                    true);
+                var cache = DynamicTypeCache.GetTypeCache(modelType);
+                var dynamicCache = DynamicTypeCache.GetTypeCache(objectType, true);
                 foreach (var pair in cache.Properties)
                 {
                     var mappingName = pair.Value.Map?.Name ?? pair.Key;
@@ -405,9 +403,8 @@ namespace VitalChoice.DynamicData.Base
             if (dynamic != null)
             {
                 dynamic.ModelType = modelType;
-                var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ModelTypeMappingCache, modelType);
-                var dynamicCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType,
-                    true);
+                var cache = DynamicTypeCache.GetTypeCache(modelType);
+                var dynamicCache = DynamicTypeCache.GetTypeCache(objectType, true);
                 var data = dynamic.DictionaryData;
                 foreach (var pair in cache.Properties)
                 {
@@ -438,7 +435,7 @@ namespace VitalChoice.DynamicData.Base
             MappedObject mappedObj = obj as MappedObject;
             if (mappedObj != null)
             {
-                var outerCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, obj.GetType(), true);
+                var outerCache = DynamicTypeCache.GetTypeCache(obj.GetType(), true);
                 foreach (var masker in outerCache.MaskProperties)
                 {
                     object value;
@@ -459,7 +456,7 @@ namespace VitalChoice.DynamicData.Base
             MappedObject mappedObj = obj as MappedObject;
             if (mappedObj != null)
             {
-                var outerCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, obj.GetType(), true);
+                var outerCache = DynamicTypeCache.GetTypeCache(obj.GetType(), true);
                 foreach (var masker in outerCache.MaskProperties)
                 {
                     object value;
