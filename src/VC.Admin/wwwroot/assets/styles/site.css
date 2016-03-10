@@ -536,6 +536,9 @@ button.main-button {
 .fixed-accordion-row .col-md-1 > .input-group {
   width: 133px;
 }
+.fixed-accordion-row .col-md-1 > p.input-group {
+  width: 150px;
+}
 .fixed-accordion-row > .control-label {
   margin-right: 10px;
 }
@@ -937,6 +940,9 @@ th.sortable-column {
 }
 .product-edit .fixed-accordion-row input.sales-text {
   width: 250px;
+}
+.product-edit .skus .panel-group {
+  margin-bottom: 0px;
 }
 .order-edit .gcs .code {
   margin-bottom: 5px;

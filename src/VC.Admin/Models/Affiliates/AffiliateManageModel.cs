@@ -5,7 +5,7 @@ using VC.Admin.Validators.Affiliate;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
 
-namespace VC.Admin.Models.Affiliate
+namespace VC.Admin.Models.Affiliates
 {
     [ApiValidator(typeof(AffiliatetManageModelValidator))]
     public class AffiliateManageModel : BaseModel

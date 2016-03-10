@@ -24,6 +24,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Workflow;
 using VitalChoice.Ecommerce.Domain.Options;
 using System.Threading;
 using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
+using VitalChoice.Ecommerce.Domain.Entities.InventorySkus;
 
 namespace VitalChoice.Ecommerce.Context
 {
@@ -255,6 +256,7 @@ namespace VitalChoice.Ecommerce.Context
                 entity.ToTable("ProductTypes");
             });
 
+            SkuToInventorySku(builder);
 
             builder.Entity<Sku>(entity =>
             {
@@ -263,6 +265,11 @@ namespace VitalChoice.Ecommerce.Context
                 entity.ToTable("Skus");
                 entity
                     .HasMany(s => s.OptionValues)
+                    .WithOne()
+                    .HasForeignKey(o => o.IdSku)
+                    .HasPrincipalKey(s => s.Id);
+                entity
+                    .HasMany(s => s.SkusToInventorySkus)
                     .WithOne()
                     .HasForeignKey(o => o.IdSku)
                     .HasPrincipalKey(s => s.Id);
@@ -345,6 +352,15 @@ namespace VitalChoice.Ecommerce.Context
                 entity.ToTable("ProductOutOfStockRequests");
             });
 
+
+            #endregion
+
+            #region InventorySkus
+            
+            InventorySkuCategories(builder);
+            InventorySkuOptionTypes(builder);
+            InventorySkuOptionValues(builder);
+            InventorySkus(builder);
 
             #endregion
 
@@ -928,6 +944,13 @@ namespace VitalChoice.Ecommerce.Context
                     .IsRequired(false);
             });
 
+            builder.Entity<OrderToPromoToInventorySku>(entity =>
+            {
+                entity.Ignore(s => s.Id);
+                entity.HasKey(s => new { s.IdOrder, s.IdSku, s.IdInventorySku });
+                entity.ToTable("OrderToPromosToInventorySkus");
+            });
+
             builder.Entity<OrderToPromo>(entity =>
             {
                 entity.Ignore(p => p.Id);
@@ -945,6 +968,10 @@ namespace VitalChoice.Ecommerce.Context
                     .WithMany()
                     .HasForeignKey(p => p.IdPromo)
                     .HasPrincipalKey(p => p.Id);
+                entity.HasMany(s => s.InventorySkus)
+                    .WithOne()
+                    .HasForeignKey(s => new { s.IdOrder, s.IdSku })
+                    .HasPrincipalKey(s => new { s.IdOrder, s.IdSku });
             });
 
             builder.Entity<OrderToGiftCertificate>(entity =>
@@ -962,6 +989,13 @@ namespace VitalChoice.Ecommerce.Context
                     .HasPrincipalKey(o => o.Id);
             });
 
+            builder.Entity<OrderToSkuToInventorySku>(entity =>
+            {
+                entity.Ignore(s => s.Id);
+                entity.HasKey(s => new {s.IdOrder, s.IdSku, s.IdInventorySku});
+                entity.ToTable("OrderToSkusToInventorySkus");
+            });
+
             builder.Entity<OrderToSku>(entity =>
             {
                 entity.Ignore(s => s.Id);
@@ -975,6 +1009,10 @@ namespace VitalChoice.Ecommerce.Context
                     .WithOne()
                     .HasForeignKey<OrderToSku>(s => s.IdSku)
                     .HasPrincipalKey<Sku>(s => s.Id);
+                entity.HasMany(s => s.InventorySkus)
+                    .WithOne()
+                    .HasForeignKey(s => new { s.IdOrder, s.IdSku})
+                    .HasPrincipalKey(s => new { s.IdOrder, s.IdSku });
             });
 
             builder.Entity<OrderStatusEntity>(entity =>
@@ -1244,6 +1282,89 @@ namespace VitalChoice.Ecommerce.Context
             });
 
             #endregion
+        }
+
+        protected virtual void SkuToInventorySku(ModelBuilder builder)
+        {
+            builder.Entity<SkuToInventorySku>(entity =>
+            {
+                entity.HasKey(o => new
+                {
+                    o.IdSku,
+                    o.IdInventorySku
+                });
+                entity.ToTable("SkusToInventorySkus");
+                entity.Ignore(p=>p.Id);
+            });
+        }
+
+        protected virtual void InventorySkuOptionTypes(ModelBuilder builder)
+        {
+            builder.Entity<InventorySkuOptionType>(entity =>
+            {
+                entity.HasKey(t => t.Id);
+                entity.ToTable("InventorySkuOptionTypes");
+                entity.HasOne(p => p.Lookup)
+                    .WithMany()
+                    .HasForeignKey(p => p.IdLookup)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired(false);
+            });
+        }
+
+        protected virtual void InventorySkuOptionValues(ModelBuilder builder)
+        {
+            builder.Entity<InventorySkuOptionValue>(entity =>
+            {
+                entity.HasKey(o => new {
+                    o.IdInventorySku,
+                    o.IdOptionType
+                });
+                entity.Ignore(o => o.Id);
+                entity.ToTable("InventorySkuOptionValues");
+                entity.HasOne(v => v.OptionType)
+                    .WithMany()
+                    .HasForeignKey(t => t.IdOptionType)
+                    .HasPrincipalKey(v => v.Id)
+                    .IsRequired();
+                entity.Ignore(v => v.BigValue);
+                entity.Ignore(v => v.IdBigString);
+            });
+        }
+
+        protected virtual void InventorySkus(ModelBuilder builder)
+        {
+            builder.Entity<InventorySku>(entity =>
+            {
+                entity.HasKey(t => t.Id);
+                entity.ToTable("InventorySkus");
+                entity.HasMany(p => p.OptionValues)
+                    .WithOne()
+                    .HasForeignKey(o => o.IdInventorySku)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired();
+                entity.HasOne(p => p.EditedBy)
+                    .WithMany()
+                    .HasForeignKey(o => o.IdEditedBy)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired(false);
+                entity.HasOne(p => p.InventorySkuCategory)
+                    .WithMany()
+                    .HasForeignKey(o => o.IdInventorySkuCategory)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired(false);
+                entity.Ignore(p => p.OptionTypes);
+                entity.Ignore(p => p.IdObjectType);
+            });
+        }
+
+        protected virtual void InventorySkuCategories(ModelBuilder builder)
+        {
+            builder.Entity<InventorySkuCategory>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("InventorySkuCategories");
+            });
         }
 
         protected virtual void CartToGiftCertificates(ModelBuilder builder)

@@ -36,10 +36,9 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<IList<InventoryCategory>> GetCategoriesTreeAsync(InventoryCategoryTreeFilter filter)
         {
-            IList<InventoryCategory> toReturn = new List<InventoryCategory>();
             var query = new InventoryCategoryQuery().NotDeleted().WithStatus(filter.Status);
             List<InventoryCategory> categories = await inventoryCategoryEcommerceRepository.Query(query).SelectAsync(false);
-            toReturn = categories.Where(p => !p.ParentId.HasValue).OrderBy(p=>p.Order).ToList();
+            IList<InventoryCategory> toReturn = categories.Where(p => !p.ParentId.HasValue).OrderBy(p=>p.Order).ToList();
 
             categories.RemoveAll(p => !p.ParentId.HasValue);
             foreach (var resCategory in toReturn)
@@ -164,11 +163,8 @@ namespace VitalChoice.Business.Services.Products
                 var products = await GetProductsAssignedToInvenotyCategory(id);
                 if (products.Count>0)
                 {
-                    string message = "Category with products can't be deleted. Product names: ";
-                    foreach(var product in products)
-                    {
-                        message += product.Name+", ";
-                    }
+                    string message = products.Aggregate("Category with products can't be deleted. Product names: ",
+                        (current, product) => current + (product.Name + ", "));
                     message=message.Remove(message.Length - 3, 2);
                     errors.Add(new MessageInfo() { Message = message });
                 }

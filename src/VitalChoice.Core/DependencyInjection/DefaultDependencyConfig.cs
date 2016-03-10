@@ -78,6 +78,7 @@ using VitalChoice.Interfaces.Services.Healthwise;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Services.Checkout;
 using VitalChoice.Business.Services.Ecommerce;
+using VitalChoice.Business.Services.InventorySkus;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Services;
 using VitalChoice.ContentProcessing.Cache;
@@ -86,6 +87,7 @@ using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Infrastructure.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus.Base;
 using VitalChoice.Interfaces.Services.Checkout;
+using VitalChoice.Interfaces.Services.InventorySkus;
 #if !DOTNET5_4
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Business.Services.Cache;
@@ -501,6 +503,8 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<OrderSchedulerService>().As<IOrderSchedulerService>().InstancePerLifetimeScope();
             builder.RegisterType<TokenService>().As<ITokenService>().InstancePerLifetimeScope();
             builder.RegisterType<ContentCrossSellService>().As<IContentCrossSellService>().InstancePerLifetimeScope();
+            builder.RegisterType<InventorySkuCategoryService>().As<IInventorySkuCategoryService>().InstancePerLifetimeScope();
+            builder.RegisterType<InventorySkuService>().As<IInventorySkuService>().InstancePerLifetimeScope();
             builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
             builder.RegisterModelConverters(projectAssembly);
             builder.RegisterModelConverters(typeof(OrderService).GetTypeInfo().Assembly);

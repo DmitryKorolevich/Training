@@ -1,4 +1,5 @@
-﻿using VitalChoice.Ecommerce.Domain.Dynamic;
+﻿using System.Collections.Generic;
+using VitalChoice.Ecommerce.Domain.Dynamic;
 
 namespace VitalChoice.Infrastructure.Domain.Dynamic
 {
@@ -15,5 +16,7 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
         public decimal WholesalePrice { get; set; }
 
         public int Order { get; set; }
+
+        public ICollection<int> InventorySkuIds { get; set; }
     }
 }

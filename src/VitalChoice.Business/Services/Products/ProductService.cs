@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.OptionsModel;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -59,6 +60,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly IRepositoryAsync<ProductContent> _productContentRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> _contentTypeRepository;
         private readonly IOptions<AppOptions> _options;
+        private readonly IEcommerceRepositoryAsync<SkuOptionValue> _skuOptionValueRepositoryAsync;
 
 
         public async Task<ProductContent> SelectContentForTransfer(int id)
@@ -73,7 +75,11 @@ namespace VitalChoice.Business.Services.Products
 
         protected override IQueryLite<Product> BuildQuery(IQueryLite<Product> query)
         {
-            return query.Include(p => p.Skus).ThenInclude(s => s.OptionValues).Include(p => p.ProductsToCategories);
+            return query.Include(p => p.Skus)
+                .ThenInclude(s => s.OptionValues)
+                .Include(p => p.Skus)
+                .ThenInclude(s => s.SkusToInventorySkus)
+                .Include(p => p.ProductsToCategories);
         }
 
         protected override Task AfterSelect(ICollection<Product> entities)
@@ -158,6 +164,7 @@ namespace VitalChoice.Business.Services.Products
             IObjectLogItemExternalService objectLogItemExternalService,
             IEcommerceRepositoryAsync<ProductToCategory> productToCategoriesRepository,
             IEcommerceRepositoryAsync<ProductOptionValue> productValueRepositoryAsync,
+            IEcommerceRepositoryAsync<SkuOptionValue> skuOptionValueRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             OrderSkusRepository orderSkusRepositoryRepository,
             SkuMapper skuMapper,
@@ -188,6 +195,7 @@ namespace VitalChoice.Business.Services.Products
             _contentTypeRepository = contentTypeRepository;
             _vCustomerFavoriteRepository = vCustomerRepositoryAsync;
             _options = options;
+            _skuOptionValueRepositoryAsync = skuOptionValueRepositoryAsync;
         }
 
         #region ProductOptions
@@ -243,6 +251,14 @@ namespace VitalChoice.Business.Services.Products
         public List<ProductOptionType> GetProductLookupsAsync()
         {
             return _mapper.OptionTypes.ToList();
+        }
+
+        public async Task<ICollection<SkuOptionValue>> GetSkuOptionValues(ICollection<int> skuIds,
+            ICollection<int> optionIds)
+        {
+            var toReturn = await _skuOptionValueRepositoryAsync.Query(p => skuIds.Contains(p.IdSku) && optionIds.Contains(p.IdOptionType))
+                .SelectAsync(false);
+            return toReturn;
         }
 
         #endregion

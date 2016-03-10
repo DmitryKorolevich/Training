@@ -23,6 +23,7 @@ using VC.Admin.Models.Orders;
 using VC.Admin.Models.Products;
 using VitalChoice.Business.CsvExportMaps;
 using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Content.Articles;
 using VitalChoice.Infrastructure.Domain.Content.Base;

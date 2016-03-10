@@ -9,5 +9,8 @@
         public const string PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE_CUSTOMER_NAME_HOLDER = "{CUSTOMER_NAME}";
         public const string PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE_PRODUCT_NAME_HOLDER = "{PRODUCT_NAME}";
         public const string PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE_PRODUCT_URL_HOLDER = "{PRODUCT_URL}";
+
+        public const string INVENTORY_SKU_LOOKUP_NAMES = "InventorySkuChannels,InventorySkuProductSources,InventorySkuUnitOfMeasures,InventorySkuPurchaseUnitOfMeasures";
+        public const string INVENTORY_SKU_LOOKUP_CHANNEL_NAME = "InventorySkuChannels";
     }
 }

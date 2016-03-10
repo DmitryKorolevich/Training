@@ -28,6 +28,8 @@ namespace VitalChoice.Interfaces.Services.Products
 
         #region Skus
 
+	    Task<ICollection<SkuOptionValue>> GetSkuOptionValues(ICollection<int> skuIds,ICollection<int> optionIds);
+
         Task<Dictionary<int, int>> GetTopPurchasedSkuIdsAsync(FilterBase filter);
 
         Task<SkuOrdered> GetSkuOrderedAsync(string code);

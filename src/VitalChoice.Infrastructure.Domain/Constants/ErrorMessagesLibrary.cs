@@ -53,6 +53,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             public const string EmptyCart = "EmptyCart";
             public const string MustBeFutureDateError = "MustBeFutureDateError";
             public const string DenyDeleteInUseItem = "DenyDeleteInUseItem";
+            public const string DenyDeleteInUseItems = "DenyDeleteInUseItems";
         }
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
@@ -104,6 +105,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             {Keys.EmptyCart, "Your cart is empty"},
             {Keys.MustBeFutureDateError,  "{0} should be future date. Please review."},
             {Keys.DenyDeleteInUseItem,  "{0} can't be deleted, because it is in use."},
+            {Keys.DenyDeleteInUseItems,  "Some {0} can't be deleted, because there are in use."},
         };
     }
 }

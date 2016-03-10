@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using VC.Admin.Models.Customer;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
@@ -137,8 +138,9 @@ namespace VC.Admin.ModelConverters
 	        }
 
             if (model.Files.Any())
-			{
-				foreach (var fileModel in model.Files.Select(x => new CustomerFile()
+            {
+                dynamic.Files = dynamic.Files ?? new List<CustomerFile>();
+                foreach (var fileModel in model.Files.Select(x => new CustomerFile()
 				{
 					Id = x.Id,
 					Description = x.Description,
