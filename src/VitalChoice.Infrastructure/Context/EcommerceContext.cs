@@ -241,6 +241,14 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(v => v.BigValue);
                 entity.Ignore(v => v.IdBigString);
             });
+
+            builder.Entity<VTopProducts>(entity =>
+            {
+                entity.Ignore(e => e.Id);
+
+                entity.HasKey(e => new {e.IdSku, e.IdCustomer});
+                entity.HasOne(e => e.Sku).WithMany().HasForeignKey(e => e.IdSku).HasPrincipalKey(s => s.Id);
+            });
         }
     }
 }

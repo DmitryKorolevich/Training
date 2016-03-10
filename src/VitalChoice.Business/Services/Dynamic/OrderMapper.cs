@@ -102,18 +102,18 @@ namespace VitalChoice.Business.Services.Dynamic
                         Amount = s.Amount,
                         Quantity = s.Quantity,
                         Sku = await _skuMapper.FromEntityAsync(s.Sku, withDefaults),
-                        ProductWithoutSkus = await _productMapper.FromEntityAsync(s.Sku?.Product, withDefaults)
                     }));
 
                     if (dynamic.Skus != null && dynamic.Skus.Count != 0)
                     {
-                        var productContents = await _productService.SelectProductContents(dynamic.Skus.Select(p => p.ProductWithoutSkus.Id).ToList());
+                        var productContents =
+                            await _productService.SelectProductContents(dynamic.Skus.Select(p => p.Sku.IdProduct).Distinct().ToList());
                         foreach (var productContent in productContents)
                         {
-                            var sku = dynamic.Skus.FirstOrDefault(p => p.ProductWithoutSkus.Id == productContent.Id);
+                            var sku = dynamic.Skus.FirstOrDefault(p => p.Sku.IdProduct == productContent.Id);
                             if (sku != null)
                             {
-                                sku.ProductWithoutSkus.Url = productContent.Url;
+                                sku.Sku.Product.Url = productContent.Url;
                             }
                         }
                     }
@@ -131,20 +131,20 @@ namespace VitalChoice.Business.Services.Dynamic
                         Amount = s.Amount,
                         Quantity = s.Quantity,
                         Sku = await _skuMapper.FromEntityAsync(s.Sku, withDefaults),
-                        ProductWithoutSkus = await _productMapper.FromEntityAsync(s.Sku?.Product, withDefaults),
                         Promotion = await _promotionMapper.FromEntityAsync(s.Promo, withDefaults),
                         Enabled = !s.Disabled
                     }));
 
                     if (dynamic.PromoSkus.Count != 0)
                     {
-                        var productContents = await _productService.SelectProductContents(dynamic.PromoSkus.Select(p => p.ProductWithoutSkus.Id).ToList());
+                        var productContents =
+                            await _productService.SelectProductContents(dynamic.PromoSkus.Select(p => p.Sku.IdProduct).Distinct().ToList());
                         foreach (var productContent in productContents)
                         {
-                            var sku = dynamic.PromoSkus.FirstOrDefault(p => p.ProductWithoutSkus.Id == productContent.Id);
+                            var sku = dynamic.PromoSkus.FirstOrDefault(p => p.Sku.IdProduct == productContent.Id);
                             if (sku != null)
                             {
-                                sku.ProductWithoutSkus.Url = productContent.Url;
+                                sku.Sku.Product.Url = productContent.Url;
                             }
                         }
                     }

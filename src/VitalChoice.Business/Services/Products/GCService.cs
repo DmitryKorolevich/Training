@@ -249,7 +249,7 @@ namespace VitalChoice.Business.Services.Products
             return dbItem;
         }
 
-        public async Task<ICollection<GiftCertificate>> AddGiftCertificatesAsync(int quantity, GiftCertificate model)
+        public async Task<ICollection<GiftCertificate>> AddManualGiftCertificatesAsync(int quantity, GiftCertificate model)
         {
             List<GiftCertificate> items = new List<GiftCertificate>();
             DateTime now = DateTime.Now;

@@ -34,3 +34,4 @@ Post-Deployment Script Template
 :r .\Scripts\SPGetOrdersZipStatistic.sql
 :r .\Scripts\VCustomerFavorites.sql
 :r .\Scripts\InventorySkuData.sql
+:r .\Scripts\VTopProducts.sql

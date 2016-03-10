@@ -1,37 +1,35 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.ObjectMapping.Interfaces;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.ObjectMapping.Extensions;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
     public class SkuMapper : DynamicMapper<SkuDynamic, Sku, ProductOptionType, SkuOptionValue>
     {
+        public ProductMapper ProductMapper { get; set; }
+
         public SkuMapper(ITypeConverter converter,
             IModelConverterService converterService,
             IEcommerceRepositoryAsync<ProductOptionType> productRepositoryAsync)
             : base(converter, converterService, productRepositoryAsync)
         {
-
         }
 
-        //public override IQueryOptionType<ProductOptionType> GetOptionTypeQuery()
-        //{
-        //    throw new ApiException("Cannot get sku option types as they inherited from product, please provide types with entity or as parameter");
-        //}
-
-        protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<SkuDynamic, Sku>> items, bool withDefaults = false)
+        protected override async Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<SkuDynamic, Sku>> items,
+            bool withDefaults = false)
         {
-            items.ForEach(pair =>
+            await items.ForEachAsync(async pair =>
             {
                 var entity = pair.Entity;
                 var dynamic = pair.Dynamic;
@@ -42,10 +40,14 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.WholesalePrice = entity.WholesalePrice;
                 dynamic.Order = entity.Order;
                 dynamic.IdProduct = entity.IdProduct;
-
                 dynamic.InventorySkuIds = entity.SkusToInventorySkus?.Select(p => p.IdInventorySku).ToList();
+                if (entity.Product.Skus != null && entity.Product.Skus.Any())
+                {
+                    entity.Product = entity.Product.Clone<Product, Entity>();
+                    entity.Product.Skus = null;
+                }
+                dynamic.Product = await ProductMapper.FromEntityAsync(entity.Product, true);
             });
-            return Task.Delay(0);
         }
 
         protected override Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<SkuDynamic, Sku>> items)

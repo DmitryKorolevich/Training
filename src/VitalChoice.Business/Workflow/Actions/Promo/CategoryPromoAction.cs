@@ -23,7 +23,7 @@ namespace VitalChoice.Business.Workflow.Actions.Promo
                 HashSet<int> promoCategories = new HashSet<int>(promo.SelectedCategoryIds);
                 foreach (var sku in context.Order.Skus)
                 {
-                    if (sku.ProductWithoutSkus.CategoryIds.Any(category => promoCategories.Contains(category)))
+                    if (sku.Sku.Product.CategoryIds.Any(category => promoCategories.Contains(category)))
                     {
                         if (sku.Amount == sku.Sku.Price)
                         {

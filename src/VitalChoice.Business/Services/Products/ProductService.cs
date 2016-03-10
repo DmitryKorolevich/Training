@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using VitalChoice.Business.Mail;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Business.Queries.Product;
+using VitalChoice.Business.Repositories;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Data.Helpers;
@@ -61,7 +62,6 @@ namespace VitalChoice.Business.Services.Products
         private readonly IRepositoryAsync<ContentTypeEntity> _contentTypeRepository;
         private readonly IOptions<AppOptions> _options;
         private readonly IEcommerceRepositoryAsync<SkuOptionValue> _skuOptionValueRepositoryAsync;
-
 
         public async Task<ProductContent> SelectContentForTransfer(int id)
 		{
@@ -265,9 +265,9 @@ namespace VitalChoice.Business.Services.Products
 
         #region Skus
 
-        public async Task<Dictionary<int, int>> GetTopPurchasedSkuIdsAsync(FilterBase filter)
+        public async Task<Dictionary<int, int>> GetTopPurchasedSkuIdsAsync(FilterBase filter, int idCustomer)
         {
-            return await _orderSkusRepositoryRepository.GetTopPurchasedSkuIdsAsync(filter);
+            return await _orderSkusRepositoryRepository.GetTopPurchasedSkuIdsAsync(filter, idCustomer);
         }
 
         public async Task<SkuOrdered> GetSkuOrderedAsync(string code)
@@ -288,14 +288,10 @@ namespace VitalChoice.Business.Services.Products
                     .SelectFirstOrDefaultAsync(false);
             if (sku == null)
                 return null;
-            sku.OptionTypes =
-                _mapper.FilterByType(sku.Product.IdObjectType);
-            sku.Product.OptionTypes = sku.OptionTypes;
             var skuDynamic = await _skuMapper.FromEntityAsync(sku, true);
             return new SkuOrdered
             {
-                Sku = skuDynamic,
-                ProductWithoutSkus = await DynamicMapper.FromEntityAsync(sku.Product, true),
+                Sku = skuDynamic
             };
         }
 
@@ -309,13 +305,9 @@ namespace VitalChoice.Business.Services.Products
                     .Include(s => s.Product)
                     .ThenInclude(p => p.ProductsToCategories)
                     .SelectFirstOrDefaultAsync(false);
-            sku.OptionTypes =
-                _mapper.FilterByType(sku.Product.IdObjectType);
-            sku.Product.OptionTypes = sku.OptionTypes;
             return new SkuOrdered
             {
-                Sku = await _skuMapper.FromEntityAsync(sku, true),
-                ProductWithoutSkus = await DynamicMapper.FromEntityAsync(sku.Product, true)
+                Sku = await _skuMapper.FromEntityAsync(sku, true)
             };
         }
 
@@ -335,18 +327,10 @@ namespace VitalChoice.Business.Services.Products
                     .Include(s => s.Product)
                     .ThenInclude(p => p.ProductsToCategories)
                     .SelectAsync(false);
-
-            foreach (var sku in skus)
+            var skusDynamic = await _skuMapper.FromEntityRangeAsync(skus, true);
+            return skusDynamic.Select(sku => new SkuOrdered
             {
-                sku.OptionTypes =
-                    _mapper.FilterByType(sku.Product.IdObjectType);
-                sku.Product.OptionTypes = sku.OptionTypes;
-            }
-
-            return skus.Select(sku => new SkuOrdered
-            {
-                Sku = _skuMapper.FromEntity(sku, true),
-                ProductWithoutSkus = DynamicMapper.FromEntity(sku.Product, true)
+                Sku = sku
             }).ToList();
         }
 
@@ -367,16 +351,10 @@ namespace VitalChoice.Business.Services.Products
                     .ThenInclude(p => p.ProductsToCategories)
                     .SelectAsync(false);
 
-            foreach (var sku in skus)
+            var skusDynamic = await _skuMapper.FromEntityRangeAsync(skus, true);
+            return skusDynamic.Select(sku => new SkuOrdered
             {
-                sku.OptionTypes = _mapper.FilterByType(sku.Product.IdObjectType);
-                sku.Product.OptionTypes = sku.OptionTypes;
-            }
-
-            return skus.Select(sku => new SkuOrdered
-            {
-                Sku = _skuMapper.FromEntity(sku, true),
-                ProductWithoutSkus = DynamicMapper.FromEntity(sku.Product, true)
+                Sku = sku
             }).ToList();
         }
 
@@ -393,8 +371,6 @@ namespace VitalChoice.Business.Services.Products
                     .Include(s => s.OptionValues)
                     .Include(s => s.Product)
                     .SelectFirstOrDefaultAsync(false);
-            sku.OptionTypes =
-                _mapper.FilterByType(sku.Product.IdObjectType);
             return await _skuMapper.FromEntityAsync(sku, withDefaults);
         }
 
@@ -405,16 +381,21 @@ namespace VitalChoice.Business.Services.Products
                     .Include(s => s.OptionValues)
                     .Include(s => s.Product)
                     .SelectFirstOrDefaultAsync(false);
-            sku.OptionTypes =
-                _mapper.FilterByType(sku.Product.IdObjectType);
             return await _skuMapper.FromEntityAsync(sku, withDefaults);
         }
 
         public async Task<ICollection<VSku>> GetSkusAsync(VProductSkuFilter filter)
         {
-            var conditions = new VSkuQuery().NotDeleted().WithText(filter.SearchText).WithCode(filter.Code).WithDescriptionName(filter.DescriptionName)
-                .WithExactCode(filter.ExactCode).WithExactCodes(filter.ExactCodes).WithExactDescriptionName(filter.ExactDescriptionName).WithIds(filter.Ids).WithIdProducts(filter.IdProducts)
-				.ActiveOnly(filter.ActiveOnly).NotHiddenOnly(filter.NotHiddenOnly);
+            var conditions = new VSkuQuery().NotDeleted()
+                .WithText(filter.SearchText)
+                .WithCode(filter.Code)
+                .WithDescriptionName(filter.DescriptionName)
+                .WithExactCode(filter.ExactCode)
+                .WithExactCodes(filter.ExactCodes)
+                .WithExactDescriptionName(filter.ExactDescriptionName)
+                .WithIds(filter.Ids)
+                .WithIdProducts(filter.IdProducts)
+                .ActiveOnly(filter.ActiveOnly).NotHiddenOnly(filter.NotHiddenOnly);
             var query = _vSkuRepository.Query(conditions);
 
             Func<IQueryable<VSku>, IOrderedQueryable<VSku>> sortable = x => x.OrderByDescending(y => y.DateCreated);

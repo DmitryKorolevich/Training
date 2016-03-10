@@ -1,14 +1,8 @@
-﻿using Microsoft.AspNet.Http;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
-using Authorize.Net.Api.Contracts.V1;
-using Authorize.Net.Api.Controllers;
-using Authorize.Net.Api.Controllers.Bases;
-using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Business.Queries.Orders;
 using VitalChoice.Business.Repositories;
@@ -20,7 +14,6 @@ using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Services;
 using VitalChoice.Data.UnitOfWork;
-using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
@@ -30,7 +23,6 @@ using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
-using VitalChoice.Ecommerce.Domain.Entities.History;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
@@ -39,17 +31,13 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
-using VitalChoice.Infrastructure.Domain.Entities.Customers;
-using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
-using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Interfaces.Services;
-using VitalChoice.Interfaces.Services.Affiliates;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Payments;
@@ -59,7 +47,6 @@ using VitalChoice.ObjectMapping.Base;
 using VitalChoice.ObjectMapping.Interfaces;
 using System.IO;
 using CsvHelper;
-using System.Text;
 using CsvHelper.Configuration;
 using VitalChoice.Business.CsvExportMaps;
 using VitalChoice.Infrastructure.Domain.Entities.Orders;
@@ -107,7 +94,6 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IProductService _productService;
         private readonly INotificationService _notificationService;
         private readonly IExtendedDynamicServiceAsync<OrderPaymentMethodDynamic, OrderPaymentMethod, CustomerPaymentMethodOptionType, OrderPaymentMethodOptionValue> _paymentGenericService;
-        private readonly IEcommerceRepositoryAsync<SkuOptionValue> _skuOptionValueRepositoryAsync;
 
         public OrderService(
             IEcommerceRepositoryAsync<VOrder> vOrderRepository,
@@ -1062,16 +1048,16 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         foreach (var skuOrdered in item.Skus)
                         {
-                            pOrder = pOrder || skuOrdered?.ProductWithoutSkus.IdObjectType == (int)ProductType.Perishable;
-                            npOrder = npOrder || skuOrdered?.ProductWithoutSkus.IdObjectType == (int)ProductType.NonPerishable;
+                            pOrder = pOrder || skuOrdered?.Sku.Product.IdObjectType == (int)ProductType.Perishable;
+                            npOrder = npOrder || skuOrdered?.Sku.Product.IdObjectType == (int)ProductType.NonPerishable;
                         }
                     }
                     if (item.PromoSkus != null)
                     {
                         foreach (var skuOrdered in item.PromoSkus.Where(p=>p.Enabled))
                         {
-                            pOrder = pOrder || skuOrdered?.ProductWithoutSkus.IdObjectType == (int)ProductType.Perishable;
-                            npOrder = npOrder || skuOrdered?.ProductWithoutSkus.IdObjectType == (int)ProductType.NonPerishable;
+                            pOrder = pOrder || skuOrdered?.Sku.Product.IdObjectType == (int)ProductType.Perishable;
+                            npOrder = npOrder || skuOrdered?.Sku.Product.IdObjectType == (int)ProductType.NonPerishable;
                         }
                     }
                     if (pOrder && npOrder)
@@ -1240,7 +1226,7 @@ namespace VitalChoice.Business.Services.Orders
                         }
                         else
                         {
-                            sku.ProductWithoutSkus = dbSku.ProductWithoutSkus;
+                            sku.Sku.Product = dbSku.Sku.Product;
                             sku.Sku = dbSku.Sku;
                             if (sku.Sku != null)
                             {

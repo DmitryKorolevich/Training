@@ -27,7 +27,7 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                     {
                         HashSet<int> categories = new HashSet<int>(dataContext.Order.Discount.CategoryIds);
                         var excludedSkus =
-                            skus.Where(s => s.ProductWithoutSkus.CategoryIds.Any(c => categories.Contains(c))).ToArray();
+                            skus.Where(s => s.Sku.Product.CategoryIds.Any(c => categories.Contains(c))).ToArray();
                         foreach (var sku in excludedSkus)
                         {
                             sku.Messages.Add("The discount for this product has been excluded by category");
@@ -44,7 +44,7 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                     {
                         HashSet<int> categories = new HashSet<int>(dataContext.Order.Discount.CategoryIds);
                         var excludedSkus =
-                            skus.Where(s => s.ProductWithoutSkus.CategoryIds.Any(c => !categories.Contains(c))).ToArray();
+                            skus.Where(s => s.Sku.Product.CategoryIds.Any(c => !categories.Contains(c))).ToArray();
                         foreach (var sku in excludedSkus)
                         {
                             sku.Messages.Add("The discount for this product has been excluded by category");

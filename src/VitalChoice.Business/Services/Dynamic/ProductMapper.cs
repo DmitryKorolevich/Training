@@ -27,7 +27,8 @@ namespace VitalChoice.Business.Services.Dynamic
             _skuMapper = skuMapper;
         }
 
-        protected override async Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<ProductDynamic, Product>> items, bool withDefaults = false)
+        protected override async Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<ProductDynamic, Product>> items,
+            bool withDefaults = false)
         {
             await items.ForEachAsync(async pair =>
             {
@@ -40,21 +41,6 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.CategoryIds = entity.ProductsToCategories?.Select(p => p.IdCategory).ToList();
                 if (entity.Skus != null)
                 {
-                    foreach (var sku in entity.Skus)
-                    {
-                        sku.OptionTypes = entity.OptionTypes;
-                        //if (withDefaults)
-                        //{
-                            //combine product part in skus
-                            //foreach (var productValue in entity.OptionValues)
-                            //{
-                            //    if (sku.OptionValues.All(p => p.IdOptionType != productValue.IdOptionType))
-                            //    {
-                            //        sku.OptionValues.Add(productValue);
-                            //    }
-                            //}
-                        //}
-                    }
                     if (dynamic.Skus == null)
                         dynamic.Skus = new List<SkuDynamic>();
                     dynamic.Skus.AddRange(await _skuMapper.FromEntityRangeAsync(entity.Skus, withDefaults));

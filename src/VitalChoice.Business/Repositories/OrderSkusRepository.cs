@@ -1,27 +1,24 @@
-﻿using Microsoft.Data.Entity;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Data.Entity;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Infrastructure.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Transfer;
 
-namespace VitalChoice.Data.Repositories.Customs
+namespace VitalChoice.Business.Repositories
 {
-    public class OrderSkusRepository : EcommerceRepositoryAsync<OrderToSku>
+    public class OrderSkusRepository : EcommerceRepositoryAsync<VTopProducts>
     {
         public OrderSkusRepository(IDataContextAsync context) : base(context)
 		{
         }
 
-        public async Task<Dictionary<int,int>> GetTopPurchasedSkuIdsAsync(FilterBase filter)
+        public async Task<Dictionary<int,int>> GetTopPurchasedSkuIdsAsync(FilterBase filter, int idCustomer)
         {
-            var query = this.DbSet.GroupBy(p => p.IdSku).Select(g => new
-            {
-                IdSku = g.Key,
-                Count = g.Sum(p => p.Quantity),
-            });
+            var query = DbSet.Where(o => o.IdCustomer == idCustomer);
 
             query = query.OrderByDescending(p => p.Count);
 
@@ -29,8 +26,7 @@ namespace VitalChoice.Data.Repositories.Customs
             {
                 query = query.Skip((filter.Paging.PageIndex - 1) * filter.Paging.PageItemCount).Take(filter.Paging.PageItemCount);
             }
-            var items = await query.ToListAsync();
-            var toReturn = items.ToDictionary(p => p.IdSku, x => x.Count);
+            var toReturn = await query.ToDictionaryAsync(p => p.IdSku, x => x.Count);
 
             return toReturn;
         }

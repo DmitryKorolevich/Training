@@ -23,6 +23,7 @@ using VitalChoice.Validation.Models;
 using Microsoft.Extensions.OptionsModel;
 using Newtonsoft.Json;
 using VitalChoice.Business.CsvExportMaps;
+using VitalChoice.Business.Queries.Users;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;

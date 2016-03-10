@@ -77,6 +77,7 @@ using VitalChoice.Business.Services.Healthwise;
 using VitalChoice.Interfaces.Services.Healthwise;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Services.Checkout;
+using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Business.Services.InventorySkus;
 using VitalChoice.Caching.Extensions;
@@ -505,7 +506,14 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<ContentCrossSellService>().As<IContentCrossSellService>().InstancePerLifetimeScope();
             builder.RegisterType<InventorySkuCategoryService>().As<IInventorySkuCategoryService>().InstancePerLifetimeScope();
             builder.RegisterType<InventorySkuService>().As<IInventorySkuService>().InstancePerLifetimeScope();
-            builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
+            builder.RegisterMappers(typeof(ProductService).GetTypeInfo().Assembly, (type, registration) =>
+            {
+                if (type == typeof(SkuMapper))
+                {
+                    return registration.OnActivated(a => ((SkuMapper)a.Instance).ProductMapper = a.Context.Resolve<ProductMapper>());
+                }
+                return registration;
+            });
             builder.RegisterModelConverters(projectAssembly);
             builder.RegisterModelConverters(typeof(OrderService).GetTypeInfo().Assembly);
 

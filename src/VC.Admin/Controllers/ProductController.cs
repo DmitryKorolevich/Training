@@ -108,14 +108,14 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<Result<ICollection<SkuWithStatisticListItemModel>>> GetTopPurchasedSkus()
+        public async Task<Result<ICollection<SkuWithStatisticListItemModel>>> GetTopPurchasedSkus(int id)
         {
             ICollection<SkuWithStatisticListItemModel> toReturn = new List<SkuWithStatisticListItemModel>();
 
             FilterBase idsFilter = new FilterBase();
             idsFilter.Paging.PageIndex = 1;
             idsFilter.Paging.PageItemCount = 20;
-            Dictionary<int, int> items =await productService.GetTopPurchasedSkuIdsAsync(idsFilter);
+            Dictionary<int, int> items = await productService.GetTopPurchasedSkuIdsAsync(idsFilter, id);
             //items.Add(54, 20);
             //items.Add(55, 5);
             //items.Add(25, 10);

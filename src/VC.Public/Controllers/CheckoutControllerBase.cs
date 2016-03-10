@@ -99,7 +99,7 @@ namespace VC.Public.Controllers
                 order.Skus?.Select(sku =>
                 {
                     var result = SkuMapper.ToModel<CartSkuModel>(sku.Sku);
-                    ProductMapper.UpdateModel(result, sku.ProductWithoutSkus);
+                    ProductMapper.UpdateModel(result, sku.Sku.Product);
                     result.Price = sku.Amount;
                     result.Quantity = sku.Quantity;
                     result.SubTotal = sku.Quantity * sku.Amount;
@@ -141,7 +141,7 @@ namespace VC.Public.Controllers
             cartModel.PromoSkus.AddRange(context.PromoSkus?.Select(sku =>
             {
                 var result = SkuMapper.ToModel<CartSkuModel>(sku.Sku);
-                ProductMapper.UpdateModel(result, sku.ProductWithoutSkus);
+                ProductMapper.UpdateModel(result, sku.Sku.Product);
                 result.Price = sku.Amount;
                 result.Quantity = sku.Quantity;
                 result.SubTotal = sku.Quantity * sku.Amount;

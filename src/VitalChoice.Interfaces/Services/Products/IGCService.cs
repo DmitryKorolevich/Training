@@ -22,7 +22,7 @@ namespace VitalChoice.Interfaces.Services.Products
 
         Task<GiftCertificate> UpdateGiftCertificateAsync(GiftCertificate model);
 
-        Task<ICollection<GiftCertificate>> AddGiftCertificatesAsync(int quantity,GiftCertificate model);
+        Task<ICollection<GiftCertificate>> AddManualGiftCertificatesAsync(int quantity,GiftCertificate model);
 
         Task<bool> SendGiftCertificateEmailAsync(BasicEmail model);
 

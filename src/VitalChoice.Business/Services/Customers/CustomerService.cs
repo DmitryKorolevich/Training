@@ -21,6 +21,7 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.Data.Services;
 using VitalChoice.Business.Queries.Affiliate;
 using VitalChoice.Business.Queries.Customers;
+using VitalChoice.Business.Queries.Users;
 using VitalChoice.Business.Repositories;
 using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Data.Extensions;

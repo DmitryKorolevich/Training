@@ -19,7 +19,7 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Base
 
         public int? IdEditedBy { get; set; }
 
-        public int IdObjectType { get; set; }
+        public virtual int IdObjectType { get; set; }
 
         public User EditedBy { get; set; }
     }
@@ -34,7 +34,7 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Base
         where TOptionValue: OptionValue<TOptionType>
         where TOptionType : OptionType
     {
-        public ICollection<TOptionType> OptionTypes { get; set; }
+        public virtual ICollection<TOptionType> OptionTypes { get; set; }
 
         //public IEnumerable<TOptionValue> ExceptOptionsIn(
         //    DynamicDataEntity<TOptionValue, TOptionType> updated)

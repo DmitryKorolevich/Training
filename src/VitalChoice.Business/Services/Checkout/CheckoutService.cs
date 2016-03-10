@@ -136,13 +136,12 @@ namespace VitalChoice.Business.Services.Checkout
                     _productMapper.FilterByType(s.Sku.Product.IdObjectType);
                 s.Sku.Product.OptionTypes = s.Sku.OptionTypes;
                 var productUrl = _productContentRep.Query(p => p.Id == s.Sku.IdProduct).Select(p => p.Url, false).FirstOrDefault();
-                var product = _productMapper.FromEntity(s.Sku.Product, true);
-                product.Url = productUrl;
+                var sku = _skuMapper.FromEntity(s.Sku, true);
+                sku.Product.Url = productUrl;
                 return new SkuOrdered
                 {
                     Amount = s.Sku.Price,
-                    Sku = _skuMapper.FromEntity(s.Sku, true),
-                    ProductWithoutSkus = product,
+                    Sku = sku,
                     Quantity = s.Quantity
                 };
             }).ToList() ?? new List<SkuOrdered>();
@@ -230,7 +229,7 @@ namespace VitalChoice.Business.Services.Checkout
                         result.Order.Skus.UpdateKeyed(productUrls, s => s.Sku.IdProduct, arg => arg.Id,
                             (s, p) =>
                             {
-                                s.ProductWithoutSkus.Url = p.Url;
+                                s.Sku.Product.Url = p.Url;
                                 s.Amount = result.Order.Customer.IdObjectType == (int) CustomerType.Wholesale
                                     ? skuAmounts[s.Sku.Id].WholesalePrice
                                     : skuAmounts[s.Sku.Id].Price;

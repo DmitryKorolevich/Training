@@ -520,9 +520,9 @@ namespace VC.Public.Controllers
                         {
                             var orderLineModel = new LastOrderLineModel()
                             {
-                                ProductUrl = ProductBaseUrl + skuOrdered.ProductWithoutSkus.Url,
-                                IconLink = skuOrdered.ProductWithoutSkus.SafeData.Thumbnail,
-                                ProductName = skuOrdered.ProductWithoutSkus.Name,
+                                ProductUrl = ProductBaseUrl + skuOrdered.Sku.Product.Url,
+                                IconLink = skuOrdered.Sku.Product.SafeData.Thumbnail,
+                                ProductName = skuOrdered.Sku.Product.Name,
                                 PortionsCount = skuOrdered.Sku.Data.QTY,
                                 Quantity = skuOrdered.Quantity,
                                 SkuCode = skuOrdered.Sku.Code,

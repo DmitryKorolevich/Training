@@ -57,6 +57,7 @@ using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Workflow.Core;
 using Autofac.Extensions.DependencyInjection;
+using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.Interfaces.Services.Help;
 using VitalChoice.DynamicData.Extensions;
@@ -309,7 +310,16 @@ namespace ExportServiceWithSBQueue
             builder.RegisterType<VitalGreenService>().As<IVitalGreenService>();
             builder.RegisterType<StylesService>().As<IStylesService>();
             builder.RegisterType<CatalogRequestAddressService>().As<ICatalogRequestAddressService>();
-            builder.RegisterMappers(typeof(ProductService).GetTypeInfo().Assembly);
+
+            builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly, (type, registration) =>
+            {
+                if (type == typeof (SkuMapper))
+                {
+                    return registration.OnActivated(a => ((SkuMapper) a.Instance).ProductMapper = a.Context.Resolve<ProductMapper>());
+                }
+                return registration;
+            });
+
             builder.RegisterModelConverters(projectAssembly);
 
             builder.RegisterGeneric(typeof(ExtendedEcommerceDynamicService<,,,>))

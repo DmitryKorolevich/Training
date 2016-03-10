@@ -16,6 +16,7 @@ using VitalChoice.Business.Queries.Help;
 using VitalChoice.Business.Mail;
 using VitalChoice.Infrastructure.Azure;
 using Microsoft.Extensions.OptionsModel;
+using VitalChoice.Business.Queries.Users;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Ecommerce.Domain.Transfer;

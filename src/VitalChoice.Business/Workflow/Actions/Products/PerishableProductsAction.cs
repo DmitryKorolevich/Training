@@ -17,7 +17,7 @@ namespace VitalChoice.Business.Workflow.Actions.Products
         public override async Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
             var perishableList =
-                dataContext.SkuOrdereds.Where(s => s.ProductWithoutSkus.IdObjectType == (int) ProductType.Perishable).ToArray();
+                dataContext.SkuOrdereds.Where(s => s.Sku.IdObjectType == (int) ProductType.Perishable).ToArray();
             var perishableAmount = perishableList
                 .Sum(s => s.Amount*s.Quantity);
             var perishableCount = perishableList.Length;

@@ -1279,7 +1279,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
     $scope.topPurchasedProducts = function ()
     {
         modalUtil.open('app/modules/product/partials/topPurchasedProductsPopup.html', 'topPurchasedProductsController', {
-            products: $scope.order.SkuOrdereds, thenCallback: function (data)
+            products: $scope.order.SkuOrdereds, idCustomer: $scope.currentCustomer.Id, thenCallback: function (data)
             {
                 var newProducts = data;
                 $.each(newProducts, function (index, newProduct)
