@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 
-namespace VitalChoice.Infrastructure.ServiceBus
+namespace VitalChoice.Infrastructure.ServiceBus.Base
 {
     public interface IObjectEncryptionHost
     {

@@ -18,6 +18,7 @@ using Microsoft.Extensions.OptionsModel;
 using Microsoft.ServiceBus;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.ServiceBus;
+using VitalChoice.Infrastructure.ServiceBus.Base;
 using Configuration = ExportServiceWithSBQueue.Configuration;
 
 namespace ExportService

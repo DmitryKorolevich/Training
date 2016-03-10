@@ -911,6 +911,11 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(p => p.IdEditedBy)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
+                entity.HasMany(o => o.GiftCertificatesGenerated)
+                    .WithOne(g => g.Order)
+                    .HasForeignKey(g => g.IdOrder)
+                    .HasPrincipalKey(o => o.Id)
+                    .IsRequired(false);
                 entity.Ignore(o => o.OptionTypes);
             });
 
@@ -1537,11 +1542,15 @@ namespace VitalChoice.Ecommerce.Context
                 entity.HasKey(p => p.Id);
                 entity.ToTable("GiftCertificates");
                 entity.Property(p => p.PublicId).ValueGeneratedOnAdd();
-                entity
-                    .HasOne(p => p.Order)
-                    .WithMany()
+                entity.HasOne(p => p.Order)
+                    .WithMany(o => o.GiftCertificatesGenerated)
                     .HasForeignKey(p => p.IdOrder)
                     .HasPrincipalKey(p => p.Id)
+                    .IsRequired(false);
+                entity.HasOne(g => g.Sku)
+                    .WithMany()
+                    .HasForeignKey(g => g.IdSku)
+                    .HasPrincipalKey(s => s.Id)
                     .IsRequired(false);
             });
         }

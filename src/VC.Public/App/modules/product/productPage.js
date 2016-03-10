@@ -12,6 +12,11 @@ window.addEventListener("load", function ()
             $(".product-action-right .in-stock").show();
             $(".product-action-right .out-of-stock").hide();
             $("#spSelectedPrice").text("Selected Price " + jChecked.attr("data-price"));
+            if (jChecked.attr("data-autoship").toLowerCase() == "true") {
+	            $(".product-autoship-container").show();
+            } else {
+            	$(".product-autoship-container").hide();
+            }
         }
         else
         {

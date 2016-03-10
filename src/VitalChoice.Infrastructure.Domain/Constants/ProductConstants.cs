@@ -17,6 +17,8 @@
         public const string FIELD_NAME_HIDE_FROM_DATA_FEED = "HideFromDataFeed";
         public const string FIELD_NAME_QTY_THRESHOLD = "QTYThreshold";
 
+        public const string FIELD_NAME_SKU_INVENTORY_BORN_DATE = "BornDate";
+
         public const string FIELD_NAME_INVENTORY_CATEGORY_ID = "InventoryCategoryId";
 
 		public const int DEFAULT_FAVORITES_COUNT = 6;

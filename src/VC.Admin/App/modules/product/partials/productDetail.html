@@ -679,9 +679,21 @@
                                                                                                 <input id="lblAssemble{{subSku.Id}}" type="checkbox" data-ng-model="subSku.Assemble">
                                                                                             </label>
                                                                                         </div>
-                                                                                    </div>
-                                                                                    <div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">
-                                                                                        <button data-ng-click="assignInventorySkus(subSku,$event);" class="btn btn-info">Manage Assigned Parts</button>
+                                                                                        <label for="lblDate{{subSku.Id}}" class="col-md-3 control-label">Born Date</label>
+                                                                                        <div class="col-md-1 margin-right-15px">
+                                                                                            <p class="input-group">
+                                                                                                <input type="text" id="lblDate{{subSku.Id}}" name="BornDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="subSku.BornDate" is-open="subSku.DateOpened"/>
+                                                                                                <span class="input-group-btn">
+                                                                                                    <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); subSku.DateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                                                                </span>
+                                                                                            </p>
+                                                                                            <div class="error-container" ng-show="forms.skussubmitted && forms.SKUs.i{{$index}}.BornDate.$invalid">
+                                                                                                <small class="error" ng-show="forms.SKUs.i{{$index}}.BornDate.$error.server">{{serverMessages.GetMessage('BornDate')}}</small>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="fixed-accordion-row margin-left-zero pull-right">
+                                                                                            <button data-ng-click="assignInventorySkus(subSku,$event);" class="btn btn-info">Manage Assigned Parts</button>
+                                                                                        </div>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>

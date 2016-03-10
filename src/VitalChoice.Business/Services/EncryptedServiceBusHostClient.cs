@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if NET451
+using System;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -9,6 +10,7 @@ using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus;
 using VitalChoice.Interfaces.Services;
 using System.Linq;
+using VitalChoice.Infrastructure.ServiceBus.Base;
 
 namespace VitalChoice.Business.Services
 {
@@ -97,3 +99,4 @@ namespace VitalChoice.Business.Services
         }
     }
 }
+#endif

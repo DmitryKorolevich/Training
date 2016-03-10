@@ -24,6 +24,8 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Orders
 
         public Customer Customer { get; set; }
 
+        public ICollection<GiftCertificate> GiftCertificatesGenerated { get; set; }
+
         public ICollection<OrderToSku> Skus { get; set; }
 
         public ICollection<OrderToPromo> PromoSkus { get; set; }

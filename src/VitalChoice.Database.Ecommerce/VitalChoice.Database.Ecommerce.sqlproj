@@ -245,4 +245,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\InventorySkuData.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\GiftCetfificatesUpdateSku.sql" />
+  </ItemGroup>
 </Project>

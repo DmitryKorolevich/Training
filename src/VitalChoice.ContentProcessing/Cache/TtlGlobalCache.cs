@@ -12,11 +12,11 @@ namespace VitalChoice.ContentProcessing.Cache
 {
     public class TtlGlobalCache : ITtlGlobalCache
     {
-        //private readonly ILogger _logger;
+        private readonly ILogger _logger;
 
-        public TtlGlobalCache(/*ILoggerFactory loggerFactory*/)
+        public TtlGlobalCache(ILoggerFactory loggerFactory)
         {
-            //_logger = loggerFactory.CreateLogger<TtlGlobalCache>();
+            _logger = loggerFactory.CreateLogger<TtlGlobalCache>();
         }
 
         private class CachedTemplate

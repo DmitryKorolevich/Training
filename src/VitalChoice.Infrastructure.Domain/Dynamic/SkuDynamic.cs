@@ -5,6 +5,8 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
 {
     public sealed class SkuDynamic : MappedObject
     {
+        public int IdProduct { get; set; }
+
         public string Code { get; set; }
 
         public bool Hidden { get; set; }
@@ -14,8 +16,6 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
         public decimal WholesalePrice { get; set; }
 
         public int Order { get; set; }
-
-        public int IdProduct { get; set; }
 
         public ICollection<int> InventorySkuIds { get; set; }
     }

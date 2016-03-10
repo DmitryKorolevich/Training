@@ -536,6 +536,9 @@ button.main-button {
 .fixed-accordion-row .col-md-1 > .input-group {
   width: 133px;
 }
+.fixed-accordion-row .col-md-1 > p.input-group {
+  width: 150px;
+}
 .fixed-accordion-row > .control-label {
   margin-right: 10px;
 }

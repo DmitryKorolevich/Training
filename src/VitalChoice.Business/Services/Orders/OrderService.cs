@@ -107,6 +107,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IProductService _productService;
         private readonly INotificationService _notificationService;
         private readonly IExtendedDynamicServiceAsync<OrderPaymentMethodDynamic, OrderPaymentMethod, CustomerPaymentMethodOptionType, OrderPaymentMethodOptionValue> _paymentGenericService;
+        private readonly IEcommerceRepositoryAsync<SkuOptionValue> _skuOptionValueRepositoryAsync;
 
         public OrderService(
             IEcommerceRepositoryAsync<VOrder> vOrderRepository,
@@ -211,7 +212,8 @@ namespace VitalChoice.Business.Services.Orders
                     .Include(o => o.Skus)
                     .ThenInclude(s => s.InventorySkus)
                     .Include(p => p.OptionValues)
-                    .Include(o => o.HealthwiseOrder);
+                    .Include(o => o.HealthwiseOrder)
+                    .Include(o => o.GiftCertificatesGenerated);
         }
 
         protected override async Task AfterSelect(ICollection<Order> entities)
@@ -548,6 +550,7 @@ namespace VitalChoice.Business.Services.Orders
                     model.IdAddedBy = entity.IdEditedBy;
                     await UpdateAffiliateOrderPayment(model, uow);
                     await UpdateHealthwiseOrder(model, uow);
+                    await SetSkusBornDate(new[] { model }, uow);
                     model.PaymentMethod.IdOrder = model.Id;
 
                     remoteUpdateTask = _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy);
@@ -623,6 +626,8 @@ namespace VitalChoice.Business.Services.Orders
                         await UpdateHealthwiseOrder(model, uow);
                         model.PaymentMethod.IdOrder = model.Id;
                     }
+                    await SetSkusBornDate(models, uow);
+
                     transaction.Commit();
                 }
                 catch
@@ -657,6 +662,7 @@ namespace VitalChoice.Business.Services.Orders
                     model.IdAddedBy = entity.IdAddedBy;
                     await UpdateAffiliateOrderPayment(model, uow);
                     await UpdateHealthwiseOrder(model, uow);
+                    await SetSkusBornDate(new []{ model }, uow);
 
                     remoteUpdateTask = _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy);
 
@@ -701,6 +707,7 @@ namespace VitalChoice.Business.Services.Orders
                         await UpdateAffiliateOrderPayment(model, uow);
                         await UpdateHealthwiseOrder(model, uow);
                     }
+                    await SetSkusBornDate(models, uow);
 
                     transaction.Commit();
                 }
@@ -711,6 +718,31 @@ namespace VitalChoice.Business.Services.Orders
                 }
             }
             return entities;
+        }
+
+        private async Task SetSkusBornDate(ICollection<OrderDynamic> orders, IUnitOfWorkAsync uow)
+        {
+            var option = _productService.GetProductOptionTypes(new HashSet<string>() { ProductConstants.FIELD_NAME_SKU_INVENTORY_BORN_DATE}).FirstOrDefault();
+            if (option != null)
+            {
+                var skuIds = orders.SelectMany(p => p?.Skus).Select(p => p.Sku.Id).ToList();
+                skuIds.AddRange(orders.SelectMany(p => p?.PromoSkus).Select(p => p.Sku.Id).ToList());
+                skuIds = skuIds.Distinct().ToList();
+                var dbOptionValues = await _productService.GetSkuOptionValues(skuIds, new[] {option.Id});
+                var skuIdsForInsert = skuIds.Except(dbOptionValues.Select(p => p.IdSku)).ToList();
+                if (skuIdsForInsert.Any())
+                {
+                    var now=DateTime.Now.ToString(CultureInfo.InvariantCulture);
+                    var skuOptionValueRepository = uow.RepositoryAsync<SkuOptionValue>();
+                    await skuOptionValueRepository.InsertRangeAsync(skuIdsForInsert.Select(p => new SkuOptionValue()
+                        {
+                            IdOptionType = option.Id,
+                            IdSku = p,
+                            Value = now
+                    }));
+                    await uow.SaveChangesAsync();
+                }
+            }
         }
 
         private async Task UpdateAffiliateOrderPayment(OrderDynamic dynamic, IUnitOfWorkAsync uow)

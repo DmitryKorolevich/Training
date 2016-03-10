@@ -14,6 +14,8 @@ namespace VitalChoice.Caching.Relational.Base
         [DataMember]
         public int AveragePing { get; set; }
         [DataMember]
+        public DateTime SendTime { get; set; }
+        [DataMember]
         public SyncType SyncType { get; set; }
         [DataMember]
         public string EntityType { get; set; }

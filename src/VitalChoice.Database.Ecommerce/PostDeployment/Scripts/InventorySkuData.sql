@@ -89,7 +89,8 @@ BEGIN
 	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
 	VALUES
 	(N'InventorySkuChannel', 3, (SELECT TOP 1 Id FROM [Lookups] WHERE Name='InventorySkuChannels'), NULL, NULL),
-	(N'Assemble', 5, NULL, NULL, 'False')
+	(N'Assemble', 5, NULL, NULL, 'False'),
+	(N'BornDate', 6, NULL, NULL, NULL)
 
 END
 GO

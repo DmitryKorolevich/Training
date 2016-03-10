@@ -11,6 +11,7 @@ using VitalChoice.Infrastructure.ServiceBus;
 using System.Linq;
 using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.ServiceBus.Base;
 
 namespace ExportServiceWithSBQueue.Services
 {

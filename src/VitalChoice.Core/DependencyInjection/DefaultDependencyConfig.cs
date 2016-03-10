@@ -85,6 +85,7 @@ using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Infrastructure.ServiceBus;
+using VitalChoice.Infrastructure.ServiceBus.Base;
 using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Interfaces.Services.InventorySkus;
 #if !DOTNET5_4
@@ -536,7 +537,9 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<ReCaptchaValidator>().AsSelf().SingleInstance();
             builder.RegisterType<CountryNameCodeResolver>().As<ICountryNameCodeResolver>()
                 .InstancePerLifetimeScope();
+#if NET451
             builder.RegisterType<EncryptedServiceBusHostClient>().As<IEncryptedServiceBusHostClient>().SingleInstance();
+#endif
             builder.RegisterType<ObjectEncryptionHost>()
                 .As<IObjectEncryptionHost>()
                 .WithParameter((pi, cc) => pi.ParameterType == typeof (ILogger),

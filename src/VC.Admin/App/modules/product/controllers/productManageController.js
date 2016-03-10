@@ -256,6 +256,19 @@ angular.module('app.modules.product.controllers.productManageController', [])
 			            if (!$scope.product.MasterContentItemId) {
 			            	$scope.product.MasterContentItemId = $scope.MasterContentItemId;
 			            };
+
+			            if ($scope.product.SKUs)
+			            {
+			                $.each($scope.product.SKUs, function (index, sku)
+			                {
+			                    if (sku.BornDate)
+			                    {
+			                        sku.BornDate = Date.parseDateTime(sku.BornDate);
+			                        sku.OriginBornDate = sku.BornDate;
+			                    }
+			                });
+			            }
+
 			            refreshHistory();
 			            setSelected($scope.rootCategory, $scope.product.CategoryIds);
 			            setInventorySelected($scope.rootInventoryCategory, $scope.product.InventoryCategoryId);
@@ -327,7 +340,23 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 updateCrossses();
                 updateVideos();
 
-                productService.updateProduct($scope.product, $scope.refreshTracker).success(function (result) {
+                var data = angular.copy($scope.product);
+                if (data.SKUs)
+                {
+                    $.each(data.SKUs, function (index, sku)
+                    {
+                        if (sku.BornDate)
+                        {
+                            if (sku.BornDate != sku.OriginBornDate)
+                            {
+                                sku.BornDate.setHours(0, 0, 0);
+                            }
+                            sku.BornDate = sku.BornDate.toServerDateTime();
+                        }
+                    });
+                }
+
+                productService.updateProduct(data, $scope.refreshTracker).success(function (result) {
                     successSaveHandler(result);
                 }).error(function (result) {
                     errorHandler(result);

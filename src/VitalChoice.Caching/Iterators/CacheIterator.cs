@@ -18,7 +18,6 @@ namespace VitalChoice.Caching.Iterators
         public Func<T, bool> Predicate;
         public Dictionary<EntityKey, EntityEntry<T>> Tracked;
         public ICacheKeysStorage<T> KeysStorage;
-        public RelationInfo Relations;
     }
 
     internal class CacheIterator<TSource> : SimpleIterator<TSource>
@@ -27,7 +26,6 @@ namespace VitalChoice.Caching.Iterators
         private readonly IEnumerable<CacheResult<TSource>> _source;
         private readonly Func<TSource, bool> _predicate;
         private readonly bool _track;
-        private readonly RelationInfo _relations;
         private readonly ICacheKeysStorage<TSource> _keysStorage;
         public Dictionary<EntityKey, EntityEntry<TSource>> Tracked { get; }
         private IEnumerator<CacheResult<TSource>> _enumerator;
@@ -45,7 +43,6 @@ namespace VitalChoice.Caching.Iterators
             _predicate = trackedParams.Predicate;
             _keysStorage = trackedParams.KeysStorage;
             Tracked = trackedParams.Tracked;
-            _relations = trackedParams.Relations;
         }
 
         public override void Dispose()
@@ -83,7 +80,7 @@ namespace VitalChoice.Caching.Iterators
                             break;
                         }
                         Found = true;
-                        if (_predicate(item))
+                        if (item.Entity != null && _predicate(item))
                         {
                             CurrentValue = _track ? GetAttached(item) : item;
                             return true;
@@ -113,6 +110,9 @@ namespace VitalChoice.Caching.Iterators
 
         private TSource GetAttached(TSource item)
         {
+            if (item == null)
+                return null;
+
             var pk = _keysStorage.GetPrimaryKeyValue(item);
             EntityEntry<TSource> entry;
             if (Tracked.TryGetValue(pk, out entry))

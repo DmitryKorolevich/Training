@@ -1,12 +1,17 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
 
 namespace VitalChoice.Ecommerce.Domain.Entities.GiftCertificates
 {
     public class GiftCertificate : Entity
     {
         public DateTime Created { get; set; }
+
+        public Sku Sku { get; set; }
+
+        public int? IdSku { get; set; }
 
         public string Code { get; set; }
 

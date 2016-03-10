@@ -260,7 +260,7 @@ namespace VitalChoice.Business.Services.Products
                 item.Created = now;
                 item.GCType = GCType.ManualGC;
                 item.StatusCode = RecordStatusCode.Active;
-                item.Code = GenerateGCCode();
+                item.Code = await GenerateGCCode();
                 items.Add(item);
             }
 
@@ -294,20 +294,20 @@ namespace VitalChoice.Business.Services.Products
             return await giftCertificateRepository.Query(expression).SelectAsync(false);
         }
 
-        public string GenerateGCCode()
+        public async Task<string> GenerateGCCode()
         {
             string toReturn = null;
             bool generated = false;
             while (!generated)
             {
-                var attempt = String.Empty;
+                var attempt = string.Empty;
                 Guid guid = Guid.NewGuid();
                 var bytes = guid.ToByteArray();
                 for(int i= bytes.Length-1; i >= bytes.Length- GC_SYMBOLS_COUNT; i--)
                 {
                     attempt += symbols[bytes[i] % symbols.Count];
                 }
-                GiftCertificate dbItem = (giftCertificateRepository.Query(p=>p.Code== attempt).Select(false)).FirstOrDefault();
+                GiftCertificate dbItem = await giftCertificateRepository.Query(p => p.Code == attempt).SelectFirstOrDefaultAsync(false);
                 if (dbItem == null)
                 {
                     generated = true;

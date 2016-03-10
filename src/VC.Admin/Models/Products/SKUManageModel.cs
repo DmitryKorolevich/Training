@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 using VitalChoice.Infrastructure.Domain.Transfer.InventorySkus;
@@ -81,6 +82,9 @@ namespace VC.Admin.Models.Products
 
         [Map]
         public bool? Assemble { get; set; }
+
+        [Map]
+        public DateTime? BornDate { get; set; }
 
         public ICollection<InventorySkuListItemModel> InventorySkus { get; set; }
     }
