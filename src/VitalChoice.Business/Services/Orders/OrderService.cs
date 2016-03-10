@@ -536,6 +536,7 @@ namespace VitalChoice.Business.Services.Orders
                 try
                 {
                     SetPOrderType(new List<OrderDynamic>() { model });
+                    await SetSkusBornDate(new[] { model }, uow);
                     await EnsurePaymentMethod(model);
                     model.PaymentMethod.IdOrder = model.Id;
                     var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
@@ -550,7 +551,6 @@ namespace VitalChoice.Business.Services.Orders
                     model.IdAddedBy = entity.IdEditedBy;
                     await UpdateAffiliateOrderPayment(model, uow);
                     await UpdateHealthwiseOrder(model, uow);
-                    await SetSkusBornDate(new[] { model }, uow);
                     model.PaymentMethod.IdOrder = model.Id;
 
                     remoteUpdateTask = _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy);
@@ -614,6 +614,7 @@ namespace VitalChoice.Business.Services.Orders
                 try
                 {
                     SetPOrderType(models);
+                    await SetSkusBornDate(models, uow);
                     entities = await base.InsertRangeAsync(models, uow);
                     foreach (var model in models)
                     {
@@ -626,7 +627,6 @@ namespace VitalChoice.Business.Services.Orders
                         await UpdateHealthwiseOrder(model, uow);
                         model.PaymentMethod.IdOrder = model.Id;
                     }
-                    await SetSkusBornDate(models, uow);
 
                     transaction.Commit();
                 }
@@ -648,6 +648,7 @@ namespace VitalChoice.Business.Services.Orders
                 try
                 {
                     SetPOrderType(new List<OrderDynamic>() { model });
+                    await SetSkusBornDate(new[] { model }, uow);
                     await EnsurePaymentMethod(model);
                     model.PaymentMethod.IdOrder = model.Id;
                     var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
@@ -662,7 +663,6 @@ namespace VitalChoice.Business.Services.Orders
                     model.IdAddedBy = entity.IdAddedBy;
                     await UpdateAffiliateOrderPayment(model, uow);
                     await UpdateHealthwiseOrder(model, uow);
-                    await SetSkusBornDate(new []{ model }, uow);
 
                     remoteUpdateTask = _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy);
 
@@ -695,6 +695,7 @@ namespace VitalChoice.Business.Services.Orders
                 try
                 {
                     SetPOrderType(models);
+                    await SetSkusBornDate(models, uow);
                     entities = await base.UpdateRangeAsync(models, uow);
                     foreach (var model in models)
                     {
@@ -707,7 +708,6 @@ namespace VitalChoice.Business.Services.Orders
                         await UpdateAffiliateOrderPayment(model, uow);
                         await UpdateHealthwiseOrder(model, uow);
                     }
-                    await SetSkusBornDate(models, uow);
 
                     transaction.Commit();
                 }
@@ -734,13 +734,12 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     var now=DateTime.Now.ToString(CultureInfo.InvariantCulture);
                     var skuOptionValueRepository = uow.RepositoryAsync<SkuOptionValue>();
-                    await skuOptionValueRepository.InsertRangeAsync(skuIdsForInsert.Select(p => new SkuOptionValue()
+                    skuOptionValueRepository.InsertRange(skuIdsForInsert.Select(p => new SkuOptionValue()
                         {
                             IdOptionType = option.Id,
                             IdSku = p,
                             Value = now
                     }));
-                    await uow.SaveChangesAsync();
                 }
             }
         }
