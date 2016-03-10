@@ -74,7 +74,7 @@
                     .error(function (result) {
                         errorHandler(result);
                     });
-            }, 'Are you sure you want to delete this inventory SKU?');
+            }, 'Are you sure you want to delete this inventory part?');
         };
 
         initialize();
