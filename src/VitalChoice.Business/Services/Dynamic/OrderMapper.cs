@@ -7,12 +7,14 @@ using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Interfaces.Services.InventorySkus;
 using VitalChoice.Interfaces.Services.Products;
@@ -27,7 +29,7 @@ namespace VitalChoice.Business.Services.Dynamic
         private readonly DiscountMapper _discountMapper;
         private readonly OrderPaymentMethodMapper _orderPaymentMethodMapper;
         private readonly SkuMapper _skuMapper;
-        private readonly ProductMapper _productMapper;
+        private readonly IGcService _gcService;
         private readonly PromotionMapper _promotionMapper;
         private readonly IProductService _productService;
         private readonly IInventorySkuService _inventorySkuService;
@@ -36,10 +38,10 @@ namespace VitalChoice.Business.Services.Dynamic
             IModelConverterService converterService,
             IEcommerceRepositoryAsync<OrderOptionType> orderRepositoryAsync, OrderAddressMapper orderAddressMapper,
             CustomerMapper customerMapper, DiscountMapper discountMapper,
-            OrderPaymentMethodMapper orderPaymentMethodMapper, SkuMapper skuMapper, ProductMapper productMapper,
+            OrderPaymentMethodMapper orderPaymentMethodMapper, SkuMapper skuMapper,
             IProductService productService,
             IInventorySkuService inventorySkuService,
-            PromotionMapper promotionMapper)
+            PromotionMapper promotionMapper, IGcService gcService)
             : base(converter, converterService, orderRepositoryAsync)
         {
             _orderAddressMapper = orderAddressMapper;
@@ -47,10 +49,10 @@ namespace VitalChoice.Business.Services.Dynamic
             _discountMapper = discountMapper;
             _orderPaymentMethodMapper = orderPaymentMethodMapper;
             _skuMapper = skuMapper;
-            _productMapper = productMapper;
             _productService = productService;
             _inventorySkuService = inventorySkuService;
             _promotionMapper = promotionMapper;
+            _gcService = gcService;
         }
 
         protected override async Task FromEntityRangeInternalAsync(
@@ -150,6 +152,14 @@ namespace VitalChoice.Business.Services.Dynamic
                     }
                 }
 
+                dynamic.GcsGenerated = entity.GiftCertificatesGenerated.Select(g => new GeneratedGiftCertificate
+                {
+                    Sku = _skuMapper.FromEntity(g.Sku, true),
+                    Id = g.Id,
+                    Balance = g.Balance,
+                    Code = g.Code
+                }).ToList();
+
                 dynamic.AffiliateOrderPayment = entity.AffiliateOrderPayment;
             });
         }
@@ -224,6 +234,22 @@ namespace VitalChoice.Business.Services.Dynamic
                         IdInventorySku = p
                     }).ToList();
                 }
+
+                entity.GiftCertificatesGenerated = dynamic.GcsGenerated.Select(g => new GiftCertificate
+                {
+                    IdSku = g.Sku.Id,
+                    Balance = g.Balance,
+                    Code = g.Id == 0 ? _gcService.GenerateGCCode().Result : g.Code,
+                    Email = dynamic.Customer?.Email,
+                    FirstName = dynamic.Customer?.ProfileAddress.SafeData.FirstName,
+                    LastName = dynamic.Customer?.ProfileAddress.SafeData.LastName,
+                    IdOrder = dynamic.Id == 0 ? null : (int?) dynamic.Id,
+                    GCType = g.Sku.IdObjectType == (int) ProductType.EGс ? GCType.EGC : GCType.GC,
+                    PublicId = Guid.NewGuid(),
+                    Created = DateTime.Now,
+                    StatusCode = RecordStatusCode.Active,
+                    UserId = dynamic.Customer?.Id
+                }).ToList();
             });
         }
 
@@ -286,12 +312,13 @@ namespace VitalChoice.Business.Services.Dynamic
                 {
                     List<int> inventoryIds;
                     inventoryMap.TryGetValue(orderToSku.IdSku, out inventoryIds);
-                    orderToSku.InventorySkus.MergeKeyed(inventoryIds ?? new List<int>(),p=> p.IdInventorySku, p=>p, p=> new OrderToSkuToInventorySku()
-                    {
-                        IdSku = orderToSku.IdSku,
-                        IdOrder = orderToSku.IdOrder,
-                        IdInventorySku = p
-                    });
+                    orderToSku.InventorySkus.MergeKeyed(inventoryIds ?? new List<int>(), p => p.IdInventorySku, p => p,
+                        p => new OrderToSkuToInventorySku()
+                        {
+                            IdSku = orderToSku.IdSku,
+                            IdOrder = orderToSku.IdOrder,
+                            IdInventorySku = p
+                        });
                 }
 
                 if (entity.PromoSkus == null)
@@ -319,13 +346,35 @@ namespace VitalChoice.Business.Services.Dynamic
                 {
                     List<int> inventoryIds;
                     inventoryMap.TryGetValue(orderToPromo.IdSku, out inventoryIds);
-                    orderToPromo.InventorySkus.MergeKeyed(inventoryIds ?? new List<int>(), p => p.IdInventorySku, p => p, p => new OrderToPromoToInventorySku()
-                    {
-                        IdSku = orderToPromo.IdSku,
-                        IdOrder = orderToPromo.IdOrder,
-                        IdInventorySku = p
-                    });
+                    orderToPromo.InventorySkus.MergeKeyed(inventoryIds ?? new List<int>(), p => p.IdInventorySku, p => p,
+                        p => new OrderToPromoToInventorySku()
+                        {
+                            IdSku = orderToPromo.IdSku,
+                            IdOrder = orderToPromo.IdOrder,
+                            IdInventorySku = p
+                        });
                 }
+
+                if (entity.GiftCertificatesGenerated == null)
+                {
+                    entity.GiftCertificatesGenerated = new List<GiftCertificate>();
+                }
+
+                entity.GiftCertificatesGenerated.MergeKeyed(dynamic.GcsGenerated, g => g.Id, g => g.Id, src => new GiftCertificate
+                {
+                    IdSku = src.Sku.Id,
+                    Balance = src.Balance,
+                    Code = src.Id == 0 ? _gcService.GenerateGCCode().Result : src.Code,
+                    Email = dynamic.Customer?.Email,
+                    FirstName = dynamic.Customer?.ProfileAddress.SafeData.FirstName,
+                    LastName = dynamic.Customer?.ProfileAddress.SafeData.LastName,
+                    IdOrder = dynamic.Id == 0 ? null : (int?) dynamic.Id,
+                    GCType = src.Sku.IdObjectType == (int) ProductType.EGс ? GCType.EGC : GCType.GC,
+                    PublicId = Guid.NewGuid(),
+                    Created = DateTime.Now,
+                    StatusCode = RecordStatusCode.Active,
+                    UserId = dynamic.Customer?.Id
+                });
             });
         }
 

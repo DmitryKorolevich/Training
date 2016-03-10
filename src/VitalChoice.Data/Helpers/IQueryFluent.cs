@@ -13,6 +13,7 @@ namespace VitalChoice.Data.Helpers
         where TEntity : Entity
     {
         IIncludableQueryFluent<TEntity, TProperty> Include<TProperty>(Expression<Func<TEntity, TProperty>> expression);
+
         IQueryFluent<TEntity> OrderBy(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy);
         Task<bool> SelectAnyAsync();
         Task<int> SelectCountAsync();

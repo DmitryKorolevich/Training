@@ -15,7 +15,5 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates
         public decimal Balance { get; set; }
 
         public SkuDynamic Sku { get; set; }
-
-        public ProductDynamic Product { get; set; }
     }
 }

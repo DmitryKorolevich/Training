@@ -20,6 +20,7 @@ namespace VitalChoice.Workflow.Configuration
         {
             setup.Action<TotalAction>("Total", action =>
             {
+                action.Dependency<GiftCertificatesBuyAction>();
                 action.Dependency<PayableTotalAction>();
 
                 action.Aggregate<PayableTotalAction>();
@@ -48,6 +49,11 @@ namespace VitalChoice.Workflow.Configuration
                 action.Aggregate<ShippingUpgradesActionResolver>();
                 action.Aggregate<ShippingOverrideAction>();
                 action.Aggregate<ShippingSurchargeOverrideAction>();
+            });
+
+            setup.Action<GiftCertificatesBuyAction>("BuyGiftCertificates", action =>
+            {
+                action.Dependency<ProductsWithPromoAction>();
             });
 
             setup.Action<SetupPromoAction>("PromoSetup");
