@@ -22,10 +22,10 @@
         </tbody>
     </table>
     <span class="legend">Search Parts</span>
-    <div class="form-horizontal" ng-form="form" data-ng-class="{submitted: forms.submitted}" novalidate>
+    <form class="form-horizontal" name="forms.form" data-ng-class="{submitted: forms.submitted}" novalidate>
         <div class="row form-group">
             <div class="col-md-4">
-                <input type="text" class="form-control direct-validation" name="Code" placeholder="Code" data-ng-model="getInventoSkuFilter(subSku).Code" ng-minlength="3" required>
+                <input type="text" class="form-control direct-validation" name="Code" placeholder="Code" data-ng-model="filter.Code" ng-minlength="3" required>
                 <div class="error-container" ng-show="forms.submitted && forms.form.Code.$invalid">
                     <small class="error" ng-show="forms.form.Code.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Code")}}</small>
                     <small class="error" ng-show="forms.form.Code.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Code")}}</small>
@@ -35,7 +35,7 @@
                 <button class="btn btn-info" data-ng-click="filterItems();" type="button">Filter</button>
             </div>
         </div>
-    </div>
+    </form>
     <spinner-overlay data-loading="refreshTracker.active()">
         <table class="table table-striped table-hover">
             <thead>
@@ -50,7 +50,7 @@
                     <td>{{item.Code}}</td>
                     <td>{{item.Description}}</td>
                     <td>
-                        <button class="btn btn-xs btn-default btn-success" data-ng-click="addItem(item);">Add</button>
+                        <button class="btn btn-xs btn-default btn-success" data-ng-click="add(item);">Add</button>
                     </td>
                 </tr>
             </tbody>

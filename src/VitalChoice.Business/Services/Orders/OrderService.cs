@@ -186,6 +186,8 @@ namespace VitalChoice.Business.Services.Orders
                     .Include(o => o.PromoSkus)
                     .ThenInclude(p => p.Promo)
                     .ThenInclude(s => s.OptionValues)
+                    .Include(o => o.PromoSkus)
+                    .ThenInclude(s => s.InventorySkus)
                     .Include(o => o.PaymentMethod)
                     .ThenInclude(p => p.BillingAddress)
                     .ThenInclude(a => a.OptionValues)
@@ -206,6 +208,8 @@ namespace VitalChoice.Business.Services.Orders
                     .ThenInclude(s => s.Sku)
                     .ThenInclude(s => s.Product)
                     .ThenInclude(s => s.OptionValues)
+                    .Include(o => o.Skus)
+                    .ThenInclude(s => s.InventorySkus)
                     .Include(p => p.OptionValues)
                     .Include(o => o.HealthwiseOrder);
         }

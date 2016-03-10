@@ -59,7 +59,6 @@ namespace VC.Admin.Controllers
         #region MasterContent
 
         [HttpPost]
-        [AdminAuthorize(PermissionType.Content)]
         public async Task<Result<IEnumerable<MasterContentItemListItemModel>>> GetMasterContentItems([FromBody]MasterContentItemListFilter filter)
         {
             return (await masterContentService.GetMasterContentItemsAsync(filter)).Select(p=>new MasterContentItemListItemModel(p)).ToList();

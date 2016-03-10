@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.InventorySkus;
 using VitalChoice.Ecommerce.Domain.Transfer;
@@ -10,5 +11,7 @@ namespace VitalChoice.Interfaces.Services.InventorySkus
 	public interface IInventorySkuService : IDynamicServiceAsync<InventorySkuDynamic, InventorySku>
     {
         Task<PagedList<InventorySkuListItemModel>> GetInventorySkusAsync(InventorySkuFilter filter);
+
+	    Task<Dictionary<int, List<int>>> GetAssignedInventorySkuIdsAsync(ICollection<int> skuIds);
     }
 }

@@ -939,6 +939,13 @@ namespace VitalChoice.Ecommerce.Context
                     .IsRequired(false);
             });
 
+            builder.Entity<OrderToPromoToInventorySku>(entity =>
+            {
+                entity.Ignore(s => s.Id);
+                entity.HasKey(s => new { s.IdOrder, s.IdSku, s.IdInventorySku });
+                entity.ToTable("OrderToPromosToInventorySkus");
+            });
+
             builder.Entity<OrderToPromo>(entity =>
             {
                 entity.Ignore(p => p.Id);
@@ -956,6 +963,10 @@ namespace VitalChoice.Ecommerce.Context
                     .WithMany()
                     .HasForeignKey(p => p.IdPromo)
                     .HasPrincipalKey(p => p.Id);
+                entity.HasMany(s => s.InventorySkus)
+                    .WithOne()
+                    .HasForeignKey(s => new { s.IdOrder, s.IdSku })
+                    .HasPrincipalKey(s => new { s.IdOrder, s.IdSku });
             });
 
             builder.Entity<OrderToGiftCertificate>(entity =>
@@ -973,6 +984,13 @@ namespace VitalChoice.Ecommerce.Context
                     .HasPrincipalKey(o => o.Id);
             });
 
+            builder.Entity<OrderToSkuToInventorySku>(entity =>
+            {
+                entity.Ignore(s => s.Id);
+                entity.HasKey(s => new {s.IdOrder, s.IdSku, s.IdInventorySku});
+                entity.ToTable("OrderToSkusToInventorySkus");
+            });
+
             builder.Entity<OrderToSku>(entity =>
             {
                 entity.Ignore(s => s.Id);
@@ -986,6 +1004,10 @@ namespace VitalChoice.Ecommerce.Context
                     .WithOne()
                     .HasForeignKey<OrderToSku>(s => s.IdSku)
                     .HasPrincipalKey<Sku>(s => s.Id);
+                entity.HasMany(s => s.InventorySkus)
+                    .WithOne()
+                    .HasForeignKey(s => new { s.IdOrder, s.IdSku})
+                    .HasPrincipalKey(s => new { s.IdOrder, s.IdSku });
             });
 
             builder.Entity<OrderStatusEntity>(entity =>

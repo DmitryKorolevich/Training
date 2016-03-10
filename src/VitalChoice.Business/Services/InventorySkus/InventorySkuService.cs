@@ -16,6 +16,7 @@ using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Entities.InventorySkus;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Context;
@@ -33,6 +34,7 @@ namespace VitalChoice.Business.Services.InventorySkus
         IInventorySkuService
     {
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
+        private readonly IEcommerceRepositoryAsync<SkuToInventorySku> _skuToInventorySkuRepository;
 
         public InventorySkuService(InventorySkuMapper mapper,
             IEcommerceRepositoryAsync<InventorySku> inventorySkuRepository,
@@ -43,11 +45,13 @@ namespace VitalChoice.Business.Services.InventorySkus
             DynamicExtensionsRewriter queryVisitor,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
+            IEcommerceRepositoryAsync<SkuToInventorySku> skuToInventorySkuRepository,
             ILoggerProviderExtended loggerProvider) : base(
                 mapper, inventorySkuRepository, inventorySkuValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
         {
             _adminProfileRepository = adminProfileRepository;
+            _skuToInventorySkuRepository = skuToInventorySkuRepository;
         }
 
         public async Task<PagedList<InventorySkuListItemModel>> GetInventorySkusAsync(InventorySkuFilter filter)
@@ -133,6 +137,25 @@ namespace VitalChoice.Business.Services.InventorySkus
                 }
             }
 
+            return toReturn;
+        }
+
+        public async Task<Dictionary<int,List<int>>> GetAssignedInventorySkuIdsAsync(ICollection<int> skuIds)
+        {
+            skuIds = skuIds.Distinct().ToList();
+            var items = await _skuToInventorySkuRepository.Query(p => skuIds.Contains(p.IdSku)).SelectAsync(false);
+            var toReturn =new Dictionary<int, List<int>>();
+            foreach (var skuToInventorySku in items)
+            {
+                List<int> assignedInventoryIds;
+                toReturn.TryGetValue(skuToInventorySku.IdSku, out assignedInventoryIds);
+                if (assignedInventoryIds == null)
+                {
+                    assignedInventoryIds=new List<int>();
+                    toReturn.Add(skuToInventorySku.IdSku,assignedInventoryIds);
+                }
+                assignedInventoryIds.Add(skuToInventorySku.IdInventorySku);
+            }
             return toReturn;
         }
     }

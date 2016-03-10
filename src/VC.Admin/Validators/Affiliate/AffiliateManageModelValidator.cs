@@ -72,6 +72,8 @@ namespace VC.Admin.Validators.Affiliate
                     .WithMessage(model => model.ChecksPayableTo, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
 
                 RuleFor(model => model.TaxID)
+                    .NotEmpty()
+                    .WithMessage(model => model.Address1, ValidationMessages.FieldRequired)
                     .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
                     .WithMessage(model => model.TaxID, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
 

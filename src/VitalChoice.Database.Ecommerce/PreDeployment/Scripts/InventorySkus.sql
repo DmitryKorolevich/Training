@@ -138,6 +138,36 @@ BEGIN
 		CONSTRAINT [FK_SkusToInventorySku_ToInventorySku] FOREIGN KEY ([IdInventorySku]) REFERENCES [InventorySkus]([Id]), 
 	);
 
+	CREATE TABLE [dbo].[OrderToSkusToInventorySkus]
+	(
+		[IdOrder] INT NOT NULL, 
+		[IdSku] INT NOT NULL, 
+		[IdInventorySku] INT NOT NULL, 
+		CONSTRAINT [PK_OrderToSkusToInventorySkus] PRIMARY KEY CLUSTERED 
+		(
+			[IdOrder] ASC,
+			[IdSku] ASC,
+			[IdInventorySku] ASC
+		),
+		CONSTRAINT [FK_OrderToSkuToInventorySku_ToSku] FOREIGN KEY ([IdOrder],[IdSku]) REFERENCES [OrderToSkus]([IdOrder],[IdSku]) ON DELETE CASCADE, 
+		CONSTRAINT [FK_OrderToSkuToInventorySku_ToInventorySku] FOREIGN KEY ([IdInventorySku]) REFERENCES [InventorySkus]([Id]), 
+	);
+
+	CREATE TABLE [dbo].[OrderToPromosToInventorySkus]
+	(
+		[IdOrder] INT NOT NULL, 
+		[IdSku] INT NOT NULL, 
+		[IdInventorySku] INT NOT NULL, 
+		CONSTRAINT [PK_OrderToPromosToInventorySkus] PRIMARY KEY CLUSTERED 
+		(
+			[IdOrder] ASC,
+			[IdSku] ASC,
+			[IdInventorySku] ASC
+		),
+		CONSTRAINT [FK_OrderToPromoToInventorySku_ToSku] FOREIGN KEY ([IdOrder],[IdSku]) REFERENCES [OrderToPromos]([IdOrder],[IdSku]) ON DELETE CASCADE, 
+		CONSTRAINT [FK_OrderToPromoToInventorySku_ToInventorySku] FOREIGN KEY ([IdInventorySku]) REFERENCES [InventorySkus]([Id]), 
+	);
+
 END
 
 GO

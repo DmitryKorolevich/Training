@@ -16,7 +16,7 @@ namespace VC.Admin.Models.Products
         public string Name { get; set; }
 
         [Map]
-        public int QTY { get; set; }
+        public int? QTY { get; set; }
 
         public bool Active { get; set; }
 

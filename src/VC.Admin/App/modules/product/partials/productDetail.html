@@ -666,7 +666,7 @@
                                                                             <span class="legend">Parts Settings</span>
                                                                             <div class="form-group">
                                                                                 <div class="col-md-12">
-                                                                                    <div class="fixed-accordion-row extra-spacing">
+                                                                                    <div class="fixed-accordion-row">
                                                                                         <label class="control-label">Channel</label>
                                                                                         <div class="col-md-1">
                                                                                             <select class="form-control" name="InventorySkuChannel" data-ng-model="subSku.InventorySkuChannel" ng-options="item.Key as item.Text for item in inventorySkuChannels"></select>
@@ -681,7 +681,20 @@
                                                                                         </div>
                                                                                     </div>
                                                                                     <div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">
-                                                                                        <button data-ng-click="assignInventorySkus(subSku,$event);" class="btn btn-info">Assign Parts</button>
+                                                                                        <button data-ng-click="assignInventorySkus(subSku,$event);" class="btn btn-info">Manage Assigned Parts</button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                <div class="col-md-12">
+                                                                                    <div class="fixed-accordion-row">
+                                                                                        <label class="control-label">Assigned Parts</label>
+                                                                                        <div class="control-label left">
+                                                                                            <span data-ng-repeat="inventoSku in subSku.InventorySkus">
+                                                                                                <span data-ng-if="!$last">{{::inventoSku.Code}}, </span>
+                                                                                                <span data-ng-if="$last">{{::inventoSku.Code}}</span>
+                                                                                            </span>
+                                                                                        </div>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>

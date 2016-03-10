@@ -117,7 +117,6 @@
                                                 <label data-ng-if="affiliate.PromoteByEmails" class="col-md-3 control-label">Monthly emails sent</label>
                                                 <div data-ng-if="affiliate.PromoteByEmails" class="col-md-5">
                                                     <select class="form-control" name="MonthlyEmailsSent" data-ng-model="affiliate.MonthlyEmailsSent" ng-options="item.Key as item.Text for item in ReferenceData.AffiliateMonthlyEmailsSentOptions" required></select>
-                                                    </select>
                                                     <div class="error-container" ng-show="forms.submitted && forms.mainForm.MonthlyEmailsSent.$invalid">
                                                         <small class="error" ng-show="forms.mainForm.MonthlyEmailsSent.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Monthly emails sent")}}</small>
                                                         <small class="error" ng-show="forms.mainForm.MonthlyEmailsSent.$error.server">{{serverMessages.GetMessage('MonthlyEmailsSent')}}</small>
@@ -296,8 +295,9 @@
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Tax ID / SSN</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" name="TaxID" class="form-control" placeholder="Tax ID / SSN" data-ng-model="affiliate.TaxID">
+                                                    <input type="text" name="TaxID" class="form-control" placeholder="Tax ID / SSN" data-ng-model="affiliate.TaxID" required>
                                                     <div class="error-container" ng-show="forms.submitted && forms.mainForm.TaxID.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.TaxID.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Tax ID / SSN")}}</small>
                                                         <small class="error" ng-show="forms.mainForm.TaxID.$error.server">{{serverMessages.GetMessage('TaxID')}}</small>
                                                     </div>
                                                 </div>

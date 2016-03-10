@@ -18,5 +18,6 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Orders
         public decimal Amount { get; set; }
         public int Quantity { get; set; }
         public bool Disabled { get; set; }
+        public ICollection<OrderToPromoToInventorySku> InventorySkus { get; set; }
     }
 }

@@ -14,6 +14,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
+using VitalChoice.Interfaces.Services.InventorySkus;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.ObjectMapping.Interfaces;
 
@@ -29,13 +30,16 @@ namespace VitalChoice.Business.Services.Dynamic
         private readonly ProductMapper _productMapper;
         private readonly PromotionMapper _promotionMapper;
         private readonly IProductService _productService;
+        private readonly IInventorySkuService _inventorySkuService;
 
         public OrderMapper(ITypeConverter converter,
             IModelConverterService converterService,
             IEcommerceRepositoryAsync<OrderOptionType> orderRepositoryAsync, OrderAddressMapper orderAddressMapper,
             CustomerMapper customerMapper, DiscountMapper discountMapper,
             OrderPaymentMethodMapper orderPaymentMethodMapper, SkuMapper skuMapper, ProductMapper productMapper,
-            IProductService productService, PromotionMapper promotionMapper)
+            IProductService productService,
+            IInventorySkuService inventorySkuService,
+            PromotionMapper promotionMapper)
             : base(converter, converterService, orderRepositoryAsync)
         {
             _orderAddressMapper = orderAddressMapper;
@@ -45,6 +49,7 @@ namespace VitalChoice.Business.Services.Dynamic
             _skuMapper = skuMapper;
             _productMapper = productMapper;
             _productService = productService;
+            _inventorySkuService = inventorySkuService;
             _promotionMapper = promotionMapper;
         }
 
@@ -151,6 +156,8 @@ namespace VitalChoice.Business.Services.Dynamic
 
         protected override async Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<OrderDynamic, Order>> items)
         {
+            var inventoryMap = await GetInventoryMap(items);
+
             await items.ForEachAsync(async item =>
             {
                 var entity = item.Entity;
@@ -183,8 +190,19 @@ namespace VitalChoice.Business.Services.Dynamic
                     Amount = s.Amount,
                     Quantity = s.Quantity,
                     IdOrder = dynamic.Id,
-                    IdSku = s.Sku.Id
+                    IdSku = s.Sku.Id,
                 }));
+                foreach (var orderToSku in entity.Skus)
+                {
+                    List<int> inventoryIds;
+                    inventoryMap.TryGetValue(orderToSku.IdSku, out inventoryIds);
+                    orderToSku.InventorySkus = inventoryIds?.Select(p => new OrderToSkuToInventorySku()
+                    {
+                        IdSku = orderToSku.IdSku,
+                        IdOrder = orderToSku.IdOrder,
+                        IdInventorySku = p
+                    }).ToList();
+                }
 
                 entity.PromoSkus = new List<OrderToPromo>(dynamic.PromoSkus.Select(s => new OrderToPromo
                 {
@@ -195,12 +213,25 @@ namespace VitalChoice.Business.Services.Dynamic
                     IdPromo = s.Promotion?.Id,
                     Disabled = !s.Enabled
                 }));
+                foreach (var orderToPromo in entity.PromoSkus)
+                {
+                    List<int> inventoryIds;
+                    inventoryMap.TryGetValue(orderToPromo.IdSku, out inventoryIds);
+                    orderToPromo.InventorySkus = inventoryIds?.Select(p => new OrderToPromoToInventorySku()
+                    {
+                        IdSku = orderToPromo.IdSku,
+                        IdOrder = orderToPromo.IdOrder,
+                        IdInventorySku = p
+                    }).ToList();
+                }
             });
         }
 
         protected override async Task UpdateEntityRangeInternalAsync(
             ICollection<DynamicEntityPair<OrderDynamic, Order>> items)
         {
+            var inventoryMap = await GetInventoryMap(items);
+
             await items.ForEachAsync(async item =>
             {
                 var entity = item.Entity;
@@ -244,12 +275,25 @@ namespace VitalChoice.Business.Services.Dynamic
                         Amount = s.Amount,
                         Quantity = s.Quantity,
                         IdOrder = dynamic.Id,
-                        IdSku = s.Sku.Id
+                        IdSku = s.Sku.Id,
+                        InventorySkus = new List<OrderToSkuToInventorySku>(),
                     }, (sku, ordered) =>
                     {
                         sku.Amount = ordered.Amount;
                         sku.Quantity = ordered.Quantity;
                     });
+                foreach (var orderToSku in entity.Skus)
+                {
+                    List<int> inventoryIds;
+                    inventoryMap.TryGetValue(orderToSku.IdSku, out inventoryIds);
+                    orderToSku.InventorySkus.MergeKeyed(inventoryIds ?? new List<int>(),p=> p.IdInventorySku, p=>p, p=> new OrderToSkuToInventorySku()
+                    {
+                        IdSku = orderToSku.IdSku,
+                        IdOrder = orderToSku.IdOrder,
+                        IdInventorySku = p
+                    });
+                }
+
                 if (entity.PromoSkus == null)
                 {
                     entity.PromoSkus = new List<OrderToPromo>();
@@ -262,7 +306,8 @@ namespace VitalChoice.Business.Services.Dynamic
                         IdOrder = dynamic.Id,
                         IdSku = s.Sku.Id,
                         IdPromo = s.Promotion?.Id,
-                        Disabled = !s.Enabled
+                        Disabled = !s.Enabled,
+                        InventorySkus = new List<OrderToPromoToInventorySku>(),
                     }, (sku, ordered) =>
                     {
                         sku.Amount = ordered.Amount;
@@ -270,7 +315,34 @@ namespace VitalChoice.Business.Services.Dynamic
                         sku.Disabled = !ordered.Enabled;
                         sku.IdPromo = ordered.Promotion?.Id;
                     });
+                foreach (var orderToPromo in entity.PromoSkus)
+                {
+                    List<int> inventoryIds;
+                    inventoryMap.TryGetValue(orderToPromo.IdSku, out inventoryIds);
+                    orderToPromo.InventorySkus.MergeKeyed(inventoryIds ?? new List<int>(), p => p.IdInventorySku, p => p, p => new OrderToPromoToInventorySku()
+                    {
+                        IdSku = orderToPromo.IdSku,
+                        IdOrder = orderToPromo.IdOrder,
+                        IdInventorySku = p
+                    });
+                }
             });
+        }
+
+        private async Task<Dictionary<int, List<int>>> GetInventoryMap(ICollection<DynamicEntityPair<OrderDynamic, Order>> items)
+        {
+            var skuIds = items.Select(p => p.Dynamic).SelectMany(p => p?.Skus).Select(p => p.Sku.Id).ToList();
+            skuIds.AddRange(items.Select(p => p.Dynamic).SelectMany(p => p?.PromoSkus).Select(p => p.Sku.Id).ToList());
+            Dictionary<int, List<int>> inventoryMap;
+            if (skuIds.Count > 0)
+            {
+                inventoryMap = await _inventorySkuService.GetAssignedInventorySkuIdsAsync(skuIds);
+            }
+            else
+            {
+                inventoryMap = new Dictionary<int, List<int>>();
+            }
+            return inventoryMap;
         }
     }
 }

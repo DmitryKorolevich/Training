@@ -84,12 +84,11 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.WholesalePrice = dynamic.WholesalePrice;
                 entity.Order = dynamic.Order;
 
-                entity.SkusToInventorySkus.MergeKeyed(dynamic.InventorySkuIds, p => p.IdInventorySku, i => i,
-                    i => new SkuToInventorySku
+                entity.SkusToInventorySkus = dynamic?.InventorySkuIds.Select(i => new SkuToInventorySku
                     {
                         IdInventorySku = i,
                         IdSku = dynamic.Id
-                    });
+                    }).ToList();
             });
             return Task.Delay(0);
         }

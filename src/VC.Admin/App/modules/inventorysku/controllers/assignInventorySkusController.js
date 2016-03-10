@@ -31,6 +31,8 @@
 
         function initialize() {
 
+            $scope.forms = {};
+
             $scope.assignedItems = angular.copy(data.assignedItems);
 
             $scope.filter = {
@@ -62,7 +64,7 @@
             });
             if(add)
             {
-                $scope.assignedItem.push(newItem);
+                $scope.assignedItems.push(newItem);
             }
         };
 
@@ -73,6 +75,7 @@
         $scope.save = function()
         {
             data.thenCallback($scope.assignedItems);
+            $modalInstance.close();
         };
 
         $scope.cancel = function ()
