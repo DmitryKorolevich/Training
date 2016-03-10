@@ -195,7 +195,7 @@ namespace VitalChoice.ObjectMapping.Base
 
             objects.Add(obj, result);
 
-            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+            var objectCache = DynamicTypeCache.GetTypeCacheNoCast(objectType);
             foreach (var pair in objectCache.Properties)
             {
                 Type propertyElementType = pair.Value.PropertyType.TryGetElementType(typeof(ICollection<>));
@@ -244,7 +244,7 @@ namespace VitalChoice.ObjectMapping.Base
                 return null;
 
             var resultList = (IList) Activator.CreateInstance(typeof (List<>).MakeGenericType(objectType));
-            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+            var objectCache = DynamicTypeCache.GetTypeCacheNoCast(objectType);
 
             foreach (var item in obj)
             {
@@ -272,7 +272,7 @@ namespace VitalChoice.ObjectMapping.Base
 
             var result = Activator.CreateInstance(objectType);
 
-            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+            var objectCache = DynamicTypeCache.GetTypeCacheNoCast(objectType);
             foreach (var pair in objectCache.Properties)
             {
                 pair.Value.Set?.Invoke(result, pair.Value.Get?.Invoke(obj));
@@ -301,7 +301,7 @@ namespace VitalChoice.ObjectMapping.Base
 
             objects.Add(obj, result);
 
-            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+            var objectCache = DynamicTypeCache.GetTypeCacheNoCast(objectType);
             foreach (var pair in objectCache.Properties)
             {
                 Type propertyElementType = pair.Value.PropertyType.TryGetElementType(typeof(ICollection<>));
@@ -356,7 +356,7 @@ namespace VitalChoice.ObjectMapping.Base
 
             objects.Add(dest);
 
-            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+            var objectCache = DynamicTypeCache.GetTypeCacheNoCast(objectType);
             foreach (var pair in objectCache.Properties)
             {
                 var srcProperty = src == null ? null : pair.Value.Get?.Invoke(src);
@@ -389,7 +389,7 @@ namespace VitalChoice.ObjectMapping.Base
         {
             if (dest == null)
                 return;
-            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+            var objectCache = DynamicTypeCache.GetTypeCacheNoCast(objectType);
             foreach (var pair in objectCache.Properties)
             {
                 if (!pair.Value.PropertyType.GetTypeInfo().IsValueType)
@@ -407,7 +407,7 @@ namespace VitalChoice.ObjectMapping.Base
         {
             if (dest == null)
                 return;
-            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+            var objectCache = DynamicTypeCache.GetTypeCacheNoCast(objectType);
             foreach (var pair in objectCache.Properties)
             {
                 if (copySkipCondition != null && copySkipCondition(pair.Value.PropertyType))

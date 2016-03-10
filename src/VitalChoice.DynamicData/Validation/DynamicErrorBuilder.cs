@@ -62,9 +62,10 @@ namespace VitalChoice.DynamicData.Validation
                 var dynamicCollectionName = member.Member.Name;
 
                 var modelCollectionName = GetModelName(dynamicCollectionName, Data.ModelType);
+
                 var innerCollectionValue =
-                    DynamicTypeCache.ObjectTypeMappingCache[typeof (TProperty)].Properties[
-                        dynamicCollectionName].Get?.Invoke(Data) as ICollection<TResultProperty>;
+                    DynamicTypeCache.GetTypeCache(typeof (TProperty), true).Properties[dynamicCollectionName].Get?.Invoke(Data) as
+                        ICollection<TResultProperty>;
                 return
                     new DynamicCollectionErrorBuilder<ICollection<TResultProperty>, TResultProperty>(
                         innerCollectionValue, modelCollectionName);
@@ -94,7 +95,7 @@ namespace VitalChoice.DynamicData.Validation
                 var dynamicCollectionName = member.Member.Name;
                 var modelCollectionName = GetModelName(dynamicCollectionName, Data.ModelType);
                 var innerCollectionValue =
-                    DynamicTypeCache.ObjectTypeMappingCache[typeof (TProperty)].Properties[
+                    DynamicTypeCache.GetTypeCache(typeof(TProperty), true).Properties[
                         dynamicCollectionName].Get?.Invoke(Data) as ICollection<TResultProperty>;
                 var itemIndexes = indexes.ToArray();
                 TResultProperty innerItem = innerCollectionValue?.Skip(itemIndexes.FirstOrDefault()).FirstOrDefault();

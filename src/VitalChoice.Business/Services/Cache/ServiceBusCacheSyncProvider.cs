@@ -82,7 +82,7 @@ namespace VitalChoice.Business.Services.Cache
                 }, () =>
                 {
                     var factory = MessagingFactory.CreateFromConnectionString(options.Value.CacheSyncOptions?.ConnectionString);
-                    return factory.CreateSubscriptionClient(queName, applicationEnvironment.ApplicationName, ReceiveMode.PeekLock);
+                    return factory.CreateSubscriptionClient(queName, applicationEnvironment.ApplicationName, ReceiveMode.ReceiveAndDelete);
                 })
                 {
                     EnableBatching = true
@@ -132,7 +132,6 @@ namespace VitalChoice.Business.Services.Cache
             {
                 if (message.ExpiresAtUtc < DateTime.UtcNow)
                 {
-                    message.Complete();
                     continue;
                 }
                 Guid senderUid;
@@ -140,11 +139,9 @@ namespace VitalChoice.Business.Services.Cache
                 {
                     if (senderUid == _clientUid)
                     {
-                        message.Abandon();
                         continue;
                     }
                     var syncOp = message.GetBody<SyncOperation>();
-                    message.Complete();
 
                     if (syncOp.SyncType != SyncType.Ping)
                     {                      
@@ -165,10 +162,6 @@ namespace VitalChoice.Business.Services.Cache
                     {
                         syncOperations.Add(syncOp);
                     }
-                }
-                else
-                {
-                    message.Complete();
                 }
             }
             if (syncOperations.Any())
