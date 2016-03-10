@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using VitalChoice.Caching.GC;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Services.Cache;
+using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Caching.Services
@@ -32,19 +33,21 @@ namespace VitalChoice.Caching.Services
 
         public IInternalEntityCache GetCache(Type entityType)
         {
-            if (!_keyStorage.HaveKeys(entityType))
+            EntityInfo info;
+            if (!_keyStorage.GetEntityInfo(entityType, out info))
                 return null;
             return _entityCaches.GetOrAdd(entityType,
                 cache =>
                     (IInternalEntityCache)
-                        Activator.CreateInstance(typeof (EntityInternalCache<>).MakeGenericType(entityType), _keyStorage, this));
+                        Activator.CreateInstance(typeof (EntityInternalCache<>).MakeGenericType(entityType), info, this));
         }
 
         public IInternalEntityCache<T> GetCache<T>()
         {
-            if (!_keyStorage.HaveKeys(typeof (T)))
+            EntityInfo info;
+            if (!_keyStorage.GetEntityInfo<T>(out info))
                 return null;
-            return (IInternalEntityCache<T>) _entityCaches.GetOrAdd(typeof (T), cache => new EntityInternalCache<T>(_keyStorage, this));
+            return (IInternalEntityCache<T>) _entityCaches.GetOrAdd(typeof (T), cache => new EntityInternalCache<T>(info, this));
         }
 
         public bool CanAddUpCache()

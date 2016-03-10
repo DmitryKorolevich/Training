@@ -77,7 +77,7 @@ namespace VitalChoice.Caching.Services
                     switch (entry.State)
                     {
                         case EntityState.Modified:
-                            primaryKey = cache.GetPrimaryKeyValue(entry.Entity);
+                            primaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entry.Entity);
                             if (primaryKey.IsValid)
                             {
                                 cache.Update(entry.Entity);
@@ -102,7 +102,7 @@ namespace VitalChoice.Caching.Services
                             }
                             break;
                         case EntityState.Added:
-                            primaryKey = cache.GetPrimaryKeyValue(entry.Entity);
+                            primaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entry.Entity);
                             if (primaryKey.IsValid)
                             {
                                 cache.TryRemove(entry.Entity);
@@ -132,7 +132,7 @@ namespace VitalChoice.Caching.Services
                     switch (entry.State)
                     {
                         case EntityState.Modified:
-                            primaryKey = cache.GetPrimaryKeyValue(entry.Entity);
+                            primaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entry.Entity);
                             if (primaryKey.IsValid)
                             {
                                 cache.Update(entry.Entity);
@@ -145,7 +145,7 @@ namespace VitalChoice.Caching.Services
                             }
                             break;
                         case EntityState.Deleted:
-                            primaryKey = cache.GetPrimaryKeyValue(entry.Entity);
+                            primaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entry.Entity);
                             if (primaryKey.IsValid)
                             {
                                 cache.TryRemove(primaryKey);

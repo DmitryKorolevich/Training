@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
+using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Ecommerce.Domain.Options;
 
@@ -80,7 +81,7 @@ namespace VitalChoice.Caching.GC
                             {
                                 foreach (var entity in cache.GetAllUntyped().Where(entity => now - entity.LastAccessTime > _timeToLeave))
                                 {
-                                    cache.TryRemoveUntyped(internalCache.GetPrimaryKeyValue(entity.EntityUntyped));
+                                    cache.TryRemoveUntyped(internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity.EntityUntyped));
                                 }
                             }
                         }

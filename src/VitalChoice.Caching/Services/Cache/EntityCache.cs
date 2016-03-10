@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.ChangeTracking;
 using Microsoft.Extensions.Logging;
+using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Iterators;
 using VitalChoice.Caching.Relational;
@@ -258,8 +259,8 @@ namespace VitalChoice.Caching.Services.Cache
             CacheIterator<T> cacheIterator = new CacheIterator<T>(new TrackedIteratorParams<T>
             {
                 Tracked = _context.ChangeTracker.Entries<T>()
-                    .ToDictionary(e => _internalCache.GetPrimaryKeyValue(e.Entity), e => e),
-                KeysStorage = _internalCache,
+                    .ToDictionary(e => _internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(e.Entity), e => e),
+                InternalCache = _internalCache,
                 Predicate = compiled,
                 Source = results
             });
@@ -283,8 +284,8 @@ namespace VitalChoice.Caching.Services.Cache
             CacheIterator<T> cacheIterator = new CacheIterator<T>(new TrackedIteratorParams<T>
             {
                 Tracked = _context.ChangeTracker.Entries<T>()
-                    .ToDictionary(e => _internalCache.GetPrimaryKeyValue(e.Entity), e => e),
-                KeysStorage = _internalCache,
+                    .ToDictionary(e => _internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(e.Entity), e => e),
+                InternalCache = _internalCache,
                 Predicate = compiled,
                 Source = results
             });
@@ -323,7 +324,7 @@ namespace VitalChoice.Caching.Services.Cache
         {
             foreach (var item in items)
             {
-                var pk = _internalCache.GetPrimaryKeyValue(item);
+                var pk = _internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(item);
                 EntityEntry<T> entry;
                 if (tracked.TryGetValue(pk, out entry))
                 {

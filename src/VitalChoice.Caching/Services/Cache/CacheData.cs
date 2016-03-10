@@ -9,19 +9,15 @@ using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Data.Extensions;
-using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.ObjectMapping.Base;
 using VitalChoice.ObjectMapping.Extensions;
-using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Caching.Services.Cache
 {
     public sealed class CacheData<T> : ICacheData<T>
     {
         private readonly IInternalEntityCacheFactory _cacheFactory;
-        private readonly CacheStorage<T> _cacheStorage;
-        private readonly IInternalEntityCache<T> _internalCache;
         private readonly EntityInfo _entityInfo;
         private readonly RelationInfo _relationInfo;
 
@@ -33,16 +29,16 @@ namespace VitalChoice.Caching.Services.Cache
 
         private readonly Dictionary<EntityConditionalIndexInfo, CacheCluster<EntityIndex, T>> _conditionalIndexedDictionary;
 
-        private readonly Dictionary<EntityCacheableIndexInfo, ConcurrentDictionary<EntityIndex, CacheCluster<EntityKey, T>>> _nonUniqueIndexedDictionary;
+        private readonly Dictionary<EntityCacheableIndexInfo, ConcurrentDictionary<EntityIndex, CacheCluster<EntityKey, T>>>
+            _nonUniqueIndexedDictionary;
+
         private volatile bool _needUpdate;
 
-        public CacheData(IInternalEntityCacheFactory cacheFactory, CacheStorage<T> cacheStorage, IInternalEntityCache<T> internalCache, EntityInfo entityInfo, RelationInfo relationInfo)
+        public CacheData(IInternalEntityCacheFactory cacheFactory, EntityInfo entityInfo, RelationInfo relationInfo)
         {
             _mainCluster = new CacheCluster<EntityKey, T>();
             _indexedCluster = new CacheCluster<EntityIndex, T>();
             _cacheFactory = cacheFactory;
-            _cacheStorage = cacheStorage;
-            _internalCache = internalCache;
             _entityInfo = entityInfo;
             _relationInfo = relationInfo;
             _conditionalIndexedDictionary = new Dictionary<EntityConditionalIndexInfo, CacheCluster<EntityIndex, T>>();
@@ -50,7 +46,8 @@ namespace VitalChoice.Caching.Services.Cache
             {
                 _conditionalIndexedDictionary.Add(conditionalIndex, new CacheCluster<EntityIndex, T>());
             }
-            _nonUniqueIndexedDictionary = new Dictionary<EntityCacheableIndexInfo, ConcurrentDictionary<EntityIndex, CacheCluster<EntityKey, T>>>();
+            _nonUniqueIndexedDictionary =
+                new Dictionary<EntityCacheableIndexInfo, ConcurrentDictionary<EntityIndex, CacheCluster<EntityKey, T>>>();
             foreach (var nonUniqueIndex in entityInfo.NonUniqueIndexes)
             {
                 _nonUniqueIndexedDictionary.Add(nonUniqueIndex, new ConcurrentDictionary<EntityIndex, CacheCluster<EntityKey, T>>());
@@ -174,7 +171,7 @@ namespace VitalChoice.Caching.Services.Cache
                 return null;
             lock (_lockObj)
             {
-                var pk = _cacheStorage.GetPrimaryKeyValue(entity);
+                var pk = _entityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
                 return _mainCluster.Update(pk, entity, e => CreateNew(pk, e), (e, exist) => UpdateExist(pk, e, exist));
             }
         }
@@ -183,10 +180,10 @@ namespace VitalChoice.Caching.Services.Cache
         {
             if (entity == null)
                 return null;
-            
+
             lock (_lockObj)
             {
-                var pk = _cacheStorage.GetPrimaryKeyValue(entity);
+                var pk = _entityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
                 var cached = Get(pk);
                 if (cached == null)
                     return null;
@@ -327,13 +324,14 @@ namespace VitalChoice.Caching.Services.Cache
 
         private CachedEntity<T> CreateNew(EntityKey pk, T entity)
         {
-            var indexValue = _cacheStorage.GetIndexValue(entity);
+            var indexValue = _entityInfo.CacheableIndex.GetIndexValue(entity);
             var conditional =
                 _conditionalIndexedDictionary.Keys.Where(c => c.CheckCondition(entity))
-                    .ToDictionary(c => c, c => _cacheStorage.GetConditionalIndexValue(entity, c));
+                    .Select(c => new KeyValuePair<EntityConditionalIndexInfo, EntityIndex>(c, c.GetConditionalIndexValue(entity)))
+                    .ToArray();
 
-            var nonUnique = _cacheStorage.GetNonUniqueIndexValues(entity);
-            var foreignKeys = _cacheStorage.GetForeignKeyValues(entity);
+            var nonUnique = _entityInfo.NonUniqueIndexes.GetNonUniqueIndexes(entity).ToArray();
+            var foreignKeys = _entityInfo.ForeignKeys.GetForeignKeyValues(entity).ToArray();
             CachedEntity<T> cached;
             if (entity == null)
             {
@@ -394,13 +392,13 @@ namespace VitalChoice.Caching.Services.Cache
 
         private void SyncInternalCache(EntityKey pk, T entity, CachedEntity<T> exist)
         {
-            var indexValue = _cacheStorage.GetIndexValue(entity);
+            var indexValue = _entityInfo.CacheableIndex.GetIndexValue(entity);
             var conditional =
                 _conditionalIndexedDictionary.Keys.Where(c => c.CheckCondition(entity))
-                    .ToDictionary(c => c, c => _cacheStorage.GetConditionalIndexValue(entity, c));
+                    .ToDictionary(c => c, c => c.GetConditionalIndexValue(entity));
 
-            var nonUnique = _cacheStorage.GetNonUniqueIndexValues(entity);
-            var foreignKeys = _cacheStorage.GetForeignKeyValues(entity);
+            var nonUnique = _entityInfo.NonUniqueIndexes.GetNonUniqueIndexes(entity).ToArray();
+            var foreignKeys = _entityInfo.ForeignKeys.GetForeignKeyValues(entity).ToArray();
 
             if (exist.UniqueIndex != null && indexValue != exist.UniqueIndex)
             {
@@ -411,7 +409,7 @@ namespace VitalChoice.Caching.Services.Cache
             IEnumerable<EntityConditionalIndexInfo> removeList;
             if (conditional.Any(c => c.Value == null))
             {
-                removeList = _conditionalIndexedDictionary.Keys.ToArray();
+                removeList = _conditionalIndexedDictionary.Keys;
             }
             else
             {
@@ -419,11 +417,11 @@ namespace VitalChoice.Caching.Services.Cache
                 {
                     _conditionalIndexedDictionary[conditionalIndex.Key].Update(conditionalIndex.Value, exist);
                 }
-                removeList = _conditionalIndexedDictionary.Keys.Where(key => !conditional.ContainsKey(key)).ToArray();
+                removeList = _conditionalIndexedDictionary.Keys.Where(key => !conditional.ContainsKey(key));
             }
             foreach (var indexInfo in removeList)
             {
-                _conditionalIndexedDictionary[indexInfo].Remove(_cacheStorage.GetConditionalIndexValue(exist, indexInfo));
+                _conditionalIndexedDictionary[indexInfo].Remove(indexInfo.GetConditionalIndexValue(exist));
             }
             if (exist.NonUniqueIndexes != null)
             {

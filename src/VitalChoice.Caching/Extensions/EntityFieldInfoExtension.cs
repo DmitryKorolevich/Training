@@ -11,10 +11,7 @@ namespace VitalChoice.Caching.Extensions
         public static EntityForeignKey GetForeignKeyValue<T>(this EntityValueGroupInfo<T> pkInfo, object entity)
             where T: EntityValueInfo
         {
-            if (pkInfo == null)
-                throw new ArgumentNullException(nameof(pkInfo));
-
-            if (entity == null)
+            if (entity == null || pkInfo == null)
                 return null;
 
             return new EntityForeignKey(GetValues(entity, pkInfo));
@@ -23,10 +20,7 @@ namespace VitalChoice.Caching.Extensions
         public static EntityKey GetPrimaryKeyValue<T>(this EntityValueGroupInfo<T> pkInfo, object entity)
             where T : EntityValueInfo
         {
-            if (pkInfo == null)
-                throw new ArgumentNullException(nameof(pkInfo));
-
-            if (entity == null)
+            if (entity == null || pkInfo == null)
                 return null;
 
             return new EntityKey(GetValues(entity, pkInfo));
@@ -35,22 +29,23 @@ namespace VitalChoice.Caching.Extensions
         public static EntityIndex GetIndexValue<T>(this EntityValueGroupInfo<T> indexInfo, object entity)
             where T : EntityValueInfo
         {
-            if (indexInfo == null)
-                throw new ArgumentNullException(nameof(indexInfo));
-
-            if (entity == null)
+            if (entity == null || indexInfo == null)
                 return null;
 
             return new EntityIndex(GetValues(entity, indexInfo));
         }
 
+        public static IEnumerable<KeyValuePair<EntityCacheableIndexInfo, EntityIndex>> GetNonUniqueIndexes(
+            this IEnumerable<EntityCacheableIndexInfo> indexInfos, object entity)
+        {
+            return indexInfos?.Select(n => new KeyValuePair<EntityCacheableIndexInfo, EntityIndex>(n, n.GetIndexValue(entity))) ??
+                   Enumerable.Empty<KeyValuePair<EntityCacheableIndexInfo, EntityIndex>>();
+        }
+
         public static EntityIndex GetConditionalIndexValue<T>(this EntityValueGroupInfo<T> conditionalInfo, object entity)
             where T : EntityValueInfo
         {
-            if (conditionalInfo == null)
-                throw new ArgumentNullException(nameof(conditionalInfo));
-
-            if (entity == null)
+            if (entity == null || conditionalInfo == null)
                 return null;
 
             return new EntityIndex(GetValues(entity, conditionalInfo));
@@ -58,21 +53,22 @@ namespace VitalChoice.Caching.Extensions
 
         public static EntityForeignKey GetForeignKeyValue(this EntityForeignKeyInfo pkInfo, object entity)
         {
-            if (pkInfo == null)
-                throw new ArgumentNullException(nameof(pkInfo));
-
-            if (entity == null)
+            if (entity == null || pkInfo == null)
                 return null;
 
             return new EntityForeignKey(GetValues(entity, pkInfo));
         }
 
+        public static IEnumerable<KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>> GetForeignKeyValues(
+            this IEnumerable<EntityForeignKeyInfo> indexInfos, object entity)
+        {
+            return indexInfos?.Select(n => new KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>(n, n.GetForeignKeyValue(entity))) ??
+                   Enumerable.Empty<KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>>();
+        }
+
         public static EntityKey GetPrimaryKeyValue(this EntityPrimaryKeyInfo pkInfo, object entity)
         {
-            if (pkInfo == null)
-                throw new ArgumentNullException(nameof(pkInfo));
-
-            if (entity == null)
+            if (pkInfo == null || entity == null)
                 return null;
 
             return new EntityKey(GetValues(entity, pkInfo));
@@ -80,10 +76,7 @@ namespace VitalChoice.Caching.Extensions
 
         public static EntityIndex GetIndexValue(this EntityCacheableIndexInfo indexInfo, object entity)
         {
-            if (indexInfo == null)
-                throw new ArgumentNullException(nameof(indexInfo));
-
-            if (entity == null)
+            if (indexInfo == null || entity == null)
                 return null;
 
             return new EntityIndex(GetValues(entity, indexInfo));
@@ -91,10 +84,7 @@ namespace VitalChoice.Caching.Extensions
 
         public static EntityIndex GetConditionalIndexValue(this EntityConditionalIndexInfo conditionalInfo, object entity)
         {
-            if (conditionalInfo == null)
-                throw new ArgumentNullException(nameof(conditionalInfo));
-
-            if (entity == null)
+            if (conditionalInfo == null || entity == null)
                 return null;
 
             return new EntityIndex(GetValues(entity, conditionalInfo));

@@ -479,7 +479,7 @@ namespace VitalChoice.Business.Services.Products
 
             if (toReturn.Items.Any())
             {
-                var ids = toReturn.Items.Select(p => p.IdEditedBy).ToList();
+                var ids = toReturn.Items.Where(p => p.IdEditedBy.HasValue).Select(p => p.IdEditedBy.Value).Distinct().ToList();
                 var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
                 foreach (var item in toReturn.Items)
                 {
