@@ -152,13 +152,13 @@ namespace VitalChoice.Business.Services.Dynamic
                     }
                 }
 
-                dynamic.GeneratedGcs = entity.GiftCertificatesGenerated.Select(g => new GeneratedGiftCertificate
+                dynamic.GeneratedGcs = entity.GiftCertificatesGenerated?.Select(g => new GeneratedGiftCertificate
                 {
                     Sku = _skuMapper.FromEntity(g.Sku, true),
                     Id = g.Id,
                     Balance = g.Balance,
                     Code = g.Code
-                }).ToList();
+                }).ToList() ?? new List<GeneratedGiftCertificate>();
 
                 dynamic.AffiliateOrderPayment = entity.AffiliateOrderPayment;
             });
@@ -235,7 +235,7 @@ namespace VitalChoice.Business.Services.Dynamic
                     }).ToList();
                 }
 
-                entity.GiftCertificatesGenerated = dynamic.GeneratedGcs.Select(g => new GiftCertificate
+                entity.GiftCertificatesGenerated = dynamic.GeneratedGcs?.Select(g => new GiftCertificate
                 {
                     IdSku = g.Sku.Id,
                     Balance = g.Balance,
@@ -249,7 +249,7 @@ namespace VitalChoice.Business.Services.Dynamic
                     Created = DateTime.Now,
                     StatusCode = RecordStatusCode.Active,
                     UserId = dynamic.Customer?.Id
-                }).ToList();
+                }).ToList() ?? new List<GiftCertificate>();
             });
         }
 

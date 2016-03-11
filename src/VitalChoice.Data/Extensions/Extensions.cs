@@ -53,12 +53,18 @@ namespace VitalChoice.Data.Extensions
         
         public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
         {
+            if (source == null)
+                return;
+
             foreach (var element in source)
                 action(element);
         }
 
         public static async Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, Task> action)
         {
+            if (source == null)
+                return;
+
             foreach (var element in source)
                 await action(element);
         }
