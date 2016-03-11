@@ -64,6 +64,7 @@ using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -76,6 +77,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skusRepository;
         private readonly ProductMapper _productMapper;
+        private readonly SkuMapper _skuMapper;
         private readonly ICustomerService _customerService;
         private readonly IWorkflowFactory _treeFactory;
         private readonly AffiliateOrderPaymentRepository _affiliateOrderPaymentRepository;
@@ -94,6 +96,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IProductService _productService;
         private readonly INotificationService _notificationService;
         private readonly IExtendedDynamicServiceAsync<OrderPaymentMethodDynamic, OrderPaymentMethod, CustomerPaymentMethodOptionType, OrderPaymentMethodOptionValue> _paymentGenericService;
+        private readonly IEcommerceRepositoryAsync<GiftCertificate> _giftCertificatesRepository;
 
         public OrderService(
             IEcommerceRepositoryAsync<VOrder> vOrderRepository,
@@ -123,7 +126,7 @@ namespace VitalChoice.Business.Services.Orders
             IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
             IProductService productService,
             INotificationService notificationService,
-            ICountryService countryService, ITransactionAccessor<EcommerceContext> transactionAccessor)
+            ICountryService countryService, ITransactionAccessor<EcommerceContext> transactionAccessor, IEcommerceRepositoryAsync<GiftCertificate> giftCertificatesRepository, SkuMapper skuMapper)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
@@ -148,6 +151,8 @@ namespace VitalChoice.Business.Services.Orders
             _orderToGiftCertificateRepositoryAsync = orderToGiftCertificateRepositoryAsync;
             _paymentGenericService = paymentGenericService;
             _countryService = countryService;
+            _giftCertificatesRepository = giftCertificatesRepository;
+            _skuMapper = skuMapper;
             _addressMapper = addressMapper;
             _productService = productService;
             _notificationService = notificationService;
@@ -289,24 +294,24 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<OrderDataContext> CalculateOrder(OrderDynamic order, OrderStatus combinedStatus, IWorkflowTree<OrderDataContext, decimal> tree)
         {
-            var context = new OrderDataContext
+            var context = new OrderDataContext(combinedStatus)
             {
                 Order = order
             };
             await tree.ExecuteAsync(context);
-            UpdateOrderFromCalculationContext(order, context, combinedStatus);
+            UpdateOrderFromCalculationContext(order, context);
             return context;
         }
 
         public async Task<OrderDataContext> CalculateOrder(OrderDynamic order, OrderStatus combinedStatus)
         {
-            var context = new OrderDataContext
+            var context = new OrderDataContext(combinedStatus)
             {
                 Order = order
             };
             var tree = await _treeFactory.CreateTreeAsync<OrderDataContext, decimal>("Order");
             await tree.ExecuteAsync(context);
-            UpdateOrderFromCalculationContext(order, context, combinedStatus);
+            UpdateOrderFromCalculationContext(order, context);
             return context;
         }
 
@@ -327,7 +332,7 @@ namespace VitalChoice.Business.Services.Orders
             //return await SelectFirstAsync(queryObject: orderQuery, orderBy: o => o.OrderByDescending(x => x.DateCreated));
         }
 
-        private void UpdateOrderFromCalculationContext(OrderDynamic order, OrderDataContext dataContext, OrderStatus combinedStatus)
+        private void UpdateOrderFromCalculationContext(OrderDynamic order, OrderDataContext dataContext)
         {
             order.TaxTotal = dataContext.TaxTotal;
             order.Total = dataContext.Total;
@@ -335,7 +340,8 @@ namespace VitalChoice.Business.Services.Orders
             order.ShippingTotal = dataContext.ShippingTotal;
             order.ProductsSubtotal = dataContext.ProductsSubtotal;
             order.PromoSkus = dataContext.PromoSkus;
-            SetOrderSplitStatuses(dataContext, order, combinedStatus);
+            order.GeneratedGcs = dataContext.GeneratedGcs;
+            SetOrderSplitStatuses(dataContext, order);
         }
 
         public async Task OrderTypeSetup(OrderDynamic order)
@@ -397,8 +403,9 @@ namespace VitalChoice.Business.Services.Orders
             }
         }
 
-        private void SetOrderSplitStatuses(OrderDataContext model, OrderDynamic dynamic, OrderStatus combinedStatus)
+        private void SetOrderSplitStatuses(OrderDataContext model, OrderDynamic dynamic)
         {
+            var combinedStatus = model.CombinedStatus;
             if (combinedStatus == OrderStatus.Incomplete)
             {
                 if (model.SplitInfo?.ShouldSplit ?? false)
@@ -1794,6 +1801,29 @@ namespace VitalChoice.Business.Services.Orders
             }
 
             return toReturn;
+        }
+
+        public async Task CancelOrder(int id, POrderType part = POrderType.All)
+        {
+            var order = SelectAsync(id);
+            
+        }
+
+        public async Task<ICollection<GeneratedGiftCertificate>> GetGeneratedGcs(int id)
+        {
+            var gcs = await _giftCertificatesRepository.Query(g => g.IdOrder == id)
+                .Include(g => g.Sku)
+                .ThenInclude(s => s.OptionValues)
+                .Include(g => g.Sku)
+                .ThenInclude(s => s.Product)
+                .ThenInclude(p => p.OptionValues)
+                .SelectAsync(false);
+            return gcs.Select(g => new GeneratedGiftCertificate
+            {
+                Sku = _skuMapper.FromEntity(g.Sku, true),
+                Balance = g.Balance,
+                Id = g.Id
+            }).ToList();
         }
 
         #endregion

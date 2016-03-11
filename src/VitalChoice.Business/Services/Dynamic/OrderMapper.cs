@@ -152,7 +152,7 @@ namespace VitalChoice.Business.Services.Dynamic
                     }
                 }
 
-                dynamic.GcsGenerated = entity.GiftCertificatesGenerated.Select(g => new GeneratedGiftCertificate
+                dynamic.GeneratedGcs = entity.GiftCertificatesGenerated.Select(g => new GeneratedGiftCertificate
                 {
                     Sku = _skuMapper.FromEntity(g.Sku, true),
                     Id = g.Id,
@@ -235,7 +235,7 @@ namespace VitalChoice.Business.Services.Dynamic
                     }).ToList();
                 }
 
-                entity.GiftCertificatesGenerated = dynamic.GcsGenerated.Select(g => new GiftCertificate
+                entity.GiftCertificatesGenerated = dynamic.GeneratedGcs.Select(g => new GiftCertificate
                 {
                     IdSku = g.Sku.Id,
                     Balance = g.Balance,
@@ -360,7 +360,7 @@ namespace VitalChoice.Business.Services.Dynamic
                     entity.GiftCertificatesGenerated = new List<GiftCertificate>();
                 }
 
-                entity.GiftCertificatesGenerated.MergeKeyed(dynamic.GcsGenerated, g => g.Id, g => g.Id, src => new GiftCertificate
+                entity.GiftCertificatesGenerated.MergeKeyed(dynamic.GeneratedGcs, g => g.Id, g => g.Id, src => new GiftCertificate
                 {
                     IdSku = src.Sku.Id,
                     Balance = src.Balance,
