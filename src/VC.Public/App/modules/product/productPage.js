@@ -49,6 +49,38 @@ window.addEventListener("load", function ()
 
 	$("body").on("click", ".proposals-item-link", addCrossToCart);
 
+	$("body").on("click", ".product-autoship-link", function() {
+		$("<div title='Set Up My New Auto-Ship' class='autoship-confirm-dialog'>" +
+			"Enjoy Free Shipping and Discount* on every Auto-Shipment!<ul><li>Upon clicking Proceed, any items in your Cart will be replaced<br>with this Auto-Ship item, and no other items can be added later.</li><li>Just complete this Auto-Ship order*, then shop to fill a new Cart.</li><li>If you don't want to Proceed with this Auto-Ship order, click Cancel.</li></ul>*Cannot be combined with other offers. Not available to Canadian or other international addresses.</div>").dialog({
+			resizable: false,
+			modal: true,
+			minWidth: defaultModalSize,
+			close: function() {
+				$(this).dialog('destroy').remove();
+			},
+			buttons: [
+				{
+					text: "Proceed",
+					'class': "main-dialog-button",
+					click: function() {
+						var jChecked = $("input[name=sku]:checked");
+						sku = jChecked.val();
+
+						window.location.href = "/Cart/AutoShip?skuCode=" + sku;
+					}
+				},
+				{
+					text: "Cancel",
+					click: function() {
+						$(this).dialog("close");
+					}
+				}
+			]
+		});
+
+		return false;
+	});
+
 	$(".product-action-right .out-of-stock a").click(function (e)
 	{
 	    $.ajax({

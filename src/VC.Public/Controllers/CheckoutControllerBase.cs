@@ -20,6 +20,7 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
@@ -35,6 +36,7 @@ namespace VC.Public.Controllers
 		protected readonly IOrderService OrderService;
 		protected readonly IDynamicMapper<SkuDynamic, Sku> SkuMapper;
 		protected readonly IDynamicMapper<ProductDynamic, Product> ProductMapper;
+		protected readonly ReferenceData AppInfrastructure;
 
 		protected CheckoutControllerBase(IHttpContextAccessor contextAccessor, ICustomerService customerService,
             IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService, ICheckoutService checkoutService, IOrderService orderService, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper) :base(contextAccessor, customerService,
@@ -43,7 +45,8 @@ namespace VC.Public.Controllers
 			OrderService = orderService;
 			SkuMapper = skuMapper;
 			ProductMapper = productMapper;
-		}
+			AppInfrastructure = infrastructureService.Get();
+        }
 
 		protected async Task<bool> IsCartEmpty()
 		{

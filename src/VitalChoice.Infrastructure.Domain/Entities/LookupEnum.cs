@@ -23,5 +23,7 @@
         public const string PromotionBuyTypes = "PromotionBuyTypes";
 
         public const string ShippingUpgrades = "ShippingUpgrade";
+
+        public const string AutoShipSchedule = "AutoShipSchedule";
     }
 }

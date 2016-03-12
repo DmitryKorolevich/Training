@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
+using Microsoft.AspNet.Mvc.Rendering;
 using VC.Public.Helpers;
 using VC.Public.Models.Cart;
 using VitalChoice.Core.Infrastructure;
@@ -238,5 +239,51 @@ namespace VC.Public.Controllers
             SetCartUid(cart.CartUid);
             return model;
         }
-    }
+
+		[HttpGet]
+		public async Task<IActionResult> AutoShip(string skuCode)
+		{
+			var sku = await _productService.GetSkuOrderedAsync(skuCode);
+
+			var options = AppInfrastructure.AutoShipOptions;
+
+			var lookup = new List<SelectListItem>();
+			if (sku.Sku.Data.AutoShipFrequency1)
+			{
+				var option = options.Single(x => x.Key == 1);
+				lookup.Add(new SelectListItem() { Value = option.Key.ToString(), Text = option.Text });
+			}
+			if (sku.Sku.Data.AutoShipFrequency2)
+			{
+				var option = options.Single(x => x.Key == 2);
+				lookup.Add(new SelectListItem() { Value = option.Key.ToString(), Text = option.Text });
+			}
+			if (sku.Sku.Data.AutoShipFrequency3)
+			{
+				var option = options.Single(x => x.Key == 3);
+				lookup.Add(new SelectListItem() { Value = option.Key.ToString(), Text = option.Text });
+			}
+			if (sku.Sku.Data.AutoShipFrequency6)
+			{
+				var option = options.Single(x => x.Key == 6);
+				lookup.Add(new SelectListItem() { Value = option.Key.ToString(), Text = option.Text });
+			}
+
+			ViewBag.AutoShipOptions = lookup;
+
+			return View("AutoShip", new AutoShipModel()
+			{
+				SkuCode = sku.Sku.Code,
+				DisplayName = $"{sku.Sku.Product.Name} {sku.Sku.Product.Data.SubTitle} ({sku.Sku.Data.QTY})",
+				IdSchedule = lookup.FirstOrDefault() != null ? Convert.ToInt32(lookup.First().Value):0,
+				ProductUrl = sku.Sku.Product.Url
+			});
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> AutoShip(AutoShipModel model)
+		{
+			return null;
+		}
+	}
 }

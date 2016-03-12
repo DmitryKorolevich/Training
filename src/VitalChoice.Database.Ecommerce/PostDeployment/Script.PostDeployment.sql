@@ -35,3 +35,4 @@ Post-Deployment Script Template
 :r .\Scripts\VCustomerFavorites.sql
 :r .\Scripts\InventorySkuData.sql
 :r .\Scripts\VTopProducts.sql
+:r .\Scripts\AutoShip.sql
