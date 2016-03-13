@@ -48,7 +48,7 @@ namespace VitalChoice.Caching.Services
                             var pk = op.Key.ToPrimaryKey(pkInfo);
                             if (internalCache.ItemExist(pk))
                             {
-                                entity = KeyStorage.GetEntity(type, op.Key.Values);
+                                entity = KeyStorage.GetEntity(type, pk);
                                 internalCache.Update(entity);
                             }
                             break;
