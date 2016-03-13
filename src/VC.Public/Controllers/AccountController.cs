@@ -49,7 +49,7 @@ namespace VC.Public.Controllers
 		}
 
         [HttpGet]
-        public IActionResult Login(string alreadyTakenEmail = null, bool forgot = false, int? type=null)
+        public IActionResult Login(string alreadyTakenEmail = null, bool forgot = false, int? type=null, string returnUrl = null)
         {
             if (!string.IsNullOrWhiteSpace(alreadyTakenEmail))
             {
@@ -57,13 +57,14 @@ namespace VC.Public.Controllers
             }
             ViewBag.ForgotPassSuccess = forgot;
             ViewBag.Type = type;
+	        ViewBag.ReturnUrl = returnUrl;
 
-            return View(new LoginModel());
+			return View(new LoginModel());
         }
 
 	    [HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Login(LoginModel model, string returnUrl)
+		public async Task<IActionResult> Login(LoginModel model, [FromQuery] string returnUrl)
 	    {
 			ViewBag.ReturnUrl = returnUrl;
 			if (!ModelState.IsValid)

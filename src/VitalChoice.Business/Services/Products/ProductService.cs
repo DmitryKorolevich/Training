@@ -270,7 +270,21 @@ namespace VitalChoice.Business.Services.Products
             return await _orderSkusRepositoryRepository.GetTopPurchasedSkuIdsAsync(filter, idCustomer);
         }
 
-        public async Task<SkuOrdered> GetSkuOrderedAsync(string code)
+	    private async Task<SkuOrdered> PopulateSkuOrderedWithUrlAsync(Sku sku)
+	    {
+			var skuDynamic = await _skuMapper.FromEntityAsync(sku, true);
+			var skuOrdered = new SkuOrdered
+			{
+				Sku = skuDynamic
+			};
+
+			var productUrl = _productContentRepository.Query(p => p.Id == sku.IdProduct).Select(p => p.Url, false).FirstOrDefault();
+			skuOrdered.Sku.Product.Url = productUrl;
+
+			return skuOrdered;
+		}
+
+	    public async Task<SkuOrdered> GetSkuOrderedAsync(string code)
         {
             if (code == null)
                 throw new ArgumentNullException(nameof(code));
@@ -288,11 +302,8 @@ namespace VitalChoice.Business.Services.Products
                     .SelectFirstOrDefaultAsync(false);
             if (sku == null)
                 return null;
-            var skuDynamic = await _skuMapper.FromEntityAsync(sku, true);
-            return new SkuOrdered
-            {
-                Sku = skuDynamic
-            };
+            
+	        return await PopulateSkuOrderedWithUrlAsync(sku);
         }
 
         public async Task<SkuOrdered> GetSkuOrderedAsync(int id)
@@ -305,11 +316,9 @@ namespace VitalChoice.Business.Services.Products
                     .Include(s => s.Product)
                     .ThenInclude(p => p.ProductsToCategories)
                     .SelectFirstOrDefaultAsync(false);
-            return new SkuOrdered
-            {
-                Sku = await _skuMapper.FromEntityAsync(sku, true)
-            };
-        }
+
+			return await PopulateSkuOrderedWithUrlAsync(sku);
+		}
 
         public async Task<List<SkuOrdered>> GetSkusOrderedAsync(ICollection<string> codes)
         {
@@ -327,11 +336,15 @@ namespace VitalChoice.Business.Services.Products
                     .Include(s => s.Product)
                     .ThenInclude(p => p.ProductsToCategories)
                     .SelectAsync(false);
-            var skusDynamic = await _skuMapper.FromEntityRangeAsync(skus, true);
-            return skusDynamic.Select(sku => new SkuOrdered
-            {
-                Sku = sku
-            }).ToList();
+
+			var res = new List<SkuOrdered>();
+	        foreach (var temp in skus)
+	        {
+				var skuOrdered = await PopulateSkuOrderedWithUrlAsync(temp);
+				res.Add(skuOrdered);
+			}
+
+	        return res;
         }
 
         public async Task<List<SkuOrdered>> GetSkusOrderedAsync(ICollection<int> ids)
@@ -351,12 +364,15 @@ namespace VitalChoice.Business.Services.Products
                     .ThenInclude(p => p.ProductsToCategories)
                     .SelectAsync(false);
 
-            var skusDynamic = await _skuMapper.FromEntityRangeAsync(skus, true);
-            return skusDynamic.Select(sku => new SkuOrdered
-            {
-                Sku = sku
-            }).ToList();
-        }
+			var res = new List<SkuOrdered>();
+			foreach (var temp in skus)
+			{
+				var skuOrdered = await PopulateSkuOrderedWithUrlAsync(temp);
+				res.Add(skuOrdered);
+			}
+
+			return res;
+		}
 
         public async Task<SkuDynamic> GetSkuAsync(string code, bool withDefaults = false)
         {

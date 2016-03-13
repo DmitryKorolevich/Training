@@ -241,9 +241,10 @@ namespace VC.Public.Controllers
         }
 
 		[HttpGet]
-		public async Task<IActionResult> AutoShip(string skuCode)
+		[CustomerAuthorize]
+		public async Task<IActionResult> AutoShip(string id)
 		{
-			var sku = await _productService.GetSkuOrderedAsync(skuCode);
+			var sku = await _productService.GetSkuOrderedAsync(id);
 
 			var options = AppInfrastructure.AutoShipOptions;
 
@@ -281,6 +282,8 @@ namespace VC.Public.Controllers
 		}
 
 		[HttpPost]
+		[CustomerAuthorize]
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> AutoShip(AutoShipModel model)
 		{
 			return null;

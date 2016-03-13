@@ -66,7 +66,7 @@ window.addEventListener("load", function ()
 						var jChecked = $("input[name=sku]:checked");
 						sku = jChecked.val();
 
-						window.location.href = "/Cart/AutoShip?skuCode=" + sku;
+						window.location.href = "/Cart/AutoShip/" + sku;
 					}
 				},
 				{
