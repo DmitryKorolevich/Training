@@ -379,6 +379,11 @@ namespace VitalChoice.Caching.Services.Cache
             return true;
         }
 
+        public bool ItemExist(EntityKey pk)
+        {
+            return CacheStorage.AllCacheDatas.Any(d => d.ItemExist(pk));
+        }
+
         public bool GetCacheExist(RelationInfo relationInfo)
         {
             return CacheStorage.GetCacheExist(relationInfo);
@@ -393,78 +398,6 @@ namespace VitalChoice.Caching.Services.Cache
         {
             return CacheStorage.AllCacheDatas;
         }
-
-        //public EntityForeignKey GetForeignKeyValue(T entity, EntityForeignKeyInfo foreignKeyInfo)
-        //{
-        //    return CacheStorage.GetForeignKeyValue(entity, foreignKeyInfo);
-        //}
-
-        //public ICollection<KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>> GetForeignKeyValues(T entity)
-        //{
-        //    return CacheStorage.GetForeignKeyValues(entity);
-        //}
-
-        //public EntityIndex GetNonUniqueIndexValue(T entity, EntityCacheableIndexInfo indexInfo)
-        //{
-        //    return CacheStorage.GetNonUniqueIndexValue(entity, indexInfo);
-        //}
-
-        //public ICollection<KeyValuePair<EntityCacheableIndexInfo, EntityIndex>> GetNonUniqueIndexValues(T entity)
-        //{
-        //    return CacheStorage.GetNonUniqueIndexValues(entity);
-        //}
-
-        //public EntityKey GetPrimaryKeyValue(T entity)
-        //{
-        //    return CacheStorage.GetPrimaryKeyValue(entity);
-        //}
-
-        //public EntityIndex GetIndexValue(T entity)
-        //{
-        //    return CacheStorage.GetIndexValue(entity);
-        //}
-
-        //public EntityIndex GetConditionalIndexValue(T entity, EntityConditionalIndexInfo conditionalInfo)
-        //{
-        //    return CacheStorage.GetConditionalIndexValue(entity, conditionalInfo);
-        //}
-
-        //public EntityForeignKey GetForeignKeyValue(object entity, EntityForeignKeyInfo foreignKeyInfo)
-        //{
-        //    return CacheStorage.GetForeignKeyValue(entity, foreignKeyInfo);
-        //}
-
-        //public ICollection<KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>> GetForeignKeyValues(object entity)
-        //{
-        //    return CacheStorage.GetForeignKeyValues(entity);
-        //}
-
-        //public EntityIndex GetNonUniqueIndexValue(object entity, EntityCacheableIndexInfo indexInfo)
-        //{
-        //    return CacheStorage.GetNonUniqueIndexValue(entity, indexInfo);
-        //}
-
-        //public ICollection<KeyValuePair<EntityCacheableIndexInfo, EntityIndex>> GetNonUniqueIndexValues(object entity)
-        //{
-        //    return CacheStorage.GetNonUniqueIndexValues(entity);
-        //}
-
-        //public EntityKey GetPrimaryKeyValue(object entity)
-        //{
-        //    return CacheStorage.GetPrimaryKeyValue(entity);
-        //}
-
-        //public EntityIndex GetIndexValue(object entity)
-        //{
-        //    return CacheStorage.GetIndexValue(entity);
-        //}
-
-        //public EntityIndex GetConditionalIndexValue(object entity, EntityConditionalIndexInfo conditionalInfo)
-        //{
-        //    return CacheStorage.GetConditionalIndexValue(entity, conditionalInfo);
-        //}
-
-        //public ICollection<KeyValuePair<Type, EntityCacheableIndexRelationInfo>> DependentTypes => CacheStorage.DependentTypes;
 
         public void Dispose()
         {

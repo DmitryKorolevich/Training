@@ -45,8 +45,12 @@ namespace VitalChoice.Caching.Services
                     switch (op.SyncType)
                     {
                         case SyncType.Update:
-                            entity = KeyStorage.GetEntity(type, op.Key.Values);
-                            internalCache.Update(entity);
+                            var pk = op.Key.ToPrimaryKey(pkInfo);
+                            if (internalCache.ItemExist(pk))
+                            {
+                                entity = KeyStorage.GetEntity(type, op.Key.Values);
+                                internalCache.Update(entity);
+                            }
                             break;
                         case SyncType.Delete:
                             internalCache.TryRemove(op.Key.ToPrimaryKey(pkInfo));

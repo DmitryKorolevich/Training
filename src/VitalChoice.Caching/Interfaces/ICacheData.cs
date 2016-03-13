@@ -15,6 +15,7 @@ namespace VitalChoice.Caching.Interfaces
         CachedEntity GetUntyped(EntityKey pk);
         IEnumerable<CachedEntity> GetAllUntyped();
         CachedEntity TryRemoveUntyped(EntityKey key);
+        bool ItemExist(EntityKey key);
         bool GetHasRelation(string name);
         bool FullCollection { get; }
         bool NeedUpdate { get; set; }

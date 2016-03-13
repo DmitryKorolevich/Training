@@ -128,6 +128,11 @@ namespace VitalChoice.Caching.Services.Cache
             return TryRemove(key);
         }
 
+        public bool ItemExist(EntityKey key)
+        {
+            return _mainCluster.Exist(key);
+        }
+
         public bool GetHasRelation(string name)
         {
             if (string.IsNullOrWhiteSpace(name))

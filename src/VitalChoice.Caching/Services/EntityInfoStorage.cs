@@ -321,6 +321,12 @@ namespace VitalChoice.Caching.Services
             return caller.GetEntity(keyValues);
         }
 
+        public object GetEntity(Type entityType, EntityKey pk)
+        {
+            var caller = (IGetEntityCaller)Activator.CreateInstance(typeof(GetEntityCaller<>).MakeGenericType(entityType), this);
+            return caller.GetEntity(pk);
+        }
+
         public ICollection<EntityCacheableIndexInfo> GetNonUniqueIndexInfos(Type entityType)
         {
             EntityInfo entityInfo;
@@ -369,16 +375,37 @@ namespace VitalChoice.Caching.Services
                         if (context != null)
                         {
                             var set = context.Set<T>();
-                            var parameter = Expression.Parameter(typeof (T));
-                            Expression conditionalExpression = null;
-                            foreach (var keyValue in keyValues)
-                            {
-                                var part =
-                                    Expression.Equal(
-                                        Expression.MakeMemberAccess(parameter, typeof (T).GetRuntimeProperty(keyValue.Name)),
-                                        Expression.Constant(keyValue.Value));
-                                conditionalExpression = conditionalExpression == null ? part : Expression.And(conditionalExpression, part);
-                            }
+                            ParameterExpression parameter;
+                            var conditionalExpression = GetConditionalExpression<T>(keyValues, out parameter);
+
+                            if (conditionalExpression == null)
+                                return null;
+
+                            return
+                                set.AsNoTracking()
+                                    .AsNonCached()
+                                    .FirstOrDefault(Expression.Lambda<Func<T, bool>>(conditionalExpression, parameter));
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        public T GetEntity<T>(EntityKey pk) where T : class
+        {
+            using (var scope = _serviceProvider.BeginLifetimeScope())
+            {
+                var contextType = GetContextType<T>();
+                if (contextType != null)
+                {
+                    using (var context = scope.Resolve(contextType) as DbContext)
+                    {
+                        if (context != null)
+                        {
+                            var set = context.Set<T>();
+                            ParameterExpression parameter;
+                            var conditionalExpression = GetConditionalExpression<T>(pk, out parameter);
 
                             if (conditionalExpression == null)
                                 return null;
@@ -501,6 +528,39 @@ namespace VitalChoice.Caching.Services
             return _gcCollector.CanAddUpCache();
         }
 
+        private static Expression GetConditionalExpression<T>(EntityKey pk, out ParameterExpression parameter) where T : class
+        {
+            parameter = Expression.Parameter(typeof (T));
+            Expression conditionalExpression = null;
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (var keyValue in pk.Values)
+            {
+                var part =
+                    Expression.Equal(
+                        Expression.MakeMemberAccess(parameter, typeof (T).GetRuntimeProperty(keyValue.ValueInfo.Name)),
+                        Expression.Constant(keyValue.Value));
+                conditionalExpression = conditionalExpression == null ? part : Expression.And(conditionalExpression, part);
+            }
+            return conditionalExpression;
+        }
+
+        private static Expression GetConditionalExpression<T>(ICollection<EntityValueExportable> keyValues,
+            out ParameterExpression parameter) where T : class
+        {
+            parameter = Expression.Parameter(typeof (T));
+            Expression conditionalExpression = null;
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (var keyValue in keyValues)
+            {
+                var part =
+                    Expression.Equal(
+                        Expression.MakeMemberAccess(parameter, typeof (T).GetRuntimeProperty(keyValue.Name)),
+                        Expression.Constant(keyValue.Value));
+                conditionalExpression = conditionalExpression == null ? part : Expression.And(conditionalExpression, part);
+            }
+            return parameter;
+        }
+
         private static IEnumerable<EntityValueInfo> CreateValueInfos(IEnumerable<IProperty> properties)
         {
             return properties.Select(
@@ -511,6 +571,7 @@ namespace VitalChoice.Caching.Services
         private interface IGetEntityCaller
         {
             object GetEntity(ICollection<EntityValueExportable> keyValues);
+            object GetEntity(EntityKey pk);
         }
 
         private struct GetEntityCaller<T> : IGetEntityCaller
@@ -526,6 +587,11 @@ namespace VitalChoice.Caching.Services
             public object GetEntity(ICollection<EntityValueExportable> keyValues)
             {
                 return _infoStorage.GetEntity<T>(keyValues);
+            }
+
+            public object GetEntity(EntityKey pk)
+            {
+                return _infoStorage.GetEntity<T>(pk);
             }
         }
     }
