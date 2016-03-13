@@ -286,7 +286,20 @@ namespace VC.Public.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> AutoShip(AutoShipModel model)
 		{
-			return null;
+			var existingUid = Request.GetCartUid();
+
+			var id = GetInternalCustomerId();
+			var cart = await _checkoutService.GetOrCreateCart(existingUid, id);
+
+			cart.Order.PromoSkus.Clear();
+			cart.Order.Skus.Clear();
+			//todo:anything else?
+
+			await _checkoutService.UpdateCart(cart);
+
+			await AddToCart(model.SkuCode);
+
+			return RedirectToAction("AddUpdateBillingAddress", "Checkout");
 		}
 	}
 }
