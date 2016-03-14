@@ -198,8 +198,8 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
                 PortionsCount = x.Data.QTY,
                 InStock = (x.SafeData.DisregardStock !=null && x.SafeData.DisregardStock == true) || x.SafeData.DisregardStock==null
                     || x.SafeData.Stock>0,
-				AutoShip = x.Data.AutoShipProduct
-			}).ToList();
+				AutoShip = x.SafeData.AutoShipProduct!=null ? x.Data.AutoShipProduct : false,
+            }).ToList();
             toReturn.YoutubeVideos = new List<TtlRelatedYoutubeVideoModel>()
             {
                 new TtlRelatedYoutubeVideoModel()

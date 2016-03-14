@@ -41,5 +41,7 @@ namespace VC.Public.Models.Cart
 
 		[Map]
 	    public string SubTitle { get; set; }
+
+        public ICollection<string> GeneratedGCCodes { get; set; }
     }
 }

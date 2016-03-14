@@ -1233,3 +1233,74 @@ WHERE Id = (SELECT TOP 1 [ContentItemId] FROM [dbo].[ContentPages] WHERE [Url] =
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentProcessors] WHERE [Type] = N'CatalogRequestProcessor')
+BEGIN
+	DECLARE @id int
+
+	INSERT INTO [dbo].[ContentProcessors]
+	(Id, [Type], Name, Description)
+	VALUES
+	(24, N'CatalogRequestProcessor', N'Catalog Request Processor', N'Get current customer and transform to a catalog request')
+
+	INSERT INTO ContentItemsToContentProcessors
+	(ContentItemId,ContentItemProcessorId)
+	VALUES
+	((SELECT TOP 1 Id FROM ContentPages WHERE Url='request-catalog'), 24)
+
+	UPDATE ContentItems
+	SET Template='<%
+<body:body>
+{{
+    @script(){{
+        <script src="https://www.google.com/recaptcha/api.js?onload=onloadRecaptchaCallback&render=explicit" async defer></script>
+        <script src="/app/common/dataAccess.js"></script>
+        <script src="/app/modules/auth/registration.js"></script>		
+        <script src="/app/modules/content/request-catalog.js"></script>
+    }}
+    <h4>Request a Catalog</h4>
+    <p>
+        <strong>The award-winning* Vital Choice catalog is an easy way to shop and offers a convenient way to plan your next order.</strong>
+    </p>
+    <p>
+        Call toll free 800-608-4825 to order catalogs ...
+        ... and to send some to your friends and family!
+    </p>
+    <p>
+        Or, fill in the form below, and click "Sign Up".
+    </p>
+    <p>
+        We''ll send one of our new catalogs to that address ... simply repeat the process to send our catalog to other addresses.
+    </p>
+    @razor(@model.CatalogRequest){{~/Views/Help/_RequestCatalog.cshtml}}
+    <div class="clear"></div>
+    <p>
+        *Our 2009 Holiday Season catalog won the 2010 Gold Award from Multichannel Merchant. 
+    </p>
+    <p>
+        <strong>To our International Friends</strong>
+    </p>
+    <ul>
+        <li>We can only mail our catalogs to U.S. and Canadian addresses. </li>
+        <li>
+            Our ability to ship packages outside of the United States and Canada is very limited.
+        </li>
+        <li>
+            We can only ship non-perishable items to U.S. territories and a few other destinations
+            outside the U.S. and Canada.
+        </li>
+        <li>Shipments of perishable items to Hawaii and Alaska involve extra fees. </li>
+        <li>All shipments to Canada incur surcharges. </li>
+    </ul>
+    <p>
+        For full information, see our <a href="#">Shipping Policies</a>. 
+    </p>
+    <p>
+        If you still have questions about the feasibility and cost of a shipment to an address outside the continental US, send your inquiries to <a href="mailto:info@{@}@vitalchoice.com">info@{@}@vitalchoice.com</a>.
+    </p>  
+}}
+%>'
+	WHERE Id =(SELECT TOP 1 ContentItemId FROM ContentPages WHERE Url='request-catalog')
+END
+
+GO

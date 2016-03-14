@@ -3,7 +3,7 @@ using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Validation.Models;
 
-namespace VC.Public.Models.Help
+namespace VitalChoice.Business.Models.Help
 {
     public class CatalogRequestAddressModel : BaseModel
     {

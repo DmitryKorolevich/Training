@@ -1829,6 +1829,7 @@ namespace VitalChoice.Business.Services.Orders
             return gcs.Select(g => new GeneratedGiftCertificate
             {
                 Sku = _skuMapper.FromEntity(g.Sku, true),
+                Code = g.Code,
                 Balance = g.Balance,
                 Id = g.Id
             }).ToList();

@@ -77,7 +77,10 @@ namespace VitalChoice.Business.ModelConverters
                 _productMapper.UpdateModel(result, sku.Sku.Product);
                 result.Price = sku.Amount;
                 result.Quantity = sku.Quantity;
-                result.SubTotal = sku.Quantity * sku.Amount; 
+                result.SubTotal = sku.Quantity * sku.Amount;
+
+                result.GeneratedGCCodes = dynamic.GeneratedGcs?.Where(g => g?.Sku.Id == sku.Sku.Id).Select(p => p.Code).ToList();
+
                 return result;
             }) ?? Enumerable.Empty<SkuEmailItem>());
 
@@ -98,6 +101,9 @@ namespace VitalChoice.Business.ModelConverters
                 result.Price = sku.Amount;
                 result.Quantity = sku.Quantity;
                 result.SubTotal = sku.Quantity * sku.Amount;
+
+                result.GeneratedGCCodes = dynamic.GeneratedGcs?.Where(g => g?.Sku.Id == sku.Sku.Id).Select(p => p.Code).ToList();
+
                 return result;
             }) ?? Enumerable.Empty<SkuEmailItem>());
 

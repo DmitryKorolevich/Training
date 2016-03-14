@@ -34,6 +34,7 @@ using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Routing;
 using Microsoft.AspNet.Mvc.Abstractions;
 using System.Net;
+using VitalChoice.Business.Models.Help;
 using VitalChoice.Infrastructure.Domain.Mail;
 
 namespace VC.Public.Controllers

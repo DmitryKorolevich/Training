@@ -1210,24 +1210,24 @@ INSERT INTO [dbo].[ContentItems]
                         				<tr>
                         					<td align="left" valign="top" style="padding: 5px 25px 5px 10px; font-size: 13px; color: #6d6e72; font-family: Arial, helvetica, sans-serif;">
                                                 @(BillToAddress.FirstName) @(BillToAddress.LastName)<br />
-												@if(BillToAddress.Company){{
+                                                @if(BillToAddress.Company){{
                                                 @(BillToAddress.Company)<br />
-												}}
+                                                }}
                                                 @(BillToAddress.Address1)<br />
-												@if(BillToAddress.Address2){{
+                                                @if(BillToAddress.Address2){{
                                                 @(BillToAddress.Address2)<br />
-												}}
+                                                }}
                                                 @(BillToAddress.City), @(BillToAddress.StateCodeOrCounty) @(BillToAddress.Zip) @(BillToAddress.Country)
                                             </td>
                         					<td align="left" valign="top" style="padding: 5px 25px 5px 10px; font-size: 13px; color: #6d6e72; font-family: Arial, helvetica, sans-serif;">
                                                 @(ShipToAddress.FirstName) @(ShipToAddress.LastName)<br />
-												@if(ShipToAddress.Company){{
+                                                @if(ShipToAddress.Company){{
                                                 @(ShipToAddress.Company)<br />
-												}}
+                                                }}
                                                 @(ShipToAddress.Address1)<br />
-												@if(BillToAddress.Address2){{
+                                                @if(ShipToAddress.Address2){{
                                                 @(ShipToAddress.Address2)<br />
-												}}
+                                                }}
                                                 @(ShipToAddress.City), @(ShipToAddress.StateCodeOrCounty) @(ShipToAddress.Zip) @(ShipToAddress.Country)
                                             </td>
                         					<td align="left" valign="top" style="padding: 5px 0 5px 5px; font-size: 13px; color: #6d6e72; font-family: Arial, helvetica, sans-serif;">
@@ -1333,6 +1333,9 @@ INSERT INTO [dbo].[ContentItems]
                                                 </td>
                                                 <td align="left" style="padding:0 10px 0 0; font-size:13px; color:#6d6e72; font-family:Arial, helvetica, sans-serif; min-width:100px">
                                                     @(DisplayName)
+                                                    @list(GeneratedGCCodes){{
+                                                        <br /><em>GC Code: @(@model)</em>
+                                                    }}
                                                 </td>
                                                 <td align="left" style="padding:0 5px 0 5px; font-size:13px; color:#6d6e72; font-family:Arial, helvetica, sans-serif;">
                                                     @(Quantity)
@@ -1378,6 +1381,9 @@ INSERT INTO [dbo].[ContentItems]
                                                     </td>
                                                     <td align="left" style="padding:0 10px 0 0; font-size:13px; color:#6d6e72; font-family:Arial, helvetica, sans-serif; min-width:100px">
                                                         @(DisplayName)
+                                                        @list(GeneratedGCCodes){{
+                                                            <br /><em>GC Code: @(@model)</em>
+                                                        }}
                                                     </td>
                                                     <td align="left" style="padding:0 5px 0 5px; font-size:13px; color:#6d6e72; font-family:Arial, helvetica, sans-serif;">
                                                         @(Quantity)

@@ -106,6 +106,9 @@ namespace VC.Public.Controllers
                     result.Price = sku.Amount;
                     result.Quantity = sku.Quantity;
                     result.SubTotal = sku.Quantity * sku.Amount;
+
+                    result.GeneratedGCCodes = order.GeneratedGcs?.Where(g => g?.Sku.Id == sku.Sku.Id).Select(p => p.Code).ToList();
+
                     return result;
                 }) ?? Enumerable.Empty<CartSkuModel>());
             var gcsInCart = cartModel.GiftCertificateCodes.ToArray();
@@ -148,6 +151,9 @@ namespace VC.Public.Controllers
                 result.Price = sku.Amount;
                 result.Quantity = sku.Quantity;
                 result.SubTotal = sku.Quantity * sku.Amount;
+
+                result.GeneratedGCCodes = order.GeneratedGcs?.Where(g => g?.Sku.Id == sku.Sku.Id).Select(p => p.Code).ToList();
+
                 return result;
             }) ?? Enumerable.Empty<CartSkuModel>());
 			cartModel.Tax = order.TaxTotal;
