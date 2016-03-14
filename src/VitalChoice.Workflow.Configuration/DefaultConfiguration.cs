@@ -43,7 +43,7 @@ namespace VitalChoice.Workflow.Configuration
             setup.Action<OrderSubTotalAction>("SubTotal", action =>
             {
                 action.Aggregate<ProductsWithPromoAction>();
-                action.Aggregate<DiscountTypeActionResolver>();
+                action.Aggregate<ReductionTypeActionResolver>();
                 action.Aggregate<ShippingStandardResolver>();
                 action.Aggregate<ShippingSurchargeResolver>();
                 action.Aggregate<ShippingUpgradesActionResolver>();
@@ -78,7 +78,7 @@ namespace VitalChoice.Workflow.Configuration
 
             setup.Action<ProductsWithPromoAction>("PromoProducts", action =>
             {
-                action.Dependency<DiscountTypeActionResolver>();
+                action.Dependency<ReductionTypeActionResolver>();
                 action.Dependency<BuyXGetYPromoAction>();
                 action.Aggregate<ProductAction>();
             });
@@ -166,7 +166,17 @@ namespace VitalChoice.Workflow.Configuration
                     "ShippingSurchargeCa");
             });
 
-            setup.ActionResolver<DiscountTypeActionResolver>("Discount", action =>
+			setup.ActionResolver<ReductionTypeActionResolver>("Reduction", action =>
+			{
+				action.ResolvePath<AutoShipAction>((int)ReductionType.AutoShip, "AutoShip");
+				action.ResolvePath<DiscountTypeActionResolver>((int)ReductionType.Discount, "Discount");
+			});
+
+			setup.Action<AutoShipAction>("AutoShip", action =>
+			{
+			});
+
+			setup.ActionResolver<DiscountTypeActionResolver>("Discount", action =>
             {
                 action.Dependency<PerishableProductsAction>();
 
@@ -179,7 +189,7 @@ namespace VitalChoice.Workflow.Configuration
 
             setup.ActionResolver<ShippingStandardResolver>("StandardShipping", action =>
             {
-                action.Dependency<DiscountTypeActionResolver>();
+                action.Dependency<ReductionTypeActionResolver>();
                 action.ResolvePath<StandardShippingUsWholesaleAction>((int) CustomerType.Wholesale, "StandardWholesaleShipping");
                 action.ResolvePath<StandardShippingUsCaRetailAction>((int) CustomerType.Retail, "StandardRetailShipping");
             });
