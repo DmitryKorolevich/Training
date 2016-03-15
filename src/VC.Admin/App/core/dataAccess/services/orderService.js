@@ -55,6 +55,11 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	        return $http.post(baseUrl + 'SendOrderShippingConfirmationEmail/{0}'.format(id), model, getConfig(tracker));
 	    },
 
+	    getIsBrontoSubscribed: function (email, tracker)
+	    {
+	        return $http.get(baseUrl + 'GetIsBrontoSubscribed/{0}'.format(email), getConfig(tracker));
+	    },	    
+
 	    //orders region sales statistic
 	    getOrdersRegionStatistic: function (filter, tracker)
 	    {

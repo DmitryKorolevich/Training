@@ -76,6 +76,7 @@ using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Business.Services.Healthwise;
 using VitalChoice.Interfaces.Services.Healthwise;
 using Microsoft.Extensions.Logging;
+using VitalChoice.Business.Services.Bronto;
 using VitalChoice.Business.Services.Checkout;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Business.Services.Ecommerce;
@@ -346,6 +347,15 @@ namespace VitalChoice.Core.DependencyInjection
                 ServiceBusQueueName = section["ServiceBusQueueName"],
                 Enabled = Convert.ToBoolean(section["Enabled"])
             };
+            section = configuration.GetSection("App:Bronto");
+            options.Bronto = new BrontoSettings
+            {
+                ApiKey = section["ApiKey"],
+                ApiUrl = section["ApiUrl"],
+                PublicFormUrl = section["PublicFormUrl"],
+                PublicFormSendData = section["PublicFormSendData"],
+                PublicFormSubscribeData = section["PublicFormSubscribeData"],
+            };
         }
 
         private static void ConfigureBaseOptions(IConfiguration configuration, AppOptionsBase options)
@@ -506,6 +516,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<ContentCrossSellService>().As<IContentCrossSellService>().InstancePerLifetimeScope();
             builder.RegisterType<InventorySkuCategoryService>().As<IInventorySkuCategoryService>().InstancePerLifetimeScope();
             builder.RegisterType<InventorySkuService>().As<IInventorySkuService>().InstancePerLifetimeScope();
+            builder.RegisterType<BrontoService>().As<BrontoService>().InstancePerLifetimeScope();
             builder.RegisterMappers(typeof(ProductService).GetTypeInfo().Assembly, (type, registration) =>
             {
                 if (type == typeof(SkuMapper))

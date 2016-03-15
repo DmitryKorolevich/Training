@@ -27,5 +27,6 @@ namespace VitalChoice.Infrastructure.Domain.Options
         public CacheSyncOptions CacheSyncOptions { get; set; }
         public AuthorizeNet AuthorizeNet { get; set; }
         public PDFMyUrl PDFMyUrl { get; set; }
+        public BrontoSettings Bronto { get; set; }
     }
 }

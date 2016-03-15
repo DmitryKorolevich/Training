@@ -37,6 +37,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VC.Admin.ModelConverters;
 using VC.Admin.Models.Products;
 using VitalChoice.Business.Mail;
+using VitalChoice.Business.Services.Bronto;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Ecommerce.Domain.Mail;
@@ -59,6 +60,7 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> _vOrderWithRegionInfoItemCSVExportService;
         private readonly IProductService _productService;
         private readonly INotificationService _notificationService;
+        private readonly BrontoService _brontoService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly ILogger logger;
 
@@ -73,6 +75,7 @@ namespace VC.Admin.Controllers
             ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> vOrderWithRegionInfoItemCSVExportService,
             IProductService productService,
             INotificationService notificationService,
+            BrontoService brontoService,
             IObjectHistoryLogService objectHistoryLogService, IOptions<AppOptions> options)
         {
             _orderService = orderService;
@@ -84,10 +87,17 @@ namespace VC.Admin.Controllers
             _vOrderWithRegionInfoItemCSVExportService = vOrderWithRegionInfoItemCSVExportService;
             _productService = productService;
             _notificationService = notificationService;
+            _brontoService = brontoService;
             _objectHistoryLogService = objectHistoryLogService;
             _options = options;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             this.logger = loggerProvider.CreateLoggerDefault();
+        }
+
+        [HttpGet]
+        public async Task<Result<bool>> GetIsBrontoSubscribed(string id)
+        {
+            return !_brontoService.GetIsUnsubscribed(id);
         }
 
         [HttpPost]
@@ -302,7 +312,18 @@ namespace VC.Admin.Controllers
 
             OrderManageModel toReturn = _mapper.ToModel<OrderManageModel>(order);
 
-            //TODO: - add sign up for newsletter(SignUpNewsletter)
+            if(!string.IsNullOrEmpty(model?.Customer.Email))
+            {
+                var unsubscribed = _brontoService.GetIsUnsubscribed(model.Customer.Email);
+                if (model.SignUpNewsletter && unsubscribed)
+                {
+                    await _brontoService.Subscribe(model.Customer.Email);
+                }
+                if (!model.SignUpNewsletter && !unsubscribed)
+                {
+                    _brontoService.Unsubscribe(model.Customer.Email);
+                }
+            }
 
             return toReturn;
         }
