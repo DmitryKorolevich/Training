@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using VC.Public.AppConfig;
 using VitalChoice.Core.DependencyInjection;
+using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Core.Infrastructure;
 using Microsoft.AspNet.Identity;
 using Microsoft.Extensions.PlatformAbstractions;
@@ -38,6 +39,11 @@ namespace VC.Public
                 .AddEnvironmentVariables();
 
             Configuration = configuration.Build();
+
+            services.AddMvc().AddMvcOptions(options =>
+            {
+                options.ModelBinders.Insert(0, new AntiXSSModelBinder());
+            });
 
             var reg = new StorefrontDependencyConfig();
             var result = reg.RegisterInfrastructure(Configuration, services, typeof(Startup).GetTypeInfo().Assembly);
