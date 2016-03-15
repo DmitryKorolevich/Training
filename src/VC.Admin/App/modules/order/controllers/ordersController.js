@@ -193,8 +193,27 @@
             refreshOrders();
         };
 
-        $scope.delete = function ()
+        $scope.delete = function (id)
         {
+            confirmUtil.confirm(function ()
+            {
+                orderService.cancelOrder(id, $scope.deleteTracker)
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            toaster.pop('success', "Success!", "Successfully canceled.");
+                            refreshOrders();
+                        } else
+                        {
+                            errorHandler(result);
+                        }
+                    })
+                    .error(function (result)
+                    {
+                        errorHandler(result);
+                    });
+            }, 'Are you sure you want to cancel this order?');
         };
 
         $scope.allExportCall = function ()

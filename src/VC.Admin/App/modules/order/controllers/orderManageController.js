@@ -191,11 +191,13 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
         $scope.discountsFilter = {
             Code: '',
+            StatusCode: 2,
             Paging: { PageIndex: 1, PageItemCount: 20 },
         };
 
         $scope.gcsFilter = {
             Code: '',
+            StatusCode: 2,
             Paging: { PageIndex: 1, PageItemCount: 20 },
         };
 

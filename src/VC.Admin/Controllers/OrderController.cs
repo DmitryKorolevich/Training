@@ -329,6 +329,12 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        public async Task<Result<bool>> CancelOrder(int id, [FromBody] object model)
+        {
+            return await _orderService.CancelOrderAsync(id);
+        }
+
+        [HttpPost]
         public async Task<Result<ObjectHistoryReportModel>> GetHistoryReport([FromBody]ObjectHistoryLogItemsFilter filter)
         {
             var toReturn = await _objectHistoryLogService.GetObjectHistoryReport(filter);

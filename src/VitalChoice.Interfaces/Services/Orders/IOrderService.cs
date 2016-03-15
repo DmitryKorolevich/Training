@@ -37,6 +37,8 @@ namespace VitalChoice.Interfaces.Services.Orders
 
 	    Task OrderTypeSetup(OrderDynamic order);
 
+	    Task<bool> CancelOrderAsync(int id);
+
         #region AffiliatesOrders
 
         Task<PagedList<AffiliateOrderListItemModel>> GetAffiliateOrderPaymentsWithCustomerInfo(AffiliateOrderPaymentFilter filter);
@@ -66,9 +68,7 @@ namespace VitalChoice.Interfaces.Services.Orders
         #region GCOrders
 
         Task<ICollection<GCOrderItem>> GetGCOrdersAsync(int idGC);
-
-	    Task CancelOrder(int id, POrderType part = POrderType.All);
-
+        
 	    Task<ICollection<GeneratedGiftCertificate>> GetGeneratedGcs(int id);
 
 	    #endregion

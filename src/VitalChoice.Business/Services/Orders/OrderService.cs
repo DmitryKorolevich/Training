@@ -60,6 +60,7 @@ using System.Text.RegularExpressions;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Infrastructure.Domain.Mail;
 using VitalChoice.Business.Mail;
+using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 using VitalChoice.Infrastructure.Context;
@@ -534,6 +535,91 @@ namespace VitalChoice.Business.Services.Orders
             return await query.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
         }
 
+        public async Task<bool> CancelOrderAsync(int id)
+        {
+            var order = await SelectAsync(id, false);
+            if (order != null)
+            {
+                if (order.OrderStatus == OrderStatus.Shipped || order.OrderStatus == OrderStatus.Cancelled || order.OrderStatus == OrderStatus.Exported ||
+                    order.POrderStatus == OrderStatus.Shipped || order.POrderStatus == OrderStatus.Cancelled || order.POrderStatus == OrderStatus.Exported ||
+                    order.NPOrderStatus == OrderStatus.Shipped || order.NPOrderStatus == OrderStatus.Cancelled || order.NPOrderStatus == OrderStatus.Exported)
+                {
+                    throw new AppValidationException("This operation isn't allowed for the order in the given status");
+                }
+
+                using (var uow = CreateUnitOfWork())
+                {
+                    using (var transaction = uow.BeginTransaction())
+                    {
+                        try
+                        {
+                            var giftCertificateRepository = uow.RepositoryAsync<GiftCertificate>();
+                            var orderToGiftCertificateRepository = uow.RepositoryAsync<OrderToGiftCertificate>();
+                            List<GiftCertificate> generatedGcs = new List<GiftCertificate>();
+                            if (order.GeneratedGcs?.Count > 0)
+                            {
+                                generatedGcs = await giftCertificateRepository.Query(p => p.IdOrder == order.Id && p.StatusCode != RecordStatusCode.Deleted).SelectAsync();
+                                generatedGcs.ForEach(p =>
+                                {
+                                    p.StatusCode = RecordStatusCode.NotActive;
+                                });
+                            }
+
+                            List<GiftCertificate> usedGcs = new List<GiftCertificate>();
+                            if (order.GiftCertificates?.Count > 0)
+                            {
+                                var ids = order.GiftCertificates.Select(p => p.GiftCertificate?.Id).ToList();
+                                usedGcs = await giftCertificateRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
+                                foreach (var giftCertificateInOrder in order.GiftCertificates)
+                                {
+                                    var gc = usedGcs.FirstOrDefault(p => p.Id == giftCertificateInOrder.GiftCertificate?.Id);
+                                    if (gc != null)
+                                    {
+                                        gc.Balance += giftCertificateInOrder.Amount;
+                                        if (giftCertificateInOrder.GiftCertificate != null)
+                                        {
+                                            giftCertificateInOrder.GiftCertificate.Balance = gc.Balance;
+                                        }
+                                    }
+                                }
+                                order.GiftCertificates.Clear();
+                            }
+
+                            //TODO: add removing one time per a customer discount info
+
+                            await uow.SaveChangesAsync();
+                            giftCertificateRepository.DetachAll(generatedGcs);
+                            giftCertificateRepository.DetachAll(usedGcs);                            
+
+                            if (order.OrderStatus.HasValue)
+                            {
+                                order.OrderStatus=OrderStatus.Cancelled;
+                            }
+                            if (order.POrderStatus.HasValue)
+                            {
+                                order.POrderStatus = OrderStatus.Cancelled;
+                            }
+                            if (order.NPOrderStatus.HasValue)
+                            {
+                                order.NPOrderStatus = OrderStatus.Cancelled;
+                            }
+
+                            var entity = await base.UpdateAsync(order, uow);
+
+                            transaction.Commit();
+                            return true;
+                        }
+                        catch
+                        {
+                            transaction.Rollback();
+                            throw;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
         protected override async Task<Order> InsertAsync(OrderDynamic model, IUnitOfWorkAsync uow)
         {
             Order entity;
@@ -729,23 +815,23 @@ namespace VitalChoice.Business.Services.Orders
 
         private async Task SetSkusBornDate(ICollection<OrderDynamic> orders, IUnitOfWorkAsync uow)
         {
-            var option = _productService.GetProductOptionTypes(new HashSet<string>() { ProductConstants.FIELD_NAME_SKU_INVENTORY_BORN_DATE}).FirstOrDefault();
+            var option = _productService.GetProductOptionTypes(new HashSet<string>() { ProductConstants.FIELD_NAME_SKU_INVENTORY_BORN_DATE }).FirstOrDefault();
             if (option != null)
             {
                 var skuIds = orders.SelectMany(p => p?.Skus).Select(p => p.Sku.Id).ToList();
                 skuIds.AddRange(orders.SelectMany(p => p?.PromoSkus).Select(p => p.Sku.Id).ToList());
                 skuIds = skuIds.Distinct().ToList();
-                var dbOptionValues = await _productService.GetSkuOptionValues(skuIds, new[] {option.Id});
+                var dbOptionValues = await _productService.GetSkuOptionValues(skuIds, new[] { option.Id });
                 var skuIdsForInsert = skuIds.Except(dbOptionValues.Select(p => p.IdSku)).ToList();
                 if (skuIdsForInsert.Any())
                 {
-                    var now=DateTime.Now.ToString(CultureInfo.InvariantCulture);
+                    var now = DateTime.Now.ToString(CultureInfo.InvariantCulture);
                     var skuOptionValueRepository = uow.RepositoryAsync<SkuOptionValue>();
                     skuOptionValueRepository.InsertRange(skuIdsForInsert.Select(p => new SkuOptionValue()
-                        {
-                            IdOptionType = option.Id,
-                            IdSku = p,
-                            Value = now
+                    {
+                        IdOptionType = option.Id,
+                        IdSku = p,
+                        Value = now
                     }));
                 }
             }
@@ -846,7 +932,7 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<PagedList<OrderInfoItem>> GetOrdersAsync2(VOrderFilter filter)
         {
-            var conditions= new OrderQuery();
+            var conditions = new OrderQuery();
             conditions = conditions.WithCustomerId(filter.IdCustomer).NotDeleted();
 
             if (!filter.ShipDate)
@@ -895,38 +981,38 @@ namespace VitalChoice.Business.Services.Orders
             }
 
             var orders = await SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, conditions,
-                    includes => includes.Include(c => c.OptionValues).Include(c=>c.PaymentMethod).
+                    includes => includes.Include(c => c.OptionValues).Include(c => c.PaymentMethod).
                     Include(c => c.ShippingAddress).ThenInclude(c => c.OptionValues).
-                    Include(c=>c.Customer).ThenInclude(p=>p.ProfileAddress).ThenInclude(c => c.OptionValues).
-                    Include(c=>c.HealthwiseOrder), 
+                    Include(c => c.Customer).ThenInclude(p => p.ProfileAddress).ThenInclude(c => c.OptionValues).
+                    Include(c => c.HealthwiseOrder),
                     orderBy: sortable, withDefaults: true);
 
             var countries = await _countryService.GetCountriesAsync(new CountryFilter());
 
             PagedList<OrderInfoItem> toReturn = new PagedList<OrderInfoItem>()
             {
-                Items = orders.Items.Select(p=>new OrderInfoItem()
+                Items = orders.Items.Select(p => new OrderInfoItem()
                 {
-                    Id =p.Id,
+                    Id = p.Id,
                     OrderStatus = p.OrderStatus,
                     POrderStatus = p.POrderStatus,
                     NPOrderStatus = p.NPOrderStatus,
-                    IdOrderSource =p.SafeData.OrderType,
+                    IdOrderSource = p.SafeData.OrderType,
                     OrderNotes = p.SafeData.OrderNotes,
                     IdPaymentMethod = p.PaymentMethod?.IdObjectType,
-                    DateCreated=p.DateCreated,
+                    DateCreated = p.DateCreated,
                     DateShipped = p.SafeData.ShipDelayDate,
                     PDateShipped = p.SafeData.ShipDelayDateP,
                     NPDateShipped = p.SafeData.ShipDelayDateNP,
-                    Total=p.Total,
+                    Total = p.Total,
                     IdEditedBy = p.IdEditedBy,
                     DateEdited = p.DateEdited,
                     POrderType = p.SafeData.POrderType,
                     IdCustomerType = p.Customer.IdObjectType,
                     IdCustomer = p.Customer.Id,
                     Company = p.Customer?.ProfileAddress.SafeData.Company,
-                    Customer = p.Customer?.ProfileAddress.SafeData.FirstName + " "+ p.Customer?.ProfileAddress.SafeData.LastName,
-                    StateCode = countries.SelectMany(pp=>pp.States).FirstOrDefault(pp=>pp.Id== p.ShippingAddress?.IdState)?.StateCode,
+                    Customer = p.Customer?.ProfileAddress.SafeData.FirstName + " " + p.Customer?.ProfileAddress.SafeData.LastName,
+                    StateCode = countries.SelectMany(pp => pp.States).FirstOrDefault(pp => pp.Id == p.ShippingAddress?.IdState)?.StateCode,
                     ShipTo = p?.ShippingAddress.SafeData.FirstName + " " + p?.ShippingAddress.SafeData.LastName,
                     Healthwise = p.IsHealthwise,
                 }).ToList(),
@@ -1075,7 +1161,7 @@ namespace VitalChoice.Business.Services.Orders
                     }
                     if (item.PromoSkus != null)
                     {
-                        foreach (var skuOrdered in item.PromoSkus.Where(p=>p.Enabled))
+                        foreach (var skuOrdered in item.PromoSkus.Where(p => p.Enabled))
                         {
                             pOrder = pOrder || skuOrdered?.Sku.Product.IdObjectType == (int)ProductType.Perishable;
                             npOrder = npOrder || skuOrdered?.Sku.Product.IdObjectType == (int)ProductType.NonPerishable;
@@ -1293,7 +1379,7 @@ namespace VitalChoice.Business.Services.Orders
             }
             else if (orderType == OrderType.DropShip)
             {
-                orderImportItemType = typeof (OrderDropShipImportItem);
+                orderImportItemType = typeof(OrderDropShipImportItem);
             }
             else
             {
@@ -1809,12 +1895,6 @@ namespace VitalChoice.Business.Services.Orders
             }
 
             return toReturn;
-        }
-
-        public async Task CancelOrder(int id, POrderType part = POrderType.All)
-        {
-            var order = SelectAsync(id);
-            
         }
 
         public async Task<ICollection<GeneratedGiftCertificate>> GetGeneratedGcs(int id)
