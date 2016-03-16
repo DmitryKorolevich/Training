@@ -87,9 +87,13 @@ namespace VC.Public.Controllers
 				cart.Order.IdObjectType = (int)OrderType.AutoShip;
 				cart.Order.Data.AutoShipFrequency = autoshipFrequency;
 			}
-			else if(cart.Order.IdObjectType == (int)OrderType.AutoShip)
+			else if(cart.Order.Skus.Any() && cart.Order.IdObjectType == (int)OrderType.AutoShip)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CartContainsAutoShip]);
+			}
+			else
+			{
+				cart.Order.IdObjectType = (int)OrderType.Normal;
 			}
 
 			cart.Order.Skus.AddUpdateKeyed(Enumerable.Repeat(sku, 1).ToArray(),
