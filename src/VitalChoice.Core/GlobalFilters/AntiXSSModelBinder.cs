@@ -10,6 +10,37 @@ namespace VitalChoice.Core.GlobalFilters
 {
     public class AntiXSSModelBinder : IModelBinder
     {
+        private static readonly List<string> ForbiddenStrings = new List<string>
+        {
+            "'",
+            "&#39;",
+            "&#x27;",
+
+            "\"",
+            "&quot;",
+            "&#34;",
+            "&#x22;",
+
+            "&",
+            "&amp;",
+            "&#38;",
+            "&#x26;",
+
+            "<",
+            "&lt;",
+            "&#60;",
+            "&#x3C;",
+
+            ">",
+            "&gt;",
+            "&#62;",
+            "&#x3E;",
+
+            "/",
+            "&#47;",
+            "&#x2F;"
+        };
+
         public Task<ModelBindingResult> BindModelAsync(ModelBindingContext bindingContext)
         {
             if (bindingContext.ModelMetadata.IsComplexType)
@@ -36,20 +67,18 @@ namespace VitalChoice.Core.GlobalFilters
                     var metadata = bindingContext.ModelMetadata as DefaultModelMetadata;
                     var preventFilteringXSS = metadata?.Attributes.PropertyAttributes.Any(x => x.GetType() == typeof(PreventXSSFilteringAttribute)) ?? false;
 
-                    var filteredString = FilterPotentiallyXSSEntries(modelAsString);
-                    if (!preventFilteringXSS && filteredString != modelAsString)
+                    var containForbidden = modelAsString != null && ForbiddenStrings.Any(x => modelAsString.Contains(x));
+                    if (!preventFilteringXSS && containForbidden)
+                    {
                         bindingContext.ModelState.AddModelError(bindingContext.ModelName, "Html forbidden");
+                        return ModelBindingResult.SuccessAsync(bindingContext.ModelName, string.Empty);
+                    }
 
-                    return ModelBindingResult.SuccessAsync(bindingContext.ModelName, preventFilteringXSS ? modelAsString : filteredString);
+                    return ModelBindingResult.SuccessAsync(bindingContext.ModelName, modelAsString);
                 }
             }
 
             return ModelBindingResult.NoResultAsync;
-        }
-
-        private string FilterPotentiallyXSSEntries(string value)
-        {
-            return value.Replace("<", "").Replace(">", "").Replace("script", "");
         }
     }
 
