@@ -174,6 +174,7 @@ namespace VitalChoice.Workflow.Configuration
 
 			setup.Action<AutoShipAction>("AutoShip", action =>
 			{
+				action.Dependency<DiscountableProductsAction>();
 			});
 
 			setup.ActionResolver<DiscountTypeActionResolver>("Discount", action =>

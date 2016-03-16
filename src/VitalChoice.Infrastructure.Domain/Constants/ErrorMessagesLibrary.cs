@@ -54,6 +54,9 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             public const string MustBeFutureDateError = "MustBeFutureDateError";
             public const string DenyDeleteInUseItem = "DenyDeleteInUseItem";
             public const string DenyDeleteInUseItems = "DenyDeleteInUseItems";
+            public const string AnyAutoShipOption = "AnyAutoShipOption";
+            public const string CantAddProductToCart = "CantAddProductToCart";
+            public const string CartContainsAutoShip = "CartContainsAutoShip";
         }
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
@@ -106,6 +109,9 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             {Keys.MustBeFutureDateError,  "{0} should be future date. Please review."},
             {Keys.DenyDeleteInUseItem,  "{0} can't be deleted, because it is in use."},
             {Keys.DenyDeleteInUseItems,  "Some {0} can't be deleted, because there are in use."},
+            {Keys.AnyAutoShipOption,  "One of available auto-ship options has to be selected"},
+            {Keys.CantAddProductToCart,  "Product can't be added to cart"},
+            {Keys.CartContainsAutoShip,  "Your cart contains Auto-Ship product. Please either complete your Auto-Ship order or remove Auto-Ship product from cart before add new product"}
         };
     }
 }

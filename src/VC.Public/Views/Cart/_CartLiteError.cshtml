@@ -1,0 +1,12 @@
+﻿@model string
+
+<div class="cart-lite-container working-area-holder" title="Your cart contains Auto-Ship product">
+	<div class="cart-lite-info">
+			<div class="form-regular">
+				<div class="form-control-important-info">@Model</div>
+			</div>
+	</div>
+	<div class="cart-lite-controls">
+		@Html.ActionLink("View Cart", "ViewCart", "Cart", null, new {@class = "button yellow"})
+	</div>
+</div>

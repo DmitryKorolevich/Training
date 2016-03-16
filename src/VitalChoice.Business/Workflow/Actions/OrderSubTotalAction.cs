@@ -13,8 +13,18 @@ namespace VitalChoice.Business.Workflow.Actions
 
         public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            dataContext.DiscountTotal = -dataContext.Data.Discount;
-            dataContext.DiscountedSubtotal = dataContext.Data.Products + dataContext.Data.Discount;
+	        decimal discounts = 0;
+	        if (dataContext.DictionaryData.Keys.Contains("Discount"))
+	        {
+		        discounts = dataContext.Data.Discount;
+	        }
+	        else if(dataContext.DictionaryData.Keys.Contains("AutoShip"))
+	        {
+				discounts = dataContext.Data.AutoShip;
+			}
+
+            dataContext.DiscountTotal = - discounts;
+            dataContext.DiscountedSubtotal = dataContext.Data.Products + discounts;
             dataContext.ShippingTotal = dataContext.StandardShippingCharges + dataContext.CanadaSurcharge +
                                     dataContext.AlaskaHawaiiSurcharge + dataContext.Data.ShippingUpgrade +
                                     dataContext.Data.ShippingOverride + dataContext.Data.SurchargeOverride;

@@ -173,6 +173,7 @@ namespace VC.Public.Controllers
             }
             cartModel.ShippingUpgradeP = (ShippingUpgradeOption?)order.SafeData.ShippingUpgradeP;
             cartModel.ShippingUpgradeNP = (ShippingUpgradeOption?)order.SafeData.ShippingUpgradeNP;
+			cartModel.AutoShip = order.IdObjectType == (int) OrderType.AutoShip;
 
             if (!cartModel.GiftCertificateCodes.Any())
             {

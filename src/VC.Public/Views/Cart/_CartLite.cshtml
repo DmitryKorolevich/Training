@@ -2,7 +2,7 @@
 
 <div class="cart-lite-container working-area-holder" title="Item(s) added to the cart">
 	<div class="cart-lite-info">
-		<span>Cart contains <b>@(Model.Skus.Sum(x => x.Quantity)+Model.PromoSkus.Sum(x => x.Quantity))</b> Item(s)</span>&nbsp;|&nbsp;
+		<span>Cart contains <b>@(Model.Skus.Sum(x => x.Quantity) + Model.PromoSkus.Sum(x => x.Quantity))</b> Item(s)</span>&nbsp;|&nbsp;
 		<span>Subtotal: <b>@Model.SubTotal.ToString("C2")</b></span>
 	</div>
 	<div class="cart-lite-controls">

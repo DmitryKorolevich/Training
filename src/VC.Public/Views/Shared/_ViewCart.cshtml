@@ -1,6 +1,9 @@
 ﻿@model VC.Public.Models.Cart.ViewCartModel
 
-	<table class="standard-table cart-items-list">
+<div data-bind="visible: Model.AutoShip" class="form-regular">
+	<div class="form-control-important-info">Your cart contains Auto-Ship product. Other products cannot be added to the cart until you submit your order. If you don't want to just remove it from cart and then you will be able add other products to cart again</div>
+</div>
+<table class="standard-table cart-items-list">
 		<thead>
 		<tr>
 			<th colspan="2">
@@ -161,7 +164,7 @@
 			<div class="cart-promo-container">
 				<i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Promo Code" data-tooltip-body="If you have a discount code, enter it in the box to see the change in your order's total."></i>
 				<label>Promo Code</label>
-				@Html.TextBoxFor(x => x.PromoCode, new {@class = "cart-input-box input-control", data_bind = "value: Model.PromoCode, css: {'input-validation-error': !isDiscountValid(Model) }"})
+				@Html.TextBoxFor(x => x.PromoCode, new {@class = "cart-input-box input-control", data_bind = "value: Model.PromoCode, css: {'input-validation-error': !isDiscountValid(Model) }, disable: Model.AutoShip" })
 				<span class="field-validation-error" data-bind="if: !isDiscountValid(Model)" data-valmsg-for="PromoCode" data-valmsg-replace="true">
 				<span id="PromoCode-error" class="" data-bind="text: getDiscountRelatedErrors(Model)[0].Value"></span>
 			</span>
@@ -182,7 +185,7 @@
 							<i class="glyphicon glyphicon-minus-sign"></i>
 						</a>
 						<!-- /ko -->
-						@Html.TextBoxFor(x => x.GiftCertificateCodes[0].Value, new {@class = "cart-input-box input-control", data_bind = "value: Value, attr: { name: 'GiftCertificateCodes' + $index(), id: 'GiftCertificateCodes' + $index()}, event: { blur: $parent.gcLostFocus }, css: {'input-validation-error': !isGcValid($parent.Model, $index()) }"})
+						@Html.TextBoxFor(x => x.GiftCertificateCodes[0].Value, new { @class = "cart-input-box input-control", data_bind = "value: Value, attr: { name: 'GiftCertificateCodes' + $index(), id: 'GiftCertificateCodes' + $index()}, event: { blur: $parent.gcLostFocus }, css: {'input-validation-error': !isGcValid($parent.Model, $index()) }, disable: $parent.Model.AutoShip" })
 						<span class="field-validation-error" data-bind="if: !isGcValid($parent.Model, $index()), attr: { 'data-valmsg-for': 'GiftCertificateCodes' + $index()}" data-valmsg-replace="true">
 						<span class="" data-bind="text: ErrorMessage"></span>
 					</span>
