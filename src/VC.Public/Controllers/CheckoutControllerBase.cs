@@ -16,6 +16,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Core.Infrastructure.Helpers;
+using VitalChoice.Core.Services;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
@@ -39,8 +40,9 @@ namespace VC.Public.Controllers
 		protected readonly ReferenceData AppInfrastructure;
 
 		protected CheckoutControllerBase(IHttpContextAccessor contextAccessor, ICustomerService customerService,
-            IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService, ICheckoutService checkoutService, IOrderService orderService, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper) :base(contextAccessor, customerService,
-			infrastructureService, authorizationService, checkoutService)
+            IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService, ICheckoutService checkoutService, IOrderService orderService, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
+            IPageResultService pageResultService) :base(contextAccessor, customerService,
+			infrastructureService, authorizationService, checkoutService, pageResultService)
         {
 			OrderService = orderService;
 			SkuMapper = skuMapper;

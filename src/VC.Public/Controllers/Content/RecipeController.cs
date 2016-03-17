@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using VC.Public.Models;
+using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Interfaces.Services.Content;
 
@@ -16,8 +17,9 @@ namespace VC.Public.Controllers.Content
         public RecipeController(
             IRecipeCategoryViewService recipeCategoryViewService,
             IRecipeViewService recipeViewService,
-            IContentEditService contentService)
-	    {
+            IContentEditService contentService,
+            IPageResultService pageResultService) : base(pageResultService)
+        {
             _recipeCategoryViewService = recipeCategoryViewService;
             _recipeViewService = recipeViewService;
             _contentService = contentService;

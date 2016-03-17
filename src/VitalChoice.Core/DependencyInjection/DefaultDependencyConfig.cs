@@ -567,7 +567,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<EncryptedOrderExportService>().As<IEncryptedOrderExportService>().InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof (TransactionAccessor<>)).As(typeof (ITransactionAccessor<>)).InstancePerLifetimeScope();
 			builder.RegisterType<ExtendedClaimsPrincipalFactory>().As<IUserClaimsPrincipalFactory<ApplicationUser>>().InstancePerLifetimeScope();
-
+            builder.RegisterType<PageResultService>().As<IPageResultService>().SingleInstance();
 
             FinishCustomRegistrations(builder);
 

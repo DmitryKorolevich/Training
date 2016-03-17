@@ -9,6 +9,7 @@ using Microsoft.AspNet.Mvc.Rendering;
 using VC.Public.Helpers;
 using VC.Public.Models.Cart;
 using VitalChoice.Core.Infrastructure;
+using VitalChoice.Core.Services;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
@@ -49,8 +50,8 @@ namespace VC.Public.Controllers
             IOrderService orderService, IProductService productService, ICheckoutService checkoutService,
             IAuthorizationService authorizationService, IAppInfrastructureService appInfrastructureService,
             IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
-            IDiscountService discountService, IGcService gcService, IContentCrossSellService contentCrossSellService)
-            : base(contextAccessor, customerService, appInfrastructureService, authorizationService, checkoutService, orderService, skuMapper,productMapper)
+            IDiscountService discountService, IGcService gcService, IContentCrossSellService contentCrossSellService, IPageResultService pageResultService)
+            : base(contextAccessor, customerService, appInfrastructureService, authorizationService, checkoutService, orderService, skuMapper,productMapper, pageResultService)
         {
 	        _productService = productService;
             _checkoutService = checkoutService;
@@ -87,9 +88,13 @@ namespace VC.Public.Controllers
 				cart.Order.IdObjectType = (int)OrderType.AutoShip;
 				cart.Order.Data.AutoShipFrequency = autoshipFrequency;
 			}
-			else if(cart.Order.IdObjectType == (int)OrderType.AutoShip)
+			else if(cart.Order.Skus.Any() && cart.Order.IdObjectType == (int)OrderType.AutoShip)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CartContainsAutoShip]);
+			}
+			else
+			{
+				cart.Order.IdObjectType = (int)OrderType.Normal;
 			}
 
 			cart.Order.Skus.AddUpdateKeyed(Enumerable.Repeat(sku, 1).ToArray(),

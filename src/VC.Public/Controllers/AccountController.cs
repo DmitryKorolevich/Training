@@ -12,6 +12,7 @@ using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Interfaces.Services.Affiliates;
 using Microsoft.AspNet.Authorization;
+using VitalChoice.Core.Services;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
@@ -38,7 +39,8 @@ namespace VC.Public.Controllers
             IDynamicMapper<CustomerDynamic, Customer> customerMapper, 
             ICustomerService customerService,
             IAffiliateService affiliateService,
-            IPaymentMethodService paymentMethodService)
+            IPaymentMethodService paymentMethodService,
+            IPageResultService pageResultService) : base(pageResultService)
 		{
 			_userService = userService;
 			_contextAccessor = contextAccessor;

@@ -35,6 +35,7 @@ using Microsoft.AspNet.Routing;
 using Microsoft.AspNet.Mvc.Abstractions;
 using System.Net;
 using VitalChoice.Business.Models.Help;
+using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Mail;
 
 namespace VC.Public.Controllers
@@ -60,7 +61,8 @@ namespace VC.Public.Controllers
             ReCaptchaValidator reCaptchaValidator,
             IOptions<AppOptions> options,
             INotificationService notificationService,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerProviderExtended loggerProvider,
+            IPageResultService pageResultService) : base(pageResultService)
         {
             _catalogRequestAddressService = catalogRequestAddressService;
             _appInfrastructureService = appInfrastructureService;
@@ -76,7 +78,7 @@ namespace VC.Public.Controllers
         {
             if((HttpStatusCode)id==HttpStatusCode.NotFound)
             {
-                return Task.FromResult<IActionResult>(Redirect("/content/"+ ContentConstants.NOT_FOUND_PAGE_URL));
+                return Task.FromResult<IActionResult>(BaseNotFoundView());
             }
             else
             {

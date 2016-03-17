@@ -21,6 +21,7 @@ using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
 using VC.Public.Models.GC;
+using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 
 namespace VC.Public.Controllers
@@ -32,7 +33,8 @@ namespace VC.Public.Controllers
 		private readonly IHttpContextAccessor _contextAccessor;
 		private readonly IGcService _gcService;
 
-		public GCController(IHttpContextAccessor contextAccessor, IGcService gcService)
+		public GCController(IHttpContextAccessor contextAccessor, IGcService gcService,
+            IPageResultService pageResultService) : base(pageResultService)
 		{
 			_contextAccessor = contextAccessor;
             _gcService = gcService;

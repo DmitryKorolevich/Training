@@ -20,7 +20,6 @@
 :r .\Scripts\InventoryCategories.sql
 :r .\Scripts\Countries.sql
 :r .\Scripts\GiftCertificates.sql
-:r .\Scripts\GiftCetfificatesUpdate.sql
 
 :r .\Scripts\FieldTypes.sql
 :r .\Scripts\ProductTypes.sql
@@ -37,6 +36,7 @@
 :r .\Scripts\ReferencesToUsers.sql
 
 :r .\Scripts\Orders.sql
+:r .\Scripts\GiftCetfificatesUpdate.sql
 
 :r .\Scripts\Affiliates.sql
 :r .\Scripts\VAffiliates.sql
@@ -54,5 +54,6 @@
 :r .\Scripts\CatalogRequests.sql
 
 :r .\Scripts\Checkout.sql
+:r .\Scripts\PromoUpdate.sql
 :r .\Scripts\InventorySkus.sql
 :r .\Scripts\GiftCetfificatesUpdateSku.sql

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNet.Mvc;
 using VitalChoice.Core.Base;
+using VitalChoice.Core.Services;
 
 namespace VC.Public.Controllers
 {
@@ -9,5 +10,9 @@ namespace VC.Public.Controllers
         {
             return View();
         }
-	}
+
+        public HomeController(IPageResultService pageResultService) : base(pageResultService)
+        {
+        }
+    }
 }

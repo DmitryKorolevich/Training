@@ -20,6 +20,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
 using System.Linq;
+using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VC.Public.Controllers
@@ -37,7 +38,8 @@ namespace VC.Public.Controllers
             IAffiliateUserService userService,
             IHttpContextAccessor contextAccessor,
             IDynamicMapper<AffiliateDynamic, Affiliate> affiliateMapper,
-            IAffiliateService affiliateService)
+            IAffiliateService affiliateService,
+            IPageResultService pageResultService) : base(pageResultService)
         {
             _userService = userService;
             _contextAccessor = contextAccessor;
