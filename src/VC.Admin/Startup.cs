@@ -13,6 +13,7 @@ using VC.Admin.AppConfig;
 using VitalChoice.Core.DependencyInjection;
 using VitalChoice.Core.Infrastructure;
 using Microsoft.AspNet.Identity;
+using VitalChoice.Core.GlobalFilters;
 
 namespace VC.Admin
 {
@@ -31,6 +32,11 @@ namespace VC.Admin
 
             
 			Configuration = configuration.Build();
+
+            services.AddMvc().AddMvcOptions(options =>
+            {
+                options.ModelBinders.Insert(0, new AntiXSSModelBinder());
+            });
 
             var reg = new AdminDependencyConfig();
 
