@@ -13,7 +13,7 @@
         public const string OrderSources = "OrderSources";
         public const string OrderSourcesCelebrityHealthAdvocate = "OrderSourcesCelebrityHealthAdvocate";
         public const string OrderPreferredShipMethod = "PreferredShipMethod";
-        public const string OrderTypes = "OrderTypes";
+        public const string OrderSourceTypes = "OrderTypes";
         public const string POrderTypes = "POrderTypes";
 
         public const string AffiliateProfessionalPractices = "AffiliateProfessionalPractices";

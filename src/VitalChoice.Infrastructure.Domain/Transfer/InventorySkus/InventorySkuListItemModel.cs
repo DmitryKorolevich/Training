@@ -21,6 +21,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.InventorySkus
 
         public string EditedByAgentId { get; set; }
 
+        public int? Quantity { get; set; }
+
         public InventorySkuListItemModel(InventorySku item)
         {
             if(item!=null)

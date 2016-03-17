@@ -94,3 +94,36 @@ BEGIN
 
 END
 GO
+
+IF EXISTS(SELECT * FROM [dbo].[InventorySkuOptionTypes] WHERE Name ='UnitOfMeasureAmount' AND [IdFieldType]=3)
+BEGIN
+
+UPDATE [dbo].[InventorySkuOptionTypes] 
+SET [IdFieldType]=1
+WHERE Name ='UnitOfMeasureAmount' AND [IdFieldType]=3
+
+END
+
+GO
+
+IF EXISTS(SELECT * FROM [dbo].[Lookups] WHERE [Description] ='Inventory Sku Channels')
+BEGIN
+
+UPDATE [dbo].[Lookups] 
+SET [Description]='Inventory Code Channels'
+WHERE [Description] ='Inventory Sku Channels'
+
+END
+
+GO
+
+IF EXISTS(SELECT * FROM [dbo].[Lookups] WHERE [Description] ='Inventory Sku Product Sources')
+BEGIN
+
+UPDATE [dbo].[Lookups] 
+SET [Description]='Inventory Code Product Sources'
+WHERE [Description] ='Inventory Sku Product Sources'
+
+END
+
+GO

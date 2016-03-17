@@ -35,7 +35,7 @@ namespace VC.Admin.Models.InventorySkus
         public int? UnitOfMeasure { get; set; }
 
         [Map]
-        public int? UnitOfMeasureAmount { get; set; }
+        public decimal? UnitOfMeasureAmount { get; set; }
 
         [Map]
         public int? PurchaseUnitOfMeasure { get; set; }

@@ -40,7 +40,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.WholesalePrice = entity.WholesalePrice;
                 dynamic.Order = entity.Order;
                 dynamic.IdProduct = entity.IdProduct;
-                dynamic.InventorySkuIds = entity.SkusToInventorySkus?.Select(p => p.IdInventorySku).ToList();
+                dynamic.SkusToInventorySkus = entity.SkusToInventorySkus?.ToList();
                 if (entity.Product.Skus != null && entity.Product.Skus.Any())
                 {
                     entity.Product = entity.Product.Clone<Product, Entity>();
@@ -63,12 +63,12 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.WholesalePrice = dynamic.WholesalePrice;
                 entity.Order = dynamic.Order;
 
-                entity.SkusToInventorySkus.MergeKeyed(dynamic.InventorySkuIds, p => p.IdInventorySku, i => i,
-                    i => new SkuToInventorySku
-                    {
-                        IdInventorySku = i,
-                        IdSku = dynamic.Id
+                if (dynamic.SkusToInventorySkus != null)
+                {
+                    entity.SkusToInventorySkus.MergeKeyed(dynamic.SkusToInventorySkus, p => p.IdInventorySku, (sku, rsku) => {
+                        sku.Quantity = rsku.Quantity;
                     });
+                }
             });
             return Task.Delay(0);
         }
@@ -86,11 +86,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.WholesalePrice = dynamic.WholesalePrice;
                 entity.Order = dynamic.Order;
 
-                entity.SkusToInventorySkus = dynamic?.InventorySkuIds.Select(i => new SkuToInventorySku
-                    {
-                        IdInventorySku = i,
-                        IdSku = dynamic.Id
-                    }).ToList();
+                entity.SkusToInventorySkus = dynamic.SkusToInventorySkus?.ToList();
             });
             return Task.Delay(0);
         }

@@ -13,10 +13,10 @@ a.block {
   max-width: 2500px;
 }
 .table > tbody > tr.selected {
-  background-color: #DDF0FB;
+  background-color: #ddf0fb;
 }
 .table > tbody > tr.warning > td {
-  background-color: #FFD9DC;
+  background-color: #ffd9dc;
   color: red;
 }
 .table.editable-table .text {
@@ -174,16 +174,19 @@ img.thumb {
   cursor: pointer;
 }
 .angular-ui-tree-handle:hover {
-  background-color: #EDEDED;
+  background-color: #ededed;
 }
 .angular-ui-tree-handle.selected {
-  background-color: #DDF0FB;
+  background-color: #ddf0fb;
 }
 .angular-ui-tree-handle .ya-treview-buttons {
   display: none;
   float: right;
   margin-left: 20px;
   margin-right: 10px;
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 .angular-ui-tree-handle:hover .ya-treview-buttons,
 .angular-ui-tree-handle:active .ya-treview-buttons {
@@ -196,6 +199,7 @@ img.thumb {
 .ya-treeview-content .checkbox {
   float: left;
   min-width: 400px;
+  word-break: break-all;
 }
 .inline-block {
   display: inline-block;
@@ -224,6 +228,7 @@ img.thumb {
 .ya-treeview-content {
   padding-left: 2px;
   margin-left: 12px;
+  position: relative;
 }
 .ya-treeview-content .line {
   float: left;
@@ -232,12 +237,20 @@ img.thumb {
   display: block;
   margin-top: 10px;
   margin-bottom: 11px;
+  padding-right: 120px;
 }
 .ya-treeview-content .line label {
   min-height: 20px;
   margin-bottom: 0;
   font-weight: normal;
   cursor: pointer;
+  word-break: break-all;
+}
+.ya-treeview-content .line .category-status {
+  display: inline-block;
+  vertical-align: top;
+  padding-top: .3em;
+  padding-bottom: .3em;
 }
 .categories.full-lines .ya-treeview-content .line {
   width: 100%;
@@ -444,7 +457,7 @@ button.main-button {
 }
 .custom-navbar-top {
   border-radius: 3px  3px 0px 0px;
-  background: #fff;
+  background: #ffffff;
 }
 .sidebar .navbar-collapse {
   height: auto;
@@ -848,6 +861,7 @@ ul.navbar-custom-header li .dropdown-menu {
   min-width: initial;
   float: none;
   display: inline-block;
+  padding-right: 0px;
 }
 .file-manager .angular-ui-tree-nodes .angular-ui-tree-nodes {
   margin-left: 20px;
@@ -883,10 +897,10 @@ ul.navbar-custom-header li .dropdown-menu {
   margin-bottom: 0;
 }
 .file-manager .center-pane .table tbody > tr:hover {
-  background-color: #EDEDED;
+  background-color: #ededed;
 }
 .file-manager .center-pane .table > tbody > tr.selected {
-  background-color: #DDF0FB;
+  background-color: #ddf0fb;
 }
 .image-box {
   border-radius: 4px;
@@ -1075,7 +1089,7 @@ th.sortable-column {
   min-width: 105px;
 }
 .help-tickets .table > tbody > tr.success > td {
-  background-color: #99FF99;
+  background-color: #99ff99;
 }
 .help-tickets .table > tbody > tr.warning > td {
   background-color: #fffaa3;
@@ -1101,6 +1115,12 @@ th.sortable-column {
   margin-left: 10px;
   margin-right: 10px;
 }
+.inventory-assign-popup .parts table th.qty {
+  width: 151px;
+}
+.inventory-assign-popup .parts table td div.as-label {
+  margin-top: 8px;
+}
 .partial-sku-list table th.sku {
   width: 130px;
 }
@@ -1108,7 +1128,7 @@ th.sortable-column {
   width: 40px;
 }
 .bug-tickets .table > tbody > tr.success > td {
-  background-color: #99FF99;
+  background-color: #99ff99;
 }
 .bug-tickets .table > tbody > tr.warning > td {
   background-color: #fffaa3;
@@ -1228,7 +1248,7 @@ th.sortable-column {
   background: #fffaa3;
 }
 .healthwise-customers table > tbody > tr.period-row.paid {
-  background: #99FF99;
+  background: #99ff99;
 }
 .product-categories-statistic .categories.full-lines .ya-treeview-content .flex-left {
   padding-right: 210px;

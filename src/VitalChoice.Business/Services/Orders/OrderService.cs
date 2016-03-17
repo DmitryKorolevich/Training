@@ -537,6 +537,7 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<bool> CancelOrderAsync(int id)
         {
+            var toReturn = false;
             var order = await SelectAsync(id, false);
             if (order != null)
             {
@@ -607,7 +608,8 @@ namespace VitalChoice.Business.Services.Orders
                             var entity = await base.UpdateAsync(order, uow);
 
                             transaction.Commit();
-                            return true;
+
+                            toReturn = true;
                         }
                         catch
                         {
@@ -617,7 +619,12 @@ namespace VitalChoice.Business.Services.Orders
                     }
                 }
             }
-            return false;
+            if(toReturn)
+            {
+                var dbEntity = await SelectEntityFirstAsync(o => o.Id == id);
+                await LogItemChanges(new[] { await DynamicMapper.FromEntityAsync(dbEntity) });
+            }
+            return toReturn;
         }
 
         protected override async Task<Order> InsertAsync(OrderDynamic model, IUnitOfWorkAsync uow)
@@ -945,6 +952,7 @@ namespace VitalChoice.Business.Services.Orders
             }
             conditions = conditions
                 .WithId(filter.Id)//TODO - should be redone after adding - https://github.com/aspnet/EntityFramework/issues/2850
+                .WithOrderType(filter.IdObjectType)
                 .WithOrderStatus(filter.OrderStatus)
                 .WithCustomerType(filter.IdCustomerType)
                 .WithoutIncomplete(filter.OrderStatus, filter.IgnoreNotShowingIncomplete)
@@ -968,6 +976,9 @@ namespace VitalChoice.Business.Services.Orders
                     break;
                 case VOrderSortPath.IdCustomerType:
                     sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.Customer.IdObjectType) : x.OrderByDescending(y => y.Customer.IdObjectType);
+                    break;
+                case VOrderSortPath.IdObjectType:
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.IdObjectType) : x.OrderByDescending(y => y.IdObjectType);
                     break;
                 case VOrderSortPath.Id:
                     sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.Id) : x.OrderByDescending(y => y.Id);
@@ -994,6 +1005,7 @@ namespace VitalChoice.Business.Services.Orders
                 Items = orders.Items.Select(p => new OrderInfoItem()
                 {
                     Id = p.Id,
+                    IdObjectType = (OrderType)p.IdObjectType,
                     OrderStatus = p.OrderStatus,
                     POrderStatus = p.POrderStatus,
                     NPOrderStatus = p.NPOrderStatus,
@@ -1052,7 +1064,7 @@ namespace VitalChoice.Business.Services.Orders
                 conditions = conditions.WithShippedDate(filter.From, filter.To);
             }
             conditions = conditions.WithOrderStatus(filter.OrderStatus).WithoutIncomplete(filter.OrderStatus, filter.IgnoreNotShowingIncomplete).WithId(filter.IdString) //TODO - should be redone after adding - https://github.com/aspnet/EntityFramework/issues/2850
-                .WithOrderSource(filter.IdOrderSource).WithPOrderType(filter.POrderType).WithCustomerType(filter.IdCustomerType).WithShippingMethod(filter.IdShippingMethod);
+                .WithOrderType(filter.IdObjectType).WithOrderSource(filter.IdOrderSource).WithPOrderType(filter.POrderType).WithCustomerType(filter.IdCustomerType).WithShippingMethod(filter.IdShippingMethod);
 
             var query = _vOrderRepository.Query(conditions);
 
@@ -1087,6 +1099,9 @@ namespace VitalChoice.Business.Services.Orders
                     break;
                 case VOrderSortPath.IdCustomerType:
                     sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.IdCustomerType) : x.OrderByDescending(y => y.IdCustomerType);
+                    break;
+                case VOrderSortPath.IdObjectType:
+                    sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.IdObjectType) : x.OrderByDescending(y => y.IdObjectType);
                     break;
                 case VOrderSortPath.Customer:
                     sortable = (x) => sortOrder == SortOrder.Asc ? x.OrderBy(y => y.Customer) : x.OrderByDescending(y => y.Customer);

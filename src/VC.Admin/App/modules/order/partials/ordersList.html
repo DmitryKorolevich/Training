@@ -46,7 +46,10 @@
                         <select class="form-control" data-ng-disabled="filter.ShipDate" placeholder="Order Status" data-ng-model="filter.OrderStatus" data-ng-options="item.Key as item.Text for item in orderStatuses"></select>
                     </div>
                     <div class="col-md-2">
-                        <select class="form-control" placeholder="Order Type" data-ng-model="filter.IdOrderSource" data-ng-options="item.Key as item.Text for item in orderTypes"></select>
+                        <select class="form-control" placeholder="Order Type" data-ng-model="filter.IdObjectType" data-ng-options="item.Key as item.Text for item in orderTypes"></select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-control" placeholder="Order Source" data-ng-model="filter.IdOrderSource" data-ng-options="item.Key as item.Text for item in orderSourceTypes"></select>
                     </div>
                     <div class="col-md-2">
                         <select class="form-control" placeholder="P/NP Type" data-ng-model="filter.POrderType" data-ng-options="item.Key as item.Text for item in pOrderTypes"></select>
@@ -74,8 +77,15 @@
                 <thead>
                     <tr>
                         <th class="actions">Status</th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('IdObjectType')">
+                            <span>Type</span>
+                            <span data-ng-if="filter.Sorting.Path == 'IdObjectType'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('IdOrderSource')">
-                            <span>Order Type</span>
+                            <span>Order Source</span>
                             <span data-ng-if="filter.Sorting.Path == 'IdOrderSource'">
                                 <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
                                 <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
@@ -161,8 +171,11 @@
                         <td>
                             <div data-ng-include="'app/modules/order/partials/orderStatusSection.html'"></div>
                         </td>
+                        <td>
+                            <span class="label font-default" data-ng-class="::{'label-retail': (item.IdObjectType==1 || item.IdObjectType==2 ||item.IdObjectType==3 || item.IdObjectType==4), 'label-primary':  item.IdObjectType==5, 'label-success':  item.IdObjectType==6}">{{::getReferenceItem(ReferenceData.ShortOrderTypes, item.IdObjectType).Text}}</span>
+                        </td>
                         <td class="order-source">
-                            <span>{{::getReferenceItem(orderTypes, item.IdOrderSource).Text}}</span>
+                            <span>{{::getReferenceItem(orderSourceTypes, item.IdOrderSource).Text}}</span>
                         </td>
                         <td class="payment-methods">
                             <span>{{::getReferenceItem(ReferenceData.ShortPaymentMethods, item.IdPaymentMethod).Text}}</span>

@@ -171,3 +171,14 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE [name] = N'Quantity' AND [object_id] = OBJECT_ID(N'SkusToInventorySkus'))
+BEGIN
+
+ALTER TABLE SkusToInventorySkus ADD Quantity INT NOT NULL DEFAULT(1)
+ALTER TABLE OrderToSkusToInventorySkus ADD Quantity INT NOT NULL DEFAULT(1)
+ALTER TABLE OrderToPromosToInventorySkus ADD Quantity INT NOT NULL DEFAULT(1)
+
+END
+
+GO
