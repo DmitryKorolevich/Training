@@ -12,7 +12,6 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
     function successSaveHandler(result)
 	{
-        processLoadingOrder(result);
         if (result.Success)
         {
             toaster.pop('success', "Success!", "Successfully saved.");
@@ -22,6 +21,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             }
             else
             {
+                processLoadingOrder(result);
                 refreshOrderHistory();
             }
         }
@@ -292,8 +292,6 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             else {
                 loadReferencedData();
             }
-        } else {
-            errorHandler(result);
         }
     };
 
@@ -302,7 +300,14 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         orderService.getOrder($scope.id, $scope.idCustomer!=0 ? $scope.idCustomer : null, false, $scope.addEditTracker)
             .success(function (result)
             {
-                processLoadingOrder(result);
+                if (result.Success)
+                {
+                    processLoadingOrder(result);
+                }
+                else
+                {
+                    errorHandler(result);
+                }
             })
             .error(function (result)
             {
