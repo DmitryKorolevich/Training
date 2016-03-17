@@ -8,7 +8,7 @@ namespace VitalChoice.Caching.Relational.Base
     public class EntityValueInfo : IEquatable<EntityValueInfo>, IClrPropertyGetter
     {
         private readonly IClrPropertyGetter _property;
-        private readonly Type _propertyType;
+        public Type PropertyType { get; }
         private readonly Func<object, object> _valueConvert;
 
         public EntityValueInfo(string name, IClrPropertyGetter property, Type propertyType)
@@ -17,7 +17,7 @@ namespace VitalChoice.Caching.Relational.Base
                 throw new ArgumentNullException(nameof(name));
 
             _property = property;
-            _propertyType = propertyType;
+            PropertyType = propertyType;
             if (propertyType.GetTypeInfo().IsEnum)
             {
 #if !DOTNET5_4
@@ -32,10 +32,17 @@ namespace VitalChoice.Caching.Relational.Base
             Name = name;
         }
 
+        public virtual bool Equals(EntityValueInfo other)
+        {
+            if ((object) this == (object) other) return true;
+            if ((object) other == null) return false;
+            return string.Equals(Name, other.Name);
+        }
+
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
+            if ((object)this == obj)
+                return true;
             var keyInfo = obj as EntityValueInfo;
             if (keyInfo != null)
                 return Equals(keyInfo);
@@ -49,7 +56,12 @@ namespace VitalChoice.Caching.Relational.Base
 
         public override string ToString()
         {
-            return $"[{_propertyType}] {Name}";
+            return $"[{PropertyType}] {Name}";
+        }
+
+        public static bool Equals(EntityValueInfo left, EntityValueInfo right)
+        {
+            return left?.Equals(right) ?? (object) right == null;
         }
 
         public static bool operator ==(EntityValueInfo left, EntityValueInfo right)
@@ -63,13 +75,6 @@ namespace VitalChoice.Caching.Relational.Base
         }
 
         public virtual string Name { get; }
-
-        public virtual bool Equals(EntityValueInfo other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return string.Equals(Name, other.Name);
-        }
 
         public object GetClrValue(object instance)
         {

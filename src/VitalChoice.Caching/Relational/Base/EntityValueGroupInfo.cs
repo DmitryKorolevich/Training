@@ -23,10 +23,10 @@ namespace VitalChoice.Caching.Relational.Base
 
         public bool Equals(EntityValueGroupInfo<TInfo> other)
         {
-            if (ReferenceEquals(null, other))
-                return false;
-            if (ReferenceEquals(this, other))
+            if ((object)this == (object)other)
                 return true;
+            if ((object)other == null)
+                return false;
             if (ValuesDictionary.Count != other.ValuesDictionary.Count)
                 return false;
             return ValuesDictionary.All(i => other.ValuesDictionary.ContainsKey(i.Key));
@@ -34,13 +34,10 @@ namespace VitalChoice.Caching.Relational.Base
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj))
-                return false;
-            if (ReferenceEquals(this, obj))
+            if ((object)this == obj)
                 return true;
-            if (!(obj is EntityValueGroupInfo<TInfo>))
-                return false;
-            return Equals((EntityValueGroupInfo<TInfo>) obj);
+            var groupInfo = obj as EntityValueGroupInfo<TInfo>;
+            return groupInfo != null && Equals(groupInfo);
         }
 
         public override string ToString()
@@ -51,9 +48,15 @@ namespace VitalChoice.Caching.Relational.Base
         public override int GetHashCode()
         {
             int result = 0;
+            // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var value in ValuesDictionary.Values)
                 result = (result*397) ^ value.GetHashCode();
             return result;
+        }
+
+        public static bool Equals(EntityValueGroupInfo<TInfo> left, EntityValueGroupInfo<TInfo> right)
+        {
+            return left?.Equals(right) ?? (object) right == null;
         }
 
         public static bool operator ==(EntityValueGroupInfo<TInfo> left, EntityValueGroupInfo<TInfo> right)

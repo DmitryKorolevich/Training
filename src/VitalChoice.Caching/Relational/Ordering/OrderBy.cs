@@ -9,16 +9,16 @@ namespace VitalChoice.Caching.Relational.Ordering
     {
         public bool Equals(OrderBy other)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if ((object)this == (object)other) return true;
+            if ((object)other == null) return false;
 
             return OrderByItems.SimpleJoin(other.OrderByItems).All(pair => pair.Key == pair.Value);
         }
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
+            if ((object)this == obj) return true;
+            if (obj == null) return false;
             var other = obj as OrderBy;
             return other != null && Equals(other);
         }
@@ -26,9 +26,15 @@ namespace VitalChoice.Caching.Relational.Ordering
         public override int GetHashCode()
         {
             int result = 0;
+            // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var item in OrderByItems)
                 result = (result*397) ^ item.GetHashCode();
             return result;
+        }
+
+        public static bool Equals(OrderBy left, OrderBy right)
+        {
+            return left?.Equals(right) ?? (object) right == null;
         }
 
         public static bool operator ==(OrderBy left, OrderBy right)

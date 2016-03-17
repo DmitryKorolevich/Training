@@ -558,7 +558,7 @@ namespace VitalChoice.Caching.Services
                         Expression.Constant(keyValue.Value));
                 conditionalExpression = conditionalExpression == null ? part : Expression.And(conditionalExpression, part);
             }
-            return parameter;
+            return conditionalExpression;
         }
 
         private static IEnumerable<EntityValueInfo> CreateValueInfos(IEnumerable<IProperty> properties)

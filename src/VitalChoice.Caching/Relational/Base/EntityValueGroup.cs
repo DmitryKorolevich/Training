@@ -19,8 +19,8 @@ namespace VitalChoice.Caching.Relational.Base
 
         public bool Equals(EntityValueGroup<TValue, TInfo> other)
         {
-            if (ReferenceEquals(this, other)) return true;
-            if (ReferenceEquals(null, other)) return false;
+            if ((object)this == (object)other) return true;
+            if ((object)other == null) return false;
 
             // ReSharper disable once LoopCanBeConvertedToQuery
             for (var index = 0; index < Values.Length; index++)
@@ -38,14 +38,16 @@ namespace VitalChoice.Caching.Relational.Base
             return $"({string.Join(", ", Values.Select(v => v.ToString()))})";
         }
 
+        public static bool Equals(EntityValueGroup<TValue, TInfo> left, EntityValueGroup<TValue, TInfo> right)
+        {
+            return left?.Equals(right) ?? (object) right == null;
+        }
+
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(this, obj)) return true;
-            if (ReferenceEquals(null, obj)) return false;
+            if ((object)this == obj) return true;
             var primaryKey = obj as EntityValueGroup<TValue, TInfo>;
-            if (primaryKey != null)
-                return Equals(primaryKey);
-            return false;
+            return primaryKey != null && Equals(primaryKey);
         }
 
         public override int GetHashCode()
