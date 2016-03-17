@@ -85,6 +85,15 @@ namespace VitalChoice.Business.Queries.Orders
             return this;
         }
 
+        public OrderQuery WithOrderType(OrderType? idObjectType)
+        {
+            if (idObjectType.HasValue)
+            {
+                Add(x => x.IdObjectType == (int)idObjectType.Value);
+            }
+            return this;
+        }
+
         public OrderQuery WithOrderStatus(OrderStatus? orderStatus)
         {
             if (orderStatus.HasValue)

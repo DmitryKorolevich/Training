@@ -18,6 +18,8 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Orders
     {
         public int Id { get; set; }
 
+        public OrderType IdObjectType { get; set; }
+
         public OrderStatus? OrderStatus { get; set; }
 
         public OrderStatus? POrderStatus { get; set; }

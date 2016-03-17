@@ -10,6 +10,8 @@ namespace VC.Admin.Models.Orders
     {
         public int Id { get; set; }
 
+        public OrderType IdObjectType { get; set; }
+
         public OrderStatus? OrderStatus { get; set; }
 
         public OrderStatus? POrderStatus { get; set; }
@@ -59,6 +61,7 @@ namespace VC.Admin.Models.Orders
             if(item!=null)
             {
                 Id = item.Id;
+                IdObjectType = item.IdObjectType;
                 OrderStatus = item.OrderStatus;
                 POrderStatus = item.POrderStatus;
                 NPOrderStatus = item.NPOrderStatus;
@@ -89,6 +92,7 @@ namespace VC.Admin.Models.Orders
             if (item != null)
             {
                 Id = item.Id;
+                IdObjectType = item.IdObjectType;
                 OrderStatus = item.OrderStatus;
                 POrderStatus = item.POrderStatus;
                 NPOrderStatus = item.NPOrderStatus;

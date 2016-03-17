@@ -296,18 +296,27 @@
                                                         <label class="col-md-12 control-label left">Order Specific Notes (*Will appear on invoice)</label>
                                                         <div class="col-md-12">
                                                             <textarea type="text" name="OrderNotes" class="form-control" placeholder="Order Specific Notes" rows="5" data-ng-model="order.OrderNotes" data-ng-disabled="orderEditDisabled"></textarea>
+                                                            <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.OrderNotes.$invalid">
+                                                                <small class="error" ng-show="forms.mainForm.OrderNotes.$error.server">{{serverMessages.GetMessage('OrderNotes')}}</small>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div data-ng-if="order.GiftOrder" class="form-group">
                                                         <label class="col-md-12 control-label left">Gift Message (*Will appear on invoice)</label>
                                                         <div class="col-md-12">
                                                             <textarea type="text" name="GiftMessage" class="form-control" placeholder="Gift Message" rows="5" data-ng-model="order.GiftMessage" data-ng-disabled="orderEditDisabled"></textarea>
+                                                            <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.GiftMessage.$invalid">
+                                                                <small class="error" ng-show="forms.mainForm.GiftMessage.$error.server">{{serverMessages.GetMessage('GiftMessage')}}</small>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div data-ng-if="order.IdObjectType!=3" class="form-group">
                                                         <label class="col-md-12 control-label left">Delivery Instructions (*Prints to Shipping Label):</label>
                                                         <div class="col-md-12">
                                                             <textarea type="text" name="DeliveryInstructions" class="form-control" placeholder="Delivery Instructions" rows="5" data-ng-model="order.DeliveryInstructions" data-ng-disabled="orderEditDisabled"></textarea>
+                                                            <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.DeliveryInstructions.$invalid">
+                                                                <small class="error" ng-show="forms.mainForm.DeliveryInstructions.$error.server">{{serverMessages.GetMessage('DeliveryInstructions')}}</small>
+                                                            </div>
                                                         </div>
                                                     </div>
 

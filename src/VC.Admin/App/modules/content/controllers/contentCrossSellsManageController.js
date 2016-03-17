@@ -124,7 +124,7 @@ angular.module('app.modules.content.controllers.contentCrossSellsManageControlle
 							if (value.Field) {
 								if (value.Field.indexOf('.') > -1) {
 									var items = value.Field.split(".");
-									$scope.forms.Items[items[0]][items[1]][items[2]].$setValidity("server", false);
+									$scope.forms[items[0]][items[1]][items[2]].$setValidity("server", false);
 								}
 								else {
 									$.each($scope.forms, function (index, form) {

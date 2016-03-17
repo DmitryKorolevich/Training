@@ -44,6 +44,7 @@ namespace VitalChoice.Business.Services
         private readonly IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository;
         private readonly IEcommerceRepositoryAsync<Lookup> lookupRepository;
         private readonly IEcommerceRepositoryAsync<AppOption> appOptionRepository;
+        private readonly IEcommerceRepositoryAsync<OrderTypeEntity> orderTypeEntityRepository;
         private readonly ISettingService settingService;
         private readonly IBackendSettingsService _backendSettingsService;
         private readonly ILocalizationService _localizationService;
@@ -63,6 +64,7 @@ namespace VitalChoice.Business.Services
             IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository,
             IEcommerceRepositoryAsync<Lookup> lookupRepository,
             IEcommerceRepositoryAsync<AppOption> appOptionRepository,
+            IEcommerceRepositoryAsync<OrderTypeEntity> orderTypeEntityRepository,
             ISettingService settingService,
             IBackendSettingsService backendSettingsService,
             ILocalizationService localizationService)
@@ -80,6 +82,7 @@ namespace VitalChoice.Business.Services
             this.lookupVariantRepository = lookupVariantRepository;
             this.lookupRepository = lookupRepository;
             this.appOptionRepository = appOptionRepository;
+            this.orderTypeEntityRepository = orderTypeEntityRepository;
             this.settingService = settingService;
             _localizationService = localizationService;
             _backendSettingsService = backendSettingsService;
@@ -98,7 +101,7 @@ namespace VitalChoice.Business.Services
             var orderSourcesLookup = lookupRepository.Query(x => x.Name == LookupNames.OrderSources).Select(false).Single().Id;
             var orderSourcesCelebrityHealthAdvocateLookup = lookupRepository.Query(x => x.Name == LookupNames.OrderSourcesCelebrityHealthAdvocate).Select(false).Single().Id;
             var orderPreferredShipMethod = lookupRepository.Query(x => x.Name == LookupNames.OrderPreferredShipMethod).Select(false).Single().Id;
-            var orderTypes = lookupRepository.Query(x => x.Name == LookupNames.OrderTypes).Select(false).Single().Id;
+            var OrderSourceTypes = lookupRepository.Query(x => x.Name == LookupNames.OrderSourceTypes).Select(false).Single().Id;
             var pOrderTypes = lookupRepository.Query(x => x.Name == LookupNames.POrderTypes).Select(false).Single().Id;
             var affiliateProfessionalPractices = lookupRepository.Query(x => x.Name == LookupNames.AffiliateProfessionalPractices).Select(false).Single().Id;
             var affiliateMonthlyEmailsSentOptions = lookupRepository.Query(x => x.Name == LookupNames.AffiliateMonthlyEmailsSentOptions).Select(false).Single().Id;
@@ -221,6 +224,10 @@ namespace VitalChoice.Business.Services
                 .ToList();
             var shortPaymentMethods = (new List<LookupItem<int>>(referenceData.PaymentMethods));
             referenceData.ShortPaymentMethods = LookupHelper.GetShortPaymentMethods(shortPaymentMethods);
+            referenceData.OrderTypes = orderTypeEntityRepository.Query().Select(x => new LookupItem<int>() { Key = x.Id, Text = x.Name })
+                .ToList();
+            var shortOrderTypes = (new List<LookupItem<int>>(referenceData.OrderTypes));
+            referenceData.ShortOrderTypes = LookupHelper.GetShortOrderTypes(shortOrderTypes);
             referenceData.TaxExempts = lookupVariantRepository.Query().Where(x => x.IdLookup == taxExemptLookup).Select(false).Select(x => new LookupItem<int>()
             {
                 Key = x.Id,
@@ -296,8 +303,8 @@ namespace VitalChoice.Business.Services
                     Key = x.Id,
                     Text = x.ValueVariant
                 }).ToList();
-            referenceData.OrderTypes = lookupVariantRepository.Query()
-                .Where(x => x.IdLookup == orderTypes)
+            referenceData.OrderSourceTypes = lookupVariantRepository.Query()
+                .Where(x => x.IdLookup == OrderSourceTypes)
                 .Select(false)
                 .Select(x => new LookupItem<int>()
                 {

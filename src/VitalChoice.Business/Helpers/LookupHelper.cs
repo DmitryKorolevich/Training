@@ -293,55 +293,109 @@ namespace VitalChoice.Business.Helpers
             List<LookupItem<int>> toReturn = new List<LookupItem<int>>();
             foreach (var paymentMethod in paymentMethods)
             {
-                switch (paymentMethod.Key)
+                switch ((PaymentMethodType)paymentMethod.Key)
                 {
-                    case 1:
+                    case PaymentMethodType.CreditCard:
                         toReturn.Add(new LookupItem<int>()
                         {
-                            Key = 1,
+                            Key = (int)PaymentMethodType.CreditCard,
                             Text = "CC"
                         });
                         break;
-                    case 2:
+                    case PaymentMethodType.Oac:
                         toReturn.Add(new LookupItem<int>()
                         {
-                            Key = 2,
+                            Key = (int)PaymentMethodType.Oac,
                             Text = "OAC"
                         });
                         break;
-                    case 3:
+                    case PaymentMethodType.Check:
                         toReturn.Add(new LookupItem<int>()
                         {
-                            Key = 3,
+                            Key = (int)PaymentMethodType.Check,
                             Text = "Check"
                         });
                         break;
-                    case 4:
+                    case PaymentMethodType.NoCharge:
                         toReturn.Add(new LookupItem<int>()
                         {
-                            Key = 4,
+                            Key = (int)PaymentMethodType.NoCharge,
                             Text = "NC"
                         });
                         break;
-                    case 6:
+                    case PaymentMethodType.WireTransfer:
                         toReturn.Add(new LookupItem<int>()
                         {
-                            Key = 6,
+                            Key = (int)PaymentMethodType.WireTransfer,
                             Text = "Wire"
                         });
                         break;
-                    case 7:
+                    case PaymentMethodType.Marketing:
                         toReturn.Add(new LookupItem<int>()
                         {
-                            Key = 7,
+                            Key = (int)PaymentMethodType.Marketing,
                             Text = "Marketing"
                         });
                         break;
-                    case 8:
+                    case PaymentMethodType.VCWellnessEmployeeProgram:
                         toReturn.Add(new LookupItem<int>()
                         {
-                            Key = 8,
+                            Key = (int)PaymentMethodType.VCWellnessEmployeeProgram,
                             Text = "Employee"
+                        });
+                        break;
+                }
+            }
+            return toReturn;
+        }
+
+        public static IList<LookupItem<int>> GetShortOrderTypes(IList<LookupItem<int>> orderTypes)
+        {
+            List<LookupItem<int>> toReturn = new List<LookupItem<int>>();
+            foreach (var orderType in orderTypes)
+            {
+                switch ((OrderType)orderType.Key)
+                {
+                    case OrderType.Normal:
+                        toReturn.Add(new LookupItem<int>()
+                        {
+                            Key = (int)OrderType.Normal,
+                            Text = "S"
+                        });
+                        break;
+                    case OrderType.AutoShip:
+                        toReturn.Add(new LookupItem<int>()
+                        {
+                            Key = (int)OrderType.AutoShip,
+                            Text = "AS"
+                        });
+                        break;
+                    case OrderType.DropShip:
+                        toReturn.Add(new LookupItem<int>()
+                        {
+                            Key = (int)OrderType.DropShip,
+                            Text = "DS"
+                        });
+                        break;
+                    case OrderType.GiftList:
+                        toReturn.Add(new LookupItem<int>()
+                        {
+                            Key = (int)OrderType.GiftList,
+                            Text = "GL"
+                        });
+                        break;
+                    case OrderType.Reship:
+                        toReturn.Add(new LookupItem<int>()
+                        {
+                            Key = (int)OrderType.Reship,
+                            Text = "RS"
+                        });
+                        break;
+                    case OrderType.Refund:
+                        toReturn.Add(new LookupItem<int>()
+                        {
+                            Key = (int)OrderType.Refund,
+                            Text = "RF"
                         });
                         break;
                 }

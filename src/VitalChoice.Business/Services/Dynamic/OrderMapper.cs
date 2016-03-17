@@ -204,13 +204,14 @@ namespace VitalChoice.Business.Services.Dynamic
                 }));
                 foreach (var orderToSku in entity.Skus)
                 {
-                    List<int> inventoryIds;
-                    inventoryMap.TryGetValue(orderToSku.IdSku, out inventoryIds);
-                    orderToSku.InventorySkus = inventoryIds?.Select(p => new OrderToSkuToInventorySku()
+                    List<SkuToInventorySku> inventories;
+                    inventoryMap.TryGetValue(orderToSku.IdSku, out inventories);
+                    orderToSku.InventorySkus = inventories?.Select(p => new OrderToSkuToInventorySku()
                     {
                         IdSku = orderToSku.IdSku,
                         IdOrder = orderToSku.IdOrder,
-                        IdInventorySku = p
+                        IdInventorySku = p.IdInventorySku,
+                        Quantity=p.Quantity,
                     }).ToList();
                 }
 
@@ -225,13 +226,14 @@ namespace VitalChoice.Business.Services.Dynamic
                 }));
                 foreach (var orderToPromo in entity.PromoSkus)
                 {
-                    List<int> inventoryIds;
-                    inventoryMap.TryGetValue(orderToPromo.IdSku, out inventoryIds);
-                    orderToPromo.InventorySkus = inventoryIds?.Select(p => new OrderToPromoToInventorySku()
+                    List<SkuToInventorySku> inventories;
+                    inventoryMap.TryGetValue(orderToPromo.IdSku, out inventories);
+                    orderToPromo.InventorySkus = inventories?.Select(p => new OrderToPromoToInventorySku()
                     {
                         IdSku = orderToPromo.IdSku,
                         IdOrder = orderToPromo.IdOrder,
-                        IdInventorySku = p
+                        IdInventorySku = p.IdInventorySku,
+                        Quantity=p.Quantity,
                     }).ToList();
                 }
 
@@ -310,14 +312,18 @@ namespace VitalChoice.Business.Services.Dynamic
                     });
                 foreach (var orderToSku in entity.Skus)
                 {
-                    List<int> inventoryIds;
-                    inventoryMap.TryGetValue(orderToSku.IdSku, out inventoryIds);
-                    orderToSku.InventorySkus.MergeKeyed(inventoryIds ?? new List<int>(), p => p.IdInventorySku, p => p,
+                    List<SkuToInventorySku> inventories;
+                    inventoryMap.TryGetValue(orderToSku.IdSku, out inventories);
+                    orderToSku.InventorySkus.MergeKeyed(inventories ?? new List<SkuToInventorySku>(), p => p.IdInventorySku, p => p.IdInventorySku,
                         p => new OrderToSkuToInventorySku()
                         {
                             IdSku = orderToSku.IdSku,
                             IdOrder = orderToSku.IdOrder,
-                            IdInventorySku = p
+                            IdInventorySku = p.IdInventorySku,
+                            Quantity=p.Quantity,
+                        },
+                        (p, rp) => {
+                            p.Quantity = rp.Quantity;
                         });
                 }
 
@@ -344,14 +350,18 @@ namespace VitalChoice.Business.Services.Dynamic
                     });
                 foreach (var orderToPromo in entity.PromoSkus)
                 {
-                    List<int> inventoryIds;
-                    inventoryMap.TryGetValue(orderToPromo.IdSku, out inventoryIds);
-                    orderToPromo.InventorySkus.MergeKeyed(inventoryIds ?? new List<int>(), p => p.IdInventorySku, p => p,
+                    List<SkuToInventorySku> inventories;
+                    inventoryMap.TryGetValue(orderToPromo.IdSku, out inventories);
+                    orderToPromo.InventorySkus.MergeKeyed(inventories ?? new List<SkuToInventorySku>(), p => p.IdInventorySku, p => p.IdInventorySku,
                         p => new OrderToPromoToInventorySku()
                         {
                             IdSku = orderToPromo.IdSku,
                             IdOrder = orderToPromo.IdOrder,
-                            IdInventorySku = p
+                            IdInventorySku = p.IdInventorySku,
+                            Quantity = p.Quantity,
+                        },
+                        (p, rp) => {
+                            p.Quantity = rp.Quantity;
                         });
                 }
 
@@ -378,18 +388,18 @@ namespace VitalChoice.Business.Services.Dynamic
             });
         }
 
-        private async Task<Dictionary<int, List<int>>> GetInventoryMap(ICollection<DynamicEntityPair<OrderDynamic, Order>> items)
+        private async Task<Dictionary<int, List<SkuToInventorySku>>> GetInventoryMap(ICollection<DynamicEntityPair<OrderDynamic, Order>> items)
         {
             var skuIds = items.Select(p => p.Dynamic).SelectMany(p => p?.Skus).Select(p => p.Sku.Id).ToList();
             skuIds.AddRange(items.Select(p => p.Dynamic).SelectMany(p => p?.PromoSkus).Select(p => p.Sku.Id).ToList());
-            Dictionary<int, List<int>> inventoryMap;
+            Dictionary<int, List<SkuToInventorySku>> inventoryMap;
             if (skuIds.Count > 0)
             {
-                inventoryMap = await _inventorySkuService.GetAssignedInventorySkuIdsAsync(skuIds);
+                inventoryMap = await _inventorySkuService.GetAssignedInventorySkusAsync(skuIds);
             }
             else
             {
-                inventoryMap = new Dictionary<int, List<int>>();
+                inventoryMap = new Dictionary<int, List<SkuToInventorySku>>();
             }
             return inventoryMap;
         }

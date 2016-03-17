@@ -140,21 +140,21 @@ namespace VitalChoice.Business.Services.InventorySkus
             return toReturn;
         }
 
-        public async Task<Dictionary<int,List<int>>> GetAssignedInventorySkuIdsAsync(ICollection<int> skuIds)
+        public async Task<Dictionary<int,List<SkuToInventorySku>>> GetAssignedInventorySkusAsync(ICollection<int> skuIds)
         {
             skuIds = skuIds.Distinct().ToList();
             var items = await _skuToInventorySkuRepository.Query(p => skuIds.Contains(p.IdSku)).SelectAsync(false);
-            var toReturn =new Dictionary<int, List<int>>();
+            var toReturn =new Dictionary<int, List<SkuToInventorySku>>();
             foreach (var skuToInventorySku in items)
             {
-                List<int> assignedInventoryIds;
-                toReturn.TryGetValue(skuToInventorySku.IdSku, out assignedInventoryIds);
-                if (assignedInventoryIds == null)
+                List<SkuToInventorySku> assignedInventories;
+                toReturn.TryGetValue(skuToInventorySku.IdSku, out assignedInventories);
+                if (assignedInventories == null)
                 {
-                    assignedInventoryIds=new List<int>();
-                    toReturn.Add(skuToInventorySku.IdSku,assignedInventoryIds);
+                    assignedInventories = new List<SkuToInventorySku>();
+                    toReturn.Add(skuToInventorySku.IdSku, assignedInventories);
                 }
-                assignedInventoryIds.Add(skuToInventorySku.IdInventorySku);
+                assignedInventories.Add(skuToInventorySku);
             }
             return toReturn;
         }

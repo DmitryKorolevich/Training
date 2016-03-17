@@ -64,7 +64,9 @@
             });
             if(add)
             {
-                $scope.assignedItems.push(newItem);
+                var item = angular.copy(newItem);
+                item.Quantity = 1;
+                $scope.assignedItems.push(item);
             }
         };
 
@@ -74,8 +76,53 @@
 
         $scope.save = function()
         {
-            data.thenCallback($scope.assignedItems);
-            $modalInstance.close();
+            clearServerValidation();
+
+            if ($scope.forms.InventorySkus.$valid)
+            {
+                data.thenCallback($scope.assignedItems);
+                $modalInstance.close();
+            }
+            else
+            {
+                $scope.forms.InventorySkus.submitted = true;
+            }
+        };
+
+        var clearServerValidation = function ()
+        {
+            $.each($scope.forms, function (index, form)
+            {
+                if (form && !(typeof form === 'boolean'))
+                {
+                    if (index == "InventorySkus")
+                    {
+                        $.each(form, function (index, subForm)
+                        {
+                            if (index.indexOf('i') == 0)
+                            {
+                                $.each(subForm, function (index, element)
+                                {
+                                    if (element && element.$name == index)
+                                    {
+                                        element.$setValidity("server", true);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    else
+                    {
+                        $.each(form, function (index, element)
+                        {
+                            if (element && element.$name == index)
+                            {
+                                element.$setValidity("server", true);
+                            }
+                        });
+                    }
+                }
+            });
         };
 
         $scope.cancel = function ()

@@ -344,3 +344,14 @@ BEGIN
 
 END
 GO
+
+IF EXISTS(SELECT * FROM OrderTypes WHERE Name='Normal Order')
+BEGIN
+
+UPDATE OrderTypes 
+SET Name='Standard'
+WHERE Name='Normal Order'
+
+END
+
+GO

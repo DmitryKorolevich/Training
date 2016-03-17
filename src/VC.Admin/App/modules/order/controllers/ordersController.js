@@ -65,6 +65,9 @@
             $scope.orderTypes = angular.copy($rootScope.ReferenceData.OrderTypes);
             $scope.orderTypes.splice(0, 0, { Key: null, Text: 'All Order Types' });
 
+            $scope.orderSourceTypes = angular.copy($rootScope.ReferenceData.OrderSourceTypes);
+            $scope.orderSourceTypes.splice(0, 0, { Key: null, Text: 'All Order Sources' });
+
             $scope.pOrderTypes = angular.copy($rootScope.ReferenceData.POrderTypes);
             $scope.pOrderTypes.splice(0, 0, { Key: null, Text: 'All  P/NP Types' });
 
@@ -88,6 +91,7 @@
                 From: currentDate.shiftDate('-1m'),
                 ShipDate: false,
                 OrderStatus: null,
+                IdObjectType: null,
                 IdOrderSource: null,
                 POrderType: null,
                 IdCustomerType: null,
@@ -106,6 +110,7 @@
                 From: null,
                 ShipDate: false,
                 OrderStatus: null,
+                IdObjectType: null,
                 IdOrderSource: null,
                 POrderType: null,
                 IdCustomerType: null,

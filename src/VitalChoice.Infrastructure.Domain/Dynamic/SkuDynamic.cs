@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using VitalChoice.Ecommerce.Domain.Dynamic;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
 
 namespace VitalChoice.Infrastructure.Domain.Dynamic
 {
@@ -25,6 +26,6 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
 
         public int Order { get; set; }
 
-        public ICollection<int> InventorySkuIds { get; set; }
+        public ICollection<SkuToInventorySku> SkusToInventorySkus { get; set; }
     }
 }

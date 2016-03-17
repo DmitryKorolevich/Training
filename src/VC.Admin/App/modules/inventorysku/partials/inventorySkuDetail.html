@@ -89,9 +89,12 @@
                                             <div class="form-group">
                                                 <label for="name" class="col-md-3 control-label">Inventory Unit Amount</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" name="UnitOfMeasureAmount" class="form-control" placeholder="Inventory Unit Amount" required data-ng-model="inventorySku.UnitOfMeasureAmount" required numbers-only />
+                                                    <input type="text" name="UnitOfMeasureAmount" class="form-control" placeholder="Inventory Unit Amount" required data-ng-model="inventorySku.UnitOfMeasureAmount" max="100000" min="0.00" required money/>
                                                     <div class="error-container" ng-show="forms.submitted && forms.details.UnitOfMeasureAmount.$invalid">
                                                         <small class="error" ng-show="forms.details.UnitOfMeasureAmount.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Inventory Unit Amount")}}</small>
+                                                        <small class="error" ng-show="forms.details.UnitOfMeasureAmount.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","Inventory Unit Amount")}}</small>
+                                                        <small class="error" ng-show="forms.details.UnitOfMeasureAmount.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Inventory Unit Amount",1000000)}}</small>
+                                                        <small class="error" ng-show="forms.details.UnitOfMeasureAmount.$error.min">{{getValidationMessage("{0} must be over 0.00","Inventory Unit Amount")}}</small>
                                                         <small class="error" ng-show="forms.details.UnitOfMeasureAmount.$error.server">{{serverMessages.GetMessage('UnitOfMeasureAmount')}}</small>
                                                     </div>
                                                 </div>

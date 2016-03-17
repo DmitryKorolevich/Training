@@ -29,7 +29,7 @@
                                         <div ui-tree-handle>
                                             <div class="ya-treeview-content clearfix">
                                                 <div class="line">
-                                                    <label>{{country.CountryName}} - <strong>{{country.CountryCode}}</strong></label>
+                                                    <label><span class="text-break-message">{{country.CountryName}} -&nbsp;</span><strong>{{country.CountryCode}}</strong></label>
                                                     <span data-ng-if="country.StatusCode == 1" class="label label-warning category-status">Hidden</span>
                                                 </div>
                                                 <div class="ya-treview-buttons" data-nodrag>
@@ -50,7 +50,7 @@
                                                 <div ui-tree-handle>
                                                     <div class="ya-treeview-content clearfix">
                                                         <div class="line">
-                                                            <label>{{state.StateName}} - <strong>{{state.StateCode}}</strong></label>
+                                                            <label><span class="text-break-message">{{state.StateName}} -&nbsp;</span><strong>{{state.StateCode}}</strong></label>
                                                             <span data-ng-if="state.StatusCode == 1" class="label label-warning category-status">Hidden</span>
                                                         </div>
                                                         <div class="ya-treview-buttons" data-nodrag>

@@ -8,6 +8,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 using VC.Admin.Models.Orders;
+using VitalChoice.Infrastructure.Domain.Constants;
 
 namespace VC.Admin.Validators.Order
 {
@@ -137,12 +138,26 @@ namespace VC.Admin.Validators.Order
                                 .WithMessage(model => model.IdPaymentMethodType, ValidationMessages.FieldRequired);
                              RuleFor(model => model.KeyCode)
                                .NotEmpty()
-                               .WithMessage(model => model.KeyCode, ValidationMessages.FieldRequired);
+                               .WithMessage(model => model.KeyCode, ValidationMessages.FieldRequired)
+                               .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                               .WithMessage(model => model.KeyCode, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
                              RuleFor(model => model.PoNumber)
                                .NotEmpty()
                                .When(p => p.Customer != null && p.Customer.CustomerType == CustomerType.Wholesale && p.IdObjectType!=(int)OrderType.GiftList)
-                               .WithMessage(model => model.PoNumber, ValidationMessages.FieldRequired);
+                               .WithMessage(model => model.PoNumber, ValidationMessages.FieldRequired)
+                               .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                               .WithMessage(model => model.PoNumber, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
 
+                             RuleFor(model => model.OrderNotes)
+                              .Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE)
+                              .WithMessage(model => model.OrderNotes, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
+                             RuleFor(model => model.DeliveryInstructions)
+                                 .Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE)
+                                 .WithMessage(model => model.DeliveryInstructions, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
+                             RuleFor(model => model.GiftMessage)
+                                 .Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE)
+                                 .WithMessage(model => model.GiftMessage, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
+                             
                              RuleFor(model => model.ShipDelayDate)
                               .Must(p => p.HasValue)
                               .When(p => p.ShipDelayType == ShipDelayType.EntireOrder)

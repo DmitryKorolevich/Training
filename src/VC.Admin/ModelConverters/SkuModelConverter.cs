@@ -6,6 +6,7 @@ using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.InventorySkus;
 using VitalChoice.Interfaces.Services.InventorySkus;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
 
 namespace VC.Admin.ModelConverters
 {
@@ -22,12 +23,20 @@ namespace VC.Admin.ModelConverters
         {
             model.Active = dynamic.StatusCode == (int)RecordStatusCode.Active;
             model.InventorySkus=new List<InventorySkuListItemModel>();
-            if (dynamic.InventorySkuIds != null && dynamic.InventorySkuIds.Count != 0)
+            if (dynamic.SkusToInventorySkus != null && dynamic.SkusToInventorySkus.Count != 0)
             {
-                InventorySkuFilter filter=new InventorySkuFilter();
-                filter.Ids = dynamic.InventorySkuIds;
+                InventorySkuFilter filter = new InventorySkuFilter();
+                filter.Ids = dynamic.SkusToInventorySkus.Select(p => p.IdInventorySku).ToList();
                 var items = _inventorySkuService.GetInventorySkusAsync(filter).Result.Items;
                 model.InventorySkus = items;
+                foreach (var item in model.InventorySkus)
+                {
+                    var reference = dynamic.SkusToInventorySkus.FirstOrDefault(p => p.IdInventorySku == item.Id);
+                    if(reference!=null)
+                    {
+                        item.Quantity = reference.Quantity;
+                    }
+                }
             }
         }
 
@@ -44,7 +53,10 @@ namespace VC.Admin.ModelConverters
                 dynamic.DictionaryData.Remove("OffPercent");
             }
 
-            dynamic.InventorySkuIds = model.InventorySkus?.Select(p => p.Id).ToList();
+            dynamic.SkusToInventorySkus = model.InventorySkus?.Select(p => new SkuToInventorySku() {
+                IdInventorySku=p.Id,
+                Quantity=p.Quantity ?? 1,
+            }).ToList();
         }
     }
 }

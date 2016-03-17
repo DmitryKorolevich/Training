@@ -25,6 +25,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 
         public int? IdOrderSource { get; set; }
 
+        public OrderType? IdObjectType { get; set; }
+
         public int? IdCustomerType { get; set; }
 
         public int? IdShippingMethod { get; set; }

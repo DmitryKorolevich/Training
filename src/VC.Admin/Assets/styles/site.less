@@ -215,6 +215,9 @@ img.thumb {
 	float: right;
 	margin-left:20px;
 	margin-right: 10px;
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 
 .angular-ui-tree-handle:hover .ya-treview-buttons,
@@ -230,6 +233,7 @@ img.thumb {
 .ya-treeview-content .checkbox{
 	float: left;
 	min-width: 400px;
+    word-break: break-all;
 }
 
 .inline-block {display: inline-block;}
@@ -260,6 +264,7 @@ img.thumb {
 .ya-treeview-content{
 	padding-left: 2px;
 	margin-left: 12px;
+    position: relative;
 }
 
 .ya-treeview-content .line{
@@ -269,6 +274,7 @@ img.thumb {
     display: block;
     margin-top: 10px;
     margin-bottom: 11px;
+    padding-right: 120px;
 }
 
 .ya-treeview-content .line label {
@@ -276,6 +282,14 @@ img.thumb {
     margin-bottom: 0;
     font-weight: normal;
     cursor: pointer;
+    word-break: break-all;
+}
+
+.ya-treeview-content .line .category-status{    
+    display: inline-block;
+    vertical-align: top;
+    padding-top: .3em;
+    padding-bottom: .3em;
 }
 
 .categories.full-lines .ya-treeview-content .line{
@@ -1014,6 +1028,7 @@ ul.navbar-custom-header li .dropdown-menu{
     min-width: initial;
     float: none;
     display: inline-block;
+    padding-right: 0px;
 }
 
 
@@ -1182,6 +1197,9 @@ th.sortable-column {
 .promotion-edit .products table th.actions { width: 65px;}
 .promotion-edit .products table td div.as-label { margin-top: 8px;}
 .promotion-edit select.buy-types { width: 80px; display: inline-block; margin-left: 10px; margin-right: 10px; }
+
+.inventory-assign-popup .parts table th.qty { width: 151px;}
+.inventory-assign-popup .parts table td div.as-label { margin-top: 8px;}
 
 .partial-sku-list table th.sku { width: 130px; }
 .partial-sku-list table th.actions { width: 40px; }

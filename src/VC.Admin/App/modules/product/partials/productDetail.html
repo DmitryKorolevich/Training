@@ -703,8 +703,8 @@
                                                                                         <label class="control-label">Assigned Parts</label>
                                                                                         <div class="control-label left">
                                                                                             <span data-ng-repeat="inventoSku in subSku.InventorySkus">
-                                                                                                <span data-ng-if="!$last">{{::inventoSku.Code}}, </span>
-                                                                                                <span data-ng-if="$last">{{::inventoSku.Code}}</span>
+                                                                                                <span data-ng-if="!$last">{{::inventoSku.Code}}({{::inventoSku.Quantity}}), </span>
+                                                                                                <span data-ng-if="$last">{{::inventoSku.Code}}({{::inventoSku.Quantity}})</span>
                                                                                             </span>
                                                                                         </div>
                                                                                     </div>
