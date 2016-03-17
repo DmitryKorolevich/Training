@@ -69,7 +69,7 @@ namespace VitalChoice.Core.GlobalFilters
                 if (model != null)
                 {
                     var metadata = bindingContext.ModelMetadata as DefaultModelMetadata;
-                    var preventFilteringXSS = metadata?.Attributes.PropertyAttributes.Any(x => x is PreventXSSFilteringAttribute) ?? false;
+                    var preventFilteringXSS = metadata?.Attributes.PropertyAttributes?.Any(x => x is AllowXSSAttribute) ?? false;
 
                     
                     if (!preventFilteringXSS)
@@ -91,7 +91,7 @@ namespace VitalChoice.Core.GlobalFilters
         }
     }
 
-    public class PreventXSSFilteringAttribute : Attribute
+    public class AllowXSSAttribute : Attribute
     {
 
     }
