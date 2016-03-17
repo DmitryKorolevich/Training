@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using VC.Public.Models;
 using VitalChoice.ContentProcessing.Interfaces;
+using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Interfaces.Services.Content;
 
@@ -15,8 +16,9 @@ namespace VC.Public.Controllers.Content
 
         public ArticleController(
             IArticleCategoryViewService articleCategoryViewService,
-            IArticleViewService articleViewService)
-	    {
+            IArticleViewService articleViewService,
+            IPageResultService pageResultService) : base(pageResultService)
+        {
             _articleCategoryViewService = articleCategoryViewService;
             _articleViewService = articleViewService;
         }

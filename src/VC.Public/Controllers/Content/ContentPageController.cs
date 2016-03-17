@@ -13,6 +13,7 @@ using Microsoft.AspNet.Mvc.ViewEngines;
 using Microsoft.AspNet.Mvc.Rendering;
 using VitalChoice.Infrastructure.Domain.Constants;
 using System.Net;
+using VitalChoice.Core.Services;
 
 namespace VC.Public.Controllers.Content
 {
@@ -23,8 +24,9 @@ namespace VC.Public.Controllers.Content
 
         public ContentPageController(
             IContentEditService contentService,
-            IContentPageViewService contentPageViewService)
-	    {
+            IContentPageViewService contentPageViewService,
+            IPageResultService pageResultService) : base(pageResultService)
+        {
 		    _contentService = contentService;
             _contentPageViewService = contentPageViewService;
         }

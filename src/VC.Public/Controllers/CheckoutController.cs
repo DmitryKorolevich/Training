@@ -29,6 +29,7 @@ using System.Reflection;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Services.Bronto;
+using VitalChoice.Core.Services;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
@@ -67,10 +68,11 @@ namespace VC.Public.Controllers
             IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper, 
             ICountryService countryService,
             BrontoService brontoService,
-            ITransactionAccessor<EcommerceContext> transactionAccessor)
+            ITransactionAccessor<EcommerceContext> transactionAccessor,
+            IPageResultService pageResultService)
             : base(
                 contextAccessor, customerService, infrastructureService, authorizationService, checkoutService, orderService,
-                skuMapper, productMapper)
+                skuMapper, productMapper, pageResultService)
         {
             _storefrontUserService = storefrontUserService;
             _paymentMethodConverter = paymentMethodConverter;

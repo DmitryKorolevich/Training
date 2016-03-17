@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using VC.Public.Models;
+using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Interfaces.Services.Content;
 
@@ -14,8 +15,9 @@ namespace VC.Public.Controllers.Content
 
         public FaqController(
             IFAQCategoryViewService faqCategoryViewService,
-            IFAQViewService faqViewService)
-	    {
+            IFAQViewService faqViewService,
+            IPageResultService pageResultService) : base(pageResultService)
+        {
             _faqCategoryViewService = faqCategoryViewService;
             _faqViewService = faqViewService;
         }

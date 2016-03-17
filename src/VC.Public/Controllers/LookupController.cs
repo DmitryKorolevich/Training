@@ -8,6 +8,7 @@ using VitalChoice.Validation.Models;
 using System.Linq;
 using Microsoft.AspNet.Authorization;
 using VitalChoice.Core.Infrastructure;
+using VitalChoice.Core.Services;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using VitalChoice.Interfaces.Services;
@@ -20,8 +21,9 @@ namespace VC.Public.Controllers
 		private readonly ICountryService _countryService;
 		private readonly IAppInfrastructureService _appInfrastructureService;
 
-		public LookupController(ICountryService countryService, IAppInfrastructureService appInfrastructureService)
-		{
+		public LookupController(ICountryService countryService, IAppInfrastructureService appInfrastructureService,
+            IPageResultService pageResultService) : base(pageResultService)
+        {
 			_countryService = countryService;
 			_appInfrastructureService = appInfrastructureService;
 		}

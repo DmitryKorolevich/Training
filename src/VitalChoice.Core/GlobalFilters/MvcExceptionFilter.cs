@@ -89,15 +89,17 @@ namespace VitalChoice.Core.GlobalFilters
 				}
 				else
 				{
-					if (apiException.Status == HttpStatusCode.NotFound)
+				    var pageService = context.HttpContext.RequestServices.GetService<IPageResultService>();
+
+                    if (apiException.Status == HttpStatusCode.NotFound)
 					{
-						context.Result = new RedirectResult("/content/" + ContentConstants.NOT_FOUND_PAGE_URL);
+						context.Result = pageService.GetResult(PageResult.NotFound);
 						return;
 					}
 					if (apiException.Status == HttpStatusCode.Forbidden)
 					{
-						context.Result = new RedirectResult("/content/" + ContentConstants.ACESS_DENIED_PAGE_URL);
-						return;
+						context.Result = pageService.GetResult(PageResult.Forbidden);
+                        return;
 					}
 					var viewName = "Error";
 

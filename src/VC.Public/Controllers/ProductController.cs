@@ -19,6 +19,7 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services.Products;
 using System.Linq;
+using VitalChoice.Core.Services;
 
 namespace VC.Public.Controllers
 {
@@ -30,8 +31,13 @@ namespace VC.Public.Controllers
 	    private readonly IProductService _productService;
 	    private readonly IProductReviewService _productReviewService;
 
-	    public ProductController(ICategoryViewService categoryViewService, IProductViewService productViewService, ReCaptchaValidator reCaptchaValidator, IProductService productService, IProductReviewService productReviewService)
-	    {
+	    public ProductController(ICategoryViewService categoryViewService, 
+            IProductViewService productViewService, 
+            ReCaptchaValidator reCaptchaValidator, 
+            IProductService productService, 
+            IProductReviewService productReviewService,
+            IPageResultService pageResultService) : base(pageResultService)
+        {
 		    _categoryViewService = categoryViewService;
 		    _productViewService = productViewService;
 		    _reCaptchaValidator = reCaptchaValidator;

@@ -22,6 +22,7 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 using System.Collections.Generic;
 using Microsoft.Extensions.OptionsModel;
+using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Options;
 
 namespace VC.Public.Controllers
@@ -40,7 +41,8 @@ namespace VC.Public.Controllers
             IAffiliateUserService affiliateUserService,
             IAffiliateService affiliateService,
             IDynamicMapper<AffiliateDynamic, Affiliate> affiliateMapper,
-            IOptions<AppOptions> appOptions)
+            IOptions<AppOptions> appOptions,
+            IPageResultService pageResultService) : base(pageResultService)
         {
             _contextAccessor = contextAccessor;
             _affiliateUserService = affiliateUserService;

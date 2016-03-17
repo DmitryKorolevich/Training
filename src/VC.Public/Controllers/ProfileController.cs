@@ -9,6 +9,7 @@ using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using VC.Public.Models.Profile;
 using VitalChoice.Core.Infrastructure;
+using VitalChoice.Core.Services;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
@@ -68,8 +69,9 @@ namespace VC.Public.Controllers
             IHelpService helpService,
             IHealthwiseService healthwiseService, IAppInfrastructureService infrastructureService,
             IAuthorizationService authorizationService, ICheckoutService checkoutService,
-            ILoggerProviderExtended loggerProvider)
-            : base(contextAccessor, customerService, infrastructureService, authorizationService, checkoutService)
+            ILoggerProviderExtended loggerProvider,
+            IPageResultService pageResultService)
+            : base(contextAccessor, customerService, infrastructureService, authorizationService, checkoutService, pageResultService)
         {
             _storefrontUserService = storefrontUserService;
             _addressConverter = addressConverter;

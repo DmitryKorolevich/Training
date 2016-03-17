@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNet.Mvc;
 using VitalChoice.Core.GlobalFilters;
+using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Constants;
 
 namespace VitalChoice.Core.Base
@@ -8,14 +9,21 @@ namespace VitalChoice.Core.Base
     [SetAffiliateCookieFilter]
     public abstract class BaseMvcController : BaseController
     {
-		public virtual IActionResult BaseNotFoundView()
+        private readonly IPageResultService _pageResultService;
+
+        protected BaseMvcController(IPageResultService pageResultService)
+        {
+            _pageResultService = pageResultService;
+        }
+
+        public virtual IActionResult BaseNotFoundView()
 		{
-			return Redirect("/content/" + ContentConstants.NOT_FOUND_PAGE_URL);
+		    return _pageResultService.GetResult(PageResult.NotFound);
 		}
 
 		public virtual IActionResult GetItemNotAccessibleResult()
 		{
-			return Redirect("/content/" + ContentConstants.ACESS_DENIED_PAGE_URL);
-		}
+			return _pageResultService.GetResult(PageResult.Forbidden);
+        }
 	}
 }

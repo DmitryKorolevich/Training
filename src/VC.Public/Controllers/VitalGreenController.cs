@@ -20,6 +20,7 @@ using Microsoft.AspNet.Mvc.ViewEngines;
 using Microsoft.AspNet.Mvc.ViewFeatures;
 using VitalChoice.Ecommerce.Utils;
 using System.Text;
+using VitalChoice.Core.Services;
 
 namespace VC.Public.Controllers
 {
@@ -41,7 +42,8 @@ namespace VC.Public.Controllers
                                     ICountryService countryService,
                                     IVitalGreenService vitalGreenService,
                                     IFedExService fedExService,
-                                    ILoggerProviderExtended loggerProvider)
+                                    ILoggerProviderExtended loggerProvider,
+                                    IPageResultService pageResultService) : base(pageResultService)
         {
             _userService = userService;
             _contextAccessor = contextAccessor;
