@@ -13,36 +13,36 @@ namespace VitalChoice.Core.GlobalFilters
         private static readonly List<string> ForbiddenStrings = new List<string>
         {
             "'",
-            "&#39;",
-            "&#x27;",
+            //"&#39;",
+            //"&#x27;",
 
             "\"",
-            "&quot;",
-            "&QUOT;",
-            "&#34;",
-            "&#x22;",
+            //"&quot;",
+            //"&QUOT;",
+            //"&#34;",
+            //"&#x22;",
 
             "&",
-            "&amp;",
-            "&AMP;",
-            "&#38;",
-            "&#x26;",
+            //"&amp;",
+            //"&AMP;",
+            //"&#38;",
+            //"&#x26;",
 
             "<",
-            "&lt;",
-            "&LT;",
-            "&#60;",
-            "&#x3C;",
+            //"&lt;",
+            //"&LT;",
+            //"&#60;",
+            //"&#x3C;",
 
             ">",
-            "&gt;",
-            "&GT;",
-            "&#62;",
-            "&#x3E;",
+            //"&gt;",
+            //"&GT;",
+            //"&#62;",
+            //"&#x3E;",
 
             "/",
-            "&#47;",
-            "&#x2F;"
+            //"&#47;",
+            //"&#x2F;"
         };
 
         public Task<ModelBindingResult> BindModelAsync(ModelBindingContext bindingContext)
