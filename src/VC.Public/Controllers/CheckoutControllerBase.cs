@@ -20,6 +20,7 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
@@ -35,6 +36,7 @@ namespace VC.Public.Controllers
 		protected readonly IOrderService OrderService;
 		protected readonly IDynamicMapper<SkuDynamic, Sku> SkuMapper;
 		protected readonly IDynamicMapper<ProductDynamic, Product> ProductMapper;
+		protected readonly ReferenceData AppInfrastructure;
 
 		protected CheckoutControllerBase(IHttpContextAccessor contextAccessor, ICustomerService customerService,
             IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService, ICheckoutService checkoutService, IOrderService orderService, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper) :base(contextAccessor, customerService,
@@ -43,7 +45,8 @@ namespace VC.Public.Controllers
 			OrderService = orderService;
 			SkuMapper = skuMapper;
 			ProductMapper = productMapper;
-		}
+			AppInfrastructure = infrastructureService.Get();
+        }
 
 		protected async Task<bool> IsCartEmpty()
 		{
@@ -99,10 +102,13 @@ namespace VC.Public.Controllers
                 order.Skus?.Select(sku =>
                 {
                     var result = SkuMapper.ToModel<CartSkuModel>(sku.Sku);
-                    ProductMapper.UpdateModel(result, sku.ProductWithoutSkus);
+                    ProductMapper.UpdateModel(result, sku.Sku.Product);
                     result.Price = sku.Amount;
                     result.Quantity = sku.Quantity;
                     result.SubTotal = sku.Quantity * sku.Amount;
+
+                    result.GeneratedGCCodes = order.GeneratedGcs?.Where(g => g?.Sku.Id == sku.Sku.Id).Select(p => p.Code).ToList();
+
                     return result;
                 }) ?? Enumerable.Empty<CartSkuModel>());
             var gcsInCart = cartModel.GiftCertificateCodes.ToArray();
@@ -141,10 +147,13 @@ namespace VC.Public.Controllers
             cartModel.PromoSkus.AddRange(context.PromoSkus?.Select(sku =>
             {
                 var result = SkuMapper.ToModel<CartSkuModel>(sku.Sku);
-                ProductMapper.UpdateModel(result, sku.ProductWithoutSkus);
+                ProductMapper.UpdateModel(result, sku.Sku.Product);
                 result.Price = sku.Amount;
                 result.Quantity = sku.Quantity;
                 result.SubTotal = sku.Quantity * sku.Amount;
+
+                result.GeneratedGCCodes = order.GeneratedGcs?.Where(g => g?.Sku.Id == sku.Sku.Id).Select(p => p.Code).ToList();
+
                 return result;
             }) ?? Enumerable.Empty<CartSkuModel>());
 			cartModel.Tax = order.TaxTotal;
@@ -164,6 +173,7 @@ namespace VC.Public.Controllers
             }
             cartModel.ShippingUpgradeP = (ShippingUpgradeOption?)order.SafeData.ShippingUpgradeP;
             cartModel.ShippingUpgradeNP = (ShippingUpgradeOption?)order.SafeData.ShippingUpgradeNP;
+			cartModel.AutoShip = order.IdObjectType == (int) OrderType.AutoShip;
 
             if (!cartModel.GiftCertificateCodes.Any())
             {

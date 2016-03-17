@@ -1,6 +1,6 @@
 ﻿angular.module('app.modules.order.controllers.ordersController', [])
-.controller('ordersController', ['$scope', '$rootScope', '$state', 'orderService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
-    function ($scope, $rootScope, $state, orderService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil)
+.controller('ordersController', ['$scope', '$rootScope', '$state', 'orderService', 'settingService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
+    function ($scope, $rootScope, $state, orderService, settingService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil)
     {
         $scope.refreshTracker = promiseTracker("refresh");
         $scope.deleteTracker = promiseTracker("delete");
@@ -30,9 +30,8 @@
                 .success(function (result)
                 {
                     if (result.Success)
-                    {
-                        $scope.items = result.Data.Items;
-                        $.each($scope.items, function (index, item)
+                    {                        
+                        $.each(result.Data.Items, function (index, item)
                         {
                             item.AllowExport = item.OrderStatus == 2;
                             item.IsSelected = item.OrderStatus == 3 || item.OrderStatus == 5;//Shipped
@@ -41,6 +40,8 @@
                             item.NPAllowExport = item.NPOrderStatus == 2;
                             item.IsNPSelected = item.NPOrderStatus == 3 || item.NPOrderStatus == 5;//Shipped
                         });
+
+                        $scope.items = result.Data.Items;
                         $scope.totalItems = result.Data.Count;
                     } else
                     {
@@ -77,6 +78,9 @@
 
             $scope.forms = {};
 
+            $scope.items = [];
+            $scope.states = [];
+
             var currentDate = new Date();
             currentDate.setHours(0, 0, 0, 0);
             $scope.filter = {
@@ -88,6 +92,10 @@
                 POrderType: null,
                 IdCustomerType: null,
                 IdShippingMethod: null,
+                IdShipState: null,
+                CustomerFirstName: null,
+                CustomerLastName: null,
+                CustomerCompany: null,
                 Paging: { PageIndex: 1, PageItemCount: 100 },
                 Sorting: gridSorterUtil.resolve(refreshOrders, "DateCreated", "Desc"),
                 IsActive: true,
@@ -119,7 +127,31 @@
             });
 
             $scope.forms.IsActive = true;
-            refreshOrders();
+
+            settingService.getCountries({}, $scope.refreshTracker)
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        $scope.state = result.Data;
+                        $.each(result.Data, function (index, country)
+                        {
+                            if (country.CountryCode == 'US')
+                            {
+                                $scope.states = country.States;
+                                $scope.states.splice(0, 0, { Id: null, StateName: 'All'});
+                            }
+                        });
+                        refreshOrders();
+                    } else
+                    {
+                        errorHandler(result);
+                    }
+                })
+                .error(function (result)
+                {
+                    errorHandler(result);
+                });
         }
 
         $scope.filterOrders = function ()
@@ -128,13 +160,25 @@
             $scope.forms.form.submitted = false;
             $scope.filter.Paging.PageIndex = 1;
             refreshOrders();
+            //if ($scope.forms.filterForm.$valid)
+            //{
+            //    $scope.forms.filterForm.submitted = false;
+            //    $scope.filter.Paging.PageIndex = 1;
+            //    refreshOrders();
+            //}
+            //else
+            //{
+            //    $scope.forms.filterForm.submitted = true;
+            //}
         };
 
         $scope.directFilterOrders = function ()
         {
             $scope.forms.IsActive = false;
+            //$scope.forms.filterForm.submitted = false;
             if ($scope.forms.form.$valid)
             {
+                $scope.forms.form.submitted = false;
                 $scope.directOrdersfilter.Paging.PageIndex = 1;
                 refreshOrders();
             }
@@ -149,8 +193,27 @@
             refreshOrders();
         };
 
-        $scope.delete = function ()
+        $scope.delete = function (id)
         {
+            confirmUtil.confirm(function ()
+            {
+                orderService.cancelOrder(id, $scope.deleteTracker)
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            toaster.pop('success', "Success!", "Successfully canceled.");
+                            refreshOrders();
+                        } else
+                        {
+                            errorHandler(result);
+                        }
+                    })
+                    .error(function (result)
+                    {
+                        errorHandler(result);
+                    });
+            }, 'Are you sure you want to cancel this order?');
         };
 
         $scope.allExportCall = function ()
@@ -172,7 +235,7 @@
             });
         };
 
-        $scope.itemExportChanged = function (item)
+        $scope.itemExportChanged = function (item, event)
         {
             if (!item.IsSelected && $scope.settings.allExport)
             {
@@ -180,7 +243,7 @@
             }
         };
 
-        $scope.PItemExportChanged = function (item)
+        $scope.PItemExportChanged = function (item, event)
         {
             if (!item.IsPSelected && $scope.settings.allExport)
             {
@@ -188,7 +251,7 @@
             }
         };
 
-        $scope.NPItemExportChanged = function (item)
+        $scope.NPItemExportChanged = function (item, event)
         {
             if (!item.IsNPSelected && $scope.settings.allExport)
             {

@@ -1,9 +1,11 @@
 ﻿'use strict';
 
 angular.module('app.modules.product.controllers.productManageController', [])
-.controller('productManageController', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', 'productService', 'toaster', 'confirmUtil', 'promiseTracker', 'contentService',
-    function ($scope, $rootScope, $state, $stateParams, $timeout, $modal, productService, toaster, confirmUtil, promiseTracker, contentService) {
+.controller('productManageController', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', 'productService', 'inventorySkuService', 'toaster', 'confirmUtil', 'promiseTracker', 'contentService', 'modalUtil',
+    function ($scope, $rootScope, $state, $stateParams, $timeout, $modal, productService, inventorySkuService, toaster, confirmUtil, promiseTracker, contentService, modalUtil)
+    {
         $scope.refreshTracker = promiseTracker("get");
+        $scope.refreshInventoriesTracker = promiseTracker("refreshInventories");
 
         var sellerFieldName = 'Seller';
         var googleCategoryFieldName = 'GoogleCategory';
@@ -185,6 +187,13 @@ angular.module('app.modules.product.controllers.productManageController', [])
                     if (result.Success) {
                         $scope.lookups = result.Data.Lookups;
                         $scope.defaults = result.Data.DefaultValues;
+                        $.each($scope.lookups, function (index, lookup)
+                        {
+                            if (lookup.Name == 'InventorySkuChannels')
+                            {
+                                $scope.inventorySkuChannels = lookup.Items;
+                            }
+                        });
                         allowLoadProduct();
                     } else {
                         errorHandler(result);
@@ -247,6 +256,19 @@ angular.module('app.modules.product.controllers.productManageController', [])
 			            if (!$scope.product.MasterContentItemId) {
 			            	$scope.product.MasterContentItemId = $scope.MasterContentItemId;
 			            };
+
+			            if ($scope.product.SKUs)
+			            {
+			                $.each($scope.product.SKUs, function (index, sku)
+			                {
+			                    if (sku.BornDate)
+			                    {
+			                        sku.BornDate = Date.parseDateTime(sku.BornDate);
+			                        sku.OriginBornDate = sku.BornDate;
+			                    }
+			                });
+			            }
+
 			            refreshHistory();
 			            setSelected($scope.rootCategory, $scope.product.CategoryIds);
 			            setInventorySelected($scope.rootInventoryCategory, $scope.product.InventoryCategoryId);
@@ -318,7 +340,23 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 updateCrossses();
                 updateVideos();
 
-                productService.updateProduct($scope.product, $scope.refreshTracker).success(function (result) {
+                var data = angular.copy($scope.product);
+                if (data.SKUs)
+                {
+                    $.each(data.SKUs, function (index, sku)
+                    {
+                        if (sku.BornDate)
+                        {
+                            if (sku.BornDate != sku.OriginBornDate)
+                            {
+                                sku.BornDate.setHours(0, 0, 0);
+                            }
+                            sku.BornDate = sku.BornDate.toServerDateTime();
+                        }
+                    });
+                }
+
+                productService.updateProduct(data, $scope.refreshTracker).success(function (result) {
                     successSaveHandler(result);
                 }).error(function (result) {
                     errorHandler(result);
@@ -624,6 +662,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 HideFromDataFeed: Boolean.parse($scope.productTypeDefaults[hideFromDataFeedFieldName]),
                 QTYThreshold: $scope.productTypeDefaults[qTYThresholdFieldName] ? parseInt($scope.productTypeDefaults[qTYThresholdFieldName]) : null,
                 Seller: $scope.defaultSeller,
+                InventorySkus: [],
                 IsOpen: true,
             };
             var skus = [];
@@ -751,6 +790,18 @@ angular.module('app.modules.product.controllers.productManageController', [])
 
         $scope.toggleOpen = function (item, event) {
             item.IsOpen = !item.IsOpen;
+        };
+
+        $scope.assignInventorySkus = function(sku)
+        {
+            modalUtil.open('app/modules/inventorysku/partials/assignInventorySkusPopup.html', 'assignInventorySkusController', {
+                assignedItems: sku.InventorySkus, thenCallback: function (data)
+                {
+                    sku.InventorySkus = data;
+                }
+            }, { size: 'sm' });
+            event.stopPropagation();
+            return false;
         };
 
         initialize();

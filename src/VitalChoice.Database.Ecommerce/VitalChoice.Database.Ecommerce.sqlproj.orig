@@ -1,0 +1,256 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>VitalChoice.Database.Ecommerce</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{3b44a066-17a4-46d2-b7d1-7e67ba6aa8d0}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>VitalChoice.Database.Ecommerce</RootNamespace>
+    <AssemblyName>VitalChoice.Database.Ecommerce</AssemblyName>
+    <ModelCollation>1049,CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <DefaultCollation>Cyrillic_General_CI_AS</DefaultCollation>
+    <DefaultFilegroup>PRIMARY</DefaultFilegroup>
+    <CreateProjectFromDatabaseCompleted>True</CreateProjectFromDatabaseCompleted>
+    <TargetDatabase>VitalChoice.Ecommerce</TargetDatabase>
+    <PermissionSet>SAFE</PermissionSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="PostDeployment" />
+    <Folder Include="deploy" />
+    <Folder Include="PostDeployment\Scripts\" />
+    <Folder Include="PreDeployment" />
+    <Folder Include="PreDeployment\Scripts" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="PostDeployment\Script.PostDeployment.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Local.publish.xml" />
+    <None Include="deploy\deploy.ps1" />
+    <None Include="VitalChoice.Database.Ecommerce.publish.xml">
+      <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
+    </None>
+    <None Include="Azure.publish.xml" />
+    <None Include="PostDeployment\Scripts\DiscountOptionTypes.sql" />
+    <None Include="PreDeployment\Scripts\Orders.sql" />
+    <None Include="PostDeployment\Scripts\OrdersData.sql" />
+    <None Include="PreDeployment\Scripts\CustomerAddressStructureUpdate.sql" />
+    <None Include="PostDeployment\Scripts\CustomerAddressStructureModeData.sql" />
+    <None Include="PreDeployment\Scripts\AllValueTablesStructureOptimize.sql" />
+    <None Include="PreDeployment\Scripts\Checkout.sql" />
+<<<<<<< HEAD
+    <None Include="PreDeployment\Scripts\PromoUpdate.sql" />
+=======
+    <None Include="PostDeployment\Scripts\VTopProducts.sql" />
+>>>>>>> master
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="VitalChoice.Database.Ecommerce.refactorlog" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\ProductOptionTypes.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\CustomerAreaBasicsData.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PreDeploy Include="PreDeployment\Script.PreDeployment.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\CustomerAreaBasics.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\Discounts.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\Products.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\BigStringValues.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\Countries.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\FieldTypes.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\GiftCertificates.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\GiftCetfificatesUpdate.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\Lookups.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\LookupVariants.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\ProductCategories.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\ProductsToCategories.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\ReferencesToUsers.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\Workflow.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\RecordStatusCodes.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\ProductTypes.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\InventoryCategories.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\ProductReviews.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\VProductsWithReviews.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\OrderLookups.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VProductSkus.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\AppOptions.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\VAffiliates.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\AffiliatesData.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\HelpTickets.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VHelpTickets.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\Promotions.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\PromotionData.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\ProductsOutOfStock.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\ObjectHistoryLogItems.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\DiscountUpdates.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VCustomers.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetEngangedAffiliatesCount.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetAffiliatesSummaryReport.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VOrders.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VSkus.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\Affiliates.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VAffiliateNotPaidCommissions.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\Healthwise.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\CatalogRequests.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VHealthwisePeriods.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetProductCategoryStatistic.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetSkusInProductCategoryStatistic.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetOrdersRegionStatistic.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetOrdersZipStatistic.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VOrderWithRegionInfoItems.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VCustomerFavorites.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\InventorySkus.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\InventorySkuData.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\GiftCetfificatesUpdateSku.sql" />
+  </ItemGroup>
+</Project>

@@ -20,6 +20,8 @@ namespace VC.Public.Models.Cart
 			CrossSells = new List<CartCrossSellModel>();
 		}
 
+	    public bool AutoShip { get; set; }
+
 	    public bool ShipAsap { get; set; }
 
 		[FutureDate(ErrorMessage = "Shipping Date should be in the future")]

@@ -9,6 +9,7 @@ namespace VitalChoice.Caching.Interfaces
 {
     public interface IInternalEntityCacheFactory: IEntityCollectorInfo
     {
+        bool CanCache(Type entityType);
         bool CacheExist(Type entityType);
         IInternalEntityCache GetCache(Type entityType);
         IInternalEntityCache<T> GetCache<T>();

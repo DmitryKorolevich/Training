@@ -4,6 +4,8 @@ using VitalChoice.Data.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.DynamicData.Extensions;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 
 namespace VitalChoice.Business.Queries.Orders
 {
@@ -48,6 +50,145 @@ namespace VitalChoice.Business.Queries.Orders
 
 			return this;
 		}
+
+        public OrderQuery WithId(int? id)
+        {
+            if (id.HasValue)
+            {
+                Add(x => x.Id == id.Value);
+            }
+            return this;
+        }
+
+        public OrderQuery WithCreatedDate(DateTime? from, DateTime? to)
+        {
+            if (from.HasValue)
+            {
+                Add(x => x.DateCreated >= from.Value);
+            }
+            if (to.HasValue)
+            {
+                Add(x =>x.DateCreated <= to.Value);
+            }
+            return this;
+        }
+
+        public OrderQuery WithShippedDate(DateTime? from, DateTime? to)
+        {
+            if (from.HasValue)
+            {
+                //
+            }
+            if (to.HasValue)
+            {
+            }
+            return this;
+        }
+
+        public OrderQuery WithOrderStatus(OrderStatus? orderStatus)
+        {
+            if (orderStatus.HasValue)
+            {
+                Add(x => x.OrderStatus == orderStatus.Value || x.POrderStatus == orderStatus.Value || x.NPOrderStatus == orderStatus.Value);
+            }
+            return this;
+        }
+
+        public OrderQuery WithoutIncomplete(OrderStatus? orderStatus, bool ignoreNotShowingIncomplete = false)
+        {
+            if (!ignoreNotShowingIncomplete)
+            {
+                if (!orderStatus.HasValue || orderStatus != OrderStatus.Incomplete)
+                {
+                    Add(x => (x.OrderStatus != OrderStatus.Incomplete && !x.POrderStatus.HasValue && !x.NPOrderStatus.HasValue)
+                            || (!x.OrderStatus.HasValue && (x.POrderStatus != OrderStatus.Incomplete || x.NPOrderStatus != OrderStatus.Incomplete)));
+                }
+            }
+            return this;
+        }
+
+        public OrderQuery WithOrderDynamicValues(int? idOrderSource, int? pOrderType, int? idShippingMethod)
+        {
+            if (idOrderSource.HasValue)
+            {
+                Add(c => c.WhenValues(new
+                {
+                    OrderType= idOrderSource.Value
+                }));
+            }
+            if (pOrderType.HasValue)
+            {
+                Add(c => c.WhenValues(new
+                {
+                    POrderType = pOrderType.Value
+                }));
+            }
+            if (idShippingMethod.HasValue && idShippingMethod.Value==1)//upgraded
+            {
+                Add(c => c.WhenValues(new
+                {
+                    ShippingUpgradeP = 1
+                }) ||
+                c.WhenValues(new
+                {
+                    ShippingUpgradeP = 2
+                })||
+                c.WhenValues(new
+                {
+                    ShippingUpgradeNP = 1
+                }) ||
+                c.WhenValues(new
+                {
+                    ShippingUpgradeNP = 2
+                }));
+            }
+            return this;
+        }
+
+        public OrderQuery WithCustomerDynamicValues(string firstName, string lastName, string company)
+        {
+            if (!string.IsNullOrEmpty(firstName))
+            {
+                Add(c => c.Customer.ProfileAddress.WhenValues(new
+                {
+                    FirstName = firstName
+                }, (int)AddressType.Profile));
+            }
+            if (!string.IsNullOrEmpty(lastName))
+            {
+                Add(c => c.Customer.ProfileAddress.WhenValues(new
+                {
+                    LastName = lastName
+                },(int) AddressType.Profile));
+            }
+            if (!string.IsNullOrEmpty(company))
+            {
+                Add(c => c.Customer.ProfileAddress.WhenValues(new
+                {
+                    Company = company
+                }, (int)AddressType.Profile));
+            }
+
+            return this;
+        }
+
+        public OrderQuery WithShipState(int? idShipState)
+        {
+            if (idShipState.HasValue)
+            {
+                Add(x => x.ShippingAddress.IdState== idShipState.Value);
+            }
+            return this;
+        }
+
+        public OrderQuery WithCustomerType(int? idCustomerType)
+        {
+            if (idCustomerType.HasValue)
+            {
+                Add(x => x.Customer.IdObjectType == idCustomerType.Value);
+            }
+            return this;
+        }
 
         #region AffiliateOrders
 

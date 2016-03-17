@@ -190,7 +190,7 @@ namespace VitalChoice.Business.Services.Products
             PagedList<PromotionDynamic> toReturn = new PagedList<PromotionDynamic>(result.Items.Select(p => _mapper.FromEntity(p)).ToList(), result.Count);
             if (toReturn.Items.Any())
             {
-                var ids = result.Items.Select(p => p.IdAddedBy).ToList();
+                var ids = result.Items.Where(p => p.IdAddedBy.HasValue).Select(p => p.IdAddedBy.Value).Distinct().ToList();
                 var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
                 foreach (var item in toReturn.Items)
                 {

@@ -195,7 +195,7 @@ namespace VitalChoice.ObjectMapping.Base
 
             objects.Add(obj, result);
 
-            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+            var objectCache = DynamicTypeCache.GetTypeCacheNoCast(objectType);
             foreach (var pair in objectCache.Properties)
             {
                 Type propertyElementType = pair.Value.PropertyType.TryGetElementType(typeof(ICollection<>));
@@ -233,6 +233,53 @@ namespace VitalChoice.ObjectMapping.Base
             return result;
         }
 
+        public static IList Clone(IEnumerable obj, Type objectType)
+        {
+            return CloneInternal(obj, objectType);
+        }
+
+        public static IList CloneInternal(IEnumerable obj, Type objectType)
+        {
+            if (obj == null)
+                return null;
+
+            var resultList = (IList) Activator.CreateInstance(typeof (List<>).MakeGenericType(objectType));
+            var objectCache = DynamicTypeCache.GetTypeCacheNoCast(objectType);
+
+            foreach (var item in obj)
+            {
+                var result = Activator.CreateInstance(objectType);
+
+                foreach (var pair in objectCache.Properties)
+                {
+                    pair.Value.Set?.Invoke(result, pair.Value.Get?.Invoke(item));
+                }
+                resultList.Add(result);
+            }
+
+            return resultList;
+        }
+
+        public static object Clone(object obj, Type objectType)
+        {
+            return CloneInternal(obj, objectType);
+        }
+
+        public static object CloneInternal(object obj, Type objectType)
+        {
+            if (obj == null)
+                return null;
+
+            var result = Activator.CreateInstance(objectType);
+
+            var objectCache = DynamicTypeCache.GetTypeCacheNoCast(objectType);
+            foreach (var pair in objectCache.Properties)
+            {
+                pair.Value.Set?.Invoke(result, pair.Value.Get?.Invoke(obj));
+            }
+            return result;
+        }
+
         public static object Clone(object obj, Type objectType, Type baseTypeToMemberwiseClone)
         {
             Dictionary<object, object> objects = new Dictionary<object, object>();
@@ -254,7 +301,7 @@ namespace VitalChoice.ObjectMapping.Base
 
             objects.Add(obj, result);
 
-            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+            var objectCache = DynamicTypeCache.GetTypeCacheNoCast(objectType);
             foreach (var pair in objectCache.Properties)
             {
                 Type propertyElementType = pair.Value.PropertyType.TryGetElementType(typeof(ICollection<>));
@@ -309,7 +356,7 @@ namespace VitalChoice.ObjectMapping.Base
 
             objects.Add(dest);
 
-            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+            var objectCache = DynamicTypeCache.GetTypeCacheNoCast(objectType);
             foreach (var pair in objectCache.Properties)
             {
                 var srcProperty = src == null ? null : pair.Value.Get?.Invoke(src);
@@ -338,13 +385,35 @@ namespace VitalChoice.ObjectMapping.Base
             CloneIntoInternal(dest, src, objectType, baseTypeToMemberwiseClone, objects);
         }
 
-        public static void CopyInto(object dest, object src, Type objectType)
+        public static void SetObjectsNull(object dest, Type objectType, Func<Type, bool> setNullSkipCondition = null)
         {
             if (dest == null)
                 return;
-            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+            var objectCache = DynamicTypeCache.GetTypeCacheNoCast(objectType);
             foreach (var pair in objectCache.Properties)
             {
+                if (!pair.Value.PropertyType.GetTypeInfo().IsValueType)
+                {
+                    if (setNullSkipCondition != null && setNullSkipCondition(pair.Value.PropertyType))
+                    {
+                        continue;
+                    }
+                    pair.Value.Set?.Invoke(dest, null);
+                }
+            }
+        }
+
+        public static void CopyInto(object dest, object src, Type objectType, Func<Type, bool> copySkipCondition = null)
+        {
+            if (dest == null)
+                return;
+            var objectCache = DynamicTypeCache.GetTypeCacheNoCast(objectType);
+            foreach (var pair in objectCache.Properties)
+            {
+                if (copySkipCondition != null && copySkipCondition(pair.Value.PropertyType))
+                {
+                    continue;
+                }
                 var srcProperty = src == null ? null : pair.Value.Get?.Invoke(src);
                 pair.Value.Set?.Invoke(dest, srcProperty);
             }

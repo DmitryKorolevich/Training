@@ -13,6 +13,7 @@ namespace VitalChoice.Caching.Interfaces
         bool GetEntityInfo(Type entityType, out EntityInfo info);
         Type GetContextType(Type entityType);
         object GetEntity(Type entityType, ICollection<EntityValueExportable> keyValues);
+        object GetEntity(Type entityType, EntityKey pk);
 
         EntityPrimaryKeyInfo GetPrimaryKeyInfo(Type entityType);
         EntityCacheableIndexInfo GetIndexInfo(Type entityType);
@@ -24,6 +25,8 @@ namespace VitalChoice.Caching.Interfaces
         bool GetEntityInfo<T>(out EntityInfo info);
         Type GetContextType<T>();
         T GetEntity<T>(ICollection<EntityValueExportable> keyValues)
+            where T : class;
+        T GetEntity<T>(EntityKey pk)
             where T : class;
 
         EntityPrimaryKeyInfo GetPrimaryKeyInfo<T>();

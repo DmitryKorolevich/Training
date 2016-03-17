@@ -38,5 +38,7 @@ namespace VitalChoice.Ecommerce.Domain.Mail
 
         [Map]
 	    public string SubTitle { get; set; }
+
+        public ICollection<string> GeneratedGCCodes { get; set; }
     }
 }

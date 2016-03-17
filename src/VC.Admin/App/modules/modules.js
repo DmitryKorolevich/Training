@@ -15,5 +15,6 @@ angular.module('app.modules', [
 	'app.modules.affiliate',
 	'app.modules.help',
 	'app.modules.misc',
-	'app.modules.healthwise'
+	'app.modules.healthwise',
+	'app.modules.inventorysku'
 ]);

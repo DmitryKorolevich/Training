@@ -23,9 +23,11 @@ namespace VitalChoice.Caching.Services
             Logger = logger;
         }
 
+        public virtual ICollection<KeyValuePair<string, int>> AverageLatency => null;
+
         public virtual void SendChanges(IEnumerable<SyncOperation> syncOperations)
         {
-            
+
         }
 
         public void AcceptChanges(IEnumerable<SyncOperation> syncOperations)
@@ -39,20 +41,23 @@ namespace VitalChoice.Caching.Services
                     continue;
                 foreach (var op in group)
                 {
+                    object entity;
                     switch (op.SyncType)
                     {
                         case SyncType.Update:
-                            internalCache.MarkForUpdate(op.Key.ToPrimaryKey(pkInfo));
+                            var pk = op.Key.ToPrimaryKey(pkInfo);
+                            if (internalCache.ItemExist(pk))
+                            {
+                                entity = KeyStorage.GetEntity(type, pk);
+                                internalCache.Update(entity);
+                            }
                             break;
                         case SyncType.Delete:
                             internalCache.TryRemove(op.Key.ToPrimaryKey(pkInfo));
                             break;
                         case SyncType.Add:
-                            var entity = KeyStorage.GetEntity(type, op.Key.Values);
+                            entity = KeyStorage.GetEntity(type, op.Key.Values);
                             internalCache.MarkForAdd(entity);
-                            break;
-                        default:
-                            Logger.LogWarning("Invalid SyncType was sent over.");
                             break;
                     }
                 }

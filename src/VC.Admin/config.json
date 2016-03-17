@@ -20,8 +20,7 @@
       "Server": "vw4v86cs0h.database.windows.net"
     },
     "ExportService": {
-      "PlainConnectionString": "",
-      "EncryptedConnectionString": "",
+      "ConnectionString": "",
       "PlainQueueName": "",
       "EncryptedQueueName": "",
       "CertThumbprint": "",
@@ -29,10 +28,10 @@
       "ServerHostName": ""
     },
     //"ExportService": {
-    //  "PlainConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=8btEfIO+srlpmg9AF0evGubknnuzetZZ70bKDOH7gps=",
-    //  "EncryptedConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=fnKDZwxtFlGCxePFOXdX5//2Js1fkgMFHJDDz7uN5PE=",
-    //  "PlainQueueName": "PlainQueue",
-    //  "EncryptedQueueName": "EncryptedQueue",
+    //  "PlainConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=6CXYK7zSC5RhTQYALz1vRqMe/Sg8vW25LwhsTSE96o8=",
+    //  "EncryptedConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=84NxAhwRn3vd2gDWgPWIDi14x+s3JWe2NFvBx1mTtq8=",
+    //  "PlainQueueName": "plainexport",
+    //  "EncryptedQueueName": "encryptedexport",
     //  "CertThumbprint": "E2603D85F0E4B59448FD3D380FEFF740B28B3215",
     //  "RootThumbprint": "89735BE3169BE34AB67B65C7D9EFFD2C230A9D98",
     //  "EncryptionHostSessionExpire": false,
@@ -91,9 +90,16 @@
       "CacheScanPeriodSeconds": 900 //15 minutes
     },
     "CacheSyncOptions": {
-      "ConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=CacheConnectors;SharedAccessKey=pCiNJKmuaN4Z6OtfoFT4Pv33Yqj832sE//Dfa8WGQow=",
-      "ServiceBusQueueName": "PlainCache",
+      "ConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=hemZgxBH/foCscmtPdhF8wvbWfh8aF9GR4ShqfnCPnY=",
+      "ServiceBusQueueName": "caching",
       "Enabled": true
+    },
+    "Bronto": {
+      "ApiKey": "BCCC606B-8D04-4BBA-80D2-8FF8832F7D2F",
+      "ApiUrl": "https://api.bronto.com/v4",
+      "PublicFormUrl": "http://news.vitalchoice.com/public/webform/process/",
+      "PublicFormSendData": "fid=hmgt3y8oy6qmzpv2rh4j51zg5l7tu&sid=09dcaffa5c9971f4be87813780496171&delid=&subid=&36429%5B338758%5D=true&36423=",
+      "PublicFormSubscribeData": "fid=0tfbcxet2mwy7gfrsgmrq6hlovv9n&sid=09dcaffa5c9971f4be87813780496171&delid=&subid=&73567%5B18487127%5D=true&73323="
     }
   }
 }

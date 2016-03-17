@@ -215,13 +215,13 @@ namespace VitalChoice.Business.Services.Avatax
             {
                 items =
                     order.SkuOrdereds.Union(order.PromoSkus.Where(p => p.Enabled))
-                        .Where(s => s.ProductWithoutSkus.IdObjectType != (int) ProductType.NonPerishable);
+                        .Where(s => s.Sku.IdObjectType != (int) ProductType.NonPerishable);
             }
             else if (taxGetType.HasFlag(TaxGetType.NonPerishableOnly))
             {
                 items =
                     order.SkuOrdereds.Union(order.PromoSkus.Where(p => p.Enabled))
-                        .Where(s => s.ProductWithoutSkus.IdObjectType == (int) ProductType.NonPerishable);
+                        .Where(s => s.Sku.IdObjectType == (int) ProductType.NonPerishable);
             }
             else
             {
@@ -231,11 +231,11 @@ namespace VitalChoice.Business.Services.Avatax
                 p => new Line
                 {
                     Amount = p.Amount*p.Quantity,
-                    Description = p.ProductWithoutSkus.Name,
+                    Description = p.Sku.Product.Name,
                     DestinationCode = "02",
                     OriginCode = "01",
                     Discounted = order.DiscountTotal > 0,
-                    TaxCode = p.ProductWithoutSkus.SafeData.TaxCode,
+                    TaxCode = p.Sku.Product.SafeData.TaxCode,
                     Qty = p.Quantity,
                     ItemCode = p.Sku.Code,
                     LineNo = (startNumber++).ToString(CultureInfo.InvariantCulture),

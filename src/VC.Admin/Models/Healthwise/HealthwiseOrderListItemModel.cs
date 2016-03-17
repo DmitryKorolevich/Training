@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
 
 namespace VC.Admin.Models.Healthwise

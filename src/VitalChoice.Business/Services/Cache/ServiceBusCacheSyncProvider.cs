@@ -2,62 +2,93 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational.Base;
 using VitalChoice.Caching.Services;
 using System.Collections.Concurrent;
-using System.Threading;
-using Autofac;
-using Autofac.Core.Lifetime;
+using System.Globalization;
 using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Infrastructure.ServiceBus.Base;
+using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services.Cache
 {
     public class ServiceBusCacheSyncProvider : CacheSyncProvider, IDisposable
     {
-        private static bool _enabled;
-        private static readonly object LockObject = new object();
-        private static QueueClient _serviceBusClient;
-        private static readonly Guid ClientUid = Guid.NewGuid();
-        private static readonly AutoResetEvent TouchQueEvent = new AutoResetEvent(false);
-        private static readonly ConcurrentQueue<BrokeredMessage> SendQue = new ConcurrentQueue<BrokeredMessage>();
-        private static ILifetimeScope _rootScope;
+        public const int PingAverageMaxCount = 50;
 
-        public ServiceBusCacheSyncProvider(ILifetimeScope serviceProvider, IInternalEntityCacheFactory cacheFactory, IEntityInfoStorage keyStorage, ILogger logger,
-            IOptions<AppOptions> options)
-            : base(cacheFactory, keyStorage, logger)
+        private readonly IApplicationEnvironment _applicationEnvironment;
+        private readonly bool _enabled;
+        private readonly object _lockObject = new object();
+        private readonly ServiceBusHostOneToMany _serviceBusClient;
+        private readonly Guid _clientUid = Guid.NewGuid();
+        private readonly ConcurrentDictionary<string, int> _averagePing;
+        private readonly int[] _pingMilliseconds = new int[PingAverageMaxCount];
+        private int _totalMessagesReceived;
+
+        public ServiceBusCacheSyncProvider(IInternalEntityCacheFactory cacheFactory, IEntityInfoStorage keyStorage,
+            ILoggerProviderExtended loggerProvider,
+            IOptions<AppOptions> options, IApplicationEnvironment applicationEnvironment)
+            : base(cacheFactory, keyStorage, loggerProvider.CreateLoggerDefault())
         {
-            lock (LockObject)
+            if (options.Value.CacheSyncOptions?.Enabled ?? false)
             {
-                if (!_enabled)
+                _applicationEnvironment = applicationEnvironment;
+                _enabled = true;
+                _averagePing = new ConcurrentDictionary<string, int>();
+
+                var queName = options.Value.CacheSyncOptions?.ServiceBusQueueName;
+                try
                 {
-                    _enabled = options.Value.CacheSyncOptions?.Enabled ?? false;
+                    var ns = NamespaceManager.CreateFromConnectionString(options.Value.CacheSyncOptions?.ConnectionString);
+                    if (!ns.TopicExists(queName))
+                    {
+                        TopicDescription topic = new TopicDescription(queName)
+                        {
+                            EnableExpress = true,
+                            EnablePartitioning = true,
+                            EnableBatchedOperations = true,
+                            DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
+                            RequiresDuplicateDetection = false
+                        };
+
+                        ns.CreateTopic(topic);
+                    }
+                    if (!ns.SubscriptionExists(queName, applicationEnvironment.ApplicationName))
+                    {
+                        SubscriptionDescription subscription = new SubscriptionDescription(queName, applicationEnvironment.ApplicationName)
+                        {
+                            EnableBatchedOperations = true,
+                            DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
+                            RequiresSession = false
+                        };
+                        ns.CreateSubscription(subscription);
+                    }
                 }
-                if (_serviceBusClient == null && _enabled)
+                catch (Exception e)
                 {
-                    _rootScope = ((LifetimeScope)serviceProvider).RootLifetimeScope;
-                    //var namespaceManager =
-                    //    NamespaceManager.CreateFromConnectionString(options.Value.CacheSyncOptions?.ConnectionString);
-                    var queName = options.Value.CacheSyncOptions?.ServiceBusQueueName;
-                    //if (!namespaceManager.QueueExists(queName))
-                    //{
-                    //    namespaceManager.CreateQueue(new QueueDescription(queName)
-                    //    {
-                    //        DefaultMessageTimeToLive = TimeSpan.FromMinutes(5),
-                    //        EnableBatchedOperations = true,
-                    //        EnablePartitioning = true,
-                    //    });
-                    //}
+                    Logger.LogInformation(e.Message, e);
+                }
+
+                _serviceBusClient = new ServiceBusHostOneToMany(Logger, () =>
+                {
                     var factory = MessagingFactory.CreateFromConnectionString(options.Value.CacheSyncOptions?.ConnectionString);
-                    _serviceBusClient = factory.CreateQueueClient(queName, ReceiveMode.PeekLock);
-                    new Thread(ReceivingThreadProc).Start(logger);
-                    new Thread(SendingThreadProc).Start(logger);
-                }
+                    return factory.CreateTopicClient(queName);
+                }, () =>
+                {
+                    var factory = MessagingFactory.CreateFromConnectionString(options.Value.CacheSyncOptions?.ConnectionString);
+                    return factory.CreateSubscriptionClient(queName, applicationEnvironment.ApplicationName, ReceiveMode.ReceiveAndDelete);
+                })
+                {
+                    EnableBatching = true
+                };
+                _serviceBusClient.ReceiveMessagesEvent += ReceiveMessages;
+                _serviceBusClient.Start();
             }
         }
 
@@ -66,27 +97,26 @@ namespace VitalChoice.Business.Services.Cache
             if (!_enabled)
                 return;
 
+            var now = DateTime.UtcNow;
             foreach (var operation in syncOperations)
             {
-                SendQue.Enqueue(new BrokeredMessage(operation)
+                operation.SendTime = now;
+                _serviceBusClient.EnqueueMessage(new BrokeredMessage(operation)
                 {
-                    CorrelationId = ClientUid.ToString(),
+                    CorrelationId = _clientUid.ToString(),
                     TimeToLive = TimeSpan.FromMinutes(5)
                 });
             }
-            TouchQueEvent.Set();
+            _serviceBusClient.SendNow();
         }
 
-        ~ServiceBusCacheSyncProvider()
-        {
-            Dispose(false);
-        }
+        public override ICollection<KeyValuePair<string, int>> AverageLatency => _averagePing;
 
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
             {
-                GC.SuppressFinalize(this);
+                _serviceBusClient.Dispose();
             }
         }
 
@@ -95,73 +125,70 @@ namespace VitalChoice.Business.Services.Cache
             Dispose(true);
         }
 
-        private static void ReceivingThreadProc(object parameter)
+        private void ReceiveMessages(IEnumerable<BrokeredMessage> incomingItems)
         {
-            var logger = parameter as ILogger;
-            if (logger == null)
-                throw new Exception("Endless thread should use valid logger");
-            while (true)
-            {
-                try
-                {
-                    using (var scope = _rootScope.BeginLifetimeScope())
-                    {
-                        var cacheSyncProvider = scope.Resolve<ICacheSyncProvider>();
-                        cacheSyncProvider.AcceptChanges(GetBatch());
-                    }
-                }
-                catch (Exception e)
-                {
-                    logger.LogError(e.Message, e);
-                }
-            }
-        }
-
-        private static void SendingThreadProc(object parameter)
-        {
-            var logger = parameter as ILogger;
-            if (logger == null)
-                throw new Exception("Endless thread should use valid logger");
-            while (true)
-            {
-                try
-                {
-                    BrokeredMessage message;
-                    if (!SendQue.TryDequeue(out message))
-                    {
-                        TouchQueEvent.WaitOne();
-                        continue;
-                    }
-                    _serviceBusClient.Send(message);
-                }
-                catch (Exception e)
-                {
-                    logger.LogError(e.Message, e);
-                }
-            }
-        }
-
-        private static IEnumerable<SyncOperation> GetBatch()
-        {
-            var incomingItems = _serviceBusClient.ReceiveBatch(100);
+            List<SyncOperation> syncOperations = new List<SyncOperation>();
             foreach (var message in incomingItems)
             {
+                if (message.ExpiresAtUtc < DateTime.UtcNow)
+                {
+                    continue;
+                }
                 Guid senderUid;
                 if (Guid.TryParse(message.CorrelationId, out senderUid))
                 {
-                    if (senderUid == ClientUid)
+                    if (senderUid == _clientUid)
                     {
-                        message.Abandon();
                         continue;
                     }
                     var syncOp = message.GetBody<SyncOperation>();
-                    message.Complete();
-                    yield return syncOp;
+
+                    if (syncOp.SyncType != SyncType.Ping)
+                    {                      
+                        var ping = (DateTime.UtcNow - syncOp.SendTime).Milliseconds;
+                        Logger.LogInformation($"{syncOp} Message lag: {ping} ms");
+                        lock (_lockObject)
+                        {
+                            _pingMilliseconds[_totalMessagesReceived] = ping;
+                            _totalMessagesReceived = (_totalMessagesReceived + 1) % PingAverageMaxCount;
+                        }
+                    }
+
+                    if (syncOp.SyncType == SyncType.Ping && syncOp.AveragePing > 0)
+                    {
+                        _averagePing.AddOrUpdate(syncOp.AppName, syncOp.AveragePing, (s, i) => syncOp.AveragePing);
+                    }
+                    else
+                    {
+                        syncOperations.Add(syncOp);
+                    }
                 }
-                else
+            }
+            if (syncOperations.Any())
+            {
+                int[] pings;
+                lock (_lockObject)
                 {
-                    message.Complete();
+                    pings = _pingMilliseconds.Where(p => p > 0).ToArray();
                 }
+                if (pings.Length > 0)
+                {
+                    var averagePing = (int)pings.Average();
+                    _averagePing.AddOrUpdate(_applicationEnvironment.ApplicationName, averagePing, (s, i) => averagePing);
+                    _serviceBusClient.EnqueueMessage(new BrokeredMessage(new SyncOperation
+                    {
+                        SyncType = SyncType.Ping,
+                        AppName = _applicationEnvironment.ApplicationName,
+                        AveragePing = averagePing,
+                        SendTime = DateTime.UtcNow
+                    })
+                    {
+                        CorrelationId = _clientUid.ToString(),
+                        TimeToLive = TimeSpan.FromMinutes(5)
+                    });
+                    _serviceBusClient.SendNow();
+                }
+                AcceptChanges(syncOperations);
             }
         }
     }

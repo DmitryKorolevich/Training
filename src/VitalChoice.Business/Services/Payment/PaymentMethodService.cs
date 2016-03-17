@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Business.Queries.Payment;
 using VitalChoice.Business.Queries.User;
+using VitalChoice.Business.Queries.Users;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Transaction;

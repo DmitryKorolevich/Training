@@ -20,6 +20,7 @@ namespace VitalChoice.Workflow.Configuration
         {
             setup.Action<TotalAction>("Total", action =>
             {
+                action.Dependency<GiftCertificatesBuyAction>();
                 action.Dependency<PayableTotalAction>();
 
                 action.Aggregate<PayableTotalAction>();
@@ -42,12 +43,17 @@ namespace VitalChoice.Workflow.Configuration
             setup.Action<OrderSubTotalAction>("SubTotal", action =>
             {
                 action.Aggregate<ProductsWithPromoAction>();
-                action.Aggregate<DiscountTypeActionResolver>();
+                action.Aggregate<ReductionTypeActionResolver>();
                 action.Aggregate<ShippingStandardResolver>();
                 action.Aggregate<ShippingSurchargeResolver>();
                 action.Aggregate<ShippingUpgradesActionResolver>();
                 action.Aggregate<ShippingOverrideAction>();
                 action.Aggregate<ShippingSurchargeOverrideAction>();
+            });
+
+            setup.Action<GiftCertificatesBuyAction>("BuyGiftCertificates", action =>
+            {
+                action.Dependency<ProductsWithPromoAction>();
             });
 
             setup.Action<SetupPromoAction>("PromoSetup");
@@ -72,7 +78,7 @@ namespace VitalChoice.Workflow.Configuration
 
             setup.Action<ProductsWithPromoAction>("PromoProducts", action =>
             {
-                action.Dependency<DiscountTypeActionResolver>();
+                action.Dependency<ReductionTypeActionResolver>();
                 action.Dependency<BuyXGetYPromoAction>();
                 action.Aggregate<ProductAction>();
             });
@@ -143,11 +149,12 @@ namespace VitalChoice.Workflow.Configuration
 
             setup.Action<ShippingUpgradesUsCaAction>("ShippingUpgradeUsCa", action =>
             {
-                action.Dependency<ProductsSplitAction>();
             });
 
             setup.ActionResolver<ShippingUpgradesActionResolver>("ShippingUpgrade", action =>
             {
+                action.Dependency<ProductsSplitAction>();
+
                 action.ResolvePath<ShippingUpgradesUsCaAction>((int) ShippingUpgradeGroup.UsCa, "ShippingUpgradeUsCa");
             });
 
@@ -159,7 +166,18 @@ namespace VitalChoice.Workflow.Configuration
                     "ShippingSurchargeCa");
             });
 
-            setup.ActionResolver<DiscountTypeActionResolver>("Discount", action =>
+			setup.ActionResolver<ReductionTypeActionResolver>("Reduction", action =>
+			{
+				action.ResolvePath<AutoShipAction>((int)ReductionType.AutoShip, "AutoShip");
+				action.ResolvePath<DiscountTypeActionResolver>((int)ReductionType.Discount, "Discount");
+			});
+
+			setup.Action<AutoShipAction>("AutoShip", action =>
+			{
+				action.Dependency<DiscountableProductsAction>();
+			});
+
+			setup.ActionResolver<DiscountTypeActionResolver>("Discount", action =>
             {
                 action.Dependency<PerishableProductsAction>();
 
@@ -172,7 +190,7 @@ namespace VitalChoice.Workflow.Configuration
 
             setup.ActionResolver<ShippingStandardResolver>("StandardShipping", action =>
             {
-                action.Dependency<DiscountTypeActionResolver>();
+                action.Dependency<ReductionTypeActionResolver>();
                 action.ResolvePath<StandardShippingUsWholesaleAction>((int) CustomerType.Wholesale, "StandardWholesaleShipping");
                 action.ResolvePath<StandardShippingUsCaRetailAction>((int) CustomerType.Retail, "StandardRetailShipping");
             });

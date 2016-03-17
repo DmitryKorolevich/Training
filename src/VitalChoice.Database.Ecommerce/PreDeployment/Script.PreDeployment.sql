@@ -55,3 +55,5 @@
 
 :r .\Scripts\Checkout.sql
 :r .\Scripts\PromoUpdate.sql
+:r .\Scripts\InventorySkus.sql
+:r .\Scripts\GiftCetfificatesUpdateSku.sql

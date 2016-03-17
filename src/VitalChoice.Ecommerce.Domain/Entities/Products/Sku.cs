@@ -1,4 +1,5 @@
-﻿using VitalChoice.Ecommerce.Domain.Entities.Base;
+﻿using System.Collections.Generic;
+using VitalChoice.Ecommerce.Domain.Entities.Base;
 
 namespace VitalChoice.Ecommerce.Domain.Entities.Products
 {
@@ -7,6 +8,22 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Products
         public int IdProduct { get; set; }
 
         public Product Product { get; set; }
+
+        private int _idObjectType;
+
+        public override int IdObjectType
+        {
+            get { return Product?.IdObjectType ?? _idObjectType; }
+            set { _idObjectType = value; }
+        }
+
+        private ICollection<ProductOptionType> _optionTypes;
+
+        public override ICollection<ProductOptionType> OptionTypes
+        {
+            get { return Product?.OptionTypes ?? _optionTypes; }
+            set { _optionTypes = value; }
+        }
 
         public string Code { get; set; }
 
@@ -17,5 +34,7 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Products
         public decimal WholesalePrice { get; set; }
 
         public int Order { get; set; }
+
+        public ICollection<SkuToInventorySku> SkusToInventorySkus { get; set; }
     }
 }

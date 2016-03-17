@@ -31,7 +31,7 @@
             // 
             // ExportServiceManager
             // 
-            this.ServiceName = "Order Export Service";
+            this.ServiceName = "exportservice";
 
         }
 

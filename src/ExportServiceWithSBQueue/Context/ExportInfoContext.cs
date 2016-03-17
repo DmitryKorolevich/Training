@@ -8,24 +8,24 @@ namespace ExportServiceWithSBQueue.Context
 {
     public class ExportInfoContext : DataContext
     {
-        private readonly IOptions<ExportOptions> _options;
+        protected readonly IOptions<ExportOptions> Options;
 
         public ExportInfoContext(IOptions<ExportOptions> options)
         {
-            _options = options;
+            Options = options;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder builder)
         {
             var connectionString = (new SqlConnectionStringBuilder
             {
-                DataSource = _options.Value.ExportConnection.Server,
+                DataSource = Options.Value.ExportConnection.Server,
                 MultipleActiveResultSets = true,
                 InitialCatalog = "VitalChoice.ExportInfo",
-                UserID = _options.Value.ExportConnection.UserName,
-                Password = _options.Value.ExportConnection.Password,
+                UserID = Options.Value.ExportConnection.UserName,
+                Password = Options.Value.ExportConnection.Password,
                 ConnectTimeout = 60,
-                Encrypt = _options.Value.ExportConnection.Encrypt,
+                Encrypt = Options.Value.ExportConnection.Encrypt,
                 TrustServerCertificate = false
             }).ConnectionString;
             builder.UseSqlServer(connectionString);

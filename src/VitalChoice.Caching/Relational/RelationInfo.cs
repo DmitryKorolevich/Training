@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using VitalChoice.Caching.Expressions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
@@ -9,22 +10,35 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Relational
 {
-    public interface IRelationGetter
+    public interface IRelationAccessor
     {
         object GetRelatedObject(object entity);
+        void SetRelatedObject(object entity, object relation);
+        bool CanSet { get; }
     }
 
-    public class RelationInfo : IEquatable<RelationInfo>, IRelationGetter
+    public class RelationInfo : IEquatable<RelationInfo>, IRelationAccessor
     {
         public string Name { get; }
         public Type RelationType { get; }
         public Type OwnedType { get; }
         internal Dictionary<string, RelationInfo> RelationsDict { get; set; }
         public ICollection<RelationInfo> Relations => RelationsDict.Values;
-        private readonly IRelationGetter _relationGetter;
-        private static readonly IRelationGetter NullGetter = new NullRelationGetter();
+        private readonly IRelationAccessor _relationAccessor;
+        private static readonly IRelationAccessor NullAccessor = new NullRelationAccessor();
 
-        public RelationInfo(string name, Type relatedType, Type ownedType, LambdaExpression relationExpression,
+        internal RelationInfo(string name, Type relatedType, Type ownedType, IRelationAccessor relationAccessor,
+            IEnumerable<RelationInfo> subRelations = null)
+        {
+            Name = name;
+            RelationType = relatedType;
+            OwnedType = ownedType;
+            _relationAccessor = relationAccessor;
+            RelationsDict = subRelations?.ToDictionary(r => r.Name) ??
+                            new Dictionary<string, RelationInfo>();
+        }
+
+        public RelationInfo(string name, Type relatedType, Type ownedType, LambdaExpression relationExpression = null,
             IEnumerable<RelationInfo> subRelations = null)
         {
             RelationType = relatedType;
@@ -32,17 +46,14 @@ namespace VitalChoice.Caching.Relational
             Name = name;
             RelationsDict = subRelations?.ToDictionary(r => r.Name) ??
                             new Dictionary<string, RelationInfo>();
-            if (relationExpression != null)
-            {
-                _relationGetter =
-                    (IRelationGetter)
-                        Activator.CreateInstance(typeof (RelationGetter<,>).MakeGenericType(ownedType, relationExpression.ReturnType),
-                            relationExpression, name);
-            }
-            else
-            {
-                _relationGetter = NullGetter;
-            }
+            _relationAccessor = relationExpression != null ? CreateAccessor(ownedType, relationExpression) : NullAccessor;
+        }
+
+        internal static IRelationAccessor CreateAccessor(Type ownedType, LambdaExpression relationExpression)
+        {
+            return (IRelationAccessor)
+                Activator.CreateInstance(typeof (RelationAccessor<,>).MakeGenericType(ownedType, relationExpression.ReturnType),
+                    relationExpression);
         }
 
         public bool Equals(RelationInfo other)
@@ -50,7 +61,7 @@ namespace VitalChoice.Caching.Relational
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            if (!string.Equals(Name, other.Name) || RelationType != other.RelationType)
+            if (!string.Equals(Name, other.Name) || OwnedType != other.OwnedType)
                 return false;
 
             if (other.RelationsDict.Count != RelationsDict.Count)
@@ -68,7 +79,7 @@ namespace VitalChoice.Caching.Relational
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            if (!string.Equals(Name, other.Name) || RelationType != other.RelationType)
+            if (!string.Equals(Name, other.Name) || OwnedType != other.OwnedType)
                 return false;
 
             if (RelationsDict.Count > other.RelationsDict.Count)
@@ -86,7 +97,7 @@ namespace VitalChoice.Caching.Relational
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            if (!string.Equals(Name, other.Name) || RelationType != other.RelationType)
+            if (!string.Equals(Name, other.Name) || OwnedType != other.OwnedType)
                 return false;
 
             if (RelationsDict.Count < other.RelationsDict.Count)
@@ -114,16 +125,34 @@ namespace VitalChoice.Caching.Relational
             unchecked
             {
                 if (!_hashCode.HasValue)
-                    _hashCode = Relations.Aggregate((Name.GetHashCode()*397) ^ RelationType.GetHashCode(),
+                    _hashCode = Relations.Aggregate((Name.GetHashCode()*397) ^ OwnedType.GetHashCode(),
                         (current, next) => (current*397) ^ next.GetHashCode());
                 return _hashCode.Value;
             }
         }
 
+        public override string ToString()
+        {
+            return $"{Name}->\n\t{string.Join("\n", Relations)}";
+        }
+
         public object GetRelatedObject(object entity)
         {
-            return _relationGetter.GetRelatedObject(entity);
+            if (entity == null)
+                return null;
+
+            return _relationAccessor.GetRelatedObject(entity);
         }
+
+        public void SetRelatedObject(object entity, object relation)
+        {
+            if (entity == null)
+                return;
+
+            _relationAccessor.SetRelatedObject(entity, relation);
+        }
+
+        public bool CanSet => _relationAccessor.CanSet;
 
         public static bool operator ==(RelationInfo left, RelationInfo right)
         {
@@ -145,36 +174,47 @@ namespace VitalChoice.Caching.Relational
             return left?.LessThanOrEqualTo(right) ?? false;
         }
 
-        private class RelationGetter<TEntity, TRelation> : IRelationGetter
+        private class RelationAccessor<TEntity, TRelation> : IRelationAccessor
         {
-            private static readonly Dictionary<string, Func<TEntity, TRelation>> RelationsCache = new Dictionary<string, Func<TEntity, TRelation>>();
+            private readonly Func<TEntity, TRelation> _getFunc;
+            private readonly Action<TEntity, TRelation> _setFunc;
 
-            public RelationGetter(Expression<Func<TEntity, TRelation>> getExpression, string propertyName)
+            public RelationAccessor(Expression<Func<TEntity, TRelation>> getExpression)
             {
-                lock (RelationsCache)
+                _getFunc = getExpression.Compile();
+                var member = getExpression.Body.RemoveConvert() as MemberExpression;
+                var property = member?.Member as PropertyInfo;
+                if (property != null)
                 {
-                    if (RelationsCache.TryGetValue(propertyName, out _relationFunc))
-                        return;
-
-                    _relationFunc = getExpression.CacheCompile();
-                    RelationsCache.Add(propertyName, _relationFunc);
+                    _setFunc = (Action<TEntity, TRelation>) property.GetSetMethod()?.CreateDelegate(typeof (Action<TEntity, TRelation>));
                 }
             }
 
-            private readonly Func<TEntity, TRelation> _relationFunc;
-
             public object GetRelatedObject(object entity)
             {
-                return _relationFunc((TEntity)entity);
+                return _getFunc((TEntity) entity);
             }
+
+            public void SetRelatedObject(object entity, object relation)
+            {
+                _setFunc?.Invoke((TEntity) entity, (TRelation) relation);
+            }
+
+            public bool CanSet => _setFunc != null;
         }
 
-        private class NullRelationGetter : IRelationGetter
+        private class NullRelationAccessor : IRelationAccessor
         {
             public object GetRelatedObject(object entity)
             {
                 return null;
             }
+
+            public void SetRelatedObject(object entity, object relation)
+            {
+            }
+
+            public bool CanSet => false;
         }
     }
 }

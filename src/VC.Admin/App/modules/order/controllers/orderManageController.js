@@ -191,11 +191,13 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
         $scope.discountsFilter = {
             Code: '',
+            StatusCode: 2,
             Paging: { PageIndex: 1, PageItemCount: 20 },
         };
 
         $scope.gcsFilter = {
             Code: '',
+            StatusCode: 2,
             Paging: { PageIndex: 1, PageItemCount: 20 },
         };
 
@@ -371,6 +373,8 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     $state.go('index.oneCol.customerDetail', { id: $scope.currentCustomer.Id });
                     return;
                 }
+                loadBrontoSubscribedStatus();
+
                 if ($scope.currentCustomer.SourceDetails)
                 {
                     $scope.currentCustomer.SourceValue = $scope.currentCustomer.SourceDetails;
@@ -560,6 +564,22 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         {
             errorHandler(result);
         });
+    };
+
+    var loadBrontoSubscribedStatus = function ()
+    {
+        orderService.getIsBrontoSubscribed($scope.currentCustomer.Email)
+            .success(function (result)
+            {
+                if (result.Success)
+                {
+                    $scope.options.BrontoSubscribedStatus = result.Data;
+                    $scope.options.BrontoSubscribedStatusLoaded = true;
+                }
+            })
+            .error(function (result)
+            {
+            });
     };
 
     $scope.goToCustomer = function ()
@@ -1188,6 +1208,8 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 order.Customer.EmailConfirm = null;
             }
 
+            order.SignUpNewsletter = $scope.options.BrontoSubscribedStatus;
+
             orderService.updateOrder(order, $scope.addEditTracker).success(function (result)
             {
                 successSaveHandler(result);
@@ -1279,7 +1301,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
     $scope.topPurchasedProducts = function ()
     {
         modalUtil.open('app/modules/product/partials/topPurchasedProductsPopup.html', 'topPurchasedProductsController', {
-            products: $scope.order.SkuOrdereds, thenCallback: function (data)
+            products: $scope.order.SkuOrdereds, idCustomer: $scope.currentCustomer.Id, thenCallback: function (data)
             {
                 var newProducts = data;
                 $.each(newProducts, function (index, newProduct)

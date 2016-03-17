@@ -1,4 +1,4 @@
-﻿<div class="container-fluid">
+﻿<div class="container-fluid logs-list">
 	<div class="well">
 		<span class="legend">Logs</span>
         <div class="row form-group">
@@ -75,8 +75,8 @@
 	            <tr data-ng-repeat="log in logs">
 	                <td>{{log.Date | date:"MM/dd/yy"}}<br/>{{log.Date | date:"h:mm a"}}</td>
 	                <td>{{log.LogLevel}}</td>
-	                <td>{{log.Source}}</td>
-	                <td>{{log.ShortMessage}}</td>
+	                <td class="text-break-message">{{log.Source}}</td>
+	                <td class="text-break-message">{{log.ShortMessage}}</td>
 	                <td>
 	                    <button title="Show Details" class="btn btn-default btn-success btn-xs" data-ng-click="open(log);">
                             <i class="fa fa-search"></i>

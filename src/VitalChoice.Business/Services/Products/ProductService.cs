@@ -1,11 +1,13 @@
 ﻿using Microsoft.Extensions.OptionsModel;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Business.Mail;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Business.Queries.Product;
+using VitalChoice.Business.Repositories;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Data.Helpers;
@@ -59,7 +61,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly IRepositoryAsync<ProductContent> _productContentRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> _contentTypeRepository;
         private readonly IOptions<AppOptions> _options;
-
+        private readonly IEcommerceRepositoryAsync<SkuOptionValue> _skuOptionValueRepositoryAsync;
 
         public async Task<ProductContent> SelectContentForTransfer(int id)
 		{
@@ -73,7 +75,11 @@ namespace VitalChoice.Business.Services.Products
 
         protected override IQueryLite<Product> BuildQuery(IQueryLite<Product> query)
         {
-            return query.Include(p => p.Skus).ThenInclude(s => s.OptionValues).Include(p => p.ProductsToCategories);
+            return query.Include(p => p.Skus)
+                .ThenInclude(s => s.OptionValues)
+                .Include(p => p.Skus)
+                .ThenInclude(s => s.SkusToInventorySkus)
+                .Include(p => p.ProductsToCategories);
         }
 
         protected override Task AfterSelect(ICollection<Product> entities)
@@ -158,6 +164,7 @@ namespace VitalChoice.Business.Services.Products
             IObjectLogItemExternalService objectLogItemExternalService,
             IEcommerceRepositoryAsync<ProductToCategory> productToCategoriesRepository,
             IEcommerceRepositoryAsync<ProductOptionValue> productValueRepositoryAsync,
+            IEcommerceRepositoryAsync<SkuOptionValue> skuOptionValueRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             OrderSkusRepository orderSkusRepositoryRepository,
             SkuMapper skuMapper,
@@ -188,6 +195,7 @@ namespace VitalChoice.Business.Services.Products
             _contentTypeRepository = contentTypeRepository;
             _vCustomerFavoriteRepository = vCustomerRepositoryAsync;
             _options = options;
+            _skuOptionValueRepositoryAsync = skuOptionValueRepositoryAsync;
         }
 
         #region ProductOptions
@@ -245,16 +253,38 @@ namespace VitalChoice.Business.Services.Products
             return _mapper.OptionTypes.ToList();
         }
 
+        public async Task<ICollection<SkuOptionValue>> GetSkuOptionValues(ICollection<int> skuIds,
+            ICollection<int> optionIds)
+        {
+            var toReturn = await _skuOptionValueRepositoryAsync.Query(p => skuIds.Contains(p.IdSku) && optionIds.Contains(p.IdOptionType))
+                .SelectAsync(false);
+            return toReturn;
+        }
+
         #endregion
 
         #region Skus
 
-        public async Task<Dictionary<int, int>> GetTopPurchasedSkuIdsAsync(FilterBase filter)
+        public async Task<Dictionary<int, int>> GetTopPurchasedSkuIdsAsync(FilterBase filter, int idCustomer)
         {
-            return await _orderSkusRepositoryRepository.GetTopPurchasedSkuIdsAsync(filter);
+            return await _orderSkusRepositoryRepository.GetTopPurchasedSkuIdsAsync(filter, idCustomer);
         }
 
-        public async Task<SkuOrdered> GetSkuOrderedAsync(string code)
+	    private async Task<SkuOrdered> PopulateSkuOrderedWithUrlAsync(Sku sku)
+	    {
+			var skuDynamic = await _skuMapper.FromEntityAsync(sku, true);
+			var skuOrdered = new SkuOrdered
+			{
+				Sku = skuDynamic
+			};
+
+			var productUrl = _productContentRepository.Query(p => p.Id == sku.IdProduct).Select(p => p.Url, false).FirstOrDefault();
+			skuOrdered.Sku.Product.Url = productUrl;
+
+			return skuOrdered;
+		}
+
+	    public async Task<SkuOrdered> GetSkuOrderedAsync(string code)
         {
             if (code == null)
                 throw new ArgumentNullException(nameof(code));
@@ -272,15 +302,8 @@ namespace VitalChoice.Business.Services.Products
                     .SelectFirstOrDefaultAsync(false);
             if (sku == null)
                 return null;
-            sku.OptionTypes =
-                _mapper.FilterByType(sku.Product.IdObjectType);
-            sku.Product.OptionTypes = sku.OptionTypes;
-            var skuDynamic = await _skuMapper.FromEntityAsync(sku, true);
-            return new SkuOrdered
-            {
-                Sku = skuDynamic,
-                ProductWithoutSkus = await DynamicMapper.FromEntityAsync(sku.Product, true),
-            };
+            
+	        return await PopulateSkuOrderedWithUrlAsync(sku);
         }
 
         public async Task<SkuOrdered> GetSkuOrderedAsync(int id)
@@ -293,15 +316,9 @@ namespace VitalChoice.Business.Services.Products
                     .Include(s => s.Product)
                     .ThenInclude(p => p.ProductsToCategories)
                     .SelectFirstOrDefaultAsync(false);
-            sku.OptionTypes =
-                _mapper.FilterByType(sku.Product.IdObjectType);
-            sku.Product.OptionTypes = sku.OptionTypes;
-            return new SkuOrdered
-            {
-                Sku = await _skuMapper.FromEntityAsync(sku, true),
-                ProductWithoutSkus = await DynamicMapper.FromEntityAsync(sku.Product, true)
-            };
-        }
+
+			return await PopulateSkuOrderedWithUrlAsync(sku);
+		}
 
         public async Task<List<SkuOrdered>> GetSkusOrderedAsync(ICollection<string> codes)
         {
@@ -320,18 +337,14 @@ namespace VitalChoice.Business.Services.Products
                     .ThenInclude(p => p.ProductsToCategories)
                     .SelectAsync(false);
 
-            foreach (var sku in skus)
-            {
-                sku.OptionTypes =
-                    _mapper.FilterByType(sku.Product.IdObjectType);
-                sku.Product.OptionTypes = sku.OptionTypes;
-            }
+			var res = new List<SkuOrdered>();
+	        foreach (var temp in skus)
+	        {
+				var skuOrdered = await PopulateSkuOrderedWithUrlAsync(temp);
+				res.Add(skuOrdered);
+			}
 
-            return skus.Select(sku => new SkuOrdered
-            {
-                Sku = _skuMapper.FromEntity(sku, true),
-                ProductWithoutSkus = DynamicMapper.FromEntity(sku.Product, true)
-            }).ToList();
+	        return res;
         }
 
         public async Task<List<SkuOrdered>> GetSkusOrderedAsync(ICollection<int> ids)
@@ -351,18 +364,15 @@ namespace VitalChoice.Business.Services.Products
                     .ThenInclude(p => p.ProductsToCategories)
                     .SelectAsync(false);
 
-            foreach (var sku in skus)
-            {
-                sku.OptionTypes = _mapper.FilterByType(sku.Product.IdObjectType);
-                sku.Product.OptionTypes = sku.OptionTypes;
-            }
+			var res = new List<SkuOrdered>();
+			foreach (var temp in skus)
+			{
+				var skuOrdered = await PopulateSkuOrderedWithUrlAsync(temp);
+				res.Add(skuOrdered);
+			}
 
-            return skus.Select(sku => new SkuOrdered
-            {
-                Sku = _skuMapper.FromEntity(sku, true),
-                ProductWithoutSkus = DynamicMapper.FromEntity(sku.Product, true)
-            }).ToList();
-        }
+			return res;
+		}
 
         public async Task<SkuDynamic> GetSkuAsync(string code, bool withDefaults = false)
         {
@@ -377,8 +387,6 @@ namespace VitalChoice.Business.Services.Products
                     .Include(s => s.OptionValues)
                     .Include(s => s.Product)
                     .SelectFirstOrDefaultAsync(false);
-            sku.OptionTypes =
-                _mapper.FilterByType(sku.Product.IdObjectType);
             return await _skuMapper.FromEntityAsync(sku, withDefaults);
         }
 
@@ -389,16 +397,21 @@ namespace VitalChoice.Business.Services.Products
                     .Include(s => s.OptionValues)
                     .Include(s => s.Product)
                     .SelectFirstOrDefaultAsync(false);
-            sku.OptionTypes =
-                _mapper.FilterByType(sku.Product.IdObjectType);
             return await _skuMapper.FromEntityAsync(sku, withDefaults);
         }
 
         public async Task<ICollection<VSku>> GetSkusAsync(VProductSkuFilter filter)
         {
-            var conditions = new VSkuQuery().NotDeleted().WithText(filter.SearchText).WithCode(filter.Code).WithDescriptionName(filter.DescriptionName)
-                .WithExactCode(filter.ExactCode).WithExactCodes(filter.ExactCodes).WithExactDescriptionName(filter.ExactDescriptionName).WithIds(filter.Ids).WithIdProducts(filter.IdProducts)
-				.ActiveOnly(filter.ActiveOnly).NotHiddenOnly(filter.NotHiddenOnly);
+            var conditions = new VSkuQuery().NotDeleted()
+                .WithText(filter.SearchText)
+                .WithCode(filter.Code)
+                .WithDescriptionName(filter.DescriptionName)
+                .WithExactCode(filter.ExactCode)
+                .WithExactCodes(filter.ExactCodes)
+                .WithExactDescriptionName(filter.ExactDescriptionName)
+                .WithIds(filter.Ids)
+                .WithIdProducts(filter.IdProducts)
+                .ActiveOnly(filter.ActiveOnly).NotHiddenOnly(filter.NotHiddenOnly);
             var query = _vSkuRepository.Query(conditions);
 
             Func<IQueryable<VSku>, IOrderedQueryable<VSku>> sortable = x => x.OrderByDescending(y => y.DateCreated);
@@ -463,7 +476,7 @@ namespace VitalChoice.Business.Services.Products
 
             if (toReturn.Items.Any())
             {
-                var ids = toReturn.Items.Select(p => p.IdEditedBy).ToList();
+                var ids = toReturn.Items.Where(p => p.IdEditedBy.HasValue).Select(p => p.IdEditedBy.Value).Distinct().ToList();
                 var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
                 foreach (var item in toReturn.Items)
                 {

@@ -23,6 +23,7 @@ using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Business.Helpers;
+using VitalChoice.Business.Services.Bronto;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -54,7 +55,7 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<PagedList<GiftCertificate>> GetGiftCertificatesAsync(GCFilter filter)
         {
-            var conditions = new GcQuery().NotDeleted().WithType(filter.Type).WithCode(filter.Code).WithEmail(filter.Email).WithName(filter.Name);
+            var conditions = new GcQuery().NotDeleted().WithType(filter.Type).WidthStatus(filter.StatusCode).WithCode(filter.Code).WithEmail(filter.Email).WithName(filter.Name);
             var query = giftCertificateRepository.Query(conditions);
 
             Func<IQueryable<GiftCertificate>, IOrderedQueryable<GiftCertificate>> sortable = x => x.OrderByDescending(y => y.Created);
@@ -249,7 +250,7 @@ namespace VitalChoice.Business.Services.Products
             return dbItem;
         }
 
-        public async Task<ICollection<GiftCertificate>> AddGiftCertificatesAsync(int quantity, GiftCertificate model)
+        public async Task<ICollection<GiftCertificate>> AddManualGiftCertificatesAsync(int quantity, GiftCertificate model)
         {
             List<GiftCertificate> items = new List<GiftCertificate>();
             DateTime now = DateTime.Now;
@@ -260,7 +261,7 @@ namespace VitalChoice.Business.Services.Products
                 item.Created = now;
                 item.GCType = GCType.ManualGC;
                 item.StatusCode = RecordStatusCode.Active;
-                item.Code = GenerateGCCode();
+                item.Code = await GenerateGCCode();
                 items.Add(item);
             }
 
@@ -294,20 +295,20 @@ namespace VitalChoice.Business.Services.Products
             return await giftCertificateRepository.Query(expression).SelectAsync(false);
         }
 
-        public string GenerateGCCode()
+        public async Task<string> GenerateGCCode()
         {
             string toReturn = null;
             bool generated = false;
             while (!generated)
             {
-                var attempt = String.Empty;
+                var attempt = string.Empty;
                 Guid guid = Guid.NewGuid();
                 var bytes = guid.ToByteArray();
                 for(int i= bytes.Length-1; i >= bytes.Length- GC_SYMBOLS_COUNT; i--)
                 {
                     attempt += symbols[bytes[i] % symbols.Count];
                 }
-                GiftCertificate dbItem = (giftCertificateRepository.Query(p=>p.Code== attempt).Select(false)).FirstOrDefault();
+                GiftCertificate dbItem = await giftCertificateRepository.Query(p => p.Code == attempt).SelectFirstOrDefaultAsync(false);
                 if (dbItem == null)
                 {
                     generated = true;

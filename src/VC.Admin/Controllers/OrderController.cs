@@ -22,6 +22,8 @@ using VitalChoice.Infrastructure.Domain.Entities.Permissions;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 using System.Linq;
+using Microsoft.Data.Entity;
+using Microsoft.Extensions.OptionsModel;
 using VC.Admin.Models.Orders;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -35,8 +37,12 @@ using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VC.Admin.ModelConverters;
 using VC.Admin.Models.Products;
 using VitalChoice.Business.Mail;
+using VitalChoice.Business.Services.Bronto;
 using VitalChoice.Business.Services.Dynamic;
+using VitalChoice.Caching.Extensions;
 using VitalChoice.Ecommerce.Domain.Mail;
+using VitalChoice.Infrastructure.Context;
+using VitalChoice.Infrastructure.Domain.Options;
 
 namespace VC.Admin.Controllers
 {
@@ -48,11 +54,13 @@ namespace VC.Admin.Controllers
         private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
         private readonly ICustomerService _customerService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
+        private readonly IOptions<AppOptions> _options;
         private readonly ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> _ordersRegionStatisticItemCSVExportService;
         private readonly ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> _ordersZipStatisticItemCSVExportService;
         private readonly ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> _vOrderWithRegionInfoItemCSVExportService;
         private readonly IProductService _productService;
         private readonly INotificationService _notificationService;
+        private readonly BrontoService _brontoService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly ILogger logger;
 
@@ -67,7 +75,8 @@ namespace VC.Admin.Controllers
             ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> vOrderWithRegionInfoItemCSVExportService,
             IProductService productService,
             INotificationService notificationService,
-            IObjectHistoryLogService objectHistoryLogService)
+            BrontoService brontoService,
+            IObjectHistoryLogService objectHistoryLogService, IOptions<AppOptions> options)
         {
             _orderService = orderService;
             _mapper = mapper;
@@ -78,9 +87,17 @@ namespace VC.Admin.Controllers
             _vOrderWithRegionInfoItemCSVExportService = vOrderWithRegionInfoItemCSVExportService;
             _productService = productService;
             _notificationService = notificationService;
+            _brontoService = brontoService;
             _objectHistoryLogService = objectHistoryLogService;
+            _options = options;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             this.logger = loggerProvider.CreateLoggerDefault();
+        }
+
+        [HttpGet]
+        public async Task<Result<bool>> GetIsBrontoSubscribed(string id)
+        {
+            return !_brontoService.GetIsUnsubscribed(id);
         }
 
         [HttpPost]
@@ -160,8 +177,27 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
+        //[HttpPost]
+        //public async Task<Result<PagedList<OrderListItemModel>>> GetOrders([FromBody]VOrderFilter filter)
+        //{
+        //    if (filter.To.HasValue)
+        //    {
+        //        filter.To = filter.To.Value.AddDays(1);
+        //    }
+
+        //    var result = await _orderService.GetOrdersAsync2(filter);
+
+        //    var toReturn = new PagedList<OrderListItemModel>
+        //    {
+        //        Items = result.Items.Select(p => new OrderListItemModel(p)).ToList(),
+        //        Count = result.Count,
+        //    };
+
+        //    return toReturn;
+        //}
+
         [HttpGet]
-        public async Task<Result<OrderManageModel>> GetOrder(int id, int? idcustomer = null, bool refreshprices=false)
+        public async Task<Result<OrderManageModel>> GetOrder(int id, int? idcustomer = null, bool refreshprices = false)
         {
             if (id == 0)
             {
@@ -173,8 +209,8 @@ namespace VC.Admin.Controllers
 
                 var model = _mapper.ToModel<OrderManageModel>(order);
 
-                model.GCs = new List<GCListItemModel>() { new GCListItemModel(null) };
-                model.SkuOrdereds = new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) };
+                model.GCs = new List<GCListItemModel>() {new GCListItemModel(null)};
+                model.SkuOrdereds = new List<SkuOrderedManageModel>() {new SkuOrderedManageModel(null)};
                 model.UpdateShippingAddressForCustomer = true;
                 model.UpdateCardForCustomer = true;
                 model.UpdateCheckForCustomer = true;
@@ -187,14 +223,16 @@ namespace VC.Admin.Controllers
             }
 
             var item = await _orderService.SelectAsync(id);
-            if(id!=0 && refreshprices && item.Skus!=null)
+            if (id != 0 && refreshprices && item.Skus != null)
             {
                 var customer = await _customerService.SelectAsync(item.Customer.Id);
-                foreach(var orderSku in item.Skus)
+                foreach (var orderSku in item.Skus)
                 {
-                    if(orderSku.Sku!=null)
+                    if (orderSku.Sku != null)
                     {
-                        orderSku.Amount = customer.IdObjectType == (int)CustomerType.Retail ? orderSku.Sku.Price : orderSku.Sku.WholesalePrice;
+                        orderSku.Amount = customer.IdObjectType == (int) CustomerType.Retail
+                            ? orderSku.Sku.Price
+                            : orderSku.Sku.WholesalePrice;
                     }
                 }
             }
@@ -274,9 +312,26 @@ namespace VC.Admin.Controllers
 
             OrderManageModel toReturn = _mapper.ToModel<OrderManageModel>(order);
 
-            //TODO: - add sign up for newsletter(SignUpNewsletter)
+            if(!string.IsNullOrEmpty(model?.Customer.Email))
+            {
+                var unsubscribed = _brontoService.GetIsUnsubscribed(model.Customer.Email);
+                if (model.SignUpNewsletter && unsubscribed)
+                {
+                    await _brontoService.Subscribe(model.Customer.Email);
+                }
+                if (!model.SignUpNewsletter && !unsubscribed)
+                {
+                    _brontoService.Unsubscribe(model.Customer.Email);
+                }
+            }
 
             return toReturn;
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> CancelOrder(int id, [FromBody] object model)
+        {
+            return await _orderService.CancelOrderAsync(id);
         }
 
         [HttpPost]

@@ -11,9 +11,10 @@
 
 	    $scope.forms = {};
 
-	    $scope.addedProducts=data.products;
+	    $scope.addedProducts = data.products;
+	    $scope.idCustomer = data.idCustomer;
 
-	    productService.getTopPurchasedSkus($scope.filter,$scope.refreshTracker)
+	    productService.getTopPurchasedSkus($scope.idCustomer, $scope.refreshTracker)
             .success(function(result) {
                 if(result.Success) {
                     $scope.products=result.Data;

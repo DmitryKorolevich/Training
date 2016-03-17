@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Dynamic;

@@ -17,8 +17,8 @@ namespace VitalChoice.Business.Workflow.Actions.Products
         {
             return
                 Task.FromResult(dataContext.SkuOrdereds.Union(dataContext.PromoSkus.Where(p => p.Enabled)).Where(s =>
-                    s.ProductWithoutSkus.IdObjectType == (int) ProductType.Perishable ||
-                    s.ProductWithoutSkus.IdObjectType == (int) ProductType.NonPerishable).Sum(s => s.Amount*s.Quantity));
+                    s.Sku.IdObjectType == (int) ProductType.Perishable ||
+                    s.Sku.IdObjectType == (int) ProductType.NonPerishable).Sum(s => s.Amount*s.Quantity));
         }
     }
 }

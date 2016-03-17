@@ -131,7 +131,7 @@ namespace VC.Admin.Controllers
                 item.UserId = userId;
             }
 
-            return (await GCService.AddGiftCertificatesAsync(quantity, item)).Select(p => new GCListItemModel(p)).ToList();
+            return (await GCService.AddManualGiftCertificatesAsync(quantity, item)).Select(p => new GCListItemModel(p)).ToList();
         }
 
         [HttpPost]

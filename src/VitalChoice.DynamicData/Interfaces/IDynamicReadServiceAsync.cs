@@ -8,7 +8,7 @@ namespace VitalChoice.DynamicData.Interfaces
 {
     public interface IDynamicReadServiceAsync<T, TEntity>
         where TEntity: DynamicDataEntity
-        where T: MappedObject
+        where T: MappedObject, new()
     {
         IDynamicMapper<T, TEntity> Mapper { get; }
 

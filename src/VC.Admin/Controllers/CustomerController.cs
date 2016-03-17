@@ -23,6 +23,8 @@ using VitalChoice.Validation.Models;
 using Microsoft.Extensions.OptionsModel;
 using Newtonsoft.Json;
 using VitalChoice.Business.CsvExportMaps;
+using VitalChoice.Business.Queries.Users;
+using VitalChoice.Business.Services.Bronto;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
@@ -54,10 +56,8 @@ namespace VC.Admin.Controllers
         private readonly Country _defaultCountry;
         private readonly ICsvExportService<ExtendedVCustomer, CustomersForAffiliatesCsvMap> _csvExportCustomersForAffiliatesService;
 
-        private readonly IDynamicServiceAsync<AddressDynamic, Address>
-            _addressService;
-        private readonly IDynamicServiceAsync<CustomerNoteDynamic, CustomerNote>
-            _notesService;
+        private readonly IDynamicServiceAsync<AddressDynamic, Address> _addressService;
+        private readonly IDynamicServiceAsync<CustomerNoteDynamic, CustomerNote> _notesService;
 
 		private readonly ILogger logger;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
@@ -69,11 +69,13 @@ namespace VC.Admin.Controllers
             IGenericService<AdminProfile> adminProfileService, IHttpContextAccessor contextAccessor,
             IDynamicServiceAsync<AddressDynamic, Address> addressService,
             IDynamicServiceAsync<CustomerNoteDynamic, CustomerNote> notesService,
-            IDynamicMapper<CustomerNoteDynamic, CustomerNote> noteMapper, ILoggerProviderExtended loggerProvider, IStorefrontUserService storefrontUserService,
+            IDynamicMapper<CustomerNoteDynamic, CustomerNote> noteMapper, ILoggerProviderExtended loggerProvider,
+            IStorefrontUserService storefrontUserService,
             IOptions<AppOptions> appOptions,
             IAppInfrastructureService appInfrastructureService,
             IObjectHistoryLogService objectHistoryLogService,
-            ICsvExportService<ExtendedVCustomer, CustomersForAffiliatesCsvMap> csvExportCustomersForAffiliatesService, IPaymentMethodService paymentMethodService)
+            ICsvExportService<ExtendedVCustomer, CustomersForAffiliatesCsvMap> csvExportCustomersForAffiliatesService, 
+            IPaymentMethodService paymentMethodService)
         {
             _customerService = customerService;
             _countryService = countryService;
@@ -92,7 +94,7 @@ namespace VC.Admin.Controllers
 	        _paymentMethodService = paymentMethodService;
         }
 
-	    [HttpGet]
+        [HttpGet]
         public async Task<Result<IList<OrderNoteModel>>> GetOrderNotes(CustomerType customerType)
 	    {
 			var result = await _customerService.GetAvailableOrderNotesAsync(customerType);

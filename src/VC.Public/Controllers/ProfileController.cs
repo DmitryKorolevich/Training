@@ -13,6 +13,7 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Transfer;
@@ -519,9 +520,9 @@ namespace VC.Public.Controllers
                         {
                             var orderLineModel = new LastOrderLineModel()
                             {
-                                ProductUrl = ProductBaseUrl + skuOrdered.ProductWithoutSkus.Url,
-                                IconLink = skuOrdered.ProductWithoutSkus.SafeData.Thumbnail,
-                                ProductName = skuOrdered.ProductWithoutSkus.Name,
+                                ProductUrl = ProductBaseUrl + skuOrdered.Sku.Product.Url,
+                                IconLink = skuOrdered.Sku.Product.SafeData.Thumbnail,
+                                ProductName = skuOrdered.Sku.Product.Name,
                                 PortionsCount = skuOrdered.Sku.Data.QTY,
                                 Quantity = skuOrdered.Quantity,
                                 SkuCode = skuOrdered.Sku.Code,

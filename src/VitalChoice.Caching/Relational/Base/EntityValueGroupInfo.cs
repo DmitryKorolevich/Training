@@ -50,7 +50,10 @@ namespace VitalChoice.Caching.Relational.Base
 
         public override int GetHashCode()
         {
-            return ValuesDictionary.Values.Aggregate(0, (current, indexInfo) => (current*397) ^ indexInfo.GetHashCode());
+            int result = 0;
+            foreach (var value in ValuesDictionary.Values)
+                result = (result*397) ^ value.GetHashCode();
+            return result;
         }
 
         public static bool operator ==(EntityValueGroupInfo<TInfo> left, EntityValueGroupInfo<TInfo> right)

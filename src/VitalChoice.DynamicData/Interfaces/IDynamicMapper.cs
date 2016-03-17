@@ -10,7 +10,7 @@ using VitalChoice.ObjectMapping.Interfaces;
 namespace VitalChoice.DynamicData.Interfaces
 {
     public interface IDynamicMapper<TDynamic, TEntity> : IObjectMapper<TDynamic> 
-        where TDynamic : MappedObject
+        where TDynamic : MappedObject, new()
         where TEntity: DynamicDataEntity
     {
         TDynamic FromModel<TModel>(TModel model, int idObjectType);
@@ -101,7 +101,7 @@ namespace VitalChoice.DynamicData.Interfaces
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>, new()
         where TOptionType : OptionType, new()
         where TOptionValue : OptionValue<TOptionType>, new()
-        where TDynamic : MappedObject
+        where TDynamic : MappedObject, new()
     {
         Task SyncCollectionsAsync(ICollection<TDynamic> dynamics, ICollection<TEntity> entities, ICollection<TOptionType> optionTypes = null);
         void SyncCollections(ICollection<TDynamic> dynamics, ICollection<TEntity> entities, ICollection<TOptionType> optionTypes = null);

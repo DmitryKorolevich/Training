@@ -17,6 +17,7 @@ namespace VitalChoice.Data.Context
         bool InTransaction { get; }
 
         event Action TransactionCommit;
+        event Action TransactionRollback;
 
         int SaveChanges();
 

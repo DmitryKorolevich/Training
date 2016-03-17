@@ -41,6 +41,11 @@ namespace VitalChoice.Caching.Services.Cache.Base
             return null;
         }
 
+        public bool Exist(TKey pk)
+        {
+            return _cluster.ContainsKey(pk);
+        }
+
         public ICollection<CachedEntity<T>> GetItems()
         {
             return _cluster.Values;

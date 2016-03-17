@@ -334,6 +334,9 @@ function confirmAction(successCallback, errorCallback, text) {
 		'<p>' + message + '</p></div>').dialog({
 		resizable: false,
 		modal: true,
+		close: function () {
+			$(this).dialog('destroy').remove();
+		},
 		buttons: [
 			{
 				text: "Ok",

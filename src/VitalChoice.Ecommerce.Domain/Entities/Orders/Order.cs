@@ -5,6 +5,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
+using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 
 namespace VitalChoice.Ecommerce.Domain.Entities.Orders
@@ -22,6 +23,8 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Orders
         public int IdCustomer { get; set; }
 
         public Customer Customer { get; set; }
+
+        public ICollection<GiftCertificate> GiftCertificatesGenerated { get; set; }
 
         public ICollection<OrderToSku> Skus { get; set; }
 
@@ -52,5 +55,7 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Orders
         public Discount Discount { get; set; }
 
         public AffiliateOrderPayment AffiliateOrderPayment { get; set; }
+
+        public HealthwiseOrder HealthwiseOrder { get; set; }
     }
 }

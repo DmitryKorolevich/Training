@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.ChangeTracking;
+using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Services.Cache.Base;
@@ -17,7 +18,7 @@ namespace VitalChoice.Caching.Iterators
         public IEnumerable<CacheResult<T>> Source;
         public Func<T, bool> Predicate;
         public Dictionary<EntityKey, EntityEntry<T>> Tracked;
-        public ICacheKeysStorage<T> KeysStorage;
+        public IInternalEntityCache<T> InternalCache;
     }
 
     internal class CacheIterator<TSource> : SimpleIterator<TSource>
@@ -26,7 +27,7 @@ namespace VitalChoice.Caching.Iterators
         private readonly IEnumerable<CacheResult<TSource>> _source;
         private readonly Func<TSource, bool> _predicate;
         private readonly bool _track;
-        private readonly ICacheKeysStorage<TSource> _keysStorage;
+        private readonly IInternalEntityCache<TSource> _internalCache;
         public Dictionary<EntityKey, EntityEntry<TSource>> Tracked { get; }
         private IEnumerator<CacheResult<TSource>> _enumerator;
 
@@ -41,7 +42,7 @@ namespace VitalChoice.Caching.Iterators
             _track = true;
             _source = trackedParams.Source;
             _predicate = trackedParams.Predicate;
-            _keysStorage = trackedParams.KeysStorage;
+            _internalCache = trackedParams.InternalCache;
             Tracked = trackedParams.Tracked;
         }
 
@@ -80,7 +81,7 @@ namespace VitalChoice.Caching.Iterators
                             break;
                         }
                         Found = true;
-                        if (_predicate(item))
+                        if (item.Entity != null && _predicate(item))
                         {
                             CurrentValue = _track ? GetAttached(item) : item;
                             return true;
@@ -110,15 +111,18 @@ namespace VitalChoice.Caching.Iterators
 
         private TSource GetAttached(TSource item)
         {
-            var pk = _keysStorage.GetPrimaryKeyValue(item);
+            if (item == null)
+                return null;
+
+            var pk = _internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(item);
             EntityEntry<TSource> entry;
             if (Tracked.TryGetValue(pk, out entry))
             {
-                item = entry.State == EntityState.Detached ? item.Clone<TSource, Entity>() : entry.Entity;
+                item = entry.State == EntityState.Detached ? item.Clone() : entry.Entity;
             }
             else
             {
-                item = item.Clone<TSource, Entity>();
+                item = item.Clone();
             }
             return item;
         }

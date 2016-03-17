@@ -19,20 +19,20 @@ namespace VitalChoice.Business.Workflow.Actions.Products
         {
             var products = dataContext.SkuOrdereds.Union(dataContext.PromoSkus.Where(p => p.Enabled)).ToArray();
             var perishableProducts =
-                products.Where(s => s.ProductWithoutSkus.IdObjectType == (int) ProductType.Perishable).ToArray();
+                products.Where(s => s.Sku.IdObjectType == (int) ProductType.Perishable).ToArray();
             var nonPerishableProducts =
-                products.Where(s => s.ProductWithoutSkus.IdObjectType == (int) ProductType.NonPerishable).ToArray();
+                products.Where(s => s.Sku.IdObjectType == (int) ProductType.NonPerishable).ToArray();
             dataContext.SplitInfo.PerishableCount = perishableProducts.Length;
             dataContext.SplitInfo.NonPerishableCount = nonPerishableProducts.Length;
             dataContext.SplitInfo.PerishableAmount = perishableProducts.Sum(p => p.Amount*p.Quantity);
             dataContext.SplitInfo.NonPerishableAmount = perishableProducts.Sum(p => p.Amount*p.Quantity);
             dataContext.SplitInfo.NonPerishableOrphanCount =
                 products.Count(
-                    s => s.ProductWithoutSkus.IdObjectType == (int) ProductType.NonPerishable && s.Sku.Data.OrphanType);
+                    s => s.Sku.IdObjectType == (int) ProductType.NonPerishable && s.Sku.Data.OrphanType);
             dataContext.SplitInfo.ThresholdReached =
                 products.Any(
                     s =>
-                        s.ProductWithoutSkus.IdObjectType == (int) ProductType.NonPerishable && s.Sku.Data.OrphanType &&
+                        s.Sku.IdObjectType == (int) ProductType.NonPerishable && s.Sku.Data.OrphanType &&
                         s.Quantity > s.Sku.Data.QTYThreshold);
             dataContext.SplitInfo.SpecialSkuAdded = products.Any(s => s.Sku.Code.ToLowerInvariant() == "emp");
 

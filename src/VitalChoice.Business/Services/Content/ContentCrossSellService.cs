@@ -47,7 +47,7 @@ namespace VitalChoice.Business.Services.Content
 				throw new ApiException("Can't be null or empty");
 			}
 
-			var ids = contentCrossSells.Select(x => x.IdSku).ToList();
+			var ids = contentCrossSells.Select(x => x.IdSku).Distinct().ToList();
 
 			var notValidSku = await _skuRepositoryAsync.Query()
 				.Include(x => x.Product)

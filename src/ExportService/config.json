@@ -1,5 +1,6 @@
 ﻿{
   "App": {
+    "LocalEncryptionKeyPath": "C:\\ProgramData\\ExportService\\key.pk",
     "DefaultCacheExpirationTermMinutes": 1440,
     "ActivationTokenExpirationTermDays": 3,
     "DefaultCultureId": "en-US",
@@ -15,11 +16,11 @@
       "Encrypt": true
     },
     "ExportService": {
-      "PlainConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=8btEfIO+srlpmg9AF0evGubknnuzetZZ70bKDOH7gps=",
-      "EncryptedConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=fnKDZwxtFlGCxePFOXdX5//2Js1fkgMFHJDDz7uN5PE=",
-      "PlainQueueName": "PlainQueue",
-      "EncryptedQueueName": "EncryptedQueue",
-      "CertThumbprint": "E2603D85F0E4B59448FD3D380FEFF740B28B3215",
+      "PlainConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=6CXYK7zSC5RhTQYALz1vRqMe/Sg8vW25LwhsTSE96o8=",
+      "EncryptedConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=84NxAhwRn3vd2gDWgPWIDi14x+s3JWe2NFvBx1mTtq8=",
+      "PlainQueueName": "plainexport",
+      "EncryptedQueueName": "encryptedexport",
+      "CertThumbprint": "505BDC22499CF0F4692CF18D69CDC32F0F285545",
       "RootThumbprint": "89735BE3169BE34AB67B65C7D9EFFD2C230A9D98",
       "EncryptionHostSessionExpire": true,
       "ServerHostName": "export-server"

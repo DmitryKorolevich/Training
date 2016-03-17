@@ -1,0 +1,66 @@
+﻿@{
+	Layout = "~/Views/Shared/_ViewCartLayout.cshtml";
+}
+
+@model VC.Public.Models.Cart.AutoShipModel
+
+@section PageScripts {
+	@*<script src="@Url.Content("/app/common/dataAccess.js")"></script>*@
+}
+
+@section Meta {
+	<title>Wild Seafood & Organics - Auto-Ship</title>
+}
+
+<div class="cart-content-middle">
+	<h6 class="cart-head">Select Your Desired Auto-Ship Schedule</h6>
+	<span class="cart-subtitle">@Model.DisplayName</span>
+	@using (Html.BeginForm("AutoShip", "Cart", null, FormMethod.Post, new { @class = "form-regular medium", role = "form" }))
+	{
+		@Html.HiddenFor(x=>x.ProductUrl)
+		@Html.HiddenFor(x=>x.DisplayName)
+		@Html.HiddenFor(x=>x.SkuCode)
+		@Html.AntiForgeryToken()
+		<div class="form-group">
+			@Html.LabelFor(m => m.IdSchedule, new {@class = "control-label"})
+			<div class="input-group">
+				@Html.DropDownListFor(m => m.IdSchedule, (List<SelectListItem>) ViewBag.AutoShipOptions, new {@class = "form-control"})
+				@Html.ValidationMessageFor(m => m.IdSchedule)
+			</div>
+		</div>
+		<div class="form-buttons-group">
+			<a href="@Model.ProductUrl" class="button arrow-left-red margin-right-reasonable">Back</a>
+			<input class="arrow-right-blue" type="submit" value="Next"/>
+		</div>
+		<div class="form-group">
+			<div class="input-group">
+				<span class="shopping-notice-note">NOTE:</span>  The Discount and Free Shipping included in your Auto-Ship order
+				will NOT appear until you reach the "Billing" step of checkout.
+			</div>
+		</div>
+	}
+	<div class="autoship-info">
+		<strong>IMPORTANT Auto-Ship Instructions &amp; Information</strong><br><br>
+		<p>What does "Schedule Shipments Every" mean?</p>
+		For example, if you choose "2 months" your first order will go out on our next shipment and<br>
+		we will ship the product to you every 2 months until you Pause or Delete Auto-Shipping (see below).
+		<br>
+		<p>Price Changes</p>
+		If the price of an Auto-Shipped item increases or decreases, the dollar amount<br>
+		charged to your credit card for each shipment will increase or decrease by the same amount.
+		<br>
+		<p>Shipping Upgrades</p>
+		<ul>
+			<li>At the Shipping Method step of checkout, you can upgrade shipping at an extra charge.</li>
+			<li>Any shipping upgrade and related charges will apply to every Auto-Shipment of that product.</li>
+			<li>For this reason, we recommend that you NOT upgrade shipping of Auto-Ship items.</li>
+		</ul>
+		<p>Pause/Delete instructions</p>
+		<ul>
+			<li>Log in to your account and click "Profile" at the upper right corner of any page.</li>
+			<li>Click on "View Current Auto-Ship Products" and choose Pause or Delete.</li>
+			<li>If you have multiple Auto-Ship orders in your Profile, you can Pause or Delete each one.</li>
+		</ul>
+		For Auto-Ship help, visit our <a href="#">Customer Service</a> page.
+	</div>
+</div>

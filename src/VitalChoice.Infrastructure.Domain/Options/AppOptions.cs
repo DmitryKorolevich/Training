@@ -4,6 +4,7 @@ namespace VitalChoice.Infrastructure.Domain.Options
 {
     public class AppOptions : AppOptionsBase
     {
+        public string LocalEncryptionKeyPath { get; set; }
         public bool GenerateLowercaseUrls { get; set; }
         public bool EnableBundlingAndMinification { get; set; }
         public int DefaultCacheExpirationTermMinutes { get; set; }
@@ -26,5 +27,6 @@ namespace VitalChoice.Infrastructure.Domain.Options
         public CacheSyncOptions CacheSyncOptions { get; set; }
         public AuthorizeNet AuthorizeNet { get; set; }
         public PDFMyUrl PDFMyUrl { get; set; }
+        public BrontoSettings Bronto { get; set; }
     }
 }

@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.Data.Entity;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
@@ -202,8 +205,18 @@ namespace VitalChoice.Business.Services.Settings
                 {
                     throw new AppValidationException(message);
                 }
-                
-                countryRepository.Delete(dbItem);
+
+                try
+                {
+                    countryRepository.Delete(dbItem);
+                }
+                catch (DbUpdateException e)
+                {
+                    if (e.InnerException != null && e.InnerException is SqlException && (e.InnerException as SqlException).Number== SqlConstants.ERROR_CODE_FOREIGN_KEY_CONFLICT)
+                    {
+                        throw new AppValidationException(string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.DenyDeleteInUseItem], "Country"));
+                    }
+                }
 
                 toReturn = true;
             }
@@ -284,7 +297,17 @@ namespace VitalChoice.Business.Services.Settings
             var dbItem = (await stateRepository.Query(p => p.Id == id).SelectAsync(false)).FirstOrDefault();
             if (dbItem != null)
             {
-                stateRepository.Delete(dbItem);
+                try
+                {
+                    stateRepository.Delete(dbItem);
+                }
+                catch (DbUpdateException e)
+                {
+                    if (e.InnerException != null && e.InnerException is SqlException && (e.InnerException as SqlException).Number == SqlConstants.ERROR_CODE_FOREIGN_KEY_CONFLICT)
+                    {
+                        throw new AppValidationException(string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.DenyDeleteInUseItem], "State"));
+                    }
+                }
 
                 toReturn = true;
             }

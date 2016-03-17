@@ -29,6 +29,7 @@ using VitalChoice.Business.CsvExportMaps;
 using Microsoft.Net.Http.Headers;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Products;
+using VitalChoice.Interfaces.Services.InventorySkus;
 
 namespace VC.Admin.Controllers
 {
@@ -72,17 +73,22 @@ namespace VC.Admin.Controllers
 
         [HttpGet]
         [AdminAuthorize(PermissionType.Products)]
-        public Task<Result<ProductEditSettingsModel>> GetProductEditSettings()
+        public async Task<Result<ProductEditSettingsModel>> GetProductEditSettings()
         {
             var lookups = productService.GetProductLookupsAsync().Select(
                         p => new LookupViewModel(p.Name, p.IdObjectType, p.DefaultValue, p.Lookup)).ToList();
+            var inventoryChannelLookup = (await settingService.GetLookupsAsync(new [] { SettingConstants.INVENTORY_SKU_LOOKUP_CHANNEL_NAME })).FirstOrDefault();
+            if (inventoryChannelLookup != null)
+            {
+                lookups.Add(new LookupViewModel(inventoryChannelLookup.Name, null, null, inventoryChannelLookup));
+            }
             var defaultValues = productService.GetProductEditDefaultSettingsAsync();
             ProductEditSettingsModel toReturn = new ProductEditSettingsModel()
             {
                 Lookups = lookups,
                 DefaultValues = defaultValues
             };
-            return Task.FromResult<Result<ProductEditSettingsModel>>(toReturn);
+            return toReturn;
         }
 
         [HttpPost]
@@ -102,14 +108,14 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<Result<ICollection<SkuWithStatisticListItemModel>>> GetTopPurchasedSkus()
+        public async Task<Result<ICollection<SkuWithStatisticListItemModel>>> GetTopPurchasedSkus(int id)
         {
             ICollection<SkuWithStatisticListItemModel> toReturn = new List<SkuWithStatisticListItemModel>();
 
             FilterBase idsFilter = new FilterBase();
             idsFilter.Paging.PageIndex = 1;
             idsFilter.Paging.PageItemCount = 20;
-            Dictionary<int, int> items =await productService.GetTopPurchasedSkuIdsAsync(idsFilter);
+            Dictionary<int, int> items = await productService.GetTopPurchasedSkuIdsAsync(idsFilter, id);
             //items.Add(54, 20);
             //items.Add(55, 5);
             //items.Add(25, 10);

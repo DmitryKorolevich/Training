@@ -29,9 +29,9 @@ namespace VitalChoice.Caching.Extensions
             var services = builder.GetInfrastructure();
             services.Replace(ServiceDescriptor.Scoped(typeof (IStateManager), typeof (CacheStateManager)));
             services.Replace(ServiceDescriptor.Scoped(typeof (IAsyncQueryProvider), typeof (CacheEntityQueryProvider)));
-            services.AddScoped<IQueryCacheFactory, QueryCacheFactory>();
-            services.AddScoped<IInternalEntityCacheFactory, InternalEntityCacheFactory>();
-            services.AddScoped<ICacheSyncProvider, TSyncProvider>();
+            services.AddSingleton<IQueryParserFactory, QueryParserFactory>();
+            services.AddSingleton<IInternalEntityCacheFactory, InternalEntityCacheFactory>();
+            services.AddSingleton<ICacheSyncProvider, TSyncProvider>();
             services.AddSingleton<IEntityInfoStorage, EntityInfoStorage>();
             services.AddInstance(typeof (IContextTypeContainer), new ContextTypeContainer(contextTypes.ToArray()));
             return builder;

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.ChangeTracking;
+using Microsoft.Extensions.Logging;
+using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Iterators;
 using VitalChoice.Caching.Relational;
@@ -16,23 +18,25 @@ using VitalChoice.ObjectMapping.Extensions;
 namespace VitalChoice.Caching.Services.Cache
 {
     public class EntityCache<T> : IEntityCache<T>
-        where T : Entity, new()
+        //where T : Entity, new()
+        where T : class, new()
     {
         private readonly IInternalEntityCache<T> _internalCache;
-        private readonly IInternalEntityCacheFactory _cacheFactory;
         private readonly DbContext _context;
+        private readonly ILogger _logger;
 
-        public EntityCache(IInternalEntityCacheFactory cacheFactory, DbContext context)
+        public EntityCache(IInternalEntityCache<T> internalCache, DbContext context, ILogger logger)
         {
-            _cacheFactory = cacheFactory;
             _context = context;
-            _internalCache = cacheFactory.GetCache<T>();
+            _logger = logger;
+            _internalCache = internalCache;
         }
 
         public CacheGetResult TryGetCached(QueryData<T> query, out List<T> entities)
         {
             if (_internalCache == null)
             {
+                _logger.LogInformation($"Cache doesn't exist for type: {typeof (T)}");
                 entities = null;
                 return CacheGetResult.NotFound;
             }
@@ -40,7 +44,7 @@ namespace VitalChoice.Caching.Services.Cache
             if (_internalCache.GetCacheExist(query.RelationInfo))
             {
                 IEnumerable<CacheResult<T>> results;
-                if (query.WhereExpression == null)
+                if (query.FullCollection)
                 {
                     results = _internalCache.GetAll(query.RelationInfo);
                     return TranslateResult(query, results,
@@ -64,14 +68,19 @@ namespace VitalChoice.Caching.Services.Cache
                 return TranslateResult(query,
                     results, out entities);
             }
+            if (_logger.IsEnabled(LogLevel.Verbose))
+                _logger.LogVerbose($"Cache miss, type: {typeof (T)}");
             entities = null;
-            return CacheGetResult.Update;
+            if (query.CanCollectionCache)
+                return CacheGetResult.Update;
+            return CacheGetResult.NotFound;
         }
 
         public CacheGetResult TryGetCachedFirstOrDefault(QueryData<T> query, out T entity)
         {
             if (_internalCache == null)
             {
+                _logger.LogInformation($"Cache doesn't exist for type: {typeof (T)}");
                 entity = null;
                 return CacheGetResult.NotFound;
             }
@@ -79,7 +88,7 @@ namespace VitalChoice.Caching.Services.Cache
             if (_internalCache.GetCacheExist(query.RelationInfo))
             {
                 IEnumerable<CacheResult<T>> results;
-                if (query.WhereExpression == null)
+                if (query.FullCollection)
                 {
                     results = _internalCache.GetAll(query.RelationInfo);
                     return TranslateFirstResult(query, results,
@@ -103,101 +112,75 @@ namespace VitalChoice.Caching.Services.Cache
                 return TranslateFirstResult(query,
                     results, out entity);
             }
+            if (_logger.IsEnabled(LogLevel.Verbose))
+                _logger.LogVerbose($"Cache miss, type: {typeof (T)}");
             entity = default(T);
-            return CacheGetResult.Update;
+            if (query.CanCache)
+                return CacheGetResult.Update;
+            return CacheGetResult.NotFound;
         }
 
-        public void Update(QueryData<T> queryData, IEnumerable<T> entities)
+        public bool Update(QueryData<T> queryData, IEnumerable<T> entities)
         {
             if (_internalCache == null)
             {
-                return;
+                _logger.LogWarning($"<Cache Update> Cache doesn't exist for type: {typeof (T)}");
+                return false;
             }
 
-            bool fullCollection;
+            bool fullCollection = queryData.FullCollection;
 
-            if (!CanUpdate(queryData, out fullCollection))
-                return;
+            if (!fullCollection && !queryData.CanCollectionCache)
+            {
+                _logger.LogWarning(
+                    $"<Cache Update> can't update cache, preconditions not met: {typeof (T)}\r\n{queryData.WhereExpression?.Expression.AsString()}");
+                return false;
+            }
 
             if (queryData.Tracked)
             {
-                entities = entities.Select(e => e.Clone<T, Entity>());
+                entities = DeepCloneList(queryData.RelationInfo, entities);
             }
 
             if (fullCollection)
             {
-                _internalCache.UpdateAll(entities, queryData.RelationInfo);
+                return _internalCache.UpdateAll(entities, queryData.RelationInfo);
             }
-            else
-            {
-                _internalCache.Update(entities, queryData.RelationInfo);
-            }
+
+            return _internalCache.Update(entities, queryData.RelationInfo);
         }
 
-        public void Update(QueryData<T> queryData, T entity)
+        public bool Update(QueryData<T> queryData, T entity)
         {
             if (_internalCache == null)
             {
-                return;
+                _logger.LogWarning($"<Cache Update> Cache doesn't exist for type: {typeof (T)}");
+                return false;
             }
 
-            bool fullCollection;
-
-            if (!CanUpdate(queryData, out fullCollection))
-                return;
+            if (!queryData.CanCache)
+            {
+                _logger.LogWarning(
+                    $"<Cache Update> can't update cache, preconditions not met: {typeof (T)}\r\nExpression:\r\n{queryData.WhereExpression?.Expression.AsString()}");
+                return false;
+            }
 
             if (entity == null)
             {
                 _internalCache.SetNull(queryData.PrimaryKeys, queryData.RelationInfo);
-            }
-            else
-            {
-                if (queryData.Tracked)
-                {
-                    entity = entity.Clone<T, Entity>();
-                }
-                if (fullCollection)
-                {
-                    _internalCache.UpdateAll(Enumerable.Repeat(entity, 1), queryData.RelationInfo);
-                }
-                else
-                {
-                    _internalCache.Update(entity, queryData.RelationInfo);
-                }
-            }
-        }
-
-        private bool CanUpdate(QueryData<T> queryData, out bool fullCollection)
-        {
-            if (queryData.WhereExpression == null)
-            {
-                fullCollection = true;
                 return true;
             }
-
-            fullCollection = false;
-            return queryData.PrimaryKeys.Count > 0 || queryData.UniqueIndexes.Count > 0 ||
-                   queryData.ConditionalIndexes.Any(c => c.Value.Count > 0);
+            if (queryData.Tracked)
+            {
+                entity = DeepCloneItem(queryData.RelationInfo, entity);
+            }
+            return _internalCache.Update(entity, queryData.RelationInfo);
         }
 
         private bool TryConditionalIndexes(QueryData<T> queryData,
             out IEnumerable<CacheResult<T>> results)
         {
             var conditionalIndexes = queryData.ConditionalIndexes;
-            //if (conditionalIndexes.Count == 1)
-            //{
-            //    var indexes = conditionalIndexes.First().Value();
-            //    if (indexes.Count == 1)
-            //    {
-            //        var result = _internalCache.TryGetEntity(indexes.First(),
-            //            conditionalIndexes.First().Key, queryData.RelationInfo, queryData.WhereExpression.Compiled);
-            //        results = Enumerable.Repeat(result, 1);
-            //        return true;
-            //    }
-            //    results = _internalCache.TryGetEntities(indexes,
-            //        conditionalIndexes.First().Key, queryData.RelationInfo, queryData.WhereExpression.Compiled);
-            //    return true;
-            //}
             if (conditionalIndexes.Count > 0)
             {
                 var entityList = Enumerable.Empty<CacheResult<T>>();
@@ -217,12 +200,6 @@ namespace VitalChoice.Caching.Services.Cache
             out IEnumerable<CacheResult<T>> results)
         {
             var indexes = query.UniqueIndexes;
-            //if (indexes.Count == 1)
-            //{
-            //    var result = _internalCache.TryGetEntity(indexes.First(), queryCache.RelationInfo);
-            //    results = Enumerable.Repeat(result, 1);
-            //    return true;
-            //}
             if (indexes.Count > 0)
             {
                 results = _internalCache.TryGetEntities(indexes, query.RelationInfo);
@@ -236,12 +213,6 @@ namespace VitalChoice.Caching.Services.Cache
             out IEnumerable<CacheResult<T>> results)
         {
             var pks = query.PrimaryKeys;
-            //if (pks.Count == 1)
-            //{
-            //    var result = _internalCache.TryGetEntity(pks.First(), queryCache.RelationInfo);
-            //    results = Enumerable.Repeat(result, 1);
-            //    return true;
-            //}
             if (pks.Count > 0)
             {
                 results = _internalCache.TryGetEntities(pks, query.RelationInfo);
@@ -288,8 +259,8 @@ namespace VitalChoice.Caching.Services.Cache
             CacheIterator<T> cacheIterator = new CacheIterator<T>(new TrackedIteratorParams<T>
             {
                 Tracked = _context.ChangeTracker.Entries<T>()
-                    .ToDictionary(e => _internalCache.GetPrimaryKeyValue(e.Entity), e => e),
-                KeysStorage = _internalCache,
+                    .ToDictionary(e => _internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(e.Entity), e => e),
+                InternalCache = _internalCache,
                 Predicate = compiled,
                 Source = results
             });
@@ -313,8 +284,8 @@ namespace VitalChoice.Caching.Services.Cache
             CacheIterator<T> cacheIterator = new CacheIterator<T>(new TrackedIteratorParams<T>
             {
                 Tracked = _context.ChangeTracker.Entries<T>()
-                            .ToDictionary(e => _internalCache.GetPrimaryKeyValue(e.Entity), e => e),
-                KeysStorage = _internalCache,
+                    .ToDictionary(e => _internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(e.Entity), e => e),
+                InternalCache = _internalCache,
                 Predicate = compiled,
                 Source = results
             });
@@ -336,7 +307,7 @@ namespace VitalChoice.Caching.Services.Cache
         {
             if (cacheIterator.AggregatedResult != CacheGetResult.Found)
             {
-                return !_cacheFactory.CanAddUpCache() ? CacheGetResult.NotFound : cacheIterator.AggregatedResult;
+                return _internalCache.CanAddUpCache() ? cacheIterator.AggregatedResult : CacheGetResult.NotFound;
             }
             if (cacheIterator.Found)
             {
@@ -346,31 +317,59 @@ namespace VitalChoice.Caching.Services.Cache
                 }
                 return CacheGetResult.Found;
             }
-            return !_cacheFactory.CanAddUpCache() ? CacheGetResult.NotFound : CacheGetResult.Update;
+            return _internalCache.CanAddUpCache() ? CacheGetResult.Update : CacheGetResult.NotFound;
         }
 
         private void AttachNotTracked(IEnumerable<T> items, Dictionary<EntityKey, EntityEntry<T>> tracked, RelationInfo relationInfo)
         {
             foreach (var item in items)
             {
-                var pk = _internalCache.GetPrimaryKeyValue(item);
+                var pk = _internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(item);
                 EntityEntry<T> entry;
                 if (tracked.TryGetValue(pk, out entry))
                 {
                     if (entry.State == EntityState.Detached)
                     {
+                        CloneRelations(relationInfo, item);
                         AttachGraph(item, relationInfo);
                     }
                 }
                 else
                 {
+                    CloneRelations(relationInfo, item);
                     AttachGraph(item, relationInfo);
                 }
             }
         }
 
-        private void AttachGraph<TObj>(TObj item, RelationInfo relationInfo) 
-            where TObj : class
+        private IEnumerable<T> DeepCloneList(RelationInfo relations, IEnumerable<T> entities)
+        {
+            return entities.Select(item => DeepCloneItem(relations, item));
+        }
+
+        private T DeepCloneItem(RelationInfo relations, T item)
+        {
+            var newItem = item.Clone();
+            CloneRelations(relations, newItem);
+            return newItem;
+        }
+
+        private void CloneRelations(RelationInfo relations, object newItem)
+        {
+            foreach (var relation in relations.Relations)
+            {
+                var value = relation.GetRelatedObject(newItem);
+                if (value != null)
+                {
+                    var replacementValue = value.GetType().IsImplementGeneric(typeof (ICollection<>))
+                        ? ((IEnumerable) value).Clone(relation.RelationType)
+                        : value.Clone(relation.RelationType);
+                    relation.SetRelatedObject(newItem, replacementValue);
+                }
+            }
+        }
+
+        private void AttachGraph(object item, RelationInfo relationInfo)
         {
             _context.Attach(item, GraphBehavior.SingleObject);
             foreach (var relation in relationInfo.Relations)

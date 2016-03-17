@@ -5,6 +5,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 {
     public class VOrderFilter : FilterBase
     {
+        public int? Id { get; set; }
+
         public string IdString { get; set; }
 
         public int? IdCustomer { get; set; }
@@ -26,5 +28,13 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
         public int? IdCustomerType { get; set; }
 
         public int? IdShippingMethod { get; set; }
+
+        public int? IdShipState { get; set; }
+
+        public string CustomerFirstName { get; set; }
+
+        public string CustomerLastName { get; set; }
+
+        public string CustomerCompany { get; set; }
     }
 }

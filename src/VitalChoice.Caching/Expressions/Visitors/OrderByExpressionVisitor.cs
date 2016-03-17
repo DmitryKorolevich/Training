@@ -27,7 +27,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             var result = base.VisitMethodCall(node);
-            if (node.Method.DeclaringType == typeof (Queryable))
+            if (node.Method.DeclaringType == typeof (Queryable) || node.Method.DeclaringType == typeof(Enumerable))
             {
                 Expression comparer;
                 LambdaExpression expr;

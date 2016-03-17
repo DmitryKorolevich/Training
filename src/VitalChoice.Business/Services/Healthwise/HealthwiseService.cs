@@ -24,6 +24,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
+using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 using VitalChoice.Ecommerce.Domain.Entities.History;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
@@ -145,7 +146,7 @@ namespace VitalChoice.Business.Services.Healthwise
                                 gc.FirstName = healthwise.CustomerFirstName;
                                 gc.LastName = healthwise.CustomerLastName;
                                 gc.Balance = amount;
-                                gc.Code = _gcService.GenerateGCCode();
+                                gc.Code = await _gcService.GenerateGCCode();
                                 gc.UserId = userId;
 
                                 giftCertificateRepository.Insert(gc);

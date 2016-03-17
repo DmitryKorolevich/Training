@@ -28,6 +28,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using VitalChoice.Business.Helpers;
+using VitalChoice.Business.Services.Bronto;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
@@ -40,6 +41,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Validation.Models;
+using ApiException = VitalChoice.Ecommerce.Domain.Exceptions.ApiException;
 
 namespace VC.Public.Controllers
 {
@@ -52,6 +54,7 @@ namespace VC.Public.Controllers
         private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
         private readonly ReferenceData _appInfrastructure;
         private readonly ICountryService _countryService;
+        private readonly BrontoService _brontoService;
         private readonly ITransactionAccessor<EcommerceContext> _transactionAccessor;
 
         public CheckoutController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
@@ -61,7 +64,9 @@ namespace VC.Public.Controllers
             IAuthorizationService authorizationService, ICheckoutService checkoutService,
             IDynamicMapper<AddressDynamic, Address> addressConverter, IAppInfrastructureService appInfrastructureService,
             IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodConverter,
-            IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper, ICountryService countryService,
+            IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper, 
+            ICountryService countryService,
+            BrontoService brontoService,
             ITransactionAccessor<EcommerceContext> transactionAccessor)
             : base(
                 contextAccessor, customerService, infrastructureService, authorizationService, checkoutService, orderService,
@@ -73,6 +78,7 @@ namespace VC.Public.Controllers
             _addressConverter = addressConverter;
             _orderPaymentMethodConverter = orderPaymentMethodConverter;
             _countryService = countryService;
+            _brontoService = brontoService;
             _transactionAccessor = transactionAccessor;
             _appInfrastructure = appInfrastructureService.Get();
         }
@@ -325,6 +331,20 @@ namespace VC.Public.Controllers
                         if (loginTask != null)
                             await loginTask();
                         transaction.Commit();
+
+                        if (!string.IsNullOrEmpty(model.Email))
+                        {
+                            var unsubscribed = _brontoService.GetIsUnsubscribed(model.Email);
+                            if (model.SendNews && unsubscribed)
+                            {
+                                await _brontoService.Subscribe(model.Email);
+                            }
+                            if (!model.SendNews && !unsubscribed)
+                            {
+                                _brontoService.Unsubscribe(model.Email);
+                            }
+                        }
+
                         return RedirectToAction("AddUpdateShippingMethod");
                     }
                     else

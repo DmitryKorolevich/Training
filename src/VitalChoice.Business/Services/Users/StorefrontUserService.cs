@@ -108,8 +108,9 @@ namespace VitalChoice.Business.Services.Users
 
             if (appUser != null)
             {
-                var customer = (await _customerRepositoryAsync.Query(p => p.Id == appUser.Id).SelectAsync()).FirstOrDefault();
-                if (customer!=null && customer.StatusCode == (int)CustomerStatus.Pending && customer.IdObjectType==(int)CustomerType.Wholesale)
+                var customer = await _customerRepositoryAsync.Query(p => p.Id == appUser.Id).SelectFirstOrDefaultAsync(false);
+                if (customer != null && customer.StatusCode == (int) CustomerStatus.Pending &&
+                    customer.IdObjectType == (int) CustomerType.Wholesale)
                 {
                     throw new WholesalePendingException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsNotConfirmed]);
                 }

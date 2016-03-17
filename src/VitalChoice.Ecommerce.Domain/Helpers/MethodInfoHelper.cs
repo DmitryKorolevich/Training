@@ -255,61 +255,43 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
 
             public override int GetHashCode()
             {
-                return ItemComparer.GetHashCode(this);
+                unchecked
+                {
+                    var hashCode = (_methodInfo.Name.GetHashCode() * 397) ^
+                                   (_methodInfo.DeclaringType?.GetHashCode() ?? _methodInfo.ReturnType.GetHashCode());
+
+                    hashCode = (hashCode * 397) ^ _resultType.GetHashCode();
+                    // ReSharper disable once ForCanBeConvertedToForeach
+                    // ReSharper disable once LoopCanBeConvertedToQuery
+                    if (_parameters != null)
+                    {
+                        for (int i = 0; i < _parameters.Length; i++)
+                        {
+                            var type = _parameters[i];
+                            hashCode = (hashCode * 397) ^ type.GetHashCode();
+                        }
+                    }
+                    return hashCode;
+                }
             }
 
             public bool Equals(CacheItem other)
             {
-                return ItemComparer.Equals(this, other);
-            }
+                if (_parameters?.Length != other._parameters?.Length)
+                    return false;
 
-            private sealed class CacheItemEqualityComparer : IEqualityComparer<CacheItem>
-            {
-                public bool Equals(CacheItem x, CacheItem y)
+                var @equals = _resultType == other._resultType && _methodInfo == other._methodInfo;
+
+                if (@equals && _parameters != null && other._parameters != null)
                 {
-                    var result = x._resultType == y._resultType && x._methodInfo == y._methodInfo;
-
-                    if (x._parameters == null ^ y._parameters == null)
-                        return false;
-
-                    if (!result || x._parameters == null)
-                        return result;
-
-                    if (x._parameters.Length != y._parameters.Length)
-                        return false;
-
-                    for (var i = 0; i < x._parameters.Length; i++)
+                    for (var i = 0; i < _parameters.Length; i++)
                     {
-                        result = result && x._parameters[i] == y._parameters[i];
+                        @equals = @equals && _parameters[i] == other._parameters[i];
                     }
-
-                    return result;
+                    return @equals;
                 }
-
-                public int GetHashCode(CacheItem obj)
-                {
-                    unchecked
-                    {
-                        var hashCode = obj._methodInfo.Name.GetHashCode()*397 ^
-                                       (obj._methodInfo.DeclaringType?.GetHashCode() ?? obj._methodInfo.ReturnType.GetHashCode());
-
-                        hashCode = (hashCode * 397) ^ obj._resultType.GetHashCode();
-                        // ReSharper disable once ForCanBeConvertedToForeach
-                        // ReSharper disable once LoopCanBeConvertedToQuery
-                        if (obj._parameters != null)
-                        {
-                            for (int i = 0; i < obj._parameters.Length; i++)
-                            {
-                                var type = obj._parameters[i];
-                                hashCode = (hashCode * 397) ^ type.GetHashCode();
-                            }
-                        }
-                        return hashCode;
-                    }
-                }
+                return @equals;
             }
-
-            private static readonly IEqualityComparer<CacheItem> ItemComparer = new CacheItemEqualityComparer();
         }
 
         private static readonly Dictionary<CacheItem, Delegate> CompiledCache = new Dictionary<CacheItem, Delegate>();

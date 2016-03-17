@@ -25,7 +25,7 @@ namespace VitalChoice.ContentProcessing.Base
 {
     public abstract class ContentViewService<TEntity, TParametersModel> : IContentViewService
         where TEntity : ContentDataItem
-        where TParametersModel : ContentParametersModel
+        where TParametersModel : ContentParametersModel, new()
     {
         private readonly ITtlGlobalCache _templatesCache;
         private readonly IContentProcessorService _processorService;

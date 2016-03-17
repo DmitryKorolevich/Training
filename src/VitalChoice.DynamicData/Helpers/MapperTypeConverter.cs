@@ -55,6 +55,8 @@ namespace VitalChoice.DynamicData.Helpers
 
         public static string ConvertToOptionValue(object value, FieldType typeId)
         {
+            if (value == null)
+                return null;
             switch (typeId)
             {
                 case FieldType.String:

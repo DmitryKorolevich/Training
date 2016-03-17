@@ -1,6 +1,7 @@
 ﻿using System;
 using VitalChoice.Validation.Models;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Infrastructure.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 
 namespace VC.Admin.Models.Orders
@@ -74,6 +75,35 @@ namespace VC.Admin.Models.Orders
                 DateEdited = item.DateEdited;
                 POrderType = item.POrderType;
                 IdShippingMethod = item.IdShippingMethod;
+                IdCustomerType = item.IdCustomerType;
+                IdCustomer = item.IdCustomer;
+                Company = item.Company;
+                Customer = item.Customer;
+                StateCode = item.StateCode;
+                ShipTo = item.ShipTo;
+            }
+        }
+
+        public OrderListItemModel(OrderInfoItem item)
+        {
+            if (item != null)
+            {
+                Id = item.Id;
+                OrderStatus = item.OrderStatus;
+                POrderStatus = item.POrderStatus;
+                NPOrderStatus = item.NPOrderStatus;
+                IdOrderSource = item.IdOrderSource ?? 1;
+                OrderNotes = item.OrderNotes;
+                IdPaymentMethod = item.IdPaymentMethod;
+                DateCreated = item.DateCreated;
+                DateShipped = item.DateShipped;
+                PDateShipped = item.PDateShipped;
+                NPDateShipped = item.NPDateShipped;
+                Total = item.Total;
+                IdEditedBy = item.IdEditedBy;
+                EditedByAgentId = item.EditedByAgentId;
+                DateEdited = item.DateEdited;
+                POrderType = item.POrderType;
                 IdCustomerType = item.IdCustomerType;
                 IdCustomer = item.IdCustomer;
                 Company = item.Company;

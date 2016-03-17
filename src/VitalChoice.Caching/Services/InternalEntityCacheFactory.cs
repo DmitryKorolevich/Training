@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using VitalChoice.Caching.GC;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Services.Cache;
+using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Caching.Services
@@ -12,7 +13,7 @@ namespace VitalChoice.Caching.Services
     {
         private readonly IEntityInfoStorage _keyStorage;
 
-        private static readonly ConcurrentDictionary<Type, IInternalEntityCache> EntityCaches =
+        private readonly ConcurrentDictionary<Type, IInternalEntityCache> _entityCaches =
             new ConcurrentDictionary<Type, IInternalEntityCache>();
 
         public InternalEntityCacheFactory(IEntityInfoStorage keyStorage)
@@ -20,24 +21,33 @@ namespace VitalChoice.Caching.Services
             _keyStorage = keyStorage;
         }
 
+        public bool CanCache(Type entityType)
+        {
+            return _keyStorage.HaveKeys(entityType);
+        }
+
         public bool CacheExist(Type entityType)
         {
-            return EntityCaches.ContainsKey(entityType);
+            return _entityCaches.ContainsKey(entityType);
         }
 
         public IInternalEntityCache GetCache(Type entityType)
         {
-            if (!_keyStorage.HaveKeys(entityType))
+            EntityInfo info;
+            if (!_keyStorage.GetEntityInfo(entityType, out info))
                 return null;
-            return EntityCaches.GetOrAdd(entityType,
+            return _entityCaches.GetOrAdd(entityType,
                 cache =>
                     (IInternalEntityCache)
-                        Activator.CreateInstance(typeof (EntityInternalCache<>).MakeGenericType(entityType), _keyStorage, this));
+                        Activator.CreateInstance(typeof (EntityInternalCache<>).MakeGenericType(entityType), info, this));
         }
 
         public IInternalEntityCache<T> GetCache<T>()
         {
-            return (IInternalEntityCache<T>) GetCache(typeof (T));
+            EntityInfo info;
+            if (!_keyStorage.GetEntityInfo<T>(out info))
+                return null;
+            return (IInternalEntityCache<T>) _entityCaches.GetOrAdd(typeof (T), cache => new EntityInternalCache<T>(info, this));
         }
 
         public bool CanAddUpCache()

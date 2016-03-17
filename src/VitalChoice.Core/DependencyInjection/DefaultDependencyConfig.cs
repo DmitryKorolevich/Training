@@ -76,14 +76,20 @@ using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Business.Services.Healthwise;
 using VitalChoice.Interfaces.Services.Healthwise;
 using Microsoft.Extensions.Logging;
+using VitalChoice.Business.Services.Bronto;
 using VitalChoice.Business.Services.Checkout;
+using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Business.Services.Ecommerce;
+using VitalChoice.Business.Services.InventorySkus;
 using VitalChoice.Caching.Extensions;
+using VitalChoice.Caching.Services;
 using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Infrastructure.ServiceBus;
+using VitalChoice.Infrastructure.ServiceBus.Base;
 using VitalChoice.Interfaces.Services.Checkout;
+using VitalChoice.Interfaces.Services.InventorySkus;
 #if !DOTNET5_4
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Business.Services.Cache;
@@ -102,7 +108,7 @@ namespace VitalChoice.Core.DependencyInjection
                 .AddEntityFrameworkCache<ServiceBusCacheSyncProvider>(new[] {typeof (VitalChoiceContext), typeof (EcommerceContext)})
                 .AddSqlServer();
 #else
-            services.AddEntityFramework().AddEntityFrameworkCache(new [] {typeof(VitalChoiceContext), typeof(EcommerceContext) }).AddSqlServer();
+            services.AddEntityFramework().AddEntityFrameworkCache<CacheSyncProvider>(new [] {typeof(VitalChoiceContext), typeof(EcommerceContext) }).AddSqlServer();
 #endif
 
             // Add Identity services to the services container.
@@ -341,6 +347,15 @@ namespace VitalChoice.Core.DependencyInjection
                 ServiceBusQueueName = section["ServiceBusQueueName"],
                 Enabled = Convert.ToBoolean(section["Enabled"])
             };
+            section = configuration.GetSection("App:Bronto");
+            options.Bronto = new BrontoSettings
+            {
+                ApiKey = section["ApiKey"],
+                ApiUrl = section["ApiUrl"],
+                PublicFormUrl = section["PublicFormUrl"],
+                PublicFormSendData = section["PublicFormSendData"],
+                PublicFormSubscribeData = section["PublicFormSubscribeData"],
+            };
         }
 
         private static void ConfigureBaseOptions(IConfiguration configuration, AppOptionsBase options)
@@ -499,7 +514,17 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<OrderSchedulerService>().As<IOrderSchedulerService>().InstancePerLifetimeScope();
             builder.RegisterType<TokenService>().As<ITokenService>().InstancePerLifetimeScope();
             builder.RegisterType<ContentCrossSellService>().As<IContentCrossSellService>().InstancePerLifetimeScope();
-            builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
+            builder.RegisterType<InventorySkuCategoryService>().As<IInventorySkuCategoryService>().InstancePerLifetimeScope();
+            builder.RegisterType<InventorySkuService>().As<IInventorySkuService>().InstancePerLifetimeScope();
+            builder.RegisterType<BrontoService>().As<BrontoService>().InstancePerLifetimeScope();
+            builder.RegisterMappers(typeof(ProductService).GetTypeInfo().Assembly, (type, registration) =>
+            {
+                if (type == typeof(SkuMapper))
+                {
+                    return registration.OnActivated(a => ((SkuMapper)a.Instance).ProductMapper = a.Context.Resolve<ProductMapper>());
+                }
+                return registration;
+            });
             builder.RegisterModelConverters(projectAssembly);
             builder.RegisterModelConverters(typeof(OrderService).GetTypeInfo().Assembly);
 
@@ -531,7 +556,9 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<ReCaptchaValidator>().AsSelf().SingleInstance();
             builder.RegisterType<CountryNameCodeResolver>().As<ICountryNameCodeResolver>()
                 .InstancePerLifetimeScope();
+#if NET451
             builder.RegisterType<EncryptedServiceBusHostClient>().As<IEncryptedServiceBusHostClient>().SingleInstance();
+#endif
             builder.RegisterType<ObjectEncryptionHost>()
                 .As<IObjectEncryptionHost>()
                 .WithParameter((pi, cc) => pi.ParameterType == typeof (ILogger),

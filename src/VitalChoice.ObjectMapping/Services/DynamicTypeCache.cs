@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Helpers;
@@ -23,48 +25,91 @@ namespace VitalChoice.ObjectMapping.Services
 
     public static class DynamicTypeCache
     {
-        public static TypeCache GetTypeCache(
-            Dictionary<Type, TypeCache> cache, Type objectType,
+        public static TypeCache GetTypeCache(Type objectType,
             bool ignoreMapAttribute = false)
         {
-            TypeCache result;
-            lock (cache)
+            var cache = ignoreMapAttribute ? ObjectTypeMappingCache : ModelTypeMappingCache;
+            return cache.GetOrAdd(objectType, _ =>
             {
-                if (!cache.TryGetValue(objectType, out result))
-                {
-                    var resultProperties = new TypeCache(objectType, objectType.GetTypeInfo().GetCustomAttributes<MaskPropertyAttribute>());
+                var typeCache = new TypeCache(objectType, objectType.GetTypeInfo().GetCustomAttributes<MaskPropertyAttribute>());
 
-                    foreach (
-                        var property in
-                            objectType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                                .Where(p => p.GetIndexParameters().Length == 0)
-                        )
+                foreach (
+                    var property in
+                        objectType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                            .Where(p => p.GetIndexParameters().Length == 0)
+                    )
+                {
+                    var mapAttribute = property.GetCustomAttribute<MapAttribute>(true);
+                    var convertWithAttribute = property.GetCustomAttribute<ConvertWithAttribute>(true);
+                    if (mapAttribute != null || ignoreMapAttribute)
                     {
-                        var mapAttribute = property.GetCustomAttribute<MapAttribute>(true);
-                        var convertWithAttribute = property.GetCustomAttribute<ConvertWithAttribute>(true);
-                        if (mapAttribute != null || ignoreMapAttribute)
+                        typeCache.Properties.Add(property.Name, new GenericProperty
                         {
-                            resultProperties.Properties.Add(property.Name, new GenericProperty
-                            {
-                                Get = property.GetMethod?.CompileAccessor<object, object>(),
-                                Set = property.SetMethod?.CompileVoidAccessor<object, object>(),
-                                Map = mapAttribute,
-                                PropertyType = property.PropertyType,
-                                Converter=convertWithAttribute,
-                            });
-                        }
+                            Get = property.GetMethod?.CompileAccessor<object, object>(),
+                            Set = property.SetMethod?.CompileVoidAccessor<object, object>(),
+                            Map = mapAttribute,
+                            PropertyType = property.PropertyType,
+                            Converter = convertWithAttribute,
+                        });
                     }
-                    cache.Add(objectType, resultProperties);
-                    return resultProperties;
                 }
-            }
-            return result;
+                return typeCache;
+            });
         }
 
-        public static readonly Dictionary<Type, TypeCache> ModelTypeMappingCache =
-            new Dictionary<Type, TypeCache>();
+        public static TypeCache GetTypeCacheNoCast(Type objectType)
+        {
+            return ObjectTypeMappingCacheNoCast.GetOrAdd(objectType, _ =>
+            {
+                var typeCache = new TypeCache(objectType, Enumerable.Empty<MaskPropertyAttribute>());
 
-        public static readonly Dictionary<Type, TypeCache> ObjectTypeMappingCache =
-            new Dictionary<Type, TypeCache>();
+                foreach (
+                    var property in
+                        objectType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                            .Where(p => p.GetIndexParameters().Length == 0)
+                    )
+                {
+                    //Func<object, object> getMethod = null;
+                    //Action<object, object> setMethod = null;
+                    //if (property.GetMethod != null)
+                    //{
+                    //    var objectParameter = Expression.Parameter(typeof(object));
+                    //    getMethod =
+                    //        (Func<object, object>)
+                    //            Expression.Lambda(typeof(Func<object, object>),
+                    //                Expression.Convert(
+                    //                    Expression.Call(Expression.Convert(objectParameter, objectType), property.GetMethod),
+                    //                    typeof(object)), objectParameter).Compile();
+                    //}
+                    //if (property.SetMethod != null)
+                    //{
+                    //    var objectParameter = Expression.Parameter(typeof(object));
+                    //    var valueParameter = Expression.Parameter(typeof(object));
+                    //    setMethod =
+                    //        (Action<object, object>)
+                    //            Expression.Lambda(typeof(Action<object, object>),
+                    //                Expression.Call(Expression.Convert(objectParameter, objectType), property.SetMethod,
+                    //                    Expression.Convert(valueParameter, property.PropertyType)), objectParameter, valueParameter)
+                    //                .Compile();
+                    //}
+                    typeCache.Properties.Add(property.Name, new GenericProperty
+                    {
+                        Get = property.GetMethod?.CompileAccessor<object, object>(),
+                        Set = property.SetMethod?.CompileVoidAccessor<object, object>(),
+                        PropertyType = property.PropertyType
+                    });
+                }
+                return typeCache;
+            });
+        }
+
+        private static readonly ConcurrentDictionary<Type, TypeCache> ModelTypeMappingCache =
+            new ConcurrentDictionary<Type, TypeCache>();
+
+        private static readonly ConcurrentDictionary<Type, TypeCache> ObjectTypeMappingCache =
+            new ConcurrentDictionary<Type, TypeCache>();
+
+        private static readonly ConcurrentDictionary<Type, TypeCache> ObjectTypeMappingCacheNoCast =
+            new ConcurrentDictionary<Type, TypeCache>();
     }
 }

@@ -12,7 +12,7 @@ namespace VitalChoice.DynamicData.Interfaces
 {
     public interface IExtendedDynamicReadServiceAsync<T, TEntity> : IDynamicReadServiceAsync<T, TEntity>
         where TEntity : DynamicDataEntity 
-        where T : MappedObject
+        where T : MappedObject, new()
     {
         Task<T> SelectAsync(int id, bool withDefaults = false, Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null);
 

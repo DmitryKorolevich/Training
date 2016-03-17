@@ -1,7 +1,10 @@
 ﻿using Microsoft.Data.Entity;
 using System.Data.SqlClient;
 using Microsoft.Extensions.OptionsModel;
+using VitalChoice.Caching.Extensions;
 using VitalChoice.Ecommerce.Context;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Options;
@@ -195,33 +198,6 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("VHelpTickets");
             });
 
-            builder.Entity<HealthwiseOrder>(entity =>
-            {
-                entity.HasKey(t => t.Id);
-                entity.ToTable("HealthwiseOrders");
-                entity.HasOne(p => p.Order)
-                    .WithOne()
-                    .HasForeignKey<HealthwiseOrder>(p => p.Id)
-                    .HasPrincipalKey<Order>(p => p.Id)
-                    .IsRequired();
-            });
-
-            builder.Entity<HealthwisePeriod>(entity =>
-            {
-                entity.HasKey(t => t.Id);
-                entity.ToTable("HealthwisePeriods");
-                entity.HasMany(p => p.HealthwiseOrders)
-                    .WithOne(p=>p.HealthwisePeriod)
-                    .HasForeignKey(o => o.IdHealthwisePeriod)
-                    .HasPrincipalKey(p => p.Id)
-                    .IsRequired();
-                entity.HasOne(p => p.Customer)
-                    .WithMany()
-                    .HasForeignKey(o => o.IdCustomer)
-                    .HasPrincipalKey(p => p.Id)
-                    .IsRequired();
-            });
-
             builder.Entity<VHealthwisePeriod>(entity =>
             {
                 entity.HasKey(t => t.Id);
@@ -266,9 +242,12 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(v => v.IdBigString);
             });
 
-            builder.Entity<CartExtended>(entity =>
+            builder.Entity<VTopProducts>(entity =>
             {
-                //entity.
+                entity.Ignore(e => e.Id);
+
+                entity.HasKey(e => new {e.IdSku, e.IdCustomer});
+                entity.HasOne(e => e.Sku).WithMany().HasForeignKey(e => e.IdSku).HasPrincipalKey(s => s.Id);
             });
         }
     }

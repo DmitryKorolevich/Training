@@ -72,10 +72,13 @@ namespace VC.Public.ModelConverters.Order
             model.Skus.AddRange(dynamic?.Skus?.Select(sku =>
                 {
                     var result = _skuMapper.ToModel<CartSkuModel>(sku.Sku);
-                    _productMapper.UpdateModel(result, sku.ProductWithoutSkus);
+                    _productMapper.UpdateModel(result, sku.Sku.Product);
                     result.Price = sku.Amount;
                     result.Quantity = sku.Quantity;
                     result.SubTotal = sku.Quantity * sku.Amount;
+
+                    result.GeneratedGCCodes = dynamic.GeneratedGcs?.Where(g => g?.Sku.Id == sku.Sku.Id).Select(p => p.Code).ToList();
+
                     return result;
                 }) ?? Enumerable.Empty<CartSkuModel>());
 
@@ -92,10 +95,13 @@ namespace VC.Public.ModelConverters.Order
             model.PromoSkus.AddRange(dynamic?.PromoSkus?.Where(p => p.Enabled).Select(sku =>
             {
                 var result = _skuMapper.ToModel<CartSkuModel>(sku.Sku);
-                _productMapper.UpdateModel(result, sku.ProductWithoutSkus);
+                _productMapper.UpdateModel(result, sku.Sku.Product);
                 result.Price = sku.Amount;
                 result.Quantity = sku.Quantity;
                 result.SubTotal = sku.Quantity * sku.Amount;
+
+                result.GeneratedGCCodes = dynamic.GeneratedGcs?.Where(g => g?.Sku.Id == sku.Sku.Id).Select(p => p.Code).ToList();
+
                 return result;
             }) ?? Enumerable.Empty<CartSkuModel>());
 

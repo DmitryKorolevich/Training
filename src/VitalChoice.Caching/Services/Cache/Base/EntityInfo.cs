@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using VitalChoice.Caching.Relational;
 
 namespace VitalChoice.Caching.Services.Cache.Base
 {
     public struct EntityInfo
     {
+        public IDictionary<string, EntityRelationalReferenceInfo> RelationReferences;
         public Type ContextType;
+        public LambdaExpression CacheCondition;
         public ICollection<EntityForeignKeyInfo> ForeignKeys;
         public ICollection<EntityCacheableIndexInfo> NonUniqueIndexes;
         public ICollection<KeyValuePair<Type, EntityCacheableIndexRelationInfo>> DependentTypes;

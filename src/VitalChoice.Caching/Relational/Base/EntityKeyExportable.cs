@@ -14,5 +14,10 @@ namespace VitalChoice.Caching.Relational.Base
 
         [DataMember]
         public ICollection<EntityValueExportable> Values { get; set; }
+
+        public override string ToString()
+        {
+            return string.Join(", ", Values?.Select(v => v.ToString()) ?? Enumerable.Empty<string>());
+        }
     }
 }

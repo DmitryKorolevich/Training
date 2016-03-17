@@ -22,5 +22,7 @@ angular.module('app.dataAccess', [
 	'app.core.dataAccess.services.manageStylesService',
 	'app.core.dataAccess.services.vitalGreenService',
 	'app.core.dataAccess.services.healthwiseService',
-	'app.core.dataAccess.services.redirectService'
+	'app.core.dataAccess.services.redirectService',
+    'app.core.dataAccess.services.cacheService',
+    'app.core.dataAccess.services.inventorySkuService'
 ]);

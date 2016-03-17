@@ -169,9 +169,9 @@
                         </td>
                         <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>
                         <td>
-                            <span data-ng-if="item.DateShipped">{{::item.DateShipped | date:"MM/dd/yy"}}</span>
-                            <span data-ng-if="!item.DateShipped && item.PDateShipped">{{::item.PDateShipped | date:"MM/dd/yy"}} - P<br /></span>
-                            <span data-ng-if="!item.DateShipped && item.NPDateShipped">{{::item.NPDateShipped | date:"MM/dd/yy"}} - NP</span>
+                            <span data-ng-if="::item.DateShipped">{{::item.DateShipped | date:"MM/dd/yy"}}</span>
+                            <span data-ng-if="::(!item.DateShipped && item.PDateShipped)">{{::item.PDateShipped | date:"MM/dd/yy"}} - P<br /></span>
+                            <span data-ng-if="::(!item.DateShipped && item.NPDateShipped)">{{::item.NPDateShipped | date:"MM/dd/yy"}} - NP</span>
                         </td>
                         <td>{{::item.Company}}</td>
                         <td>{{::item.StateCode}}</td>
@@ -180,10 +180,10 @@
                             <span data-ng-if="::item.IdCustomerType == 2" class="label label-wholesale font-default">{{::getReferenceItem(ReferenceData.ShortCustomerTypes, item.IdCustomerType).Text}}</span>
                         </td>
                         <td>
-                            <a ui-sref="index.oneCol.customerDetail({id:item.IdCustomer})">{{::item.Customer}}</a>
+                            <a ui-sref="index.oneCol.customerDetail({id: {{::item.IdCustomer}}})">{{::item.Customer}}</a>
                         </td>
                         <td>
-                            <a ui-sref="index.oneCol.orderDetail({id:item.Id})">{{::item.Id}}</a>
+                            <a ui-sref="index.oneCol.orderDetail({id: {{::item.Id}}})">{{::item.Id}}</a>
                         </td>
                         <td>{{::item.Total | currency}}</td>
                         <td>{{::item.DateEdited | date:"MM/dd/yy"}}<br />{{::item.DateEdited | date:"h:mm a"}}<br />{{::item.EditedByAgentId}}</td>
@@ -194,24 +194,25 @@
                             <button title="Edit" class="btn btn-default btn-success btn-xs" data-ng-click="openOrder(item.Id);">
                                 <i class="glyphicon glyphicon-edit"></i>
                             </button>
-                            <button title="Delete" data-ng-if="::!(item.OrderStatus==3 || item.OrderStatus==4 || item.OrderStatus==5 || item.POrderStatus==3 || item.POrderStatus==4 || item.POrderStatus==5 || item.NPOrderStatus==3 || item.NPOrderStatus==4 || item.NPOrderStatus==5)" class="btn btn-default btn-danger btn-xs" ladda="deleteTracker.active()" data-ng-click="delete(item.Id);">
+                            <button title="Delete" data-ng-if="::!(item.OrderStatus==3 || item.OrderStatus==4 || item.OrderStatus==5 || item.POrderStatus==3 || item.POrderStatus==4 || item.POrderStatus==5 || item.NPOrderStatus==3 || item.NPOrderStatus==4 || item.NPOrderStatus==5)" class="btn btn-default btn-danger btn-xs"
+                                    ladda="deleteTracker.active()" data-ng-click="delete(item.Id);">
                                 <i class="glyphicon glyphicon-remove"></i>
                             </button>
                         </td>
                         <td>
                             <div data-ng-if="::item.OrderStatus" class="checkbox margin-bottom-0px margin-top-0px">
                                 <label>
-                                    <input data-ng-disabled="!item.AllowExport" data-ng-model="item.IsSelected" type="checkbox" data-ng-change="itemExportChanged(item)">
+                                    <input data-ng-disabled="::!item.AllowExport" data-ng-model="item.IsSelected" type="checkbox" data-ng-change="itemExportChanged(item, $event)">
                                 </label>
                             </div>
                             <div data-ng-if="::(!item.OrderStatus && item.POrderStatus)" class="checkbox margin-bottom-5px margin-top-0px">
                                 <label>
-                                    <input data-ng-disabled="!item.PAllowExport" data-ng-model="item.IsPSelected" type="checkbox" data-ng-change="PItemExportChanged(item)"> P
+                                    <input data-ng-disabled="::!item.PAllowExport" data-ng-model="item.IsPSelected" type="checkbox" data-ng-change="PItemExportChanged(item, $event)"> P
                                 </label>
                             </div>
                             <div data-ng-if="::(!item.OrderStatus && item.NPOrderStatus)" class="checkbox margin-bottom-0px margin-top-0px">
                                 <label>
-                                    <input data-ng-disabled="!item.NPAllowExport" data-ng-model="item.IsNPSelected" type="checkbox" data-ng-change="NPItemExportChanged(item)"> NP
+                                    <input data-ng-disabled="::!item.NPAllowExport" data-ng-model="item.IsNPSelected" type="checkbox" data-ng-change="NPItemExportChanged(item, $event)"> NP
                                 </label>
                             </div>
                         </td>

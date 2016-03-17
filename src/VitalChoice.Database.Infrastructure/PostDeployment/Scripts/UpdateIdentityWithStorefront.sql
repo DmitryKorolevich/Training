@@ -144,3 +144,21 @@ VALUES
 END
 
 GO
+
+IF(NOT EXISTS (SELECT * FROM [dbo].[AspNetRoleClaims] WHERE [ClaimValue]='17' AND ([RoleId]=1)))
+BEGIN
+
+INSERT INTO [dbo].[AspNetRoleClaims]
+([ClaimType], [ClaimValue], [RoleId])
+VALUES
+(N'Permission', 17, 1)
+
+INSERT INTO [dbo].[AspNetRoleClaims]
+([ClaimType], [ClaimValue], [RoleId])
+VALUES
+(N'Permission', 17, 5)
+
+END
+
+GO
+

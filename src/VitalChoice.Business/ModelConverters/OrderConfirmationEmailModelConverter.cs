@@ -74,10 +74,13 @@ namespace VitalChoice.Business.ModelConverters
             model.Skus.AddRange(dynamic?.Skus?.Select(sku =>
             {
                 var result = _skuMapper.ToModel<SkuEmailItem>(sku.Sku);
-                _productMapper.UpdateModel(result, sku.ProductWithoutSkus);
+                _productMapper.UpdateModel(result, sku.Sku.Product);
                 result.Price = sku.Amount;
                 result.Quantity = sku.Quantity;
-                result.SubTotal = sku.Quantity * sku.Amount; 
+                result.SubTotal = sku.Quantity * sku.Amount;
+
+                result.GeneratedGCCodes = dynamic.GeneratedGcs?.Where(g => g?.Sku.Id == sku.Sku.Id).Select(p => p.Code).ToList();
+
                 return result;
             }) ?? Enumerable.Empty<SkuEmailItem>());
 
@@ -94,10 +97,13 @@ namespace VitalChoice.Business.ModelConverters
             model.PromoSkus.AddRange(dynamic?.PromoSkus.Where(p => p.Enabled)?.Select(sku =>
             {
                 var result = _skuMapper.ToModel<SkuEmailItem>(sku.Sku);
-                _productMapper.UpdateModel(result, sku.ProductWithoutSkus);
+                _productMapper.UpdateModel(result, sku.Sku.Product);
                 result.Price = sku.Amount;
                 result.Quantity = sku.Quantity;
                 result.SubTotal = sku.Quantity * sku.Amount;
+
+                result.GeneratedGCCodes = dynamic.GeneratedGcs?.Where(g => g?.Sku.Id == sku.Sku.Id).Select(p => p.Code).ToList();
+
                 return result;
             }) ?? Enumerable.Empty<SkuEmailItem>());
 

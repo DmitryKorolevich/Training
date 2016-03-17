@@ -21,6 +21,10 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
                     }
                     yield return new KeyValuePair<T1, T2>(leftItem, enumerator.Current);
                 }
+                if (enumerator.MoveNext())
+                {
+                    throw new AggregateException("Collections has different number of items");
+                }
             }
         }
 

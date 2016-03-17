@@ -35,6 +35,7 @@ namespace VitalChoice.Infrastructure.Context
             {
                 _transaction = new InnerEmbeddingTransaction(Database.BeginTransaction(isolation), this);
                 _transaction.TransactionCommit += OnTransactionCommit;
+                _transaction.TransactionRollback += OnTransactionRollback;
             }
             _transaction.IncReference();
             return _transaction;
@@ -43,7 +44,9 @@ namespace VitalChoice.Infrastructure.Context
 	    public bool InTransaction => _transaction != null && !_transaction.Closed;
 
         public event Action TransactionCommit;
-        public override void Dispose()
+	    public event Action TransactionRollback;
+
+	    public override void Dispose()
         {
             if (_transaction == null || _transaction.Closed)
                 base.Dispose();
@@ -76,5 +79,10 @@ namespace VitalChoice.Infrastructure.Context
         {
             TransactionCommit?.Invoke();
         }
+
+	    protected virtual void OnTransactionRollback()
+	    {
+	        TransactionRollback?.Invoke();
+	    }
     }
 }

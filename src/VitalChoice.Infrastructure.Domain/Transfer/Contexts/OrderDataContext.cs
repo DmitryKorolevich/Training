@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 using VitalChoice.Workflow.Base;
@@ -37,10 +39,12 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
 
     public class OrderDataContext : ComputableDataContext
     {
+        public OrderStatus CombinedStatus { get; }
         public List<PromotionDynamic> Promotions { get; set; }
 
-        public OrderDataContext()
+        public OrderDataContext(OrderStatus combinedStatus)
         {
+            CombinedStatus = combinedStatus;
             Messages = new List<MessageInfo>();
             PromoSkus = new List<PromoOrdered>();
             GcMessageInfos = new List<MessageInfo>();
@@ -94,6 +98,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
         public ICollection<PromoOrdered> PromoSkus { get; set; }
 
         public ICollection<MessageInfo> Messages { get; set; }
+
+        public ICollection<GeneratedGiftCertificate> GeneratedGcs { get; set; }
 
         public SplitInfo SplitInfo { get; set; }
 

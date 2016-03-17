@@ -16,9 +16,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             }
             T result;
 
-            var cachableExpression = Evaluator.PartialEval(expression);
-            cachableExpression = LocalCollectionExpander.Rewrite(cachableExpression);
-            string key = cachableExpression.ToString();
+            var key = expression.AsString();
 
             lock (_lambdaCache)
             {
@@ -42,6 +40,14 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
     }
     public static class LambdaCompiler
     {
+        public static string AsString(this Expression expression)
+        {
+            var cachableExpression = Evaluator.PartialEval(expression);
+            cachableExpression = LocalCollectionExpander.Rewrite(cachableExpression);
+            string key = cachableExpression.ToString();
+            return key;
+        }
+
         public static T CacheCompile<T>(this Expression<T> expression)
         {
             return LambdaCompiler<T>.CacheCompile(expression);

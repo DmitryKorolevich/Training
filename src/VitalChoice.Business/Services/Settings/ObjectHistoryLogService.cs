@@ -43,10 +43,10 @@ namespace VitalChoice.Business.Services.Settings
             Func<IQueryable<ObjectHistoryLogItem>, IOrderedQueryable<ObjectHistoryLogItem>> sortable = x => x.OrderByDescending(y => y.DateCreated);
             var toReturn = await _objectHistoryLogItemRepository.Query(p => p.IdObjectType == (int)filter.IdObjectType && p.IdObject == filter.IdObject).
                 OrderBy(sortable).
-                SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
-
-            var profiles = await _adminProfileRepository.Query(p => toReturn.Items.Where(pp=>pp.IdEditedBy.HasValue).
-                Select(pp=>pp.IdEditedBy).Contains(p.Id)).SelectAsync();
+                SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, false);
+            var adminIds = toReturn.Items.Where(pp => pp.IdEditedBy.HasValue).
+                Select(pp => pp.IdEditedBy.Value).Distinct().ToList();
+            var profiles = await _adminProfileRepository.Query(p => adminIds.Contains(p.Id)).SelectAsync();
             foreach (var item in toReturn.Items)
             {
                 foreach (var profile in profiles)
@@ -65,7 +65,7 @@ namespace VitalChoice.Business.Services.Settings
         {
             ObjectHistoryReportModel toReturn = new ObjectHistoryReportModel();
             
-            var ids = new List<int>();
+            var ids = new HashSet<int>();
             Func<IQueryable<ObjectHistoryLogItem>, IOrderedQueryable<ObjectHistoryLogItem>> sortable = x => x.OrderByDescending(y => y.DateCreated);
             toReturn.Main =new ObjectHistoryLogListItemModel(
                 (await _objectHistoryLogItemRepository.Query(p => p.IdObjectType == (int)filter.IdObjectType && p.IdObject == filter.IdObject).

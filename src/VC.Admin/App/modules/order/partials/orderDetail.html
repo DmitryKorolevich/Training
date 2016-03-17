@@ -311,12 +311,12 @@
                                                         </div>
                                                     </div>
 
-                                                    <span class="legend">Newsletter</span>
-                                                    <div class="form-group">
+                                                    <span data-ng-if="options.BrontoSubscribedStatusLoaded" class="legend">Newsletter</span>
+                                                    <div data-ng-if="options.BrontoSubscribedStatusLoaded" class="form-group">
                                                         <div class="col-md-12">
                                                             <div class="checkbox">
                                                                 <label>
-                                                                    <input type="checkbox" name="SignUpNewsletter" data-ng-model="order.SignUpNewsletter" data-ng-disabled="orderEditDisabled" /> Sign up for e-newsletter and receive Bonus Offers, Sale Alerts, Recipes, and Health News
+                                                                    <input type="checkbox" name="BrontoSubscribedStatus" data-ng-model="options.BrontoSubscribedStatus" data-ng-disabled="orderEditDisabled" /> Sign up for e-newsletter and receive Bonus Offers, Sale Alerts, Recipes, and Health News
                                                                 </label>
                                                             </div>
                                                         </div>

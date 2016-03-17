@@ -105,6 +105,7 @@ namespace VitalChoice.Business.Services
             var affiliateTiers = lookupRepository.Query(x => x.Name == LookupNames.AffiliateTiers).Select(false).Single().Id;
             var promotionBuyTypes = lookupRepository.Query(x => x.Name == LookupNames.PromotionBuyTypes).Select(false).Single().Id;
             var shippingUpgrades = lookupRepository.Query(x => x.Name == LookupNames.ShippingUpgrades).Select(false).Single().Id;
+            var autoshipOptions = lookupRepository.Query(x => x.Name == LookupNames.AutoShipSchedule).Select(false).Single().Id;
 
             var referenceData = new ReferenceData();
             referenceData.DefaultCountry = _backendSettingsService.GetDefaultCountry();
@@ -374,7 +375,15 @@ namespace VitalChoice.Business.Services
                     Key = x.Id,
                     Text = x.ValueVariant
                 }).ToList();
-            referenceData.PersonTitles = LookupHelper.GetPersonTitles();
+			referenceData.AutoShipOptions = lookupVariantRepository.Query()
+				.Where(x => x.IdLookup == autoshipOptions)
+				.Select(false)
+				.Select(x => new LookupItem<int>()
+				{
+					Key = x.Id,
+					Text = x.ValueVariant
+				}).ToList();
+			referenceData.PersonTitles = LookupHelper.GetPersonTitles();
 
             //BUG: shoule be moved to the specific worker
             SetupAppSettings();

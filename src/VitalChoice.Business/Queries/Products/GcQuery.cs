@@ -66,6 +66,16 @@ namespace VitalChoice.Business.Queries.Product
             return this;
         }
 
+        public GcQuery WidthStatus(RecordStatusCode? status)
+        {
+            if (status.HasValue)
+            {
+                Add(x => x.StatusCode == status.Value);
+            }
+
+            return this;
+        }
+
         public GcQuery WithType(GCType? type)
         {
             if (type.HasValue)

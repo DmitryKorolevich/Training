@@ -3,7 +3,9 @@ using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
+using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 
 namespace VitalChoice.Infrastructure.Domain.Dynamic
@@ -29,6 +31,8 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
         public CustomerDynamic Customer { get; set; }
 
         public ICollection<SkuOrdered> Skus { get; set; }
+
+        public ICollection<GeneratedGiftCertificate> GeneratedGcs { get; set; }
 
         public DiscountDynamic Discount { get; set; }
 

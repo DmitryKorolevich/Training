@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Autofac;
 using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.Infrastructure;
 using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Metadata.Internal;
 using Microsoft.Extensions.Logging;
@@ -57,7 +58,8 @@ namespace VitalChoice.Caching.Services
                             if (!TryGetPrimaryKey(entityType, out primaryKey))
                                 continue;
                             var uniqueIndex = GetFirstUniqueIndex(entityType);
-                            var conditionalList = GetyConditionalIndexes(entityType);
+                            var conditionalList = GetConditionalIndexes(entityType);
+                            var cacheCondition = GetCacheCondition(entityType);
                             var nonUniqueIndexes = SetupForeignKeys(entityType, entityInfos);
 
                             if (!parsedEntities.Contains(entityType.ClrType))
@@ -69,7 +71,8 @@ namespace VitalChoice.Caching.Services
                                     PrimaryKey = primaryKey,
                                     CacheableIndex = uniqueIndex,
                                     ConditionalIndexes = conditionalList,
-                                    ContextType = context.GetType()
+                                    ContextType = context.GetType(),
+                                    CacheCondition = cacheCondition
                                 }, info =>
                                 {
                                     if (info.ForeignKeys == null)
@@ -79,6 +82,7 @@ namespace VitalChoice.Caching.Services
                                     info.CacheableIndex = uniqueIndex;
                                     info.ConditionalIndexes = conditionalList;
                                     info.ContextType = context.GetType();
+                                    info.CacheCondition = cacheCondition;
                                     return info;
                                 });
                             }
@@ -138,9 +142,29 @@ namespace VitalChoice.Caching.Services
             var nonUniqueList = new HashSet<EntityCacheableIndexInfo>();
             var externalForeignKeys = new List<KeyValuePair<Type, EntityForeignKeyInfo>>();
             var externalDependentTypes = new List<KeyValuePair<Type, EntityCacheableIndexRelationInfo>>();
+            var relationalReferences =
+                new List<KeyValuePair<Type, KeyValuePair<string, EntityRelationalReferenceInfo>>>();
 
             foreach (var foreignKey in entityType.GetForeignKeys())
             {
+                if (foreignKey.PrincipalToDependent != null && !foreignKey.PrincipalToDependent.IsCollection())
+                {
+                    relationalReferences.Add(
+                        new KeyValuePair<Type, KeyValuePair<string, EntityRelationalReferenceInfo>>(
+                            foreignKey.PrincipalToDependent.DeclaringEntityType.ClrType,
+                            new KeyValuePair<string, EntityRelationalReferenceInfo>(
+                                foreignKey.PrincipalToDependent.Name,
+                                new EntityRelationalReferenceInfo(CreateValueInfos(foreignKey.PrincipalKey.Properties)))));
+                }
+                if (foreignKey.DependentToPrincipal != null && !foreignKey.DependentToPrincipal.IsCollection())
+                {
+                    relationalReferences.Add(
+                        new KeyValuePair<Type, KeyValuePair<string, EntityRelationalReferenceInfo>>(
+                            foreignKey.DependentToPrincipal.DeclaringEntityType.ClrType,
+                            new KeyValuePair<string, EntityRelationalReferenceInfo>(
+                                foreignKey.DependentToPrincipal.Name,
+                                new EntityRelationalReferenceInfo(CreateValueInfos(foreignKey.Properties)))));
+                }
                 if (foreignKey.PrincipalToDependent != null && foreignKey.PrincipalToDependent.IsCollection())
                 {
                     var foreignValues = CreateValueInfos(foreignKey.Properties).ToArray();
@@ -227,17 +251,34 @@ namespace VitalChoice.Caching.Services
                 info.ForeignKeys.Add(external.Value);
                 return info;
             }));
+            relationalReferences.ForEach(external => entityInfos.AddOrUpdate(external.Key, () => new EntityInfo
+            {
+                RelationReferences =
+                    new Dictionary<string, EntityRelationalReferenceInfo> {{external.Value.Key, external.Value.Value}}
+            },
+                info =>
+                {
+                    if (info.RelationReferences == null)
+                    {
+                        info.RelationReferences = new Dictionary<string, EntityRelationalReferenceInfo>();
+                    }
+                    if (!info.RelationReferences.ContainsKey(external.Value.Key))
+                    {
+                        info.RelationReferences.Add(external.Value.Key, external.Value.Value);
+                    }
+                    return info;
+                }));
             return nonUniqueList;
         }
 
-        private static List<EntityConditionalIndexInfo> GetyConditionalIndexes(IEntityType entityType)
+        private static List<EntityConditionalIndexInfo> GetConditionalIndexes(IEntityType entityType)
         {
             List<EntityConditionalIndexInfo> conditionalList = new List<EntityConditionalIndexInfo>();
 
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var index in entityType.GetIndexes())
             {
-                var conditionAnnotation = index.FindAnnotation(IndexBuilderExtension.UniqueIndexAnnotationName);
+                var conditionAnnotation = index.FindAnnotation(EntityBuilderExtensions.UniqueIndexAnnotationName);
                 if (conditionAnnotation != null)
                 {
                     conditionalList.Add(new EntityConditionalIndexInfo(CreateValueInfos(index.Properties),
@@ -246,6 +287,12 @@ namespace VitalChoice.Caching.Services
                 }
             }
             return conditionalList;
+        }
+
+        private static LambdaExpression GetCacheCondition(IAnnotatable entityType)
+        {
+            var fullCacheAnnotation = entityType.FindAnnotation(EntityBuilderExtensions.FullCollectionAnnotationName);
+            return (LambdaExpression) fullCacheAnnotation?.Value;
         }
 
         public bool HaveKeys(Type entityType)
@@ -272,6 +319,12 @@ namespace VitalChoice.Caching.Services
         {
             var caller = (IGetEntityCaller) Activator.CreateInstance(typeof (GetEntityCaller<>).MakeGenericType(entityType), this);
             return caller.GetEntity(keyValues);
+        }
+
+        public object GetEntity(Type entityType, EntityKey pk)
+        {
+            var caller = (IGetEntityCaller)Activator.CreateInstance(typeof(GetEntityCaller<>).MakeGenericType(entityType), this);
+            return caller.GetEntity(pk);
         }
 
         public ICollection<EntityCacheableIndexInfo> GetNonUniqueIndexInfos(Type entityType)
@@ -317,25 +370,51 @@ namespace VitalChoice.Caching.Services
                 var contextType = GetContextType<T>();
                 if (contextType != null)
                 {
-                    var context = scope.Resolve(contextType) as DbContext;
-                    if (context != null)
+                    using (var context = scope.Resolve(contextType) as DbContext)
                     {
-                        var set = context.Set<T>();
-                        var parameter = Expression.Parameter(typeof (T));
-                        Expression conditionalExpression = null;
-                        foreach (var keyValue in keyValues)
+                        if (context != null)
                         {
-                            var part =
-                                Expression.Equal(
-                                    Expression.MakeMemberAccess(parameter, typeof (T).GetRuntimeProperty(keyValue.Name)),
-                                    Expression.Constant(keyValue.Value));
-                            conditionalExpression = conditionalExpression == null ? part : Expression.And(conditionalExpression, part);
+                            var set = context.Set<T>();
+                            ParameterExpression parameter;
+                            var conditionalExpression = GetConditionalExpression<T>(keyValues, out parameter);
+
+                            if (conditionalExpression == null)
+                                return null;
+
+                            return
+                                set.AsNoTracking()
+                                    .AsNonCached()
+                                    .FirstOrDefault(Expression.Lambda<Func<T, bool>>(conditionalExpression, parameter));
                         }
+                    }
+                }
+            }
+            return null;
+        }
 
-                        if (conditionalExpression == null)
-                            return null;
+        public T GetEntity<T>(EntityKey pk) where T : class
+        {
+            using (var scope = _serviceProvider.BeginLifetimeScope())
+            {
+                var contextType = GetContextType<T>();
+                if (contextType != null)
+                {
+                    using (var context = scope.Resolve(contextType) as DbContext)
+                    {
+                        if (context != null)
+                        {
+                            var set = context.Set<T>();
+                            ParameterExpression parameter;
+                            var conditionalExpression = GetConditionalExpression<T>(pk, out parameter);
 
-                        return set.FirstOrDefault(Expression.Lambda<Func<T, bool>>(conditionalExpression, parameter));
+                            if (conditionalExpression == null)
+                                return null;
+
+                            return
+                                set.AsNoTracking()
+                                    .AsNonCached()
+                                    .FirstOrDefault(Expression.Lambda<Func<T, bool>>(conditionalExpression, parameter));
+                        }
                     }
                 }
             }
@@ -449,6 +528,39 @@ namespace VitalChoice.Caching.Services
             return _gcCollector.CanAddUpCache();
         }
 
+        private static Expression GetConditionalExpression<T>(EntityKey pk, out ParameterExpression parameter) where T : class
+        {
+            parameter = Expression.Parameter(typeof (T));
+            Expression conditionalExpression = null;
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (var keyValue in pk.Values)
+            {
+                var part =
+                    Expression.Equal(
+                        Expression.MakeMemberAccess(parameter, typeof (T).GetRuntimeProperty(keyValue.ValueInfo.Name)),
+                        Expression.Constant(keyValue.Value));
+                conditionalExpression = conditionalExpression == null ? part : Expression.And(conditionalExpression, part);
+            }
+            return conditionalExpression;
+        }
+
+        private static Expression GetConditionalExpression<T>(ICollection<EntityValueExportable> keyValues,
+            out ParameterExpression parameter) where T : class
+        {
+            parameter = Expression.Parameter(typeof (T));
+            Expression conditionalExpression = null;
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (var keyValue in keyValues)
+            {
+                var part =
+                    Expression.Equal(
+                        Expression.MakeMemberAccess(parameter, typeof (T).GetRuntimeProperty(keyValue.Name)),
+                        Expression.Constant(keyValue.Value));
+                conditionalExpression = conditionalExpression == null ? part : Expression.And(conditionalExpression, part);
+            }
+            return parameter;
+        }
+
         private static IEnumerable<EntityValueInfo> CreateValueInfos(IEnumerable<IProperty> properties)
         {
             return properties.Select(
@@ -459,6 +571,7 @@ namespace VitalChoice.Caching.Services
         private interface IGetEntityCaller
         {
             object GetEntity(ICollection<EntityValueExportable> keyValues);
+            object GetEntity(EntityKey pk);
         }
 
         private struct GetEntityCaller<T> : IGetEntityCaller
@@ -474,6 +587,11 @@ namespace VitalChoice.Caching.Services
             public object GetEntity(ICollection<EntityValueExportable> keyValues)
             {
                 return _infoStorage.GetEntity<T>(keyValues);
+            }
+
+            public object GetEntity(EntityKey pk)
+            {
+                return _infoStorage.GetEntity<T>(pk);
             }
         }
     }

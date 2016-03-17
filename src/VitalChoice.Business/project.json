@@ -19,6 +19,7 @@
     "VitalChoice.Interfaces": "",
     "VitalChoice.DynamicData": "",
     "VitalChoice.ContentProcessing": "",
+    "VitalChoice.Validation": "",
     "Authorize.Net": ""
   },
 
@@ -38,7 +39,8 @@
         "System.ServiceModel.Primitives": "4.0.1-*",
         "System.Xml.XPath": "4.0.1-*",
         "System.Xml.XmlDocument": "4.0.1-*",
-        "System.Xml.XmlSerializer": "4.0.11-*"
+        "System.Xml.XmlSerializer": "4.0.11-*",
+        "System.Runtime.Serialization.Xml": "4.0.11-*"
       }
     }
   }

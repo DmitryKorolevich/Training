@@ -9,7 +9,7 @@ namespace VitalChoice.Business.Services.Ecommerce
     public class EcommerceDynamicReadServiceDecorator<TDynamic, TEntity> :
         IDynamicReadServiceAsync<TDynamic, TEntity>
         where TEntity : DynamicDataEntity
-        where TDynamic : MappedObject
+        where TDynamic : MappedObject, new()
     {
         private readonly IDynamicReadServiceAsync<TDynamic, TEntity> _extendedReadService;
 
