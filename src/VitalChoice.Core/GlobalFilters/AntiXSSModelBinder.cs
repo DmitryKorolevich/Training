@@ -18,21 +18,25 @@ namespace VitalChoice.Core.GlobalFilters
 
             "\"",
             "&quot;",
+            "&QUOT;",
             "&#34;",
             "&#x22;",
 
             "&",
             "&amp;",
+            "&AMP;",
             "&#38;",
             "&#x26;",
 
             "<",
             "&lt;",
+            "&LT;",
             "&#60;",
             "&#x3C;",
 
             ">",
             "&gt;",
+            "&GT;",
             "&#62;",
             "&#x3E;",
 
@@ -65,13 +69,18 @@ namespace VitalChoice.Core.GlobalFilters
                 if (model != null)
                 {
                     var metadata = bindingContext.ModelMetadata as DefaultModelMetadata;
-                    var preventFilteringXSS = metadata?.Attributes.PropertyAttributes.Any(x => x.GetType() == typeof(PreventXSSFilteringAttribute)) ?? false;
+                    var preventFilteringXSS = metadata?.Attributes.PropertyAttributes.Any(x => x is PreventXSSFilteringAttribute) ?? false;
 
-                    var containForbidden = modelAsString != null && ForbiddenStrings.Any(x => modelAsString.Contains(x));
-                    if (!preventFilteringXSS && containForbidden)
+                    
+                    if (!preventFilteringXSS)
                     {
-                        bindingContext.ModelState.AddModelError(bindingContext.ModelName, "Html forbidden");
-                        return ModelBindingResult.SuccessAsync(bindingContext.ModelName, string.Empty);
+                        var containForbidden = modelAsString != null && ForbiddenStrings.Any(x => modelAsString.Contains(x));
+
+                        if (containForbidden)
+                        {
+                            bindingContext.ModelState.AddModelError(bindingContext.ModelName, "Html forbidden");
+                            return ModelBindingResult.SuccessAsync(bindingContext.ModelName, string.Empty);
+                        }
                     }
 
                     return ModelBindingResult.SuccessAsync(bindingContext.ModelName, modelAsString);
