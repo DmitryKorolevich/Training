@@ -283,7 +283,8 @@ namespace VitalChoice.Core.DependencyInjection
                 Port = Convert.ToInt32(configuration.GetSection("App:Email:Port").Value),
                 Secured = Convert.ToBoolean(configuration.GetSection("App:Email:Secured").Value),
                 Username = configuration.GetSection("App:Email:Username").Value,
-                Password = configuration.GetSection("App:Email:Password").Value
+                Password = configuration.GetSection("App:Email:Password").Value,
+                Disabled = Convert.ToBoolean(configuration.GetSection("App:Email:Disabled").Value)
             };
             options.ExportService = new ExportService
             {

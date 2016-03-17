@@ -20,7 +20,8 @@
       "Port": 587,
       "Secured": true,
       "Username": "admin.staging@g2designgroup.com",
-      "Password": "vcstaging123"
+      "Password": "vcstaging123",
+      "Disabled": false
     },
     "DefaultCultureId": "en-US",
     "Connection": {

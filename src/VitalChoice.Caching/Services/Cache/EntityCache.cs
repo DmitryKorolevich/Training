@@ -298,8 +298,8 @@ namespace VitalChoice.Caching.Services.Cache
         {
             var compiled = queryData.WhereExpression?.Compiled;
             CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled);
-            var orderedList = Order(cacheIterator, queryData);
-            entities = orderedList.ToList();
+            var orderedClonedList = DeepCloneList(queryData.RelationInfo, Order(cacheIterator, queryData));
+            entities = orderedClonedList.ToList();
             return CreateGetResult(cacheIterator, queryData, entities);
         }
 

@@ -59,57 +59,36 @@ namespace VitalChoice.ObjectMapping.Services
 
         public static TypeCache GetTypeCacheNoCast(Type objectType)
         {
-            return ObjectTypeMappingCacheNoCast.GetOrAdd(objectType, _ =>
-            {
-                var typeCache = new TypeCache(objectType, Enumerable.Empty<MaskPropertyAttribute>());
-
-                foreach (
-                    var property in
-                        objectType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                            .Where(p => p.GetIndexParameters().Length == 0)
-                    )
-                {
-                    //Func<object, object> getMethod = null;
-                    //Action<object, object> setMethod = null;
-                    //if (property.GetMethod != null)
-                    //{
-                    //    var objectParameter = Expression.Parameter(typeof(object));
-                    //    getMethod =
-                    //        (Func<object, object>)
-                    //            Expression.Lambda(typeof(Func<object, object>),
-                    //                Expression.Convert(
-                    //                    Expression.Call(Expression.Convert(objectParameter, objectType), property.GetMethod),
-                    //                    typeof(object)), objectParameter).Compile();
-                    //}
-                    //if (property.SetMethod != null)
-                    //{
-                    //    var objectParameter = Expression.Parameter(typeof(object));
-                    //    var valueParameter = Expression.Parameter(typeof(object));
-                    //    setMethod =
-                    //        (Action<object, object>)
-                    //            Expression.Lambda(typeof(Action<object, object>),
-                    //                Expression.Call(Expression.Convert(objectParameter, objectType), property.SetMethod,
-                    //                    Expression.Convert(valueParameter, property.PropertyType)), objectParameter, valueParameter)
-                    //                .Compile();
-                    //}
-                    typeCache.Properties.Add(property.Name, new GenericProperty
-                    {
-                        Get = property.GetMethod?.CompileAccessor<object, object>(),
-                        Set = property.SetMethod?.CompileVoidAccessor<object, object>(),
-                        PropertyType = property.PropertyType
-                    });
-                }
-                return typeCache;
-            });
+            return GetTypeCache(objectType, true);
+            //Func<object, object> getMethod = null;
+            //Action<object, object> setMethod = null;
+            //if (property.GetMethod != null)
+            //{
+            //    var objectParameter = Expression.Parameter(typeof(object));
+            //    getMethod =
+            //        (Func<object, object>)
+            //            Expression.Lambda(typeof(Func<object, object>),
+            //                Expression.Convert(
+            //                    Expression.Call(Expression.Convert(objectParameter, objectType), property.GetMethod),
+            //                    typeof(object)), objectParameter).Compile();
+            //}
+            //if (property.SetMethod != null)
+            //{
+            //    var objectParameter = Expression.Parameter(typeof(object));
+            //    var valueParameter = Expression.Parameter(typeof(object));
+            //    setMethod =
+            //        (Action<object, object>)
+            //            Expression.Lambda(typeof(Action<object, object>),
+            //                Expression.Call(Expression.Convert(objectParameter, objectType), property.SetMethod,
+            //                    Expression.Convert(valueParameter, property.PropertyType)), objectParameter, valueParameter)
+            //                .Compile();
+            //}
         }
 
         private static readonly ConcurrentDictionary<Type, TypeCache> ModelTypeMappingCache =
             new ConcurrentDictionary<Type, TypeCache>();
 
         private static readonly ConcurrentDictionary<Type, TypeCache> ObjectTypeMappingCache =
-            new ConcurrentDictionary<Type, TypeCache>();
-
-        private static readonly ConcurrentDictionary<Type, TypeCache> ObjectTypeMappingCacheNoCast =
             new ConcurrentDictionary<Type, TypeCache>();
     }
 }

@@ -31,6 +31,8 @@ namespace VitalChoice.Caching.Services.Cache.Base
 
         public DateTime LastAccessTime => LastAccess;
 
+        public HashSet<string> NeedUpdateRelated { get; } = new HashSet<string>();
+
         public virtual bool NeedUpdate
         {
             get { return _needUpdate; }
@@ -87,7 +89,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
 
         public override bool NeedUpdate
         {
-            get { return _cacheData.FullCollection && _cacheData.NeedUpdate || base.NeedUpdate; }
+            get { return _cacheData.FullCollection && _cacheData.NeedUpdate || base.NeedUpdate || NeedUpdateRelated.Any(); }
             set { base.NeedUpdate = value; }
         }
 

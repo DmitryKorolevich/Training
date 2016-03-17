@@ -21,23 +21,28 @@ namespace VitalChoice.Business.Mail
 	    {
 #if !DOTNET5_4
             _configuration = options.Value.EmailConfiguration;
-
-			_client = new SmtpClient(_configuration.Host, _configuration.Port)
-			{
-				UseDefaultCredentials = false,
-				DeliveryMethod = SmtpDeliveryMethod.Network,
-				EnableSsl = _configuration.Secured,
-				Credentials = new NetworkCredential(_configuration.Username, _configuration.Password)
-			};
+		    if (!_configuration.Disabled)
+		    {
+		        _client = new SmtpClient(_configuration.Host, _configuration.Port)
+		        {
+		            UseDefaultCredentials = false,
+		            DeliveryMethod = SmtpDeliveryMethod.Network,
+		            EnableSsl = _configuration.Secured,
+		            Credentials = new NetworkCredential(_configuration.Username, _configuration.Password)
+		        };
+		    }
 #endif
 		}
 
-		public async Task SendEmailAsync(string email, string subject, string message, string fromDisplayName= null, string fromEmail=null, string toDisplayName = "",
-            bool isBodyHtml=true)
-		{
+        public async Task SendEmailAsync(string email, string subject, string message, string fromDisplayName = null,
+            string fromEmail = null, string toDisplayName = "",
+            bool isBodyHtml = true)
+        {
 #if !DOTNET5_4
+            if (_configuration.Disabled)
+                return;
             var fromEmailAdddress = fromEmail;
-            if(String.IsNullOrEmpty(fromEmailAdddress))
+            if (String.IsNullOrEmpty(fromEmailAdddress))
             {
                 fromEmailAdddress = _configuration.From;
             }
@@ -46,21 +51,21 @@ namespace VitalChoice.Business.Mail
                 fromDisplayName = "Vital Choice";
             }
             var fromAddr = new MailAddress(fromEmailAdddress, fromDisplayName, Encoding.UTF8);
-			var toAddr = new MailAddress(email, toDisplayName, Encoding.UTF8);
+            var toAddr = new MailAddress(email, toDisplayName, Encoding.UTF8);
             var mailmsg = new MailMessage(fromAddr, toAddr)
-			{
-				IsBodyHtml = isBodyHtml,
-				Body = message,
-				BodyEncoding = Encoding.UTF8,
-				Subject = subject,
-				SubjectEncoding = Encoding.UTF8,
-			};
+            {
+                IsBodyHtml = isBodyHtml,
+                Body = message,
+                BodyEncoding = Encoding.UTF8,
+                Subject = subject,
+                SubjectEncoding = Encoding.UTF8,
+            };
 
             try
             {
                 await _client.SendMailAsync(mailmsg);
             }
-            catch(SmtpFailedRecipientException e)
+            catch (SmtpFailedRecipientException e)
             {
 
             }
@@ -80,7 +85,7 @@ namespace VitalChoice.Business.Mail
                 if (disposing)
                 {
 #if !DOTNET5_4
-                    _client.Dispose();
+                    _client?.Dispose();
 #endif
                 }
 

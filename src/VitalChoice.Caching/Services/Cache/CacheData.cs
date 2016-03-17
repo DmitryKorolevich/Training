@@ -221,6 +221,7 @@ namespace VitalChoice.Caching.Services.Cache
                         {
                             if (newRelated is IEnumerable)
                             {
+                                //cached.NeedUpdateRelated.Remove(pair.Key.Name);
                                 pair.Key.SetRelatedObject(oldEntity, (newRelated as IEnumerable).Clone(pair.Key.RelationType));
                             }
                         }
@@ -231,6 +232,7 @@ namespace VitalChoice.Caching.Services.Cache
                             {
                                 if (newRelated != null)
                                 {
+                                    //cached.NeedUpdateRelated.Remove(pair.Key.Name);
                                     pair.Key.SetRelatedObject(oldEntity, newRelated.Clone(pair.Key.RelationType));
                                 }
                                 else
@@ -241,6 +243,7 @@ namespace VitalChoice.Caching.Services.Cache
                             }
                             else
                             {
+                                //cached.NeedUpdateRelated.Remove(pair.Key.Name);
                                 pair.Key.SetRelatedObject(oldEntity, null);
                             }
                         }
@@ -385,6 +388,7 @@ namespace VitalChoice.Caching.Services.Cache
                     {
                         TypeConverter.CopyInto(exist.Entity, entity, typeof (T));
                         UpdateRelations(entity);
+                        exist.NeedUpdateRelated.Clear();
                     }
                     else
                     {

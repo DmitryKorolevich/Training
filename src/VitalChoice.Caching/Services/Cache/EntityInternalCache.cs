@@ -321,7 +321,7 @@ namespace VitalChoice.Caching.Services.Cache
             {
                 cacheDatas = cacheDatas.Where(c => c.GetHasRelation(hasRelation));
             }
-            MarkForUpdateInternal(pk, cacheDatas);
+            MarkForUpdateInternal(pk, cacheDatas, hasRelation);
         }
 
         public void MarkForUpdate(IEnumerable<EntityKey> pks)
@@ -343,7 +343,7 @@ namespace VitalChoice.Caching.Services.Cache
             }
             foreach (var pk in pks)
             {
-                MarkForUpdateInternal(pk, cacheDatas);
+                MarkForUpdateInternal(pk, cacheDatas, hasRelation);
             }
         }
 
@@ -404,13 +404,17 @@ namespace VitalChoice.Caching.Services.Cache
             CacheStorage.Dispose();
         }
 
-        private void MarkForUpdateInternal(EntityKey pk, IEnumerable<ICacheData<T>> cacheDatas)
+        private void MarkForUpdateInternal(EntityKey pk, IEnumerable<ICacheData<T>> cacheDatas, string markRelated)
         {
             foreach (var data in cacheDatas)
             {
                 var cached = data.Get(pk);
                 if (cached != null)
                 {
+                    if (!string.IsNullOrWhiteSpace(markRelated))
+                    {
+                        cached.NeedUpdateRelated.Add(markRelated);
+                    }
                     if (!cached.NeedUpdate)
                     {
                         cached.NeedUpdate = true;
