@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 
 namespace VitalChoice.Validation.Models
@@ -34,12 +35,23 @@ namespace VitalChoice.Validation.Models
             return result;
         }
 
-        public static Result<T> CreateErrorResult<T>(IEnumerable<MessageInfo> messages, T data = default(T))
+        public static Result<T> CreateErrorResult<T>(ICollection<MessageInfo> messages, T data = default(T))
         {
             var result = new Result<T>(false);
-            foreach (var messageInfo in messages)
+            foreach (var messageInfo in messages.Where(m => m.MessageType == MessageType.FormField))
             {
                 result.AddMessage(messageInfo.Field,messageInfo.Message);
+            }
+            foreach (var messageInfo in messages.Where(m => m.MessageType == MessageType.FieldAsCode))
+            {
+                if (messageInfo.Field == "ConcurrencyFailure")
+                {
+                    result.AddMessage(string.Empty, "The data has been changed, please Reload page to see changes");
+                }
+                else
+                {
+                    result.AddMessage(string.Empty, messageInfo.Message);
+                }
             }
             return result;
         }

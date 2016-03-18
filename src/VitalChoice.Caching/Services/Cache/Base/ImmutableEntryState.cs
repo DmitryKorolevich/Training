@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.ChangeTracking;
 using Microsoft.Data.Entity.ChangeTracking.Internal;
+using Microsoft.Data.Entity.Infrastructure;
 
 namespace VitalChoice.Caching.Services.Cache.Base
 {
@@ -21,6 +23,12 @@ namespace VitalChoice.Caching.Services.Cache.Base
         {
             _entry = entry;
             State = entry.EntityState;
+        }
+
+        public ImmutableEntryState(EntityEntry entry)
+        {
+            _entry = ((IInfrastructure<InternalEntityEntry>) entry).Instance;
+            State = entry.State;
         }
     }
 }

@@ -40,10 +40,10 @@ namespace VC.Public
 
             Configuration = configuration.Build();
 
-            //services.AddMvc().AddMvcOptions(options =>
-            //{
-            //    options.ModelBinders.Insert(0, new AntiXSSModelBinder());
-            //});
+            services.AddMvc().AddMvcOptions(options =>
+            {
+                options.ModelBinders.Insert(0, new AntiXSSModelBinder());
+            });
 
             var reg = new StorefrontDependencyConfig();
             var result = reg.RegisterInfrastructure(Configuration, services, typeof(Startup).GetTypeInfo().Assembly);

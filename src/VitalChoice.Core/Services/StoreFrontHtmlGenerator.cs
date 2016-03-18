@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Antiforgery;
 using Microsoft.AspNet.Mvc;
+using Microsoft.AspNet.Mvc.Localization;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Mvc.Rendering;
 using Microsoft.AspNet.Mvc.ViewFeatures;
@@ -20,7 +21,8 @@ namespace VitalChoice.Core.Services
         {
         }
 
-        public override TagBuilder GenerateValidationSummary(ViewContext viewContext, bool excludePropertyErrors, string message, string headerTag,
+        public override TagBuilder GenerateValidationSummary(ViewContext viewContext, bool excludePropertyErrors, string message,
+            string headerTag,
             object htmlAttributes)
         {
             if (viewContext.ModelState.Any(s => string.IsNullOrWhiteSpace(s.Key)))

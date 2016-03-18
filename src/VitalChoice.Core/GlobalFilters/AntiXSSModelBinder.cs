@@ -40,7 +40,7 @@ namespace VitalChoice.Core.GlobalFilters
             //"&#62;",
             //"&#x3E;",
 
-            "/",
+            //"/",
             //"&#47;",
             //"&#x2F;"
         };
@@ -79,11 +79,11 @@ namespace VitalChoice.Core.GlobalFilters
                         if (containForbidden)
                         {
                             bindingContext.ModelState.AddModelError(bindingContext.ModelName, "Html forbidden");
-                            return ModelBindingResult.SuccessAsync(bindingContext.ModelName, modelAsString);
+                            return ModelBindingResult.FailedAsync(bindingContext.ModelName);
                         }
                     }
 
-                    return ModelBindingResult.SuccessAsync(bindingContext.ModelName, modelAsString);
+                    return ModelBindingResult.NoResultAsync;
                 }
             }
 

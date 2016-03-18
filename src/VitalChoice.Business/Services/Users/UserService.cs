@@ -142,9 +142,14 @@ namespace VitalChoice.Business.Services.Users
 			return (PermissionType) Enum.Parse(typeof (PermissionType), value);
 		}
 
-		private string AggregateIdentityErrors(IEnumerable<IdentityError> errors)
+		private IEnumerable<MessageInfo> AggregateIdentityErrors(IEnumerable<IdentityError> errors)
 		{
-			return errors.First().Description.Trim();
+		    return errors.Select(e => new MessageInfo
+		    {
+		        Field = e.Code,
+		        Message = e.Description,
+		        MessageType = MessageType.FieldAsCode
+		    });
 		}
 
 		private async Task<ApplicationUser> UpdateInternalAsync(ApplicationUser user, IList<RoleType> roleIds = null,

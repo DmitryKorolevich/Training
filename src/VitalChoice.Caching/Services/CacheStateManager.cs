@@ -6,6 +6,7 @@ using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.ChangeTracking.Internal;
 using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Storage;
+using Remotion.Linq.Parsing;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
@@ -33,45 +34,59 @@ namespace VitalChoice.Caching.Services
         protected override int SaveChanges(IReadOnlyList<InternalEntityEntry> entriesToSave)
         {
             var immutableList = new List<ImmutableEntryState>(entriesToSave.Select(e => new ImmutableEntryState(e)));
-            var result = base.SaveChanges(entriesToSave);
-            if (DataContext.InTransaction)
+            try
             {
-                UpdateCache(immutableList);
-                DataContext.TransactionCommit += () => _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
-                DataContext.TransactionRollback += () => UpdateRollback(immutableList);
+                var result = base.SaveChanges(entriesToSave);
+                if (DataContext.InTransaction)
+                {
+                    UpdateCache(immutableList);
+                    DataContext.TransactionCommit += () => _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
+                    DataContext.TransactionRollback += () => UpdateRollback(immutableList);
+                }
+                else
+                {
+                    _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
+                }
+                return result;
             }
-            else
+            catch (DbUpdateException)
             {
-                _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
+                UpdateRollback(immutableList);
+                throw;
             }
-            return result;
         }
 
         protected override async Task<int> SaveChangesAsync(IReadOnlyList<InternalEntityEntry> entriesToSave,
             CancellationToken cancellationToken = new CancellationToken())
         {
             var immutableList = new List<ImmutableEntryState>(entriesToSave.Select(e => new ImmutableEntryState(e)));
-            var result = await base.SaveChangesAsync(entriesToSave, cancellationToken);
-            if (DataContext.InTransaction)
+            try
             {
-                UpdateCache(immutableList);
-                DataContext.TransactionCommit += () => _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
-                DataContext.TransactionRollback += () => UpdateRollback(immutableList);
+                var result = await base.SaveChangesAsync(entriesToSave, cancellationToken);
+                if (DataContext.InTransaction)
+                {
+                    UpdateCache(immutableList);
+                    DataContext.TransactionCommit += () => _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
+                    DataContext.TransactionRollback += () => UpdateRollback(immutableList);
+                }
+                else
+                {
+                    _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
+                }
+                return result;
             }
-            else
+            catch (DbUpdateException)
             {
-                _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
+                UpdateRollback(immutableList);
+                throw;
             }
-            return result;
         }
 
-        private void /*IEnumerable<SyncOperation>*/ UpdateRollback(ICollection<ImmutableEntryState> entriesToSave)
+        private void UpdateRollback(ICollection<ImmutableEntryState> entriesToSave)
         {
-            /*var syncOperations = new List<SyncOperation>();*/
             foreach (var group in entriesToSave.Where(e => e.EntityType != null).GroupBy(e => e.EntityType))
             {
                 var cache = CacheFactory.GetCache(group.Key);
-                var dbContext = DataContext as DbContext;
                 foreach (var entry in group)
                 {
                     EntityKey primaryKey;
@@ -81,44 +96,27 @@ namespace VitalChoice.Caching.Services
                             primaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entry.Entity);
                             if (primaryKey.IsValid)
                             {
-                                cache.Update(entry.Entity, dbContext);
-                                //syncOperations.Add(new SyncOperation
-                                //{
-                                //    Key = primaryKey.ToExportable(group.Key),
-                                //    SyncType = SyncType.Update,
-                                //    EntityType = group.Key.FullName
-                                //});
+                                cache.MarkForUpdate(primaryKey);
                             }
                             break;
                         case EntityState.Deleted:
-                            primaryKey = cache.MarkForAdd(entry.Entity);
-                            //if (primaryKey.IsValid)
-                            //{
-                                //syncOperations.Add(new SyncOperation
-                                //{
-                                //    Key = primaryKey.ToExportable(group.Key),
-                                //    SyncType = SyncType.Add,
-                                //    EntityType = group.Key.FullName
-                                //});
-                            //}
+                            primaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entry.Entity);
+                            if (primaryKey.IsValid)
+                            {
+                                var entity = entry.Entity;
+                                cache.MarkForAdd(entity);
+                            }
                             break;
                         case EntityState.Added:
                             primaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entry.Entity);
                             if (primaryKey.IsValid)
                             {
-                                cache.TryRemove(entry.Entity);
-                                //syncOperations.Add(new SyncOperation
-                                //{
-                                //    Key = primaryKey.ToExportable(group.Key),
-                                //    SyncType = SyncType.Delete,
-                                //    EntityType = group.Key.FullName
-                                //});
+                                cache.MarkForUpdate(primaryKey);
                             }
                             break;
                     }
                 }
             }
-            //return syncOperations;
         }
 
         private IEnumerable<SyncOperation> UpdateCache(ICollection<ImmutableEntryState> entriesToSave)

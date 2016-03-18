@@ -1,5 +1,10 @@
 ﻿namespace VitalChoice.Ecommerce.Domain.Exceptions
 {
+    public enum MessageType
+    {
+        FormField = 0,
+        FieldAsCode = 1
+    }
 
     public enum MessageLevel
     {
@@ -10,6 +15,7 @@
 
     public struct MessageInfo
     {
+        public MessageType MessageType { get; set; }
         public MessageLevel MessageLevel { get; set; }
         public string Field { get; set; }
         public string Message { get; set; }
