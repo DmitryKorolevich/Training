@@ -17,14 +17,14 @@ namespace VitalChoice.Validation.Models
         public static Result<T> CreateErrorResult<T>(string errorMessage, T data = default(T))
         {
             var result = new Result<T>(false);
-            result.AddMessage("", errorMessage );
+            result.AddMessage(string.Empty, errorMessage );
             return result;
         }
 
         public static Result<T> CreateErrorResult<T>(string errorMessage,string command, T data = default(T))
         {
             var result = new Result<T>(false, data,command);
-            result.AddMessage("", errorMessage);
+            result.AddMessage(string.Empty, errorMessage);
             return result;
         }
 

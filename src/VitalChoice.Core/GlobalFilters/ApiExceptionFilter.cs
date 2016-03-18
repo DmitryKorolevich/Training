@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using VitalChoice.Core.Services;
 using VitalChoice.Validation.Models;
 using Microsoft.AspNet.Mvc.Filters;
+using Microsoft.Data.Entity;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 
 namespace VitalChoice.Core.GlobalFilters
@@ -26,10 +27,23 @@ namespace VitalChoice.Core.GlobalFilters
                 }
                 else
                 {
-                    result = new JsonResult(ResultHelper.CreateErrorResult<object>(ApiException.GetDefaultErrorMessage))
+                    var dbUpdateException = context.Exception as DbUpdateException;
+                    if (dbUpdateException != null)
                     {
-                        StatusCode = (int) HttpStatusCode.InternalServerError
-                    };
+                        result =
+                            new JsonResult(
+                                ResultHelper.CreateErrorResult<object>("The data has been changed, please Reload page to see changes"))
+                            {
+                                StatusCode = (int) HttpStatusCode.OK
+                            };
+                    }
+                    else
+                    {
+                        result = new JsonResult(ResultHelper.CreateErrorResult<object>(ApiException.GetDefaultErrorMessage))
+                        {
+                            StatusCode = (int) HttpStatusCode.InternalServerError
+                        };
+                    }
                     LoggerService.GetDefault().LogError(context.Exception.ToString());
                 }
             }
