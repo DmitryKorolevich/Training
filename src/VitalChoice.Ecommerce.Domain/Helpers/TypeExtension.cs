@@ -17,7 +17,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
 
             return typeToCheck.IsAssignableFrom(type);
         }
-        
+
         public static bool IsType(this Type typeToCheck, object data)
         {
             if (typeToCheck == null)

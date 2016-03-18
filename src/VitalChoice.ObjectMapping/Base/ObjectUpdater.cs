@@ -40,8 +40,7 @@ namespace VitalChoice.ObjectMapping.Base
                 return;
 
             ToModelInternal(obj, model, modelType, typeof(T));
-            var converter = ConverterService.GetConverter(modelType, typeof(T));
-            converter?.DynamicToModel(model, obj);
+            ConverterService.DynamicToModel(modelType, typeof(T), model, obj);
         }
 
         void IObjectUpdater.UpdateObject(Type modelType, object model, object obj)
@@ -53,9 +52,7 @@ namespace VitalChoice.ObjectMapping.Base
                 return;
 
             FromModelInternal(obj, model, modelType, typeof(T));
-
-            var converter = ConverterService.GetConverter(modelType, typeof(T));
-            converter?.ModelToDynamic(model, obj);
+            ConverterService.ModelToDynamic(modelType, typeof(T), model, obj);
         }
 
         public void CloneInto<TBase>(T dest, T src)
@@ -86,8 +83,7 @@ namespace VitalChoice.ObjectMapping.Base
 
             ToModelInternal(obj, model, typeof(TModel), typeof(T));
 
-            var converter = ConverterService.GetConverter<TModel, T>();
-            converter?.DynamicToModel(model, obj);
+            ConverterService.DynamicToModel(model, obj);
         }
 
         public IDictionary<string, object> ToDictionary(object obj)
@@ -123,8 +119,7 @@ namespace VitalChoice.ObjectMapping.Base
 
             FromModelInternal(obj, model, typeof(TModel), typeof(T));
 
-            var converter = ConverterService.GetConverter<TModel, T>();
-            converter?.ModelToDynamic(model, obj);
+            ConverterService.ModelToDynamic(model, obj);
         }
 
         public void UpdateObject(object obj, IDictionary<string, object> model, bool caseSense = true)

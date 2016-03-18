@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using Autofac.Features.Indexed;
 using VitalChoice.Ecommerce.Domain.Attributes;
@@ -70,11 +71,9 @@ namespace VitalChoice.ObjectMapping.Base
                 return destType.IsAssignableFrom(enumType) ? Convert.ChangeType(obj, enumType) : null;
             }
 
-            IObjectMapper objectMapper;
-            if (Mappers.TryGetValue(destType, out objectMapper))
-            {
-                return objectMapper.FromModel(sourceType, obj);
-            }
+            var mapper = GetMapper(destType);
+            if (mapper != null)
+                return mapper.FromModel(sourceType, obj);
 
             Type destElementType = destType.TryGetElementType(typeof (ICollection<>));
             Type srcElementType = sourceType.TryGetElementType(typeof (ICollection<>));
@@ -104,7 +103,7 @@ namespace VitalChoice.ObjectMapping.Base
             }
             try
             {
-                var mapper = MapperFactory.CreateMapper(destType);
+                mapper = MapperFactory.CreateMapper(destType);
                 return mapper.FromModel(sourceType, obj);
             }
             catch
@@ -138,11 +137,9 @@ namespace VitalChoice.ObjectMapping.Base
             //    return (int) (long) obj;
             //}
 
-            IObjectMapper objectMapper;
-            if (Mappers.TryGetValue(sourceType, out objectMapper))
-            {
-                return objectMapper.ToModel(obj, destType);
-            }
+            var mapper = GetMapper(sourceType);
+            if (mapper != null)
+                return mapper.ToModel(obj, destType);
 
             Type destElementType = destType.TryGetElementType(typeof (ICollection<>));
             Type srcElementType = sourceType.TryGetElementType(typeof (ICollection<>));
@@ -172,7 +169,7 @@ namespace VitalChoice.ObjectMapping.Base
             }
             try
             {
-                var mapper = MapperFactory.CreateMapper(sourceType);
+                mapper = MapperFactory.CreateMapper(sourceType);
                 return mapper.ToModel(obj, destType);
             }
             catch
@@ -490,6 +487,16 @@ namespace VitalChoice.ObjectMapping.Base
             catch
             {
                 return null;
+            }
+            return null;
+        }
+
+        private IObjectMapper GetMapper(Type objectType)
+        {
+            IObjectMapper objectMapper;
+            if (Mappers.TryGetValue(objectType, out objectMapper))
+            {
+                return objectMapper;
             }
             return null;
         }

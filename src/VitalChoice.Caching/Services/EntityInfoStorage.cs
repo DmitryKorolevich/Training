@@ -630,6 +630,7 @@ namespace VitalChoice.Caching.Services
         {
             private readonly IEntityInfoStorage _infoStorage;
 
+            // ReSharper disable once UnusedMember.Local
             public GetEntityCaller(IEntityInfoStorage infoStorage)
             {
                 _infoStorage = infoStorage;

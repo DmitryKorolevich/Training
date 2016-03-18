@@ -1,7 +1,9 @@
 ﻿using System;
 using Autofac.Features.Indexed;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.ObjectMapping.Base;
 using VitalChoice.ObjectMapping.Interfaces;
+using System.Linq;
 
 namespace VitalChoice.ObjectMapping.Services
 {
@@ -14,24 +16,72 @@ namespace VitalChoice.ObjectMapping.Services
             _converters = converters;
         }
 
-        public IModelConverter<TModel, TDynamic> GetConverter<TModel, TDynamic>()
+        public void DynamicToModel<TModel, TDynamic>(TModel model, TDynamic dynamic)
         {
-            IModelConverter conv;
-            if (_converters.TryGetValue(new TypePair(typeof (TModel), typeof (TDynamic)), out conv))
+            var baseList = typeof (TModel).GetBaseTypes();
+            IModelConverter converter;
+            foreach (var type in baseList.Where(t => t != typeof(object)))
             {
-                return conv as IModelConverter<TModel, TDynamic>;
+                if (_converters.TryGetValue(new TypePair(type, typeof (TDynamic)), out converter))
+                {
+                    converter.DynamicToModel(model, dynamic);
+                }
             }
-            return null;
+            if (_converters.TryGetValue(new TypePair(typeof (TModel), typeof (TDynamic)), out converter))
+            {
+                ((IModelConverter<TModel, TDynamic>)converter).DynamicToModel(model, dynamic);
+            }
         }
 
-        public IModelConverter GetConverter(Type modelType, Type dynamicType)
+        public void ModelToDynamic<TModel, TDynamic>(TModel model, TDynamic dynamic)
         {
-            IModelConverter conv;
-            if (_converters.TryGetValue(new TypePair(modelType, dynamicType), out conv))
+            var baseList = typeof(TModel).GetBaseTypes();
+            IModelConverter converter;
+            foreach (var type in baseList.Where(t => t != typeof(object)))
             {
-                return conv;
+                if (_converters.TryGetValue(new TypePair(type, typeof(TDynamic)), out converter))
+                {
+                    converter.ModelToDynamic(model, dynamic);
+                }
             }
-            return null;
+            if (_converters.TryGetValue(new TypePair(typeof(TModel), typeof(TDynamic)), out converter))
+            {
+                ((IModelConverter<TModel, TDynamic>) converter).ModelToDynamic(model, dynamic);
+            }
+        }
+
+        public void DynamicToModel(Type modelType, Type dynamicType, object model, object dynamic)
+        {
+            var baseList = modelType.GetBaseTypes();
+            IModelConverter converter;
+            foreach (var type in baseList.Where(t => t != typeof(object)))
+            {
+                if (_converters.TryGetValue(new TypePair(type, dynamicType), out converter))
+                {
+                    converter.DynamicToModel(model, dynamic);
+                }
+            }
+            if (_converters.TryGetValue(new TypePair(modelType, dynamicType), out converter))
+            {
+                converter.DynamicToModel(model, dynamic);
+            }
+        }
+
+        public void ModelToDynamic(Type modelType, Type dynamicType, object model, object dynamic)
+        {
+            var baseList = modelType.GetBaseTypes();
+            IModelConverter converter;
+            foreach (var type in baseList.Where(t => t != typeof(object)))
+            {
+                if (_converters.TryGetValue(new TypePair(type, dynamicType), out converter))
+                {
+                    converter.ModelToDynamic(model, dynamic);
+                }
+            }
+            if (_converters.TryGetValue(new TypePair(modelType, dynamicType), out converter))
+            {
+                converter.ModelToDynamic(model, dynamic);
+            }
         }
     }
 }

@@ -380,7 +380,7 @@ namespace VitalChoice.Caching.Services.Cache
                             if (trackedRelation == null || !_trackedObjects.Contains(trackedRelation))
                             {
                                 var newItems =
-                                    ((IEnumerable) value).Cast<object>().Select(singleValue => AttachGraph(singleValue, relation));
+                                    ((IEnumerable<object>) value).Select(singleValue => AttachGraph(singleValue, relation));
                                 var set = typeof (HashSet<>).CreateGenericCollection(relation.RelationType, newItems);
                                 relation.SetRelatedObject(result, set.CollectionObject);
                                 _trackedObjects.Add(set.CollectionObject);
