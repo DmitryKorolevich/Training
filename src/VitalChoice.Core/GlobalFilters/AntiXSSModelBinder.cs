@@ -79,7 +79,7 @@ namespace VitalChoice.Core.GlobalFilters
                         if (containForbidden)
                         {
                             bindingContext.ModelState.AddModelError(bindingContext.ModelName, "Html forbidden");
-                            return ModelBindingResult.SuccessAsync(bindingContext.ModelName, string.Empty);
+                            return ModelBindingResult.SuccessAsync(bindingContext.ModelName, modelAsString);
                         }
                     }
 
