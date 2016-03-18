@@ -7,6 +7,7 @@
         function initialize()
         {
             $scope.logFileRequest = {};
+            $scope.fileForms = {};
         }
 
         $scope.$on('customerFiles#in#init', function (event, args)
@@ -71,6 +72,7 @@
                     logRequest.state = '';
 
                     $scope.uploading = false;
+                    $scope.fileForms.file.$setDirty();
                 }).error(function (data, status, headers, config)
                 {
                     $scope.uploading = false;
@@ -101,6 +103,7 @@
                 confirmUtil.confirm(function ()
                 {
                     $scope.files.splice(indexForDelete, 1);
+                    $scope.fileForms.file.$setDirty();
                 }, 'Are you sure you want to delete this file?');
             }
         };

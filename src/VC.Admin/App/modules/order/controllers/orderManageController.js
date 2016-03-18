@@ -573,18 +573,21 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
     var loadBrontoSubscribedStatus = function ()
     {
-        orderService.getIsBrontoSubscribed($scope.currentCustomer.Email)
-            .success(function (result)
-            {
-                if (result.Success)
+        if ($scope.currentCustomer.Email)
+        {
+            orderService.getIsBrontoSubscribed($scope.currentCustomer.Email)
+                .success(function (result)
                 {
-                    $scope.options.BrontoSubscribedStatus = result.Data;
-                    $scope.options.BrontoSubscribedStatusLoaded = true;
-                }
-            })
-            .error(function (result)
-            {
-            });
+                    if (result.Success)
+                    {
+                        $scope.options.BrontoSubscribedStatus = result.Data;
+                        $scope.options.BrontoSubscribedStatusLoaded = true;
+                    }
+                })
+                .error(function (result)
+                {
+                });
+        }
     };
 
     $scope.goToCustomer = function ()

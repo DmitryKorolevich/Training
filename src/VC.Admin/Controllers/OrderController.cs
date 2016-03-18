@@ -97,7 +97,7 @@ namespace VC.Admin.Controllers
         [HttpGet]
         public async Task<Result<bool>> GetIsBrontoSubscribed(string id)
         {
-            return !_brontoService.GetIsUnsubscribed(id);
+            return !(_brontoService.GetIsUnsubscribed(id) ?? false);
         }
 
         [HttpPost]
@@ -315,13 +315,22 @@ namespace VC.Admin.Controllers
             if(!string.IsNullOrEmpty(model?.Customer.Email))
             {
                 var unsubscribed = _brontoService.GetIsUnsubscribed(model.Customer.Email);
-                if (model.SignUpNewsletter && unsubscribed)
+                if (model.SignUpNewsletter && (!unsubscribed.HasValue || unsubscribed.Value))
                 {
                     await _brontoService.Subscribe(model.Customer.Email);
                 }
-                if (!model.SignUpNewsletter && !unsubscribed)
+                if (!model.SignUpNewsletter)
                 {
-                    _brontoService.Unsubscribe(model.Customer.Email);
+                    if (!unsubscribed.HasValue)
+                    {
+                        //Resolve issue with showing the default value only the first time
+                        await _brontoService.Subscribe(model.Customer.Email);
+                        _brontoService.Unsubscribe(model.Customer.Email);
+                    }
+                    else if(!unsubscribed.Value)
+                    {
+                        _brontoService.Unsubscribe(model.Customer.Email);
+                    }
                 }
             }
 
