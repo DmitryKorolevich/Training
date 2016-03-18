@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Autofac;
 using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.ChangeTracking;
 using Microsoft.Data.Entity.Infrastructure;
 using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Metadata.Internal;
@@ -15,6 +16,7 @@ using VitalChoice.Caching.GC;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Base;
+using VitalChoice.Caching.Relational.ChangeTracking;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain.Options;
@@ -293,6 +295,55 @@ namespace VitalChoice.Caching.Services
         {
             var fullCacheAnnotation = entityType.FindAnnotation(EntityBuilderExtensions.FullCollectionAnnotationName);
             return (LambdaExpression) fullCacheAnnotation?.Value;
+        }
+
+        public Dictionary<TrackedEntityKey, EntityEntry> GetTrackData(DbContext context)
+        {
+            if (context == null)
+                return null;
+            Dictionary<TrackedEntityKey, EntityEntry> trackData = new Dictionary<TrackedEntityKey, EntityEntry>();
+            foreach (var group in context.ChangeTracker.Entries().Where(e => e.Entity != null).GroupBy(e => e.Entity.GetType()))
+            {
+                var keyInfo = GetPrimaryKeyInfo(group.Key);
+                if (keyInfo == null)
+                    continue;
+
+                foreach (var entry in group)
+                {
+                    var key = new TrackedEntityKey(group.Key,
+                        keyInfo.GetPrimaryKeyValue(entry.Entity));
+                    if (!trackData.ContainsKey(key))
+                        trackData.Add(key, entry);
+                }
+            }
+            return trackData;
+        }
+
+        public Dictionary<TrackedEntityKey, EntityEntry> GetTrackData(DbContext context, out HashSet<object> trackedObjects)
+        {
+            if (context == null)
+            {
+                trackedObjects = null;
+                return null;
+            }
+            Dictionary<TrackedEntityKey, EntityEntry> trackData = new Dictionary<TrackedEntityKey, EntityEntry>();
+            trackedObjects = new HashSet<object>();
+            foreach (var group in context.ChangeTracker.Entries().Where(e => e.Entity != null).GroupBy(e => e.Entity.GetType()))
+            {
+                var keyInfo = GetPrimaryKeyInfo(group.Key);
+                if (keyInfo == null)
+                    continue;
+
+                foreach (var entry in group)
+                {
+                    trackedObjects.Add(entry.Entity);
+                    var key = new TrackedEntityKey(group.Key,
+                        keyInfo.GetPrimaryKeyValue(entry.Entity));
+                    if (!trackData.ContainsKey(key))
+                        trackData.Add(key, entry);
+                }
+            }
+            return trackData;
         }
 
         public bool HaveKeys(Type entityType)

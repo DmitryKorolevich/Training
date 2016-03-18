@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.ChangeTracking;
+using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Base;
+using VitalChoice.Caching.Relational.ChangeTracking;
 
 namespace VitalChoice.Caching.Extensions
 {

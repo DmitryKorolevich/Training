@@ -12,38 +12,17 @@ using VitalChoice.ObjectMapping.Extensions;
 
 namespace VitalChoice.Caching.Iterators
 {
-    internal struct TrackedIteratorParams<T>
-        where T : class, new()
-    {
-        public IEnumerable<CacheResult<T>> Source;
-        public Func<T, bool> Predicate;
-        public Dictionary<EntityKey, EntityEntry<T>> Tracked;
-        public IInternalEntityCache<T> InternalCache;
-    }
-
     internal class CacheIterator<TSource> : SimpleIterator<TSource>
         where TSource : class, new()
     {
         private readonly IEnumerable<CacheResult<TSource>> _source;
         private readonly Func<TSource, bool> _predicate;
-        private readonly bool _track;
-        private readonly IInternalEntityCache<TSource> _internalCache;
-        public Dictionary<EntityKey, EntityEntry<TSource>> Tracked { get; }
         private IEnumerator<CacheResult<TSource>> _enumerator;
 
         public CacheIterator(IEnumerable<CacheResult<TSource>> source, Func<TSource, bool> predicate)
         {
             _source = source;
             _predicate = predicate;
-        }
-
-        public CacheIterator(TrackedIteratorParams<TSource> trackedParams)
-        {
-            _track = true;
-            _source = trackedParams.Source;
-            _predicate = trackedParams.Predicate;
-            _internalCache = trackedParams.InternalCache;
-            Tracked = trackedParams.Tracked;
         }
 
         public override void Dispose()
@@ -53,7 +32,7 @@ namespace VitalChoice.Caching.Iterators
             base.Dispose();
         }
 
-        public bool Found { get; private set; }
+        public bool FoundAny { get; private set; }
 
         public CacheGetResult AggregatedResult { get; private set; } = CacheGetResult.Found;
 
@@ -80,10 +59,10 @@ namespace VitalChoice.Caching.Iterators
                             Dispose();
                             break;
                         }
-                        Found = true;
+                        FoundAny = true;
                         if (item.Entity != null && _predicate(item))
                         {
-                            CurrentValue = _track ? GetAttached(item) : item;
+                            CurrentValue = item;
                             return true;
                         }
                     }
@@ -99,8 +78,8 @@ namespace VitalChoice.Caching.Iterators
                             Dispose();
                             break;
                         }
-                        Found = true;
-                        CurrentValue = _track ? GetAttached(item) : item;
+                        FoundAny = true;
+                        CurrentValue = item;
                         return true;
                     }
                     Dispose();
@@ -109,22 +88,22 @@ namespace VitalChoice.Caching.Iterators
             return false;
         }
 
-        private TSource GetAttached(TSource item)
-        {
-            if (item == null)
-                return null;
+        //private TSource GetAttached(TSource item)
+        //{
+        //    if (item == null)
+        //        return null;
 
-            var pk = _internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(item);
-            EntityEntry<TSource> entry;
-            if (Tracked.TryGetValue(pk, out entry))
-            {
-                item = entry.State == EntityState.Detached ? item.Clone() : entry.Entity;
-            }
-            else
-            {
-                item = item.Clone();
-            }
-            return item;
-        }
+        //    var pk = _internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(item);
+        //    EntityEntry<TSource> entry;
+        //    if (Tracked.TryGetValue(pk, out entry))
+        //    {
+        //        item = entry.State == EntityState.Detached ? item.Clone() : entry.Entity;
+        //    }
+        //    else
+        //    {
+        //        item = item.Clone();
+        //    }
+        //    return item;
+        //}
     }
 }

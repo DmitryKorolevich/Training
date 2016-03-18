@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using Microsoft.Data.Entity;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Services.Cache;
 using VitalChoice.Caching.Services.Cache.Base;
@@ -13,7 +14,7 @@ namespace VitalChoice.Caching.Interfaces
         IEnumerable<CachedEntity> Update(RelationInfo relations, IEnumerable<object> entity);
         bool Update(IEnumerable<object> entities, RelationInfo relationInfo);
         bool Update(object entity, RelationInfo relationInfo);
-        bool Update(object entity);
+        bool Update(object entity, DbContext context = null);
         void SetNull(IEnumerable<EntityKey> keys, RelationInfo relationInfo);
         void SetNull(EntityKey key, RelationInfo relationInfo);
         bool UpdateAll(IEnumerable<object> entities, RelationInfo relationInfo);
@@ -56,7 +57,7 @@ namespace VitalChoice.Caching.Interfaces
         IEnumerable<CacheResult<T>> TryRemoveWithResult(T entity);
         bool Update(IEnumerable<T> entities, RelationInfo relationInfo);
         bool Update(T entity, RelationInfo relationInfo);
-        bool Update(T entity);
+        bool Update(T entity, DbContext context = null);
         CachedEntity<T> Update(RelationInfo relations, T entity);
         IEnumerable<CachedEntity<T>> Update(RelationInfo relations, IEnumerable<T> entities);
         bool UpdateAll(IEnumerable<T> entities, RelationInfo relationInfo);

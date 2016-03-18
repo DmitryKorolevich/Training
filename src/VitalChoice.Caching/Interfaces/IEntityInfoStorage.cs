@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.ChangeTracking;
 using VitalChoice.Caching.GC;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Base;
+using VitalChoice.Caching.Relational.ChangeTracking;
 using VitalChoice.Caching.Services.Cache.Base;
 
 namespace VitalChoice.Caching.Interfaces
@@ -14,6 +17,8 @@ namespace VitalChoice.Caching.Interfaces
         Type GetContextType(Type entityType);
         object GetEntity(Type entityType, ICollection<EntityValueExportable> keyValues);
         object GetEntity(Type entityType, EntityKey pk);
+        Dictionary<TrackedEntityKey, EntityEntry> GetTrackData(DbContext context);
+        Dictionary<TrackedEntityKey, EntityEntry> GetTrackData(DbContext context, out HashSet<object> trackedObjects);
 
         EntityPrimaryKeyInfo GetPrimaryKeyInfo(Type entityType);
         EntityCacheableIndexInfo GetIndexInfo(Type entityType);

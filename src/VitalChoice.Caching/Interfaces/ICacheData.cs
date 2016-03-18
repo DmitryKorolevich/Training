@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.ChangeTracking;
 using VitalChoice.Caching.Relational;
+using VitalChoice.Caching.Relational.ChangeTracking;
 using VitalChoice.Caching.Services.Cache;
 using VitalChoice.Caching.Services.Cache.Base;
 
@@ -31,7 +34,7 @@ namespace VitalChoice.Caching.Interfaces
         ICollection<CachedEntity<T>> GetAll();
         CachedEntity<T> TryRemove(EntityKey key);
         CachedEntity<T> Update(T entity);
-        CachedEntity<T> UpdateKeepRelations(T entity);
+        CachedEntity<T> UpdateKeepRelations(T entity, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities);
         bool Update(IEnumerable<T> entity);
         bool UpdateAll(IEnumerable<T> entity);
         void SetNull(EntityKey key);

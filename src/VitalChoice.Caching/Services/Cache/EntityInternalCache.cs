@@ -4,9 +4,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
+using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.ChangeTracking;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
+using VitalChoice.Caching.Relational.ChangeTracking;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain.Helpers;
@@ -17,17 +20,18 @@ namespace VitalChoice.Caching.Services.Cache
     public class EntityInternalCache<T> : IInternalEntityCache<T>
     {
         public EntityInfo EntityInfo { get; }
-        //protected readonly IEntityInfoStorage KeyStorage;
+        private readonly IEntityInfoStorage _infoStorage;
         protected readonly IInternalEntityCacheFactory CacheFactory;
 
         protected readonly CacheStorage<T> CacheStorage;
 
-        public EntityInternalCache(EntityInfo entityInfo, IInternalEntityCacheFactory cacheFactory)
+        public EntityInternalCache(EntityInfo entityInfo, IEntityInfoStorage infoStorage, IInternalEntityCacheFactory cacheFactory)
         {
             EntityInfo = entityInfo;
             //KeyStorage = keyStorage;
+            _infoStorage = infoStorage;
             CacheFactory = cacheFactory;
-            CacheStorage = new CacheStorage<T>(entityInfo, cacheFactory);
+            CacheStorage = new CacheStorage<T>(entityInfo, infoStorage, cacheFactory);
         }
 
         public CacheResult<T> TryGetEntity(EntityKey key, RelationInfo relations)
@@ -195,18 +199,20 @@ namespace VitalChoice.Caching.Services.Cache
             return data.Update(entity) != null;
         }
 
-        public bool Update(T entity)
+        public bool Update(T entity, DbContext context = null)
         {
             if (entity == null)
                 return false;
 
             MarkForUpdate(entity);
 
+            var trackData = _infoStorage.GetTrackData(context);
+
             var result = CacheStorage.AllCacheDatas.Any();
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var data in CacheStorage.AllCacheDatas)
             {
-                result = result && data.UpdateKeepRelations(entity) != null;
+                result = result && data.UpdateKeepRelations(entity, trackData) != null;
             }
             return result;
         }
@@ -275,9 +281,9 @@ namespace VitalChoice.Caching.Services.Cache
             return Update((T) entity, relationInfo);
         }
 
-        public bool Update(object entity)
+        public bool Update(object entity, DbContext context = null)
         {
-            return Update((T) entity);
+            return Update((T) entity, context);
         }
 
         public void SetNull(IEnumerable<EntityKey> keys, RelationInfo relationInfo)

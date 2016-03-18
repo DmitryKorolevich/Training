@@ -4,9 +4,11 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Data.Entity.ChangeTracking;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
+using VitalChoice.Caching.Relational.ChangeTracking;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain.Helpers;
@@ -19,6 +21,7 @@ namespace VitalChoice.Caching.Services.Cache
     {
         private readonly IInternalEntityCacheFactory _cacheFactory;
         private readonly EntityInfo _entityInfo;
+        private readonly IEntityInfoStorage _infoStorage;
         private readonly RelationInfo _relationInfo;
 
         private readonly object _lockObj = new object();
@@ -34,12 +37,13 @@ namespace VitalChoice.Caching.Services.Cache
 
         private volatile bool _needUpdate;
 
-        public CacheData(IInternalEntityCacheFactory cacheFactory, EntityInfo entityInfo, RelationInfo relationInfo)
+        public CacheData(IInternalEntityCacheFactory cacheFactory, EntityInfo entityInfo, IEntityInfoStorage infoStorage, RelationInfo relationInfo)
         {
             _mainCluster = new CacheCluster<EntityKey, T>();
             _indexedCluster = new CacheCluster<EntityIndex, T>();
             _cacheFactory = cacheFactory;
             _entityInfo = entityInfo;
+            _infoStorage = infoStorage;
             _relationInfo = relationInfo;
             _conditionalIndexedDictionary = new Dictionary<EntityConditionalIndexInfo, CacheCluster<EntityIndex, T>>();
             foreach (var conditionalIndex in entityInfo.ConditionalIndexes)
@@ -181,7 +185,7 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        public CachedEntity<T> UpdateKeepRelations(T entity)
+        public CachedEntity<T> UpdateKeepRelations(T entity, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities)
         {
             if (entity == null)
                 return null;
@@ -221,8 +225,17 @@ namespace VitalChoice.Caching.Services.Cache
                         {
                             if (newRelated is IEnumerable)
                             {
-                                //cached.NeedUpdateRelated.Remove(pair.Key.Name);
-                                pair.Key.SetRelatedObject(oldEntity, (newRelated as IEnumerable).Clone(pair.Key.RelationType));
+                                var pkInfo = _infoStorage.GetPrimaryKeyInfo(pair.Key.RelationType);
+                                if (trackedEntities == null || pkInfo != null &&
+                                    (newRelated as IEnumerable).Cast<object>()
+                                        .Any(
+                                            r =>
+                                                trackedEntities.ContainsKey(new TrackedEntityKey(pair.Key.RelationType,
+                                                    pkInfo.GetPrimaryKeyValue(r)))))
+                                {
+                                    cached.NeedUpdateRelated.Remove(pair.Key.Name);
+                                    pair.Key.SetRelatedObject(oldEntity, (newRelated as IEnumerable).Clone(pair.Key.RelationType));
+                                }
                             }
                         }
                         else
@@ -232,8 +245,11 @@ namespace VitalChoice.Caching.Services.Cache
                             {
                                 if (newRelated != null)
                                 {
-                                    //cached.NeedUpdateRelated.Remove(pair.Key.Name);
-                                    pair.Key.SetRelatedObject(oldEntity, newRelated.Clone(pair.Key.RelationType));
+                                    if (trackedEntities == null || trackedEntities.ContainsKey(new TrackedEntityKey(pair.Key.RelationType, newRelatedKey)))
+                                    {
+                                        cached.NeedUpdateRelated.Remove(pair.Key.Name);
+                                        pair.Key.SetRelatedObject(oldEntity, newRelated.Clone(pair.Key.RelationType));
+                                    }
                                 }
                                 else
                                 {
@@ -243,7 +259,7 @@ namespace VitalChoice.Caching.Services.Cache
                             }
                             else
                             {
-                                //cached.NeedUpdateRelated.Remove(pair.Key.Name);
+                                cached.NeedUpdateRelated.Remove(pair.Key.Name);
                                 pair.Key.SetRelatedObject(oldEntity, null);
                             }
                         }

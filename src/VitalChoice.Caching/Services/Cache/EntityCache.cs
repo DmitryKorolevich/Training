@@ -9,7 +9,9 @@ using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Iterators;
 using VitalChoice.Caching.Relational;
+using VitalChoice.Caching.Relational.ChangeTracking;
 using VitalChoice.Caching.Services.Cache.Base;
+using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.ObjectMapping.Base;
@@ -22,14 +24,18 @@ namespace VitalChoice.Caching.Services.Cache
         where T : class, new()
     {
         private readonly IInternalEntityCache<T> _internalCache;
+        private readonly IEntityInfoStorage _infoStorage;
         private readonly DbContext _context;
         private readonly ILogger _logger;
+        private Dictionary<TrackedEntityKey, EntityEntry> _trackData;
+        private HashSet<object> _trackedObjects;
 
-        public EntityCache(IInternalEntityCache<T> internalCache, DbContext context, ILogger logger)
+        public EntityCache(IInternalEntityCache<T> internalCache, IEntityInfoStorage infoStorage, DbContext context, ILogger logger)
         {
             _context = context;
             _logger = logger;
             _internalCache = internalCache;
+            _infoStorage = infoStorage;
         }
 
         public CacheGetResult TryGetCached(QueryData<T> query, out List<T> entities)
@@ -43,6 +49,11 @@ namespace VitalChoice.Caching.Services.Cache
 
             if (_internalCache.GetCacheExist(query.RelationInfo))
             {
+                if (query.Tracked)
+                {
+                    _trackData = _infoStorage.GetTrackData(_context, out _trackedObjects);
+                }
+
                 IEnumerable<CacheResult<T>> results;
                 if (query.FullCollection)
                 {
@@ -87,6 +98,11 @@ namespace VitalChoice.Caching.Services.Cache
 
             if (_internalCache.GetCacheExist(query.RelationInfo))
             {
+                if (query.Tracked)
+                {
+                    _trackData = _infoStorage.GetTrackData(_context, out _trackedObjects);
+                }
+
                 IEnumerable<CacheResult<T>> results;
                 if (query.FullCollection)
                 {
@@ -226,10 +242,6 @@ namespace VitalChoice.Caching.Services.Cache
             QueryData<T> queryData, IEnumerable<CacheResult<T>> results,
             out T entity)
         {
-            if (queryData.Tracked)
-            {
-                return ConvertAttachResult(results, queryData, out entity);
-            }
             return ConvertResult(results, queryData, out entity);
         }
 
@@ -237,10 +249,6 @@ namespace VitalChoice.Caching.Services.Cache
             QueryData<T> queryData, IEnumerable<CacheResult<T>> results,
             out List<T> entities)
         {
-            if (queryData.Tracked)
-            {
-                return ConvertAttachResult(results, queryData, out entities);
-            }
             return ConvertResult(results, queryData, out entities);
         }
 
@@ -253,93 +261,46 @@ namespace VitalChoice.Caching.Services.Cache
             return entities;
         }
 
-        private CacheGetResult ConvertAttachResult(IEnumerable<CacheResult<T>> results, QueryData<T> queryData, out T entity)
-        {
-            var compiled = queryData.WhereExpression?.Compiled;
-            CacheIterator<T> cacheIterator = new CacheIterator<T>(new TrackedIteratorParams<T>
-            {
-                Tracked = _context.ChangeTracker.Entries<T>()
-                    .ToDictionary(e => _internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(e.Entity), e => e),
-                InternalCache = _internalCache,
-                Predicate = compiled,
-                Source = results
-            });
-            var orderedList = Order(cacheIterator, queryData);
-            entity = orderedList.FirstOrDefault();
-            return CreateGetResult(cacheIterator, queryData, Enumerable.Repeat(entity, 1));
-        }
-
         private CacheGetResult ConvertResult(IEnumerable<CacheResult<T>> results, QueryData<T> queryData, out T entity)
         {
             var compiled = queryData.WhereExpression?.Compiled;
             CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled);
-            var orderedList = Order(cacheIterator, queryData);
-            entity = orderedList.FirstOrDefault();
-            return CreateGetResult(cacheIterator, queryData, Enumerable.Repeat(entity, 1));
-        }
-
-        private CacheGetResult ConvertAttachResult(IEnumerable<CacheResult<T>> results, QueryData<T> queryData, out List<T> entities)
-        {
-            var compiled = queryData.WhereExpression?.Compiled;
-            CacheIterator<T> cacheIterator = new CacheIterator<T>(new TrackedIteratorParams<T>
-            {
-                Tracked = _context.ChangeTracker.Entries<T>()
-                    .ToDictionary(e => _internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(e.Entity), e => e),
-                InternalCache = _internalCache,
-                Predicate = compiled,
-                Source = results
-            });
-            var orderedList = Order(cacheIterator, queryData);
-            entities = orderedList.ToList();
-            return CreateGetResult(cacheIterator, queryData, entities);
+            var orderedResult = Order(cacheIterator, queryData);
+            orderedResult = queryData.Tracked
+                ? AttachNotTracked(orderedResult, queryData.RelationInfo)
+                : DeepCloneList(queryData.RelationInfo, orderedResult);
+            entity = orderedResult.FirstOrDefault();
+            return CreateGetResult(cacheIterator);
         }
 
         private CacheGetResult ConvertResult(IEnumerable<CacheResult<T>> results, QueryData<T> queryData, out List<T> entities)
         {
             var compiled = queryData.WhereExpression?.Compiled;
             CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled);
-            var orderedClonedList = DeepCloneList(queryData.RelationInfo, Order(cacheIterator, queryData));
-            entities = orderedClonedList.ToList();
-            return CreateGetResult(cacheIterator, queryData, entities);
+            var orderedResult = Order(cacheIterator, queryData);
+            orderedResult = queryData.Tracked
+                ? AttachNotTracked(orderedResult, queryData.RelationInfo)
+                : DeepCloneList(queryData.RelationInfo, orderedResult);
+            entities = orderedResult.ToList();
+            return CreateGetResult(cacheIterator);
         }
 
-        private CacheGetResult CreateGetResult(CacheIterator<T> cacheIterator, QueryData<T> queryData, IEnumerable<T> entities)
+        private CacheGetResult CreateGetResult(CacheIterator<T> cacheIterator)
         {
             if (cacheIterator.AggregatedResult != CacheGetResult.Found)
             {
                 return _internalCache.CanAddUpCache() ? cacheIterator.AggregatedResult : CacheGetResult.NotFound;
             }
-            if (cacheIterator.Found)
+            if (cacheIterator.FoundAny)
             {
-                if (queryData.Tracked)
-                {
-                    AttachNotTracked(entities, cacheIterator.Tracked, queryData.RelationInfo);
-                }
                 return CacheGetResult.Found;
             }
             return _internalCache.CanAddUpCache() ? CacheGetResult.Update : CacheGetResult.NotFound;
         }
 
-        private void AttachNotTracked(IEnumerable<T> items, Dictionary<EntityKey, EntityEntry<T>> tracked, RelationInfo relationInfo)
+        private IEnumerable<T> AttachNotTracked(IEnumerable<T> items, RelationInfo relationInfo)
         {
-            foreach (var item in items)
-            {
-                var pk = _internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(item);
-                EntityEntry<T> entry;
-                if (tracked.TryGetValue(pk, out entry))
-                {
-                    if (entry.State == EntityState.Detached)
-                    {
-                        CloneRelations(relationInfo, item);
-                        AttachGraph(item, relationInfo);
-                    }
-                }
-                else
-                {
-                    CloneRelations(relationInfo, item);
-                    AttachGraph(item, relationInfo);
-                }
-            }
+            return items.Select(item => AttachGraph(item, relationInfo)).Cast<T>();
         }
 
         private IEnumerable<T> DeepCloneList(RelationInfo relations, IEnumerable<T> entities)
@@ -369,27 +330,108 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        private void AttachGraph(object item, RelationInfo relationInfo)
+        //private void AttachGraph(object item, RelationInfo relationInfo)
+        //{
+        //    EntityEntry entry;
+        //    if (!_trackData.TryGetValue(
+        //        new TrackedEntityKey(relationInfo.RelationType,
+        //            _infoStorage.GetPrimaryKeyInfo(relationInfo.RelationType).GetPrimaryKeyValue(item)), out entry) ||
+        //        entry.State == EntityState.Detached)
+        //    {
+        //        foreach (var relation in relationInfo.Relations)
+        //        {
+        //            var value = relation.GetRelatedObject(item);
+        //            if (value != null)
+        //            {
+        //                if (value.GetType().IsImplementGeneric(typeof (ICollection<>)))
+        //                {
+        //                    ((IEnumerable) value).Cast<object>().ForEach(singleValue => AttachGraph(singleValue, relation));
+        //                }
+        //                else
+        //                {
+        //                    AttachGraph(value, relation);
+        //                }
+        //            }
+        //        }
+        //        _context.Attach(item, GraphBehavior.SingleObject);
+        //    }
+        //}
+
+        private object AttachGraph(object item, RelationInfo relationInfo)
         {
-            _context.Attach(item, GraphBehavior.SingleObject);
-            foreach (var relation in relationInfo.Relations)
+            object result;
+            EntityEntry entry;
+            var trackKey = new TrackedEntityKey(relationInfo.RelationType,
+                _infoStorage.GetPrimaryKeyInfo(relationInfo.RelationType).GetPrimaryKeyValue(item));
+            if (_trackData.TryGetValue(trackKey, out entry))
             {
-                var value = relation.GetRelatedObject(item);
-                if (value != null)
+                if (entry.State == EntityState.Detached)
+                    entry.State = EntityState.Unchanged;
+                var state = entry.State;
+                result = entry.Entity;
+                foreach (var relation in relationInfo.Relations)
                 {
-                    if (value.GetType().IsImplementGeneric(typeof (ICollection<>)))
+                    var value = relation.GetRelatedObject(item);
+                    if (value != null)
                     {
-                        foreach (var singleValue in (IEnumerable) value)
+                        if (value.GetType().IsImplementGeneric(typeof (ICollection<>)))
                         {
-                            AttachGraph(singleValue, relation);
+                            var trackedRelation = relation.GetRelatedObject(result);
+                            if (trackedRelation == null || !_trackedObjects.Contains(trackedRelation))
+                            {
+                                var newItems =
+                                    ((IEnumerable) value).Cast<object>().Select(singleValue => AttachGraph(singleValue, relation));
+                                var set = typeof (HashSet<>).CreateGenericCollection(relation.RelationType, newItems);
+                                relation.SetRelatedObject(result, set.CollectionObject);
+                                _trackedObjects.Add(set.CollectionObject);
+                                if (trackedRelation != null)
+                                {
+                                    entry.State = state;
+                                }
+                            }
                         }
-                    }
-                    else
-                    {
-                        AttachGraph(value, relation);
+                        else
+                        {
+                            var trackedRelation = relation.GetRelatedObject(result);
+                            if (trackedRelation == null || !_trackedObjects.Contains(trackedRelation))
+                            {
+                                var newRelation = AttachGraph(value, relation);
+                                relation.SetRelatedObject(result, newRelation);
+                                _trackedObjects.Add(newRelation);
+                                if (trackedRelation != null)
+                                {
+                                    entry.State = state;
+                                }
+                            }
+                        }
                     }
                 }
             }
+            else
+            {
+                result = item.Clone(relationInfo.RelationType);
+                foreach (var relation in relationInfo.Relations)
+                {
+                    var value = relation.GetRelatedObject(item);
+                    if (value != null)
+                    {
+                        if (value.GetType().IsImplementGeneric(typeof (ICollection<>)))
+                        {
+                            var newItems =
+                                ((IEnumerable<object>) value).Select(singleValue => AttachGraph(singleValue, relation));
+                            var set = typeof (HashSet<>).CreateGenericCollection(relation.RelationType, newItems);
+                            relation.SetRelatedObject(result, set.CollectionObject);
+                        }
+                        else
+                        {
+                            relation.SetRelatedObject(result, AttachGraph(value, relation));
+                        }
+                    }
+                }
+                _trackData.Add(trackKey, _context.Attach(result, GraphBehavior.SingleObject));
+                _trackedObjects.Add(result);
+            }
+            return result;
         }
     }
 }

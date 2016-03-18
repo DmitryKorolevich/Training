@@ -17,11 +17,13 @@ namespace VitalChoice.Caching.Services.Cache
         //private readonly ICollection<EntityForeignKeyInfo> _foreignKeyInfos;
         //private readonly ICollection<EntityCacheableIndexInfo> _nonUniqueIndexes;
         private readonly EntityInfo _entityInfo;
+        private readonly IEntityInfoStorage _infoStorage;
 
-        public CacheStorage(EntityInfo entityInfo, IInternalEntityCacheFactory cacheFactory)
+        public CacheStorage(EntityInfo entityInfo, IEntityInfoStorage infoStorage, IInternalEntityCacheFactory cacheFactory)
         {
             _cacheFactory = cacheFactory;
             _entityInfo = entityInfo;
+            _infoStorage = infoStorage;
             //if (keyStorage.GetEntityInfo<T>(out _entityInfo))
             //{
             //_primaryKeyInfo = _entityInfo.PrimaryKey;
@@ -40,7 +42,7 @@ namespace VitalChoice.Caching.Services.Cache
         public ICacheData<T> GetCacheData(RelationInfo relationInfo)
         {
             return _cacheData.GetOrAdd(relationInfo,
-                r => new CacheData<T>(_cacheFactory, _entityInfo, relationInfo));
+                r => new CacheData<T>(_cacheFactory, _entityInfo, _infoStorage, relationInfo));
         }
 
         public ICollection<ICacheData<T>> AllCacheDatas => _cacheData.Values;
