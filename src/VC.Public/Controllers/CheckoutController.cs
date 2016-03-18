@@ -252,6 +252,11 @@ namespace VC.Public.Controllers
                 addUpdateModel.Email = cart.Order.Customer?.Email;
             }
 
+            if (!string.IsNullOrEmpty(addUpdateModel.Email))
+            {
+                addUpdateModel.SendNews = !(_brontoService.GetIsUnsubscribed(addUpdateModel.Email) ?? false);
+            }
+
             return View(addUpdateModel);
         }
 
@@ -337,13 +342,21 @@ namespace VC.Public.Controllers
                         if (!string.IsNullOrEmpty(model.Email))
                         {
                             var unsubscribed = _brontoService.GetIsUnsubscribed(model.Email);
-                            if (model.SendNews && unsubscribed)
+                            if (model.SendNews && (!unsubscribed.HasValue || unsubscribed.Value))
                             {
                                 await _brontoService.Subscribe(model.Email);
                             }
-                            if (!model.SendNews && !unsubscribed)
+                            if (!model.SendNews)
                             {
-                                _brontoService.Unsubscribe(model.Email);
+                                if (!unsubscribed.HasValue)
+                                {
+                                    await _brontoService.Subscribe(model.Email);
+                                    _brontoService.Unsubscribe(model.Email);
+                                }
+                                else if (!unsubscribed.Value)
+                                {
+                                    _brontoService.Unsubscribe(model.Email);
+                                }
                             }
                         }
 

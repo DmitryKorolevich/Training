@@ -33,10 +33,10 @@ namespace VC.Admin
             
 			Configuration = configuration.Build();
 
-            //services.AddMvc().AddMvcOptions(options =>
-            //{
-            //    options.ModelBinders.Insert(0, new AntiXSSModelBinder());
-            //});
+            services.AddMvc().AddMvcOptions(options =>
+            {
+                options.ModelBinders.Insert(0, new AntiXSSModelBinder());
+            });
 
             var reg = new AdminDependencyConfig();
 

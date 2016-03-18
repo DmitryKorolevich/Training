@@ -77,6 +77,10 @@ namespace VitalChoice.Business.Services.Bronto
                     var responseStream = response.GetResponseStream();
                     if (responseStream != null)
                     {
+                        using (var reader = new StreamReader(responseStream))
+                        {
+                            var data = reader.ReadToEnd();
+                        }
                         return true;
                     }
                 }
@@ -114,6 +118,10 @@ namespace VitalChoice.Business.Services.Bronto
                     var responseStream = response.GetResponseStream();
                     if (responseStream != null)
                     {
+                        using (var reader = new StreamReader(responseStream))
+                        {
+                            var data = reader.ReadToEnd();
+                        }
                         return true;
                     }
                 }
@@ -164,7 +172,7 @@ namespace VitalChoice.Business.Services.Bronto
             return true;
         }
 
-        public bool GetIsUnsubscribed(string email)
+        public bool? GetIsUnsubscribed(string email)
         {
 #if !DOTNET5_4
             List<contactObject> result = new List<contactObject>();
@@ -190,7 +198,8 @@ namespace VitalChoice.Business.Services.Bronto
                     pageNumber++;
                 }
             } while (lists != null && lists.Length > 0);
-            return result.All(c => c.status == "unsub");
+            
+            return result.Count==0 ? (bool?)null : result.All(c => c.status == "unsub");
 #endif
             return true;
         }
