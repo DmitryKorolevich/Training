@@ -27,10 +27,6 @@ namespace VitalChoice.Interfaces.Services.Orders
 	    Task<OrderDataContext> CalculateOrder(OrderDynamic order, OrderStatus combinedStatus);
         Task<OrderDynamic> SelectLastOrderAsync(int customerId);
 
-        Task<List<OrderDynamic>> SelectAsync(Expression<Func<Order, bool>> query = null,
-            Func<IQueryLite<Order>, IQueryLite<Order>> includesOverride = null,
-            bool withDefaults = false);
-
         Task<OrderDynamic> CreateNewNormalOrder(OrderStatus status);
         
         Task<bool> ImportOrders(byte[] file, string fileName, OrderType orderType, int idCustomer, int idPaymentMethod, int idAddedBy);

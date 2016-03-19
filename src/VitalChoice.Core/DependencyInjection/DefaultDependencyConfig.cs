@@ -497,7 +497,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<PaymentMethodService>().As<IPaymentMethodService>().InstancePerLifetimeScope();
             builder.RegisterType<OrderNoteService>().As<IOrderNoteService>().InstancePerLifetimeScope();
             builder.RegisterType<CustomerService>().As<ICustomerService>().InstancePerLifetimeScope();
-            builder.RegisterType<OrderService>().As<IOrderService>().InstancePerLifetimeScope();
+            builder.RegisterType<OrderService>().As<IOrderService>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<AffiliateService>().As<IAffiliateService>().InstancePerLifetimeScope();
             builder.RegisterType<HelpService>().As<IHelpService>().InstancePerLifetimeScope();
             builder.RegisterType<BlobStorageClient>().As<IBlobStorageClient>().InstancePerLifetimeScope();

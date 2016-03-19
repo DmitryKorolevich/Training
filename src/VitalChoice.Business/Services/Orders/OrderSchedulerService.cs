@@ -76,12 +76,12 @@ namespace VitalChoice.Business.Services.Orders
 {
     public class OrderSchedulerService : IOrderSchedulerService
     {
-        private readonly IOrderService _orderService;
+        private readonly OrderService _orderService;
         private readonly ICustomerService _customerService;
         private readonly ILogger _logger;
 
         public OrderSchedulerService(
-            IOrderService orderService,
+            OrderService orderService,
             ICustomerService customerService,
             ILoggerProviderExtended loggerProvider)
         {
