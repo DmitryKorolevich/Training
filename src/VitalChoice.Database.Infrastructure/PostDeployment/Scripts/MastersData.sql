@@ -2026,7 +2026,7 @@ END
 
 GO
 
-IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template not like N'%<div class="product-autoship-container">%' AND [Name] = 'Product page')
+IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like N'@if(@model.Skus.First().AutoShip) {{' AND [Name] = 'Product page')
 BEGIN
 	UPDATE [dbo].[MasterContentItems]
 	SET [Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage}}
@@ -2151,8 +2151,7 @@ BEGIN
     				    <a href="#" id="lnkAddToCart">
     					    <img src="/assets/images/addtocartorange-2015.jpg"/>
     				    </a>
-    				    @if(@model.Skus.First().AutoShip) {{
-    				        <div class="product-autoship-container">
+    				        <div class="product-autoship-container" style="display: none;">
     				            <a href="#" class="product-autoship-link"></a>
     				            <i class="tooltip-v glyphicon glyphicon-question-sign" data-tooltip-title="Learn About Auto-Shipping" data-tooltip-body="<strong>Why choose Auto-Shipping?</strong><br>
 • You get <u>FREE Shipping &amp; Discount*</u> every shipment!<br>
@@ -2167,7 +2166,6 @@ BEGIN
 <br><br>
 *Cannot be combined with other offers."></i>
                             </div>
-    				    }}
 				    </div>
 			        <div style="display: none;" class="out-of-stock">
 			            <a href="#">
