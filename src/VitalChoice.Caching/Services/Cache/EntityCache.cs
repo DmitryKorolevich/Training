@@ -160,10 +160,10 @@ namespace VitalChoice.Caching.Services.Cache
 
             if (fullCollection)
             {
-                return _internalCache.UpdateAll(entities, queryData.RelationInfo);
+                return _internalCache.UpdateAll(entities, queryData.RelationInfo, _context);
             }
 
-            return _internalCache.Update(entities, queryData.RelationInfo);
+            return _internalCache.Update(entities, queryData.RelationInfo, _context);
         }
 
         public bool Update(QueryData<T> queryData, T entity)
@@ -190,7 +190,7 @@ namespace VitalChoice.Caching.Services.Cache
             {
                 entity = DeepCloneItem(queryData.RelationInfo, entity);
             }
-            return _internalCache.Update(entity, queryData.RelationInfo);
+            return _internalCache.Update(entity, queryData.RelationInfo, _context);
         }
 
         private bool TryConditionalIndexes(QueryData<T> queryData,

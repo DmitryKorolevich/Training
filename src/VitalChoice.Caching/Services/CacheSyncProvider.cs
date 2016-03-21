@@ -49,7 +49,7 @@ namespace VitalChoice.Caching.Services
                             if (internalCache.ItemExist(pk))
                             {
                                 entity = KeyStorage.GetEntity(type, pk);
-                                internalCache.Update(entity);
+                                internalCache.Update(entity, null);
                             }
                             break;
                         case SyncType.Delete:

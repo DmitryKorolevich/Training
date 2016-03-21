@@ -18,6 +18,7 @@ namespace VitalChoice.Caching.Interfaces
         CachedEntity GetUntyped(EntityKey pk);
         IEnumerable<CachedEntity> GetAllUntyped();
         CachedEntity TryRemoveUntyped(EntityKey key);
+        CachedEntity Update(object entity, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities);
         bool ItemExist(EntityKey key);
         bool GetHasRelation(string name);
         bool FullCollection { get; }
@@ -33,10 +34,10 @@ namespace VitalChoice.Caching.Interfaces
         CachedEntity<T> Get(EntityConditionalIndexInfo conditionalIndex, EntityIndex index);
         ICollection<CachedEntity<T>> GetAll();
         CachedEntity<T> TryRemove(EntityKey key);
-        CachedEntity<T> Update(T entity);
+        CachedEntity<T> Update(T entity, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities);
         CachedEntity<T> UpdateKeepRelations(T entity, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities);
-        bool Update(IEnumerable<T> entity);
-        bool UpdateAll(IEnumerable<T> entity);
+        bool Update(IEnumerable<T> entity, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities);
+        bool UpdateAll(IEnumerable<T> entity, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities);
         void SetNull(EntityKey key);
         void SetNull(IEnumerable<EntityKey> keys);
     }
