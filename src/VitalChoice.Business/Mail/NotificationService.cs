@@ -95,7 +95,7 @@ namespace VitalChoice.Business.Mail
 
             if (generatedEmail != null)
             {
-                await emailSender.SendEmailAsync(_mainSuperAdminEmail, generatedEmail.Subject, generatedEmail.Body);
+                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body);
             }
         }
 
