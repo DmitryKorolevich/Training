@@ -15,6 +15,14 @@ namespace VitalChoice.Core.DependencyInjection
 {
     public class StorefrontDependencyConfig:DefaultDependencyConfig
     {
+        protected override void AddMvc(IServiceCollection services)
+        {
+            services.AddMvc().AddMvcOptions(options =>
+            {
+                options.ModelBinders.Insert(0, new AntiXSSModelBinder());
+            });
+        }
+
         protected override void StartCustomServicesRegistration(IServiceCollection services)
         {
             services.AddCaching();
