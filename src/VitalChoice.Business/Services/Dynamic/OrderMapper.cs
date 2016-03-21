@@ -278,15 +278,31 @@ namespace VitalChoice.Business.Services.Dynamic
                 await _orderAddressMapper.UpdateEntityAsync(dynamic.ShippingAddress, entity.ShippingAddress);
 
                 entity.IdCustomer = dynamic.Customer.Id;
-                entity.GiftCertificates?.MergeKeyed(
-                    dynamic.GiftCertificates,
-                    g => g.IdGiftCertificate, gio => gio.GiftCertificate?.Id,
-                    g => new OrderToGiftCertificate
-                    {
-                        Amount = g.Amount,
-                        IdOrder = dynamic.Id,
-                        IdGiftCertificate = g.GiftCertificate.Id
-                    });
+                if (dynamic.OrderStatus != null && dynamic.OrderStatus.Value == OrderStatus.Incomplete ||
+                    dynamic.POrderStatus == OrderStatus.Incomplete && dynamic.NPOrderStatus == OrderStatus.Incomplete)
+                {
+                    entity.GiftCertificates?.MergeKeyed(
+                        dynamic.GiftCertificates,
+                        g => g.IdGiftCertificate, gio => gio.GiftCertificate?.Id,
+                        g => new OrderToGiftCertificate
+                        {
+                            Amount = 0, //g.Amount,
+                            IdOrder = dynamic.Id,
+                            IdGiftCertificate = g.GiftCertificate.Id
+                        }, (g, dg) => g.Amount = 0);
+                }
+                else
+                {
+                    entity.GiftCertificates?.MergeKeyed(
+                        dynamic.GiftCertificates,
+                        g => g.IdGiftCertificate, gio => gio.GiftCertificate?.Id,
+                        g => new OrderToGiftCertificate
+                        {
+                            Amount = g.Amount,
+                            IdOrder = dynamic.Id,
+                            IdGiftCertificate = g.GiftCertificate.Id
+                        }, (g, dg) => g.Amount = dg.Amount);
+                }
                 entity.IdDiscount = dynamic.Discount?.Id;
                 if (dynamic.PaymentMethod.Address != null && entity.PaymentMethod.BillingAddress == null)
                 {
