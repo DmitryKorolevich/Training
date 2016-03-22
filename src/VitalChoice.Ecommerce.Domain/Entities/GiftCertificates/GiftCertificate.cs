@@ -13,6 +13,10 @@ namespace VitalChoice.Ecommerce.Domain.Entities.GiftCertificates
 
         public int? IdSku { get; set; }
 
+        public int? IdOrder { get; set; }
+
+        public Order Order { get; set; }
+
         public string Code { get; set; }
 
         public decimal Balance { get; set; }
@@ -33,10 +37,6 @@ namespace VitalChoice.Ecommerce.Domain.Entities.GiftCertificates
         public GCType GCType { get; set; }
 
         public Guid PublicId { get; set; }
-
-        public int? IdOrder { get; set; }
-
-        public Order Order { get; set; }
 
         public GiftCertificate Clone()
         {

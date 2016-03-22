@@ -352,7 +352,6 @@ namespace VC.Admin.Controllers
                     if (order != null)
                     {
                         order.GiftCertificates=new List<GiftCertificateInOrder>();
-                        order.GeneratedGcs=new List<GeneratedGiftCertificate>();
                         order.Discount = null;
                         toReturn = _mapper.ToModel<OrderReshipManageModel>(order);
                         toReturn.KeyCode = "RESHIP";

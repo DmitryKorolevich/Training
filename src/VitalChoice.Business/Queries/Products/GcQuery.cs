@@ -103,23 +103,5 @@ namespace VitalChoice.Business.Queries.Product
             }
             return this;
         }
-
-        public GcQuery FilterShippingAddress(CustomerAddressFilter filter)
-        {
-            if (filter != null)
-            {
-                Add(c => c.Order.ShippingAddress.WhenValues(filter));
-            }
-            return this;
-        }
-
-        public GcQuery FilterBillingAddress(CustomerAddressFilter filter)
-        {
-            if (filter != null)
-            {
-                Add(c => c.Order.PaymentMethod.BillingAddress.WhenValues(filter));
-            }
-            return this;
-        }
     }
 }

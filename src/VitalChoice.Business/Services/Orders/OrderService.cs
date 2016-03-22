@@ -208,7 +208,6 @@ namespace VitalChoice.Business.Services.Orders
                     .Include(o => o.Skus)
                     .ThenInclude(s => s.GeneratedGiftCertificates)
                     .Include(p => p.OptionValues)
-                    .ThenInclude(p => p.OptionValues)
                     .Include(o => o.HealthwiseOrder)
                     .Include(o => o.ReshipProblemSkus)
                     .ThenInclude(g => g.Sku);
