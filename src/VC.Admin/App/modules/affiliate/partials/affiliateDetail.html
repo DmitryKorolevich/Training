@@ -181,7 +181,6 @@
                                                 <label data-ng-if="affiliate.PromoteByProfessionalPractice" class="col-md-3 control-label">Practice</label>
                                                 <div data-ng-if="affiliate.PromoteByProfessionalPractice" class="col-md-5">
                                                     <select class="form-control" name="ProfessionalPractice" data-ng-model="affiliate.ProfessionalPractice" ng-options="item.Key as item.Text for item in ReferenceData.AffiliateProfessionalPractices" required></select>
-                                                    </select>
                                                     <div class="error-container" ng-show="forms.submitted && forms.mainForm.ProfessionalPractice.$invalid">
                                                         <small class="error" ng-show="forms.mainForm.ProfessionalPractice.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Professional practice")}}</small>
                                                         <small class="error" ng-show="forms.mainForm.ProfessionalPractice.$error.server">{{serverMessages.GetMessage('ProfessionalPractice')}}</small>
@@ -535,7 +534,7 @@
                     </tab>
                     <tab heading="Orders" active="ordersTab.active">
                         <div class="container-fluid">
-                            <div class="well row">
+                            <div class="well row orders">
                                 <div class="row form-group" data-ng-if="affiliate.Id">
                                     <div class="col-md-3">
                                         <p class="input-group">
@@ -567,14 +566,14 @@
                                                 <th>Cust ID</th>
                                                 <th>Net Product Total</th>
                                                 <th>Repeat</th>
-                                                <th>Order Status</th>
+                                                <th class="status">Order Status</th>
                                                 <th>Commission</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr data-ng-repeat="item in orders">
                                                 <td>
-                                                    <a ui-sref="index.oneCol.orderDetail({id:item.IdOrder})">{{::item.IdOrder}}</a>
+                                                    <a ui-sref="{{::item.IdObjectType==5 ? 'index.oneCol.orderReshipDetail({id: item.Id })' : 'index.oneCol.orderDetail({id: item.Id })'}}">{{::item.IdOrder}}</a>
                                                 </td>
                                                 <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>
                                                 <td>{{::item.CustomerName}}</td>

@@ -876,6 +876,11 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(o => o.IdCustomer)
                     .HasPrincipalKey(c => c.Id)
                     .IsRequired();
+                entity.HasOne(o => o.OrderSource)
+                    .WithMany()
+                    .HasForeignKey(o => o.IdOrderSource)
+                    .HasPrincipalKey(c => c.Id)
+                    .IsRequired(false);
                 entity.HasMany(o => o.Skus)
                     .WithOne(a => a.Order)
                     .HasForeignKey(s => s.IdOrder)
@@ -1124,7 +1129,7 @@ namespace VitalChoice.Ecommerce.Context
                 entity.HasKey(r => new { r.IdOrder, r.IdSku });
                 entity.ToTable("ReshipProblemSkus");
                 entity.HasOne(r => r.Order)
-                    .WithMany()
+                    .WithMany(p=>p.ReshipProblemSkus)
                     .HasForeignKey(r => r.IdOrder)
                     .HasPrincipalKey(o => o.Id)
                     .IsRequired();
@@ -1133,6 +1138,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(r => r.IdSku)
                     .HasPrincipalKey(s => s.Id)
                     .IsRequired();
+                entity.Ignore(v => v.Id);
             });
 
             #endregion

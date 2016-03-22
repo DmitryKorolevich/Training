@@ -191,7 +191,7 @@ namespace VC.Admin.ModelConverters
                 }
             }
 
-            if (model.Id != 0)
+            if (!model.UseShippingAndBillingFromCustomer)
             {
                 if (model.Shipping != null)
                 {
@@ -350,7 +350,7 @@ namespace VC.Admin.ModelConverters
 
         private void ModelToPaymentDynamic(OrderManageModel model, OrderDynamic dynamic)
         {
-            if (model.Id != 0)
+            if (!model.UseShippingAndBillingFromCustomer)
             {
                 if (model.IdPaymentMethodType.HasValue)
                 {

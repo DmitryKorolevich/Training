@@ -54,6 +54,14 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    {
 	        return $http.post(baseUrl + 'SendOrderShippingConfirmationEmail/{0}'.format(id), model, getConfig(tracker));
 	    },
+	    getReshipOrder: function (id, idsource, idcustomer, tracker)
+	    {
+	        return $http.get(baseUrl + 'GetReshipOrder/{0}?idsource={1}&idcustomer={2}'.format(id, idsource, idcustomer), getConfig(tracker));
+	    },
+	    updateReshipOrder: function (model, tracker)
+	    {
+	        return $http.post(baseUrl + 'UpdateReshipOrder', model, getConfig(tracker));
+	    },
 	    cancelOrder: function (id, tracker)
 	    {
 	        return $http.post(baseUrl + 'CancelOrder/{0}'.format(id), null, getConfig(tracker));

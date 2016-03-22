@@ -84,12 +84,12 @@
                     </tab>
                     <tab heading="Orders Used On" active="orders.active">
                         <div class="container-fluid">
-                            <div class="well row">
+                            <div class="well row orders">
                                 <spinner-overlay data-loading="refreshTracker.active()">
                                     <table class="table table-striped order-statuses">
                                         <thead>
                                             <tr>
-                                                <th>Status</th>
+                                                <th class="status">Status</th>
                                                 <th>Updated</th>
                                                 <th>Order Type</th>
                                                 <th>Order Date</th>
@@ -114,7 +114,7 @@
                                                     <a ui-sref="index.oneCol.customerDetail({id:item.IdCustomer})">{{::item.CustomerFirstName}} {{::item.CustomerLastName}}</a>
                                                 </td>
                                                 <td>
-                                                    <a ui-sref="index.oneCol.orderDetail({id:item.Id})">{{::item.Id}}</a>
+                                                    <a ui-sref="{{::item.IdObjectType==5 ? 'index.oneCol.orderReshipDetail({id: item.Id })' : 'index.oneCol.orderDetail({id: item.Id })'}}">{{::item.Id}}</a>
                                                 </td>
                                                 <td>{{::item.Total | currency}}</td>
                                                 <td>{{::item.CustomerShipFirstName}} {{::item.CustomerShipLastName}}</td>

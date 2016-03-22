@@ -32,6 +32,20 @@ angular.module('app.core.dataAccess.services.settingService', [])
 		    return $http.post(baseUrl + 'GetHistoryReport', filter, getConfig(tracker));
 		},
 
+	    //lookups
+		getLookups: function (tracker)
+		{
+		    return $http.get(baseUrl + 'GetLookups', getConfig(tracker));
+		},
+		getLookup: function (id, tracker)
+		{
+		    return $http.get(baseUrl + 'GetLookup/{0}'.format(id), getConfig(tracker));
+		},
+		updateLookupVariants: function (id, model, tracker)
+		{
+		    return $http.post(baseUrl + 'UpdateLookupVariants/{0}'.format(id), model, getConfig(tracker));
+		},
+
         //countries/states
 	    getCountries: function (filter, tracker) {
 	        return $http.post(baseUrl + 'GetCountries', filter, getConfig(tracker));

@@ -1,0 +1,467 @@
+﻿<div class="container-fluid order-edit">
+    <div class="left-pane-controls">
+        <div class="well container-fluid">
+            <div>
+                <button data-ng-click="save()" class="btn btn-success width-160px" unsaved-warning-clear>Save</button>
+            </div>
+            <div class="btn-group margin-top-10px">
+                <button ui-sref="index.oneCol.manageOrders" class="btn btn-default width-160px" unsaved-warning-clear>Cancel</button>
+            </div>
+            <div class="margin-top-10px">
+                <button class="btn btn-primary width-160px" ui-sref="index.oneCol.manageOrders">Manage All</button>
+            </div>
+            <div class="margin-top-10px">
+                <button class="btn btn-info width-160px" data-ng-click="goToCustomer();">Manage Customer</button>
+            </div>
+            <div data-ng-show="currentCustomer && order.Id && options.oldOrderStatus!=1" class="margin-top-10px">
+                <button class="btn btn-purple width-160px" data-ng-click="sendOrderConfirmationEmail();">Resend Order Conf</button>
+            </div>
+            <div data-ng-show="currentCustomer && order.Id && order.CombinedEditOrderStatus==3" class="margin-top-10px">
+                <button class="btn btn-purple width-160px" data-ng-click="sendOrderShippingConfirmationEmail();">Resend Ship Conf</button>
+            </div>
+        </div>
+        <div ng-controller="objectHistorySectionController" onload="name = 'History'" data-ng-include="'app/modules/order/partials/orderObjectHistorySection.html'"></div>
+    </div>
+    <div class="right-pane-main">
+        <div class="container-fluid">
+            <div class="row">
+                <span class="legend top">
+                    <span data-ng-if="legend.IdOrderSource" class="item">Reship: Order ID: <strong>{{legend.IdOrderSource}}</strong></span>
+                    <span data-ng-if="legend.OrderSourceDateCreated" class="item">Order Date: <strong>{{::legend.OrderSourceDateCreated | date:"MM/dd/yy"}} {{::legend.OrderSourceDateCreated | date:"h:mm a"}}</strong></span>
+                    <span data-ng-if="legend.OrderSourceTotal" class="item">Total Order Amount: <strong>{{legend.OrderSourceTotal | currency}}</strong></span>
+                    <br />
+                    <span data-ng-if="legend.CustomerName" class="item">Customer: <strong>{{legend.CustomerName}}</strong></span>
+                    <span data-ng-if="legend.CustomerId" class="item">Customer ID: <strong>{{legend.CustomerId}}</strong></span>
+                    <span data-ng-if="legend.OrderId" class="item">Order ID: <strong>{{legend.OrderId}}</strong></span>
+                    <span data-ng-if="legend.OrderDate" class="item">Order Date: <strong>{{legend.OrderDate | date:"MM/dd/yy"}} {{::legend.OrderDate | date:"h:mm a"}}</strong></span>
+                    <span data-ng-if="legend.OrderStatus" class="item">Status: <strong>{{legend.OrderStatus}}</strong></span>
+                </span>
+            </div>
+            <div class="row">
+                <tabset>
+                    <tab heading="{{mainTab.name}}" active="mainTab.active">
+                        <div class="container container-left xbig-container">
+                            <div class="well row">
+                                <spinner-overlay data-loading="addEditTracker.active()">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="options-row form-horizontal">
+                                                <label class="checkbox-inline">
+                                                    <input type="checkbox" data-ng-model="order.OnHold" data-ng-disabled="orderEditDisabled">Hold Order
+                                                    <i class="fa fa-pause"></i>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <form class="form-horizontal" name="forms.topForm" data-ng-submit="save()" data-ng-class="{submitted: forms.topForm.submitted}" novalidate unsaved-warning-form>
+                                                <fieldset>
+                                                    <div class="form-group">
+                                                        <label for="type" class="col-md-3 control-label">Problem SKUs</label>
+                                                        <div class="col-md-9">
+                                                            <label class="checkbox-inline margin-left-zero margin-right-25px">
+                                                                <input type="checkbox" data-ng-click="toggleAllReshipProblemSkus()" data-ng-model="options.AllReshipProblemSkus" autocomplete="off" data-ng-disabled="order.Id || orderEditDisabled">
+                                                                All
+                                                            </label>
+                                                            <label class="checkbox-inline margin-left-zero margin-right-25px" data-ng-repeat="item in order.ReshipProblemSkus">
+                                                                <input type="checkbox" data-ng-click="toggleReshipProblemSku(item)" data-ng-model="item.Used" autocomplete="off" data-ng-disabled="order.Id || orderEditDisabled">
+                                                                {{item.Code}}
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="type" class="col-md-3 control-label">Service Code</label>
+                                                        <div class="col-md-9">
+                                                            <select data-ng-disabled="order.Id || orderEditDisabled" class="form-control" name="ServiceCode" data-ng-model="order.ServiceCode" ng-options="item.Key as item.Text for item in ReferenceData.ServiceCodes" required>
+                                                            </select>
+                                                            <div class="error-container" ng-show="forms.topForm.submitted && forms.topForm.ServiceCode.$invalid">
+                                                                <small class="error" ng-show="forms.topForm.ServiceCode.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Service Code")}}</small>
+                                                                <small class="error" ng-show="forms.topForm.ServiceCode.$error.server">{{serverMessages.GetMessage('ServiceCode')}}</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-3 control-label"></label>
+                                                        <div class="col-md-9">
+                                                            <div class="checkbox">
+                                                                <label>
+                                                                    <input type="checkbox" data-ng-disabled="order.Id || orderEditDisabled" data-ng-model="order.ReturnAssociated">
+                                                                    <strong>Is there a product return associated with this Customer Service call?</strong>
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-3 control-label">Notes</label>
+                                                        <div class="col-md-9">
+                                                            <textarea type="text" name="OrderNotes" class="form-control" placeholder="Notes" rows="5" data-ng-model="order.OrderNotes" data-ng-disabled="orderEditDisabled" required></textarea>
+                                                            <div class="error-container" ng-show="forms.topForm.submitted && forms.topForm.OrderNotes.$invalid">
+                                                                <small class="error" ng-show="forms.topForm.OrderNotes.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Order Notes")}}</small>
+                                                                <small class="error" ng-show="forms.topForm.OrderNotes.$error.server">{{serverMessages.GetMessage('OrderNotes')}}</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </fieldset>
+                                            </form>
+                                        </div>
+                                        <div class="col-md-12 products-buttons">
+                                            <button data-ng-click="productAdd()" class="btn btn-primary-orange width-160px" data-ng-if="!orderEditDisabled">Add Product</button>
+                                            <button data-ng-click="topPurchasedProducts()" class="btn btn-info btn-right width-200px" data-ng-if="!orderEditDisabled">Top Purchased Products</button>
+                                        </div>
+                                        <div class="col-md-12 form-horizontal products">
+                                            <table class="table table-striped">
+                                                <tbody>
+                                                    <tr data-ng-class="{warning: item.Messages.length>0 || (item.ClientMessages && item.ClientMessages.length>0)}" data-ng-repeat-start="item in order.SkuOrdereds">
+                                                        <td class="sku">
+                                                            <div class="input-group autocomplete">
+                                                                <input type="text" name="SKU{{$index}}" class="form-control" placeholder="SKU" data-ng-model="item.Code"
+                                                                       typeahead-min-length="1" typeahead="sku.Code as sku.Code for sku in getSKUsBySKU($viewValue)" typeahead-loading="loadingSKUsBySKU"
+                                                                       typeahead-on-select="skuChanged($index)" data-ng-blur="skuChanged($index)"
+                                                                       typeahead-wait-ms="100" data-ng-disabled="orderEditDisabled">
+                                                            </div>
+                                                        </td>
+                                                        <td class="type">
+                                                            <span data-ng-if="item.IdProductType==2" class="perishable">P</span>
+                                                            <span data-ng-if="item.IdProductType==1" class="not-perishable">NP</span>
+                                                        </td>
+                                                        <td class="qty">
+                                                            <input name="QTY{{$index}}" class="form-control" placeholder="QTY" numbers-only numbers-only-deny-zero min="1" max="1000" data-ng-model="item.QTY" data-ng-blur="requestRecalculate()" data-ng-disabled="orderEditDisabled">
+                                                        </td>
+                                                        <td class="product-name">
+                                                            <div class="input-group autocomplete">
+                                                                <input type="text" name="ProductName{{$index}}" class="form-control" placeholder="Product Name" data-ng-model="item.ProductName"
+                                                                       typeahead-min-length="1" typeahead="sku.DescriptionName as sku.DescriptionName for sku in getSKUsByProductName($viewValue)" typeahead-loading="loadingSKUsByProductNane"
+                                                                       typeahead-on-select="productNameChanged($index)" typeahead-wait-ms="100" data-ng-disabled="orderEditDisabled">
+                                                            </div>
+                                                        </td>
+                                                        <td class="price">
+                                                            <div class="col-md-12 padding-0px">
+                                                                <div class="input-group">
+                                                                    <span class="input-group-addon">$</span>
+                                                                    <input type="text" name="Price{{$index}}" class="form-control" placeholder="Price" money min="0.00" max="100000" data-ng-model="item.Price" data-ng-blur="requestRecalculate()" data-ng-disabled="orderEditDisabled">
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="amount">
+                                                            <div class="amount">{{item.Amount | currency}}</div>
+                                                        </td>
+                                                        <td class="del">
+                                                            <a class="btn btn-danger btn-xs" title="Delete" data-ng-click="productDelete($index);" data-ng-disabled="orderEditDisabled" data-ng-if="!orderEditDisabled"><i class="glyphicon glyphicon-remove"></i></a>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="warning" data-ng-if="item.Messages.length>0">
+                                                        <td colspan="7">
+                                                            <strong class="message" data-ng-repeat="message in item.Messages">{{message}}</strong>
+                                                        </td>
+                                                    </tr>
+                                                    <tr data-ng-repeat-end class="warning" data-ng-if="item.ClientMessages && item.ClientMessages.length>0">
+                                                        <td colspan="7">
+                                                            <strong class="message" data-ng-repeat="message in item.ClientMessages">{{message}}</strong>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="warning" data-ng-if="productsPerishableThresholdIssue && !options.ignoneMinimumPerishableThreshold">
+                                                        <td colspan="7">
+                                                            <label class="perishable-threshold-message">
+                                                                <strong>{{minimumPerishableThreshold | currency}} minimum perishable threshold not met. Override</strong>
+                                                                <input type="checkbox" data-ng-model="options.ignoneMinimumPerishableThreshold" data-ng-disabled="orderEditDisabled">
+                                                            </label>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="col-md-6 left-section">
+                                            <form class="form-horizontal" name="forms.mainForm" data-ng-submit="save()" data-ng-class="{submitted: forms.mainForm.submitted}" novalidate unsaved-warning-form>
+                                                <fieldset>
+                                                    <div class="form-group">
+                                                        <label for="type" class="col-md-3 control-label">Source</label>
+                                                        <div data-ng-if="currentCustomer.SourceValue" class="col-md-9 form-control-static">
+                                                            <span>{{currentCustomer.SourceValue}}</span>
+                                                        </div>
+                                                        <div data-ng-if="!currentCustomer.SourceValue" class="col-md-9">
+                                                            <select class="form-control" name="Source" data-ng-model="currentCustomer.Source" ng-options="source.Key as source.Text for source in orderSources" data-ng-required="!order.OnHold" data-ng-disabled="orderEditDisabled">
+                                                                <option value="" selected hidden />
+                                                            </select>
+                                                            <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.Source.$invalid">
+                                                                <small class="error" ng-show="forms.mainForm.Source.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Source")}}</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div data-ng-if="!currentCustomer.SourceValue && currentCustomer.Source && (currentCustomer.Source==4 || currentCustomer.Source==10)" class="form-group">
+                                                        <label for="type" class="col-md-3 control-label">Details</label>
+                                                        <div class="col-md-9">
+                                                            <input data-ng-if="currentCustomer.Source==10" name="SourceDetailsText" class="form-control" placeholder="Details" data-ng-model="currentCustomer.SourceDetails" data-ng-required="!order.OnHold" data-ng-disabled="orderEditDisabled">
+                                                            <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.SourceDetailsText.$invalid">
+                                                                <small class="error" ng-show="forms.mainForm.SourceDetailsText.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Details")}}</small>
+                                                            </div>
+                                                            <select data-ng-if="currentCustomer.Source==4" class="form-control" name="SourceDetailsCelebrity" data-ng-model="currentCustomer.SourceDetails" ng-options="sourceCelebrity.Text as sourceCelebrity.Text for sourceCelebrity in orderSourcesCelebrityHealthAdvocate" data-ng-required="!order.OnHold" data-ng-disabled="orderEditDisabled">
+                                                                <option value="" selected hidden />
+                                                            </select>
+                                                            <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.SourceDetailsCelebrity.$invalid">
+                                                                <small class="error" ng-show="forms.mainForm.SourceDetailsCelebrity.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Details")}}</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div data-ng-if="currentCustomer.CustomerType == 2 && order.IdObjectType!=4" class="form-group">
+                                                        <label for="type" class="col-md-3 control-label">PO#</label>
+                                                        <div class="col-md-9">
+                                                            <input name="PoNumber" class="form-control" placeholder="PO#" data-ng-model="order.PoNumber" data-ng-required="!order.OnHold" data-ng-disabled="orderEditDisabled">
+                                                            <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.PoNumber.$invalid">
+                                                                <small class="error" ng-show="forms.mainForm.PoNumber.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","#PO")}}</small>
+                                                                <small class="error" ng-show="forms.mainForm.PoNumber.$error.server">{{serverMessages.GetMessage('PoNumber')}}</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="type" class="col-md-3 control-label">Key Code</label>
+                                                        <div class="col-md-9">
+                                                            <input name="KeyCode" class="form-control" placeholder="Key Code" data-ng-model="order.KeyCode" data-ng-required="!order.OnHold" data-ng-disabled="orderEditDisabled">
+                                                            <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.KeyCode.$invalid">
+                                                                <small class="error" ng-show="forms.mainForm.KeyCode.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Key Code")}}</small>
+                                                                <small class="error" ng-show="forms.mainForm.KeyCode.$error.server">{{serverMessages.GetMessage('KeyCode')}}</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <span class="legend">Ship Delay</span>
+                                                    <div class="form-group">
+                                                        <label class="col-md-12 control-label left">Ship Delay Order?</label>
+                                                        <div class="col-md-12">
+                                                            <label class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="0" type="radio" data-ng-disabled="orderEditDisabled">None</label>
+                                                            <label class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="1" type="radio" data-ng-disabled="orderEditDisabled">Entire Order</label>
+                                                            <label data-ng-if="order.ShouldSplit && order.IdObjectType!=3" class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="2" type="radio" data-ng-disabled="orderEditDisabled">Perishable & Non-Perishable</label>
+                                                        </div>
+                                                    </div>
+                                                    <div data-ng-if="order.ShipDelayType==1" class="form-group">
+                                                        <label for="date" class="col-md-6 control-label">Ship Date</label>
+                                                        <div class="col-md-6">
+                                                            <p class="input-group">
+                                                                <input type="text" name="ShipDelayDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDate" is-open="shipDelayDateOpened" required data-ng-disabled="orderEditDisabled" />
+                                                                <span class="input-group-btn">
+                                                                    <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                                </span>
+                                                            </p>
+                                                            <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.ShipDelayDate.$invalid">
+                                                                <small class="error" ng-show="forms.mainForm.ShipDelayDate.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Date")}}</small>
+                                                                <small class="error" ng-show="forms.mainForm.ShipDelayDate.$error.server">{{serverMessages.GetMessage('ShipDelayDate')}}</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div data-ng-if="order.ShipDelayType==2 && order.ShouldSplit" class="form-group">
+                                                        <label for="date" class="col-md-6 control-label">Perishable Ship Date</label>
+                                                        <div class="col-md-6">
+                                                            <p class="input-group">
+                                                                <input type="text" name="ShipDelayDateP" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateP" is-open="shipDelayDatePOpened" data-ng-disabled="orderEditDisabled" />
+                                                                <span class="input-group-btn">
+                                                                    <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDatePOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                                </span>
+                                                            </p>
+                                                            <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.ShipDelayDateP.$invalid">
+                                                                <small class="error" ng-show="forms.mainForm.ShipDelayDateP.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Date")}}</small>
+                                                                <small class="error" ng-show="forms.mainForm.ShipDelayDateP.$error.server">{{serverMessages.GetMessage('ShipDelayDateP')}}</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div data-ng-if="order.ShipDelayType==2 && order.ShouldSplit" class="form-group">
+                                                        <label for="date" class="col-md-6 control-label">Non-Perishable Ship Date</label>
+                                                        <div class="col-md-6">
+                                                            <p class="input-group">
+                                                                <input type="text" name="ShipDelayDateNP" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateNP" is-open="shipDelayDateNPOpened" data-ng-disabled="orderEditDisabled" />
+                                                                <span class="input-group-btn">
+                                                                    <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDateNPOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                                </span>
+                                                            </p>
+                                                            <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.ShipDelayDateNP.$invalid">
+                                                                <small class="error" ng-show="forms.mainForm.ShipDelayDateNP.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Date")}}</small>
+                                                                <small class="error" ng-show="forms.mainForm.ShipDelayDateNP.$error.server">{{serverMessages.GetMessage('ShipDelayDateNP')}}</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <span class="legend">Notes</span>
+                                                    <div data-ng-if="order.IdObjectType!=3" class="form-group">
+                                                        <label class="col-md-12 control-label left">Delivery Instructions (*Prints to Shipping Label):</label>
+                                                        <div class="col-md-12">
+                                                            <textarea type="text" name="DeliveryInstructions" class="form-control" placeholder="Delivery Instructions" rows="5" data-ng-model="order.DeliveryInstructions" data-ng-disabled="orderEditDisabled"></textarea>
+                                                            <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.DeliveryInstructions.$invalid">
+                                                                <small class="error" ng-show="forms.mainForm.DeliveryInstructions.$error.server">{{serverMessages.GetMessage('DeliveryInstructions')}}</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </fieldset>
+                                            </form>
+                                        </div>
+                                        <div class="col-md-6 right-section">
+                                            <form class="form-horizontal" name="forms.mainForm2" data-ng-submit="save()" data-ng-class="{submitted: forms.mainForm2.submitted}" novalidate unsaved-warning-form>
+                                                <fieldset>
+                                                    <div data-ng-if="order.AlaskaHawaiiSurcharge!=0" class="form-group margin-bottom-0px">
+                                                        <label for="type" class="col-md-7 control-label">Alaska/Hawaii Surcharge</label>
+                                                        <div class="col-md-5 form-control-static">
+                                                            <span>{{order.AlaskaHawaiiSurcharge | currency}}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div data-ng-if="order.CanadaSurcharge!=0" class="form-group margin-bottom-0px">
+                                                        <label for="type" class="col-md-7 control-label">Canada Surcharge</label>
+                                                        <div class="col-md-5 form-control-static">
+                                                            <span>{{order.CanadaSurcharge | currency}}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group margin-bottom-0px">
+                                                        <label for="type" class="col-md-7 control-label">Standard Shipping Charges</label>
+                                                        <div class="col-md-5 form-control-static">
+                                                            <span>{{order.StandardShippingCharges | currency}}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div data-ng-if="shippingUpgradePOptions && shippingUpgradePOptions.length!=0 && order.IdObjectType!=3" class="form-group">
+                                                        <label for="type" class="col-md-7 control-label">Upgrade Perishable Shipping</label>
+                                                        <div class="col-md-5">
+                                                            <select data-ng-disabled="!shippingUpgradePOptions || shippingUpgradePOptions.length==0 || orderEditDisabled" class="form-control" name="ShippingUpgradeP" data-ng-model="order.ShippingUpgradeP" ng-options="item.Key as item.Text for item in shippingUpgradePOptions" data-ng-change="requestRecalculate()">
+                                                                <option value="">None</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div data-ng-if="shippingUpgradeNPOptions && shippingUpgradeNPOptions.length!=0 && order.IdObjectType!=3" class="form-group">
+                                                        <label for="type" class="col-md-7 control-label">Upgrade Non-Perishable Shipping</label>
+                                                        <div class="col-md-5">
+                                                            <select data-ng-disabled="!shippingUpgradeNPOptions || shippingUpgradeNPOptions.length==0 || orderEditDisabled" class="form-control" name="ShippingUpgradeNP" data-ng-model="order.ShippingUpgradeNP" ng-options="item.Key as item.Text for item in shippingUpgradeNPOptions" data-ng-change="requestRecalculate()">
+                                                                <option value="">None</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div data-ng-if="order.AlaskaHawaiiSurcharge!=0 || order.CanadaSurcharge!=0" class="form-group">
+                                                        <label for="type" class="col-md-7 control-label">Surcharge Override (-)</label>
+                                                        <div class="col-md-5">
+                                                            <div class="input-group">
+                                                                <span class="input-group-addon">$</span>
+                                                                <input type="text" name="SurchargeOverride" class="form-control" placeholder="Surcharge" money min="0.00" max="100000" data-ng-model="order.SurchargeOverride" data-ng-blur="requestRecalculate()" data-ng-disabled="orderEditDisabled">
+                                                            </div>
+                                                            <div class="error-container" ng-show="forms.mainForm2.submitted && forms.mainForm2.SurchargeOverride.$invalid">
+                                                                <small class="error" ng-show="forms.mainForm2.SurchargeOverride.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Amount")}}</small>
+                                                                <small class="error" ng-show="forms.mainForm2.SurchargeOverride.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","GeneralFieldNames.Amount",1000000)}}</small>
+                                                                <small class="error" ng-show="forms.mainForm2.SurchargeOverride.$error.server">{{serverMessages.GetMessage('SurchargeOverride')}}</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div data-ng-if="order.IdObjectType!=3" class="form-group">
+                                                        <label for="type" class="col-md-7 control-label">Shipping Override (-)</label>
+                                                        <div class="col-md-5">
+                                                            <div class="input-group">
+                                                                <span class="input-group-addon">$</span>
+                                                                <input type="text" name="ShippingOverride" class="form-control" placeholder="Shipping" money min="0.00" max="100000" data-ng-model="order.ShippingOverride" data-ng-blur="requestRecalculate()" data-ng-disabled="orderEditDisabled">
+                                                            </div>
+                                                            <div class="error-container" ng-show="forms.mainForm2.submitted && forms.mainForm2.ShippingOverride.$invalid">
+                                                                <small class="error" ng-show="forms.mainForm2.ShippingOverride.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Amount")}}</small>
+                                                                <small class="error" ng-show="forms.mainForm2.ShippingOverride.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","GeneralFieldNames.Amount",1000000)}}</small>
+                                                                <small class="error" ng-show="forms.mainForm2.ShippingOverride.$error.server">{{serverMessages.GetMessage('ShippingOverride')}}</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group margin-bottom-0px">
+                                                        <label for="type" class="col-md-7 control-label">Total Shipping</label>
+                                                        <div class="col-md-5 form-control-static">
+                                                            <span>{{order.TotalShipping | currency}}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div data-ng-if="order.IdObjectType!=3" class="form-group">
+                                                        <label for="type" class="col-md-7 control-label">Preferred Ship Method</label>
+                                                        <div class="col-md-5">
+                                                            <select class="form-control" name="PreferredShipMethod" data-ng-model="order.PreferredShipMethod" ng-options="item.Key as item.Text for item in orderPreferredShipMethod" required data-ng-disabled="orderEditDisabled">
+                                                                <option value="" selected hidden />
+                                                            </select>
+                                                            <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.PreferredShipMethod.$invalid">
+                                                                <small class="error" ng-show="forms.mainForm2.PreferredShipMethod.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","PreferredShipMethod")}}</small>
+                                                                <small class="error" ng-show="forms.mainForm2.PreferredShipMethod.$error.server">{{serverMessages.GetMessage('PreferredShipMethod')}}</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group margin-bottom-0px">
+                                                        <label for="type" class="col-md-7 control-label">Product Subtotal</label>
+                                                        <div class="col-md-5 form-control-static">
+                                                            <span>{{order.ProductsSubtotal | currency}}</span>
+                                                        </div>
+                                                    </div>
+                                                </fieldset>
+                                            </form>
+
+                                            <form name="forms.GCs" class="form-horizontal" data-ng-submit="save()" data-ng-class="{submitted: forms.GCs.skussubmitted}" novalidate unsaved-warning-form>
+                                                <fieldset>
+                                                    <div class="total-section">
+                                                        <div data-ng-if="order.IdObjectType!=3" class="form-group margin-bottom-0px">
+                                                            <label class="col-md-6 control-label">Discount</label>
+                                                            <div class="col-md-6 form-control-static">
+                                                                <span>{{order.DiscountMessage}}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div data-ng-if="order.IdObjectType!=3" class="form-group margin-bottom-0px">
+                                                            <label class="col-md-6 control-label">Discount Amount</label>
+                                                            <div class="col-md-6 form-control-static">
+                                                                <span>({{order.DiscountTotal | currency}})</span>
+                                                            </div>
+                                                        </div>
+                                                        <div data-ng-if="order.IdObjectType!=3" class="form-group margin-bottom-0px">
+                                                            <label class="col-md-6 control-label">Discounted Subtotal</label>
+                                                            <div class="col-md-6 form-control-static">
+                                                                <span>{{order.DiscountedSubtotal | currency}}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group margin-bottom-0px">
+                                                            <label class="col-md-6 control-label">Shipping Total</label>
+                                                            <div class="col-md-6 form-control-static">
+                                                                <span>{{order.ShippingTotal | currency}}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group margin-bottom-0px">
+                                                            <label class="col-md-6 control-label">Tax</label>
+                                                            <div class="col-md-6 form-control-static">
+                                                                <span>{{order.TaxTotal | currency}}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group margin-bottom-0px">
+                                                            <label class="col-md-6 control-label">Gift Certificates</label>
+                                                            <div class="col-md-6 form-control-static">
+                                                                <span>({{order.GiftCertificatesSubtotal | currency}})</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group margin-bottom-0px">
+                                                            <label class="col-md-6 control-label">Grand Total</label>
+                                                            <div class="col-md-6 form-control-static">
+                                                                <span>{{order.Total | currency}}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </fieldset>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </spinner-overlay>
+                            </div>
+                        </div>
+                    </tab>
+                    <tab heading="Shipping Address" active="shippingAddressTab.active">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <spinner-overlay data-loading="addEditTracker.active()">
+                                    <div data-ng-include="'app/modules/customer/partials/updateOrderShippingSection.html'"></div>
+                                </spinner-overlay>
+                            </div>
+                        </div>
+                    </tab>
+                    <tab heading="Payment Information" active="paymentInfoTab.active">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <spinner-overlay data-loading="addEditTracker.active()">
+                                    <div class="form-horizontal">
+                                        <span class="legend">Select Payment Method</span>
+                                        <div data-ng-include="'app/modules/order/partials/updateOrderBillingSection.html'"></div>
+                                    </div>
+                                </spinner-overlay>
+                            </div>
+                        </div>
+                    </tab>
+                </tabset>
+            </div>
+        </div>
+    </div>
+</div>

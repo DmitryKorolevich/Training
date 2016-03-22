@@ -211,7 +211,9 @@ namespace VitalChoice.Business.Services.Orders
                     .Include(o => o.GiftCertificatesGenerated)
                     .ThenInclude(g => g.Sku)
                     .ThenInclude(s => s.Product)
-                    .ThenInclude(p => p.OptionValues);
+                    .ThenInclude(p => p.OptionValues)
+                    .Include(o => o.ReshipProblemSkus)
+                    .ThenInclude(g => g.Sku);
         }
 
         protected override async Task AfterSelect(ICollection<Order> entities)
@@ -1026,6 +1028,7 @@ namespace VitalChoice.Business.Services.Orders
                     Customer = p.Customer?.ProfileAddress.SafeData.FirstName + " " + p.Customer?.ProfileAddress.SafeData.LastName,
                     StateCode = countries.SelectMany(pp => pp.States).FirstOrDefault(pp => pp.Id == p.ShippingAddress?.IdState)?.StateCode,
                     ShipTo = p?.ShippingAddress.SafeData.FirstName + " " + p?.ShippingAddress.SafeData.LastName,
+                    PreferredShipMethod = p.SafeData.PreferredShipMethod,
                     Healthwise = p.IsHealthwise,
                 }).ToList(),
                 Count = orders.Count

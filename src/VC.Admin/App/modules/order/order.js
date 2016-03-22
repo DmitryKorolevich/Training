@@ -1,8 +1,10 @@
 ﻿'use strict';
 
-angular.module('app.modules.order',[
+angular.module('app.modules.order', [
+	'app.modules.order.services.orderEditService',
 	'app.modules.order.controllers.ordersController',
 	'app.modules.order.controllers.orderManageController',
+	'app.modules.order.controllers.orderReshipManageController',
 	'app.modules.order.controllers.orderStatusUpdateController',
 	'app.modules.order.controllers.moveOrderController',
 	'app.modules.order.controllers.customerOrdersController',
@@ -30,6 +32,16 @@ angular.module('app.modules.order',[
 		            url: '/orders/add?{idcustomer:int}{idsource:int}',
 		            templateUrl: 'app/modules/order/partials/orderDetail.html',
 		            controller: 'orderManageController'
+		        })
+		        .state('index.oneCol.orderReshipDetail', {
+		            url: '/orderreships/{id:int}',
+		            templateUrl: 'app/modules/order/partials/orderReshipDetail.html',
+		            controller: 'orderReshipManageController'
+		        })
+		        .state('index.oneCol.orderReshipAdd', {
+		            url: '/orderreships/add?{idcustomer:int}{idsource:int}',
+		            templateUrl: 'app/modules/order/partials/orderReshipDetail.html',
+		            controller: 'orderReshipManageController'
 		        })
 		        .state('index.oneCol.changeOrderStatus', {
 		            url: '/tools/change-order-status',

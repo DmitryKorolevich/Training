@@ -313,7 +313,7 @@ BEGIN
 END
 GO
 
-IF NOT EXISTS(SELECT * FROM OrderOptionTypes WHERE IdObjectType=4 AND Name='IdDiscountTier')
+IF NOT EXISTS(SELECT * FROM OrderOptionTypes WHERE Name='IdDiscountTier')
 BEGIN
 
 	INSERT INTO [dbo].[OrderOptionTypes]
@@ -351,6 +351,36 @@ BEGIN
 UPDATE OrderTypes 
 SET Name='Standard'
 WHERE Name='Normal Order'
+
+END
+
+GO
+
+IF NOT EXISTS(SELECT * FROM OrderOptionTypes WHERE Name='DeliveryInstructions' AND [IdObjectType]=5)
+BEGIN
+
+	INSERT INTO [dbo].[OrderOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'DeliveryInstructions', 4, NULL, 5, NULL)
+
+	UPDATE Lookups
+	SET Name='ServiceCodes',
+	[Description]='Service Codes'
+	WHERE Name='ServiceCode'	
+
+END
+
+GO
+
+IF NOT EXISTS(SELECT * FROM OrderOptionTypes WHERE Name='PreferredShipMethod' AND IdObjectType=5)
+BEGIN
+
+	INSERT INTO [dbo].[OrderOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'PreferredShipMethod', 5, (SELECT TOP 1 Id FROM Lookups WHERE Name='PreferredShipMethod'), 1, N'1'),
+	(N'KeyCode', 4, NULL, 5, NULL)
 
 END
 
