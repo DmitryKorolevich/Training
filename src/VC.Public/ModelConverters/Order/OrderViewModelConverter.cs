@@ -99,9 +99,7 @@ namespace VC.Public.ModelConverters.Order
                 result.Price = sku.Amount;
                 result.Quantity = sku.Quantity;
                 result.SubTotal = sku.Quantity * sku.Amount;
-
-                result.GeneratedGCCodes = sku.GcsGenerated?.Select(g => g.Code).ToList() ?? new List<string>();
-
+                
                 return result;
             }) ?? Enumerable.Empty<CartSkuModel>());
 
