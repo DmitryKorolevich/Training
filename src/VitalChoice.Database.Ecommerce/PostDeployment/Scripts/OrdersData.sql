@@ -379,7 +379,7 @@ BEGIN
 	INSERT INTO [dbo].[OrderOptionTypes]
 	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
 	VALUES
-	(N'PreferredShipMethod', 5, (SELECT TOP 1 Id FROM Lookups WHERE Name='PreferredShipMethod'), 1, N'1'),
+	(N'PreferredShipMethod', 3, (SELECT TOP 1 Id FROM Lookups WHERE Name='PreferredShipMethod'), 5, N'1'),
 	(N'KeyCode', 4, NULL, 5, NULL)
 
 END
