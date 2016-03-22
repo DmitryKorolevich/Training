@@ -17,6 +17,8 @@ namespace VC.Admin.Models.Orders
     {
         public int? Id { get; set; }
 
+        public int? IdSku { get; set; }
+
         public string Code { get; set; }
 
         public int? IdProductType { get; set; }
@@ -59,6 +61,7 @@ namespace VC.Admin.Models.Orders
                 if (model.Sku != null)
                 {
                     Id = model.Sku.Id;
+                    IdSku= model.Sku.Id;
                     Code = model.Sku.Code;
                     AutoShipProduct = model.Sku.DictionaryData.ContainsKey("AutoShipProduct") ? model.Sku.Data.AutoShipProduct : false;
                     AutoShipFrequency1 = model.Sku.DictionaryData.ContainsKey("AutoShipFrequency1") ? model.Sku.Data.AutoShipFrequency1 : false;
@@ -95,6 +98,29 @@ namespace VC.Admin.Models.Orders
                 }
             }
         }
+
+        public SkuOrderedManageModel ConvertToBase()
+        {
+            var toReturn=new SkuOrderedManageModel(null);
+            toReturn.ProductName = this.ProductName;
+            toReturn.IdProductType = this.IdProductType;
+            toReturn.IdProductType = this.IdProductType;
+
+            toReturn.QTY = this.QTY;
+            toReturn.Price = this.Price;
+            toReturn.Amount = this.Amount;
+
+            toReturn.Id = this.IdSku;
+            toReturn.IdSku = this.IdSku;
+            toReturn.Code = this.Code;
+            toReturn.AutoShipProduct = this.AutoShipProduct;
+            toReturn.AutoShipFrequency1 = this.AutoShipFrequency1;
+            toReturn.AutoShipFrequency2 = this.AutoShipFrequency2;
+            toReturn.AutoShipFrequency3 = this.AutoShipFrequency3;
+            toReturn.AutoShipFrequency6 = this.AutoShipFrequency6;
+            toReturn.Messages = this.Messages;
+            return toReturn;
+        }
     }
 
     [ApiValidator(typeof(OrderManageModelValidator))]
@@ -112,6 +138,8 @@ namespace VC.Admin.Models.Orders
         [DirectLocalized("Customer")]
         [Map]
         public AddUpdateCustomerModel Customer { get; set; }
+
+        public bool UseShippingAndBillingFromCustomer { get; set; }
         
         //Only for adding a new one 
         public bool UpdateShippingAddressForCustomer {get; set;}
@@ -279,9 +307,12 @@ namespace VC.Admin.Models.Orders
         [Map]
         public bool ConfirmationEmailSent { get; set; }
 
-        public bool SignUpNewsletter { get; set; }
+        public bool? SignUpNewsletter { get; set; }
 
         public bool ShouldSplit { get; set; }
+
+        [Map]
+        public int? IdOrderSource { get; set; }
 
         public OrderManageModel()
         {

@@ -32,6 +32,7 @@ using VitalChoice.Infrastructure.Domain.Content.Faq;
 using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Content.Recipes;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Data.Extensions;
 
 namespace VC.Admin.Controllers
 {
@@ -65,6 +66,53 @@ namespace VC.Admin.Controllers
             _exportCatalogRequestAddressService = exportCatalogRequestAddressService;
             this.logger = loggerProvider.CreateLoggerDefault();
         }
+
+        #region Lookups
+
+        [HttpGet]
+        public async Task<Result<IList<Lookup>>> GetLookups()
+        {
+            var result = await settingService.GetLookupsAsync(SettingConstants.SETTINGS_LOOKUP_NAMES.Split(','));
+            result.ForEach(p =>
+            {
+                if (p.LookupVariants != null)
+                {
+                    foreach (var lookupVariant in p.LookupVariants)
+                    {
+                        lookupVariant.Lookup = null;
+                    }
+                }
+            });
+
+            return result.ToList();
+        }
+
+        [HttpGet]
+        [AdminAuthorize(PermissionType.Settings)]
+        public async Task<Result<Lookup>> GetLookup(int id)
+        {
+            var result = await settingService.GetLookupAsync(id);
+            if (result.LookupVariants != null)
+            {
+                foreach (var lookupVariant in result.LookupVariants)
+                {
+                    lookupVariant.Lookup = null;
+                }
+            }
+
+            return result;
+        }
+
+        [HttpPost]
+        [AdminAuthorize(PermissionType.Settings)]
+        public async Task<Result<bool>> UpdateLookupVariants(int id, [FromBody]ICollection<LookupVariant> model)
+        {
+            var result = await settingService.UpdateLookupVariantsAsync(id, model);
+
+            return result;
+        }
+
+        #endregion
 
         #region Countries/States
 

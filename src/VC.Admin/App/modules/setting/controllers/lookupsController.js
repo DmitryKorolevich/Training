@@ -1,6 +1,6 @@
-﻿angular.module('app.modules.inventorysku.controllers.lookupsController', [])
-.controller('lookupsController', ['$scope', '$state', 'inventorySkuService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
-function ($scope, $state, inventorySkuService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil)
+﻿angular.module('app.modules.setting.controllers.lookupsController', [])
+.controller('lookupsController', ['$scope', '$state', 'settingService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
+function ($scope, $state, settingService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil)
     {
 	$scope.refreshTracker = promiseTracker("refresh");
 
@@ -9,7 +9,7 @@ function ($scope, $state, inventorySkuService, toaster, modalUtil, confirmUtil, 
     };
 
     function refresh() {
-        inventorySkuService.getInventorySkuLookups($scope.refreshTracker)
+        settingService.getLookups($scope.refreshTracker)
 			.success(function (result) {
 			    if (result.Success) {
 			        $scope.items = result.Data;

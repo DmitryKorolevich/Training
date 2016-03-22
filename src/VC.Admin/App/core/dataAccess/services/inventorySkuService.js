@@ -32,20 +32,6 @@ angular.module('app.core.dataAccess.services.inventorySkuService', [])
 	        return $http.post(baseUrl + 'DeleteInventorySku/' + id, null, getConfig(tracker));
 	    },
 
-	    //inventoryLookups
-	    getInventorySkuLookups: function (tracker)
-	    {
-	        return $http.get(baseUrl + 'GetInventorySkuLookups', getConfig(tracker));
-	    },
-	    getInventorySkuLookup: function (id, tracker)
-	    {
-	        return $http.get(baseUrl + 'GetInventorySkuLookup/{0}'.format(id), getConfig(tracker));
-	    },
-	    updateInventorySkuLookupVariants: function (id, model, tracker)
-	    {
-	        return $http.post(baseUrl + 'UpdateInventorySkuLookupVariants/{0}'.format(id), model, getConfig(tracker));
-	    },
-
 	    //inventoryCategories
 	    getInventorySkuCategoriesTree: function (filter, tracker) {
 	        return $http.post(baseUrl + 'GetInventorySkuCategoriesTree', filter, getConfig(tracker));

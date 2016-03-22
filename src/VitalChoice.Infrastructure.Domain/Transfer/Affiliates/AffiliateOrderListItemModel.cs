@@ -10,6 +10,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Affiliates
 
         public int IdOrder { get; set; }
 
+        public OrderType IdObjectType { get; set; }
+
         public OrderStatus? OrderStatus { get; set; }
 
         public OrderStatus? POrderStatus { get; set; }
@@ -42,6 +44,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Affiliates
             {
                 DateCreated = affiliatePayment.Order.DateCreated;
                 IdOrder = affiliatePayment.Id;
+                IdObjectType = (OrderType)affiliatePayment.Order.IdObjectType;
                 OrderStatus = affiliatePayment.Order.OrderStatus;
                 POrderStatus = affiliatePayment.Order.POrderStatus;
                 NPOrderStatus = affiliatePayment.Order.NPOrderStatus;

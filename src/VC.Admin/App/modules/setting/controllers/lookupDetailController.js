@@ -1,8 +1,8 @@
 ﻿'use strict';
 
-angular.module('app.modules.inventorysku.controllers.lookupDetailController', [])
-.controller('lookupDetailController', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', 'inventorySkuService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker',
-function ($scope, $rootScope, $state, $stateParams, $timeout, inventorySkuService, toaster, modalUtil, confirmUtil, promiseTracker)
+angular.module('app.modules.setting.controllers.lookupDetailController', [])
+.controller('lookupDetailController', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', 'settingService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker',
+function ($scope, $rootScope, $state, $stateParams, $timeout, settingService, toaster, modalUtil, confirmUtil, promiseTracker)
 {
     $scope.refreshTracker = promiseTracker("get");
 
@@ -34,7 +34,7 @@ function ($scope, $rootScope, $state, $stateParams, $timeout, inventorySkuServic
 
         $scope.forms = {};
 
-        inventorySkuService.getInventorySkuLookup($stateParams.id, $scope.refreshTracker).success(function (result)
+        settingService.getLookup($stateParams.id, $scope.refreshTracker).success(function (result)
         {
             if (result.Success)
             {
@@ -57,7 +57,7 @@ function ($scope, $rootScope, $state, $stateParams, $timeout, inventorySkuServic
 
         if ($scope.forms.form.$valid)
         {
-            inventorySkuService.updateInventorySkuLookupVariants($scope.lookup.Id, $scope.lookup.LookupVariants, $scope.refreshTracker).success(function (result)
+            settingService.updateLookupVariants($scope.lookup.Id, $scope.lookup.LookupVariants, $scope.refreshTracker).success(function (result)
             {
                 successSaveHandler(result);
             }).

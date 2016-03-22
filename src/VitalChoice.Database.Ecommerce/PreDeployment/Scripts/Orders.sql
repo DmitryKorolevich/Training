@@ -280,3 +280,14 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'Orders') AND Name = N'IdOrderSource')
+BEGIN
+
+	ALTER TABLE Orders
+	ADD IdOrderSource INT NULL
+		CONSTRAINT FK_OrderToOrderSource FOREIGN KEY (IdOrderSource) REFERENCES dbo.Orders (Id)
+
+END
+
+GO

@@ -62,6 +62,8 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Orders
 
         public string ShipTo { get; set; }
 
+        public int? PreferredShipMethod { get; set; }
+
         public bool Healthwise { get; set; }
     }
 }

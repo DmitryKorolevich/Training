@@ -15,6 +15,7 @@
         public const string OrderPreferredShipMethod = "PreferredShipMethod";
         public const string OrderSourceTypes = "OrderTypes";
         public const string POrderTypes = "POrderTypes";
+        public const string ServiceCodes = "ServiceCodes";
 
         public const string AffiliateProfessionalPractices = "AffiliateProfessionalPractices";
         public const string AffiliateMonthlyEmailsSentOptions = "AffiliateMonthlyEmailsSentOptions";

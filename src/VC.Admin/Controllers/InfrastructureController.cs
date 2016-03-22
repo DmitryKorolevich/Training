@@ -73,6 +73,7 @@ namespace VC.Admin.Controllers
                     OrderPreferredShipMethod = referenceData.OrderPreferredShipMethod,
                     OrderSourceTypes = referenceData.OrderSourceTypes,
                     POrderTypes = referenceData.POrderTypes,
+                    ServiceCodes = referenceData.ServiceCodes,
                     AffiliateProfessionalPractices = referenceData.AffiliateProfessionalPractices,
                     AffiliateMonthlyEmailsSentOptions = referenceData.AffiliateMonthlyEmailsSentOptions,
                     AffiliateTiers = referenceData.AffiliateTiers,

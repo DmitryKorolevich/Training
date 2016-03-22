@@ -40,9 +40,12 @@ using VitalChoice.Business.Mail;
 using VitalChoice.Business.Services.Bronto;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Caching.Extensions;
+using VitalChoice.Data.Extensions;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates;
 
 namespace VC.Admin.Controllers
 {
@@ -208,7 +211,7 @@ namespace VC.Admin.Controllers
                 }
 
                 var model = _mapper.ToModel<OrderManageModel>(order);
-
+                model.UseShippingAndBillingFromCustomer = true;
                 model.GCs = new List<GCListItemModel>() {new GCListItemModel(null)};
                 model.SkuOrdereds = new List<SkuOrderedManageModel>() {new SkuOrderedManageModel(null)};
                 model.UpdateShippingAddressForCustomer = true;
@@ -312,14 +315,14 @@ namespace VC.Admin.Controllers
 
             OrderManageModel toReturn = _mapper.ToModel<OrderManageModel>(order);
 
-            if(!string.IsNullOrEmpty(model?.Customer.Email))
+            if(!string.IsNullOrEmpty(model?.Customer.Email) && model.SignUpNewsletter.HasValue)
             {
                 var unsubscribed = _brontoService.GetIsUnsubscribed(model.Customer.Email);
-                if (model.SignUpNewsletter && (!unsubscribed.HasValue || unsubscribed.Value))
+                if (model.SignUpNewsletter.Value && (!unsubscribed.HasValue || unsubscribed.Value))
                 {
                     await _brontoService.Subscribe(model.Customer.Email);
                 }
-                if (!model.SignUpNewsletter)
+                if (!model.SignUpNewsletter.Value)
                 {
                     if (!unsubscribed.HasValue)
                     {
@@ -333,6 +336,112 @@ namespace VC.Admin.Controllers
                     }
                 }
             }
+
+            return toReturn;
+        }
+
+        [HttpGet]
+        public async Task<Result<OrderReshipManageModel>> GetReshipOrder(int id, int? idsource = null, int? idcustomer = null)
+        {
+            OrderReshipManageModel toReturn = null;
+            if (id == 0)
+            {
+                if (idsource.HasValue)
+                {
+                    var order = await _orderService.SelectAsync(idsource.Value);
+                    if (order != null)
+                    {
+                        order.GiftCertificates=new List<GiftCertificateInOrder>();
+                        order.GeneratedGcs=new List<GeneratedGiftCertificate>();
+                        order.Discount = null;
+                        toReturn = _mapper.ToModel<OrderReshipManageModel>(order);
+                        toReturn.KeyCode = "RESHIP";
+                        toReturn.IdObjectType = (int)OrderType.Reship;
+                        toReturn.IdOrderSource = toReturn.Id;
+                        toReturn.OrderSourceDateCreated = toReturn.DateCreated;
+                        toReturn.OrderSourceTotal = toReturn.Total;
+                        toReturn.OrderNotes=String.Empty;
+                        if (toReturn.SkuOrdereds != null && toReturn.PromoSkus != null)
+                        {
+                            toReturn.SkuOrdereds.AddRange(toReturn.PromoSkus.Select(p=>p.ConvertToBase()).ToList());
+                            toReturn.PromoSkus=new List<PromoSkuOrderedManageModel>();
+                        }
+                        toReturn.SkuOrdereds?.ForEach(p =>
+                        {
+                            p.Price = 0;
+                            p.Amount = 0;
+                        });
+                        toReturn.ReshipProblemSkus =
+                            toReturn.SkuOrdereds?.Where(p=>p.IdSku.HasValue).Select(p => new ReshipProblemSkuModel()
+                            {
+                                IdSku = p.IdSku.Value,
+                                Code = p.Code,
+                                Used = true,
+                            }).ToList();
+                        toReturn.Id = 0;
+                    }
+                }
+            }
+
+            var item = await _orderService.SelectAsync(id);
+            if (item != null)
+            {
+                toReturn = _mapper.ToModel<OrderReshipManageModel>(item);
+            }
+
+            return toReturn;
+        }
+
+        [HttpPost]
+        public async Task<Result<OrderReshipManageModel>> UpdateReshipOrder([FromBody]OrderReshipManageModel model)
+        {
+            if (!Validate(model))
+                return null;
+
+            var order = _mapper.FromModel(model);
+
+            var sUserId = Request.HttpContext.User.GetUserId();
+            int userId;
+            if (int.TryParse(sUserId, out userId))
+            {
+                order.IdEditedBy = userId;
+            }
+
+            var sendOrderConfirm = false;
+            if (model.CombinedEditOrderStatus != OrderStatus.Cancelled && model.CombinedEditOrderStatus != OrderStatus.Exported && model.CombinedEditOrderStatus != OrderStatus.Shipped)
+            {
+                await _orderService.OrderTypeSetup(order);
+                await _orderService.CalculateOrder(order, model.CombinedEditOrderStatus);
+
+                if (!model.ConfirmationEmailSent &&
+                    (model.CombinedEditOrderStatus == OrderStatus.Processed ||
+                     model.CombinedEditOrderStatus == OrderStatus.ShipDelayed) &&
+                    !string.IsNullOrEmpty(model.Customer.Email))
+                {
+                    sendOrderConfirm = true;
+                    order.Data.ConfirmationEmailSent = true;
+                }
+
+                if (model.Id > 0)
+                {
+                    order = await _orderService.UpdateAsync(order);
+                }
+                else
+                {
+                    order = await _orderService.InsertAsync(order);
+                }
+            }
+
+            if (sendOrderConfirm && !string.IsNullOrEmpty(model.Customer?.Email))
+            {
+                var emailModel = _mapper.ToModel<OrderConfirmationEmail>(order);
+                if (emailModel != null)
+                {
+                    await _notificationService.SendOrderConfirmationEmailAsync(model.Customer.Email, emailModel);
+                }
+            }
+
+            OrderReshipManageModel toReturn = _mapper.ToModel<OrderReshipManageModel>(order);
 
             return toReturn;
         }
@@ -351,7 +460,7 @@ namespace VC.Admin.Controllers
             if (toReturn.Main != null && !string.IsNullOrEmpty(toReturn.Main.Data))
             {
                 var dynamic = (OrderDynamic)JsonConvert.DeserializeObject(toReturn.Main.Data, typeof(OrderDynamic));
-                var model = _mapper.ToModel<OrderManageModel>(dynamic);
+                var model = GetOrderManageModel(dynamic);
                 toReturn.Main.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
@@ -361,7 +470,7 @@ namespace VC.Admin.Controllers
             if (toReturn.Before != null && !string.IsNullOrEmpty(toReturn.Before.Data))
             {
                 var dynamic = (OrderDynamic)JsonConvert.DeserializeObject(toReturn.Before.Data, typeof(OrderDynamic));
-                var model = _mapper.ToModel<OrderManageModel>(dynamic);
+                var model = GetOrderManageModel(dynamic);
                 toReturn.Before.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
@@ -370,6 +479,20 @@ namespace VC.Admin.Controllers
             }
 
             return toReturn;
+        }
+
+        private OrderManageModel GetOrderManageModel(OrderDynamic dynamic)
+        {
+            OrderManageModel model;
+            if (dynamic.IdObjectType == (int) OrderType.Reship)
+            {
+                model = _mapper.ToModel<OrderReshipManageModel>(dynamic);
+            }
+            else
+            {
+                model = _mapper.ToModel<OrderManageModel>(dynamic);
+            }
+            return model;
         }
 
         [HttpPost]

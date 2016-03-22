@@ -66,53 +66,6 @@ namespace VC.Admin.Controllers
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
-        #region Lookups
-
-        [HttpGet]
-        public async Task<Result<IList<Lookup>>> GetInventorySkuLookups()
-        {
-            var result = await _settingService.GetLookupsAsync(SettingConstants.INVENTORY_SKU_LOOKUP_NAMES.Split(','));
-            result.ForEach(p =>
-            {
-                if (p.LookupVariants != null)
-                {
-                    foreach (var lookupVariant in p.LookupVariants)
-                    {
-                        lookupVariant.Lookup = null;
-                    }
-                }
-            });
-
-            return result.ToList();
-        }
-
-        [HttpGet]
-        [AdminAuthorize(PermissionType.InventorySkus)]
-        public async Task<Result<Lookup>> GetInventorySkuLookup(int id)
-        {
-            var result = await _settingService.GetLookupAsync(id);
-            if (result.LookupVariants != null)
-            {
-                foreach (var lookupVariant in result.LookupVariants)
-                {
-                    lookupVariant.Lookup = null;
-                }
-            }
-
-            return result;
-        }
-
-        [HttpPost]
-        [AdminAuthorize(PermissionType.InventorySkus)]
-        public async Task<Result<bool>> UpdateInventorySkuLookupVariants(int id, [FromBody]ICollection<LookupVariant> model)
-        {
-            var result = await _settingService.UpdateLookupVariantsAsync(id,model);
-
-            return result;
-        }
-
-        #endregion
-
         #region InventorySkus
 
         [HttpPost]

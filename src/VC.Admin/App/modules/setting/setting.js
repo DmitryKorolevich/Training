@@ -13,6 +13,8 @@ angular.module('app.modules.setting', [
 	'app.modules.setting.controllers.objectLogReportController',
 	'app.modules.setting.controllers.objectHistorySectionController',
 	'app.modules.setting.controllers.errorDetailsController',
+	'app.modules.setting.controllers.lookupsController',
+	'app.modules.setting.controllers.lookupDetailController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -43,6 +45,17 @@ angular.module('app.modules.setting', [
 					url: '/settings/ordernotes',
 					templateUrl: 'app/modules/setting/partials/orderNotesList.html',
 					controller: 'orderNotesManagementController'
-				});
+				})
+		    	/*lookups*/
+		        .state('index.oneCol.manageLookups', {
+		            url: '/settings/lookups',
+		            templateUrl: 'app/modules/setting/partials/lookupsList.html',
+		            controller: 'lookupsController',
+		        })
+		        .state('index.oneCol.lookupDetail', {
+		            url: '/settings/lookups/{id:int}',
+		            templateUrl: 'app/modules/setting/partials/lookupDetail.html',
+		            controller: 'lookupDetailController',
+		        });
 		}
 ]);

@@ -72,6 +72,13 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.ShippingTotal = entity.ShippingTotal;
                 dynamic.TaxTotal = entity.TaxTotal;
                 dynamic.Total = entity.Total;
+                dynamic.IdOrderSource = entity.IdOrderSource;
+                dynamic.ReshipProblemSkus = entity.ReshipProblemSkus?.Select(p=>new ReshipProblemSkuOrdered()
+                {
+                    IdSku = p.IdSku,
+                    Code=p.Sku.Code,
+                    IdOrder = p.IdOrder,
+                }).ToList();
 
                 dynamic.IsHealthwise = entity.HealthwiseOrder != null;
 
@@ -175,6 +182,11 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.ShippingTotal = dynamic.ShippingTotal;
                 entity.TaxTotal = dynamic.TaxTotal;
                 entity.Total = dynamic.Total;
+                entity.IdOrderSource = dynamic.IdOrderSource;
+                entity.ReshipProblemSkus = dynamic.ReshipProblemSkus?.Select(p => new ReshipProblemSku()
+                {
+                    IdSku = p.IdSku,
+                }).ToList();
 
                 entity.ShippingAddress =
                     await _orderAddressMapper.ToEntityAsync(dynamic.ShippingAddress);

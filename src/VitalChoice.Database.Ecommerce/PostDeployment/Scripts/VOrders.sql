@@ -32,16 +32,17 @@ SELECT
 	CONVERT(bit,CASE WHEN ho.Id IS NULL THEN 0 ELSE 1 END) As Healthwise,
 	CAST(orderOptions.[ShipDelayDate] as datetime2) As DateShipped,
 	CAST(orderOptions.[ShipDelayDateP] as datetime2) As PDateShipped,
-	CAST(orderOptions.[ShipDelayDateNP] as datetime2) As NPDateShipped
+	CAST(orderOptions.[ShipDelayDateNP] as datetime2) As NPDateShipped,
+	CAST(orderOptions.PreferredShipMethod as int) As PreferredShipMethod
 	FROM Orders AS o
 	LEFT JOIN HealthwiseOrders AS ho ON ho.Id = o.Id
 	LEFT JOIN OrderPaymentMethods AS opm ON opm.Id = o.IdPaymentMethod
 
-	LEFT JOIN (SELECT [IdOrder], [OrderType], [OrderNotes], [POrderType], [ShippingUpgradeP], [ShippingUpgradeNP], [ShipDelayDate], [ShipDelayDateP], [ShipDelayDateNP]
+	LEFT JOIN (SELECT [IdOrder], [OrderType], [OrderNotes], [POrderType], [ShippingUpgradeP], [ShippingUpgradeNP], [ShipDelayDate], [ShipDelayDateP], [ShipDelayDateNP], [PreferredShipMethod]
 	FROM (SELECT [IdOrder], [Name], [Value] FROM [dbo].[OrderOptionTypes] AS adt
 	INNER JOIN [dbo].[OrderOptionValues] AS adv on adt.Id = adv.IdOptionType) As source
 	PIVOT(
-	MIN([Value]) FOR [Name] in ([OrderType], [OrderNotes], [POrderType], [ShippingUpgradeP], [ShippingUpgradeNP], [ShipDelayDate], [ShipDelayDateP], [ShipDelayDateNP])
+	MIN([Value]) FOR [Name] in ([OrderType], [OrderNotes], [POrderType], [ShippingUpgradeP], [ShippingUpgradeNP], [ShipDelayDate], [ShipDelayDateP], [ShipDelayDateNP], [PreferredShipMethod])
 	) AS piv) AS orderOptions ON o.Id = orderOptions.IdOrder
 
 	JOIN Customers AS c ON c.Id = o.[IdCustomer]

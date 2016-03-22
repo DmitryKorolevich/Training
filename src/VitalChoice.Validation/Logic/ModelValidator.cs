@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
+using System.Collections.Generic;
 using FluentValidation.Results;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Validation.Interfaces;
@@ -43,7 +44,14 @@ namespace VitalChoice.Validation.Logic
             }
         }
 
-        
+        protected virtual void ParseResults(IModelValidator innerValidator)
+        {
+            IsValid = IsValid && innerValidator.IsValid;
+            if (!IsValid && innerValidator.Errors.Any())
+            {
+                ValidationErrors.AddRange(innerValidator.Errors);
+            }
+        }
 
         void IModelValidator.Validate(IModel value)
         {

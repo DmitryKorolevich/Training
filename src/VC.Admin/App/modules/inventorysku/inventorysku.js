@@ -3,8 +3,6 @@
 angular.module('app.modules.inventorysku', [
 	'app.modules.inventorysku.controllers.inventorySkuCategoriesController',
 	'app.modules.inventorysku.controllers.inventorySkuCategoryManageController',
-	'app.modules.inventorysku.controllers.lookupsController',
-	'app.modules.inventorysku.controllers.lookupDetailController',
 	'app.modules.inventorysku.controllers.inventorySkusController',
 	'app.modules.inventorysku.controllers.inventorySkuManageController',
 	'app.modules.inventorysku.controllers.assignInventorySkusController',
@@ -19,17 +17,6 @@ angular.module('app.modules.inventorysku', [
 		            url: '/inventoryskus/settings/categories',
 		            templateUrl: 'app/modules/inventorysku/partials/inventorySkuCategoriesTreeView.html',
 		            controller: 'inventorySkuCategoriesController',
-		        })
-		        /*lookups*/
-		        .state('index.oneCol.manageInventorySkuLookups', {
-		            url: '/inventoryskus/settings/lookups',
-		            templateUrl: 'app/modules/inventorysku/partials/lookupsList.html',
-		            controller: 'lookupsController',
-		        })
-		        .state('index.oneCol.lookupDetail', {
-		            url: '/inventoryskus/settings/lookups/{id:int}',
-		            templateUrl: 'app/modules/inventorysku/partials/lookupDetail.html',
-		            controller: 'lookupDetailController',
 		        })
 		        /*inventory skus*/
 		        .state('index.oneCol.manageInventorySkus', {

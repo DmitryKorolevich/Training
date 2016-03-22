@@ -1,11 +1,18 @@
-﻿<div class="well row customer-orders-list">
+﻿<div class="well row customer-orders-list orders">
     <spinner-overlay data-loading="addEditTracker.active()">
         <table class="table table-striped order-statuses">
             <thead>
                 <tr>
-                    <th class="sortable-column" data-ng-click="filter.Sorting.applySort('OrderStatus')">
+                    <th class="status" data-ng-click="filter.Sorting.applySort('OrderStatus')">
                         <span>Status</span>
                         <span data-ng-if="filter.Sorting.Path == 'OrderStatus'">
+                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                        </span>
+                    </th>
+                    <th class="sortable-column" data-ng-click="filter.Sorting.applySort('IdObjectType')">
+                        <span>Type</span>
+                        <span data-ng-if="filter.Sorting.Path == 'IdObjectType'">
                             <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
                             <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                         </span>
@@ -60,13 +67,16 @@
                     <td>
                         <div data-ng-include="'app/modules/order/partials/orderStatusSection.html'"></div>
                     </td>
+                    <td>
+                        <span class="label font-default" data-ng-class="::{'label-retail': (item.IdObjectType==1 || item.IdObjectType==2 ||item.IdObjectType==3 || item.IdObjectType==4), 'label-primary':  item.IdObjectType==5, 'label-success':  item.IdObjectType==6}">{{::getReferenceItem(ReferenceData.ShortOrderTypes, item.IdObjectType).Text}}</span>
+                    </td>
                     <td>{{::item.DateEdited | date:"MM/dd/yy"}}<br />{{::item.DateEdited | date:"h:mm a"}}<br />{{::item.EditedByAgentId}}</td>
                     <td class="order-source">
                         <span>{{getReferenceItem(ReferenceData.OrderSourceTypes, item.IdOrderSource).Text}}</span>
                     </td>
                     <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>
                     <td>
-                        <a ui-sref="index.oneCol.orderDetail({id:item.Id})">{{::item.Id}}</a>
+                        <a ui-sref="{{::item.IdObjectType==5 ? 'index.oneCol.orderReshipDetail({id: item.Id })' : 'index.oneCol.orderDetail({id: item.Id })'}}">{{::item.Id}}</a>
                     </td>
                     <td>{{::item.Total | currency}}</td>
                     <td>
@@ -76,7 +86,7 @@
                         <button title="Repeat" class="btn btn-default btn-success btn-xs" ui-sref="index.oneCol.orderAdd({idcustomer:item.IdCustomer, idsource:item.Id })">
                             Repeat
                         </button>
-                        <button title="Reship" class="btn btn-default btn-info btn-xs">
+                        <button title="Reship" class="btn btn-default btn-info btn-xs" ui-sref="index.oneCol.orderReshipAdd({idcustomer:item.IdCustomer, idsource:item.Id })">
                             Reship
                         </button>
                         <button data-ng-if="item.OrderStatus==3" title="Refund" class="btn btn-default btn-primary btn-xs">

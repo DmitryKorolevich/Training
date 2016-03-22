@@ -50,6 +50,8 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
 
         public decimal DiscountTotal { get; set; }
 
+        public int? IdOrderSource { get; set; }
+
         public AffiliateOrderPayment AffiliateOrderPayment { get; set; }
 
         public bool IsHealthwise { get; set; }
@@ -61,5 +63,7 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
 
         //Don't storing in DB, should be set be calculating logic
         public bool? AffiliateNewCustomerOrder { get; set; }
+
+        public ICollection<ReshipProblemSkuOrdered> ReshipProblemSkus { get; set; }
     }
 }

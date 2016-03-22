@@ -50,10 +50,16 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Orders
 
         public decimal DiscountTotal { get; set; }
 
+        public int? IdOrderSource { get; set; }
+
+        public Order OrderSource { get; set; }
+
         public Discount Discount { get; set; }
 
         public AffiliateOrderPayment AffiliateOrderPayment { get; set; }
 
         public HealthwiseOrder HealthwiseOrder { get; set; }
+
+        public ICollection<ReshipProblemSku> ReshipProblemSkus { get; set; }
     }
 }
