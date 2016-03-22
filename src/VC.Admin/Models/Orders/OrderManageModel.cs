@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Attributes;
 using VC.Admin.Validators.Order;
@@ -45,6 +46,8 @@ namespace VC.Admin.Models.Orders
 
         public IList<string> Messages { get; set; }
 
+        public IList<string> GCCodes { get; set; } 
+
         public SkuOrderedManageModel(SkuOrdered model)
         {
             if (model != null)
@@ -69,6 +72,9 @@ namespace VC.Admin.Models.Orders
                     AutoShipFrequency3 = model.Sku.DictionaryData.ContainsKey("AutoShipFrequency3") ? model.Sku.Data.AutoShipFrequency3 : false;
                     AutoShipFrequency6 = model.Sku.DictionaryData.ContainsKey("AutoShipFrequency6") ? model.Sku.Data.AutoShipFrequency6 : false;
                 }
+
+                GCCodes = model.GcsGenerated?.Select(p => p.Code).ToList() ?? new List<string>(); 
+
                 Messages = model.Messages;
             }
         }

@@ -68,11 +68,12 @@ namespace VitalChoice.Business.Workflow.Actions.GiftCertificates
                     SkuOrdered ordered;
                     if (groupedBySku.TryGetValue(sku.Sku.Id, out ordered))
                     {
+                        sku.GcsGenerated = ordered.GcsGenerated ?? new List<GiftCertificate>();
                         var numberToRemove = ordered.Quantity - sku.Quantity;
                         var numberToAdd = -numberToRemove;
                         if (numberToRemove > 0)
                         {
-                            sku.GcsGenerated.RemoveAll(sku.GcsGenerated.Take(numberToRemove));
+                            sku.GcsGenerated.RemoveAll(sku.GcsGenerated.Take(numberToRemove).ToList());
                         }
                         if (numberToAdd > 0)
                         {
