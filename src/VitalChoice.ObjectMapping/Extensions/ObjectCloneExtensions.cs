@@ -21,26 +21,26 @@ namespace VitalChoice.ObjectMapping.Extensions
             return (T) TypeConverter.Clone(obj, typeof (T), typeof (TBase));
         }
 
-        public static ICollection<T> Clone<T>(this ICollection<T> obj)
+        public static ICollection<T> Clone<T>(this ICollection<T> obj, Func<Type, bool> copySkipCondition = null)
             where T : new()
         {
-            return (ICollection<T>) TypeConverter.Clone(obj, typeof (T));
+            return (ICollection<T>) TypeConverter.Clone(obj, typeof (T), copySkipCondition);
         }
 
-        public static T Clone<T>(this T obj)
+        public static T Clone<T>(this T obj, Func<Type, bool> copySkipCondition = null)
             where T : new()
         {
-            return (T)TypeConverter.Clone(obj, typeof(T));
+            return (T) TypeConverter.Clone(obj, typeof (T), copySkipCondition);
         }
 
-        public static object Clone(this object obj, Type objectType)
+        public static object Clone(this object obj, Type objectType, Func<Type, bool> copySkipCondition = null)
         {
-            return TypeConverter.Clone(obj, objectType);
+            return TypeConverter.Clone(obj, objectType, copySkipCondition);
         }
 
-        public static IList Clone(this IEnumerable obj, Type objectType)
+        public static IList Clone(this IEnumerable obj, Type objectType, Func<Type, bool> copySkipCondition = null)
         {
-            return TypeConverter.Clone(obj, objectType);
+            return TypeConverter.Clone(obj, objectType, copySkipCondition);
         }
     }
 }

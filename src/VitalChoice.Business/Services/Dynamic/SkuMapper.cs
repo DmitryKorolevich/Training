@@ -41,7 +41,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.Order = entity.Order;
                 dynamic.IdProduct = entity.IdProduct;
                 dynamic.SkusToInventorySkus = entity.SkusToInventorySkus?.ToList();
-                if (entity.Product.Skus != null && entity.Product.Skus.Any())
+                if (entity.Product?.Skus?.Any() ?? false)
                 {
                     entity.Product = entity.Product.Clone<Product, Entity>();
                     entity.Product.Skus = null;

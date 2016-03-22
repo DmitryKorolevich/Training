@@ -57,7 +57,7 @@ namespace VitalChoice.ObjectMapping.Services
             });
         }
 
-        public static TypeCache GetTypeCacheNoCast(Type objectType)
+        public static TypeCache GetTypeCacheNoMap(Type objectType)
         {
             return GetTypeCache(objectType, true);
             //Func<object, object> getMethod = null;

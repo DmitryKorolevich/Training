@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.ChangeTracking;
 using Microsoft.Extensions.Logging;
@@ -309,23 +310,23 @@ namespace VitalChoice.Caching.Services.Cache
 
         private static object DeepCloneItem(object item, RelationInfo relations)
         {
-            var newItem = item.Clone(relations.RelationType);
-            CloneRelations(relations, newItem);
+            var newItem = item.Clone(relations.RelationType, type => !type.GetTypeInfo().IsValueType && type != typeof(string));
+            CloneRelations(relations, newItem, item);
             return newItem;
         }
 
         private static T DeepCloneItem(T item, RelationInfo relations)
         {
-            var newItem = item.Clone();
-            CloneRelations(relations, newItem);
+            var newItem = item.Clone(type => !type.GetTypeInfo().IsValueType && type != typeof(string));
+            CloneRelations(relations, newItem, item);
             return newItem;
         }
 
-        private static void CloneRelations(RelationInfo relations, object newItem)
+        private static void CloneRelations(RelationInfo relations, object newItem, object oldItem)
         {
             foreach (var relation in relations.Relations)
             {
-                var value = relation.GetRelatedObject(newItem);
+                var value = relation.GetRelatedObject(oldItem);
                 if (value != null)
                 {
                     var replacementValue = value.GetType().IsImplementGeneric(typeof (ICollection<>))

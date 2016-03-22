@@ -16,7 +16,7 @@ namespace VitalChoice.Caching.Services.Cache
         public static RelationInfo GetRelation(string name, Type relatedType, Type ownedType, LambdaExpression lambda)
         {
             var searchKey = new RelationCacheInfo(name, ownedType);
-            return new RelationInfo(name, relatedType, ownedType, Cache.GetOrAdd(searchKey, RelationInfo.CreateAccessor(ownedType, lambda)));
+            return new RelationInfo(name, relatedType, ownedType, Cache.GetOrAdd(searchKey, key => RelationInfo.CreateAccessor(ownedType, lambda)));
         }
 
         private struct RelationCacheInfo : IEquatable<RelationCacheInfo>
