@@ -32,8 +32,6 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
 
         public ICollection<SkuOrdered> Skus { get; set; }
 
-        public ICollection<GeneratedGiftCertificate> GeneratedGcs { get; set; }
-
         public DiscountDynamic Discount { get; set; }
 
         public ICollection<GiftCertificateInOrder> GiftCertificates { get; set; }

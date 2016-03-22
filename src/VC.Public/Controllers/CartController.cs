@@ -82,7 +82,6 @@ namespace VC.Public.Controllers
 				cart.Order.PromoSkus.Clear();
 				cart.Order.Skus.Clear();
 				cart.Order.Discount = null;
-				cart.Order.GeneratedGcs.Clear();
 				cart.Order.GiftCertificates.Clear();
 
 				cart.Order.IdObjectType = (int)OrderType.AutoShip;

@@ -65,7 +65,7 @@ namespace VitalChoice.Interfaces.Services.Orders
 
         Task<ICollection<GCOrderItem>> GetGCOrdersAsync(int idGC);
         
-	    Task<ICollection<GeneratedGiftCertificate>> GetGeneratedGcs(int id);
+	    Task<ICollection<SkuOrdered>> GetGeneratedGcs(int id);
 
 	    #endregion
 	}

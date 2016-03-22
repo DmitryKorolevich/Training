@@ -99,8 +99,6 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
 
         public ICollection<MessageInfo> Messages { get; set; }
 
-        public ICollection<GeneratedGiftCertificate> GeneratedGcs { get; set; }
-
         public SplitInfo SplitInfo { get; set; }
 
         public bool AllowHealthWise { get; set; }

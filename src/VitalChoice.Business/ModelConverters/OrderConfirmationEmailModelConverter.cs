@@ -79,7 +79,7 @@ namespace VitalChoice.Business.ModelConverters
                 result.Quantity = sku.Quantity;
                 result.SubTotal = sku.Quantity * sku.Amount;
 
-                result.GeneratedGCCodes = dynamic.GeneratedGcs?.Where(g => g?.Sku.Id == sku.Sku.Id).Select(p => p.Code).ToList();
+                result.GeneratedGCCodes = sku.GcsGenerated?.Select(s => s.Code).ToList();
 
                 return result;
             }) ?? Enumerable.Empty<SkuEmailItem>());
@@ -102,7 +102,7 @@ namespace VitalChoice.Business.ModelConverters
                 result.Quantity = sku.Quantity;
                 result.SubTotal = sku.Quantity * sku.Amount;
 
-                result.GeneratedGCCodes = dynamic.GeneratedGcs?.Where(g => g?.Sku.Id == sku.Sku.Id).Select(p => p.Code).ToList();
+                result.GeneratedGCCodes = sku.GcsGenerated?.Select(s => s.Code).ToList();
 
                 return result;
             }) ?? Enumerable.Empty<SkuEmailItem>());

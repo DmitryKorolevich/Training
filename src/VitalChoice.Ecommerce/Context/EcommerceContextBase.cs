@@ -911,11 +911,6 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(p => p.IdEditedBy)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
-                entity.HasMany(o => o.GiftCertificatesGenerated)
-                    .WithOne(g => g.Order)
-                    .HasForeignKey(g => g.IdOrder)
-                    .HasPrincipalKey(o => o.Id)
-                    .IsRequired(false);
                 entity.Ignore(o => o.OptionTypes);
             });
 
@@ -1013,6 +1008,10 @@ namespace VitalChoice.Ecommerce.Context
                     .WithOne()
                     .HasForeignKey(s => new { s.IdOrder, s.IdSku})
                     .HasPrincipalKey(s => new { s.IdOrder, s.IdSku });
+                entity.HasMany(s => s.GeneratedGiftCertificates)
+                    .WithOne(g => g.Sku)
+                    .HasForeignKey(g => new {g.IdOrder, g.IdSku})
+                    .HasPrincipalKey(s => new {s.IdOrder, s.IdSku});
             });
 
             builder.Entity<OrderStatusEntity>(entity =>
@@ -1542,11 +1541,6 @@ namespace VitalChoice.Ecommerce.Context
                 entity.HasKey(p => p.Id);
                 entity.ToTable("GiftCertificates");
                 entity.Property(p => p.PublicId).ValueGeneratedOnAdd();
-                entity.HasOne(p => p.Order)
-                    .WithMany(o => o.GiftCertificatesGenerated)
-                    .HasForeignKey(p => p.IdOrder)
-                    .HasPrincipalKey(p => p.Id)
-                    .IsRequired(false);
                 entity.HasOne(g => g.Sku)
                     .WithMany()
                     .HasForeignKey(g => g.IdSku)

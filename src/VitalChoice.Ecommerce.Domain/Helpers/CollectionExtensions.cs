@@ -156,14 +156,14 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             }
         }
 
-        public static void UpdateKeyed<T1, T2, TKey>(this ICollection<T1> main, IEnumerable<T2> toAdd,
+        public static void UpdateKeyed<T1, T2, TKey>(this ICollection<T1> main, IEnumerable<T2> toSearchIn,
             Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Action<T1, T2> updateAction)
         {
             if (main == null)
                 throw new ArgumentNullException(nameof(main));
-            if (toAdd != null)
+            if (toSearchIn != null)
             {
-                Dictionary<TKey, T2> searchIn = toAdd.ToDictionary(rightKeySelector);
+                Dictionary<TKey, T2> searchIn = toSearchIn.ToDictionary(rightKeySelector);
                 foreach (var m in main)
                 {
                     T2 item;
@@ -175,14 +175,14 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             }
         }
 
-        public static void UpdateKeyed<T, TKey>(this ICollection<T> main, IEnumerable<T> toAdd,
+        public static void UpdateKeyed<T, TKey>(this ICollection<T> main, IEnumerable<T> toSearchIn,
             Func<T, TKey> keySelector, Action<T, T> updateAction)
         {
             if (main == null)
                 throw new ArgumentNullException(nameof(main));
-            if (toAdd != null)
+            if (toSearchIn != null)
             { 
-                Dictionary<TKey, T> searchIn = toAdd.ToDictionary(keySelector);
+                Dictionary<TKey, T> searchIn = toSearchIn.ToDictionary(keySelector);
                 foreach (var m in main)
                 {
                     T item;

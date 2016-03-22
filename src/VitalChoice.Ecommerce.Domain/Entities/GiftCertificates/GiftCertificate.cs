@@ -9,7 +9,7 @@ namespace VitalChoice.Ecommerce.Domain.Entities.GiftCertificates
     {
         public DateTime Created { get; set; }
 
-        public Sku Sku { get; set; }
+        public OrderToSku Sku { get; set; }
 
         public int? IdSku { get; set; }
 

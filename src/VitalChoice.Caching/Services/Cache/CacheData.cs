@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.ChangeTracking;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
@@ -132,9 +133,9 @@ namespace VitalChoice.Caching.Services.Cache
             return TryRemove(key);
         }
 
-        public CachedEntity Update(object entity, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities)
+        public CachedEntity Update(object entity)
         {
-            return Update((T) entity, trackedEntities);
+            return Update((T) entity);
         }
 
         public bool ItemExist(EntityKey key)
@@ -179,14 +180,14 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        public CachedEntity<T> Update(T entity, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities)
+        public CachedEntity<T> Update(T entity)
         {
             if (entity == null)
                 return null;
             lock (_lockObj)
             {
                 var pk = _entityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
-                return _mainCluster.Update(pk, entity, e => CreateNew(pk, e, trackedEntities), (e, exist) => UpdateExist(pk, e, exist, trackedEntities));
+                return _mainCluster.Update(pk, entity, e => CreateNew(pk, e), (e, exist) => UpdateExist(pk, e, exist));
             }
         }
 
@@ -250,6 +251,7 @@ namespace VitalChoice.Caching.Services.Cache
                                         return
                                             trackedEntities.TryGetValue(
                                                 new TrackedEntityKey(pair.Key.RelationType, pkInfo.GetPrimaryKeyValue(r)), out entry) &&
+                                            entry.State != EntityState.Unchanged && entry.State != EntityState.Detached &&
                                             entry.Entity == r;
                                     }))
                         {
@@ -268,6 +270,7 @@ namespace VitalChoice.Caching.Services.Cache
                             EntityEntry entry;
                             if (trackedEntities == null ||
                                 trackedEntities.TryGetValue(new TrackedEntityKey(pair.Key.RelationType, newRelatedKey), out entry) &&
+                                entry.State != EntityState.Unchanged && entry.State != EntityState.Detached &&
                                 entry.Entity == newRelated)
                             {
                                 cached.NeedUpdateRelated.Remove(pair.Key.Name);
@@ -287,19 +290,19 @@ namespace VitalChoice.Caching.Services.Cache
                     }
                 }
             }
-            UpdateRelations(oldEntity, trackedEntities);
+            UpdateRelations(oldEntity);
             return true;
         }
 
-        public bool Update(IEnumerable<T> entities, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities)
+        public bool Update(IEnumerable<T> entities)
         {
-            return entities.Aggregate(true, (current, next) => current && Update(next, trackedEntities) != null);
+            return entities.Aggregate(true, (current, next) => current && Update(next) != null);
         }
 
-        public bool UpdateAll(IEnumerable<T> entities, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities)
+        public bool UpdateAll(IEnumerable<T> entities)
         {
             Clear();
-            var result = Update(entities, trackedEntities);
+            var result = Update(entities);
             FullCollection = true;
             NeedUpdate = false;
             return result;
@@ -335,7 +338,7 @@ namespace VitalChoice.Caching.Services.Cache
 
         #region Helper Methods
 
-        private void UpdateRelations(T newEntity, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities)
+        private void UpdateRelations(T newEntity)
         {
             if (newEntity == null)
                 return;
@@ -357,19 +360,19 @@ namespace VitalChoice.Caching.Services.Cache
                     var data = cache.GetCacheData(relation);
                     foreach (var item in obj as IEnumerable)
                     {
-                        data.Update(item, trackedEntities);
+                        data.Update(item);
                     }
                 }
                 else
                 {
                     var cache = _cacheFactory.GetCache(objType);
                     var data = cache.GetCacheData(relation);
-                    data.Update(obj, trackedEntities);
+                    data.Update(obj);
                 }
             }
         }
 
-        private CachedEntity<T> CreateNew(EntityKey pk, T entity, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities)
+        private CachedEntity<T> CreateNew(EntityKey pk, T entity)
         {
             var indexValue = _entityInfo.CacheableIndex.GetIndexValue(entity);
             var conditional =
@@ -393,7 +396,7 @@ namespace VitalChoice.Caching.Services.Cache
                     UniqueIndex = indexValue,
                     NonUniqueIndexes = nonUnique
                 };
-                UpdateRelations(entity, trackedEntities);
+                UpdateRelations(entity);
                 foreach (var conditionalIndex in conditional)
                 {
                     _conditionalIndexedDictionary[conditionalIndex.Key].Update(conditionalIndex.Value, cached);
@@ -415,7 +418,7 @@ namespace VitalChoice.Caching.Services.Cache
             return cached;
         }
 
-        private CachedEntity<T> UpdateExist(EntityKey pk, T entity, CachedEntity<T> exist, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities)
+        private CachedEntity<T> UpdateExist(EntityKey pk, T entity, CachedEntity<T> exist)
         {
             lock (exist)
             {
@@ -425,11 +428,11 @@ namespace VitalChoice.Caching.Services.Cache
 
                     if (entity != null)
                     {
-                        if (!UpdateEntityWithRelations(entity, trackedEntities, exist))
-                            return null;
-                        //TypeConverter.CopyInto(exist.Entity, entity, typeof (T));
-                        //UpdateRelations(entity);
-                        //exist.NeedUpdateRelated.Clear();
+                        //if (!UpdateEntityWithRelations(entity, trackedEntities, exist))
+                        //    return null;
+                        TypeConverter.CopyInto(exist.Entity, entity, typeof (T));
+                        UpdateRelations(entity);
+                        exist.NeedUpdateRelated.Clear();
                     }
                     else
                     {

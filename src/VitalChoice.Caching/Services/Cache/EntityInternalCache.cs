@@ -192,8 +192,7 @@ namespace VitalChoice.Caching.Services.Cache
         public bool Update(IEnumerable<T> entities, RelationInfo relationInfo, DbContext context)
         {
             var data = CacheStorage.GetCacheData(relationInfo);
-            var trackData = _infoStorage.GetTrackData(context);
-            return data.Update(entities, trackData);
+            return data.Update(entities);
         }
 
         public bool Update(T entity, RelationInfo relationInfo, DbContext context)
@@ -202,8 +201,7 @@ namespace VitalChoice.Caching.Services.Cache
                 return false;
 
             var data = CacheStorage.GetCacheData(relationInfo);
-            var trackData = _infoStorage.GetTrackData(context);
-            return data.Update(entity, trackData) != null;
+            return data.Update(entity) != null;
         }
 
         public bool Update(T entity, DbContext context)
@@ -227,22 +225,19 @@ namespace VitalChoice.Caching.Services.Cache
         public CachedEntity<T> Update(RelationInfo relations, T entity, DbContext context)
         {
             var data = CacheStorage.GetCacheData(relations);
-            var trackData = _infoStorage.GetTrackData(context);
-            return data.Update(entity, trackData);
+            return data.Update(entity);
         }
 
         public IEnumerable<CachedEntity<T>> Update(RelationInfo relations, IEnumerable<T> entities, DbContext context)
         {
             var data = CacheStorage.GetCacheData(relations);
-            var trackData = _infoStorage.GetTrackData(context);
-            return entities.Select(entity => data.Update(entity, trackData));
+            return entities.Select(entity => data.Update(entity));
         }
 
         public bool UpdateAll(IEnumerable<T> entities, RelationInfo relationInfo, DbContext context)
         {
             var data = CacheStorage.GetCacheData(relationInfo);
-            var trackData = _infoStorage.GetTrackData(context);
-            return data.UpdateAll(entities, trackData);
+            return data.UpdateAll(entities);
         }
 
         public EntityKey MarkForUpdate(T entity)

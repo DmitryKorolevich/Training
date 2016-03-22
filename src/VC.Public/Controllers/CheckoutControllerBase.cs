@@ -109,7 +109,7 @@ namespace VC.Public.Controllers
                     result.Quantity = sku.Quantity;
                     result.SubTotal = sku.Quantity * sku.Amount;
 
-                    result.GeneratedGCCodes = order.GeneratedGcs?.Where(g => g?.Sku.Id == sku.Sku.Id).Select(p => p.Code).ToList();
+                    result.GeneratedGCCodes = sku.GcsGenerated?.Select(g => g.Code).ToList();
 
                     return result;
                 }) ?? Enumerable.Empty<CartSkuModel>());
@@ -154,7 +154,7 @@ namespace VC.Public.Controllers
                 result.Quantity = sku.Quantity;
                 result.SubTotal = sku.Quantity * sku.Amount;
 
-                result.GeneratedGCCodes = order.GeneratedGcs?.Where(g => g?.Sku.Id == sku.Sku.Id).Select(p => p.Code).ToList();
+                result.GeneratedGCCodes = sku.GcsGenerated.Select(g => g.Code).ToList();
 
                 return result;
             }) ?? Enumerable.Empty<CartSkuModel>());

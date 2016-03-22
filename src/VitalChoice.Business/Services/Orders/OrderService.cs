@@ -98,6 +98,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly INotificationService _notificationService;
         private readonly IExtendedDynamicServiceAsync<OrderPaymentMethodDynamic, OrderPaymentMethod, CustomerPaymentMethodOptionType, OrderPaymentMethodOptionValue> _paymentGenericService;
         private readonly IEcommerceRepositoryAsync<GiftCertificate> _giftCertificatesRepository;
+        private readonly IEcommerceRepositoryAsync<OrderToSku> _orderToSkusRepository;
 
         public OrderService(
             IEcommerceRepositoryAsync<VOrder> vOrderRepository,
@@ -127,7 +128,7 @@ namespace VitalChoice.Business.Services.Orders
             IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
             IProductService productService,
             INotificationService notificationService,
-            ICountryService countryService, ITransactionAccessor<EcommerceContext> transactionAccessor, IEcommerceRepositoryAsync<GiftCertificate> giftCertificatesRepository, SkuMapper skuMapper)
+            ICountryService countryService, ITransactionAccessor<EcommerceContext> transactionAccessor, IEcommerceRepositoryAsync<GiftCertificate> giftCertificatesRepository, SkuMapper skuMapper, IEcommerceRepositoryAsync<OrderToSku> orderToSkusRepository)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
@@ -154,6 +155,7 @@ namespace VitalChoice.Business.Services.Orders
             _countryService = countryService;
             _giftCertificatesRepository = giftCertificatesRepository;
             _skuMapper = skuMapper;
+            _orderToSkusRepository = orderToSkusRepository;
             _addressMapper = addressMapper;
             _productService = productService;
             _notificationService = notificationService;
@@ -203,15 +205,10 @@ namespace VitalChoice.Business.Services.Orders
                     .ThenInclude(s => s.OptionValues)
                     .Include(o => o.Skus)
                     .ThenInclude(s => s.InventorySkus)
+                    .Include(o => o.Skus)
+                    .ThenInclude(s => s.GeneratedGiftCertificates)
                     .Include(p => p.OptionValues)
-                    .Include(o => o.HealthwiseOrder)
-                    .Include(o => o.GiftCertificatesGenerated)
-                    .ThenInclude(g => g.Sku)
-                    .ThenInclude(g => g.OptionValues)
-                    .Include(o => o.GiftCertificatesGenerated)
-                    .ThenInclude(g => g.Sku)
-                    .ThenInclude(s => s.Product)
-                    .ThenInclude(p => p.OptionValues);
+                    .Include(o => o.HealthwiseOrder);
         }
 
         protected override async Task AfterSelect(ICollection<Order> entities)
@@ -288,8 +285,26 @@ namespace VitalChoice.Business.Services.Orders
         {
             //We need to manually remove generated but unlinked gift certificates
             var gcRep = uow.RepositoryAsync<GiftCertificate>();
-            HashSet<int> ids = new HashSet<int>(updated.GiftCertificatesGenerated.Select(g => g.Id));
-            await gcRep.DeleteAllAsync(initial.GiftCertificatesGenerated.Where(g => !ids.Contains(g.Id)));
+            if ((model.OrderStatus == null || model.OrderStatus.Value != OrderStatus.Incomplete) &&
+                (model.POrderStatus != OrderStatus.Incomplete || model.NPOrderStatus != OrderStatus.Incomplete))
+            {
+                var toLoadUp =
+                    new HashSet<int>(updated.GiftCertificates.Where(g => g.GiftCertificate == null).Select(g => g.IdGiftCertificate));
+                var gcs = await gcRep.Query(g => toLoadUp.Contains(g.Id)).SelectAsync();
+                updated.GiftCertificates.ForEach(g =>
+                {
+                    if (g.GiftCertificate == null)
+                    {
+                        g.GiftCertificate = gcs.FirstOrDefault(db => db.Id == g.IdGiftCertificate);
+                    }
+                    if (g.GiftCertificate != null)
+                    {
+                        g.GiftCertificate.Balance =
+                            model.GiftCertificates.Where(dyn => dyn.GiftCertificate.Id == g.IdGiftCertificate)
+                                .Select(dyn => dyn.GiftCertificate.Balance).FirstOrDefault();
+                    }
+                });
+            }
         }
 
         protected override bool LogObjectFullData => true;
@@ -349,7 +364,6 @@ namespace VitalChoice.Business.Services.Orders
             order.ShippingTotal = dataContext.ShippingTotal;
             order.ProductsSubtotal = dataContext.ProductsSubtotal;
             order.PromoSkus = dataContext.PromoSkus;
-            order.GeneratedGcs = dataContext.GeneratedGcs;
             SetOrderSplitStatuses(dataContext, order);
         }
 
@@ -555,11 +569,13 @@ namespace VitalChoice.Business.Services.Orders
                         try
                         {
                             var giftCertificateRepository = uow.RepositoryAsync<GiftCertificate>();
-                            var orderToGiftCertificateRepository = uow.RepositoryAsync<OrderToGiftCertificate>();
                             List<GiftCertificate> generatedGcs = new List<GiftCertificate>();
-                            if (order.GeneratedGcs?.Count > 0)
+                            if (order.Skus.Any(s => s.GcsGenerated?.Any() ?? false))
                             {
-                                generatedGcs = await giftCertificateRepository.Query(p => p.IdOrder == order.Id && p.StatusCode != RecordStatusCode.Deleted).SelectAsync();
+                                generatedGcs =
+                                    await
+                                        giftCertificateRepository.Query(
+                                            p => p.IdOrder == order.Id && p.StatusCode != RecordStatusCode.Deleted).SelectAsync();
                                 generatedGcs.ForEach(p =>
                                 {
                                     p.StatusCode = RecordStatusCode.NotActive;
@@ -605,9 +621,12 @@ namespace VitalChoice.Business.Services.Orders
                                 order.NPOrderStatus = OrderStatus.Cancelled;
                             }
 
-                            var entity = await base.UpdateAsync(order, uow);
+                            await base.UpdateAsync(order, uow);
 
                             transaction.Commit();
+
+                            var dbEntity = await SelectEntityFirstAsync(o => o.Id == id);
+                            await LogItemChanges(new[] { await DynamicMapper.FromEntityAsync(dbEntity) });
 
                             toReturn = true;
                         }
@@ -618,11 +637,6 @@ namespace VitalChoice.Business.Services.Orders
                         }
                     }
                 }
-            }
-            if(toReturn)
-            {
-                var dbEntity = await SelectEntityFirstAsync(o => o.Id == id);
-                await LogItemChanges(new[] { await DynamicMapper.FromEntityAsync(dbEntity) });
             }
             return toReturn;
         }
@@ -1912,21 +1926,26 @@ namespace VitalChoice.Business.Services.Orders
             return toReturn;
         }
 
-        public async Task<ICollection<GeneratedGiftCertificate>> GetGeneratedGcs(int id)
+        public async Task<ICollection<SkuOrdered>> GetGeneratedGcs(int id)
         {
-            var gcs = await _giftCertificatesRepository.Query(g => g.IdOrder == id)
-                .Include(g => g.Sku)
-                .ThenInclude(s => s.OptionValues)
-                .Include(g => g.Sku)
-                .ThenInclude(s => s.Product)
-                .ThenInclude(p => p.OptionValues)
-                .SelectAsync(false);
-            return gcs.Select(g => new GeneratedGiftCertificate
+            var items =
+                await
+                    _orderToSkusRepository.Query(
+                        s => s.IdOrder == id && (s.Sku.IdObjectType == (int) ProductType.EGс || s.Sku.IdObjectType == (int) ProductType.Gc))
+                        .Include(g => g.Sku)
+                        .ThenInclude(s => s.OptionValues)
+                        .Include(g => g.Sku)
+                        .ThenInclude(s => s.Product)
+                        .ThenInclude(p => p.OptionValues)
+                        .Include(s => s.GeneratedGiftCertificates)
+                        .SelectAsync(false);
+
+            return items.Select(s => new SkuOrdered
             {
-                Sku = _skuMapper.FromEntity(g.Sku, true),
-                Code = g.Code,
-                Balance = g.Balance,
-                Id = g.Id
+                Sku = _skuMapper.FromEntity(s.Sku, true),
+                GcsGenerated = s.GeneratedGiftCertificates,
+                Quantity = s.Quantity,
+                Amount = s.Amount
             }).ToList();
         }
 
