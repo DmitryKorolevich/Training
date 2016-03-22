@@ -154,7 +154,7 @@ namespace VC.Public.Controllers
                 result.Quantity = sku.Quantity;
                 result.SubTotal = sku.Quantity * sku.Amount;
 
-                result.GeneratedGCCodes = sku.GcsGenerated.Select(g => g.Code).ToList();
+                result.GeneratedGCCodes = sku.GcsGenerated?.Select(g => g.Code).ToList();
 
                 return result;
             }) ?? Enumerable.Empty<CartSkuModel>());

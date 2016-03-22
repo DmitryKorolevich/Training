@@ -179,9 +179,13 @@
                             <td class="sku">@t.Code</td>
                             <td>
                                 <a class="cart-text-link" href="@t.ProductPageUrl">@t.DisplayName @(!string.IsNullOrWhiteSpace(t.SubTitle) ? $"{t.SubTitle} " : string.Empty)(@t.PortionsCount)</a>
-                                @foreach (var gcCode in t.GeneratedGCCodes)
+                                @if (t.GeneratedGCCodes != null)
                                 {
-                                    <br /><span class="cart-sku-code"><em>GC Code: @gcCode</em></span>
+                                    foreach (var gcCode in t.GeneratedGCCodes)
+                                    {
+                                        <br/>
+                                        <span class="cart-sku-code"><em>GC Code: @gcCode</em></span>
+                                    }
                                 }
                             </td>
                             <td class="unit-price">@((t.Price ?? 0).ToString("C2"))</td>
