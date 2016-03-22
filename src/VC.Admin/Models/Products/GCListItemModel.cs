@@ -30,6 +30,8 @@ namespace VC.Admin.Models.Products
 
         public string AgentId { get; set; }
 
+        public int? IdOrder { get; set; }
+
         public RecordStatusCode StatusCode { get; set; }
 
         public GCType GCType { get; set; }
@@ -47,6 +49,7 @@ namespace VC.Admin.Models.Products
                 Email = item.Email;
                 StatusCode = item.StatusCode;
                 GCType = item.GCType;
+                IdOrder = item.IdOrder;
                 if (!string.IsNullOrEmpty(item.FirstName) || !String.IsNullOrEmpty(item.LastName))
                 {
                     RecipientName = $"{item.FirstName} {item.LastName} ";
