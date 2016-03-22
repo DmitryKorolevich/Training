@@ -283,6 +283,7 @@ angular.module('app.modules.order.services.orderEditService', [])
                         uiSku.Amount = sku.Amount;
                         uiSku.Quantity = sku.Quantity;
                         uiSku.Messages = sku.Messages;
+                        uiSku.GCCodes = sku.GCCodes;
                         found = true;
                         return false;
                     }
