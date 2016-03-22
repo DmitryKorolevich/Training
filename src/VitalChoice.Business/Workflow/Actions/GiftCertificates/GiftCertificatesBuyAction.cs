@@ -61,6 +61,10 @@ namespace VitalChoice.Business.Workflow.Actions.GiftCertificates
                 //Merge on existing skus in old and new order instance, removed tracked automatically
                 foreach (var sku in gcsOrdered)
                 {
+                    if (sku.GcsGenerated == null)
+                    {
+                        sku.GcsGenerated = new List<GiftCertificate>();
+                    }
                     SkuOrdered ordered;
                     if (groupedBySku.TryGetValue(sku.Sku.Id, out ordered))
                     {
