@@ -77,7 +77,7 @@ namespace VC.Public.Controllers
 				cart = await _checkoutService.GetOrCreateCart(existingUid);
 			}
 
-			if (sku.Sku.Data.AutoShipProduct)
+			if (sku.Sku.SafeData.AutoShipProduct==true)
 			{
 				cart.Order.PromoSkus.Clear();
 				cart.Order.Skus.Clear();
