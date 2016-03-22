@@ -189,13 +189,13 @@ namespace VitalChoice.Caching.Services.Cache
             return TryRemove(pk);
         }
 
-        public bool Update(IEnumerable<T> entities, RelationInfo relationInfo, DbContext context)
+        public bool Update(IEnumerable<T> entities, RelationInfo relationInfo)
         {
             var data = CacheStorage.GetCacheData(relationInfo);
             return data.Update(entities);
         }
 
-        public bool Update(T entity, RelationInfo relationInfo, DbContext context)
+        public bool Update(T entity, RelationInfo relationInfo)
         {
             if (entity == null)
                 return false;
@@ -222,19 +222,19 @@ namespace VitalChoice.Caching.Services.Cache
             return result;
         }
 
-        public CachedEntity<T> Update(RelationInfo relations, T entity, DbContext context)
+        public CachedEntity<T> Update(RelationInfo relations, T entity)
         {
             var data = CacheStorage.GetCacheData(relations);
             return data.Update(entity);
         }
 
-        public IEnumerable<CachedEntity<T>> Update(RelationInfo relations, IEnumerable<T> entities, DbContext context)
+        public IEnumerable<CachedEntity<T>> Update(RelationInfo relations, IEnumerable<T> entities)
         {
             var data = CacheStorage.GetCacheData(relations);
             return entities.Select(entity => data.Update(entity));
         }
 
-        public bool UpdateAll(IEnumerable<T> entities, RelationInfo relationInfo, DbContext context)
+        public bool UpdateAll(IEnumerable<T> entities, RelationInfo relationInfo)
         {
             var data = CacheStorage.GetCacheData(relationInfo);
             return data.UpdateAll(entities);
@@ -266,24 +266,24 @@ namespace VitalChoice.Caching.Services.Cache
             return entities.Select(MarkForAdd);
         }
 
-        public CachedEntity Update(RelationInfo relations, object entity, DbContext context)
+        public CachedEntity Update(RelationInfo relations, object entity)
         {
-            return Update(relations, (T) entity, context);
+            return Update(relations, (T) entity);
         }
 
-        public IEnumerable<CachedEntity> Update(RelationInfo relations, IEnumerable<object> entity, DbContext context)
+        public IEnumerable<CachedEntity> Update(RelationInfo relations, IEnumerable<object> entity)
         {
-            return Update(relations, entity.Cast<T>(), context);
+            return Update(relations, entity.Cast<T>());
         }
 
-        public bool Update(IEnumerable<object> entities, RelationInfo relationInfo, DbContext context)
+        public bool Update(IEnumerable<object> entities, RelationInfo relationInfo)
         {
-            return Update(entities.Cast<T>(), relationInfo, context);
+            return Update(entities.Cast<T>(), relationInfo);
         }
 
-        public bool Update(object entity, RelationInfo relationInfo, DbContext context)
+        public bool Update(object entity, RelationInfo relationInfo)
         {
-            return Update((T) entity, relationInfo, context);
+            return Update((T) entity, relationInfo);
         }
 
         public bool Update(object entity, DbContext context)
@@ -303,9 +303,9 @@ namespace VitalChoice.Caching.Services.Cache
             data.SetNull(key);
         }
 
-        public bool UpdateAll(IEnumerable<object> entities, RelationInfo relationInfo, DbContext context)
+        public bool UpdateAll(IEnumerable<object> entities, RelationInfo relationInfo)
         {
-            return UpdateAll(entities.Cast<T>(), relationInfo, context);
+            return UpdateAll(entities.Cast<T>(), relationInfo);
         }
 
         public EntityKey MarkForUpdate(object entity)

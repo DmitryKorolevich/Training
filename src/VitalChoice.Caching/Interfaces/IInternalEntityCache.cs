@@ -10,14 +10,14 @@ namespace VitalChoice.Caching.Interfaces
 {
     public interface IInternalEntityCache: IEntityCollectorInfo, IDisposable
     {
-        CachedEntity Update(RelationInfo relations, object entity, DbContext context);
-        IEnumerable<CachedEntity> Update(RelationInfo relations, IEnumerable<object> entity, DbContext context);
-        bool Update(IEnumerable<object> entities, RelationInfo relationInfo, DbContext context);
-        bool Update(object entity, RelationInfo relationInfo, DbContext context);
+        CachedEntity Update(RelationInfo relations, object entity);
+        IEnumerable<CachedEntity> Update(RelationInfo relations, IEnumerable<object> entity);
+        bool Update(IEnumerable<object> entities, RelationInfo relationInfo);
+        bool Update(object entity, RelationInfo relationInfo);
         bool Update(object entity, DbContext context);
         void SetNull(IEnumerable<EntityKey> keys, RelationInfo relationInfo);
         void SetNull(EntityKey key, RelationInfo relationInfo);
-        bool UpdateAll(IEnumerable<object> entities, RelationInfo relationInfo, DbContext context);
+        bool UpdateAll(IEnumerable<object> entities, RelationInfo relationInfo);
         EntityKey MarkForUpdate(object entity);
         IEnumerable<EntityKey> MarkForUpdate(IEnumerable<object> entities);
         void MarkForUpdate(EntityKey pk);
@@ -56,12 +56,12 @@ namespace VitalChoice.Caching.Interfaces
         IEnumerable<CacheResult<T>> GetAll(RelationInfo relations);
         bool TryRemove(T entity);
         IEnumerable<CacheResult<T>> TryRemoveWithResult(T entity);
-        bool Update(IEnumerable<T> entities, RelationInfo relationInfo, DbContext context);
-        bool Update(T entity, RelationInfo relationInfo, DbContext context);
+        bool Update(IEnumerable<T> entities, RelationInfo relationInfo);
+        bool Update(T entity, RelationInfo relationInfo);
         bool Update(T entity, DbContext context);
-        CachedEntity<T> Update(RelationInfo relations, T entity, DbContext context);
-        IEnumerable<CachedEntity<T>> Update(RelationInfo relations, IEnumerable<T> entities, DbContext context);
-        bool UpdateAll(IEnumerable<T> entities, RelationInfo relationInfo, DbContext context);
+        CachedEntity<T> Update(RelationInfo relations, T entity);
+        IEnumerable<CachedEntity<T>> Update(RelationInfo relations, IEnumerable<T> entities);
+        bool UpdateAll(IEnumerable<T> entities, RelationInfo relationInfo);
         EntityKey MarkForUpdate(T entity);
         IEnumerable<EntityKey> MarkForUpdate(IEnumerable<T> entities);
         EntityKey MarkForAdd(T entity);

@@ -13,6 +13,7 @@ using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Base;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Data.Context;
+using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 
 namespace VitalChoice.Caching.Services
 {

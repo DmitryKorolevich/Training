@@ -397,6 +397,8 @@ namespace VitalChoice.Caching.Services.Cache
                     NonUniqueIndexes = nonUnique
                 };
                 UpdateRelations(entity);
+                if (indexValue != null)
+                    _indexedCluster.Update(indexValue, cached);
                 foreach (var conditionalIndex in conditional)
                 {
                     _conditionalIndexedDictionary[conditionalIndex.Key].Update(conditionalIndex.Value, cached);

@@ -153,17 +153,14 @@ namespace VitalChoice.Caching.Services.Cache
                 return false;
             }
 
-            if (queryData.Tracked)
-            {
-                entities = DeepCloneList(queryData.RelationInfo, entities);
-            }
+            entities = DeepCloneList(entities, queryData.RelationInfo);
 
             if (fullCollection)
             {
-                return _internalCache.UpdateAll(entities, queryData.RelationInfo, _context);
+                return _internalCache.UpdateAll(entities, queryData.RelationInfo);
             }
 
-            return _internalCache.Update(entities, queryData.RelationInfo, _context);
+            return _internalCache.Update(entities, queryData.RelationInfo);
         }
 
         public bool Update(QueryData<T> queryData, T entity)
@@ -186,11 +183,8 @@ namespace VitalChoice.Caching.Services.Cache
                 _internalCache.SetNull(queryData.PrimaryKeys, queryData.RelationInfo);
                 return true;
             }
-            if (queryData.Tracked)
-            {
-                entity = DeepCloneItem(queryData.RelationInfo, entity);
-            }
-            return _internalCache.Update(entity, queryData.RelationInfo, _context);
+            entity = DeepCloneItem(entity, queryData.RelationInfo);
+            return _internalCache.Update(entity, queryData.RelationInfo);
         }
 
         private bool TryConditionalIndexes(QueryData<T> queryData,
@@ -268,7 +262,7 @@ namespace VitalChoice.Caching.Services.Cache
             var orderedResult = Order(cacheIterator, queryData);
             orderedResult = queryData.Tracked
                 ? AttachNotTracked(orderedResult, queryData.RelationInfo)
-                : DeepCloneList(queryData.RelationInfo, orderedResult);
+                : DeepCloneList(orderedResult, queryData.RelationInfo);
             entity = orderedResult.FirstOrDefault();
             return CreateGetResult(cacheIterator);
         }
@@ -280,7 +274,7 @@ namespace VitalChoice.Caching.Services.Cache
             var orderedResult = Order(cacheIterator, queryData);
             orderedResult = queryData.Tracked
                 ? AttachNotTracked(orderedResult, queryData.RelationInfo)
-                : DeepCloneList(queryData.RelationInfo, orderedResult);
+                : DeepCloneList(orderedResult, queryData.RelationInfo);
             entities = orderedResult.ToList();
             return CreateGetResult(cacheIterator);
         }
@@ -303,19 +297,31 @@ namespace VitalChoice.Caching.Services.Cache
             return items.Select(item => AttachGraph(item, relationInfo)).Cast<T>();
         }
 
-        private IEnumerable<T> DeepCloneList(RelationInfo relations, IEnumerable<T> entities)
+        private static IEnumerable<T> DeepCloneList(IEnumerable<T> entities, RelationInfo relations)
         {
-            return entities.Select(item => DeepCloneItem(relations, item));
+            return entities.Select(item => DeepCloneItem(item, relations));
         }
 
-        private T DeepCloneItem(RelationInfo relations, T item)
+        private static object DeepCloneCreateList(IEnumerable<object> entities, RelationInfo relations)
+        {
+            return typeof (List<>).CreateGenericCollection(relations.RelationType, entities.Select(item => DeepCloneItem(item, relations))).CollectionObject;
+        }
+
+        private static object DeepCloneItem(object item, RelationInfo relations)
+        {
+            var newItem = item.Clone(relations.RelationType);
+            CloneRelations(relations, newItem);
+            return newItem;
+        }
+
+        private static T DeepCloneItem(T item, RelationInfo relations)
         {
             var newItem = item.Clone();
             CloneRelations(relations, newItem);
             return newItem;
         }
 
-        private void CloneRelations(RelationInfo relations, object newItem)
+        private static void CloneRelations(RelationInfo relations, object newItem)
         {
             foreach (var relation in relations.Relations)
             {
@@ -323,8 +329,8 @@ namespace VitalChoice.Caching.Services.Cache
                 if (value != null)
                 {
                     var replacementValue = value.GetType().IsImplementGeneric(typeof (ICollection<>))
-                        ? ((IEnumerable) value).Clone(relation.RelationType)
-                        : value.Clone(relation.RelationType);
+                        ? DeepCloneCreateList((IEnumerable<object>) value, relation)
+                        : DeepCloneItem(value, relation);
                     relation.SetRelatedObject(newItem, replacementValue);
                 }
             }

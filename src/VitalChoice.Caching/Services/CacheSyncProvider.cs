@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Autofac;
+using Microsoft.Data.Entity;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
@@ -49,7 +50,7 @@ namespace VitalChoice.Caching.Services
                             if (internalCache.ItemExist(pk))
                             {
                                 entity = KeyStorage.GetEntity(type, pk);
-                                internalCache.Update(entity, null);
+                                internalCache.Update(entity, (DbContext)null);
                             }
                             break;
                         case SyncType.Delete:

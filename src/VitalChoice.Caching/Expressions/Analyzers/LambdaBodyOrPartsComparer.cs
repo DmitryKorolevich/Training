@@ -11,14 +11,14 @@ namespace VitalChoice.Caching.Expressions.Analyzers
         {
             if (left == null || right == null)
                 return false;
-            return ContainsOrEqualInternal(left, right);
+            return EqualToInternal(left, right);
         }
 
         public bool ContainsOrEqual(Expression left, Expression right)
         {
             if (left == null || right == null)
                 return false;
-            return EqualToInternal(left, right);
+            return ContainsOrEqualInternal(left, right);
         }
 
         protected virtual bool EqualToInternal(Expression left, Expression right)

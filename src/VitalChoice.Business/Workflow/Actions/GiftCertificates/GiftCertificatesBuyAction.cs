@@ -49,11 +49,11 @@ namespace VitalChoice.Business.Workflow.Actions.GiftCertificates
 
         private static async Task SyncExistingWithExist(OrderDataContext context, IGcService gcService, IOrderService orderService)
         {
-            var generated = await orderService.GetGeneratedGcs(context.Order.Id);
-            if (generated.Any())
+            var ordereds = await orderService.GetGeneratedGcs(context.Order.Id);
+            if (ordereds.Any())
             {
                 var groupedBySku =
-                    generated.ToDictionary(g => g.Sku.Id);
+                    ordereds.ToDictionary(g => g.Sku.Id);
 
                 var gcsOrdered =
                     context.SkuOrdereds.Where(s => s.Sku.IdObjectType == (int) ProductType.EGс || s.Sku.IdObjectType == (int) ProductType.Gc);
@@ -69,7 +69,7 @@ namespace VitalChoice.Business.Workflow.Actions.GiftCertificates
                     if (groupedBySku.TryGetValue(sku.Sku.Id, out ordered))
                     {
                         sku.GcsGenerated = ordered.GcsGenerated ?? new List<GiftCertificate>();
-                        var numberToRemove = ordered.Quantity - sku.Quantity;
+                        var numberToRemove = sku.GcsGenerated.Count - sku.Quantity;
                         var numberToAdd = -numberToRemove;
                         if (numberToRemove > 0)
                         {

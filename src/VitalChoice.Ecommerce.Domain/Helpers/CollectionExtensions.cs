@@ -96,7 +96,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
                 return;
             }
 
-            var filtered = collection.Where(where).ToList();
+            var filtered = collection.Where(where).ToArray();
 
             foreach (var item in filtered)
             {
@@ -243,50 +243,58 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
         }
 
         public static void MergeKeyed<T1, T2, TKey>(this ICollection<T1> main, ICollection<T2> toAdd,
-            Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T2, T1> projection, Action<T1, T2> updateAction)
+            Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T2, T1> projection, Action<T1, T2> updateAction, Action<ICollection<T1>> removeAction = null)
         {
             if (main == null)
                 throw new ArgumentNullException(nameof(main));
             if (toAdd != null)
             {
                 AddUpdateKeyed(main, toAdd, leftKeySelector, rightKeySelector, projection, updateAction);
-                main.RemoveAll(main.ExceptKeyedWith(toAdd, leftKeySelector, rightKeySelector).ToArray());
+                var toRemove = main.ExceptKeyedWith(toAdd, leftKeySelector, rightKeySelector).ToArray();
+                removeAction?.Invoke(toRemove);
+                main.RemoveAll(toRemove);
             }
         }
 
         public static void MergeKeyed<T, TKey>(this ICollection<T> main, ICollection<T> toAdd,
-            Func<T, TKey> keySelector, Action<T, T> updateAction)
+            Func<T, TKey> keySelector, Action<T, T> updateAction, Action<ICollection<T>> removeAction = null)
         {
             if (main == null)
                 throw new ArgumentNullException(nameof(main));
             if (toAdd != null)
             {
                 AddUpdateKeyed(main, toAdd, keySelector, updateAction);
-                main.RemoveAll(main.ExceptKeyedWith(toAdd, keySelector).ToArray());
+                var toRemove = main.ExceptKeyedWith(toAdd, keySelector).ToArray();
+                removeAction?.Invoke(toRemove);
+                main.RemoveAll(toRemove);
             }
         }
 
         public static void MergeKeyed<T, TKey>(this ICollection<T> main, ICollection<T> toAdd,
-            Func<T, TKey> keySelector)
+            Func<T, TKey> keySelector, Action<ICollection<T>> removeAction = null)
         {
             if (main == null)
                 throw new ArgumentNullException(nameof(main));
             if (toAdd != null)
             {
                 main.AddKeyed(toAdd, keySelector);
-                main.RemoveAll(main.ExceptKeyedWith(toAdd, keySelector, keySelector).ToArray());
+                var toRemove = main.ExceptKeyedWith(toAdd, keySelector).ToArray();
+                removeAction?.Invoke(toRemove);
+                main.RemoveAll(toRemove);
             }
         }
 
         public static void MergeKeyed<T1, T2, TKey>(this ICollection<T1> main, ICollection<T2> toAdd,
-            Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T2, T1> projection)
+            Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T2, T1> projection, Action<ICollection<T1>> removeAction = null)
         {
             if (main == null)
                 throw new ArgumentNullException(nameof(main));
             if (toAdd != null)
             {
                 main.AddKeyed(toAdd, leftKeySelector, rightKeySelector, projection);
-                main.RemoveAll(main.ExceptKeyedWith(toAdd, leftKeySelector, rightKeySelector).ToArray());
+                var toRemove = main.ExceptKeyedWith(toAdd, leftKeySelector, rightKeySelector).ToArray();
+                removeAction?.Invoke(toRemove);
+                main.RemoveAll(toRemove);
             }
         }
 

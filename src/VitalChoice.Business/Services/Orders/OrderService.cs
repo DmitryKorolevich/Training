@@ -580,7 +580,7 @@ namespace VitalChoice.Business.Services.Orders
                                             p => p.IdOrder == order.Id && p.StatusCode != RecordStatusCode.Deleted).SelectAsync();
                                 generatedGcs.ForEach(p =>
                                 {
-                                    p.StatusCode = RecordStatusCode.NotActive;
+                                    p.StatusCode = RecordStatusCode.Deleted;
                                 });
                             }
 

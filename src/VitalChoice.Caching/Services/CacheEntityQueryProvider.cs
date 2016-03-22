@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -64,6 +65,7 @@ namespace VitalChoice.Caching.Services
                         results = base.Execute<TResult>(expression);
                         if (elementType != null)
                         {
+                            //results = typeof (List<>).CreateGenericCollection(elementType, (IEnumerable) results).CollectionObject;
                             cacheExecutor.UpdateList(results);
                         }
                         else
@@ -134,16 +136,17 @@ namespace VitalChoice.Caching.Services
                     case CacheGetResult.Found:
                         return (TResult) result;
                     case CacheGetResult.Update:
-                        var results = await base.ExecuteAsync<TResult>(expression, cancellationToken);
+                        var results = (object)await base.ExecuteAsync<TResult>(expression, cancellationToken);
                         if (elementType != null)
                         {
+                            //results = typeof (List<>).CreateGenericCollection(elementType, (IEnumerable) results).CollectionObject;
                             cacheExecutor.UpdateList(results);
                         }
                         else
                         {
                             cacheExecutor.Update(results);
                         }
-                        return results;
+                        return (TResult)results;
                 }
                 //}
             }

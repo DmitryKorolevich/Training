@@ -316,7 +316,8 @@ namespace VitalChoice.Business.Services.Dynamic
                     {
                         sku.Amount = ordered.Amount;
                         sku.Quantity = ordered.Quantity;
-                        sku.GeneratedGiftCertificates.MergeKeyed(ordered.GcsGenerated, g => g.Id);
+                        sku.GeneratedGiftCertificates.MergeKeyed(ordered.GcsGenerated, g => g.Id,
+                            removed => removed.ForEach(r => r.StatusCode = RecordStatusCode.Deleted));
 
                         List<SkuToInventorySku> inventories;
                         inventoryMap.TryGetValue(sku.IdSku, out inventories);
