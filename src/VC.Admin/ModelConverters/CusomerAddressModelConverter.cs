@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using VC.Admin.Models.Customer;
 using VitalChoice.DynamicData.Base;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VC.Admin.ModelConverters
@@ -10,7 +12,15 @@ namespace VC.Admin.ModelConverters
 	    public override void DynamicToModel(AddressModel model, AddressDynamic dynamic)
 	    {
 		    model.Country.Id = dynamic.IdCountry;
-	    }
+	        if (!model.PreferredShipMethod.HasValue && dynamic.IdObjectType == (int) AddressType.Shipping)
+	        {
+	            model.PreferredShipMethod=PreferredShipMethod.Best;
+	        }
+            if (!model.ShippingAddressType.HasValue && dynamic.IdObjectType == (int)AddressType.Shipping)
+            {
+                model.ShippingAddressType = ShippingAddressType.Residential;
+            }
+        }
 
 	    public override void ModelToDynamic(AddressModel model, AddressDynamic dynamic)
 	    {

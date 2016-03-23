@@ -2,6 +2,7 @@
 using VC.Admin.Validators.Customer;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Validation.Attributes;
 using VitalChoice.Validation.Models;
 
@@ -17,8 +18,8 @@ namespace VC.Admin.Models.Customer
 
         [Map]
 	    public int Id { get; set; }
-
-		[Map]
+        
+        [Map]
 	    public string Company { get; set; }
 
 		[Map]
@@ -61,6 +62,15 @@ namespace VC.Admin.Models.Customer
 
 		[Map]
 		public bool Default { get; set; }
+
+        [Map]
+        public string DeliveryInstructions { get; set; }
+
+        [Map]
+        public PreferredShipMethod? PreferredShipMethod { get; set; }
+
+        [Map]
+        public ShippingAddressType? ShippingAddressType { get; set; }
 
         public bool IsSelected { get; set; }
     }

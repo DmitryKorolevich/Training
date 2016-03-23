@@ -1,0 +1,32 @@
+﻿<div data-ng-include="'app/modules/customer/partials/address.html'"></div>
+<div class="form-group">
+    <label class="col-md-3 control-label"></label>
+    <div class="col-md-9">
+        <label class="radio-inline">
+            <input data-ng-model="model.Address.ShippingAddressType" value="1" type="radio">Residential
+        </label>
+        <label class="radio-inline">
+            <input data-ng-model="model.Address.ShippingAddressType" value="2" type="radio">Commercial
+        </label>
+    </div>
+</div>
+<div class="form-group">
+    <label for="{{::model.formName}}_model_preferred" class="col-md-3 control-label">Preferred Ship Method</label>
+    <div class="col-md-9">
+        <select name="PreferredShipMethod" class="form-control" data-ng-model="model.Address.PreferredShipMethod" id="{{::model.formName}}_model_preferred" ng-options="item.Key as item.Text for item in ReferenceData.OrderPreferredShipMethod" required autocomplete="off" data-ng-disabled="orderEditDisabled">
+        </select>
+        <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].PreferredShipMethod.$invalid">
+            <small class="error" ng-show="forms[model.formName].PreferredShipMethod.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Preferred Ship Method")}}</small>
+            <small class="error" ng-show="forms[model.formName].PreferredShipMethod.$error.server">{{serverMessages.GetMessage('PreferredShipMethod', model.collectionName, model.index, model.formName)}}</small>
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label for="{{::model.formName}}_model_delivery" class="col-md-3 control-label">Delivery Instructions (*Prints to Shipping Label):</label>
+    <div class="col-md-9">
+        <textarea type="text" name="DeliveryInstructions" id="{{::model.formName}}_model_delivery" class="form-control" placeholder="Delivery Instructions" rows="5" data-ng-model="model.Address.DeliveryInstructions" autocomplete="off" data-ng-disabled="orderEditDisabled"></textarea>
+        <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].DeliveryInstructions.$invalid">
+            <small class="error" ng-show="forms[model.formName].DeliveryInstructions.$error.server">{{serverMessages.GetMessage('DeliveryInstructions', model.collectionName, model.index, model.formName)}}</small>
+        </div>
+    </div>
+</div>

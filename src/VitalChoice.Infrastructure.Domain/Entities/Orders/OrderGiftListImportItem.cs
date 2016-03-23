@@ -35,7 +35,6 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Orders
             order.OrderStatus = OrderStatus.OnHold;
             order.Data.GiftOrder = true;
             order.Data.OrderType = (int)SourceOrderType.Phone;
-            order.Data.PreferredShipMethod = (int)PreferredShipMethod.Best;
             order.Data.OrderNotes = OrderNotes;
             order.Data.GiftMessage = GiftMessage;
             order.Data.ShipDelayType = ShipDelayDate.HasValue ? ShipDelayType.EntireOrder : ShipDelayType.None;

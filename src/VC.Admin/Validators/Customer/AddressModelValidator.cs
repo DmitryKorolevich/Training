@@ -100,6 +100,10 @@ namespace VC.Admin.Validators.Customer
                 .EmailAddress()
                 .When(x => !string.IsNullOrWhiteSpace(x.Email))
                 .WithMessage(model => model.Email, ValidationMessages.EmailFormat);
-		}
+
+            RuleFor(model => model.DeliveryInstructions)
+                .Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE)
+                .WithMessage(model => model.DeliveryInstructions, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
+        }
 	}
 }

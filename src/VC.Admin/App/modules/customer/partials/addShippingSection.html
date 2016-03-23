@@ -8,6 +8,6 @@
                 <button class="btn btn-info" id="sameAsProfile" data-ng-click="makeAsProfileAddress();">Copy Profile</button>
             </div>
         </div>
-        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildShippingAddressForPartial(currentCustomer.Shipping, 0)]"></div>
+        <div data-ng-include="'app/modules/customer/partials/shippingAddress.html'" data-ng-repeat="model in [buildShippingAddressForPartial(currentCustomer.Shipping, 0)]"></div>
     </fieldset>
 </form>

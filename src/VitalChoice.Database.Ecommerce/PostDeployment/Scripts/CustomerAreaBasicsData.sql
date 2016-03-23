@@ -514,3 +514,50 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[AddressOptionTypes] WHERE IdObjectType = 3 AND Name=N'PreferredShipMethod')
+BEGIN
+	DECLARE @IdLookup INT
+
+	INSERT INTO [dbo].[Lookups]
+	([LookupValueType], Name)
+	VALUES
+	(N'string', N'ShippingAddressTypes')
+
+	SET @IdLookup = SCOPE_IDENTITY()
+
+	INSERT INTO [dbo].[LookupVariants]
+	([Id], [IdLookup], [ValueVariant])
+	VALUES
+	(1, @IdLookup, 'Residential'),
+	(2, @IdLookup, 'Commercial')
+
+	INSERT INTO [dbo].[AddressOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'ShippingAddressType', 3, @IdLookup, 3, N'1'),
+	(N'PreferredShipMethod', 3, (SELECT Id FROM [dbo].[Lookups] WHERE Name='PreferredShipMethod'), 3, N'1'),
+	(N'DeliveryInstructions', 4, NULL, 3, NULL)
+	
+	INSERT INTO AddressOptionValues
+	(IdAddress,IdOptionType,Value)
+	SELECT Id,(SELECT TOP 1 Id FROM AddressOptionTypes WHERE Name='PreferredShipMethod'),'1' FROM Addresses
+	WHERE IdObjectType=3
+
+	INSERT INTO AddressOptionValues
+	(IdAddress,IdOptionType,Value)
+	SELECT Id,(SELECT TOP 1 Id FROM AddressOptionTypes WHERE Name='ShippingAddressType'),'1' FROM Addresses
+	WHERE IdObjectType=3
+
+	INSERT INTO OrderAddressOptionValues
+	(IdOrderAddress,IdOptionType,Value)
+	SELECT Id,(SELECT TOP 1 Id FROM AddressOptionTypes WHERE Name='PreferredShipMethod'),'1' FROM OrderAddresses
+	WHERE IdObjectType=3
+
+	INSERT INTO OrderAddressOptionValues
+	(IdOrderAddress,IdOptionType,Value)
+	SELECT Id,(SELECT TOP 1 Id FROM AddressOptionTypes WHERE Name='ShippingAddressType'),'1' FROM OrderAddresses
+	WHERE IdObjectType=3
+END
+
+GO

@@ -27,6 +27,7 @@ using VitalChoice.Business.Queries.Users;
 using VitalChoice.Business.Services.Bronto;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Transfer;
@@ -134,9 +135,16 @@ namespace VC.Admin.Controllers
             model.InceptionDate = DateTime.Now;
             model.TradeClass = 1;
             model.CustomerNotes = new List<CustomerNoteModel>();
-            model.ProfileAddress = new AddressModel();
+            model.ProfileAddress = new AddressModel() { };
             model.ProfileAddress.Country = new CountryListItemModel(_defaultCountry);
-            model.Shipping = new List<AddressModel>() { new AddressModel() { Country = new CountryListItemModel(_defaultCountry) } };
+            model.Shipping = new List<AddressModel>()
+            { new AddressModel()
+                {
+                    Country = new CountryListItemModel(_defaultCountry),
+                    PreferredShipMethod = PreferredShipMethod.Best,
+                    ShippingAddressType = ShippingAddressType.Residential,
+                }
+            };
             model.StatusCode = (int)CustomerStatus.PhoneOnly;
 
 	        var defaultPaymentMethodId = (await _paymentMethodService.GetStorefrontDefaultPaymentMethod()).Id;
@@ -213,7 +221,12 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Customers)]
         public Result<AddressModel> CreateAddressPrototype()
         {
-            return new AddressModel() { Country = new CountryListItemModel(_defaultCountry)};
+            return new AddressModel()
+            {
+                Country = new CountryListItemModel(_defaultCountry),
+                PreferredShipMethod = PreferredShipMethod.Best,
+                ShippingAddressType = ShippingAddressType.Residential,
+            };
         }
 
         [HttpPost]

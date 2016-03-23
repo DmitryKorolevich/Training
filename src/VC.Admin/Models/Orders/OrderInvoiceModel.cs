@@ -109,10 +109,7 @@ namespace VC.Admin.Models.Orders
 
         [Map]
         public decimal ShippingTotal { get; set; }
-
-        [Map]
-        public PreferredShipMethod? PreferredShipMethod { get; set; }
-
+        
         [Map]
         public decimal ProductsSubtotal { get; set; }
 

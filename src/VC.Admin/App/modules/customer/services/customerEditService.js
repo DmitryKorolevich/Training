@@ -307,6 +307,9 @@ angular.module('app.modules.customer.services.customerEditService', [])
         uiScope.makeAsProfileAddress = function ()
         {
             var defaultValue = uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].Default;
+            var shippingAddressType = uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].ShippingAddressType;
+            var preferredShipMethod = uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].PreferredShipMethod;
+            var deliveryInstructions = uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].DeliveryInstructions;
             for (var key in uiScope.currentCustomer.ProfileAddress)
             {
                 uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex][key] = uiScope.currentCustomer.ProfileAddress[key];
@@ -319,6 +322,9 @@ angular.module('app.modules.customer.services.customerEditService', [])
                 uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].Email = uiScope.currentCustomer.Email;
             }
             uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].Default = defaultValue;
+            uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].ShippingAddressType = shippingAddressType;
+            uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].PreferredShipMethod = preferredShipMethod;
+            uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].DeliveryInstructions = deliveryInstructions;
             uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].AddressType = 3;
             uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].Id = 0;
         };

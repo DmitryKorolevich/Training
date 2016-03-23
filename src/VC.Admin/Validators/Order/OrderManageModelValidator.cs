@@ -151,9 +151,6 @@ namespace VC.Admin.Validators.Order
                              RuleFor(model => model.OrderNotes)
                               .Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE)
                               .WithMessage(model => model.OrderNotes, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
-                             RuleFor(model => model.DeliveryInstructions)
-                                 .Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE)
-                                 .WithMessage(model => model.DeliveryInstructions, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
                              RuleFor(model => model.GiftMessage)
                                  .Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE)
                                  .WithMessage(model => model.GiftMessage, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);

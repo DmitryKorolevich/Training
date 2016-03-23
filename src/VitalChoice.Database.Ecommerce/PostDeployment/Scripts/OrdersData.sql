@@ -356,32 +356,16 @@ END
 
 GO
 
-IF NOT EXISTS(SELECT * FROM OrderOptionTypes WHERE Name='DeliveryInstructions' AND [IdObjectType]=5)
+IF EXISTS(SELECT [Id] FROM [dbo].[OrderOptionTypes] WHERE Name = 'DeliveryInstructions' OR Name=N'PreferredShipMethod')
 BEGIN
 
-	INSERT INTO [dbo].[OrderOptionTypes]
-	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
-	VALUES
-	(N'DeliveryInstructions', 4, NULL, 5, NULL)
+	DELETE OrderOptionValues
+	WHERE IdOptionType IN
+	(SELECT Id FROM [dbo].[OrderOptionTypes] 
+	WHERE Name = 'DeliveryInstructions' OR Name=N'PreferredShipMethod')
 
-	UPDATE Lookups
-	SET Name='ServiceCodes',
-	[Description]='Service Codes'
-	WHERE Name='ServiceCode'	
-
-END
-
-GO
-
-IF NOT EXISTS(SELECT * FROM OrderOptionTypes WHERE Name='PreferredShipMethod' AND IdObjectType=5)
-BEGIN
-
-	INSERT INTO [dbo].[OrderOptionTypes]
-	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
-	VALUES
-	(N'PreferredShipMethod', 3, (SELECT TOP 1 Id FROM Lookups WHERE Name='PreferredShipMethod'), 5, N'1'),
-	(N'KeyCode', 4, NULL, 5, NULL)
-
+	DELETE [dbo].[OrderOptionTypes] 
+	WHERE Name = 'DeliveryInstructions' OR Name=N'PreferredShipMethod'
 END
 
 GO

@@ -164,9 +164,9 @@ namespace VC.Admin.ModelConverters
                     case PaymentMethodType.Oac:
                         model.ShowVitalChoiceTaxId = true;
                         model.ShowWholesaleNormalView = true;
-                        if (model.PreferredShipMethod.HasValue)
+                        if (model.ShippingAddress.PreferredShipMethod.HasValue)
                         {
-                            model.PreferredShipMethodName = _appInfrastructureService.Get().OrderPreferredShipMethod.FirstOrDefault(p => p.Key == (int)model.PreferredShipMethod.Value)?.Text;
+                            model.PreferredShipMethodName = _appInfrastructureService.Get().OrderPreferredShipMethod.FirstOrDefault(p => p.Key == (int)model.ShippingAddress.PreferredShipMethod.Value)?.Text;
                         }
                         if (dynamic.PaymentMethod.DictionaryData.ContainsKey("Fob") && dynamic.PaymentMethod.SafeData.Fob is int)
                         {

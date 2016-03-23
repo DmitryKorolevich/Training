@@ -313,15 +313,6 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div data-ng-if="order.IdObjectType!=3" class="form-group">
-                                                        <label class="col-md-12 control-label left">Delivery Instructions (*Prints to Shipping Label):</label>
-                                                        <div class="col-md-12">
-                                                            <textarea type="text" name="DeliveryInstructions" class="form-control" placeholder="Delivery Instructions" rows="5" data-ng-model="order.DeliveryInstructions" data-ng-disabled="orderEditDisabled"></textarea>
-                                                            <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.DeliveryInstructions.$invalid">
-                                                                <small class="error" ng-show="forms.mainForm.DeliveryInstructions.$error.server">{{serverMessages.GetMessage('DeliveryInstructions')}}</small>
-                                                            </div>
-                                                        </div>
-                                                    </div>
 
                                                     <span data-ng-if="options.BrontoSubscribedStatusLoaded" class="legend">Newsletter</span>
                                                     <div data-ng-if="options.BrontoSubscribedStatusLoaded" class="form-group">
@@ -407,18 +398,6 @@
                                                         <label for="type" class="col-md-7 control-label">Total Shipping</label>
                                                         <div class="col-md-5 form-control-static">
                                                             <span>{{order.TotalShipping | currency}}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div data-ng-if="order.IdObjectType!=3" class="form-group">
-                                                        <label for="type" class="col-md-7 control-label">Preferred Ship Method</label>
-                                                        <div class="col-md-5">
-                                                            <select class="form-control" name="PreferredShipMethod" data-ng-model="order.PreferredShipMethod" ng-options="item.Key as item.Text for item in orderPreferredShipMethod" required data-ng-disabled="orderEditDisabled">
-                                                                <option value="" selected hidden />
-                                                            </select>
-                                                            <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.PreferredShipMethod.$invalid">
-                                                                <small class="error" ng-show="forms.mainForm2.PreferredShipMethod.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","PreferredShipMethod")}}</small>
-                                                                <small class="error" ng-show="forms.mainForm2.PreferredShipMethod.$error.server">{{serverMessages.GetMessage('PreferredShipMethod')}}</small>
-                                                            </div>
                                                         </div>
                                                     </div>
 

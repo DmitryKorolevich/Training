@@ -1168,7 +1168,6 @@ namespace VitalChoice.Business.Services.Orders
             }
             toReturn.OrderStatus = status;
             toReturn.DateCreated = DateTime.Now;
-            toReturn.Data.PreferredShipMethod = (int)PreferredShipMethod.Best;
             toReturn.Data.ShipDelayType = (int)ShipDelayType.None;
 
             return toReturn;

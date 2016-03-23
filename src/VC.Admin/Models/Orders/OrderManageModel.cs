@@ -248,10 +248,7 @@ namespace VC.Admin.Models.Orders
 
         [Map]
         public string GiftMessage { get; set; }
-
-        [Map]
-        public string DeliveryInstructions { get; set; }
-
+        
         [Map]
         public decimal AlaskaHawaiiSurcharge { get; set; }
 
@@ -275,10 +272,7 @@ namespace VC.Admin.Models.Orders
 
         [Map]
         public decimal ShippingTotal { get; set; }
-
-        [Map]
-        public PreferredShipMethod? PreferredShipMethod { get; set; }
-
+        
         [Map]
         public decimal ProductsSubtotal { get; set; }
 
