@@ -66,7 +66,7 @@ namespace VitalChoice.Core.GlobalFilters
             {
                 var modelAsString = model as string;
 
-                if (model != null)
+                if (modelAsString != null)
                 {
                     var metadata = bindingContext.ModelMetadata as DefaultModelMetadata;
                     var preventFilteringXSS = metadata?.Attributes.PropertyAttributes?.Any(x => x is AllowXSSAttribute) ?? false;
@@ -74,7 +74,7 @@ namespace VitalChoice.Core.GlobalFilters
                     
                     if (!preventFilteringXSS)
                     {
-                        var containForbidden = modelAsString != null && ForbiddenStrings.Any(x => modelAsString.Contains(x));
+                        var containForbidden = ForbiddenStrings.Any(x => modelAsString.Contains(x));
 
                         if (containForbidden)
                         {
