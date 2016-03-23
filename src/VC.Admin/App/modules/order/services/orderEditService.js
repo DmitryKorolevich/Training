@@ -941,7 +941,16 @@ angular.module('app.modules.order.services.orderEditService', [])
         }
     };
 
-    var baseReferencedDataInitExistOrder = function(uiScope){
+    var baseReferencedDataInitExistOrder = function (uiScope)
+    {
+        if (uiScope.order.SkuOrdereds)
+        {
+            $.each(uiScope.order.SkuOrdereds, function (index, item)
+            {
+                item.RequestedCode = item.Code;
+            });
+        }
+
         uiScope.paymentInfoTab.PaymentMethodType = uiScope.order.IdPaymentMethodType;
 
         uiScope.$watch('paymentInfoTab.CreditCardIndex', function (newValue, oldValue)

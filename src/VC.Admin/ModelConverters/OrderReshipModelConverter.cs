@@ -16,6 +16,7 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Services.Orders;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Interfaces.Services.Orders;
 
 namespace VC.Admin.ModelConverters
@@ -37,6 +38,15 @@ namespace VC.Admin.ModelConverters
                 Code = p.Code,
                 Used = true,
             }).ToList();
+
+            model.ReshipProblemSkus?.AddRange(
+                dynamic.Skus.Where(p => model.ReshipProblemSkus!=null && !model.ReshipProblemSkus.Select(pp => pp.IdSku).Contains(p.Sku.Id))
+                    .Select(p => new ReshipProblemSkuModel()
+                    {
+                        IdSku = p.Sku.Id,
+                        Code = p.Sku.Code,
+                        Used = false,
+                    }).ToArray());
 
             if (dynamic.IdOrderSource.HasValue)
             {

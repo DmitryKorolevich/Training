@@ -26,7 +26,7 @@
         <div class="container-fluid">
             <div class="row">
                 <span class="legend top">
-                    <span data-ng-if="legend.IdOrderSource" class="item">Reship: Order ID: <strong>{{legend.IdOrderSource}}</strong></span>
+                    <span data-ng-if="legend.IdOrderSource" class="item">Associated Order ID: <strong>{{legend.IdOrderSource}}</strong></span>
                     <span data-ng-if="legend.OrderSourceDateCreated" class="item">Order Date: <strong>{{::legend.OrderSourceDateCreated | date:"MM/dd/yy"}} {{::legend.OrderSourceDateCreated | date:"h:mm a"}}</strong></span>
                     <span data-ng-if="legend.OrderSourceTotal" class="item">Total Order Amount: <strong>{{legend.OrderSourceTotal | currency}}</strong></span>
                     <br />
@@ -59,11 +59,11 @@
                                                         <label for="type" class="col-md-3 control-label">Problem SKUs</label>
                                                         <div class="col-md-9">
                                                             <label class="checkbox-inline margin-left-zero margin-right-25px">
-                                                                <input type="checkbox" data-ng-click="toggleAllReshipProblemSkus()" data-ng-model="options.AllReshipProblemSkus" autocomplete="off" data-ng-disabled="order.Id || orderEditDisabled">
+                                                                <input type="checkbox" data-ng-click="toggleAllReshipProblemSkus()" data-ng-model="options.AllReshipProblemSkus" autocomplete="off" data-ng-disabled="orderEditDisabled">
                                                                 All
                                                             </label>
                                                             <label class="checkbox-inline margin-left-zero margin-right-25px" data-ng-repeat="item in order.ReshipProblemSkus">
-                                                                <input type="checkbox" data-ng-click="toggleReshipProblemSku(item)" data-ng-model="item.Used" autocomplete="off" data-ng-disabled="order.Id || orderEditDisabled">
+                                                                <input type="checkbox" data-ng-click="toggleReshipProblemSku(item)" data-ng-model="item.Used" autocomplete="off" data-ng-disabled="orderEditDisabled">
                                                                 {{item.Code}}
                                                             </label>
                                                         </div>
@@ -71,7 +71,7 @@
                                                     <div class="form-group">
                                                         <label for="type" class="col-md-3 control-label">Service Code</label>
                                                         <div class="col-md-9">
-                                                            <select data-ng-disabled="order.Id || orderEditDisabled" class="form-control" name="ServiceCode" data-ng-model="order.ServiceCode" ng-options="item.Key as item.Text for item in ReferenceData.ServiceCodes" required>
+                                                            <select data-ng-disabled="orderEditDisabled" class="form-control" name="ServiceCode" data-ng-model="order.ServiceCode" ng-options="item.Key as item.Text for item in ReferenceData.ServiceCodes" required>
                                                             </select>
                                                             <div class="error-container" ng-show="forms.topForm.submitted && forms.topForm.ServiceCode.$invalid">
                                                                 <small class="error" ng-show="forms.topForm.ServiceCode.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Service Code")}}</small>
@@ -84,7 +84,7 @@
                                                         <div class="col-md-9">
                                                             <div class="checkbox">
                                                                 <label>
-                                                                    <input type="checkbox" data-ng-disabled="order.Id || orderEditDisabled" data-ng-model="order.ReturnAssociated">
+                                                                    <input type="checkbox" data-ng-disabled="orderEditDisabled" data-ng-model="order.ReturnAssociated">
                                                                     <strong>Is there a product return associated with this Customer Service call?</strong>
                                                                 </label>
                                                             </div>
@@ -131,6 +131,9 @@
                                                                 <input type="text" name="ProductName{{$index}}" class="form-control" placeholder="Product Name" data-ng-model="item.ProductName"
                                                                        typeahead-min-length="1" typeahead="sku.DescriptionName as sku.DescriptionName for sku in getSKUsByProductName($viewValue)" typeahead-loading="loadingSKUsByProductNane"
                                                                        typeahead-on-select="productNameChanged($index)" typeahead-wait-ms="100" data-ng-disabled="orderEditDisabled">
+                                                            </div>
+                                                            <div data-ng-if="item.GCCodes" class="input-group">
+                                                                <span data-ng-repeat="gc in item.GCCodes"><em>GC Code: {{gc}}</em><br /></span>
                                                             </div>
                                                         </td>
                                                         <td class="price">
