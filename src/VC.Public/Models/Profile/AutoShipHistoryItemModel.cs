@@ -9,7 +9,6 @@ namespace VC.Public.Models.Profile
 	    public AutoShipHistoryItemModel()
 	    {
 			ShippingDetails = new List<KeyValuePair<string, string>>();
-			BillingDetails = new List<KeyValuePair<string, string>>();
 			PaymentMethodDetails = new List<KeyValuePair<string, string>>();
 		}
 
@@ -38,8 +37,6 @@ namespace VC.Public.Models.Profile
         public DateTime NextDate { get; set; }
 
         public IList<KeyValuePair<string,string>> ShippingDetails { get; set; }
-
-		public IList<KeyValuePair<string, string>> BillingDetails { get; set; }
 
 		public IList<KeyValuePair<string, string>> PaymentMethodDetails { get; set; }
 

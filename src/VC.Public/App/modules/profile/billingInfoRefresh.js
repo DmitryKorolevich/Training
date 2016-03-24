@@ -9,7 +9,7 @@
 function changeSelection(selId) {
 	var orderId = 0;
 	var paymentId = 0;
-	if ($("#OrderId").val() == selId) {
+	if ($("#orderId").val() == selId) {
 		orderId = selId;
 	} else {
 		paymentId = selId;

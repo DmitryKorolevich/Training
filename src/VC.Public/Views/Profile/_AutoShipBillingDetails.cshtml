@@ -5,8 +5,7 @@
 <div id="autoShipDialog" title="Edit Billing Details" class="margin-top-small">
 	<form asp-controller="Profile" asp-action="AutoShipBillingDetails" data-ajax-success="submitSuccess" data-ajax-failure="submitError" data-ajax="true" data-method="post" data-ajax-mode="replace" data-ajax-update="#dynamicArea" class="form-regular medium-small">
 		@Html.AntiForgeryToken()
-		@Html.ValidationSummary(true, "")
-		@Html.Hidden("OrderId", (object)ViewBag.OrderId)
+		@Html.Hidden("orderId", (object)ViewBag.OrderId)
 		@if (ViewBag.CreditCards != null && ViewBag.CreditCards.Count > 1)
 		{
 		<div class="form-group">

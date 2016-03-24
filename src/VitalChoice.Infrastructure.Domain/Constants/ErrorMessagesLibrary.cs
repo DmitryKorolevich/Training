@@ -58,6 +58,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             public const string CantAddProductToCart = "CantAddProductToCart";
             public const string CartContainsAutoShip = "CartContainsAutoShip";
 		    public const string AutoShipNotAvailable = "AutoShipNotAvailable";
+		    public const string AccessDenied = "AccessDenied";
 		}
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
@@ -113,7 +114,8 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             {Keys.AnyAutoShipOption,  "One of available auto-ship options has to be selected"},
             {Keys.CantAddProductToCart,  "Product can't be added to cart"},
             {Keys.CartContainsAutoShip,  "Your cart contains Auto-Ship product. Please either complete your Auto-Ship order or remove Auto-Ship product from cart before add new product"},
-            {Keys.AutoShipNotAvailable,  "Requested Auto-Ship either not available or not found"}
+            {Keys.AutoShipNotAvailable,  "Requested Auto-Ship either not available or not found"},
+            {Keys.AccessDenied,  "Access denied"}
         };
     }
 }

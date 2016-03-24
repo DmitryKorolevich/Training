@@ -85,21 +85,6 @@
 									</div>
 								}
 							}
-							<div class="review-box-line">
-							</div>
-							@foreach (var line in item.BillingDetails)
-							{
-								if (!string.IsNullOrEmpty(line.Value))
-								{
-									<div class="review-box-line">
-										@if (!string.IsNullOrWhiteSpace(line.Key))
-										{
-											<span class="review-info-label">@line.Key:</span>
-										}
-										<span class="review-info-value">@line.Value</span>
-									</div>
-								}
-							}
 						</div>
 						<input class="autoship-delivery-action edit-billing" data-autoship-billing="@item.Id" type="button" value="Edit"/>
 					</td>

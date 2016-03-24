@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Authorization;
@@ -135,7 +136,6 @@ namespace VC.Public.Controllers
 					_orderMapper.UpdateModel(result, p);
 
 					var paymentMethod = p.PaymentMethod;
-					result.BillingDetails = paymentMethod.Address.PopulateBillingAddressDetails(countries, customer.Email);
 					result.PaymentMethodDetails = paymentMethod.PopulateCreditCardDetails(infr);
 
 					var shippingAddress = p.ShippingAddress;
@@ -724,14 +724,18 @@ namespace VC.Public.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> AutoShipBillingDetails(BillingInfoModel model, int OrderId)
+		public async Task<IActionResult> AutoShipBillingDetails(BillingInfoModel model, int orderId)
 		{
 			if (!ModelState.IsValid)
 			{
 				return PartialView("_BillingDetailsInner", model);
 			}
 
-			var order = await _orderService.SelectAsync(OrderId);
+			var order = await _orderService.SelectWithCustomerAsync(orderId);
+			if (order.Customer.Id != GetInternalCustomerId())
+			{
+				throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AccessDenied], HttpStatusCode.Forbidden);
+			}
 
 			var addressId = order.PaymentMethod.Address.Id;
 			await _orderPaymentMethodConverter.UpdateObjectAsync(model, order.PaymentMethod,

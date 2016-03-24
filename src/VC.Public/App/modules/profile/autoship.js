@@ -94,6 +94,14 @@ function refreshGrid() {
 		dataType: "html"
 	}).success(function (result) {
 		$("#gridcontainer").html(result);
+
+		$('.tooltip-v').each(function () {
+			var title = $(this).data("tooltip-title");
+			var body = $(this).data("tooltip-body");
+			settingsVertical.content = getBaseHtml(title, body);
+			$(this).tooltipster(settingsVertical);
+		});
+
 		$(".overlay").hide();
 	}).error(function (result) {
 		notifyError();
@@ -116,7 +124,7 @@ function billingDetailsDialog(s) {
 			open: function () {
 				refreshCountries();
 				populateCardTypes();
-				$("#ddCreditCardsSelection").val($("#OrderId").val());
+				$("#ddCreditCardsSelection").val($("#orderId").val());
 			},
 			buttons: [
                 {
