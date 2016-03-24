@@ -12,6 +12,7 @@ angular.module('app.modules.order', [
 	'app.modules.order.controllers.ordersRegionStatisticDetailController',
 	'app.modules.order.controllers.sendOrderConfirmationController',
 	'app.modules.order.controllers.sendOrderShippingConfirmationController',
+	'app.modules.order.controllers.serviceCodesReportController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -62,6 +63,11 @@ angular.module('app.modules.order', [
 		            url: '/report/regional-sales-details?{from:string}{to:string}{idcustomertype:int}{idordertype:int}{region:string}{zip:string}',
 		            templateUrl: 'app/modules/order/partials/ordersRegionStatisticDetail.html',
 		            controller: 'ordersRegionStatisticDetailController'
-		        });
+		        })
+				.state('index.oneCol.serviceCodesStatistic', {
+				    url: '/report/service-codes',
+				    templateUrl: 'app/modules/order/partials/serviceCodesReport.html',
+				    controller: 'serviceCodesReportController'
+				});
 		}
 ]);

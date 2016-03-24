@@ -162,7 +162,62 @@ namespace VitalChoice.Business.Services.Orders
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
 
-        protected override IQueryLite<Order> BuildQuery(IQueryLite<Order> query)
+		private async Task<Order> FindAutoShipToChangeStatusAsync(int customerId, int autoShipId)
+		{
+			var orderQuery = new OrderQuery().WithCustomerId(customerId).WithId(autoShipId).NotDeleted().WithOrderType(OrderType.AutoShip);
+
+			var autoShip = await _orderRepository.Query(orderQuery).SelectFirstOrDefaultAsync();
+			if (autoShip == null)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AutoShipNotAvailable]);
+			}
+
+			return autoShip;
+		}
+
+		private Func<IQueryable<Order>, IOrderedQueryable<Order>> PerformOrderSorting(FilterBase filter)
+		{
+			Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable;
+
+			var sortOrder = filter.Sorting.SortOrder;
+			switch (filter.Sorting.Path)
+			{
+				case OrderSortPath.OrderDate:
+					if (sortOrder == SortOrder.Desc)
+					{
+						sortable = x => x.OrderByDescending(y => y.DateCreated);
+					}
+					else
+					{
+						sortable = x => x.OrderBy(y => y.DateCreated);
+					}
+					break;
+				case OrderSortPath.DateEdited:
+					if (sortOrder == SortOrder.Desc)
+					{
+						sortable = x => x.OrderByDescending(y => y.DateEdited);
+					}
+					else
+					{
+						sortable = x => x.OrderBy(y => y.DateEdited);
+					}
+					break;
+				default:
+					if (sortOrder == SortOrder.Desc)
+					{
+						sortable = x => x.OrderByDescending(y => y.Id);
+					}
+					else
+					{
+						sortable = x => x.OrderBy(y => y.Id);
+					}
+					break;
+			}
+
+			return sortable;
+		}
+
+		protected override IQueryLite<Order> BuildQuery(IQueryLite<Order> query)
         {
             return
                 query.Include(o => o.Discount)
@@ -514,36 +569,11 @@ namespace VitalChoice.Business.Services.Orders
             return order?.IdCustomer;
         }
 
-        public async Task<PagedList<Order>> GetShortOrdersAsync(ShortOrderFilter filter)
+	    public async Task<PagedList<Order>> GetShortOrdersAsync(OrderFilter filter)
         {
-            Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable;
+            Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable = PerformOrderSorting(filter);
 
-            var sortOrder = filter.Sorting.SortOrder;
-            switch (filter.Sorting.Path)
-            {
-                case OrderSortPath.OrderDate:
-                    if (sortOrder == SortOrder.Desc)
-                    {
-                        sortable = x => x.OrderByDescending(y => y.DateCreated);
-                    }
-                    else
-                    {
-                        sortable = x => x.OrderBy(y => y.DateCreated);
-                    }
-                    break;
-                default:
-                    if (sortOrder == SortOrder.Desc)
-                    {
-                        sortable = x => x.OrderByDescending(y => y.Id);
-                    }
-                    else
-                    {
-                        sortable = x => x.OrderBy(y => y.Id);
-                    }
-                    break;
-            }
-
-            var orderQuery = new OrderQuery().WithCustomerId(filter.IdCustomer).FilterById(filter.Id).NotDeleted();
+			var orderQuery = new OrderQuery().WithCustomerId(filter.IdCustomer).FilterById(filter.Id).NotDeleted().WithOrderType(filter.OrderType);
 
             var query =
                 this.ObjectRepository.Query(orderQuery)
@@ -551,7 +581,38 @@ namespace VitalChoice.Business.Services.Orders
             return await query.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
         }
 
-        public async Task<bool> CancelOrderAsync(int id)
+	    public async Task<PagedList<OrderDynamic>> GetFullOrdersAsync(OrderFilter filter)
+	    {
+			var orderQuery = new OrderQuery().WithCustomerId(filter.IdCustomer).FilterById(filter.Id).NotDeleted().WithOrderType(filter.OrderType);
+
+		    var orders =
+			    await
+				    SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, orderQuery, null, PerformOrderSorting(filter), true);
+
+		    return orders;
+	    }
+
+	    public async Task ActivatePauseAutoShipAsync(int customerId, int autoShipId)
+	    {
+		    var autoShip = await FindAutoShipToChangeStatusAsync(customerId, autoShipId);
+
+			autoShip.StatusCode = autoShip.StatusCode == (int) RecordStatusCode.Active
+			    ? (int) RecordStatusCode.NotActive
+			    : (int) RecordStatusCode.Active;
+
+		    await _orderRepository.UpdateAsync(autoShip);
+	    }
+
+		public async Task DeleteAutoShipAsync(int customerId, int autoShipId)
+	    {
+			var autoShip = await FindAutoShipToChangeStatusAsync(customerId, autoShipId);
+
+			autoShip.StatusCode = (int)RecordStatusCode.Deleted;
+
+			await _orderRepository.UpdateAsync(autoShip);
+		}
+
+	    public async Task<bool> CancelOrderAsync(int id)
         {
             var toReturn = false;
             var order = await SelectAsync(id, false);
@@ -608,11 +669,11 @@ namespace VitalChoice.Business.Services.Orders
 
                             await uow.SaveChangesAsync();
                             giftCertificateRepository.DetachAll(generatedGcs);
-                            giftCertificateRepository.DetachAll(usedGcs);                            
+                            giftCertificateRepository.DetachAll(usedGcs);
 
                             if (order.OrderStatus.HasValue)
                             {
-                                order.OrderStatus=OrderStatus.Cancelled;
+                                order.OrderStatus = OrderStatus.Cancelled;
                             }
                             if (order.POrderStatus.HasValue)
                             {
@@ -1933,7 +1994,7 @@ namespace VitalChoice.Business.Services.Orders
             var items =
                 await
                     _orderToSkusRepository.Query(
-                        s => s.IdOrder == id && (s.Sku.IdObjectType == (int) ProductType.EGс || s.Sku.IdObjectType == (int) ProductType.Gc))
+                        s => s.IdOrder == id && (s.Sku.IdObjectType == (int)ProductType.EGс || s.Sku.IdObjectType == (int)ProductType.Gc))
                         .Include(g => g.Sku)
                         .ThenInclude(s => s.OptionValues)
                         .Include(g => g.Sku)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
@@ -90,6 +91,16 @@ namespace VitalChoice.Business.Queries.Orders
             if (idObjectType.HasValue)
             {
                 Add(x => x.IdObjectType == (int)idObjectType.Value);
+            }
+            return this;
+        }
+
+        public OrderQuery WithOrderTypes(ICollection<OrderType> idObjectTypes)
+        {
+            if (idObjectTypes!=null && idObjectTypes.Count>0)
+            {
+                var ids = idObjectTypes.Select(p => (int) p).ToArray();
+                Add(x => ids.Contains(x.IdObjectType));
             }
             return this;
         }

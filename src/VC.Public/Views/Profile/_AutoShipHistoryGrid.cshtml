@@ -1,0 +1,123 @@
+﻿@using System.Threading.Tasks
+@using VitalChoice.Interfaces.Services
+@model  VitalChoice.Ecommerce.Domain.Transfer.PagedListEx<VC.Public.Models.Profile.AutoShipHistoryItemModel>
+
+<table class="standard-table cart-items-list reivew-order-info autoship-history-grid">
+	<thead>
+		<tr>
+			<th colspan="2">
+				Item
+			</th>
+			<th>
+				Delivery Details
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		@if (Model.Items.Any())
+		{
+			foreach (var item in Model.Items)
+			{
+				<tr>
+					<td class="cart-image-link">
+						<a href="@item.ProductUrl" title="@item.DisplayName">
+							<img src="@item.IconUrl" alt="@item.Name">
+						</a>
+					</td>
+					<td class="cart-line-info">
+						<a href="@item.ProductUrl" title="@item.DisplayName" class="cart-text-link">@item.DisplayName</a>
+						<span class="cart-sku-code">(@item.Code)</span>
+						<ul>
+							<li>Frequency: <b>@item.Frequency Months</b></li>
+							<li>Active: <b>@(item.Active ? "Yes" : "No")</b></li>
+							<li>Next Shipment Date: <b>@item.NextDate.ToString("MM/dd/yyyy")</b></li>
+						</ul>
+						<div class="autoship-actions-container">
+							@if (item.Active)
+							{
+								<input type="button" class="yellow pause" data-autoship-id="@item.Id" value="Pause" />
+							}
+							else
+							{
+								<input type="button" class="yellow activate" data-autoship-id="@item.Id" value="Start" />
+							}
+							<input type="button" class="red delete" data-autoship-id="@item.Id" value="Delete"/>
+						</div>
+					</td>
+					<td>
+						<div class="autoship-delivery-label">
+							<span>Frequency</span>
+							<i class="tooltip-v glyphicon glyphicon-question-sign" data-tooltip-title="Edit Delivery Schedule" data-tooltip-body="To change the frequencey of an auto-ship, you must cancel / delete the auto-ship from the system and add a new auto-ship with the desired frequency."></i>
+						</div>
+						<div class="autoship-delivery-data">
+							<div class="review-box-line">
+								<span class="review-info-value">@item.Frequency Months</span>
+							</div>
+						</div>
+						<div class="autoship-delivery-label"><span>Shipping Details</span></div>
+						<div class="autoship-delivery-data">
+							@foreach (var line in item.ShippingDetails)
+							{
+								if (!string.IsNullOrEmpty(line.Value))
+								{
+									<div class="review-box-line">
+										@if (!string.IsNullOrWhiteSpace(line.Key))
+										{
+											<span class="review-info-label">@line.Key:</span>
+										}
+										<span class="review-info-value">@line.Value</span>
+									</div>
+								}
+							}
+						</div>
+						<div class="autoship-delivery-label"><span>Billing Details</span></div>
+						<div class="autoship-delivery-data">
+							@foreach (var line in item.PaymentMethodDetails)
+							{
+								if (!string.IsNullOrEmpty(line.Value))
+								{
+									<div class="review-box-line">
+										@if (!string.IsNullOrWhiteSpace(line.Key))
+										{
+											<span class="review-info-label">@line.Key:</span>
+										}
+										<span class="review-info-value">@line.Value</span>
+									</div>
+								}
+							}
+							<div class="review-box-line">
+							</div>
+							@foreach (var line in item.BillingDetails)
+							{
+								if (!string.IsNullOrEmpty(line.Value))
+								{
+									<div class="review-box-line">
+										@if (!string.IsNullOrWhiteSpace(line.Key))
+										{
+											<span class="review-info-label">@line.Key:</span>
+										}
+										<span class="review-info-value">@line.Value</span>
+									</div>
+								}
+							}
+						</div>
+						<input class="autoship-delivery-action edit-billing" data-autoship-billing="@item.Id" type="button" value="Edit"/>
+					</td>
+				</tr>
+			}
+		}
+		else
+		{
+			<tr><td colspan="6">No Auto-Ships Found</td></tr>
+		}
+	</tbody>
+</table>
+<div>
+	<cs-pager cs-paging-pagenumber="@Model.Index"
+			  cs-paging-pagesize="@BaseAppConstants.DEFAULT_LIST_TAKE_COUNT"
+			  cs-paging-totalitems="@Model.Count"
+			  cs-pagenumber-param="Paging.PageIndex"
+			  cs-ajax-target="#gridcontainer"
+			  asp-controller="Profile"
+			  asp-action="RefreshAutoShipHistory"></cs-pager>
+</div>

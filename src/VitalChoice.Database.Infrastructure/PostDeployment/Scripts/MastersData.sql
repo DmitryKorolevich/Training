@@ -2026,7 +2026,7 @@ END
 
 GO
 
-IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like N'@if(@model.Skus.First().AutoShip) {{' AND [Name] = 'Product page')
+IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like N'%@if(@model.Skus.First().AutoShip) {{%' AND [Name] = 'Product page')
 BEGIN
 	UPDATE [dbo].[MasterContentItems]
 	SET [Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage}}

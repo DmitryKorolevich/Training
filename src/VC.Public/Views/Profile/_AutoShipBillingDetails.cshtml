@@ -1,0 +1,27 @@
+﻿@using System.Threading.Tasks
+@using Microsoft.AspNet.Mvc.Rendering
+@model VC.Public.Models.Profile.BillingInfoModel
+
+<div id="autoShipDialog" title="Edit Billing Details" class="margin-top-small">
+	<form asp-controller="Profile" asp-action="AutoShipBillingDetails" data-ajax-success="submitSuccess" data-ajax-failure="submitError" data-ajax="true" data-method="post" data-ajax-mode="replace" data-ajax-update="#dynamicArea" class="form-regular medium-small">
+		@Html.AntiForgeryToken()
+		@Html.ValidationSummary(true, "")
+		@Html.Hidden("OrderId", (object)ViewBag.OrderId)
+		@if (ViewBag.CreditCards != null && ViewBag.CreditCards.Count > 1)
+		{
+		<div class="form-group">
+			@Html.Label("SavedCards", "Saved Cards", new { @class = "control-label" })
+			<div class="input-group">
+				@Html.DropDownListFor(x => x.Id, new SelectList(ViewBag.CreditCards, "Key", "Value"), new { id = "ddCreditCardsSelection", @class = "form-control" })
+			</div>
+		</div>
+		<div class="form-group">
+			<hr />
+		</div>
+		}
+
+		<div id="dynamicArea">
+			@await Html.PartialAsync("_BillingDetailsInner", Model, ViewData)
+		</div>
+	</form>
+</div>

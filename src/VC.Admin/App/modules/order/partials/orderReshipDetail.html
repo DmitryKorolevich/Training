@@ -122,6 +122,8 @@
                                                         <td class="type">
                                                             <span data-ng-if="item.IdProductType==2" class="perishable">P</span>
                                                             <span data-ng-if="item.IdProductType==1" class="not-perishable">NP</span>
+                                                            <span data-ng-if="item.IdProductType==3" class="perishable">eGC</span>
+                                                            <span data-ng-if="item.IdProductType==4" class="perishable">GC</span>
                                                         </td>
                                                         <td class="qty">
                                                             <input name="QTY{{$index}}" class="form-control" placeholder="QTY" numbers-only numbers-only-deny-zero min="1" max="1000" data-ng-model="item.QTY" data-ng-blur="requestRecalculate()" data-ng-disabled="orderEditDisabled">
@@ -268,7 +270,7 @@
                                                         <label for="date" class="col-md-6 control-label">Non-Perishable Ship Date</label>
                                                         <div class="col-md-6">
                                                             <p class="input-group">
-                                                                <input type="text" name="ShipDelayDateNP" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateNP" is-open="shipDelayDateNPOpened" data-ng-disabled="orderEditDisabled" />
+                                                                <input type="text" name="ShipDelayDateNP" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateNP" is-open="shipDelayDateNPOpened" data-ng-disabled="orderEditDisabled"/>
                                                                 <span class="input-group-btn">
                                                                     <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDateNPOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                                 </span>
@@ -281,6 +283,12 @@
                                                     </div>
 
                                                     <span class="legend">Notes</span>
+                                                    <div class="form-group">
+                                                        <label class="col-md-12 control-label left">Delivery Instructions (*Prints to Shipping Label):</label>
+                                                        <div class="col-md-12">
+                                                            <textarea type="text" name="DeliveryInstructions" class="form-control" placeholder="Delivery Instructions" rows="5" data-ng-model="buildOrderShippingAddressForPartial(order.OnHold && !order.UpdateShippingAddressForCustomer).Address.DeliveryInstructions" data-ng-disabled="true"></textarea>
+                                                        </div>
+                                                    </div>
                                                 </fieldset>
                                             </form>
                                         </div>

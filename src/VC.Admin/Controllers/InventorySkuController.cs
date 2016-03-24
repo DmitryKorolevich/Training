@@ -66,6 +66,25 @@ namespace VC.Admin.Controllers
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
+
+        [HttpGet]
+        public async Task<Result<IList<Lookup>>> GetInventorySkuLookups()
+        {
+            var result = await _settingService.GetLookupsAsync(SettingConstants.INVENTORY_SKU_LOOKUP_NAMES.Split(','));
+            result.ForEach(p =>
+            {
+                if (p.LookupVariants != null)
+                {
+                    foreach (var lookupVariant in p.LookupVariants)
+                    {
+                        lookupVariant.Lookup = null;
+                    }
+                }
+            });
+
+            return result.ToList();
+        }
+
         #region InventorySkus
 
         [HttpPost]

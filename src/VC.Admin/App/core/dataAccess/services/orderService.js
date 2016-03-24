@@ -108,5 +108,11 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    {
 	        return $http.get(baseUrl + 'GetGCOrders/'+ id, getConfig(tracker));
 	    },
+
+	    //service codes
+	    getServiceCodesReport: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetServiceCodesReport', filter, getConfig(tracker));
+	    },
 	};
 }]);
