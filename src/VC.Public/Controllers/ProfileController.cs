@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -39,7 +40,10 @@ using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Business.Helpers;
+using VitalChoice.Interfaces.Services.Settings;
 
 namespace VC.Public.Controllers
 {
@@ -52,12 +56,17 @@ namespace VC.Public.Controllers
 
         private readonly IStorefrontUserService _storefrontUserService;
         private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
-        private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _paymentMethodConverter;
+        private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _customerPaymentMethodConverter;
+        private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _orderPaymentMethodConverter;
         private readonly IDynamicMapper<OrderDynamic, Order> _orderConverter;
-        private readonly IProductService _productService;
+		private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
+		private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
+		private readonly IDynamicMapper<OrderDynamic, Order> _orderMapper;
+		private readonly IProductService _productService;
         private readonly IOrderService _orderService;
         private readonly IHelpService _helpService;
         private readonly IHealthwiseService _healthwiseService;
+	    private readonly ICountryService _countryService;
         private readonly ILogger _logger;
 
         public ProfileController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
@@ -70,21 +79,116 @@ namespace VC.Public.Controllers
             IHealthwiseService healthwiseService, IAppInfrastructureService infrastructureService,
             IAuthorizationService authorizationService, ICheckoutService checkoutService,
             ILoggerProviderExtended loggerProvider,
-            IPageResultService pageResultService)
+            IPageResultService pageResultService, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper, ICountryService countryService, IDynamicMapper<OrderDynamic, Order> orderMapper, IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodConverter)
             : base(contextAccessor, customerService, infrastructureService, authorizationService, checkoutService, pageResultService)
         {
             _storefrontUserService = storefrontUserService;
             _addressConverter = addressConverter;
-            _paymentMethodConverter = paymentMethodConverter;
+            _customerPaymentMethodConverter = paymentMethodConverter;
             _orderService = orderService;
             _orderConverter = orderConverter;
             _productService = productService;
             _helpService = helpService;
             _healthwiseService = healthwiseService;
-            _logger = loggerProvider.CreateLoggerDefault();
+	        _skuMapper = skuMapper;
+	        _productMapper = productMapper;
+	        _countryService = countryService;
+	        _orderMapper = orderMapper;
+	        _orderPaymentMethodConverter = orderPaymentMethodConverter;
+	        _logger = loggerProvider.CreateLoggerDefault();
         }
 
-        private async Task<PagedListEx<OrderHistoryItemModel>> PopulateHistoryModel(VOrderFilter filter)
+	    private DateTime FindNextAutoShipDate(DateTime orderDate, int frequency)
+	    {
+		    var next = orderDate;
+		    do
+		    {
+			    next = next.AddMonths(frequency);
+
+		    } while (next < DateTime.Now);
+
+		    return next;
+	    }
+
+	    private async Task<PagedListEx<AutoShipHistoryItemModel>> PopulateAutoShipHistoryModel(OrderFilter filter)
+		{
+			var infr = InfrastructureService.Get();
+			var countries = await _countryService.GetCountriesAsync();
+
+			var customer = await GetCurrentCustomerDynamic();
+
+			filter.IdCustomer = customer.Id;
+			filter.Sorting.SortOrder = SortOrder.Desc;
+			filter.Sorting.Path = VOrderSortPath.DateCreated;
+			filter.OrderType = OrderType.AutoShip;
+			
+			var orders = await _orderService.GetFullOrdersAsync(filter);
+
+			var ordersModel = new PagedListEx<AutoShipHistoryItemModel>
+			{
+				Items = orders.Items.Select(p =>
+				{
+					var skuItem = p.Skus.Single();
+
+					var result = _skuMapper.ToModel<AutoShipHistoryItemModel>(skuItem.Sku);
+					_productMapper.UpdateModel(result, skuItem.Sku.Product);
+					_orderMapper.UpdateModel(result, p);
+
+					var paymentMethod = p.PaymentMethod;
+					result.BillingDetails = paymentMethod.Address.PopulateBillingAddressDetails(countries, customer.Email);
+					result.PaymentMethodDetails = paymentMethod.PopulateCreditCardDetails(infr);
+
+					var shippingAddress = p.ShippingAddress;
+					result.ShippingDetails = shippingAddress.PopulateShippingAddressDetails(countries);
+
+					var displayName = result.Name;
+					if (!string.IsNullOrWhiteSpace(result.SubTitle))
+					{
+						displayName += $" {result.SubTitle}";
+					}
+					displayName += $" ({result.PortionsCount})";
+
+					result.DisplayName = displayName;
+					result.Active = p.StatusCode == (int)RecordStatusCode.Active;
+					result.NextDate = FindNextAutoShipDate(p.DateCreated, result.Frequency);
+					result.Id = p.Id;
+
+					return result;
+				}).ToList(),
+				Count = orders.Count,
+				Index = filter.Paging.PageIndex
+			};
+
+			return ordersModel;
+		}
+
+		private async Task<BillingInfoModel> GetBillingDetailsInternal(int id, int orderId)
+		{
+			var currentCustomer = await GetCurrentCustomerDynamic();
+
+			BillingInfoModel model;
+			if (id > 0 )
+			{
+				var dynamic = currentCustomer.CustomerPaymentMethods
+				.Single(p => p.IdObjectType == (int)PaymentMethodType.CreditCard && p.Id == id);
+				model = _addressConverter.ToModel<BillingInfoModel>(dynamic.Address);
+				_customerPaymentMethodConverter.UpdateModel(model, dynamic);
+			}
+			else if(orderId > 0)
+			{
+				var order = await _orderService.SelectAsync(orderId);
+				model = _addressConverter.ToModel<BillingInfoModel>(order.PaymentMethod.Address);
+				_orderPaymentMethodConverter.UpdateModel(model, order.PaymentMethod);
+			}
+			else
+			{
+				throw new ApiException();
+			}
+
+			return model;
+		}
+
+		private async Task<PagedListEx<OrderHistoryItemModel>> PopulateOrderHistoryModel(VOrderFilter filter)
         {
             var internalId = GetInternalCustomerId();
 
@@ -121,7 +225,7 @@ namespace VC.Public.Controllers
                     currentCustomer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard))
             {
                 var billingInfoModel = _addressConverter.ToModel<BillingInfoModel>(creditCard.Address);
-                _paymentMethodConverter.UpdateModel(billingInfoModel, creditCard);
+                _customerPaymentMethodConverter.UpdateModel(billingInfoModel, creditCard);
 
                 creditCards.Add(billingInfoModel);
             }
@@ -305,7 +409,7 @@ namespace VC.Public.Controllers
 		        model.Default = true;
 	        }
 
-			var customerPaymentMethod = await _paymentMethodConverter.FromModelAsync(model, (int)PaymentMethodType.CreditCard);
+			var customerPaymentMethod = await _customerPaymentMethodConverter.FromModelAsync(model, (int)PaymentMethodType.CreditCard);
             customerPaymentMethod.Data.SecurityCode = model.SecurityCode;
 
             customerPaymentMethod.Address = await _addressConverter.FromModelAsync(model, (int)AddressType.Billing);
@@ -578,17 +682,99 @@ namespace VC.Public.Controllers
         {
             var filter = new VOrderFilter();
 
-            return View(await PopulateHistoryModel(filter));
+            return View(await PopulateOrderHistoryModel(filter));
         }
 
         public async Task<IActionResult> RefreshOrderHistory(VOrderFilter filter)
         {
-            var model = await PopulateHistoryModel(filter);
+            var model = await PopulateOrderHistoryModel(filter);
 
             return PartialView("_OrderHistoryGrid", model);
         }
 
-        [HttpGet]
+		[HttpGet]
+		public async Task<IActionResult> AutoShipHistory()
+		{
+			var filter = new OrderFilter();
+
+			return View(await PopulateAutoShipHistoryModel(filter));
+		}
+
+		public async Task<IActionResult> RefreshAutoShipHistory()
+		{
+			var filter = new OrderFilter();
+			var model = await PopulateAutoShipHistoryModel(filter);
+
+			return PartialView("_AutoShipHistoryGrid", model);
+		}
+
+	    [HttpGet]
+	    public async Task<IActionResult> AutoShipBillingDetails(int orderId)
+	    {
+			var billingInfoModel = await GetBillingDetailsInternal(0,orderId);
+
+			await PopulateCreditCardsLookup();
+
+		    var dict = (Dictionary<int,string>)ViewBag.CreditCards;
+			dict.Add(orderId, "In Order");
+		    ViewBag.CreditCards = dict;
+		    ViewBag.OrderId = orderId;
+
+			return PartialView("_AutoShipBillingDetails", billingInfoModel);
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> AutoShipBillingDetails(BillingInfoModel model, int OrderId)
+		{
+			if (!ModelState.IsValid)
+			{
+				return PartialView("_BillingDetailsInner", model);
+			}
+
+			var order = await _orderService.SelectAsync(OrderId);
+
+			var addressId = order.PaymentMethod.Address.Id;
+			await _orderPaymentMethodConverter.UpdateObjectAsync(model, order.PaymentMethod,
+							   (int)PaymentMethodType.CreditCard);
+			await _addressConverter.UpdateObjectAsync(model, order.PaymentMethod.Address, (int) AddressType.Billing);
+
+			order.PaymentMethod.Address.Id = addressId;
+
+			await _orderService.UpdateAsync(order);
+
+			ViewBag.Success = true;
+			return PartialView("_BillingDetailsInner", model);
+		}
+
+		[HttpGet]
+	    public async Task<IActionResult> GetBillingAddress(int paymentId, int orderId)
+	    {
+		    var billingInfoModel = await GetBillingDetailsInternal(paymentId, orderId);
+
+		    return PartialView("_BillingDetailsInner", billingInfoModel);
+	    }
+
+	    [HttpPost]
+		public async Task<Result<bool>> ActivatePauseAutoShip(int id)
+		{
+			var internalId = GetInternalCustomerId();
+
+			await _orderService.ActivatePauseAutoShipAsync(internalId, id);
+
+			return true;
+		}
+
+		[HttpPost]
+		public async Task<Result<bool>> DeleteAutoShip(int id)
+		{
+			var internalId = GetInternalCustomerId();
+
+			await _orderService.DeleteAutoShipAsync(internalId, id);
+
+			return true;
+		}
+
+		[HttpGet]
         public async Task<IActionResult> OrderInvoice(int id)
         {
             var internalId = GetInternalCustomerId();
@@ -761,5 +947,5 @@ namespace VC.Public.Controllers
 
             return View(toReturn);
         }
-    }
+	}
 }

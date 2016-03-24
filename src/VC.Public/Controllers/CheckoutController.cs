@@ -85,14 +85,6 @@ namespace VC.Public.Controllers
             _appInfrastructure = appInfrastructureService.Get();
         }
 
-        private void PopulateCreditCardsLookup(IEnumerable<CustomerPaymentMethodDynamic> creditCards)
-        {
-            ViewBag.CreditCards = creditCards.ToDictionary(x => x.Id,
-                y =>
-                    _appInfrastructure.CreditCardTypes.Single(z => z.Key == (int) y.Data.CardType).Text + ", ending in " +
-                    ((string) y.Data.CardNumber).Substring(((string) y.Data.CardNumber).Length - 4));
-        }
-
         private void PopulateShippingAddressesLookup(IList<AddressDynamic> addresses)
         {
             ViewBag.ShippingAddresses = addresses.OrderBy(x => (bool) x.Data.Default).ToDictionary(x => x.Id,
@@ -229,7 +221,7 @@ namespace VC.Public.Controllers
                         _orderPaymentMethodConverter.UpdateModel<BillingInfoModel>(addUpdateModel, cart.Order.PaymentMethod);
                     }
 
-                    PopulateCreditCardsLookup(creditCards);
+                    await PopulateCreditCardsLookup();
                 }
                 else
                 {
@@ -275,11 +267,7 @@ namespace VC.Public.Controllers
             {
                 if (loggedIn)
                 {
-                    var currentCustomer = await GetCurrentCustomerDynamic();
-                    var creditCards = currentCustomer.CustomerPaymentMethods
-                        .Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard);
-
-                    PopulateCreditCardsLookup(creditCards);
+                    await PopulateCreditCardsLookup();
                 }
                 return View(model);
             }
@@ -290,11 +278,7 @@ namespace VC.Public.Controllers
                 {
                     if (loggedIn)
                     {
-                        var currentCustomer = await GetCurrentCustomerDynamic();
-                        var creditCards = currentCustomer.CustomerPaymentMethods
-                            .Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard);
-
-                        PopulateCreditCardsLookup(creditCards);
+                       await PopulateCreditCardsLookup();
                     }
                     else
                     {

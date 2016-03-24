@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Authorization;
@@ -18,6 +19,8 @@ using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services.Checkout;
+using System.Linq;
+using VitalChoice.Ecommerce.Domain.Entities.Payment;
 
 namespace VC.Public.Controllers
 {
@@ -106,5 +109,17 @@ namespace VC.Public.Controllers
 
             return customer;
         }
-    }
+
+		protected async Task PopulateCreditCardsLookup()
+		{
+			var currentCustomer = await GetCurrentCustomerDynamic();
+			var creditCards = currentCustomer.CustomerPaymentMethods
+				.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard);
+
+			ViewBag.CreditCards = creditCards.ToDictionary(x => x.Id,
+				y =>
+					InfrastructureService.Get().CreditCardTypes.Single(z => z.Key == (int)y.Data.CardType).Text + ", ending in " +
+					((string)y.Data.CardNumber).Substring(((string)y.Data.CardNumber).Length - 4));
+		}
+	}
 }
