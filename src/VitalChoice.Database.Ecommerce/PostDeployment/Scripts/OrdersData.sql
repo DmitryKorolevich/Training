@@ -356,6 +356,18 @@ END
 
 GO
 
+IF EXISTS(SELECT * FROM Lookups WHERE Name='ServiceCode')
+BEGIN
+
+	UPDATE Lookups
+	SET Name='ServiceCodes',
+	[Description]='Service Codes'
+	WHERE Name='ServiceCode'	
+
+END
+
+GO
+
 IF EXISTS(SELECT [Id] FROM [dbo].[OrderOptionTypes] WHERE Name = 'DeliveryInstructions' OR Name=N'PreferredShipMethod')
 BEGIN
 
