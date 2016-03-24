@@ -23,5 +23,7 @@
 
 		public const int DEFAULT_FAVORITES_COUNT = 6;
 		public const int MAX_FAVORITES_COUNT = 10000;
-	}
+
+        public const decimal DEFAULT_RETURN_AMOUNT = -40;
+    }
 }

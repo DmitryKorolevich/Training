@@ -6,8 +6,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 {
     public class ServiceCodesReportFilter
     {
-        public DateTime From { get; set; }
+        public DateTime? From { get; set; }
 
-        public DateTime To { get; set; }
+        public DateTime? To { get; set; }
     }
 }

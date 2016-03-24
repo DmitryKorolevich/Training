@@ -2013,15 +2013,5 @@ namespace VitalChoice.Business.Services.Orders
         }
 
         #endregion
-
-        #region ServiceCodes
-
-        public async Task<ServiceCodesReport> GetServiceCodesReportAsync(ServiceCodesReportFilter filter)
-        {
-            var toReturn = new ServiceCodesReport();
-            return toReturn;
-        }
-
-        #endregion
     }
 }

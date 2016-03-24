@@ -270,7 +270,7 @@
                                                         <label for="date" class="col-md-6 control-label">Non-Perishable Ship Date</label>
                                                         <div class="col-md-6">
                                                             <p class="input-group">
-                                                                <input type="text" name="ShipDelayDateNP" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateNP" is-open="shipDelayDateNPOpened" data-ng-disabled="orderEditDisabled" />
+                                                                <input type="text" name="ShipDelayDateNP" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateNP" is-open="shipDelayDateNPOpened" data-ng-disabled="orderEditDisabled"/>
                                                                 <span class="input-group-btn">
                                                                     <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDateNPOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                                 </span>
@@ -279,6 +279,14 @@
                                                                 <small class="error" ng-show="forms.mainForm.ShipDelayDateNP.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Date")}}</small>
                                                                 <small class="error" ng-show="forms.mainForm.ShipDelayDateNP.$error.server">{{serverMessages.GetMessage('ShipDelayDateNP')}}</small>
                                                             </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <span class="legend">Notes</span>
+                                                    <div class="form-group">
+                                                        <label class="col-md-12 control-label left">Delivery Instructions (*Prints to Shipping Label):</label>
+                                                        <div class="col-md-12">
+                                                            <textarea type="text" name="DeliveryInstructions" class="form-control" placeholder="Delivery Instructions" rows="5" data-ng-model="buildOrderShippingAddressForPartial(order.OnHold && !order.UpdateShippingAddressForCustomer).Address.DeliveryInstructions" data-ng-disabled="true"></textarea>
                                                         </div>
                                                     </div>
                                                 </fieldset>

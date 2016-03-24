@@ -17,6 +17,8 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			subMenu: [
 				{ name: 'viewAllOrders', stateName: 'index.oneCol.manageOrders', stateLabel: 'Manage Orders', access: 2 },
 				{ name: 'viewAllOrders', stateName: 'index.oneCol.manageHelpTickets', stateLabel: 'Manage Help Tickets', access: 11 },
+				{ name: 'moveOrder', stateName: 'index.oneCol.moveOrder', stateLabel: 'Reassign Transaction', access: 8 },
+				{ name: 'changeOrderStatus', stateName: 'index.oneCol.changeOrderStatus', stateLabel: 'Change Order Status', access: 8 },
 			]
 		},
 		{
@@ -94,7 +96,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				    stateLabel: 'Operations',
 				    subMenu: [
                         //{ name: 'weeklyAgentReport', stateName: 'index.oneCol.weeklyAgentReport', stateLabel: 'Weekly Agent Report', access: 3 },
-                        //{ name: 'serviceCodeReport', stateName: 'index.oneCol.serviceCodeReport', stateLabel: 'Service Code Report', access: 3 },
+                        { name: 'index.oneCol.serviceCodesStatistic', stateName: 'index.oneCol.serviceCodesStatistic', stateLabel: 'Service Codes Report', access: 3 },
                         //{ name: 'productQualityIssuesReport', stateName: 'index.oneCol.productQualityIssuesReport', stateLabel: 'Product Quality Issues Report', access: 3 },
                         //{ name: 'kPIReport', stateName: 'index.oneCol.kPIReport', stateLabel: 'KPI Report (APIs)', access: 3 },
                         { name: 'vitalGreen', stateName: 'index.oneCol.vitalGreen', stateLabel: 'Review VitalGreen Statistics', access: 3 },
@@ -142,16 +144,6 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			]
 		},
 		{
-			name: 'tools',
-			stateLabel: 'Tools',
-			subMenu: [
-				{ name: 'manageProductTaxCodes', stateName: 'index.oneCol.manageProductTaxCodes', stateLabel: 'Manage Product Tax Codes', access: 8 },
-				//{ name: 'emailAddressProfiles', stateName: 'index.oneCol.emailAddressProfiles', stateLabel: 'Multiple Email Address Profiles', access: 8 },
-				{ name: 'moveOrder', stateName: 'index.oneCol.moveOrder', stateLabel: 'Reassign Transaction', access: 8 },
-				{ name: 'changeOrderStatus', stateName: 'index.oneCol.changeOrderStatus', stateLabel: 'Change Order Status', access: 8 },
-			]
-		},
-		{
 			name: 'users',
 			stateLabel: 'Users',
 			subMenu: [
@@ -167,6 +159,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'managePaymentMethods', stateName: 'index.oneCol.managePaymentMethods', stateLabel: 'Manage Payment Methods', access: null }, //only for super admins
 				{ name: 'manageOrderNotes', stateName: 'index.oneCol.manageOrderNotes', stateLabel: 'Manage Automatic Order Specific Notes', access: null },
 				{ name: 'manageLookups', stateName: 'index.oneCol.manageLookups', stateLabel: 'Manage Lookups', access: 10 },
+				{ name: 'manageProductTaxCodes', stateName: 'index.oneCol.manageProductTaxCodes', stateLabel: 'Manage Product Tax Codes', access: 8 },
 			]
 		},
 		{

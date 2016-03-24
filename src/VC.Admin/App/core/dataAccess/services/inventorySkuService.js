@@ -32,6 +32,12 @@ angular.module('app.core.dataAccess.services.inventorySkuService', [])
 	        return $http.post(baseUrl + 'DeleteInventorySku/' + id, null, getConfig(tracker));
 	    },
 
+	    //inventoryLookups
+	    getInventorySkuLookups: function (tracker)
+	    {
+	        return $http.get(baseUrl + 'GetInventorySkuLookups', getConfig(tracker));
+	    },
+
 	    //inventoryCategories
 	    getInventorySkuCategoriesTree: function (filter, tracker) {
 	        return $http.post(baseUrl + 'GetInventorySkuCategoriesTree', filter, getConfig(tracker));

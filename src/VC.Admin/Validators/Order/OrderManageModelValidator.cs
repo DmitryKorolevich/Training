@@ -26,7 +26,7 @@ namespace VC.Admin.Validators.Order
             var marketingPaymentModelValidator = ValidatorsFactory.GetValidator<MarketingModelRules>();
             var VCWellnessPaymentModelValidator = ValidatorsFactory.GetValidator<VCWellnessModelRules>();
             ParseResults(ValidatorsFactory.GetValidator<OrderModelValidator>().Validate(value, ruleSet: "Main"));
-            if (value.Id == 0)
+            if (value.UseShippingAndBillingFromCustomer)
             {
                 ParseResults(ValidatorsFactory.GetValidator<OrderModelValidator>().Validate(value, ruleSet: "NewOrder"));
                 if (value.Customer != null)
@@ -183,7 +183,7 @@ namespace VC.Admin.Validators.Order
                                .Must(p => p != null)
                                .WithMessage(model => model.Customer, ValidationMessages.FieldRequired);
                             RuleFor(model => model.Customer.CreditCards)
-                               .Must(p => p.Where(x => x.IsSelected).Any())
+                               .Must(p => p.Any(x => x.IsSelected))
                                .When(p => p.IdPaymentMethodType.HasValue && p.IdPaymentMethodType.Value == 1 && p.Customer != null && p.OrderStatus != OrderStatus.OnHold)
                                .WithMessage(model => model.Customer.CreditCards, ValidationMessages.FieldRequired);
                             RuleFor(model => model.Customer.Oac)

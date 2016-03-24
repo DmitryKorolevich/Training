@@ -63,6 +63,7 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> _vOrderWithRegionInfoItemCSVExportService;
         private readonly IProductService _productService;
         private readonly INotificationService _notificationService;
+        private readonly IServiceCodeService _serviceCodeService;
         private readonly BrontoService _brontoService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly ILogger logger;
@@ -78,6 +79,7 @@ namespace VC.Admin.Controllers
             ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> vOrderWithRegionInfoItemCSVExportService,
             IProductService productService,
             INotificationService notificationService,
+            IServiceCodeService serviceCodeService,
             BrontoService brontoService,
             IObjectHistoryLogService objectHistoryLogService, IOptions<AppOptions> options)
         {
@@ -90,6 +92,7 @@ namespace VC.Admin.Controllers
             _vOrderWithRegionInfoItemCSVExportService = vOrderWithRegionInfoItemCSVExportService;
             _productService = productService;
             _notificationService = notificationService;
+            _serviceCodeService = serviceCodeService;
             _brontoService = brontoService;
             _objectHistoryLogService = objectHistoryLogService;
             _options = options;
@@ -360,6 +363,7 @@ namespace VC.Admin.Controllers
                         toReturn.OrderSourceDateCreated = toReturn.DateCreated;
                         toReturn.OrderSourceTotal = toReturn.Total;
                         toReturn.OrderNotes=String.Empty;
+                        toReturn.ConfirmationEmailSent = false;
                         if (toReturn.SkuOrdereds != null && toReturn.PromoSkus != null)
                         {
                             toReturn.SkuOrdereds.AddRange(toReturn.PromoSkus.Select(p=>p.ConvertToBase()).ToList());
@@ -678,7 +682,11 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<ServiceCodesReport>> GetServiceCodesReport([FromBody]ServiceCodesReportFilter filter)
         {
-            return await _orderService.GetServiceCodesReportAsync(filter);
+            if (filter.To.HasValue)
+            {
+                filter.To = filter.To.Value.AddDays(1);
+            }
+            return await _serviceCodeService.GetServiceCodesReportAsync(filter);
         }
     }
 }

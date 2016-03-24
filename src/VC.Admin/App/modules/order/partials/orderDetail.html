@@ -317,6 +317,13 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-12 control-label left">Delivery Instructions (*Prints to Shipping Label):</label>
+                                                        <div class="col-md-12">
+                                                            <textarea data-ng-if="!id" type="text" name="DeliveryInstructions" class="form-control" placeholder="Delivery Instructions" rows="5" data-ng-model="buildShippingAddressForPartial(currentCustomer.Shipping, shippingAddressTab.AddressIndex, order.OnHold && !order.UpdateShippingAddressForCustomer, order && true).Address.DeliveryInstructions" data-ng-disabled="true"></textarea>
+                                                            <textarea data-ng-if="id" type="text" name="DeliveryInstructions" class="form-control" placeholder="Delivery Instructions" rows="5" data-ng-model="buildOrderShippingAddressForPartial(order.OnHold && !order.UpdateShippingAddressForCustomer).Address.DeliveryInstructions" data-ng-disabled="true"></textarea>
+                                                        </div>
+                                                    </div>
 
                                                     <span data-ng-if="options.BrontoSubscribedStatusLoaded" class="legend">Newsletter</span>
                                                     <div data-ng-if="options.BrontoSubscribedStatusLoaded" class="form-group">

@@ -69,12 +69,6 @@ namespace VitalChoice.Interfaces.Services.Orders
 
         #endregion
 
-        #region ServiceCodes
-
-	    Task<ServiceCodesReport> GetServiceCodesReportAsync(ServiceCodesReportFilter filter);
-
-	    #endregion
-
 		Task<PagedList<OrderDynamic>> GetFullOrdersAsync(OrderFilter filter);
 
 		Task ActivatePauseAutoShipAsync(int customerId, int autoShipId);
