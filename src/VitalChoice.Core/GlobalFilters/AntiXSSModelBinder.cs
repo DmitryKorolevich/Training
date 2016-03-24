@@ -3,6 +3,7 @@ using Microsoft.AspNet.Mvc.ModelBinding;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc.ModelBinding.Metadata;
 
@@ -10,40 +11,11 @@ namespace VitalChoice.Core.GlobalFilters
 {
     public class AntiXSSModelBinder : IModelBinder
     {
-        private static readonly List<string> ForbiddenStrings = new List<string>
-        {
-            "'",
-            //"&#39;",
-            //"&#x27;",
-
-            "\"",
-            //"&quot;",
-            //"&QUOT;",
-            //"&#34;",
-            //"&#x22;",
-
-            "&",
-            //"&amp;",
-            //"&AMP;",
-            //"&#38;",
-            //"&#x26;",
-
-            "<",
-            //"&lt;",
-            //"&LT;",
-            //"&#60;",
-            //"&#x3C;",
-
-            ">",
-            //"&gt;",
-            //"&GT;",
-            //"&#62;",
-            //"&#x3E;",
-
-            //"/",
-            //"&#47;",
-            //"&#x2F;"
-        };
+        // < > " ' &
+        // \u5F
+        // \u{F9}
+        // %FF
+        private static readonly Regex ForbiddenStringsRegex = new Regex("^.*([<>\"'&]|\\\\u[0-9A-F]{2,5}|\\\\u\\{[0-9A-F]{2,5}\\}|%[0-9A-F]{2}).*$");
 
         public Task<ModelBindingResult> BindModelAsync(ModelBindingContext bindingContext)
         {
@@ -74,12 +46,12 @@ namespace VitalChoice.Core.GlobalFilters
                     
                     if (!preventFilteringXSS)
                     {
-                        var containForbidden = ForbiddenStrings.Any(x => modelAsString.Contains(x));
+                        var containForbidden = ForbiddenStringsRegex.IsMatch(modelAsString);
 
                         if (containForbidden)
                         {
-                            bindingContext.ModelState.AddModelError(bindingContext.ModelName, "Html forbidden");
-                            return ModelBindingResult.FailedAsync(bindingContext.ModelName);
+                            bindingContext.ModelState.AddModelError(bindingContext.ModelName, "String contains characters that indicates potential injection threat");
+                            return ModelBindingResult.NoResultAsync;
                         }
                     }
 
