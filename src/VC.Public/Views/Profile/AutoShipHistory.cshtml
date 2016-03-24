@@ -1,0 +1,29 @@
+﻿@model  VitalChoice.Ecommerce.Domain.Transfer.PagedListEx<VC.Public.Models.Profile.AutoShipHistoryItemModel>
+
+@section Meta {
+	<title>Vital Choice | Auto-Ship History</title>
+}
+
+@section PageScripts {
+	<script src="@Url.Content("/app/modules/profile/autoship.js")"></script>
+	<script src="@Url.Content("/app/common/dataAccess.js")"></script>
+	<script src="@Url.Content("/app/modules/auth/registration.js")"></script>
+	<script src="@Url.Content("/app/common/billing.js")"></script>
+	<script src="@Url.Content("/app/modules/profile/billingInfoRefresh.js")"></script>
+	<script src="@Url.Content("/app/modules/profile/gccheckform.js")"></script>
+}
+
+<div class="working-area-holder">
+	<div class="left-pane clean-border">
+		@await Component.InvokeAsync("ProfileSidebar")
+	</div>
+	<div class="right-pane clean-indent">
+		<div class="border-form-left relative">
+			<div class="overlay hide">
+				<div class="loading">Loading…</div>
+			</div>
+			<h4>Auto-Ship History</h4>
+			<div id="gridcontainer">@Html.Partial("_AutoShipHistoryGrid", Model)</div>
+		</div>
+	</div>
+</div>

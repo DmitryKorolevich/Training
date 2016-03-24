@@ -19,7 +19,7 @@ namespace VitalChoice.Interfaces.Services.Orders
 {
 	public interface IOrderService: IDynamicServiceAsync<OrderDynamic, Order>
 	{
-        Task<PagedList<Order>> GetShortOrdersAsync(ShortOrderFilter filter);
+        Task<PagedList<Order>> GetShortOrdersAsync(OrderFilter filter);
         Task<int?> GetOrderIdCustomer(int id);
         Task<PagedList<VOrder>> GetOrdersAsync(VOrderFilter filter);
 	    Task<PagedList<OrderInfoItem>> GetOrdersAsync2(VOrderFilter filter);
@@ -74,5 +74,11 @@ namespace VitalChoice.Interfaces.Services.Orders
 	    Task<ServiceCodesReport> GetServiceCodesReportAsync(ServiceCodesReportFilter filter);
 
 	    #endregion
+
+		Task<PagedList<OrderDynamic>> GetFullOrdersAsync(OrderFilter filter);
+
+		Task ActivatePauseAutoShipAsync(int customerId, int autoShipId);
+
+		Task DeleteAutoShipAsync(int customerId, int autoShipId);
 	}
 }
