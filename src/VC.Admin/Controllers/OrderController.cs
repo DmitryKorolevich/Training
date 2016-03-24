@@ -674,5 +674,11 @@ namespace VC.Admin.Controllers
             await _notificationService.SendOrderShippingConfirmationEmailAsync(model.Email, emailModel);
             return true;
         }
+
+        [HttpPost]
+        public async Task<Result<ServiceCodesReport>> GetServiceCodesReport([FromBody]ServiceCodesReportFilter filter)
+        {
+            return await _orderService.GetServiceCodesReportAsync(filter);
+        }
     }
 }

@@ -67,6 +67,12 @@ namespace VitalChoice.Interfaces.Services.Orders
         
 	    Task<ICollection<SkuOrdered>> GetGeneratedGcs(int id);
 
+        #endregion
+
+        #region ServiceCodes
+
+	    Task<ServiceCodesReport> GetServiceCodesReportAsync(ServiceCodesReportFilter filter);
+
 	    #endregion
 	}
 }

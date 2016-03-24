@@ -608,11 +608,11 @@ namespace VitalChoice.Business.Services.Orders
 
                             await uow.SaveChangesAsync();
                             giftCertificateRepository.DetachAll(generatedGcs);
-                            giftCertificateRepository.DetachAll(usedGcs);                            
+                            giftCertificateRepository.DetachAll(usedGcs);
 
                             if (order.OrderStatus.HasValue)
                             {
-                                order.OrderStatus=OrderStatus.Cancelled;
+                                order.OrderStatus = OrderStatus.Cancelled;
                             }
                             if (order.POrderStatus.HasValue)
                             {
@@ -1933,7 +1933,7 @@ namespace VitalChoice.Business.Services.Orders
             var items =
                 await
                     _orderToSkusRepository.Query(
-                        s => s.IdOrder == id && (s.Sku.IdObjectType == (int) ProductType.EGс || s.Sku.IdObjectType == (int) ProductType.Gc))
+                        s => s.IdOrder == id && (s.Sku.IdObjectType == (int)ProductType.EGс || s.Sku.IdObjectType == (int)ProductType.Gc))
                         .Include(g => g.Sku)
                         .ThenInclude(s => s.OptionValues)
                         .Include(g => g.Sku)
@@ -1949,6 +1949,16 @@ namespace VitalChoice.Business.Services.Orders
                 Quantity = s.Quantity,
                 Amount = s.Amount
             }).ToList();
+        }
+
+        #endregion
+
+        #region ServiceCodes
+
+        public async Task<ServiceCodesReport> GetServiceCodesReportAsync(ServiceCodesReportFilter filter)
+        {
+            var toReturn = new ServiceCodesReport();
+            return toReturn;
         }
 
         #endregion
