@@ -16,7 +16,7 @@ namespace VitalChoice.Business.Workflow.Actions.Discounts
         {
             dataContext.FreeShipping = true;
 
-			return Task.FromResult<decimal>(-(decimal)dataContext.Order.Skus.Single().Sku.Data.OffPercent *
+			return Task.FromResult<decimal>(-(decimal)dataContext.Order.Skus.First().Sku.Data.OffPercent *
 										(decimal)dataContext.Data.DiscountableSubtotal / 100);
 		}
     }
