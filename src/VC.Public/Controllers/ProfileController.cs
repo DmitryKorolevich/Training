@@ -128,7 +128,7 @@ namespace VC.Public.Controllers
 			{
 				Items = orders.Items.Select(p =>
 				{
-					var skuItem = p.Skus.Single();
+					var skuItem = p.Skus.First();
 
 					var result = _skuMapper.ToModel<AutoShipHistoryItemModel>(skuItem.Sku);
 					_productMapper.UpdateModel(result, skuItem.Sku.Product);
