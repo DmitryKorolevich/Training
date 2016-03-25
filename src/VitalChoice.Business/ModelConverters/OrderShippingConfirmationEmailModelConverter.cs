@@ -58,9 +58,9 @@ namespace VitalChoice.Business.ModelConverters
             //model.Carrier
             //model.ServiceUrl(generating urls - TrackingService.GetServiceUrl)
             //model.TrackingInfoItems
-            if (dynamic.SendSide == (int)POrderType.P)
+            if (dynamic.SendSide.HasValue)
             {
-                model.IsPerishable = true;
+                model.IsPerishable = dynamic.SendSide == (int)POrderType.P;
             }
             else
             {
