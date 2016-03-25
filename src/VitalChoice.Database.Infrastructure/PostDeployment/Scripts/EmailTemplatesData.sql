@@ -1881,6 +1881,12 @@ INSERT INTO [dbo].[ContentItems]
                         				<td align="left" valign="top" style="padding: 5px 0 5px 5px; font-size: 13px; color: #6d6e72; font-family: Arial, helvetica, sans-serif;">
                                             Order#:
                                             <br/> @(Id)
+                                            @if(@model.SendSide==1){{
+                                             - Perishable Goods
+                                            }}
+                                            @if(@model.SendSide==2){{
+                                             - Non-Perishable Goods
+                                            }}
                                             <br/> Purchase Date:
                                             <br/> @date(DateCreated){{MM''/''dd''/''yyyy}}
                                             <br/>
