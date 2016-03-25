@@ -738,8 +738,8 @@ angular.module('app.modules.order.services.orderEditService', [])
         uiScope.sendOrderConfirmationEmail = function ()
         {
             modalUtil.open('app/modules/order/partials/sendOrderConfirmationPopup.html', 'sendOrderConfirmationController', {
-                email: uiScope.currentCustomer.Email,
-                id: uiScope.order.Id,
+                Email: uiScope.currentCustomer.Email,
+                Id: uiScope.order.Id,
                 thenCallback: function (data)
                 {
 
@@ -750,8 +750,11 @@ angular.module('app.modules.order.services.orderEditService', [])
         uiScope.sendOrderShippingConfirmationEmail = function ()
         {
             modalUtil.open('app/modules/order/partials/sendOrderShippingConfirmationPopup.html', 'sendOrderShippingConfirmationController', {
-                email: uiScope.currentCustomer.Email,
-                id: uiScope.order.Id,
+                Email: uiScope.currentCustomer.Email,
+                OrderStatus: uiScope.order.OrderStatus,
+                POrderStatus: uiScope.order.POrderStatus,
+                NPOrderStatus: uiScope.order.NPOrderStatus,
+                Id: uiScope.order.Id,
                 thenCallback: function (data)
                 {
 

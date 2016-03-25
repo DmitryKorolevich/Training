@@ -16,5 +16,11 @@ namespace VC.Admin.Models.Orders
 		}
         
 	    public string Email { get; set; }
+
+	    public bool SendAll { get; set; }
+
+        public bool SendP { get; set; }
+
+        public bool SendNP { get; set; }
     }
 }

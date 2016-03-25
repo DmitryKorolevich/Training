@@ -671,11 +671,34 @@ namespace VC.Admin.Controllers
                 return false;
             }
 
-            var emailModel = _mapper.ToModel<OrderShippingConfirmationEmail>(order);
-            if (emailModel == null)
-                return false;
+            if (model.SendAll)
+            {
+                var emailModel = _mapper.ToModel<OrderShippingConfirmationEmail>(order);
+                if (emailModel == null)
+                    return false;
+                await _notificationService.SendOrderShippingConfirmationEmailAsync(model.Email, emailModel);
+            }
+            else
+            {
+                if (model.SendP)
+                {
+                    order.SendSide = (int)POrderType.P;
+                    var emailModel = _mapper.ToModel<OrderShippingConfirmationEmail>(order);
+                    if (emailModel == null)
+                        return false;
 
-            await _notificationService.SendOrderShippingConfirmationEmailAsync(model.Email, emailModel);
+                    await _notificationService.SendOrderShippingConfirmationEmailAsync(model.Email, emailModel);
+                }
+                if (model.SendNP)
+                {
+                    order.SendSide = (int)POrderType.NP;
+                    var emailModel = _mapper.ToModel<OrderShippingConfirmationEmail>(order);
+                    if (emailModel == null)
+                        return false;
+
+                    await _notificationService.SendOrderShippingConfirmationEmailAsync(model.Email, emailModel);
+                }
+            }
             return true;
         }
 

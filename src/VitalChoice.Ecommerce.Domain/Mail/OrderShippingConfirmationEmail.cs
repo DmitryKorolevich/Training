@@ -16,6 +16,9 @@ namespace VitalChoice.Ecommerce.Domain.Mail
         public string PublicHost { get; set; }
 
         [Map]
+        public int? SendSide { get; set; }
+
+        [Map]
         public int Id { get; set; }
 
         [Map]

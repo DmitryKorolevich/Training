@@ -13,7 +13,7 @@
             <div class="margin-top-10px">
                 <button class="btn btn-info width-160px" data-ng-click="goToCustomer();">Manage Customer</button>
             </div>
-            <div data-ng-show="currentCustomer && order.Id && options.oldOrderStatus!=1" class="margin-top-10px">
+            <div data-ng-show="currentCustomer && order.Id && options.oldOrderStatus!=1 && options.oldOrderStatus!=4" class="margin-top-10px">
                 <button class="btn btn-purple width-160px" data-ng-click="sendOrderConfirmationEmail();">Resend Order Conf</button>
             </div>
             <div data-ng-show="currentCustomer && order.Id && order.CombinedEditOrderStatus==3" class="margin-top-10px">
@@ -286,7 +286,7 @@
                                                     <div class="form-group">
                                                         <label class="col-md-12 control-label left">Delivery Instructions (*Prints to Shipping Label):</label>
                                                         <div class="col-md-12">
-                                                            <textarea type="text" name="DeliveryInstructions" class="form-control" placeholder="Delivery Instructions" rows="5" data-ng-model="buildOrderShippingAddressForPartial(order.OnHold && !order.UpdateShippingAddressForCustomer).Address.DeliveryInstructions" data-ng-disabled="true"></textarea>
+                                                            <textarea type="text" name="DeliveryInstructions" class="form-control" rows="5" data-ng-model="buildOrderShippingAddressForPartial(order.OnHold && !order.UpdateShippingAddressForCustomer).Address.DeliveryInstructions" data-ng-disabled="true"></textarea>
                                                         </div>
                                                     </div>
                                                 </fieldset>

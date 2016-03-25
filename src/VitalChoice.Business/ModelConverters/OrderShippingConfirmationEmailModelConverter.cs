@@ -50,14 +50,22 @@ namespace VitalChoice.Business.ModelConverters
 
             dynamic.Customer = _customerService.SelectAsync(dynamic.Customer.Id).Result;
             model.PublicHost = _options.Value.PublicHost;
-
-            model.IsPerishable = dynamic.SafeData.POrderType == (int)POrderType.P || dynamic.SafeData.POrderType == (int)POrderType.PNP;
+            
             model.Email = dynamic.Customer.Email;
 
             //TODO - fill tracking info
+            //TODO: apply some logic for filtering tracking info based on the SendSide field
             //model.Carrier
             //model.ServiceUrl(generating urls - TrackingService.GetServiceUrl)
             //model.TrackingInfoItems
+            if (dynamic.SendSide == (int)POrderType.P)
+            {
+                model.IsPerishable = true;
+            }
+            else
+            {
+                model.IsPerishable = dynamic.SafeData.POrderType == (int)POrderType.P || dynamic.SafeData.POrderType == (int)POrderType.PNP;
+            }
 
             //Dates in the needed timezone
             model.DateCreated = TimeZoneInfo.ConvertTime(model.DateCreated, TimeZoneInfo.Local, _pstTimeZoneInfo);
