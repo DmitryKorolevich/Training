@@ -54,6 +54,12 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    {
 	        return $http.post(baseUrl + 'SendOrderShippingConfirmationEmail/{0}'.format(id), model, getConfig(tracker));
 	    },
+	    cancelOrder: function (id, tracker)
+	    {
+	        return $http.post(baseUrl + 'CancelOrder/{0}'.format(id), null, getConfig(tracker));
+	    },
+
+	    //reship
 	    getReshipOrder: function (id, idsource, idcustomer, tracker)
 	    {
 	        return $http.get(baseUrl + 'GetReshipOrder/{0}?idsource={1}&idcustomer={2}'.format(id, idsource, idcustomer), getConfig(tracker));
@@ -62,10 +68,24 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    {
 	        return $http.post(baseUrl + 'UpdateReshipOrder', model, getConfig(tracker));
 	    },
-	    cancelOrder: function (id, tracker)
+
+	    //refund
+	    getRefundOrder: function (id, idsource, idcustomer, tracker)
 	    {
-	        return $http.post(baseUrl + 'CancelOrder/{0}'.format(id), null, getConfig(tracker));
-	    },	    
+	        return $http.get(baseUrl + 'GetRefundOrder/{0}?idsource={1}&idcustomer={2}'.format(id, idsource, idcustomer), getConfig(tracker));
+	    },
+	    addRefundOrder: function (model, tracker)
+	    {
+	        return $http.post(baseUrl + 'AddRefundOrder', model, getConfig(tracker));
+	    },
+	    calculateRefundOrder: function (model, canceller)
+	    {
+	        return $http.post(baseUrl + 'CalculateRefundOrder', model, { timeout: canceller.promise });
+	    },
+	    cancelRefundOrder: function (id, tracker)
+	    {
+	        return $http.post(baseUrl + 'CancelRefundOrder/{0}'.format(id), null, getConfig(tracker));
+	    },
 
 	    getIsBrontoSubscribed: function (email, tracker)
 	    {

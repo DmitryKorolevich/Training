@@ -61,5 +61,9 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Orders
         public HealthwiseOrder HealthwiseOrder { get; set; }
 
         public ICollection<ReshipProblemSku> ReshipProblemSkus { get; set; }
+
+        public ICollection<RefundSku> RefundSkus { get; set; }
+
+        public ICollection<RefundOrderToGiftCertificate> RefundOrderToGiftCertificates { get; set; }
     }
 }

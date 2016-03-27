@@ -62,6 +62,8 @@ namespace VitalChoice.DynamicData.Base
             return query;
         }
 
+        protected virtual Expression<Func<TEntity, bool>> AdditionalDefaultConditions => null;
+
         protected async Task<List<TEntity>> SelectEntitiesAsync(Expression<Func<TEntity, bool>> query = null,
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null)
         {
@@ -270,8 +272,12 @@ namespace VitalChoice.DynamicData.Base
         private IQueryFluent<TEntity> BuildQueryFluent(Expression<Func<TEntity, bool>> query,
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy)
         {
-            var queryFluent = CreateQuery(includesOverride ?? BuildQuery,
-                query ?? (p => p.StatusCode != (int) RecordStatusCode.Deleted));
+            var conditions = query ?? (p => p.StatusCode != (int) RecordStatusCode.Deleted);
+            if (AdditionalDefaultConditions != null)
+            {
+                conditions = conditions.And(AdditionalDefaultConditions);
+            }
+            var queryFluent = CreateQuery(includesOverride ?? BuildQuery, conditions);
 
             if (orderBy != null)
                 queryFluent = queryFluent.OrderBy(orderBy);

@@ -291,3 +291,33 @@ BEGIN
 END
 
 GO
+
+IF OBJECT_ID(N'[dbo].[RefundOrderToGiftCertificates]', N'U') IS NULL
+BEGIN
+	CREATE TABLE RefundOrderToGiftCertificates (
+		[IdRefundOrder] INT NOT NULL		
+			CONSTRAINT FK_RefundOrderToGiftCertificateToOrder FOREIGN KEY (IdRefundOrder) REFERENCES dbo.Orders (Id),
+		[IdOrder] INT NOT NULL,
+		[IdGiftCertificate] INT NOT NULL
+			CONSTRAINT PK_RefundOrderToGiftCertificates PRIMARY KEY (IdRefundOrder DESC, IdOrder DESC, IdGiftCertificate),
+			CONSTRAINT FK_RefundOrderToGiftCertificateToOrderToGiftCertificate FOREIGN KEY (IdOrder, IdGiftCertificate) REFERENCES dbo.OrderToGiftCertificates (IdOrder, IdGiftCertificate),
+		[Amount] MONEY NOT NULL,
+	)
+
+	CREATE NONCLUSTERED INDEX IX_RefundOrderToGiftCertificates_IdRefundOrder ON RefundOrderToGiftCertificates (IdRefundOrder)
+
+END
+GO
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE name = N'RefundPrice' AND [object_id] = OBJECT_ID(N'[dbo].[RefundSkus]', N'U'))
+BEGIN
+
+	ALTER TABLE dbo.RefundSkus
+	ADD RefundPrice MONEY NULL
+
+	EXEC('UPDATE dbo.RefundSkus SET RefundPrice=0')
+
+	ALTER TABLE dbo.RefundSkus
+	ALTER COLUMN RefundPrice MONEY NOT NULL
+END
+GO

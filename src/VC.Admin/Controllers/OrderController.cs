@@ -41,6 +41,7 @@ using VitalChoice.Business.Services.Bronto;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Data.Extensions;
+using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Context;
@@ -53,7 +54,9 @@ namespace VC.Admin.Controllers
     public class OrderController : BaseApiController
     {
         private readonly IOrderService _orderService;
+        private readonly IOrderRefundService _orderRefundService;
         private readonly OrderMapper _mapper;
+        private readonly OrderRefundMapper _orderRefundMapper;
         private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
         private readonly ICustomerService _customerService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
@@ -70,8 +73,10 @@ namespace VC.Admin.Controllers
 
         public OrderController(
             IOrderService orderService,
+            IOrderRefundService orderRefundService,
             ILoggerProviderExtended loggerProvider,
             OrderMapper mapper,
+            OrderRefundMapper orderRefundMapper,
             ICustomerService customerService,
             IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
             ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> ordersRegionStatisticItemCSVExportService,
@@ -84,7 +89,9 @@ namespace VC.Admin.Controllers
             IObjectHistoryLogService objectHistoryLogService, IOptions<AppOptions> options)
         {
             _orderService = orderService;
+            _orderRefundService = orderRefundService;
             _mapper = mapper;
+            _orderRefundMapper = orderRefundMapper;
             _customerService = customerService;
             _addressMapper = addressMapper;
             _ordersRegionStatisticItemCSVExportService = ordersRegionStatisticItemCSVExportService;
@@ -484,12 +491,16 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
-        private OrderManageModel GetOrderManageModel(OrderDynamic dynamic)
+        private object GetOrderManageModel(OrderDynamic dynamic)
         {
-            OrderManageModel model;
+            object model;
             if (dynamic.IdObjectType == (int) OrderType.Reship)
             {
                 model = _mapper.ToModel<OrderReshipManageModel>(dynamic);
+            }
+            else if (dynamic.IdObjectType == (int)OrderType.Refund)
+            {
+                model = _mapper.ToModel<OrderRefundManageModel>(dynamic);
             }
             else
             {
@@ -710,6 +721,106 @@ namespace VC.Admin.Controllers
                 filter.To = filter.To.Value.AddDays(1);
             }
             return await _serviceCodeService.GetServiceCodesReportAsync(filter);
+        }
+
+        [HttpPost]
+        public async Task<Result<OrderRefundCalculateModel>> CalculateRefundOrder([FromBody]OrderRefundManageModel model)
+        {
+            var order = _orderRefundMapper.FromModel(model);
+            var orderContext = await _orderRefundService.CalculateRefundOrder(order);
+
+            OrderRefundCalculateModel toReturn = new OrderRefundCalculateModel(orderContext);
+
+            return toReturn;
+        }
+
+        [HttpGet]
+        public async Task<Result<OrderRefundManageModel>> GetRefundOrder(int id, int? idsource = null, int? idcustomer = null)
+        {
+            OrderRefundManageModel toReturn = null;
+            if (id == 0)
+            {
+                if (idsource.HasValue)
+                {
+                    var order = await _orderService.SelectAsync(idsource.Value);
+                    if (order != null)
+                    {
+                        OrderRefundDynamic refund=new OrderRefundDynamic();
+                        refund.IdOrderSource = order.IdOrderSource;
+                        refund.ShippingTotal = order.ShippingTotal;
+                        refund.ShippingAddress = order.ShippingAddress;
+                        refund.OrderStatus=OrderStatus.Processed;
+                        AddressDynamic paymentAddress = null;
+                        if (order?.PaymentMethod?.Address != null)
+                        {
+                            paymentAddress = order.PaymentMethod.Address;
+                        }
+                        else
+                        {
+                            var customer = order.Customer;
+                            if (customer.ProfileAddress != null)
+                            {
+                                paymentAddress = customer.ProfileAddress;
+                            }
+                            else
+                            {
+                                customer = await _customerService.SelectAsync(order.Customer.Id);
+                                paymentAddress = customer.ProfileAddress ?? new AddressDynamic();
+                            }
+                        }
+                        refund.PaymentMethod = new OrderPaymentMethodDynamic()
+                        {
+                            Address = paymentAddress,
+                            IdObjectType = (int)PaymentMethodType.Oac,
+                        };
+                        toReturn = _mapper.ToModel<OrderRefundManageModel>(order);
+                    }
+                }
+            }
+
+            var item = await _orderRefundService.SelectAsync(id);
+            if (item != null)
+            {
+                toReturn = _orderRefundMapper.ToModel<OrderRefundManageModel>(item);
+            }
+
+            return toReturn;
+        }
+
+        [HttpPost]
+        public async Task<Result<OrderRefundManageModel>> AddRefundOrder([FromBody]OrderRefundManageModel model)
+        {
+            if (!Validate(model))
+                return null;
+
+            var order = _orderRefundMapper.FromModel(model);
+
+            var sUserId = Request.HttpContext.User.GetUserId();
+            int userId;
+            if (int.TryParse(sUserId, out userId))
+            {
+                order.IdEditedBy = userId;
+            }
+            
+            if (model.OrderStatus != OrderStatus.Cancelled && model.OrderStatus != OrderStatus.Exported && model.OrderStatus != OrderStatus.Shipped)
+            {
+                await _orderRefundService.CalculateRefundOrder(order);
+
+                if (model.Id == 0)
+                {
+                    order = await _orderRefundService.InsertAsync(order);
+                }
+            }
+
+            OrderRefundManageModel toReturn = _orderRefundMapper.ToModel<OrderRefundManageModel>(order);
+
+            return toReturn;
+        }
+        
+        [HttpPost]
+        public async Task<Result<bool>> CancelRefundOrder(int id, [FromBody] object model)
+        {
+            return await _orderRefundService.CancelRefundOrderAsync(id);
         }
     }
 }
