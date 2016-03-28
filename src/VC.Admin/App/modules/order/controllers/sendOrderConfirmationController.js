@@ -36,8 +36,8 @@ angular.module('app.modules.order.controllers.sendOrderConfirmationController', 
 	    $scope.forms = {};
 
 	    $scope.options = {};
-	    $scope.options.Email = data.email;
-	    $scope.options.Id = data.id;
+	    $scope.options.Email = data.Email;
+	    $scope.options.Id = data.Id;
 
 	    $scope.save = function () {
 	        $.each($scope.forms.form, function (index, element) {

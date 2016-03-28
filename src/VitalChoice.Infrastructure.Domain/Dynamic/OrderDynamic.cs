@@ -65,5 +65,8 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
         public bool? AffiliateNewCustomerOrder { get; set; }
 
         public ICollection<ReshipProblemSkuOrdered> ReshipProblemSkus { get; set; }
+
+        //Don't storing in DB
+        public int? SendSide { get; set; }
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using VitalChoice.Ecommerce.Domain.Attributes;
 
-namespace VC.Public.Models.Profile
+namespace VitalChoice.SharedWeb.Models.Orders
 {
     public class AutoShipHistoryItemModel
     {

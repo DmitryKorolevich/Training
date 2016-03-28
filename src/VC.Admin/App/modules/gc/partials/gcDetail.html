@@ -58,12 +58,18 @@
                                                 <label class="col-md-3 control-label">First Name</label>
                                                 <div class="col-md-9">
                                                     <input type="text" name="FirstName" class="form-control" placeholder="First Name" data-ng-model="gc.FirstName">
+                                                    <div class="error-container" ng-show="forms.form.submitted && forms.form.FirstName.$invalid">
+                                                        <small class="error" ng-show="forms.form.FirstName.$error.server">{{serverMessages.GetMessage('FirstName')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Last Name</label>
                                                 <div class="col-md-9">
                                                     <input type="text" name="LastName" class="form-control" placeholder="Last Name" data-ng-model="gc.LastName">
+                                                    <div class="error-container" ng-show="forms.form.submitted && forms.form.LastName.$invalid">
+                                                        <small class="error" ng-show="forms.form.LastName.$error.server">{{serverMessages.GetMessage('LastName')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">

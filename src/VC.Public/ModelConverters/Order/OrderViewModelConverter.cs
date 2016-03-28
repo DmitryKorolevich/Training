@@ -18,6 +18,7 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
+using VitalChoice.SharedWeb.Helpers;
 
 namespace VC.Public.ModelConverters.Order
 {

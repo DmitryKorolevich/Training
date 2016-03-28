@@ -35,6 +35,7 @@ using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VC.Admin.ModelConverters;
+using VC.Admin.Models.Customers;
 using VC.Admin.Models.Products;
 using VitalChoice.Business.Mail;
 using VitalChoice.Business.Services.Bronto;
@@ -46,6 +47,10 @@ using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates;
+using VitalChoice.SharedWeb.Models.Orders;
+using VitalChoice.Business.Helpers;
+using VitalChoice.Ecommerce.Domain.Entities.Payment;
+using VitalChoice.SharedWeb.Helpers;
 
 namespace VC.Admin.Controllers
 {
@@ -54,11 +59,17 @@ namespace VC.Admin.Controllers
     {
         private readonly IOrderService _orderService;
         private readonly OrderMapper _mapper;
-        private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
-        private readonly ICustomerService _customerService;
+        private readonly IDynamicMapper<AddressDynamic, OrderAddress> _orderAddressMapper;
+		private readonly IDynamicMapper<AddressDynamic, Address> _addressMapper;
+		private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _customerPaymentMethodMapper;
+		private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _orderPaymentMethodMapper;
+
+		private readonly ICustomerService _customerService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly IOptions<AppOptions> _options;
-        private readonly ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> _ordersRegionStatisticItemCSVExportService;
+	    private readonly IAppInfrastructureService _appInfrastructureService;
+	    private readonly ICountryService _countryService;
+	    private readonly ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> _ordersRegionStatisticItemCSVExportService;
         private readonly ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> _ordersZipStatisticItemCSVExportService;
         private readonly ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> _vOrderWithRegionInfoItemCSVExportService;
         private readonly IProductService _productService;
@@ -67,8 +78,11 @@ namespace VC.Admin.Controllers
         private readonly BrontoService _brontoService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly ILogger logger;
+		private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
+		private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
+		private readonly IDynamicMapper<OrderDynamic, Order> _orderMapper;
 
-        public OrderController(
+		public OrderController(
             IOrderService orderService,
             ILoggerProviderExtended loggerProvider,
             OrderMapper mapper,
@@ -81,12 +95,12 @@ namespace VC.Admin.Controllers
             INotificationService notificationService,
             IServiceCodeService serviceCodeService,
             BrontoService brontoService,
-            IObjectHistoryLogService objectHistoryLogService, IOptions<AppOptions> options)
+            IObjectHistoryLogService objectHistoryLogService, IOptions<AppOptions> options, IAppInfrastructureService appInfrastructureService, ICountryService countryService, IDynamicMapper<OrderDynamic, Order> orderMapper, IDynamicMapper<ProductDynamic, Product> productMapper, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodMapper, IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> customerPaymentMethodMapper, IDynamicMapper<AddressDynamic, Address> addressMapper1)
         {
             _orderService = orderService;
             _mapper = mapper;
             _customerService = customerService;
-            _addressMapper = addressMapper;
+            _orderAddressMapper = addressMapper;
             _ordersRegionStatisticItemCSVExportService = ordersRegionStatisticItemCSVExportService;
             _ordersZipStatisticItemCSVExportService = ordersZipStatisticItemCSVExportService;
             _vOrderWithRegionInfoItemCSVExportService = vOrderWithRegionInfoItemCSVExportService;
@@ -96,7 +110,15 @@ namespace VC.Admin.Controllers
             _brontoService = brontoService;
             _objectHistoryLogService = objectHistoryLogService;
             _options = options;
-            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
+	        _appInfrastructureService = appInfrastructureService;
+	        _countryService = countryService;
+			_orderMapper = orderMapper;
+			_productMapper = productMapper;
+			_skuMapper = skuMapper;
+			_orderPaymentMethodMapper = orderPaymentMethodMapper;
+			_customerPaymentMethodMapper = customerPaymentMethodMapper;
+			_addressMapper = addressMapper1;
+			_pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             this.logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -183,26 +205,93 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
-        //[HttpPost]
-        //public async Task<Result<PagedList<OrderListItemModel>>> GetOrders([FromBody]VOrderFilter filter)
-        //{
-        //    if (filter.To.HasValue)
-        //    {
-        //        filter.To = filter.To.Value.AddDays(1);
-        //    }
+	    [HttpPost]
+	    public async Task<Result<PagedList<AutoShipHistoryItemModel>>> GetAutoShips([FromBody] OrderFilter filter)
+	    {
+			var infr = _appInfrastructureService.Get();
+			var countries = await _countryService.GetCountriesAsync();
 
-        //    var result = await _orderService.GetOrdersAsync2(filter);
+			filter.Sorting.SortOrder = VitalChoice.Infrastructure.Domain.Transfer.SortOrder.Desc;
+			filter.Sorting.Path = VOrderSortPath.DateCreated;
+			filter.OrderType = OrderType.AutoShip;
 
-        //    var toReturn = new PagedList<OrderListItemModel>
-        //    {
-        //        Items = result.Items.Select(p => new OrderListItemModel(p)).ToList(),
-        //        Count = result.Count,
-        //    };
+			var orders = await _orderService.GetFullOrdersAsync(filter);
 
-        //    return toReturn;
-        //}
+		    var helper = new AutoShipModelHelper(_skuMapper, _productMapper, _orderMapper, infr, countries);
+			var ordersModel = new PagedList<AutoShipHistoryItemModel>
+			{
+				Items = orders.Items.Select(p =>helper.PopulateAutoShipItemModel(p)).ToList(),
+				Count = orders.Count
+			};
 
-        [HttpGet]
+			return ordersModel;
+		}
+
+	    [HttpGet]
+	    public async Task<Result<IList<CreditCardModel>>> GetAutoShipCreditCards([FromQuery] int orderId, [FromQuery] int customerId)
+	    {
+		    var model = new List<CreditCardModel>();
+
+			var order = await _orderService.SelectAsync(orderId);
+			var orderCreditCard = _addressMapper.ToModel<CreditCardModel>(order.PaymentMethod.Address);
+			_orderPaymentMethodMapper.UpdateModel(orderCreditCard, order.PaymentMethod);
+
+		    orderCreditCard.IsSelected = true;
+			model.Add(orderCreditCard);
+
+			var customer = await _customerService.SelectAsync(customerId);
+				var dynamics = customer.CustomerPaymentMethods
+				.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard).ToList();
+		    foreach (var item in dynamics)
+		    {
+				var tempModel = _addressMapper.ToModel<CreditCardModel>(item.Address);
+				_customerPaymentMethodMapper.UpdateModel(tempModel, item);
+
+				model.Add(tempModel);
+			}
+
+		    return model;
+	    }
+
+		[HttpPost]
+		public async Task<Result<CreditCardModel>> UpdateAutoShipBilling([FromBody]CreditCardModel model, [FromQuery] int orderId)
+	    {
+			if (!Validate(model))
+				return null;
+
+			var order = await _orderService.SelectAsync(orderId, true);
+
+			var addressId = order.PaymentMethod.Address.Id;
+			await _orderPaymentMethodMapper.UpdateObjectAsync(model, order.PaymentMethod,
+							   (int)PaymentMethodType.CreditCard);
+			await _addressMapper.UpdateObjectAsync(model, order.PaymentMethod.Address, (int)AddressType.Billing);
+
+			order.PaymentMethod.Address.Id = addressId;
+
+			order = await _orderService.UpdateAsync(order);
+			var orderCreditCard = _addressMapper.ToModel<CreditCardModel>(order.PaymentMethod.Address);
+			_orderPaymentMethodMapper.UpdateModel(orderCreditCard, order.PaymentMethod);
+
+			return orderCreditCard;
+	    }
+
+	    [HttpPost]
+		public async Task<Result<bool>> ActivatePauseAutoShip([FromQuery]int customerId, [FromQuery]int id)
+		{
+			await _orderService.ActivatePauseAutoShipAsync(customerId, id);
+
+			return true;
+		}
+
+		[HttpPost]
+		public async Task<Result<bool>> DeleteAutoShip([FromQuery]int customerId, [FromQuery]int id)
+		{
+			await _orderService.DeleteAutoShipAsync(customerId, id);
+
+			return true;
+		}
+
+		[HttpGet]
         public async Task<Result<OrderManageModel>> GetOrder(int id, int? idcustomer = null, bool refreshprices = false)
         {
             if (id == 0)
@@ -671,11 +760,34 @@ namespace VC.Admin.Controllers
                 return false;
             }
 
-            var emailModel = _mapper.ToModel<OrderShippingConfirmationEmail>(order);
-            if (emailModel == null)
-                return false;
+            if (model.SendAll)
+            {
+                var emailModel = _mapper.ToModel<OrderShippingConfirmationEmail>(order);
+                if (emailModel == null)
+                    return false;
+                await _notificationService.SendOrderShippingConfirmationEmailAsync(model.Email, emailModel);
+            }
+            else
+            {
+                if (model.SendP)
+                {
+                    order.SendSide = (int)POrderType.P;
+                    var emailModel = _mapper.ToModel<OrderShippingConfirmationEmail>(order);
+                    if (emailModel == null)
+                        return false;
 
-            await _notificationService.SendOrderShippingConfirmationEmailAsync(model.Email, emailModel);
+                    await _notificationService.SendOrderShippingConfirmationEmailAsync(model.Email, emailModel);
+                }
+                if (model.SendNP)
+                {
+                    order.SendSide = (int)POrderType.NP;
+                    var emailModel = _mapper.ToModel<OrderShippingConfirmationEmail>(order);
+                    if (emailModel == null)
+                        return false;
+
+                    await _notificationService.SendOrderShippingConfirmationEmailAsync(model.Email, emailModel);
+                }
+            }
             return true;
         }
 

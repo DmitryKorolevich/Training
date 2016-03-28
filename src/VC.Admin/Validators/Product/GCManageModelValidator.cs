@@ -35,6 +35,13 @@ namespace VC.Admin.Validators.Product
                     .WithMessage(model => model.Email, ValidationMessages.EmailFormat)
                     .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
                     .WithMessage(model => model.Email, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+
+                RuleFor(model => model.FirstName)
+                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                    .WithMessage(model => model.FirstName, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+                RuleFor(model => model.LastName)
+                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                    .WithMessage(model => model.LastName, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
             }
         }
     }

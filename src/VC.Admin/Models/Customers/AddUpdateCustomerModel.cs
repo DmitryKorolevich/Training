@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using VC.Admin.Models.Customers;
 using VC.Admin.Validators.Customer;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;

@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using VC.Admin.Models.Customer;
+using VC.Admin.Models.Customers;
 using VitalChoice.Validation.Logic;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Infrastructure.Domain.Constants;

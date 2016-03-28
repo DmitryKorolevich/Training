@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using VC.Admin.Models.Customer;
+using VC.Admin.Models.Customers;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Base;
@@ -16,6 +17,7 @@ using VitalChoice.Business.Queries.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Business.Helpers;
+using VitalChoice.SharedWeb.Helpers;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 

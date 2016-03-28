@@ -36,8 +36,16 @@ angular.module('app.modules.order.controllers.sendOrderShippingConfirmationContr
 	    $scope.forms = {};
 
 	    $scope.options = {};
-	    $scope.options.Email = data.email;
-	    $scope.options.Id = data.id;
+	    $scope.options.Email = data.Email;
+	    $scope.options.OrderStatus = data.OrderStatus;
+	    $scope.options.POrderStatus = data.POrderStatus;
+	    $scope.options.NPOrderStatus = data.NPOrderStatus;
+
+	    $scope.options.SendAll = $scope.options.OrderStatus != null;
+	    $scope.options.SendP = $scope.options.OrderStatus == null && $scope.options.POrderStatus==3;//shipped
+	    $scope.options.SendNP = $scope.options.OrderStatus == null && $scope.options.NPOrderStatus == 3;//shipped
+
+	    $scope.options.Id = data.Id;
 
 	    $scope.save = function () {
 	        $.each($scope.forms.form, function (index, element) {

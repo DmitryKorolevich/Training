@@ -1,8 +1,9 @@
-﻿using VitalChoice.Ecommerce.Domain.Attributes;
+﻿using VC.Admin.Models.Customer;
+using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Validation.Models;
 
-namespace VC.Admin.Models.Customer
+namespace VC.Admin.Models.Customers
 {
     public class CheckPaymentModel : BaseModel
     {
