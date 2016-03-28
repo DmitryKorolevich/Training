@@ -48,7 +48,7 @@ namespace VitalChoice.ContentProcessing.Extensions
             }
             try
             {
-                if (scope.ModelData is string && !String.IsNullOrEmpty((string)scope.ModelData))
+                if (!string.IsNullOrEmpty(scope.ModelData as string))
                 {
                     if (_type == null)
                     {

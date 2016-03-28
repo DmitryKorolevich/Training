@@ -638,10 +638,10 @@ namespace VitalChoice.Business.Services.Orders
                                 generatedGcs =
                                     await
                                         giftCertificateRepository.Query(
-                                            p => p.IdOrder == order.Id && p.StatusCode != RecordStatusCode.Deleted).SelectAsync();
+                                            p => p.IdOrder == order.Id && p.StatusCode != RecordStatusCode.NotActive).SelectAsync();
                                 generatedGcs.ForEach(p =>
                                 {
-                                    p.StatusCode = RecordStatusCode.Deleted;
+                                    p.StatusCode = RecordStatusCode.NotActive;
                                 });
                             }
 
@@ -649,19 +649,21 @@ namespace VitalChoice.Business.Services.Orders
                             if (order.GiftCertificates?.Count > 0)
                             {
                                 var ids = order.GiftCertificates.Select(p => p.GiftCertificate?.Id).ToList();
-                                usedGcs = await giftCertificateRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
-                                foreach (var giftCertificateInOrder in order.GiftCertificates)
-                                {
-                                    var gc = usedGcs.FirstOrDefault(p => p.Id == giftCertificateInOrder.GiftCertificate?.Id);
-                                    if (gc != null)
-                                    {
-                                        gc.Balance += giftCertificateInOrder.Amount;
-                                        if (giftCertificateInOrder.GiftCertificate != null)
-                                        {
-                                            giftCertificateInOrder.GiftCertificate.Balance = gc.Balance;
-                                        }
-                                    }
-                                }
+                                usedGcs = await giftCertificateRepository.Query(p => ids.Contains(p.Id)).SelectAsync(true);
+                                usedGcs.UpdateKeyed(order.GiftCertificates, g => g.Id, g => g.GiftCertificate.Id,
+                                    (db, gc) => db.Balance += gc.Amount);
+                                //foreach (var giftCertificateInOrder in order.GiftCertificates)
+                                //{
+                                //    var gc = usedGcs.FirstOrDefault(p => p.Id == giftCertificateInOrder.GiftCertificate?.Id);
+                                //    if (gc != null)
+                                //    {
+                                //        gc.Balance += giftCertificateInOrder.Amount;
+                                //        //if (giftCertificateInOrder.GiftCertificate != null)
+                                //        //{
+                                //        //    giftCertificateInOrder.GiftCertificate.Balance = gc.Balance;
+                                //        //}
+                                //    }
+                                //}
                                 order.GiftCertificates.Clear();
                             }
 
@@ -728,6 +730,7 @@ namespace VitalChoice.Business.Services.Orders
                     model.IdAddedBy = entity.IdEditedBy;
                     await UpdateAffiliateOrderPayment(model, uow);
                     await UpdateHealthwiseOrder(model, uow);
+                    await ChargeGiftCertificates(model, uow);
                     model.PaymentMethod.IdOrder = model.Id;
 
                     remoteUpdateTask = _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy);
@@ -745,6 +748,20 @@ namespace VitalChoice.Business.Services.Orders
                 Logger.LogError("Cannot update order payment info on remote.");
             }
             return entity;
+        }
+
+        private async Task ChargeGiftCertificates(OrderDynamic model, IUnitOfWorkAsync uow)
+        {
+            if (model.OrderStatus == OrderStatus.Incomplete ||
+                model.POrderStatus == OrderStatus.Incomplete && model.NPOrderStatus == OrderStatus.Incomplete)
+            {
+                return;
+            }
+            var gcsRep = uow.RepositoryAsync<GiftCertificate>();
+            var gcs = model.GiftCertificates.Select(g => g.GiftCertificate.Id).Distinct().ToList();
+            var gcsInDb = await gcsRep.Query(g => gcs.Contains(g.Id)).SelectAsync(true);
+            gcsInDb.UpdateKeyed(model.GiftCertificates.Select(g => g.GiftCertificate), g => g.Id, (gcDb, gc) => gcDb.Balance = gc.Balance);
+            await uow.SaveChangesAsync();
         }
 
         private async Task EnsurePaymentMethod(OrderDynamic model)
@@ -802,6 +819,7 @@ namespace VitalChoice.Business.Services.Orders
                         }
                         await UpdateAffiliateOrderPayment(model, uow);
                         await UpdateHealthwiseOrder(model, uow);
+                        await ChargeGiftCertificates(model, uow);
                         model.PaymentMethod.IdOrder = model.Id;
                     }
 

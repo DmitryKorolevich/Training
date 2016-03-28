@@ -73,7 +73,7 @@ namespace VC.Admin.Models.Orders
                     AutoShipFrequency6 = model.Sku.DictionaryData.ContainsKey("AutoShipFrequency6") ? model.Sku.Data.AutoShipFrequency6 : false;
                 }
 
-                GCCodes = model.GcsGenerated?.Select(p => p.Code).ToList() ?? new List<string>(); 
+                GCCodes = model.GcsGenerated?.Where(g => !string.IsNullOrEmpty(g.Code)).Select(p => p.Code).ToList();
 
                 Messages = model.Messages;
             }

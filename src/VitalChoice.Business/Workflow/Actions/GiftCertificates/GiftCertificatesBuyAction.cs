@@ -10,7 +10,6 @@ using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
-using VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
@@ -42,7 +41,7 @@ namespace VitalChoice.Business.Workflow.Actions.GiftCertificates
             }
             else
             {
-                await AddAll(context, gcService);
+                AddAll(context);
             }
             return 0;
         }
@@ -77,23 +76,22 @@ namespace VitalChoice.Business.Workflow.Actions.GiftCertificates
                         }
                         if (numberToAdd > 0)
                         {
-                            sku.GcsGenerated.AddRange(await CreateGiftCertificates(sku, numberToAdd, context, gcService));
+                            sku.GcsGenerated.AddRange(CreateGiftCertificates(sku, numberToAdd, context));
                         }
                     }
                     else
                     {
-                        sku.GcsGenerated.AddRange(await CreateGiftCertificates(sku, sku.Quantity, context, gcService));
+                        sku.GcsGenerated.AddRange(CreateGiftCertificates(sku, sku.Quantity, context));
                     }
                 }
             }
             else
             {
-                await AddAll(context, gcService);
+                AddAll(context);
             }
         }
 
-        private static async Task<List<GiftCertificate>> CreateGiftCertificates(SkuOrdered sku, int count, OrderDataContext context,
-            IGcService gcService)
+        private static List<GiftCertificate> CreateGiftCertificates(SkuOrdered sku, int count, OrderDataContext context)
         {
             List<GiftCertificate> result = new List<GiftCertificate>();
             for (int i = 0; i < count; i++)
@@ -105,7 +103,7 @@ namespace VitalChoice.Business.Workflow.Actions.GiftCertificates
                         Balance = context.Order.Customer.IdObjectType == (int) CustomerType.Wholesale
                             ? sku.Sku.WholesalePrice
                             : sku.Sku.Price,
-                        Code = await gcService.GenerateGCCode(),
+                        //Code = await gcService.GenerateGCCode(),
                         Email = context.Order.Customer?.Email,
                         FirstName = context.Order.Customer?.ProfileAddress.SafeData.FirstName,
                         LastName = context.Order.Customer?.ProfileAddress.SafeData.LastName,
@@ -120,12 +118,12 @@ namespace VitalChoice.Business.Workflow.Actions.GiftCertificates
             return result;
         }
 
-        private static async Task AddAll(OrderDataContext context, IGcService gcService)
+        private static void AddAll(OrderDataContext context)
         {
-            await context.SkuOrdereds.Where(s => s.Sku.IdObjectType == (int) ProductType.EGс || s.Sku.IdObjectType == (int) ProductType.Gc)
-                .ForEachAsync(async sku =>
+            context.SkuOrdereds.Where(s => s.Sku.IdObjectType == (int) ProductType.EGс || s.Sku.IdObjectType == (int) ProductType.Gc)
+                .ForEach(sku =>
                 {
-                    sku.GcsGenerated = await CreateGiftCertificates(sku, sku.Quantity, context, gcService);
+                    sku.GcsGenerated = CreateGiftCertificates(sku, sku.Quantity, context);
                 });
         }
     }

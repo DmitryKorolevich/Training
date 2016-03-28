@@ -91,6 +91,14 @@ namespace VitalChoice.Caching.Expressions.Visitors
                         return node.Arguments[0];
                 }
             }
+            if (node.Method.DeclaringType == typeof (RelationalQueryableExtensions))
+            {
+                if (node.Method.Name == "FromSql")
+                {
+                    NonCached = true;
+                    return node;
+                }
+            }
             var result = base.VisitMethodCall(node);
             if (node.Method.DeclaringType == typeof (EntityFrameworkQueryableExtensions))
             {
