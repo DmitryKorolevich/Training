@@ -13,6 +13,8 @@ angular.module('app.modules.order', [
 	'app.modules.order.controllers.sendOrderConfirmationController',
 	'app.modules.order.controllers.sendOrderShippingConfirmationController',
 	'app.modules.order.controllers.serviceCodesReportController',
+	'app.modules.order.controllers.customerAutoShipsController',
+	'app.modules.order.controllers.manageAutoShipBillingController'
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
