@@ -14,11 +14,11 @@ angular.module('app.modules.order.controllers.manageAutoShipBillingController', 
 		} else {
 			var messages = "";
 			if (result.Messages) {
-				$scope.creditCardForm.submitted = true;
+				$scope.forms.submitted["creditCard"] = true;
 				$scope.serverMessages = new ServerMessages(result.Messages);
 				$.each(result.Messages, function(index, value) {
-					if (value.Field && $scope.creditCardForm[value.Field]) {
-						$scope.creditCardForm[value.Field].$setValidity("server", false);
+					if (value.Field && $scope.forms.creditCard[value.Field]) {
+						$scope.forms.creditCard[value.Field].$setValidity("server", false);
 					}
 					messages += value.Message + "<br />";
 				});
@@ -34,6 +34,8 @@ angular.module('app.modules.order.controllers.manageAutoShipBillingController', 
 	};
 
 	function initialize() {
+		$scope.forms = { submitted: [] };
+
 		customerEditService.initBase($scope);
 
 		$scope.countries = data.countries;
@@ -46,18 +48,19 @@ angular.module('app.modules.order.controllers.manageAutoShipBillingController', 
 		$scope.creditCardTypes = $rootScope.ReferenceData.CreditCardTypes;
 
 		angular.forEach($scope.creditCards, function (cc, index) {
+			cc.formName = "creditCard";
 			customerEditService.syncCountry($scope, cc.Address);
 		});
 	}
 
 	$scope.save = function() {
-		$.each($scope.creditCardForm, function(index, element) {
+		$.each($scope.forms.creditCard, function(index, element) {
 			if (element && element.$name == index) {
 				element.$setValidity("server", true);
 			}
 		});
 
-		if ($scope.creditCardForm.$valid) {
+		if ($scope.forms.creditCard.$valid) {
 			$scope.saving = true;
 			orderService.updateAutoShipBilling($scope.creditCard,$scope.orderId, $scope.saveTracker).success(function(result) {
 					successHandler(result);
@@ -66,7 +69,7 @@ angular.module('app.modules.order.controllers.manageAutoShipBillingController', 
 					errorHandler(result);
 				});
 		} else {
-			$scope.creditCardForm.submitted = true;
+			$scope.forms.submitted["creditCard"] = true;
 		}
 	};
 

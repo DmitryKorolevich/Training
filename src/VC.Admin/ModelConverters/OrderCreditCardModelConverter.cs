@@ -12,9 +12,9 @@ namespace VC.Admin.ModelConverters
         {
             if (dynamic.DictionaryData.ContainsKey("ExpDate"))
             {
-                DateTime exp = dynamic.Data.ExpDate;
-                model.ExpirationDateMonth = exp.Month;
-                model.ExpirationDateYear = exp.Year%2000;
+                DateTime? exp = dynamic.SafeData.ExpDate;
+                model.ExpirationDateMonth = exp?.Month;
+                model.ExpirationDateYear = exp?.Year%2000;
             }
         }
 
