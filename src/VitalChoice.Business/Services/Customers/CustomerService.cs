@@ -261,14 +261,17 @@ namespace VitalChoice.Business.Services.Customers
 			foreach (var dbFile in updated.Files)
 			{
 				bool delete = true;
-				foreach (var file in model.Files)
-				{
-					if (dbFile.Id == file.Id)
-					{
-						delete = false;
-					}
-				}
-				if (delete)
+			    if (model.Files != null)
+			    {
+			        foreach (var file in model.Files)
+			        {
+			            if (dbFile.Id == file.Id)
+			            {
+			                delete = false;
+			            }
+			        }
+			    }
+			    if (delete)
 				{
 					fileNamesForDelete.Add(dbFile.FileName);
 				}
