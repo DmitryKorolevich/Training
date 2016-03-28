@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
@@ -43,8 +42,9 @@ using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
-using VitalChoice.Business.Helpers;
 using VitalChoice.Interfaces.Services.Settings;
+using VitalChoice.SharedWeb.Helpers;
+using VitalChoice.SharedWeb.Models.Orders;
 
 namespace VC.Public.Controllers
 {
@@ -99,18 +99,6 @@ namespace VC.Public.Controllers
 	        _logger = loggerProvider.CreateLoggerDefault();
         }
 
-	    private DateTime FindNextAutoShipDate(DateTime orderDate, int frequency)
-	    {
-		    var next = orderDate;
-		    do
-		    {
-			    next = next.AddMonths(frequency);
-
-		    } while (next < DateTime.Now);
-
-		    return next;
-	    }
-
 	    private async Task<PagedListEx<AutoShipHistoryItemModel>> PopulateAutoShipHistoryModel(OrderFilter filter)
 		{
 			var infr = InfrastructureService.Get();
@@ -125,36 +113,10 @@ namespace VC.Public.Controllers
 			
 			var orders = await _orderService.GetFullOrdersAsync(filter);
 
+			var helper = new AutoShipModelHelper(_skuMapper, _productMapper, _orderMapper, infr, countries);
 			var ordersModel = new PagedListEx<AutoShipHistoryItemModel>
 			{
-				Items = orders.Items.Select(p =>
-				{
-					var skuItem = p.Skus.First();
-
-					var result = _skuMapper.ToModel<AutoShipHistoryItemModel>(skuItem.Sku);
-					_productMapper.UpdateModel(result, skuItem.Sku.Product);
-					_orderMapper.UpdateModel(result, p);
-
-					var paymentMethod = p.PaymentMethod;
-					result.PaymentMethodDetails = paymentMethod.PopulateCreditCardDetails(infr);
-
-					var shippingAddress = p.ShippingAddress;
-					result.ShippingDetails = shippingAddress.PopulateShippingAddressDetails(countries);
-
-					var displayName = result.Name;
-					if (!string.IsNullOrWhiteSpace(result.SubTitle))
-					{
-						displayName += $" {result.SubTitle}";
-					}
-					displayName += $" ({result.PortionsCount})";
-
-					result.DisplayName = displayName;
-					result.Active = p.StatusCode == (int)RecordStatusCode.Active;
-					result.NextDate = FindNextAutoShipDate(p.DateCreated, result.Frequency);
-					result.Id = p.Id;
-
-					return result;
-				}).ToList(),
+				Items = orders.Items.Select(p => helper.PopulateAutoShipItemModel(p)).ToList(),
 				Count = orders.Count,
 				Index = filter.Paging.PageIndex
 			};

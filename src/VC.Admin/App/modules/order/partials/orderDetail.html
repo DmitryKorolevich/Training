@@ -515,11 +515,16 @@
                             </div>
                         </div>
                     </tab>
-                    <tab heading="Order History">
-                        <div class="container-fluid">
-                            <div ng-controller="customerOrdersController" onload="name = 'CustomerOrders'" data-ng-include="'app/modules/order/partials/customerOrdersList.html'"></div>
-                        </div>
-                    </tab>
+                <tab heading="Order History">
+	                <div class="container-fluid">
+		                <div ng-controller="customerOrdersController" onload="name = 'CustomerOrders'" data-ng-include="'app/modules/order/partials/customerOrdersList.html'"></div>
+	                </div>
+                </tab>
+					<tab heading="Auto-Ship">
+						<div class="container-fluid">
+							<div ng-controller="customerAutoShipsController" data-ng-include="'app/modules/order/partials/autoShipList.html'"></div>
+						</div>
+					</tab>
                     <tab data-ng-if="!id" heading="Account Profile" active="accountProfileTab.active">
                         <div class="container container-left">
                             <div class="well row">

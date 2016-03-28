@@ -22,6 +22,7 @@ using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
 using Microsoft.Extensions.OptionsModel;
 using Newtonsoft.Json;
+using VC.Admin.Models.Customers;
 using VitalChoice.Business.CsvExportMaps;
 using VitalChoice.Business.Queries.Users;
 using VitalChoice.Business.Services.Bronto;
