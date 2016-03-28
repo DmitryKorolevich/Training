@@ -60,7 +60,8 @@ namespace VC.Admin.ModelConverters
                 {
                     model.OrderSourceDateCreated = source.DateCreated;
                     model.OrderSourceTotal = source.Total;
-                    model.OrderSourcePaymentMethodType = source?.PaymentMethod?.IdObjectType;
+                    model.OrderSourcePaymentMethodType = source.PaymentMethod?.IdObjectType;
+                    model.OrderSourceShippingTotal = source.ShippingTotal;
                     model.OrderSourceRefundIds = _orderRefundService.GetRefundIdsForOrder(source.Id).Result;
                     if (dynamic.Id != 0)
                     {
@@ -140,7 +141,12 @@ namespace VC.Admin.ModelConverters
             if (model.IdPaymentMethodType.HasValue)
             {
                 dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Oac, model.IdPaymentMethodType.Value);
+                if (dynamic?.PaymentMethod?.Address != null)
+                {
+                    dynamic.PaymentMethod.Address.IdObjectType = (int) AddressType.Billing;
+                }
             }
+            dynamic.Customer=new CustomerDynamic() { Id =model.IdCustomer};
 
             dynamic.RefundSkus = model.RefundSkus.Where(p => p.Active && p.IdSku.HasValue).Select(p => new RefundSkuOrdered()
             {

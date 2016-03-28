@@ -1,0 +1,139 @@
+﻿<div class="container-fluid order-edit">
+    <div class="left-pane-controls">
+        <div class="well container-fluid">
+            <div data-ng-if="!order.Id">
+                <button data-ng-click="save()" class="btn btn-success width-160px" unsaved-warning-clear>Submit Refund</button>
+            </div>
+            <div data-ng-if="order.Id && order.OrderStatus!=4">
+                <button data-ng-click="cancelRefund()" class="btn btn-default width-160px">Cancel Refund</button>
+            </div>
+            <div class="margin-top-10px">
+                <button ui-sref="index.oneCol.manageOrders" class="btn btn-default width-160px" unsaved-warning-clear>Cancel</button>
+            </div>
+            <div class="margin-top-10px">
+                <button class="btn btn-primary width-160px" ui-sref="index.oneCol.manageOrders">Manage All</button>
+            </div>
+            <div class="margin-top-10px">
+                <button class="btn btn-info width-160px" data-ng-click="goToCustomer();">Manage Customer</button>
+            </div>
+        </div>
+        <div ng-controller="objectHistorySectionController" onload="name = 'History'" data-ng-include="'app/modules/order/partials/orderObjectHistorySection.html'"></div>
+    </div>
+    <div class="right-pane-main">
+        <div class="container-fluid">
+            <div class="row">
+                <span class="legend top">
+                    <span data-ng-if="legend.IdOrderSource" class="item">Associated Order ID: <a ui-sref="index.oneCol.orderDetail({id: legend.IdOrderSource })"><strong>{{legend.IdOrderSource}}</strong></a></span>
+                    <span data-ng-if="legend.OrderSourceRefundIds" class="item">Associated Refund IDs: 
+                        <span data-ng-repeat="item in legend.OrderSourceRefundIds"><a ui-sref="index.oneCol.orderRefundDetail({id: item })"><strong>{{item}}</strong></a><strong data-ng-if="!$last">, </strong></span>
+                    </span>
+                    <span data-ng-if="legend.OrderSourceDateCreated" class="item">Order Date: <strong>{{::legend.OrderSourceDateCreated | date:"MM/dd/yy"}} {{::legend.OrderSourceDateCreated | date:"h:mm a"}}</strong></span>
+                    <span data-ng-if="legend.OrderSourceTotal" class="item">Total Order Amount: <strong>{{legend.OrderSourceTotal | currency}}</strong></span>
+                    <span data-ng-if="legend.OrderSourcePaymentMethodType" class="item">Form of Payment: <strong>{{::getReferenceItem(ReferenceData.PaymentMethods, legend.OrderSourcePaymentMethodType).Text}}</strong></span>
+                    <br />
+                    <span data-ng-if="legend.CustomerName" class="item">Customer: <strong>{{legend.CustomerName}}</strong></span>
+                    <span data-ng-if="legend.CustomerId" class="item">Customer ID: <strong>{{legend.CustomerId}}</strong></span>
+                    <span data-ng-if="legend.OrderId" class="item">Order ID: <strong>{{legend.OrderId}}</strong></span>
+                    <span data-ng-if="legend.OrderDate" class="item">Order Date: <strong>{{legend.OrderDate | date:"MM/dd/yy"}} {{::legend.OrderDate | date:"h:mm a"}}</strong></span>
+                    <span data-ng-if="legend.OrderStatus" class="item">Status: <strong>{{legend.OrderStatus}}</strong></span>
+                </span>
+            </div>
+            <div class="row">
+                <tabset>
+                    <tab heading="{{mainTab.name}}" active="mainTab.active">
+                        <div class="container container-left xbig-container">
+                            <div class="well row">
+                                <spinner-overlay data-loading="addEditTracker.active()">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <form class="form-horizontal" name="forms.topForm" data-ng-submit="save()" data-ng-class="{submitted: forms.topForm.submitted}" novalidate unsaved-warning-form>
+                                                <fieldset>
+                                                    <div class="form-group">
+                                                        <label for="type" class="col-md-3 control-label">Service Code</label>
+                                                        <div class="col-md-9">
+                                                            <select data-ng-disabled="orderEditDisabled" class="form-control" name="ServiceCode" data-ng-model="order.ServiceCode" ng-options="item.Key as item.Text for item in ReferenceData.ServiceCodes" required>
+                                                            </select>
+                                                            <div class="error-container" ng-show="forms.topForm.submitted && forms.topForm.ServiceCode.$invalid">
+                                                                <small class="error" ng-show="forms.topForm.ServiceCode.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Service Code")}}</small>
+                                                                <small class="error" ng-show="forms.topForm.ServiceCode.$error.server">{{serverMessages.GetMessage('ServiceCode')}}</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-3 control-label"></label>
+                                                        <div class="col-md-9">
+                                                            <div class="checkbox">
+                                                                <label>
+                                                                    <input type="checkbox" data-ng-disabled="orderEditDisabled" data-ng-model="order.ReturnAssociated">
+                                                                    <strong>Is there a product return associated with this Customer Service call?</strong>
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-3 control-label">Notes</label>
+                                                        <div class="col-md-9">
+                                                            <textarea type="text" name="OrderNotes" class="form-control" placeholder="Notes" rows="5" data-ng-model="order.OrderNotes" data-ng-disabled="orderEditDisabled" required></textarea>
+                                                            <div class="error-container" ng-show="forms.topForm.submitted && forms.topForm.OrderNotes.$invalid">
+                                                                <small class="error" ng-show="forms.topForm.OrderNotes.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Order Notes")}}</small>
+                                                                <small class="error" ng-show="forms.topForm.OrderNotes.$error.server">{{serverMessages.GetMessage('OrderNotes')}}</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </fieldset>
+                                            </form>
+                                        </div>
+                                        <div class="col-md-12 form-horizontal products">
+                                            <table class="table table-striped">
+                                                <tbody>
+                                                    <tr data-ng-repeat="item in order.RefundSkus">
+                                                        
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <form class="form-horizontal" name="forms.mainForm" data-ng-submit="save()" data-ng-class="{submitted: forms.mainForm.submitted}" novalidate unsaved-warning-form>
+                                                <fieldset>
+                                                </fieldset>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </spinner-overlay>
+                            </div>
+                        </div>
+                    </tab>
+                    <tab heading="Shipping Address" active="shippingAddressTab.active">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <spinner-overlay data-loading="addEditTracker.active()">
+                                    <div data-ng-include="'app/modules/customer/partials/updateOrderShippingSection.html'"></div>
+                                </spinner-overlay>
+                            </div>
+                        </div>
+                    </tab>
+                    <tab heading="Payment Information" active="paymentInfoTab.active">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <spinner-overlay data-loading="addEditTracker.active()">
+                                    <div class="form-horizontal">
+                                        <div>
+                                            <form class="form-horizontal" name="forms.oac" data-ng-class="{submitted: forms.submitted['oac']}" novalidate unsaved-warning-form>
+                                                <fieldset>
+                                                    <div>
+                                                        <span class="legend">Billing Address</span>
+                                                        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildOrderPaymentPartial(order.Oac, order.OnHold)]"></div>
+                                                    </div>
+                                                </fieldset>
+                                            </form
+                                        </div>
+                                    </div>
+                                </spinner-overlay>
+                            </div>
+                        </div>
+                    </tab>
+                </tabset>
+            </div>
+        </div>
+    </div>
+</div>

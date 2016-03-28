@@ -847,7 +847,7 @@ angular.module('app.modules.customer.services.customerEditService', [])
         {
             if (noteItem.Priority == 1)
             {
-                highPriNotes.push('<p>Date: ' + $filter('date')(noteItem.DateEdited, 'short') + '</p>' + '<p>Agent: ' + noteItem.EditedBy + '</p>' + '<p>Notes: <p class="container">' + noteItem.Text + '</p></p>');
+                highPriNotes.push('<p>Date: ' + $filter('date')(noteItem.DateEdited, 'short') + '</p>' + '<p>Agent: ' + noteItem.EditedBy + '</p>' + '<p>Notes: <p>' + noteItem.Text + '</p></p>');
             }
         });
         if (highPriNotes.length > 0)

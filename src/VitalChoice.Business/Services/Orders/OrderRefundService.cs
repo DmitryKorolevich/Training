@@ -64,7 +64,18 @@ namespace VitalChoice.Business.Services.Orders
                     .ThenInclude(p => p.OptionValues)
                     .Include(g => g.RefundOrderToGiftCertificates)
 		            .ThenInclude(og => og.OrderToGiftCertificate)
-                    .ThenInclude(g=>g.GiftCertificate);
+                    .ThenInclude(g=>g.GiftCertificate)
+                    .Include(o => o.PaymentMethod)
+                    .ThenInclude(p => p.BillingAddress)
+                    .ThenInclude(a => a.OptionValues)
+                    .Include(o => o.PaymentMethod)
+                    .ThenInclude(p => p.BillingAddress)
+                    .Include(o => o.PaymentMethod)
+                    .ThenInclude(p => p.OptionValues)
+                    .Include(o => o.PaymentMethod)
+                    .ThenInclude(p => p.PaymentMethod)
+                    .Include(o => o.ShippingAddress)
+                    .ThenInclude(s => s.OptionValues);
 		}
 
         protected override bool LogObjectFullData => true;
@@ -75,15 +86,15 @@ namespace VitalChoice.Business.Services.Orders
             {
                 Order = order
             };
-            var tree = await _treeFactory.CreateTreeAsync<OrderRefundDataContext, decimal>("OrderRefund");
-            await tree.ExecuteAsync(context);
-            UpdateOrderFromCalculationContext(order, context);
+            //var tree = await _treeFactory.CreateTreeAsync<OrderRefundDataContext, decimal>("OrderRefund");
+            //await tree.ExecuteAsync(context);
+            //UpdateOrderFromCalculationContext(order, context);
             return context;
         }
 
         public async Task<ICollection<int>> GetRefundIdsForOrder(int idOrder)
         {
-            return await ObjectRepository.Query(p => p.IdOrderSource == idOrder && p.StatusCode != (int)RecordStatusCode.Deleted)
+            return await ObjectRepository.Query(p => p.IdOrderSource == idOrder && p.StatusCode != (int)RecordStatusCode.Deleted && p.IdObjectType==(int)OrderType.Refund)
                     .SelectAsync(p => p.Id, false);
         }
 

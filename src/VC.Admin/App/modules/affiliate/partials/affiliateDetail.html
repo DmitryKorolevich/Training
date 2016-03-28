@@ -573,7 +573,7 @@
                                         <tbody>
                                             <tr data-ng-repeat="item in orders">
                                                 <td>
-                                                    <a ui-sref="{{::item.IdObjectType==5 ? 'index.oneCol.orderReshipDetail({id: item.Id })' : 'index.oneCol.orderDetail({id: item.Id })'}}">{{::item.IdOrder}}</a>
+                                                    <a ui-sref="{{::item.IdObjectType==5 ? 'index.oneCol.orderReshipDetail({id: item.Id })' :  item.IdObjectType==6 ? 'index.oneCol.orderRefundDetail({id: item.Id })' : 'index.oneCol.orderDetail({id: item.Id })'}}">{{::item.IdOrder}}</a>
                                                 </td>
                                                 <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>
                                                 <td>{{::item.CustomerName}}</td>

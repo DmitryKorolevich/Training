@@ -198,7 +198,7 @@
             refreshOrders();
         };
 
-        $scope.delete = function (id)
+        $scope.cancel = function (id)
         {
             confirmUtil.confirm(function ()
             {
@@ -219,6 +219,29 @@
                         errorHandler(result);
                     });
             }, 'Are you sure you want to cancel this order?');
+        };
+
+        $scope.cancelRefund = function (id)
+        {
+            confirmUtil.confirm(function ()
+            {
+                orderService.cancelRefundOrder(id, $scope.deleteTracker)
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            toaster.pop('success', "Success!", "Successfully canceled.");
+                            refreshOrders();
+                        } else
+                        {
+                            errorHandler(result);
+                        }
+                    })
+                    .error(function (result)
+                    {
+                        errorHandler(result);
+                    });
+            }, 'Are you sure you want to cancel this refund?');
         };
 
         $scope.allExportCall = function ()

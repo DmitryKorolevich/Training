@@ -470,7 +470,7 @@ namespace VC.Admin.Controllers
             if (toReturn.Main != null && !string.IsNullOrEmpty(toReturn.Main.Data))
             {
                 var dynamic = (OrderDynamic)JsonConvert.DeserializeObject(toReturn.Main.Data, typeof(OrderDynamic));
-                var model = GetOrderManageModel(dynamic);
+                var model = GetOrderManageModel(dynamic, toReturn.Main.Data);
                 toReturn.Main.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
@@ -480,7 +480,7 @@ namespace VC.Admin.Controllers
             if (toReturn.Before != null && !string.IsNullOrEmpty(toReturn.Before.Data))
             {
                 var dynamic = (OrderDynamic)JsonConvert.DeserializeObject(toReturn.Before.Data, typeof(OrderDynamic));
-                var model = GetOrderManageModel(dynamic);
+                var model = GetOrderManageModel(dynamic, toReturn.Before.Data);
                 toReturn.Before.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
@@ -491,16 +491,18 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
-        private object GetOrderManageModel(OrderDynamic dynamic)
+        private object GetOrderManageModel(OrderDynamic dynamic, string data)
         {
             object model;
             if (dynamic.IdObjectType == (int) OrderType.Reship)
             {
-                model = _mapper.ToModel<OrderReshipManageModel>(dynamic);
+                OrderReshipManageModel model2 = _mapper.ToModel<OrderReshipManageModel>(dynamic);
+                model = model2;
             }
             else if (dynamic.IdObjectType == (int)OrderType.Refund)
             {
-                model = _mapper.ToModel<OrderRefundManageModel>(dynamic);
+                var refund = (OrderRefundDynamic)JsonConvert.DeserializeObject(data, typeof(OrderRefundDynamic));
+                model = _orderRefundMapper.ToModel<OrderRefundManageModel>(refund);
             }
             else
             {
@@ -746,9 +748,12 @@ namespace VC.Admin.Controllers
                     if (order != null)
                     {
                         OrderRefundDynamic refund=new OrderRefundDynamic();
-                        refund.IdOrderSource = order.IdOrderSource;
-                        refund.ShippingTotal = order.ShippingTotal;
+                        refund.DateCreated = DateTime.Now;
+                        refund.IdObjectType = (int)OrderType.Refund;
+                        refund.Customer = order.Customer;
+                        refund.IdOrderSource = order.Id;
                         refund.ShippingAddress = order.ShippingAddress;
+                        refund.ShippingAddress.Id = 0;
                         refund.OrderStatus=OrderStatus.Processed;
                         AddressDynamic paymentAddress = null;
                         if (order?.PaymentMethod?.Address != null)
@@ -768,12 +773,13 @@ namespace VC.Admin.Controllers
                                 paymentAddress = customer.ProfileAddress ?? new AddressDynamic();
                             }
                         }
+                        paymentAddress.Id = 0;
                         refund.PaymentMethod = new OrderPaymentMethodDynamic()
                         {
                             Address = paymentAddress,
                             IdObjectType = (int)PaymentMethodType.Oac,
                         };
-                        toReturn = _mapper.ToModel<OrderRefundManageModel>(order);
+                        toReturn = _orderRefundMapper.ToModel<OrderRefundManageModel>(refund);
                     }
                 }
             }

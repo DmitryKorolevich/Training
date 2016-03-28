@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Attributes;
 using VC.Admin.Validators.Order;
@@ -44,6 +45,7 @@ namespace VC.Admin.Models.Orders
 
         public bool Active { get; set; }
 
+        [JsonConstructor]
         public RefundSkuManageModel(RefundSkuOrdered model)
         {
             if (model != null)
@@ -113,6 +115,7 @@ namespace VC.Admin.Models.Orders
 
         public IList<string> Messages { get; set; }
 
+        [JsonConstructor]
         public RefundOrderToGiftCertificateManageModel(RefundOrderToGiftCertificateUsed model)
         {
             if (model != null)
@@ -228,6 +231,8 @@ namespace VC.Admin.Models.Orders
         public DateTime OrderSourceDateCreated { get; set; }
 
         public int? OrderSourcePaymentMethodType { get; set; }
+
+        public decimal OrderSourceShippingTotal { get; set; }
 
         public ICollection<int> OrderSourceRefundIds { get; set; }
 

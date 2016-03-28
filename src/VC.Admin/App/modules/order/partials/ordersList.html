@@ -206,11 +206,11 @@
                             <a class="btn btn-default btn-primary btn-xs" target="_blank" data-ng-href="/api/orderinvoice/base/{{::item.Id}}">
                                 <i class="fa fa-search"></i>
                             </a>
-                            <button title="Edit" class="btn btn-default btn-success btn-xs" ui-sref="{{::item.IdObjectType==5 ? 'index.oneCol.orderReshipDetail({id: item.Id })' : 'index.oneCol.orderDetail({id: item.Id })'}}">
+                            <button title="Edit" class="btn btn-default btn-success btn-xs" ui-sref="{{::item.IdObjectType==5 ? 'index.oneCol.orderReshipDetail({id: item.Id })' : item.IdObjectType==6 ? 'index.oneCol.orderRefundDetail({id: item.Id })' : 'index.oneCol.orderDetail({id: item.Id })'}}">
                                 <i class="glyphicon glyphicon-edit"></i>
                             </button>
                             <button title="Delete" data-ng-if="::!(item.OrderStatus==3 || item.OrderStatus==4 || item.OrderStatus==5 || item.POrderStatus==3 || item.POrderStatus==4 || item.POrderStatus==5 || item.NPOrderStatus==3 || item.NPOrderStatus==4 || item.NPOrderStatus==5)" class="btn btn-default btn-danger btn-xs"
-                                    ladda="deleteTracker.active()" data-ng-click="delete(item.Id);">
+                                    ladda="deleteTracker.active()" data-ng-click="item.IdObjectType==5 ? cancel(item.Id) : cancelRefund(item.Id)">
                                 <i class="glyphicon glyphicon-remove"></i>
                             </button>
                         </td>

@@ -321,3 +321,12 @@ BEGIN
 	ALTER COLUMN RefundPrice MONEY NOT NULL
 END
 GO
+
+IF NOT EXISTS(SELECT * FROM sys.indexes WHERE name = 'IX_Orders_IdOrderSource')
+BEGIN
+
+	CREATE NONCLUSTERED INDEX IX_Orders_IdOrderSource ON Orders (IdOrderSource)
+
+END
+
+GO

@@ -1126,6 +1126,7 @@ namespace VitalChoice.Ecommerce.Context
 
             builder.Entity<RefundSku>(entity =>
             {
+                entity.Ignore(s => s.Id);
                 entity.HasKey(r => new { r.IdOrder, r.IdSku });
                 entity.ToTable("RefundSkus");
                 entity.HasOne(r => r.Order)

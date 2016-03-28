@@ -48,8 +48,14 @@ angular.module('app.modules.order.services.orderEditService', [])
                     uiScope.forms.topForm.submitted = true;
                 }
                 uiScope.forms.mainForm.submitted = true;
-                uiScope.forms.mainForm2.submitted = true;
-                uiScope.forms.GCs.skussubmitted = true;
+                if (uiScope.forms.mainForm2 != null)
+                {
+                    uiScope.forms.mainForm2.submitted = true;
+                }
+                if (uiScope.forms.GCs)
+                {
+                    uiScope.forms.GCs.skussubmitted = true;
+                }
                 uiScope.forms.submitted['profile'] = true;
                 uiScope.forms.submitted['shipping'] = true;
                 uiScope.forms.submitted['card'] = true;
@@ -338,8 +344,14 @@ angular.module('app.modules.order.services.orderEditService', [])
             //set server validation for the main tab left part 
             if (data.Messages)
             {
-                uiScope.forms.mainForm2.submitted = true;
-                uiScope.forms.GCs.skussubmitted = true;
+                if (uiScope.forms.mainForm2 != null)
+                {
+                    uiScope.forms.mainForm2.submitted = true;
+                }
+                if (uiScope.forms.GCs)
+                {
+                    uiScope.forms.GCs.skussubmitted = true;
+                }
                 uiScope.calculateErrors = data.Messages;
                 uiScope.calculateServerMessages = new ServerMessages(data.Messages);
                 var formForShowing = null;
@@ -864,14 +876,17 @@ angular.module('app.modules.order.services.orderEditService', [])
         } else if (uiScope.currentCustomer.Source)
         {
             var sourceName = uiScope.currentCustomer.Source;
-            $.each(uiScope.orderSources, function (index, orderSource)
+            if (uiScope.orderSources)
             {
-                if (orderSource.Key == uiScope.currentCustomer.Source)
+                $.each(uiScope.orderSources, function (index, orderSource)
                 {
-                    sourceName = orderSource.Text;
-                    return false;
-                }
-            });
+                    if (orderSource.Key == uiScope.currentCustomer.Source)
+                    {
+                        sourceName = orderSource.Text;
+                        return false;
+                    }
+                });
+            }
             uiScope.currentCustomer.SourceValue = sourceName;
         }
 

@@ -5,6 +5,7 @@ angular.module('app.modules.order', [
 	'app.modules.order.controllers.ordersController',
 	'app.modules.order.controllers.orderManageController',
 	'app.modules.order.controllers.orderReshipManageController',
+	'app.modules.order.controllers.orderRefundManageController',
 	'app.modules.order.controllers.orderStatusUpdateController',
 	'app.modules.order.controllers.moveOrderController',
 	'app.modules.order.controllers.customerOrdersController',
@@ -43,6 +44,16 @@ angular.module('app.modules.order', [
 		            url: '/orderreships/add?{idcustomer:int}{idsource:int}',
 		            templateUrl: 'app/modules/order/partials/orderReshipDetail.html',
 		            controller: 'orderReshipManageController'
+		        })
+		        .state('index.oneCol.orderRefundDetail', {
+		            url: '/orderrefunds/{id:int}',
+		            templateUrl: 'app/modules/order/partials/orderRefundDetail.html',
+		            controller: 'orderRefundManageController'
+		        })
+		        .state('index.oneCol.orderRefundAdd', {
+		            url: '/orderrefunds/add?{idcustomer:int}{idsource:int}',
+		            templateUrl: 'app/modules/order/partials/orderRefundDetail.html',
+		            controller: 'orderRefundManageController'
 		        })
 		        .state('index.oneCol.changeOrderStatus', {
 		            url: '/tools/change-order-status',

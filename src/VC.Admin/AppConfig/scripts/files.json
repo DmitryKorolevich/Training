@@ -195,6 +195,7 @@
     "app/modules/order/controllers/ordersController.js",
     "app/modules/order/controllers/orderManageController.js",
     "app/modules/order/controllers/orderReshipManageController.js",
+    "app/modules/order/controllers/orderRefundManageController.js",
     "app/modules/order/controllers/orderStatusUpdateController.js",
     "app/modules/order/controllers/customerOrdersController.js",
     "app/modules/order/controllers/moveOrderController.js",

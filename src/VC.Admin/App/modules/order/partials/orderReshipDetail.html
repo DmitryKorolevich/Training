@@ -26,7 +26,7 @@
         <div class="container-fluid">
             <div class="row">
                 <span class="legend top">
-                    <span data-ng-if="legend.IdOrderSource" class="item">Associated Order ID: <strong>{{legend.IdOrderSource}}</strong></span>
+                    <span data-ng-if="legend.IdOrderSource" class="item">Associated Order ID: <a ui-sref="index.oneCol.orderDetail({id: legend.IdOrderSource })"><strong>{{legend.IdOrderSource}}</strong></a></span>
                     <span data-ng-if="legend.OrderSourceDateCreated" class="item">Order Date: <strong>{{::legend.OrderSourceDateCreated | date:"MM/dd/yy"}} {{::legend.OrderSourceDateCreated | date:"h:mm a"}}</strong></span>
                     <span data-ng-if="legend.OrderSourceTotal" class="item">Total Order Amount: <strong>{{legend.OrderSourceTotal | currency}}</strong></span>
                     <br />
