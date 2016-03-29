@@ -67,24 +67,26 @@
 		    });
 	    }
 
-	    $scope.delete = function (id) {
-			orderService.deleteAutoShip(id,$scope.idCustomer, $scope.addEditTracker)
-			.success(function (result) {
-				if (result.Success) {
-					refreshAutoShips();
-				} else {
-					if (result.Messages) {
-						toaster.pop('error', 'Error!', result.Messages[0].Message);
-					} else {
-						toaster.pop('error', 'Error!', "Can't cancel auto-ship");
-					}
-				}
-			}).error(function (result) {
-				toaster.pop('error', 'Error!', "Can't cancel auto-ship");
-			});
-		}
+		$scope.delete = function(id) {
+		    confirmUtil.confirm(function() {
+			    orderService.deleteAutoShip(id, $scope.idCustomer, $scope.addEditTracker)
+				    .success(function(result) {
+					    if (result.Success) {
+						    refreshAutoShips();
+					    } else {
+						    if (result.Messages) {
+							    toaster.pop('error', 'Error!', result.Messages[0].Message);
+						    } else {
+							    toaster.pop('error', 'Error!', "Can't cancel auto-ship");
+						    }
+					    }
+				    }).error(function(result) {
+					    toaster.pop('error', 'Error!', "Can't cancel auto-ship");
+				    });
+		    }, 'Are you sure you want to delete this auto-ship?');
+	    }
 
-		function openModal(result, id, countries) {
+	    function openModal(result, id, countries) {
 			modalUtil.open('app/modules/order/partials/manageAutoShipBilling.html', 'manageAutoShipBillingController', {
 				creditCards: result.Data, orderId: id, countries: countries, thenCallback: function () {
 					refreshAutoShips();
