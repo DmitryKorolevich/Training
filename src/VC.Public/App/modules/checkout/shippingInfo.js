@@ -59,20 +59,20 @@ function processCharcount(ev) {
 function controlUseBillingState(selector, controlId) {
 	jSel = $(selector);
 	jDrop = $("#ddShippingAddressesSelection").closest(".form-group");
-	jChk = $("#chkSelectOther").closest(".form-group");
+	//jChk = $("#chkSelectOther").closest(".form-group");
 	jSpan = $("#spEnterAddress");
 
 	if ($(controlId).is(":checked")) {
 		jSel.hide();
 		jDrop.hide();
-		jChk.hide();
+		//jChk.hide();
 		jSpan.hide();
 	} else {
 		jSel.show();
 		jDrop.show();
-		jChk.show();
+		//jChk.show();
 		jSpan.show();
 
-		controlSectionState("#ddShippingAddressesSelection", "#chkSelectOther");
+		//controlSectionState("#ddShippingAddressesSelection", "#chkSelectOther");
 	}
 }

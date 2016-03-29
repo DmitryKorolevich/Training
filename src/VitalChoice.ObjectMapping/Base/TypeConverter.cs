@@ -33,7 +33,14 @@ namespace VitalChoice.ObjectMapping.Base
             if (srcElementType != null)
             {
                 IList results = (IList) Activator.CreateInstance(typeof (List<>).MakeGenericType(srcElementType));
-                results.AddRange(obj as IEnumerable);
+                var enumerable = obj as IEnumerable;
+                if (enumerable != null)
+                {
+                    foreach (var item in enumerable)
+                    {
+                        results.Add(item);
+                    }
+                }
                 return results;
             }
             return obj;

@@ -360,9 +360,9 @@ namespace VC.Public.Controllers
         public async Task<IActionResult> GetShippingAddress(int id)
         {
             var currentCustomer = await GetCurrentCustomerDynamic();
-
-            var shipping = currentCustomer.ShippingAddresses
-                .Single(p => p.Id == id);
+            var cart = await GetCurrentCart();
+            var addresses = GetShippingAddresses(cart.Order, currentCustomer);
+            var shipping = addresses[id].Value;
 
             var shippingModel = new AddUpdateShippingMethodModel();
 
@@ -412,8 +412,10 @@ namespace VC.Public.Controllers
                 shippingMethodModel.IsGiftOrder = cart.Order.SafeData.GiftOrder;
                 shippingMethodModel.GiftMessage = cart.Order.SafeData.GiftMessage;
                 shippingMethodModel.DeliveryInstructions = cart.Order.SafeData.DeliveryInstructions;
-                if (currentCustomer.ShippingAddresses.Any())
-                    PopulateShippingAddressesLookup(currentCustomer.ShippingAddresses);
+                var addresses = GetShippingAddresses(cart.Order, currentCustomer);
+                var i = 0;
+                ViewBag.ShippingAddresses = addresses.ToDictionary(x => i++,
+                    y => $"{y.Value.Data.FirstName} {y.Value.Data.LastName} {y.Value.Data.Address1} {y.Key}");
             }
             else
             {
@@ -482,9 +484,11 @@ namespace VC.Public.Controllers
                 }
 
                 var currentCustomer = await GetCurrentCustomerDynamic();
-                var shippingAddresses = currentCustomer.ShippingAddresses.ToList();
 
-                PopulateShippingAddressesLookup(shippingAddresses);
+                var addresses = GetShippingAddresses(cart.Order, currentCustomer);
+                var i = 0;
+                ViewBag.ShippingAddresses = addresses.ToDictionary(x => i++,
+                    y => $"{y.Value.Data.FirstName} {y.Value.Data.LastName} {y.Value.Data.Address1} {y.Key}");
             }
             else
             {
@@ -560,10 +564,22 @@ namespace VC.Public.Controllers
             return View(receiptModel);
         }
 
-        private void PopulateShippingAddressesLookup(IEnumerable<AddressDynamic> addresses)
+        private List<KeyValuePair<string, AddressDynamic>> GetShippingAddresses(OrderDynamic order, CustomerDynamic currentCustomer)
         {
-            ViewBag.ShippingAddresses = addresses.OrderBy(x => (bool)x.Data.Default).ToDictionary(x => x.Id,
-                y => $"{y.Data.FirstName} {y.Data.LastName} {y.Data.Address1}" + ((bool)y.Data.Default ? " (Default)" : ""));
+            List<KeyValuePair<string, AddressDynamic>> shippingAddresses = new List<KeyValuePair<string, AddressDynamic>>();
+            if (order.ShippingAddress != null && order.ShippingAddress.Id != 0 &&
+                !string.IsNullOrEmpty(order.ShippingAddress.SafeData.FirstName))
+            {
+                shippingAddresses.Add(new KeyValuePair<string, AddressDynamic>("(In Order)", order.ShippingAddress));
+            }
+            if (currentCustomer.ShippingAddresses.Any())
+            {
+                shippingAddresses.AddRange(
+                    currentCustomer.ShippingAddresses.OrderBy(a => a.Data.Default).Select(
+                        a => new KeyValuePair<string, AddressDynamic>((bool)a.Data.Default ? "(Default)" : string.Empty, a)));
+            }
+            shippingAddresses.Add(new KeyValuePair<string, AddressDynamic>("(Profile)", currentCustomer.ProfileAddress));
+            return shippingAddresses;
         }
 
         private async Task<CustomerCartOrder> PopulateReviewModel(ReviewOrderModel reviewOrderModel, CustomerCartOrder cart)
