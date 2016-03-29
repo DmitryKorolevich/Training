@@ -375,6 +375,10 @@ else
                                 </td>
                                 <td valign="top" class="entry-text">
                                     @skuOrdered.ProductName
+                                    @foreach (var gcCode in skuOrdered.GCCodes)
+                                    {
+                                        <br /><span><em>GC Code: @gcCode</em></span>
+                                    }
                                 </td>
                                 <td valign="top" class="unit-price entry-text">
                                     @if (skuOrdered.Price.HasValue)
@@ -433,6 +437,10 @@ else
                                     </td>
                                     <td valign="top" class="entry-text">
                                         @skuOrdered.ProductName
+                                        @foreach (var gcCode in skuOrdered.GCCodes)
+                                        {
+                                            <br /><span><em>GC Code: @gcCode</em></span>
+                                        }
                                     </td>
                                     <td valign="top" class="unit-price entry-text">
                                         @if (skuOrdered.Price.HasValue)
@@ -539,7 +547,7 @@ else
                                             </tr>
                                             @if (Model.GCs.Count > 0)
                                             {
-                                                @foreach (var item in Model.GCs)
+                                                foreach (var item in Model.GCs)
                                                 {
                                             <tr>
                                                 <td class="entry-text text-align-right">
