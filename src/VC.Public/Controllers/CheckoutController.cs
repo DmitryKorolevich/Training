@@ -86,47 +86,6 @@ namespace VC.Public.Controllers
             _appInfrastructure = appInfrastructureService.Get();
         }
 
-        private void PopulateShippingAddressesLookup(IList<AddressDynamic> addresses)
-        {
-            ViewBag.ShippingAddresses = addresses.OrderBy(x => (bool) x.Data.Default).ToDictionary(x => x.Id,
-                y => $"{y.Data.FirstName} {y.Data.LastName} {y.Data.Address1}" + ((bool) y.Data.Default ? " (Default)" : ""));
-        }
-
-        private async Task<CustomerCartOrder> PopulateReviewModel(ReviewOrderModel reviewOrderModel, CustomerCartOrder cart)
-        {
-            await InitCartModelInternal(reviewOrderModel);
-
-            var countries = await _countryService.GetCountriesAsync();
-
-            var paymentMethod = cart.Order.PaymentMethod;
-            reviewOrderModel.BillToAddress = paymentMethod.Address.PopulateBillingAddressDetails(countries, cart.Order.Customer.Email);
-            reviewOrderModel.CreditCardDetails = paymentMethod.PopulateCreditCardDetails(_appInfrastructure);
-
-            var shippingAddress = cart.Order.ShippingAddress;
-            reviewOrderModel.ShipToAddress = shippingAddress.PopulateShippingAddressDetails(countries);
-
-            return cart;
-        }
-
-        private async Task<OrderDynamic> PopulateReviewModel(ReviewOrderModel reviewOrderModel, int idOrder)
-        {
-            var order = await OrderService.SelectAsync(idOrder, true);
-            order.Customer = await CustomerService.SelectAsync(order.Customer.Id, true);
-            var context = await OrderService.CalculateOrder(order, OrderStatus.Processed);
-            FillModel(reviewOrderModel, order, context);
-
-            var countries = await _countryService.GetCountriesAsync();
-
-            var paymentMethod = order.PaymentMethod;
-            reviewOrderModel.BillToAddress = paymentMethod.Address.PopulateBillingAddressDetails(countries, order.Customer.Email);
-            reviewOrderModel.CreditCardDetails = paymentMethod.PopulateCreditCardDetails(_appInfrastructure);
-
-            var shippingAddress = order.ShippingAddress;
-            reviewOrderModel.ShipToAddress = shippingAddress.PopulateShippingAddressDetails(countries);
-
-            return order;
-        }
-
         public async Task<IActionResult> Welcome(bool forgot = false)
         {
             if (await CustomerLoggedIn())
@@ -395,103 +354,6 @@ namespace VC.Public.Controllers
             return View(model);
         }
 
-        private struct CreateResult
-        {
-            public CustomerDynamic Customer;
-            public Func<Task<ApplicationUser>> LoginTask;
-        }
-
-        private async Task<CreateResult> EnsureCustomerCreated(AddUpdateBillingAddressModel model, CustomerDynamic existing = null)
-        {
-            Func<Task<ApplicationUser>> loginTask;
-            CustomerDynamic newCustomer;
-            if (model.GuestCheckout)
-            {
-                existing = await CustomerService.GetByEmailAsync(model.Email);
-                if (existing == null || existing.StatusCode != (int) CustomerStatus.PhoneOnly)
-                {
-                    newCustomer = await CreateAccount(model);
-                    loginTask = CreateLoginForNewGuest(newCustomer);
-                }
-                else
-                {
-                    newCustomer = await ReplaceAccount(model, existing);
-                    if (newCustomer == null)
-                    {
-                        throw new ApiException("Customer couldn't be created");
-                    }
-                    loginTask = CreateLoginForExistingGuest(newCustomer);
-                }
-            }
-            else
-            {
-                existing = await CustomerService.GetByEmailAsync(model.Email);
-                if (existing == null || existing.StatusCode != (int) CustomerStatus.PhoneOnly)
-                {
-                    newCustomer = await CreateAccount(model);
-                }
-                else
-                {
-                    newCustomer = await ReplaceAccount(model, existing);
-                    if (newCustomer == null)
-                    {
-                        throw new ApiException("Customer couldn't be created");
-                    }
-                }
-                loginTask = CreateLoginForNewActive(model);
-            }
-            return new CreateResult
-            {
-                Customer = newCustomer,
-                LoginTask = loginTask
-            };
-        }
-
-        private Func<Task<ApplicationUser>> CreateLoginForExistingGuest(CustomerDynamic newCustomer)
-        {
-            return async () =>
-            {
-                var user = await _storefrontUserService.GetAsync(newCustomer.Id);
-                user = await _storefrontUserService.SignInNoStatusCheckingAsync(user);
-                if (user == null)
-                {
-                    throw new AppValidationException(
-                        ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
-                }
-                return user;
-            };
-        }
-
-        private Func<Task<ApplicationUser>> CreateLoginForNewGuest(CustomerDynamic newCustomer)
-        {
-            return async () =>
-            {
-                await _storefrontUserService.SendActivationAsync(newCustomer.Email);
-                var user = await _storefrontUserService.GetAsync(newCustomer.Id);
-                user = await _storefrontUserService.SignInNoStatusCheckingAsync(user);
-                if (user == null)
-                {
-                    throw new AppValidationException(
-                        ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
-                }
-                return user;
-            };
-        }
-
-        private Func<Task<ApplicationUser>> CreateLoginForNewActive(AddUpdateBillingAddressModel model)
-        {
-            return async () =>
-            {
-                await _storefrontUserService.SendSuccessfulRegistration(model.Email, model.FirstName, model.LastName);
-                var user = await _storefrontUserService.SignInAsync(model.Email, model.Password);
-                if (user == null)
-                {
-                    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
-                }
-                return user;
-            };
-        }
-
         [HttpGet]
         [CustomerAuthorize]
         [CustomerStatusCheck]
@@ -533,10 +395,9 @@ namespace VC.Public.Controllers
                 }
                 var currentCustomer = await GetCurrentCustomerDynamic();
 
-                var shippingAddresses = currentCustomer.ShippingAddresses.ToList();
-
-                var defaultShipping = shippingAddresses.FirstOrDefault(x => (bool?) x.SafeData.Default == true);
-                if (cart.Order.ShippingAddress != null && cart.Order.ShippingAddress.Id != 0)
+                var defaultShipping = currentCustomer.ShippingAddresses.FirstOrDefault(x => (bool?) x.SafeData.Default == true);
+                if (cart.Order.ShippingAddress != null && cart.Order.ShippingAddress.Id != 0 &&
+                    !string.IsNullOrEmpty(cart.Order.ShippingAddress.SafeData.FirstName))
                 {
                     _addressConverter.UpdateModel<ShippingInfoModel>(shippingMethodModel, cart.Order.ShippingAddress);
                 }
@@ -544,11 +405,15 @@ namespace VC.Public.Controllers
                 {
                     _addressConverter.UpdateModel<ShippingInfoModel>(shippingMethodModel, defaultShipping);
                 }
+                else
+                {
+                    _addressConverter.UpdateModel<ShippingInfoModel>(shippingMethodModel, currentCustomer.ProfileAddress);
+                }
                 shippingMethodModel.IsGiftOrder = cart.Order.SafeData.GiftOrder;
                 shippingMethodModel.GiftMessage = cart.Order.SafeData.GiftMessage;
                 shippingMethodModel.DeliveryInstructions = cart.Order.SafeData.DeliveryInstructions;
-                if (shippingAddresses.Any())
-                    PopulateShippingAddressesLookup(shippingAddresses);
+                if (currentCustomer.ShippingAddresses.Any())
+                    PopulateShippingAddressesLookup(currentCustomer.ShippingAddresses);
             }
             else
             {
@@ -693,6 +558,144 @@ namespace VC.Public.Controllers
             receiptModel.OrderDate = order.DateCreated;
 
             return View(receiptModel);
+        }
+
+        private void PopulateShippingAddressesLookup(IEnumerable<AddressDynamic> addresses)
+        {
+            ViewBag.ShippingAddresses = addresses.OrderBy(x => (bool)x.Data.Default).ToDictionary(x => x.Id,
+                y => $"{y.Data.FirstName} {y.Data.LastName} {y.Data.Address1}" + ((bool)y.Data.Default ? " (Default)" : ""));
+        }
+
+        private async Task<CustomerCartOrder> PopulateReviewModel(ReviewOrderModel reviewOrderModel, CustomerCartOrder cart)
+        {
+            await InitCartModelInternal(reviewOrderModel);
+
+            var countries = await _countryService.GetCountriesAsync();
+
+            var paymentMethod = cart.Order.PaymentMethod;
+            reviewOrderModel.BillToAddress = paymentMethod.Address.PopulateBillingAddressDetails(countries, cart.Order.Customer.Email);
+            reviewOrderModel.CreditCardDetails = paymentMethod.PopulateCreditCardDetails(_appInfrastructure);
+
+            var shippingAddress = cart.Order.ShippingAddress;
+            reviewOrderModel.ShipToAddress = shippingAddress.PopulateShippingAddressDetails(countries);
+
+            return cart;
+        }
+
+        private async Task<OrderDynamic> PopulateReviewModel(ReviewOrderModel reviewOrderModel, int idOrder)
+        {
+            var order = await OrderService.SelectAsync(idOrder, true);
+            order.Customer = await CustomerService.SelectAsync(order.Customer.Id, true);
+            var context = await OrderService.CalculateOrder(order, OrderStatus.Processed);
+            FillModel(reviewOrderModel, order, context);
+
+            var countries = await _countryService.GetCountriesAsync();
+
+            var paymentMethod = order.PaymentMethod;
+            reviewOrderModel.BillToAddress = paymentMethod.Address.PopulateBillingAddressDetails(countries, order.Customer.Email);
+            reviewOrderModel.CreditCardDetails = paymentMethod.PopulateCreditCardDetails(_appInfrastructure);
+
+            var shippingAddress = order.ShippingAddress;
+            reviewOrderModel.ShipToAddress = shippingAddress.PopulateShippingAddressDetails(countries);
+
+            return order;
+        }
+
+        private struct CreateResult
+        {
+            public CustomerDynamic Customer;
+            public Func<Task<ApplicationUser>> LoginTask;
+        }
+
+        private async Task<CreateResult> EnsureCustomerCreated(AddUpdateBillingAddressModel model, CustomerDynamic existing = null)
+        {
+            Func<Task<ApplicationUser>> loginTask;
+            CustomerDynamic newCustomer;
+            if (model.GuestCheckout)
+            {
+                existing = await CustomerService.GetByEmailAsync(model.Email);
+                if (existing == null || existing.StatusCode != (int)CustomerStatus.PhoneOnly)
+                {
+                    newCustomer = await CreateAccount(model);
+                    loginTask = CreateLoginForNewGuest(newCustomer);
+                }
+                else
+                {
+                    newCustomer = await ReplaceAccount(model, existing);
+                    if (newCustomer == null)
+                    {
+                        throw new ApiException("Customer couldn't be created");
+                    }
+                    loginTask = CreateLoginForExistingGuest(newCustomer);
+                }
+            }
+            else
+            {
+                existing = await CustomerService.GetByEmailAsync(model.Email);
+                if (existing == null || existing.StatusCode != (int)CustomerStatus.PhoneOnly)
+                {
+                    newCustomer = await CreateAccount(model);
+                }
+                else
+                {
+                    newCustomer = await ReplaceAccount(model, existing);
+                    if (newCustomer == null)
+                    {
+                        throw new ApiException("Customer couldn't be created");
+                    }
+                }
+                loginTask = CreateLoginForNewActive(model);
+            }
+            return new CreateResult
+            {
+                Customer = newCustomer,
+                LoginTask = loginTask
+            };
+        }
+
+        private Func<Task<ApplicationUser>> CreateLoginForExistingGuest(CustomerDynamic newCustomer)
+        {
+            return async () =>
+            {
+                var user = await _storefrontUserService.GetAsync(newCustomer.Id);
+                user = await _storefrontUserService.SignInNoStatusCheckingAsync(user);
+                if (user == null)
+                {
+                    throw new AppValidationException(
+                        ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+                }
+                return user;
+            };
+        }
+
+        private Func<Task<ApplicationUser>> CreateLoginForNewGuest(CustomerDynamic newCustomer)
+        {
+            return async () =>
+            {
+                await _storefrontUserService.SendActivationAsync(newCustomer.Email);
+                var user = await _storefrontUserService.GetAsync(newCustomer.Id);
+                user = await _storefrontUserService.SignInNoStatusCheckingAsync(user);
+                if (user == null)
+                {
+                    throw new AppValidationException(
+                        ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+                }
+                return user;
+            };
+        }
+
+        private Func<Task<ApplicationUser>> CreateLoginForNewActive(AddUpdateBillingAddressModel model)
+        {
+            return async () =>
+            {
+                await _storefrontUserService.SendSuccessfulRegistration(model.Email, model.FirstName, model.LastName);
+                var user = await _storefrontUserService.SignInAsync(model.Email, model.Password);
+                if (user == null)
+                {
+                    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+                }
+                return user;
+            };
         }
 
         private async Task<bool?> EnsureLoggedIn(CustomerCartOrder cart)
