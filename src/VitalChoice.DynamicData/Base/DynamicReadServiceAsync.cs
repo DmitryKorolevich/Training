@@ -57,7 +57,7 @@ namespace VitalChoice.DynamicData.Base
             return Task.Delay(0);
         }
 
-        protected virtual IQueryLite<TEntity> BuildQuery(IQueryLite<TEntity> query)
+        protected virtual IQueryLite<TEntity> BuildIncludes(IQueryLite<TEntity> query)
         {
             return query;
         }
@@ -252,9 +252,9 @@ namespace VitalChoice.DynamicData.Base
 
         #region Helpers
 
-        protected IQueryFluent<TEntity> BuildQuery(IQueryFluent<TEntity> query)
+        protected virtual IQueryFluent<TEntity> BuildQuery(IQueryFluent<TEntity> query)
         {
-            return (BuildQuery(new QueryLite<TEntity>(query)) as QueryLite<TEntity>)?.Query;
+            return (BuildIncludes(new QueryLite<TEntity>(query)) as QueryLite<TEntity>)?.Query;
         }
 
         private async Task ProcessEntities(ICollection<TEntity> entities)
@@ -270,7 +270,7 @@ namespace VitalChoice.DynamicData.Base
         private IQueryFluent<TEntity> BuildQueryFluent(Expression<Func<TEntity, bool>> query,
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy)
         {
-            var queryFluent = CreateQuery(includesOverride ?? BuildQuery,
+            var queryFluent = CreateQuery(includesOverride ?? BuildIncludes,
                 query ?? (p => p.StatusCode != (int) RecordStatusCode.Deleted));
 
             if (orderBy != null)

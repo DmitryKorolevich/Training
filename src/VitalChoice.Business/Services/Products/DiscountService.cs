@@ -75,7 +75,7 @@ namespace VitalChoice.Business.Services.Products
             return new List<MessageInfo>();
         }
 
-        protected override IQueryLite<Discount> BuildQuery(IQueryLite<Discount> query)
+        protected override IQueryLite<Discount> BuildIncludes(IQueryLite<Discount> query)
         {
             return query.Include(p => p.DiscountTiers)
                 .Include(p => p.DiscountsToSelectedSkus)

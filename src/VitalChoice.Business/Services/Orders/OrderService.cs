@@ -217,7 +217,7 @@ namespace VitalChoice.Business.Services.Orders
 			return sortable;
 		}
 
-		protected override IQueryLite<Order> BuildQuery(IQueryLite<Order> query)
+		protected override IQueryLite<Order> BuildIncludes(IQueryLite<Order> query)
         {
             return
                 query.Include(o => o.Discount)

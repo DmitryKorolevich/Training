@@ -73,7 +73,7 @@ namespace VitalChoice.Business.Services.Products
             return (await _productContentRepository.Query(p => ids.Contains(p.Id)).Include(p => p.ContentItem).SelectAsync(false)).ToList();
         }
 
-        protected override IQueryLite<Product> BuildQuery(IQueryLite<Product> query)
+        protected override IQueryLite<Product> BuildIncludes(IQueryLite<Product> query)
         {
             return query.Include(p => p.Skus)
                 .ThenInclude(s => s.OptionValues)
