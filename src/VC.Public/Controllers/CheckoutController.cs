@@ -405,10 +405,10 @@ namespace VC.Public.Controllers
                 {
                     _addressConverter.UpdateModel<ShippingInfoModel>(shippingMethodModel, defaultShipping);
                 }
-                else
-                {
-                    _addressConverter.UpdateModel<ShippingInfoModel>(shippingMethodModel, currentCustomer.ProfileAddress);
-                }
+                //else
+                //{
+                //    _addressConverter.UpdateModel<ShippingInfoModel>(shippingMethodModel, currentCustomer.ProfileAddress);
+                //}
                 shippingMethodModel.IsGiftOrder = cart.Order.SafeData.GiftOrder;
                 shippingMethodModel.GiftMessage = cart.Order.SafeData.GiftMessage;
                 shippingMethodModel.DeliveryInstructions = cart.Order.SafeData.DeliveryInstructions;
@@ -575,10 +575,9 @@ namespace VC.Public.Controllers
             if (currentCustomer.ShippingAddresses.Any())
             {
                 shippingAddresses.AddRange(
-                    currentCustomer.ShippingAddresses.OrderBy(a => a.Data.Default).Select(
+                    currentCustomer.ShippingAddresses.OrderByDescending(a => (bool)a.Data.Default).Select(
                         a => new KeyValuePair<string, AddressDynamic>((bool)a.Data.Default ? "(Default)" : string.Empty, a)));
             }
-            shippingAddresses.Add(new KeyValuePair<string, AddressDynamic>("(Profile)", currentCustomer.ProfileAddress));
             return shippingAddresses;
         }
 
