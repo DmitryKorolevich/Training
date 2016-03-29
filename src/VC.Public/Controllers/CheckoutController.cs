@@ -570,7 +570,7 @@ namespace VC.Public.Controllers
             if (order.ShippingAddress != null && order.ShippingAddress.Id != 0 &&
                 !string.IsNullOrEmpty(order.ShippingAddress.SafeData.FirstName))
             {
-                shippingAddresses.Add(new KeyValuePair<string, AddressDynamic>("(In Order)", order.ShippingAddress));
+                shippingAddresses.Add(new KeyValuePair<string, AddressDynamic>("(Currently On Order)", order.ShippingAddress));
             }
             if (currentCustomer.ShippingAddresses.Any())
             {
