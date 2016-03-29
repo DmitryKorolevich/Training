@@ -400,6 +400,8 @@ angular.module('app.modules.order.services.orderEditService', [])
                     items.push({ Key: 6, Text: '6 Months' });
                 }
                 uiScope.autoShipOrderFrequencies = items;
+            } else if(uiScope.order.IdObjectType == 2) {
+	            uiScope.order.IdObjectType = 1;
             }
         };
 
@@ -792,7 +794,11 @@ angular.module('app.modules.order.services.orderEditService', [])
     {
         uiScope.options.oldOrderStatus = uiScope.order.CombinedEditOrderStatus;
         uiScope.order.OnHold = uiScope.order.CombinedEditOrderStatus == 7;//on hold status
-        uiScope.order.AutoShip = uiScope.order.AutoShipFrequency ? true : false;
+        if (uiScope.order.AutoShipFrequency) {
+        	uiScope.order.IdObjectType = 2;
+	    } else {
+        	uiScope.order.IdObjectType = 1;
+        }
         if (uiScope.onHoldWatch)
             uiScope.onHoldWatch();
         uiScope.onHoldWatch = uiScope.$watch('order.OnHold', function (newValue, oldValue)
@@ -1027,7 +1033,7 @@ angular.module('app.modules.order.services.orderEditService', [])
             order.Customer.InceptionDate = order.Customer.InceptionDate.toServerDateTime();
         }
 
-        if (!order.AutoShip)
+        if (order.IdObjectType != 2)
         {
             order.AutoShipFrequency = null;
         }
