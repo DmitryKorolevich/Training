@@ -56,7 +56,7 @@ namespace VitalChoice.ObjectMapping.Base
             {
                 return Enum.Parse(unwrappedDest, obj.ToString());
             }
-            var directResult = TryDirectConvert(obj, destType);
+            var directResult = TryDirectConvert(obj, unwrappedDest);
             if (directResult != null)
                 return directResult;
             //if (sourceType == typeof (long) && (destType == typeof (int) || destType == typeof (int?)))
@@ -129,7 +129,7 @@ namespace VitalChoice.ObjectMapping.Base
             {
                 return Enum.Parse(unwrappedDest, obj.ToString());
             }
-            var directResult = TryDirectConvert(obj, destType);
+            var directResult = TryDirectConvert(obj, unwrappedDest);
             if (directResult != null)
                 return directResult;
             //if (sourceType == typeof (long) && (destType == typeof (int) || destType == typeof (int?)))
