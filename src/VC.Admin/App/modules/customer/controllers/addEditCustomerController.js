@@ -99,10 +99,17 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			        initCustomerFiles();
 			        initCustomerNotes();
 			        initOrdersList();
+				    initAutoShipsList();
 			    } else {
 			        toaster.pop('error', 'Error!', "Can't load customer");
 			    }
 			}
+
+			function initAutoShipsList() {
+				var data = {};
+				data.idCustomer = $scope.currentCustomer.Id;
+				$scope.$broadcast('customerAutoShips#in#init', data);
+			};
 
 			function initialize() {
 				$scope.editMode = $stateParams.id != null;

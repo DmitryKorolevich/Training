@@ -96,9 +96,16 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
                         var values = method.Object != null ? method.Object.GetValue() : method.Arguments.First().RemoveConvert().GetValue();
 
                         if (values != null && memberSelector != null && memberSelector.Expression.Type == typeof (T) &&
-                            GroupInfo.TryGet(memberSelector.Member.Name, out info) && GroupInfo.Count == 1)
+                            GroupInfo.TryGet(memberSelector.Member.Name, out info))
                         {
-                            AddNewKeys(itemsSet, info, values);
+                            if (GroupInfo.Count == 1)
+                            {
+                                AddNewKeys(itemsSet, info, values);
+                            }
+                            else
+                            {
+                                //TODO: parse pared sequnces
+                            }
                         }
                     }
                     ContainsAdditionalConditions = true;

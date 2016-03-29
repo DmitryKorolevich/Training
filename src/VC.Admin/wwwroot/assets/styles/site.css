@@ -1295,3 +1295,7 @@ th.sortable-column {
   display: inline-block;
   max-width: 200px;
 }
+.buttons-compact-container > * {
+  display: block;
+  margin-bottom: 20px;
+}
