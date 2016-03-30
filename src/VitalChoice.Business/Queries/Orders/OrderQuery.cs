@@ -114,7 +114,7 @@ namespace VitalChoice.Business.Queries.Orders
             return this;
         }
 
-        public OrderQuery WithoutIncomplete(OrderStatus? orderStatus, bool ignoreNotShowingIncomplete = false)
+        public OrderQuery WithoutIncomplete(OrderStatus? orderStatus = null, bool ignoreNotShowingIncomplete = false)
         {
             if (!ignoreNotShowingIncomplete)
             {

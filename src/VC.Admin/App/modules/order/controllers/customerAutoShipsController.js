@@ -67,6 +67,10 @@
 		    });
 	    }
 
+		$scope.emptyOrNull = function (item) {
+			return !(item.Value === null || item.Value.trim().length === 0)
+		}
+
 		$scope.delete = function(id) {
 		    confirmUtil.confirm(function() {
 			    orderService.deleteAutoShip(id, $scope.idCustomer, $scope.addEditTracker)

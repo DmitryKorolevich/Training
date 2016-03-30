@@ -43,13 +43,13 @@
                     </td>
 	                <td>{{item.NextDate | date:"MM/dd/yy"}}</td>
 	                <td>
-		                <div class="key-value-line" data-ng-repeat="detail in item.ShippingDetails">
+		                <div class="key-value-line" data-ng-repeat="detail in item.ShippingDetails | filter:emptyOrNull">
 			                <span class="key-info-boxed" data-ng-if="detail.Key">{{detail.Key}}:</span>
 			                <span class="value-info-boxed" data-ng-if="detail.Value">{{detail.Value}}</span>
 		                </div>
 	                </td>
 	                <td>
-						<div class="key-value-line" data-ng-repeat="detail in item.PaymentMethodDetails">
+						<div class="key-value-line" data-ng-repeat="detail in item.PaymentMethodDetails | filter:emptyOrNull">
 							<span class="key-info-boxed" data-ng-if="detail.Key">{{detail.Key}}:</span>
 							<span class="value-info-boxed" data-ng-if="detail.Value">{{detail.Value}}</span>
 						</div>
