@@ -37,7 +37,10 @@
 						<a target="_blank" href="{{baseUrl}}{{item.ProductUrl}}" title="{{item.DisplayName}}" class="cart-text-link">{{item.DisplayName}} ({{item.Code}})</a>
 	                </td>
                     <td>{{item.Frequency}} Months</td>
-	                <td>{{item.Active ? "Yes" : "No"}}</td>
+                    <td>
+                        <span data-ng-if="item.Active" class="label label-success font-default">Yes</span>
+                        <span data-ng-if="!item.Active" class="label label-danger font-default">No</span>
+                    </td>
 	                <td>{{item.NextDate | date:"MM/dd/yy"}}</td>
 	                <td>
 		                <div class="key-value-line" data-ng-repeat="detail in item.ShippingDetails">
