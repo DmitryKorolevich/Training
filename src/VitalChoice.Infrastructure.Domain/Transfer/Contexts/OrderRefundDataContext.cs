@@ -37,9 +37,15 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
 
         public decimal Total { get; set; }
 
+        public decimal AutoTotal { get; set; }
+
         public bool ShippingRefunded { get; set; }
 
+        public decimal ManualShippingTotal { get; set; }
+
         public decimal ManualRefundOverride { get; set; }
+
+        public decimal RefundGCsUsedOnOrder { get; set; }
 
         public ICollection<RefundSkuOrdered> RefundSkus { get; set; }
 

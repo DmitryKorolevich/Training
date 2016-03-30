@@ -22,6 +22,21 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    {
 	        return $http.post(baseUrl + 'GetOrders', filter, getConfig(tracker));
 	    },
+	    getAutoShips: function (filter, tracker) {
+	    	return $http.post(baseUrl + 'GetAutoShips', filter, getConfig(tracker));
+	    },
+	    getAutoShipCreditCards: function (orderId, customerId,  tracker) {
+	    	return $http.get(baseUrl + 'GetAutoShipCreditCards?customerId=' + customerId + '&orderId=' + orderId, getConfig(tracker));
+	    },
+	    updateAutoShipBilling: function (model, orderId, tracker) {
+	    	return $http.post(baseUrl + 'UpdateAutoShipBilling?orderId=' + orderId, model, getConfig(tracker));
+	    },
+	    activatePauseAutoShip: function (id, customerId, tracker) {
+	    	return $http.post(baseUrl + 'ActivatePauseAutoShip?id=' +id +'&customerId=' + customerId, getConfig(tracker));
+	    },
+	    deleteAutoShip: function (id, customerId, tracker) {
+	    	return $http.post(baseUrl + 'DeleteAutoShip?id=' + id + '&customerId=' + customerId, getConfig(tracker));
+	    },
 	    getOrder: function (id, idcustomer, refreshPrices, tracker)
 	    {
 	        return $http.get(baseUrl + 'GetOrder/{0}?idcustomer={1}&refreshprices={2}'.format(id, idcustomer, refreshPrices), getConfig(tracker));

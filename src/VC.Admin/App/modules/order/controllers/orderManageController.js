@@ -129,6 +129,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 $scope.options.inited=true;
                 customerEditService.initBase($scope);
                 orderEditService.initBase($scope);
+                orderEditService.initRecalculate($scope);
                 if ($scope.id) {
                     $scope.idCustomer = $scope.order.IdCustomer;
                     customerEditService.initOrderEditCustomerParts($scope);
@@ -276,6 +277,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 initCustomerNotes();
 
                 initOrdersList();
+                initAutoShipsList();
 
                 if (($scope.id || $scope.idOrderSource) && !$scope.orderEditDisabled)
                 {
@@ -338,6 +340,12 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         var data = {};
         data.idCustomer = $scope.idCustomer;
         $scope.$broadcast('customerOrders#in#init', data);
+    };
+
+    function initAutoShipsList() {
+    	var data = {};
+    	data.idCustomer = $scope.idCustomer;
+    	$scope.$broadcast('customerAutoShips#in#init', data);
     };
 
     $scope.save = function ()

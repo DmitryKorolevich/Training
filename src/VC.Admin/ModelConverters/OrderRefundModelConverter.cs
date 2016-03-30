@@ -61,14 +61,11 @@ namespace VC.Admin.ModelConverters
                     model.OrderSourceDateCreated = source.DateCreated;
                     model.OrderSourceTotal = source.Total;
                     model.OrderSourcePaymentMethodType = source.PaymentMethod?.IdObjectType;
-                    model.OrderSourceShippingTotal = source.ShippingTotal;
                     model.OrderSourceRefundIds = _orderRefundService.GetRefundIdsForOrder(source.Id).Result;
-                    if (dynamic.Id != 0)
-                    {
-                        model.OrderSourceRefundIds.Remove(dynamic.Id);
-                    }
-                    var existDifferentRefunds = _orderRefundService.Select(p =>model.OrderSourceRefundIds.Contains(p.Id) && 
+
+                    var existAllRefunds = _orderRefundService.Select(p =>model.OrderSourceRefundIds.Contains(p.Id) && 
                         p.OrderStatus!=OrderStatus.Cancelled, withDefaults:false);
+                    var existDifferentRefunds = existAllRefunds.Where(p => p.Id != dynamic.Id).ToList();
 
                     if (source.Discount != null)
                     {
@@ -78,22 +75,24 @@ namespace VC.Admin.ModelConverters
 
                     if (dynamic.Id ==0)
                     {
-                        var refundWithShippingRefunded = existDifferentRefunds.FirstOrDefault(p => p.SafeData.ShippingRefunded == true);
+                        var refundWithShippingRefunded = existAllRefunds.FirstOrDefault(p => p.SafeData.ShippingRefunded == true);
                         model.ShippingRefunded = refundWithShippingRefunded != null;
 
                         model.RefundSkus=new List<RefundSkuManageModel>();
                         foreach (var skuOrdered in source?.Skus)
                         {
                             var refundSku = new RefundSkuManageModel(skuOrdered);
-                            var refundWithSkuExist = existDifferentRefunds.SelectMany(p => p.RefundSkus).FirstOrDefault(p => p?.Sku.Id == refundSku.IdSku);
+                            var refundWithSkuExist = existAllRefunds.SelectMany(p => p.RefundSkus).FirstOrDefault(p => p?.Sku.Id == refundSku.IdSku);
                             refundSku.Disabled = refundWithSkuExist != null;
+                            refundSku.Active = refundSku.Disabled;
                             model.RefundSkus.Add(refundSku);
                         }
                         foreach (var skuOrdered in source?.PromoSkus)
                         {
                             var refundSku = new RefundSkuManageModel(skuOrdered);
-                            var refundWithSkuExist = existDifferentRefunds.SelectMany(p => p.RefundSkus).FirstOrDefault(p => p?.Sku.Id == refundSku.IdSku);
+                            var refundWithSkuExist = existAllRefunds.SelectMany(p => p.RefundSkus).FirstOrDefault(p => p?.Sku.Id == refundSku.IdSku);
                             refundSku.Disabled = refundWithSkuExist != null;
+                            refundSku.Active = refundSku.Disabled;
                             model.RefundSkus.Add(refundSku);
                         }
 
@@ -104,6 +103,7 @@ namespace VC.Admin.ModelConverters
                     else
                     {
                         model.DisableShippingRefunded = true;
+                        model.ManualShippingTotal = model.ShippingTotal;
                         model.RefundSkus = dynamic.RefundSkus.Select(p => new RefundSkuManageModel(p)).ToList();
                         model.RefundSkus.ForEach(p =>
                         {
@@ -112,10 +112,18 @@ namespace VC.Admin.ModelConverters
                         });
                         model.RefundOrderToGiftCertificates = dynamic.RefundOrderToGiftCertificates.
                             Select(p => new RefundOrderToGiftCertificateManageModel(p)).ToList();
-                        //count refundgcs on the current refund
-                        foreach (var refundOrderToGiftCertificateManageModel in model.RefundOrderToGiftCertificates)
+
+                        var giftCertificateInOrders = source.GiftCertificates?.Where(p => p.GiftCertificate != null);
+                        if (giftCertificateInOrders != null)
                         {
-                            refundOrderToGiftCertificateManageModel.AmountRefunded+=refundOrderToGiftCertificateManageModel.Amount;
+                            foreach (var sourceGc in giftCertificateInOrders)
+                            {
+                                var modelGc = model.RefundOrderToGiftCertificates.FirstOrDefault(p => p.IdGiftCertificate == sourceGc.GiftCertificate.Id);
+                                if (modelGc == null)
+                                {
+                                    model.RefundOrderToGiftCertificates.Add(new RefundOrderToGiftCertificateManageModel(sourceGc, source.Id));
+                                }
+                            }
                         }
                     }
 
@@ -127,6 +135,8 @@ namespace VC.Admin.ModelConverters
                         refundOrderToGiftCertificateManageModel.AmountRefunded +=
                             existOrderToGiftCertificateOnDifferentRefunds.Sum(p => p.Amount);
                     }
+                    model.GiftCertificatesUsedAmountOnSourceOrder =
+                        model.RefundOrderToGiftCertificates.Sum(p =>p.AmountUsedOnSourceOrder);
                 }
             }
         }

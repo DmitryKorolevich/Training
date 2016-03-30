@@ -1,5 +1,6 @@
 ﻿using System;
 using VC.Admin.Models.Customer;
+using VC.Admin.Models.Customers;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 
@@ -11,9 +12,9 @@ namespace VC.Admin.ModelConverters
         {
             if (dynamic.DictionaryData.ContainsKey("ExpDate"))
             {
-                DateTime exp = dynamic.Data.ExpDate;
-                model.ExpirationDateMonth = exp.Month;
-                model.ExpirationDateYear = exp.Year%2000;
+                DateTime? exp = dynamic.SafeData.ExpDate;
+                model.ExpirationDateMonth = exp?.Month;
+                model.ExpirationDateYear = exp?.Year%2000;
             }
         }
 

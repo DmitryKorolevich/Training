@@ -198,6 +198,8 @@
     "app/modules/order/controllers/orderRefundManageController.js",
     "app/modules/order/controllers/orderStatusUpdateController.js",
     "app/modules/order/controllers/customerOrdersController.js",
+    "app/modules/order/controllers/customerAutoShipsController.js",
+    "app/modules/order/controllers/manageAutoShipBillingController.js",
     "app/modules/order/controllers/moveOrderController.js",
     "app/modules/order/controllers/ordersRegionStatisticController.js",
     "app/modules/order/controllers/ordersRegionStatisticDetailController.js",

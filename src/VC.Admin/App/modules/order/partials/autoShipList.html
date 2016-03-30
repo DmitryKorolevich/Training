@@ -1,0 +1,82 @@
+﻿<div class="well row customer-orders-list orders">
+    <spinner-overlay data-loading="addEditTracker.active()">
+        <table class="table table-striped order-statuses">
+            <thead>
+                <tr>
+                    <th colspan="2">
+                       Item
+                    </th>
+	                <th>
+		                Frequency
+	                </th>
+					<th>
+						Active
+					</th>
+	                <th>
+		                Next Date
+	                </th>
+	                <th>
+		                Shipping Details
+	                </th>
+	                <th>
+		                Billing Details
+	                </th>
+	                <th>
+		                Actions
+	                </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-repeat="item in autoShips">
+	                <td>
+						<a target="_blank" href="{{baseUrl}}{{item.ProductUrl}}" title="{{item.DisplayName}}">
+							<img class="thumb" src="{{item.IconUrl}}" alt="{{item.Name}}">
+						</a>
+	                </td>
+	                <td>
+						<a target="_blank" href="{{baseUrl}}{{item.ProductUrl}}" title="{{item.DisplayName}}" class="cart-text-link">{{item.DisplayName}} ({{item.Code}})</a>
+	                </td>
+                    <td>{{item.Frequency}} Months</td>
+	                <td>{{item.Active ? "Yes" : "No"}}</td>
+	                <td>{{item.NextDate | date:"MM/dd/yy"}}</td>
+	                <td>
+		                <div class="key-value-line" data-ng-repeat="detail in item.ShippingDetails">
+			                <span class="key-info-boxed" data-ng-if="detail.Key">{{detail.Key}}:</span>
+			                <span class="value-info-boxed" data-ng-if="detail.Value">{{detail.Value}}</span>
+		                </div>
+	                </td>
+	                <td>
+						<div class="key-value-line" data-ng-repeat="detail in item.PaymentMethodDetails">
+							<span class="key-info-boxed" data-ng-if="detail.Key">{{detail.Key}}:</span>
+							<span class="value-info-boxed" data-ng-if="detail.Value">{{detail.Value}}</span>
+						</div>
+	                </td>
+	                <td class="buttons-compact-container">
+						<button title="Edit Billing" class="btn btn-default btn-primary btn-xs" data-ng-click="editBilling(item.Id)">
+							Edit Billing Details
+						</button>
+		                <button title="Pause" data-ng-if="item.Active" class="btn btn-default btn-info btn-xs" data-ng-click="activatePause(item.Id)">
+			                Pause
+		                </button>
+		                <button title="Pause" data-ng-if="!item.Active" class="btn btn-default btn-success btn-xs" data-ng-click="activatePause(item.Id)">
+			                Start
+		                </button>
+		                <button title="Delete" class="btn btn-default btn-danger btn-xs" data-ng-click="delete(item.Id)">
+			                Delete
+		                </button>
+	                </td>
+                </tr>
+            </tbody>
+        </table>
+    </spinner-overlay>
+    <pagination boundary-links="true"
+                total-items="autoShipsTotalItems"
+                items-per-page="autoShipsFilter.Paging.PageItemCount"
+                data-ng-model="autoShipsFilter.Paging.PageIndex"
+                previous-text="&lsaquo;"
+                next-text="&rsaquo;"
+                first-text="&laquo;"
+                last-text="&raquo;"
+                data-ng-change="autoShipsPageChanged()">
+    </pagination>
+</div>

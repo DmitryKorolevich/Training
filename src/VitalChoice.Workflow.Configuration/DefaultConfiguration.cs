@@ -21,7 +21,6 @@ namespace VitalChoice.Workflow.Configuration
             setup.Action<TotalAction>("Total", action =>
             {
                 action.Dependency<GiftCertificatesBuyAction>();
-                action.Dependency<PayableTotalAction>();
 
                 action.Aggregate<PayableTotalAction>();
                 action.Aggregate<GiftCertificatesPaymentAction>();

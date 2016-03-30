@@ -196,196 +196,7 @@ angular.module('app.modules.order.services.orderEditService', [])
                 }
             }
             return isValid;
-        };
-
-        uiScope.requestRecalculate = function ()
-        {
-            //additional client validation
-            if (!uiScope.skusClientValid())
-            {
-                return;
-            }
-
-            angular.forEach(uiScope.currentCustomer.Shipping, function (shippingItem, index)
-            {
-                shippingItem.IsSelected = index.toString() == uiScope.shippingAddressTab.AddressIndex;
-            });
-            var orderForCalculating = angular.copy(uiScope.order);
-            orderForCalculating.Customer = angular.copy(uiScope.currentCustomer);
-            if (angular.equals(uiScope.oldOrderForCalculating, orderForCalculating))
-            {
-                return;
-            }
-            uiScope.oldOrderForCalculating = orderForCalculating;
-            if (uiScope.currectCalculateCanceller)
-            {
-                uiScope.currectCalculateCanceller.resolve("canceled");
-            }
-            uiScope.currectCalculateCanceller = $q.defer();
-            orderService.calculateOrder(orderForCalculating, uiScope.currectCalculateCanceller)
-                .success(function (result)
-                {
-                    if (result.Success)
-                    {
-                        successCalculateHandler(result.Data);
-                    } else
-                    {
-                        errorHandler(result);
-                    }
-                    if (uiScope.currectCalculateCanceller)
-                    {
-                        uiScope.currectCalculateCanceller.reject();
-                        uiScope.currectCalculateCanceller = null;
-                    }
-                })
-                .error(function (result)
-                {
-                    if (result == "canceled")
-                    {
-                        errorHandler(result);
-                        if (uiScope.currectCalculateCanceller)
-                        {
-                            uiScope.currectCalculateCanceller.reject();
-                            uiScope.currectCalculateCanceller = null;
-                        }
-                    }
-                });
-        };
-
-        function successCalculateHandler(data)
-        {
-            uiScope.order.AlaskaHawaiiSurcharge = data.AlaskaHawaiiSurcharge;
-            uiScope.order.CanadaSurcharge = data.CanadaSurcharge;
-            uiScope.order.StandardShippingCharges = data.StandardShippingCharges;
-            uiScope.order.ShippingTotal = data.ShippingTotal;
-            uiScope.order.TotalShipping = data.TotalShipping;
-            uiScope.order.ProductsSubtotal = data.ProductsSubtotal;
-            uiScope.order.DiscountTotal = data.DiscountTotal;
-            uiScope.order.DiscountedSubtotal = data.DiscountedSubtotal;
-            uiScope.order.DiscountMessage = data.DiscountMessage;
-            uiScope.order.TaxTotal = data.TaxTotal;
-            uiScope.order.GiftCertificatesSubtotal = data.GiftCertificatesSubtotal;
-            uiScope.order.Total = data.Total;
-
-            uiScope.order.ShouldSplit = data.ShouldSplit;
-
-            uiScope.shippingUpgradePOptions = data.ShippingUpgradePOptions;
-            uiScope.shippingUpgradeNPOptions = data.ShippingUpgradeNPOptions;
-
-            uiScope.order.ShippingOverride = data.ShippingOverride;
-            uiScope.order.SurchargeOverride = data.SurchargeOverride;
-
-            uiScope.productsPerishableThresholdIssue = data.ProductsPerishableThresholdIssue;
-
-            var toDeleteIdxs = [];
-            $.each(uiScope.order.SkuOrdereds, function (index, uiSku)
-            {
-                var found = false;
-                $.each(data.SkuOrdereds, function (index, sku)
-                {
-                    if (uiSku.Code == sku.Code)
-                    {
-                        uiSku.Price = sku.Price;
-                        uiSku.Amount = sku.Amount;
-                        uiSku.Quantity = sku.Quantity;
-                        uiSku.Messages = sku.Messages;
-                        uiSku.GCCodes = sku.GCCodes;
-                        found = true;
-                        return false;
-                    }
-                });
-                if (!found && uiSku.Id != null)
-                {
-                    toDeleteIdxs.push(index);
-                }
-            });
-
-            $.each(toDeleteIdxs, function (index, item)
-            {
-                uiScope.order.SkuOrdereds.splice(item, 1);
-            });
-
-            uiScope.order.PromoSkus = data.PromoSkus;
-
-            //clear the main tab left part validation
-            $.each(uiScope.forms, function (index, form)
-            {
-                if (form)
-                {
-                    if (index == "GCs")
-                    {
-                        $.each(form, function (index, subForm)
-                        {
-                            if (index.indexOf('i') == 0)
-                            {
-                                $.each(subForm, function (index, element)
-                                {
-                                    if (element && element.$name == index)
-                                    {
-                                        element.$setValidity("server", true);
-                                    }
-                                });
-                            }
-                        });
-                    }
-                    else if (index == "mainForm2")
-                    {
-                        $.each(form, function (index, element)
-                        {
-                            if (element && element.$name == index)
-                            {
-                                element.$setValidity("server", true);
-                            }
-                        });
-                    }
-                }
-            });
-
-            //set server validation for the main tab left part 
-            if (data.Messages)
-            {
-                if (uiScope.forms.mainForm2 != null)
-                {
-                    uiScope.forms.mainForm2.submitted = true;
-                }
-                if (uiScope.forms.GCs)
-                {
-                    uiScope.forms.GCs.skussubmitted = true;
-                }
-                uiScope.calculateErrors = data.Messages;
-                uiScope.calculateServerMessages = new ServerMessages(data.Messages);
-                var formForShowing = null;
-                $.each(data.Messages, function (index, value)
-                {
-                    if (value.Field)
-                    {
-                        if (value.Field.indexOf('.') > -1)
-                        {
-                            var items = value.Field.split(".");
-                            uiScope.forms[items[0]][items[1]][items[2]].$setValidity("server", false);
-                            formForShowing = items[0];
-                            openSKUs();
-                        }
-                        else
-                        {
-                            $.each(uiScope.forms, function (index, form)
-                            {
-                                if (form)
-                                {
-                                    if (form[value.Field] != undefined)
-                                    {
-                                        form[value.Field].$setValidity("server", false);
-                                        return false;
-                                    }
-                                }
-                            });
-                        }
-                    }
-                });
-            }
-
-            uiScope.initAutoShipOptions();
-        }
+        };        
 
         uiScope.initAutoShipOptions = function ()
         {
@@ -780,6 +591,198 @@ angular.module('app.modules.order.services.orderEditService', [])
         };
     };
 
+    var initRecalculate = function (uiScope)
+    {
+        uiScope.requestRecalculate = function ()
+        {
+            //additional client validation
+            if (!uiScope.skusClientValid())
+            {
+                return;
+            }
+
+            angular.forEach(uiScope.currentCustomer.Shipping, function (shippingItem, index)
+            {
+                shippingItem.IsSelected = index.toString() == uiScope.shippingAddressTab.AddressIndex;
+            });
+            var orderForCalculating = angular.copy(uiScope.order);
+            orderForCalculating.Customer = angular.copy(uiScope.currentCustomer);
+            if (angular.equals(uiScope.oldOrderForCalculating, orderForCalculating))
+            {
+                return;
+            }
+            uiScope.oldOrderForCalculating = orderForCalculating;
+            if (uiScope.currectCalculateCanceller)
+            {
+                uiScope.currectCalculateCanceller.resolve("canceled");
+            }
+            uiScope.currectCalculateCanceller = $q.defer();
+            orderService.calculateOrder(orderForCalculating, uiScope.currectCalculateCanceller)
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        successCalculateHandler(result.Data);
+                    } else
+                    {
+                        errorHandler(result);
+                    }
+                    if (uiScope.currectCalculateCanceller)
+                    {
+                        uiScope.currectCalculateCanceller.reject();
+                        uiScope.currectCalculateCanceller = null;
+                    }
+                })
+                .error(function (result)
+                {
+                    if (result == "canceled")
+                    {
+                        errorHandler(result);
+                        if (uiScope.currectCalculateCanceller)
+                        {
+                            uiScope.currectCalculateCanceller.reject();
+                            uiScope.currectCalculateCanceller = null;
+                        }
+                    }
+                });
+        };
+
+        function successCalculateHandler(data)
+        {
+            uiScope.order.AlaskaHawaiiSurcharge = data.AlaskaHawaiiSurcharge;
+            uiScope.order.CanadaSurcharge = data.CanadaSurcharge;
+            uiScope.order.StandardShippingCharges = data.StandardShippingCharges;
+            uiScope.order.ShippingTotal = data.ShippingTotal;
+            uiScope.order.TotalShipping = data.TotalShipping;
+            uiScope.order.ProductsSubtotal = data.ProductsSubtotal;
+            uiScope.order.DiscountTotal = data.DiscountTotal;
+            uiScope.order.DiscountedSubtotal = data.DiscountedSubtotal;
+            uiScope.order.DiscountMessage = data.DiscountMessage;
+            uiScope.order.TaxTotal = data.TaxTotal;
+            uiScope.order.GiftCertificatesSubtotal = data.GiftCertificatesSubtotal;
+            uiScope.order.Total = data.Total;
+
+            uiScope.order.ShouldSplit = data.ShouldSplit;
+
+            uiScope.shippingUpgradePOptions = data.ShippingUpgradePOptions;
+            uiScope.shippingUpgradeNPOptions = data.ShippingUpgradeNPOptions;
+
+            uiScope.order.ShippingOverride = data.ShippingOverride;
+            uiScope.order.SurchargeOverride = data.SurchargeOverride;
+
+            uiScope.productsPerishableThresholdIssue = data.ProductsPerishableThresholdIssue;
+
+            var toDeleteIdxs = [];
+            $.each(uiScope.order.SkuOrdereds, function (index, uiSku)
+            {
+                var found = false;
+                $.each(data.SkuOrdereds, function (index, sku)
+                {
+                    if (uiSku.Code == sku.Code)
+                    {
+                        uiSku.Price = sku.Price;
+                        uiSku.Amount = sku.Amount;
+                        uiSku.Quantity = sku.Quantity;
+                        uiSku.Messages = sku.Messages;
+                        uiSku.GCCodes = sku.GCCodes;
+                        found = true;
+                        return false;
+                    }
+                });
+                if (!found && uiSku.Id != null)
+                {
+                    toDeleteIdxs.push(index);
+                }
+            });
+
+            $.each(toDeleteIdxs, function (index, item)
+            {
+                uiScope.order.SkuOrdereds.splice(item, 1);
+            });
+
+            uiScope.order.PromoSkus = data.PromoSkus;
+
+            //clear the main tab left part validation
+            $.each(uiScope.forms, function (index, form)
+            {
+                if (form)
+                {
+                    if (index == "GCs")
+                    {
+                        $.each(form, function (index, subForm)
+                        {
+                            if (index.indexOf('i') == 0)
+                            {
+                                $.each(subForm, function (index, element)
+                                {
+                                    if (element && element.$name == index)
+                                    {
+                                        element.$setValidity("server", true);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    else if (index == "mainForm2")
+                    {
+                        $.each(form, function (index, element)
+                        {
+                            if (element && element.$name == index)
+                            {
+                                element.$setValidity("server", true);
+                            }
+                        });
+                    }
+                }
+            });
+
+            //set server validation for the main tab left part 
+            if (data.Messages)
+            {
+                if (uiScope.forms.mainForm2 != null)
+                {
+                    uiScope.forms.mainForm2.submitted = true;
+                }
+                if (uiScope.forms.GCs)
+                {
+                    uiScope.forms.GCs.skussubmitted = true;
+                }
+                uiScope.calculateErrors = data.Messages;
+                uiScope.calculateServerMessages = new ServerMessages(data.Messages);
+                var formForShowing = null;
+                $.each(data.Messages, function (index, value)
+                {
+                    if (value.Field)
+                    {
+                        if (value.Field.indexOf('.') > -1)
+                        {
+                            var items = value.Field.split(".");
+                            uiScope.forms[items[0]][items[1]][items[2]].$setValidity("server", false);
+                            formForShowing = items[0];
+                            openSKUs();
+                        }
+                        else
+                        {
+                            $.each(uiScope.forms, function (index, form)
+                            {
+                                if (form)
+                                {
+                                    if (form[value.Field] != undefined)
+                                    {
+                                        form[value.Field].$setValidity("server", false);
+                                        return false;
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+
+            uiScope.initAutoShipOptions();
+        }
+    };
+
     var baseProcessLoadingOrder = function(uiScope)
     {
         if (uiScope.order.ShipDelayDate)
@@ -1115,6 +1118,7 @@ angular.module('app.modules.order.services.orderEditService', [])
 
     return {
         initBase: initBase,
+        initRecalculate: initRecalculate,
         baseProcessLoadingOrder: baseProcessLoadingOrder,
         initOrderOptions: initOrderOptions,
         baseReferencedDataInit: baseReferencedDataInit,

@@ -9,6 +9,7 @@ using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
+using VitalChoice.Ecommerce.Domain.Entities.Checkout;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
@@ -200,6 +201,13 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.IdDiscount = dynamic.Discount?.Id;
                 entity.PaymentMethod =
                     await _orderPaymentMethodMapper.ToEntityAsync(dynamic.PaymentMethod);
+                foreach (var sku in dynamic.Skus.Where(s => s.GcsGenerated?.Any() ?? false))
+                {
+                    foreach (var gc in sku.GcsGenerated.Where(g => string.IsNullOrEmpty(g.Code)))
+                    {
+                        gc.Code = await _gcService.GenerateGCCode();
+                    }
+                }
                 entity.Skus = new List<OrderToSku>(dynamic.Skus.Select(s => new OrderToSku
                 {
                     Amount = s.Amount,
@@ -217,7 +225,7 @@ namespace VitalChoice.Business.Services.Dynamic
                         IdSku = orderToSku.IdSku,
                         IdOrder = orderToSku.IdOrder,
                         IdInventorySku = p.IdInventorySku,
-                        Quantity=p.Quantity,
+                        Quantity = p.Quantity,
                     }).ToList();
                 }
 
@@ -239,7 +247,7 @@ namespace VitalChoice.Business.Services.Dynamic
                         IdSku = orderToPromo.IdSku,
                         IdOrder = orderToPromo.IdOrder,
                         IdInventorySku = p.IdInventorySku,
-                        Quantity=p.Quantity,
+                        Quantity = p.Quantity,
                     }).ToList();
                 }
             });
@@ -268,7 +276,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 await _orderAddressMapper.UpdateEntityAsync(dynamic.ShippingAddress, entity.ShippingAddress);
 
                 entity.IdCustomer = dynamic.Customer.Id;
-                if (dynamic.OrderStatus != null && dynamic.OrderStatus.Value == OrderStatus.Incomplete ||
+                if (dynamic.OrderStatus == OrderStatus.Incomplete ||
                     dynamic.POrderStatus == OrderStatus.Incomplete && dynamic.NPOrderStatus == OrderStatus.Incomplete)
                 {
                     entity.GiftCertificates?.MergeKeyed(
@@ -291,7 +299,14 @@ namespace VitalChoice.Business.Services.Dynamic
                             Amount = g.Amount,
                             IdOrder = dynamic.Id,
                             IdGiftCertificate = g.GiftCertificate.Id,
-                        }, (g, dg) => g.Amount = dg.Amount);
+                        }, (g, dg) =>
+                        {
+                            g.Amount = dg.Amount;
+                            if (g.GiftCertificate != null && dg.GiftCertificate != null)
+                            {
+                                g.GiftCertificate.Balance = dg.GiftCertificate.Balance;
+                            }
+                        }, removed => removed.ForEach(r => r.GiftCertificate.Balance += r.Amount));
                 }
                 entity.IdDiscount = dynamic.Discount?.Id;
                 if (dynamic.PaymentMethod.Address != null && entity.PaymentMethod.BillingAddress == null)
@@ -302,6 +317,13 @@ namespace VitalChoice.Business.Services.Dynamic
                 if (entity.Skus == null)
                 {
                     entity.Skus = new List<OrderToSku>();
+                }
+                foreach (var sku in dynamic.Skus.Where(s => s.GcsGenerated?.Any() ?? false))
+                {
+                    foreach (var gc in sku.GcsGenerated.Where(g => string.IsNullOrEmpty(g.Code)))
+                    {
+                        gc.Code = await _gcService.GenerateGCCode();
+                    }
                 }
                 entity.Skus.MergeKeyed(dynamic.Skus.Where(s => (s.Sku?.Id ?? 0) != 0).ToArray(), sku => sku.IdSku, ordered => ordered.Sku.Id,
                     s => new OrderToSku

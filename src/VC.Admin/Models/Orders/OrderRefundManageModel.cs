@@ -105,7 +105,7 @@ namespace VC.Admin.Models.Orders
 
         public int IdGiftCertificate { get; set; }
 
-        public decimal? AmountUsedOnSourceOrder { get; set; }
+        public decimal AmountUsedOnSourceOrder { get; set; }
 
         public decimal AmountRefunded { get; set; }
 
@@ -199,6 +199,9 @@ namespace VC.Admin.Models.Orders
         public decimal TaxTotal { get; set; }
 
         [Map]
+        public decimal AutoTotal { get; set; }
+
+        [Map]
         public decimal Total { get; set; }
 
         [Map]
@@ -206,7 +209,7 @@ namespace VC.Admin.Models.Orders
 
         [Map]
         public IList<RefundOrderToGiftCertificateManageModel> RefundOrderToGiftCertificates { get; set; }
-
+        
         [Map]
         public int? IdOrderSource { get; set; }
 
@@ -222,20 +225,24 @@ namespace VC.Admin.Models.Orders
         public bool ShippingRefunded { get; set; }
 
         [Map]
+        public decimal ManualShippingTotal { get; set; }
+
+        [Map]
         public decimal ManualRefundOverride { get; set; }
 
-        public decimal? RefundGCsUsedOnOrder { get; set; }
+        [Map]
+        public decimal RefundGCsUsedOnOrder { get; set; }
 
         public decimal OrderSourceTotal { get; set; }
 
         public DateTime OrderSourceDateCreated { get; set; }
 
         public int? OrderSourcePaymentMethodType { get; set; }
-
-        public decimal OrderSourceShippingTotal { get; set; }
-
+        
         public ICollection<int> OrderSourceRefundIds { get; set; }
 
+        public decimal GiftCertificatesUsedAmountOnSourceOrder { get; set; }
+        
         public OrderRefundManageModel()
         {
             RefundSkus = new List<RefundSkuManageModel>();

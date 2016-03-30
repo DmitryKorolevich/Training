@@ -105,6 +105,10 @@ namespace VitalChoice.Business.Services.Orders
             order.DiscountTotal = dataContext.DiscountTotal;
             order.ShippingTotal = dataContext.ShippingTotal;
             order.ProductsSubtotal = dataContext.ProductsSubtotal;
+            order.Data.AutoTotal = dataContext.AutoTotal;
+            order.Data.ShippingRefunded = dataContext.ShippingRefunded;
+            order.Data.ManualShippingTotal = dataContext.ManualShippingTotal;
+            order.Data.RefundGCsUsedOnOrder = dataContext.RefundGCsUsedOnOrder;
             order.Data.ManualRefundOverride = dataContext.ManualRefundOverride;
         }
 

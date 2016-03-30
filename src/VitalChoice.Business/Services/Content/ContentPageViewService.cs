@@ -34,9 +34,6 @@ namespace VitalChoice.Business.Services.Content
 {
     public class ContentPageViewService : ContentViewService<ContentPage, ContentParametersModel>, IContentPageViewService
     {
-        #region Public
-
-        #endregion
 
         public ContentPageViewService(ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider,
             IContentProcessorService processorService, IRepositoryAsync<ContentPage> contentRepository,

@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using VC.Admin.Models.Customer;
+using VC.Admin.Models.Customers;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Base;
@@ -15,6 +17,9 @@ using VitalChoice.Business.Queries.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Business.Helpers;
+using VitalChoice.SharedWeb.Helpers;
+using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 
 namespace VC.Admin.ModelConverters
 {
@@ -27,10 +32,12 @@ namespace VC.Admin.ModelConverters
         private readonly IPromotionService _promotionService;
         private readonly IGcService _gcService;
         private readonly IProductService _productService;
+        private readonly IEcommerceRepositoryAsync<OrderToGiftCertificate> _gcInOrderRep;
 
         public OrderModelConverter(IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
             IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> paymentMethodMapper, ICustomerService customerService,
-            IDiscountService discountService, IGcService gcService, IProductService productService, IPromotionService promotionService)
+            IDiscountService discountService, IGcService gcService, IProductService productService, IPromotionService promotionService,
+            IEcommerceRepositoryAsync<OrderToGiftCertificate> gcInOrderRep)
         {
             _addressMapper = addressMapper;
             _paymentMethodMapper = paymentMethodMapper;
@@ -39,6 +46,7 @@ namespace VC.Admin.ModelConverters
             _gcService = gcService;
             _productService = productService;
             _promotionService = promotionService;
+            _gcInOrderRep = gcInOrderRep;
         }
 
         public override void DynamicToModel(OrderManageModel model, OrderDynamic dynamic)
@@ -161,7 +169,7 @@ namespace VC.Admin.ModelConverters
                 dynamic.Discount = _discountService.GetByCode(model.DiscountCode).Result;
             }
 
-            ModelToGcsDynamic(model, dynamic);
+            ModelToGcsDynamic(model, dynamic).GetAwaiter().GetResult();
 
             ModelToSkusDynamic(model, dynamic);
 
@@ -425,7 +433,7 @@ namespace VC.Admin.ModelConverters
             }
         }
 
-        private void ModelToGcsDynamic(OrderManageModel model, OrderDynamic dynamic)
+        private async Task ModelToGcsDynamic(OrderManageModel model, OrderDynamic dynamic)
         {
             if (model.GCs != null)
             {
@@ -433,11 +441,13 @@ namespace VC.Admin.ModelConverters
                 {
                     ICollection<string> codes =
                         model.GCs.Select(g => g.Code).Where(c => !string.IsNullOrWhiteSpace(c)).ToList();
-                    var task = _gcService.GetGiftCertificatesAsync(g => codes.Contains(g.Code));
-                    dynamic.GiftCertificates = task.Result.Select(g => new GiftCertificateInOrder
+                    var gcs = await _gcService.GetGiftCertificatesAsync(g => codes.Contains(g.Code));
+                    var gcIds = gcs.Select(g => g.Id).Distinct().ToList();
+                    var gcsOrdered = await _gcInOrderRep.Query(g => gcIds.Contains(g.IdGiftCertificate) && g.IdOrder == dynamic.Id).SelectAsync(false);
+                    dynamic.GiftCertificates = gcs.Select(g => new GiftCertificateInOrder
                     {
                         GiftCertificate = g,
-                        Amount = 0
+                        Amount = gcsOrdered.Where(gco => gco.IdGiftCertificate == g.Id).Select(gco => gco.Amount).FirstOrDefault()
                     }).ToList();
                 }
             }

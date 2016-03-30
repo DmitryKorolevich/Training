@@ -75,6 +75,7 @@ namespace VitalChoice.Business.Services.Dynamic
                         Redeem = s.Redeem,
                         Quantity = s.Quantity,
                         RefundValue = s.RefundValue,
+                        RefundPrice = s.RefundPrice,
                         RefundPercent = s.RefundPercent,
                         Sku = await _skuMapper.FromEntityAsync(s.Sku, withDefaults),
                     }));
@@ -88,7 +89,7 @@ namespace VitalChoice.Business.Services.Dynamic
                             IdOrder = s.IdOrder,
                             IdGiftCertificate = s.IdGiftCertificate,
                             Amount = s.Amount,
-                            AmountUsedOnSourceOrder = s.OrderToGiftCertificate?.Amount,
+                            AmountUsedOnSourceOrder = s.OrderToGiftCertificate?.Amount ?? 0,
                             Code = s.OrderToGiftCertificate?.GiftCertificate?.Code,
                         }));
                 }
@@ -122,6 +123,7 @@ namespace VitalChoice.Business.Services.Dynamic
                     Redeem = s.Redeem,
                     Quantity = s.Quantity,
                     RefundValue = s.RefundValue,
+                    RefundPrice = s.RefundPrice,
                     RefundPercent = s.RefundPercent,
                     IdOrder = dynamic.Id,
                     IdSku = s.Sku.Id,
@@ -183,6 +185,7 @@ namespace VitalChoice.Business.Services.Dynamic
                         Redeem = s.Redeem,
                         Quantity = s.Quantity,
                         RefundValue = s.RefundValue,
+                        RefundPrice = s.RefundPrice,
                         RefundPercent = s.RefundPercent,
                         IdOrder = dynamic.Id,
                         IdSku = s.Sku.Id,
@@ -191,10 +194,10 @@ namespace VitalChoice.Business.Services.Dynamic
                         sku.Redeem = ordered.Redeem;
                         sku.Quantity = ordered.Quantity;
                         sku.RefundValue = ordered.RefundValue;
+                        sku.RefundPrice = ordered.RefundPrice;
                         sku.RefundPercent = ordered.RefundPercent;
                     });
-
-                //TODO: deside what to do with RefundOrderToGiftCertificates on update or cancel
+                
                 dynamic.RefundOrderToGiftCertificates = dynamic.RefundOrderToGiftCertificates ?? new List<RefundOrderToGiftCertificateUsed>();
                 entity.RefundOrderToGiftCertificates.RemoveAll(p=> dynamic.RefundOrderToGiftCertificates.
                     FirstOrDefault(pp=>pp.IdOrder==p.IdOrder && pp.IdGiftCertificate==p.IdGiftCertificate)==null);

@@ -74,20 +74,20 @@ namespace VitalChoice.Business.ModelConverters
             {
                 model.BillToAddress = _addressMapper.ToModel<AddressEmailItem>(dynamic.Customer.ProfileAddress);
                 model.BillToAddress.Country = countries.FirstOrDefault(p => p.Id == dynamic.Customer.ProfileAddress.IdCountry)?.CountryName;
-                model.BillToAddress.StateCodeOrCounty = DynamicViewHelper.ResolveStateOrCounty(countries, dynamic.Customer.ProfileAddress);
+                model.BillToAddress.StateCodeOrCounty = BusinessHelper.ResolveStateOrCounty(countries, dynamic.Customer.ProfileAddress);
             }
             else if (dynamic?.PaymentMethod?.Address != null)
             {
                 model.BillToAddress = _addressMapper.ToModel<AddressEmailItem>(dynamic.PaymentMethod.Address);
                 model.BillToAddress.Country = countries.FirstOrDefault(p => p.Id == dynamic.PaymentMethod.Address.IdCountry)?.CountryName;
-                model.BillToAddress.StateCodeOrCounty = DynamicViewHelper.ResolveStateOrCounty(countries, dynamic.PaymentMethod.Address);
+                model.BillToAddress.StateCodeOrCounty = BusinessHelper.ResolveStateOrCounty(countries, dynamic.PaymentMethod.Address);
             }
 
             if (dynamic?.ShippingAddress != null)
             {
                 model.ShipToAddress = _addressMapper.ToModel<AddressEmailItem>(dynamic.ShippingAddress);
                 model.ShipToAddress.Country = countries.FirstOrDefault(p => p.Id == dynamic.ShippingAddress.IdCountry)?.CountryName;
-                model.ShipToAddress.StateCodeOrCounty = DynamicViewHelper.ResolveStateOrCounty(countries, dynamic.ShippingAddress);
+                model.ShipToAddress.StateCodeOrCounty = BusinessHelper.ResolveStateOrCounty(countries, dynamic.ShippingAddress);
             }
         }
 

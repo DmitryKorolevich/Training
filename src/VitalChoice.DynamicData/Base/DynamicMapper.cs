@@ -680,11 +680,10 @@ namespace VitalChoice.DynamicData.Base
         public virtual void UpdateObject<TModel>(TModel model, TDynamic obj, int idObjectType)
             where TModel : class, new()
         {
-            var defaultModel = CreatePrototypeFor<TModel>(idObjectType);
             if (obj != null)
                 obj.IdObjectType = idObjectType;
 
-            UpdateObject(defaultModel, obj);           
+            UpdateObjectWithDefaults(obj, idObjectType).GetAwaiter().GetResult();
             UpdateObject(model, obj);
         }
 
@@ -698,12 +697,29 @@ namespace VitalChoice.DynamicData.Base
         public virtual async Task UpdateObjectAsync<TModel>(TModel model, TDynamic obj, int idObjectType)
             where TModel : class, new()
         {
-            var defaultModel = await CreatePrototypeForAsync<TModel>(idObjectType);
+            
             if (obj != null)
                 obj.IdObjectType = idObjectType;
 
-            UpdateObject(defaultModel, obj);
+            await UpdateObjectWithDefaults(obj, idObjectType);
             UpdateObject(model, obj);
+        }
+
+        private async Task UpdateObjectWithDefaults(TDynamic obj, int idObjectType)
+        {
+            var defaultObject = await CreatePrototypeAsync(idObjectType);
+            var objData = obj.DictionaryData;
+            foreach (var value in defaultObject.DictionaryData)
+            {
+                if (objData.ContainsKey(value.Key))
+                {
+                    objData[value.Key] = value.Value;
+                }
+                else
+                {
+                    objData.Add(value);
+                }
+            }
         }
 
         public TDynamic CreatePrototype(int idObjectType)

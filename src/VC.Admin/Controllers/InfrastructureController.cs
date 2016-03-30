@@ -85,8 +85,9 @@ namespace VC.Admin.Controllers
                     PromotionBuyTypes = referenceData.PromotionBuyTypes,
                     ShippingUpgrades = referenceData.ShippingUpgrades,
                     PersonTitles=referenceData.PersonTitles,
-					CartShippingOptions = referenceData.CartShippingOptions
-				};
+					CartShippingOptions = referenceData.CartShippingOptions,
+                    RefundRedeemOptions=referenceData.RefundRedeemOptions,
+                };
 	        }
 			else
 			{

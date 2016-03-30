@@ -31,10 +31,16 @@ namespace VC.Admin.Models.Orders
         
         public decimal Total { get; set; }
 
+        public decimal AutoTotal { get; set; }
+
         public bool ShippingRefunded { get; set; }
 
-        public decimal ManualRefundOverride { get; set; }
+        public decimal ManualShippingTotal { get; set; }
 
+        public decimal RefundGCsUsedOnOrder { get; set; }
+
+        public decimal ManualRefundOverride { get; set; }
+        
         public ICollection<RefundSkuManageModel> RefundSkus { get; set; }
 
         public ICollection<RefundOrderToGiftCertificateManageModel> RefundOrderToGiftCertificates { get; set; }
@@ -50,8 +56,11 @@ namespace VC.Admin.Models.Orders
             DiscountMessage = dataContext.DiscountMessage;
             TaxTotal = dataContext.TaxTotal;
             Total = dataContext.Total;
-            ManualRefundOverride = dataContext.ManualRefundOverride;
+            AutoTotal = dataContext.AutoTotal;
             ShippingRefunded = dataContext.ShippingRefunded;
+            ManualShippingTotal = dataContext.ManualShippingTotal;
+            RefundGCsUsedOnOrder = dataContext.RefundGCsUsedOnOrder;
+            ManualRefundOverride = dataContext.ManualRefundOverride;
 
             RefundSkus = dataContext.RefundSkus?.Select(item => new RefundSkuManageModel(item)).ToList() 
                 ?? new List<RefundSkuManageModel>();

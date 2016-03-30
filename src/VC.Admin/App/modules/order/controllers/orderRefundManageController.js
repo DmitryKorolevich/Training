@@ -87,6 +87,9 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             }
 
             loadReferencedData();
+
+            $scope.options.RefundGiftCertificatesEnable = $scope.order.RefundGCsUsedOnOrder > 0;
+            $scope.options.ManualRefundOverrideEnable = $scope.order.ManualRefundOverride > 0;
         }
     };
 
@@ -148,7 +151,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
                 if (!$scope.orderEditDisabled)
                 {
-                    $scope.requestRefundRecalculate();
+                    $scope.requestRecalculate();
                 }
             }
             else
@@ -161,8 +164,105 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         });
     };
 
-    $scope.requestRefundRecalculate = function ()
+    $scope.requestRecalculate = function ()
     {
+        if ($scope.id)
+        {
+            return;
+        }
+        if (!$scope.forms.mainForm.$valid || !$scope.forms.mainForm2.$valid)
+        {
+            $scope.forms.mainForm.submitted = true;
+            $scope.forms.mainForm2.submitted = true;
+        }
+        else
+        {
+            console.log('requestRecalculate');
+            return;
+
+            var orderForCalculating = angular.copy(uiScope.order);
+            orderForCalculating.Customer = angular.copy(uiScope.currentCustomer);
+            if (angular.equals(uiScope.oldOrderForCalculating, orderForCalculating))
+            {
+                return;
+            }
+            uiScope.oldOrderForCalculating = orderForCalculating;
+            if (uiScope.currectCalculateCanceller)
+            {
+                uiScope.currectCalculateCanceller.resolve("canceled");
+            }
+            uiScope.currectCalculateCanceller = $q.defer();
+            orderService.calculateRefundOrder(orderForCalculating, uiScope.currectCalculateCanceller)
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        successCalculateHandler(result.Data);
+                    } else
+                    {
+                        errorHandler(result);
+                    }
+                    if (uiScope.currectCalculateCanceller)
+                    {
+                        uiScope.currectCalculateCanceller.reject();
+                        uiScope.currectCalculateCanceller = null;
+                    }
+                })
+                .error(function (result)
+                {
+                    if (result == "canceled")
+                    {
+                        errorHandler(result);
+                        if (uiScope.currectCalculateCanceller)
+                        {
+                            uiScope.currectCalculateCanceller.reject();
+                            uiScope.currectCalculateCanceller = null;
+                        }
+                    }
+                });
+        }
+    };
+
+    function successCalculateHandler(data)
+    {
+        uiScope.order.ShippingTotal = data.ShippingTotal;
+        uiScope.order.ProductsSubtotal = data.ProductsSubtotal;
+        uiScope.order.DiscountTotal = data.DiscountTotal;
+        uiScope.order.DiscountedSubtotal = data.DiscountedSubtotal;
+        uiScope.order.DiscountMessage = data.DiscountMessage;
+        uiScope.order.TaxTotal = data.TaxTotal;
+        uiScope.order.AutoTotal = data.AutoTotal;
+        uiScope.order.Total = data.Total;
+
+        uiScope.order.ManualShippingTotal = data.ManualShippingTotal;
+        uiScope.order.RefundGCsUsedOnOrder = data.RefundGCsUsedOnOrder;
+        uiScope.order.ManualRefundOverride = data.ManualRefundOverride;
+
+        $.each(uiScope.order.RefundSkus, function (index, uiSku)
+        {
+            var found = false;
+            $.each(data.RefundSkus, function (index, sku)
+            {
+                if (uiSku.IdSku == sku.IdSku)
+                {
+                    uiSku.RefundValue = sku.RefundValue;
+                    return false;
+                }
+            });
+        });
+
+        $.each(uiScope.order.RefundOrderToGiftCertificates, function (index, uiGc)
+        {
+            var found = false;
+            $.each(data.RefundOrderToGiftCertificates, function (index, gc)
+            {
+                if (uiGc.IdGiftCertificate == gc.IdGiftCertificate)
+                {
+                    uiGc.Amount = gc.Amount;
+                    return false;
+                }
+            });
+        });
     };
 
     var initOrder = function ()
@@ -234,6 +334,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 $scope.forms.topForm.submitted = true;
             }
             $scope.forms.mainForm.submitted = true;
+            $scope.forms.mainForm2.submitted = true;
             $scope.forms.submitted['shipping'] = true;
             $scope.forms.submitted['card'] = true;
             $scope.forms.submitted['oac'] = true;
@@ -266,6 +367,45 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     errorHandler(result);
                 });
         }, 'Are you sure you want to cancel this refund?');
+    };
+
+    $scope.toggleAllActiveRefundSkus = function ()
+    {
+        $.each($scope.order.RefundSkus, function (index, item)
+        {
+            if (!item.Disabled)
+            {
+                item.Active = $scope.options.allActiveRefundSkus;
+            }
+        });
+        $scope.requestRecalculate();
+    };
+
+    $scope.toggleRefundSku = function (item)
+    {
+        var allActive = true;
+        $.each($scope.order.RefundSkus, function (index, item)
+        {
+            if (!item.Disabled && !item.Active)
+            {
+                allActive = false;
+                return false;
+            }
+        });
+        $scope.options.allActiveRefundSkus = allActive;
+        $scope.requestRecalculate();
+    };
+
+    $scope.toggleRefundGiftCertificates = function ()
+    {
+        $scope.order.RefundGCsUsedOnOrder = 0;
+        $scope.requestRecalculate();
+    };
+
+    $scope.toggleManualRefundOverride = function ()
+    {
+        $scope.order.ManualRefundOverride = 0;
+        $scope.requestRecalculate();
     };
 
     initialize();
