@@ -46,15 +46,15 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             }
         }
 
-        public static void AddRange(this IList results, IEnumerable items)
-        {
-            if (items == null)
-                return;
-            foreach (var item in items)
-            {
-                results.Add(item);
-            }
-        }
+        //public static void AddRange(this IList results, IEnumerable items)
+        //{
+        //    if (items == null)
+        //        return;
+        //    foreach (var item in items)
+        //    {
+        //        results.Add(item);
+        //    }
+        //}
 
         public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> items)
         {

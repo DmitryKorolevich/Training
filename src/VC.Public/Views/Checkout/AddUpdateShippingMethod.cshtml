@@ -37,20 +37,20 @@
 				</label>
 			</div>
 		</div>
-		if (ViewBag.ShippingAddresses != null && ViewBag.ShippingAddresses.Count > 1)
+		if (ViewBag.ShippingAddresses != null && ViewBag.ShippingAddresses.Count > 0)
 		{
-			<div class="form-group">
+			@*<div class="form-group">
 				<div class="input-group">
 					<label class="multiline-checkbox-container">
-						<input id="chkSelectOther" type="checkbox" />
+						<input id="chkSelectOther" type="checkbox" checked="checked" />
 						View and select other Shipping addresses in my account.
 					</label>
 				</div>
-			</div>
-			<div class="form-group" style="display: none;">
+			</div>*@
+			<div class="form-group" @*style="display: none;"*@>
 				@Html.Label("SavedAddresses", "Saved Addresses", new { @class = "control-label" })
 				<div class="input-group">
-					@Html.DropDownListFor(x => x.Id, new SelectList(ViewBag.ShippingAddresses, "Key", "Value"), new { id = "ddShippingAddressesSelection", @class = "form-control" })
+					@Html.DropDownListFor(x => x.Id, new SelectList(ViewBag.ShippingAddresses, "Key", "Value"), new { id = "ddShippingAddressesSelection", @class = "form-control auto" })
 				</div>
 			</div>
 		}

@@ -119,7 +119,7 @@ namespace VitalChoice.Business.Services.Customers
             _paymentMethodService = paymentMethodService;
         }
 
-        protected override IQueryLite<Customer> BuildQuery(IQueryLite<Customer> query)
+        protected override IQueryLite<Customer> BuildIncludes(IQueryLite<Customer> query)
         {
             return query
                 .Include(p => p.Files)

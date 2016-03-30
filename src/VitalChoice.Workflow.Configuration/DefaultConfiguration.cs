@@ -67,7 +67,7 @@ namespace VitalChoice.Workflow.Configuration
 
             setup.Action<GiftCertificatesPaymentAction>("GiftCertificates", action =>
             {
-                action.Dependency<OrderSubTotalAction>();
+                action.Dependency<PayableTotalAction>();
             });
 
             setup.Action<ProductAction>("Products", action =>

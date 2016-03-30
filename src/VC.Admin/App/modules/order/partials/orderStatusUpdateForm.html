@@ -15,7 +15,11 @@
                             <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate>
                                 <fieldset>
                                     <span class="legend">Change Order Status</span>
-
+                                    <div class="form-group">
+                                        <div class="col-md-12 error-container">
+                                            *Note: If changing order status to PROCESSED you MUST go into the order and re-save it to ensure all calculations generate and save properly.
+                                        </div>
+                                    </div>
                                     <div class="form-group">
                                         <label for="id" class="col-md-3 control-label">Order #</label>
                                         <div class="col-md-9">

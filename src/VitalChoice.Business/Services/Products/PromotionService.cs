@@ -73,7 +73,7 @@ namespace VitalChoice.Business.Services.Products
             return Task.FromResult(errors);
         }
 
-        protected override IQueryLite<Promotion> BuildQuery(IQueryLite<Promotion> query)
+        protected override IQueryLite<Promotion> BuildIncludes(IQueryLite<Promotion> query)
         {
             return query.Include(p => p.PromotionsToBuySkus)
                         .Include(p => p.PromotionsToGetSkus)
