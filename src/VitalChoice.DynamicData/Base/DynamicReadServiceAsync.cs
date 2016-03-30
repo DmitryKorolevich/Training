@@ -277,7 +277,7 @@ namespace VitalChoice.DynamicData.Base
             {
                 conditions = conditions.And(AdditionalDefaultConditions);
             }
-            var queryFluent = CreateQuery(includesOverride ?? BuildQuery, conditions);
+            var queryFluent = CreateQuery(includesOverride ?? BuildIncludes, conditions);
 
             if (orderBy != null)
                 queryFluent = queryFluent.OrderBy(orderBy);

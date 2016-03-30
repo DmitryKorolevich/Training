@@ -52,7 +52,7 @@ namespace VitalChoice.Business.Services.Orders
         protected override Expression<Func<Order, bool>> AdditionalDefaultConditions => 
             p => p.IdObjectType == (int) OrderType.Refund;
 
-        protected override IQueryLite<Order> BuildQuery(IQueryLite<Order> query)
+        protected override IQueryLite<Order> BuildIncludes(IQueryLite<Order> query)
 		{
 		    return
 		        query.Include(o => o.RefundSkus)
