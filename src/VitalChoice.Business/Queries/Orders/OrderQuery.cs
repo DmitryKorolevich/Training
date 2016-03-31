@@ -127,7 +127,13 @@ namespace VitalChoice.Business.Queries.Orders
             return this;
         }
 
-        public OrderQuery WithOrderDynamicValues(int? idOrderSource, int? pOrderType, int? idShippingMethod)
+		public OrderQuery NotAutoShip()
+		{
+			Add(x => x.IdObjectType != (int)OrderType.AutoShip);
+			return this;
+		}
+
+		public OrderQuery WithOrderDynamicValues(int? idOrderSource, int? pOrderType, int? idShippingMethod)
         {
             if (idOrderSource.HasValue)
             {

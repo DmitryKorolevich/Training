@@ -222,7 +222,7 @@ namespace VC.Admin.Controllers
 			filter.Sorting.Path = VOrderSortPath.DateCreated;
 			filter.OrderType = OrderType.AutoShip;
 
-			var orders = await _orderService.GetFullOrdersAsync(filter);
+			var orders = await _orderService.GetFullAutoShipsAsync(filter);
 
 		    var helper = new AutoShipModelHelper(_skuMapper, _productMapper, _orderMapper, infr, countries);
 			var ordersModel = new PagedList<AutoShipHistoryItemModel>
