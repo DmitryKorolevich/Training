@@ -42,6 +42,7 @@ using VitalChoice.Business.Services.Bronto;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Data.Extensions;
+using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Context;
@@ -58,18 +59,20 @@ namespace VC.Admin.Controllers
     public class OrderController : BaseApiController
     {
         private readonly IOrderService _orderService;
+        private readonly IOrderRefundService _orderRefundService;
         private readonly OrderMapper _mapper;
+        private readonly OrderRefundMapper _orderRefundMapper;
         private readonly IDynamicMapper<AddressDynamic, OrderAddress> _orderAddressMapper;
 		private readonly IDynamicMapper<AddressDynamic, Address> _addressMapper;
 		private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _customerPaymentMethodMapper;
 		private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _orderPaymentMethodMapper;
 
-		private readonly ICustomerService _customerService;
+        private readonly ICustomerService _customerService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly IOptions<AppOptions> _options;
 	    private readonly IAppInfrastructureService _appInfrastructureService;
 	    private readonly ICountryService _countryService;
-	    private readonly ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> _ordersRegionStatisticItemCSVExportService;
+        private readonly ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> _ordersRegionStatisticItemCSVExportService;
         private readonly ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> _ordersZipStatisticItemCSVExportService;
         private readonly ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> _vOrderWithRegionInfoItemCSVExportService;
         private readonly IProductService _productService;
@@ -82,10 +85,12 @@ namespace VC.Admin.Controllers
 		private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
 		private readonly IDynamicMapper<OrderDynamic, Order> _orderMapper;
 
-		public OrderController(
+        public OrderController(
             IOrderService orderService,
+            IOrderRefundService orderRefundService,
             ILoggerProviderExtended loggerProvider,
             OrderMapper mapper,
+            OrderRefundMapper orderRefundMapper,
             ICustomerService customerService,
             IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
             ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> ordersRegionStatisticItemCSVExportService,
@@ -98,7 +103,9 @@ namespace VC.Admin.Controllers
             IObjectHistoryLogService objectHistoryLogService, IOptions<AppOptions> options, IAppInfrastructureService appInfrastructureService, ICountryService countryService, IDynamicMapper<OrderDynamic, Order> orderMapper, IDynamicMapper<ProductDynamic, Product> productMapper, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodMapper, IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> customerPaymentMethodMapper, IDynamicMapper<AddressDynamic, Address> addressMapper1)
         {
             _orderService = orderService;
+            _orderRefundService = orderRefundService;
             _mapper = mapper;
+            _orderRefundMapper = orderRefundMapper;
             _customerService = customerService;
             _orderAddressMapper = addressMapper;
             _ordersRegionStatisticItemCSVExportService = ordersRegionStatisticItemCSVExportService;
@@ -118,7 +125,7 @@ namespace VC.Admin.Controllers
 			_orderPaymentMethodMapper = orderPaymentMethodMapper;
 			_customerPaymentMethodMapper = customerPaymentMethodMapper;
 			_addressMapper = addressMapper1;
-			_pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
+            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             this.logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -215,7 +222,7 @@ namespace VC.Admin.Controllers
 			filter.Sorting.Path = VOrderSortPath.DateCreated;
 			filter.OrderType = OrderType.AutoShip;
 
-			var orders = await _orderService.GetFullOrdersAsync(filter);
+			var orders = await _orderService.GetFullAutoShipsAsync(filter);
 
 		    var helper = new AutoShipModelHelper(_skuMapper, _productMapper, _orderMapper, infr, countries);
 			var ordersModel = new PagedList<AutoShipHistoryItemModel>
@@ -227,7 +234,7 @@ namespace VC.Admin.Controllers
 			return ordersModel;
 		}
 
-	    [HttpGet]
+        [HttpGet]
 	    public async Task<Result<IList<CreditCardModel>>> GetAutoShipCreditCards([FromQuery] int orderId, [FromQuery] int customerId)
 	    {
 		    var model = new List<CreditCardModel>();
@@ -318,6 +325,11 @@ namespace VC.Admin.Controllers
             }
 
             var item = await _orderService.SelectAsync(id);
+		    if (item.IdObjectType != (int) OrderType.Normal && item.IdObjectType != (int) OrderType.AutoShip &&
+		        item.IdObjectType != (int) OrderType.DropShip && item.IdObjectType != (int) OrderType.GiftList)
+		    {
+		        throw new AccessDeniedException();
+		    }
             if (id != 0 && refreshprices && item.Skus != null)
             {
                 var customer = await _customerService.SelectAsync(item.Customer.Id);
@@ -478,6 +490,10 @@ namespace VC.Admin.Controllers
             var item = await _orderService.SelectAsync(id);
             if (item != null)
             {
+                if (item.IdObjectType != (int)OrderType.Reship)
+                {
+                    throw new AccessDeniedException();
+                }
                 toReturn = _mapper.ToModel<OrderReshipManageModel>(item);
             }
 
@@ -552,7 +568,7 @@ namespace VC.Admin.Controllers
             if (toReturn.Main != null && !string.IsNullOrEmpty(toReturn.Main.Data))
             {
                 var dynamic = (OrderDynamic)JsonConvert.DeserializeObject(toReturn.Main.Data, typeof(OrderDynamic));
-                var model = GetOrderManageModel(dynamic);
+                var model = GetOrderManageModel(dynamic, toReturn.Main.Data);
                 toReturn.Main.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
@@ -562,7 +578,7 @@ namespace VC.Admin.Controllers
             if (toReturn.Before != null && !string.IsNullOrEmpty(toReturn.Before.Data))
             {
                 var dynamic = (OrderDynamic)JsonConvert.DeserializeObject(toReturn.Before.Data, typeof(OrderDynamic));
-                var model = GetOrderManageModel(dynamic);
+                var model = GetOrderManageModel(dynamic, toReturn.Before.Data);
                 toReturn.Before.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
@@ -573,12 +589,18 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
-        private OrderManageModel GetOrderManageModel(OrderDynamic dynamic)
+        private object GetOrderManageModel(OrderDynamic dynamic, string data)
         {
-            OrderManageModel model;
+            object model;
             if (dynamic.IdObjectType == (int) OrderType.Reship)
             {
-                model = _mapper.ToModel<OrderReshipManageModel>(dynamic);
+                OrderReshipManageModel model2 = _mapper.ToModel<OrderReshipManageModel>(dynamic);
+                model = model2;
+            }
+            else if (dynamic.IdObjectType == (int)OrderType.Refund)
+            {
+                var refund = (OrderRefundDynamic)JsonConvert.DeserializeObject(data, typeof(OrderRefundDynamic));
+                model = _orderRefundMapper.ToModel<OrderRefundManageModel>(refund);
             }
             else
             {
@@ -799,6 +821,116 @@ namespace VC.Admin.Controllers
                 filter.To = filter.To.Value.AddDays(1);
             }
             return await _serviceCodeService.GetServiceCodesReportAsync(filter);
+        }
+
+        [HttpPost]
+        public async Task<Result<OrderRefundCalculateModel>> CalculateRefundOrder([FromBody]OrderRefundManageModel model)
+        {
+            var order = _orderRefundMapper.FromModel(model);
+            var orderContext = await _orderRefundService.CalculateRefundOrder(order);
+
+            OrderRefundCalculateModel toReturn = new OrderRefundCalculateModel(orderContext);
+
+            return toReturn;
+        }
+
+        [HttpGet]
+        public async Task<Result<OrderRefundManageModel>> GetRefundOrder(int id, int? idsource = null, int? idcustomer = null)
+        {
+            OrderRefundManageModel toReturn = null;
+            if (id == 0)
+            {
+                if (idsource.HasValue)
+                {
+                    var order = await _orderService.SelectAsync(idsource.Value);
+                    if (order != null)
+                    {
+                        OrderRefundDynamic refund=new OrderRefundDynamic();
+                        refund.DateCreated = DateTime.Now;
+                        refund.IdObjectType = (int)OrderType.Refund;
+                        refund.Customer = order.Customer;
+                        refund.IdOrderSource = order.Id;
+                        refund.ShippingAddress = order.ShippingAddress;
+                        refund.ShippingAddress.Id = 0;
+                        refund.OrderStatus=OrderStatus.Processed;
+                        AddressDynamic paymentAddress = null;
+                        if (order?.PaymentMethod?.Address != null)
+                        {
+                            paymentAddress = order.PaymentMethod.Address;
+                        }
+                        else
+                        {
+                            var customer = order.Customer;
+                            if (customer.ProfileAddress != null)
+                            {
+                                paymentAddress = customer.ProfileAddress;
+                            }
+                            else
+                            {
+                                customer = await _customerService.SelectAsync(order.Customer.Id);
+                                paymentAddress = customer.ProfileAddress ?? new AddressDynamic();
+                            }
+                        }
+                        paymentAddress.Id = 0;
+                        refund.PaymentMethod = new OrderPaymentMethodDynamic()
+                        {
+                            Address = paymentAddress,
+                            IdObjectType = (int)PaymentMethodType.Oac,
+                        };
+                        toReturn = _orderRefundMapper.ToModel<OrderRefundManageModel>(refund);
+                        toReturn.ManualShippingTotal = order.ShippingTotal;
+                    }
+                }
+            }
+
+            var item = await _orderRefundService.SelectAsync(id);
+            if (item != null)
+            {
+                if (item.IdObjectType != (int)OrderType.Refund)
+                {
+                    throw new AccessDeniedException();
+                }
+                toReturn = _orderRefundMapper.ToModel<OrderRefundManageModel>(item);
+                toReturn.ManualShippingTotal = toReturn.ShippingTotal;
+            }
+
+            return toReturn;
+        }
+
+        [HttpPost]
+        public async Task<Result<OrderRefundManageModel>> AddRefundOrder([FromBody]OrderRefundManageModel model)
+        {
+            if (!Validate(model))
+                return null;
+
+            var order = _orderRefundMapper.FromModel(model);
+
+            var sUserId = Request.HttpContext.User.GetUserId();
+            int userId;
+            if (int.TryParse(sUserId, out userId))
+            {
+                order.IdEditedBy = userId;
+            }
+            
+            if (model.OrderStatus != OrderStatus.Cancelled && model.OrderStatus != OrderStatus.Exported && model.OrderStatus != OrderStatus.Shipped)
+            {
+                await _orderRefundService.CalculateRefundOrder(order);
+
+                if (model.Id == 0)
+                {
+                    order = await _orderRefundService.InsertAsync(order);
+                }
+            }
+
+            OrderRefundManageModel toReturn = _orderRefundMapper.ToModel<OrderRefundManageModel>(order);
+
+            return toReturn;
+        }
+        
+        [HttpPost]
+        public async Task<Result<bool>> CancelRefundOrder(int id, [FromBody] object model)
+        {
+            return await _orderRefundService.CancelRefundOrderAsync(id);
         }
     }
 }

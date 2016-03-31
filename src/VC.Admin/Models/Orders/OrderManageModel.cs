@@ -10,6 +10,7 @@ using VC.Admin.Models.Products;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 
@@ -47,15 +48,20 @@ namespace VC.Admin.Models.Orders
 
         public IList<string> Messages { get; set; }
 
-        public IList<string> GCCodes { get; set; } 
+        public IList<string> GCCodes { get; set; }
+
+        public static string FormatProductName(SkuDynamic skuDynamic)
+        {
+            return $"{skuDynamic.Product.Name} {skuDynamic.Product.SafeData.SubTitle} ({skuDynamic.SafeData.QTY})";
+        }
 
         public SkuOrderedManageModel(SkuOrdered model)
         {
             if (model != null)
             {
-                if (model.Sku.Product != null)
+                if (model.Sku?.Product != null)
                 {
-                    ProductName = $"{model.Sku.Product.Name} {model.Sku.Product.SafeData.SubTitle} ({model.Sku.SafeData.QTY})";
+                    ProductName = SkuOrderedManageModel.FormatProductName(model.Sku);
                     IdProductType = model.Sku.IdObjectType;
                 }
                 QTY = model.Quantity;

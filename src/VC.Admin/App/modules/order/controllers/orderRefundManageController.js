@@ -1,7 +1,7 @@
 ﻿'use strict';
 
-angular.module('app.modules.order.controllers.orderReshipManageController', [])
-.controller('orderReshipManageController', ['$q', '$scope', '$rootScope', '$filter', '$injector', '$state', '$stateParams', '$timeout', 'modalUtil', 'orderService', 'customerService',
+angular.module('app.modules.order.controllers.orderRefundManageController', [])
+.controller('orderRefundManageController', ['$q', '$scope', '$rootScope', '$filter', '$injector', '$state', '$stateParams', '$timeout', 'modalUtil', 'orderService', 'customerService',
     'productService', 'gcService', 'discountService', 'settingService', 'toaster', 'confirmUtil', 'promiseTracker', 'customerEditService', 'orderEditService', 'gridSorterUtil',
 function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $timeout, modalUtil, orderService, customerService, productService, gcService, discountService,
     settingService, toaster, confirmUtil, promiseTracker, customerEditService, orderEditService, gridSorterUtil)
@@ -15,7 +15,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             toaster.pop('success', "Success!", "Successfully saved.");
             if (!$scope.id)
             {
-                $state.go('index.oneCol.orderReshipDetail', { id: result.Data.Id });
+                $state.go('index.oneCol.orderRefundDetail', { id: result.Data.Id });
             }
             else
             {
@@ -42,34 +42,14 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
         $scope.forms = { submitted: [] };
 
-        $scope.autoShipOrderFrequencies = [];
-
-        $scope.minimumPerishableThreshold = $rootScope.ReferenceData.AppSettings.GlobalPerishableThreshold;
         $scope.options = {};
-        $scope.options.ignoneMinimumPerishableThreshold = false;
-        $scope.orderSources = $rootScope.ReferenceData.OrderSources;
-        $scope.orderSourcesCelebrityHealthAdvocate = $rootScope.ReferenceData.OrderSourcesCelebrityHealthAdvocate;
-        $scope.orderPreferredShipMethod = $rootScope.ReferenceData.OrderPreferredShipMethod;
-        $scope.creditCardTypes = $rootScope.ReferenceData.CreditCardTypes;
-
-        $scope.skusFilter = {
-            Code: '',
-            DescriptionName: '',
-            Paging: { PageIndex: 1, PageItemCount: 20 },
-        };
-
-        $scope.skuFilter = {
-            ExactCode: '',
-            ExactDescriptionName: '',
-            Paging: { PageIndex: 1, PageItemCount: 1 },
-        };
 
         $scope.legend = {};
 
         $scope.mainTab = {
             active: true,
-            formNames: ['topForm', 'mainForm', 'mainForm2', 'GCs'],
-            name: $scope.id ? 'Edit Reship Order' : 'New Reship Order',
+            formNames: ['topForm', 'mainForm', 'mainForm2', ],
+            name: $scope.id ? 'Refund Order' : 'New Refund Order',
         };
         $scope.shippingAddressTab = {
             active: false,
@@ -78,7 +58,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         };
         $scope.paymentInfoTab = {
             active: false,
-            formNames: ['card', 'oac', 'check', 'wiretransfer', 'marketing', 'vcwellness'],
+            formNames: ['oac'],
             AddressEditModels: {}
         };
         var tabs = [];
@@ -102,18 +82,20 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 $scope.options.inited = true;
                 customerEditService.initBase($scope);
                 orderEditService.initBase($scope);
-                orderEditService.initRecalculate($scope);
                 $scope.idCustomer = $scope.order.IdCustomer;
                 customerEditService.initOrderEditCustomerParts($scope);
             }
 
             loadReferencedData();
+
+            $scope.options.RefundGiftCertificatesEnable = $scope.order.RefundGCsUsedOnOrder > 0;
+            $scope.options.ManualRefundOverrideEnable = $scope.order.ManualRefundOverride > 0;
         }
     };
 
     var loadOrder = function ()
     {
-        orderService.getReshipOrder($scope.id, $scope.idOrderSource, $scope.idCustomer, $scope.addEditTracker)
+        orderService.getRefundOrder($scope.id, $scope.idOrderSource, $scope.idCustomer, $scope.addEditTracker)
             .success(function (result)
             {
                 if (result.Success)
@@ -147,8 +129,6 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
                 $scope.options.DBStatusCode = $scope.currentCustomer.StatusCode;
 
-                customerEditService.syncCountry($scope, $scope.currentCustomer.ProfileAddress);
-
                 customerEditService.syncCountry($scope, $scope.order.Shipping);
                 angular.forEach($scope.currentCustomer.Shipping, function (shippingItem)
                 {
@@ -166,7 +146,6 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
                 orderEditService.baseReferencedDataInit($scope);
                 orderEditService.baseReferencedDataInitExistOrder($scope);
-                customerEditService.syncDefaultPaymentMethod($scope);
 
                 initOrder();
 
@@ -185,44 +164,115 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         });
     };
 
+    $scope.requestRecalculate = function ()
+    {
+        if ($scope.id)
+        {
+            return;
+        }
+        if (!$scope.forms.mainForm.$valid || !$scope.forms.mainForm2.$valid)
+        {
+            $scope.forms.mainForm.submitted = true;
+            $scope.forms.mainForm2.submitted = true;
+        }
+        else
+        {
+            console.log('requestRecalculate');
+            return;
+
+            var orderForCalculating = angular.copy(uiScope.order);
+            orderForCalculating.Customer = angular.copy(uiScope.currentCustomer);
+            if (angular.equals(uiScope.oldOrderForCalculating, orderForCalculating))
+            {
+                return;
+            }
+            uiScope.oldOrderForCalculating = orderForCalculating;
+            if (uiScope.currectCalculateCanceller)
+            {
+                uiScope.currectCalculateCanceller.resolve("canceled");
+            }
+            uiScope.currectCalculateCanceller = $q.defer();
+            orderService.calculateRefundOrder(orderForCalculating, uiScope.currectCalculateCanceller)
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        successCalculateHandler(result.Data);
+                    } else
+                    {
+                        errorHandler(result);
+                    }
+                    if (uiScope.currectCalculateCanceller)
+                    {
+                        uiScope.currectCalculateCanceller.reject();
+                        uiScope.currectCalculateCanceller = null;
+                    }
+                })
+                .error(function (result)
+                {
+                    if (result == "canceled")
+                    {
+                        errorHandler(result);
+                        if (uiScope.currectCalculateCanceller)
+                        {
+                            uiScope.currectCalculateCanceller.reject();
+                            uiScope.currectCalculateCanceller = null;
+                        }
+                    }
+                });
+        }
+    };
+
+    function successCalculateHandler(data)
+    {
+        uiScope.order.ShippingTotal = data.ShippingTotal;
+        uiScope.order.ProductsSubtotal = data.ProductsSubtotal;
+        uiScope.order.DiscountTotal = data.DiscountTotal;
+        uiScope.order.DiscountedSubtotal = data.DiscountedSubtotal;
+        uiScope.order.DiscountMessage = data.DiscountMessage;
+        uiScope.order.TaxTotal = data.TaxTotal;
+        uiScope.order.AutoTotal = data.AutoTotal;
+        uiScope.order.Total = data.Total;
+
+        uiScope.order.ManualShippingTotal = data.ManualShippingTotal;
+        uiScope.order.RefundGCsUsedOnOrder = data.RefundGCsUsedOnOrder;
+        uiScope.order.ManualRefundOverride = data.ManualRefundOverride;
+
+        $.each(uiScope.order.RefundSkus, function (index, uiSku)
+        {
+            var found = false;
+            $.each(data.RefundSkus, function (index, sku)
+            {
+                if (uiSku.IdSku == sku.IdSku)
+                {
+                    uiSku.RefundValue = sku.RefundValue;
+                    return false;
+                }
+            });
+        });
+
+        $.each(uiScope.order.RefundOrderToGiftCertificates, function (index, uiGc)
+        {
+            var found = false;
+            $.each(data.RefundOrderToGiftCertificates, function (index, gc)
+            {
+                if (uiGc.IdGiftCertificate == gc.IdGiftCertificate)
+                {
+                    uiGc.Amount = gc.Amount;
+                    return false;
+                }
+            });
+        });
+    };
+
     var initOrder = function ()
     {
         orderEditService.initOrderOptions($scope);
-        if ($scope.order.IdOrderSource)
-        {
-            $scope.legend.IdOrderSource = $scope.order.IdOrderSource;
-        }
-        if ($scope.order.OrderSourceDateCreated)
-        {
-            $scope.legend.OrderSourceDateCreated = $scope.order.OrderSourceDateCreated;
-        }
-        if ($scope.order.OrderSourceTotal)
-        {
-            $scope.legend.OrderSourceTotal = $scope.order.OrderSourceTotal;
-        }
-        $scope.options.AllReshipProblemSkus = true;
-    };
-
-    $scope.toggleAllReshipProblemSkus = function ()
-    {
-        $.each($scope.order.ReshipProblemSkus, function (index, item)
-        {
-            item.Used = $scope.options.AllReshipProblemSkus;
-        });
-    };
-
-    $scope.toggleReshipProblemSku = function (item)
-    {
-        var allUsed = true;
-        $.each($scope.order.ReshipProblemSkus, function (index, item)
-        {
-            if (!item.Used)
-            {
-                allUsed = false;
-                return false;
-            }
-        });
-        $scope.options.AllReshipProblemSkus = allUsed;
+        $scope.legend.IdOrderSource = $scope.order.IdOrderSource;
+        $scope.legend.OrderSourceRefundIds = $scope.order.OrderSourceRefundIds;
+        $scope.legend.OrderSourceDateCreated = $scope.order.OrderSourceDateCreated;
+        $scope.legend.OrderSourceTotal = $scope.order.OrderSourceTotal;
+        $scope.legend.OrderSourcePaymentMethodType = $scope.order.OrderSourcePaymentMethodType;
     };
 
     $scope.save = function ()
@@ -243,72 +293,18 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             }
         });
 
-        if (valid && $scope.skusClientValid())
+        if (valid)
         {
-            if (!orderEditService.isProductsValid($scope))
-            {
-                return;
-            }
-
-            angular.forEach($scope.currentCustomer.Shipping, function (shippingItem, index)
-            {
-                shippingItem.IsSelected = index.toString() == $scope.shippingAddressTab.AddressIndex;
-            });
-
             $scope.order.IdPaymentMethodType = $scope.paymentInfoTab.PaymentMethodType;
             var billingErrorMessages = '';
-            if ($scope.order.IdPaymentMethodType == 1)//card
-            {
-                if ($scope.currentCustomer.CreditCards.length != 0)
-                {
-                    angular.forEach($scope.currentCustomer.CreditCards, function (cardItem, index)
-                    {
-                        cardItem.IsSelected = index.toString() == $scope.paymentInfoTab.CreditCardIndex;
-                    });
-                }
-            }
+
             if (!$scope.order.OnHold)
             {
-                if ($scope.order.IdPaymentMethodType == 1)//card
-                {
-                    if ($scope.order.CreditCard == null)
-                    {
-                        billingErrorMessages += "Credit Card is required. ";
-                    }
-                }
                 if ($scope.order.IdPaymentMethodType == 2)//oac
                 {
                     if ($scope.order.Oac == null)
                     {
                         billingErrorMessages += "On Approved Credit is required. ";
-                    }
-                }
-                if ($scope.order.IdPaymentMethodType == 3)//check
-                {
-                    if ($scope.order.Check == null)
-                    {
-                        billingErrorMessages += "Check is required. ";
-                    }
-                }
-                if ($scope.order.IdPaymentMethodType == 6)
-                {
-                    if ($scope.order.WireTransfer == null)
-                    {
-                        billingErrorMessages += "Wire Transfer is required. ";
-                    }
-                }
-                if ($scope.order.IdPaymentMethodType == 7)
-                {
-                    if ($scope.order.Marketing == null)
-                    {
-                        billingErrorMessages += "Marketing payment info is required. ";
-                    }
-                }
-                if ($scope.order.IdPaymentMethodType == 8)
-                {
-                    if ($scope.order.VCWellness == null)
-                    {
-                        billingErrorMessages += "VC Wellness Employee Program is required. ";
                     }
                 }
             }
@@ -322,7 +318,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
             var order = orderEditService.orderDataProcessingBeforeSave($scope);
 
-            orderService.updateReshipOrder(order, $scope.addEditTracker).success(function (result)
+            orderService.addRefundOrder(order, $scope.addEditTracker).success(function (result)
             {
                 successSaveHandler(result);
             }).
@@ -348,6 +344,68 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             $scope.forms.submitted['vcwellness'] = true;
             toaster.pop('error', "Error!", "Validation errors, please correct field values.", null, 'trustedHtml');
         }
+    };
+
+    $scope.cancelRefund = function ()
+    {
+        confirmUtil.confirm(function ()
+        {
+            orderService.cancelRefundOrder($scope.order.Id, $scope.addEditTracker)
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        toaster.pop('success', "Success!", "Successfully canceled.");
+                        $state.go('index.oneCol.manageOrders');
+                    } else
+                    {
+                        errorHandler(result);
+                    }
+                })
+                .error(function (result)
+                {
+                    errorHandler(result);
+                });
+        }, 'Are you sure you want to cancel this refund?');
+    };
+
+    $scope.toggleAllActiveRefundSkus = function ()
+    {
+        $.each($scope.order.RefundSkus, function (index, item)
+        {
+            if (!item.Disabled)
+            {
+                item.Active = $scope.options.allActiveRefundSkus;
+            }
+        });
+        $scope.requestRecalculate();
+    };
+
+    $scope.toggleRefundSku = function (item)
+    {
+        var allActive = true;
+        $.each($scope.order.RefundSkus, function (index, item)
+        {
+            if (!item.Disabled && !item.Active)
+            {
+                allActive = false;
+                return false;
+            }
+        });
+        $scope.options.allActiveRefundSkus = allActive;
+        $scope.requestRecalculate();
+    };
+
+    $scope.toggleRefundGiftCertificates = function ()
+    {
+        $scope.order.RefundGCsUsedOnOrder = 0;
+        $scope.requestRecalculate();
+    };
+
+    $scope.toggleManualRefundOverride = function ()
+    {
+        $scope.order.ManualRefundOverride = 0;
+        $scope.requestRecalculate();
     };
 
     initialize();

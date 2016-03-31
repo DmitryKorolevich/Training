@@ -989,6 +989,23 @@ namespace VitalChoice.Ecommerce.Context
                     .HasPrincipalKey(o => o.Id);
             });
 
+
+            builder.Entity<RefundOrderToGiftCertificate>(entity =>
+            {
+                entity.Ignore(s => s.Id);
+                entity.HasKey(s => new { s.IdRefundOrder, s.IdOrder, s.IdGiftCertificate });
+                entity.ToTable("RefundOrderToGiftCertificates");
+                entity.HasOne(g => g.RefundOrder)
+                    .WithMany(p => p.RefundOrderToGiftCertificates)
+                    .HasForeignKey(g => g.IdRefundOrder)
+                    .HasPrincipalKey(g => g.Id)
+                    .IsRequired();
+                entity.HasOne(g => g.OrderToGiftCertificate)
+                    .WithMany()
+                    .HasForeignKey(g => new {g.IdOrder, g.IdGiftCertificate})
+                    .HasPrincipalKey(o => new {o.IdOrder, o.IdGiftCertificate})
+                    .IsRequired();
+            });
             builder.Entity<OrderToSkuToInventorySku>(entity =>
             {
                 entity.Ignore(s => s.Id);
@@ -1109,10 +1126,11 @@ namespace VitalChoice.Ecommerce.Context
 
             builder.Entity<RefundSku>(entity =>
             {
+                entity.Ignore(s => s.Id);
                 entity.HasKey(r => new { r.IdOrder, r.IdSku });
                 entity.ToTable("RefundSkus");
                 entity.HasOne(r => r.Order)
-                    .WithMany()
+                    .WithMany(p=>p.RefundSkus)
                     .HasForeignKey(r => r.IdOrder)
                     .HasPrincipalKey(o => o.Id)
                     .IsRequired();

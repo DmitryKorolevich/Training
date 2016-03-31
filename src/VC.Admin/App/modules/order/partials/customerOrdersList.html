@@ -76,7 +76,7 @@
                     </td>
                     <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>
                     <td>
-                        <a ui-sref="{{::item.IdObjectType==5 ? 'index.oneCol.orderReshipDetail({id: item.Id })' : 'index.oneCol.orderDetail({id: item.Id })'}}">{{::item.Id}}</a>
+                        <a ui-sref="{{::item.IdObjectType==5 ? 'index.oneCol.orderReshipDetail({id: item.Id })' : item.IdObjectType==6 ? 'index.oneCol.orderRefundDetail({id: item.Id })' : 'index.oneCol.orderDetail({id: item.Id })'}}">{{::item.Id}}</a>
                     </td>
                     <td>{{::item.Total | currency}}</td>
                     <td>
@@ -89,7 +89,7 @@
                         <button title="Reship" class="btn btn-default btn-info btn-xs" ui-sref="index.oneCol.orderReshipAdd({idcustomer:item.IdCustomer, idsource:item.Id })">
                             Reship
                         </button>
-                        <button data-ng-if="item.OrderStatus==3" title="Refund" class="btn btn-default btn-primary btn-xs">
+                        <button data-ng-if="item.OrderStatus==3 || item.POrderStatus==3 || item.NPOrderStatus==3" ui-sref="index.oneCol.orderRefundAdd({idcustomer:item.IdCustomer, idsource:item.Id })" title="Refund" class="btn btn-default btn-primary btn-xs">
                             Refund
                         </button>
                     </td>

@@ -16,7 +16,13 @@ namespace VitalChoice.Business.Queries.Orders
             return this;
         }
 
-        public VOrderQuery WithCreatedDate(DateTime? from, DateTime? to)
+		public VOrderQuery NotAutoShip()
+		{
+			Add(x => x.IdObjectType != OrderType.AutoShip);
+			return this;
+		}
+
+		public VOrderQuery WithCreatedDate(DateTime? from, DateTime? to)
         {
             if (from.HasValue && to.HasValue)
             {

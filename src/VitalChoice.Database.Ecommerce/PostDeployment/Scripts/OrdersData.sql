@@ -381,3 +381,37 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT * FROM Lookups WHERE Name='RefundRedeemOptions')
+BEGIN
+	DECLARE @IdLookup INT
+	
+	INSERT INTO [dbo].[Lookups]
+	([LookupValueType], Name)
+	VALUES
+	(N'string', N'RefundRedeemOptions')
+		
+	SET @IdLookup = SCOPE_IDENTITY()
+	
+	INSERT INTO [dbo].[LookupVariants]
+	([Id], [IdLookup], [ValueVariant], [Order])
+	VALUES
+	(1, @IdLookup, 'Refund',1),
+	(2, @IdLookup, 'Return',2),
+	(3, @IdLookup, 'Discount',3),
+	(4, @IdLookup, 'Other',4)
+END
+
+GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[OrderOptionTypes] WHERE Name = 'AutoTotal' AND [IdObjectType]=6)
+BEGIN
+
+	INSERT INTO [dbo].[OrderOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'AutoTotal', 1, NULL, 6, NULL)
+
+END
+
+GO

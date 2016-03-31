@@ -74,8 +74,7 @@ namespace VitalChoice.SharedWeb.Helpers
                 new KeyValuePair<string, string>(string.Empty, shippingAddress.SafeData.Company),
                 new KeyValuePair<string, string>(string.Empty, shippingAddress.Data.Address1),
                 new KeyValuePair<string, string>(string.Empty, shippingAddress.SafeData.Address2),
-                new KeyValuePair<string, string>(string.Empty, $"{shippingAddress.Data.City}, {BusinessHelper.ResolveStateOrCounty(countries, shippingAddress)} {shippingAddress.Data.Zip}"),
-                new KeyValuePair<string, string>("Phone", shippingAddress.SafeData.Phone!=null ? ((string)shippingAddress.SafeData.Phone).FormatAsPhone(BaseAppConstants.BASE_PHONE_FORMAT) : String.Empty),
+                new KeyValuePair<string, string>(string.Empty, $"{shippingAddress.Data.City}, {BusinessHelper.ResolveStateOrCounty(countries, shippingAddress)} {shippingAddress.Data.Zip}")
             };
         }
     }

@@ -2,12 +2,8 @@
 
 namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 {
-    public class OrderFilter : FilterBase
-    {
-        public string Id { get; set; }
-
-	    public int? IdCustomer { get; set; }
-
-	    public OrderType? OrderType { get; set; }
+    public class OrderFilter : OrderFilterBase
+	{
+        public OrderType? OrderType { get; set; }
     }
 }

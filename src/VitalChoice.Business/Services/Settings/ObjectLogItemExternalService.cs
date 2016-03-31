@@ -96,8 +96,18 @@ namespace VitalChoice.Business.Services.Settings
             };
             if(objectType == ObjectType.Order)
             {
-                OrderDynamic order = (OrderDynamic)model;
-                item.OptionalData = $"All:{(int?)order.OrderStatus},P:{(int?)order.POrderStatus},NP:{(int?)order.NPOrderStatus}";
+                if (model is OrderDynamic)
+                {
+                    OrderDynamic order = (OrderDynamic) model;
+                    item.OptionalData =
+                        $"All:{(int?) order.OrderStatus},P:{(int?) order.POrderStatus},NP:{(int?) order.NPOrderStatus}";
+                }
+                if (model is OrderRefundDynamic)
+                {
+                    OrderRefundDynamic order = (OrderRefundDynamic)model;
+                    item.OptionalData =
+                        $"All:{(int?)order.OrderStatus}";
+                }
             }
             return item;
         }
@@ -145,6 +155,7 @@ namespace VitalChoice.Business.Services.Settings
             {
                 if (isDynamic)
                 {
+                    name = name.Replace("Refund", "");
                     name = name.Replace("Dynamic", "");
                 }
                 Enum.TryParse<ObjectType>(name, out result);

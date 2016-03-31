@@ -16,9 +16,10 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Orders
 
         public int Quantity { get; set; }
 
+        public decimal RefundPrice { get; set; }
+
         public decimal RefundValue { get; set; }
 
         public double RefundPercent { get; set; }
-
     }
 }

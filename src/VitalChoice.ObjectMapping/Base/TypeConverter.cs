@@ -139,9 +139,9 @@ namespace VitalChoice.ObjectMapping.Base
             var directResult = TryDirectConvert(obj, unwrappedDest);
             if (directResult != null)
                 return directResult;
-            //if (sourceType == typeof (long) && (destType == typeof (int) || destType == typeof (int?)))
+            //if (sourceType == typeof(long) && (destType == typeof(int) || destType == typeof(int?)))
             //{
-            //    return (int) (long) obj;
+            //    return (int)(long)obj;
             //}
 
             var mapper = GetMapper(sourceType);

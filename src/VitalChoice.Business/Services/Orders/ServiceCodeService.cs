@@ -60,14 +60,14 @@ namespace VitalChoice.Business.Services.Orders
                 return toReturn;
             }
 
-            conditions = conditions.WithOrderTypes(new List<OrderType>() { OrderType.Reship, OrderType.Refund });
-            var orders = await _orderService.SelectAsync(conditions,
+            conditions = conditions.WithOrderType(OrderType.Reship);
+            var reships = await _orderService.SelectAsync(conditions,
                 x => x.Include(p => p.Customer).
                 Include(p => p.OptionValues).
                 Include(p => p.Skus).
                 ThenInclude(p => p.Sku));
 
-            foreach (var reship in orders.Where(p=>p.IdObjectType==(int)OrderType.Reship))
+            foreach (var reship in reships)
             {
                 if (reship.SafeData.ServiceCode != null)
                 {
@@ -97,8 +97,36 @@ namespace VitalChoice.Business.Services.Orders
                 }
             }
 
-            //TODO: calculate refunds statistic
+            conditions = new OrderQuery().NotDeleted().WithActualStatusOnly().WithFromDate(filter.From).WithToDate(filter.To);
+            conditions = conditions.WithOrderType(OrderType.Reship);
+            var refunds = await _orderService.SelectAsync(conditions);
+            foreach (var refund in refunds)
+            {
+                if (refund.SafeData.ServiceCode != null)
+                {
+                    var serviceCodesReportItem = toReturn.Items.FirstOrDefault(p => p.Id == refund.SafeData.ServiceCode);
+                    if (serviceCodesReportItem == null)
+                    {
+                        serviceCodesReportItem = new ServiceCodesReportItem();
+                        serviceCodesReportItem.Id = refund.SafeData.ServiceCode;
+                        serviceCodesReportItem.Name =
+                            serviceCodesLookup.LookupVariants.FirstOrDefault(p => p.Id == refund.SafeData.ServiceCode)?
+                                .ValueVariant;
+                        toReturn.Items.Add(serviceCodesReportItem);
+                    }
 
+                    serviceCodesReportItem.RefundsCount++;
+                    serviceCodesReportItem.TotalCount++;
+                    if (refund.SafeData.ReturnAssociated == true)
+                    {
+                        serviceCodesReportItem.ReturnsCount++;
+                        serviceCodesReportItem.ReturnsAmount += ProductConstants.DEFAULT_RETURN_AMOUNT;
+                    }
+                    serviceCodesReportItem.RefundsAmount -= refund.Total;
+                    serviceCodesReportItem.TotalAmount -= refund.Total;
+                }
+            }
+            
             //Calculate percents
             foreach (var serviceCodesReportItem in toReturn.Items)
             {

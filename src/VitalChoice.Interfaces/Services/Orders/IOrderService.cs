@@ -71,6 +71,8 @@ namespace VitalChoice.Interfaces.Services.Orders
 
 		Task<PagedList<OrderDynamic>> GetFullOrdersAsync(OrderFilter filter);
 
+		Task<PagedList<OrderDynamic>> GetFullAutoShipsAsync(OrderFilterBase filter);
+
 		Task ActivatePauseAutoShipAsync(int customerId, int autoShipId);
 
 		Task DeleteAutoShipAsync(int customerId, int autoShipId);
