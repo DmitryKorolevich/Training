@@ -5,7 +5,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Promotions;
 using VitalChoice.Infrastructure.Domain.Transfer;
 
-namespace VitalChoice.Business.Queries.Product
+namespace VitalChoice.Business.Queries.Products
 {
     public class PromotionQuery : QueryObject<Promotion>
     {

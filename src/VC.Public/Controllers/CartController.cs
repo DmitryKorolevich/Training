@@ -224,7 +224,7 @@ namespace VC.Public.Controllers
             }
 
             model.ShippingDateError = !ModelState.IsValid
-                ? ModelState["ShippingDate"].Errors.Select(x => x.ErrorMessage).FirstOrDefault()
+                ? ModelState["ShippingDate"]?.Errors.Select(x => x.ErrorMessage).FirstOrDefault() ?? string.Empty
                 : string.Empty;
 
             var existingUid = Request.GetCartUid();
