@@ -13,19 +13,22 @@ namespace VitalChoice.SharedWeb.Helpers
 {
     public static class ViewModelHelper
     {
-		public static DateTime FindNextAutoShipDate(DateTime orderDate, int frequency)
-		{
-			var next = orderDate;
-			do
-			{
-				next = next.AddMonths(frequency);
+        public static DateTime FindNextAutoShipDate(DateTime orderDate, int frequency)
+        {
+            if (frequency <= 0)
+                throw new InvalidOperationException("Invalid auto-ship frequency");
 
-			} while (next < DateTime.Now);
+            var difference = DateTime.Now - orderDate;
+            var cyclesAdd = (int) (difference.Days/30.0/frequency);
+            var next = orderDate.AddMonths(cyclesAdd*frequency);
+            if (next < DateTime.Today)
+            {
+                next = next.AddMonths(frequency);
+            }
+            return next;
+        }
 
-			return next;
-		}
-
-		public static List<KeyValuePair<string, string>> PopulateBillingAddressDetails(this AddressDynamic billingAddress, ICollection<Country> countries, string email)
+        public static List<KeyValuePair<string, string>> PopulateBillingAddressDetails(this AddressDynamic billingAddress, ICollection<Country> countries, string email)
         {
             return new List<KeyValuePair<string, string>>()
             {
