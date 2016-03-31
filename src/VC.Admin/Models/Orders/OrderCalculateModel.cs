@@ -79,9 +79,9 @@ namespace VC.Admin.Models.Orders
             ShouldSplit = dataContext.SplitInfo.ShouldSplit;
             ProductsPerishableThresholdIssue = dataContext.ProductsPerishableThresholdIssue;
 
-            SkuOrdereds = dataContext.SkuOrdereds?.Select(item => new SkuOrderedManageModel(item)).ToList() ?? new List<SkuOrderedManageModel>();
+            SkuOrdereds = dataContext.SkuOrdereds.Select(item => new SkuOrderedManageModel(item)).ToList();
 
-            PromoSkus = dataContext.PromoSkus?.Select(item => new PromoSkuOrderedManageModel(item)).ToList() ?? new List<PromoSkuOrderedManageModel>();
+            PromoSkus = dataContext.PromoSkus.Select(item => new PromoSkuOrderedManageModel(item)).ToList();
 
             Messages = dataContext.Messages;
         }

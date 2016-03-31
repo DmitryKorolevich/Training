@@ -47,6 +47,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
             CombinedStatus = combinedStatus;
             Messages = new List<MessageInfo>();
             PromoSkus = new List<PromoOrdered>();
+            SkuOrdereds = new List<SkuOrdered>();
             GcMessageInfos = new List<MessageInfo>();
             SplitInfo = new SplitInfo();
         }

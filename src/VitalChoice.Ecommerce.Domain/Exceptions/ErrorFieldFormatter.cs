@@ -2,12 +2,12 @@
 {
     public static class ErrorFieldFormatter
     {
-        public static string Collection(string collectionName, int index, string propertyName)
+        public static string FormatCollectionError(this string propertyName, string collectionName, int index)
         {
             return $"{collectionName}.i{index}.{propertyName}";
         }
 
-        public static string Form(string formName, string fieldName)
+        public static string FormatErrorWithForm(this string fieldName, string formName)
         {
             if (!string.IsNullOrEmpty(formName))
                 return $"{formName}::{fieldName}";

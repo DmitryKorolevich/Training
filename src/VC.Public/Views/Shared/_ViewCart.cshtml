@@ -35,7 +35,8 @@
 			<td class="cart-line-info">
 				<a class="cart-text-link" data-bind="attr: { href: ProductPageUrl, title: formatDisplayName($data) }, text: formatDisplayName($data)"></a>
 				<span class="cart-sku-code" data-bind="text: '(' + Code() + ')', visible: Code"></span>
-				<span class="stock-presence-note" data-bind="text: InStock() ? 'In Stock Ready to Ship' : 'Not in Stock'"></span>
+			    <span class="stock-presence-note" data-bind="visible: InStock()">In Stock Ready to Ship</span>
+			    <span class="note" data-bind="text: !InStock() ? 'Out of stock' : '', attr: {'data-valmsg-for': 'Skus.i' + $index() + '.Code'}" data-valmsg-replace="true"></span>
 			</td>
 			<td data-bind="text: formatCurrency(Price())"></td>
 			<td class="width-cart-quantity">
@@ -84,7 +85,8 @@
 			<td class="cart-line-info">
 				<a class="cart-text-link" data-bind="attr: { href: ProductPageUrl, title: formatDisplayName($data) }, text: formatDisplayName($data)"></a>
 				<span class="cart-sku-code" data-bind="text: '(' + Code() + ')', visible: Code"></span>
-				<span class="stock-presence-note" data-bind="text: InStock() ? 'In Stock Ready to Ship' : 'Not in Stock'"></span>
+			    <span class="stock-presence-note" data-bind="visible: InStock()">In Stock Ready to Ship</span>
+                <span class="note" data-bind="text: !InStock() ? 'Out of stock' : '', attr: {'data-valmsg-for': 'Promos.i' + $index() + '.Code'}" data-valmsg-replace="true"></span>
 			</td>
 			<td data-bind="text: formatCurrency(Price())"></td>
 			<td class="width-cart-quantity" data-bind="text: Quantity"></td>
@@ -106,10 +108,8 @@
 				<input name="rdUpgradeOption" type="radio" data-bind="checked: Model.ShipAsap, checkedValue: false, event: { change: shipAsapChanged }"/>
 				Ship this order the week of:
 			</label>
-			@Html.TextBoxFor(x => x.ShippingDate, Model.ShippingDate?.ToString("MM/dd/yyyy") ?? string.Empty, new {@class = "cart-input-box input-control date-picker", data_bind = "value: Model.ShippingDate, disable: Model.ShipAsap, css: {'input-validation-error': Model.ShippingDateError() && !Model.ShipAsap()}"})
-            <span class="field-validation-error" data-bind="if: Model.ShippingDateError() && !Model.ShipAsap()" data-valmsg-replace="true" data-valmsg-for="ShippingDate">
-                <span class="" data-bind="text: Model.ShippingDateError"></span>
-            </span>
+			@Html.TextBoxFor(x => x.ShippingDate, Model.ShippingDate?.ToString("MM/dd/yyyy") ?? string.Empty, new {@class = "cart-input-box input-control date-picker", data_bind = "value: Model.ShippingDate, disable: Model.ShipAsap"})
+            <span class="field-validation-error" data-valmsg-replace="true" data-valmsg-for="ShippingDate"></span>
 			<a href="#">View our shipping policies</a>
 		</div>
 		<div class="cart-order-totals">

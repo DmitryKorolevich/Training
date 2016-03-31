@@ -605,17 +605,17 @@ namespace VitalChoice.Business.Services.Customers
                         result.AddRange(o);
                         return result;
                     })).ToArray();
-                    int index = 0;
+                    int[] index = {0};
                     await model.CustomerPaymentMethods.ForEachAsync(async method =>
                     {
                         var errors = await _paymentMethodService.AuthorizeCreditCard(method);
                         errors.Select(error => new MessageInfo
                         {
-                            Field = ErrorFieldFormatter.Form("card", ErrorFieldFormatter.Collection("CreditCards", index, error.Field)),
+                            Field = error.Field.FormatCollectionError("CreditCards", index[0]).FormatErrorWithForm("card"),
                             Message = error.Message,
                             MessageLevel = error.MessageLevel
                         }).ToList().Raise();
-                        index++;
+                        index[0]++;
                     });
 
                     entity = await base.UpdateAsync(model, uow);
@@ -700,7 +700,7 @@ namespace VitalChoice.Business.Services.Customers
                         var errors = await _paymentMethodService.AuthorizeCreditCard(method);
                         errors.Select(error => new MessageInfo
                         {
-                            Field = ErrorFieldFormatter.Form("card", ErrorFieldFormatter.Collection("CreditCards", index, error.Field)),
+                            Field = error.Field.FormatCollectionError("CreditCards", index).FormatErrorWithForm("card"),
                             Message = error.Message,
                             MessageLevel = error.MessageLevel
                         }).ToList().Raise();

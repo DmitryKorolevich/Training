@@ -124,7 +124,7 @@ function recalculateCart(viewModel, successCallback) {
 			type: "POST"
 		}).success(function(result) {
 			if (result.Success) {
-				if (successCallback && !result.Data.ShippingDateError) {
+				if (successCallback) {
 					successCallback();
 				} else {
 					ko.mapping.fromJS(result.Data, { 'ignore': ["ShipAsap", "PromoCode", "ShippingDate"] }, viewModel.Model);
@@ -132,6 +132,10 @@ function recalculateCart(viewModel, successCallback) {
 				}
 			} else
 			{
+			    if (result.Data)
+			    {
+			        ko.mapping.fromJS(result.Data, { 'ignore': ["ShipAsap", "PromoCode", "ShippingDate"] }, viewModel.Model);
+			    }
 			    processErrorResponse(result);
 			}
 			viewModel.refreshing(false);
@@ -211,7 +215,7 @@ function getDiscountRelatedErrors(model) {
 	}
 
 	return $.grep(model.Messages(), function(element) {
-		return element.Key = "DiscountCode";
+		return element.Key = "PromoCode";
 	});
 }
 
@@ -238,7 +242,7 @@ function processErrorResponse(result)
         }
         else
         {
-            notifyError(result.Messages[0]);
+            trySetFormErrors(result);
         }
     }
     else

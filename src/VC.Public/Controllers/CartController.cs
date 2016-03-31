@@ -220,12 +220,12 @@ namespace VC.Public.Controllers
             if (model.ShipAsap && model.ShippingDate.HasValue)
             {
                 model.ShippingDate = null;
-                ModelState.Clear();
+                //    ModelState.Clear();
             }
 
-            model.ShippingDateError = !ModelState.IsValid
-                ? ModelState["ShippingDate"]?.Errors.Select(x => x.ErrorMessage).FirstOrDefault() ?? string.Empty
-                : string.Empty;
+            //model.ShippingDateError = !ModelState.IsValid
+            //    ? ModelState["ShippingDate"]?.Errors.Select(x => x.ErrorMessage).FirstOrDefault() ?? string.Empty
+            //    : string.Empty;
 
             var existingUid = Request.GetCartUid();
             CustomerCartOrder cart;
@@ -259,9 +259,9 @@ namespace VC.Public.Controllers
                 cart.Order.Data.ShipDelayType = ShipDelayType.EntireOrder;
                 if (model.ShippingDate == null)
                 {
-                    model.ShippingDateError = string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldIsRequired],
-                        "Shipping Date");
-                    return model;
+                    ModelState.AddModelError("ShippingDate",
+                        string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldIsRequired], "Shipping Date"));
+                    return ResultHelper.CreateErrorResult(ModelState, model);
                 }
                 cart.Order.Data.ShipDelayDate = model.ShippingDate;
             }
@@ -272,20 +272,19 @@ namespace VC.Public.Controllers
             }
             cart.Order.Data.ShippingUpgradeP = model.ShippingUpgradeP;
             cart.Order.Data.ShippingUpgradeNP = model.ShippingUpgradeNP;
-            if (ModelState.IsValid)
-            {
-                if (!await _checkoutService.UpdateCart(cart))
-                {
-                    return new Result<ViewCartModel>(false, model);
-                }
-            }
             var context = await OrderService.CalculateOrder(cart.Order, OrderStatus.Incomplete);
             FillModel(model, cart.Order, context);
             SetCartUid(cart.CartUid);
+
+            var updateResult = await _checkoutService.UpdateCart(cart);
+            if (!ModelState.IsValid)
+                return ResultHelper.CreateErrorResult(ModelState, model);
+            if (!updateResult)
+                return new Result<ViewCartModel>(false, model);
             return model;
         }
 
-		[HttpGet]
+        [HttpGet]
 		[CustomerAuthorize]
 		public async Task<IActionResult> AutoShip(string id)
 		{

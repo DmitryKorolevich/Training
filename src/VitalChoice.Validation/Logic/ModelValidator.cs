@@ -23,7 +23,7 @@ namespace VitalChoice.Validation.Logic
                 {
                     ValidationErrors.Add(
                         new KeyValuePair<string, string>(
-                            ErrorFieldFormatter.Form(formName, validationError.PropertyName),
+                            validationError.PropertyName.FormatErrorWithForm(formName),
                             validationError.ErrorMessage));
                 }
             }
@@ -38,7 +38,7 @@ namespace VitalChoice.Validation.Logic
                 {
                     ValidationErrors.Add(
                         new KeyValuePair<string, string>(
-                            ErrorFieldFormatter.Form(formName, ErrorFieldFormatter.Collection(collectionName, index, validationError.PropertyName)),
+                            validationError.PropertyName.FormatCollectionError(collectionName, index).FormatErrorWithForm(formName),
                             validationError.ErrorMessage));
                 }
             }

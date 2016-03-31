@@ -110,22 +110,17 @@ namespace VitalChoice.Business.Services.Orders
                             var context = await _orderService.CalculateOrder(order, OrderStatus.Processed);
 
                             List<MessageInfo> messages =new List<MessageInfo>(context.Messages);
-                            if (context.SkuOrdereds != null)
-                            {
-                                messages.AddRange(context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages).Select(p =>
-                                          new MessageInfo()
-                                          {
-                                              Message = p
-                                          }));
-                            }
-                            if (context.PromoSkus != null)
-                            {
-                                messages.AddRange(context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages).Select(p =>
-                                          new MessageInfo()
-                                          {
-                                              Message = p
-                                          }));
-                            }
+                            messages.AddRange(context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages).Select(p =>
+                                new MessageInfo
+                                {
+                                    Message = p
+                                }));
+                            messages.AddRange(
+                                context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages).Select(p =>
+                                    new MessageInfo()
+                                    {
+                                        Message = p
+                                    }));
                             if(messages.Count>0)
                             {
                                 //TODO - add additioanl logic for this case

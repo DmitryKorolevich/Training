@@ -1585,24 +1585,18 @@ namespace VitalChoice.Business.Services.Orders
                 var context = await CalculateOrder(item.Order, orderCombinedStatus, tree);
 
                 item.OrderImportItem.ErrorMessages.AddRange(context.Messages);
-                if (context.SkuOrdereds != null)
-                {
-                    item.OrderImportItem.ErrorMessages.AddRange(
-                        context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages).Select(p =>
-                            new MessageInfo()
-                            {
-                                Message = p
-                            }));
-                }
-                if (context.PromoSkus != null)
-                {
-                    item.OrderImportItem.ErrorMessages.AddRange(
-                        context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages).Select(p =>
-                            new MessageInfo()
-                            {
-                                Message = p
-                            }));
-                }
+                item.OrderImportItem.ErrorMessages.AddRange(
+                    context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages).Select(p =>
+                        new MessageInfo()
+                        {
+                            Message = p
+                        }));
+                item.OrderImportItem.ErrorMessages.AddRange(
+                    context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages).Select(p =>
+                        new MessageInfo()
+                        {
+                            Message = p
+                        }));
             }
 
             //throw calculating errors

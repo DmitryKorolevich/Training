@@ -29,7 +29,7 @@ namespace VC.Public.Models.Cart
         [Display(Name = "Shipping Date")]
         public DateTime? ShippingDate { get; set; }
 
-        public string ShippingDateError { get; set; }
+        //public string ShippingDateError { get; set; }
 
 		[Display(Name = "Tax")]
 		public decimal Tax { get; set; }
