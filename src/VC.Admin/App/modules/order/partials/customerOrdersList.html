@@ -89,7 +89,7 @@
                         <button title="Reship" class="btn btn-default btn-info btn-xs" ui-sref="index.oneCol.orderReshipAdd({idcustomer:item.IdCustomer, idsource:item.Id })">
                             Reship
                         </button>
-                        <button data-ng-if="item.OrderStatus==3" ui-sref="index.oneCol.orderRefundAdd({idcustomer:item.IdCustomer, idsource:item.Id })" title="Refund" class="btn btn-default btn-primary btn-xs">
+                        <button data-ng-if="item.OrderStatus==3 || item.POrderStatus==3 || item.NPOrderStatus==3" ui-sref="index.oneCol.orderRefundAdd({idcustomer:item.IdCustomer, idsource:item.Id })" title="Refund" class="btn btn-default btn-primary btn-xs">
                             Refund
                         </button>
                     </td>
