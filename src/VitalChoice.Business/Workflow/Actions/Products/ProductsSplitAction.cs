@@ -25,7 +25,7 @@ namespace VitalChoice.Business.Workflow.Actions.Products
             dataContext.SplitInfo.PerishableCount = perishableProducts.Length;
             dataContext.SplitInfo.NonPerishableCount = nonPerishableProducts.Length;
             dataContext.SplitInfo.PerishableAmount = perishableProducts.Sum(p => p.Amount*p.Quantity);
-            dataContext.SplitInfo.NonPerishableAmount = perishableProducts.Sum(p => p.Amount*p.Quantity);
+            dataContext.SplitInfo.NonPerishableAmount = nonPerishableProducts.Sum(p => p.Amount*p.Quantity);
             dataContext.SplitInfo.NonPerishableOrphanCount =
                 products.Count(
                     s => s.Sku.IdObjectType == (int) ProductType.NonPerishable && s.Sku.Data.OrphanType);
