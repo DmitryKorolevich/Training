@@ -163,227 +163,236 @@ namespace VitalChoice.Business.Services.Orders
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
 
-		private async Task<Order> InsertAsyncInternal(OrderDynamic model, IUnitOfWorkAsync uow)
-		{
-			Order entity;
-			Task<bool> remoteUpdateTask;
-			using (var transaction = uow.BeginTransaction())
-			{
-				try
-				{
-					SetPOrderType(new List<OrderDynamic>() { model });
-					await SetSkusBornDate(new[] { model }, uow);
-					await EnsurePaymentMethod(model);
-					model.PaymentMethod.IdOrder = model.Id;
-					var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
-					var paymentCopy = _paymentMapper.Clone<ExpandoObject>(model.PaymentMethod, o =>
-					{
-						var result = new ExpandoObject();
-						result.AddRange(o);
-						return result;
-					});
-					(await authTask).Raise();
-					entity = await base.InsertAsync(model, uow);
-					model.IdAddedBy = entity.IdEditedBy;
-					await UpdateAffiliateOrderPayment(model, uow);
-					await UpdateHealthwiseOrder(model, uow);
-					await ChargeGiftCertificates(model, uow);
-					model.PaymentMethod.IdOrder = model.Id;
+        private async Task<Order> InsertAsyncInternal(OrderDynamic model, IUnitOfWorkAsync uow)
+        {
+            Order entity;
+            Task<bool> remoteUpdateTask;
+            using (var transaction = uow.BeginTransaction())
+            {
+                try
+                {
+                    SetPOrderType(new List<OrderDynamic>() { model });
+                    await SetSkusBornDate(new[] { model }, uow);
+                    await EnsurePaymentMethod(model);
+                    model.PaymentMethod.IdOrder = model.Id;
+                    var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
+                    var paymentCopy = _paymentMapper.Clone<ExpandoObject>(model.PaymentMethod, o =>
+                    {
+                        var result = new ExpandoObject();
+                        result.AddRange(o);
+                        return result;
+                    });
+                    (await authTask).Raise();
+                    entity = await base.InsertAsync(model, uow);
+                    //storefront update
+                    if (!entity.IdEditedBy.HasValue)
+                    {
+                        await UpdateAffiliateOrderPayment(model, uow);
+                        await UpdateHealthwiseOrder(model, uow);
+                    }
+                    await ChargeGiftCertificates(model, uow);
+                    model.PaymentMethod.IdOrder = model.Id;
 
-					remoteUpdateTask = _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy);
+                    remoteUpdateTask = _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy);
 
-					transaction.Commit();
-				}
-				catch
-				{
-					transaction.Rollback();
-					throw;
-				}
-			}
-			if (!await remoteUpdateTask)
-			{
-				Logger.LogError("Cannot update order payment info on remote.");
-			}
-			return entity;
-		}
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+            if (!await remoteUpdateTask)
+            {
+                Logger.LogError("Cannot update order payment info on remote.");
+            }
+            return entity;
+        }
 
-		/// <summary>
-		/// We don't do card authorize on collection inserts and also don't make a send to export service
-		/// </summary>
-		/// <param name="models"></param>
-		/// <param name="uow"></param>
-		/// <returns></returns>
-		private async Task<List<Order>> InsertRangeInternalAsync(ICollection<OrderDynamic> models, IUnitOfWorkAsync uow)
-		{
-			List<Order> entities;
-			using (var transaction = uow.BeginTransaction())
-			{
-				try
-				{
-					SetPOrderType(models);
-					await SetSkusBornDate(models, uow);
-					entities = await base.InsertRangeAsync(models, uow);
-					foreach (var model in models)
-					{
-						var entity = entities.FirstOrDefault(e => e.Id == model.Id);
-						if (entity != null)
-						{
-							model.IdAddedBy = entity.IdAddedBy;
-						}
-						await UpdateAffiliateOrderPayment(model, uow);
-						await UpdateHealthwiseOrder(model, uow);
-						await ChargeGiftCertificates(model, uow);
-						model.PaymentMethod.IdOrder = model.Id;
-					}
+        /// <summary>
+        /// We don't do card authorize on collection inserts and also don't make a send to export service
+        /// </summary>
+        /// <param name="models"></param>
+        /// <param name="uow"></param>
+        /// <returns></returns>
+        private async Task<List<Order>> InsertRangeInternalAsync(ICollection<OrderDynamic> models, IUnitOfWorkAsync uow)
+        {
+            List<Order> entities;
+            using (var transaction = uow.BeginTransaction())
+            {
+                try
+                {
+                    SetPOrderType(models);
+                    await SetSkusBornDate(models, uow);
+                    entities = await base.InsertRangeAsync(models, uow);
+                    foreach (var model in models)
+                    {
+                        var entity = entities.FirstOrDefault(e => e.Id == model.Id);
+                        //storefront update
+                        if (entity != null && !entity.IdAddedBy.HasValue)
+                        {
+                            await UpdateAffiliateOrderPayment(model, uow);
+                            await UpdateHealthwiseOrder(model, uow);
+                        }
+                        await ChargeGiftCertificates(model, uow);
+                        model.PaymentMethod.IdOrder = model.Id;
+                    }
 
-					transaction.Commit();
-				}
-				catch
-				{
-					transaction.Rollback();
-					throw;
-				}
-			}
-			return entities;
-		}
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+            return entities;
+        }
 
-		private async Task<Order> UpdateInternalAsync(OrderDynamic model, IUnitOfWorkAsync uow)
-		{
-			Order entity;
-			Task<bool> remoteUpdateTask;
-			using (var transaction = uow.BeginTransaction())
-			{
-				try
-				{
-					SetPOrderType(new List<OrderDynamic>() { model });
-					await SetSkusBornDate(new[] { model }, uow);
-					await EnsurePaymentMethod(model);
-					model.PaymentMethod.IdOrder = model.Id;
-					var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
-					var paymentCopy = _paymentMapper.Clone<ExpandoObject>(model.PaymentMethod, o =>
-					{
-						var result = new ExpandoObject();
-						result.AddRange(o);
-						return result;
-					});
-					(await authTask).Raise();
-					entity = await base.UpdateAsync(model, uow);
-					model.IdAddedBy = entity.IdAddedBy;
-					await UpdateAffiliateOrderPayment(model, uow);
-					await UpdateHealthwiseOrder(model, uow);
+        private async Task<Order> UpdateInternalAsync(OrderDynamic model, IUnitOfWorkAsync uow)
+        {
+            Order entity;
+            Task<bool> remoteUpdateTask;
+            using (var transaction = uow.BeginTransaction())
+            {
+                try
+                {
+                    SetPOrderType(new List<OrderDynamic>() { model });
+                    await SetSkusBornDate(new[] { model }, uow);
+                    await EnsurePaymentMethod(model);
+                    model.PaymentMethod.IdOrder = model.Id;
+                    var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
+                    var paymentCopy = _paymentMapper.Clone<ExpandoObject>(model.PaymentMethod, o =>
+                    {
+                        var result = new ExpandoObject();
+                        result.AddRange(o);
+                        return result;
+                    });
+                    (await authTask).Raise();
+                    entity = await base.UpdateAsync(model, uow);
+                    //storefront update
+                    if (!entity.IdAddedBy.HasValue)
+                    {
+                        await UpdateAffiliateOrderPayment(model, uow);
+                        await UpdateHealthwiseOrder(model, uow);
+                    }
 
-					remoteUpdateTask = _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy);
+                    remoteUpdateTask = _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy);
 
-					transaction.Commit();
-				}
-				catch
-				{
-					transaction.Rollback();
-					throw;
-				}
-			}
-			if (!await remoteUpdateTask)
-			{
-				Logger.LogError("Cannot update order payment info on remote.");
-			}
-			return entity;
-		}
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+            if (!await remoteUpdateTask)
+            {
+                Logger.LogError("Cannot update order payment info on remote.");
+            }
+            return entity;
+        }
 
-		/// <summary>
-		/// We don't do card authorize on collection updates and also don't make a send to export service
-		/// </summary>
-		/// <param name="models"></param>
-		/// <param name="uow"></param>
-		/// <returns></returns>
-		private async Task<List<Order>> UpdateRangeInternalAsync(ICollection<OrderDynamic> models, IUnitOfWorkAsync uow)
-		{
-			List<Order> entities;
-			using (var transaction = uow.BeginTransaction())
-			{
-				try
-				{
-					SetPOrderType(models);
-					await SetSkusBornDate(models, uow);
-					entities = await base.UpdateRangeAsync(models, uow);
-					foreach (var model in models)
-					{
-						var entity = entities.FirstOrDefault(p => p.Id == model.Id);
-						if (entity != null)
-						{
-							model.IdAddedBy = entity.IdAddedBy;
-							model.PaymentMethod.IdOrder = model.Id;
-						}
-						await UpdateAffiliateOrderPayment(model, uow);
-						await UpdateHealthwiseOrder(model, uow);
-					}
+        /// <summary>
+        /// We don't do card authorize on collection updates and also don't make a send to export service
+        /// </summary>
+        /// <param name="models"></param>
+        /// <param name="uow"></param>
+        /// <returns></returns>
+        private async Task<List<Order>> UpdateRangeInternalAsync(ICollection<OrderDynamic> models, IUnitOfWorkAsync uow)
+        {
+            List<Order> entities;
+            using (var transaction = uow.BeginTransaction())
+            {
+                try
+                {
+                    SetPOrderType(models);
+                    await SetSkusBornDate(models, uow);
+                    entities = await base.UpdateRangeAsync(models, uow);
+                    foreach (var model in models)
+                    {
+                        var entity = entities.FirstOrDefault(p => p.Id == model.Id);
+                        if (entity != null)
+                        {
+                            model.PaymentMethod.IdOrder = model.Id;
+                        }
+                        //storefront update
+                        if (entity != null && !entity.IdAddedBy.HasValue)
+                        {
+                            await UpdateAffiliateOrderPayment(model, uow);
+                            await UpdateHealthwiseOrder(model, uow);
+                        }
+                    }
 
-					transaction.Commit();
-				}
-				catch
-				{
-					transaction.Rollback();
-					throw;
-				}
-			}
-			return entities;
-		}
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+            return entities;
+        }
 
-		private async Task<Order> FindAutoShipToChangeStatusAsync(int customerId, int autoShipId)
-		{
-			var orderQuery = new OrderQuery().WithCustomerId(customerId).WithId(autoShipId).NotDeleted().WithOrderType(OrderType.AutoShip);
+        private async Task<Order> FindAutoShipToChangeStatusAsync(int customerId, int autoShipId)
+        {
+            var orderQuery = new OrderQuery().WithCustomerId(customerId).WithId(autoShipId).NotDeleted().WithOrderType(OrderType.AutoShip);
 
-			var autoShip = await _orderRepository.Query(orderQuery).SelectFirstOrDefaultAsync();
-			if (autoShip == null)
-			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AutoShipNotAvailable]);
-			}
+            var autoShip = await _orderRepository.Query(orderQuery).SelectFirstOrDefaultAsync();
+            if (autoShip == null)
+            {
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AutoShipNotAvailable]);
+            }
 
-			return autoShip;
-		}
+            return autoShip;
+        }
 
-		private Func<IQueryable<Order>, IOrderedQueryable<Order>> PerformOrderSorting(FilterBase filter)
-		{
-			Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable;
+        private Func<IQueryable<Order>, IOrderedQueryable<Order>> PerformOrderSorting(FilterBase filter)
+        {
+            Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable;
 
-			var sortOrder = filter.Sorting.SortOrder;
-			switch (filter.Sorting.Path)
-			{
-				case OrderSortPath.OrderDate:
-					if (sortOrder == SortOrder.Desc)
-					{
-						sortable = x => x.OrderByDescending(y => y.DateCreated);
-					}
-					else
-					{
-						sortable = x => x.OrderBy(y => y.DateCreated);
-					}
-					break;
-				case OrderSortPath.DateEdited:
-					if (sortOrder == SortOrder.Desc)
-					{
-						sortable = x => x.OrderByDescending(y => y.DateEdited);
-					}
-					else
-					{
-						sortable = x => x.OrderBy(y => y.DateEdited);
-					}
-					break;
-				default:
-					if (sortOrder == SortOrder.Desc)
-					{
-						sortable = x => x.OrderByDescending(y => y.Id);
-					}
-					else
-					{
-						sortable = x => x.OrderBy(y => y.Id);
-					}
-					break;
-			}
+            var sortOrder = filter.Sorting.SortOrder;
+            switch (filter.Sorting.Path)
+            {
+                case OrderSortPath.OrderDate:
+                    if (sortOrder == SortOrder.Desc)
+                    {
+                        sortable = x => x.OrderByDescending(y => y.DateCreated);
+                    }
+                    else
+                    {
+                        sortable = x => x.OrderBy(y => y.DateCreated);
+                    }
+                    break;
+                case OrderSortPath.DateEdited:
+                    if (sortOrder == SortOrder.Desc)
+                    {
+                        sortable = x => x.OrderByDescending(y => y.DateEdited);
+                    }
+                    else
+                    {
+                        sortable = x => x.OrderBy(y => y.DateEdited);
+                    }
+                    break;
+                default:
+                    if (sortOrder == SortOrder.Desc)
+                    {
+                        sortable = x => x.OrderByDescending(y => y.Id);
+                    }
+                    else
+                    {
+                        sortable = x => x.OrderBy(y => y.Id);
+                    }
+                    break;
+            }
 
-			return sortable;
-		}
+            return sortable;
+        }
 
-		protected override IQueryLite<Order> BuildIncludes(IQueryLite<Order> query)
+        protected override IQueryLite<Order> BuildIncludes(IQueryLite<Order> query)
         {
             return
                 query.Include(o => o.Discount)
@@ -729,17 +738,17 @@ namespace VitalChoice.Business.Services.Orders
             return base.ValidateAsync(dynamic);
         }
 
-	    public async Task<int?> GetOrderIdCustomer(int id)
+        public async Task<int?> GetOrderIdCustomer(int id)
         {
             var order = (await this.ObjectRepository.Query(p => p.StatusCode != (int)RecordStatusCode.Deleted && p.Id == id).SelectAsync(false)).FirstOrDefault();
             return order?.IdCustomer;
         }
 
-	    public async Task<PagedList<Order>> GetShortOrdersAsync(OrderFilter filter)
+        public async Task<PagedList<Order>> GetShortOrdersAsync(OrderFilter filter)
         {
             Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable = PerformOrderSorting(filter);
 
-			var orderQuery = new OrderQuery().WithCustomerId(filter.IdCustomer).FilterById(filter.Id).NotDeleted().WithOrderType(filter.OrderType).NotAutoShip();
+            var orderQuery = new OrderQuery().WithCustomerId(filter.IdCustomer).FilterById(filter.Id).NotDeleted().WithOrderType(filter.OrderType).NotAutoShip();
 
             var query =
                 this.ObjectRepository.Query(orderQuery)
@@ -747,49 +756,49 @@ namespace VitalChoice.Business.Services.Orders
             return await query.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
         }
 
-	    public async Task<PagedList<OrderDynamic>> GetFullOrdersAsync(OrderFilter filter)
-	    {
-			var orderQuery = new OrderQuery().WithCustomerId(filter.IdCustomer).FilterById(filter.Id).NotDeleted().WithOrderType(filter.OrderType).WithoutIncomplete().NotAutoShip();
+        public async Task<PagedList<OrderDynamic>> GetFullOrdersAsync(OrderFilter filter)
+        {
+            var orderQuery = new OrderQuery().WithCustomerId(filter.IdCustomer).FilterById(filter.Id).NotDeleted().WithOrderType(filter.OrderType).WithoutIncomplete().NotAutoShip();
 
-			var orders =
-				await
-					SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, orderQuery, null, PerformOrderSorting(filter), true);
+            var orders =
+                await
+                    SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, orderQuery, null, PerformOrderSorting(filter), true);
 
-			return orders;
-		}
+            return orders;
+        }
 
-		public async Task<PagedList<OrderDynamic>> GetFullAutoShipsAsync(OrderFilterBase filter)
-		{
-			var orderQuery = new OrderQuery().WithCustomerId(filter.IdCustomer).FilterById(filter.Id).NotDeleted().WithOrderType(OrderType.AutoShip).WithoutIncomplete();
+        public async Task<PagedList<OrderDynamic>> GetFullAutoShipsAsync(OrderFilterBase filter)
+        {
+            var orderQuery = new OrderQuery().WithCustomerId(filter.IdCustomer).FilterById(filter.Id).NotDeleted().WithOrderType(OrderType.AutoShip).WithoutIncomplete();
 
-			var orders =
-				await
-					SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, orderQuery, null, PerformOrderSorting(filter), true);
+            var orders =
+                await
+                    SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, orderQuery, null, PerformOrderSorting(filter), true);
 
-			return orders;
-		}
+            return orders;
+        }
 
-		public async Task ActivatePauseAutoShipAsync(int customerId, int autoShipId)
-	    {
-		    var autoShip = await FindAutoShipToChangeStatusAsync(customerId, autoShipId);
+        public async Task ActivatePauseAutoShipAsync(int customerId, int autoShipId)
+        {
+            var autoShip = await FindAutoShipToChangeStatusAsync(customerId, autoShipId);
 
-			autoShip.StatusCode = autoShip.StatusCode == (int) RecordStatusCode.Active
-			    ? (int) RecordStatusCode.NotActive
-			    : (int) RecordStatusCode.Active;
+            autoShip.StatusCode = autoShip.StatusCode == (int)RecordStatusCode.Active
+                ? (int)RecordStatusCode.NotActive
+                : (int)RecordStatusCode.Active;
 
-		    await _orderRepository.UpdateAsync(autoShip);
-	    }
+            await _orderRepository.UpdateAsync(autoShip);
+        }
 
-		public async Task DeleteAutoShipAsync(int customerId, int autoShipId)
-	    {
-			var autoShip = await FindAutoShipToChangeStatusAsync(customerId, autoShipId);
+        public async Task DeleteAutoShipAsync(int customerId, int autoShipId)
+        {
+            var autoShip = await FindAutoShipToChangeStatusAsync(customerId, autoShipId);
 
-			autoShip.StatusCode = (int)RecordStatusCode.Deleted;
+            autoShip.StatusCode = (int)RecordStatusCode.Deleted;
 
-			await _orderRepository.UpdateAsync(autoShip);
-		}
+            await _orderRepository.UpdateAsync(autoShip);
+        }
 
-	    public async Task<bool> CancelOrderAsync(int id)
+        public async Task<bool> CancelOrderAsync(int id)
         {
             var toReturn = false;
             var order = await SelectAsync(id, false);
@@ -883,48 +892,48 @@ namespace VitalChoice.Business.Services.Orders
             return toReturn;
         }
 
-	    protected override async Task<Order> InsertAsync(OrderDynamic model, IUnitOfWorkAsync uow)
-	    {
-		    Order res;
+        protected override async Task<Order> InsertAsync(OrderDynamic model, IUnitOfWorkAsync uow)
+        {
+            Order res;
 
-		    if (model.IdObjectType == (int)OrderType.AutoShip)
-		    {
-			    using (var transaction = uow.BeginTransaction())
-			    {
-				    try
-				    {
-						res = await InsertAsyncInternal(model, uow);
+            if (model.IdObjectType == (int)OrderType.AutoShip)
+            {
+                using (var transaction = uow.BeginTransaction())
+                {
+                    try
+                    {
+                        res = await InsertAsyncInternal(model, uow);
 
-						if (model.OrderStatus != OrderStatus.Incomplete)
-						{
-							model.IdObjectType = (int)OrderType.Normal;
-							model.Data.AutoShipFrequency = null;
-							model.Id = 0;
-							model.PaymentMethod.Id = 0;
-							model.ShippingAddress.Id = 0;
+                        if (model.OrderStatus != OrderStatus.Incomplete)
+                        {
+                            model.IdObjectType = (int)OrderType.Normal;
+                            model.Data.AutoShipFrequency = null;
+                            model.Id = 0;
+                            model.PaymentMethod.Id = 0;
+                            model.ShippingAddress.Id = 0;
 
-							await InsertAsyncInternal(model, uow);
-						}
+                            await InsertAsyncInternal(model, uow);
+                        }
 
-						transaction.Commit();
-					}
-				    catch (Exception)
-				    {
-					    transaction.Rollback();
-					    throw;
-				    }
-			    }
-			   
-		    }
-		    else
-		    {
-				res = await InsertAsyncInternal(model, uow);
-			}
+                        transaction.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
 
-		    return res;
-	    }
+            }
+            else
+            {
+                res = await InsertAsyncInternal(model, uow);
+            }
 
-	    private async Task ChargeGiftCertificates(OrderDynamic model, IUnitOfWorkAsync uow)
+            return res;
+        }
+
+        private async Task ChargeGiftCertificates(OrderDynamic model, IUnitOfWorkAsync uow)
         {
             if (model.OrderStatus == OrderStatus.Incomplete ||
                 model.POrderStatus == OrderStatus.Incomplete && model.NPOrderStatus == OrderStatus.Incomplete)
@@ -968,158 +977,158 @@ namespace VitalChoice.Business.Services.Orders
             }
         }
 
-	    protected override async Task<List<Order>> InsertRangeAsync(ICollection<OrderDynamic> models,
-		    IUnitOfWorkAsync uow)
-	    {
-		    var autoShips = models.Where(x => x.IdObjectType == (int) OrderType.AutoShip).ToList();
-		    var others = models.Where(x => x.IdObjectType != (int) OrderType.AutoShip).ToList();
+        protected override async Task<List<Order>> InsertRangeAsync(ICollection<OrderDynamic> models,
+            IUnitOfWorkAsync uow)
+        {
+            var autoShips = models.Where(x => x.IdObjectType == (int)OrderType.AutoShip).ToList();
+            var others = models.Where(x => x.IdObjectType != (int)OrderType.AutoShip).ToList();
 
-		    List<Order> res = new List<Order>();
-		    if (autoShips.Any())
-		    {
-			    using (var transaction = uow.BeginTransaction())
-			    {
-				    try
-				    {
-						res.AddRange(await InsertRangeInternalAsync(autoShips, uow));
+            List<Order> res = new List<Order>();
+            if (autoShips.Any())
+            {
+                using (var transaction = uow.BeginTransaction())
+                {
+                    try
+                    {
+                        res.AddRange(await InsertRangeInternalAsync(autoShips, uow));
 
-						var completed = autoShips.Where(x => x.OrderStatus != OrderStatus.Incomplete).ToList();
-						if (completed.Any())
-						{
-							foreach (var model in completed)
-							{
-								model.IdObjectType = (int)OrderType.Normal;
-								model.Data.AutoShipFrequency = null;
-								model.PaymentMethod.Id = 0;
-								model.ShippingAddress.Id = 0;
-								model.Id = 0;
-							}
+                        var completed = autoShips.Where(x => x.OrderStatus != OrderStatus.Incomplete).ToList();
+                        if (completed.Any())
+                        {
+                            foreach (var model in completed)
+                            {
+                                model.IdObjectType = (int)OrderType.Normal;
+                                model.Data.AutoShipFrequency = null;
+                                model.PaymentMethod.Id = 0;
+                                model.ShippingAddress.Id = 0;
+                                model.Id = 0;
+                            }
 
-							await InsertRangeInternalAsync(completed, uow);
-						}
+                            await InsertRangeInternalAsync(completed, uow);
+                        }
 
-						transaction.Commit();
-					}
-				    catch (Exception)
-				    {
-						transaction.Rollback();
-						throw;
-				    }
-			    }
+                        transaction.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
 
-		    }
+            }
 
-		    if(others.Any())
-		    {
-				res.AddRange(await InsertRangeInternalAsync(models, uow));
-		    }
+            if (others.Any())
+            {
+                res.AddRange(await InsertRangeInternalAsync(models, uow));
+            }
 
-		    return res;
-	    }
+            return res;
+        }
 
 
-	    protected override async Task<Order> UpdateAsync(OrderDynamic model, IUnitOfWorkAsync uow)
-		{
-			Order res;
+        protected override async Task<Order> UpdateAsync(OrderDynamic model, IUnitOfWorkAsync uow)
+        {
+            Order res;
 
-			if (model.IdObjectType == (int)OrderType.AutoShip)
-			{
-				var previous = await SelectEntityFirstAsync(x=>x.Id == model.Id);
+            if (model.IdObjectType == (int)OrderType.AutoShip)
+            {
+                var previous = await SelectEntityFirstAsync(x => x.Id == model.Id);
 
-				using (var transaction = uow.BeginTransaction())
-				{
-					try
-					{
-						res = await UpdateInternalAsync(model, uow);
+                using (var transaction = uow.BeginTransaction())
+                {
+                    try
+                    {
+                        res = await UpdateInternalAsync(model, uow);
 
-						if (previous.OrderStatus == OrderStatus.Incomplete && model.OrderStatus != OrderStatus.Incomplete)
-						{
-							model.IdObjectType = (int)OrderType.Normal;
-							model.Data.AutoShipFrequency = null;
-							model.Id = 0;
-							model.PaymentMethod.Id = 0;
-							model.ShippingAddress.Id = 0;
+                        if (previous.OrderStatus == OrderStatus.Incomplete && model.OrderStatus != OrderStatus.Incomplete)
+                        {
+                            model.IdObjectType = (int)OrderType.Normal;
+                            model.Data.AutoShipFrequency = null;
+                            model.Id = 0;
+                            model.PaymentMethod.Id = 0;
+                            model.ShippingAddress.Id = 0;
 
-							await InsertAsyncInternal(model, uow);
-						}
+                            await InsertAsyncInternal(model, uow);
+                        }
 
-						transaction.Commit();
-					}
-					catch (Exception)
-					{
-						transaction.Rollback();
-						throw;
-					}
-				}
+                        transaction.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
 
-			}
-			else
-			{
-				res = await UpdateInternalAsync(model, uow);
-			}
+            }
+            else
+            {
+                res = await UpdateInternalAsync(model, uow);
+            }
 
-			return res;
-		}
+            return res;
+        }
 
-		protected override async Task<List<Order>> UpdateRangeAsync(ICollection<OrderDynamic> models, IUnitOfWorkAsync uow)
-		{
-			var autoShips = models.Where(x => x.IdObjectType == (int)OrderType.AutoShip).ToList();
-			var others = models.Where(x => x.IdObjectType != (int)OrderType.AutoShip).ToList();
+        protected override async Task<List<Order>> UpdateRangeAsync(ICollection<OrderDynamic> models, IUnitOfWorkAsync uow)
+        {
+            var autoShips = models.Where(x => x.IdObjectType == (int)OrderType.AutoShip).ToList();
+            var others = models.Where(x => x.IdObjectType != (int)OrderType.AutoShip).ToList();
 
-			List<Order> res = new List<Order>();
-			if (autoShips.Any())
-			{
-				using (var transaction = uow.BeginTransaction())
-				{
-					try
-					{
-						res.AddRange(await UpdateRangeInternalAsync(autoShips, uow));
+            List<Order> res = new List<Order>();
+            if (autoShips.Any())
+            {
+                using (var transaction = uow.BeginTransaction())
+                {
+                    try
+                    {
+                        res.AddRange(await UpdateRangeInternalAsync(autoShips, uow));
 
-						var completed = autoShips.Where(x => x.OrderStatus != OrderStatus.Incomplete).ToList();
-						if (completed.Any())
-						{
-							var toInsert = new List<OrderDynamic>();
+                        var completed = autoShips.Where(x => x.OrderStatus != OrderStatus.Incomplete).ToList();
+                        if (completed.Any())
+                        {
+                            var toInsert = new List<OrderDynamic>();
 
-							foreach (var model in completed)
-							{
-								var previous = await SelectEntityFirstAsync(x => x.Id == model.Id);
-								if (previous.OrderStatus == OrderStatus.Incomplete && model.OrderStatus != OrderStatus.Incomplete)
-								{
-									model.IdObjectType = (int)OrderType.Normal;
-									model.Data.AutoShipFrequency = null;
-									model.Id = 0;
-									model.PaymentMethod.Id = 0;
-									model.ShippingAddress.Id = 0;
+                            foreach (var model in completed)
+                            {
+                                var previous = await SelectEntityFirstAsync(x => x.Id == model.Id);
+                                if (previous.OrderStatus == OrderStatus.Incomplete && model.OrderStatus != OrderStatus.Incomplete)
+                                {
+                                    model.IdObjectType = (int)OrderType.Normal;
+                                    model.Data.AutoShipFrequency = null;
+                                    model.Id = 0;
+                                    model.PaymentMethod.Id = 0;
+                                    model.ShippingAddress.Id = 0;
 
-									toInsert.Add(model);
-								}
-							}
+                                    toInsert.Add(model);
+                                }
+                            }
 
-							if (toInsert.Any())
-							{
-								await InsertRangeInternalAsync(toInsert, uow);
-							}
-						}
+                            if (toInsert.Any())
+                            {
+                                await InsertRangeInternalAsync(toInsert, uow);
+                            }
+                        }
 
-						transaction.Commit();
-					}
-					catch (Exception)
-					{
-						transaction.Rollback();
-						throw;
-					}
-				}
+                        transaction.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
 
-			}
-			if(others.Any())
-			{
-				res.AddRange(await InsertRangeInternalAsync(models, uow));
-			}
+            }
+            if (others.Any())
+            {
+                res.AddRange(await InsertRangeInternalAsync(models, uow));
+            }
 
-			return res;
-		}
+            return res;
+        }
 
-		private async Task SetSkusBornDate(ICollection<OrderDynamic> orders, IUnitOfWorkAsync uow)
+        private async Task SetSkusBornDate(ICollection<OrderDynamic> orders, IUnitOfWorkAsync uow)
         {
             var option = _productService.GetProductOptionTypes(new HashSet<string>() { ProductConstants.FIELD_NAME_SKU_INVENTORY_BORN_DATE }).FirstOrDefault();
             if (option != null)
@@ -1145,7 +1154,7 @@ namespace VitalChoice.Business.Services.Orders
 
         private async Task UpdateAffiliateOrderPayment(OrderDynamic dynamic, IUnitOfWorkAsync uow)
         {
-            if (!dynamic.IdAddedBy.HasValue && dynamic.Customer.IdAffiliate.HasValue &&
+            if (dynamic.Customer.IdAffiliate.HasValue &&
                 dynamic.AffiliatePaymentAmount.HasValue && dynamic.AffiliateNewCustomerOrder.HasValue)
             {
                 AffiliateOrderPayment payment = new AffiliateOrderPayment();
@@ -1186,52 +1195,49 @@ namespace VitalChoice.Business.Services.Orders
             //model.IsHealthwise = true;
             var healthwisePeriodRepository = uow.RepositoryAsync<HealthwisePeriod>();
             var healthwiseOrderRepository = uow.RepositoryAsync<HealthwiseOrder>();
-            if (!model.IdAddedBy.HasValue)
+            if (!model.IsHealthwise)
             {
-                if (!model.IsHealthwise)
+                healthwiseOrderRepository.Delete(model.Id);
+                await uow.SaveChangesAsync();
+            }
+            else
+            {
+                HealthwiseOrder healthwiseOrder = (await healthwiseOrderRepository.Query(p => p.Id == model.Id).SelectAsync(false)).FirstOrDefault();
+                if (healthwiseOrder == null)
                 {
-                    healthwiseOrderRepository.Delete(model.Id);
-                    await uow.SaveChangesAsync();
-                }
-                else
-                {
-                    HealthwiseOrder healthwiseOrder = (await healthwiseOrderRepository.Query(p => p.Id == model.Id).SelectAsync(false)).FirstOrDefault();
-                    if (healthwiseOrder == null)
-                    {
-                        var maxCount = _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount;
-                        var dateNow = DateTime.Now;
-                        var periods = (await healthwisePeriodRepository.Query(p => p.IdCustomer == model.Customer.Id && dateNow >= p.StartDate && dateNow < p.EndDate && !p.PaidDate.HasValue).Include(p => p.HealthwiseOrders).SelectAsync(false)).ToList();
+                    var maxCount = _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount;
+                    var dateNow = DateTime.Now;
+                    var periods = (await healthwisePeriodRepository.Query(p => p.IdCustomer == model.Customer.Id && dateNow >= p.StartDate && dateNow < p.EndDate && !p.PaidDate.HasValue).Include(p => p.HealthwiseOrders).SelectAsync(false)).ToList();
 
-                        bool addedToPeriod = false;
-                        foreach (var period in periods)
+                    bool addedToPeriod = false;
+                    foreach (var period in periods)
+                    {
+                        if (period.HealthwiseOrders.Count < maxCount)
                         {
-                            if (period.HealthwiseOrders.Count < maxCount)
+                            healthwiseOrder = new HealthwiseOrder()
                             {
-                                healthwiseOrder = new HealthwiseOrder()
-                                {
-                                    Id = model.Id,
-                                    IdHealthwisePeriod = period.Id
-                                };
-                                _healthwiseOrderRepositoryAsync.Insert(healthwiseOrder);
-                                addedToPeriod = true;
-                                break;
-                            }
+                                Id = model.Id,
+                                IdHealthwisePeriod = period.Id
+                            };
+                            _healthwiseOrderRepositoryAsync.Insert(healthwiseOrder);
+                            addedToPeriod = true;
+                            break;
                         }
-                        if (!addedToPeriod)
-                        {
-                            var period = new HealthwisePeriod();
-                            period.IdCustomer = model.Customer.Id;
-                            period.StartDate = dateNow;
-                            period.EndDate = period.StartDate.AddYears(1);
-                            period.HealthwiseOrders = new List<HealthwiseOrder>()
+                    }
+                    if (!addedToPeriod)
+                    {
+                        var period = new HealthwisePeriod();
+                        period.IdCustomer = model.Customer.Id;
+                        period.StartDate = dateNow;
+                        period.EndDate = period.StartDate.AddYears(1);
+                        period.HealthwiseOrders = new List<HealthwiseOrder>()
                             {
                                 new HealthwiseOrder() {Id = model.Id}
                             };
-                            _healthwisePeriodRepositoryAsync.InsertGraph(period);
-                        }
-
-                        await uow.SaveChangesAsync();
+                        _healthwisePeriodRepositoryAsync.InsertGraph(period);
                     }
+
+                    await uow.SaveChangesAsync();
                 }
             }
         }
@@ -1249,17 +1255,17 @@ namespace VitalChoice.Business.Services.Orders
             {
                 conditions = conditions.WithShippedDate(filter.From, filter.To);
             }
-	        conditions = conditions
-		        .WithId(filter.Id)
-		        //TODO - should be redone after adding - https://github.com/aspnet/EntityFramework/issues/2850
-		        .WithOrderType(filter.IdObjectType)
-		        .WithOrderStatus(filter.OrderStatus)
-		        .WithCustomerType(filter.IdCustomerType)
-		        .WithoutIncomplete(filter.OrderStatus, filter.IgnoreNotShowingIncomplete)
-		        .WithShipState(filter.IdShipState)
-		        .WithOrderDynamicValues(filter.IdOrderSource, filter.POrderType, filter.IdShippingMethod)
-		        .WithCustomerDynamicValues(filter.CustomerFirstName, filter.CustomerLastName, filter.CustomerCompany)
-		        .NotAutoShip();
+            conditions = conditions
+                .WithId(filter.Id)
+                //TODO - should be redone after adding - https://github.com/aspnet/EntityFramework/issues/2850
+                .WithOrderType(filter.IdObjectType)
+                .WithOrderStatus(filter.OrderStatus)
+                .WithCustomerType(filter.IdCustomerType)
+                .WithoutIncomplete(filter.OrderStatus, filter.IgnoreNotShowingIncomplete)
+                .WithShipState(filter.IdShipState)
+                .WithOrderDynamicValues(filter.IdOrderSource, filter.POrderType, filter.IdShippingMethod)
+                .WithCustomerDynamicValues(filter.CustomerFirstName, filter.CustomerLastName, filter.CustomerCompany)
+                .NotAutoShip();
 
             Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable = x => x.OrderByDescending(y => y.DateCreated);
             var sortOrder = filter.Sorting.SortOrder;
@@ -1365,17 +1371,17 @@ namespace VitalChoice.Business.Services.Orders
             {
                 conditions = conditions.WithShippedDate(filter.From, filter.To);
             }
-	        conditions =
-		        conditions.WithOrderStatus(filter.OrderStatus)
-			        .WithoutIncomplete(filter.OrderStatus, filter.IgnoreNotShowingIncomplete)
-			        .WithId(filter.IdString)
-			        //TODO - should be redone after adding - https://github.com/aspnet/EntityFramework/issues/2850
-			        .WithOrderType(filter.IdObjectType)
-			        .WithOrderSource(filter.IdOrderSource)
-			        .WithPOrderType(filter.POrderType)
-			        .WithCustomerType(filter.IdCustomerType)
-			        .WithShippingMethod(filter.IdShippingMethod)
-			        .NotAutoShip();
+            conditions =
+                conditions.WithOrderStatus(filter.OrderStatus)
+                    .WithoutIncomplete(filter.OrderStatus, filter.IgnoreNotShowingIncomplete)
+                    .WithId(filter.IdString)
+                    //TODO - should be redone after adding - https://github.com/aspnet/EntityFramework/issues/2850
+                    .WithOrderType(filter.IdObjectType)
+                    .WithOrderSource(filter.IdOrderSource)
+                    .WithPOrderType(filter.POrderType)
+                    .WithCustomerType(filter.IdCustomerType)
+                    .WithShippingMethod(filter.IdShippingMethod)
+                    .NotAutoShip();
 
             var query = _vOrderRepository.Query(conditions);
 
