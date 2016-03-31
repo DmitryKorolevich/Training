@@ -80,7 +80,7 @@ namespace VC.Admin.Models.Orders
                     AutoShipFrequency6 = model.Sku.DictionaryData.ContainsKey("AutoShipFrequency6") ? model.Sku.Data.AutoShipFrequency6 : false;
                 }
 
-                GCCodes = model.GcsGenerated?.Where(g => !string.IsNullOrEmpty(g.Code)).Select(p => p.Code).ToList();
+                GCCodes = model.GcsGenerated?.Where(g => !string.IsNullOrEmpty(g.Code)).Select(p => p.Code).ToList() ?? new List<string>();
 
                 Messages = model.Messages;
             }
@@ -313,6 +313,9 @@ namespace VC.Admin.Models.Orders
 
         [Map]
         public bool ConfirmationEmailSent { get; set; }
+
+        [Map]
+        public bool Guest { get; set; }
 
         public bool? SignUpNewsletter { get; set; }
 
