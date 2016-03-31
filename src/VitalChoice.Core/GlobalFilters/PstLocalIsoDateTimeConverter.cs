@@ -1,6 +1,7 @@
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 
 namespace VitalChoice.Core.GlobalFilters
 {

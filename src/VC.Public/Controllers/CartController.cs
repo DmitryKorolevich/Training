@@ -212,6 +212,11 @@ namespace VC.Public.Controllers
         [HttpPost]
         public async Task<Result<ViewCartModel>> UpdateCart([FromBody] ViewCartModel model)
         {
+            if (model == null)
+            {
+                model = new ViewCartModel();
+                await InitCartModelInternal(model);
+            }
             if (model.ShipAsap && model.ShippingDate.HasValue)
             {
                 model.ShippingDate = null;

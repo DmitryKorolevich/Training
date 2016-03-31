@@ -23,6 +23,8 @@ namespace VitalChoice.Core.GlobalFilters
 {
     public class MvcExceptionFilter : ExceptionFilterAttribute
 	{
+        private readonly ApiExceptionFilterAttribute _apiExceptionFilter = new ApiExceptionFilterAttribute();
+
 		public override void OnException(ExceptionContext context)
 		{
             var acceptHeader = context.HttpContext.Request.Headers["Accept"];
@@ -33,7 +35,7 @@ namespace VitalChoice.Core.GlobalFilters
                     context.Result = CustomerStatusCheckAttribute.CreateJsonResponse();
                     return;
 			    }
-    	        new ApiExceptionFilterAttribute().OnException(context);
+                _apiExceptionFilter.OnException(context);
 			}
 			else
             {

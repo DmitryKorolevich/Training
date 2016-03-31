@@ -107,9 +107,9 @@
 				Ship this order the week of:
 			</label>
 			@Html.TextBoxFor(x => x.ShippingDate, Model.ShippingDate?.ToString("MM/dd/yyyy") ?? string.Empty, new {@class = "cart-input-box input-control date-picker", data_bind = "value: Model.ShippingDate, disable: Model.ShipAsap, css: {'input-validation-error': Model.ShippingDateError() && !Model.ShipAsap()}"})
-			<span class="field-validation-error" data-bind="if: Model.ShippingDateError() && !Model.ShipAsap()" data-valmsg-replace="true" data-valmsg-for="ShippingDate">
-			<span class="" data-bind="text: Model.ShippingDateError"></span>
-		</span>
+            <span class="field-validation-error" data-bind="if: Model.ShippingDateError() && !Model.ShipAsap()" data-valmsg-replace="true" data-valmsg-for="ShippingDate">
+                <span class="" data-bind="text: Model.ShippingDateError"></span>
+            </span>
 			<a href="#">View our shipping policies</a>
 		</div>
 		<div class="cart-order-totals">
