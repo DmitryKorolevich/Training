@@ -65,8 +65,6 @@ using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Exceptions;
-using VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates;
-using VitalChoice.ObjectMapping.Extensions;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -97,8 +95,10 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
         private readonly IProductService _productService;
         private readonly INotificationService _notificationService;
-        private readonly IExtendedDynamicServiceAsync<OrderPaymentMethodDynamic, OrderPaymentMethod, CustomerPaymentMethodOptionType, OrderPaymentMethodOptionValue> _paymentGenericService;
-        private readonly IEcommerceRepositoryAsync<GiftCertificate> _giftCertificatesRepository;
+        private readonly
+            IExtendedDynamicServiceAsync
+                <OrderPaymentMethodDynamic, OrderPaymentMethod, CustomerPaymentMethodOptionType, OrderPaymentMethodOptionValue>
+            _paymentGenericService;
         private readonly IEcommerceRepositoryAsync<OrderToSku> _orderToSkusRepository;
 
         public OrderService(
@@ -125,11 +125,14 @@ namespace VitalChoice.Business.Services.Orders
             IPaymentMethodService paymentMethodService,
             IObjectMapper<OrderPaymentMethodDynamic> paymentMapper,
             IEcommerceRepositoryAsync<OrderToGiftCertificate> orderToGiftCertificateRepositoryAsync,
-            IExtendedDynamicServiceAsync<OrderPaymentMethodDynamic, OrderPaymentMethod, CustomerPaymentMethodOptionType, OrderPaymentMethodOptionValue> paymentGenericService,
+            IExtendedDynamicServiceAsync
+                <OrderPaymentMethodDynamic, OrderPaymentMethod, CustomerPaymentMethodOptionType, OrderPaymentMethodOptionValue>
+                paymentGenericService,
             IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
             IProductService productService,
             INotificationService notificationService,
-            ICountryService countryService, ITransactionAccessor<EcommerceContext> transactionAccessor, IEcommerceRepositoryAsync<GiftCertificate> giftCertificatesRepository, SkuMapper skuMapper, IEcommerceRepositoryAsync<OrderToSku> orderToSkusRepository)
+            ICountryService countryService, ITransactionAccessor<EcommerceContext> transactionAccessor, SkuMapper skuMapper,
+            IEcommerceRepositoryAsync<OrderToSku> orderToSkusRepository)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
@@ -154,7 +157,6 @@ namespace VitalChoice.Business.Services.Orders
             _orderToGiftCertificateRepositoryAsync = orderToGiftCertificateRepositoryAsync;
             _paymentGenericService = paymentGenericService;
             _countryService = countryService;
-            _giftCertificatesRepository = giftCertificatesRepository;
             _skuMapper = skuMapper;
             _orderToSkusRepository = orderToSkusRepository;
             _addressMapper = addressMapper;
@@ -171,10 +173,9 @@ namespace VitalChoice.Business.Services.Orders
             {
                 try
                 {
-                    SetPOrderType(new List<OrderDynamic>() { model });
+                    SetExtendedOptions(Enumerable.Repeat(model, 1));
                     await SetSkusBornDate(new[] { model }, uow);
                     await EnsurePaymentMethod(model);
-                    model.PaymentMethod.IdOrder = model.Id;
                     var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
                     var paymentCopy = _paymentMapper.Clone<ExpandoObject>(model.PaymentMethod, o =>
                     {
@@ -191,7 +192,8 @@ namespace VitalChoice.Business.Services.Orders
                         await UpdateHealthwiseOrder(model, uow);
                     }
                     await ChargeGiftCertificates(model, uow);
-                    model.PaymentMethod.IdOrder = model.Id;
+
+                    paymentCopy.IdOrder = entity.Id;
 
                     remoteUpdateTask = _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy);
 
@@ -223,7 +225,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 try
                 {
-                    SetPOrderType(models);
+                    SetExtendedOptions(models);
                     await SetSkusBornDate(models, uow);
                     entities = await base.InsertRangeAsync(models, uow);
                     foreach (var model in models)
@@ -236,7 +238,6 @@ namespace VitalChoice.Business.Services.Orders
                             await UpdateHealthwiseOrder(model, uow);
                         }
                         await ChargeGiftCertificates(model, uow);
-                        model.PaymentMethod.IdOrder = model.Id;
                     }
 
                     transaction.Commit();
@@ -258,10 +259,9 @@ namespace VitalChoice.Business.Services.Orders
             {
                 try
                 {
-                    SetPOrderType(new List<OrderDynamic>() { model });
+                    SetExtendedOptions(Enumerable.Repeat(model, 1));
                     await SetSkusBornDate(new[] { model }, uow);
                     await EnsurePaymentMethod(model);
-                    model.PaymentMethod.IdOrder = model.Id;
                     var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
                     var paymentCopy = _paymentMapper.Clone<ExpandoObject>(model.PaymentMethod, o =>
                     {
@@ -277,7 +277,7 @@ namespace VitalChoice.Business.Services.Orders
                         await UpdateAffiliateOrderPayment(model, uow);
                         await UpdateHealthwiseOrder(model, uow);
                     }
-
+                    paymentCopy.IdOrder = entity.Id;
                     remoteUpdateTask = _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy);
 
                     transaction.Commit();
@@ -308,16 +308,12 @@ namespace VitalChoice.Business.Services.Orders
             {
                 try
                 {
-                    SetPOrderType(models);
+                    SetExtendedOptions(models);
                     await SetSkusBornDate(models, uow);
                     entities = await base.UpdateRangeAsync(models, uow);
                     foreach (var model in models)
                     {
                         var entity = entities.FirstOrDefault(p => p.Id == model.Id);
-                        if (entity != null)
-                        {
-                            model.PaymentMethod.IdOrder = model.Id;
-                        }
                         //storefront update
                         if (entity != null && !entity.IdAddedBy.HasValue)
                         {
@@ -909,7 +905,6 @@ namespace VitalChoice.Business.Services.Orders
                             model.IdObjectType = (int)OrderType.Normal;
                             model.Data.AutoShipFrequency = null;
                             model.Id = 0;
-                            model.PaymentMethod.Id = 0;
                             model.ShippingAddress.Id = 0;
 
                             await InsertAsyncInternal(model, uow);
@@ -999,7 +994,6 @@ namespace VitalChoice.Business.Services.Orders
                             {
                                 model.IdObjectType = (int)OrderType.Normal;
                                 model.Data.AutoShipFrequency = null;
-                                model.PaymentMethod.Id = 0;
                                 model.ShippingAddress.Id = 0;
                                 model.Id = 0;
                             }
@@ -1054,8 +1048,9 @@ namespace VitalChoice.Business.Services.Orders
 
                         transaction.Commit();
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
+                        Logger.LogError(e.Message, e);
                         transaction.Rollback();
                         throw;
                     }
@@ -1112,8 +1107,9 @@ namespace VitalChoice.Business.Services.Orders
 
                         transaction.Commit();
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
+                        Logger.LogError(e.Message, e);
                         transaction.Rollback();
                         throw;
                     }
@@ -1473,12 +1469,17 @@ namespace VitalChoice.Business.Services.Orders
             return toReturn;
         }
 
-        private void SetPOrderType(ICollection<OrderDynamic> items)
+        private void SetExtendedOptions(IEnumerable<OrderDynamic> items)
         {
             if (items != null)
             {
                 foreach (var item in items)
                 {
+                    if ((bool?) item.Customer?.SafeData.Guest ?? false)
+                    {
+                        item.Data.Guest = true;
+                    }
+
                     POrderType? toReturn = null;
                     var pOrder = false;
                     var npOrder = false;
@@ -1486,16 +1487,16 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         foreach (var skuOrdered in item.Skus)
                         {
-                            pOrder = pOrder || skuOrdered?.Sku.Product.IdObjectType == (int)ProductType.Perishable;
-                            npOrder = npOrder || skuOrdered?.Sku.Product.IdObjectType == (int)ProductType.NonPerishable;
+                            pOrder = pOrder || skuOrdered.Sku.Product.IdObjectType == (int)ProductType.Perishable;
+                            npOrder = npOrder || skuOrdered.Sku.Product.IdObjectType == (int)ProductType.NonPerishable;
                         }
                     }
                     if (item.PromoSkus != null)
                     {
                         foreach (var skuOrdered in item.PromoSkus.Where(p => p.Enabled))
                         {
-                            pOrder = pOrder || skuOrdered?.Sku.Product.IdObjectType == (int)ProductType.Perishable;
-                            npOrder = npOrder || skuOrdered?.Sku.Product.IdObjectType == (int)ProductType.NonPerishable;
+                            pOrder = pOrder || skuOrdered.Sku.Product.IdObjectType == (int)ProductType.Perishable;
+                            npOrder = npOrder || skuOrdered.Sku.Product.IdObjectType == (int)ProductType.NonPerishable;
                         }
                     }
                     if (pOrder && npOrder)

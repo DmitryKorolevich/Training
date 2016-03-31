@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.Common;
 using Microsoft.Data.Entity.Storage;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Data.Context;
 
 namespace VitalChoice.Data.Transaction

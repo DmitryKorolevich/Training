@@ -406,12 +406,19 @@ GO
 
 IF NOT EXISTS(SELECT [Id] FROM [dbo].[OrderOptionTypes] WHERE Name = 'AutoTotal' AND [IdObjectType]=6)
 BEGIN
-
 	INSERT INTO [dbo].[OrderOptionTypes]
 	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
 	VALUES
 	(N'AutoTotal', 1, NULL, 6, NULL)
+END
 
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[OrderOptionTypes] WHERE Name = N'Guest' AND IdObjectType=1)
+BEGIN
+	INSERT INTO [dbo].[OrderOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'Guest', 5, NULL, 1, N'False')
 END
 
 GO

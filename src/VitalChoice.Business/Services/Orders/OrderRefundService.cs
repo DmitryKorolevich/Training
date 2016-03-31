@@ -143,7 +143,6 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     entity = await base.InsertAsync(model, uow);
                     model.IdAddedBy = entity.IdEditedBy;
-                    model.PaymentMethod.IdOrder = model.Id;
 
                     transaction.Commit();
                 }
@@ -172,7 +171,6 @@ namespace VitalChoice.Business.Services.Orders
                         {
                             model.IdAddedBy = entity.IdAddedBy;
                         }
-                        model.PaymentMethod.IdOrder = model.Id;
                     }
 
                     transaction.Commit();
@@ -194,7 +192,6 @@ namespace VitalChoice.Business.Services.Orders
             {
                 try
                 {
-                    model.PaymentMethod.IdOrder = model.Id;
                     entity = await base.UpdateAsync(model, uow);
                     model.IdAddedBy = entity.IdAddedBy;
 
@@ -223,7 +220,6 @@ namespace VitalChoice.Business.Services.Orders
                         if (entity != null)
                         {
                             model.IdAddedBy = entity.IdAddedBy;
-                            model.PaymentMethod.IdOrder = model.Id;
                         }
                     }
 
