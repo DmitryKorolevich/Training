@@ -5,6 +5,7 @@ using VitalChoice.Core.Services;
 using VitalChoice.Validation.Models;
 using Microsoft.AspNet.Mvc.Filters;
 using Microsoft.Data.Entity;
+using VitalChoice.Core.Infrastructure;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 
 namespace VitalChoice.Core.GlobalFilters
@@ -13,7 +14,7 @@ namespace VitalChoice.Core.GlobalFilters
     {
         public override void OnException(ExceptionContext context)
         {
-            JsonResult result;
+            IActionResult result;
             var apiException = context.Exception as ApiException;
             if (apiException == null)
             {
@@ -49,10 +50,18 @@ namespace VitalChoice.Core.GlobalFilters
             }
             else
             {
-                result = new JsonResult(ResultHelper.CreateErrorResult<object>(apiException.Message))
+                var exception = context.Exception as AccessDeniedException;
+                if (exception != null)
                 {
-                    StatusCode = (int) apiException.Status
-                };
+                    result = new HttpForbiddenResult();
+                }
+                else
+                {
+                    result = new JsonResult(ResultHelper.CreateErrorResult<object>(apiException.Message))
+                    {
+                        StatusCode = (int)apiException.Status
+                    };
+                }
             }
 
             context.Result = result;

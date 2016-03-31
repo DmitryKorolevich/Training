@@ -198,36 +198,6 @@ angular.module('app.modules.order.services.orderEditService', [])
             return isValid;
         };        
 
-        uiScope.initAutoShipOptions = function ()
-        {
-            //show/hide autoship option
-            uiScope.autoShipOrderOptionShow = (uiScope.order.SkuOrdereds.length == 1 || (uiScope.order.SkuOrdereds.length == 2 && !uiScope.order.SkuOrdereds[1].Code))
-                && uiScope.order.PromoSkus.length == 0 && uiScope.order.SkuOrdereds[0].AutoShipProduct;
-            if (uiScope.autoShipOrderOptionShow)
-            {
-                var items = [];
-                if (uiScope.order.SkuOrdereds[0].AutoShipFrequency1)
-                {
-                    items.push({ Key: 1, Text: '1 Month' });
-                }
-                if (uiScope.order.SkuOrdereds[0].AutoShipFrequency2)
-                {
-                    items.push({ Key: 2, Text: '2 Months' });
-                }
-                if (uiScope.order.SkuOrdereds[0].AutoShipFrequency3)
-                {
-                    items.push({ Key: 3, Text: '3 Months' });
-                }
-                if (uiScope.order.SkuOrdereds[0].AutoShipFrequency6)
-                {
-                    items.push({ Key: 6, Text: '6 Months' });
-                }
-                uiScope.autoShipOrderFrequencies = items;
-            } else if(uiScope.order.IdObjectType == 2) {
-	            uiScope.order.IdObjectType = 1;
-            }
-        };
-
         uiScope.clearServerValidation = function ()
         {
             $.each(uiScope.forms, function (index, form)
@@ -593,6 +563,40 @@ angular.module('app.modules.order.services.orderEditService', [])
         };
     };
 
+    var initAutoShipLogic = function (uiScope)
+    {
+        uiScope.initAutoShipOptions = function ()
+        {
+            //show/hide autoship option
+            uiScope.autoShipOrderOptionShow = (uiScope.order.SkuOrdereds.length == 1 || (uiScope.order.SkuOrdereds.length == 2 && !uiScope.order.SkuOrdereds[1].Code))
+                && uiScope.order.PromoSkus.length == 0 && uiScope.order.SkuOrdereds[0].AutoShipProduct;
+            if (uiScope.autoShipOrderOptionShow)
+            {
+                var items = [];
+                if (uiScope.order.SkuOrdereds[0].AutoShipFrequency1)
+                {
+                    items.push({ Key: 1, Text: '1 Month' });
+                }
+                if (uiScope.order.SkuOrdereds[0].AutoShipFrequency2)
+                {
+                    items.push({ Key: 2, Text: '2 Months' });
+                }
+                if (uiScope.order.SkuOrdereds[0].AutoShipFrequency3)
+                {
+                    items.push({ Key: 3, Text: '3 Months' });
+                }
+                if (uiScope.order.SkuOrdereds[0].AutoShipFrequency6)
+                {
+                    items.push({ Key: 6, Text: '6 Months' });
+                }
+                uiScope.autoShipOrderFrequencies = items;
+            } else if (uiScope.order.IdObjectType == 2)
+            {
+                uiScope.order.IdObjectType = 1;
+            }
+        };
+    };    
+
     var initRecalculate = function (uiScope)
     {
         uiScope.requestRecalculate = function ()
@@ -781,7 +785,10 @@ angular.module('app.modules.order.services.orderEditService', [])
                 });
             }
 
-            uiScope.initAutoShipOptions();
+            if (uiScope.initAutoShipOptions)
+            {
+                uiScope.initAutoShipOptions();
+            }
         }
     };
 
@@ -809,10 +816,15 @@ angular.module('app.modules.order.services.orderEditService', [])
     {
         uiScope.options.oldOrderStatus = uiScope.order.CombinedEditOrderStatus;
         uiScope.order.OnHold = uiScope.order.CombinedEditOrderStatus == 7;//on hold status
-        if (uiScope.order.AutoShipFrequency) {
-        	uiScope.order.IdObjectType = 2;
-	    } else {
-        	uiScope.order.IdObjectType = 1;
+        if (uiScope.order.IdObjectType == 1 || uiScope.order.IdObjectType == 2)
+        {
+            if (uiScope.order.AutoShipFrequency)
+            {
+                uiScope.order.IdObjectType = 2;
+            } else
+            {
+                uiScope.order.IdObjectType = 1;
+            }
         }
         if (uiScope.onHoldWatch)
             uiScope.onHoldWatch();
@@ -1124,6 +1136,7 @@ angular.module('app.modules.order.services.orderEditService', [])
 
     return {
         initBase: initBase,
+        initAutoShipLogic : initAutoShipLogic,
         initRecalculate: initRecalculate,
         baseProcessLoadingOrder: baseProcessLoadingOrder,
         initOrderOptions: initOrderOptions,

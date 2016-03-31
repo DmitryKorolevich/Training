@@ -129,6 +129,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 $scope.options.inited=true;
                 customerEditService.initBase($scope);
                 orderEditService.initBase($scope);
+                orderEditService.initAutoShipLogic($scope);
                 orderEditService.initRecalculate($scope);
                 if ($scope.id) {
                     $scope.idCustomer = $scope.order.IdCustomer;
