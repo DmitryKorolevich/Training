@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Business.Queries.Product;
+using VitalChoice.Business.Queries.Products;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Repositories;

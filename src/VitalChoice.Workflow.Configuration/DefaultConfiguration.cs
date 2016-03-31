@@ -167,11 +167,11 @@ namespace VitalChoice.Workflow.Configuration
 
 			setup.ActionResolver<ReductionTypeActionResolver>("Reduction", action =>
 			{
-				action.ResolvePath<AutoShipAction>((int)ReductionType.AutoShip, "AutoShip");
+				action.ResolvePath<AutoShipDiscountAction>((int)ReductionType.AutoShip, "AutoShip");
 				action.ResolvePath<DiscountTypeActionResolver>((int)ReductionType.Discount, "Discount");
 			});
 
-			setup.Action<AutoShipAction>("AutoShip", action =>
+			setup.Action<AutoShipDiscountAction>("AutoShip", action =>
 			{
 				action.Dependency<DiscountableProductsAction>();
 			});
