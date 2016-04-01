@@ -32,6 +32,7 @@ namespace VC.Public.Models.Cart
 	    public decimal? Price { get; set; }
 
 		[Range(0, int.MaxValue, ErrorMessage = "Quantity must be greater than zero")]
+        [RegularExpression("-?\\d", ErrorMessage = "Quantity must be whole number")]
 		public int Quantity { get; set; }
 
 	    public decimal? SubTotal { get; set; }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 
@@ -64,7 +65,14 @@ namespace VitalChoice.Validation.Models
             {
                 foreach (var error in state.Value.Errors)
                 {
-                    result.AddMessage(state.Key, error.ErrorMessage);
+                    if (!string.IsNullOrEmpty(error.ErrorMessage))
+                    {
+                        result.AddMessage(state.Key, error.ErrorMessage);
+                    }
+                    else if (error.Exception != null)
+                    {
+                        result.AddMessage(state.Key, error.Exception.Message);
+                    }
                 }
             }
             return result;

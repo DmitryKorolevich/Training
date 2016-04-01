@@ -212,20 +212,17 @@ namespace VC.Public.Controllers
         [HttpPost]
         public async Task<Result<ViewCartModel>> UpdateCart([FromBody] ViewCartModel model)
         {
+            bool canUpdate = true;
             if (model == null)
             {
+                canUpdate = false;
                 model = new ViewCartModel();
                 await InitCartModelInternal(model);
             }
             if (model.ShipAsap && model.ShippingDate.HasValue)
             {
                 model.ShippingDate = null;
-                //    ModelState.Clear();
             }
-
-            //model.ShippingDateError = !ModelState.IsValid
-            //    ? ModelState["ShippingDate"]?.Errors.Select(x => x.ErrorMessage).FirstOrDefault() ?? string.Empty
-            //    : string.Empty;
 
             var existingUid = Request.GetCartUid();
             CustomerCartOrder cart;
@@ -276,7 +273,11 @@ namespace VC.Public.Controllers
             FillModel(model, cart.Order, context);
             SetCartUid(cart.CartUid);
 
-            var updateResult = await _checkoutService.UpdateCart(cart);
+            bool updateResult = true;
+            if (canUpdate)
+            {
+                updateResult = await _checkoutService.UpdateCart(cart);
+            }
             if (!ModelState.IsValid)
                 return ResultHelper.CreateErrorResult(ModelState, model);
             if (!updateResult)
