@@ -21,7 +21,7 @@ namespace VitalChoice.Business.Workflow.Actions.Discounts
             var discountableSubtotal = dataContext.Data.DiscountableSubtotal;
             foreach (var tier in dataContext.Order.Discount.DiscountTiers)
             {
-                if (discountableSubtotal >= tier.From && tier.To == null || discountableSubtotal <= tier.To)
+                if (discountableSubtotal >= tier.From && (tier.To == null || discountableSubtotal <= tier.To))
                 {
                     dataContext.Order.Data.IdDiscountTier = tier.Id;
                     dataContext.DiscountMessage = dataContext.Order.Discount.GetDiscountMessage(tier.Id);
@@ -38,7 +38,7 @@ namespace VitalChoice.Business.Workflow.Actions.Discounts
             }
             dataContext.Messages.Add(new MessageInfo
             {
-                Message = "Cannot determine any tear from discountable products subtotal. Discount won't apply.",
+                Message = "Cannot determine any tier from discountable products subtotal. Discount won't apply.",
                 Field = "DiscountCode"
             });
             return Task.FromResult((decimal)0);
