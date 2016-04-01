@@ -21,7 +21,7 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                 {
                     if (sku.Sku.SafeData.Stock < sku.Quantity)
                     {
-                        sku.Messages.Add("Out of stock");
+                        sku.Messages.Add("Сurrently out of stock. Please remove to continue.");
                     }
                 }
             }

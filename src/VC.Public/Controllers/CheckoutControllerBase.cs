@@ -147,7 +147,7 @@ namespace VC.Public.Controllers
             cartModel.DiscountTotal = -context.DiscountTotal;
             cartModel.GiftCertificatesTotal = context.GiftCertificatesSubtotal;
             cartModel.PromoSkus.Clear();
-            cartModel.PromoSkus.AddRange(context.PromoSkus.Select(sku =>
+            cartModel.PromoSkus.AddRange(context.PromoSkus.Where(p => p.Enabled).Select(sku =>
             {
                 var result = SkuMapper.ToModel<CartSkuModel>(sku.Sku);
                 ProductMapper.UpdateModel(result, sku.Sku.Product);
@@ -158,7 +158,7 @@ namespace VC.Public.Controllers
                 result.GeneratedGCCodes = sku.GcsGenerated?.Select(g => g.Code).ToList();
 
                 return result;
-            }) ?? Enumerable.Empty<CartSkuModel>());
+            }));
             cartModel.Tax = order.TaxTotal;
             cartModel.OrderTotal = order.Total;
             cartModel.PromoCode = order.Discount?.Code;
@@ -194,6 +194,7 @@ namespace VC.Public.Controllers
                 foreach (var error in sku.Messages)
                 {
                     ModelState.AddModelError("Code".FormatCollectionError("Skus", index), error);
+                    ModelState.AddModelError(string.Empty, $"{sku.Sku.Code}: {error}");
                 }
                 index++;
             }

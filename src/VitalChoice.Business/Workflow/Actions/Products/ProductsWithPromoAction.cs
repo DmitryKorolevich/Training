@@ -15,6 +15,17 @@ namespace VitalChoice.Business.Workflow.Actions.Products
         public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
             var promoAmount = dataContext.PromoSkus.Where(p => p.Enabled).Sum(p => p.Amount*p.Quantity);
+            foreach (var promo in dataContext.PromoSkus)
+            {
+                if (!(promo.Sku.SafeData.DisregardStock ?? true))
+                {
+                    if (promo.Sku.SafeData.Stock < promo.Quantity)
+                    {
+                        promo.Messages.Add("Сurrently out of stock. Please remove to continue.");
+                        promo.Enabled = false;
+                    }
+                }
+            }
             dataContext.ProductsSubtotal = dataContext.Data.Products + promoAmount;
             return Task.FromResult(promoAmount);
         }
