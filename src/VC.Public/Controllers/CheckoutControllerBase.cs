@@ -199,11 +199,12 @@ namespace VC.Public.Controllers
                 index++;
             }
             index = 0;
-            foreach (var sku in context.PromoSkus)
+            foreach (var promo in context.PromoSkus.Where(p => p.Enabled))
             {
-                foreach (var error in sku.Messages)
+                foreach (var error in promo.Messages)
                 {
                     ModelState.AddModelError("Code".FormatCollectionError("Promos", index), error);
+                    ModelState.AddModelError(string.Empty, $"{promo.Sku.Code}: {error}");
                 }
                 index++;
             }

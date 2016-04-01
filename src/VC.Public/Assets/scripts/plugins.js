@@ -262,15 +262,15 @@ function trySetFormErrors(result) {
         var globalBlocks = $("div.validation-summary-errors");
         if (globalBlocks.length > 0) {
             var globalsFormatted = [];
-            for (var i = 0; i < globalErrors.length; i++)
-            {
+            for (var i = 0; i < globalErrors.length; i++) {
                 globalsFormatted.push('<li>' + globalErrors[i] + '</li>');
             }
             globalBlocks.html('<ul>' + globalsFormatted.join() + '</ul>');
         }
-        else
-        {
-            notifyError(globalErrors.join('\n'));
+        else {
+            for (var i = 0; i < globalErrors.length; i++) {
+                notifyError(globalErrors[i]);
+            }
         }
     }
 }
