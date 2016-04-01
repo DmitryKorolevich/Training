@@ -245,36 +245,6 @@ function refreshAjaxForm(data)
     };
 }
 
-function trySetFormErrors(result) {
-    $("span[data-valmsg-for]").text('');
-    $("div.validation-summary-errors").html('');
-    var globalErrors = [];
-    for (var i = 0; i < result.Messages.length; i++) {
-        var items = $("span[data-valmsg-for='" + result.Messages[i].Field + "']");
-        if (items.length == 0) {
-            globalErrors.push(result.Messages[i].Message);
-        }
-        else {
-            items.text(result.Messages[i].Message);
-        }
-    }
-    if (globalErrors.length > 0) {
-        var globalBlocks = $("div.validation-summary-errors");
-        if (globalBlocks.length > 0) {
-            var globalsFormatted = [];
-            for (var i = 0; i < globalErrors.length; i++) {
-                globalsFormatted.push('<li>' + globalErrors[i] + '</li>');
-            }
-            globalBlocks.html('<ul>' + globalsFormatted.join() + '</ul>');
-        }
-        else {
-            for (var i = 0; i < globalErrors.length; i++) {
-                notifyError(globalErrors[i]);
-            }
-        }
-    }
-}
-
 function ajaxFormSubmitError(data)
 {
     notifyError("Server error occured");
@@ -528,4 +498,34 @@ function registerRequiredIf() {
 		}
 		return true;
 	});
+}
+
+function trySetFormErrors(result) {
+    $("span[data-valmsg-for]").text('');
+    $("div.validation-summary-errors").html('');
+    var globalErrors = [];
+    for (var i = 0; i < result.Messages.length; i++) {
+        var items = $("span[data-valmsg-for='" + result.Messages[i].Field + "']");
+        if (items.length == 0) {
+            globalErrors.push(result.Messages[i].Message);
+        }
+        else {
+            items.text(result.Messages[i].Message);
+        }
+    }
+    if (globalErrors.length > 0) {
+        var globalBlocks = $("div.validation-summary-errors");
+        if (globalBlocks.length > 0) {
+            var globalsFormatted = [];
+            for (var i = 0; i < globalErrors.length; i++) {
+                globalsFormatted.push('<li>' + globalErrors[i] + '</li>');
+            }
+            globalBlocks.html('<ul>' + globalsFormatted.join() + '</ul>');
+        }
+        else {
+            for (var i = 0; i < globalErrors.length; i++) {
+                notifyError(globalErrors[i]);
+            }
+        }
+    }
 }

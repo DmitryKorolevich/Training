@@ -49,8 +49,8 @@ $(function () {
 					contentType: "application/json; charset=utf-8",
 					type: "POST"
 				}).success(function (result) {
-					if (result.Success) {
-						window.location.href = result.Data;
+				    if (result.Success) {
+				        window.location.href = result.Data;
 					} else
 					{
 					    processErrorResponse(result);
@@ -123,7 +123,9 @@ function recalculateCart(viewModel, successCallback) {
 			contentType: "application/json; charset=utf-8",
 			type: "POST"
 		}).success(function(result) {
-			if (result.Success) {
+		    if (result.Success) {
+		        $("span[data-valmsg-for]").text('');
+		        $("div.validation-summary-errors").html('');
 				if (successCallback) {
 					successCallback();
 				} else {

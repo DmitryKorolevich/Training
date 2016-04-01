@@ -30,7 +30,7 @@ namespace VitalChoice.Business.Workflow.Actions.Discounts
                         case DiscountType.PriceDiscount:
                             return Task.FromResult<decimal>(-Math.Min(discountableSubtotal, tier.Amount ?? 0));
                         case DiscountType.PercentDiscount:
-                            return Task.FromResult(-tier.Percent ?? 0*(decimal) discountableSubtotal/100);
+                            return Task.FromResult(-(tier.Percent ?? 0)*(decimal) discountableSubtotal/100);
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
