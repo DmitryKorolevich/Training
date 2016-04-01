@@ -27,6 +27,7 @@
                     <br />
                     <span data-ng-if="legend.OrderSourceRefundIds" class="item">
                         Associated Refund IDs:
+                        <br data-ng-if="legend.OrderSourceRefundIds.length==0" />
                         <span data-ng-repeat="item in legend.OrderSourceRefundIds">
                             <span data-ng-if="!$first" class="refund-ids-section"></span>
                             <a ui-sref="index.oneCol.orderRefundDetail({id: item })"><strong>{{item}}</strong></a><br />

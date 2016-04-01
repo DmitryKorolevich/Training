@@ -52,7 +52,7 @@
                         <select class="form-control" placeholder="Order Source" data-ng-model="filter.IdOrderSource" data-ng-options="item.Key as item.Text for item in orderSourceTypes"></select>
                     </div>
                     <div class="col-md-2">
-                        <select class="form-control" placeholder="P/NP Type" data-ng-model="filter.POrderType" data-ng-options="item.Key as item.Text for item in pOrderTypes"></select>
+                        <select class="form-control" placeholder="P/NP Type" data-ng-model="filter.POrderType" data-ng-options="item.Key as item.Text for item in ReferenceData.FilterPNPOrderTypes"></select>
                     </div>
                     <div class="col-md-2">
                         <select class="form-control" placeholder="Customer Type" data-ng-model="filter.IdCustomerType" data-ng-options="item.Key as item.Text for item in customerTypes"></select>

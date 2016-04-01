@@ -989,6 +989,12 @@ th.sortable-column {
 .order-edit .options-row .checkbox-inline .fa {
   margin-left: 7px;
 }
+.order-edit .options-row .checkbox-inline.guest {
+  padding-left: 0px;
+  color: #CCC;
+  margin-left: 0px;
+  cursor: default;
+}
 .order-edit .products-buttons {
   margin-bottom: 15px;
 }

@@ -68,9 +68,6 @@
             $scope.orderSourceTypes = angular.copy($rootScope.ReferenceData.OrderSourceTypes);
             $scope.orderSourceTypes.splice(0, 0, { Key: null, Text: 'All Order Sources' });
 
-            $scope.pOrderTypes = angular.copy($rootScope.ReferenceData.POrderTypes);
-            $scope.pOrderTypes.splice(0, 0, { Key: null, Text: 'All  P/NP Types' });
-
             $scope.shippingMethods = [
                 { Key: null, Text: 'All Shipping Methods' },
                 { Key: 1, Text: 'Upgraded' },

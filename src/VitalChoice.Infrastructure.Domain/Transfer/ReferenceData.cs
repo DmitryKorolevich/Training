@@ -88,6 +88,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer
         public IList<LookupItem<int>> OrderPreferredShipMethod { get; set; }
         public IList<LookupItem<int>> OrderSourceTypes { get; set; }
         public IList<LookupItem<int>> POrderTypes { get; set; }
+        public IList<LookupItem<int?>> FilterPNPOrderTypes { get; set; }
         public IList<LookupItem<int>> ServiceCodes { get; set; }
 
         public IList<LookupItem<int>> AffiliateProfessionalPractices { get; set; }
