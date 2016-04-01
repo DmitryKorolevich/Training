@@ -10,6 +10,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Promotions;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Entities.Help;
 using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 
 namespace VitalChoice.Business.Helpers
@@ -529,5 +530,16 @@ namespace VitalChoice.Business.Helpers
 			};
 			return toReturn;
 		}
-	}
+
+        public static IList<LookupItem<int?>> GetFilterPNPOrderTypes()
+        {
+            IList<LookupItem<int?>> toReturn = new List<LookupItem<int?>>
+            {
+                new LookupItem<int?>() {Key= (int?) null, Text= "All P/NP Orders"},
+                new LookupItem<int?>(){Key = (int?) POrderType.P, Text = "P Only Orders"},
+                new LookupItem<int?>(){Key = (int?) POrderType.NP, Text = "NP Only Orders"},
+            };
+            return toReturn;
+        }
+    }
 }

@@ -70,6 +70,9 @@
                                                     <input type="checkbox" data-ng-model="order.MailOrder" data-ng-disabled="orderEditDisabled">Mail Order
                                                     <i class="fa fa-envelope"></i>
                                                 </label>
+                                                <label data-ng-if="order.Guest" class="checkbox-inline guest">
+                                                    Guest Checkout
+                                                </label>
                                             </div>
                                         </div>
                                         <div class="col-md-12 products-buttons">
@@ -239,17 +242,6 @@
                                                             <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.KeyCode.$invalid">
                                                                 <small class="error" ng-show="forms.mainForm.KeyCode.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Key Code")}}</small>
                                                                 <small class="error" ng-show="forms.mainForm.KeyCode.$error.server">{{serverMessages.GetMessage('KeyCode')}}</small>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label for="guest" class="col-md-3 control-label"></label>
-                                                        <div class="col-md-9">
-                                                            <div class="checkbox">
-                                                                <label>
-                                                                    <input id="guest" type="checkbox" name="Guest" data-ng-model="order.Guest" disabled="true" />
-                                                                    <strong>Guest Order</strong>
-                                                                </label>
                                                             </div>
                                                         </div>
                                                     </div>

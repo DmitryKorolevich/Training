@@ -321,6 +321,7 @@ namespace VitalChoice.Business.Services
                     Key = x.Id,
                     Text = x.ValueVariant
                 }).ToList();
+            referenceData.FilterPNPOrderTypes = LookupHelper.GetFilterPNPOrderTypes();
             referenceData.ServiceCodes = lookupVariantRepository.Query()
                 .Where(x => x.IdLookup == serviceCodes)
                 .Select(false)
