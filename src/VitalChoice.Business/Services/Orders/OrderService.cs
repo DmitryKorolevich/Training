@@ -65,6 +65,7 @@ using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Exceptions;
+using VitalChoice.Infrastructure.Extensions;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -270,7 +271,15 @@ namespace VitalChoice.Business.Services.Orders
                         return result;
                     });
                     (await authTask).Raise();
+                    var initial = await SelectEntityFirstAsync(o => o.Id == model.Id, query => query);
                     entity = await base.UpdateAsync(model, uow);
+                    
+                    //Update date created if order was incomplete and become processed
+                    if (initial.IsAnyIncomplete() && model.IsAnyNotIncomplete())
+                    {
+                        entity.DateCreated = DateTime.Now;
+                        await uow.SaveChangesAsync();
+                    }
                     //storefront update
                     if (!entity.IdAddedBy.HasValue)
                     {
@@ -310,16 +319,31 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     SetExtendedOptions(models);
                     await SetSkusBornDate(models, uow);
+                    var ids = models.Select(o => o.Id).Distinct().ToList();
+                    var initialList = await SelectEntitiesAsync(o => ids.Contains(o.Id), query => query);
                     entities = await base.UpdateRangeAsync(models, uow);
+                    bool needSave = false;
                     foreach (var model in models)
                     {
                         var entity = entities.FirstOrDefault(p => p.Id == model.Id);
+                        var initial = initialList.FirstOrDefault(o => o.Id == model.Id);
+
+                        if (entity != null && initial != null && initial.IsAnyIncomplete() && model.IsAnyNotIncomplete())
+                        {
+                            needSave = true;
+                            entity.DateCreated = DateTime.Now;
+                        }
+
                         //storefront update
                         if (entity != null && !entity.IdAddedBy.HasValue)
                         {
                             await UpdateAffiliateOrderPayment(model, uow);
                             await UpdateHealthwiseOrder(model, uow);
                         }
+                    }
+                    if (needSave)
+                    {
+                        await uow.SaveChangesAsync();
                     }
 
                     transaction.Commit();

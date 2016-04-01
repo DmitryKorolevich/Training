@@ -376,7 +376,7 @@ namespace VitalChoice.Business.Services.Checkout
 
                         sendOrderConfirm = true;
                         cartOrder.Order.Data.ConfirmationEmailSent = true;
-
+                        cartOrder.Order.DateCreated = DateTime.Now;
                         cartOrder.Order = await _orderService.UpdateAsync(cartOrder.Order);
                         cart.IdCustomer = cartOrder.Order?.Customer?.Id;
                         cart.IdOrder = null;
@@ -390,7 +390,7 @@ namespace VitalChoice.Business.Services.Checkout
                     await _context.SaveChangesAsync();
                     transaction.Commit();
 
-                    if (sendOrderConfirm && cartOrder?.Order?.Customer!=null)
+                    if (sendOrderConfirm && cartOrder.Order?.Customer!=null)
                     {
                         var customer = await _customerRepository.Query(p => p.Id == cartOrder.Order.Customer.Id).SelectFirstOrDefaultAsync(false);
                         if (!string.IsNullOrEmpty(customer?.Email))

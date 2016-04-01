@@ -219,7 +219,6 @@ namespace VitalChoice.DynamicData.Base
             }
             (await ValidateCollection(models)).Raise();
             var mainRepository = uow.RepositoryAsync<TEntity>();
-            var valueRepository = uow.RepositoryAsync<TOptionValue>();
             var bigValueRepository = uow.RepositoryAsync<BigStringValue>();
 
             var ids = models.Select(m => m.Id).ToList();
@@ -242,7 +241,7 @@ namespace VitalChoice.DynamicData.Base
                     item.Entity.OptionTypes = DynamicMapper.FilterByType(item.Dynamic.IdObjectType);
                     item.InitialEntity.OptionTypes = item.Entity.OptionTypes;
                 }
-                await UpdateItems(uow, items, bigValueRepository, valueRepository);
+                await UpdateItems(uow, items, bigValueRepository);
                 await mainRepository.UpdateRangeAsync(entities);
                 await uow.SaveChangesAsync(CancellationToken.None);
 
@@ -256,7 +255,6 @@ namespace VitalChoice.DynamicData.Base
             DynamicMapper.SecureObject(model);
             (await ValidateAsync(model)).Raise();
             var mainRepository = uow.RepositoryAsync<TEntity>();
-            var valueRepository = uow.RepositoryAsync<TOptionValue>();
             var bigValueRepository = uow.RepositoryAsync<BigStringValue>();
             IQueryFluent<TEntity> query =
                 mainRepository.Query(o => o.Id == model.Id && o.StatusCode != (int) RecordStatusCode.Deleted)
@@ -273,7 +271,7 @@ namespace VitalChoice.DynamicData.Base
                     new List<DynamicEntityPair<TDynamic, TEntity>>
                     {
                         new DynamicEntityPair<TDynamic, TEntity>(model, entity) { InitialEntity = initialEntity}
-                    }, bigValueRepository, valueRepository);
+                    }, bigValueRepository);
             await uow.SaveChangesAsync();
 
             return entity;
@@ -400,8 +398,7 @@ namespace VitalChoice.DynamicData.Base
         }
 
         private async Task UpdateItems(IUnitOfWorkAsync uow, ICollection<DynamicEntityPair<TDynamic, TEntity>> items,
-            IRepositoryAsync<BigStringValue> bigValueRepository,
-            IRepositoryAsync<TOptionValue> valueRepository)
+            IRepositoryAsync<BigStringValue> bigValueRepository)
         {
             await SetBigValuesAsync(items.Select(i => i.Entity), true);
             foreach (var pair in items)
