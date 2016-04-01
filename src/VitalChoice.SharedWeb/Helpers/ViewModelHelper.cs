@@ -5,6 +5,7 @@ using VitalChoice.Business.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer;
@@ -16,7 +17,7 @@ namespace VitalChoice.SharedWeb.Helpers
         public static DateTime FindNextAutoShipDate(DateTime orderDate, int frequency)
         {
             if (frequency <= 0)
-                throw new InvalidOperationException("Invalid auto-ship frequency");
+                throw new ApiException("Invalid auto-ship frequency");
 
             var difference = DateTime.Now - orderDate;
             var cyclesAdd = (int) (difference.Days/30.0/frequency);
