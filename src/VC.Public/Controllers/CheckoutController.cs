@@ -70,10 +70,10 @@ namespace VC.Public.Controllers
             ICountryService countryService,
             BrontoService brontoService,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
-            IPageResultService pageResultService)
+            IPageResultService pageResultService, ISettingService settingService)
             : base(
                 contextAccessor, customerService, infrastructureService, authorizationService, checkoutService, orderService,
-                skuMapper, productMapper, pageResultService)
+                skuMapper, productMapper, pageResultService, settingService)
         {
             _storefrontUserService = storefrontUserService;
             _paymentMethodConverter = paymentMethodConverter;
@@ -602,7 +602,7 @@ namespace VC.Public.Controllers
             var order = await OrderService.SelectAsync(idOrder, true);
             order.Customer = await CustomerService.SelectAsync(order.Customer.Id, true);
             var context = await OrderService.CalculateOrder(order, OrderStatus.Processed);
-            FillModel(reviewOrderModel, order, context);
+            await FillModel(reviewOrderModel, order, context);
 
             var countries = await _countryService.GetCountriesAsync();
 

@@ -164,7 +164,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         });
     };
 
-    $scope.requestRecalculate = function ()
+    $scope.requestRecalculate = function (callback)
     {
         if ($scope.id)
         {
@@ -207,6 +207,9 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                         uiScope.currectCalculateCanceller.reject();
                         uiScope.currectCalculateCanceller = null;
                     }
+                    if (callback) {
+                        callback(result);
+                    }
                 })
                 .error(function (result)
                 {
@@ -218,6 +221,9 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                             uiScope.currectCalculateCanceller.reject();
                             uiScope.currectCalculateCanceller = null;
                         }
+                    }
+                    if (callback) {
+                        callback(result);
                     }
                 });
         }

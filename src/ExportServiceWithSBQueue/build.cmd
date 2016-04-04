@@ -1,5 +1,5 @@
 @echo off
-cd "%1\src\WorkerBuilder"
-if not exist "%1\packages\WorkerRole\" mkdir "%1\packages\WorkerRole\"
-dnx --configuration Release run %1\packages\WorkerRole\ -silent
-cd %1
+cd "%2\src\WorkerBuilder"
+if not exist "%2\packages\WorkerRole\" mkdir "%2\packages\WorkerRole\"
+dnx --configuration %1 run %2\packages\WorkerRole\ -silent
+cd %2

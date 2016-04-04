@@ -1,7 +1,10 @@
 ﻿@model VC.Public.Models.Cart.ViewCartModel
 
 <div data-bind="visible: Model.AutoShip" class="form-regular">
-	<div class="form-control-important-info">Your cart contains Auto-Ship product. Other products cannot be added to the cart until you submit your order. If you don't want to just remove it from cart and then you will be able add other products to cart again</div>
+    <div class="form-control-important-info">Your cart contains Auto-Ship product. Other products cannot be added to the cart until you submit your order. If you don't want to just remove it from cart and then you will be able add other products to cart again</div>
+</div>
+<div data-bind="visible: Model.TopGlobalMessage" class="form-regular">
+    <div class="form-control-important-info" data-bind="text: Model.TopGlobalMessage"></div>
 </div>
 <table class="standard-table cart-items-list">
 		<thead>

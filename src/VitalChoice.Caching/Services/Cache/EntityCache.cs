@@ -181,8 +181,8 @@ namespace VitalChoice.Caching.Services.Cache
 
             if (entity == null)
             {
-                _internalCache.SetNull(queryData.PrimaryKeys, queryData.RelationInfo);
-                return true;
+                //_internalCache.SetNull(queryData.PrimaryKeys, queryData.RelationInfo);
+                return false;
             }
             entity = DeepCloneItem(entity, queryData.RelationInfo);
             return _internalCache.Update(entity, queryData.RelationInfo);

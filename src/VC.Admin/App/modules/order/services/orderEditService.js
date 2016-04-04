@@ -599,56 +599,50 @@ angular.module('app.modules.order.services.orderEditService', [])
 
     var initRecalculate = function (uiScope)
     {
-        uiScope.requestRecalculate = function ()
-        {
+        uiScope.requestRecalculate = function (callback) {
             //additional client validation
-            if (!uiScope.skusClientValid())
-            {
+            if (!uiScope.skusClientValid()) {
                 return;
             }
 
-            angular.forEach(uiScope.currentCustomer.Shipping, function (shippingItem, index)
-            {
+            angular.forEach(uiScope.currentCustomer.Shipping, function (shippingItem, index) {
                 shippingItem.IsSelected = index.toString() == uiScope.shippingAddressTab.AddressIndex;
             });
             var orderForCalculating = angular.copy(uiScope.order);
             orderForCalculating.Customer = angular.copy(uiScope.currentCustomer);
-            if (angular.equals(uiScope.oldOrderForCalculating, orderForCalculating))
-            {
+            if (angular.equals(uiScope.oldOrderForCalculating, orderForCalculating)) {
                 return;
             }
             uiScope.oldOrderForCalculating = orderForCalculating;
-            if (uiScope.currectCalculateCanceller)
-            {
+            if (uiScope.currectCalculateCanceller) {
                 uiScope.currectCalculateCanceller.resolve("canceled");
             }
             uiScope.currectCalculateCanceller = $q.defer();
             orderService.calculateOrder(orderForCalculating, uiScope.currectCalculateCanceller)
-                .success(function (result)
-                {
-                    if (result.Success)
-                    {
+                .success(function (result) {
+                    if (result.Success) {
                         successCalculateHandler(result.Data);
-                    } else
-                    {
+                    } else {
                         errorHandler(result);
                     }
-                    if (uiScope.currectCalculateCanceller)
-                    {
+                    if (uiScope.currectCalculateCanceller) {
                         uiScope.currectCalculateCanceller.reject();
                         uiScope.currectCalculateCanceller = null;
                     }
+                    if (callback) {
+                        callback(result);
+                    }
                 })
-                .error(function (result)
-                {
-                    if (result == "canceled")
-                    {
+                .error(function (result) {
+                    if (result == "canceled") {
                         errorHandler(result);
-                        if (uiScope.currectCalculateCanceller)
-                        {
+                        if (uiScope.currectCalculateCanceller) {
                             uiScope.currectCalculateCanceller.reject();
                             uiScope.currectCalculateCanceller = null;
                         }
+                    }
+                    if (callback) {
+                        callback(result);
                     }
                 });
         };

@@ -87,6 +87,7 @@
     <None Include="PreDeployment\Scripts\Checkout.sql" />
     <None Include="PreDeployment\Scripts\PromoUpdate.sql" />
     <None Include="PostDeployment\Scripts\VTopProducts.sql" />
+    <None Include="PreDeployment\Scripts\DiscountsUsed.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="VitalChoice.Database.Ecommerce.refactorlog" />

@@ -71,6 +71,8 @@ namespace VC.Public.Models.Cart
 
 	    public string DiscountDescription { get; set; }
 
+        public string TopGlobalMessage { get; set; }
+
 	    public IList<KeyValuePair<string, string>> Messages { get; set; }
 
 		public IList<CartCrossSellModel> CrossSells { get; set; }

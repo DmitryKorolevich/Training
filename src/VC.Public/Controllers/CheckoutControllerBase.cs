@@ -28,12 +28,13 @@ using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Interfaces.Services.Orders;
+using VitalChoice.Interfaces.Services.Settings;
 
 namespace VC.Public.Controllers
 {
     public abstract class CheckoutControllerBase : PublicControllerBase
     {
-
+        protected readonly ISettingService SettingService;
         protected readonly IOrderService OrderService;
         protected readonly IDynamicMapper<SkuDynamic, Sku> SkuMapper;
         protected readonly IDynamicMapper<ProductDynamic, Product> ProductMapper;
@@ -42,12 +43,13 @@ namespace VC.Public.Controllers
         protected CheckoutControllerBase(IHttpContextAccessor contextAccessor, ICustomerService customerService,
             IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService, ICheckoutService checkoutService,
             IOrderService orderService, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
-            IPageResultService pageResultService) : base(contextAccessor, customerService,
+            IPageResultService pageResultService, ISettingService settingService) : base(contextAccessor, customerService,
                 infrastructureService, authorizationService, checkoutService, pageResultService)
         {
             OrderService = orderService;
             SkuMapper = skuMapper;
             ProductMapper = productMapper;
+            SettingService = settingService;
             AppInfrastructure = infrastructureService.Get();
         }
 
@@ -72,7 +74,7 @@ namespace VC.Public.Controllers
         {
             var cart = await GetCurrentCart();
             var context = await OrderService.CalculateOrder(cart.Order, OrderStatus.Incomplete);
-            FillModel(cartModel, cart.Order, context);
+            await FillModel(cartModel, cart.Order, context);
             SetCartUid(cart.CartUid);
         }
 
@@ -84,11 +86,18 @@ namespace VC.Public.Controllers
             });
         }
 
-        protected void FillModel(ViewCartModel cartModel, OrderDynamic order, OrderDataContext context)
+        protected async Task FillModel(ViewCartModel cartModel, OrderDynamic order, OrderDataContext context)
         {
-            if (context.ProductsPerishableThresholdIssue)
+            if (!context.ProductsPerishableThresholdIssue)
             {
-                
+                cartModel.TopGlobalMessage = null;
+            }
+            else
+            {
+                var globalThreshold = (await SettingService.GetAppSettingsAsync()).GlobalPerishableThreshold;
+                cartModel.TopGlobalMessage = globalThreshold.HasValue && globalThreshold.Value > 0
+                    ? $"Frozen products must total {globalThreshold.Value.ToString("c")}, to prevent thawing during shipping. Please add frozen items until they total {globalThreshold.Value.ToString("c")}."
+                    : null;
             }
             var gcMessages = context.GcMessageInfos.ToDictionary(m => m.Field);
             if (!string.IsNullOrWhiteSpace(cartModel.PromoCode) && order.Discount == null)

@@ -15,8 +15,6 @@ namespace VitalChoice.Caching.Interfaces
         bool Update(IEnumerable<object> entities, RelationInfo relationInfo);
         bool Update(object entity, RelationInfo relationInfo);
         bool Update(object entity, DbContext context);
-        void SetNull(IEnumerable<EntityKey> keys, RelationInfo relationInfo);
-        void SetNull(EntityKey key, RelationInfo relationInfo);
         bool UpdateAll(IEnumerable<object> entities, RelationInfo relationInfo);
         EntityKey MarkForUpdate(object entity);
         IEnumerable<EntityKey> MarkForUpdate(IEnumerable<object> entities);

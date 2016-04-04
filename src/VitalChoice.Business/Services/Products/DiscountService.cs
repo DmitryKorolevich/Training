@@ -26,6 +26,7 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Disocunts;
@@ -39,6 +40,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly IEcommerceRepositoryAsync<Discount> _discountRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
+        private readonly IEcommerceRepositoryAsync<OneTimeDiscountToCustomerUsage> _oneTimeDiscountRepository;
         private readonly DiscountMapper _mapper;
 
         public DiscountService(
@@ -48,7 +50,7 @@ namespace VitalChoice.Business.Services.Products
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, DiscountMapper mapper,
             IObjectLogItemExternalService objectLogItemExternalService,
-            ILoggerProviderExtended loggerProvider, DirectMapper<Discount> directMapper, DynamicExtensionsRewriter queryVisitor, ITransactionAccessor<EcommerceContext> transactionAccessor)
+            ILoggerProviderExtended loggerProvider, DirectMapper<Discount> directMapper, DynamicExtensionsRewriter queryVisitor, ITransactionAccessor<EcommerceContext> transactionAccessor, IEcommerceRepositoryAsync<OneTimeDiscountToCustomerUsage> oneTimeDiscountRepository)
             : base(mapper, discountRepository, discountOptionValueRepository, bigStringRepositoryAsync, objectLogItemExternalService, 
                   loggerProvider, directMapper, queryVisitor, transactionAccessor)
         {
@@ -56,6 +58,7 @@ namespace VitalChoice.Business.Services.Products
             _skuRepository = skuRepository;
             _adminProfileRepository = adminProfileRepository;
             _mapper = mapper;
+            _oneTimeDiscountRepository = oneTimeDiscountRepository;
         }
 
         protected override async Task<List<MessageInfo>> ValidateAsync(DiscountDynamic dynamic)
@@ -259,6 +262,59 @@ namespace VitalChoice.Business.Services.Products
             if (string.IsNullOrWhiteSpace(code))
                 return Task.FromResult<DiscountDynamic>(null);
             return SelectFirstAsync(new DiscountQuery().WithEqualCode(code).NotDeleted(), withDefaults: true);
+        }
+
+        public async Task<int> GetDiscountUsed(DiscountDynamic discount, int idCustomer)
+        {
+            if ((int?) discount.SafeData.MaxTimesUse > 0)
+            {
+                var result =
+                    (await
+                        _oneTimeDiscountRepository.Query(d => d.IdCustomer == idCustomer && d.IdDiscount == discount.Id)
+                            .SelectFirstOrDefaultAsync(false))?.UsageCount ?? 0;
+                return result;
+            }
+            return -1;
+        }
+
+        public async Task<bool> SetDiscountUsed(DiscountDynamic discount, int idCustomer, bool addUsage = true)
+        {
+            if ((int?)discount.SafeData.MaxTimesUse > 0)
+            {
+                if (addUsage)
+                {
+                    var usage = await
+                        _oneTimeDiscountRepository.Query(d => d.IdCustomer == idCustomer && d.IdDiscount == discount.Id)
+                            .SelectFirstOrDefaultAsync(true);
+                    if (usage != null)
+                    {
+                        usage.UsageCount++;
+                        _oneTimeDiscountRepository.Update(usage);
+                        return true;
+                    }
+                    return await _oneTimeDiscountRepository.InsertAsync(new OneTimeDiscountToCustomerUsage
+                    {
+                        IdCustomer = idCustomer,
+                        IdDiscount = discount.Id,
+                        UsageCount = 1
+                    });
+                }
+                var toDelete = await
+                    _oneTimeDiscountRepository.Query(d => d.IdCustomer == idCustomer && d.IdDiscount == discount.Id)
+                        .SelectFirstOrDefaultAsync(true);
+                if (toDelete != null)
+                {
+                    if (toDelete.UsageCount == 1)
+                    {
+                        return await _oneTimeDiscountRepository.DeleteAsync(toDelete);
+                    }
+                    toDelete.UsageCount--;
+                    return await _oneTimeDiscountRepository.UpdateAsync(toDelete);
+                }
+                
+                return true;
+            }
+            return true;
         }
 
         #endregion

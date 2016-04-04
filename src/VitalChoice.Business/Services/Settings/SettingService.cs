@@ -97,6 +97,14 @@ namespace VitalChoice.Business.Services.Settings
                                 property.SetValue(toReturn, value, null);
                             }
                         }
+                        if (property.PropertyType == typeof(decimal?) || property.PropertyType == typeof(decimal))
+                        {
+                            decimal value;
+                            if (decimal.TryParse(setting.Value, out value))
+                            {
+                                property.SetValue(toReturn, value, null);
+                            }
+                        }
                         if (property.PropertyType == typeof(string))
                         {
                             property.SetValue(toReturn, setting.Value, null);

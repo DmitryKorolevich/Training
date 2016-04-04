@@ -95,7 +95,8 @@ namespace VitalChoice.Business.Services.Customers
             ILoggerProviderExtended loggerProvider, DirectMapper<Customer> directMapper, DynamicExtensionsRewriter queryVisitor,
             AddressOptionValueRepository addressOptionValueRepositoryAsync, CustomerAddressMapper customerAddressMapper,
             ICountryNameCodeResolver countryNameCode, IEncryptedOrderExportService encryptedOrderExportService,
-            IObjectMapper<CustomerPaymentMethodDynamic> paymentMapper, IPaymentMethodService paymentMethodService, ITransactionAccessor<EcommerceContext> transactionAccessor)
+            IObjectMapper<CustomerPaymentMethodDynamic> paymentMapper, IPaymentMethodService paymentMethodService,
+            ITransactionAccessor<EcommerceContext> transactionAccessor)
             : base(
                 customerMapper, customerRepositoryAsync,
                 customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectLogItemExternalService, loggerProvider, directMapper,

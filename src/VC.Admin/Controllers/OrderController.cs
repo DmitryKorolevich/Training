@@ -50,7 +50,6 @@ using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates;
 using VitalChoice.SharedWeb.Models.Orders;
 using VitalChoice.Business.Helpers;
-using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.SharedWeb.Helpers;
 
 namespace VC.Admin.Controllers
@@ -128,9 +127,9 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<Result<bool>> GetIsBrontoSubscribed(string id)
+        public Task<Result<bool>> GetIsBrontoSubscribed(string id)
         {
-            return !(_brontoService.GetIsUnsubscribed(id) ?? false);
+            return Task.FromResult<Result<bool>>(!(_brontoService.GetIsUnsubscribed(id) ?? false));
         }
 
         [HttpPost]

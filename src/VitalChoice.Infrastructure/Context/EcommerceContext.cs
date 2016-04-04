@@ -19,6 +19,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Entities.CatalogRequests;
 using VitalChoice.Infrastructure.Domain.Entities.Checkout;
+using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.Entities.Products;
 
 namespace VitalChoice.Infrastructure.Context
@@ -248,6 +249,15 @@ namespace VitalChoice.Infrastructure.Context
 
                 entity.HasKey(e => new {e.IdSku, e.IdCustomer});
                 entity.HasOne(e => e.Sku).WithMany().HasForeignKey(e => e.IdSku).HasPrincipalKey(s => s.Id);
+            });
+
+            builder.Entity<OneTimeDiscountToCustomerUsage>(entity =>
+            {
+                entity.Ignore(e => e.Id);
+
+                entity.ToTable("OneTimeDiscountToCustomerUsages");
+
+                entity.HasKey(e => new {e.IdCustomer, e.IdDiscount});
             });
         }
     }

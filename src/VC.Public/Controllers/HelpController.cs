@@ -167,16 +167,17 @@ namespace VC.Public.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> SendContentUrlNotification(string name, string url, int type= (int)SendContentUrlType.Article)
+        public Task<IActionResult> SendContentUrlNotification(string name, string url, int type= (int)SendContentUrlType.Article)
         {
             ViewBag.Url = url;
             ViewBag.Name = name;
 
-            return PartialView("_SendContentUrlNotification", new SendContentUrlNotificationModel {
+            return Task.FromResult<IActionResult>(PartialView("_SendContentUrlNotification", new SendContentUrlNotificationModel
+            {
                 Url = url,
-                Name=name,
-                Type=(SendContentUrlType)type,
-            });
+                Name = name,
+                Type = (SendContentUrlType) type,
+            }));
         }
 
         [HttpPost]

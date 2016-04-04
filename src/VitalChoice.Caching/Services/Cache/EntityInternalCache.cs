@@ -255,6 +255,15 @@ namespace VitalChoice.Caching.Services.Cache
         public EntityKey MarkForAdd(T entity)
         {
             var pk = EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
+            foreach (var data in CacheStorage.AllCacheDatas)
+            {
+                var cached = data.Get(pk);
+                if (cached != null)
+                {
+                    Update(entity, (DbContext)null);
+                    cached.NeedUpdate = true;
+                }
+            }
             var foreignKeys = EntityInfo.ForeignKeys.GetForeignKeyValues(entity);
             MarkForUpdateForeignKeys(foreignKeys);
             MarkForUpdateDependent(pk);
@@ -291,17 +300,17 @@ namespace VitalChoice.Caching.Services.Cache
             return Update((T) entity, context);
         }
 
-        public void SetNull(IEnumerable<EntityKey> keys, RelationInfo relationInfo)
-        {
-            var data = CacheStorage.GetCacheData(relationInfo);
-            data.SetNull(keys);
-        }
+        //public void SetNull(IEnumerable<EntityKey> keys, RelationInfo relationInfo)
+        //{
+        //    var data = CacheStorage.GetCacheData(relationInfo);
+        //    data.SetNull(keys);
+        //}
 
-        public void SetNull(EntityKey key, RelationInfo relationInfo)
-        {
-            var data = CacheStorage.GetCacheData(relationInfo);
-            data.SetNull(key);
-        }
+        //public void SetNull(EntityKey key, RelationInfo relationInfo)
+        //{
+        //    var data = CacheStorage.GetCacheData(relationInfo);
+        //    data.SetNull(key);
+        //}
 
         public bool UpdateAll(IEnumerable<object> entities, RelationInfo relationInfo)
         {

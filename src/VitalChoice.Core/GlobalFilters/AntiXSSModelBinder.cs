@@ -52,7 +52,7 @@ namespace VitalChoice.Core.GlobalFilters
 
                         if (containForbidden)
                         {
-                            bindingContext.ModelState.AddModelError(bindingContext.ModelName, "String contains characters that indicates potential injection threat");
+                            bindingContext.ModelState.AddModelError(bindingContext.ModelName, "Invalid characters used");
                             return ModelBindingResult.NoResultAsync;
                         }
                     }

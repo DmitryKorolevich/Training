@@ -57,3 +57,5 @@
 :r .\Scripts\PromoUpdate.sql
 :r .\Scripts\InventorySkus.sql
 :r .\Scripts\GiftCetfificatesUpdateSku.sql
+
+:r .\Scripts\DiscountsUsed.sql

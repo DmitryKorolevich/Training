@@ -101,6 +101,7 @@ namespace VitalChoice.Business.Services.Orders
                 <OrderPaymentMethodDynamic, OrderPaymentMethod, CustomerPaymentMethodOptionType, OrderPaymentMethodOptionValue>
             _paymentGenericService;
         private readonly IEcommerceRepositoryAsync<OrderToSku> _orderToSkusRepository;
+        private readonly IDiscountService _discountService;
 
         public OrderService(
             IEcommerceRepositoryAsync<VOrder> vOrderRepository,
@@ -133,7 +134,7 @@ namespace VitalChoice.Business.Services.Orders
             IProductService productService,
             INotificationService notificationService,
             ICountryService countryService, ITransactionAccessor<EcommerceContext> transactionAccessor, SkuMapper skuMapper,
-            IEcommerceRepositoryAsync<OrderToSku> orderToSkusRepository)
+            IEcommerceRepositoryAsync<OrderToSku> orderToSkusRepository, IDiscountService discountService)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
@@ -160,6 +161,7 @@ namespace VitalChoice.Business.Services.Orders
             _countryService = countryService;
             _skuMapper = skuMapper;
             _orderToSkusRepository = orderToSkusRepository;
+            _discountService = discountService;
             _addressMapper = addressMapper;
             _productService = productService;
             _notificationService = notificationService;
@@ -169,7 +171,6 @@ namespace VitalChoice.Business.Services.Orders
         private async Task<Order> InsertAsyncInternal(OrderDynamic model, IUnitOfWorkAsync uow)
         {
             Order entity;
-            Task<bool> remoteUpdateTask;
             using (var transaction = uow.BeginTransaction())
             {
                 try
@@ -187,17 +188,22 @@ namespace VitalChoice.Business.Services.Orders
                     (await authTask).Raise();
                     entity = await base.InsertAsync(model, uow);
                     //storefront update
-                    if (!entity.IdEditedBy.HasValue)
+                    if (model.IsAnyNotIncomplete())
                     {
-                        await UpdateAffiliateOrderPayment(model, uow);
-                        await UpdateHealthwiseOrder(model, uow);
+                        if (!entity.IdEditedBy.HasValue)
+                        {
+                            await UpdateAffiliateOrderPayment(model, uow);
+                            await UpdateHealthwiseOrder(model, uow);
+                        }
+                        await ChargeGiftCertificates(model, uow);
+                        await ChargeOnetimeDiscount(model);
+                        paymentCopy.IdOrder = entity.Id;
+
+                        if (!await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy))
+                        {
+                            Logger.LogError("Cannot update order payment info on remote.");
+                        }
                     }
-                    await ChargeGiftCertificates(model, uow);
-
-                    paymentCopy.IdOrder = entity.Id;
-
-                    remoteUpdateTask = _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy);
-
                     transaction.Commit();
                 }
                 catch
@@ -206,10 +212,7 @@ namespace VitalChoice.Business.Services.Orders
                     throw;
                 }
             }
-            if (!await remoteUpdateTask)
-            {
-                Logger.LogError("Cannot update order payment info on remote.");
-            }
+            
             return entity;
         }
 
@@ -255,13 +258,12 @@ namespace VitalChoice.Business.Services.Orders
         private async Task<Order> UpdateInternalAsync(OrderDynamic model, IUnitOfWorkAsync uow)
         {
             Order entity;
-            Task<bool> remoteUpdateTask;
             using (var transaction = uow.BeginTransaction())
             {
                 try
                 {
                     SetExtendedOptions(Enumerable.Repeat(model, 1));
-                    await SetSkusBornDate(new[] { model }, uow);
+                    await SetSkusBornDate(new[] {model}, uow);
                     await EnsurePaymentMethod(model);
                     var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
                     var paymentCopy = _paymentMapper.Clone<ExpandoObject>(model.PaymentMethod, o =>
@@ -273,22 +275,29 @@ namespace VitalChoice.Business.Services.Orders
                     (await authTask).Raise();
                     var initial = await SelectEntityFirstAsync(o => o.Id == model.Id, query => query);
                     entity = await base.UpdateAsync(model, uow);
-                    
+
                     //Update date created if order was incomplete and become processed
                     if (initial.IsAnyIncomplete() && model.IsAnyNotIncomplete())
                     {
                         entity.DateCreated = DateTime.Now;
                         await uow.SaveChangesAsync();
                     }
-                    //storefront update
-                    if (!entity.IdAddedBy.HasValue)
+                    if (model.IsAnyNotIncomplete())
                     {
-                        await UpdateAffiliateOrderPayment(model, uow);
-                        await UpdateHealthwiseOrder(model, uow);
+                        //storefront update
+                        if (!entity.IdAddedBy.HasValue)
+                        {
+                            await UpdateAffiliateOrderPayment(model, uow);
+                            await UpdateHealthwiseOrder(model, uow);
+                        }
+                        //charge one-time discount, remove old charge if different
+                        await ChargeOnetimeDiscount(model, initial);
+                        paymentCopy.IdOrder = entity.Id;
+                        if (!await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy))
+                        {
+                            Logger.LogError("Cannot update order payment info on remote.");
+                        }
                     }
-                    paymentCopy.IdOrder = entity.Id;
-                    remoteUpdateTask = _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy);
-
                     transaction.Commit();
                 }
                 catch
@@ -297,11 +306,23 @@ namespace VitalChoice.Business.Services.Orders
                     throw;
                 }
             }
-            if (!await remoteUpdateTask)
-            {
-                Logger.LogError("Cannot update order payment info on remote.");
-            }
             return entity;
+        }
+
+        private async Task ChargeOnetimeDiscount(OrderDynamic model, Order initial = null)
+        {
+            if (model.Discount?.Id != initial?.IdDiscount)
+            {
+                if (initial?.IdDiscount != null)
+                {
+                    var discount = await _discountService.SelectAsync(initial.IdDiscount.Value, true);
+                    await _discountService.SetDiscountUsed(discount, initial.IdCustomer, false);
+                }
+                else if (model.Discount?.Id > 0)
+                {
+                    await _discountService.SetDiscountUsed(model.Discount, model.Customer.Id);
+                }
+            }
         }
 
         /// <summary>
@@ -958,16 +979,15 @@ namespace VitalChoice.Business.Services.Orders
 
         private async Task ChargeGiftCertificates(OrderDynamic model, IUnitOfWorkAsync uow)
         {
-            if (model.OrderStatus == OrderStatus.Incomplete ||
-                model.POrderStatus == OrderStatus.Incomplete && model.NPOrderStatus == OrderStatus.Incomplete)
+            if (model.IsAnyNotIncomplete())
             {
-                return;
+                var gcsRep = uow.RepositoryAsync<GiftCertificate>();
+                var gcs = model.GiftCertificates.Select(g => g.GiftCertificate.Id).Distinct().ToList();
+                var gcsInDb = await gcsRep.Query(g => gcs.Contains(g.Id)).SelectAsync(true);
+                gcsInDb.UpdateKeyed(model.GiftCertificates.Select(g => g.GiftCertificate), g => g.Id,
+                    (gcDb, gc) => gcDb.Balance = gc.Balance);
+                await uow.SaveChangesAsync();
             }
-            var gcsRep = uow.RepositoryAsync<GiftCertificate>();
-            var gcs = model.GiftCertificates.Select(g => g.GiftCertificate.Id).Distinct().ToList();
-            var gcsInDb = await gcsRep.Query(g => gcs.Contains(g.Id)).SelectAsync(true);
-            gcsInDb.UpdateKeyed(model.GiftCertificates.Select(g => g.GiftCertificate), g => g.Id, (gcDb, gc) => gcDb.Balance = gc.Balance);
-            await uow.SaveChangesAsync();
         }
 
         private async Task EnsurePaymentMethod(OrderDynamic model)

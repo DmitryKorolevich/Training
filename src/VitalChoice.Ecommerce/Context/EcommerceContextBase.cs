@@ -121,6 +121,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(p => p.IdLookup)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
+                entity.HasIndex(e => new { e.Name, e.IdObjectType }).IsUnique(true);
             });
 
             builder.Entity<PromotionOptionValue>(entity =>
@@ -227,6 +228,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(p => p.IdLookup)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
+                entity.HasIndex(e => new { e.Name, e.IdObjectType }).IsUnique(true);
             });
 
 
@@ -531,6 +533,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(p => p.IdLookup)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
+                entity.HasIndex(e => new { e.Name, e.IdObjectType }).IsUnique(true);
             });
 
 
@@ -598,6 +601,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(p => p.IdLookup)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
+                entity.HasIndex(e => e.Name).IsUnique(true);
             });
 
             builder.Entity<CustomerNoteOptionValue>(entity =>
@@ -699,6 +703,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(p => p.IdLookup)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
+                entity.HasIndex(e => new { e.Name, e.IdObjectType }).IsUnique(true);
             });
 
 
@@ -839,6 +844,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(p => p.IdLookup)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
+                entity.HasIndex(e => new { e.Name, e.IdObjectType }).IsUnique(true);
             });
 
             builder.Entity<CustomerPaymentMethodOptionValue>(entity =>
@@ -942,6 +948,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey<OrderOptionType>(t => t.IdLookup)
                     .HasPrincipalKey<Lookup>(l => l.Id)
                     .IsRequired(false);
+                entity.HasIndex(e => new { e.Name, e.IdObjectType }).IsUnique(true);
             });
 
             builder.Entity<OrderToPromoToInventorySku>(entity =>
@@ -1189,6 +1196,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(p => p.IdLookup)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
+                entity.HasIndex(e => new { e.Name, e.IdObjectType }).IsUnique(true);
             });
 
             builder.Entity<Affiliate>(entity =>
@@ -1332,6 +1340,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(p => p.IdLookup)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
+                entity.HasIndex(e => new { e.Name, e.IdObjectType }).IsUnique(true);
             });
         }
 
@@ -1555,6 +1564,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(p => p.IdLookup)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
+                entity.HasIndex(e => new {e.Name, e.IdObjectType}).IsUnique(true);
             });
         }
 

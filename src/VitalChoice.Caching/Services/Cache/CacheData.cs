@@ -308,23 +308,23 @@ namespace VitalChoice.Caching.Services.Cache
             return result;
         }
 
-        public void SetNull(EntityKey pk)
-        {
-            if (pk == null)
-                return;
-            lock (_lockObj)
-            {
-                _mainCluster.Update(pk, new CachedEntity<T>(default(T), this));
-            }
-        }
+        //public void SetNull(EntityKey pk)
+        //{
+        //    if (pk == null)
+        //        return;
+        //    lock (_lockObj)
+        //    {
+        //        _mainCluster.Update(pk, new CachedEntity<T>(default(T), this));
+        //    }
+        //}
 
-        public void SetNull(IEnumerable<EntityKey> keys)
-        {
-            foreach (var key in keys)
-            {
-                SetNull(key);
-            }
-        }
+        //public void SetNull(IEnumerable<EntityKey> keys)
+        //{
+        //    foreach (var key in keys)
+        //    {
+        //        SetNull(key);
+        //    }
+        //}
 
         public bool FullCollection { get; private set; }
 

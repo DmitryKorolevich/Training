@@ -31,6 +31,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 using VitalChoice.Interfaces.Services.Content;
+using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Validation.Models;
 
 namespace VC.Public.Controllers
@@ -50,8 +51,8 @@ namespace VC.Public.Controllers
             IOrderService orderService, IProductService productService, ICheckoutService checkoutService,
             IAuthorizationService authorizationService, IAppInfrastructureService appInfrastructureService,
             IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
-            IDiscountService discountService, IGcService gcService, IContentCrossSellService contentCrossSellService, IPageResultService pageResultService)
-            : base(contextAccessor, customerService, appInfrastructureService, authorizationService, checkoutService, orderService, skuMapper,productMapper, pageResultService)
+            IDiscountService discountService, IGcService gcService, IContentCrossSellService contentCrossSellService, IPageResultService pageResultService, ISettingService settingService)
+            : base(contextAccessor, customerService, appInfrastructureService, authorizationService, checkoutService, orderService, skuMapper,productMapper, pageResultService, settingService)
         {
 	        _productService = productService;
             _checkoutService = checkoutService;
@@ -203,7 +204,7 @@ namespace VC.Public.Controllers
 
 	        var res = await AddToCartInternal(skuCode);
 
-			FillModel(result, res.Item2.Order, res.Item1);
+			await FillModel(result, res.Item2.Order, res.Item1);
             SetCartUid(res.Item2.CartUid);
             ContextAccessor.HttpContext.Session.Remove(CheckoutConstants.ReceiptSessionOrderId);
             return result;
@@ -270,7 +271,7 @@ namespace VC.Public.Controllers
             cart.Order.Data.ShippingUpgradeP = model.ShippingUpgradeP;
             cart.Order.Data.ShippingUpgradeNP = model.ShippingUpgradeNP;
             var context = await OrderService.CalculateOrder(cart.Order, OrderStatus.Incomplete);
-            FillModel(model, cart.Order, context);
+            await FillModel(model, cart.Order, context);
             SetCartUid(cart.CartUid);
 
             bool updateResult = true;

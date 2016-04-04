@@ -11,5 +11,7 @@ namespace VitalChoice.Interfaces.Services.Products
 	{
         Task<PagedList<DiscountDynamic>> GetDiscountsAsync(DiscountFilter filter);
 	    Task<DiscountDynamic> GetByCode(string code);
+        Task<int> GetDiscountUsed(DiscountDynamic discount, int idCustomer);
+	    Task<bool> SetDiscountUsed(DiscountDynamic discount, int idCustomer, bool addUsage = true);
 	}
 }

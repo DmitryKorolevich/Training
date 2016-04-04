@@ -2,7 +2,7 @@
 {
     public class AppSettings
     {
-        public int? GlobalPerishableThreshold { get; set; }
+        public decimal? GlobalPerishableThreshold { get; set; }
 
         public bool CreditCardAuthorizations { get; set; }
 

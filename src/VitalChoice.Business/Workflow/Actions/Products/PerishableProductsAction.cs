@@ -27,6 +27,11 @@ namespace VitalChoice.Business.Workflow.Actions.Products
             {
                 dataContext.ProductsPerishableThresholdIssue = true;
             }
+            if (perishableCount == 1 && (bool) perishableList[0].Sku.Data.DisallowSingle && perishableList[0].Quantity == 1)
+            {
+                perishableList[0].Messages.Add(
+                    "It is not possible to ship the single perishable item above. If you wish to order this item, please add another perishable item to your cart.");
+            }
             return perishableAmount;
         }
     }
