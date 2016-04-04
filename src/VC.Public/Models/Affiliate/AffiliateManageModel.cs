@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using VC.Public.Validators.Affiliate;
+using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -30,12 +31,14 @@ namespace VC.Public.Models.Affiliate
         public string ConfirmEmail { get; set; }
 
         [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+        [AllowXSS]
         public string Password { get; set; }
 
 		[Compare("Password")]
         [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         [Display(Name = "Password Confirm")]
-		public string ConfirmPassword { get; set; }
+        [AllowXSS]
+        public string ConfirmPassword { get; set; }
 
         
         [Display(Name = "Website")]

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using VC.Public.Models.Profile;
+using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Validation.Models;
@@ -22,12 +23,14 @@ namespace VC.Public.Models.Checkout
 		public string Email { get; set; }
 
 		[Required]
-		public string Password { get; set; }
+        [AllowXSS]
+        public string Password { get; set; }
 
 		[Required]
 		[Compare("Password")]
 		[Display(Name = "Password Confirm")]
-		public string ConfirmPassword { get; set; }
+        [AllowXSS]
+        public string ConfirmPassword { get; set; }
 
 	    public bool GuestCheckout { get; set; }
 

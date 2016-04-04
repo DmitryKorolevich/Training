@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Infrastructure.Domain.Constants;
 
@@ -7,11 +8,13 @@ namespace VC.Public.Models.Auth
     public class RegisterAccountModel : RegisterEmailModel
 	{
 		[Required]
-		public string Password { get; set; }
+        [AllowXSS]
+        public string Password { get; set; }
 
 		[Required]
 		[Compare("Password")]
 		[Display(Name = "Password Confirm")]
+        [AllowXSS]
 		public string ConfirmPassword { get; set; }
 
 		[Required]

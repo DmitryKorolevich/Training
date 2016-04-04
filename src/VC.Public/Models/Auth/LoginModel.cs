@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using VC.Public.Validators.Auth;
+using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Validation.Attributes;
 using VitalChoice.Validation.Models;
@@ -15,6 +16,7 @@ namespace VC.Public.Models.Auth
 		public string Email { get; set; }
 
 		[Required]
-		public string Password { get; set; }
+        [AllowXSS]
+        public string Password { get; set; }
 	}
 }

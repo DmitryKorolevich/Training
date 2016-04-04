@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Validation.Models;
 
 namespace VC.Public.Models.Profile
@@ -7,15 +8,18 @@ namespace VC.Public.Models.Profile
     {
 		[Required]
 		[Display(Name = "Old Password")]
-		public string OldPassword { get; set; }
+        [AllowXSS]
+        public string OldPassword { get; set; }
 
 	    [Required]
 		[Display(Name = "New Password")]
-		public string Password { get; set; }
+        [AllowXSS]
+        public string Password { get; set; }
 
 		[Required]
 		[Compare("Password")]
 		[Display(Name = "Password Confirm")]
-		public string ConfirmPassword { get; set; }
+        [AllowXSS]
+        public string ConfirmPassword { get; set; }
 	}
 }

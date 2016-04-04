@@ -86,6 +86,10 @@ namespace VC.Public.Controllers
 
         protected void FillModel(ViewCartModel cartModel, OrderDynamic order, OrderDataContext context)
         {
+            if (context.ProductsPerishableThresholdIssue)
+            {
+                
+            }
             var gcMessages = context.GcMessageInfos.ToDictionary(m => m.Field);
             if (!string.IsNullOrWhiteSpace(cartModel.PromoCode) && order.Discount == null)
             {
