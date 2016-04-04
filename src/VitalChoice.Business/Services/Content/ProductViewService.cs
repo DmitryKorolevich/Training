@@ -6,19 +6,18 @@ using VitalChoice.ContentProcessing.Base;
 using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.ContentProcessing.Interfaces;
 using VitalChoice.Data.Repositories;
-using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Content.Products;
+using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Entities.Roles;
+using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
-using VitalChoice.Infrastructure.Domain.Dynamic;
-using VitalChoice.Infrastructure.Identity;
 using VitalChoice.ObjectMapping.Interfaces;
-using VitalChoice.Infrastructure.Domain.Entities.Roles;
 
-namespace VitalChoice.Business.Services.Products
+namespace VitalChoice.Business.Services.Content
 {
     public class ProductViewForCustomerModel : ContentParametersModel
     {

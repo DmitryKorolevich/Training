@@ -1,36 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
-using Templates;
-using Templates.Exceptions;
-using VitalChoice.Business.Services.Content.ContentProcessors;
 using VitalChoice.ContentProcessing.Base;
+using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.ContentProcessing.Interfaces;
-using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
+using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Content.Products;
+using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
-using Microsoft.Extensions.Logging;
-using VitalChoice.ContentProcessing.Cache;
-using VitalChoice.Ecommerce.Domain.Entities.Products;
-using VitalChoice.Ecommerce.Domain.Helpers;
-using VitalChoice.Infrastructure.Domain.Constants;
-using VitalChoice.Infrastructure.Identity;
 using VitalChoice.ObjectMapping.Interfaces;
 
-namespace VitalChoice.Business.Services.Products
+namespace VitalChoice.Business.Services.Content
 {
     public class CategoryViewService : ContentViewService<ProductCategoryContent, ProductViewForCustomerModel>, ICategoryViewService
 	{

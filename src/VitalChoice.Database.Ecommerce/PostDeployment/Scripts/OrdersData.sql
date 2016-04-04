@@ -313,7 +313,7 @@ BEGIN
 END
 GO
 
-IF NOT EXISTS(SELECT * FROM OrderOptionTypes WHERE Name='IdDiscountTier')
+IF NOT EXISTS(SELECT * FROM OrderOptionTypes WHERE Name=N'IdDiscountTier')
 BEGIN
 
 	INSERT INTO [dbo].[OrderOptionTypes]
