@@ -133,7 +133,19 @@ namespace VitalChoice.Business.Queries.Orders
 			return this;
 		}
 
-		public OrderQuery WithOrderDynamicValues(int? idOrderSource, int? pOrderType, int? idShippingMethod)
+        public OrderQuery WithServiceCode(int? serviceCode)
+        {
+            if (serviceCode.HasValue)
+            {
+                Add(c => c.WhenValues(new
+                {
+                    ServiceCode = serviceCode.Value
+                }));
+            }
+            return this;
+        }
+
+        public OrderQuery WithOrderDynamicValues(int? idOrderSource, int? pOrderType, int? idShippingMethod)
         {
             if (idOrderSource.HasValue)
             {

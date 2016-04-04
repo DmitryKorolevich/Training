@@ -77,7 +77,6 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> _vOrderWithRegionInfoItemCSVExportService;
         private readonly IProductService _productService;
         private readonly INotificationService _notificationService;
-        private readonly IServiceCodeService _serviceCodeService;
         private readonly BrontoService _brontoService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly ILogger logger;
@@ -113,7 +112,6 @@ namespace VC.Admin.Controllers
             _vOrderWithRegionInfoItemCSVExportService = vOrderWithRegionInfoItemCSVExportService;
             _productService = productService;
             _notificationService = notificationService;
-            _serviceCodeService = serviceCodeService;
             _brontoService = brontoService;
             _objectHistoryLogService = objectHistoryLogService;
             _options = options;
@@ -811,16 +809,6 @@ namespace VC.Admin.Controllers
                 }
             }
             return true;
-        }
-
-        [HttpPost]
-        public async Task<Result<ServiceCodesReport>> GetServiceCodesReport([FromBody]ServiceCodesReportFilter filter)
-        {
-            if (filter.To.HasValue)
-            {
-                filter.To = filter.To.Value.AddDays(1);
-            }
-            return await _serviceCodeService.GetServiceCodesReportAsync(filter);
         }
 
         [HttpPost]

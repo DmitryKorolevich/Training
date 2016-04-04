@@ -137,29 +137,29 @@
 				</label>
 				<label class="cart-total-value" data-bind="text: Model.DiscountTotal() ? formatCurrency(Model.DiscountTotal()) : ''">@(Model.DiscountTotal?.ToString("C2"))</label>
 			</div>
-			<div class="cart-total-line" data-bind="visible: Model.GiftCertificatesTotal() != null && Model.GiftCertificatesTotal() != 0" style="display: none;">
-				<label>
-					Gift Certificates
-				</label>
-				<label class="cart-total-value" data-bind="text: Model.GiftCertificatesTotal() ? formatCurrency(Model.GiftCertificatesTotal()) : ''">@(Model.GiftCertificatesTotal?.ToString("C2"))</label>
-			</div>
 			<div class="cart-total-line">
 				<label>
 					Shipping
 				</label>
 				<label class="cart-total-value" data-bind="text: Model.ShippingCost() ? formatCurrency(Model.ShippingCost()) : 'FREE!'">@(Model.ShippingCost.HasValue ? Model.ShippingCost.Value.ToString("C2") : "FREE!")</label>
 			</div>
-			<div class="cart-total-line" data-bind="visible: Model.Tax() != null && Model.Tax() != 0">
-				<label>
-					Tax
-				</label>
-				<label class="cart-total-value" data-bind="text: Model.Tax() ? formatCurrency(Model.Tax()) : ''">@(Model.Tax.ToString("C2"))</label>
-			</div>
+		    <div class="cart-total-line" data-bind="visible: Model.Tax() != null && Model.Tax() != 0">
+		        <label>
+		            Tax
+		        </label>
+		        <label class="cart-total-value" data-bind="text: Model.Tax() ? formatCurrency(Model.Tax()) : ''">@(Model.Tax.ToString("C2"))</label>
+		    </div>
+            <div class="cart-total-line" data-bind="visible: Model.GiftCertificatesTotal() != null && Model.GiftCertificatesTotal() != 0" style="display: none;">
+                <label>
+                    Gift Certificates
+                </label>
+                <label class="cart-total-value" data-bind="text: Model.GiftCertificatesTotal() ? formatCurrency(Model.GiftCertificatesTotal()) : ''">@(Model.GiftCertificatesTotal?.ToString("C2"))</label>
+            </div>
 			<div class="cart-total-line cart-order-summary">
 				<label>
 					Order Total
 				</label>
-				<label class="cart-total-value" data-bind="text: Model.OrderTotal() ? formatCurrency(Model.OrderTotal()) : ''">@Model.OrderTotal.ToString("C2")</label>
+				<label class="cart-total-value" data-bind="text: formatCurrency(Model.OrderTotal())">@Model.OrderTotal.ToString("C2")</label>
 			</div>
 			<div class="cart-promo-container">
 				<i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Promo Code" data-tooltip-body="If you have a discount code, enter it in the box to see the change in your order's total."></i>

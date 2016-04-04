@@ -65,9 +65,10 @@ namespace VitalChoice.DynamicData.Base
         protected virtual Expression<Func<TEntity, bool>> AdditionalDefaultConditions => null;
 
         protected async Task<List<TEntity>> SelectEntitiesAsync(Expression<Func<TEntity, bool>> query = null,
-            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null)
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null)
         {
-            var queryFluent = BuildQueryFluent(query, includesOverride, null);
+            var queryFluent = BuildQueryFluent(query, includesOverride, orderBy);
             var entities = await queryFluent.SelectAsync(false);
             await ProcessEntities(entities);
             return entities;
@@ -146,16 +147,19 @@ namespace VitalChoice.DynamicData.Base
         }
 
         public Task<List<TDynamic>> SelectAsync(IQueryObject<TEntity> queryObject = null,
-            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null, bool withDefaults = false)
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, 
+            bool withDefaults = false)
         {
-            return SelectAsync(queryObject?.Query(), includesOverride, withDefaults);
+            return SelectAsync(queryObject?.Query(), includesOverride, orderBy, withDefaults);
         }
 
         public async Task<List<TDynamic>> SelectAsync(Expression<Func<TEntity, bool>> query = null,
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             bool withDefaults = false)
         {
-            return await DynamicMapper.FromEntityRangeAsync(await SelectEntitiesAsync(query, includesOverride), withDefaults);
+            return await DynamicMapper.FromEntityRangeAsync(await SelectEntitiesAsync(query, includesOverride, orderBy), withDefaults);
         }
 
         public Task<TDynamic> SelectFirstAsync( IQueryObject<TEntity> queryObject = null,
@@ -197,7 +201,7 @@ namespace VitalChoice.DynamicData.Base
             
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null, bool withDefaults = false)
         {
-            return SelectAsync(query, includesOverride, withDefaults).Result;
+            return SelectAsync(query, includesOverride, withDefaults: withDefaults).Result;
         }
 
         public TDynamic SelectFirst( IQueryObject<TEntity> queryObject = null,
@@ -247,7 +251,7 @@ namespace VitalChoice.DynamicData.Base
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
             bool withDefaults = false)
         {
-            return SelectAsync(queryObject?.Query(), includesOverride, withDefaults).Result;
+            return SelectAsync(queryObject?.Query(), includesOverride, withDefaults: withDefaults).Result;
         }
 
         #endregion

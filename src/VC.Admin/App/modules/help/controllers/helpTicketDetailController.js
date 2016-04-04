@@ -163,6 +163,7 @@ function ($scope, $rootScope, $state, $stateParams, helpService, toaster, modalU
             {
                 successSaveNewCommentHandler(result);
                 $scope.newHelpTicketComment.Comment = '';
+                $scope.forms.newComment.submitted = false;
             }).error(function (result)
             {
                 errorHandler(result);

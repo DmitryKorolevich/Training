@@ -273,6 +273,12 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.TaxTotal = dynamic.TaxTotal;
                 entity.Total = dynamic.Total;
 
+                entity.ReshipProblemSkus.MergeKeyed(dynamic.ReshipProblemSkus, p=>p.IdSku,pp=>pp.IdSku, s => new ReshipProblemSku()
+                {
+                    IdOrder = dynamic.Id,
+                    IdSku = s.IdSku,
+                });
+
                 await _orderAddressMapper.UpdateEntityAsync(dynamic.ShippingAddress, entity.ShippingAddress);
 
                 entity.IdCustomer = dynamic.Customer.Id;

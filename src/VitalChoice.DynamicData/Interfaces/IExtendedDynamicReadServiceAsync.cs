@@ -20,10 +20,14 @@ namespace VitalChoice.DynamicData.Interfaces
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null);
 
         Task<List<T>> SelectAsync(IQueryObject<TEntity> queryObject = null,
-            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null, bool withDefaults = false);
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            bool withDefaults = false);
 
         Task<List<T>> SelectAsync(Expression<Func<TEntity, bool>> query = null,
-            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null, bool withDefaults = false);
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            bool withDefaults = false);
 
         Task<T> SelectFirstAsync(IQueryObject<TEntity> queryObject = null,
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,

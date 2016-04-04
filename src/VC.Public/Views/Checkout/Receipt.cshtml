@@ -238,15 +238,6 @@
 		        </label>
 	        </div>
         }
-        @if (Model.GiftCertificatesTotal.HasValue && Model.GiftCertificatesTotal.Value != 0)
-        {
-	        <div class="cart-total-line">
-		        @Html.LabelFor(x => x.GiftCertificatesTotal)
-		        <label class="cart-total-value">
-			        @Model.GiftCertificatesTotal.Value.ToString("C2")
-		        </label>
-	        </div>
-        }
         <div class="cart-total-line">
             @Html.LabelFor(x => x.ShippingCost)
             <label class="cart-total-value">
@@ -262,6 +253,15 @@
 			    </label>
 		    </div>
 	    }
+        @if (Model.GiftCertificatesTotal.HasValue && Model.GiftCertificatesTotal.Value != 0)
+        {
+            <div class="cart-total-line">
+                @Html.LabelFor(x => x.GiftCertificatesTotal)
+                <label class="cart-total-value">
+                    @Model.GiftCertificatesTotal.Value.ToString("C2")
+                </label>
+            </div>
+        }
         <div class="cart-total-line cart-order-summary">
             @Html.LabelFor(x => x.OrderTotal)
             <label class="cart-total-value">

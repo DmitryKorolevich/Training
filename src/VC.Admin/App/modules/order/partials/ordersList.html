@@ -136,7 +136,7 @@
                             </span>
                         </th>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Id')">
-                            <span>Order ID</span>
+                            <span>Order #</span>
                             <span data-ng-if="filter.Sorting.Path == 'Id'">
                                 <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
                                 <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
@@ -198,7 +198,7 @@
                             <a ui-sref="index.oneCol.customerDetail({id: {{::item.IdCustomer}}})">{{::item.Customer}}</a>
                         </td>
                         <td>
-                            <a ui-sref="{{::item.IdObjectType==5 ? 'index.oneCol.orderReshipDetail({id: item.Id })' : 'index.oneCol.orderDetail({id: item.Id })'}}">{{::item.Id}}</a>
+                            <a ui-sref="{{::item.IdObjectType==5 ? 'index.oneCol.orderReshipDetail({id: item.Id })' : item.IdObjectType==6 ? 'index.oneCol.orderRefundDetail({id: item.Id })' : 'index.oneCol.orderDetail({id: item.Id })'}}">{{::item.Id}}</a>
                         </td>
                         <td>{{::item.Total | currency}}</td>
                         <td>{{::item.DateEdited | date:"MM/dd/yy"}}<br />{{::item.DateEdited | date:"h:mm a"}}<br />{{::item.EditedByAgentId}}</td>

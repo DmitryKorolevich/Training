@@ -49,13 +49,18 @@ $(function () {
 					contentType: "application/json; charset=utf-8",
 					type: "POST"
 				}).success(function (result) {
-				    if (result.Success) {
+				    if (result.Success)
+				    {
+				        if (result.Data != '/checkout/receipt')
+				        {
+				            self.refreshing(false);
+				        }
 				        window.location.href = result.Data;
 					} else
-					{
+				    {
+				        self.refreshing(false);
 					    processErrorResponse(result);
 					}
-					self.refreshing(false);
 				}).error(function (result)
 				{
 				    processErrorResponse();
@@ -84,10 +89,10 @@ function formatCurrency(value) {
 	}
 
 	if (value >= 0) {
-		return "$" + value.toFixed(2);
+		return "${0}".format(value.toFixed(2));
 	}
 	else {
-		return "-$" + Math.abs(value).toFixed(2);
+		return "(${0})".format(Math.abs(value).toFixed(2));
 	}
 }
 
@@ -122,15 +127,19 @@ function recalculateCart(viewModel, successCallback) {
 			data: ko.toJSON(viewModel.Model),
 			contentType: "application/json; charset=utf-8",
 			type: "POST"
-		}).success(function(result) {
+		}).success(function (result)
+		{
 		    if (result.Success) {
 		        $("span[data-valmsg-for]").text('');
 		        $("div.validation-summary-errors").html('');
-				if (successCallback) {
-					successCallback();
+		        if (successCallback)
+		        {
+		            viewModel.refreshing(false);
+				    successCallback();
 				} else {
 					ko.mapping.fromJS(result.Data, { 'ignore': ["ShipAsap", "PromoCode", "ShippingDate"] }, viewModel.Model);
 					processServerMessages(viewModel.Model);
+					viewModel.refreshing(false);
 				}
 			} else
 			{
@@ -139,8 +148,8 @@ function recalculateCart(viewModel, successCallback) {
 			        ko.mapping.fromJS(result.Data, { 'ignore': ["ShipAsap", "PromoCode", "ShippingDate"] }, viewModel.Model);
 			    }
 			    processErrorResponse(result);
+			    viewModel.refreshing(false);
 			}
-			viewModel.refreshing(false);
 		}).error(function (result)
 		{
 		    processErrorResponse();

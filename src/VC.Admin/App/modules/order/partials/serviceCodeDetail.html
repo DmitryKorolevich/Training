@@ -1,0 +1,172 @@
+﻿<div class="container-fluid service-code-details">
+    <div class="well">
+        <span class="legend">Service Code: {{getReferenceItem(ReferenceData.ServiceCodes, options.ServiceCode).Text}}</span>
+        <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate>
+            <fieldset>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="From" data-ng-change="filterChanged();" datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.From.$invalid">
+                            <small class="error" ng-show="forms.form.From.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","From")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="To" data-ng-change="filterChanged();" datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.To.$invalid">
+                            <small class="error" ng-show="forms.form.To.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","To")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-info" data-ng-click="filterItems();" type="button">Filter</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+        <span class="legend">New Service Code</span>
+        <form class="form-horizontal" name="forms.newCode" data-ng-submit="save()" data-ng-class="{submitted: forms.newCode.submitted}" novalidate>
+            <fieldset>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <select class="form-control" name="NewServiceCode" placeholder="New Service Code" data-ng-required="true" data-ng-model="options.NewServiceCode" data-ng-options="item.Key as item.Text for item in ReferenceData.ServiceCodes"></select>
+                        <div class="error-container" ng-show="forms.newCode.submitted && forms.newCode.NewServiceCode.$invalid">
+                            <small class="error" ng-show="forms.newCode.NewServiceCode.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","New Service Code")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-info" data-ng-click="reassignItems();" type="button">Reassign</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+        <span class="legend">Refunds</span>
+        <div class="row form-group">
+            <div class="col-md-12">
+                <a target="_self" class="btn btn-primary pull-right" data-ng-href={{options.refundExportUrl}}>Export</a>
+            </div>
+        </div>
+        <spinner-overlay data-loading="refreshTracker.active()">
+            <table class="table table-striped table-hover margin-bottom-30px">
+                <thead>
+                    <tr>
+                        <th>Order Number</th>
+                        <th>Order Date</th>
+                        <th>Original Order Number</th>
+                        <th>Amount</th>
+                        <th>Issues Sku</th>
+                        <th>Comments</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="item in refunds">
+                        <td>
+                            <div class="checkbox margin-top-0px">
+                                <label>
+                                    <input data-ng-model="item.Assign" type="checkbox">
+                                    <a ui-sref="index.oneCol.orderRefundDetail({id: item.Id })">{{::item.Id}}</a>
+                                </label>
+                            </div>
+                        </td>
+                        <td>{{::item.DateCreated | date:"MM/dd/yy"}}</td>
+                        <td>
+                            <a ui-sref="index.oneCol.orderDetail({id: item.IdOrderSource })">{{::item.IdOrderSource}}</a>
+                        </td>
+                        <td data-ng-if="item.Total>=0">{{::item.Total | currency}}</td>
+                        <td data-ng-if="item.Total<0">({{::Math.abs(item.Total) | currency}})</td>
+                        <td>
+                            <span data-ng-repeat="code in item.SkuCodes">
+                                {{code}}
+                                <span data-ng-if="!$last">,</span>
+                            </span>
+                        </td>
+                        <td>{{::item.OrderNotes}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </spinner-overlay>
+        <pagination boundary-links="true"
+                    total-items="totalRefundItems"
+                    items-per-page="RefundPaging.PageItemCount"
+                    data-ng-model="RefundPaging.PageIndex"
+                    previous-text="&lsaquo;"
+                    next-text="&rsaquo;"
+                    first-text="&laquo;"
+                    last-text="&raquo;"
+                    data-ng-change="refreshRefunds()">
+        </pagination>
+        <span class="legend">Reships</span>
+        <div class="row form-group">
+            <div class="col-md-12">
+                <a target="_self" class="btn btn-primary pull-right" data-ng-href={{options.reshipExportUrl}}>Export</a>
+            </div>
+        </div>
+        <spinner-overlay data-loading="refreshTracker.active()">
+            <table class="table table-striped table-hover margin-bottom-30px">
+                <thead>
+                    <tr>
+                        <th>Order Number</th>
+                        <th>Order Date</th>
+                        <th>Original Order Number</th>
+                        <th>Ship Date</th>
+                        <th>Warehouse</th>
+                        <th>Dest. State</th>
+                        <th>Carrier</th>
+                        <th>Ship Service</th>
+                        <th>Amount</th>
+                        <th>Issues Sku</th>
+                        <th>Comments</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="item in reships">
+                        <td>
+                            <div class="checkbox margin-top-0px">
+                                <label>
+                                    <input data-ng-model="item.Assign" type="checkbox">
+                                    <a ui-sref="index.oneCol.orderReshipDetail({id: item.Id })">{{::item.Id}}</a>
+                                </label>
+                            </div>
+                        </td>
+                        <td>{{::item.DateCreated | date:"MM/dd/yy"}}</td>
+                        <td>
+                            <a ui-sref="index.oneCol.orderDetail({id: item.IdOrderSource })">{{::item.IdOrderSource}}</a>
+                        </td>
+                        <td>{{::item.ShipDate | date:"MM/dd/yy"}}</td>
+                        <td>{{::item.Warehouse}}</td>
+                        <td>{{::item.ShippingStateCode}}</td>
+                        <td>{{::item.Carrier}}</td>
+                        <td>{{::item.ShipService}}</td>
+                        <td data-ng-if="item.Total>=0">{{::item.Total | currency}}</td>
+                        <td data-ng-if="item.Total<0">({{::Math.abs(item.Total) | currency}})</td>
+                        <td>
+                            <span data-ng-repeat="code in item.SkuCodes">
+                                {{code}}
+                                <span data-ng-if="!$last">,</span>
+                            </span>
+                        </td>
+                        <td>{{::item.OrderNotes}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </spinner-overlay>
+        <pagination boundary-links="true"
+                    total-items="totalReshipItems"
+                    items-per-page="ReshipPaging.PageItemCount"
+                    data-ng-model="ReshipPaging.PageIndex"
+                    previous-text="&lsaquo;"
+                    next-text="&rsaquo;"
+                    first-text="&laquo;"
+                    last-text="&raquo;"
+                    data-ng-change="refreshReships()">
+        </pagination>
+    </div>
+</div>

@@ -106,9 +106,10 @@
                                                 <span>{{comment.Comment}}</span>
                                             </div>
                                             <div data-ng-if="comment.IsEdit" class="col-md-9">
-                                                <textarea type="text" name="Comment" class="form-control" placeholder="Comment" rows="10" data-ng-model="comment.EditComment" required></textarea>
+                                                <textarea type="text" name="Comment" class="form-control" placeholder="Comment" rows="10" data-ng-model="comment.EditComment" data-ng-maxlength="1000" required></textarea>
                                                 <div class="error-container" ng-show="forms.existComment.submitted && forms.existComment.Comment.$invalid">
                                                     <small class="error" ng-show="forms.existComment.Comment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Comment")}}</small>
+                                                    <small class="error" ng-show="forms.existComment.Comment.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Comment", "1000"])}}</small>
                                                     <small class="error" ng-show="forms.existComment.Comment.$error.server">{{serverMessages.GetMessage('Comment')}}</small>
                                                 </div>
                                             </div>
@@ -123,9 +124,10 @@
                                     <div class="form-group">
                                         <label for="" class="col-md-3 control-label">Comment</label>
                                         <div class="col-md-9">
-                                            <textarea type="text" name="Comment" class="form-control" placeholder="Comment" rows="10" data-ng-model="newHelpTicketComment.Comment" required></textarea>
+                                            <textarea type="text" name="Comment" class="form-control" placeholder="Comment" rows="10" data-ng-model="newHelpTicketComment.Comment" required data-ng-maxlength="1000"></textarea>
                                             <div class="error-container" ng-show="forms.newComment.submitted && forms.newComment.Comment.$invalid">
                                                 <small class="error" ng-show="forms.newComment.Comment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Comment")}}</small>
+                                                <small class="error" ng-show="forms.newComment.Comment.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Comment", "1000"])}}</small>
                                                 <small class="error" ng-show="forms.newComment.Comment.$error.server">{{serverMessages.GetMessage('Comment')}}</small>
                                             </div>
                                         </div>

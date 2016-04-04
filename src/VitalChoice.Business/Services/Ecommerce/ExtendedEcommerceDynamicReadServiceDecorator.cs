@@ -33,14 +33,18 @@ namespace VitalChoice.Business.Services.Ecommerce
             return _extendedReadService.SelectAsync(ids, withDefaults, includesOverride);
         }
 
-        public Task<List<TDynamic>> SelectAsync(IQueryObject<TEntity> queryObject = null, Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null, bool withDefaults = false)
+        public Task<List<TDynamic>> SelectAsync(IQueryObject<TEntity> queryObject = null, Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            bool withDefaults = false)
         {
-            return _extendedReadService.SelectAsync(queryObject, includesOverride, withDefaults);
+            return _extendedReadService.SelectAsync(queryObject, includesOverride, orderBy, withDefaults);
         }
 
-        public Task<List<TDynamic>> SelectAsync(Expression<Func<TEntity, bool>> query = null, Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null, bool withDefaults = false)
+        public Task<List<TDynamic>> SelectAsync(Expression<Func<TEntity, bool>> query = null, Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            bool withDefaults = false)
         {
-            return _extendedReadService.SelectAsync(query, includesOverride, withDefaults);
+            return _extendedReadService.SelectAsync(query, includesOverride, orderBy, withDefaults);
         }
 
         public Task<TDynamic> SelectFirstAsync(IQueryObject<TEntity> queryObject = null, Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, bool withDefaults = false)

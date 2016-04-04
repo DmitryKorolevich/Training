@@ -1,6 +1,6 @@
 ﻿angular.module('app.modules.order.controllers.serviceCodesReportController', [])
-.controller('serviceCodesReportController', ['$scope', '$rootScope', '$state', 'orderService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
-    function ($scope, $rootScope, $state, orderService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil)
+.controller('serviceCodesReportController', ['$scope', '$rootScope', '$state', 'serviceCodeService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
+    function ($scope, $rootScope, $state, serviceCodeService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil)
     {
         $scope.refreshTracker = promiseTracker("refresh");
 
@@ -27,7 +27,7 @@
                 data.To = data.To.toServerDateTime();
             }
 
-            orderService.getServiceCodesReport(data, $scope.refreshTracker)
+            serviceCodeService.getServiceCodesReport(data, $scope.refreshTracker)
                 .success(function (result) {
                     if (result.Success) {
                         $scope.report = result.Data;
@@ -67,6 +67,24 @@
             {
                 $scope.forms.form.submitted = false;
                 refreshItems();
+            }
+            else
+            {
+                $scope.forms.form.submitted = true;
+            }
+        };
+
+        $scope.goToDetails = function (code)
+        {
+            if ($scope.forms.form.$valid)
+            {
+                $scope.forms.form.submitted = false;
+                $state.go('index.oneCol.serviceCodeDetail',
+                    {
+                        id: code,
+                        from: $scope.filter.From.toQueryParamDateTime(),
+                        to: $scope.filter.To.toQueryParamDateTime(),
+                    });
             }
             else
             {

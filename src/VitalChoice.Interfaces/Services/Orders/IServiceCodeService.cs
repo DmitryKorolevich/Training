@@ -17,8 +17,16 @@ using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 
 namespace VitalChoice.Interfaces.Services.Orders
 {
-	public interface IServiceCodeService
-	{
+    public interface IServiceCodeService
+    {
         Task<ServiceCodesReport> GetServiceCodesReportAsync(ServiceCodesReportFilter filter);
+
+        Task<PagedList<ServiceCodeRefundItem>> GetServiceCodeRefundItemsAsync(ServiceCodeItemsFilter filter);
+
+        Task<PagedList<ServiceCodeReshipItem>> GetServiceCodeReshipItemsAsync(ServiceCodeItemsFilter filter);
+
+        Task<bool> AssignServiceCodeForRefundsAsync(IEnumerable<int> ids, int serviceCode);
+
+        Task<bool> AssignServiceCodeForReshipsAsync(IEnumerable<int> ids, int serviceCode);
     }
 }

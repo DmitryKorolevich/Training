@@ -1182,6 +1182,25 @@ header .search-area {
         clear: both;
         width: 100%;
         min-height: 200px;
+
+        i.tooltip-h,
+	    i.tooltip-l,
+	    i.tooltip-v{
+		    color: #C3392F;
+		    font-size: 18px;
+		    cursor: help;
+		    margin-top: 6px;
+		    margin-left: 10px;
+		    vertical-align:middle;
+
+		    &:hover{
+			    color: #BD281E;
+		    }
+
+		    &.on-input-box{
+			    vertical-align:top;
+		    }
+	    }
     }
 }
 
@@ -3175,6 +3194,10 @@ footer {
 					margin-bottom:0;
 				}
 			}
+
+            .field-validation-error {
+                max-width: 200px;
+            }
         }
     }
 
@@ -5331,7 +5354,7 @@ h6.cart-head{
 
 	i.tooltip-v{
 		vertical-align: top;
-		margin-top: 17px;
+		margin-top: 14px;
 	}
 }
 
@@ -5363,6 +5386,10 @@ h6.cart-head{
 	width:110px;
 	padding: 3px 0;
 	margin-bottom:20px;
+
+    i.tooltip-v{
+        margin-top: -5px;
+    }
 }
 
 .autoship-delivery-data{

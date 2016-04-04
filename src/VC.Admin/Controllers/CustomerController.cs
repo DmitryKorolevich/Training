@@ -442,6 +442,11 @@ namespace VC.Admin.Controllers
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
             }
 
+            if (result.IdObjectType == (int) CustomerType.Wholesale && result.SafeData.InceptionDate == null)
+            {
+                result.Data.InceptionDate = DateTime.Now;
+            }
+
             var customerModel = _customerMapper.ToModel<AddUpdateCustomerModel>(result);
 
 	        var login = await _storefrontUserService.GetAsync(customerModel.Id);

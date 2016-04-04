@@ -1142,7 +1142,7 @@ namespace VitalChoice.Business.Services.Orders
             }
             if (others.Any())
             {
-                res.AddRange(await InsertRangeInternalAsync(models, uow));
+                res.AddRange(await UpdateRangeInternalAsync(models, uow));
             }
 
             return res;

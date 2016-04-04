@@ -109,6 +109,7 @@ angular.module('app.core.utils.appBootstrap', [])
 	        bindRootScope();
 
 	        $rootScope.appStarted = false;
+	        $rootScope.Math = window.Math;
 	        $rootScope.ReferenceData = {};
 
 	        infrastructureService.getReferenceData().success(function (res) {

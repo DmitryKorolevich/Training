@@ -22,7 +22,7 @@
                                 <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                             </span>
                         </p>
-                        <div class="error-container" ng-show="forms.form.submitted && forms.filterForm.To.$invalid">
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.To.$invalid">
                             <small class="error" ng-show="forms.form.To.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","To")}}</small>
                         </div>
                     </div>
@@ -50,7 +50,7 @@
                 <tbody>
                     <tr data-ng-repeat="item in report.Items">
                         <td>
-                            <a data-ng-if="::item.Id" ui-sref="index.oneCol.serviceCodeDetails({id:item.Id})">{{::item.Name}}</a>
+                            <a data-ng-if="::item.Id" data-ng-click="goToDetails(item.Id)">{{::item.Name}}</a>
                             <span data-ng-if="::!item.Id">{{::item.Name}}</span>
                         </td>
                         <td>{{::item.ReshipsCount}}</td>
@@ -85,7 +85,7 @@
                 <tbody>
                     <tr data-ng-repeat="item in report.Items">
                         <td>
-                            <a data-ng-if="::item.Id" ui-sref="index.oneCol.serviceCodeDetails({id:item.Id})">{{::item.Name}}</a>
+                            <a data-ng-if="::item.Id" data-ng-click="goToDetails(item.Id)">{{::item.Name}}</a>
                             <span data-ng-if="::!item.Id">{{::item.Name}}</span>
                         </td>
                         <td>
