@@ -16,7 +16,7 @@ namespace VitalChoice.Core.GlobalFilters
         // \u{F9}
         // %FF
         private static readonly Regex ForbiddenStringsRegex =
-            new Regex("^.*([<>\"'&]|\\\\u[0-9A-F]{2,5}|\\\\u\\{[0-9A-F]{2,5}\\}|%[0-9A-F]{2}).*$",
+            new Regex("[<>\"'&]|\\\\u[0-9A-F]{1,5}|\\\\u\\{[0-9A-F]{1,5}\\}|%[0-9A-F]{1,2}",
                 RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public Task<ModelBindingResult> BindModelAsync(ModelBindingContext bindingContext)
