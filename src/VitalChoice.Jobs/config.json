@@ -1,0 +1,17 @@
+﻿{
+  "App": {
+    "DefaultCultureId": "en-US",
+    "Connection": {
+      "UserName": "dev_vcdb_login",
+      "Password": "CCQLaskw3pMFU9XqE6CHp28m",
+      "Server": "vw4v86cs0h.database.windows.net"
+    },
+    "LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
+    "CacheSettings": {
+      "MaxProcessHeapsSizeBytes": 1572864000, //1500 Mb, entire application
+      "CacheTimeToLeaveSeconds": 1800, //30 minutes
+      "CacheScanPeriodSeconds": 900 //15 minutes
+    },
+    "AutoShipSchedule": "0/10 * * * * ?"
+  }
+}

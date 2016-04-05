@@ -64,6 +64,7 @@ using VitalChoice.ContentProcessing.Helpers;
 using VitalChoice.DynamicData.Extensions;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNet.Authentication.Cookies;
+using Microsoft.AspNet.Hosting;
 using VitalChoice.Business.Repositories;
 using VitalChoice.Core.Infrastructure.Helpers.ReCaptcha;
 using VitalChoice.DynamicData.Interfaces;
@@ -100,7 +101,7 @@ namespace VitalChoice.Core.DependencyInjection
     public abstract class DefaultDependencyConfig : IDependencyConfig
     {
         public IServiceProvider RegisterInfrastructure(IConfiguration configuration, IServiceCollection services,
-            Assembly projectAssembly)
+            Assembly projectAssembly, IApplicationEnvironment appEnv = null)
         {
             // Add EF services to the services container.
 #if !DOTNET5_4
@@ -163,7 +164,12 @@ namespace VitalChoice.Core.DependencyInjection
 
             var builder = new ContainerBuilder();
 
-            builder.Populate(services);
+			if (appEnv != null)
+	        {
+				builder.RegisterInstance(appEnv).As<IApplicationEnvironment>();
+			}
+
+			builder.Populate(services);
             builder.RegisterInstance(configuration).As<IConfiguration>();
             builder.RegisterType<LoggerProviderExtended>()
                 .As<ILoggerProviderExtended>()
@@ -583,7 +589,7 @@ namespace VitalChoice.Core.DependencyInjection
 
         }
 
-	    protected virtual void FinishCustomRegistrations(ContainerBuilder builder)
+		protected virtual void FinishCustomRegistrations(ContainerBuilder builder)
 	    {
 	    }
 

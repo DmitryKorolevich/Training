@@ -4,12 +4,28 @@ using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Discounts;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VitalChoice.Business.Helpers
 {
     public static class BusinessHelper
     {
+		public static DateTime FindNextAutoShipDate(DateTime orderDate, int frequency)
+		{
+			if (frequency <= 0)
+				throw new ApiException("Invalid auto-ship frequency");
+
+			var difference = DateTime.Now - orderDate;
+			var cyclesAdd = (int)(difference.Days / 30.0 / frequency);
+			var next = orderDate.AddMonths(cyclesAdd * frequency);
+			if (next < DateTime.Today)
+			{
+				next = next.AddMonths(frequency);
+			}
+			return next;
+		}
+
 		public static string ResolveStateOrCounty(ICollection<Country> countries, AddressDynamic address)
 		{
 			var target = countries.Single(x => x.Id == address.IdCountry);

@@ -843,7 +843,18 @@ namespace VitalChoice.Business.Services.Orders
             await _orderRepository.UpdateAsync(autoShip);
         }
 
-        public async Task<bool> CancelOrderAsync(int id)
+	    public async Task SubmitAutoShipOrders()
+	    {
+			var orderQuery = new OrderQuery().NotDeleted().WithOrderType(OrderType.AutoShip).WithoutIncomplete();
+
+			var filter = new FilterBase();
+
+			var autoShips =
+				await
+					SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, orderQuery, null, null, true);
+		}
+
+	    public async Task<bool> CancelOrderAsync(int id)
         {
             var toReturn = false;
             var order = await SelectAsync(id, false);

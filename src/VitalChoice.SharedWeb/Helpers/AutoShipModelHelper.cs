@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Services;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -54,7 +55,7 @@ namespace VitalChoice.SharedWeb.Helpers
 
 			result.DisplayName = displayName;
 			result.Active = orderDynamic.StatusCode == (int)RecordStatusCode.Active;
-			result.NextDate = ViewModelHelper.FindNextAutoShipDate(orderDynamic.DateCreated, result.Frequency);
+			result.NextDate = BusinessHelper.FindNextAutoShipDate(orderDynamic.DateCreated, result.Frequency);
 			result.Id = orderDynamic.Id;
 
 		    return result;
