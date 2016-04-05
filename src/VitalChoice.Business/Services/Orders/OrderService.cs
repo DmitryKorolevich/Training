@@ -281,6 +281,14 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         entity.DateCreated = DateTime.Now;
                         await uow.SaveChangesAsync();
+                        if (model.Discount?.Id > 0)
+                        {
+                            await _discountService.SetDiscountUsed(model.Discount, model.Customer.Id);
+                        }
+                    }
+                    else if (model.IsAnyNotIncomplete())
+                    {
+                        await ChargeOnetimeDiscount(model, initial);
                     }
                     if (model.IsAnyNotIncomplete())
                     {
@@ -291,7 +299,6 @@ namespace VitalChoice.Business.Services.Orders
                             await UpdateHealthwiseOrder(model, uow);
                         }
                         //charge one-time discount, remove old charge if different
-                        await ChargeOnetimeDiscount(model, initial);
                         paymentCopy.IdOrder = entity.Id;
                         if (!await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy))
                         {
@@ -960,7 +967,7 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         res = await InsertAsyncInternal(model, uow);
 
-                        if (model.OrderStatus != OrderStatus.Incomplete)
+                        if (model.IsAnyNotIncomplete())
                         {
                             model.IdObjectType = (int)OrderType.Normal;
                             model.Data.AutoShipFrequency = null;
@@ -1094,7 +1101,7 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         res = await UpdateInternalAsync(model, uow);
 
-                        if (previous.OrderStatus == OrderStatus.Incomplete && model.OrderStatus != OrderStatus.Incomplete)
+                        if (previous.IsAnyIncomplete() && model.IsAnyNotIncomplete())
                         {
                             model.IdObjectType = (int)OrderType.Normal;
                             model.Data.AutoShipFrequency = null;
