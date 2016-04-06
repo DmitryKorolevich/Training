@@ -900,6 +900,8 @@ namespace VitalChoice.Business.Services.Orders
 		    {
 			    var autoShip = await SelectAsync(id);
 
+				Logger.LogInformation($"AutoShip {autoShip.Id} suitable for order submit");
+
 			    using (var uow = CreateUnitOfWork())
 			    {
 				    using (var transaction = uow.BeginTransaction())
@@ -920,11 +922,15 @@ namespace VitalChoice.Business.Services.Orders
 						    await InsertAsyncInternal(standardOrder, uow);
 
 						    transaction.Commit();
-					    }
-					    catch
+
+							Logger.LogInformation($"AutoShip {autoShip.Id} handled successfully");
+						}
+					    catch(Exception ex)
 					    {
 							transaction.Rollback();
-							throw;
+
+							Logger.LogError(ex.Message, ex);
+							Logger.LogError($"AutoShip {autoShip.Id} skipped due to error ocurred");
 						}
 				    }
 			    }
