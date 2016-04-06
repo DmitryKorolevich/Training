@@ -872,8 +872,9 @@ namespace VitalChoice.Business.Services.Orders
 			var toProcess = new List<int>();
 		    foreach (var frequency in frequencyAvailable)
 		    {
-			    var tempDate = currentDate.AddMonths(-frequency);
-			    var vAutoShips =
+			    var tempDate = currentDate.AddDays(-frequency);//AddMonths(-frequency);
+
+				var vAutoShips =
 				    await _vAutoShipRepository.Query(
 					    x =>
 						    x.AutoShipFrequency == frequency &&
