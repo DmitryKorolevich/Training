@@ -4,6 +4,7 @@ using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
+using VitalChoice.Infrastructure.Extensions;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Core;
@@ -81,7 +82,7 @@ namespace VitalChoice.Business.Workflow.ActionResolvers
             {
                 var discountService = executionContext.Resolve<IDiscountService>();
                 var usageCount = await discountService.GetDiscountUsed(dataContext.Order.Discount, dataContext.Order.Customer.Id);
-                if (dataContext.Order.Id > 0)
+                if (dataContext.Order.Id > 0 && dataContext.Order.IsAnyNotIncomplete())
                 {
                     var orderRepository = executionContext.Resolve<IEcommerceRepositoryAsync<Order>>();
                     var originalOrder = await orderRepository.Query(o => o.Id == dataContext.Order.Id).SelectFirstOrDefaultAsync(false);
@@ -90,7 +91,7 @@ namespace VitalChoice.Business.Workflow.ActionResolvers
                         usageCount--;
                     }
                 }
-                if (usageCount >= (int?) dataContext.Order.Discount.Data.MaxTimesUse)
+                if (usageCount >= (int?) dataContext.Order.Discount?.Data.MaxTimesUse)
                 {
                     dataContext.Messages.Add(new MessageInfo
                     {

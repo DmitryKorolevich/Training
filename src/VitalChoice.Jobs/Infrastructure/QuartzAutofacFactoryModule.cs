@@ -5,7 +5,7 @@ using Quartz;
 using Quartz.Impl;
 using Quartz.Spi;
 
-namespace VitalChoice.Jobs.Jobs
+namespace VitalChoice.Jobs.Infrastructure
 {
 	public class QuartzAutofacFactoryModule : Module
 	{

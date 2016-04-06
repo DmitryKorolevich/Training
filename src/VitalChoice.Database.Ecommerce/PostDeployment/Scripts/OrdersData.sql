@@ -422,3 +422,15 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[OrderOptionTypes] Where Name='LastAutoShipDate' AND IdObjectType=2)
+BEGIN
+
+	INSERT INTO [dbo].[OrderOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'LastAutoShipDate', 6, NULL, 2, NULL)
+
+END
+
+GO

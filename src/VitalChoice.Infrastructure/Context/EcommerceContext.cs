@@ -117,7 +117,13 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(t => t.EditedByAgentId);
             });
 
-            builder.Entity<VOrderWithRegionInfoItem>(entity =>
+			builder.Entity<VAutoShip>(entity =>
+			{
+				entity.HasKey(t => t.Id);
+				entity.ToTable("VAutoShips");
+			});
+
+			builder.Entity<VOrderWithRegionInfoItem>(entity =>
             {
                 entity.HasKey(t => t.Id);
                 entity.ToTable("VOrderWithRegionInfoItems");
