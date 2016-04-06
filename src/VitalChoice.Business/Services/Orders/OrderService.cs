@@ -986,7 +986,10 @@ namespace VitalChoice.Business.Services.Orders
                                 order.GiftCertificates.Clear();
                             }
 
-                            //TODO: add removing one time per a customer discount info
+                            if (order.Discount?.Id > 0)
+                            {
+                                await _discountService.SetDiscountUsed(order.Discount, order.Customer.Id, false);
+                            }
 
                             await uow.SaveChangesAsync();
                             giftCertificateRepository.DetachAll(generatedGcs);
