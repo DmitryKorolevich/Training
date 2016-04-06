@@ -43,13 +43,6 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.Name = entity.Name;
                 dynamic.PublicId = entity.PublicId;
                 dynamic.Hidden = entity.Hidden;
-                if (entity.ProductsToCategories == null)
-                {
-#if !DOTNET5_4
-                    var stackFrame = new StackFrame();
-                    _logger.LogWarning($"Product doesn't have ProductToCategories linkage \n{stackFrame.ToString()}");
-#endif
-                }
                 dynamic.CategoryIds = entity.ProductsToCategories?.Select(p => p.IdCategory).ToList();
                 if (entity.Skus != null)
                 {
