@@ -150,7 +150,12 @@ namespace VC.Public.Controllers
         {
 			var cartModel = new ViewCartModel();
 
-			return await InitCartModelInternal(cartModel);
+			var result = await InitCartModelInternal(cartModel);
+		    if (!ModelState.IsValid)
+		    {
+		        return ResultHelper.CreateErrorResult(ModelState, result);
+		    }
+		    return result;
         }
 
         public async Task<IActionResult> ViewCart()

@@ -159,37 +159,48 @@ function recalculateCart(viewModel, successCallback) {
 }
 
 function initCart() {
-	var viewModel;
+    var viewModel;
 
-	$.ajax({
-		url: "/Cart/InitCartModel",
-		dataType: "json",
-		contentType: "application/json; charset=utf-8",
-		type: "GET"
-	}).success(function (result) {
-		if (result.Success) {
-			viewModel = new Cart(result.Data);
+    $.ajax({
+        url: "/Cart/InitCartModel",
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        type: "GET"
+    }).success(function (result) {
+        var binded = false;
+        if (result.Success) {
+            $("span[data-valmsg-for]").text('');
+            $("div.validation-summary-errors").html('');
 
-			processServerMessages(viewModel.Model);
+            viewModel = new Cart(result.Data);
 
-			$("body").on("click", ".proposals-item-link", function () { addToCart($(this), viewModel); return false;});
-		} else
-		{
-		    processErrorResponse(result);
-		}
+            processServerMessages(viewModel.Model);
 
-		ko.applyBindings(viewModel);
+            $("body").on("click", ".proposals-item-link", function () { addToCart($(this), viewModel); return false; });
+        } else {
+            if (result.Data) {
+                viewModel = new Cart(result.Data);
+                binded = true;
+                ko.applyBindings(viewModel);
+            }
+            
+            viewModel.refreshing(false);
+            processErrorResponse(result);
+        }
 
-		reparseElementValidators("form#viewCartForm");
+        if (!binded) {
+            ko.applyBindings(viewModel);
+        }
 
-		viewModel.refreshing(false);
-		viewModel.initializing = false;
-	}).error(function (result)
-	{
-	    processErrorResponse();
-		viewModel.refreshing(false);
-		viewModel.initializing = false;
-	});
+        reparseElementValidators("form#viewCartForm");
+
+        viewModel.refreshing(false);
+        viewModel.initializing = false;
+    }).error(function (result) {
+        processErrorResponse();
+        viewModel.refreshing(false);
+        viewModel.initializing = false;
+    });
 }
 
 var originalDiscountDescription;

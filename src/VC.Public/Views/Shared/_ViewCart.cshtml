@@ -39,7 +39,7 @@
 				<a class="cart-text-link" data-bind="attr: { href: ProductPageUrl, title: formatDisplayName($data) }, text: formatDisplayName($data)"></a>
 				<span class="cart-sku-code" data-bind="text: '(' + Code() + ')', visible: Code"></span>
 			    <span class="stock-presence-note" data-bind="visible: InStock()">In Stock Ready to Ship</span>
-			    <span class="note" data-bind="text: !InStock() ? 'Out of stock' : '', attr: {'data-valmsg-for': 'Skus.i' + $index() + '.Code'}" data-valmsg-replace="true"></span>
+			    <span class="field-validation-error no-space" data-bind="text: !InStock() ? 'Out of stock' : '', attr: {'data-valmsg-for': 'Skus.i' + $index() + '.Code'}" data-valmsg-replace="true"></span>
 			</td>
 			<td data-bind="text: formatCurrency(Price())"></td>
 			<td class="width-cart-quantity">
@@ -89,7 +89,7 @@
 				<a class="cart-text-link" data-bind="attr: { href: ProductPageUrl, title: formatDisplayName($data) }, text: formatDisplayName($data)"></a>
 				<span class="cart-sku-code" data-bind="text: '(' + Code() + ')', visible: Code"></span>
 			    <span class="stock-presence-note" data-bind="visible: InStock()">In Stock Ready to Ship</span>
-                <span class="note" data-bind="text: !InStock() ? 'Out of stock' : '', attr: {'data-valmsg-for': 'Promos.i' + $index() + '.Code'}" data-valmsg-replace="true"></span>
+                <span class="field-validation-error no-space" data-bind="text: !InStock() ? 'Out of stock' : '', attr: {'data-valmsg-for': 'Promos.i' + $index() + '.Code'}" data-valmsg-replace="true"></span>
 			</td>
 			<td data-bind="text: formatCurrency(Price())"></td>
 			<td class="width-cart-quantity" data-bind="text: Quantity"></td>

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
@@ -11,6 +13,7 @@ using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Interfaces.Services;
 using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Business.Services.Dynamic
@@ -18,13 +21,15 @@ namespace VitalChoice.Business.Services.Dynamic
     public class ProductMapper : DynamicMapper<ProductDynamic, Product, ProductOptionType, ProductOptionValue>
     {
         private readonly SkuMapper _skuMapper;
+        private readonly ILogger _logger;
 
         public ProductMapper(ITypeConverter converter,
             IModelConverterService converterService,
-            SkuMapper skuMapper, IEcommerceRepositoryAsync<ProductOptionType> productRepositoryAsync)
+            SkuMapper skuMapper, IEcommerceRepositoryAsync<ProductOptionType> productRepositoryAsync, ILoggerProviderExtended loggerProvider)
             : base(converter, converterService, productRepositoryAsync)
         {
             _skuMapper = skuMapper;
+            _logger = loggerProvider.CreateLoggerDefault();
         }
 
         protected override async Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<ProductDynamic, Product>> items,
@@ -38,6 +43,13 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.Name = entity.Name;
                 dynamic.PublicId = entity.PublicId;
                 dynamic.Hidden = entity.Hidden;
+                if (entity.ProductsToCategories == null)
+                {
+#if !DOTNET5_4
+                    var stackFrame = new StackFrame();
+                    _logger.LogWarning($"Product doesn't have ProductToCategories linkage \n{stackFrame.ToString()}");
+#endif
+                }
                 dynamic.CategoryIds = entity.ProductsToCategories?.Select(p => p.IdCategory).ToList();
                 if (entity.Skus != null)
                 {

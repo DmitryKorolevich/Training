@@ -3212,10 +3212,14 @@ footer {
 }
 
  .field-validation-error {
-                color: red;
-                margin: 5px 0 0 0px;
-                display: block;
-            }
+    color: red;
+    margin: 5px 0 0 0px;
+    display: block;
+
+    &.no-space {
+        margin: 0;
+    }
+}
 
             .input-validation-error {
                 border: 1px solid red;

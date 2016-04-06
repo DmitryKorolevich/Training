@@ -510,7 +510,12 @@ function trySetFormErrors(result) {
             globalErrors.push(result.Messages[i].Message);
         }
         else {
-            items.text(result.Messages[i].Message);
+            if (items.text().length > 0) {
+                items.append('<p>' + result.Messages[i].Message + '</p>');
+            }
+            else {
+                items.text(result.Messages[i].Message);
+            }
         }
     }
     if (globalErrors.length > 0) {
