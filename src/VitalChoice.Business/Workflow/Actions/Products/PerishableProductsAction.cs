@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Workflow.Base;
@@ -30,7 +31,11 @@ namespace VitalChoice.Business.Workflow.Actions.Products
             if (perishableCount == 1 && (bool) perishableList[0].Sku.Data.DisallowSingle && perishableList[0].Quantity == 1)
             {
                 perishableList[0].Messages.Add(
-                    "It is not possible to ship the single perishable item above. If you wish to order this item, please add another perishable item to your cart.");
+                                new MessageInfo()
+                                {
+                                    MessageLevel = MessageLevel.Error,
+                                    Message = "It is not possible to ship the single perishable item above. If you wish to order this item, please add another perishable item to your cart."
+                                });
             }
             return perishableAmount;
         }

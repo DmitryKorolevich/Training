@@ -110,7 +110,7 @@
                                         <div class="col-md-12 form-horizontal products">
                                             <table class="table table-striped">
                                                 <tbody>
-                                                    <tr data-ng-class="{warning: item.Messages.length>0 || (item.ClientMessages && item.ClientMessages.length>0)}" data-ng-repeat-start="item in order.SkuOrdereds">
+                                                    <tr data-ng-class="{warning: (item.ErrorMessages && item.ErrorMessages.length>0) || (item.ClientMessages && item.ClientMessages.length>0)}" data-ng-repeat-start="item in order.SkuOrdereds">
                                                         <td class="sku">
                                                             <div class="input-group autocomplete">
                                                                 <input type="text" name="SKU{{$index}}" class="form-control" placeholder="SKU" data-ng-model="item.Code"
@@ -153,9 +153,9 @@
                                                             <a class="btn btn-danger btn-xs" title="Delete" data-ng-click="productDelete($index);" data-ng-disabled="orderEditDisabled" data-ng-if="!orderEditDisabled"><i class="glyphicon glyphicon-remove"></i></a>
                                                         </td>
                                                     </tr>
-                                                    <tr class="warning" data-ng-if="item.Messages.length>0">
+                                                    <tr data-ng-class="{warning: messageItem.MessageLevel==0, 'message-warning': messageItem.MessageLevel==1, 'message-info': messageItem.MessageLevel==2 }" data-ng-repeat="messageItem in item.Messages">
                                                         <td colspan="7">
-                                                            <strong class="message" data-ng-repeat="message in item.Messages">{{message}}</strong>
+                                                            <strong class="message">{{messageItem.Message}}</strong>
                                                         </td>
                                                     </tr>
                                                     <tr data-ng-repeat-end class="warning" data-ng-if="item.ClientMessages && item.ClientMessages.length>0">

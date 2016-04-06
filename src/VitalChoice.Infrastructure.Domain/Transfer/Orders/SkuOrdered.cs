@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
@@ -8,14 +9,14 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
     {
         public SkuOrdered()
         {
-            Messages = new List<string>();
+            Messages = new List<MessageInfo>();
         }
 
         public SkuDynamic Sku { get; set; }
         public ICollection<GiftCertificate> GcsGenerated { get; set; }
         public decimal Amount { get; set; }
         public int Quantity { get; set; }
-        public IList<string> Messages { get; set; }
+        public IList<MessageInfo> Messages { get; set; }
     }
 
     public class PromoOrdered: SkuOrdered

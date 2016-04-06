@@ -30,7 +30,11 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                             skus.Where(s => s.Sku.Product.CategoryIds.Any(c => categories.Contains(c))).ToArray();
                         foreach (var sku in excludedSkus)
                         {
-                            sku.Messages.Add("The discount for this product has been excluded by category");
+                            sku.Messages.Add(new MessageInfo()
+                            {
+                                MessageLevel = MessageLevel.Error,
+                                Message = "The discount for this product has been excluded by category"
+                            });
                         }
                         if (excludedSkus.Any())
                         {
@@ -47,7 +51,12 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                             skus.Where(s => s.Sku.Product.CategoryIds.Any(c => !categories.Contains(c))).ToArray();
                         foreach (var sku in excludedSkus)
                         {
-                            sku.Messages.Add("The discount for this product has been excluded by category");
+                            sku.Messages.Add(
+                                new MessageInfo()
+                                {
+                                    MessageLevel = MessageLevel.Error,
+                                    Message = "The discount for this product has been excluded by category"
+                                });
                         }
                         if (excludedSkus.Any())
                         {
@@ -65,7 +74,12 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                             skus.Where(s => filteredSkus.Contains(s.Sku.Id)).ToArray();
                         foreach (var sku in excludedSkus)
                         {
-                            sku.Messages.Add("The discount for this product has been excluded by SKU");
+                            sku.Messages.Add(
+                                new MessageInfo()
+                                {
+                                    MessageLevel = MessageLevel.Error,
+                                    Message = "The discount for this product has been excluded by SKU"
+                                });
                         }
                         if (excludedSkus.Any())
                         {
@@ -83,7 +97,12 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                             skus.Where(s => !filteredSkus.Contains(s.Sku.Id)).ToArray();
                         foreach (var sku in excludedSkus)
                         {
-                            sku.Messages.Add("The discount for this product has been excluded by SKU");
+                            sku.Messages.Add(
+                                new MessageInfo()
+                                {
+                                    MessageLevel = MessageLevel.Error,
+                                    Message = "The discount for this product has been excluded by SKU"
+                                });
                         }
                         if (excludedSkus.Any())
                         {

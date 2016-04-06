@@ -10,6 +10,7 @@ using VC.Admin.Models.Products;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
@@ -46,7 +47,7 @@ namespace VC.Admin.Models.Orders
 
         public bool AutoShipFrequency6 { get; set; }
 
-        public IList<string> Messages { get; set; }
+        public IList<MessageInfo> Messages { get; set; }
 
         public IList<string> GCCodes { get; set; }
 

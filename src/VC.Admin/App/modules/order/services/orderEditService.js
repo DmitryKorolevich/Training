@@ -672,6 +672,21 @@ angular.module('app.modules.order.services.orderEditService', [])
 
             uiScope.productsPerishableThresholdIssue = data.ProductsPerishableThresholdIssue;
 
+            if (data.SkuOrdereds)
+            {
+                $.each(data.SkuOrdereds, function (index, sku)
+                {
+                    sku.ErrorMessages = $.grep(sku.Messages, function (item, i) { return item.MessageLevel == 0; });
+                });
+            }
+            if (data.PromoSkus)
+            {
+                $.each(data.PromoSkus, function (index, sku)
+                {
+                    sku.ErrorMessages = $.grep(sku.Messages, function (item, i) { return item.MessageLevel == 0; });
+                });
+            }
+
             var toDeleteIdxs = [];
             $.each(uiScope.order.SkuOrdereds, function (index, uiSku)
             {
@@ -684,6 +699,7 @@ angular.module('app.modules.order.services.orderEditService', [])
                         uiSku.Amount = sku.Amount;
                         uiSku.Quantity = sku.Quantity;
                         uiSku.Messages = sku.Messages;
+                        uiSku.ErrorMessages = sku.ErrorMessages;
                         uiSku.GCCodes = sku.GCCodes;
                         found = true;
                         return false;
@@ -1107,12 +1123,13 @@ angular.module('app.modules.order.services.orderEditService', [])
         }
         angular.forEach(uiScope.order.SkuOrdereds, function (skuOrdered, index)
         {
-            if (skuOrdered.Messages && skuOrdered.Messages.length != 0)
+            if (skuOrdered.ErrorMessages && skuOrdered.ErrorMessages.length != 0)
             {
                 productErrorsExist = true;
                 return;
             }
         });
+
         if (productErrorsExist)
         {
             productErrorMessages += "There are some errors in the order. ";

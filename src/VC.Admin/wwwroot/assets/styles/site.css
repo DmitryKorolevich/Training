@@ -19,6 +19,12 @@ a.block {
   background-color: #ffd9dc;
   color: red;
 }
+.table > tbody > tr.message-warning > td {
+  color: yellow;
+}
+.table > tbody > tr.message-info > td {
+  color: #88c149;
+}
 .table.editable-table .text {
   margin-top: 8px;
 }

@@ -12,6 +12,7 @@ using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 
@@ -39,7 +40,7 @@ namespace VC.Admin.Models.Orders
 
         public double RefundPercent { get; set; }
 
-        public IList<string> Messages { get; set; }
+        public IList<MessageInfo> Messages { get; set; }
 
         public bool Disabled { get; set; }
 

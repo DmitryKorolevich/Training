@@ -1652,17 +1652,9 @@ namespace VitalChoice.Business.Services.Orders
 
                 item.OrderImportItem.ErrorMessages.AddRange(context.Messages);
                 item.OrderImportItem.ErrorMessages.AddRange(
-                    context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages).Select(p =>
-                        new MessageInfo()
-                        {
-                            Message = p
-                        }));
+                    context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages));
                 item.OrderImportItem.ErrorMessages.AddRange(
-                    context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages).Select(p =>
-                        new MessageInfo()
-                        {
-                            Message = p
-                        }));
+                    context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages));
             }
 
             //throw calculating errors

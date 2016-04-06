@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Core;
@@ -21,7 +22,12 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                 {
                     if (sku.Sku.SafeData.Stock < sku.Quantity)
                     {
-                        sku.Messages.Add("Сurrently out of stock. Please remove to continue.");
+                        sku.Messages.Add(
+                                new MessageInfo()
+                                {
+                                    MessageLevel = MessageLevel.Error,
+                                    Message = "Сurrently out of stock. Please remove to continue."
+                                });
                     }
                 }
             }

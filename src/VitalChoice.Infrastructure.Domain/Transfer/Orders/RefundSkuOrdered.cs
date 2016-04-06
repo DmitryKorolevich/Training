@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
@@ -8,7 +9,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
     {
         public RefundSkuOrdered()
         {
-            Messages = new List<string>();
+            Messages = new List<MessageInfo>();
         }
 
         public SkuDynamic Sku { get; set; }
@@ -23,6 +24,6 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 
         public double RefundPercent { get; set; }
 
-        public IList<string> Messages { get; set; }
+        public IList<MessageInfo> Messages { get; set; }
     }
 }
