@@ -99,6 +99,10 @@ namespace VC.Public.Controllers
                     ? $"Frozen products must total {globalThreshold.Value.ToString("c")}, to prevent thawing during shipping. Please add frozen items until they total {globalThreshold.Value.ToString("c")}."
                     : null;
             }
+            if (cartModel.TopGlobalMessage != null)
+            {
+                ModelState.AddModelError(string.Empty, cartModel.TopGlobalMessage);
+            }
             var gcMessages = context.GcMessageInfos.ToDictionary(m => m.Field);
             if (!string.IsNullOrWhiteSpace(cartModel.PromoCode) && order.Discount == null)
             {
