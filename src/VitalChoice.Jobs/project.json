@@ -8,7 +8,6 @@
 
   "dependencies": {
     "Autofac": "4.0.0-rc1-177",
-    "Microsoft.Dnx.Runtime": "1.0.0-*",
     "Quartz": "2.3.3",
     "VitalChoice.Business": "1.0.0-*",
     "VitalChoice.Core": "1.0.0-*",

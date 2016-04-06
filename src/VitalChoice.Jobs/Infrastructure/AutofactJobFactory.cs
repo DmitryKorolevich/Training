@@ -6,7 +6,7 @@ using Common.Logging;
 using Quartz;
 using Quartz.Spi;
 
-namespace VitalChoice.Jobs.Jobs
+namespace VitalChoice.Jobs.Infrastructure
 {
 	public class AutofacJobFactory : IJobFactory, IDisposable
 	{
@@ -68,6 +68,8 @@ namespace VitalChoice.Jobs.Jobs
 		/// </returns>
 		public IJob NewJob(TriggerFiredBundle bundle, IScheduler scheduler)
 		{
+			//return (IJob)_lifetimeScope.BeginLifetimeScope(_scopeName).Resolve(bundle.JobDetail.JobType);
+
 			if (bundle == null) throw new ArgumentNullException(nameof(bundle));
 			if (scheduler == null) throw new ArgumentNullException(nameof(scheduler));
 

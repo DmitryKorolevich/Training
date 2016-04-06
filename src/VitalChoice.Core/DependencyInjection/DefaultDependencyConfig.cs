@@ -100,7 +100,7 @@ namespace VitalChoice.Core.DependencyInjection
 {
     public abstract class DefaultDependencyConfig : IDependencyConfig
     {
-        public IServiceProvider RegisterInfrastructure(IConfiguration configuration, IServiceCollection services,
+        public IContainer RegisterInfrastructure(IConfiguration configuration, IServiceCollection services,
             Assembly projectAssembly, IApplicationEnvironment appEnv = null)
         {
             // Add EF services to the services container.
@@ -197,10 +197,10 @@ namespace VitalChoice.Core.DependencyInjection
             UnitOfWorkBase.SetOptions(container.Resolve<IOptions<AppOptionsBase>>());
             LoggerService.Build(container.Resolve<IOptions<AppOptions>>(), container.Resolve<IApplicationEnvironment>());
             EcommerceContextBase.ServiceProvider = container.Resolve<IServiceProvider>();
-            return EcommerceContextBase.ServiceProvider;
+            return container;
         }
 
-        private static void ConfigureMvcOptions(MvcOptions o)
+        private void ConfigureMvcOptions(MvcOptions o)
         {
             var inputFormatter =
                 (JsonInputFormatter)
@@ -254,117 +254,6 @@ namespace VitalChoice.Core.DependencyInjection
             }
         }
 
-        private static void ConfigureAppOptions(IConfiguration configuration, AppOptions options)
-        {
-            ConfigureBaseOptions(configuration, options);
-            options.GenerateLowercaseUrls =
-                Convert.ToBoolean(configuration.GetSection("App:GenerateLowercaseUrls").Value);
-            options.EnableBundlingAndMinification =
-                Convert.ToBoolean(configuration.GetSection("App:EnableBundlingAndMinification").Value);
-            options.Versioning = new Versioning()
-            {
-                EnableStaticContentVersioning =
-                    Convert.ToBoolean(configuration.GetSection("App:Versioning:EnableStaticContentVersioning").Value),
-                BuildNumber =
-                    Convert.ToBoolean(configuration.GetSection("App:Versioning:AutoGenerateBuildNumber").Value)
-                        ? Guid.NewGuid().ToString("N")
-                        : configuration.GetSection("App:Versioning:BuildNumber").Value
-            };
-            options.DefaultCacheExpirationTermMinutes =
-                Convert.ToInt32(configuration.GetSection("App:DefaultCacheExpirationTermMinutes").Value);
-            options.ActivationTokenExpirationTermDays =
-                Convert.ToInt32(configuration.GetSection("App:ActivationTokenExpirationTermDays").Value);
-            options.DefaultCultureId = configuration.GetSection("App:DefaultCultureId").Value;
-            options.PublicHost = configuration.GetSection("App:PublicHost").Value;
-            options.AdminHost = configuration.GetSection("App:AdminHost").Value;
-            options.MainSuperAdminEmail = configuration.GetSection("App:MainSuperAdminEmail").Value;
-            options.CustomerServiceToEmail = configuration.GetSection("App:CustomerServiceToEmail").Value;
-            options.CustomerFeedbackToEmail = configuration.GetSection("App:CustomerFeedbackToEmail").Value;
-            options.FilesRelativePath = configuration.GetSection("App:FilesRelativePath").Value;
-            options.FilesPath = configuration.GetSection("App:FilesPath").Value;
-            options.EmailConfiguration = new Email
-            {
-                From = configuration.GetSection("App:Email:From").Value,
-                Host = configuration.GetSection("App:Email:Host").Value,
-                Port = Convert.ToInt32(configuration.GetSection("App:Email:Port").Value),
-                Secured = Convert.ToBoolean(configuration.GetSection("App:Email:Secured").Value),
-                Username = configuration.GetSection("App:Email:Username").Value,
-                Password = configuration.GetSection("App:Email:Password").Value,
-                Disabled = Convert.ToBoolean(configuration.GetSection("App:Email:Disabled").Value)
-            };
-            options.ExportService = new ExportService
-            {
-                PlainConnectionString = configuration.GetSection("App:ExportService:PlainConnectionString").Value,
-                EncryptedConnectionString = configuration.GetSection("App:ExportService:EncryptedConnectionString").Value,
-                EncryptedQueueName = configuration.GetSection("App:ExportService:EncryptedQueueName").Value,
-                PlainQueueName = configuration.GetSection("App:ExportService:PlainQueueName").Value,
-                CertThumbprint = configuration.GetSection("App:ExportService:CertThumbprint").Value,
-                RootThumbprint = configuration.GetSection("App:ExportService:RootThumbprint").Value,
-                EncryptionHostSessionExpire =
-                    Convert.ToBoolean(
-                        configuration.GetSection("App:ExportService:EncryptionHostSessionExpire").Value),
-                ServerHostName = configuration.GetSection("App:ExportService:ServerHostName").Value
-            };
-            options.AzureStorage = new AzureStorage()
-            {
-                StorageConnectionString = configuration.GetSection("App:AzureStorage:StorageConnectionString").Value,
-                CustomerContainerName = configuration.GetSection("App:AzureStorage:CustomerContainerName").Value,
-                BugTicketFilesContainerName =
-                    configuration.GetSection("App:AzureStorage:BugTicketFilesContainerName").Value,
-                BugTicketCommentFilesContainerName =
-                    configuration.GetSection("App:AzureStorage:BugTicketCommentFilesContainerName").Value,
-            };
-            options.FedExOptions = new FedExOptions()
-            {
-                AccountNumber = configuration.GetSection("App:FedExOptions:AccountNumber").Value,
-                MeterNumber = configuration.GetSection("App:FedExOptions:MeterNumber").Value,
-                MerchantPhoneNumber = configuration.GetSection("App:FedExOptions:MerchantPhoneNumber").Value,
-                Key = configuration.GetSection("App:FedExOptions:Key").Value,
-                Password = configuration.GetSection("App:FedExOptions:Password").Value,
-                PayAccountNumber = configuration.GetSection("App:FedExOptions:PayAccountNumber").Value,
-                ShipServiceUrl = configuration.GetSection("App:FedExOptions:ShipServiceUrl").Value,
-                LocatorServiceUrl = configuration.GetSection("App:FedExOptions:LocatorServiceUrl").Value,
-            };
-            options.Avatax = new AvataxOptions
-            {
-                AccountNumber = configuration.GetSection("App:Avatax:AccountNumber").Value,
-                CompanyCode = configuration.GetSection("App:Avatax:CompanyCode").Value,
-                AccountName = configuration.GetSection("App:Avatax:AccountName").Value,
-                LicenseKey = configuration.GetSection("App:Avatax:LicenseKey").Value,
-                ProfileName = configuration.GetSection("App:Avatax:ProfileName").Value,
-                ServiceUrl = configuration.GetSection("App:Avatax:ServiceUrl").Value,
-                TurnOffCommit = Convert.ToBoolean(configuration.GetSection("App:Avatax:TurnOffCommit").Value)
-            };
-            options.GoogleCaptcha = new GoogleCaptcha
-            {
-                PublicKey = configuration.GetSection("App:GoogleCaptcha:PublicKey").Value,
-                SecretKey = configuration.GetSection("App:GoogleCaptcha:SecretKey").Value,
-                VerifyUrl = configuration.GetSection("App:GoogleCaptcha:VerifyUrl").Value
-            };
-            options.AuthorizeNet = new AuthorizeNet
-            {
-                ApiKey = configuration.GetSection("App:AuthorizeNet:ApiKey").Value,
-                ApiLogin = configuration.GetSection("App:AuthorizeNet:ApiLogin").Value,
-                TestEnv = Convert.ToBoolean(configuration.GetSection("App:AuthorizeNet:TestEnv").Value)
-            };
-            var section = configuration.GetSection("App:CacheSyncOptions");
-            options.CacheSyncOptions = new CacheSyncOptions
-            {
-                ConnectionString = section["ConnectionString"],
-                ServiceBusQueueName = section["ServiceBusQueueName"],
-                Enabled = Convert.ToBoolean(section["Enabled"])
-            };
-            section = configuration.GetSection("App:Bronto");
-            options.Bronto = new BrontoSettings
-            {
-                ApiKey = section["ApiKey"],
-                ApiUrl = section["ApiUrl"],
-                PublicFormUrl = section["PublicFormUrl"],
-                PublicFormSendData = section["PublicFormSendData"],
-                PublicFormSubscribeData = section["PublicFormSubscribeData"],
-            };
-        }
-
         private static void ConfigureBaseOptions(IConfiguration configuration, AppOptionsBase options)
         {
             options.LogPath = configuration.GetSection("App:LogPath").Value;
@@ -383,7 +272,118 @@ namespace VitalChoice.Core.DependencyInjection
             };
         }
 
-        public IContainer BuildContainer(Assembly projectAssembly, ContainerBuilder builder)
+		protected virtual void ConfigureAppOptions(IConfiguration configuration, AppOptions options)
+		{
+			ConfigureBaseOptions(configuration, options);
+			options.GenerateLowercaseUrls =
+				Convert.ToBoolean(configuration.GetSection("App:GenerateLowercaseUrls").Value);
+			options.EnableBundlingAndMinification =
+				Convert.ToBoolean(configuration.GetSection("App:EnableBundlingAndMinification").Value);
+			options.Versioning = new Versioning()
+			{
+				EnableStaticContentVersioning =
+					Convert.ToBoolean(configuration.GetSection("App:Versioning:EnableStaticContentVersioning").Value),
+				BuildNumber =
+					Convert.ToBoolean(configuration.GetSection("App:Versioning:AutoGenerateBuildNumber").Value)
+						? Guid.NewGuid().ToString("N")
+						: configuration.GetSection("App:Versioning:BuildNumber").Value
+			};
+			options.DefaultCacheExpirationTermMinutes =
+				Convert.ToInt32(configuration.GetSection("App:DefaultCacheExpirationTermMinutes").Value);
+			options.ActivationTokenExpirationTermDays =
+				Convert.ToInt32(configuration.GetSection("App:ActivationTokenExpirationTermDays").Value);
+			options.DefaultCultureId = configuration.GetSection("App:DefaultCultureId").Value;
+			options.PublicHost = configuration.GetSection("App:PublicHost").Value;
+			options.AdminHost = configuration.GetSection("App:AdminHost").Value;
+			options.MainSuperAdminEmail = configuration.GetSection("App:MainSuperAdminEmail").Value;
+			options.CustomerServiceToEmail = configuration.GetSection("App:CustomerServiceToEmail").Value;
+			options.CustomerFeedbackToEmail = configuration.GetSection("App:CustomerFeedbackToEmail").Value;
+			options.FilesRelativePath = configuration.GetSection("App:FilesRelativePath").Value;
+			options.FilesPath = configuration.GetSection("App:FilesPath").Value;
+			options.EmailConfiguration = new Email
+			{
+				From = configuration.GetSection("App:Email:From").Value,
+				Host = configuration.GetSection("App:Email:Host").Value,
+				Port = Convert.ToInt32(configuration.GetSection("App:Email:Port").Value),
+				Secured = Convert.ToBoolean(configuration.GetSection("App:Email:Secured").Value),
+				Username = configuration.GetSection("App:Email:Username").Value,
+				Password = configuration.GetSection("App:Email:Password").Value,
+				Disabled = Convert.ToBoolean(configuration.GetSection("App:Email:Disabled").Value)
+			};
+			options.ExportService = new ExportService
+			{
+				PlainConnectionString = configuration.GetSection("App:ExportService:PlainConnectionString").Value,
+				EncryptedConnectionString = configuration.GetSection("App:ExportService:EncryptedConnectionString").Value,
+				EncryptedQueueName = configuration.GetSection("App:ExportService:EncryptedQueueName").Value,
+				PlainQueueName = configuration.GetSection("App:ExportService:PlainQueueName").Value,
+				CertThumbprint = configuration.GetSection("App:ExportService:CertThumbprint").Value,
+				RootThumbprint = configuration.GetSection("App:ExportService:RootThumbprint").Value,
+				EncryptionHostSessionExpire =
+					Convert.ToBoolean(
+						configuration.GetSection("App:ExportService:EncryptionHostSessionExpire").Value),
+				ServerHostName = configuration.GetSection("App:ExportService:ServerHostName").Value
+			};
+			options.AzureStorage = new AzureStorage()
+			{
+				StorageConnectionString = configuration.GetSection("App:AzureStorage:StorageConnectionString").Value,
+				CustomerContainerName = configuration.GetSection("App:AzureStorage:CustomerContainerName").Value,
+				BugTicketFilesContainerName =
+					configuration.GetSection("App:AzureStorage:BugTicketFilesContainerName").Value,
+				BugTicketCommentFilesContainerName =
+					configuration.GetSection("App:AzureStorage:BugTicketCommentFilesContainerName").Value,
+			};
+			options.FedExOptions = new FedExOptions()
+			{
+				AccountNumber = configuration.GetSection("App:FedExOptions:AccountNumber").Value,
+				MeterNumber = configuration.GetSection("App:FedExOptions:MeterNumber").Value,
+				MerchantPhoneNumber = configuration.GetSection("App:FedExOptions:MerchantPhoneNumber").Value,
+				Key = configuration.GetSection("App:FedExOptions:Key").Value,
+				Password = configuration.GetSection("App:FedExOptions:Password").Value,
+				PayAccountNumber = configuration.GetSection("App:FedExOptions:PayAccountNumber").Value,
+				ShipServiceUrl = configuration.GetSection("App:FedExOptions:ShipServiceUrl").Value,
+				LocatorServiceUrl = configuration.GetSection("App:FedExOptions:LocatorServiceUrl").Value,
+			};
+			options.Avatax = new AvataxOptions
+			{
+				AccountNumber = configuration.GetSection("App:Avatax:AccountNumber").Value,
+				CompanyCode = configuration.GetSection("App:Avatax:CompanyCode").Value,
+				AccountName = configuration.GetSection("App:Avatax:AccountName").Value,
+				LicenseKey = configuration.GetSection("App:Avatax:LicenseKey").Value,
+				ProfileName = configuration.GetSection("App:Avatax:ProfileName").Value,
+				ServiceUrl = configuration.GetSection("App:Avatax:ServiceUrl").Value,
+				TurnOffCommit = Convert.ToBoolean(configuration.GetSection("App:Avatax:TurnOffCommit").Value)
+			};
+			options.GoogleCaptcha = new GoogleCaptcha
+			{
+				PublicKey = configuration.GetSection("App:GoogleCaptcha:PublicKey").Value,
+				SecretKey = configuration.GetSection("App:GoogleCaptcha:SecretKey").Value,
+				VerifyUrl = configuration.GetSection("App:GoogleCaptcha:VerifyUrl").Value
+			};
+			options.AuthorizeNet = new AuthorizeNet
+			{
+				ApiKey = configuration.GetSection("App:AuthorizeNet:ApiKey").Value,
+				ApiLogin = configuration.GetSection("App:AuthorizeNet:ApiLogin").Value,
+				TestEnv = Convert.ToBoolean(configuration.GetSection("App:AuthorizeNet:TestEnv").Value)
+			};
+			var section = configuration.GetSection("App:CacheSyncOptions");
+			options.CacheSyncOptions = new CacheSyncOptions
+			{
+				ConnectionString = section["ConnectionString"],
+				ServiceBusQueueName = section["ServiceBusQueueName"],
+				Enabled = Convert.ToBoolean(section["Enabled"])
+			};
+			section = configuration.GetSection("App:Bronto");
+			options.Bronto = new BrontoSettings
+			{
+				ApiKey = section["ApiKey"],
+				ApiUrl = section["ApiUrl"],
+				PublicFormUrl = section["PublicFormUrl"],
+				PublicFormSendData = section["PublicFormSendData"],
+				PublicFormSubscribeData = section["PublicFormSubscribeData"],
+			};
+		}
+
+		public IContainer BuildContainer(Assembly projectAssembly, ContainerBuilder builder)
         {
             builder.RegisterType<VitalChoiceContext>()
                 .As<IDataContextAsync>()

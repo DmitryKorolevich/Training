@@ -4,7 +4,7 @@ using Autofac;
 using Quartz;
 using Module = Autofac.Module;
 
-namespace VitalChoice.Jobs.Jobs
+namespace VitalChoice.Jobs.Infrastructure
 {
 	public class QuartzAutofacJobsModule : Module
 	{
@@ -35,7 +35,7 @@ namespace VitalChoice.Jobs.Jobs
 		{
 			builder.RegisterAssemblyTypes(_assembliesToScan)
 				.Where(type => !type.IsAbstract && typeof(IJob).IsAssignableFrom(type))
-				.AsSelf().InstancePerLifetimeScope();
+				.As<IJob>().AsSelf().InstancePerLifetimeScope();
 		}
 	}
 }

@@ -1,11 +1,9 @@
-﻿using VitalChoice.Ecommerce.Domain.Options;
+﻿using System.Collections.Generic;
 
 namespace VitalChoice.Infrastructure.Domain.Options
 {
-    public class JobSettings: AppOptionsBase
+    public class JobSettings
 	{
-	    public string AutoShipSchedule { get; set; }
-
-		public string DefaultCultureId { get; set; }
+	    public Dictionary<string, string> Schedules { get; set; }
 	}
 }

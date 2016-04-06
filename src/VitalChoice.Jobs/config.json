@@ -12,6 +12,16 @@
       "CacheTimeToLeaveSeconds": 1800, //30 minutes
       "CacheScanPeriodSeconds": 900 //15 minutes
     },
-    "AutoShipSchedule": "0/10 * * * * ?"
+    "AzureStorage": {
+      "StorageConnectionString": "DefaultEndpointsProtocol=https;AccountName=vcdatabases;AccountKey=ERNr+5Hrxekm8nRWhgs8zXhPNyzBoU8KAJ1JyUe6nX4zSvUoSVFLhYa/Fk1jVxkUCXvG8riZdMVGbGutVugdrg==",
+      "CustomerContainerName": "customer-files",
+      "BugTicketFilesContainerName": "bug-ticket-files",
+      "BugTicketCommentFilesContainerName": "bug-ticket-comment-files"
+    },
+    "JobSettings": {
+      "Schedules": {
+        "AutoShipJob": "0 0 * * * ?"
+      }
+    }
   }
 }

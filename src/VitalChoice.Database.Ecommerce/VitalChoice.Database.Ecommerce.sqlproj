@@ -251,4 +251,10 @@
   <ItemGroup>
     <None Include="PreDeployment\Scripts\GiftCetfificatesUpdateSku.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\AutoShip.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VAutoShips.sql" />
+  </ItemGroup>
 </Project>
