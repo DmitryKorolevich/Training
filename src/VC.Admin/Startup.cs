@@ -1,19 +1,15 @@
 ﻿using System;
-using System.IO;
 using System.Reflection;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Diagnostics;
 using Microsoft.AspNet.Hosting;
-using Microsoft.AspNet.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
 using VC.Admin.AppConfig;
 using VitalChoice.Core.DependencyInjection;
-using VitalChoice.Core.Infrastructure;
-using Microsoft.AspNet.Identity;
-using VitalChoice.Core.GlobalFilters;
+using Autofac;
 
 namespace VC.Admin
 {
@@ -35,8 +31,9 @@ namespace VC.Admin
 
             var reg = new AdminDependencyConfig();
 
-            var result = reg.RegisterInfrastructure(Configuration, services, typeof(Startup).GetTypeInfo().Assembly);
-            return result;
+            var container = reg.RegisterInfrastructure(Configuration, services, typeof(Startup).GetTypeInfo().Assembly);
+
+			return container.Resolve<IServiceProvider>();
 		}
 
 		// Configure is called after ConfigureServices is called.

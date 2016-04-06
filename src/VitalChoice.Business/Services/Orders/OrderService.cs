@@ -64,6 +64,7 @@ using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 using VitalChoice.Infrastructure.Context;
+using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Exceptions;
 using VitalChoice.Infrastructure.Extensions;
 
@@ -102,8 +103,11 @@ namespace VitalChoice.Business.Services.Orders
             _paymentGenericService;
         private readonly IEcommerceRepositoryAsync<OrderToSku> _orderToSkusRepository;
         private readonly IDiscountService _discountService;
+	    private readonly IEcommerceRepositoryAsync<VAutoShip> _vAutoShipRepository;
+	    private readonly IEcommerceRepositoryAsync<Lookup> _lookupRepository;
+		private readonly IEcommerceRepositoryAsync<LookupVariant> _lookupVariantRepository;
 
-        public OrderService(
+		public OrderService(
             IEcommerceRepositoryAsync<VOrder> vOrderRepository,
             IEcommerceRepositoryAsync<VOrderWithRegionInfoItem> vOrderWithRegionInfoItemRepository,
             OrderRepository orderRepository,
@@ -134,7 +138,7 @@ namespace VitalChoice.Business.Services.Orders
             IProductService productService,
             INotificationService notificationService,
             ICountryService countryService, ITransactionAccessor<EcommerceContext> transactionAccessor, SkuMapper skuMapper,
-            IEcommerceRepositoryAsync<OrderToSku> orderToSkusRepository, IDiscountService discountService)
+            IEcommerceRepositoryAsync<OrderToSku> orderToSkusRepository, IDiscountService discountService, IEcommerceRepositoryAsync<VAutoShip> vAutoShipRepository, IEcommerceRepositoryAsync<Lookup> lookupRepository, IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
@@ -162,7 +166,10 @@ namespace VitalChoice.Business.Services.Orders
             _skuMapper = skuMapper;
             _orderToSkusRepository = orderToSkusRepository;
             _discountService = discountService;
-            _addressMapper = addressMapper;
+			_vAutoShipRepository = vAutoShipRepository;
+		    _lookupRepository = lookupRepository;
+			_lookupVariantRepository = lookupVariantRepository;
+			_addressMapper = addressMapper;
             _productService = productService;
             _notificationService = notificationService;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
@@ -852,13 +859,76 @@ namespace VitalChoice.Business.Services.Orders
 
 	    public async Task SubmitAutoShipOrders()
 	    {
-			var orderQuery = new OrderQuery().NotDeleted().WithOrderType(OrderType.AutoShip).WithoutIncomplete();
+		    var currentDate = DateTime.Now;
 
-			var filter = new FilterBase();
+			//var frequencyAvailable = _appInfrastructureService.Get().AutoShipOptions;
+			var autoshipOptions = _lookupRepository.Query(x => x.Name == LookupNames.AutoShipSchedule).Select(false).Single().Id;
+			var frequencyAvailable = _lookupVariantRepository.Query()
+				.Where(x => x.IdLookup == autoshipOptions)
+				.Select(false)
+				.Select(x=>x.Id).ToList();
 
-			var autoShips =
-				await
-					SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, orderQuery, null, null, true);
+
+			var toProcess = new List<int>();
+		    foreach (var frequency in frequencyAvailable)
+		    {
+			    var tempDate = currentDate.AddDays(-frequency);//AddMonths(-frequency);
+
+				var vAutoShips =
+				    await _vAutoShipRepository.Query(
+					    x =>
+						    x.AutoShipFrequency == frequency &&
+						    x.LastAutoShipDate.HasValue && x.LastAutoShipDate.Value.Day == tempDate.Day && x.LastAutoShipDate.Value.Year == tempDate.Year && x.LastAutoShipDate.Value.Month == tempDate.Month).SelectAsync(x=>x.Id);
+
+			    if (vAutoShips.Any())
+			    {
+				    toProcess.AddRange(vAutoShips);
+			    }
+		    }
+
+			//skipped by some reason
+			var skippedAcidently =
+					await _vAutoShipRepository.Query(
+						x => !x.LastAutoShipDate.HasValue).SelectAsync(x => x.Id);
+
+			if (skippedAcidently.Any())
+			{
+				toProcess.AddRange(skippedAcidently);
+			}
+
+			foreach (var id in toProcess)
+		    {
+			    var autoShip = await SelectAsync(id);
+
+			    using (var uow = CreateUnitOfWork())
+			    {
+				    using (var transaction = uow.BeginTransaction())
+				    {
+					    try
+					    {
+						    autoShip.Data.LastAutoShipDate = currentDate;
+							await UpdateInternalAsync(autoShip, uow);
+
+						    var standardOrder = autoShip;
+							standardOrder.IdObjectType = (int)OrderType.Normal;
+							standardOrder.Data.AutoShipFrequency = null;
+							standardOrder.Data.LastAutoShipDate = null;
+							standardOrder.Id = 0;
+							standardOrder.PaymentMethod.Id = 0;
+							standardOrder.ShippingAddress.Id = 0;
+
+						    await InsertAsyncInternal(standardOrder, uow);
+
+						    transaction.Commit();
+					    }
+					    catch
+					    {
+							transaction.Rollback();
+							throw;
+						}
+				    }
+			    }
+		    }
 		}
 
 	    public async Task<bool> CancelOrderAsync(int id)
@@ -965,12 +1035,19 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     try
                     {
-                        res = await InsertAsyncInternal(model, uow);
+	                    var anyNotIncomplete = model.IsAnyNotIncomplete();
+						if (anyNotIncomplete)
+	                    {
+							model.Data.LastAutoShipDate = DateTime.Now;
+						}
 
-                        if (model.IsAnyNotIncomplete())
+	                    res = await InsertAsyncInternal(model, uow);
+
+                        if (anyNotIncomplete)
                         {
-                            model.IdObjectType = (int)OrderType.Normal;
+							model.IdObjectType = (int)OrderType.Normal;
                             model.Data.AutoShipFrequency = null;
+	                        model.Data.LastAutoShipDate = null;
                             model.Id = 0;
                             model.ShippingAddress.Id = 0;
 
@@ -1051,16 +1128,26 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     try
                     {
-                        res.AddRange(await InsertRangeInternalAsync(autoShips, uow));
+						foreach (var autoShip in autoShips)
+						{
+							var anyNotIncomplete = autoShip.IsAnyNotIncomplete();
+							if (anyNotIncomplete)
+							{
+								autoShip.Data.LastAutoShipDate = DateTime.Now;
+							}
+						}
 
-                        var completed = autoShips.Where(x => x.OrderStatus != OrderStatus.Incomplete).ToList();
+						res.AddRange(await InsertRangeInternalAsync(autoShips, uow));
+
+                        var completed = autoShips.Where(x => x.IsAnyNotIncomplete()).ToList();
                         if (completed.Any())
                         {
-                            foreach (var model in completed)
+							foreach (var model in completed)
                             {
                                 model.IdObjectType = (int)OrderType.Normal;
                                 model.Data.AutoShipFrequency = null;
-                                model.ShippingAddress.Id = 0;
+								model.Data.LastAutoShipDate = null;
+								model.ShippingAddress.Id = 0;
                                 model.Id = 0;
                             }
 
@@ -1103,9 +1190,13 @@ namespace VitalChoice.Business.Services.Orders
 
                         if (previous.IsAnyIncomplete() && model.IsAnyNotIncomplete())
                         {
-                            model.IdObjectType = (int)OrderType.Normal;
+							model.Data.LastAutoShipDate = DateTime.Now;
+	                        await UpdateInternalAsync(model, uow);
+
+							model.IdObjectType = (int)OrderType.Normal;
                             model.Data.AutoShipFrequency = null;
-                            model.Id = 0;
+							model.Data.LastAutoShipDate = null;
+							model.Id = 0;
                             model.PaymentMethod.Id = 0;
                             model.ShippingAddress.Id = 0;
 
@@ -1143,7 +1234,9 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     try
                     {
-                        res.AddRange(await UpdateRangeInternalAsync(autoShips, uow));
+						var previous = await SelectAsync(x => autoShips.Select(y=>y.Id).Contains(x.Id));
+
+						res.AddRange(await UpdateRangeInternalAsync(autoShips, uow));
 
                         var completed = autoShips.Where(x => x.OrderStatus != OrderStatus.Incomplete).ToList();
                         if (completed.Any())
@@ -1152,12 +1245,15 @@ namespace VitalChoice.Business.Services.Orders
 
                             foreach (var model in completed)
                             {
-                                var previous = await SelectEntityFirstAsync(x => x.Id == model.Id);
-                                if (previous.OrderStatus == OrderStatus.Incomplete && model.OrderStatus != OrderStatus.Incomplete)
+                                if (previous.Single(x=>x.Id == model.Id).OrderStatus == OrderStatus.Incomplete && model.OrderStatus != OrderStatus.Incomplete)
                                 {
-                                    model.IdObjectType = (int)OrderType.Normal;
+									model.Data.LastAutoShipDate = DateTime.Now;
+									await UpdateInternalAsync(model, uow);
+
+									model.IdObjectType = (int)OrderType.Normal;
                                     model.Data.AutoShipFrequency = null;
-                                    model.Id = 0;
+									model.Data.LastAutoShipDate = null;
+									model.Id = 0;
                                     model.PaymentMethod.Id = 0;
                                     model.ShippingAddress.Id = 0;
 

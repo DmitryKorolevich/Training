@@ -1,22 +1,34 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
 using Quartz;
 using VitalChoice.Interfaces.Services.Orders;
-using VitalChoice.Interfaces.Services.Settings;
 
 namespace VitalChoice.Jobs.Jobs
 {
     public class AutoShipJob: IJob
     {
-	    private readonly ICountryService _orderService;
+	    private readonly IOrderService _orderService;
+	    private readonly ILogger _logger;
 
-	    public AutoShipJob(ICountryService orderService)
-	    {
-		    _orderService = orderService;
-	    }
+		public AutoShipJob(IOrderService orderService, ILogger logger)
+		{
+			_orderService = orderService;
+			_logger = logger;
+		}
 
 	    public void Execute(IJobExecutionContext context)
 	    {
-		    throw new NotImplementedException();
+		    try
+		    {
+				Console.WriteLine("Started AutoShip job");
+				_orderService.SubmitAutoShipOrders().Wait();
+				Console.WriteLine("Finished AutoShip job");
+			}
+		    catch (Exception ex)
+		    {
+				_logger.LogError(ex.Message, ex);
+				throw;
+		    }
 	    }
     }
 }

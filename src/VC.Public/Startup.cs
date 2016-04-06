@@ -20,6 +20,7 @@ using Microsoft.AspNet.Mvc;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Authentication.Cookies;
 using VitalChoice.Interfaces.Services;
+using Autofac;
 
 namespace VC.Public
 {
@@ -41,9 +42,10 @@ namespace VC.Public
             Configuration = configuration.Build();
 
             var reg = new StorefrontDependencyConfig();
-            var result = reg.RegisterInfrastructure(Configuration, services, typeof(Startup).GetTypeInfo().Assembly);
-            return result;
-        }
+            var container = reg.RegisterInfrastructure(Configuration, services, typeof(Startup).GetTypeInfo().Assembly);
+
+			return container.Resolve<IServiceProvider>();
+		}
 
         // Configure is called after ConfigureServices is called.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerfactory)

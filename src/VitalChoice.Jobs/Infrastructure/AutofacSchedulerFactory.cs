@@ -3,8 +3,9 @@ using System.Collections.Specialized;
 using Quartz;
 using Quartz.Core;
 using Quartz.Impl;
+using VitalChoice.Jobs.Jobs;
 
-namespace VitalChoice.Jobs.Jobs
+namespace VitalChoice.Jobs.Infrastructure
 {
 	public class AutofacSchedulerFactory : StdSchedulerFactory
 	{
