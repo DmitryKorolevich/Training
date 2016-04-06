@@ -61,7 +61,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
 
         public virtual int SendThreadCount { get; set; } = 1;
 
-        public virtual int ReceiveThreadCount { get; set; } = 1;
+        public virtual int ReceiveThreadCount { get; set; } = 2;
 
         public virtual int BatchSize { get; set; } = 100;
 

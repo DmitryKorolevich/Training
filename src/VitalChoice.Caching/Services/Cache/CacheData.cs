@@ -259,6 +259,11 @@ namespace VitalChoice.Caching.Services.Cache
                             pair.Key.SetRelatedObject(oldEntity, (newRelated as IEnumerable).Clone(pair.Key.RelationType));
                         }
                     }
+                    else
+                    {
+                        cached.NeedUpdate = true;
+                        return false;
+                    }
                 }
                 else
                 {
