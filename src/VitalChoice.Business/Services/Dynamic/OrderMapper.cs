@@ -64,7 +64,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 var entity = item.Entity;
                 var dynamic = item.Dynamic;
 
-                dynamic.IdAddedBy = entity.IdAddedBy;
+				dynamic.IdAddedBy = entity.IdAddedBy;
                 dynamic.DiscountTotal = entity.DiscountTotal;
                 dynamic.OrderStatus = entity.OrderStatus;
                 dynamic.POrderStatus = entity.POrderStatus;

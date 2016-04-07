@@ -97,7 +97,7 @@ namespace VC.Admin.ModelConverters
                 }
             }
 
-            if (!model.ShipDelayType.HasValue)
+            if (!model.ShipDelayType.HasValue || model.IdObjectType == (int)OrderType.AutoShip)
             {
                 model.ShipDelayType = ShipDelayType.None;
             }

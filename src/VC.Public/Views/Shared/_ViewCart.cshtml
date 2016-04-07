@@ -99,10 +99,10 @@
 		</tbody>
 	</table>
 	<div class="cart-order-details">
-		<div class="cart-shipping-instructions">
+		<div class="cart-shipping-instructions" data-bind="ifnot: Model.AutoShip">
 			<span class="shipping-instructions-title">
-			Shipping Instructions:
-		</span>
+				Shipping Instructions:
+			</span>
 			<label class="cart-shipping-option">
 				<input name="rdUpgradeOption" type="radio" data-bind="checked: Model.ShipAsap, checkedValue: true, event: { change: shipAsapChanged }"/>
 				Ship this order as soon as possible
@@ -164,34 +164,36 @@
 				</label>
 				<label class="cart-total-value" data-bind="text: formatCurrency(Model.OrderTotal())">@Model.OrderTotal.ToString("C2")</label>
 			</div>
-			<div class="cart-promo-container">
-				<i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Promo Code" data-tooltip-body="If you have a discount code, enter it in the box to see the change in your order's total."></i>
-				<label>Promo Code</label>
-				@Html.TextBoxFor(x => x.PromoCode, new {@class = "cart-input-box input-control", data_bind = "value: Model.PromoCode, css: {'input-validation-error': !isDiscountValid(Model) }, disable: Model.AutoShip" })
-				<span class="field-validation-error" data-bind="if: !isDiscountValid(Model)" data-valmsg-for="PromoCode" data-valmsg-replace="true">
-				<span id="PromoCode-error" class="" data-bind="text: getDiscountRelatedErrors(Model)[0].Value"></span>
-			</span>
-				<span class="success-message-box" data-bind="text: Model.DiscountMessage, visible: Model.DiscountMessage && isDiscountValid(Model)"></span>
-			</div>
-			<div id="divGcContainer" class="cart-gc-container">
-				<i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Gift Certificate Code" data-tooltip-body="If you have a gift certificate code, enter it in the box to see the change in your order's total."></i>
-				<div data-bind="foreach:Model.GiftCertificateCodes">
-					<div>
-						<!-- ko if: $index() == 0 -->
-						<label>Gift Certificate Code</label>
-						<a id="btnAddGc" class="circle-button button-green" data-bind="click: $parent.addGc, visible: $index() == 0">
-							<i class="glyphicon glyphicon-plus-sign"></i>
-						</a>
-						<!-- /ko -->
-						<!-- ko if: $index() != 0 -->
-						<a class="btnRemoveGc circle-button button-red" data-bind="click: $parent.removeGc, visible: $index() != 0">
-							<i class="glyphicon glyphicon-minus-sign"></i>
-						</a>
-						<!-- /ko -->
-						@Html.TextBoxFor(x => x.GiftCertificateCodes[0].Value, new { @class = "cart-input-box input-control", data_bind = "value: Value, attr: { name: 'GiftCertificateCodes' + $index(), id: 'GiftCertificateCodes' + $index()}, event: { blur: $parent.gcLostFocus }, css: {'input-validation-error': !isGcValid($parent.Model, $index()) }, disable: $parent.Model.AutoShip" })
-						<span class="field-validation-error" data-bind="if: !isGcValid($parent.Model, $index()), attr: { 'data-valmsg-for': 'GiftCertificateCodes' + $index()}" data-valmsg-replace="true">
-						<span class="" data-bind="text: ErrorMessage"></span>
+			<div data-bind="ifnot: Model.AutoShip">
+				<div class="cart-promo-container">
+					<i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Promo Code" data-tooltip-body="If you have a discount code, enter it in the box to see the change in your order's total."></i>
+					<label>Promo Code</label>
+					@Html.TextBoxFor(x => x.PromoCode, new {@class = "cart-input-box input-control", data_bind = "value: Model.PromoCode, css: {'input-validation-error': !isDiscountValid(Model) }, disable: Model.AutoShip"})
+					<span class="field-validation-error" data-bind="if: !isDiscountValid(Model)" data-valmsg-for="PromoCode" data-valmsg-replace="true">
+						<span id="PromoCode-error" class="" data-bind="text: getDiscountRelatedErrors(Model)[0].Value"></span>
 					</span>
+					<span class="success-message-box" data-bind="text: Model.DiscountMessage, visible: Model.DiscountMessage && isDiscountValid(Model)"></span>
+				</div>
+				<div id="divGcContainer" class="cart-gc-container">
+					<i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Gift Certificate Code" data-tooltip-body="If you have a gift certificate code, enter it in the box to see the change in your order's total."></i>
+					<div data-bind="foreach:Model.GiftCertificateCodes">
+						<div>
+							<!-- ko if: $index() == 0 -->
+							<label>Gift Certificate Code</label>
+							<a id="btnAddGc" class="circle-button button-green" data-bind="click: $parent.addGc, visible: $index() == 0">
+								<i class="glyphicon glyphicon-plus-sign"></i>
+							</a>
+							<!-- /ko -->
+							<!-- ko if: $index() != 0 -->
+							<a class="btnRemoveGc circle-button button-red" data-bind="click: $parent.removeGc, visible: $index() != 0">
+								<i class="glyphicon glyphicon-minus-sign"></i>
+							</a>
+							<!-- /ko -->
+							@Html.TextBoxFor(x => x.GiftCertificateCodes[0].Value, new {@class = "cart-input-box input-control", data_bind = "value: Value, attr: { name: 'GiftCertificateCodes' + $index(), id: 'GiftCertificateCodes' + $index()}, event: { blur: $parent.gcLostFocus }, css: {'input-validation-error': !isGcValid($parent.Model, $index()) }, disable: $parent.Model.AutoShip"})
+							<span class="field-validation-error" data-bind="if: !isGcValid($parent.Model, $index()), attr: { 'data-valmsg-for': 'GiftCertificateCodes' + $index()}" data-valmsg-replace="true">
+						<span class="" data-bind="text: ErrorMessage"></span>
+						</span>
+						</div>
 					</div>
 				</div>
 			</div>
