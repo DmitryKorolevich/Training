@@ -110,7 +110,12 @@ namespace VitalChoice.Business.Services.Checkout
                     .Include(c => c.Skus)
                     .ThenInclude(s => s.Sku)
                     .ThenInclude(s => s.Product)
-                    .ThenInclude(p => p.OptionValues).SelectFirstOrDefaultAsync(false) ?? await CreateNew();
+                    .ThenInclude(p => p.OptionValues)
+                    .Include(c => c.Skus)
+                    .ThenInclude(s => s.Sku)
+                    .ThenInclude(s => s.Product)
+                    .ThenInclude(p => p.ProductsToCategories)
+                    .SelectFirstOrDefaultAsync(false) ?? await CreateNew();
             }
             else
             {
