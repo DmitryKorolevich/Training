@@ -390,12 +390,24 @@ namespace VitalChoice.Business.Services.Checkout
                     await _context.SaveChangesAsync();
                     transaction.Commit();
 
-                    if (sendOrderConfirm && cartOrder.Order?.Customer!=null)
-                    {
+                    if (sendOrderConfirm && cartOrder.Order?.Customer!=null)//&& cartOrder.Order.IdObjectType != (int)OrderType.AutoShip
+					{
                         var customer = await _customerRepository.Query(p => p.Id == cartOrder.Order.Customer.Id).SelectFirstOrDefaultAsync(false);
                         if (!string.IsNullOrEmpty(customer?.Email))
                         {
-                            var emailModel = _orderMapper.ToModel<OrderConfirmationEmail>(cartOrder.Order);
+							OrderDynamic mailOrder;
+							if (cartOrder.Order.IdObjectType == (int)OrderType.AutoShip)
+							{
+								var ids = await _orderService.SelectAutoShipOrdersAsync(cartOrder.Order.Id);
+
+								mailOrder = await _orderService.SelectAsync(ids.First());
+							}
+							else
+							{
+								mailOrder = cartOrder.Order;
+							}
+
+							var emailModel = _orderMapper.ToModel<OrderConfirmationEmail>(mailOrder);
                             if (emailModel != null)
                             {
                                 await _notificationService.SendOrderConfirmationEmailAsync(customer.Email, emailModel);

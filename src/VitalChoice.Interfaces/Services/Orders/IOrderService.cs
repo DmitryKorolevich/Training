@@ -78,5 +78,7 @@ namespace VitalChoice.Interfaces.Services.Orders
 		Task DeleteAutoShipAsync(int customerId, int autoShipId);
 
 		Task SubmitAutoShipOrders();
+
+		Task<IList<int>> SelectAutoShipOrdersAsync(int idOrder);
 	}
 }

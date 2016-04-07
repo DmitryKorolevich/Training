@@ -123,6 +123,12 @@ namespace VitalChoice.Infrastructure.Context
 				entity.ToTable("VAutoShips");
 			});
 
+			builder.Entity<VAutoShipOrder>(entity =>
+			{
+				entity.HasKey(t => t.Id);
+				entity.ToTable("VAutoShipOrders");
+			});
+
 			builder.Entity<VOrderWithRegionInfoItem>(entity =>
             {
                 entity.HasKey(t => t.Id);

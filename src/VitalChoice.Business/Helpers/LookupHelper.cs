@@ -364,10 +364,10 @@ namespace VitalChoice.Business.Helpers
                             Text = "S"
                         });
                         break;
-                    case OrderType.AutoShip:
+                    case OrderType.AutoShipOrder:
                         toReturn.Add(new LookupItem<int>()
                         {
-                            Key = (int)OrderType.AutoShip,
+                            Key = (int)OrderType.AutoShipOrder,
                             Text = "AS"
                         });
                         break;

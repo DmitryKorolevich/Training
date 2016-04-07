@@ -322,7 +322,7 @@ namespace VC.Admin.Controllers
             }
 
             var item = await _orderService.SelectAsync(id);
-		    if (item.IdObjectType != (int) OrderType.Normal && item.IdObjectType != (int) OrderType.AutoShip &&
+		    if (item.IdObjectType != (int) OrderType.Normal && item.IdObjectType != (int)OrderType.AutoShipOrder && item.IdObjectType != (int) OrderType.AutoShip &&
 		        item.IdObjectType != (int) OrderType.DropShip && item.IdObjectType != (int) OrderType.GiftList)
 		    {
 		        throw new AccessDeniedException();
@@ -405,12 +405,24 @@ namespace VC.Admin.Controllers
                 }
             }
 
-            if (sendOrderConfirm && !string.IsNullOrEmpty(model.Customer?.Email))
+            if (sendOrderConfirm  && !string.IsNullOrEmpty(model.Customer?.Email))//&& order.IdObjectType != (int)OrderType.AutoShip
             {
-                var emailModel = _mapper.ToModel<OrderConfirmationEmail>(order);
+	            OrderDynamic mailOrder;
+				if (order.IdObjectType == (int)OrderType.AutoShip)
+				{
+					var ids = await _orderService.SelectAutoShipOrdersAsync(order.Id);
+
+					mailOrder = await _orderService.SelectAsync(ids.First());
+				}
+				else
+				{
+					mailOrder = order;
+				}
+
+                var emailModel = _mapper.ToModel<OrderConfirmationEmail>(mailOrder);
                 if (emailModel != null)
                 {
-                    await _notificationService.SendOrderConfirmationEmailAsync(model.Customer.Email, emailModel);
+                    await _notificationService.SendOrderConfirmationEmailAsync(mailOrder.Customer.Email, emailModel);
                 }
             }
 
