@@ -522,9 +522,11 @@ namespace VitalChoice.Business.Services.Orders
                         .ToArray();
                 var skuIds = new HashSet<int>(invalidSkuOrdered.Select(s => s.IdSku));
                 var invalidSkus = (await _skusRepository.Query(p => skuIds.Contains(p.Id))
-                    .Include(p => p.Product)
-                    .ThenInclude(s => s.OptionValues)
-                    .Include(p => p.OptionValues)
+                    .Include(s => s.OptionValues)
+                    .Include(s => s.Product)
+                    .ThenInclude(p => p.OptionValues)
+                    .Include(s => s.Product)
+                    .ThenInclude(p => p.ProductsToCategories)
                     .SelectAsync(false)).ToDictionary(s => s.Id);
                 foreach (var orderToSku in invalidSkuOrdered)
                 {
@@ -555,9 +557,11 @@ namespace VitalChoice.Business.Services.Orders
                         .ToArray();
                 var skuIds = new HashSet<int>(invalidSkuOrdered.Select(s => s.IdSku));
                 var invalidSkus = (await _skusRepository.Query(p => skuIds.Contains(p.Id))
-                    .Include(p => p.Product)
-                    .ThenInclude(s => s.OptionValues)
-                    .Include(p => p.OptionValues)
+                    .Include(s => s.OptionValues)
+                    .Include(s => s.Product)
+                    .ThenInclude(p => p.OptionValues)
+                    .Include(s => s.Product)
+                    .ThenInclude(p => p.ProductsToCategories)
                     .SelectAsync(false)).ToDictionary(s => s.Id);
                 foreach (var orderToSku in invalidSkuOrdered)
                 {
@@ -622,6 +626,16 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<OrderDataContext> CalculateOrder(OrderDynamic order, OrderStatus combinedStatus)
         {
+            if (combinedStatus == OrderStatus.Incomplete)
+            {
+                if (order.PromoSkus != null)
+                {
+                    foreach (var promo in order.PromoSkus)
+                    {
+                        promo.Enabled = true;
+                    }
+                }
+            }
             var context = new OrderDataContext(combinedStatus)
             {
                 Order = order

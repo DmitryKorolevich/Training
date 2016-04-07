@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -25,6 +26,10 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                 {
                     if (dataContext.Order.Discount.CategoryIds?.Any() ?? false)
                     {
+                        if (skus.Any(s => s.Sku.Product.CategoryIds == null))
+                        {
+                            throw new InvalidOperationException("Product doesn't have any categories set in object.");
+                        }
                         HashSet<int> categories = new HashSet<int>(dataContext.Order.Discount.CategoryIds);
                         var excludedSkus =
                             skus.Where(s => s.Sku.Product.CategoryIds.Any(c => categories.Contains(c))).ToArray();
@@ -46,6 +51,10 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                 {
                     if (dataContext.Order.Discount.CategoryIds?.Any() ?? false)
                     {
+                        if (skus.Any(s => s.Sku.Product.CategoryIds == null))
+                        {
+                            throw new InvalidOperationException("Product doesn't have any categories set in object.");
+                        }
                         HashSet<int> categories = new HashSet<int>(dataContext.Order.Discount.CategoryIds);
                         var excludedSkus =
                             skus.Where(s => s.Sku.Product.CategoryIds.Any(c => !categories.Contains(c))).ToArray();
@@ -68,6 +77,10 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                 {
                     if (dataContext.Order.Discount.SkusFilter?.Any() ?? false)
                     {
+                        if (skus.Any(s => s.Sku.Product.CategoryIds == null))
+                        {
+                            throw new InvalidOperationException("Product doesn't have any categories set in object.");
+                        }
                         HashSet<int> filteredSkus =
                             new HashSet<int>(dataContext.Order.Discount.SkusFilter.Select(s => s.IdSku));
                         var excludedSkus =

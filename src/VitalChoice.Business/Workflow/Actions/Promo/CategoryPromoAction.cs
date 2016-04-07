@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Entities.Promotions;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Base;
@@ -32,6 +34,10 @@ namespace VitalChoice.Business.Workflow.Actions.Promo
                 HashSet<int> promoCategories = new HashSet<int>(promo.SelectedCategoryIds);
                 foreach (var sku in context.Order.Skus)
                 {
+                    if (sku.Sku.Product.CategoryIds == null)
+                    {
+                        throw new InvalidOperationException("Product doesn't have any categories set in object.");
+                    }
                     if (sku.Sku.Product.CategoryIds.Any(category => promoCategories.Contains(category)))
                     {
                         if (sku.Amount == sku.Sku.Price)
