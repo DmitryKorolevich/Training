@@ -1,5 +1,6 @@
 ﻿{
   "App": {
+    "DefaultCacheExpirationTermMinutes": 1440,
     "DefaultCultureId": "en-US",
     "Connection": {
       "UserName": "dev_vcdb_login",
@@ -22,6 +23,15 @@
       "Schedules": {
         "AutoShipJob": "0 0 * * * ?"
       }
+    },
+    "Email": {
+      "From": "admin.staging@g2designgroup.com",
+      "Host": "smtp.1and1.com",
+      "Port": 587,
+      "Secured": true,
+      "Username": "admin.staging@g2designgroup.com",
+      "Password": "vcstaging123",
+      "Disabled": false
     }
   }
 }

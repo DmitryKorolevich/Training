@@ -395,7 +395,7 @@ namespace VitalChoice.Business.Services.Checkout
                     await _context.SaveChangesAsync();
                     transaction.Commit();
 
-                    if (sendOrderConfirm && cartOrder.Order?.Customer!=null)//&& cartOrder.Order.IdObjectType != (int)OrderType.AutoShip
+                    if (sendOrderConfirm && cartOrder.Order?.Customer!=null)
 					{
                         var customer = await _customerRepository.Query(p => p.Id == cartOrder.Order.Customer.Id).SelectFirstOrDefaultAsync(false);
                         if (!string.IsNullOrEmpty(customer?.Email))

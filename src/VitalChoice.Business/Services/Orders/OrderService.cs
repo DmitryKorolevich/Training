@@ -878,13 +878,7 @@ namespace VitalChoice.Business.Services.Orders
 	    {
 		    var currentDate = DateTime.Now;
 
-			//var frequencyAvailable = _appInfrastructureService.Get().AutoShipOptions;
-			var autoshipOptions = _lookupRepository.Query(x => x.Name == LookupNames.AutoShipSchedule).Select(false).Single().Id;
-			var frequencyAvailable = _lookupVariantRepository.Query()
-				.Where(x => x.IdLookup == autoshipOptions)
-				.Select(false)
-				.Select(x=>x.Id).ToList();
-
+			var frequencyAvailable = _appInfrastructureService.Get().AutoShipOptions.Select(x => x.Key).ToList();
 
 			var toProcess = new List<int>();
 		    foreach (var frequency in frequencyAvailable)
@@ -919,6 +913,9 @@ namespace VitalChoice.Business.Services.Orders
 
 				Logger.LogInformation($"AutoShip {autoShip.Id} suitable for order submit");
 
+			    OrderDynamic standardOrder = null;
+
+			    var success = false;
 			    using (var uow = CreateUnitOfWork())
 			    {
 				    using (var transaction = uow.BeginTransaction())
@@ -928,7 +925,7 @@ namespace VitalChoice.Business.Services.Orders
 						    autoShip.Data.LastAutoShipDate = currentDate;
 							await UpdateInternalAsync(autoShip, uow);
 
-						    var standardOrder = autoShip;
+						    standardOrder = autoShip;
 							standardOrder.IdObjectType = (int)OrderType.AutoShipOrder;
 							standardOrder.Data.AutoShipFrequency = null;
 							standardOrder.Data.LastAutoShipDate = null;
@@ -942,16 +939,36 @@ namespace VitalChoice.Business.Services.Orders
 						    transaction.Commit();
 
 							Logger.LogInformation($"AutoShip {autoShip.Id} handled successfully");
-						}
+
+						    success = true;
+					    }
 					    catch(Exception ex)
 					    {
 							transaction.Rollback();
 
 							Logger.LogError($"AutoShip {autoShip.Id} skipped due to error ocurred. Error: {ex.Message}", ex);
+
+							success = false;
 						}
 				    }
 			    }
-		    }
+
+			    if (success)
+			    {
+					try
+					{
+						var emailModel = Mapper.ToModel<VitalChoice.Ecommerce.Domain.Mail.OrderConfirmationEmail>(standardOrder);
+						if (emailModel != null)
+						{
+							await _notificationService.SendOrderConfirmationEmailAsync(standardOrder.Customer.Email, emailModel);
+						}
+					}
+					catch (Exception ex)
+					{
+						Logger.LogError($"Order confirmation {standardOrder.Id} was not sent. Error: {ex.Message}", ex);
+					}
+				}
+			}
 		}
 
 	    public async Task<IList<int>> SelectAutoShipOrdersAsync(int idAutoShip)
