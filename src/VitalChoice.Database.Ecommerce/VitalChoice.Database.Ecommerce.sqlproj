@@ -257,4 +257,10 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\VAutoShips.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetInventorySkusUsageReport.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\TFGetTableIdsByString.sql" />
+  </ItemGroup>
 </Project>

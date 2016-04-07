@@ -14,5 +14,9 @@ namespace VitalChoice.Interfaces.Services.InventorySkus
         Task<PagedList<InventorySkuListItemModel>> GetInventorySkusAsync(InventorySkuFilter filter);
 
         Task<Dictionary<int, List<SkuToInventorySku>>> GetAssignedInventorySkusAsync(ICollection<int> skuIds);
+
+	    Task<ICollection<InventorySkuUsageReportItem>> GetInventorySkuUsageReportAsync(InventorySkuUsageReportFilter filter);
+
+        Task<ICollection<InventorySkuUsageReportItemForExport>> GetInventorySkuUsageReportForExportAsync(InventorySkuUsageReportFilter filter);
     }
 }

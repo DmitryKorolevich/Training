@@ -31,8 +31,10 @@ using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 using Microsoft.Extensions.OptionsModel;
+using Microsoft.Net.Http.Headers;
 using VC.Admin.Models.InventorySkus;
 using VC.Admin.Models.Products;
+using VitalChoice.Business.CsvExportMaps.Products;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
@@ -50,6 +52,7 @@ namespace VC.Admin.Controllers
         private readonly IInventorySkuService _inventorySkuService;
         private readonly InventorySkuMapper _mapper;
         private readonly ISettingService _settingService;
+        private readonly ICsvExportService<InventorySkuUsageReportItemForExport, InventorySkuUsageReportItemForExportCsvMap> _inventorySkuUsageReportItemForExportCSVExportService;
         private readonly ILogger _logger;
 
         public InventorySkuController(
@@ -57,12 +60,14 @@ namespace VC.Admin.Controllers
             IInventorySkuService inventorySkuService,
             InventorySkuMapper mapper,
             ISettingService settingService,
+            ICsvExportService<InventorySkuUsageReportItemForExport, InventorySkuUsageReportItemForExportCsvMap> inventorySkuUsageReportItemForExportCSVExportService,
             ILoggerProviderExtended loggerProvider)
         {
             _inventorySkuCategoryService = inventorySkuCategoryService;
             _inventorySkuService = inventorySkuService;
             _mapper = mapper;
             _settingService = settingService;
+            _inventorySkuUsageReportItemForExportCSVExportService = inventorySkuUsageReportItemForExportCSVExportService;
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -212,6 +217,47 @@ namespace VC.Admin.Controllers
         public async Task<Result<bool>> DeleteInventorySkuCategory(int id, [FromBody] object model)
         {
             return await _inventorySkuCategoryService.DeleteCategoryAsync(id);
+        }
+
+        #endregion
+
+        #region Reports
+
+        [HttpPost]
+        public async Task<Result<ICollection<InventorySkuUsageReportItem>>> GetInventorySkuUsageReport([FromBody]InventorySkuUsageReportFilter filter)
+        {
+            filter.To = filter.To.AddDays(1);
+
+            var toReturn = await _inventorySkuService.GetInventorySkuUsageReportAsync(filter);
+
+            return toReturn.ToList();
+        }
+
+        [HttpGet]
+        public async Task<FileResult> GetInventorySkuUsageReportFile([FromQuery]DateTime from, [FromQuery]DateTime to,
+             [FromQuery]string skuids, [FromQuery]string invskuids)
+        {
+            InventorySkuUsageReportFilter filter = new InventorySkuUsageReportFilter()
+            {
+                From = from,
+                To = to,
+                SkuIds =!string.IsNullOrEmpty(skuids) ? skuids.Split(',').Select(Int32.Parse).ToList() : new List<int>(),
+                InvSkuIds = !string.IsNullOrEmpty(invskuids) ? invskuids.Split(',').Select(Int32.Parse).ToList() : new List<int>(),
+            };
+
+            filter.To = filter.To.AddDays(1);
+
+            var result = await _inventorySkuService.GetInventorySkuUsageReportForExportAsync(filter);
+
+            var data = _inventorySkuUsageReportItemForExportCSVExportService.ExportToCsv(result);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.INVENTORY_SKUS_REPORT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(data, "text/csv");
         }
 
         #endregion

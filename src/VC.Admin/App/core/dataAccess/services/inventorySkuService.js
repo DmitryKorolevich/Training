@@ -54,5 +54,16 @@ angular.module('app.core.dataAccess.services.inventorySkuService', [])
 	    deleteInventorySkuCategory: function (id, tracker) {
 	        return $http.post(baseUrl + 'DeleteInventorySkuCategory/' + id, null, getConfig(tracker));
 	    },
+
+	    //reports
+	    getInventorySkuUsageReport: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetInventorySkuUsageReport', filter, getConfig(tracker));
+	    },
+	    getInventorySkuUsageReportFile: function (filter, buildNumber)
+	    {
+	        return baseUrl + 'GetInventorySkuUsageReportFile?from={0}&to={1}&skuids={2}&invskuids={3}&buildNumber={4}'
+                .format(filter.From, filter.To, filter.SkuIds, filter.InvSkuIds, buildNumber);
+	    },
 	};
 }]);

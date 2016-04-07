@@ -37,3 +37,5 @@ Post-Deployment Script Template
 :r .\Scripts\VTopProducts.sql
 :r .\Scripts\AutoShip.sql
 :r .\Scripts\VAutoShips.sql
+:r .\Scripts\TFGetTableIdsByString.sql
+:r .\Scripts\SPGetInventorySkusUsageReport.sql

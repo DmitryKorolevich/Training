@@ -12,6 +12,9 @@
 
         public const string SETTINGS_LOOKUP_NAMES = "ServiceCodes,InventorySkuChannels,InventorySkuProductSources,InventorySkuUnitOfMeasures,InventorySkuPurchaseUnitOfMeasures";
         public const string INVENTORY_SKU_LOOKUP_CHANNEL_NAME = "InventorySkuChannels";
+        public const string INVENTORY_SKU_LOOKUP_PRODUCT_SOURCE_NAME = "InventorySkuProductSources";
+        public const string INVENTORY_SKU_LOOKUP_UNIT_OF_MEASURE_NAME = "InventorySkuUnitOfMeasures";
+        public const string INVENTORY_SKU_LOOKUP_PURCHASE_UNIT_OF_MEASURE_NAME = "InventorySkuPurchaseUnitOfMeasures";
         public const string INVENTORY_SKU_LOOKUP_NAMES = "InventorySkuChannels,InventorySkuProductSources,InventorySkuUnitOfMeasures,InventorySkuPurchaseUnitOfMeasures";
         public const string SERVICE_CODE_LOOKUP_NAME = "ServiceCodes";
     }

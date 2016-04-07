@@ -7,6 +7,7 @@ using VitalChoice.Business.Queries.InventorySkus;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Data.Repositories;
+using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Services;
 using VitalChoice.Data.Transaction;
@@ -20,12 +21,14 @@ using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Context;
+using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Content;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.InventorySkus;
 using VitalChoice.Interfaces.Services.InventorySkus;
+using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.ObjectMapping.Base;
 
 namespace VitalChoice.Business.Services.InventorySkus
@@ -35,10 +38,16 @@ namespace VitalChoice.Business.Services.InventorySkus
     {
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly IEcommerceRepositoryAsync<SkuToInventorySku> _skuToInventorySkuRepository;
+        private readonly IInventorySkuCategoryService _inventorySkuCategoryService;
+        private readonly SPEcommerceRepository _sPEcommerceRepository;
+        private readonly ISettingService _settingService;
 
         public InventorySkuService(InventorySkuMapper mapper,
             IEcommerceRepositoryAsync<InventorySku> inventorySkuRepository,
             IEcommerceRepositoryAsync<InventorySkuOptionValue> inventorySkuValueRepositoryAsync,
+            IInventorySkuCategoryService inventorySkuCategoryService,
+            SPEcommerceRepository sPEcommerceRepository,
+            ISettingService settingService,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
             DirectMapper<InventorySku> directMapper,
@@ -52,6 +61,9 @@ namespace VitalChoice.Business.Services.InventorySkus
         {
             _adminProfileRepository = adminProfileRepository;
             _skuToInventorySkuRepository = skuToInventorySkuRepository;
+            _inventorySkuCategoryService = inventorySkuCategoryService;
+            _sPEcommerceRepository = sPEcommerceRepository;
+            _settingService = settingService;
         }
 
         public async Task<PagedList<InventorySkuListItemModel>> GetInventorySkusAsync(InventorySkuFilter filter)
@@ -157,6 +169,135 @@ namespace VitalChoice.Business.Services.InventorySkus
                 assignedInventories.Add(skuToInventorySku);
             }
             return toReturn;
+        }
+
+        public async Task<ICollection<InventorySkuUsageReportItem>> GetInventorySkuUsageReportAsync(InventorySkuUsageReportFilter filter)
+        {
+            var toReturn = new List<InventorySkuUsageReportItem>();
+            var data = await _sPEcommerceRepository.GetInventorySkusUsageReportAsync(filter);
+
+            foreach (var inventorySkuUsageRawReportItem in data)
+            {
+                var item = toReturn.FirstOrDefault(p => p.IdSku == inventorySkuUsageRawReportItem.IdSku);
+                if (item == null)
+                {
+                    item=new InventorySkuUsageReportItem();
+                    item.IdSku = inventorySkuUsageRawReportItem.IdSku;
+                    item.SkuCode = inventorySkuUsageRawReportItem.SkuCode;
+                    item.TotalSkuQuantity = inventorySkuUsageRawReportItem.TotalSkuQuantity;
+                    item.BornDate = inventorySkuUsageRawReportItem.BornDate;
+                    item.InventorySkuChannel = inventorySkuUsageRawReportItem.InventorySkuChannel;
+                    toReturn.Add(item);
+                }
+
+                if (inventorySkuUsageRawReportItem.IdInventorySku.HasValue)
+                {
+                    var inventorySku = new SubInventorySkuUsageReportItem();
+                    inventorySku.IdInventorySku = inventorySkuUsageRawReportItem.IdInventorySku.Value;
+                    inventorySku.TotalInvSkuQuantity = inventorySkuUsageRawReportItem.TotalInvSkuQuantity ?? 0;
+                    inventorySku.InvSkuCode = inventorySkuUsageRawReportItem.InvSkuCode;
+                    inventorySku.InvDescription = inventorySkuUsageRawReportItem.InvDescription;
+                    inventorySku.IdInventorySkuCategory = inventorySkuUsageRawReportItem.IdInventorySkuCategory;
+
+                    inventorySku.ProductSource = inventorySkuUsageRawReportItem.ProductSource;
+                    inventorySku.TotalInvQuantityWithInvCorrection = (inventorySkuUsageRawReportItem.InvQuantity ?? 0) * inventorySku.TotalInvSkuQuantity;
+                    inventorySku.UnitOfMeasure = inventorySkuUsageRawReportItem.UnitOfMeasure;
+                    inventorySku.TotalUnitOfMeasureAmount = (inventorySkuUsageRawReportItem.UnitOfMeasureAmount ?? 0) * inventorySku.TotalInvSkuQuantity;
+                    inventorySku.PurchaseUnitOfMeasure = inventorySkuUsageRawReportItem.PurchaseUnitOfMeasure;
+                    inventorySku.PurchaseUnitOfMeasureAmount = inventorySkuUsageRawReportItem.PurchaseUnitOfMeasureAmount ?? 0;
+
+                    item.InventorySkus.Add(inventorySku);
+                }
+            }
+
+            toReturn = toReturn.OrderBy(p => p.SkuCode).ToList();
+
+            return toReturn;
+        }
+
+        public async Task<ICollection<InventorySkuUsageReportItemForExport>> GetInventorySkuUsageReportForExportAsync(InventorySkuUsageReportFilter filter)
+        {
+            var toReturn = new List<InventorySkuUsageReportItemForExport>();
+            var data = await GetInventorySkuUsageReportAsync(filter);
+            
+            var categoryTree = new InventorySkuCategory();
+            categoryTree.SubCategories = await _inventorySkuCategoryService.GetCategoriesTreeAsync(new InventorySkuCategoryTreeFilter());
+
+            var lookups = await _settingService.GetLookupsAsync(SettingConstants.INVENTORY_SKU_LOOKUP_NAMES.Split(','));
+
+            foreach (var inventorySkuUsageReportItem in data)
+            {
+                InventorySkuUsageReportItemForExport item=new InventorySkuUsageReportItemForExport();
+                item.IdSku = inventorySkuUsageReportItem.IdSku;
+                item.SkuCode = inventorySkuUsageReportItem.SkuCode;
+                item.TotalSkuQuantity = inventorySkuUsageReportItem.TotalSkuQuantity;
+                item.BornDate = inventorySkuUsageReportItem.BornDate;
+                item.Assemble = inventorySkuUsageReportItem.Assemble.HasValue ? (inventorySkuUsageReportItem.Assemble.Value ? "yes" : "no") : null;
+
+                var lookup = lookups.FirstOrDefault(p => p.Name == SettingConstants.INVENTORY_SKU_LOOKUP_CHANNEL_NAME);
+                if (lookup != null)
+                {
+                    item.InventorySkuChannel=lookup.LookupVariants.FirstOrDefault(p=>p.Id==inventorySkuUsageReportItem.InventorySkuChannel)?.ValueVariant;
+                }
+
+                toReturn.Add(item);
+
+                foreach (var subInventorySkuUsageReportItem in inventorySkuUsageReportItem.InventorySkus)
+                {
+                    item = new InventorySkuUsageReportItemForExport();
+                    item.IdInventorySku = subInventorySkuUsageReportItem.IdInventorySku;
+                    item.TotalInvSkuQuantity = subInventorySkuUsageReportItem.TotalInvSkuQuantity;
+                    item.InvSkuCode = subInventorySkuUsageReportItem.InvSkuCode;
+                    item.InvDescription = subInventorySkuUsageReportItem.InvDescription;
+                    item.InventorySkuCategory = FindUICategory(categoryTree, subInventorySkuUsageReportItem.IdInventorySkuCategory)?.Name;
+
+                    lookup = lookups.FirstOrDefault(p => p.Name == SettingConstants.INVENTORY_SKU_LOOKUP_PRODUCT_SOURCE_NAME);
+                    if (lookup != null)
+                    {
+                        item.ProductSource = lookup.LookupVariants.FirstOrDefault(p => p.Id == subInventorySkuUsageReportItem.ProductSource)?.ValueVariant;
+                    }
+                    lookup = lookups.FirstOrDefault(p => p.Name == SettingConstants.INVENTORY_SKU_LOOKUP_UNIT_OF_MEASURE_NAME);
+                    if (lookup != null)
+                    {
+                        item.UnitOfMeasure = lookup.LookupVariants.FirstOrDefault(p => p.Id == subInventorySkuUsageReportItem.UnitOfMeasure)?.ValueVariant;
+                    }
+                    lookup = lookups.FirstOrDefault(p => p.Name == SettingConstants.INVENTORY_SKU_LOOKUP_PURCHASE_UNIT_OF_MEASURE_NAME);
+                    if (lookup != null)
+                    {
+                        item.PurchaseUnitOfMeasure = lookup.LookupVariants.FirstOrDefault(p => p.Id == subInventorySkuUsageReportItem.PurchaseUnitOfMeasure)?.ValueVariant;
+                    }
+
+                    item.TotalInvQuantityWithInvCorrection=subInventorySkuUsageReportItem.TotalInvQuantityWithInvCorrection;
+                    item.TotalUnitOfMeasureAmount = subInventorySkuUsageReportItem.TotalUnitOfMeasureAmount;
+                    item.PurchaseUnitOfMeasureAmount = subInventorySkuUsageReportItem.PurchaseUnitOfMeasureAmount;
+
+                    toReturn.Add(item);
+                }
+            }
+
+            return toReturn;
+        }
+
+        private InventorySkuCategory FindUICategory(InventorySkuCategory root, int? id)
+        {
+            if (!id.HasValue)
+            {
+                return null;
+            }
+
+            if (root.Id == id)
+            {
+                if (root.ParentId.HasValue)
+                {
+                    return root;
+                }
+            }
+            else
+            {
+                return root.SubCategories.Select(subCategory => FindUICategory(subCategory, id)).FirstOrDefault(res => res != null);
+            }
+
+            return null;
         }
     }
 }

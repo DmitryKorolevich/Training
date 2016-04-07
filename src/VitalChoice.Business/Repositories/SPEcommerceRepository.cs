@@ -13,7 +13,9 @@ using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 using VitalChoice.Ecommerce.Domain;
+using VitalChoice.Infrastructure.Domain.Entities.InventorySkus;
 using VitalChoice.Infrastructure.Domain.Entities.Products;
+using VitalChoice.Infrastructure.Domain.Transfer.InventorySkus;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 
 namespace VitalChoice.Data.Repositories.Customs
@@ -48,6 +50,40 @@ namespace VitalChoice.Data.Repositories.Customs
         {
             var toReturn = await Context.Set<OrdersZipStatisticItem>().FromSql("[dbo].[SPGetOrdersZipStatistic] @from={0}, @to={1}, @IdCustomerType={2}, @IdOrderType={3}",
                 filter.From, filter.To, filter.IdCustomerType, filter.IdOrderType).ToListAsync();
+            return toReturn;
+        }
+
+        public async Task<ICollection<InventorySkuUsageRawReportItem>> GetInventorySkusUsageReportAsync(InventorySkuUsageReportFilter filter)
+        {
+            string sSkuIds = null;
+            if (filter.SkuIds != null && filter.SkuIds.Count>0)
+            {
+                sSkuIds = string.Empty;
+                for (int i = 0; i < filter.SkuIds.Count; i++)
+                {
+                    sSkuIds += filter.SkuIds[i];
+                    if (i != filter.SkuIds.Count - 1)
+                    {
+                        sSkuIds += ",";
+                    }
+                }
+            }
+            string sInvSkuIds = null;
+            if (filter.InvSkuIds != null && filter.InvSkuIds.Count > 0)
+            {
+                sInvSkuIds = string.Empty;
+                for (int i = 0; i < filter.InvSkuIds.Count; i++)
+                {
+                    sInvSkuIds += filter.InvSkuIds[i];
+                    if (i != filter.InvSkuIds.Count - 1)
+                    {
+                        sInvSkuIds += ",";
+                    }
+                }
+            }
+
+            var toReturn = await Context.Set<InventorySkuUsageRawReportItem>().FromSql("[dbo].[SPGetInventorySkusUsageReport] @from={0}, @to={1}, @skus={2}, @invskus={3}",
+                filter.From, filter.To, sSkuIds, sInvSkuIds).ToListAsync();
             return toReturn;
         }
     }

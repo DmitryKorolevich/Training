@@ -20,6 +20,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Entities.CatalogRequests;
 using VitalChoice.Infrastructure.Domain.Entities.Checkout;
 using VitalChoice.Infrastructure.Domain.Entities.Customers;
+using VitalChoice.Infrastructure.Domain.Entities.InventorySkus;
 using VitalChoice.Infrastructure.Domain.Entities.Products;
 
 namespace VitalChoice.Infrastructure.Context
@@ -136,6 +137,11 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.HasKey(p => p.Region);
                 entity.Ignore(p => p.Id);
+            });
+
+            builder.Entity<InventorySkuUsageRawReportItem>(entity =>
+            {
+                entity.HasKey(p => p.Id);
             });
 
             builder.Entity<OrdersZipStatisticItem>(entity =>
