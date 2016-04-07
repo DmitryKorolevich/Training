@@ -110,7 +110,7 @@ namespace VC.Public.Controllers
 			if (!await _checkoutService.UpdateCart(cart))
 				throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
 
-			var context = await OrderService.CalculateOrder(cart.Order, OrderStatus.Incomplete);
+			var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
 
 		    return new Tuple<OrderDataContext, CustomerCartOrder>(context, cart);
 	    }

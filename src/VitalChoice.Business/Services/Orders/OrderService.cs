@@ -613,18 +613,7 @@ namespace VitalChoice.Business.Services.Orders
             return order;
         }
 
-        public async Task<OrderDataContext> CalculateOrder(OrderDynamic order, OrderStatus combinedStatus, IWorkflowTree<OrderDataContext, decimal> tree)
-        {
-            var context = new OrderDataContext(combinedStatus)
-            {
-                Order = order
-            };
-            await tree.ExecuteAsync(context);
-            UpdateOrderFromCalculationContext(order, context);
-            return context;
-        }
-
-        public async Task<OrderDataContext> CalculateOrder(OrderDynamic order, OrderStatus combinedStatus)
+        public async Task<OrderDataContext> CalculateStorefrontOrder(OrderDynamic order, OrderStatus combinedStatus)
         {
             if (combinedStatus == OrderStatus.Incomplete)
             {
@@ -636,6 +625,18 @@ namespace VitalChoice.Business.Services.Orders
                     }
                 }
             }
+            var context = new OrderDataContext(combinedStatus)
+            {
+                Order = order
+            };
+            var tree = await _treeFactory.CreateTreeAsync<OrderDataContext, decimal>("Order");
+            await tree.ExecuteAsync(context);
+            UpdateOrderFromCalculationContext(order, context);
+            return context;
+        }
+
+        public async Task<OrderDataContext> CalculateOrder(OrderDynamic order, OrderStatus combinedStatus)
+        {
             var context = new OrderDataContext(combinedStatus)
             {
                 Order = order
@@ -1772,14 +1773,12 @@ namespace VitalChoice.Business.Services.Orders
                 throw new AppValidationException(messages);
             }
 
-            var tree = await _treeFactory.CreateTreeAsync<OrderDataContext, decimal>("Order");
-
             foreach (var item in map)
             {
                 var orderCombinedStatus = item.Order.OrderStatus ?? OrderStatus.Processed;
                 item.Order.Data.ShipDelayType = item.Order.SafeData.ShipDelayDate != null ? ShipDelayType.EntireOrder : ShipDelayType.None;
 
-                var context = await CalculateOrder(item.Order, orderCombinedStatus, tree);
+                var context = await CalculateOrder(item.Order, orderCombinedStatus);
 
                 item.OrderImportItem.ErrorMessages.AddRange(context.Messages);
                 item.OrderImportItem.ErrorMessages.AddRange(

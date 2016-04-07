@@ -356,7 +356,7 @@ namespace VitalChoice.Business.Services.Checkout
             if (cartOrder?.Order == null)
                 return false;
 
-            cartOrder.Order = (await _orderService.CalculateOrder(cartOrder.Order, OrderStatus.Processed)).Order;
+            cartOrder.Order = (await _orderService.CalculateStorefrontOrder(cartOrder.Order, OrderStatus.Processed)).Order;
             using (var transaction = _context.BeginTransaction())
             {
                 try

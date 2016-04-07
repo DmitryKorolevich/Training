@@ -73,7 +73,7 @@ namespace VC.Public.Controllers
         protected async Task FillCartModel(ViewCartModel cartModel)
         {
             var cart = await GetCurrentCart();
-            var context = await OrderService.CalculateOrder(cart.Order, OrderStatus.Incomplete);
+            var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
             await FillModel(cartModel, cart.Order, context);
             SetCartUid(cart.CartUid);
         }
