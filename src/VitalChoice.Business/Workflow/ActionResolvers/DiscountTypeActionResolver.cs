@@ -91,7 +91,7 @@ namespace VitalChoice.Business.Workflow.ActionResolvers
                         usageCount--;
                     }
                 }
-                if (usageCount >= (int?) dataContext.Order.Discount?.Data.MaxTimesUse)
+                if (usageCount >= (int?) dataContext.Order.Discount?.SafeData.MaxTimesUse)
                 {
                     dataContext.Messages.Add(new MessageInfo
                     {
