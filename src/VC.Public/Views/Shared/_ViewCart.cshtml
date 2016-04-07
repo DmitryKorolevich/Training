@@ -1,9 +1,9 @@
 ﻿@model VC.Public.Models.Cart.ViewCartModel
 
-<div data-bind="visible: Model.AutoShip" class="form-regular">
+<div data-bind="visible: Model.AutoShip" style="display: none;" class="form-regular">
     <div class="form-control-important-info">Your cart contains Auto-Ship product. Other products cannot be added to the cart until you submit your order. If you don't want to just remove it from cart and then you will be able add other products to cart again</div>
 </div>
-<div data-bind="visible: Model.TopGlobalMessage" class="form-regular">
+<div data-bind="visible: Model.TopGlobalMessage" style="display: none;" class="form-regular">
     <div class="form-control-important-info" data-bind="text: Model.TopGlobalMessage"></div>
 </div>
 <table class="standard-table cart-items-list">
@@ -39,7 +39,7 @@
 				<a class="cart-text-link" data-bind="attr: { href: ProductPageUrl, title: formatDisplayName($data) }, text: formatDisplayName($data)"></a>
 				<span class="cart-sku-code" data-bind="text: '(' + Code() + ')', visible: Code"></span>
 			    <span class="stock-presence-note" data-bind="visible: InStock()">In Stock Ready to Ship</span>
-			    <span class="note" data-bind="text: !InStock() ? 'Out of stock' : '', attr: {'data-valmsg-for': 'Skus.i' + $index() + '.Code'}" data-valmsg-replace="true"></span>
+			    <span class="field-validation-error no-space" data-bind="text: !InStock() ? 'Out of stock' : '', attr: {'data-valmsg-for': 'Skus.i' + $index() + '.Code'}" data-valmsg-replace="true"></span>
 			</td>
 			<td data-bind="text: formatCurrency(Price())"></td>
 			<td class="width-cart-quantity">
@@ -89,7 +89,7 @@
 				<a class="cart-text-link" data-bind="attr: { href: ProductPageUrl, title: formatDisplayName($data) }, text: formatDisplayName($data)"></a>
 				<span class="cart-sku-code" data-bind="text: '(' + Code() + ')', visible: Code"></span>
 			    <span class="stock-presence-note" data-bind="visible: InStock()">In Stock Ready to Ship</span>
-                <span class="note" data-bind="text: !InStock() ? 'Out of stock' : '', attr: {'data-valmsg-for': 'Promos.i' + $index() + '.Code'}" data-valmsg-replace="true"></span>
+                <span class="field-validation-error no-space" data-bind="text: !InStock() ? 'Out of stock' : '', attr: {'data-valmsg-for': 'Promos.i' + $index() + '.Code'}" data-valmsg-replace="true"></span>
 			</td>
 			<td data-bind="text: formatCurrency(Price())"></td>
 			<td class="width-cart-quantity" data-bind="text: Quantity"></td>

@@ -88,7 +88,7 @@ namespace VitalChoice.Caching.Services
             foreach (var group in entriesToSave.Where(e => e.EntityType != null).GroupBy(e => e.EntityType))
             {
                 var cache = CacheFactory.GetCache(group.Key);
-                foreach (var entry in group)
+                foreach (var entry in group.OrderBy(e => e.State))
                 {
                     EntityKey primaryKey;
                     switch (entry.State)
@@ -127,7 +127,7 @@ namespace VitalChoice.Caching.Services
             foreach (var group in entriesToSave.Where(e => e.EntityType != null).GroupBy(e => e.EntityType))
             {
                 var cache = CacheFactory.GetCache(group.Key);
-                foreach (var entry in group)
+                foreach (var entry in group.OrderBy(e => e.State))
                 {
                     EntityKey primaryKey;
                     switch (entry.State)

@@ -173,7 +173,7 @@
                             <div data-ng-include="'app/modules/order/partials/orderStatusSection.html'"></div>
                         </td>
                         <td>
-                            <span class="label font-default" data-ng-class="::{'label-retail': (item.IdObjectType==1 || item.IdObjectType==2 ||item.IdObjectType==3 || item.IdObjectType==4), 'label-primary':  item.IdObjectType==5, 'label-success':  item.IdObjectType==6}">{{::getReferenceItem(ReferenceData.ShortOrderTypes, item.IdObjectType).Text}}</span>
+                            <span class="label font-default" data-ng-class="::{'label-retail': (item.IdObjectType==1 || item.IdObjectType==7 ||item.IdObjectType==3 || item.IdObjectType==4), 'label-primary':  item.IdObjectType==5, 'label-success':  item.IdObjectType==6}">{{::getReferenceItem(ReferenceData.ShortOrderTypes, item.IdObjectType).Text}}</span>
                         </td>
                         <td class="order-source">
                             <span>{{::getReferenceItem(orderSourceTypes, item.IdOrderSource).Text}}</span>

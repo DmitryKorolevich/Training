@@ -104,6 +104,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IEcommerceRepositoryAsync<OrderToSku> _orderToSkusRepository;
         private readonly IDiscountService _discountService;
 	    private readonly IEcommerceRepositoryAsync<VAutoShip> _vAutoShipRepository;
+	    private readonly IEcommerceRepositoryAsync<VAutoShipOrder> _vAutoShipOrderRepository;
 	    private readonly IEcommerceRepositoryAsync<Lookup> _lookupRepository;
 		private readonly IEcommerceRepositoryAsync<LookupVariant> _lookupVariantRepository;
 
@@ -138,7 +139,7 @@ namespace VitalChoice.Business.Services.Orders
             IProductService productService,
             INotificationService notificationService,
             ICountryService countryService, ITransactionAccessor<EcommerceContext> transactionAccessor, SkuMapper skuMapper,
-            IEcommerceRepositoryAsync<OrderToSku> orderToSkusRepository, IDiscountService discountService, IEcommerceRepositoryAsync<VAutoShip> vAutoShipRepository, IEcommerceRepositoryAsync<Lookup> lookupRepository, IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository)
+            IEcommerceRepositoryAsync<OrderToSku> orderToSkusRepository, IDiscountService discountService, IEcommerceRepositoryAsync<VAutoShip> vAutoShipRepository, IEcommerceRepositoryAsync<Lookup> lookupRepository, IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository, IEcommerceRepositoryAsync<VAutoShipOrder> vAutoShipOrderRepository)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
@@ -169,6 +170,7 @@ namespace VitalChoice.Business.Services.Orders
 			_vAutoShipRepository = vAutoShipRepository;
 		    _lookupRepository = lookupRepository;
 			_lookupVariantRepository = lookupVariantRepository;
+			_vAutoShipOrderRepository = vAutoShipOrderRepository;
 			_addressMapper = addressMapper;
             _productService = productService;
             _notificationService = notificationService;
@@ -520,9 +522,11 @@ namespace VitalChoice.Business.Services.Orders
                         .ToArray();
                 var skuIds = new HashSet<int>(invalidSkuOrdered.Select(s => s.IdSku));
                 var invalidSkus = (await _skusRepository.Query(p => skuIds.Contains(p.Id))
-                    .Include(p => p.Product)
-                    .ThenInclude(s => s.OptionValues)
-                    .Include(p => p.OptionValues)
+                    .Include(s => s.OptionValues)
+                    .Include(s => s.Product)
+                    .ThenInclude(p => p.OptionValues)
+                    .Include(s => s.Product)
+                    .ThenInclude(p => p.ProductsToCategories)
                     .SelectAsync(false)).ToDictionary(s => s.Id);
                 foreach (var orderToSku in invalidSkuOrdered)
                 {
@@ -553,9 +557,11 @@ namespace VitalChoice.Business.Services.Orders
                         .ToArray();
                 var skuIds = new HashSet<int>(invalidSkuOrdered.Select(s => s.IdSku));
                 var invalidSkus = (await _skusRepository.Query(p => skuIds.Contains(p.Id))
-                    .Include(p => p.Product)
-                    .ThenInclude(s => s.OptionValues)
-                    .Include(p => p.OptionValues)
+                    .Include(s => s.OptionValues)
+                    .Include(s => s.Product)
+                    .ThenInclude(p => p.OptionValues)
+                    .Include(s => s.Product)
+                    .ThenInclude(p => p.ProductsToCategories)
                     .SelectAsync(false)).ToDictionary(s => s.Id);
                 foreach (var orderToSku in invalidSkuOrdered)
                 {
@@ -607,12 +613,23 @@ namespace VitalChoice.Business.Services.Orders
             return order;
         }
 
-        public async Task<OrderDataContext> CalculateOrder(OrderDynamic order, OrderStatus combinedStatus, IWorkflowTree<OrderDataContext, decimal> tree)
+        public async Task<OrderDataContext> CalculateStorefrontOrder(OrderDynamic order, OrderStatus combinedStatus)
         {
+            if (combinedStatus == OrderStatus.Incomplete)
+            {
+                if (order.PromoSkus != null)
+                {
+                    foreach (var promo in order.PromoSkus)
+                    {
+                        promo.Enabled = true;
+                    }
+                }
+            }
             var context = new OrderDataContext(combinedStatus)
             {
                 Order = order
             };
+            var tree = await _treeFactory.CreateTreeAsync<OrderDataContext, decimal>("Order");
             await tree.ExecuteAsync(context);
             UpdateOrderFromCalculationContext(order, context);
             return context;
@@ -912,14 +929,15 @@ namespace VitalChoice.Business.Services.Orders
 							await UpdateInternalAsync(autoShip, uow);
 
 						    var standardOrder = autoShip;
-							standardOrder.IdObjectType = (int)OrderType.Normal;
+							standardOrder.IdObjectType = (int)OrderType.AutoShipOrder;
 							standardOrder.Data.AutoShipFrequency = null;
 							standardOrder.Data.LastAutoShipDate = null;
 							standardOrder.Id = 0;
 							standardOrder.PaymentMethod.Id = 0;
 							standardOrder.ShippingAddress.Id = 0;
+						    standardOrder.Data.AutoShipId = autoShip.Id;
 
-						    await InsertAsyncInternal(standardOrder, uow);
+							await InsertAsyncInternal(standardOrder, uow);
 
 						    transaction.Commit();
 
@@ -929,12 +947,16 @@ namespace VitalChoice.Business.Services.Orders
 					    {
 							transaction.Rollback();
 
-							Logger.LogError(ex.Message, ex);
-							Logger.LogError($"AutoShip {autoShip.Id} skipped due to error ocurred");
+							Logger.LogError($"AutoShip {autoShip.Id} skipped due to error ocurred. Error: {ex.Message}", ex);
 						}
 				    }
 			    }
 		    }
+		}
+
+	    public async Task<IList<int>> SelectAutoShipOrdersAsync(int idAutoShip)
+	    {
+			return await _vAutoShipOrderRepository.Query(x => x.AutoShipId == idAutoShip).SelectAsync(x => x.Id);
 		}
 
 	    public async Task<bool> CancelOrderAsync(int id)
@@ -1054,13 +1076,14 @@ namespace VitalChoice.Business.Services.Orders
 
                         if (anyNotIncomplete)
                         {
-							model.IdObjectType = (int)OrderType.Normal;
+							model.IdObjectType = (int)OrderType.AutoShipOrder;
                             model.Data.AutoShipFrequency = null;
 	                        model.Data.LastAutoShipDate = null;
-                            model.Id = 0;
+							model.Data.AutoShipId = res.Id;
+							model.Id = 0;
                             model.ShippingAddress.Id = 0;
 
-                            await InsertAsyncInternal(model, uow);
+							await InsertAsyncInternal(model, uow);
                         }
 
                         transaction.Commit();
@@ -1101,7 +1124,8 @@ namespace VitalChoice.Business.Services.Orders
                 switch ((OrderType)model.IdObjectType)
                 {
                     case OrderType.Normal:
-                        model.PaymentMethod = await _paymentGenericService.Mapper.CreatePrototypeAsync((int)PaymentMethodType.CreditCard);
+					case OrderType.AutoShipOrder:
+						model.PaymentMethod = await _paymentGenericService.Mapper.CreatePrototypeAsync((int)PaymentMethodType.CreditCard);
                         break;
                     case OrderType.AutoShip:
                         model.PaymentMethod = await _paymentGenericService.Mapper.CreatePrototypeAsync((int)PaymentMethodType.CreditCard);
@@ -1153,9 +1177,10 @@ namespace VitalChoice.Business.Services.Orders
                         {
 							foreach (var model in completed)
                             {
-                                model.IdObjectType = (int)OrderType.Normal;
+                                model.IdObjectType = (int)OrderType.AutoShipOrder;
                                 model.Data.AutoShipFrequency = null;
 								model.Data.LastAutoShipDate = null;
+								model.Data.AutoShipId = model.Id;
 								model.ShippingAddress.Id = 0;
                                 model.Id = 0;
                             }
@@ -1202,9 +1227,10 @@ namespace VitalChoice.Business.Services.Orders
 							model.Data.LastAutoShipDate = DateTime.Now;
 	                        await UpdateInternalAsync(model, uow);
 
-							model.IdObjectType = (int)OrderType.Normal;
+							model.IdObjectType = (int)OrderType.AutoShipOrder;
                             model.Data.AutoShipFrequency = null;
 							model.Data.LastAutoShipDate = null;
+							model.Data.AutoShipId = res.Id;
 							model.Id = 0;
                             model.PaymentMethod.Id = 0;
                             model.ShippingAddress.Id = 0;
@@ -1259,9 +1285,10 @@ namespace VitalChoice.Business.Services.Orders
 									model.Data.LastAutoShipDate = DateTime.Now;
 									await UpdateInternalAsync(model, uow);
 
-									model.IdObjectType = (int)OrderType.Normal;
+									model.IdObjectType = (int)OrderType.AutoShipOrder;
                                     model.Data.AutoShipFrequency = null;
 									model.Data.LastAutoShipDate = null;
+									model.Data.AutoShipId = model.Id;
 									model.Id = 0;
                                     model.PaymentMethod.Id = 0;
                                     model.ShippingAddress.Id = 0;
@@ -1746,14 +1773,12 @@ namespace VitalChoice.Business.Services.Orders
                 throw new AppValidationException(messages);
             }
 
-            var tree = await _treeFactory.CreateTreeAsync<OrderDataContext, decimal>("Order");
-
             foreach (var item in map)
             {
                 var orderCombinedStatus = item.Order.OrderStatus ?? OrderStatus.Processed;
                 item.Order.Data.ShipDelayType = item.Order.SafeData.ShipDelayDate != null ? ShipDelayType.EntireOrder : ShipDelayType.None;
 
-                var context = await CalculateOrder(item.Order, orderCombinedStatus, tree);
+                var context = await CalculateOrder(item.Order, orderCombinedStatus);
 
                 item.OrderImportItem.ErrorMessages.AddRange(context.Messages);
                 item.OrderImportItem.ErrorMessages.AddRange(

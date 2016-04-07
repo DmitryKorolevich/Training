@@ -434,3 +434,30 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM OrderTypes WHERE Id = 7)
+BEGIN
+	INSERT INTO OrderTypes
+	(Id, Name)
+	VALUES
+	(7, 'Auto-Ship Order')
+
+	INSERT INTO OrderOptionTypes ([Name]
+      ,[IdLookup]
+      ,[IdFieldType]
+      ,[IdObjectType]
+      ,[DefaultValue])
+	SELECT [Name], [IdLookup], [IdFieldType], 7, [DefaultValue] FROM OrderOptionTypes WHERE [IdObjectType] = 1
+END
+
+GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[OrderOptionTypes] Where Name='AutoShipId' AND IdObjectType=7)
+BEGIN
+
+	INSERT INTO [dbo].[OrderOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'AutoShipId', 3, NULL, 7, NULL)
+
+END

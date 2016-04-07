@@ -73,7 +73,7 @@ namespace VC.Public.Controllers
         protected async Task FillCartModel(ViewCartModel cartModel)
         {
             var cart = await GetCurrentCart();
-            var context = await OrderService.CalculateOrder(cart.Order, OrderStatus.Incomplete);
+            var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
             await FillModel(cartModel, cart.Order, context);
             SetCartUid(cart.CartUid);
         }
@@ -211,7 +211,7 @@ namespace VC.Public.Controllers
                 foreach (var error in sku.Messages)
                 {
                     ModelState.AddModelError("Code".FormatCollectionError("Skus", index), error.Message);
-                    ModelState.AddModelError(string.Empty, $"{sku.Sku.Code}: {error}");
+                    ModelState.AddModelError(string.Empty, $"{sku.Sku.Code}: {error.Message}");
                 }
                 index++;
             }
@@ -221,7 +221,7 @@ namespace VC.Public.Controllers
                 foreach (var error in promo.Messages)
                 {
                     ModelState.AddModelError("Code".FormatCollectionError("Promos", index), error.Message);
-                    ModelState.AddModelError(string.Empty, $"{promo.Sku.Code}: {error}");
+                    ModelState.AddModelError(string.Empty, $"{promo.Sku.Code}: {error.Message}");
                 }
                 index++;
             }

@@ -7,6 +7,7 @@
         DropShip = 3,
         GiftList = 4,
         Reship = 5,
-        Refund = 6
+        Refund = 6,
+		AutoShipOrder = 7
     }
 }

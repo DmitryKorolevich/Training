@@ -476,7 +476,7 @@ namespace VC.Public.Controllers
                     cart.Order.Data.GiftOrder = model.IsGiftOrder;
                     cart.Order.Data.GiftMessage = model.GiftMessage;
                     cart.Order.Data.DeliveryInstructions = model.DeliveryInstructions;
-                    await OrderService.CalculateOrder(cart.Order, OrderStatus.Incomplete);
+                    await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
                     if (await CheckoutService.UpdateCart(cart))
                     {
                         return RedirectToAction("ReviewOrder");
@@ -600,8 +600,15 @@ namespace VC.Public.Controllers
         private async Task<OrderDynamic> PopulateReviewModel(ReviewOrderModel reviewOrderModel, int idOrder)
         {
             var order = await OrderService.SelectAsync(idOrder, true);
+			if (order.IdObjectType == (int)OrderType.AutoShip)
+	        {
+				var id = (await OrderService.SelectAutoShipOrdersAsync(idOrder)).First();
+
+				order = await OrderService.SelectAsync(id, true);
+			}
+
             order.Customer = await CustomerService.SelectAsync(order.Customer.Id, true);
-            var context = await OrderService.CalculateOrder(order, OrderStatus.Processed);
+            var context = await OrderService.CalculateStorefrontOrder(order, OrderStatus.Processed);
             await FillModel(reviewOrderModel, order, context);
 
             var countries = await _countryService.GetCountriesAsync();

@@ -378,15 +378,11 @@ namespace VitalChoice.Caching.Services.Cache
         {
             if (pk == null)
                 return false;
-            MarkForUpdateDependent(pk);
+            MarkForUpdateInternal(pk, CacheStorage.AllCacheDatas, null);
             var datas = CacheStorage.AllCacheDatas;
             datas.ForEach(data =>
             {
-                var cached = data.TryRemove(pk);
-                if (cached != null)
-                {
-                    MarkForUpdateForeignKeys(cached.ForeignKeys);
-                }
+                data.TryRemove(pk);
             });
             return true;
         }

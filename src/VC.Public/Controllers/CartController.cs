@@ -78,7 +78,7 @@ namespace VC.Public.Controllers
 				cart = await _checkoutService.GetOrCreateCart(existingUid);
 			}
 
-			if (sku.Sku.SafeData.AutoShipProduct==true)
+			if (sku.Sku.SafeData.AutoShipProduct == true && autoshipFrequency.HasValue)
 			{
 				cart.Order.PromoSkus.Clear();
 				cart.Order.Skus.Clear();
@@ -110,7 +110,7 @@ namespace VC.Public.Controllers
 			if (!await _checkoutService.UpdateCart(cart))
 				throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
 
-			var context = await OrderService.CalculateOrder(cart.Order, OrderStatus.Incomplete);
+			var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
 
 		    return new Tuple<OrderDataContext, CustomerCartOrder>(context, cart);
 	    }
@@ -150,7 +150,12 @@ namespace VC.Public.Controllers
         {
 			var cartModel = new ViewCartModel();
 
-			return await InitCartModelInternal(cartModel);
+			var result = await InitCartModelInternal(cartModel);
+		    if (!ModelState.IsValid)
+		    {
+		        return ResultHelper.CreateErrorResult(ModelState, result);
+		    }
+		    return result;
         }
 
         public async Task<IActionResult> ViewCart()

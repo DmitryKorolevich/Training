@@ -110,7 +110,12 @@ namespace VitalChoice.Business.Services.Checkout
                     .Include(c => c.Skus)
                     .ThenInclude(s => s.Sku)
                     .ThenInclude(s => s.Product)
-                    .ThenInclude(p => p.OptionValues).SelectFirstOrDefaultAsync(false) ?? await CreateNew();
+                    .ThenInclude(p => p.OptionValues)
+                    .Include(c => c.Skus)
+                    .ThenInclude(s => s.Sku)
+                    .ThenInclude(s => s.Product)
+                    .ThenInclude(p => p.ProductsToCategories)
+                    .SelectFirstOrDefaultAsync(false) ?? await CreateNew();
             }
             else
             {
@@ -351,7 +356,7 @@ namespace VitalChoice.Business.Services.Checkout
             if (cartOrder?.Order == null)
                 return false;
 
-            cartOrder.Order = (await _orderService.CalculateOrder(cartOrder.Order, OrderStatus.Processed)).Order;
+            cartOrder.Order = (await _orderService.CalculateStorefrontOrder(cartOrder.Order, OrderStatus.Processed)).Order;
             using (var transaction = _context.BeginTransaction())
             {
                 try
@@ -390,12 +395,24 @@ namespace VitalChoice.Business.Services.Checkout
                     await _context.SaveChangesAsync();
                     transaction.Commit();
 
-                    if (sendOrderConfirm && cartOrder.Order?.Customer!=null)
-                    {
+                    if (sendOrderConfirm && cartOrder.Order?.Customer!=null)//&& cartOrder.Order.IdObjectType != (int)OrderType.AutoShip
+					{
                         var customer = await _customerRepository.Query(p => p.Id == cartOrder.Order.Customer.Id).SelectFirstOrDefaultAsync(false);
                         if (!string.IsNullOrEmpty(customer?.Email))
                         {
-                            var emailModel = _orderMapper.ToModel<OrderConfirmationEmail>(cartOrder.Order);
+							OrderDynamic mailOrder;
+							if (cartOrder.Order.IdObjectType == (int)OrderType.AutoShip)
+							{
+								var ids = await _orderService.SelectAutoShipOrdersAsync(cartOrder.Order.Id);
+
+								mailOrder = await _orderService.SelectAsync(ids.First());
+							}
+							else
+							{
+								mailOrder = cartOrder.Order;
+							}
+
+							var emailModel = _orderMapper.ToModel<OrderConfirmationEmail>(mailOrder);
                             if (emailModel != null)
                             {
                                 await _notificationService.SendOrderConfirmationEmailAsync(customer.Email, emailModel);

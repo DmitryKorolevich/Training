@@ -62,6 +62,7 @@ namespace VitalChoice.Caching.Services.Cache
         public CacheCluster<EntityKey, T> Get(EntityCacheableIndexInfo nonUniqueIndexInfo, EntityIndex index)
         {
             ConcurrentDictionary<EntityIndex, CacheCluster<EntityKey, T>> indexedPartition;
+            // ReSharper disable once InconsistentlySynchronizedField
             if (_nonUniqueIndexedDictionary.TryGetValue(nonUniqueIndexInfo, out indexedPartition))
             {
                 CacheCluster<EntityKey, T> cluster;
@@ -107,6 +108,10 @@ namespace VitalChoice.Caching.Services.Cache
                 foreach (var conditionalIndex in _conditionalIndexedDictionary)
                 {
                     conditionalIndex.Value.Clear();
+                }
+                foreach (var nonUniqueIndex in _nonUniqueIndexedDictionary)
+                {
+                    nonUniqueIndex.Value.Clear();
                 }
             }
         }
@@ -239,60 +244,75 @@ namespace VitalChoice.Caching.Services.Cache
                 //Collection reference, update always if not null
                 if (relationReference == null)
                 {
-                    if (newRelated is IEnumerable<object>)
-                    {
-                        var pkInfo = _infoStorage.GetPrimaryKeyInfo(pair.Key.RelationType);
-                        if (trackedEntities == null || pkInfo != null &&
-                            (newRelated as IEnumerable<object>)
-                                .Any(
-                                    r =>
-                                    {
-                                        EntityEntry entry;
-                                        return
-                                            trackedEntities.TryGetValue(
-                                                new TrackedEntityKey(pair.Key.RelationType, pkInfo.GetPrimaryKeyValue(r)), out entry) &&
-                                            entry.State != EntityState.Unchanged && entry.State != EntityState.Detached &&
-                                            entry.Entity == r;
-                                    }))
-                        {
-                            cached.NeedUpdateRelated.Remove(pair.Key.Name);
-                            pair.Key.SetRelatedObject(oldEntity, (newRelated as IEnumerable).Clone(pair.Key.RelationType));
-                        }
-                    }
-                    else
+                    if (!(newRelated is IEnumerable<object>))
                     {
                         cached.NeedUpdate = true;
                         return false;
                     }
+                    var pkInfo = _infoStorage.GetPrimaryKeyInfo(pair.Key.RelationType);
+                    var newItems = newRelated as IEnumerable<object>;
+                    if (pkInfo == null)
+                    {
+                        cached.NeedUpdate = true;
+                        return false;
+                    }
+                    foreach (var newItem in newItems)
+                    {
+                        var pk = pkInfo.GetPrimaryKeyValue(newItem);
+                        if (!pk.IsValid)
+                        {
+                            cached.NeedUpdate = true;
+                            return false;
+                        }
+                        if (trackedEntities != null)
+                        {
+                            EntityEntry entry;
+                            if (!trackedEntities.TryGetValue(new TrackedEntityKey(pair.Key.RelationType, pk), out entry))
+                            {
+                                cached.NeedUpdate = true;
+                                return false;
+                            }
+                            if (entry.State != EntityState.Unchanged && entry.State != EntityState.Detached && entry.Entity != newItem)
+                            {
+                                cached.NeedUpdate = true;
+                                return false;
+                            }
+                        }
+                    }
+                    cached.NeedUpdateRelated.Remove(pair.Key.Name);
+                    pair.Key.SetRelatedObject(oldEntity, (newRelated as IEnumerable).Clone(pair.Key.RelationType));
                 }
                 else
                 {
                     var newRelatedKey = relationReference.GetPrimaryKeyValue(entity);
                     if (newRelatedKey.IsValid)
                     {
-                        if (newRelated != null)
-                        {
-                            EntityEntry entry;
-                            if (trackedEntities == null ||
-                                trackedEntities.TryGetValue(new TrackedEntityKey(pair.Key.RelationType, newRelatedKey), out entry) &&
-                                entry.State != EntityState.Unchanged && entry.State != EntityState.Detached &&
-                                entry.Entity == newRelated)
-                            {
-                                cached.NeedUpdateRelated.Remove(pair.Key.Name);
-                                pair.Key.SetRelatedObject(oldEntity, newRelated.Clone(pair.Key.RelationType));
-                            }
-                        }
-                        else
+                        if (newRelated == null)
                         {
                             cached.NeedUpdate = true;
                             return false;
                         }
+                        if (trackedEntities != null)
+                        {
+                            EntityEntry entry;
+                            if (!trackedEntities.TryGetValue(new TrackedEntityKey(pair.Key.RelationType, newRelatedKey), out entry))
+                            {
+                                cached.NeedUpdate = true;
+                                return false;
+                            }
+                            if (entry.State != EntityState.Unchanged && entry.State != EntityState.Detached && entry.Entity != newRelated)
+                            {
+                                cached.NeedUpdate = true;
+                                return false;
+                            }
+                        }
+                        pair.Key.SetRelatedObject(oldEntity, newRelated.Clone(pair.Key.RelationType));
                     }
                     else
                     {
-                        cached.NeedUpdateRelated.Remove(pair.Key.Name);
                         pair.Key.SetRelatedObject(oldEntity, null);
                     }
+                    cached.NeedUpdateRelated.Remove(pair.Key.Name);
                 }
             }
             UpdateRelations(oldEntity);

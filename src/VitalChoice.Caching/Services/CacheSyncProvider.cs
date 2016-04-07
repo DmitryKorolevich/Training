@@ -40,7 +40,7 @@ namespace VitalChoice.Caching.Services
                 var pkInfo = KeyStorage.GetPrimaryKeyInfo(type);
                 if (pkInfo == null)
                     continue;
-                foreach (var op in group)
+                foreach (var op in group.OrderByDescending(e => e.SyncType))
                 {
                     object entity;
                     switch (op.SyncType)
