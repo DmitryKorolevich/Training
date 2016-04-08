@@ -6,7 +6,6 @@ using VitalChoice.Validation.Models;
 using System;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
-using System.Security.Claims;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Orders;
@@ -32,7 +31,6 @@ using VitalChoice.Infrastructure.Domain.Constants;
 using Microsoft.Net.Http.Headers;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Core.Infrastructure.Helpers;
-using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VC.Admin.ModelConverters;
 using VC.Admin.Models.Customers;
@@ -51,6 +49,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates;
 using VitalChoice.SharedWeb.Models.Orders;
 using VitalChoice.Business.Helpers;
 using VitalChoice.SharedWeb.Helpers;
+using System.Security.Claims;
 
 namespace VC.Admin.Controllers
 {
@@ -61,25 +60,21 @@ namespace VC.Admin.Controllers
         private readonly IOrderRefundService _orderRefundService;
         private readonly OrderMapper _mapper;
         private readonly OrderRefundMapper _orderRefundMapper;
-        private readonly IDynamicMapper<AddressDynamic, OrderAddress> _orderAddressMapper;
-		private readonly IDynamicMapper<AddressDynamic, Address> _addressMapper;
+	    private readonly IDynamicMapper<AddressDynamic, Address> _addressMapper;
 		private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _customerPaymentMethodMapper;
 		private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _orderPaymentMethodMapper;
 
         private readonly ICustomerService _customerService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
-        private readonly IOptions<AppOptions> _options;
 	    private readonly IAppInfrastructureService _appInfrastructureService;
 	    private readonly ICountryService _countryService;
         private readonly ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> _ordersRegionStatisticItemCSVExportService;
         private readonly ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> _ordersZipStatisticItemCSVExportService;
         private readonly ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> _vOrderWithRegionInfoItemCSVExportService;
-        private readonly IProductService _productService;
-        private readonly INotificationService _notificationService;
+	    private readonly INotificationService _notificationService;
         private readonly BrontoService _brontoService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
-        private readonly ILogger logger;
-		private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
+	    private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
 		private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
 		private readonly IDynamicMapper<OrderDynamic, Order> _orderMapper;
 
@@ -94,9 +89,7 @@ namespace VC.Admin.Controllers
             ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> ordersRegionStatisticItemCSVExportService,
             ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> ordersZipStatisticItemCSVExportService,
             ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> vOrderWithRegionInfoItemCSVExportService,
-            IProductService productService,
             INotificationService notificationService,
-            IServiceCodeService serviceCodeService,
             BrontoService brontoService,
             IObjectHistoryLogService objectHistoryLogService, IOptions<AppOptions> options, IAppInfrastructureService appInfrastructureService, ICountryService countryService, IDynamicMapper<OrderDynamic, Order> orderMapper, IDynamicMapper<ProductDynamic, Product> productMapper, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodMapper, IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> customerPaymentMethodMapper, IDynamicMapper<AddressDynamic, Address> addressMapper1)
         {
@@ -105,15 +98,12 @@ namespace VC.Admin.Controllers
             _mapper = mapper;
             _orderRefundMapper = orderRefundMapper;
             _customerService = customerService;
-            _orderAddressMapper = addressMapper;
-            _ordersRegionStatisticItemCSVExportService = ordersRegionStatisticItemCSVExportService;
+	        _ordersRegionStatisticItemCSVExportService = ordersRegionStatisticItemCSVExportService;
             _ordersZipStatisticItemCSVExportService = ordersZipStatisticItemCSVExportService;
             _vOrderWithRegionInfoItemCSVExportService = vOrderWithRegionInfoItemCSVExportService;
-            _productService = productService;
-            _notificationService = notificationService;
+	        _notificationService = notificationService;
             _brontoService = brontoService;
             _objectHistoryLogService = objectHistoryLogService;
-            _options = options;
 	        _appInfrastructureService = appInfrastructureService;
 	        _countryService = countryService;
 			_orderMapper = orderMapper;
@@ -123,7 +113,7 @@ namespace VC.Admin.Controllers
 			_customerPaymentMethodMapper = customerPaymentMethodMapper;
 			_addressMapper = addressMapper1;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
-            this.logger = loggerProvider.CreateLoggerDefault();
+            loggerProvider.CreateLoggerDefault();
         }
 
         [HttpGet]
@@ -402,27 +392,21 @@ namespace VC.Admin.Controllers
                 else
                 {
                     order = await _orderService.InsertAsync(order);
-                }
+					if (order.IdObjectType == (int)OrderType.AutoShip)
+					{
+						var ids = await _orderService.SelectAutoShipOrdersAsync(order.Id);
+
+						order = await _orderService.SelectAsync(ids.First());
+					}
+				}
             }
 
             if (sendOrderConfirm  && !string.IsNullOrEmpty(model.Customer?.Email))//&& order.IdObjectType != (int)OrderType.AutoShip
             {
-	            OrderDynamic mailOrder;
-				if (order.IdObjectType == (int)OrderType.AutoShip)
-				{
-					var ids = await _orderService.SelectAutoShipOrdersAsync(order.Id);
-
-					mailOrder = await _orderService.SelectAsync(ids.First());
-				}
-				else
-				{
-					mailOrder = order;
-				}
-
-                var emailModel = _mapper.ToModel<OrderConfirmationEmail>(mailOrder);
+	            var emailModel = _mapper.ToModel<OrderConfirmationEmail>(order);
                 if (emailModel != null)
                 {
-                    await _notificationService.SendOrderConfirmationEmailAsync(mailOrder.Customer.Email, emailModel);
+                    await _notificationService.SendOrderConfirmationEmailAsync(order.Customer.Email, emailModel);
                 }
             }
 

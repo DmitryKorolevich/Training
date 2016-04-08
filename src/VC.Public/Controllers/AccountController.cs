@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Http;
@@ -66,7 +67,7 @@ namespace VC.Public.Controllers
 
 	    [HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Login(LoginModel model, [FromQuery] string returnUrl)
+		public async Task<IActionResult> Login(LoginModel model, [FromQuery]string returnUrl)
 	    {
 			ViewBag.ReturnUrl = returnUrl;
 			if (!ModelState.IsValid)
@@ -75,17 +76,23 @@ namespace VC.Public.Controllers
 			}
 
             ApplicationUser user = null;
-            try
-            {
-                user = await _userService.SignInAsync(model.Email, model.Password);
-            }
-            catch(WholesalePendingException e)
-            {
-                return Redirect("/content/wholesale-review");
-            }
-			if (user == null)
+		    try
+		    {
+			    user = await _userService.SignInAsync(model.Email, model.Password);
+		    }
+		    catch (WholesalePendingException e)
+		    {
+			    return Redirect("/content/wholesale-review");
+		    }
+		    catch (AppValidationException e)
+		    {
+				ModelState.AddModelError(string.Empty, e.Messages.First().Message);
+				return View(model);
+			}
+		    if (user == null)
 			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+				ModelState.AddModelError(string.Empty,ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+				return View(model);
 			}
 
 		    if (!string.IsNullOrWhiteSpace(returnUrl))
@@ -177,22 +184,35 @@ namespace VC.Public.Controllers
 		}
 
 		[HttpGet]
-		public IActionResult RegisterEmail()
+		public IActionResult RegisterEmail(string returnUrl)
 		{
+			ViewBag.ReturnUrl = returnUrl;
 			return View(new RegisterEmailModel());
 		}
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> RegisterEmail(RegisterEmailModel model)
+		public async Task<IActionResult> RegisterEmail(RegisterEmailModel model, string returnUrl)
 		{
+			ViewBag.ReturnUrl = returnUrl;
+
 			if (!ModelState.IsValid)
 				return View(model);
 
-			var validated = await _userService.ValidateEmailUniquenessAsync(model.Email);
+			bool validated;
+			try
+			{
+				validated = await _userService.ValidateEmailUniquenessAsync(model.Email);
+			}
+			catch (AppValidationException e)
+			{
+				ModelState.AddModelError(string.Empty, e.Messages.First().Message);
+				return View(model);
+			}
+			
 			if (!validated)
 			{
-				return RedirectToAction("Login", new { alreadyTakenEmail = model.Email });
+				return RedirectToAction("Login", new { alreadyTakenEmail = model.Email, returnUrl = returnUrl });
 			}
 
 			return View("RegisterAccount", new RegisterAccountModel() { Email = model.Email });
@@ -200,8 +220,10 @@ namespace VC.Public.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> RegisterAccount(RegisterAccountModel model)
+		public async Task<IActionResult> RegisterAccount(RegisterAccountModel model, string returnUrl)
 		{
+			ViewBag.ReturnUrl = returnUrl;
+
 			if (!ModelState.IsValid)
 				return View(model);
 
@@ -227,15 +249,25 @@ namespace VC.Public.Controllers
 			customer.ApprovedPaymentMethods = new List<int> {defaultPaymentMethod.Id};
 			customer.IdEditedBy = null;
 
-			customer = await _customerService.InsertAsync(customer, model.Password);
+			try
+			{
+				customer = await _customerService.InsertAsync(customer, model.Password);
+			}
+			catch (AppValidationException e)
+			{
+				ModelState.AddModelError(string.Empty, e.Messages.First().Message);
+				return View(model);
+			}
+
 			if (customer == null || customer.Id == 0)
 			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+				ModelState.AddModelError(string.Empty, ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+				return View(model);
 			}
 
 			await _userService.SendSuccessfulRegistration(model.Email, model.FirstName, model.LastName);
 
-			return await Login(new LoginModel() { Email = model.Email, Password = model.Password }, string.Empty);
+			return await Login(new LoginModel() { Email = model.Email, Password = model.Password }, returnUrl);
 		}
 
         [HttpPost]
@@ -353,14 +385,22 @@ namespace VC.Public.Controllers
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
             }
 
-            await _userService.SendForgotPasswordAsync(user.PublicId);
+	        try
+	        {
+		        await _userService.SendForgotPasswordAsync(user.PublicId);
+	        }
+			catch (AppValidationException e)
+			{
+				ModelState.AddModelError(string.Empty, e.Messages.First().Message);
+				return View(model);
+			}
 
-			if (!string.IsNullOrWhiteSpace(returnUrl))
+	        if (!string.IsNullOrWhiteSpace(returnUrl))
 			{
 				return Redirect(returnUrl);
 			}
 
-			return RedirectToAction("Login",new { forgot = true });
+			return RedirectToAction("Login",new { forgot = true, returnUrl = returnUrl });
         }
 
 		[HttpGet]

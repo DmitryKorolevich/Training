@@ -55,7 +55,7 @@ namespace VitalChoice.SharedWeb.Helpers
 
 			result.DisplayName = displayName;
 			result.Active = orderDynamic.StatusCode == (int)RecordStatusCode.Active;
-			result.NextDate = BusinessHelper.FindNextAutoShipDate(orderDynamic.DateCreated, result.Frequency);
+			result.NextDate = orderDynamic.Data.LastAutoShipDate.AddMonths(result.Frequency);
 			result.Id = orderDynamic.Id;
 
 		    return result;

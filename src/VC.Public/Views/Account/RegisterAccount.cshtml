@@ -15,7 +15,7 @@
 }
 
 <div class="working-area-holder">
-	@using (Html.BeginForm("RegisterAccount", "Account", null, FormMethod.Post, new { @class = "form-regular medium-small", role = "form" }))
+	@using (Html.BeginForm("RegisterAccount", "Account", new { returnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-regular medium-small", role = "form" }))
 	{
 		<input id="hdCountry" value="@Html.DisplayForEx(x=>x.IdCountry)" type="hidden">
 		<input id="hdState" value="@Html.DisplayForEx(x=>x.IdState)" type="hidden">

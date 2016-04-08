@@ -245,31 +245,32 @@
                                                             </div>
                                                         </div>
                                                     </div>
-
-                                                    <span class="legend">Ship Delay</span>
-                                                    <div class="form-group">
-                                                        <label class="col-md-12 control-label left">Ship Delay Order?</label>
-                                                        <div class="col-md-12">
-                                                            <label class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="0" type="radio" data-ng-disabled="orderEditDisabled">None</label>
-                                                            <label class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="1" type="radio" data-ng-disabled="orderEditDisabled">Entire Order</label>
-                                                            <label data-ng-if="order.ShouldSplit && order.IdObjectType!=3" class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="2" type="radio" data-ng-disabled="orderEditDisabled">Perishable & Non-Perishable</label>
-                                                        </div>
-                                                    </div>
-                                                    <div data-ng-if="order.ShipDelayType==1" class="form-group">
-                                                        <label for="date" class="col-md-6 control-label">Ship Date</label>
-                                                        <div class="col-md-6">
-                                                            <p class="input-group">
-                                                                <input type="text" name="ShipDelayDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDate" is-open="shipDelayDateOpened" required data-ng-disabled="orderEditDisabled" />
-                                                                <span class="input-group-btn">
+	                                                <div data-ng-hide="order.IdObjectType==2">
+		                                                <span class="legend">Ship Delay</span>
+		                                                <div class="form-group">
+			                                                <label class="col-md-12 control-label left">Ship Delay Order?</label>
+			                                                <div class="col-md-12">
+				                                                <label class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="0" type="radio" data-ng-disabled="orderEditDisabled">None</label>
+				                                                <label class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="1" type="radio" data-ng-disabled="orderEditDisabled">Entire Order</label>
+				                                                <label data-ng-if="order.ShouldSplit && order.IdObjectType!=3" class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="2" type="radio" data-ng-disabled="orderEditDisabled">Perishable & Non-Perishable</label>
+			                                                </div>
+		                                                </div>
+		                                                <div data-ng-if="order.ShipDelayType==1" class="form-group">
+			                                                <label for="date" class="col-md-6 control-label">Ship Date</label>
+			                                                <div class="col-md-6">
+				                                                <p class="input-group">
+					                                                <input type="text" name="ShipDelayDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDate" is-open="shipDelayDateOpened" required data-ng-disabled="orderEditDisabled"/>
+					                                                <span class="input-group-btn">
                                                                     <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                                 </span>
-                                                            </p>
-                                                            <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.ShipDelayDate.$invalid">
-                                                                <small class="error" ng-show="forms.mainForm.ShipDelayDate.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Date")}}</small>
-                                                                <small class="error" ng-show="forms.mainForm.ShipDelayDate.$error.server">{{serverMessages.GetMessage('ShipDelayDate')}}</small>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+				                                                </p>
+				                                                <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.ShipDelayDate.$invalid">
+					                                                <small class="error" ng-show="forms.mainForm.ShipDelayDate.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Date")}}</small>
+					                                                <small class="error" ng-show="forms.mainForm.ShipDelayDate.$error.server">{{serverMessages.GetMessage('ShipDelayDate')}}</small>
+				                                                </div>
+			                                                </div>
+		                                                </div>
+	                                                </div>
                                                     <div data-ng-if="order.ShipDelayType==2 && order.ShouldSplit" class="form-group">
                                                         <label for="date" class="col-md-6 control-label">Perishable Ship Date</label>
                                                         <div class="col-md-6">

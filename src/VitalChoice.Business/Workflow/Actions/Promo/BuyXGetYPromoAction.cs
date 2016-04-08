@@ -58,7 +58,7 @@ namespace VitalChoice.Business.Workflow.Actions.Promo
         private static async Task AddPromoProducts(OrderDataContext context, IProductService productService,
             PromotionDynamic promo, int applyCount)
         {
-            int? maxUsage = promo.Data.MaxTimesUse;
+            int? maxUsage = promo.SafeData.MaxTimesUse;
 
             applyCount = Math.Min(applyCount, maxUsage ?? applyCount);
             if (applyCount > 0)
