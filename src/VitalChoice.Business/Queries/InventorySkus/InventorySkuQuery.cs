@@ -52,6 +52,16 @@ namespace VitalChoice.Business.Queries.InventorySkus
             return this;
         }
 
+        public InventorySkuQuery WithExactCode(string code)
+        {
+            if (!string.IsNullOrEmpty(code))
+            {
+                Add(x => x.Code==code);
+            }
+
+            return this;
+        }
+
         public InventorySkuQuery WithDescription(string description)
         {
             if (!string.IsNullOrEmpty(description))

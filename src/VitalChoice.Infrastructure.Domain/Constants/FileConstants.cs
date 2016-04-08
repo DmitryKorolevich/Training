@@ -13,6 +13,6 @@
         public const string REFUNDS_REPORT = "Refunds_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
         public const string RESHIPS_REPORT = "Reships_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
 
-        public const string INVENTORY_SKUS_REPORT = "Refunds_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
+        public const string INVENTORY_SKUS_REPORT = "Parts_Usage_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
     }
 }

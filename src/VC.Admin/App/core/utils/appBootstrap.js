@@ -2,10 +2,16 @@
 
 angular.module('app.core.utils.appBootstrap', [])
 	.service('appBootstrap', ['infrastructureService', '$rootScope', 'toaster', 'authenticationService', 'cacheService', '$location', 'ngProgress', 'webStorageUtil', 'confirmUtil', function (infrastructureService, $rootScope, toaster, authenticationService, cacheService, $location, ngProgress, webStorageUtil, confirmUtil) {
-	    function getReferenceItem(lookup, key) {
-	        return $.grep(lookup, function (elem) {
-	            return elem.Key === key;
-	        })[0];
+	    function getReferenceItem(lookup, key)
+	    {
+	        if (lookup)
+	        {
+	            return $.grep(lookup, function (elem)
+	            {
+	                return elem.Key === key;
+	            })[0];
+	        }
+	        return null;
 	    };
 
 	    function stopPropagation($event) {

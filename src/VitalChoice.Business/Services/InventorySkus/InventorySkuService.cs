@@ -68,7 +68,10 @@ namespace VitalChoice.Business.Services.InventorySkus
 
         public async Task<PagedList<InventorySkuListItemModel>> GetInventorySkusAsync(InventorySkuFilter filter)
         {
-            var conditions =new InventorySkuQuery().NotDeleted().WithIds(filter.Ids).WithStatus(filter.StatusCode).WithCode(filter.Code).WithDescription(filter.Description);
+            var conditions =new InventorySkuQuery().NotDeleted().WithIds(filter.Ids).WithStatus(filter.StatusCode)
+                .WithExactCode(filter.ExactCode)
+                .WithCode(filter.Code)
+                .WithDescription(filter.Description);
             var query = ObjectRepository.Query(conditions);
 
             Func<IQueryable<InventorySku>, IOrderedQueryable<InventorySku>> sortable = x => x.OrderBy(y => y.Code);
@@ -176,6 +179,9 @@ namespace VitalChoice.Business.Services.InventorySkus
             var toReturn = new List<InventorySkuUsageReportItem>();
             var data = await _sPEcommerceRepository.GetInventorySkusUsageReportAsync(filter);
 
+            var categoryTree = new InventorySkuCategory();
+            categoryTree.SubCategories = await _inventorySkuCategoryService.GetCategoriesTreeAsync(new InventorySkuCategoryTreeFilter());
+
             foreach (var inventorySkuUsageRawReportItem in data)
             {
                 var item = toReturn.FirstOrDefault(p => p.IdSku == inventorySkuUsageRawReportItem.IdSku);
@@ -186,6 +192,7 @@ namespace VitalChoice.Business.Services.InventorySkus
                     item.SkuCode = inventorySkuUsageRawReportItem.SkuCode;
                     item.TotalSkuQuantity = inventorySkuUsageRawReportItem.TotalSkuQuantity;
                     item.BornDate = inventorySkuUsageRawReportItem.BornDate;
+                    item.Assemble = inventorySkuUsageRawReportItem.Assemble;
                     item.InventorySkuChannel = inventorySkuUsageRawReportItem.InventorySkuChannel;
                     toReturn.Add(item);
                 }
@@ -198,6 +205,7 @@ namespace VitalChoice.Business.Services.InventorySkus
                     inventorySku.InvSkuCode = inventorySkuUsageRawReportItem.InvSkuCode;
                     inventorySku.InvDescription = inventorySkuUsageRawReportItem.InvDescription;
                     inventorySku.IdInventorySkuCategory = inventorySkuUsageRawReportItem.IdInventorySkuCategory;
+                    inventorySku.InventorySkuCategory = FindUICategory(categoryTree, inventorySkuUsageRawReportItem.IdInventorySkuCategory)?.Name;
 
                     inventorySku.ProductSource = inventorySkuUsageRawReportItem.ProductSource;
                     inventorySku.TotalInvQuantityWithInvCorrection = (inventorySkuUsageRawReportItem.InvQuantity ?? 0) * inventorySku.TotalInvSkuQuantity;
@@ -219,9 +227,6 @@ namespace VitalChoice.Business.Services.InventorySkus
         {
             var toReturn = new List<InventorySkuUsageReportItemForExport>();
             var data = await GetInventorySkuUsageReportAsync(filter);
-            
-            var categoryTree = new InventorySkuCategory();
-            categoryTree.SubCategories = await _inventorySkuCategoryService.GetCategoriesTreeAsync(new InventorySkuCategoryTreeFilter());
 
             var lookups = await _settingService.GetLookupsAsync(SettingConstants.INVENTORY_SKU_LOOKUP_NAMES.Split(','));
 
@@ -249,7 +254,7 @@ namespace VitalChoice.Business.Services.InventorySkus
                     item.TotalInvSkuQuantity = subInventorySkuUsageReportItem.TotalInvSkuQuantity;
                     item.InvSkuCode = subInventorySkuUsageReportItem.InvSkuCode;
                     item.InvDescription = subInventorySkuUsageReportItem.InvDescription;
-                    item.InventorySkuCategory = FindUICategory(categoryTree, subInventorySkuUsageReportItem.IdInventorySkuCategory)?.Name;
+                    item.InventorySkuCategory = subInventorySkuUsageReportItem.InventorySkuCategory;
 
                     lookup = lookups.FirstOrDefault(p => p.Name == SettingConstants.INVENTORY_SKU_LOOKUP_PRODUCT_SOURCE_NAME);
                     if (lookup != null)

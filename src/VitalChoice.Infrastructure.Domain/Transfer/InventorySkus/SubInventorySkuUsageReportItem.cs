@@ -12,6 +12,8 @@
 
         public int? IdInventorySkuCategory { get; set; }
 
+        public string InventorySkuCategory { get; set; }
+
         public int? ProductSource { get; set; }
 
         public int TotalInvQuantityWithInvCorrection { get; set; }

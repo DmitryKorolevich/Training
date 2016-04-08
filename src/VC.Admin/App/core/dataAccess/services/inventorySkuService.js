@@ -19,6 +19,10 @@ angular.module('app.core.dataAccess.services.inventorySkuService', [])
 	    {
 	        return $http.post(baseUrl + 'GetInventorySkus', filter, getConfig(tracker));
 	    },
+	    getShortInventorySku: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetShortInventorySku', filter, getConfig(tracker));
+	    },
 	    getInventorySku: function (id, tracker)
 	    {
 	        return $http.get(baseUrl + 'GetInventorySku/' + id, getConfig(tracker));
@@ -63,7 +67,7 @@ angular.module('app.core.dataAccess.services.inventorySkuService', [])
 	    getInventorySkuUsageReportFile: function (filter, buildNumber)
 	    {
 	        return baseUrl + 'GetInventorySkuUsageReportFile?from={0}&to={1}&skuids={2}&invskuids={3}&buildNumber={4}'
-                .format(filter.From, filter.To, filter.SkuIds, filter.InvSkuIds, buildNumber);
+                .format(filter.From, filter.To, filter.sSkuIds, filter.sInvSkuIds, buildNumber);
 	    },
 	};
 }]);

@@ -1210,6 +1210,13 @@ th.sortable-column {
 .vital-green-report table > thead > tr > th.completions {
   width: 50px;
 }
+.inventory-usage-report table > tbody > tr.sub-item-row {
+  background: white;
+}
+.inventory-usage-report .filtered-item {
+  display: inline-block;
+  margin-right: 15px;
+}
 .object-history {
   padding: 19px 0 0;
 }

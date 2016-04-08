@@ -7,6 +7,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.InventorySkus
     {
         public string Code { get; set; }
 
+        public string ExactCode { get; set; }
+
         public string Description { get; set; }
 
         public RecordStatusCode? StatusCode { get; set; }

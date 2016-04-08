@@ -93,12 +93,19 @@ namespace VC.Admin.Controllers
         #region InventorySkus
 
         [HttpPost]
-        [AdminAuthorize(PermissionType.InventorySkus)]
         public async Task<Result<PagedList<InventorySkuListItemModel>>> GetInventorySkus([FromBody]InventorySkuFilter filter)
         {
             var toReturn = await _inventorySkuService.GetInventorySkusAsync(filter);
 
             return toReturn;
+        }
+
+        [HttpPost]
+        public async Task<Result<InventorySkuListItemModel>> GetShortInventorySku([FromBody]InventorySkuFilter filter)
+        {
+            var result = await _inventorySkuService.GetInventorySkusAsync(filter);
+
+            return result.Items.FirstOrDefault();
         }
 
         [HttpGet]
