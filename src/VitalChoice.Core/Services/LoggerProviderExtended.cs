@@ -153,7 +153,7 @@ namespace VitalChoice.Core.Services
 
         public ILogger CreateLogger(string name)
         {
-            name = $"{_env.ApplicationName}::{name ?? string.Empty}";
+            name = name ?? string.Empty;
             //lock (_loggers)
             //{
             //    ILogger result;
