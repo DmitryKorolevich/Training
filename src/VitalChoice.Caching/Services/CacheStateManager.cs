@@ -7,14 +7,12 @@ using Microsoft.Data.Entity.ChangeTracking.Internal;
 using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Storage;
 using Microsoft.Extensions.Logging;
-using Remotion.Linq.Parsing;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Base;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Data.Context;
-using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 
 namespace VitalChoice.Caching.Services
 {
@@ -35,12 +33,23 @@ namespace VitalChoice.Caching.Services
             Logger = loggerFactory.CreateLogger<CacheStateManager>();
         }
 
-        protected override int SaveChanges(IReadOnlyList<InternalEntityEntry> entriesToSave)
+        private IEnumerable<InternalEntityEntry> GetEntriesToSave()
         {
+            return Entries.Where(e =>
+            {
+                if (e.EntityState != EntityState.Added && e.EntityState != EntityState.Modified)
+                    return e.EntityState == EntityState.Deleted;
+                return true;
+            });
+        }
+
+        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = new CancellationToken())
+        {
+            var entriesToSave = GetEntriesToSave();
             var immutableList = new List<ImmutableEntryState>(entriesToSave.Select(e => new ImmutableEntryState(e)));
             try
             {
-                var result = base.SaveChanges(entriesToSave);
+                var result = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
                 if (DataContext.InTransaction)
                 {
                     UpdateCache(immutableList);
@@ -60,13 +69,13 @@ namespace VitalChoice.Caching.Services
             }
         }
 
-        protected override async Task<int> SaveChangesAsync(IReadOnlyList<InternalEntityEntry> entriesToSave,
-            CancellationToken cancellationToken = new CancellationToken())
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
+            var entriesToSave = GetEntriesToSave();
             var immutableList = new List<ImmutableEntryState>(entriesToSave.Select(e => new ImmutableEntryState(e)));
             try
             {
-                var result = await base.SaveChangesAsync(entriesToSave, cancellationToken);
+                var result = base.SaveChanges(acceptAllChangesOnSuccess);
                 if (DataContext.InTransaction)
                 {
                     UpdateCache(immutableList);
