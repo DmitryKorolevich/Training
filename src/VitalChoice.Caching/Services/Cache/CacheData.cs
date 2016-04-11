@@ -457,7 +457,7 @@ namespace VitalChoice.Caching.Services.Cache
                     {
                         //if (!UpdateEntityWithRelations(entity, trackedEntities, exist))
                         //    return null;
-                        TypeConverter.CopyInto(exist.Entity, entity, typeof (T));
+                        exist.Entity = entity;
                         UpdateRelations(entity);
                         exist.NeedUpdateRelated.Clear();
                     }

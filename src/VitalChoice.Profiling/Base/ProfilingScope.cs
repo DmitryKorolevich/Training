@@ -80,7 +80,7 @@ namespace VitalChoice.Profiling.Base
         {
 #if !DOTNET5_4
             return
-                $"{{\"{ClassType.FullName}::{MethodName}\":\"{Data?.ToString().Replace("\"", "\\\"")}\"{(_additionalData == null ? string.Empty : $", \"additional\": [{string.Join(",", _additionalData.Select(d => $"\"{d}\""))}]")} {(_subScopes == null ? string.Empty : $", \"subTrace\": [{string.Join(",", _subScopes.Select(s => s.ToString()))}]")}}}"ж
+                $"{{\"{ClassType.FullName}::{MethodName}\":\"{Data?.ToString().Replace("\"", "\\\"")}\"{(_additionalData == null ? string.Empty : $", \"additional\": [{string.Join(",", _additionalData.Select(d => $"\"{d}\""))}]")} {(_subScopes == null ? string.Empty : $", \"subTrace\": [{string.Join(",", _subScopes.Select(s => s.ToString()))}]")}}}";
 #else
             return Data?.ToString();
 #endif

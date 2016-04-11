@@ -160,7 +160,7 @@ namespace VitalChoice.Caching.Services.Cache
                 yield return CacheGetResult.NotFound;
             }
             var allItems = data.GetAll();
-            if (data.Empty || allItems.Any(cached => cached.NeedUpdate))
+            if (data.NeedUpdate || data.Empty || allItems.Any(cached => cached.NeedUpdate))
             {
                 yield return CacheGetResult.Update;
             }
@@ -254,6 +254,13 @@ namespace VitalChoice.Caching.Services.Cache
 
         public EntityKey MarkForAdd(T entity)
         {
+            foreach (var data in CacheStorage.AllCacheDatas)
+            {
+                if (data.FullCollection)
+                {
+                    data.NeedUpdate = true;
+                }
+            }
             Update(entity, (DbContext)null);
             var pk = EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
             var foreignKeys = EntityInfo.ForeignKeys.GetForeignKeyValues(entity);

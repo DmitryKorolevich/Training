@@ -6,6 +6,7 @@ using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.ChangeTracking.Internal;
 using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Storage;
+using Microsoft.Extensions.Logging;
 using Remotion.Linq.Parsing;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
@@ -20,16 +21,18 @@ namespace VitalChoice.Caching.Services
     public class CacheStateManager : StateManager
     {
         protected readonly IInternalEntityCacheFactory CacheFactory;
-        private readonly ICacheSyncProvider _cacheSyncProvider;
+        protected readonly ICacheSyncProvider CacheSyncProvider;
         protected readonly IDataContext DataContext;
+        protected readonly ILogger Logger;
 
         public CacheStateManager(IInternalEntityEntryFactory factory, IInternalEntityEntrySubscriber subscriber,
             IInternalEntityEntryNotifier notifier, IValueGenerationManager valueGeneration, IModel model, IDatabase database,
-            DbContext context, IInternalEntityCacheFactory cacheFactory, ICacheSyncProvider cacheSyncProvider) : base(factory, subscriber, notifier, valueGeneration, model, database, context)
+            DbContext context, IInternalEntityCacheFactory cacheFactory, ICacheSyncProvider cacheSyncProvider, ILoggerFactory loggerFactory) : base(factory, subscriber, notifier, valueGeneration, model, database, context)
         {
             CacheFactory = cacheFactory;
-            _cacheSyncProvider = cacheSyncProvider;
+            CacheSyncProvider = cacheSyncProvider;
             DataContext = context as IDataContext;
+            Logger = loggerFactory.CreateLogger<CacheStateManager>();
         }
 
         protected override int SaveChanges(IReadOnlyList<InternalEntityEntry> entriesToSave)
@@ -41,12 +44,12 @@ namespace VitalChoice.Caching.Services
                 if (DataContext.InTransaction)
                 {
                     UpdateCache(immutableList);
-                    DataContext.TransactionCommit += () => _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
+                    DataContext.TransactionCommit += () => CacheSyncProvider.SendChanges(UpdateCache(immutableList));
                     DataContext.TransactionRollback += () => UpdateRollback(immutableList);
                 }
                 else
                 {
-                    _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
+                    CacheSyncProvider.SendChanges(UpdateCache(immutableList));
                 }
                 return result;
             }
@@ -67,12 +70,12 @@ namespace VitalChoice.Caching.Services
                 if (DataContext.InTransaction)
                 {
                     UpdateCache(immutableList);
-                    DataContext.TransactionCommit += () => _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
+                    DataContext.TransactionCommit += () => CacheSyncProvider.SendChanges(UpdateCache(immutableList));
                     DataContext.TransactionRollback += () => UpdateRollback(immutableList);
                 }
                 else
                 {
-                    _cacheSyncProvider.SendChanges(UpdateCache(immutableList));
+                    CacheSyncProvider.SendChanges(UpdateCache(immutableList));
                 }
                 return result;
             }
@@ -136,7 +139,13 @@ namespace VitalChoice.Caching.Services
                             primaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entry.Entity);
                             if (primaryKey.IsValid)
                             {
-                                cache.Update(entry.Entity, dbContext);
+                                if (!cache.Update(entry.Entity, dbContext))
+                                {
+                                    if (cache.ItemExist(primaryKey))
+                                    {
+                                        Logger.LogWarning($"Cannot update <{group.Key.FullName}>{primaryKey}");
+                                    }
+                                }
                                 syncOperations.Add(new SyncOperation
                                 {
                                     Key = primaryKey.ToExportable(group.Key),
@@ -149,7 +158,13 @@ namespace VitalChoice.Caching.Services
                             primaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entry.Entity);
                             if (primaryKey.IsValid)
                             {
-                                cache.TryRemove(primaryKey);
+                                if (!cache.TryRemove(primaryKey))
+                                {
+                                    if (cache.ItemExist(primaryKey))
+                                    {
+                                        Logger.LogWarning($"Cannot remove <{group.Key.FullName}>{primaryKey}");
+                                    }
+                                }
                                 syncOperations.Add(new SyncOperation
                                 {
                                     Key = primaryKey.ToExportable(group.Key),

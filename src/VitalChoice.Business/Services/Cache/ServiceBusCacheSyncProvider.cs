@@ -32,9 +32,9 @@ namespace VitalChoice.Business.Services.Cache
         private int _totalMessagesReceived;
 
         public ServiceBusCacheSyncProvider(IInternalEntityCacheFactory cacheFactory, IEntityInfoStorage keyStorage,
-            ILoggerProviderExtended loggerProvider,
+            ILoggerFactory loggerFactory,
             IOptions<AppOptions> options, IApplicationEnvironment applicationEnvironment)
-            : base(cacheFactory, keyStorage, loggerProvider.CreateLoggerDefault())
+            : base(cacheFactory, keyStorage, loggerFactory)
         {
             if (options.Value.CacheSyncOptions?.Enabled ?? false)
             {
