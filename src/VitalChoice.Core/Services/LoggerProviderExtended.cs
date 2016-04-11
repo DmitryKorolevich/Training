@@ -111,14 +111,16 @@ namespace VitalChoice.Core.Services
 
     public class LoggerProviderExtended : ILoggerProviderExtended
     {
+        private readonly IApplicationEnvironment _env;
         private readonly ILoggerFactory _factory;
 
-        private readonly Dictionary<string, ILogger> _loggers = new Dictionary<string, ILogger>();
+        //private readonly Dictionary<string, ILogger> _loggers = new Dictionary<string, ILogger>();
 
         public ILoggerFactory Factory => _factory;
 
         public LoggerProviderExtended(IOptions<AppOptions> options, IApplicationEnvironment env)
         {
+            _env = env;
             string basePath = env.ApplicationBasePath;
             string logPath = options.Value.LogPath;
             _factory = new LoggerFactory();
@@ -151,18 +153,18 @@ namespace VitalChoice.Core.Services
 
         public ILogger CreateLogger(string name)
         {
-            name = name ?? string.Empty;
-            lock (_loggers)
-            {
-                ILogger result;
-                if (_loggers.TryGetValue(name, out result))
-                {
-                    return result;
-                }
-                ILogger logger = _factory.CreateLogger(name);
-                _loggers.Add(name, logger);
-                return logger;
-            }
+            name = $"{_env.ApplicationName}::{name ?? string.Empty}";
+            //lock (_loggers)
+            //{
+            //    ILogger result;
+            //    if (_loggers.TryGetValue(name, out result))
+            //    {
+            //        return result;
+            //    }
+            ILogger logger = _factory.CreateLogger(name);
+            //_loggers.Add(name, logger);
+            return logger;
+            //}
         }
 
         public ILogger CreateLoggerDefault()
@@ -176,7 +178,7 @@ namespace VitalChoice.Core.Services
 
         public ILogger CreateLogger(Type type)
         {
-            return CreateLogger(type?.FullName ?? string.Empty);
+            return CreateLogger($"{_env.ApplicationName}::{type?.FullName ?? string.Empty}");
         }
 
         public ILogger<T> CreateLogger<T>()
