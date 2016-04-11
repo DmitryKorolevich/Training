@@ -23,7 +23,11 @@ namespace VitalChoice.Business.Workflow.ActionResolvers
 
         public override Task<int> GetActionKeyAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            return Task.FromResult((dataContext.Order.IdObjectType == (int)OrderType.AutoShip || dataContext.Order.IdObjectType == (int)OrderType.AutoShipOrder) ? (int)ReductionType.AutoShip : (int)ReductionType.Discount);
+            return
+                Task.FromResult((dataContext.Order.IdObjectType == (int) OrderType.AutoShip ||
+                                 dataContext.Order.IdObjectType == (int) OrderType.AutoShipOrder)
+                    ? (int) ReductionType.AutoShip
+                    : (int) ReductionType.Discount);
         }
     }
 }

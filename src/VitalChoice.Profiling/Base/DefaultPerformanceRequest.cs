@@ -16,7 +16,11 @@ namespace VitalChoice.Profiling.Base
 
         public virtual void OnFinishedRequest(ProfilingScope scope)
         {
-            if (scope.TimeElapsed.Milliseconds > SlowRequestTimeMilliseconds)
+            if (scope.CriticalException != null)
+            {
+                _logger.LogCritical($"{scope.CriticalException}\nPerformance associated:\n{scope}");
+            }
+            else if (scope.TimeElapsed.Milliseconds > SlowRequestTimeMilliseconds)
             {
                 if (_logger.IsEnabled(LogLevel.Warning))
                 {

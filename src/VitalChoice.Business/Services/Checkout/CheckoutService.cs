@@ -90,6 +90,25 @@ namespace VitalChoice.Business.Services.Checkout
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
+        public IQueryFluent<CartExtended> BuildIncludes(IQueryFluent<CartExtended> query)
+        {
+            return query.Include(c => c.Discount)
+                .ThenInclude(d => d.OptionValues)
+                .Include(c => c.GiftCertificates)
+                .ThenInclude(g => g.GiftCertificate)
+                .Include(c => c.Skus)
+                .ThenInclude(s => s.Sku)
+                .ThenInclude(s => s.OptionValues)
+                .Include(c => c.Skus)
+                .ThenInclude(s => s.Sku)
+                .ThenInclude(s => s.Product)
+                .ThenInclude(p => p.OptionValues)
+                .Include(c => c.Skus)
+                .ThenInclude(s => s.Sku)
+                .ThenInclude(s => s.Product)
+                .ThenInclude(p => p.ProductsToCategories);
+        }
+
         public async Task<CustomerCartOrder> GetOrCreateCart(Guid? uid)
         {
             CartExtended cart;
@@ -100,22 +119,8 @@ namespace VitalChoice.Business.Services.Checkout
                 {
                     return await GetOrCreateCart(uid, cartForCheck.IdCustomer.Value);
                 }
-                cart = await _cartRepository.Query(c => c.CartUid == uid.Value).Include(c => c.Discount)
-                    .ThenInclude(d => d.OptionValues)
-                    .Include(c => c.GiftCertificates)
-                    .ThenInclude(g => g.GiftCertificate)
-                    .Include(c => c.Skus)
-                    .ThenInclude(s => s.Sku)
-                    .ThenInclude(s => s.OptionValues)
-                    .Include(c => c.Skus)
-                    .ThenInclude(s => s.Sku)
-                    .ThenInclude(s => s.Product)
-                    .ThenInclude(p => p.OptionValues)
-                    .Include(c => c.Skus)
-                    .ThenInclude(s => s.Sku)
-                    .ThenInclude(s => s.Product)
-                    .ThenInclude(p => p.ProductsToCategories)
-                    .SelectFirstOrDefaultAsync(false) ?? await CreateNew();
+                cart = await BuildIncludes(_cartRepository.Query(c => c.CartUid == uid.Value)).SelectFirstOrDefaultAsync(false) ??
+                       await CreateNew();
             }
             else
             {
@@ -260,13 +265,14 @@ namespace VitalChoice.Business.Services.Checkout
 
         private async Task<CartExtended> CreateNew(int? idCustomer = null)
         {
+            var newUid = Guid.NewGuid();
             var cart = new CartExtended
             {
-                CartUid = Guid.NewGuid(),
+                CartUid = newUid,
                 IdCustomer = idCustomer
             };
             await _cartRepository.InsertGraphAsync(cart);
-            return cart;
+            return await BuildIncludes(_cartRepository.Query(c => c.CartUid == newUid)).SelectFirstOrDefaultAsync(false);
         }
 
         public async Task<bool> UpdateCart(CustomerCartOrder cartOrder)
@@ -301,8 +307,8 @@ namespace VitalChoice.Business.Services.Checkout
                         cart.IdCustomer = cartOrder.Order?.Customer?.Id;
                         cart.IdOrder = cartOrder.Order?.Id;
                         cart.IdDiscount = null;
-                        cart.GiftCertificates.Clear();
-                        cart.Skus.Clear();
+                        cart.GiftCertificates?.Clear();
+                        cart.Skus?.Clear();
                         cart.ShipDelayDate = null;
                         cart.ShippingUpgradeNP = null;
                         cart.ShippingUpgradeP = null;
@@ -310,7 +316,7 @@ namespace VitalChoice.Business.Services.Checkout
                     else
                     {
                         cart.IdDiscount = cartOrder.Order.Discount?.Id;
-                        cart.GiftCertificates.MergeKeyed(cartOrder.Order.GiftCertificates, c => c.IdGiftCertificate,
+                        cart.GiftCertificates?.MergeKeyed(cartOrder.Order.GiftCertificates, c => c.IdGiftCertificate,
                             co => co.GiftCertificate.Id,
                             co => new CartToGiftCertificate
                             {
@@ -318,7 +324,7 @@ namespace VitalChoice.Business.Services.Checkout
                                 IdCart = cart.Id,
                                 IdGiftCertificate = co.GiftCertificate.Id
                             }, (certificate, order) => certificate.Amount = order.Amount);
-                        cart.Skus.MergeKeyed(cartOrder.Order.Skus, s => s.IdSku, so => so.Sku.Id, so => new CartToSku
+                        cart.Skus?.MergeKeyed(cartOrder.Order.Skus, s => s.IdSku, so => so.Sku.Id, so => new CartToSku
                         {
                             Amount = so.Amount,
                             IdCart = cart.Id,
@@ -386,8 +392,8 @@ namespace VitalChoice.Business.Services.Checkout
                         cart.IdCustomer = cartOrder.Order?.Customer?.Id;
                         cart.IdOrder = null;
                         cart.IdDiscount = null;
-                        cart.GiftCertificates.Clear();
-                        cart.Skus.Clear();
+                        cart.GiftCertificates?.Clear();
+                        cart.Skus?.Clear();
                         cart.ShipDelayDate = null;
                         cart.ShippingUpgradeNP = null;
                         cart.ShippingUpgradeP = null;

@@ -18,6 +18,7 @@ using VitalChoice.Core.Infrastructure;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Exceptions;
+using VitalChoice.Profiling.Base;
 
 namespace VitalChoice.Core.GlobalFilters
 {
@@ -27,7 +28,17 @@ namespace VitalChoice.Core.GlobalFilters
 
 		public override void OnException(ExceptionContext context)
 		{
-            var acceptHeader = context.HttpContext.Request.Headers["Accept"];
+		    var systemException = context.Exception as SystemException;
+		    if (systemException != null)
+		    {
+		        var root = ProfilingScope.RootScope;
+		        if (root != null)
+		        {
+		            root.CriticalException = systemException;
+		        }
+		    }
+
+		    var acceptHeader = context.HttpContext.Request.Headers["Accept"];
             if (acceptHeader.Any() && acceptHeader.First().Contains("application/json"))
 			{
 			    if (context.Exception is CustomerSuspendException)

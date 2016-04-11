@@ -24,6 +24,8 @@ namespace VitalChoice.Profiling.Base
             public Stack<ProfilingScope> Value { get; set; }
         }
 
+        public static ProfilingScope RootScope => ProfileScope.Count == 0 ? null : ProfileScope.Last();
+
         private static Stack<ProfilingScope> ProfileScope
         {
             get
@@ -99,6 +101,8 @@ namespace VitalChoice.Profiling.Base
         }
 
         public IReadOnlyCollection<ProfilingScope> SubScopes => _subScopes?.ToArray() ?? EmptyList;
+
+        public Exception CriticalException { get; set; }
 
         public Type ClassType { get; }
 
