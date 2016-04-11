@@ -23,7 +23,7 @@
     },
     "JobSettings": {
       "Schedules": {
-        "AutoShipJob": "0 0 * * * ?"
+        "AutoShipJob": "0 0 0/2 * * ?"
       }
     },
     "Email": {
