@@ -48,6 +48,14 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             return key;
         }
 
+        public static string AsStringWithParameters(this Expression expression)
+        {
+            var cachableExpression = Evaluator.PartialEval(expression, expression1 => true);
+            cachableExpression = LocalCollectionExpander.Rewrite(cachableExpression);
+            string key = cachableExpression.ToString();
+            return key;
+        }
+
         public static T CacheCompile<T>(this Expression<T> expression)
         {
             return LambdaCompiler<T>.CacheCompile(expression);

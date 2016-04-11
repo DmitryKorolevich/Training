@@ -10,6 +10,7 @@ using Microsoft.Extensions.PlatformAbstractions;
 using VC.Admin.AppConfig;
 using VitalChoice.Core.DependencyInjection;
 using Autofac;
+using VitalChoice.Profiling;
 
 namespace VC.Admin
 {
@@ -57,7 +58,8 @@ namespace VC.Admin
 
 			app.UseIdentity();
 
-			app.UseMvc(RouteConfig.RegisterRoutes);
-        }
+            app.InjectProfiler();
+            app.UseMvc(RouteConfig.RegisterRoutes);
+		}
 	}
 }

@@ -1,22 +1,20 @@
-{
+﻿{
   "version": "1.0.0-*",
-  "description": "VitalChoice.Caching Class Library",
+  "description": "VitalChoice.Profiling Class Library",
   "authors": [ "multi_000" ],
   "tags": [ "" ],
   "projectUrl": "",
   "licenseUrl": "",
   "dependencies": {
-    "VitalChoice.Ecommerce.Domain": "",
-    "VitalChoice.ObjectMapping": "",
+    "Microsoft.AspNet.Mvc.Abstractions": "6.0.0-*",
     "EntityFramework.Relational": "7.0.0-*",
-    "VitalChoice.Data": "",
-    "VitalChoice.Profiling": "",
-    "EntityFramework.Core": "7.0.0-*"
+    "EntityFramework.MicrosoftSqlServer": "7.0.0-*",
+    "VitalChoice.Ecommerce.Domain": ""
   },
   "frameworks": {
     "net451": {
       "frameworkAssemblies": {
-        "System.Reflection": "4.0.0.0"
+        "System.Runtime": "4.0.10.0"
       }
     },
     "dotnet5.4": {
@@ -25,10 +23,7 @@
         "System.Collections": "4.0.11-*",
         "System.Linq": "4.0.1-*",
         "System.Runtime": "4.0.21-*",
-        "System.Threading": "4.0.11-*",
-        "System.Reflection": "4.1.0-*",
-        "System.Reflection.TypeExtensions": "4.1.0-*",
-        "System.Threading.Thread": "4.0.0-*"
+        "System.Threading": "4.0.11-*"
       }
     }
   }

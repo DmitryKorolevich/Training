@@ -91,6 +91,8 @@ using VitalChoice.Infrastructure.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus.Base;
 using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Interfaces.Services.InventorySkus;
+using VitalChoice.Profiling;
+using VitalChoice.Profiling.Interfaces;
 #if !DOTNET5_4
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Business.Services.Cache;
@@ -107,11 +109,11 @@ namespace VitalChoice.Core.DependencyInjection
 #if !DOTNET5_4
             services.AddEntityFramework()
                 .AddEntityFrameworkCache<ServiceBusCacheSyncProvider>(new[] {typeof (VitalChoiceContext), typeof (EcommerceContext)})
-                .AddSqlServer();
+                .AddSqlServer().InjectProfiler();
 #else
             services.AddEntityFramework().AddEntityFrameworkCache<CacheSyncProvider>(new [] {typeof(VitalChoiceContext), typeof(EcommerceContext) }).AddSqlServer();
 #endif
-
+            services.AddScoped<IPerformanceRequest, PerformanceRequestService>();
             // Add Identity services to the services container.
             services.AddIdentity<ApplicationUser, ApplicationRole>(x =>
             {

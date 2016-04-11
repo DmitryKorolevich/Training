@@ -438,7 +438,7 @@ namespace VitalChoice.Business.Services
 
         private ReferenceData SetAppSettings(ReferenceData referenceData)
         {
-            referenceData.AppSettings = settingService.GetAppSettingsAsync().Result;
+            referenceData.AppSettings = settingService.GetAppSettingsAsync().GetAwaiter().GetResult();
             return referenceData;
         }
 

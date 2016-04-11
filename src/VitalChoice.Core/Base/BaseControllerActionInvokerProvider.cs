@@ -12,7 +12,6 @@ using Microsoft.AspNet.Mvc.Formatters;
 using Microsoft.AspNet.Mvc.Infrastructure;
 using System;
 using System.Diagnostics;
-using VitalChoice.Ecommerce.Context;
 
 namespace VitalChoice.Core.Base
 {

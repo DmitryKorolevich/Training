@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 
-namespace VitalChoice.Caching.Expressions.Visitors
+namespace VitalChoice.Ecommerce.Domain.Helpers
 {
     public class ParameterVisitor : ExpressionVisitor
     {

@@ -14,6 +14,8 @@ using VitalChoice.Caching.Services.Cache;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Profiling;
+using VitalChoice.Profiling.Base;
 
 namespace VitalChoice.Caching.Services
 {
@@ -37,120 +39,144 @@ namespace VitalChoice.Caching.Services
 
         public override TResult Execute<TResult>(Expression expression)
         {
-            var cacheObjectType = typeof (TResult);
-            var elementType = typeof (TResult).TryGetElementType(typeof (IEnumerable<>));
-            if (elementType != null)
+            using (var scope = new ProfilingScope(new ExpressionStringFormatter(expression)))
             {
-                cacheObjectType = elementType;
-            }
-            if (_cacheFactory.CanCache(cacheObjectType))
-            {
-                //if (cacheObjectType.GetTypeInfo().IsSubclassOf(typeof (Entity)))
-                //{
-                var cacheExecutor =
-                    (ICacheExecutor)
-                        Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
-                            _context, _infoStorage, _queryParserFactory, _logger);
-                if (cacheExecutor.ReparsedExpression != null)
-                    return base.Execute<TResult>(cacheExecutor.ReparsedExpression);
-                CacheGetResult cacheGetResult;
-                var results = elementType != null
-                    ? cacheExecutor.Execute(out cacheGetResult)
-                    : cacheExecutor.ExecuteFirst(out cacheGetResult);
-                switch (cacheGetResult)
+                var cacheObjectType = typeof (TResult);
+                var elementType = typeof (TResult).TryGetElementType(typeof (IEnumerable<>));
+                if (elementType != null)
                 {
-                    case CacheGetResult.Found:
-                        return (TResult) results;
-                    case CacheGetResult.Update:
-                        results = base.Execute<TResult>(expression);
-                        if (elementType != null)
-                        {
-                            //results = typeof (List<>).CreateGenericCollection(elementType, (IEnumerable) results).CollectionObject;
-                            cacheExecutor.UpdateList(results);
-                        }
-                        else
-                        {
-                            cacheExecutor.Update(results);
-                        }
-                        return (TResult) results;
+                    cacheObjectType = elementType;
                 }
-                //}
+                if (_cacheFactory.CanCache(cacheObjectType))
+                {
+                    //if (cacheObjectType.GetTypeInfo().IsSubclassOf(typeof (Entity)))
+                    //{
+                    var cacheExecutor =
+                        (ICacheExecutor)
+                            Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
+                                _context, _infoStorage, _queryParserFactory, _logger);
+                    if (cacheExecutor.ReparsedExpression != null)
+                        return base.Execute<TResult>(cacheExecutor.ReparsedExpression);
+                    CacheGetResult cacheGetResult;
+                    var results = elementType != null
+                        ? cacheExecutor.Execute(out cacheGetResult)
+                        : cacheExecutor.ExecuteFirst(out cacheGetResult);
+                    scope.AddScopeData(cacheGetResult);
+                    switch (cacheGetResult)
+                    {
+                        case CacheGetResult.Found:
+                            return (TResult) results;
+                        case CacheGetResult.Update:
+                            results = base.Execute<TResult>(expression);
+                            using (var updateScope = new ProfilingScope(cacheGetResult))
+                            {
+                                updateScope.AddScopeData(elementType != null
+                                    ? cacheExecutor.UpdateList(results)
+                                    : cacheExecutor.Update(results));
+                            }
+                            return (TResult) results;
+                    }
+                    //}
+                }
+                else
+                {
+                    scope.AddScopeData(CacheGetResult.NotFound);
+                }
+                return base.Execute<TResult>(expression);
             }
-            return base.Execute<TResult>(expression);
         }
 
         public override IAsyncEnumerable<TResult> ExecuteAsync<TResult>(Expression expression)
         {
-            var cacheObjectType = typeof (TResult);
-            if (_cacheFactory.CanCache(cacheObjectType))
+            using (var scope = new ProfilingScope(new ExpressionStringFormatter(expression)))
             {
-                //if (cacheObjectType.GetTypeInfo().IsSubclassOf(typeof (Entity)))
-                //{
-                var cacheExecutor =
-                    (ICacheExecutor)
-                        Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
-                            _context, _infoStorage, _queryParserFactory, _logger);
-                if (cacheExecutor.ReparsedExpression != null)
-                    return base.ExecuteAsync<TResult>(cacheExecutor.ReparsedExpression);
-                CacheGetResult cacheGetResult;
-                var result = (List<TResult>) cacheExecutor.Execute(out cacheGetResult);
-                switch (cacheGetResult)
+                var cacheObjectType = typeof (TResult);
+                if (_cacheFactory.CanCache(cacheObjectType))
                 {
-                    case CacheGetResult.Found:
-                        return result.ToAsyncEnumerable();
-                    case CacheGetResult.Update:
-                        var asyncResult = base.ExecuteAsync<TResult>(expression);
-                        var results = asyncResult.ToList().GetAwaiter().GetResult();
-                        cacheExecutor.UpdateList(results);
-                        return results.ToAsyncEnumerable();
+                    //if (cacheObjectType.GetTypeInfo().IsSubclassOf(typeof (Entity)))
+                    //{
+                    var cacheExecutor =
+                        (ICacheExecutor)
+                            Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
+                                _context, _infoStorage, _queryParserFactory, _logger);
+                    if (cacheExecutor.ReparsedExpression != null)
+                        return base.ExecuteAsync<TResult>(cacheExecutor.ReparsedExpression);
+                    CacheGetResult cacheGetResult;
+                    var result = (List<TResult>) cacheExecutor.Execute(out cacheGetResult);
+                    scope.AddScopeData(cacheGetResult);
+                    switch (cacheGetResult)
+                    {
+                        case CacheGetResult.Found:
+                            return result.ToAsyncEnumerable();
+                        case CacheGetResult.Update:
+                            var asyncResult = base.ExecuteAsync<TResult>(expression);
+                            using (var updateScope = new ProfilingScope(cacheGetResult))
+                            {
+                                var results = asyncResult.ToList().GetAwaiter().GetResult();
+                                updateScope.AddScopeData(cacheExecutor.UpdateList(results));
+                                return results.ToAsyncEnumerable();
+                            }
+                    }
+                    //}
                 }
-                //}
+                else
+                {
+                    scope.AddScopeData(CacheGetResult.NotFound);
+                }
+                return base.ExecuteAsync<TResult>(expression);
             }
-            return base.ExecuteAsync<TResult>(expression);
         }
 
         public override async Task<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken)
         {
-            var cacheObjectType = typeof (TResult);
-            var elementType = typeof(TResult).TryGetElementType(typeof(IEnumerable<>));
-            if (elementType != null)
+            using (var scope = new ProfilingScope(new ExpressionStringFormatter(expression)))
             {
-                cacheObjectType = elementType;
-            }
-            if (_cacheFactory.CanCache(cacheObjectType))
-            {
-                //if (cacheObjectType.GetTypeInfo().IsSubclassOf(typeof (Entity)))
-                //{
-                var cacheExecutor =
-                    (ICacheExecutor)
-                        Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
-                            _context, _infoStorage, _queryParserFactory, _logger);
-                if (cacheExecutor.ReparsedExpression != null)
-                    return await base.ExecuteAsync<TResult>(cacheExecutor.ReparsedExpression, cancellationToken);
-                CacheGetResult cacheGetResult;
-                var result = elementType != null
-                    ? cacheExecutor.Execute(out cacheGetResult)
-                    : cacheExecutor.ExecuteFirst(out cacheGetResult);
-                switch (cacheGetResult)
+                var cacheObjectType = typeof (TResult);
+                var elementType = typeof (TResult).TryGetElementType(typeof (IEnumerable<>));
+                if (elementType != null)
                 {
-                    case CacheGetResult.Found:
-                        return (TResult) result;
-                    case CacheGetResult.Update:
-                        var results = (object)await base.ExecuteAsync<TResult>(expression, cancellationToken);
-                        if (elementType != null)
-                        {
-                            //results = typeof (List<>).CreateGenericCollection(elementType, (IEnumerable) results).CollectionObject;
-                            cacheExecutor.UpdateList(results);
-                        }
-                        else
-                        {
-                            cacheExecutor.Update(results);
-                        }
-                        return (TResult)results;
+                    cacheObjectType = elementType;
                 }
-                //}
+                if (_cacheFactory.CanCache(cacheObjectType))
+                {
+                    //if (cacheObjectType.GetTypeInfo().IsSubclassOf(typeof (Entity)))
+                    //{
+                    var cacheExecutor =
+                        (ICacheExecutor)
+                            Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
+                                _context, _infoStorage, _queryParserFactory, _logger);
+                    if (cacheExecutor.ReparsedExpression != null)
+                        return await base.ExecuteAsync<TResult>(cacheExecutor.ReparsedExpression, cancellationToken);
+                    CacheGetResult cacheGetResult;
+                    var result = elementType != null
+                        ? cacheExecutor.Execute(out cacheGetResult)
+                        : cacheExecutor.ExecuteFirst(out cacheGetResult);
+                    scope.AddScopeData(cacheGetResult);
+                    using (new ProfilingScope(cacheGetResult))
+                    {
+                        switch (cacheGetResult)
+                        {
+                            case CacheGetResult.Found:
+                                return (TResult) result;
+                            case CacheGetResult.Update:
+                                var results = (object) await base.ExecuteAsync<TResult>(expression, cancellationToken);
+                                using (var updateScope = new ProfilingScope(cacheGetResult))
+                                {
+                                    updateScope.AddScopeData(elementType != null
+                                        ? cacheExecutor.UpdateList(results)
+                                        : cacheExecutor.Update(results));
+                                }
+                                return (TResult) results;
+                        }
+                    }
+                    //}
+                }
+                else
+                {
+                    scope.AddScopeData(CacheGetResult.NotFound);
+                }
+                return await base.ExecuteAsync<TResult>(expression, cancellationToken);
             }
-            return await base.ExecuteAsync<TResult>(expression, cancellationToken);
         }
 
         private interface ICacheExecutor
@@ -170,6 +196,7 @@ namespace VitalChoice.Caching.Services
             private readonly IEntityCache<T> _cache;
             private readonly Expression _reparsedExpression;
 
+            // ReSharper disable once UnusedMember.Local
             public CacheExecutor(Expression expression, DbContext context, IEntityInfoStorage infoStorage, IQueryParserFactory queryParserFactory, ILogger logger)
             {
                 _logger = logger;
@@ -185,7 +212,7 @@ namespace VitalChoice.Caching.Services
                 try
                 {
                     List<T> entities;
-                    cacheResult = _cache.TryGetCached(_queryData, out entities);
+                        cacheResult = _cache.TryGetCached(_queryData, out entities);
                     return entities;
                 }
                 catch (Exception e)
@@ -201,7 +228,7 @@ namespace VitalChoice.Caching.Services
                 try
                 {
                     T entity;
-                    cacheResult = _cache.TryGetCachedFirstOrDefault(_queryData, out entity);
+                        cacheResult = _cache.TryGetCachedFirstOrDefault(_queryData, out entity);
                     return entity;
                 }
                 catch (Exception e)

@@ -82,7 +82,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
                     Stack<string> members = new Stack<string>();
                     while (convertRemoved.NodeType == ExpressionType.MemberAccess)
                     {
-                        var member = (MemberExpression)convertRemoved;
+                        var member = (MemberExpression) convertRemoved;
                         members.Push(member.Member.Name);
                         convertRemoved = member.Expression;
                     }
@@ -95,11 +95,11 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
                 {
                     return Expression.Constant($"<{e.Type.FullName}>");
                 }
-                LambdaExpression lambda = Expression.Lambda(e);
-                Delegate fn = lambda.Compile();
-                return Expression.Constant(fn.DynamicInvoke(null), e.Type);
+                var value = e.GetValue();
+                if (value != null)
+                    return Expression.Constant(value);
+                return e;
             }
-
         }
 
         /// <summary>
