@@ -1,5 +1,7 @@
 ﻿{
   "App": {
+    "PublicHost": "staging.g2-dg.com",
+    "AdminHost": "admin.staging.g2-dg.com",
     "DefaultCacheExpirationTermMinutes": 1440,
     "DefaultCultureId": "en-US",
     "Connection": {
