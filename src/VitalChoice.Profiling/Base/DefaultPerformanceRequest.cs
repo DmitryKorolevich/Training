@@ -18,7 +18,7 @@ namespace VitalChoice.Profiling.Base
         {
             if (scope.CriticalException != null)
             {
-                _logger.LogCritical($"{scope.CriticalException}\nPerformance associated:\n{scope}");
+                _logger.LogCritical($"{scope.CriticalException}\nPerformance trace:\n{scope}");
             }
             else if (scope.TimeElapsed.Milliseconds > SlowRequestTimeMilliseconds)
             {
