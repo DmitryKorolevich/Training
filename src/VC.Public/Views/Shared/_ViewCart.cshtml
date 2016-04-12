@@ -168,12 +168,12 @@
 				<div class="cart-promo-container">
 					<i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Promo Code" data-tooltip-body="If you have a discount code, enter it in the box to see the change in your order's total."></i>
 					<label>Promo Code</label>
-					@Html.TextBoxFor(x => x.DiscountCode, new {@class = "cart-input-box input-control", data_bind = "value: Model.DiscountCode, css: {'input-validation-error': !isDiscountValid(Model) }, disable: Model.AutoShip" })
+					@Html.TextBoxFor(x => x.DiscountCode, new {@class = "cart-input-box input-control", data_bind = "value: Model.DiscountCode, css: {'input-validation-error': !isDiscountValid(Model) }, disable: Model.AutoShip"})
 					<span class="field-validation-error" data-bind="if: !isDiscountValid(Model)" data-valmsg-for="DiscountCode" data-valmsg-replace="true">
 						<span id="DiscountCode-error" class="" data-bind="text: getDiscountRelatedErrors(Model)[0].Value"></span>
 					</span>
-					<span class="success-message-box" data-bind="text: Model.DiscountMessage, visible: Model.DiscountMessage && isDiscountValid(Model)"></span>
 				</div>
+				<span class="success-message-box" data-bind="text: Model.DiscountMessage, visible: Model.DiscountMessage && isDiscountValid(Model)"></span>
 				<div id="divGcContainer" class="cart-gc-container">
 					<i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Gift Certificate Code" data-tooltip-body="If you have a gift certificate code, enter it in the box to see the change in your order's total."></i>
 					<div data-bind="foreach:Model.GiftCertificateCodes">
