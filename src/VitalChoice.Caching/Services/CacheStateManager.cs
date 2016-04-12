@@ -55,15 +55,18 @@ namespace VitalChoice.Caching.Services
         {
             var result = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
             var entriesToSave = GetEntriesToSave();
-            if (DataContext.InTransaction)
+            if (entriesToSave != null)
             {
-                UpdateCache(entriesToSave);
-                DataContext.TransactionCommit += () => CacheSyncProvider.SendChanges(UpdateCache(entriesToSave));
-                DataContext.TransactionRollback += () => UpdateRollback(entriesToSave);
-            }
-            else
-            {
-                CacheSyncProvider.SendChanges(UpdateCache(entriesToSave));
+                if (DataContext.InTransaction)
+                {
+                    UpdateCache(entriesToSave);
+                    DataContext.TransactionCommit += () => CacheSyncProvider.SendChanges(UpdateCache(entriesToSave));
+                    DataContext.TransactionRollback += () => UpdateRollback(entriesToSave);
+                }
+                else
+                {
+                    CacheSyncProvider.SendChanges(UpdateCache(entriesToSave));
+                }
             }
             return result;
         }
@@ -72,15 +75,18 @@ namespace VitalChoice.Caching.Services
         {
             var result = base.SaveChanges(acceptAllChangesOnSuccess);
             var entriesToSave = GetEntriesToSave();
-            if (DataContext.InTransaction)
+            if (entriesToSave != null)
             {
-                UpdateCache(entriesToSave);
-                DataContext.TransactionCommit += () => CacheSyncProvider.SendChanges(UpdateCache(entriesToSave));
-                DataContext.TransactionRollback += () => UpdateRollback(entriesToSave);
-            }
-            else
-            {
-                CacheSyncProvider.SendChanges(UpdateCache(entriesToSave));
+                if (DataContext.InTransaction)
+                {
+                    UpdateCache(entriesToSave);
+                    DataContext.TransactionCommit += () => CacheSyncProvider.SendChanges(UpdateCache(entriesToSave));
+                    DataContext.TransactionRollback += () => UpdateRollback(entriesToSave);
+                }
+                else
+                {
+                    CacheSyncProvider.SendChanges(UpdateCache(entriesToSave));
+                }
             }
             return result;
         }
