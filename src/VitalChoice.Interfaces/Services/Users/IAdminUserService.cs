@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 
 namespace VitalChoice.Interfaces.Services.Users
@@ -8,5 +9,7 @@ namespace VitalChoice.Interfaces.Services.Users
         Task<AdminProfile> GetAdminProfileAsync(int id);
 
         Task<bool> IsSuperAdmin(ApplicationUser user);
-	}
+
+        Task<ICollection<AdminTeam>> GetAdminTeams();
+    }
 }

@@ -26,6 +26,7 @@ namespace VitalChoice.Business.Services.Users
 	public class AdminUserService : UserService, IAdminUserService
     {
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
+        private readonly IRepositoryAsync<AdminTeam> _adminTeamRepository;
 
         public AdminUserService(UserManager<ApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,
@@ -34,10 +35,13 @@ namespace VitalChoice.Business.Services.Users
             IOptions<AppOptions> options,
             IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
+            IRepositoryAsync<AdminTeam> adminTeamRepository,
             IUserValidator<ApplicationUser> userValidator, ITransactionAccessor<VitalChoiceContext> transactionAccessor) : 
             base(userManager, roleManager, context, signInManager, appInfrastructureService, notificationService, options, ecommerceRepositoryAsync, userValidator, transactionAccessor)
 		{
             _adminProfileRepository = adminProfileRepository;
+            _adminTeamRepository = adminTeamRepository;
+
 		}
 
         public async Task<AdminProfile> GetAdminProfileAsync(int id)
@@ -51,6 +55,11 @@ namespace VitalChoice.Business.Services.Users
 				.AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser)
 				.Text.Normalize());
 		}
+
+	    public async Task<ICollection<AdminTeam>> GetAdminTeams()
+	    {
+	        return await _adminTeamRepository.Query().SelectAsync(false);
+	    }
 
 		protected override async Task SendActivationInternalAsync(ApplicationUser dbUser)
 		{

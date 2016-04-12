@@ -53,7 +53,6 @@ using System.Security.Claims;
 
 namespace VC.Admin.Controllers
 {
-    [AdminAuthorize(PermissionType.Orders)]
     public class OrderController : BaseApiController
     {
         private readonly IOrderService _orderService;
@@ -77,6 +76,7 @@ namespace VC.Admin.Controllers
 	    private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
 		private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
 		private readonly IDynamicMapper<OrderDynamic, Order> _orderMapper;
+        private readonly IOrderReportService _orderReportService;
 
         public OrderController(
             IOrderService orderService,
@@ -91,6 +91,7 @@ namespace VC.Admin.Controllers
             ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> vOrderWithRegionInfoItemCSVExportService,
             INotificationService notificationService,
             BrontoService brontoService,
+            IOrderReportService orderReportService,
             IObjectHistoryLogService objectHistoryLogService, IOptions<AppOptions> options, IAppInfrastructureService appInfrastructureService, ICountryService countryService, IDynamicMapper<OrderDynamic, Order> orderMapper, IDynamicMapper<ProductDynamic, Product> productMapper, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodMapper, IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> customerPaymentMethodMapper, IDynamicMapper<AddressDynamic, Address> addressMapper1)
         {
             _orderService = orderService;
@@ -103,6 +104,7 @@ namespace VC.Admin.Controllers
             _vOrderWithRegionInfoItemCSVExportService = vOrderWithRegionInfoItemCSVExportService;
 	        _notificationService = notificationService;
             _brontoService = brontoService;
+            _orderReportService = orderReportService;
             _objectHistoryLogService = objectHistoryLogService;
 	        _appInfrastructureService = appInfrastructureService;
 	        _countryService = countryService;
@@ -116,11 +118,7 @@ namespace VC.Admin.Controllers
             loggerProvider.CreateLoggerDefault();
         }
 
-        [HttpGet]
-        public Task<Result<bool>> GetIsBrontoSubscribed(string id)
-        {
-            return Task.FromResult<Result<bool>>(!(_brontoService.GetIsUnsubscribed(id) ?? false));
-        }
+        #region BaseOrderLogic
 
         [HttpPost]
         public async Task<Result<PagedList<ShortOrderListItemModel>>> GetShortOrders([FromBody]OrderFilter filter)
@@ -135,6 +133,7 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
+        [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
         public async Task<Result<bool>> UpdateOrderStatus(int id, int status, [FromBody] object model, int? orderpart = null)
         {
@@ -148,10 +147,11 @@ namespace VC.Admin.Controllers
             {
                 order.OrderStatus = (OrderStatus)status;
             }
-            else if(orderpart == 1)//NP
+            else if (orderpart == 1)//NP
             {
                 order.NPOrderStatus = (OrderStatus)status;
-            } if(orderpart == 2)//P
+            }
+            if (orderpart == 2)//P
             {
                 order.POrderStatus = (OrderStatus)status;
             }
@@ -160,6 +160,7 @@ namespace VC.Admin.Controllers
             return order != null;
         }
 
+        [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
         public async Task<Result<bool>> MoveOrder(int id, int idcustomer, [FromBody] object model)
         {
@@ -199,93 +200,8 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
-	    [HttpPost]
-	    public async Task<Result<PagedList<AutoShipHistoryItemModel>>> GetAutoShips([FromBody] OrderFilter filter)
-	    {
-			var infr = _appInfrastructureService.Get();
-			var countries = await _countryService.GetCountriesAsync();
-
-			filter.Sorting.SortOrder = VitalChoice.Infrastructure.Domain.Transfer.SortOrder.Desc;
-			filter.Sorting.Path = VOrderSortPath.DateCreated;
-			filter.OrderType = OrderType.AutoShip;
-
-			var orders = await _orderService.GetFullAutoShipsAsync(filter);
-
-		    var helper = new AutoShipModelHelper(_skuMapper, _productMapper, _orderMapper, infr, countries);
-			var ordersModel = new PagedList<AutoShipHistoryItemModel>
-			{
-				Items = orders.Items.Select(p =>helper.PopulateAutoShipItemModel(p)).ToList(),
-				Count = orders.Count
-			};
-
-			return ordersModel;
-		}
-
+        [AdminAuthorize(PermissionType.Orders)]
         [HttpGet]
-	    public async Task<Result<IList<CreditCardModel>>> GetAutoShipCreditCards([FromQuery] int orderId, [FromQuery] int customerId)
-	    {
-		    var model = new List<CreditCardModel>();
-
-			var order = await _orderService.SelectAsync(orderId);
-			var orderCreditCard = _addressMapper.ToModel<CreditCardModel>(order.PaymentMethod.Address);
-			_orderPaymentMethodMapper.UpdateModel(orderCreditCard, order.PaymentMethod);
-
-		    orderCreditCard.IsSelected = true;
-			model.Add(orderCreditCard);
-
-			var customer = await _customerService.SelectAsync(customerId);
-				var dynamics = customer.CustomerPaymentMethods
-				.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard).ToList();
-		    foreach (var item in dynamics)
-		    {
-				var tempModel = _addressMapper.ToModel<CreditCardModel>(item.Address);
-				_customerPaymentMethodMapper.UpdateModel(tempModel, item);
-
-				model.Add(tempModel);
-			}
-
-		    return model;
-	    }
-
-		[HttpPost]
-		public async Task<Result<CreditCardModel>> UpdateAutoShipBilling([FromBody]CreditCardModel model, [FromQuery] int orderId)
-	    {
-			if (!Validate(model))
-				return null;
-
-			var order = await _orderService.SelectAsync(orderId, true);
-
-			var addressId = order.PaymentMethod.Address.Id;
-			await _orderPaymentMethodMapper.UpdateObjectAsync(model, order.PaymentMethod,
-							   (int)PaymentMethodType.CreditCard);
-			await _addressMapper.UpdateObjectAsync(model, order.PaymentMethod.Address, (int)AddressType.Billing);
-
-			order.PaymentMethod.Address.Id = addressId;
-
-			order = await _orderService.UpdateAsync(order);
-			var orderCreditCard = _addressMapper.ToModel<CreditCardModel>(order.PaymentMethod.Address);
-			_orderPaymentMethodMapper.UpdateModel(orderCreditCard, order.PaymentMethod);
-
-			return orderCreditCard;
-	    }
-
-	    [HttpPost]
-		public async Task<Result<bool>> ActivatePauseAutoShip([FromQuery]int customerId, [FromQuery]int id)
-		{
-			await _orderService.ActivatePauseAutoShipAsync(customerId, id);
-
-			return true;
-		}
-
-		[HttpPost]
-		public async Task<Result<bool>> DeleteAutoShip([FromQuery]int customerId, [FromQuery]int id)
-		{
-			await _orderService.DeleteAutoShipAsync(customerId, id);
-
-			return true;
-		}
-
-		[HttpGet]
         public async Task<Result<OrderManageModel>> GetOrder(int id, int? idcustomer = null, bool refreshprices = false)
         {
             if (id == 0)
@@ -298,8 +214,8 @@ namespace VC.Admin.Controllers
 
                 var model = _mapper.ToModel<OrderManageModel>(order);
                 model.UseShippingAndBillingFromCustomer = true;
-                model.GCs = new List<GCListItemModel>() {new GCListItemModel(null)};
-                model.SkuOrdereds = new List<SkuOrderedManageModel>() {new SkuOrderedManageModel(null)};
+                model.GCs = new List<GCListItemModel>() { new GCListItemModel(null) };
+                model.SkuOrdereds = new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) };
                 model.UpdateShippingAddressForCustomer = true;
                 model.UpdateCardForCustomer = true;
                 model.UpdateCheckForCustomer = true;
@@ -312,11 +228,11 @@ namespace VC.Admin.Controllers
             }
 
             var item = await _orderService.SelectAsync(id);
-		    if (item.IdObjectType != (int) OrderType.Normal && item.IdObjectType != (int)OrderType.AutoShipOrder && item.IdObjectType != (int) OrderType.AutoShip &&
-		        item.IdObjectType != (int) OrderType.DropShip && item.IdObjectType != (int) OrderType.GiftList)
-		    {
-		        throw new AccessDeniedException();
-		    }
+            if (item.IdObjectType != (int)OrderType.Normal && item.IdObjectType != (int)OrderType.AutoShipOrder && item.IdObjectType != (int)OrderType.AutoShip &&
+                item.IdObjectType != (int)OrderType.DropShip && item.IdObjectType != (int)OrderType.GiftList)
+            {
+                throw new AccessDeniedException();
+            }
             if (id != 0 && refreshprices && item.Skus != null)
             {
                 var customer = await _customerService.SelectAsync(item.Customer.Id);
@@ -324,7 +240,7 @@ namespace VC.Admin.Controllers
                 {
                     if (orderSku.Sku != null)
                     {
-                        orderSku.Amount = customer.IdObjectType == (int) CustomerType.Retail
+                        orderSku.Amount = customer.IdObjectType == (int)CustomerType.Retail
                             ? orderSku.Sku.Price
                             : orderSku.Sku.WholesalePrice;
                     }
@@ -336,6 +252,7 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
+        [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
         public async Task<Result<OrderCalculateModel>> CalculateOrder([FromBody]OrderManageModel model)
         {
@@ -347,6 +264,7 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
+        [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
         public async Task<Result<OrderManageModel>> UpdateOrder([FromBody]OrderManageModel model)
         {
@@ -392,18 +310,18 @@ namespace VC.Admin.Controllers
                 else
                 {
                     order = await _orderService.InsertAsync(order);
-					if (order.IdObjectType == (int)OrderType.AutoShip)
-					{
-						var ids = await _orderService.SelectAutoShipOrdersAsync(order.Id);
+                    if (order.IdObjectType == (int)OrderType.AutoShip)
+                    {
+                        var ids = await _orderService.SelectAutoShipOrdersAsync(order.Id);
 
-						order = await _orderService.SelectAsync(ids.First());
-					}
-				}
+                        order = await _orderService.SelectAsync(ids.First());
+                    }
+                }
             }
 
-            if (sendOrderConfirm  && !string.IsNullOrEmpty(model.Customer?.Email))//&& order.IdObjectType != (int)OrderType.AutoShip
+            if (sendOrderConfirm && !string.IsNullOrEmpty(model.Customer?.Email))//&& order.IdObjectType != (int)OrderType.AutoShip
             {
-	            var emailModel = _mapper.ToModel<OrderConfirmationEmail>(order);
+                var emailModel = _mapper.ToModel<OrderConfirmationEmail>(order);
                 if (emailModel != null)
                 {
                     await _notificationService.SendOrderConfirmationEmailAsync(order.Customer.Email, emailModel);
@@ -412,7 +330,7 @@ namespace VC.Admin.Controllers
 
             OrderManageModel toReturn = _mapper.ToModel<OrderManageModel>(order);
 
-            if(!string.IsNullOrEmpty(model?.Customer.Email) && model.SignUpNewsletter.HasValue)
+            if (!string.IsNullOrEmpty(model?.Customer.Email) && model.SignUpNewsletter.HasValue)
             {
                 var unsubscribed = _brontoService.GetIsUnsubscribed(model.Customer.Email);
                 if (model.SignUpNewsletter.Value && (!unsubscribed.HasValue || unsubscribed.Value))
@@ -427,7 +345,7 @@ namespace VC.Admin.Controllers
                         await _brontoService.Subscribe(model.Customer.Email);
                         _brontoService.Unsubscribe(model.Customer.Email);
                     }
-                    else if(!unsubscribed.Value)
+                    else if (!unsubscribed.Value)
                     {
                         _brontoService.Unsubscribe(model.Customer.Email);
                     }
@@ -437,6 +355,119 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
+        [AdminAuthorize(PermissionType.Orders)]
+        [HttpPost]
+        public async Task<Result<bool>> CancelOrder(int id, [FromBody] object model)
+        {
+            return await _orderService.CancelOrderAsync(id);
+        }
+
+        [AdminAuthorize(PermissionType.Orders)]
+        [HttpGet]
+        public Task<Result<bool>> GetIsBrontoSubscribed(string id)
+        {
+            return Task.FromResult<Result<bool>>(!(_brontoService.GetIsUnsubscribed(id) ?? false));
+        }
+
+        #endregion
+
+        #region AutoShips
+        
+        [HttpPost]
+	    public async Task<Result<PagedList<AutoShipHistoryItemModel>>> GetAutoShips([FromBody] OrderFilter filter)
+	    {
+			var infr = _appInfrastructureService.Get();
+			var countries = await _countryService.GetCountriesAsync();
+
+			filter.Sorting.SortOrder = VitalChoice.Infrastructure.Domain.Transfer.SortOrder.Desc;
+			filter.Sorting.Path = VOrderSortPath.DateCreated;
+			filter.OrderType = OrderType.AutoShip;
+
+			var orders = await _orderService.GetFullAutoShipsAsync(filter);
+
+		    var helper = new AutoShipModelHelper(_skuMapper, _productMapper, _orderMapper, infr, countries);
+			var ordersModel = new PagedList<AutoShipHistoryItemModel>
+			{
+				Items = orders.Items.Select(p =>helper.PopulateAutoShipItemModel(p)).ToList(),
+				Count = orders.Count
+			};
+
+			return ordersModel;
+		}
+
+        [AdminAuthorize(PermissionType.Orders)]
+        [HttpGet]
+	    public async Task<Result<IList<CreditCardModel>>> GetAutoShipCreditCards([FromQuery] int orderId, [FromQuery] int customerId)
+	    {
+		    var model = new List<CreditCardModel>();
+
+			var order = await _orderService.SelectAsync(orderId);
+			var orderCreditCard = _addressMapper.ToModel<CreditCardModel>(order.PaymentMethod.Address);
+			_orderPaymentMethodMapper.UpdateModel(orderCreditCard, order.PaymentMethod);
+
+		    orderCreditCard.IsSelected = true;
+			model.Add(orderCreditCard);
+
+			var customer = await _customerService.SelectAsync(customerId);
+				var dynamics = customer.CustomerPaymentMethods
+				.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard).ToList();
+		    foreach (var item in dynamics)
+		    {
+				var tempModel = _addressMapper.ToModel<CreditCardModel>(item.Address);
+				_customerPaymentMethodMapper.UpdateModel(tempModel, item);
+
+				model.Add(tempModel);
+			}
+
+		    return model;
+	    }
+
+        [AdminAuthorize(PermissionType.Orders)]
+        [HttpPost]
+		public async Task<Result<CreditCardModel>> UpdateAutoShipBilling([FromBody]CreditCardModel model, [FromQuery] int orderId)
+	    {
+			if (!Validate(model))
+				return null;
+
+			var order = await _orderService.SelectAsync(orderId, true);
+
+			var addressId = order.PaymentMethod.Address.Id;
+			await _orderPaymentMethodMapper.UpdateObjectAsync(model, order.PaymentMethod,
+							   (int)PaymentMethodType.CreditCard);
+			await _addressMapper.UpdateObjectAsync(model, order.PaymentMethod.Address, (int)AddressType.Billing);
+
+			order.PaymentMethod.Address.Id = addressId;
+
+			order = await _orderService.UpdateAsync(order);
+			var orderCreditCard = _addressMapper.ToModel<CreditCardModel>(order.PaymentMethod.Address);
+			_orderPaymentMethodMapper.UpdateModel(orderCreditCard, order.PaymentMethod);
+
+			return orderCreditCard;
+	    }
+
+        [AdminAuthorize(PermissionType.Orders)]
+        [HttpPost]
+		public async Task<Result<bool>> ActivatePauseAutoShip([FromQuery]int customerId, [FromQuery]int id)
+		{
+			await _orderService.ActivatePauseAutoShipAsync(customerId, id);
+
+			return true;
+		}
+
+        [AdminAuthorize(PermissionType.Orders)]
+        [HttpPost]
+		public async Task<Result<bool>> DeleteAutoShip([FromQuery]int customerId, [FromQuery]int id)
+		{
+			await _orderService.DeleteAutoShipAsync(customerId, id);
+
+			return true;
+		}
+
+        #endregion
+
+        #region Reships
+
+        [AdminAuthorize(PermissionType.Orders)]
         [HttpGet]
         public async Task<Result<OrderReshipManageModel>> GetReshipOrder(int id, int? idsource = null, int? idcustomer = null)
         {
@@ -493,6 +524,7 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
+        [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
         public async Task<Result<OrderReshipManageModel>> UpdateReshipOrder([FromBody]OrderReshipManageModel model)
         {
@@ -547,12 +579,130 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
+        #endregion
+
+        #region Refunds
+
+        [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
-        public async Task<Result<bool>> CancelOrder(int id, [FromBody] object model)
+        public async Task<Result<OrderRefundCalculateModel>> CalculateRefundOrder([FromBody]OrderRefundManageModel model)
         {
-            return await _orderService.CancelOrderAsync(id);
+            var order = _orderRefundMapper.FromModel(model);
+            var orderContext = await _orderRefundService.CalculateRefundOrder(order);
+
+            OrderRefundCalculateModel toReturn = new OrderRefundCalculateModel(orderContext);
+
+            return toReturn;
         }
 
+        [AdminAuthorize(PermissionType.Orders)]
+        [HttpGet]
+        public async Task<Result<OrderRefundManageModel>> GetRefundOrder(int id, int? idsource = null, int? idcustomer = null)
+        {
+            OrderRefundManageModel toReturn = null;
+            if (id == 0)
+            {
+                if (idsource.HasValue)
+                {
+                    var order = await _orderService.SelectAsync(idsource.Value);
+                    if (order != null)
+                    {
+                        OrderRefundDynamic refund = new OrderRefundDynamic();
+                        refund.DateCreated = DateTime.Now;
+                        refund.IdObjectType = (int)OrderType.Refund;
+                        refund.Customer = order.Customer;
+                        refund.IdOrderSource = order.Id;
+                        refund.ShippingAddress = order.ShippingAddress;
+                        refund.ShippingAddress.Id = 0;
+                        refund.OrderStatus = OrderStatus.Processed;
+                        AddressDynamic paymentAddress = null;
+                        if (order?.PaymentMethod?.Address != null)
+                        {
+                            paymentAddress = order.PaymentMethod.Address;
+                        }
+                        else
+                        {
+                            var customer = order.Customer;
+                            if (customer.ProfileAddress != null)
+                            {
+                                paymentAddress = customer.ProfileAddress;
+                            }
+                            else
+                            {
+                                customer = await _customerService.SelectAsync(order.Customer.Id);
+                                paymentAddress = customer.ProfileAddress ?? new AddressDynamic();
+                            }
+                        }
+                        paymentAddress.Id = 0;
+                        refund.PaymentMethod = new OrderPaymentMethodDynamic()
+                        {
+                            Address = paymentAddress,
+                            IdObjectType = (int)PaymentMethodType.Oac,
+                        };
+                        toReturn = _orderRefundMapper.ToModel<OrderRefundManageModel>(refund);
+                        toReturn.ManualShippingTotal = order.ShippingTotal;
+                    }
+                }
+            }
+
+            var item = await _orderRefundService.SelectAsync(id);
+            if (item != null)
+            {
+                if (item.IdObjectType != (int)OrderType.Refund)
+                {
+                    throw new AccessDeniedException();
+                }
+                toReturn = _orderRefundMapper.ToModel<OrderRefundManageModel>(item);
+                toReturn.ManualShippingTotal = toReturn.ShippingTotal;
+            }
+
+            return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Orders)]
+        [HttpPost]
+        public async Task<Result<OrderRefundManageModel>> AddRefundOrder([FromBody]OrderRefundManageModel model)
+        {
+            if (!Validate(model))
+                return null;
+
+            var order = _orderRefundMapper.FromModel(model);
+
+            var sUserId = Request.HttpContext.User.GetUserId();
+            int userId;
+            if (int.TryParse(sUserId, out userId))
+            {
+                order.IdEditedBy = userId;
+            }
+
+            if (model.OrderStatus != OrderStatus.Cancelled && model.OrderStatus != OrderStatus.Exported && model.OrderStatus != OrderStatus.Shipped)
+            {
+                order.Data.OrderType = (int)SourceOrderType.Phone;
+                await _orderRefundService.CalculateRefundOrder(order);
+
+                if (model.Id == 0)
+                {
+                    order = await _orderRefundService.InsertAsync(order);
+                }
+            }
+
+            OrderRefundManageModel toReturn = _orderRefundMapper.ToModel<OrderRefundManageModel>(order);
+
+            return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Orders)]
+        [HttpPost]
+        public async Task<Result<bool>> CancelRefundOrder(int id, [FromBody] object model)
+        {
+            return await _orderRefundService.CancelRefundOrderAsync(id);
+        }
+
+        #endregion
+
+        #region OrderUpdateHistory
+
+        [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
         public async Task<Result<ObjectHistoryReportModel>> GetHistoryReport([FromBody]ObjectHistoryLogItemsFilter filter)
         {
@@ -602,6 +752,11 @@ namespace VC.Admin.Controllers
             return model;
         }
 
+        #endregion
+
+        #region Reports
+
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpPost]
         public async Task<Result<ICollection<OrdersRegionStatisticItem>>> GetOrdersRegionStatistic([FromBody]OrderRegionFilter filter)
         {
@@ -609,6 +764,7 @@ namespace VC.Admin.Controllers
             return toReturn.ToList();
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpGet]
         public async Task<FileResult> GetOrdersRegionStatisticReportFile([FromQuery]DateTime from, [FromQuery]DateTime to,
             [FromQuery]int? idcustomertype = null, [FromQuery]int? idordertype = null)
@@ -634,6 +790,7 @@ namespace VC.Admin.Controllers
             return File(data, "text/csv");
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpPost]
         public async Task<Result<ICollection<OrdersZipStatisticItem>>> GetOrdersZipStatistic([FromBody]OrderRegionFilter filter)
         {
@@ -641,6 +798,7 @@ namespace VC.Admin.Controllers
             return toReturn.ToList();
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpGet]
         public async Task<FileResult> GetOrdersZipStatisticReportFile([FromQuery]DateTime from, [FromQuery]DateTime to,
             [FromQuery]int? idcustomertype = null, [FromQuery]int? idordertype = null)
@@ -667,6 +825,7 @@ namespace VC.Admin.Controllers
         }
 
 
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpPost]
         public async Task<Result<PagedList<VOrderWithRegionInfoItem>>> GetOrderWithRegionInfoItems([FromBody]OrderRegionFilter filter)
         {
@@ -674,6 +833,7 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpGet]
         public async Task<FileResult> GetOrderWithRegionInfoItemsReportFile([FromQuery]DateTime from, [FromQuery]DateTime to,
             [FromQuery]int? idcustomertype = null, [FromQuery]int? idordertype = null, [FromQuery]string region = null, [FromQuery]string zip = null)
@@ -706,12 +866,25 @@ namespace VC.Admin.Controllers
             return File(result, "text/csv");
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpPost]
         public async Task<Result<decimal>> GetOrderWithRegionInfoAmount([FromBody]OrderRegionFilter filter)
         {
             var toReturn = await _orderService.GetOrderWithRegionInfoAmountAsync(filter);
             return toReturn;
         }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<OrdersAgentReport>> GetOrdersAgentReport([FromBody]OrdersAgentReportFilter filter)
+        {
+            var toReturn = await _orderReportService.GetOrdersAgentReportAsync(filter);
+            return toReturn;
+        }
+
+        #endregion
+
+        #region GCOrders
 
         [HttpGet]
         public async Task<Result<ICollection<GCOrderListItemModel>>> GetGCOrders(int id)
@@ -720,8 +893,13 @@ namespace VC.Admin.Controllers
             return toReturn.Select(p => new GCOrderListItemModel(p)).ToList();
         }
 
+        #endregion
+
+        #region ImportOrders
+
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
+        [AdminAuthorize(PermissionType.Orders)]
         public async Task<Result<bool>> ImportOrders()
         {
             var form = await Request.ReadFormAsync();
@@ -749,6 +927,11 @@ namespace VC.Admin.Controllers
             }
         }
 
+        #endregion
+
+        #region OrderEmails
+
+        [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
         public async Task<Result<bool>> SendOrderConfirmationEmail(int id, [FromBody]OrderManualSendConfirmationModel model)
         {
@@ -766,6 +949,7 @@ namespace VC.Admin.Controllers
             return true;
         }
 
+        [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
         public async Task<Result<bool>> SendOrderShippingConfirmationEmail(int id, [FromBody]OrderManualSendConfirmationModel model)
         {
@@ -806,114 +990,6 @@ namespace VC.Admin.Controllers
             return true;
         }
 
-        [HttpPost]
-        public async Task<Result<OrderRefundCalculateModel>> CalculateRefundOrder([FromBody]OrderRefundManageModel model)
-        {
-            var order = _orderRefundMapper.FromModel(model);
-            var orderContext = await _orderRefundService.CalculateRefundOrder(order);
-
-            OrderRefundCalculateModel toReturn = new OrderRefundCalculateModel(orderContext);
-
-            return toReturn;
-        }
-
-        [HttpGet]
-        public async Task<Result<OrderRefundManageModel>> GetRefundOrder(int id, int? idsource = null, int? idcustomer = null)
-        {
-            OrderRefundManageModel toReturn = null;
-            if (id == 0)
-            {
-                if (idsource.HasValue)
-                {
-                    var order = await _orderService.SelectAsync(idsource.Value);
-                    if (order != null)
-                    {
-                        OrderRefundDynamic refund=new OrderRefundDynamic();
-                        refund.DateCreated = DateTime.Now;
-                        refund.IdObjectType = (int)OrderType.Refund;
-                        refund.Customer = order.Customer;
-                        refund.IdOrderSource = order.Id;
-                        refund.ShippingAddress = order.ShippingAddress;
-                        refund.ShippingAddress.Id = 0;
-                        refund.OrderStatus=OrderStatus.Processed;
-                        AddressDynamic paymentAddress = null;
-                        if (order?.PaymentMethod?.Address != null)
-                        {
-                            paymentAddress = order.PaymentMethod.Address;
-                        }
-                        else
-                        {
-                            var customer = order.Customer;
-                            if (customer.ProfileAddress != null)
-                            {
-                                paymentAddress = customer.ProfileAddress;
-                            }
-                            else
-                            {
-                                customer = await _customerService.SelectAsync(order.Customer.Id);
-                                paymentAddress = customer.ProfileAddress ?? new AddressDynamic();
-                            }
-                        }
-                        paymentAddress.Id = 0;
-                        refund.PaymentMethod = new OrderPaymentMethodDynamic()
-                        {
-                            Address = paymentAddress,
-                            IdObjectType = (int)PaymentMethodType.Oac,
-                        };
-                        toReturn = _orderRefundMapper.ToModel<OrderRefundManageModel>(refund);
-                        toReturn.ManualShippingTotal = order.ShippingTotal;
-                    }
-                }
-            }
-
-            var item = await _orderRefundService.SelectAsync(id);
-            if (item != null)
-            {
-                if (item.IdObjectType != (int)OrderType.Refund)
-                {
-                    throw new AccessDeniedException();
-                }
-                toReturn = _orderRefundMapper.ToModel<OrderRefundManageModel>(item);
-                toReturn.ManualShippingTotal = toReturn.ShippingTotal;
-            }
-
-            return toReturn;
-        }
-
-        [HttpPost]
-        public async Task<Result<OrderRefundManageModel>> AddRefundOrder([FromBody]OrderRefundManageModel model)
-        {
-            if (!Validate(model))
-                return null;
-
-            var order = _orderRefundMapper.FromModel(model);
-
-            var sUserId = Request.HttpContext.User.GetUserId();
-            int userId;
-            if (int.TryParse(sUserId, out userId))
-            {
-                order.IdEditedBy = userId;
-            }
-            
-            if (model.OrderStatus != OrderStatus.Cancelled && model.OrderStatus != OrderStatus.Exported && model.OrderStatus != OrderStatus.Shipped)
-            {
-                await _orderRefundService.CalculateRefundOrder(order);
-
-                if (model.Id == 0)
-                {
-                    order = await _orderRefundService.InsertAsync(order);
-                }
-            }
-
-            OrderRefundManageModel toReturn = _orderRefundMapper.ToModel<OrderRefundManageModel>(order);
-
-            return toReturn;
-        }
-        
-        [HttpPost]
-        public async Task<Result<bool>> CancelRefundOrder(int id, [FromBody] object model)
-        {
-            return await _orderRefundService.CancelRefundOrderAsync(id);
-        }
+        #endregion
     }
 }

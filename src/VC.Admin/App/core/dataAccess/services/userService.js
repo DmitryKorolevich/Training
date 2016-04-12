@@ -13,6 +13,10 @@ angular.module('app.core.dataAccess.services.userService', [])
 	};
 
 	return {
+	    getAdminTeams: function (tracker)
+	    {
+	        return $http.get(baseUrl + 'GetAdminTeams', getConfig(tracker));
+	    },
 		getUsers: function(filter, tracker) {
 			return $http.post(baseUrl + 'GetUsers', filter, getConfig(tracker));
 		},

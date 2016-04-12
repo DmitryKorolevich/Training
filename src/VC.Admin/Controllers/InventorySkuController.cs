@@ -14,6 +14,7 @@ using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Affiliates;
 using VC.Admin.Models.Affiliate;
 using System.Text;
+using System.Threading;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Interfaces.Services.Settings;
 using Newtonsoft.Json;

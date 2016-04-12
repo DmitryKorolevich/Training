@@ -22,5 +22,9 @@ namespace VC.Admin.Models.UserManagement
 	    public string AgentId { get; set; }
 
 	    public DateTime? LastLoginDate { get; set; }
+
+        public int? IdAdminTeam { get; set; }
+
+        public string AdminTeam { get; set; }
 	}
 }

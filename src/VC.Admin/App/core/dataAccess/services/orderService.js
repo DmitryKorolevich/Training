@@ -139,6 +139,14 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    {
 	        return $http.post(baseUrl + 'GetOrderWithRegionInfoAmount', filter, getConfig(tracker));
 	    },
+
+	    //agents report
+	    getOrdersAgentReport: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetOrdersAgentReport', filter, getConfig(tracker));
+	    },
+
+        //gcs
 	    getGCOrders: function (id, tracker)
 	    {
 	        return $http.get(baseUrl + 'GetGCOrders/'+ id, getConfig(tracker));

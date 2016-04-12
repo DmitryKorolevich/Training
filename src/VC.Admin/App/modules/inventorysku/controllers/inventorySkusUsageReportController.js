@@ -247,15 +247,16 @@
                                 errorHandler(result);
                             }
                             $scope.options.SkuAddDisabled = false;
+                            $scope.skuChangedRequest = null;
                         })
                         .error(function (result)
                         {
                             $scope.options.SkuAddDisabled = false;
                             errorHandler(result);
+                            $scope.skuChangedRequest = null;
                         });
-                    $scope.skuChangedRequest = null;
                 }
-            }, 20);
+            }, 100);
         };
 
         $scope.addSku = function ()
@@ -344,15 +345,16 @@
                                 errorHandler(result);
                             }
                             $scope.options.InvSkuAddDisabled = false;
+                            $scope.invSkuChangedRequest = null;
                         })
                         .error(function (result)
                         {
                             $scope.options.InvSkuAddDisabled = false;
                             errorHandler(result);
+                            $scope.invSkuChangedRequest = null;
                         });
-                    $scope.invSkuChangedRequest = null;
                 }
-            }, 20);
+            }, 100);
         };
 
         $scope.addInvSku = function ()
