@@ -37,7 +37,7 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                         {
                             sku.Messages.Add(new MessageInfo()
                             {
-                                MessageLevel = MessageLevel.Error,
+                                MessageLevel = MessageLevel.Warning,
                                 Message = "The discount for this product has been excluded by category"
                             });
                         }
@@ -63,7 +63,7 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                             sku.Messages.Add(
                                 new MessageInfo()
                                 {
-                                    MessageLevel = MessageLevel.Error,
+                                    MessageLevel = MessageLevel.Warning,
                                     Message = "The discount for this product has been excluded by category"
                                 });
                         }
@@ -90,7 +90,7 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                             sku.Messages.Add(
                                 new MessageInfo()
                                 {
-                                    MessageLevel = MessageLevel.Error,
+                                    MessageLevel = MessageLevel.Warning,
                                     Message = "The discount for this product has been excluded by SKU"
                                 });
                         }
@@ -113,7 +113,7 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                             sku.Messages.Add(
                                 new MessageInfo()
                                 {
-                                    MessageLevel = MessageLevel.Error,
+                                    MessageLevel = MessageLevel.Warning,
                                     Message = "The discount for this product has been excluded by SKU"
                                 });
                         }
@@ -127,6 +127,26 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                 {
                     var selectedSkus = skus.IntersectKeyedWith(dataContext.Order.Discount.SkusAppliedOnlyTo, sku => sku.Sku.Id,
                         selectedSku => selectedSku.IdSku).ToArray();
+                    if (!selectedSkus.Any())
+                    {
+                        dataContext.Messages.Add(new MessageInfo
+                        {
+                            Message = "Cannot apply discount. Discountable products not found.",
+                            Field = "DiscountCode"
+                        });
+                    }
+                    skus = selectedSkus;
+                }
+                if (dataContext.Order.Discount.CategoryIdsAppliedOnlyTo?.Any() ?? false)
+                {
+                    if (skus.Any(s => s.Sku.Product.CategoryIds == null))
+                    {
+                        throw new InvalidOperationException("Product doesn't have any categories set in object.");
+                    }
+                    HashSet<int> categories = new HashSet<int>(dataContext.Order.Discount.CategoryIdsAppliedOnlyTo);
+                    var selectedSkus =
+                        skus.Where(s => s.Sku.Product.CategoryIds.Any(c => categories.Contains(c))).ToArray();
+                    
                     if (!selectedSkus.Any())
                     {
                         dataContext.Messages.Add(new MessageInfo

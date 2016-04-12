@@ -248,7 +248,7 @@ namespace VC.Public.Controllers
                     result.Quantity = skuModel.Quantity;
                     return result;
                 }, (ordered, skuModel) => ordered.Quantity = skuModel.Quantity);
-            cart.Order.Discount = await _discountService.GetByCode(model.PromoCode);
+            cart.Order.Discount = await _discountService.GetByCode(model.DiscountCode);
             var gcCodes = model.GiftCertificateCodes.Select(x => x.Value).ToList();
             cart.Order.GiftCertificates?.MergeKeyed(
                 gcCodes.Select(code => _gcService.GetGiftCertificateAsync(code).Result).Where(g => g != null).ToArray(),

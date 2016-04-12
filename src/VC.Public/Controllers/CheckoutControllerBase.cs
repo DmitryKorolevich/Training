@@ -104,7 +104,7 @@ namespace VC.Public.Controllers
                 ModelState.AddModelError(string.Empty, cartModel.TopGlobalMessage);
             }
             var gcMessages = context.GcMessageInfos.ToDictionary(m => m.Field);
-            if (!string.IsNullOrWhiteSpace(cartModel.PromoCode) && order.Discount == null)
+            if (!string.IsNullOrWhiteSpace(cartModel.DiscountCode) && order.Discount == null)
             {
                 context.Messages.Add(new MessageInfo
                 {
@@ -178,7 +178,7 @@ namespace VC.Public.Controllers
             }));
             cartModel.Tax = order.TaxTotal;
             cartModel.OrderTotal = order.Total;
-            cartModel.PromoCode = order.Discount?.Code;
+            cartModel.DiscountCode = order.Discount?.Code;
             cartModel.ShippingCost = order.ShippingTotal;
             cartModel.SubTotal = order.ProductsSubtotal;
             if (((ShipDelayType?) order.SafeData.ShipDelayType ?? ShipDelayType.None) != ShipDelayType.None)

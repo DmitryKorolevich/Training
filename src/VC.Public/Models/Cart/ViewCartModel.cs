@@ -51,7 +51,7 @@ namespace VC.Public.Models.Cart
 		[Display(Name = "Gift Certificates")]
 		public decimal? GiftCertificatesTotal { get; set; }
 
-	    public string PromoCode { get; set; }
+	    public string DiscountCode { get; set; }
 
 		public ICollection<LookupItem<ShippingUpgradeOption>> ShippingUpgradePOptions { get; set; }
 

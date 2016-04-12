@@ -137,7 +137,7 @@ function recalculateCart(viewModel, successCallback) {
 		            viewModel.refreshing(false);
 				    successCallback();
 				} else {
-					ko.mapping.fromJS(result.Data, { 'ignore': ["ShipAsap", "PromoCode", "ShippingDate"] }, viewModel.Model);
+		            ko.mapping.fromJS(result.Data, { 'ignore': ["ShipAsap", "DiscountCode", "ShippingDate"] }, viewModel.Model);
 					processServerMessages(viewModel.Model);
 					viewModel.refreshing(false);
 				}
@@ -145,7 +145,7 @@ function recalculateCart(viewModel, successCallback) {
 			{
 			    if (result.Data)
 			    {
-			        ko.mapping.fromJS(result.Data, { 'ignore': ["ShipAsap", "PromoCode", "ShippingDate"] }, viewModel.Model);
+			        ko.mapping.fromJS(result.Data, { 'ignore': ["ShipAsap", "DiscountCode", "ShippingDate"] }, viewModel.Model);
 			    }
 			    processErrorResponse(result);
 			    viewModel.refreshing(false);
@@ -237,7 +237,7 @@ function getDiscountRelatedErrors(model) {
 	}
 
 	return $.grep(model.Messages(), function(element) {
-		return element.Key = "PromoCode";
+	    return element.Key = "DiscountCode";
 	});
 }
 
@@ -289,7 +289,7 @@ function addToCart(jElem, viewModel) {
 		type: "POST"
 	}).success(function (result) {
 		if (result.Success) {
-				ko.mapping.fromJS(result.Data, { 'ignore': ["ShipAsap", "PromoCode", "ShippingDate"] }, viewModel.Model);
+		    ko.mapping.fromJS(result.Data, { 'ignore': ["ShipAsap", "DiscountCode", "ShippingDate"] }, viewModel.Model);
 				processServerMessages(viewModel.Model);
 		} else {
 			processErrorResponse(result);
