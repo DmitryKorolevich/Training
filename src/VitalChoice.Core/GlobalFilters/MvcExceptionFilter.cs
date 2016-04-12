@@ -28,7 +28,8 @@ namespace VitalChoice.Core.GlobalFilters
 
 		public override void OnException(ExceptionContext context)
 		{
-		    var systemException = context.Exception as SystemException;
+#if !DOTNET5_4
+            var systemException = context.Exception as SystemException;
 		    if (systemException != null)
 		    {
 		        var root = ProfilingScope.RootScope;
@@ -37,8 +38,9 @@ namespace VitalChoice.Core.GlobalFilters
 		            root.CriticalException = systemException;
 		        }
 		    }
+#endif
 
-		    var acceptHeader = context.HttpContext.Request.Headers["Accept"];
+            var acceptHeader = context.HttpContext.Request.Headers["Accept"];
             if (acceptHeader.Any() && acceptHeader.First().Contains("application/json"))
 			{
 			    if (context.Exception is CustomerSuspendException)
