@@ -25,9 +25,9 @@ namespace VitalChoice.Infrastructure.Context
         {
             InstanceId = Guid.NewGuid();
         }
-	    public bool LateDisposed { get; private set; }
 
-	    
+	    public object Tag { get; set; }
+	    public bool Disposed { get; private set; }
 	    public Guid InstanceId { get; }
 	    
 	    public IInnerEmbeddingTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted)        {
@@ -50,7 +50,7 @@ namespace VitalChoice.Infrastructure.Context
         {
             if (_transaction == null || _transaction.Closed)
                 base.Dispose();
-            LateDisposed = true;
+            Disposed = true;
         }
 
         public override int SaveChanges()

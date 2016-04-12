@@ -54,7 +54,7 @@ namespace VitalChoice.Caching.Services
                                 entity = KeyStorage.GetEntity(type, pk);
                                 if (!internalCache.Update(entity, (DbContext) null))
                                 {
-                                    Logger.LogWarning($"Cannot update <{op.EntityType}>{pk}");
+                                    //Logger.LogWarning($"Cannot update <{op.EntityType}>{pk}");
                                 }
                             }
                             break;
@@ -64,7 +64,7 @@ namespace VitalChoice.Caching.Services
                             {
                                 if (internalCache.ItemExist(pk))
                                 {
-                                    Logger.LogWarning($"Cannot remove <{op.EntityType}>{pk}");
+                                    //Logger.LogWarning($"Cannot remove <{op.EntityType}>{pk}");
                                 }
                             }
                             break;

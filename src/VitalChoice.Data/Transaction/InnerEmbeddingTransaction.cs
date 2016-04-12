@@ -25,6 +25,10 @@ namespace VitalChoice.Data.Transaction
                 Closed = true;
                 _referenceCount--;
                 _transaction.Dispose();
+                if (DbContext.Disposed)
+                {
+                    DbContext.Dispose();
+                }
             }
             else
             {

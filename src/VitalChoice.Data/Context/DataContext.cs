@@ -24,8 +24,10 @@ namespace VitalChoice.Data.Context
             InstanceId = Guid.NewGuid();
         }
 
-	    
-	    public Guid InstanceId { get; }
+
+        public object Tag { get; set; }
+        public bool Disposed { get; private set; }
+        public Guid InstanceId { get; }
 
 	    public IInnerEmbeddingTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted)
 	    {
@@ -46,8 +48,9 @@ namespace VitalChoice.Data.Context
 
         public override void Dispose()
         {
-            if (_transaction == null)
+            if (_transaction == null || _transaction.Closed)
                 base.Dispose();
+            Disposed = true;
         }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))

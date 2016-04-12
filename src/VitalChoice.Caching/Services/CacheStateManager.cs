@@ -33,66 +33,56 @@ namespace VitalChoice.Caching.Services
             Logger = loggerFactory.CreateLogger<CacheStateManager>();
         }
 
-        private IEnumerable<InternalEntityEntry> GetEntriesToSave()
+        private List<ImmutableEntryState> GetEntriesToSave()
         {
-            return Entries.Where(e =>
-            {
-                if (e.EntityState != EntityState.Added && e.EntityState != EntityState.Modified)
-                    return e.EntityState == EntityState.Deleted;
-                return true;
-            });
+            return (List<ImmutableEntryState>) DataContext.Tag;
         }
 
-        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = new CancellationToken())
+        protected override Task<int> SaveChangesAsync(IReadOnlyList<InternalEntityEntry> entriesToSave, CancellationToken cancellationToken = new CancellationToken())
         {
+            DataContext.Tag = new List<ImmutableEntryState>(entriesToSave.Select(e => new ImmutableEntryState(e)));
+            return base.SaveChangesAsync(entriesToSave, cancellationToken);
+        }
+
+        protected override int SaveChanges(IReadOnlyList<InternalEntityEntry> entriesToSave)
+        {
+            DataContext.Tag = new List<ImmutableEntryState>(entriesToSave.Select(e => new ImmutableEntryState(e)));
+            return base.SaveChanges(entriesToSave);
+        }
+
+        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
+            CancellationToken cancellationToken = new CancellationToken())
+        {
+            var result = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
             var entriesToSave = GetEntriesToSave();
-            var immutableList = new List<ImmutableEntryState>(entriesToSave.Select(e => new ImmutableEntryState(e)));
-            try
+            if (DataContext.InTransaction)
             {
-                var result = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-                if (DataContext.InTransaction)
-                {
-                    UpdateCache(immutableList);
-                    DataContext.TransactionCommit += () => CacheSyncProvider.SendChanges(UpdateCache(immutableList));
-                    DataContext.TransactionRollback += () => UpdateRollback(immutableList);
-                }
-                else
-                {
-                    CacheSyncProvider.SendChanges(UpdateCache(immutableList));
-                }
-                return result;
+                UpdateCache(entriesToSave);
+                DataContext.TransactionCommit += () => CacheSyncProvider.SendChanges(UpdateCache(entriesToSave));
+                DataContext.TransactionRollback += () => UpdateRollback(entriesToSave);
             }
-            catch (DbUpdateException)
+            else
             {
-                UpdateRollback(immutableList);
-                throw;
+                CacheSyncProvider.SendChanges(UpdateCache(entriesToSave));
             }
+            return result;
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
+            var result = base.SaveChanges(acceptAllChangesOnSuccess);
             var entriesToSave = GetEntriesToSave();
-            var immutableList = new List<ImmutableEntryState>(entriesToSave.Select(e => new ImmutableEntryState(e)));
-            try
+            if (DataContext.InTransaction)
             {
-                var result = base.SaveChanges(acceptAllChangesOnSuccess);
-                if (DataContext.InTransaction)
-                {
-                    UpdateCache(immutableList);
-                    DataContext.TransactionCommit += () => CacheSyncProvider.SendChanges(UpdateCache(immutableList));
-                    DataContext.TransactionRollback += () => UpdateRollback(immutableList);
-                }
-                else
-                {
-                    CacheSyncProvider.SendChanges(UpdateCache(immutableList));
-                }
-                return result;
+                UpdateCache(entriesToSave);
+                DataContext.TransactionCommit += () => CacheSyncProvider.SendChanges(UpdateCache(entriesToSave));
+                DataContext.TransactionRollback += () => UpdateRollback(entriesToSave);
             }
-            catch (DbUpdateException)
+            else
             {
-                UpdateRollback(immutableList);
-                throw;
+                CacheSyncProvider.SendChanges(UpdateCache(entriesToSave));
             }
+            return result;
         }
 
         private void UpdateRollback(ICollection<ImmutableEntryState> entriesToSave)

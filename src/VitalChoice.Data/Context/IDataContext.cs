@@ -10,6 +10,10 @@ namespace VitalChoice.Data.Context
 {
     public interface IDataContext : IDisposable
     {
+        object Tag { get; set; }
+
+        bool Disposed { get; }
+
         Guid InstanceId { get; }
 
         IInnerEmbeddingTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted);
