@@ -1,22 +1,12 @@
-﻿IF OBJECT_ID(N'[dbo].[AdminTeams]', N'U') IS NULL
+﻿IF NOT EXISTS(SELECT * FROM AdminTeams)
 BEGIN
-	CREATE TABLE [dbo].AdminTeams (
-		[Id] INT NOT NULL 
-			CONSTRAINT PK_AdminTeams PRIMARY KEY (Id) IDENTITY,
-		[Name] nvarchar(250) NOT NULL,
-	)
 
-	ALTER TABLE dbo.AdminProfiles
-	ADD IdAdminTeam INT NULL
-
-	ALTER TABLE dbo.AdminProfiles ADD CONSTRAINT
-	FK_AdminProfiles_AdminTeams FOREIGN KEY
-	(
-	IdAdminTeam
-	) REFERENCES dbo.AdminTeams
-	(
-	Id
-	)
+	INSERT AdminTeams
+	(Name)
+	VALUES
+	('Crystal Creek'),
+	('Taction'),
+	('Vital Choice')
 
 END
 
