@@ -39,7 +39,7 @@ namespace VitalChoice.Caching.Services
 
         public override TResult Execute<TResult>(Expression expression)
         {
-            using (var scope = new ProfilingScope(new ExpressionStringFormatter(expression)))
+            using (new ProfilingScope(new ExpressionStringFormatter(expression)))
             {
                 var cacheObjectType = typeof (TResult);
                 var elementType = typeof (TResult).TryGetElementType(typeof (IEnumerable<>));
@@ -61,7 +61,6 @@ namespace VitalChoice.Caching.Services
                     var results = elementType != null
                         ? cacheExecutor.Execute(out cacheGetResult)
                         : cacheExecutor.ExecuteFirst(out cacheGetResult);
-                    scope.AddScopeData(cacheGetResult);
                     switch (cacheGetResult)
                     {
                         case CacheGetResult.Found:
@@ -78,17 +77,16 @@ namespace VitalChoice.Caching.Services
                     }
                     //}
                 }
-                else
+                using (new ProfilingScope(CacheGetResult.NotFound))
                 {
-                    scope.AddScopeData(CacheGetResult.NotFound);
+                    return base.Execute<TResult>(expression);
                 }
-                return base.Execute<TResult>(expression);
             }
         }
 
         public override IAsyncEnumerable<TResult> ExecuteAsync<TResult>(Expression expression)
         {
-            using (var scope = new ProfilingScope(new ExpressionStringFormatter(expression)))
+            using (new ProfilingScope(new ExpressionStringFormatter(expression)))
             {
                 var cacheObjectType = typeof (TResult);
                 if (_cacheFactory.CanCache(cacheObjectType))
@@ -103,7 +101,6 @@ namespace VitalChoice.Caching.Services
                         return base.ExecuteAsync<TResult>(cacheExecutor.ReparsedExpression);
                     CacheGetResult cacheGetResult;
                     var result = (List<TResult>) cacheExecutor.Execute(out cacheGetResult);
-                    scope.AddScopeData(cacheGetResult);
                     switch (cacheGetResult)
                     {
                         case CacheGetResult.Found:
@@ -119,17 +116,16 @@ namespace VitalChoice.Caching.Services
                     }
                     //}
                 }
-                else
+                using (new ProfilingScope(CacheGetResult.NotFound))
                 {
-                    scope.AddScopeData(CacheGetResult.NotFound);
+                    return base.ExecuteAsync<TResult>(expression).ToList().GetAwaiter().GetResult().ToAsyncEnumerable();
                 }
-                return base.ExecuteAsync<TResult>(expression);
             }
         }
 
         public override async Task<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken)
         {
-            using (var scope = new ProfilingScope(new ExpressionStringFormatter(expression)))
+            using (new ProfilingScope(new ExpressionStringFormatter(expression)))
             {
                 var cacheObjectType = typeof (TResult);
                 var elementType = typeof (TResult).TryGetElementType(typeof (IEnumerable<>));
@@ -151,7 +147,6 @@ namespace VitalChoice.Caching.Services
                     var result = elementType != null
                         ? cacheExecutor.Execute(out cacheGetResult)
                         : cacheExecutor.ExecuteFirst(out cacheGetResult);
-                    scope.AddScopeData(cacheGetResult);
                     using (new ProfilingScope(cacheGetResult))
                     {
                         switch (cacheGetResult)
@@ -171,11 +166,10 @@ namespace VitalChoice.Caching.Services
                     }
                     //}
                 }
-                else
+                using (new ProfilingScope(CacheGetResult.NotFound))
                 {
-                    scope.AddScopeData(CacheGetResult.NotFound);
+                    return await base.ExecuteAsync<TResult>(expression, cancellationToken);
                 }
-                return await base.ExecuteAsync<TResult>(expression, cancellationToken);
             }
         }
 
