@@ -201,7 +201,7 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         if (!entity.IdEditedBy.HasValue)
                         {
-                            await UpdateAffiliateOrderPayment(model, uow);
+                            await UpdateAffiliateOrderPayment(model, entity.Id, uow);
                             await UpdateHealthwiseOrder(model, uow);
                         }
                         await ChargeGiftCertificates(model, uow);
@@ -247,7 +247,7 @@ namespace VitalChoice.Business.Services.Orders
                         //storefront update
                         if (entity != null && !entity.IdAddedBy.HasValue)
                         {
-                            await UpdateAffiliateOrderPayment(model, uow);
+                            await UpdateAffiliateOrderPayment(model, entity.Id, uow);
                             await UpdateHealthwiseOrder(model, uow);
                         }
                         await ChargeGiftCertificates(model, uow);
@@ -304,7 +304,7 @@ namespace VitalChoice.Business.Services.Orders
                         //storefront update
                         if (!entity.IdAddedBy.HasValue)
                         {
-                            await UpdateAffiliateOrderPayment(model, uow);
+                            await UpdateAffiliateOrderPayment(model, model.Id, uow);
                             await UpdateHealthwiseOrder(model, uow);
                         }
                         //charge one-time discount, remove old charge if different
@@ -374,7 +374,7 @@ namespace VitalChoice.Business.Services.Orders
                         //storefront update
                         if (entity != null && !entity.IdAddedBy.HasValue)
                         {
-                            await UpdateAffiliateOrderPayment(model, uow);
+                            await UpdateAffiliateOrderPayment(model, model.Id, uow);
                             await UpdateHealthwiseOrder(model, uow);
                         }
                     }
@@ -1371,29 +1371,32 @@ namespace VitalChoice.Business.Services.Orders
             }
         }
 
-        private async Task UpdateAffiliateOrderPayment(OrderDynamic dynamic, IUnitOfWorkAsync uow)
+        private async Task UpdateAffiliateOrderPayment(OrderDynamic dynamic, int id, IUnitOfWorkAsync uow)
         {
             if (dynamic.Customer.IdAffiliate.HasValue &&
                 dynamic.AffiliatePaymentAmount.HasValue && dynamic.AffiliateNewCustomerOrder.HasValue)
             {
-                AffiliateOrderPayment payment = new AffiliateOrderPayment();
-                payment.Id = dynamic.Id;
-                payment.Status = AffiliateOrderPaymentStatus.NotPaid;
-                payment.IdAffiliate = dynamic.Customer.IdAffiliate.Value;
-                //TODO - calculate commission and set is a first order or no the given customer
-                payment.Amount = dynamic.AffiliatePaymentAmount.Value;
-                payment.NewCustomerOrder = dynamic.AffiliateNewCustomerOrder.Value;
+                AffiliateOrderPayment payment = new AffiliateOrderPayment
+                {
+                    Id = id,
+                    Status = AffiliateOrderPaymentStatus.NotPaid,
+                    IdAffiliate = dynamic.Customer.IdAffiliate.Value,
+                    Amount = dynamic.AffiliatePaymentAmount.Value,
+                    NewCustomerOrder = dynamic.AffiliateNewCustomerOrder.Value
+                };
 
                 var affiliateOrderPaymentRepository = uow.RepositoryAsync<AffiliateOrderPayment>();
-                var dbItem = (await affiliateOrderPaymentRepository.Query(p => p.Id == payment.Id).SelectAsync(false)).FirstOrDefault();
+                var dbItem = await affiliateOrderPaymentRepository.Query(p => p.Id == payment.Id).SelectFirstOrDefaultAsync(true);
                 if (dbItem == null)
                 {
-                    dbItem = new AffiliateOrderPayment();
-                    dbItem.Status = AffiliateOrderPaymentStatus.NotPaid;
-                    dbItem.IdAffiliate = payment.IdAffiliate;
-                    dbItem.Id = payment.Id;
-                    dbItem.Amount = payment.Amount;
-                    dbItem.NewCustomerOrder = payment.NewCustomerOrder;
+                    dbItem = new AffiliateOrderPayment
+                    {
+                        Status = AffiliateOrderPaymentStatus.NotPaid,
+                        IdAffiliate = payment.IdAffiliate,
+                        Id = payment.Id,
+                        Amount = payment.Amount,
+                        NewCustomerOrder = payment.NewCustomerOrder
+                    };
 
                     await _affiliateOrderPaymentRepository.InsertAsync(dbItem);
                 }
