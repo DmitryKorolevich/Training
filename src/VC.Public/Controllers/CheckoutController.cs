@@ -368,7 +368,9 @@ namespace VC.Public.Controllers
 
             _addressConverter.UpdateModel<ShippingInfoModel>(shippingModel, shipping);
 
-            return PartialView("_AddUpdateShippingMethod", shippingModel);
+			shippingModel.ShipAddressIdToOverride = shipping.Id == cart.Order.ShippingAddress.Id ? null : (int?)shipping.Id;
+
+			return PartialView("_AddUpdateShippingMethod", shippingModel);
         }
 
         [HttpGet]
@@ -383,7 +385,7 @@ namespace VC.Public.Controllers
 
             var shippingMethodModel = new AddUpdateShippingMethodModel()
             {
-                AddressType = CheckoutAddressType.Residental
+                AddressType = ShippingAddressType.Residential
             };
             var cart = await GetCurrentCart();
             var loggedIn = await EnsureLoggedIn(cart);
@@ -404,14 +406,15 @@ namespace VC.Public.Controllers
                 else if (defaultShipping != null)
                 {
                     _addressConverter.UpdateModel<ShippingInfoModel>(shippingMethodModel, defaultShipping);
-                }
+					shippingMethodModel.ShipAddressIdToOverride = defaultShipping.Id;
+				}
                 //else
                 //{
                 //    _addressConverter.UpdateModel<ShippingInfoModel>(shippingMethodModel, currentCustomer.ProfileAddress);
                 //}
                 shippingMethodModel.IsGiftOrder = cart.Order.SafeData.GiftOrder;
                 shippingMethodModel.GiftMessage = cart.Order.SafeData.GiftMessage;
-                shippingMethodModel.DeliveryInstructions = cart.Order.SafeData.DeliveryInstructions;
+                //shippingMethodModel.DeliveryInstructions = cart.Order.SafeData.DeliveryInstructions;
                 var addresses = GetShippingAddresses(cart.Order, currentCustomer);
                 var i = 0;
                 ViewBag.ShippingAddresses = addresses.ToDictionary(x => i++,
@@ -422,7 +425,7 @@ namespace VC.Public.Controllers
                 return RedirectToAction("Welcome");
             }
 
-            return View(shippingMethodModel);
+			return View(shippingMethodModel);
         }
 
         [HttpPost]
@@ -473,11 +476,18 @@ namespace VC.Public.Controllers
                             await _addressConverter.UpdateObjectAsync(model, cart.Order.ShippingAddress, (int) AddressType.Shipping);
                         }
                     }
+
+	                int? customerAddressIdToUpdate = null;
+	                if (model.SaveToProfile && model.ShipAddressIdToOverride.HasValue)
+	                {
+		                customerAddressIdToUpdate = model.ShipAddressIdToOverride;
+	                }
+
                     cart.Order.Data.GiftOrder = model.IsGiftOrder;
                     cart.Order.Data.GiftMessage = model.GiftMessage;
-                    cart.Order.Data.DeliveryInstructions = model.DeliveryInstructions;
+                    //cart.Order.Data.DeliveryInstructions = model.DeliveryInstructions;
                     await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
-                    if (await CheckoutService.UpdateCart(cart))
+                    if (await CheckoutService.UpdateCart(cart, customerAddressIdToUpdate))
                     {
                         return RedirectToAction("ReviewOrder");
                     }

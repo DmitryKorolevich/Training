@@ -29,6 +29,8 @@ function changeSelection(selId) {
 			$(this).tooltipster(settingsVertical);
 		});
 
+		$(".phone-mask").mask("(999) 999-9999? x99999");
+
 		reparseElementValidators("form");
 	}).error(function (result) {
 		notifyError();

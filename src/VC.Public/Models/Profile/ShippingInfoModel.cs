@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using VitalChoice.Ecommerce.Domain.Attributes;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Constants;
 
 namespace VC.Public.Models.Profile
@@ -11,5 +13,19 @@ namespace VC.Public.Models.Profile
 
 		[Map]
 	    public int Id { get; set; }
-    }
+
+		[Map]
+		[MaxLength(60)]
+		[Display(Name = "Delivery Instructions")]
+		public string DeliveryInstructions { get; set; }
+
+		[Map]
+		[Display(Name = "Preferred Ship Method")]
+		public PreferredShipMethod? PreferredShipMethod { get; set; }
+
+		[Map("ShippingAddressType")]
+		[Required]
+		[Display(Name = "Address Type")]
+		public ShippingAddressType? AddressType { get; set; }
+	}
 }

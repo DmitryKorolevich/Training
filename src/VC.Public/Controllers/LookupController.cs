@@ -64,5 +64,15 @@ namespace VC.Public.Controllers
 
 			return new Result<IList<LookupItem<int>>>(true, options);
 		}
+
+		[HttpGet]
+		public Result<IList<LookupItem<int>>> GetShippingPreferredOptions()
+		{
+			var referenceData = _appInfrastructureService.Get();
+
+			var shipMethods = referenceData.OrderPreferredShipMethod;
+
+			return new Result<IList<LookupItem<int>>>(true, shipMethods);
+		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿@using System.Threading.Tasks
 @using VC.Public.Helpers
 @using VitalChoice.Ecommerce.Domain.Entities.Addresses
+@using VitalChoice.Interfaces.Services
 @model VC.Public.Models.Checkout.AddUpdateShippingMethodModel
 
 @section Meta {
@@ -39,18 +40,19 @@
 		</div>
 		if (ViewBag.ShippingAddresses != null && ViewBag.ShippingAddresses.Count > 0)
 		{
-			@*<div class="form-group">
-				<div class="input-group">
-					<label class="multiline-checkbox-container">
-						<input id="chkSelectOther" type="checkbox" checked="checked" />
-						View and select other Shipping addresses in my account.
-					</label>
-				</div>
-			</div>*@
 			<div class="form-group" @*style="display: none;"*@>
-				@Html.Label("SavedAddresses", "Saved Addresses", new { @class = "control-label" })
+				@Html.Label("SavedAddresses", "Saved Addresses", new {@class = "control-label"})
 				<div class="input-group">
-					@Html.DropDownListFor(x => x.Id, new SelectList(ViewBag.ShippingAddresses, "Key", "Value"), new { id = "ddShippingAddressesSelection", @class = "form-control auto" })
+					@Html.DropDownListFor(x => x.Id, new SelectList(ViewBag.ShippingAddresses, "Key", "Value"), new {id = "ddShippingAddressesSelection", @class = "form-control auto"})
+				</div>
+			</div>
+			<div class="form-group" style="display:none;" id="updateSaved">
+				<label class="control-label"></label>
+				<div class="input-group">
+					<label class="multiline-checkbox-container bold">
+						@Html.CheckBoxFor(m => m.SaveToProfile, new { @class = "form-control" })
+						Update saved shipping address
+					</label>
 				</div>
 			</div>
 		}
@@ -63,30 +65,6 @@
 				@await Html.PartialAsync("_AddUpdateShippingMethod", Model, ViewData)
 			</div>
 
-			<div class="form-group">
-				<div class="checkout-sections-divider"></div>
-			</div>
-			<div class="form-group">
-				<label class="control-label">Address Type</label>
-				<div class="input-group">
-					<label>
-						@Html.RadioButtonFor(m => m.AddressType, CheckoutAddressType.Residental, new { @class = "form-control" })
-						Residential
-					</label>
-					<label class="left-indent-medium">
-						@Html.RadioButtonFor(m => m.AddressType, CheckoutAddressType.Commercial, new { @class = "form-control" })
-						Commercial
-					</label>
-				</div>
-			</div>
-			<div class="form-group">
-				@Html.LabelFor(m => m.DeliveryInstructions, new { @class = "control-label" })
-				<div class="input-group">
-					@Html.TextAreaFor(m => m.DeliveryInstructions, new { @class = "form-control checkout-huge", rows = "5", maxlength = 60, placeholder = "Please enter any special notes for the driver. Example: Please Knock on Door" })
-					<span class="checkout-charcount"><b>60</b> characters remaining</span>
-					@Html.ValidationMessageFor(m => m.DeliveryInstructions)
-				</div>
-			</div>
 			<div class="form-group">
 				<label class="control-label"></label>
 				<div class="input-group">
@@ -103,7 +81,7 @@
 						<span class="shopping-notice-note">NOTE:</span> If this is an e-Gift Certificate, enter the recipient’s email address where indicated AFTER you place your order,<br />
 						using the form on the Thank You page. (This is a security requirement.)
 					</div>
-					@Html.TextAreaFor(m => m.GiftMessage, new { @class = "form-control checkout-huge", rows = "5", maxlength = 255 })
+					@Html.TextAreaFor(m => m.GiftMessage, new { @class = "form-control checkout-huge", rows = "5", maxlength = 255, charcount = "true" })
 					<span class="checkout-charcount"><b>255</b> characters remaining</span>
 					@Html.ValidationMessageFor(m => m.GiftMessage)
 				</div>

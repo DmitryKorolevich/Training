@@ -1,6 +1,17 @@
 ﻿var shippingAddresses = null;
+var preferredOptions = [];
 
 $(function () {
+	getShippingPreferredOptions(function(res) {
+		if (res.Success) {
+			preferredOptions = res.Data;
+		} else {
+			notifyError(res.Messages[0].Message);
+		}
+	}, function() {
+		notifyError();
+	});
+
 	changeSaveButtonLabel($("#hdShipping").val());
 
 	shippingAddresses = [];
@@ -66,7 +77,10 @@ $(function () {
 			Phone: "",
 			Fax: "",
 			Email: "",
-			Default: false
+			Default: false,
+			AddressType: 1,
+			DeliveryInstructions: "",
+			PreferredShipMethod: 1
 		}
 
 		$("#ddShippingAddressesSelection").val("");
@@ -174,6 +188,7 @@ function setChangedData(selectedShippingAddress) {
 	$("#hdCountry").val(selectedShippingAddress.IdCountry);
 	$("#hdState").val(selectedShippingAddress.IdState);
 	$("#hdDefault").val(selectedShippingAddress.Default);
+	$("#hdPreferredShipMethod").val(selectedShippingAddress.PreferredShipMethod);
 
 	$("input[name=FirstName]").val(selectedShippingAddress.FirstName);
 	$("input[name=LastName]").val(selectedShippingAddress.LastName);
@@ -189,11 +204,22 @@ function setChangedData(selectedShippingAddress) {
 	$("input[name=Fax]").val(selectedShippingAddress.Fax);
 	$("input[name=Email]").val(selectedShippingAddress.Email);
 
+	if (selectedShippingAddress.AddressType == 1) {
+		$("input[name=AddressType][value=Residential]").prop("checked", true).trigger('change');;
+	} else if (selectedShippingAddress.AddressType == 2) {
+		$("input[name=AddressType][value=Commercial]").prop("checked", true).trigger('change');;
+	}
+
+	$("#PreferredShipMethod").text($.grep(preferredOptions, function (elem) { return elem.Key == selectedShippingAddress.PreferredShipMethod; })[0].Text);
+	$("textarea[name=DeliveryInstructions]").val(selectedShippingAddress.DeliveryInstructions);
+
 	$("form").removeData("validator");
 	$("form").removeData("unobtrusiveValidation");
 	$.validator.unobtrusive.parse("form");
 
 	syncDefaultBtnState();
+
+	processCharcount({ target: $("textarea[name=DeliveryInstructions]") });
 }
 
 function deleteShippingAddress(idAddress, successCallback, errorCallback) {

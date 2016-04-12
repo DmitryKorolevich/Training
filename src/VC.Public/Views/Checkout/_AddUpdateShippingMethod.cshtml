@@ -1,6 +1,12 @@
 ﻿@using System.Threading.Tasks
+@using VitalChoice.Ecommerce.Domain.Entities.Addresses
+@using VitalChoice.Interfaces.Services
 @model VC.Public.Models.Checkout.AddUpdateShippingMethodModel
 
+@inject IAppInfrastructureService appInfrastructureService;
+
+@Html.HiddenFor(x=>x.ShipAddressIdToOverride)
+@Html.HiddenFor(x=>x.PreferredShipMethod)
 <div class="form-two-column">
 	<div class="form-group">
 		@Html.LabelFor(m => m.FirstName, new {@class = "control-label"})
@@ -89,5 +95,35 @@
 			@Html.TextBoxFor(m => m.Fax, new {@class = "form-control phone-mask"})
 			@Html.ValidationMessageFor(m => m.Fax)
 		</div>
+	</div>
+</div>
+<div class="form-group">
+	<div class="checkout-sections-divider"></div>
+</div>
+<div class="form-group">
+	<label class="control-label">Address Type</label>
+	<div class="input-group">
+		<label>
+			@Html.RadioButtonFor(m => m.AddressType, ShippingAddressType.Residential, new { @class = "form-control" })
+			Residential
+		</label>
+		<label class="left-indent-medium">
+			@Html.RadioButtonFor(m => m.AddressType, ShippingAddressType.Commercial, new { @class = "form-control" })
+			Commercial
+		</label>
+	</div>
+</div>
+<div class="form-group">
+	@Html.LabelFor(m => m.PreferredShipMethod, new { @class = "control-label" })
+	<div class="input-group">
+		<label id="PreferredShipMethod" class="form-control-static">@(Model.PreferredShipMethod.HasValue ? appInfrastructureService.Get().OrderPreferredShipMethod.Single(x => x.Key == (int)Model.PreferredShipMethod).Text : string.Empty)</label>
+	</div>
+</div>
+<div class="form-group">
+	@Html.LabelFor(m => m.DeliveryInstructions, new { @class = "control-label" })
+	<div class="input-group">
+		@Html.TextAreaFor(m => m.DeliveryInstructions, new { @class = "form-control checkout-huge", rows = "5", maxlength = 60, placeholder = "Please enter any special notes for the driver. Example: Please Knock on Door", charcount = "true" })
+		<span class="checkout-charcount"><b>60</b> characters remaining</span>
+		@Html.ValidationMessageFor(m => m.DeliveryInstructions)
 	</div>
 </div>

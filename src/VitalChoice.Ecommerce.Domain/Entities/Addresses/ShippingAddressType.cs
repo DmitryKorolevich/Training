@@ -1,4 +1,4 @@
-﻿namespace VitalChoice.Ecommerce.Domain.Entities.Orders
+﻿namespace VitalChoice.Ecommerce.Domain.Entities.Addresses
 {
     public enum ShippingAddressType
     {

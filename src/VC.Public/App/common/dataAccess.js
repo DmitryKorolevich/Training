@@ -42,3 +42,18 @@ function getCartShippingOptions(successCallback, errorCallback) {
 		}
 	});
 }
+
+function getShippingPreferredOptions(successCallback, errorCallback) {
+	$.ajax({
+		url: "/Lookup/GetShippingPreferredOptions",
+		dataType: "json"
+	}).success(function (result) {
+		if (successCallback) {
+			successCallback(result);
+		}
+	}).error(function (result) {
+		if (errorCallback) {
+			errorCallback(result);
+		}
+	});
+}

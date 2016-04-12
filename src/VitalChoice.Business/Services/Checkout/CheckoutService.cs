@@ -280,7 +280,7 @@ namespace VitalChoice.Business.Services.Checkout
             return await BuildIncludes(_cartRepository.Query(c => c.CartUid == newUid)).SelectFirstOrDefaultAsync(false);
         }
 
-        public async Task<bool> UpdateCart(CustomerCartOrder cartOrder)
+        public async Task<bool> UpdateCart(CustomerCartOrder cartOrder, int? customerAddressToUpdate = null)
         {
             if (cartOrder?.Order == null)
                 return false;
@@ -300,6 +300,23 @@ namespace VitalChoice.Business.Services.Checkout
                     if (cartOrder.Order.Customer?.Id != 0)
                     {
                         var customerBackup = cartOrder.Order.Customer;
+
+	                    if (customerAddressToUpdate.HasValue)
+	                    {
+		                    var customerAddresses = customerBackup.ShippingAddresses.ToList();
+
+							var index = customerAddresses.IndexOf(customerAddresses.Single(x => x.Id == customerAddressToUpdate.Value));
+		                    var originalId = customerAddresses[index].Id;
+		                    var defaultAddr = customerAddresses[index].Data.Default;
+							customerAddresses[index] = cartOrder.Order.ShippingAddress;
+		                    customerAddresses[index].Id = originalId;
+		                    customerAddresses[index].Data.Default = defaultAddr;
+
+		                    customerBackup.ShippingAddresses = customerAddresses;
+
+							customerBackup = await _customerService.UpdateAsync(customerBackup);
+	                    }
+
                         if (cartOrder.Order.Id == 0)
                         {
                             cartOrder.Order = await _orderService.InsertAsync(cartOrder.Order);

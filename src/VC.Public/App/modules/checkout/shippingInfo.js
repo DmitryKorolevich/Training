@@ -3,20 +3,26 @@
 	controlSectionState("#GiftMessage", "#IsGiftOrder");
 	controlUseBillingState(".form-two-column", "#UseBillingAddress");
 
-	$.each($("textarea"), function(index,elem) {
-		processCharcount({target: elem});
-	});
-
 	$("body").on("click", "#chkSelectOther", function() { controlSectionState("#ddShippingAddressesSelection", "#chkSelectOther"); });
 	$("body").on("click", "#IsGiftOrder", function () { controlSectionState("#GiftMessage", "#IsGiftOrder"); });
 	$("body").on("click", "#UseBillingAddress", function () { controlUseBillingState(".form-two-column", "#UseBillingAddress"); });
 
-	$('body').on("keyup", "textarea", function (elem) { processCharcount(elem); });
-
 	$("body").on("change", "#ddShippingAddressesSelection", function () {
 		changeSelection($("#ddShippingAddressesSelection").val());
 	});
+
+	controlUpdateSavedState();
 });
+
+function controlUpdateSavedState() {
+	if ($("#ShipAddressIdToOverride").val() == null || $("#ShipAddressIdToOverride").val() == "") {
+		$("#SaveToProfile").prop("checked", false);
+		$("#SaveToProfile").trigger("change");
+		$("#updateSaved").hide();
+	} else {
+		$("#updateSaved").show();
+	}
+}
 
 function changeSelection(selId) {
 	$.ajax({
@@ -26,6 +32,10 @@ function changeSelection(selId) {
 		$("#dynamicArea").html(result);
 
 		refreshCountries();
+
+		controlUpdateSavedState();
+
+		$(".phone-mask").mask("(999) 999-9999? x99999");
 
 		reparseElementValidators("form");
 	}).error(function (result) {
@@ -43,34 +53,26 @@ function controlSectionState(selector, controlId) {
 	}
 }
 
-function processCharcount(ev) {
-	var elem = ev.target;
-
-	var max = $(elem).attr("maxlength");
-	var len = $(elem).val().length;
-	if (len >= max) {
-		$(elem).next().html('you have reached the limit');
-	} else {
-		var char = max - len;
-		$(elem).next().html('<b>' + char + '</b> characters remaining');
-	}
-}
-
 function controlUseBillingState(selector, controlId) {
 	jSel = $(selector);
 	jDrop = $("#ddShippingAddressesSelection").closest(".form-group");
-	//jChk = $("#chkSelectOther").closest(".form-group");
+
+	jChk = $("#SaveToProfile");
+	jChkContainer = $("#updateSaved");
+
 	jSpan = $("#spEnterAddress");
 
 	if ($(controlId).is(":checked")) {
 		jSel.hide();
 		jDrop.hide();
-		//jChk.hide();
+		jChk.prop("checked", false);
+		jChk.trigger("change");
+		jChkContainer.hide();
 		jSpan.hide();
 	} else {
 		jSel.show();
 		jDrop.show();
-		//jChk.show();
+		jChkContainer.show();
 		jSpan.show();
 
 		//controlSectionState("#ddShippingAddressesSelection", "#chkSelectOther");

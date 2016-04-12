@@ -313,7 +313,26 @@ $(function () {
 	if (document.getElementById('lhnContainer')) {
 		initLiveHelp();
 	}
+
+	$.each($("textarea"), function (index, elem) {
+		processCharcount({ target: elem });
+	});
+
+	$('body').on("keyup", "textarea[charcount=true]", function (elem) { processCharcount(elem); });
 });
+
+function processCharcount(ev) {
+	var elem = ev.target;
+
+	var max = $(elem).attr("maxlength");
+	var len = $(elem).val().length;
+	if (len >= max) {
+		$(elem).next().html('you have reached the limit');
+	} else {
+		var char = max - len;
+		$(elem).next().html('<b>' + char + '</b> characters remaining');
+	}
+}
 
 function initLiveHelp() {
 	if (window.addEventListener) {

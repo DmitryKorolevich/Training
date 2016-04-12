@@ -1,5 +1,7 @@
 ﻿@using System.Threading.Tasks
 @using VC.Public.Helpers
+@using VitalChoice.Ecommerce.Domain.Entities.Addresses
+@using VitalChoice.Interfaces.Services
 @model VC.Public.Models.Profile.ShippingInfoModel
 
 @section Meta {
@@ -13,6 +15,8 @@
     <script src="@Url.Content("/app/modules/profile/gccheckform.js")"></script>
 }
 
+@inject IAppInfrastructureService appInfrastructureService;
+
 <script>
 	var shippingAddressesJson = '@Html.Raw(ViewBag.ShippingAddresses)';
 	successMessage = '@ViewBag.SuccessMessage';
@@ -23,29 +27,30 @@
 		@await Component.InvokeAsync("ProfileSidebar")
 	</div>
 	<div class="right-pane clean-indent">
-		@using (Html.BeginForm("ChangeShippingInfo", "Profile", new {}, FormMethod.Post, new { @class = "form-regular medium-small border-form-left", role = "form" }))
+		@using (Html.BeginForm("ChangeShippingInfo", "Profile", new {}, FormMethod.Post, new {@class = "form-regular medium-small border-form-left", role = "form"}))
 		{
-			<input id="hdCountry" value="@Html.DisplayForEx(x=>x.IdCountry)" type="hidden">
-			<input id="hdState" value="@Html.DisplayForEx(x=>x.IdState)" type="hidden">
-			@Html.HiddenFor(m => m.Id, new { @id = "hdShipping" })
-			@Html.HiddenFor(m => m.Default, new { @id = "hdDefault" })
+			<input id="hdCountry" value="@Html.DisplayForEx(x => x.IdCountry)" type="hidden">
+			<input id="hdState" value="@Html.DisplayForEx(x => x.IdState)" type="hidden">
+			@Html.HiddenFor(m => m.Id, new {@id = "hdShipping"})
+			@Html.HiddenFor(m => m.Default, new {@id = "hdDefault"})
+			@Html.HiddenFor(x => x.PreferredShipMethod, new { @id = "hdPreferredShipMethod" })
 			@Html.AntiForgeryToken()
 			<h4>Manage Shipping Addresses</h4>
 			<div class="form-group">
 				<div class="input-group control-label-indent">
-					<input id="addNew" class="yellow inline-button" type="button" value="Add New" />
+					<input id="addNew" class="yellow inline-button" type="button" value="Add New"/>
 				</div>
 			</div>
 			<div class="form-group">
 				@Html.Label("SavedAddresses", "Saved Addresses", new {@class = "control-label"})
 				<div class="input-group">
 					<select class="form-control" id="ddShippingAddressesSelection"></select>
-					<input id="setDefaultSelected" class="left-indent-small inline-button" type="button" value="Set as Default" style="display:none;" />
-					<input id="delSelected" class="red left-indent-small inline-button" type="button" value="Delete Address" />
+					<input id="setDefaultSelected" class="left-indent-small inline-button" type="button" value="Set as Default" style="display: none;"/>
+					<input id="delSelected" class="red left-indent-small inline-button" type="button" value="Delete Address"/>
 				</div>
 			</div>
 			<div class="form-group">
-				<hr />
+				<hr/>
 			</div>
 			@Html.ValidationSummary(true, "")
 			<div class="form-two-column">
@@ -78,16 +83,16 @@
 					</div>
 				</div>
 				<div class="form-group">
-					@Html.LabelFor(m => m.Address1, new { @class = "control-label" })
+					@Html.LabelFor(m => m.Address1, new {@class = "control-label"})
 					<div class="input-group">
-						@Html.TextBoxFor(m => m.Address1, new { @class = "form-control" })
+						@Html.TextBoxFor(m => m.Address1, new {@class = "form-control"})
 						@Html.ValidationMessageFor(m => m.Address1)
 					</div>
 				</div>
 				<div class="form-group">
 					<label class="control-label"></label>
 					<div class="input-group">
-						@Html.TextBoxFor(m => m.Address2, new { @class = "form-control" })
+						@Html.TextBoxFor(m => m.Address2, new {@class = "form-control"})
 						@Html.ValidationMessageFor(m => m.Address2)
 					</div>
 				</div>
@@ -138,8 +143,38 @@
 					</div>
 				</div>
 			</div>
+			<div class="form-group">
+				<hr />
+			</div>
+			<div class="form-group">
+					<label class="control-label">Address Type</label>
+					<div class="input-group">
+						<label>
+							@Html.RadioButtonFor(m => m.AddressType, ShippingAddressType.Residential, new {@class = "form-control"})
+							Residential
+						</label>
+						<label class="left-indent-medium">
+							@Html.RadioButtonFor(m => m.AddressType, ShippingAddressType.Commercial, new {@class = "form-control"})
+							Commercial
+						</label>
+					</div>
+				</div>
+				<div class="form-group">
+					@Html.LabelFor(m => m.PreferredShipMethod, new { @class = "control-label" })
+					<div class="input-group">
+						<label id="PreferredShipMethod" class="form-control-static">@(Model.PreferredShipMethod.HasValue? appInfrastructureService.Get().OrderPreferredShipMethod.Single(x=>x.Key == (int)Model.PreferredShipMethod).Text : string.Empty)</label>
+					</div>
+				</div>
+				<div class="form-group">
+					@Html.LabelFor(m => m.DeliveryInstructions, new {@class = "control-label"})
+					<div class="input-group">
+						@Html.TextAreaFor(m => m.DeliveryInstructions, new {@class = "form-control profile-huge-control", rows = "5", maxlength = 60, placeholder = "Please enter any special notes for the driver. Example: Please Knock on Door", charcount="true"})
+						<span class="checkout-charcount"><b>60</b> characters remaining</span>
+						@Html.ValidationMessageFor(m => m.DeliveryInstructions)
+					</div>
+				</div>
 			<div class="form-buttons-group">
-				<input data-back-button="@Url.Action("TopFavoriteItems","Profile")" type="button" value="Back"/>
+				<input data-back-button="@Url.Action("TopFavoriteItems", "Profile")" type="button" value="Back"/>
 				<input class="yellow" type="submit" value="Save"/>
 			</div>
 		}

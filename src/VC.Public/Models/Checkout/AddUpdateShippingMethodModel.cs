@@ -8,13 +8,6 @@ namespace VC.Public.Models.Checkout
 {
     public class AddUpdateShippingMethodModel: ShippingInfoModel
 	{
-		[Display(Name = "Address Type")]
-		public CheckoutAddressType AddressType { get; set; }
-
-		[Display(Name = "Delivery Instructions")]
-		[MaxLength(60)]
-		public string DeliveryInstructions { get; set; }
-
 		public bool IsGiftOrder { get; set; }
 
 		[Display(Name = "Gift Message")]
@@ -22,5 +15,9 @@ namespace VC.Public.Models.Checkout
 		public string GiftMessage { get; set; }
 
 		public bool UseBillingAddress { get; set; }
+
+	    public bool SaveToProfile { get; set; }
+
+	    public int? ShipAddressIdToOverride { get; set; }
 	}
 }
