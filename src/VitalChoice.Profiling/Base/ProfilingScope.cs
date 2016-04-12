@@ -82,7 +82,7 @@ namespace VitalChoice.Profiling.Base
         {
 #if !DOTNET5_4
             return
-                $"{{\"{ClassType.FullName}::{MethodName}\":\"{Data?.ToString().Replace("\"", "\\\"")}\"{(_additionalData == null ? string.Empty : $", \"additional\": [{string.Join(",", _additionalData.Select(d => $"\"{d}\""))}]")} {(_subScopes == null ? string.Empty : $", \"subTrace\": [{string.Join(",", _subScopes.Select(s => s.ToString()))}]")}}}";
+                $"{{\"{ClassType.FullName}::{MethodName}\":\"{Data?.ToString().Replace("\"", "\\\"")}\", \"time\": {TimeElapsed.Milliseconds}{(_additionalData == null ? string.Empty : $", \"additional\": [{string.Join(",", _additionalData.Select(d => $"\"{d}\""))}]")} {(_subScopes == null ? string.Empty : $", \"subTrace\": [{string.Join(",", _subScopes.Select(s => s.ToString()))}]")}}}";
 #else
             return Data?.ToString();
 #endif
@@ -102,8 +102,6 @@ namespace VitalChoice.Profiling.Base
 
         public IReadOnlyCollection<ProfilingScope> SubScopes => _subScopes?.ToArray() ?? EmptyList;
 
-        public Exception CriticalException { get; set; }
-
         public Type ClassType { get; }
 
         public string MethodName { get; }
@@ -111,6 +109,7 @@ namespace VitalChoice.Profiling.Base
         public TimeSpan TimeElapsed { get; private set; }
 
         public object Data { get; }
+        public bool ForceLog { get; set; }
 
         public void AddScopeData(object data)
         {

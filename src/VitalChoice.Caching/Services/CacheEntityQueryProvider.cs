@@ -49,8 +49,6 @@ namespace VitalChoice.Caching.Services
                 }
                 if (_cacheFactory.CanCache(cacheObjectType))
                 {
-                    //if (cacheObjectType.GetTypeInfo().IsSubclassOf(typeof (Entity)))
-                    //{
                     var cacheExecutor =
                         (ICacheExecutor)
                             Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
@@ -61,21 +59,22 @@ namespace VitalChoice.Caching.Services
                     var results = elementType != null
                         ? cacheExecutor.Execute(out cacheGetResult)
                         : cacheExecutor.ExecuteFirst(out cacheGetResult);
-                    switch (cacheGetResult)
+                    using (var updateScope = new ProfilingScope(cacheGetResult))
                     {
-                        case CacheGetResult.Found:
-                            return (TResult) results;
-                        case CacheGetResult.Update:
-                            results = base.Execute<TResult>(expression);
-                            using (var updateScope = new ProfilingScope(cacheGetResult))
-                            {
+                        switch (cacheGetResult)
+                        {
+                            case CacheGetResult.Found:
+                                return (TResult) results;
+                            case CacheGetResult.Update:
+                                results = base.Execute<TResult>(expression);
+
                                 updateScope.AddScopeData(elementType != null
                                     ? cacheExecutor.UpdateList(results)
                                     : cacheExecutor.Update(results));
-                            }
-                            return (TResult) results;
+
+                                return (TResult) results;
+                        }
                     }
-                    //}
                 }
                 using (new ProfilingScope(CacheGetResult.NotFound))
                 {
@@ -91,8 +90,6 @@ namespace VitalChoice.Caching.Services
                 var cacheObjectType = typeof (TResult);
                 if (_cacheFactory.CanCache(cacheObjectType))
                 {
-                    //if (cacheObjectType.GetTypeInfo().IsSubclassOf(typeof (Entity)))
-                    //{
                     var cacheExecutor =
                         (ICacheExecutor)
                             Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
@@ -101,20 +98,19 @@ namespace VitalChoice.Caching.Services
                         return base.ExecuteAsync<TResult>(cacheExecutor.ReparsedExpression);
                     CacheGetResult cacheGetResult;
                     var result = (List<TResult>) cacheExecutor.Execute(out cacheGetResult);
-                    switch (cacheGetResult)
+                    using (var updateScope = new ProfilingScope(cacheGetResult))
                     {
-                        case CacheGetResult.Found:
-                            return result.ToAsyncEnumerable();
-                        case CacheGetResult.Update:
-                            var asyncResult = base.ExecuteAsync<TResult>(expression);
-                            using (var updateScope = new ProfilingScope(cacheGetResult))
-                            {
+                        switch (cacheGetResult)
+                        {
+                            case CacheGetResult.Found:
+                                return result.ToAsyncEnumerable();
+                            case CacheGetResult.Update:
+                                var asyncResult = base.ExecuteAsync<TResult>(expression);
                                 var results = asyncResult.ToList().GetAwaiter().GetResult();
                                 updateScope.AddScopeData(cacheExecutor.UpdateList(results));
                                 return results.ToAsyncEnumerable();
-                            }
+                        }
                     }
-                    //}
                 }
                 using (new ProfilingScope(CacheGetResult.NotFound))
                 {
@@ -135,8 +131,6 @@ namespace VitalChoice.Caching.Services
                 }
                 if (_cacheFactory.CanCache(cacheObjectType))
                 {
-                    //if (cacheObjectType.GetTypeInfo().IsSubclassOf(typeof (Entity)))
-                    //{
                     var cacheExecutor =
                         (ICacheExecutor)
                             Activator.CreateInstance(typeof (CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
@@ -147,7 +141,7 @@ namespace VitalChoice.Caching.Services
                     var result = elementType != null
                         ? cacheExecutor.Execute(out cacheGetResult)
                         : cacheExecutor.ExecuteFirst(out cacheGetResult);
-                    using (new ProfilingScope(cacheGetResult))
+                    using (var updateScope = new ProfilingScope(cacheGetResult))
                     {
                         switch (cacheGetResult)
                         {
@@ -155,16 +149,13 @@ namespace VitalChoice.Caching.Services
                                 return (TResult) result;
                             case CacheGetResult.Update:
                                 var results = (object) await base.ExecuteAsync<TResult>(expression, cancellationToken);
-                                using (var updateScope = new ProfilingScope(cacheGetResult))
-                                {
-                                    updateScope.AddScopeData(elementType != null
-                                        ? cacheExecutor.UpdateList(results)
-                                        : cacheExecutor.Update(results));
-                                }
+
+                                updateScope.AddScopeData(elementType != null
+                                    ? cacheExecutor.UpdateList(results)
+                                    : cacheExecutor.Update(results));
                                 return (TResult) results;
                         }
                     }
-                    //}
                 }
                 using (new ProfilingScope(CacheGetResult.NotFound))
                 {

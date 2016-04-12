@@ -33,6 +33,7 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
+using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Settings;
 
 namespace VitalChoice.Business.Services.Checkout
@@ -40,13 +41,13 @@ namespace VitalChoice.Business.Services.Checkout
     public class CheckoutService : ICheckoutService
     {
         private readonly IEcommerceRepositoryAsync<CartExtended> _cartRepository;
-        private readonly DiscountMapper _discountMapper;
         private readonly SkuMapper _skuMapper;
         private readonly ProductMapper _productMapper;
         private readonly OrderMapper _orderMapper;
         private readonly IOrderService _orderService;
         private readonly EcommerceContext _context;
         private readonly ICustomerService _customerService;
+        private readonly IDiscountService _discountService;
         private readonly IEcommerceRepositoryAsync<CartToSku> _cartToSkusRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
         private readonly IDynamicReadServiceAsync<AddressDynamic, OrderAddress> _addressService;
@@ -59,7 +60,6 @@ namespace VitalChoice.Business.Services.Checkout
         private readonly ILogger _logger;
 
         public CheckoutService(IEcommerceRepositoryAsync<CartExtended> cartRepository,
-            DiscountMapper discountMapper,
             SkuMapper skuMapper, ProductMapper productMapper, OrderMapper orderMapper,
             IOrderService orderService, EcommerceContext context,
             ILoggerProviderExtended loggerProvider, ICustomerService customerService,
@@ -68,10 +68,9 @@ namespace VitalChoice.Business.Services.Checkout
             IEcommerceRepositoryAsync<OrderToSku> orderToSkuRepository, IRepositoryAsync<ProductContent> productContentRep,
             IEcommerceRepositoryAsync<Sku> skuRepository, IEcommerceRepositoryAsync<OrderToPromo> promoOrderedRepository,
             IEcommerceRepositoryAsync<Customer> customerRepository,
-            INotificationService notificationService)
+            INotificationService notificationService, IDiscountService discountService)
         {
             _cartRepository = cartRepository;
-            _discountMapper = discountMapper;
             _skuMapper = skuMapper;
             _productMapper = productMapper;
             _orderMapper = orderMapper;
@@ -87,13 +86,13 @@ namespace VitalChoice.Business.Services.Checkout
             _promoOrderedRepository = promoOrderedRepository;
             _customerRepository = customerRepository;
             _notificationService = notificationService;
+            _discountService = discountService;
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
         public IQueryFluent<CartExtended> BuildIncludes(IQueryFluent<CartExtended> query)
         {
-            return query.Include(c => c.Discount)
-                .ThenInclude(d => d.OptionValues)
+            return query
                 .Include(c => c.GiftCertificates)
                 .ThenInclude(g => g.GiftCertificate)
                 .Include(c => c.Skus)
@@ -139,7 +138,10 @@ namespace VitalChoice.Business.Services.Checkout
                 Amount = g.Amount,
                 GiftCertificate = g.GiftCertificate
             }).ToList() ?? new List<GiftCertificateInOrder>();
-            newOrder.Discount = await _discountMapper.FromEntityAsync(cart.Discount, true);
+            if (cart.IdDiscount.HasValue)
+            {
+                newOrder.Discount = await _discountService.SelectAsync(cart.IdDiscount.Value, true);
+            }
             newOrder.Skus = cart.Skus?.Select(s =>
             {
                 s.Sku.OptionTypes =

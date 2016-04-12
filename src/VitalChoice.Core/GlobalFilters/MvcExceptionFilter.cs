@@ -35,7 +35,7 @@ namespace VitalChoice.Core.GlobalFilters
 		        var root = ProfilingScope.RootScope;
 		        if (root != null)
 		        {
-		            root.CriticalException = systemException;
+		            root.ForceLog = true;
 		        }
 		    }
 #endif
