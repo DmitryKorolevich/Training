@@ -118,8 +118,11 @@ namespace VitalChoice.Business.Services.Checkout
                 {
                     return await GetOrCreateCart(uid, cartForCheck.IdCustomer.Value);
                 }
-                cart = await BuildIncludes(_cartRepository.Query(c => c.CartUid == uid.Value)).SelectFirstOrDefaultAsync(false) ??
-                       await CreateNew();
+                cart = await BuildIncludes(_cartRepository.Query(c => c.CartUid == uid.Value)).SelectFirstOrDefaultAsync(false);
+                if (cart == null)
+                {
+                    cart = await CreateNew();
+                }
             }
             else
             {
