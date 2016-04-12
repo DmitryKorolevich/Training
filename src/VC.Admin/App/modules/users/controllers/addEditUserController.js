@@ -1,8 +1,10 @@
 ﻿'use strict';
 
 angular.module('app.modules.users.controllers.addEditUserController', [])
-.controller('addEditUserController', ['$scope', '$modalInstance', 'data', 'userService', 'toaster', 'promiseTracker', '$rootScope', function ($scope, $modalInstance, data, userService, toaster, promiseTracker, $rootScope) {
-	$scope.saveTracker = promiseTracker("save");
+.controller('addEditUserController', ['$scope', '$modalInstance', 'data', 'userService', 'toaster', 'promiseTracker', '$rootScope', function ($scope, $modalInstance, data, userService, toaster, promiseTracker, $rootScope)
+{
+    $scope.refreshTracker = promiseTracker("refresh");
+    $scope.saveTracker = promiseTracker("save");
 	$scope.resendTracker = promiseTracker("resend");
 	$scope.resetTracker = promiseTracker("reset");
 
@@ -19,11 +21,11 @@ angular.module('app.modules.users.controllers.addEditUserController', [])
 		} else {
 			var messages = "";
 			if (result.Messages) {
-				$scope.userForm.submitted = true;
+				$scope.forms.userForm.submitted = true;
 				$scope.serverMessages = new ServerMessages(result.Messages);
 				$.each(result.Messages, function(index, value) {
-					if (value.Field && $scope.userForm[value.Field.toLowerCase()]) {
-						$scope.userForm[value.Field.toLowerCase()].$setValidity("server", false);
+					if (value.Field && $scope.forms.userForm[value.Field.toLowerCase()]) {
+						$scope.forms.userForm[value.Field.toLowerCase()].$setValidity("server", false);
 					}
 					messages += value.Message + "<br />";
 				});
@@ -38,99 +40,147 @@ angular.module('app.modules.users.controllers.addEditUserController', [])
 		data.thenCallback();
 	};
 
-	function initialize() {
+	function initialize()
+	{
 	    $scope.user = data.user;
+	    $scope.forms = {};
 
 	    $scope.signedInUser = $scope.user.Email === $rootScope.currentUser.Email;
 
-		$scope.editMode = data.editMode;
-		$scope.userStatuses = $.grep($rootScope.ReferenceData.UserStatuses, function(elem) {
-			return elem.Key !== 0;
-		});
+	    $scope.editMode = data.editMode;
+	    $scope.userStatuses = $.grep($rootScope.ReferenceData.UserStatuses, function (elem)
+	    {
+	        return elem.Key !== 0;
+	    });
 
-		$scope.save = function () {
-			$.each($scope.userForm, function(index, element) {
-				if (element && element.$name == index) {
-					element.$setValidity("server", true);
-				}
-			});
+	    $scope.save = function ()
+	    {
+	        $.each($scope.forms.userForm, function (index, element)
+	        {
+	            if (element && element.$name == index)
+	            {
+	                element.$setValidity("server", true);
+	            }
+	        });
 
-			if ($scope.userForm.$valid) {
-				if (!$scope.user.RoleIds || $scope.user.RoleIds.length === 0) {
-					toaster.pop('error', 'Error!', $rootScope.getValidationMessage("ValidationMessages.AtLeastOneRole"));
-					return;
-				}
+	        if ($scope.forms.userForm.$valid)
+	        {
+	            if (!$scope.user.RoleIds || $scope.user.RoleIds.length === 0)
+	            {
+	                toaster.pop('error', 'Error!', $rootScope.getValidationMessage("ValidationMessages.AtLeastOneRole"));
+	                return;
+	            }
 
-				$scope.saving = true;
-				if ($scope.editMode) {
-					userService.updateUser($scope.user,$scope.saveTracker).success(function(result) {
-							successHandler(result);
-						}).
-						error(function(result) {
-							errorHandler(result);
-						});
-				} else {
-					userService.createUser($scope.user,$scope.saveTracker).success(function(result) {
-							successHandler(result);
-						}).
-						error(function(result) {
-							errorHandler(result);
-						});
-				}
+	            $scope.saving = true;
+	            if ($scope.editMode)
+	            {
+	                userService.updateUser($scope.user, $scope.saveTracker).success(function (result)
+	                {
+	                    successHandler(result);
+	                }).
+                        error(function (result)
+                        {
+                            errorHandler(result);
+                        });
+	            } else
+	            {
+	                userService.createUser($scope.user, $scope.saveTracker).success(function (result)
+	                {
+	                    successHandler(result);
+	                }).
+                        error(function (result)
+                        {
+                            errorHandler(result);
+                        });
+	            }
 
-			} else {
-				$scope.userForm.submitted = true;
-			}
-		};
+	        } else
+	        {
+	            $scope.forms.userForm.submitted = true;
+	        }
+	    };
 
-		$scope.resend = function() {
-			userService.resendActivation($scope.user.PublicId, $scope.resendTracker)
-				.success(function(result) {
-					if (result.Success) {
-						toaster.pop('success', "Success!", "Successfully sent");
-						$modalInstance.close();
-					} else {
-						var messages = "";
-						if (result.Messages) {
-							$.each(result.Messages, function(index, value) {
-								messages += value.Message + "<br />";
-							});
-						}
-						toaster.pop('error', "Error!", messages, null, 'trustedHtml');
-					}
-					data.thenCallback();
-				}).error(function() {
-					toaster.pop('error', "Error!", "Server error occured");
-					data.thenCallback();
-				});
-		};
+	    $scope.resend = function ()
+	    {
+	        userService.resendActivation($scope.user.PublicId, $scope.resendTracker)
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        toaster.pop('success', "Success!", "Successfully sent");
+                        $modalInstance.close();
+                    } else
+                    {
+                        var messages = "";
+                        if (result.Messages)
+                        {
+                            $.each(result.Messages, function (index, value)
+                            {
+                                messages += value.Message + "<br />";
+                            });
+                        }
+                        toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+                    }
+                    data.thenCallback();
+                }).error(function ()
+                {
+                    toaster.pop('error', "Error!", "Server error occured");
+                    data.thenCallback();
+                });
+	    };
 
-		$scope.resetPassword = function () {
-		    userService.resetPassword($scope.user.PublicId, $scope.resetTracker)
-				.success(function (result) {
-				    if (result.Success) {
-				        toaster.pop('success', "Success!", "Successfully reset");
-				        $modalInstance.close();
-				    } else {
-				        var messages = "";
-				        if (result.Messages) {
-				            $.each(result.Messages, function (index, value) {
-				                messages += value.Message + "<br />";
-				            });
-				        }
-				        toaster.pop('error', "Error!", messages, null, 'trustedHtml');
-				    }
-				    data.thenCallback();
-				}).error(function () {
-				    toaster.pop('error', "Error!", "Server error occured");
-				    data.thenCallback();
-				});
-		};
+	    $scope.resetPassword = function ()
+	    {
+	        userService.resetPassword($scope.user.PublicId, $scope.resetTracker)
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        toaster.pop('success', "Success!", "Successfully reset");
+                        $modalInstance.close();
+                    } else
+                    {
+                        var messages = "";
+                        if (result.Messages)
+                        {
+                            $.each(result.Messages, function (index, value)
+                            {
+                                messages += value.Message + "<br />";
+                            });
+                        }
+                        toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+                    }
+                    data.thenCallback();
+                }).error(function ()
+                {
+                    toaster.pop('error', "Error!", "Server error occured");
+                    data.thenCallback();
+                });
+	    };
 
-		$scope.cancel = function () {
-			$modalInstance.close();
-		};
-	}
+	    $scope.cancel = function ()
+	    {
+	        $modalInstance.close();
+	    };
+
+	    userService.getAdminTeams($scope.refreshTracker).success(function (result)
+	    {
+	        if (result.Success)
+	        {
+	            $scope.adminTeams = result.Data;
+	            $scope.adminTeams.splice(0, 0, { Id: null, Name: 'Not Specified' });
+	        }
+	        else
+	        {
+	            errorHandler(result);
+	        }
+	    }).
+        error(function (result)
+        {
+            errorHandler(result);
+        });
+	};
+
 
 	$scope.toggleRoleSelection = function (roleId) {
 		if (!$scope.user.RoleIds) {

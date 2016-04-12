@@ -254,6 +254,16 @@ namespace VitalChoice.Business.Queries.Orders
             return this;
         }
 
+        public OrderQuery WithCreatedByAgentsOrWithout(ICollection<int> agentIds)
+        {
+            if (agentIds!=null)
+            {
+                var tAgentIds = agentIds.Select(p => (int?) p).ToList();
+                Add(x => !x.IdAddedBy.HasValue || tAgentIds.Contains(x.IdAddedBy));
+            }
+            return this;
+        }
+
         public OrderQuery WithAffiliateOrderStatus()
         {
             Add(x => x.StatusCode != (int)RecordStatusCode.Deleted && (x.OrderStatus == OrderStatus.Processed ||

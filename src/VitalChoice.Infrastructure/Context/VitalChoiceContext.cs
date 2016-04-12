@@ -511,15 +511,18 @@ namespace VitalChoice.Infrastructure.Context
                     .WithOne(x => x.Profile)
                     .HasForeignKey<AdminProfile>(a => a.Id)
                     .HasPrincipalKey<ApplicationUser>(x => x.Id);
-                entity.HasKey(x => x.Id);
-                entity.ToTable("AdminProfiles");
                 entity
-                    .HasOne(x => x.User)
-                    .WithOne(x => x.Profile)
-                    .HasForeignKey<AdminProfile>(a => a.Id)
-                    .HasPrincipalKey<ApplicationUser>(x => x.Id);
+                    .HasOne(x => x.AdminTeam)
+                    .WithMany()
+                    .HasForeignKey(a => a.IdAdminTeam)
+                    .HasPrincipalKey(x => x.Id);
             });
 
+            builder.Entity<AdminTeam>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+                entity.ToTable("AdminTeams");
+            });
 
             #endregion
 

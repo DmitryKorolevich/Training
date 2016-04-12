@@ -55,3 +55,5 @@ set dateformat mdy
 
 :r .\Scripts\Tokens.sql
 :r .\Scripts\ContentCrossSellsDefaultData.sql
+
+:r .\Scripts\AdminTeams.sql

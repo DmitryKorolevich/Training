@@ -40,6 +40,7 @@
                             <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                         </span>
                     </th>
+                    <th>Team</th>
 				    <th>Roles</th>
                     <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Status')">
                         <span>Status</span>
@@ -64,9 +65,10 @@
                         <a data-ng-click="open(true, user.PublicId);">{{::user.FullName}}</a>
                     </td>
 					<td>{{user.Email}}</td>
-					<td><span data-ng-repeat="role in user.RoleIds" data-ng-bind="$index < user.RoleIds.length - 1 ? getReferenceItem(ReferenceData.AdminRoles, role).Text + ', ' : getReferenceItem(ReferenceData.AdminRoles, role).Text">
-					</span>
-					</td>
+                    <td>{{user.AdminTeam}}</td>
+				    <td>
+				        <span data-ng-repeat="role in user.RoleIds" data-ng-bind="$index < user.RoleIds.length - 1 ? getReferenceItem(ReferenceData.AdminRoles, role).Text + ', ' : getReferenceItem(ReferenceData.AdminRoles, role).Text"></span>
+				    </td>
 					<td>
 						<span data-ng-if="user.Status == 2" class="label label-danger font-default">{{getReferenceItem(ReferenceData.UserStatuses, user.Status).Text}}</span>
 						<span data-ng-if="user.Status == 0" class="label label-warning font-default">{{getReferenceItem(ReferenceData.UserStatuses, user.Status).Text}}</span>

@@ -528,6 +528,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<InventorySkuService>().As<IInventorySkuService>().InstancePerLifetimeScope();
             builder.RegisterType<BrontoService>().As<BrontoService>().InstancePerLifetimeScope();
             builder.RegisterType<ServiceCodeService>().As<IServiceCodeService>().InstancePerLifetimeScope();
+            builder.RegisterType<OrderReportService>().As<IOrderReportService>().InstancePerLifetimeScope();
             builder.RegisterMappers(typeof(ProductService).GetTypeInfo().Assembly, (type, registration) =>
             {
                 if (type == typeof(SkuMapper))

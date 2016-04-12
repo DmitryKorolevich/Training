@@ -1,8 +1,10 @@
-﻿using Microsoft.Data.Entity;
+﻿using System;
+using Microsoft.Data.Entity;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Business.Queries.Orders;
+using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories.Specifics;
@@ -10,6 +12,7 @@ using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.Transfer;
@@ -19,8 +22,11 @@ namespace VitalChoice.Business.Repositories
 {
     public class OrderRepository : EcommerceRepositoryAsync<Order>
     {
-        public OrderRepository(IDataContextAsync context) : base(context)
+        private readonly OrderMapper _orderMapper;
+
+        public OrderRepository(IDataContextAsync context, OrderMapper orderMapper) : base(context)
         {
+            _orderMapper = orderMapper;
         }
 
         public async Task<List<CustomerOrderStatistic>> GetCustomerOrderStatistics(ICollection<int> ids)
@@ -47,6 +53,33 @@ namespace VitalChoice.Business.Repositories
             // ReSharper disable once PossibleNullReferenceException
             var toReturn = await (this.Context as DbContext).Set<VOrderWithRegionInfoItem>().Where(conditions.Query()).SumAsync(p => p.Total);
             return toReturn;
+        }
+
+        public async Task<ICollection<OrderForAgentReport>> GetOrdersForAgentReportAsync(DateTime from, DateTime to, List<int> specififcAgentIds)
+        {
+            OrderQuery conditions = new OrderQuery().NotDeleted().WithActualStatusOnly().WithFromDate(from).WithToDate(to).
+                WithCreatedByAgentsOrWithout(specififcAgentIds);
+
+            var orderTypeOption = _orderMapper.OptionTypes.FirstOrDefault(p => p.Name == "OrderType");
+
+            var orderQuery = this.DbSet.Where(conditions.Query());
+            // ReSharper disable once PossibleNullReferenceException
+            var orderOptionValueQuery = (this.Context as DbContext).Set<OrderOptionValue>().Where(p => p.IdOptionType == orderTypeOption.Id);
+
+            var result = (from o in orderQuery
+                         join v in orderOptionValueQuery on o.Id equals v.IdOrder into grouping
+                         from d in grouping.DefaultIfEmpty()
+                         select new
+                         {
+                             Order = o,
+                             OrderType =d
+                         }).ToList();
+
+            return result.Select(p => new OrderForAgentReport()
+            {
+                Order = p.Order,
+                OrderType = p.OrderType?.Value !=null ? (SourceOrderType?)Int32.Parse(p.OrderType.Value) : (SourceOrderType?)null
+            }).ToList();
         }
     }
 }

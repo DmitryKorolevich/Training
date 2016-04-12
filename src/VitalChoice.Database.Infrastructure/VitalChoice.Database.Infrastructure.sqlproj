@@ -187,4 +187,10 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\CategoriesHistoryLogUpdate.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\AdminTeams.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\AdminTeams.sql" />
+  </ItemGroup>
 </Project>

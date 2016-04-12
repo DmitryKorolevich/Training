@@ -31,5 +31,7 @@ namespace VC.Admin.Models.UserManagement
 		public UserStatus Status { get; set; }
 
 		public Guid PublicId { get; set; }
+
+	    public int? IdAdminTeam { get; set; }
 	}
 }

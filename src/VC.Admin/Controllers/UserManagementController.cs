@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.OptionsModel;
@@ -17,7 +19,6 @@ using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.Permissions;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
-using System.Linq;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
@@ -38,6 +39,12 @@ namespace VC.Admin.Controllers
 			this.contextAccessor = contextAccessor;
         }
 
+	    [HttpGet]
+	    public async Task<Result<ICollection<AdminTeam>>> GetAdminTeams()
+	    {
+	        return (await userService.GetAdminTeams()).ToList();
+	    }
+
 	    [HttpPost]
 	    public async Task<Result<PagedList<UserListItemModel>>> GetUsers([FromBody]FilterBase filter)
 		{
@@ -53,7 +60,9 @@ namespace VC.Admin.Controllers
 					LastLoginDate = x.LastLoginDate,
 					PublicId = x.PublicId,
 					RoleIds = x.Roles.Select(y=> (RoleType)y.RoleId).ToList(),
-					Status = x.Status
+					Status = x.Status,
+                    IdAdminTeam = x?.Profile?.AdminTeam?.Id,
+                    AdminTeam = x?.Profile?.AdminTeam?.Name
 				}).ToList()
 		    };
 		}
@@ -82,9 +91,10 @@ namespace VC.Admin.Controllers
                 Profile = new AdminProfile()
 				{
 					AgentId = userModel.AgentId,
+                    IdAdminTeam = userModel.IdAdminTeam
 				},
 				IdUserType = UserType.Admin,
-				Status = UserStatus.NotActive
+				Status = UserStatus.NotActive,
 			};
 
 			await userService.CreateAsync(appUser, userModel.RoleIds);
@@ -116,7 +126,8 @@ namespace VC.Admin.Controllers
 			user.FirstName = userModel.FirstName;
 			user.LastName = userModel.LastName;
 			user.Profile.AgentId = userModel.AgentId;
-			user.Status = userModel.Status;
+		    user.Profile.IdAdminTeam = userModel.IdAdminTeam;
+            user.Status = userModel.Status;
 			user.Email = userModel.Email;
 			user.UserName = userModel.Email;
 			user.IdUserType = UserType.Admin;
@@ -146,9 +157,10 @@ namespace VC.Admin.Controllers
 				LastName = user.LastName,
 				PublicId = user.PublicId,
 				AgentId = user.Profile.AgentId,
-				Email = user.Email,
+                IdAdminTeam = user?.Profile?.IdAdminTeam,
+                Email = user.Email,
 				Status = user.Status,
-				RoleIds = user.Roles.Select(y=> (RoleType)y.RoleId).ToList()
+				RoleIds = user.Roles.Select(y=> (RoleType)y.RoleId).ToList(),
 			};
 		}
 
