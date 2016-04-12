@@ -148,7 +148,7 @@ namespace VitalChoice.Caching.Services
                                 {
                                     if (cache.ItemExist(primaryKey))
                                     {
-                                        Logger.LogWarning($"Cannot update <{group.Key.FullName}>{primaryKey}");
+                                        //Logger.LogWarning($"Cannot update <{group.Key.FullName}>{primaryKey}");
                                     }
                                 }
                                 syncOperations.Add(new SyncOperation
@@ -167,7 +167,7 @@ namespace VitalChoice.Caching.Services
                                 {
                                     if (cache.ItemExist(primaryKey))
                                     {
-                                        Logger.LogWarning($"Cannot remove <{group.Key.FullName}>{primaryKey}");
+                                        //Logger.LogWarning($"Cannot remove <{group.Key.FullName}>{primaryKey}");
                                     }
                                 }
                                 syncOperations.Add(new SyncOperation
