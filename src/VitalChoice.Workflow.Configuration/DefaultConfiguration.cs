@@ -1,5 +1,6 @@
 ﻿using VitalChoice.Business.Workflow.ActionResolvers;
 using VitalChoice.Business.Workflow.Actions;
+using VitalChoice.Business.Workflow.Actions.Affiliates;
 using VitalChoice.Business.Workflow.Actions.Discounts;
 using VitalChoice.Business.Workflow.Actions.GiftCertificates;
 using VitalChoice.Business.Workflow.Actions.Products;
@@ -21,9 +22,16 @@ namespace VitalChoice.Workflow.Configuration
             setup.Action<TotalAction>("Total", action =>
             {
                 action.Dependency<GiftCertificatesBuyAction>();
+                action.Dependency<AffiliateCommissionAction>();
 
                 action.Aggregate<PayableTotalAction>();
                 action.Aggregate<GiftCertificatesPaymentAction>();
+            });
+
+            setup.Action<AffiliateCommissionAction>("AffiliateCommission", action =>
+            {
+                action.Dependency<ProductsWithPromoAction>();
+                action.Dependency<ReductionTypeActionResolver>();
             });
 
             setup.Action<PayableTotalAction>("PayableTotal", action =>
@@ -165,18 +173,18 @@ namespace VitalChoice.Workflow.Configuration
                     "ShippingSurchargeCa");
             });
 
-			setup.ActionResolver<ReductionTypeActionResolver>("Reduction", action =>
+			setup.ActionResolver<ReductionTypeActionResolver>("Discount", action =>
 			{
-				action.ResolvePath<AutoShipDiscountAction>((int)ReductionType.AutoShip, "AutoShip");
-				action.ResolvePath<DiscountTypeActionResolver>((int)ReductionType.Discount, "Discount");
+				action.ResolvePath<AutoShipDiscountAction>((int)ReductionType.AutoShip, "AutoShipDiscount");
+				action.ResolvePath<DiscountTypeActionResolver>((int)ReductionType.Discount, "NormalDiscount");
 			});
 
-			setup.Action<AutoShipDiscountAction>("AutoShip", action =>
+			setup.Action<AutoShipDiscountAction>("AutoShipDiscount", action =>
 			{
 				action.Dependency<DiscountableProductsAction>();
 			});
 
-			setup.ActionResolver<DiscountTypeActionResolver>("Discount", action =>
+			setup.ActionResolver<DiscountTypeActionResolver>("NormalDiscount", action =>
             {
                 action.Dependency<PerishableProductsAction>();
 

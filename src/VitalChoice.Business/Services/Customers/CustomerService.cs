@@ -233,64 +233,58 @@ namespace VitalChoice.Business.Services.Customers
 			}
 		}
 
-		protected override async Task AfterEntityChangesAsync(CustomerDynamic model, Customer updated, Customer initial, IUnitOfWorkAsync uow)
-		{
+        protected override async Task AfterEntityChangesAsync(CustomerDynamic model, Customer updated, Customer initial,
+            IUnitOfWorkAsync uow)
+        {
             var customerToShippingRepository = uow.RepositoryAsync<CustomerToShippingAddress>();
 
-		    await
-		        SyncDbCollections<Address, AddressOptionValue>(uow, initial.ShippingAddresses.Select(s => s.ShippingAddress),
-		            updated.ShippingAddresses.Select(s => s.ShippingAddress), true);
+            await
+                SyncDbCollections<Address, AddressOptionValue>(uow, initial.ShippingAddresses.Select(s => s.ShippingAddress),
+                    updated.ShippingAddresses.Select(s => s.ShippingAddress), true);
 
             await customerToShippingRepository.DeleteAllAsync(
-                updated.ShippingAddresses.Where(s => s.ShippingAddress.StatusCode == (int)RecordStatusCode.Deleted));
+                updated.ShippingAddresses.Where(s => s.ShippingAddress.StatusCode == (int) RecordStatusCode.Deleted));
 
-		    await customerToShippingRepository.InsertGraphRangeAsync(
-		        updated.ShippingAddresses.Where(s => s.ShippingAddress.StatusCode != (int) RecordStatusCode.Deleted && s.IdAddress == 0));
+            await customerToShippingRepository.InsertGraphRangeAsync(
+                updated.ShippingAddresses.Where(s => s.ShippingAddress.StatusCode != (int) RecordStatusCode.Deleted && s.IdAddress == 0));
 
             await
-		        SyncDbCollections<CustomerNote, CustomerNoteOptionValue>(uow, initial.CustomerNotes, updated.CustomerNotes, true);
+                SyncDbCollections<CustomerNote, CustomerNoteOptionValue>(uow, initial.CustomerNotes, updated.CustomerNotes, true);
 
-		    await
-		        SyncDbCollections<CustomerPaymentMethod, CustomerPaymentMethodOptionValue>(uow,
-		            initial.CustomerPaymentMethods, updated.CustomerPaymentMethods, true);
+            await
+                SyncDbCollections<CustomerPaymentMethod, CustomerPaymentMethodOptionValue>(uow,
+                    initial.CustomerPaymentMethods, updated.CustomerPaymentMethods, true);
 
             await
                 SyncDbCollections<Address, AddressOptionValue>(uow, initial.CustomerPaymentMethods.Select(p => p.BillingAddress),
                     updated.CustomerPaymentMethods.Select(p => p.BillingAddress), true);
 
             List<string> fileNamesForDelete = new List<string>();
-			foreach (var dbFile in updated.Files)
-			{
-				bool delete = true;
-			    if (model.Files != null)
-			    {
-			        foreach (var file in model.Files)
-			        {
-			            if (dbFile.Id == file.Id)
-			            {
-			                delete = false;
-			            }
-			        }
-			    }
-			    if (delete)
-				{
-					fileNamesForDelete.Add(dbFile.FileName);
-				}
-			}
+            foreach (var dbFile in updated.Files)
+            {
+                bool delete = true;
+                if (model.Files != null)
+                {
+                    foreach (var file in model.Files)
+                    {
+                        if (dbFile.Id == file.Id)
+                        {
+                            delete = false;
+                        }
+                    }
+                }
+                if (delete)
+                {
+                    fileNamesForDelete.Add(dbFile.FileName);
+                }
+            }
 
-			if (fileNamesForDelete.Count != 0)
-			{
-				var publicId = updated.PublicId;
-				Task deleteFilesTask = new Task(() =>
-				{
-					foreach (var fileName in fileNamesForDelete)
-					{
-						var result = DeleteFileAsync(fileName, publicId.ToString()).Result;
-					}
-				});
-				deleteFilesTask.Start();
-			}
-		}
+            if (fileNamesForDelete.Count != 0)
+            {
+                var publicId = updated.PublicId;
+                await Task.WhenAll(fileNamesForDelete.Select(fileName => DeleteFileAsync(fileName, publicId.ToString())));
+            }
+        }
 
         protected override async Task<Customer> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow)
         {
@@ -330,6 +324,15 @@ namespace VitalChoice.Business.Services.Customers
                 return await DynamicMapper.FromEntityAsync(entity);
 			}
 		}
+
+        public async Task<bool> GetCustomerHasAffiliateOrders(int idCustomer)
+        {
+            return (await _orderRepository.Query(
+                o =>
+                    o.IdCustomer == idCustomer && o.OrderStatus != OrderStatus.Incomplete &&
+                    o.OrderStatus != OrderStatus.Cancelled && o.IdObjectType == (int) OrderType.Normal)
+                .Include(o => o.AffiliateOrderPayment).SelectAsync(false)).Any(o => o.AffiliateOrderPayment != null);
+        }
 
         public async Task<IList<OrderNote>> GetAvailableOrderNotesAsync(CustomerType customerType)
 	    {

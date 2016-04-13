@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
@@ -8,9 +9,9 @@ namespace VitalChoice.Business.Queries.Affiliates
 {
     public class AffiliateOrderPaymentQuery : QueryObject<AffiliateOrderPayment>
     {
-        public AffiliateOrderPaymentQuery WithIdAffiliate(int IdAffiliate)
+        public AffiliateOrderPaymentQuery WithIdAffiliate(int idAffiliate)
         {
-            Add(x => x.IdAffiliate == IdAffiliate);
+            Add(x => x.IdAffiliate == idAffiliate);
             return this;
         }
 
@@ -32,19 +33,40 @@ namespace VitalChoice.Business.Queries.Affiliates
             return this;
         }
 
-        public AffiliateOrderPaymentQuery WithOrderStatus()
-        {
-            Add(x => x.Order.StatusCode != (int)RecordStatusCode.Deleted && (x.Order.OrderStatus== OrderStatus.Processed ||
-            x.Order.OrderStatus == OrderStatus.Shipped || x.Order.OrderStatus == OrderStatus.Exported));
-            return this;
-        }
-
         public AffiliateOrderPaymentQuery WithPaymentStatus(AffiliateOrderPaymentStatus? status)
         {
             if (status.HasValue)
             {
                 Add(x => x.Status == status.Value);
             }
+            return this;
+        }
+
+        //public AffiliateOrderPaymentQuery WithIdCustomer(int idCustomer)
+        //{
+        //    Add(a => a.Order.IdCustomer == idCustomer);
+        //    return this;
+        //}
+
+        //public AffiliateOrderPaymentQuery WithIdCustomers(ICollection<int> idCustomers)
+        //{
+        //    foreach (var id in idCustomers)
+        //    {
+        //        Add(a => a.Order.IdCustomer == id);
+        //    }
+        //    return this;
+        //}
+
+        public AffiliateOrderPaymentQuery WithActiveOrder()
+        {
+            Add(
+                a =>
+                    a.Order.StatusCode != (int) RecordStatusCode.Deleted &&
+                    (a.Order.OrderStatus == OrderStatus.Processed || a.Order.OrderStatus == OrderStatus.Shipped ||
+                     a.Order.OrderStatus == OrderStatus.Exported || a.Order.POrderStatus == OrderStatus.Processed ||
+                     a.Order.POrderStatus == OrderStatus.Shipped || a.Order.POrderStatus == OrderStatus.Exported ||
+                     a.Order.NPOrderStatus == OrderStatus.Processed || a.Order.NPOrderStatus == OrderStatus.Shipped ||
+                     a.Order.NPOrderStatus == OrderStatus.Exported));
             return this;
         }
     }

@@ -26,7 +26,7 @@ namespace VitalChoice.DynamicData.Base
         where TDynamic : MappedObject, new()
     {
         protected readonly IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> DynamicMapper;
-        protected readonly IReadRepositoryAsync<TEntity> ObjectRepository;
+        protected readonly IRepositoryAsync<TEntity> ObjectRepository;
         protected readonly IReadRepositoryAsync<TOptionValue> OptionValuesRepository;
         protected readonly IReadRepositoryAsync<BigStringValue> BigStringRepository;
         protected readonly IObjectLogItemExternalService ObjectLogItemExternalService;
@@ -35,7 +35,7 @@ namespace VitalChoice.DynamicData.Base
 
         protected DynamicReadServiceAsync(
             IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> mapper,
-            IReadRepositoryAsync<TEntity> objectRepository,
+            IRepositoryAsync<TEntity> objectRepository,
             IReadRepositoryAsync<BigStringValue> bigStringRepository,
             IReadRepositoryAsync<TOptionValue> optionValuesRepository,
             IObjectLogItemExternalService objectLogItemExternalService,

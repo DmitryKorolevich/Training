@@ -33,7 +33,7 @@ namespace VitalChoice.DynamicData.Base
         private readonly DirectMapper<TEntity> _directMapper;
 
         protected DynamicServiceAsync(IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> mapper,
-            IReadRepositoryAsync<TEntity> objectRepository,
+            IRepositoryAsync<TEntity> objectRepository,
             IReadRepositoryAsync<TOptionValue> optionValueRepositoryAsync,
             IReadRepositoryAsync<BigStringValue> bigStringRepository,
             IObjectLogItemExternalService objectLogItemExternalService,

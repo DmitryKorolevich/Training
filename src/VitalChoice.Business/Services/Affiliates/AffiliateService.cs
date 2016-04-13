@@ -174,11 +174,11 @@ namespace VitalChoice.Business.Services.Affiliates
                     break;
             }
 
-            var toReturn = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            var toReturn = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, false);
             if (toReturn.Items.Any())
             {
                 var ids = toReturn.Items.Where(p => p.IdEditedBy.HasValue).Select(p => p.IdEditedBy).ToList();
-                var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
+                var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);
                 foreach (var item in toReturn.Items)
                 {
                     foreach (var profile in profiles)
@@ -447,7 +447,7 @@ namespace VitalChoice.Business.Services.Affiliates
         {
             PagedList<AffiliateOrderPayment> toReturn;
             AffiliateOrderPaymentQuery conditions = new AffiliateOrderPaymentQuery().WithIdAffiliate(filter.IdAffiliate).WithPaymentStatus(filter.Status).
-                WithOrderStatus().WithFromDate(filter.From).WithToDate(filter.To);
+                WithActiveOrder().WithFromDate(filter.From).WithToDate(filter.To);
 
             Func<IQueryable<AffiliateOrderPayment>, IOrderedQueryable<AffiliateOrderPayment>> sortable = x => x.OrderByDescending(y => y.Order.DateCreated);
             var query = _affiliateOrderPaymentRepository.Query(conditions).Include(p => p.Order).OrderBy(sortable);

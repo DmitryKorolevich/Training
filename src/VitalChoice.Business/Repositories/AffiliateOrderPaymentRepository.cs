@@ -7,6 +7,7 @@ using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Extensions;
 using System.Linq.Expressions;
+using VitalChoice.Business.Queries.Affiliates;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
@@ -22,16 +23,10 @@ namespace VitalChoice.Data.Repositories.Customs
 		{
         }
 
-        public async Task<Dictionary<int,int>> GetAffiliateOrdersInCustomers(int idAffiliate,ICollection<int> customerIds)
+        public async Task<Dictionary<int,int>> GetAffiliateOrders(int idAffiliate)//,ICollection<int> customerIds)
         {
-            Expression<Func<AffiliateOrderPayment, bool>> filter = (p => p.IdAffiliate == idAffiliate && p.Order.StatusCode != (int)RecordStatusCode.Deleted &&
-                (p.Order.OrderStatus == OrderStatus.Processed || p.Order.OrderStatus == OrderStatus.Shipped ||
-                p.Order.OrderStatus == OrderStatus.Exported));
-            foreach (var id in customerIds)
-            {
-                filter = filter.And((p => p.Order.IdCustomer == id));
-            }
-            var query = this.DbSet.Include(p => p.Order)/*.AsExpandable()*/.Where(filter);
+            var filter = new AffiliateOrderPaymentQuery().WithIdAffiliate(idAffiliate).WithActiveOrder();//.WithIdCustomers(customerIds);
+            var query = this.DbSet.Include(p => p.Order)/*.AsExpandable()*/.Where(filter.Query());
 
             //var groups = await query.GroupBy(p => p.Order.IdCustomer).Select(g => new
             //{

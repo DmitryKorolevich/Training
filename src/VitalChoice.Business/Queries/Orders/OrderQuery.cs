@@ -264,10 +264,14 @@ namespace VitalChoice.Business.Queries.Orders
             return this;
         }
 
-        public OrderQuery WithAffiliateOrderStatus()
+        public OrderQuery Active()
         {
-            Add(x => x.StatusCode != (int)RecordStatusCode.Deleted && (x.OrderStatus == OrderStatus.Processed ||
-            x.OrderStatus == OrderStatus.Shipped || x.OrderStatus == OrderStatus.Exported));
+            Add(a => a.StatusCode != (int)RecordStatusCode.Deleted &&
+                    (a.OrderStatus == OrderStatus.Processed || a.OrderStatus == OrderStatus.Shipped ||
+                     a.OrderStatus == OrderStatus.Exported || a.POrderStatus == OrderStatus.Processed ||
+                     a.POrderStatus == OrderStatus.Shipped || a.POrderStatus == OrderStatus.Exported ||
+                     a.NPOrderStatus == OrderStatus.Processed || a.NPOrderStatus == OrderStatus.Shipped ||
+                     a.NPOrderStatus == OrderStatus.Exported));
             return this;
         }
 
