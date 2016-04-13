@@ -24,7 +24,7 @@ namespace VitalChoice.Business.Workflow.Actions.Affiliates
                 var customerService = executionContext.Resolve<ICustomerService>();
                 var affiliateService = executionContext.Resolve<IAffiliateService>();
                 var hasOrders =
-                    await customerService.GetCustomerHasAffiliateOrders(context.Order.Customer.Id);
+                    await customerService.GetCustomerHasAffiliateOrders(context.Order.Customer.Id, context.Order.Id);
                 var affiliate = await affiliateService.SelectAsync(context.Order.Customer.IdAffiliate.Value, true);
                 decimal result;
 

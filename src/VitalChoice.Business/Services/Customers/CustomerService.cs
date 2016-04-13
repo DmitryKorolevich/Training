@@ -325,13 +325,22 @@ namespace VitalChoice.Business.Services.Customers
 			}
 		}
 
-        public async Task<bool> GetCustomerHasAffiliateOrders(int idCustomer)
+        public async Task<bool> GetCustomerHasAffiliateOrders(int idCustomer, int? excludeIdOrder = null)
         {
-            return (await _orderRepository.Query(
+            if (excludeIdOrder.HasValue && excludeIdOrder.Value > 0)
+            {
+                return await _orderRepository.Query(
+                    o =>
+                        o.IdCustomer == idCustomer && o.OrderStatus != OrderStatus.Incomplete &&
+                        o.OrderStatus != OrderStatus.Cancelled && o.IdObjectType == (int) OrderType.Normal &&
+                        o.AffiliateOrderPayment.Id != excludeIdOrder.Value && o.AffiliateOrderPayment.Id > 0)
+                    .Include(o => o.AffiliateOrderPayment).SelectAnyAsync();
+            }
+            return await _orderRepository.Query(
                 o =>
                     o.IdCustomer == idCustomer && o.OrderStatus != OrderStatus.Incomplete &&
-                    o.OrderStatus != OrderStatus.Cancelled && o.IdObjectType == (int) OrderType.Normal)
-                .Include(o => o.AffiliateOrderPayment).SelectAsync(false)).Any(o => o.AffiliateOrderPayment != null);
+                    o.OrderStatus != OrderStatus.Cancelled && o.IdObjectType == (int) OrderType.Normal && o.AffiliateOrderPayment.Id > 0)
+                .Include(o => o.AffiliateOrderPayment).SelectAnyAsync();
         }
 
         public async Task<IList<OrderNote>> GetAvailableOrderNotesAsync(CustomerType customerType)

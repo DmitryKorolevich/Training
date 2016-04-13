@@ -16,7 +16,7 @@ namespace VitalChoice.Interfaces.Services.Customers
 {
 	public interface ICustomerService : IDynamicServiceAsync<CustomerDynamic, Customer>
 	{
-	    Task<bool> GetCustomerHasAffiliateOrders(int idCustomer);
+	    Task<bool> GetCustomerHasAffiliateOrders(int idCustomer, int? excludeIdOrder = null);
 
 	    Task<IList<OrderNote>> GetAvailableOrderNotesAsync(CustomerType customerType);
 
