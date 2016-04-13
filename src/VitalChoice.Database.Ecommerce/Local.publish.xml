@@ -9,5 +9,6 @@
     <BlockOnPossibleDataLoss>False</BlockOnPossibleDataLoss>
     <CreateNewDatabase>True</CreateNewDatabase>
     <ProfileVersionNumber>1</ProfileVersionNumber>
+    <AllowIncompatiblePlatform>True</AllowIncompatiblePlatform>
   </PropertyGroup>
 </Project>

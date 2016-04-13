@@ -9,5 +9,6 @@
     <ScriptDatabaseOptions>True</ScriptDatabaseOptions>
     <BlockOnPossibleDataLoss>False</BlockOnPossibleDataLoss>
     <CreateNewDatabase>False</CreateNewDatabase>
+    <AllowIncompatiblePlatform>True</AllowIncompatiblePlatform>
   </PropertyGroup>
 </Project>
