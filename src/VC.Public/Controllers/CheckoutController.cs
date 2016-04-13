@@ -355,7 +355,6 @@ namespace VC.Public.Controllers
         }
 
         [HttpGet]
-        [CustomerAuthorize]
         [CustomerStatusCheck]
         public async Task<IActionResult> GetShippingAddress(int id)
         {
@@ -375,7 +374,6 @@ namespace VC.Public.Controllers
 
         [HttpGet]
         [CustomerStatusCheck]
-        //[CustomerAuthorize]
         public async Task<IActionResult> AddUpdateShippingMethod()
         {
             if (await IsCartEmpty())
