@@ -96,7 +96,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				    name: 'operations',
 				    stateLabel: 'Operations',
 				    subMenu: [
-                        //{ name: 'weeklyAgentReport', stateName: 'index.oneCol.weeklyAgentReport', stateLabel: 'Weekly Agent Report', access: 3 },
+                        { name: 'orderAgentsStatistic', stateName: 'index.oneCol.orderAgentsStatistic', stateLabel: 'Agents Report', access: 3 },
                         { name: 'index.oneCol.serviceCodesStatistic', stateName: 'index.oneCol.serviceCodesStatistic', stateLabel: 'Service Codes Report', access: 3 },
                         //{ name: 'productQualityIssuesReport', stateName: 'index.oneCol.productQualityIssuesReport', stateLabel: 'Product Quality Issues Report', access: 3 },
                         //{ name: 'kPIReport', stateName: 'index.oneCol.kPIReport', stateLabel: 'KPI Report (APIs)', access: 3 },

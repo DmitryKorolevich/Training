@@ -533,12 +533,21 @@ namespace VitalChoice.Business.Services.Users
 					break;
 			}
 
-			var pageIndex = filter.Paging.PageIndex;
-			var pageItemCount = filter.Paging.PageItemCount;
+		    List<ApplicationUser> items = null;
 
-			var items = await queryable.Skip((pageIndex - 1)*pageItemCount).Take(pageItemCount).ToListAsync();
+		    if (filter.Paging != null)
+		    {
+		        var pageIndex = filter.Paging.PageIndex;
+		        var pageItemCount = filter.Paging.PageItemCount;
 
-			return new PagedList<ApplicationUser>(items, overallCount);
+		        items = await queryable.Skip((pageIndex - 1)*pageItemCount).Take(pageItemCount).ToListAsync();
+		    }
+		    else
+		    {
+                items = await queryable.ToListAsync();
+            }
+
+		    return new PagedList<ApplicationUser>(items, overallCount);
 		}
 
 		public async Task<ApplicationUser> ResetPasswordAsync(string email, string token, string newPassword)

@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.order.controllers.orderStatusUpdateController', [])
-.controller('orderStatusUpdateController', ['$scope', '$rootScope', '$state', '$stateParams', 'orderService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker',
-function ($scope, $rootScope, $state, $stateParams, orderService, toaster, modalUtil, confirmUtil, promiseTracker)
+.controller('orderStatusUpdateController', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', 'orderService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker',
+function ($scope, $rootScope, $state, $stateParams, $timeout, orderService, toaster, modalUtil, confirmUtil, promiseTracker)
 {
     $scope.refreshTracker = promiseTracker("get");
 
@@ -42,6 +42,8 @@ function ($scope, $rootScope, $state, $stateParams, orderService, toaster, modal
 
     function initialize()
     {
+        $scope.options = {};
+
         $scope.orderStatuses = angular.copy($rootScope.ReferenceData.OrderStatuses);
         $scope.orderParts=[
             {Key: 2, Text: 'P'},
@@ -57,6 +59,10 @@ function ($scope, $rootScope, $state, $stateParams, orderService, toaster, modal
             Id: '',
             Paging: { PageIndex: 1, PageItemCount: 20 },
         };
+        $scope.directFilter = {
+            Id: '',
+            Paging: { PageIndex: 1, PageItemCount: 20 },
+        };
     };
 
     $scope.save = function () {
@@ -68,7 +74,7 @@ function ($scope, $rootScope, $state, $stateParams, orderService, toaster, modal
 
         if ($scope.forms.form.$valid)
         {
-            var id = parseInt($scope.order.Id);
+            var id = parseInt($scope.options.loadedId);
             if (id == NaN)
             {
                 id = 0;
@@ -103,7 +109,7 @@ function ($scope, $rootScope, $state, $stateParams, orderService, toaster, modal
 
     $scope.idLoaded = function (item, model, label)
     {
-        $scope.loadedId=$scope.order.Id;
+        $scope.options.loadedId=$scope.order.Id;
         $scope.order.CurrentIdStatus = item.OrderStatus;
         $scope.order.CurrentIdPStatus = item.POrderStatus;
         $scope.order.CurrentIdNPStatus = item.NPOrderStatus;
@@ -117,9 +123,27 @@ function ($scope, $rootScope, $state, $stateParams, orderService, toaster, modal
         }
     };
 
+    $scope.lostFocusRequest = null;
+
+    $scope.lostFocus = function (index)
+    {
+        //resolving issue with additional load after lost focus from the input in time of selecting a new element
+        if ($scope.lostFocusRequest)
+        {
+            $timeout.cancel($scope.lostFocusRequest);
+        }
+        $scope.lostFocusRequest = $timeout(function ()
+        {
+            if ($scope.options.loadedId != $scope.order.Id)
+            {
+                loadOrder();
+            }
+        }, 100);
+    };
+
     $scope.idChanged = function ()
     {
-        if ($scope.loadedId != $scope.order.Id)
+        if ($scope.options.loadedId != $scope.order.Id)
         {
             $.each($scope.forms.form, function (index, element)
             {
@@ -131,8 +155,33 @@ function ($scope, $rootScope, $state, $stateParams, orderService, toaster, modal
             $scope.order.CurrentIdStatus = null;
             $scope.order.CurrentIdPStatus = null;
             $scope.order.CurrentIdNPStatus = null;
-            $scope.loadedId = null;
+            $scope.options.loadedId = null;
         }
+    };
+
+    $scope.getOrderSettings = function (event)
+    {
+        if ($scope.options.loadedId != $scope.order.Id)
+        {
+            loadOrder();
+            event.preventDefault();
+        }
+    };
+
+    var loadOrder = function ()
+    {
+        $scope.directFilter.Id = $scope.order.Id;
+        orderService.getShortOrders($scope.directFilter, $scope.refreshTracker).success(function (result)
+        {
+            if (result.Data.Items.length == 1)
+            {
+                $scope.idLoaded(result.Data.Items[0], null, null);
+            }
+        }).
+        error(function (result)
+        {
+            errorHandler(result);
+        });
     };
 
     initialize();

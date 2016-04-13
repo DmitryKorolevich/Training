@@ -1,0 +1,53 @@
+﻿<div class="container-fluid order-agents-report">
+    <div class="well">
+        <span class="legend">Agents Report</span>
+        <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate>
+            <fieldset>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="From" datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.From.$invalid">
+                            <small class="error" ng-show="forms.form.From.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","From")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.To.$invalid">
+                            <small class="error" ng-show="forms.form.To.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","To")}}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <select class="form-control" name="FrequencyType" data-ng-model="filter.FrequencyType" ng-options="item.Key as item.Text for item in frequencyTypes"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control" name="IdAdminTeam" data-ng-model="filter.IdAdminTeam" data-ng-change="idAdminTeamChanged()" ng-options="item.Id as item.Name for item in teams"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control" name="IdAdmin" data-ng-model="filter.IdAdmin" data-ng-change="idAdminChanged()" ng-options="item.Id as item.AgentId for item in admins"></select>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-4">
+                        <button class="btn btn-info" data-ng-click="filterItems();" type="button">Filter</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+        <hr />
+        <spinner-overlay data-loading="refreshTracker.active()">
+            
+        </spinner-overlay>
+    </div>
+</div>

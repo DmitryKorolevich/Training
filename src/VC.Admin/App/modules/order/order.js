@@ -16,7 +16,8 @@ angular.module('app.modules.order', [
 	'app.modules.order.controllers.serviceCodesReportController',
 	'app.modules.order.controllers.serviceCodeDetailController',
 	'app.modules.order.controllers.customerAutoShipsController',
-	'app.modules.order.controllers.manageAutoShipBillingController'
+	'app.modules.order.controllers.manageAutoShipBillingController',
+	'app.modules.order.controllers.orderAgentsReportController'
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -87,6 +88,11 @@ angular.module('app.modules.order', [
 		            url: '/report/service-codes/{id:int}?{from:string}{to:string}',
 		            templateUrl: 'app/modules/order/partials/serviceCodeDetail.html',
 		            controller: 'serviceCodeDetailController'
-		        });
+		        })
+				.state('index.oneCol.orderAgentsStatistic', {
+				    url: '/report/order-agents',
+				    templateUrl: 'app/modules/order/partials/orderAgentsReport.html',
+				    controller: 'orderAgentsReportController'
+				});
 		}
 ]);

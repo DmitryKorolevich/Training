@@ -610,9 +610,7 @@ angular.module('app.modules.order.services.orderEditService', [])
             });
             var orderForCalculating = angular.copy(uiScope.order);
             orderForCalculating.Customer = angular.copy(uiScope.currentCustomer);
-            if (angular.equals(uiScope.oldOrderForCalculating, orderForCalculating)) {
-                return;
-            }
+
             uiScope.oldOrderForCalculating = orderForCalculating;
             if (uiScope.currectCalculateCanceller) {
                 uiScope.currectCalculateCanceller.resolve("canceled");

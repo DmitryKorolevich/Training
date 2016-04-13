@@ -54,6 +54,7 @@ namespace VC.Admin.Controllers
 				Count = result.Count,
 				Items = result.Items.Select(x=> new UserListItemModel()
 				{
+                    Id=x.Id,
 					AgentId = x.Profile.AgentId,
 					Email = x.Email,
 					FullName = $"{x.FirstName} {x.LastName}",

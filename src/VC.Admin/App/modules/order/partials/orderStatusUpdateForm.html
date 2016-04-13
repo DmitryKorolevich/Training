@@ -26,7 +26,8 @@
                                             <div class="input-group autocomplete">
                                                 <input type="text" name="Id" class="form-control" placeholder="Order #" data-ng-model="order.Id" required numbers-only
                                                        typeahead-min-length="3" typeahead="item.Id as item.Id for item in getOrders($viewValue)" typeahead-loading="loadingOrders"
-                                                       typeahead-on-select="idLoaded($item, $model, $label)" data-ng-change="idChanged()" autocomplete="off">
+                                                       typeahead-on-select="idLoaded($item, $model, $label)" data-ng-change="idChanged()" autocomplete="off"
+                                                       data-ng-keypress="$event.keyCode==13 ? getOrderSettings($event) : null" data-ng-blur="lostFocus()">
                                                 <span class="input-group-addon">
                                                     <i ng-show="loadingOrders" class="glyphicon glyphicon-refresh"></i>
                                                 </span>
@@ -37,34 +38,42 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div data-ng-if="order.CurrentIdStatus" class="form-group">
-                                        <label class="col-md-3 control-label">Current Status</label>
-                                        <div class="col-md-9 form-control-static">
-                                            <span>{{getReferenceItem(orderStatuses, order.CurrentIdStatus).Text}}</span>
+                                    <div data-ng-if="options.loadedId">
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">Loaded Order #</label>
+                                            <div class="col-md-9 form-control-static">
+                                                <span>{{options.loadedId}}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div data-ng-if="order.CurrentIdPStatus" class="form-group">
-                                        <label class="col-md-3 control-label">P Current Status</label>
-                                        <div class="col-md-9 form-control-static">
-                                            <span>{{getReferenceItem(orderStatuses, order.CurrentIdPStatus).Text}}</span>
+                                        <div data-ng-if="order.CurrentIdStatus" class="form-group">
+                                            <label class="col-md-3 control-label">Current Status</label>
+                                            <div class="col-md-9 form-control-static">
+                                                <span>{{getReferenceItem(orderStatuses, order.CurrentIdStatus).Text}}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div data-ng-if="order.CurrentIdNPStatus" class="form-group">
-                                        <label class="col-md-3 control-label">NP Current Status</label>
-                                        <div class="col-md-9 form-control-static">
-                                            <span>{{getReferenceItem(orderStatuses, order.CurrentIdNPStatus).Text}}</span>
+                                        <div data-ng-if="order.CurrentIdPStatus" class="form-group">
+                                            <label class="col-md-3 control-label">P Current Status</label>
+                                            <div class="col-md-9 form-control-static">
+                                                <span>{{getReferenceItem(orderStatuses, order.CurrentIdPStatus).Text}}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div data-ng-if="order.OrderPart" class="form-group">
-                                        <label for="status" class="col-md-3 control-label">Order Part</label>
-                                        <div class="col-md-9">
-                                            <select class="form-control" name="OrderPart" data-ng-model="order.OrderPart" ng-options="item.Key as item.Text for item in orderParts"></select>
+                                        <div data-ng-if="order.CurrentIdNPStatus" class="form-group">
+                                            <label class="col-md-3 control-label">NP Current Status</label>
+                                            <div class="col-md-9 form-control-static">
+                                                <span>{{getReferenceItem(orderStatuses, order.CurrentIdNPStatus).Text}}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="status" class="col-md-3 control-label">New Status</label>
-                                        <div class="col-md-9">
-                                            <select class="form-control" name="Status" data-ng-model="order.Status" ng-options="item.Key as item.Text for item in orderStatuses"></select>
+                                        <div data-ng-if="order.OrderPart" class="form-group">
+                                            <label for="status" class="col-md-3 control-label">Order Part</label>
+                                            <div class="col-md-9">
+                                                <select class="form-control" name="OrderPart" data-ng-model="order.OrderPart" ng-options="item.Key as item.Text for item in orderParts"></select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="status" class="col-md-3 control-label">New Status</label>
+                                            <div class="col-md-9">
+                                                <select class="form-control" name="Status" data-ng-model="order.Status" ng-options="item.Key as item.Text for item in orderStatuses"></select>
+                                            </div>
                                         </div>
                                     </div>
                                 </fieldset>

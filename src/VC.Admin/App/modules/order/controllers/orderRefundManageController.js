@@ -182,10 +182,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
             var orderForCalculating = angular.copy(uiScope.order);
             orderForCalculating.Customer = angular.copy(uiScope.currentCustomer);
-            if (angular.equals(uiScope.oldOrderForCalculating, orderForCalculating))
-            {
-                return;
-            }
+
             uiScope.oldOrderForCalculating = orderForCalculating;
             if (uiScope.currectCalculateCanceller)
             {

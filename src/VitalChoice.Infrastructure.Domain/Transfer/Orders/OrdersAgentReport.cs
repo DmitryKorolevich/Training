@@ -14,5 +14,9 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
         }
 
         public ICollection<OrdersAgentReportPeriodItem> Periods { get; set; }
+
+        public int? IdAdminTeam { get; set; }
+
+        public int? IdAdmin { get; set; }
     }
 }

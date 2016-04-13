@@ -8,8 +8,10 @@ using VitalChoice.Validation.Models;
 namespace VC.Admin.Models.UserManagement
 {
     public class UserListItemModel : BaseModel<UserManageSettings>
-	{
-	    public Guid PublicId { get; set; }
+    {
+        public int Id { get; set; }
+
+        public Guid PublicId { get; set; }
 
 	    public string FullName { get; set; }
 

@@ -143,15 +143,15 @@ namespace VC.Admin.Controllers
             {
                 throw new AppValidationException("Id", "The given order doesn't exist.");
             }
-            if (!orderpart.HasValue)
+            if (!orderpart.HasValue && order.OrderStatus.HasValue)
             {
                 order.OrderStatus = (OrderStatus)status;
             }
-            else if (orderpart == 1)//NP
+            else if (orderpart == 1 && order.NPOrderStatus.HasValue)//NP
             {
                 order.NPOrderStatus = (OrderStatus)status;
             }
-            if (orderpart == 2)//P
+            if (orderpart == 2 && order.POrderStatus.HasValue)//P
             {
                 order.POrderStatus = (OrderStatus)status;
             }
@@ -878,6 +878,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<OrdersAgentReport>> GetOrdersAgentReport([FromBody]OrdersAgentReportFilter filter)
         {
+            filter.To = filter.To.AddDays(1);
             var toReturn = await _orderReportService.GetOrdersAgentReportAsync(filter);
             return toReturn;
         }

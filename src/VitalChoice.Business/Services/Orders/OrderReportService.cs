@@ -45,6 +45,8 @@ namespace VitalChoice.Business.Services.Orders
         public async Task<OrdersAgentReport> GetOrdersAgentReportAsync(OrdersAgentReportFilter filter)
         {
             OrdersAgentReport toReturn = new OrdersAgentReport();
+            toReturn.IdAdminTeam = filter.IdAdminTeam;
+            toReturn.IdAdmin = filter.IdAdmin;
 
             var agents = await _adminProfileRepository.Query().SelectAsync(false);
             var teams = await _adminTeamRepository.Query().SelectAsync(false);
@@ -61,7 +63,7 @@ namespace VitalChoice.Business.Services.Orders
 
             var orders = await _orderRepository.GetOrdersForAgentReportAsync(filter.From, filter.To, specififcAgentIds);
 
-            if (filter.From < filter.To)
+            if (filter.From > filter.To)
             {
                 return toReturn;
             }
@@ -122,7 +124,7 @@ namespace VitalChoice.Business.Services.Orders
             foreach (var orderForAgentReport in orders)
             {
                 orderTotalWithoutShipping = orderForAgentReport.Order.Total - orderForAgentReport.Order.ShippingTotal;
-                period = toReturn.Periods.FirstOrDefault(p=>p.From>= orderForAgentReport.Order.DateCreated && p.To<orderForAgentReport.Order.DateCreated);
+                period = toReturn.Periods.FirstOrDefault(p=>p.From<=orderForAgentReport.Order.DateCreated && p.To>orderForAgentReport.Order.DateCreated);
                 if (period != null)
                 {
                     if (orderForAgentReport.OrderType == SourceOrderType.Phone)
@@ -144,7 +146,7 @@ namespace VitalChoice.Business.Services.Orders
                                 else
                                 {
                                     agent.OrdersCount++;
-                                    agent.TotalOrdersAmount = orderTotalWithoutShipping;
+                                    agent.TotalOrdersAmount += orderTotalWithoutShipping;
                                     if (agent.HighestOrderAmount < orderTotalWithoutShipping)
                                     {
                                         agent.HighestOrderAmount = orderTotalWithoutShipping;
@@ -169,7 +171,7 @@ namespace VitalChoice.Business.Services.Orders
                         else
                         {
                             period.OrdersCount++;
-                            period.TotalOrdersAmount = orderTotalWithoutShipping;
+                            period.TotalOrdersAmount += orderTotalWithoutShipping;
                             if (period.HighestOrderAmount < orderTotalWithoutShipping)
                             {
                                 period.HighestOrderAmount = orderTotalWithoutShipping;
@@ -193,7 +195,7 @@ namespace VitalChoice.Business.Services.Orders
                     else
                     {
                         period.AllOrdersCount++;
-                        period.AllTotalOrdersAmount = orderTotalWithoutShipping;
+                        period.AllTotalOrdersAmount += orderTotalWithoutShipping;
                         if (period.AllHighestOrderAmount < orderTotalWithoutShipping)
                         {
                             period.AllHighestOrderAmount = orderTotalWithoutShipping;
@@ -215,8 +217,10 @@ namespace VitalChoice.Business.Services.Orders
                 ordersAgentReportPeriodItem.AllAverageOrdersAmount = ordersAgentReportPeriodItem.AllOrdersCount != 0
                     ? ordersAgentReportPeriodItem.AllTotalOrdersAmount / ordersAgentReportPeriodItem.AllOrdersCount
                     : 0;
-                ordersAgentReportPeriodItem.AgentOrdersPercent = ordersAgentReportPeriodItem.TotalOrdersAmount / period.AllTotalOrdersAmount;
-                ordersAgentReportPeriodItem.AverageOrdersAmountDifference = ordersAgentReportPeriodItem.AverageOrdersAmountDifference - ordersAgentReportPeriodItem.AllAverageOrdersAmount;
+                ordersAgentReportPeriodItem.AgentOrdersPercent = ordersAgentReportPeriodItem.TotalOrdersAmount!=0 ?
+                    ordersAgentReportPeriodItem.TotalOrdersAmount / ordersAgentReportPeriodItem.AllTotalOrdersAmount
+                    : 0;
+                ordersAgentReportPeriodItem.AverageOrdersAmountDifference = ordersAgentReportPeriodItem.AverageOrdersAmount - ordersAgentReportPeriodItem.AllAverageOrdersAmount;
 
                 foreach (var ordersAgentReportTeamItem in ordersAgentReportPeriodItem.Teams)
                 {
@@ -246,8 +250,10 @@ namespace VitalChoice.Business.Services.Orders
                         ? ordersAgentReportTeamItem.TotalOrdersAmount / ordersAgentReportTeamItem.OrdersCount
                         : 0;
 
-                    ordersAgentReportTeamItem.AgentOrdersPercent = ordersAgentReportTeamItem.TotalOrdersAmount/ period.TotalOrdersAmount;
-                    ordersAgentReportTeamItem.AverageOrdersAmountDifference = ordersAgentReportTeamItem.AverageOrdersAmountDifference - ordersAgentReportPeriodItem.AverageOrdersAmount;
+                    ordersAgentReportTeamItem.AgentOrdersPercent = ordersAgentReportTeamItem.TotalOrdersAmount!=0 
+                        ? ordersAgentReportTeamItem.TotalOrdersAmount / ordersAgentReportPeriodItem.TotalOrdersAmount
+                        : 0;
+                    ordersAgentReportTeamItem.AverageOrdersAmountDifference = ordersAgentReportTeamItem.AverageOrdersAmount - ordersAgentReportPeriodItem.AverageOrdersAmount;
                 }
             }
 
@@ -270,6 +276,7 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     OrdersAgentReportTeamItem teamItem = new OrdersAgentReportTeamItem();
                     teamItem.IdAdminTeam = team.Id;
+                    teamItem.AdminTeamName = team.Name;
                     teamItem.Agents = agents.Where(p => p.IdAdminTeam == team.Id).Select(p => new OrdersAgentReportAgentItem()
                     {
                         IdAdmin = p.Id,
@@ -281,6 +288,7 @@ namespace VitalChoice.Business.Services.Orders
                 if (!idAdminTeam.HasValue)
                 {
                     OrdersAgentReportTeamItem teamItem = new OrdersAgentReportTeamItem();
+                    teamItem.AdminTeamName = "Not Specified";
                     teamItem.Agents = agents.Where(p => !p.IdAdminTeam.HasValue).Select(p => new OrdersAgentReportAgentItem()
                     {
                         IdAdmin = p.Id,

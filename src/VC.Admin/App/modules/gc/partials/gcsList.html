@@ -77,7 +77,7 @@
                         <a ui-sref="index.oneCol.gcDetail({id:item.Id})">{{::item.Code}}</a>
                     </td>
                     <td>{{item.Created | date:"MM/dd/yy"}}<br />{{item.Created | date:"h:mm a"}}<br />{{item.AgentId}}</td>
-                    <td><a ui-sref="index.oneCol.orderDetail({id:item.IdOrder})">{{item.IdOrder}}</a></td>
+                    <td><a data-ng-if="item.IdOrder" ui-sref="index.oneCol.orderDetail({id:item.IdOrder})">{{item.IdOrder}}</a></td>
                     <td>{{item.RecipientName}}<br />{{item.RecipientEmail}}</td>
                     <td>{{item.Balance | currency}}</td>
                     <td>
