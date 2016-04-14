@@ -41,7 +41,7 @@
         {
             $scope.options = {};
             $scope.filter = {
-                Paging: { PageIndex: 1, PageItemCount: 25 },
+                Paging: { PageIndex: 1, PageItemCount: 10 },
             };
 
             refreshItems();

@@ -238,8 +238,9 @@ namespace VC.Admin.Controllers
         public async Task<Result<PagedList<ProfileScopeListItemModel>>> GetProfileScopeItems([FromBody]FilterBase filter)
         {
             PagedList<ProfileScopeListItemModel> toReturn=new PagedList<ProfileScopeListItemModel>();
-            toReturn.Count = PerformanceRequestService.WorkedScopes.Count();
-            toReturn.Items = PerformanceRequestService.WorkedScopes.Skip((filter.Paging.PageIndex-1) *filter.Paging.PageItemCount).
+            var scopes = PerformanceRequestService.WorkedScopes;
+            toReturn.Count = scopes.Count;
+            toReturn.Items = scopes.Skip((filter.Paging.PageIndex-1) *filter.Paging.PageItemCount).
                 Take(filter.Paging.PageItemCount).Select(p=>new ProfileScopeListItemModel(p)).ToList();
 
             return toReturn;

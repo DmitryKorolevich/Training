@@ -14,11 +14,11 @@ namespace VitalChoice.DynamicData.Interfaces
         where TEntity: DynamicDataEntity
     {
         TDynamic FromModel<TModel>(TModel model, int idObjectType);
-        void UpdateObject<TModel>(TModel model, TDynamic obj, int idObjectType)
+        void UpdateObject<TModel>(TModel model, TDynamic obj, int idObjectType, bool loadDefaults = true)
             where TModel : class, new();
 
         Task<TDynamic> FromModelAsync<TModel>(TModel model, int idObjectType);
-        Task UpdateObjectAsync<TModel>(TModel model, TDynamic obj, int idObjectType)
+        Task UpdateObjectAsync<TModel>(TModel model, TDynamic obj, int idObjectType, bool loadDefaults = true)
             where TModel : class, new();
 
         Task<TDynamic> CreatePrototypeAsync(int idObjectType);

@@ -267,13 +267,13 @@ namespace VC.Public.Controllers
                     if (cart.Order.PaymentMethod?.Address == null || cart.Order.PaymentMethod.Id == 0)
                     {
                         cart.Order.PaymentMethod =
-                            await _orderPaymentMethodConverter.FromModelAsync((BillingInfoModel) model, (int) PaymentMethodType.CreditCard);
+                            await _orderPaymentMethodConverter.FromModelAsync(model, (int) PaymentMethodType.CreditCard);
                         cart.Order.PaymentMethod.Address = await _addressConverter.FromModelAsync(model, (int) AddressType.Billing);
                     }
                     else
                     {
                         await
-                            _orderPaymentMethodConverter.UpdateObjectAsync((BillingInfoModel) model, cart.Order.PaymentMethod,
+                            _orderPaymentMethodConverter.UpdateObjectAsync(model, cart.Order.PaymentMethod,
                                 (int) PaymentMethodType.CreditCard);
                         if (cart.Order.PaymentMethod.Address == null)
                         {
@@ -471,9 +471,10 @@ namespace VC.Public.Controllers
                     {
                         if (model.UseBillingAddress)
                         {
+                            await _addressConverter.UpdateObjectAsync(model, cart.Order.ShippingAddress, (int)AddressType.Shipping);
                             await _addressConverter.UpdateObjectAsync(
                                 _addressConverter.ToModel<AddUpdateShippingMethodModel>(cart.Order.PaymentMethod.Address),
-                                cart.Order.ShippingAddress, (int) AddressType.Shipping);
+                                cart.Order.ShippingAddress, (int) AddressType.Shipping, false);
 							cart.Order.Data.DeliveryInstructions = model.DeliveryInstructions;
 							cart.Order.Data.PreferredShipMethod = model.PreferredShipMethod;
 							cart.Order.Data.AddressType = model.AddressType;
