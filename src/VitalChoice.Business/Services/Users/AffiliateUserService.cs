@@ -38,7 +38,7 @@ namespace VitalChoice.Business.Services.Users
             IOptions<AppOptions> options, 
             IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync,
             IEcommerceRepositoryAsync<Affiliate> affiliateRepositoryAsync,
-            IUserValidator<ApplicationUser> userValidator, ITransactionAccessor<VitalChoiceContext> transactionAccessor) :
+            IUserValidator<ApplicationUser> userValidator, ITransactionAccessor<VitalChoiceContext> transactionAccessor, ILoggerProviderExtended loggerProvider) :
             base(
                 userManager,
                 roleManager,
@@ -48,7 +48,7 @@ namespace VitalChoice.Business.Services.Users
                 notificationService, 
                 options, 
                 ecommerceRepositoryAsync,
-                userValidator, transactionAccessor)
+                userValidator, transactionAccessor, loggerProvider)
 		{
             _affiliateRepositoryAsync = affiliateRepositoryAsync;
         }

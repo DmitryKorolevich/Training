@@ -34,10 +34,10 @@ namespace VitalChoice.Business.Services.Users
 			IAppInfrastructureService appInfrastructureService, INotificationService notificationService,
 			IOptions<AppOptions> options, IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync,
             IEcommerceRepositoryAsync<Customer> customerRepositoryAsync,
-            IUserValidator<ApplicationUser> userValidator, ITransactionAccessor<VitalChoiceContext> transactionAccessor)
+            IUserValidator<ApplicationUser> userValidator, ITransactionAccessor<VitalChoiceContext> transactionAccessor, ILoggerProviderExtended loggerProvider)
 			: base(
 				userManager, roleManager, context, signInManager, appInfrastructureService, notificationService, options,
-				ecommerceRepositoryAsync, userValidator, transactionAccessor)
+				ecommerceRepositoryAsync, userValidator, transactionAccessor, loggerProvider)
 		{
             _customerRepositoryAsync = customerRepositoryAsync;
 

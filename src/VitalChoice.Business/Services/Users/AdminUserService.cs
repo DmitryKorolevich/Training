@@ -36,8 +36,8 @@ namespace VitalChoice.Business.Services.Users
             IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IRepositoryAsync<AdminTeam> adminTeamRepository,
-            IUserValidator<ApplicationUser> userValidator, ITransactionAccessor<VitalChoiceContext> transactionAccessor) : 
-            base(userManager, roleManager, context, signInManager, appInfrastructureService, notificationService, options, ecommerceRepositoryAsync, userValidator, transactionAccessor)
+            IUserValidator<ApplicationUser> userValidator, ITransactionAccessor<VitalChoiceContext> transactionAccessor, ILoggerProviderExtended loggerProvider) : 
+            base(userManager, roleManager, context, signInManager, appInfrastructureService, notificationService, options, ecommerceRepositoryAsync, userValidator, transactionAccessor, loggerProvider)
 		{
             _adminProfileRepository = adminProfileRepository;
             _adminTeamRepository = adminTeamRepository;
