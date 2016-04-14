@@ -299,17 +299,17 @@ namespace VitalChoice.Caching.Services.Cache
             return Update((T) entity, context);
         }
 
-        //public void SetNull(IEnumerable<EntityKey> keys, RelationInfo relationInfo)
-        //{
-        //    var data = CacheStorage.GetCacheData(relationInfo);
-        //    data.SetNull(keys);
-        //}
+        public void SetNull(IEnumerable<EntityKey> keys, RelationInfo relationInfo)
+        {
+            var data = CacheStorage.GetCacheData(relationInfo);
+            data.SetNull(keys);
+        }
 
-        //public void SetNull(EntityKey key, RelationInfo relationInfo)
-        //{
-        //    var data = CacheStorage.GetCacheData(relationInfo);
-        //    data.SetNull(key);
-        //}
+        public void SetNull(EntityKey key, RelationInfo relationInfo)
+        {
+            var data = CacheStorage.GetCacheData(relationInfo);
+            data.SetNull(key);
+        }
 
         public bool UpdateAll(IEnumerable<object> entities, RelationInfo relationInfo)
         {

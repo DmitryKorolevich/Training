@@ -225,15 +225,15 @@ namespace VitalChoice.Caching.Services.Cache
 
         private bool UpdateEntityWithRelations(T entity, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities, CachedEntity<T> cached)
         {
-            if (_relationInfo.Relations.Any(r => r.Relations.Any()))
+            var oldEntity = cached.Entity;
+            TypeConverter.CopyInto(oldEntity, entity, typeof(T),
+                type => !type.GetTypeInfo().IsValueType && type != typeof(string));
+
+            if (!GetAllNormalizedAndTracked(entity, _relationInfo, trackedEntities))
             {
                 cached.NeedUpdate = true;
                 return false;
             }
-
-            var oldEntity = cached.Entity;
-            TypeConverter.CopyInto(oldEntity, entity, typeof(T),
-                type => !type.GetTypeInfo().IsValueType && type != typeof(string));
 
             var relatedObjects =
                 _relationInfo.Relations.Select(
@@ -250,16 +250,44 @@ namespace VitalChoice.Caching.Services.Cache
                 //Collection reference, update always if not null
                 if (relationReference == null)
                 {
+                    cached.NeedUpdateRelated.Remove(pair.Key.Name);
+                    pair.Key.SetRelatedObject(oldEntity, (newRelated as IEnumerable).Clone(pair.Key.RelationType));
+                }
+                else
+                {
+                    var newRelatedKey = relationReference.GetPrimaryKeyValue(entity);
+                    cached.NeedUpdateRelated.Remove(pair.Key.Name);
+                    pair.Key.SetRelatedObject(oldEntity, newRelatedKey.IsValid ? newRelated.Clone(pair.Key.RelationType) : null);
+                }
+            }
+
+            UpdateRelations(oldEntity);
+            return true;
+        }
+
+        private bool GetAllNormalizedAndTracked(object entity, RelationInfo relations, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities)
+        {
+            EntityInfo entityInfo;
+            if (!_infoStorage.GetEntityInfo(relations.RelationType, out entityInfo))
+            {
+                return false;
+            }
+            foreach (var relation in relations.Relations)
+            {
+                var newRelated = relation.GetRelatedObject(entity);
+                EntityRelationalReferenceInfo relationReference = null;
+                entityInfo.RelationReferences?.TryGetValue(relation.Name, out relationReference);
+
+                if (relationReference == null)
+                {
                     if (!(newRelated is IEnumerable<object>))
                     {
-                        cached.NeedUpdate = true;
                         return false;
                     }
-                    var pkInfo = _infoStorage.GetPrimaryKeyInfo(pair.Key.RelationType);
+                    var pkInfo = _infoStorage.GetPrimaryKeyInfo(relation.RelationType);
                     var newItems = newRelated as IEnumerable<object>;
                     if (pkInfo == null)
                     {
-                        cached.NeedUpdate = true;
                         return false;
                     }
                     foreach (var newItem in newItems)
@@ -267,26 +295,25 @@ namespace VitalChoice.Caching.Services.Cache
                         var pk = pkInfo.GetPrimaryKeyValue(newItem);
                         if (!pk.IsValid)
                         {
-                            cached.NeedUpdate = true;
                             return false;
                         }
                         if (trackedEntities != null)
                         {
                             EntityEntry entry;
-                            if (!trackedEntities.TryGetValue(new TrackedEntityKey(pair.Key.RelationType, pk), out entry))
+                            if (!trackedEntities.TryGetValue(new TrackedEntityKey(relation.RelationType, pk), out entry))
                             {
-                                cached.NeedUpdate = true;
                                 return false;
                             }
-                            if (entry.State != EntityState.Unchanged && entry.State != EntityState.Detached && entry.Entity != newItem)
+                            if (entry.State == EntityState.Detached || entry.Entity != newItem)
                             {
-                                cached.NeedUpdate = true;
                                 return false;
                             }
                         }
+                        if (!GetAllNormalizedAndTracked(newItem, relation, trackedEntities))
+                        {
+                            return false;
+                        }
                     }
-                    cached.NeedUpdateRelated.Remove(pair.Key.Name);
-                    pair.Key.SetRelatedObject(oldEntity, (newRelated as IEnumerable).Clone(pair.Key.RelationType));
                 }
                 else
                 {
@@ -295,39 +322,41 @@ namespace VitalChoice.Caching.Services.Cache
                     {
                         if (newRelated == null)
                         {
-                            cached.NeedUpdate = true;
                             return false;
                         }
                         if (trackedEntities != null)
                         {
                             EntityEntry entry;
-                            if (!trackedEntities.TryGetValue(new TrackedEntityKey(pair.Key.RelationType, newRelatedKey), out entry))
+                            if (!trackedEntities.TryGetValue(new TrackedEntityKey(relation.RelationType, newRelatedKey), out entry))
                             {
-                                cached.NeedUpdate = true;
                                 return false;
                             }
-                            if (entry.State != EntityState.Unchanged && entry.State != EntityState.Detached && entry.Entity != newRelated)
+                            if (entry.State == EntityState.Detached || entry.Entity != newRelated)
                             {
-                                cached.NeedUpdate = true;
                                 return false;
                             }
                         }
-                        pair.Key.SetRelatedObject(oldEntity, newRelated.Clone(pair.Key.RelationType));
+                        if (!GetAllNormalizedAndTracked(newRelated, relation, trackedEntities))
+                        {
+                            return false;
+                        }
                     }
-                    else
-                    {
-                        pair.Key.SetRelatedObject(oldEntity, null);
-                    }
-                    cached.NeedUpdateRelated.Remove(pair.Key.Name);
                 }
             }
-            UpdateRelations(oldEntity);
             return true;
         }
 
         public bool Update(IEnumerable<T> entities)
         {
-            return entities.Aggregate(true, (current, next) => current && Update(next) != null);
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (var entity in entities)
+            {
+                if (Update(entity) == null)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         public bool UpdateAll(IEnumerable<T> entities)
@@ -339,23 +368,23 @@ namespace VitalChoice.Caching.Services.Cache
             return result;
         }
 
-        //public void SetNull(EntityKey pk)
-        //{
-        //    if (pk == null)
-        //        return;
-        //    lock (_lockObj)
-        //    {
-        //        _mainCluster.Update(pk, new CachedEntity<T>(default(T), this));
-        //    }
-        //}
+        public void SetNull(EntityKey pk)
+        {
+            if (pk == null)
+                return;
+            lock (_lockObj)
+            {
+                _mainCluster.Update(pk, new CachedEntity<T>(default(T), this));
+            }
+        }
 
-        //public void SetNull(IEnumerable<EntityKey> keys)
-        //{
-        //    foreach (var key in keys)
-        //    {
-        //        SetNull(key);
-        //    }
-        //}
+        public void SetNull(IEnumerable<EntityKey> keys)
+        {
+            foreach (var key in keys)
+            {
+                SetNull(key);
+            }
+        }
 
         public bool FullCollection { get; private set; }
 
@@ -385,9 +414,10 @@ namespace VitalChoice.Caching.Services.Cache
                 var elementType = objType.TryGetElementType(typeof (ICollection<>));
                 if (elementType != null)
                 {
+                    if (!(obj is IEnumerable))
+                        continue;
+
                     var cache = _cacheFactory.GetCache(elementType);
-                    // ReSharper disable once PossibleNullReferenceException
-                    // ReSharper disable once LoopCanBeConvertedToQuery
                     var data = cache.GetCacheData(relation);
                     foreach (var item in obj as IEnumerable)
                     {
