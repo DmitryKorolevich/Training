@@ -129,7 +129,7 @@ namespace VC.Admin.Controllers
 			user.FirstName = userModel.FirstName;
 			user.LastName = userModel.LastName;
 			user.Profile.AgentId = userModel.AgentId;
-		    user.Profile.IdAdminTeam = userModel.IdAdminTeam;
+            user.Profile.IdAdminTeam = userModel.IdAdminTeam;
             user.Status = userModel.Status;
 			user.Email = userModel.Email;
 			user.UserName = userModel.Email;
