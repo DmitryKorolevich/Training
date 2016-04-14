@@ -875,7 +875,7 @@ namespace VitalChoice.Business.Services.Orders
 				    await _vAutoShipRepository.Query(
 					    x =>
 						    x.AutoShipFrequency == frequency &&
-						    x.LastAutoShipDate.HasValue && x.LastAutoShipDate.Value.Day == tempDate.Day && x.LastAutoShipDate.Value.Year == tempDate.Year && x.LastAutoShipDate.Value.Month == tempDate.Month).SelectAsync(x=>x.Id);
+						    x.LastAutoShipDate.HasValue && x.LastAutoShipDate.Value.Day <= tempDate.Day && x.LastAutoShipDate.Value.Year <= tempDate.Year && x.LastAutoShipDate.Value.Month <= tempDate.Month).SelectAsync(x=>x.Id);
 
 			    if (vAutoShips.Any())
 			    {

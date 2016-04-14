@@ -642,7 +642,7 @@ namespace VitalChoice.Business.Services.Customers
                     transaction.Commit();
 
                 }
-                catch
+                catch(Exception ex)
                 {
                     transaction.Rollback();
                     throw;
