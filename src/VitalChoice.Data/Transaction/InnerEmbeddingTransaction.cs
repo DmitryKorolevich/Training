@@ -53,7 +53,14 @@ namespace VitalChoice.Data.Transaction
             if (_referenceCount > 0)
             {
                 _referenceCount = 0;
-                _transaction.Rollback();
+                try
+                {
+                    _transaction.Rollback();
+                }
+                catch (Exception e)
+                {
+                    
+                }
                 OnTransactionRollback();
             }
         }

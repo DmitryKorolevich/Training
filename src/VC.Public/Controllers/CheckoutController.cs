@@ -27,6 +27,7 @@ using VitalChoice.Interfaces.Services.Users;
 using System.Linq;
 using System.Reflection;
 using Microsoft.AspNet.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Services.Bronto;
 using VitalChoice.Core.Services;
@@ -60,6 +61,7 @@ namespace VC.Public.Controllers
         private readonly BrontoService _brontoService;
         private readonly ITransactionAccessor<EcommerceContext> _transactionAccessor;
         private readonly IAffiliateService _affiliateService;
+        private readonly ILogger _logger;
 
         public CheckoutController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
             ICustomerService customerService,
@@ -73,7 +75,7 @@ namespace VC.Public.Controllers
             ICountryService countryService,
             BrontoService brontoService,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
-            IPageResultService pageResultService, ISettingService settingService)
+            IPageResultService pageResultService, ISettingService settingService, ILoggerProviderExtended loggerProvider)
             : base(
                 contextAccessor, customerService, infrastructureService, authorizationService, checkoutService, orderService,
                 skuMapper, productMapper, pageResultService, settingService)
@@ -88,6 +90,7 @@ namespace VC.Public.Controllers
             _transactionAccessor = transactionAccessor;
             _affiliateService = affiliateService;
             _appInfrastructure = appInfrastructureService.Get();
+            _logger = loggerProvider.CreateLoggerDefault();
         }
 
         public async Task<IActionResult> Welcome(bool forgot = false)
@@ -341,8 +344,9 @@ namespace VC.Public.Controllers
                     }
                     throw new AppValidationException(newMessages);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    _logger.LogError(e.Message, e);
                     transaction.Rollback();
                     if (loginTask != null)
                     {
@@ -459,7 +463,7 @@ namespace VC.Public.Controllers
                                     _addressConverter.ToModel<AddUpdateShippingMethodModel>(cart.Order.PaymentMethod.Address),
                                     (int) AddressType.Shipping);
 							cart.Order.Data.DeliveryInstructions = model.DeliveryInstructions;
-							cart.Order.Data.PreferredShipMethod = model.PreferredShipMethod;
+							cart.Order.Data.PreferredShipMethod = PreferredShipMethod.Best;
 							cart.Order.Data.AddressType = model.AddressType;
 						}
                         else
@@ -476,8 +480,8 @@ namespace VC.Public.Controllers
                                 _addressConverter.ToModel<AddUpdateShippingMethodModel>(cart.Order.PaymentMethod.Address),
                                 cart.Order.ShippingAddress, (int) AddressType.Shipping, false);
 							cart.Order.Data.DeliveryInstructions = model.DeliveryInstructions;
-							cart.Order.Data.PreferredShipMethod = model.PreferredShipMethod;
-							cart.Order.Data.AddressType = model.AddressType;
+                            cart.Order.Data.PreferredShipMethod = PreferredShipMethod.Best;
+                            cart.Order.Data.AddressType = model.AddressType;
 						}
                         else
                         {

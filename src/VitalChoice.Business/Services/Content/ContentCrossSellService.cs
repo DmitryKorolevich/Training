@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
@@ -15,6 +16,7 @@ using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Content;
 using VitalChoice.Infrastructure.Domain.Content.ContentCrossSells;
+using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Interfaces.Services.Products;
 
@@ -25,12 +27,15 @@ namespace VitalChoice.Business.Services.Content
 		private readonly IRepositoryAsync<ContentCrossSell> _repository;
 		private readonly IOptions<AppOptionsBase> _options;
 		private readonly IRepositoryAsync<Sku> _skuRepositoryAsync;
+	    private readonly ILogger _logger;
 
-		public ContentCrossSellService(IRepositoryAsync<ContentCrossSell> repository, IOptions<AppOptionsBase> options, IEcommerceRepositoryAsync<Sku> skuRepositoryAsync)
+		public ContentCrossSellService(IRepositoryAsync<ContentCrossSell> repository, IOptions<AppOptionsBase> options, IEcommerceRepositoryAsync<Sku> skuRepositoryAsync, ILoggerProviderExtended loggerProvider)
 		{
 			_repository = repository;
 			_options = options;
 			_skuRepositoryAsync = skuRepositoryAsync;
+		    _logger = loggerProvider.CreateLoggerDefault();
+
 		}
 
 		public async Task<IList<ContentCrossSell>> GetContentCrossSellsAsync(ContentCrossSellType type)
@@ -89,9 +94,10 @@ namespace VitalChoice.Business.Services.Content
 							transaction.Commit();
 						}
 					}
-					catch (Exception)
-					{
-						transaction.Rollback();
+                    catch (Exception e)
+                    {
+                        _logger.LogError(e.Message, e);
+                        transaction.Rollback();
 						throw;
 					}
 				}

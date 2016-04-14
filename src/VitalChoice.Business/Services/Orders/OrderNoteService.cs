@@ -180,9 +180,10 @@ namespace VitalChoice.Business.Services.Orders
 
 					transaction.Commit();
 				}
-				catch (Exception)
-				{
-					transaction.Rollback();
+                catch (Exception e)
+                {
+                    _logger.LogError(e.Message, e);
+                    transaction.Rollback();
 					throw;
 				}
 			}

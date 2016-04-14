@@ -642,8 +642,9 @@ namespace VitalChoice.Business.Services.Customers
                     transaction.Commit();
 
                 }
-                catch(Exception ex)
+                catch (Exception e)
                 {
+                    Logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -725,8 +726,9 @@ namespace VitalChoice.Business.Services.Customers
 
                     transaction.Commit();
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.LogError(e.Message, e);
                     if (appUser.Id > 0)
                     {
                         await _storefrontUserService.DeleteAsync(appUser);
@@ -795,9 +797,9 @@ namespace VitalChoice.Business.Services.Customers
 					tran.Commit();
 
 				}
-			    catch (Exception)
-			    {
-					tran.Rollback();
+                catch (Exception e)
+                {
+                    Logger.LogError(e.Message, e);
 				    if (customerUpdated) //this needs to be done since distributed transactions not supported yet
 						//todo: refactor this once distributed transactions arrive
 				    {
@@ -807,7 +809,8 @@ namespace VitalChoice.Business.Services.Customers
 
 						await _storefrontUserService.UpdateAsync(applicationUser);
 					}
-				    throw;
+                    tran.Rollback();
+                    throw;
 			    }
 		    }
 

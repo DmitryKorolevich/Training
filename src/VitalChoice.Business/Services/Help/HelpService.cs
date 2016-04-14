@@ -226,8 +226,9 @@ namespace VitalChoice.Business.Services.HelpService
 
                     transaction.Commit();
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    _logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -328,8 +329,9 @@ namespace VitalChoice.Business.Services.HelpService
 
                     transaction.Commit();
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    _logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -580,8 +582,9 @@ namespace VitalChoice.Business.Services.HelpService
 
                     transaction.Commit();
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    _logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -691,6 +694,7 @@ namespace VitalChoice.Business.Services.HelpService
                 }
                 catch (Exception e)
                 {
+                    _logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }

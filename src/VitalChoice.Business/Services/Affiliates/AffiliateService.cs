@@ -18,6 +18,7 @@ using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.DynamicData.Helpers;
 using System.Globalization;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Queries.Affiliates;
 using VitalChoice.Business.Queries.Customers;
 using VitalChoice.Business.Services.Ecommerce;
@@ -269,8 +270,9 @@ namespace VitalChoice.Business.Services.Affiliates
                     transaction.Commit();
                     return toReturn;
                 }
-                catch
+                catch(Exception e)
                 {
+                    Logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -344,8 +346,9 @@ namespace VitalChoice.Business.Services.Affiliates
 
                     return affiliate;
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.LogError(e.Message, e);
                     if (appUser.Id > 0)
                     {
                         await _affiliateUserService.DeleteAsync(appUser);
@@ -412,8 +415,9 @@ namespace VitalChoice.Business.Services.Affiliates
 
                     return affiliate;
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    Logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -552,8 +556,9 @@ namespace VitalChoice.Business.Services.Affiliates
 
                         transaction.Commit();
                     }
-                    catch
+                    catch (Exception e)
                     {
+                        Logger.LogError(e.Message, e);
                         transaction.Rollback();
                         throw;
                     }

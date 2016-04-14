@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.OptionsModel;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.OptionsModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -723,8 +724,9 @@ namespace VitalChoice.Business.Services.Products
 
                     return product;
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -769,8 +771,9 @@ namespace VitalChoice.Business.Services.Products
                     return product;
 
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
