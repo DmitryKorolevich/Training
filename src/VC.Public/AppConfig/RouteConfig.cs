@@ -96,6 +96,11 @@ namespace VC.Public.AppConfig
                 defaults: new { controller = "Recipe", action = "EditMasterContent" });
 
             routeBuilder.MapRoute(
+                name: "GoogleProductsFeed",
+                template: "google/datafeed.csv",
+                defaults: new { controller = "Help", action = "GoogleProductsFeed" });
+
+            routeBuilder.MapRoute(
                 name: "Default",
                 template: "{controller}/{action}/{id?}",
                 defaults: new { controller = "Home", action = "Index" });

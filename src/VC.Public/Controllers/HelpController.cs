@@ -34,6 +34,7 @@ using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Routing;
 using Microsoft.AspNet.Mvc.Abstractions;
 using System.Net;
+using Microsoft.Net.Http.Headers;
 using VitalChoice.Business.Models.Help;
 using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Mail;
@@ -213,6 +214,19 @@ namespace VC.Public.Controllers
             }
 
             return PartialView("_SendContentUrlNotificationInner", model);
+        }
+
+        public async Task<FileResult> GoogleProductsFeed()
+        {
+            var data =new byte[0];
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.REGIONAL_SALES_STATISTIC, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(data, "text/csv");
         }
     }
 }

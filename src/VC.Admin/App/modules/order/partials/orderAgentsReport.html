@@ -47,8 +47,8 @@
         </form>
         <spinner-overlay data-loading="refreshTracker.active()">
             <div class="margin-bottom-30px" data-ng-repeat="period in report.Periods">
-                <span data-ng-if="report.FrequencyType==1" class="legend">{{period.From | date:"MM/dd/yy"}}</span>
-                <span data-ng-if="report.FrequencyType!=1" class="legend">{{period.From | date:"MM/dd/yy"}} - {{period.To | date:"MM/dd/yy"}}</span>
+                <span data-ng-if="report.FrequencyType==1" class="legend dates">{{period.From | date:"MM/dd/yy"}}</span>
+                <span data-ng-if="report.FrequencyType!=1" class="legend dates">{{period.From | date:"MM/dd/yy"}} - {{period.To | date:"MM/dd/yy"}}</span>
                 <div>
                     <div data-ng-repeat="team in period.Teams">
                         <span data-ng-if="team.AdminTeamName" class="legend">{{team.AdminTeamName}}</span>

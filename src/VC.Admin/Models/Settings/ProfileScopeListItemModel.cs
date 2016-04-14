@@ -12,7 +12,7 @@ namespace VC.Admin.Models.Settings
 
         public string ShortData { get; set; }
 
-        public long TimeElapsed { get; set; }
+        public double TimeElapsed { get; set; }
 
         public string MethodName { get; set; }
 
@@ -29,7 +29,7 @@ namespace VC.Admin.Models.Settings
                     ? Data.Substring(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
                     : Data;
                 ClassTypeName = item.ClassType.FullName;
-                TimeElapsed = (long)Math.Round(item.TimeElapsed.TotalMilliseconds);
+                TimeElapsed = item.TimeElapsed.TotalMilliseconds;
                 MethodName = item.MethodName;
                 SubScopes = item.SubScopes?.Select(p => new ProfileScopeListItemModel(p)).ToList() ?? new List<ProfileScopeListItemModel>();
             }

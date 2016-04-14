@@ -326,8 +326,11 @@
                                             <div class="form-group">
                                                 <label for="tax_code" class="col-md-3 control-label">Tax Code</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" name="TaxCode" class="form-control" placeholder="Tax Code" data-ng-model="product.TaxCode">
+                                                    <input type="text" name="TaxCode" class="form-control" placeholder="Tax Code" data-ng-model="product.TaxCode" data-ng-minlength="8" data-ng-maxlength="8" data-ng-pattern="/^((?!([pP]0000000))[\da-zA-Z])*$/">
                                                     <div class="error-container" ng-show="forms.submitted && forms.parentDetails.TaxCode.$invalid">
+                                                        <small class="error" ng-show="forms.parentDetails.TaxCode.$error.minlength">Tax Code should be 8 characters long</small>
+                                                        <small class="error" ng-show="forms.parentDetails.TaxCode.$error.maxlength">Tax Code should be 8 characters long</small>
+                                                        <small class="error" ng-show="forms.parentDetails.TaxCode.$error.pattern">Tax Code should be alphanumeric(P0000000 isn't allowed)</small>
                                                         <small class="error" ng-show="forms.parentDetails.TaxCode.$error.server">{{serverMessages.GetMessage('TaxCode')}}</small>
                                                     </div>
                                                 </div>
