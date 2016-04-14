@@ -40,6 +40,7 @@ using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
+using VitalChoice.Interfaces.Services.Affiliates;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.SharedWeb.Helpers;
 using VitalChoice.Validation.Models;
@@ -58,9 +59,11 @@ namespace VC.Public.Controllers
         private readonly ICountryService _countryService;
         private readonly BrontoService _brontoService;
         private readonly ITransactionAccessor<EcommerceContext> _transactionAccessor;
+        private readonly IAffiliateService _affiliateService;
 
         public CheckoutController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
             ICustomerService customerService,
+            IAffiliateService affiliateService,
             IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter,
             IOrderService orderService, IProductService productService, IAppInfrastructureService infrastructureService,
             IAuthorizationService authorizationService, ICheckoutService checkoutService,
@@ -83,6 +86,7 @@ namespace VC.Public.Controllers
             _countryService = countryService;
             _brontoService = brontoService;
             _transactionAccessor = transactionAccessor;
+            _affiliateService = affiliateService;
             _appInfrastructure = appInfrastructureService.Get();
         }
 
@@ -797,6 +801,21 @@ namespace VC.Public.Controllers
             shipping.Id = 0;
             shipping.Data.Default = true;
             newCustomer.ShippingAddresses = new List<AddressDynamic> {shipping};
+
+            var cookies = Request.Cookies[AffiliateConstants.AffiliatePublicIdParam];
+            if (!String.IsNullOrEmpty(cookies))
+            {
+                int idAffiliate = 0;
+                if (Int32.TryParse(cookies, out idAffiliate))
+                {
+                    var affiliate = await _affiliateService.SelectAsync(idAffiliate);
+                    if (affiliate != null)
+                    {
+                        newCustomer.IdAffiliate = affiliate.Id;
+                    }
+                }
+            }
+
             newCustomer =
                 await CustomerService.InsertAsync(newCustomer, model.GuestCheckout ? null : model.Password);
             return newCustomer;

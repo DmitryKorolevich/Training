@@ -17,8 +17,6 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 
         public DateTime To { get; set; }
 
-        public FrequencyType FrequencyType { get; set; }
-
         public ICollection<OrdersAgentReportTeamItem> Teams { get; set; }
 
         public int OrdersCount { get; set; }

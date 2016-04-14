@@ -22,16 +22,7 @@
                             Order Number
                         </th>
                         <th class="align-right">
-                            Product Total
-                        </th>
-                        <th class="align-right">
-                            Order Total
-                        </th>
-                        <th class="align-right">
-                            Shipping
-                        </th>
-                        <th class="align-right">
-                            Tax
+                            Discounted Subtotal
                         </th>
 						<th class="align-right">
                             Commission
@@ -41,7 +32,7 @@
 				<tbody>
                 @if (Model.Any())
                 {
-					@foreach (var item in Model)
+					foreach (var item in Model)
 					{
 						<tr>
 							<td>@item.DateCreated.ToString("MM/yyyy")</td>
@@ -52,10 +43,7 @@
                                     <span class="note">*</span>
                                 }
                             </td>
-                            <td class="align-right">@item.ProductTotal.ToString("C2")</td>
-                            <td class="align-right">@item.OrderTotal.ToString("C2")</td>
-                            <td class="align-right">@item.Shipping.ToString("C2")</td>
-                            <td class="align-right">@item.Tax.ToString("C2")</td>
+                            <td class="align-right">@item.DiscountedProductsSubtotal.ToString("C2")</td>
                             <td class="align-right">@item.Commission.ToString("C2")</td>
 						</tr>
 					}	

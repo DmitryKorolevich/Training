@@ -15,6 +15,7 @@ angular.module('app.modules.setting', [
 	'app.modules.setting.controllers.errorDetailsController',
 	'app.modules.setting.controllers.lookupsController',
 	'app.modules.setting.controllers.lookupDetailController',
+	'app.modules.setting.controllers.profileScopesController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -25,6 +26,11 @@ angular.module('app.modules.setting', [
 					url: '/settings/logs',
 					templateUrl: 'app/modules/setting/partials/logsList.html',
 					controller: 'logsController'
+				})
+				.state('index.oneCol.manageProfileScopes', {
+				    url: '/settings/profile-scopes',
+				    templateUrl: 'app/modules/setting/partials/profileScopesList.html',
+				    controller: 'profileScopesController'
 				})
 				.state('index.oneCol.manageCountries', {
 					url: '/settings/countries',

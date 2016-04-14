@@ -1,0 +1,25 @@
+﻿<div class="container-fluid profile-scopes">
+    <div class="well categories">
+        <span class="legend">Profile Scopes</span>
+        <spinner-overlay data-loading="refreshTracker.active()">
+            <button data-ng-if="!categoriesExpanded" data-ng-click="updateCategoriesCollapsed(true);" class="btn btn-primary btn-xs expand-button">Expand All</button>
+            <button data-ng-if="categoriesExpanded" data-ng-click="updateCategoriesCollapsed(false);" class="btn btn-primary btn-xs expand-button">Collapse All</button>
+            <div ui-tree data-drag-enabled="false" class="ya-treeview">
+                <ol ui-tree-nodes data-ng-model="options.Items">
+                    <li ng-repeat="item in options.Items" collapsed="true" ui-tree-node data-ng-include="'app/modules/setting/partials/profileScopeListItem.html'">
+                    </li>
+                </ol>
+            </div>
+        </spinner-overlay>
+        <pagination boundary-links="true"
+                    total-items="totalItems"
+                    items-per-page="filter.Paging.PageItemCount"
+                    data-ng-model="filter.Paging.PageIndex"
+                    previous-text="&lsaquo;"
+                    next-text="&rsaquo;"
+                    first-text="&laquo;"
+                    last-text="&raquo;"
+                    data-ng-change="pageChanged()">
+        </pagination>
+    </div>
+</div>

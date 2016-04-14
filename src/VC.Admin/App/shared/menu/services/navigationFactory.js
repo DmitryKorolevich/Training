@@ -96,7 +96,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				    name: 'operations',
 				    stateLabel: 'Operations',
 				    subMenu: [
-                        { name: 'orderAgentsStatistic', stateName: 'index.oneCol.orderAgentsStatistic', stateLabel: 'Agents Report', access: 3 },
+                        { name: 'orderAgentsStatistic', stateName: 'index.oneCol.orderAgentsStatistic', stateLabel: 'Agents Report', access: null },
                         { name: 'index.oneCol.serviceCodesStatistic', stateName: 'index.oneCol.serviceCodesStatistic', stateLabel: 'Service Codes Report', access: 3 },
                         //{ name: 'productQualityIssuesReport', stateName: 'index.oneCol.productQualityIssuesReport', stateLabel: 'Product Quality Issues Report', access: 3 },
                         //{ name: 'kPIReport', stateName: 'index.oneCol.kPIReport', stateLabel: 'KPI Report (APIs)', access: 3 },
@@ -169,7 +169,8 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			subMenu: [
 				{ name: 'manageBugTickets', stateName: 'index.oneCol.manageBugTickets', stateLabel: 'Manage Bug Tickets', access: 11 },
 				//{ name: 'viewWiki', stateName: 'index.oneCol.viewWiki', stateLabel: 'View Wiki', access: 11 },
-				{ name: 'viewLogs', stateName: 'index.oneCol.manageLogs', stateLabel: 'View Logs', access: 10 }
+				{ name: 'manageLogs', stateName: 'index.oneCol.manageLogs', stateLabel: 'View Logs', access: 10 },
+			    { name: 'manageProfileScopes', stateName: 'index.oneCol.manageProfileScopes', stateLabel: 'Profile Scopes', access: 10 }
 			]
 		}
 	];

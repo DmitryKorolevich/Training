@@ -31,10 +31,10 @@
                     <div class="col-md-3">
                         <select class="form-control" name="FrequencyType" data-ng-model="filter.FrequencyType" ng-options="item.Key as item.Text for item in frequencyTypes"></select>
                     </div>
-                    <div class="col-md-3">
+                    <div data-ng-if="options.allowSeeFullReport" class="col-md-3">
                         <select class="form-control" name="IdAdminTeam" data-ng-model="filter.IdAdminTeam" data-ng-change="idAdminTeamChanged()" ng-options="item.Id as item.Name for item in teams"></select>
                     </div>
-                    <div class="col-md-3">
+                    <div data-ng-if="options.allowSeeFullReport" class="col-md-3">
                         <select class="form-control" name="IdAdmin" data-ng-model="filter.IdAdmin" data-ng-change="idAdminChanged()" ng-options="item.Id as item.AgentId for item in admins"></select>
                     </div>
                 </div>
@@ -45,9 +45,164 @@
                 </div>
             </fieldset>
         </form>
-        <hr />
         <spinner-overlay data-loading="refreshTracker.active()">
-            
+            <div class="margin-bottom-30px" data-ng-repeat="period in report.Periods">
+                <span data-ng-if="report.FrequencyType==1" class="legend">{{period.From | date:"MM/dd/yy"}}</span>
+                <span data-ng-if="report.FrequencyType!=1" class="legend">{{period.From | date:"MM/dd/yy"}} - {{period.To | date:"MM/dd/yy"}}</span>
+                <div>
+                    <div data-ng-repeat="team in period.Teams">
+                        <span data-ng-if="team.AdminTeamName" class="legend">{{team.AdminTeamName}}</span>
+                        <table data-ng-if="team.Agents.length>0" class="table table-striped agents">
+                            <thead>
+                                <tr>
+                                    <th class="sortable-column" data-ng-click="team.Sorting.applySort('AgentId')">
+                                        <span>Agent</span>
+                                        <span data-ng-if="team.Sorting.Path == 'AgentId'">
+                                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="team.Sorting.SortOrder == 'Asc'"></i>
+                                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="team.Sorting.SortOrder == 'Desc'"></i>
+                                        </span>
+                                    </th>
+                                    <th class="sortable-column" data-ng-click="team.Sorting.applySort('OrdersCount')">
+                                        <span># of Orders</span>
+                                        <span data-ng-if="team.Sorting.Path == 'OrdersCount'">
+                                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="team.Sorting.SortOrder == 'Asc'"></i>
+                                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="team.Sorting.SortOrder == 'Desc'"></i>
+                                        </span>
+                                    </th>
+                                    <th class="sortable-column" data-ng-click="team.Sorting.applySort('TotalOrdersAmount')">
+                                        <span>Total Order Value</span>
+                                        <span data-ng-if="team.Sorting.Path == 'TotalOrdersAmount'">
+                                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="team.Sorting.SortOrder == 'Asc'"></i>
+                                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="team.Sorting.SortOrder == 'Desc'"></i>
+                                        </span>
+                                    </th>
+                                    <th class="sortable-column" data-ng-click="team.Sorting.applySort('AverageOrdersAmount')">
+                                        <span>Average Order Value</span>
+                                        <span data-ng-if="team.Sorting.Path == 'AverageOrdersAmount'">
+                                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="team.Sorting.SortOrder == 'Asc'"></i>
+                                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="team.Sorting.SortOrder == 'Desc'"></i>
+                                        </span>
+                                    </th>
+                                    <th class="sortable-column" data-ng-click="team.Sorting.applySort('LowestOrderAmount')">
+                                        <span>Lowest Order Value</span>
+                                        <span data-ng-if="team.Sorting.Path == 'LowestOrderAmount'">
+                                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="team.Sorting.SortOrder == 'Asc'"></i>
+                                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="team.Sorting.SortOrder == 'Desc'"></i>
+                                        </span>
+                                    </th>
+                                    <th class="sortable-column" data-ng-click="team.Sorting.applySort('HighestOrderAmount')">
+                                        <span>Highest Order Value</span>
+                                        <span data-ng-if="team.Sorting.Path == 'HighestOrderAmount'">
+                                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="team.Sorting.SortOrder == 'Asc'"></i>
+                                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="team.Sorting.SortOrder == 'Desc'"></i>
+                                        </span>
+                                    </th>
+                                    <th class="sortable-column" data-ng-click="team.Sorting.applySort('RefundsCount')">
+                                        <span># Refunds</span>
+                                        <span data-ng-if="team.Sorting.Path == 'RefundsCount'">
+                                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="team.Sorting.SortOrder == 'Asc'"></i>
+                                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="team.Sorting.SortOrder == 'Desc'"></i>
+                                        </span>
+                                    </th>
+                                    <th class="sortable-column" data-ng-click="team.Sorting.applySort('ReshipsCount')">
+                                        <span># Reships</span>
+                                        <span data-ng-if="team.Sorting.Path == 'ReshipsCount'">
+                                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="team.Sorting.SortOrder == 'Asc'"></i>
+                                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="team.Sorting.SortOrder == 'Desc'"></i>
+                                        </span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr data-ng-repeat="agent in team.Agents">
+                                    <td class="agent">{{agent.AgentId}}</td>
+                                    <td class="orders-count">{{agent.OrdersCount}}</td>
+                                    <td class="orders-total-amount">{{agent.TotalOrdersAmount | currency}}</td>
+                                    <td class="orders-average-amount">{{agent.AverageOrdersAmount | currency}}</td>
+                                    <td class="orders-lowest-amount">{{agent.LowestOrderAmount | currency}}</td>
+                                    <td class="orders-highest-amount">{{agent.HighestOrderAmount | currency}}</td>
+                                    <td class="refunds">{{agent.RefundsCount}}</td>
+                                    <td class="reships">{{agent.ReshipsCount}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table data-ng-if="options.allowSeeFullReport && !report.IdAdmin" class="table table-striped team-total">
+                            <tbody>
+                                <tr>
+                                    <td class="agent"><strong>Team Total</strong></td>
+                                    <td class="orders-count"><strong>{{team.OrdersCount}}</strong></td>
+                                    <td class="orders-total-amount"><strong>{{team.TotalOrdersAmount | currency}}</strong></td>
+                                    <td class="orders-average-amount"><strong>{{team.AverageOrdersAmount | currency}}</strong></td>
+                                    <td class="orders-lowest-amount"><strong>{{team.LowestOrderAmount | currency}}</strong></td>
+                                    <td class="orders-highest-amount"><strong>{{team.HighestOrderAmount | currency}}</strong></td>
+                                    <td class="refunds"><strong>{{team.RefundsCount}}</strong></td>
+                                    <td class="reships"><strong>{{team.ReshipsCount}}</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table data-ng-if="options.allowSeeFullReport" class="table table-striped team-diff">
+                            <tbody>
+                                <tr>
+                                    <td class="agent">% of total phone orders</td>
+                                    <td class="orders-count">{{team.AgentOrdersPercent}}%</td>
+                                    <td class="orders-total-amount"></td>
+                                    <td data-ng-if="team.AverageOrdersAmountDifference>=0" class="orders-average-amount">{{team.AverageOrdersAmountDifference | currency}}</td>
+                                    <td data-ng-if="team.AverageOrdersAmountDifference<0" class="orders-average-amount">({{Math.abs(team.AverageOrdersAmountDifference) | currency}})</td>
+                                    <td class="orders-lowest-amount"></td>
+                                    <td class="orders-highest-amount"></td>
+                                    <td class="refunds"></td>
+                                    <td class="reships"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div data-ng-if="options.allowSeeFullReport" class="margin-top-30px">
+                    <table class="table table-striped all-teams-total">
+                        <tbody>
+                            <tr>
+                                <td class="agent"><strong>Overall Teams Total(phone orders)</strong></td>
+                                <td class="orders-count"><strong>{{period.OrdersCount}}</strong></td>
+                                <td class="orders-total-amount"><strong>{{period.TotalOrdersAmount | currency}}</strong></td>
+                                <td class="orders-average-amount"><strong>{{period.AverageOrdersAmount | currency}}</strong></td>
+                                <td class="orders-lowest-amount"><strong>{{period.LowestOrderAmount | currency}}</strong></td>
+                                <td class="orders-highest-amount"><strong>{{period.HighestOrderAmount | currency}}</strong></td>
+                                <td class="refunds"><strong>{{period.RefundsCount}}</strong></td>
+                                <td class="reships"><strong>{{period.ReshipsCount}}</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class="table table-striped all-teams-diff">
+                        <tbody>
+                            <tr>
+                                <td class="agent">% of total orders</td>
+                                <td class="orders-count">{{period.AgentOrdersPercent}}%</td>
+                                <td class="orders-total-amount"></td>
+                                <td data-ng-if="period.AverageOrdersAmountDifference>=0" class="orders-average-amount">{{period.AverageOrdersAmountDifference | currency}}</td>
+                                <td data-ng-if="period.AverageOrdersAmountDifference<0" class="orders-average-amount">({{Math.abs(period.AverageOrdersAmountDifference) | currency}})</td>
+                                <td class="orders-lowest-amount"></td>
+                                <td class="orders-highest-amount"></td>
+                                <td class="refunds"></td>
+                                <td class="reships"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class="table table-striped all-total">
+                        <tbody>
+                            <tr>
+                                <td class="agent"><strong>Total Orders</strong></td>
+                                <td class="orders-count"><strong>{{period.AllOrdersCount}}</strong></td>
+                                <td class="orders-total-amount"><strong>{{period.AllTotalOrdersAmount | currency}}</strong></td>
+                                <td class="orders-average-amount"><strong>{{period.AllAverageOrdersAmount | currency}}</strong></td>
+                                <td class="orders-lowest-amount"><strong>{{period.AllLowestOrderAmount | currency}}</strong></td>
+                                <td class="orders-highest-amount"><strong>{{period.AllHighestOrderAmount | currency}}</strong></td>
+                                <td class="refunds"><strong>{{period.AllRefundsCount}}</strong></td>
+                                <td class="reships"><strong>{{period.AllReshipsCount}}</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </spinner-overlay>
     </div>
 </div>

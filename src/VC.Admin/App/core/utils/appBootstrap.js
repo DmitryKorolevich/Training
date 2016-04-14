@@ -66,7 +66,8 @@ angular.module('app.core.utils.appBootstrap', [])
 	        var result = false;
 	        if (menuItem && menuItem.subMenu) {
 	            $.each(menuItem.subMenu, function (index, subMenuItem) {
-	                if ($rootScope.currentUser.Permissions.indexOf(subMenuItem.access) > -1) {
+	                if (subMenuItem.access ==null || $rootScope.currentUser.Permissions.indexOf(subMenuItem.access) > -1)
+	                {
 	                    result = true;
 	                    return false;
 	                }

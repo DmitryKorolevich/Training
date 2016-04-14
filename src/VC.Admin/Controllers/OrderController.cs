@@ -50,6 +50,7 @@ using VitalChoice.SharedWeb.Models.Orders;
 using VitalChoice.Business.Helpers;
 using VitalChoice.SharedWeb.Helpers;
 using System.Security.Claims;
+using VitalChoice.Infrastructure.Domain.Entities;
 
 namespace VC.Admin.Controllers
 {
@@ -874,12 +875,19 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
-        [AdminAuthorize(PermissionType.Reports)]
         [HttpPost]
         public async Task<Result<OrdersAgentReport>> GetOrdersAgentReport([FromBody]OrdersAgentReportFilter filter)
         {
             filter.To = filter.To.AddDays(1);
             var toReturn = await _orderReportService.GetOrdersAgentReportAsync(filter);
+            //correct dates for UI
+            if (toReturn.FrequencyType == FrequencyType.Weekly || toReturn.FrequencyType == FrequencyType.Monthly)
+            {
+                for (int i = 0; i < toReturn.Periods.Count; i++)
+                {
+                    toReturn.Periods[i].To = toReturn.Periods[i].To.AddDays(-1);
+                }
+            }
             return toReturn;
         }
 

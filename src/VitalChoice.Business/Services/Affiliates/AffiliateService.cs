@@ -571,6 +571,9 @@ namespace VitalChoice.Business.Services.Affiliates
             toReturn.EngagedAffiliates = await _affiliateOrderPaymentRepository.GetEngangedAffiliatesCount();
             CustomerQuery customerCoditions = new CustomerQuery().NotDeleted().WithAffiliate();
             toReturn.AffiliateCustomers = await _customerRepositoryAsync.Query(customerCoditions).SelectCountAsync();
+            toReturn.EngagedPercent = toReturn.AffiliateCustomers != 0
+                ? Math.Round((decimal)toReturn.EngagedAffiliates*100/toReturn.AffiliateCustomers, 2)
+                : 0;
 
             return toReturn;
         }

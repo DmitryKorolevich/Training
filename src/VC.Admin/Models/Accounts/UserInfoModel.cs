@@ -5,8 +5,10 @@ using VitalChoice.Validation.Models;
 namespace VC.Admin.Models.Account
 {
     public class UserInfoModel : BaseModel
-	{
-		public string Email { get; set; }
+    {
+        public int Id { get; set; }
+
+        public string Email { get; set; }
 
 	    public string FirstName { get; set; }
 

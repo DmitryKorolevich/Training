@@ -47,19 +47,21 @@ namespace VitalChoice.Business.Services.Orders
             OrdersAgentReport toReturn = new OrdersAgentReport();
             toReturn.IdAdminTeam = filter.IdAdminTeam;
             toReturn.IdAdmin = filter.IdAdmin;
+            toReturn.FrequencyType = filter.FrequencyType;
 
-            var agents = await _adminProfileRepository.Query().SelectAsync(false);
+            var agents = await _adminProfileRepository.Query(p=>p.User.Status!=UserStatus.Disabled).Include(p=>p.User).SelectAsync(false);
             var teams = await _adminTeamRepository.Query().SelectAsync(false);
 
             List<int> specififcAgentIds = null;
-            if (filter.IdAdminTeam.HasValue)
-            {
-                specififcAgentIds = agents.Where(p => p.IdAdminTeam == filter.IdAdminTeam.Value).Select(p => p.Id).ToList();
-            }
-            else if (filter.IdAdmin.HasValue)
-            {
-                specififcAgentIds = agents.Where(p => p.Id == filter.IdAdmin.Value).Select(p => p.Id).ToList();
-            }
+            //if (filter.IdAdminTeam.HasValue)
+            //{
+            //    specififcAgentIds = agents.Where(p => p.IdAdminTeam == filter.IdAdminTeam.Value).Select(p => p.Id).ToList();
+            //}
+            //else if (filter.IdAdmin.HasValue)
+            //{
+            //    specififcAgentIds = agents.Where(p => p.Id == filter.IdAdmin.Value).Select(p => p.Id).ToList();
+            //}
+            specififcAgentIds = agents.Select(p => p.Id).ToList();
 
             var orders = await _orderRepository.GetOrdersForAgentReportAsync(filter.From, filter.To, specififcAgentIds);
 
@@ -90,7 +92,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 current = filter.To;
             }
-            var period = CreateAgentReportPeriod(filter.From, current, filter.IdAdmin, filter.IdAdminTeam, teams, agents, filter.FrequencyType);
+            var period = CreateAgentReportPeriod(filter.From, current, filter.IdAdmin, filter.IdAdminTeam, teams, agents);
             toReturn.Periods.Add(period);
 
             while (current < filter.To)
@@ -114,7 +116,7 @@ namespace VitalChoice.Business.Services.Orders
                     nextCurrent = filter.To;
                 }
 
-                period = CreateAgentReportPeriod(current, nextCurrent, filter.IdAdmin, filter.IdAdminTeam, teams, agents, filter.FrequencyType);
+                period = CreateAgentReportPeriod(current, nextCurrent, filter.IdAdmin, filter.IdAdminTeam, teams, agents);
                 toReturn.Periods.Add(period);
                 current = nextCurrent;
             }
@@ -124,6 +126,7 @@ namespace VitalChoice.Business.Services.Orders
             foreach (var orderForAgentReport in orders)
             {
                 orderTotalWithoutShipping = orderForAgentReport.Order.Total - orderForAgentReport.Order.ShippingTotal;
+                orderTotalWithoutShipping = orderTotalWithoutShipping > 0 ? orderTotalWithoutShipping : 0;
                 period = toReturn.Periods.FirstOrDefault(p=>p.From<=orderForAgentReport.Order.DateCreated && p.To>orderForAgentReport.Order.DateCreated);
                 if (period != null)
                 {
@@ -218,7 +221,7 @@ namespace VitalChoice.Business.Services.Orders
                     ? ordersAgentReportPeriodItem.AllTotalOrdersAmount / ordersAgentReportPeriodItem.AllOrdersCount
                     : 0;
                 ordersAgentReportPeriodItem.AgentOrdersPercent = ordersAgentReportPeriodItem.TotalOrdersAmount!=0 ?
-                    ordersAgentReportPeriodItem.TotalOrdersAmount / ordersAgentReportPeriodItem.AllTotalOrdersAmount
+                    Math.Round(ordersAgentReportPeriodItem.TotalOrdersAmount *100/ ordersAgentReportPeriodItem.AllTotalOrdersAmount, 2)
                     : 0;
                 ordersAgentReportPeriodItem.AverageOrdersAmountDifference = ordersAgentReportPeriodItem.AverageOrdersAmount - ordersAgentReportPeriodItem.AllAverageOrdersAmount;
 
@@ -251,7 +254,7 @@ namespace VitalChoice.Business.Services.Orders
                         : 0;
 
                     ordersAgentReportTeamItem.AgentOrdersPercent = ordersAgentReportTeamItem.TotalOrdersAmount!=0 
-                        ? ordersAgentReportTeamItem.TotalOrdersAmount / ordersAgentReportPeriodItem.TotalOrdersAmount
+                        ? Math.Round(ordersAgentReportTeamItem.TotalOrdersAmount *100 / ordersAgentReportPeriodItem.TotalOrdersAmount,2)
                         : 0;
                     ordersAgentReportTeamItem.AverageOrdersAmountDifference = ordersAgentReportTeamItem.AverageOrdersAmount - ordersAgentReportPeriodItem.AverageOrdersAmount;
                 }
@@ -261,10 +264,9 @@ namespace VitalChoice.Business.Services.Orders
         }
 
         private OrdersAgentReportPeriodItem CreateAgentReportPeriod(DateTime from, DateTime to,int? idAdmin, int? idAdminTeam, List<AdminTeam> teams,
-            List<AdminProfile> agents, FrequencyType frequencyType)
+            List<AdminProfile> agents)
         {
             OrdersAgentReportPeriodItem period = new OrdersAgentReportPeriodItem();
-            period.FrequencyType = frequencyType;
             period.From = from;
             period.To = to;
             if (!idAdmin.HasValue)
@@ -281,7 +283,7 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         IdAdmin = p.Id,
                         AgentId = p.AgentId,
-                    }).ToList();
+                    }).OrderBy(p => p.AgentId).ToList();
                     period.Teams.Add(teamItem);
                 }
                 //admins without team
@@ -293,7 +295,7 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         IdAdmin = p.Id,
                         AgentId = p.AgentId,
-                    }).ToList();
+                    }).OrderBy(p=>p.AgentId).ToList();
                     period.Teams.Add(teamItem);
                 }
             }

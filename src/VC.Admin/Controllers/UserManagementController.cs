@@ -25,7 +25,6 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VC.Admin.Controllers
 {
-	[AdminAuthorize(PermissionType.Users)]
     public class UserManagementController : BaseApiController
     {
 	    private readonly IAdminUserService userService;
@@ -68,13 +67,15 @@ namespace VC.Admin.Controllers
 		    };
 		}
 
-		[HttpPost]
+        [AdminAuthorize(PermissionType.Users)]
+        [HttpPost]
 		public Result<ManageUserModel> CreateUserPrototype([FromBody] object model)
 		{
 			return new ManageUserModel();
 		}
 
-		[HttpPost]
+        [AdminAuthorize(PermissionType.Users)]
+        [HttpPost]
 		[ControlMode(UserManageMode.Create, typeof(UserManageSettings))]
 		public async Task<Result<bool>> CreateUser([FromBody]ManageUserModel userModel)
 		{
@@ -103,7 +104,8 @@ namespace VC.Admin.Controllers
 			return true;
 		}
 
-		[HttpPost]
+        [AdminAuthorize(PermissionType.Users)]
+        [HttpPost]
 		[ControlMode(UserManageMode.Update, typeof(UserManageSettings))]
 		public async Task<Result<bool>> UpdateUser([FromBody]ManageUserModel userModel)
 		{
@@ -143,7 +145,8 @@ namespace VC.Admin.Controllers
 			return true;
 		}
 
-		[HttpGet]
+        [AdminAuthorize(PermissionType.Users)]
+        [HttpGet]
 	    public async Task<Result<ManageUserModel>> GetUser(Guid id)
 		{
 			var user = await userService.GetAsync(id);
@@ -165,7 +168,8 @@ namespace VC.Admin.Controllers
 			};
 		}
 
-		[HttpPost]
+        [AdminAuthorize(PermissionType.Users)]
+        [HttpPost]
 	    public async Task<Result<bool>> DeleteUser([FromBody]GetUserModel getUserModel)
 	    {
 			var user = await userService.GetAsync(getUserModel.PublicId);
@@ -185,7 +189,8 @@ namespace VC.Admin.Controllers
 			return true;
 	    }
 
-		[HttpPost]
+        [AdminAuthorize(PermissionType.Users)]
+        [HttpPost]
 		public async Task<Result<bool>> ResendActivation(Guid id, [FromBody] object model)
 		{
 			await userService.ResendActivationAsync(id);
@@ -193,7 +198,8 @@ namespace VC.Admin.Controllers
 			return true;
 		}
 
-		[HttpPost]
+        [AdminAuthorize(PermissionType.Users)]
+        [HttpPost]
 		public async Task<Result<bool>> ResetPassword(Guid id, [FromBody] object model)
 		{
 			await userService.SendResetPasswordAsync(id);

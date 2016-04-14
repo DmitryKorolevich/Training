@@ -18,7 +18,9 @@ BEGIN
 		INNER JOIN Affiliates af ON af.Id=op.IdAffiliate
 		WHERE af.StatusCode!=3
 		AND o.StatusCode!=3
-		AND (o.OrderStatus=2 OR o.OrderStatus=3 OR o.OrderStatus=5)
+		AND (o.OrderStatus=2 OR o.OrderStatus=3 OR o.OrderStatus=5 OR
+		o.POrderStatus=2 OR o.POrderStatus=3 OR o.POrderStatus=5 OR
+		o.NPOrderStatus=2 OR o.NPOrderStatus=3 OR o.NPOrderStatus=5)
 		AND o.Id <=
 		ALL
 		(
@@ -30,7 +32,9 @@ BEGIN
 			AND op.IdAffiliate = opIn.IdAffiliate
 			AND afIn.StatusCode!=3 
 			AND oIn.StatusCode!=3
-			AND (oIn.OrderStatus=2 OR oIn.OrderStatus=3 OR oIn.OrderStatus=5)
+			AND (oIn.OrderStatus=2 OR oIn.OrderStatus=3 OR oIn.OrderStatus=5 OR
+			o.POrderStatus=2 OR o.POrderStatus=3 OR o.POrderStatus=5 OR
+			o.NPOrderStatus=2 OR o.NPOrderStatus=3 OR o.NPOrderStatus=5)
 		)
 		GROUP BY op.IdAffiliate
 		HAVING COUNT(DISTINCT op.Id) > 1

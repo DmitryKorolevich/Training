@@ -21,7 +21,9 @@ using Newtonsoft.Json;
 using VC.Admin.Models.ContentManagement;
 using VC.Admin.Models.Orders;
 using VC.Admin.Models.Products;
+using VC.Admin.Models.Settings;
 using VitalChoice.Business.CsvExportMaps;
+using VitalChoice.Business.Services;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Helpers;
@@ -33,6 +35,7 @@ using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Content.Recipes;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Data.Extensions;
+using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VC.Admin.Controllers
 {
@@ -226,6 +229,18 @@ namespace VC.Admin.Controllers
                 Items = result.Items.Select(p => new LogListItemModel(p)).ToList(),
                 Count = result.Count,
             };
+
+            return toReturn;
+        }
+
+        [HttpPost]
+        [AdminAuthorize(PermissionType.Settings)]
+        public async Task<Result<PagedList<ProfileScopeListItemModel>>> GetProfileScopeItems([FromBody]FilterBase filter)
+        {
+            PagedList<ProfileScopeListItemModel> toReturn=new PagedList<ProfileScopeListItemModel>();
+            toReturn.Count = PerformanceRequestService.WorkedScopes.Count();
+            toReturn.Items = PerformanceRequestService.WorkedScopes.Skip((filter.Paging.PageIndex-1) *filter.Paging.PageItemCount).
+                Take(filter.Paging.PageItemCount).Select(p=>new ProfileScopeListItemModel(p)).ToList();
 
             return toReturn;
         }

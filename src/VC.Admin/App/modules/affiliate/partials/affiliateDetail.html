@@ -564,7 +564,7 @@
                                                 <th>Order Date</th>
                                                 <th>Customer Name</th>
                                                 <th>Cust #</th>
-                                                <th>Net Product Total</th>
+                                                <th>Discounted Subtotal</th>
                                                 <th>Repeat</th>
                                                 <th class="status">Order Status</th>
                                                 <th>Commission</th>
@@ -573,14 +573,14 @@
                                         <tbody>
                                             <tr data-ng-repeat="item in orders">
                                                 <td>
-                                                    <a ui-sref="{{::item.IdObjectType==5 ? 'index.oneCol.orderReshipDetail({id: item.Id })' :  item.IdObjectType==6 ? 'index.oneCol.orderRefundDetail({id: item.Id })' : 'index.oneCol.orderDetail({id: item.Id })'}}">{{::item.IdOrder}}</a>
+                                                    <a ui-sref="{{::item.IdObjectType==5 ? 'index.oneCol.orderReshipDetail({id: item.IdOrder })' :  item.IdObjectType==6 ? 'index.oneCol.orderRefundDetail({id: item.IdOrder })' : 'index.oneCol.orderDetail({id: item.IdOrder })'}}">{{::item.IdOrder}}</a>
                                                 </td>
                                                 <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>
                                                 <td>{{::item.CustomerName}}</td>
                                                 <td>
                                                     <a ui-sref="index.oneCol.customerDetail({id:item.IdCustomer})">{{::item.IdCustomer}}</a>
                                                 </td>
-                                                <td>{{::item.ProductsSubtotal | currency}}</td>
+                                                <td>{{::item.DiscountedProductsSubtotal | currency}}</td>
                                                 <td>{{::item.RepeatInCustomer}}</td>
                                                 <td>
                                                     <div data-ng-include="'app/modules/order/partials/orderStatusSection.html'"></div>

@@ -11,6 +11,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Affiliates
 
         public decimal ProductTotal { get; set; }
 
+        public decimal DiscountedProductsSubtotal { get; set; }
+
         public decimal OrderTotal { get; set; }
 
         public decimal Shipping { get; set; }
@@ -29,6 +31,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Affiliates
                 IdOrder = orderPayment.Id;
                 NewCustomerOrder = orderPayment.NewCustomerOrder;
                 ProductTotal = orderPayment.Order.ProductsSubtotal;
+                DiscountedProductsSubtotal = orderPayment.Order.ProductsSubtotal - orderPayment.Order.DiscountTotal;
                 OrderTotal = orderPayment.Order.Total;
                 Shipping = orderPayment.Order.ShippingTotal;
                 Tax = orderPayment.Order.TaxTotal;

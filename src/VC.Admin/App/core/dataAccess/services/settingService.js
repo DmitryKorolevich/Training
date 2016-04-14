@@ -17,6 +17,10 @@ angular.module('app.core.dataAccess.services.settingService', [])
 		getLogItems: function (filter, tracker) {
 			return $http.post(baseUrl + 'GetLogItems', filter, getConfig(tracker));
 		},
+		getProfileScopeItems: function (filter, tracker)
+		{
+		    return $http.post(baseUrl + 'GetProfileScopeItems', filter, getConfig(tracker));
+		},
 
 	    //object logs
 		getObjectHistoryLogItems: function (filter, tracker)

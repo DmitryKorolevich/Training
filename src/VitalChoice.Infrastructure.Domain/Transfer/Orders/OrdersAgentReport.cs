@@ -13,7 +13,9 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
             Periods=new List<OrdersAgentReportPeriodItem>();
         }
 
-        public ICollection<OrdersAgentReportPeriodItem> Periods { get; set; }
+        public IList<OrdersAgentReportPeriodItem> Periods { get; set; }
+
+        public FrequencyType FrequencyType { get; set; }
 
         public int? IdAdminTeam { get; set; }
 
