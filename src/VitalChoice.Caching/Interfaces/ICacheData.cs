@@ -38,7 +38,7 @@ namespace VitalChoice.Caching.Interfaces
         CachedEntity<T> UpdateKeepRelations(T entity, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities);
         bool Update(IEnumerable<T> entity);
         bool UpdateAll(IEnumerable<T> entity);
-        //void SetNull(EntityKey key);
-        //void SetNull(IEnumerable<EntityKey> keys);
+        void SetNull(EntityKey key);
+        void SetNull(IEnumerable<EntityKey> keys);
     }
 }
