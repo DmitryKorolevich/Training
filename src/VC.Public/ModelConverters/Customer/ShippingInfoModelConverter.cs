@@ -12,11 +12,11 @@ namespace VC.Public.ModelConverters.Customer
 	{
 		public override void DynamicToModel(ShippingInfoModel model, AddressDynamic dynamic)
 		{
-			if (dynamic.Data.PreferredShipMethod == null && dynamic.IdObjectType == (int)AddressType.Shipping)
+			if (dynamic.SafeData.PreferredShipMethod == null && dynamic.IdObjectType == (int)AddressType.Shipping)
 			{
 				model.PreferredShipMethod = PreferredShipMethod.Best;
 			}
-			if (dynamic.Data.ShippingAddressType == null && dynamic.IdObjectType == (int)AddressType.Shipping)
+			if (dynamic.SafeData.ShippingAddressType == null && dynamic.IdObjectType == (int)AddressType.Shipping)
 			{
 				model.AddressType = ShippingAddressType.Residential;
 			}

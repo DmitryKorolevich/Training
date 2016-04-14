@@ -458,8 +458,10 @@ namespace VC.Public.Controllers
                                 await _addressConverter.FromModelAsync(
                                     _addressConverter.ToModel<AddUpdateShippingMethodModel>(cart.Order.PaymentMethod.Address),
                                     (int) AddressType.Shipping);
-
-                        }
+							cart.Order.Data.DeliveryInstructions = model.DeliveryInstructions;
+							cart.Order.Data.PreferredShipMethod = model.PreferredShipMethod;
+							cart.Order.Data.AddressType = model.AddressType;
+						}
                         else
                         {
                             cart.Order.ShippingAddress = await _addressConverter.FromModelAsync(model, (int) AddressType.Shipping);
@@ -472,7 +474,10 @@ namespace VC.Public.Controllers
                             await _addressConverter.UpdateObjectAsync(
                                 _addressConverter.ToModel<AddUpdateShippingMethodModel>(cart.Order.PaymentMethod.Address),
                                 cart.Order.ShippingAddress, (int) AddressType.Shipping);
-                        }
+							cart.Order.Data.DeliveryInstructions = model.DeliveryInstructions;
+							cart.Order.Data.PreferredShipMethod = model.PreferredShipMethod;
+							cart.Order.Data.AddressType = model.AddressType;
+						}
                         else
                         {
                             await _addressConverter.UpdateObjectAsync(model, cart.Order.ShippingAddress, (int) AddressType.Shipping);

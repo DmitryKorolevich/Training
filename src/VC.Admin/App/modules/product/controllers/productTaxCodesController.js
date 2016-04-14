@@ -35,6 +35,8 @@
         };
 
         function initialize() {
+            $scope.forms={};
+
             self.baseUrl = 'https://' + $rootScope.ReferenceData.PublicHost + '{0}';
 
             $scope.filter = {
@@ -58,24 +60,32 @@
 
         $scope.update = function ()
         {
-            var productsForUpdate = [];
-            $.each($scope.products, function (index, item)
+            if ($scope.forms.form.$valid)
             {
-                if (item.NewTaxCode != item.TaxCode)
+                var productsForUpdate = [];
+                $.each($scope.products, function (index, item)
                 {
-                    var productForUpdate = angular.copy(item);
-                    productForUpdate.TaxCode = productForUpdate.NewTaxCode;
-                    productsForUpdate.push(productForUpdate);
-                }
-            });
-            if (productsForUpdate.length>0)
-            {
-                productService.updateProductTaxCodes(productsForUpdate, $scope.refreshTracker).success(function (result)
-                {
-                    refreshProducts();
-                }).error(function (result) {
-                    errorHandler(result);
+                    if (item.NewTaxCode != item.TaxCode)
+                    {
+                        var productForUpdate = angular.copy(item);
+                        productForUpdate.TaxCode = productForUpdate.NewTaxCode;
+                        productsForUpdate.push(productForUpdate);
+                    }
                 });
+                if (productsForUpdate.length > 0)
+                {
+                    productService.updateProductTaxCodes(productsForUpdate, $scope.refreshTracker).success(function (result)
+                    {
+                        refreshProducts();
+                    }).error(function (result)
+                    {
+                        errorHandler(result);
+                    });
+                }
+            }
+            else
+            {
+                $scope.forms.submitted = true;
             }
         };
 

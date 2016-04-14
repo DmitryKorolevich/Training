@@ -1362,3 +1362,10 @@ th.sortable-column {
 .order-agents-report .table td.agent {
   width: 23%;
 }
+.order-agents-report .legend.dates {
+  background-image: -webkit-linear-gradient(#04519b, #033c73 60%, #02325f);
+  background-image: -o-linear-gradient(#04519b, #033c73 60%, #02325f);
+  background-image: ca;
+  color: white;
+  padding-left: 10px;
+}

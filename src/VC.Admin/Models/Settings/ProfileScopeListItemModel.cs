@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Profiling.Base;
@@ -11,7 +12,7 @@ namespace VC.Admin.Models.Settings
 
         public string ShortData { get; set; }
 
-        public int TimeElapsed { get; set; }
+        public double TimeElapsed { get; set; }
 
         public string MethodName { get; set; }
 
@@ -28,7 +29,7 @@ namespace VC.Admin.Models.Settings
                     ? Data.Substring(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
                     : Data;
                 ClassTypeName = item.ClassType.FullName;
-                TimeElapsed = item.TimeElapsed.Milliseconds;
+                TimeElapsed = item.TimeElapsed.TotalMilliseconds;
                 MethodName = item.MethodName;
                 SubScopes = item.SubScopes?.Select(p => new ProfileScopeListItemModel(p)).ToList() ?? new List<ProfileScopeListItemModel>();
             }
