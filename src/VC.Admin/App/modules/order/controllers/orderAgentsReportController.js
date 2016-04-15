@@ -145,6 +145,35 @@
                     toaster.pop('error', "Error!", "'To' date can't be less than 'From' date.", null, 'trustedHtml');
                     return;
                 }
+                if ($scope.filter.FrequencyType==3)
+                {
+                    var months = $scope.filter.To.getMonth() - $scope.filter.From.getMonth()
+                        + (12 * ($scope.filter.To.getFullYear() - $scope.filter.From.getFullYear()));
+                    if (months > 12)
+                    {
+                        toaster.pop('error', "Error!", "Date range can't be more than 12 months.", null, 'trustedHtml');
+                        return;
+                    }
+                }
+                if ($scope.filter.FrequencyType == 2)
+                {
+                    var days = Math.round(Math.abs($scope.filter.To.getTime() - $scope.filter.From.getTime()) / 8.64e7);
+                    var weeks = Math.round(days / 7);
+                    if (weeks > 16)
+                    {
+                        toaster.pop('error', "Error!", "Date range can't be more than 16 weeks.", null, 'trustedHtml');
+                        return;
+                    }
+                }
+                if ($scope.filter.FrequencyType == 1)
+                {
+                    var days = Math.round(Math.abs($scope.filter.To.getTime() - $scope.filter.From.getTime()) / 8.64e7);
+                    if (days > 14)
+                    {
+                        toaster.pop('error', "Error!", "Date range can't be more than 14 days.", null, 'trustedHtml');
+                        return;
+                    }
+                }
                 $scope.forms.form.submitted = false;
                 refreshItems();
             }

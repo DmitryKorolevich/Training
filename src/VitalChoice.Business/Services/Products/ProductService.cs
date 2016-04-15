@@ -672,7 +672,9 @@ namespace VitalChoice.Business.Services.Products
                 var entity = await InsertAsync(model.ProductDynamic, uow, model.ProductContent);
                 int id = entity.Id;
                 entity = await SelectEntityFirstAsync(o => o.Id == id);
-                await LogItemChanges(new[] { await DynamicMapper.FromEntityAsync(entity) });
+                var newProductDynamic = await DynamicMapper.FromEntityAsync(entity);
+                model.ProductDynamic = newProductDynamic;
+                await LogItemProductContentTransferEntityChanges(new[] { model });
                 return await DynamicMapper.FromEntityAsync(entity);
             }
         }
@@ -685,9 +687,25 @@ namespace VitalChoice.Business.Services.Products
                 var entity = await UpdateAsync(model.ProductDynamic, uow, model.ProductContent);
                 int id = entity.Id;
                 entity = await SelectEntityFirstAsync(o => o.Id == id);
-                await LogItemChanges(new[] { await DynamicMapper.FromEntityAsync(entity) });
+                var newProductDynamic = await DynamicMapper.FromEntityAsync(entity);
+                model.ProductDynamic = newProductDynamic;
+                await LogItemProductContentTransferEntityChanges(new[] { model });
                 return await DynamicMapper.FromEntityAsync(entity);
             }
+        }
+
+        protected async Task LogItemProductContentTransferEntityChanges(ICollection<ProductContentTransferEntity> models)
+        {
+            //write product content fields to dynamic for logging purpouse
+            foreach (var productContentTransferEntity in models)
+            {
+                productContentTransferEntity.ProductDynamic.Data.Url = productContentTransferEntity.ProductContent.Url;
+                productContentTransferEntity.ProductDynamic.Data.MasterContentItemId = productContentTransferEntity.ProductContent.MasterContentItemId;
+                productContentTransferEntity.ProductDynamic.Data.Template = productContentTransferEntity.ProductContent.ContentItem.Template;
+                productContentTransferEntity.ProductDynamic.Data.MetaTitle = productContentTransferEntity.ProductContent.ContentItem.Title;
+                productContentTransferEntity.ProductDynamic.Data.MetaDescription = productContentTransferEntity.ProductContent.ContentItem.MetaDescription;
+            }
+            await LogItemChanges(models.Select(p=>p.ProductDynamic).ToList());
         }
 
         protected override async Task<Product> InsertAsync(ProductDynamic model, IUnitOfWorkAsync uow)

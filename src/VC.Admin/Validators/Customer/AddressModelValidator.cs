@@ -102,8 +102,8 @@ namespace VC.Admin.Validators.Customer
                 .WithMessage(model => model.Email, ValidationMessages.EmailFormat);
 
             RuleFor(model => model.DeliveryInstructions)
-                .Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE)
-                .WithMessage(model => model.DeliveryInstructions, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
+                .Length(0, BaseAppConstants.DELIVERY_INSTRUCTIONS_MAX_SIZE)
+                .WithMessage(model => model.DeliveryInstructions, ValidationMessages.FieldLength, BaseAppConstants.DELIVERY_INSTRUCTIONS_MAX_SIZE);
         }
 	}
 }

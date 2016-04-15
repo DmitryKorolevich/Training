@@ -13,6 +13,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Products
 
         public string Name { get; set; }
 
+        public int Order { get; set; }
+
         public string SubTitle { get; set; }
 
         public decimal? Price { get; set; }

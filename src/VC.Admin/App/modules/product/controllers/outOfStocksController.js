@@ -69,9 +69,14 @@
 
         $scope.delete = function ()
         {
+            var ids = getIds();
+            if (ids.length == 0)
+            {
+                toaster.pop('error', "Error!", "Please, select at least one request.");
+                return;
+            }
             confirmUtil.confirm(function ()
             {
-                var ids = getIds();
                 productService.deleteProductOutOfStockRequests(ids, $scope.deleteTracker)
                     .success(function (result)
                     {

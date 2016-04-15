@@ -47,14 +47,17 @@ namespace VC.Admin.Models.Products
         [Localized(GeneralFieldNames.Name)]
         public string Name { get; set; }
 
-		public string Template { get; set; }
+        [Map]
+        public string Template { get; set; }
 
 		[Map]
 		public string SubTitle { get; set; }
 
-		[Localized(GeneralFieldNames.Url)]
+        [Localized(GeneralFieldNames.Url)]
+        [Map]
         public string Url { get; set; }
 
+        [Map]
         public int MasterContentItemId { get; set; }
 
         [Map("IdObjectType")]
