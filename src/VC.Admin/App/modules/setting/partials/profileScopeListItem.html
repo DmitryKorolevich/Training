@@ -6,19 +6,19 @@
 <div ui-tree-handle>
     <div class="ya-treeview-content clearfix">
         <div class="line">
-            <label>{{item.ShortData}} ({{item.TimeElapsed}} ms)</label>
+            <label>{{::item.ShortData}} ({{::item.TimeElapsed}} ms)</label>
         </div>
     </div>
 </div>
 <div data-ng-class="{hidden: collapsed}">
     <div>
-        Method Name: {{item.MethodName}}
+        Method Name: {{::item.MethodName}}
     </div>
     <div>
-        Class Type: {{item.ClassTypeName}}
+        Class Type: {{::item.ClassTypeName}}
     </div>
     <div>
-        Data: {{item.Data}}
+        Data: {{::item.Data}}
     </div>
 </div>
 <ol ui-tree-nodes="" data-ng-model="item.SubScopes" data-ng-class="{hidden: collapsed}">

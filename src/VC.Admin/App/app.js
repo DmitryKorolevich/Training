@@ -10,8 +10,8 @@ var app = angular
 		'app.shared'
 	])
 	.config([
-		'$stateProvider', '$urlRouterProvider','$httpProvider', '$locationProvider',
-		function ($stateProvider, $urlRouterProvider, $httpProvider, $locationProvider) {
+		'$stateProvider', '$urlRouterProvider','$httpProvider', '$locationProvider', '$compileProvider',
+		function ($stateProvider, $urlRouterProvider, $httpProvider, $locationProvider, $compileProvider) {
 			$urlRouterProvider.when('/',[ '$state', function($state) {
 				$state.go('index.oneCol.dashboard');
 			}]);
@@ -20,6 +20,7 @@ var app = angular
 			$httpProvider.interceptors.push("httpInterceptor");
 
 			$locationProvider.html5Mode(true);
+			$compileProvider.debugInfoEnabled(false);
 		}
 	])
 	.run([
@@ -28,10 +29,11 @@ var app = angular
 		    function initialize() {
 				$rootScope.$state = $state;
 				$rootScope.$stateParams = $stateParams;
-
 				appBootstrap.initialize();
 			};
 
-			initialize();
+		    initialize();
+
+
 		}
 	]);
