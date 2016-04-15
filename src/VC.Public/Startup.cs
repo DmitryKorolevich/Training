@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Authentication.Cookies;
 using VitalChoice.Interfaces.Services;
 using Autofac;
+using Microsoft.AspNet.StaticFiles;
 using VitalChoice.Profiling;
 
 namespace VC.Public
@@ -68,7 +69,10 @@ namespace VC.Public
             }
 
             // Add static files to the request pipeline.
-            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                OnPrepareResponse = context => context.Context.Response.Headers.Add("Cache-Control", "public, max-age=3600")
+            });
 
             // Add cookie-based authentication to the request pipeline.
             app.UseIdentity();

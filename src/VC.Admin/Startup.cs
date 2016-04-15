@@ -10,6 +10,7 @@ using Microsoft.Extensions.PlatformAbstractions;
 using VC.Admin.AppConfig;
 using VitalChoice.Core.DependencyInjection;
 using Autofac;
+using Microsoft.AspNet.StaticFiles;
 using VitalChoice.Profiling;
 
 namespace VC.Admin
@@ -54,7 +55,10 @@ namespace VC.Admin
 				// send the request to the following path or controller action.
 			}
 			// Add static files to the request pipeline.
-			app.UseStaticFiles();
+		    app.UseStaticFiles(new StaticFileOptions
+		    {
+		        OnPrepareResponse = context => context.Context.Response.Headers.Add("Cache-Control", "public, max-age=3600")
+		    });
 
 			app.UseIdentity();
 
