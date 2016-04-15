@@ -60,7 +60,13 @@
             refreshDiscounts();
         }
 
-        $scope.filterDiscounts = function () {
+        $scope.filterDiscounts = function ()
+        {
+            if ($scope.filter.ValidFrom > $scope.filter.ValidTo)
+            {
+                toaster.pop('error', "Error!", "'Valid To' date can't be less than 'Valid From' date.", null, 'trustedHtml');
+                return;
+            }
             $scope.filter.Paging.PageIndex = 1;
             refreshDiscounts();
         };

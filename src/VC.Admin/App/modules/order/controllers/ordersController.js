@@ -158,6 +158,11 @@
 
         $scope.filterOrders = function ()
         {
+            if ($scope.filter.From > $scope.filter.To)
+            {
+                toaster.pop('error', "Error!", "'To' date can't be less than 'From' date.", null, 'trustedHtml');
+                return;
+            }
             $scope.forms.IsActive = true;
             $scope.forms.form.submitted = false;
             $scope.filter.Paging.PageIndex = 1;

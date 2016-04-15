@@ -19,6 +19,7 @@ SELECT
 	s.Hidden,
 	p.IdObjectType AS IdProductType,
 	p.Name,
+	s.[Order], 
 	psval.Value as SubTitle,
 	p.Name +ISNULL(' '+psval.Value, '')+ISNULL(' ('+sval.Value+')', '') AS DescriptionName,
 	CONVERT(bit,ISNULL(aval.Value, 0)) AS AutoShipProduct,

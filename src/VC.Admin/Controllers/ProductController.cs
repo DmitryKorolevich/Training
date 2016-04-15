@@ -158,14 +158,10 @@ namespace VC.Admin.Controllers
             var skus = await productService.GetSkusAsync(skuFilter);
             foreach (var item in toReturn.Items)
             {
-                item.SKUs = new List<SkuListItemModel>();
-                foreach (var sku in skus)
-                {
-                    if(item.ProductId==sku.IdProduct)
-                    {
-                        item.SKUs.Add(new SkuListItemModel(sku));
-                    }
-                }
+                item.SKUs = skus.Where(p => p.IdProduct == item.ProductId)
+                            .OrderBy(p => p.Order)
+                            .Select(p => new SkuListItemModel(p))
+                            .ToList();  new List<SkuListItemModel>();
             }
 
             return toReturn;
@@ -607,6 +603,10 @@ namespace VC.Admin.Controllers
             {
                 var dynamic = (ProductDynamic)JsonConvert.DeserializeObject(toReturn.Main.Data, typeof(ProductDynamic));
                 var model = _mapper.ToModel<ProductManageModel>(dynamic);
+                if (string.IsNullOrEmpty(model.Url))
+                {
+                    model.Url = dynamic.SafeData.Url;
+                }
                 toReturn.Main.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
@@ -617,6 +617,10 @@ namespace VC.Admin.Controllers
             {
                 var dynamic = (ProductDynamic)JsonConvert.DeserializeObject(toReturn.Before.Data, typeof(ProductDynamic));
                 var model = _mapper.ToModel<ProductManageModel>(dynamic);
+                if (string.IsNullOrEmpty(model.Url))
+                {
+                    model.Url = dynamic.SafeData.Url;
+                }
                 toReturn.Before.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,

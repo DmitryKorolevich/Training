@@ -8,6 +8,7 @@
         public const int DEFAULT_AUTO_COMPLETE_TAKE_COUNT = 20;
         public const int DEFAULT_TEXT_FIELD_MAX_SIZE = 100;
         public const int DEFAULT_TEXTAREA_FIELD_MAX_SIZE = 250;
+        public const int DELIVERY_INSTRUCTIONS_MAX_SIZE = 60;
         public const int DEFAULT_BIG_TEXT_FIELD_MAX_SIZE = 1000;
         public const int DEFAULT_EMAIL_FIELD_MAX_SIZE = 1000;
         public const int STATE_COUNTRY_CODE_MAX_SIZE = 3;
