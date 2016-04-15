@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.file.controllers.filesController', [])
-.controller('filesController', ['$scope', '$rootScope', '$state', '$stateParams', '$modal', '$timeout', 'appBootstrap', 'Upload', 'modalUtil', 'fileService', 'toaster', 'confirmUtil', 'promiseTracker',
-function ($scope, $rootScope, $state, $stateParams, $modal, $timeout, appBootstrap, Upload, modalUtil, fileService, toaster, confirmUtil, promiseTracker) {
+.controller('filesController', ['$scope', '$rootScope', '$state', '$stateParams', '$uibModal', '$timeout', 'appBootstrap', 'Upload', 'modalUtil', 'fileService', 'toaster', 'confirmUtil', 'promiseTracker',
+function ($scope, $rootScope, $state, $stateParams, $uibModal, $timeout, appBootstrap, Upload, modalUtil, fileService, toaster, confirmUtil, promiseTracker) {
         var INVALID_FILE_FORMAT_MESSAGE = "The uploaded file must be .jpg, .gif, .png or .pdf.";
         var INVALID_FILE_SIZE_MESSAGE = "The uploaded file must be less than 10 mb.";
         var MAX_FILE_SIZE = 10485760;

@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.product.controllers.productManageController', [])
-.controller('productManageController', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', 'productService', 'inventorySkuService', 'toaster', 'confirmUtil', 'promiseTracker', 'contentService', 'modalUtil',
-    function ($scope, $rootScope, $state, $stateParams, $timeout, $modal, productService, inventorySkuService, toaster, confirmUtil, promiseTracker, contentService, modalUtil)
+.controller('productManageController', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$uibModal', 'productService', 'inventorySkuService', 'toaster', 'confirmUtil', 'promiseTracker', 'contentService', 'modalUtil',
+    function ($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, productService, inventorySkuService, toaster, confirmUtil, promiseTracker, contentService, modalUtil)
     {
         $scope.refreshTracker = promiseTracker("get");
         $scope.refreshInventoriesTracker = promiseTracker("refreshInventories");

@@ -1,11 +1,11 @@
 ﻿'use strict';
 
 angular.module('app.core.utils.confirmation.confirmUtil', [])
-.service('confirmUtil', ['$modal', '$log', function ($modal, $log) {
+.service('confirmUtil', ['$uibModal', '$log', function ($uibModal, $log) {
 	return {
 	    confirm: function (okHandler, optionalConfirmText, optionalCancelHandler, optionalOkLabel, optionalCancelLabel)
 	    {
-			var modalInstance = $modal.open({
+			var modalInstance = $uibModal.open({
 				templateUrl: "app/core/utils/confirmation/confirmation.html",
 				controller: "confirmController",
 				animation: true,

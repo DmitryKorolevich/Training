@@ -1,6 +1,6 @@
 ﻿angular.module('app.modules.misc.controllers.addEditRedirectController', [])
-.controller('addEditRedirectController', ['$scope', '$modalInstance', 'data', 'redirectService', 'toaster', 'promiseTracker', '$rootScope',
-    function ($scope, $modalInstance, data, redirectService, toaster, promiseTracker, $rootScope)
+.controller('addEditRedirectController', ['$scope', '$uibModalInstance', 'data', 'redirectService', 'toaster', 'promiseTracker', '$rootScope',
+    function ($scope, $uibModalInstance, data, redirectService, toaster, promiseTracker, $rootScope)
 {
     $scope.saveTracker = promiseTracker("save");
 
@@ -9,7 +9,7 @@
             toaster.pop('success', "Success!", "Successfully saved.");
 
             data.thenCallback();
-            $modalInstance.close();
+            $uibModalInstance.close();
         } else {
             var messages = "";
             if (result.Messages) {
@@ -78,7 +78,7 @@
 
     $scope.cancel = function ()
     {
-        $modalInstance.close();
+        $uibModalInstance.close();
     };
 
     initialize();

@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.core.utils.modalUtil', [])
-.service('modalUtil', ['$modal', '$log', function ($modal, $log) {
+.service('modalUtil', ['$uibModal', '$log', function ($uibModal, $log) {
 	return {
 	    open: function (templateUrl, controller, data, options, successCallback, errorCallback) {
 	        var options = $.extend(
@@ -9,7 +9,7 @@ angular.module('app.core.utils.modalUtil', [])
                     size: 'sm'
                 }, options);
 
-			var modalInstance = $modal.open({
+			var modalInstance = $uibModal.open({
 				templateUrl: templateUrl,
 				controller: controller,
 				size: options.size,

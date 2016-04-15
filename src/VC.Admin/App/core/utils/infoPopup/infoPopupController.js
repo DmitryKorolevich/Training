@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.core.utils.infoPopup.infoPopupController', [])
-.controller('infoPopupController', ['$scope', '$modalInstance', 'data', function ($scope, $modalInstance, data) {
+.controller('infoPopupController', ['$scope', '$uibModalInstance', 'data', function ($scope, $uibModalInstance, data) {
 	function initialize() {
 		$scope.text = data.text;
 		$scope.title = data.title;
@@ -11,7 +11,7 @@ angular.module('app.core.utils.infoPopup.infoPopupController', [])
 		if (data.okHandler) {
 			data.okHandler();
 		}
-		$modalInstance.close(false);
+		$uibModalInstance.close(false);
 	};
 
 	initialize();

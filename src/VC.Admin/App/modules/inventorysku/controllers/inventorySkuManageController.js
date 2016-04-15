@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.inventorysku.controllers.inventorySkuManageController', [])
-.controller('inventorySkuManageController', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', 'inventorySkuService', 'toaster', 'confirmUtil', 'promiseTracker', 'contentService',
-    function ($scope, $rootScope, $state, $stateParams, $timeout, $modal, inventorySkuService, toaster, confirmUtil, promiseTracker, contentService)
+.controller('inventorySkuManageController', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$uibModal', 'inventorySkuService', 'toaster', 'confirmUtil', 'promiseTracker', 'contentService',
+    function ($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, inventorySkuService, toaster, confirmUtil, promiseTracker, contentService)
     {
         $scope.refreshTracker = promiseTracker("refresh");
 

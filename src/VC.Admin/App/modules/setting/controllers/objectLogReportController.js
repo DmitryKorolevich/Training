@@ -1,6 +1,6 @@
 ﻿angular.module('app.modules.setting.controllers.objectLogReportController', [])
-.controller('objectLogReportController', ['$scope', '$modalInstance', '$rootScope', '$timeout', '$window', 'data', 'toaster', 'promiseTracker',
-    function ($scope, $modalInstance, $rootScope, $timeout, $window, data, toaster, promiseTracker)
+.controller('objectLogReportController', ['$scope', '$uibModalInstance', '$rootScope', '$timeout', '$window', 'data', 'toaster', 'promiseTracker',
+    function ($scope, $uibModalInstance, $rootScope, $timeout, $window, data, toaster, promiseTracker)
     {
 
 	function initialize() {
@@ -69,7 +69,7 @@
 	};
 
 	$scope.cancel=function() {
-	    $modalInstance.close();
+	    $uibModalInstance.close();
 	};
     
 	initialize();

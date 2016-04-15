@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.healthwise.controllers.moveToPeriodController', [])
-.controller('moveToPeriodController', ['$scope', '$modalInstance', 'data', 'healthwiseService', 'toaster', 'promiseTracker', '$rootScope', 'confirmUtil',
-    function ($scope, $modalInstance, data, healthwiseService, toaster, promiseTracker, $rootScope, confirmUtil)
+.controller('moveToPeriodController', ['$scope', '$uibModalInstance', 'data', 'healthwiseService', 'toaster', 'promiseTracker', '$rootScope', 'confirmUtil',
+    function ($scope, $uibModalInstance, data, healthwiseService, toaster, promiseTracker, $rootScope, confirmUtil)
     {
         $scope.refreshTracker = promiseTracker("refresh");
 
@@ -11,7 +11,7 @@ angular.module('app.modules.healthwise.controllers.moveToPeriodController', [])
             if (result.Success)
             {
                 toaster.pop('success', "Success!", "Successfully moved");
-                $modalInstance.close();
+                $uibModalInstance.close();
                 data.thenCallback();
             } else
             {
@@ -116,7 +116,7 @@ angular.module('app.modules.healthwise.controllers.moveToPeriodController', [])
 
         $scope.cancel = function ()
         {
-            $modalInstance.close();
+            $uibModalInstance.close();
         };
 
         initialize();

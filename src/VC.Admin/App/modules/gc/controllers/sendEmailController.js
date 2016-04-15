@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.gc.controllers.sendEmailController', [])
-.controller('sendEmailController', ['$scope', '$modalInstance', 'data', 'gcService', 'toaster', 'promiseTracker', '$rootScope',
-    function ($scope, $modalInstance, data, gcService, toaster, promiseTracker, $rootScope) {
+.controller('sendEmailController', ['$scope', '$uibModalInstance', 'data', 'gcService', 'toaster', 'promiseTracker', '$rootScope',
+    function ($scope, $uibModalInstance, data, gcService, toaster, promiseTracker, $rootScope) {
 	$scope.saveTracker = promiseTracker("save");
 
 	function successSaveHandler(result) {
@@ -12,7 +12,7 @@ angular.module('app.modules.gc.controllers.sendEmailController', [])
 	        if (data.thenCallback) {
 	            data.thenCallback(result.Data);
 	        }
-	        $modalInstance.close();
+	        $uibModalInstance.close();
 	    } else {
 	        var messages = "";
 	        if (result.Messages) {
@@ -71,7 +71,7 @@ angular.module('app.modules.gc.controllers.sendEmailController', [])
 		};
 
 		$scope.cancel = function () {
-			$modalInstance.close();
+			$uibModalInstance.close();
 		};
 	}
     

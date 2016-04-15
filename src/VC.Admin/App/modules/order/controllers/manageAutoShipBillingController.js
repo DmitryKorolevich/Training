@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.modules.order.controllers.manageAutoShipBillingController', [])
-.controller('manageAutoShipBillingController', ['$scope', '$modalInstance', 'data', 'orderService', 'toaster', 'promiseTracker', '$rootScope','customerEditService', function ($scope, $modalInstance, data, orderService, toaster, promiseTracker, $rootScope, customerEditService) {
+.controller('manageAutoShipBillingController', ['$scope', '$uibModalInstance', 'data', 'orderService', 'toaster', 'promiseTracker', '$rootScope','customerEditService', function ($scope, $uibModalInstance, data, orderService, toaster, promiseTracker, $rootScope, customerEditService) {
 	$scope.saveTracker = promiseTracker("save");
 	$scope.resendTracker = promiseTracker("resend");
 	$scope.resetTracker = promiseTracker("reset");
@@ -9,7 +9,7 @@ angular.module('app.modules.order.controllers.manageAutoShipBillingController', 
 	function successHandler(result) {
 		if (result.Success) {
 			toaster.pop('success', "Success!", "Successfully saved");
-			$modalInstance.close();
+			$uibModalInstance.close();
 
 		} else {
 			var messages = "";
@@ -75,7 +75,7 @@ angular.module('app.modules.order.controllers.manageAutoShipBillingController', 
 
 
 	$scope.cancel = function () {
-		$modalInstance.close();
+		$uibModalInstance.close();
 	};
 
 	initialize();

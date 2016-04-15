@@ -1,13 +1,13 @@
 ﻿'use strict';
 
 angular.module('app.modules.setting.controllers.logDetailsController', [])
-.controller('logDetailsController', ['$scope', '$modalInstance', 'data', 'toaster', function ($scope, $modalInstance, data, toaster)
+.controller('logDetailsController', ['$scope', '$uibModalInstance', 'data', 'toaster', function ($scope, $uibModalInstance, data, toaster)
 {
 
     function initialize()
     {
         $scope.cancel = function () {
-            $modalInstance.close();
+            $uibModalInstance.close();
         };
 
         $scope.item = data.item;

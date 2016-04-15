@@ -1,6 +1,6 @@
 {
   "name": "angular-ladda",
-  "version": "0.3.1",
+  "version": "0.3.4",
   "homepage": "https://github.com/remotty/angular-ladda",
   "authors": [
     "Chungsub Kim <subicura@subicura.com>"
@@ -24,21 +24,21 @@
     "node_modules"
   ],
   "dependencies": {
-    "angular": ">= 1.2.0",
+    "angular": "^1.2.0",
     "ladda": "~0.9.8"
   },
   "devDependencies": {
-    "bootstrap": "~3.3.1",
-    "angular-bootstrap": "~0.12.0",
-    "requirejs": "~2.1.18"
+    "bootstrap": "^3.3.1",
+    "angular-bootstrap": ">=0.12.0",
+    "requirejs": "^2.1.18"
   },
-  "_release": "0.3.1",
+  "_release": "0.3.4",
   "_resolution": {
     "type": "version",
-    "tag": "0.3.1",
-    "commit": "c97ab3ff6c808cf9a1c862ce4e1455034de827ef"
+    "tag": "0.3.4",
+    "commit": "42bcffb037ecc0522ed3b47f2190af65604f05aa"
   },
-  "_source": "git://github.com/remotty/angular-ladda.git",
-  "_target": "~0.3.1",
+  "_source": "https://github.com/remotty/angular-ladda.git",
+  "_target": "~0.3.4",
   "_originalSource": "angular-ladda"
 }

@@ -3,13 +3,13 @@
   "private": true,
   "dependencies": {
     "jQuery": "~1.11.3",
-    "normalize.css": "~3.0.3",
+    "normalize.css": "~4.1.1",
     "nivoslider": "*",
     "jquery.scrollTo": "~2.1.2",
     "tooltipster": "~3.3.0",
-    "font-awesome": "~4.5.0",
+    "font-awesome": "~4.6.1",
     "knockout": "~3.4.0",
-    "moment": "~2.11.1"
+    "moment": "~2.12.0"
   },
   "exportsOverride": {
     "jQuery": {

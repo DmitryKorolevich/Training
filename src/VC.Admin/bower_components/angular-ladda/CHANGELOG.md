@@ -1,5 +1,12 @@
 # angular-ladda
 
+## 0.3.3
+ * support global spinner-size, spinner-color config
+
+## 0.3.2
+ * use window.angular in CommonJS (@radotzki)
+ * fix memory leak (@mihaipanait)
+
 ## 0.3.1
  * remove requirejs from bower.json
 

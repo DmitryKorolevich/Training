@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.product.controllers.discountManageController', [])
-.controller('discountManageController', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', 'productService', 'discountService', 'toaster', 'confirmUtil', 'promiseTracker',
-    function ($scope, $rootScope, $state, $stateParams, $timeout, $modal, productService, discountService, toaster, confirmUtil, promiseTracker) {
+.controller('discountManageController', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$uibModal', 'productService', 'discountService', 'toaster', 'confirmUtil', 'promiseTracker',
+    function ($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, productService, discountService, toaster, confirmUtil, promiseTracker) {
         $scope.refreshTracker = promiseTracker("get");
         
         function refreshHistory()

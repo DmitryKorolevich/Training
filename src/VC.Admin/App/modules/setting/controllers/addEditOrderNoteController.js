@@ -1,13 +1,13 @@
 ﻿'use strict';
 
 angular.module('app.modules.setting.controllers.addEditOrderNoteController', [])
-.controller('addEditOrderNoteController', ['$scope', '$modalInstance', 'data', 'orderNoteService', 'toaster', 'promiseTracker', '$rootScope', function ($scope, $modalInstance, data, orderNoteService, toaster, promiseTracker, $rootScope) {
+.controller('addEditOrderNoteController', ['$scope', '$uibModalInstance', 'data', 'orderNoteService', 'toaster', 'promiseTracker', '$rootScope', function ($scope, $uibModalInstance, data, orderNoteService, toaster, promiseTracker, $rootScope) {
 	$scope.saveTracker = promiseTracker("save");
 
 	function successHandler(result) {
 		if (result.Success) {
 			toaster.pop('success', "Success!", "Successfully saved");
-			$modalInstance.close();
+			$uibModalInstance.close();
 		} else {
 			var messages = "";
 			if (result.Messages) {
@@ -67,7 +67,7 @@ angular.module('app.modules.setting.controllers.addEditOrderNoteController', [])
 		};
 
 		$scope.cancel = function () {
-			$modalInstance.close();
+			$uibModalInstance.close();
 		};
 	}
 

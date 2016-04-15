@@ -1,6 +1,6 @@
 ﻿angular.module('app.modules.product.controllers.sendOutOfStockRequestsPopupController', [])
-.controller('sendOutOfStockRequestsPopupController', ['$scope', '$modalInstance', 'data', 'productService', 'toaster', 'promiseTracker', '$rootScope',
-    function ($scope, $modalInstance, data, productService, toaster, promiseTracker, $rootScope)
+.controller('sendOutOfStockRequestsPopupController', ['$scope', '$uibModalInstance', 'data', 'productService', 'toaster', 'promiseTracker', '$rootScope',
+    function ($scope, $uibModalInstance, data, productService, toaster, promiseTracker, $rootScope)
 {
     $scope.refreshTracker = promiseTracker("refresh");
 
@@ -9,7 +9,7 @@
         {
             toaster.pop('success', "Success!", "Successfully sent.");
             data.thenCallback($scope.state);
-            $modalInstance.close();
+            $uibModalInstance.close();
         } else {
             var messages = "";
             if (result.Messages) {
@@ -68,7 +68,7 @@
 
     $scope.cancel = function ()
     {
-        $modalInstance.close();
+        $uibModalInstance.close();
     };
 
     initialize();

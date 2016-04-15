@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.file.controllers.addFolderController', [])
-.controller('addFolderController', ['$scope', '$modalInstance', 'data', 'fileService', 'toaster', 'promiseTracker', '$rootScope',
-    function ($scope, $modalInstance, data, fileService, toaster, promiseTracker, $rootScope) {
+.controller('addFolderController', ['$scope', '$uibModalInstance', 'data', 'fileService', 'toaster', 'promiseTracker', '$rootScope',
+    function ($scope, $uibModalInstance, data, fileService, toaster, promiseTracker, $rootScope) {
 	$scope.saveTracker = promiseTracker("save");
 
 	function successSaveHandler(result) {
@@ -10,7 +10,7 @@ angular.module('app.modules.file.controllers.addFolderController', [])
 	        toaster.pop('success', "Success!", "Successfully saved.");
 
 	        data.thenCallback(result.Data);
-	        $modalInstance.close();
+	        $uibModalInstance.close();
 	    } else {
 	        var messages = "";
 	        if (result.Messages) {
@@ -61,7 +61,7 @@ angular.module('app.modules.file.controllers.addFolderController', [])
 		};
 
 		$scope.cancel = function () {
-			$modalInstance.close();
+			$uibModalInstance.close();
 		};
 	}
     

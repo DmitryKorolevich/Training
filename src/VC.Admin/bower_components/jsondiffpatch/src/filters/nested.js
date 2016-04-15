@@ -29,12 +29,24 @@ var objectsDiffFilter = function objectsDiffFilter(context) {
     return;
   }
 
-  var name, child;
+  var name, child, propertyFilter = context.options.propertyFilter;
   for (name in context.left) {
+    if (!Object.prototype.hasOwnProperty.call(context.left, name)) {
+      continue;
+    }
+    if (propertyFilter && !propertyFilter(name, context)) {
+      continue;
+    }
     child = new DiffContext(context.left[name], context.right[name]);
     context.push(child, name);
   }
   for (name in context.right) {
+    if (!Object.prototype.hasOwnProperty.call(context.right, name)) {
+      continue;
+    }
+    if (propertyFilter && !propertyFilter(name, context)) {
+      continue;
+    }
     if (typeof context.left[name] === 'undefined') {
       child = new DiffContext(undefined, context.right[name]);
       context.push(child, name);
@@ -76,7 +88,7 @@ var collectChildrenPatchFilter = function collectChildrenPatchFilter(context) {
   var child;
   for (var index = 0; index < length; index++) {
     child = context.children[index];
-    if (context.left.hasOwnProperty(child.childName) && child.result === undefined) {
+    if (Object.prototype.hasOwnProperty.call(context.left, child.childName) && child.result === undefined) {
       delete context.left[child.childName];
     } else if (context.left[child.childName] !== child.result) {
       context.left[child.childName] = child.result;

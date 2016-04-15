@@ -33,7 +33,7 @@
     "tag": "1.4.1",
     "commit": "f19728180c604c1b0c62d6aa97af262c0c04d71c"
   },
-  "_source": "git://github.com/digitalBush/jquery.maskedinput.git",
+  "_source": "https://github.com/digitalBush/jquery.maskedinput.git",
   "_target": "~1.4.1",
   "_originalSource": "jquery.maskedinput"
 }

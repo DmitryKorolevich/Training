@@ -1,15 +1,15 @@
 ﻿'use strict';
 
 angular.module('app.modules.affiliate.controllers.affiliatePayCommissionsController', [])
-.controller('affiliatePayCommissionsController', ['$scope', '$modalInstance', 'data', 'affiliateService', 'toaster', 'promiseTracker', '$rootScope', 'confirmUtil',
-    function ($scope, $modalInstance, data, affiliateService, toaster, promiseTracker, $rootScope, confirmUtil)
+.controller('affiliatePayCommissionsController', ['$scope', '$uibModalInstance', 'data', 'affiliateService', 'toaster', 'promiseTracker', '$rootScope', 'confirmUtil',
+    function ($scope, $uibModalInstance, data, affiliateService, toaster, promiseTracker, $rootScope, confirmUtil)
 {
     $scope.refreshTracker = promiseTracker("refresh");
 
 	function successHandler(result) {
 		if (result.Success) {
 		    toaster.pop('success', "Success!", "Successfully paid");
-		    $modalInstance.close();
+		    $uibModalInstance.close();
 		    data.thenCallback();
 		} else {
 			var messages = "";
@@ -96,7 +96,7 @@ angular.module('app.modules.affiliate.controllers.affiliatePayCommissionsControl
 
 	$scope.cancel = function ()
 	{
-	    $modalInstance.close();
+	    $uibModalInstance.close();
 	};
 
 	initialize();

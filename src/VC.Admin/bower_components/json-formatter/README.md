@@ -6,6 +6,8 @@ JSON Formatter is an AngularJS directive for rendering JSON objects in HTML with
 
 [![Screebshot](./screenshot.png)](http://azimi.me/json-formatter/demo/demo.html)
 
+#### [Now also available in pure JavaScript with zero dependency!](https://github.com/mohsen1/json-formatter-js)
+
 ## Usage
 
 * Install via Bower or npm
@@ -19,14 +21,9 @@ JSON Formatter is an AngularJS directive for rendering JSON objects in HTML with
   npm install jsonformatter --save
   ```
 * Add `jsonFormatter` to your app dependencies
-  ```js
-  angular
-  .module('jsonFormatterApp', [
-    'ngCookies',
-    ...
-    'jsonFormatter'
-  ])
 
+  ```js
+  angular.module('MyApp', ['jsonFormatter'])
   ```
 * Use `<json-formatter>` directive
 
@@ -60,6 +57,7 @@ app.config(function (JSONFormatterConfigProvider) {
 See [Examples here](http://azimi.me/json-formatter/demo/demo.html)
 
 
+## Known Bugs
 ##### `hashKey`
 
 If you are iterating in an array of objects using `ng-repeat`, make sure you are using `track by $index` to avoid adding extra `$$hashKey` to your objects.

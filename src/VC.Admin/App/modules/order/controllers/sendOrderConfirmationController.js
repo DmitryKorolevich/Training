@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.order.controllers.sendOrderConfirmationController', [])
-.controller('sendOrderConfirmationController', ['$scope', '$modalInstance', 'data', 'orderService', 'toaster', 'promiseTracker', '$rootScope',
-    function ($scope, $modalInstance, data, orderService, toaster, promiseTracker, $rootScope)
+.controller('sendOrderConfirmationController', ['$scope', '$uibModalInstance', 'data', 'orderService', 'toaster', 'promiseTracker', '$rootScope',
+    function ($scope, $uibModalInstance, data, orderService, toaster, promiseTracker, $rootScope)
 {
         $scope.refreshTracker = promiseTracker("save");
 
@@ -10,7 +10,7 @@ angular.module('app.modules.order.controllers.sendOrderConfirmationController', 
 	    if (result.Success) {
 	        toaster.pop('success', "Success!", "Successfully sent.");
 	        data.thenCallback();
-	        $modalInstance.close();
+	        $uibModalInstance.close();
 	    } else {
 	        var messages = "";
 	        if (result.Messages) {
@@ -60,7 +60,7 @@ angular.module('app.modules.order.controllers.sendOrderConfirmationController', 
 		};
 
 		$scope.cancel = function () {
-			$modalInstance.close();
+			$uibModalInstance.close();
 		};
 	}
     

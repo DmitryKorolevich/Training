@@ -1,14 +1,14 @@
 ﻿'use strict';
 
 angular.module('app.core.utils.infoPopup.infoPopupUtil', [])
-.service('infoPopupUtil', ['$modal', '$log', function ($modal, $log) {
+.service('infoPopupUtil', ['$uibModal', '$log', function ($uibModal, $log) {
 	return {
 	    info: function (title, text, optionalOkHandler, preventClose) {
 	        if (preventClose === undefined || preventClose === null)
 	        {
 	            preventClose = false;
 	        }
-			var modalInstance = $modal.open({
+			var modalInstance = $uibModal.open({
 				templateUrl: "app/core/utils/infoPopup/info.html",
 				controller: "infoPopupController",
 				backdrop: preventClose ? 'static' : true,

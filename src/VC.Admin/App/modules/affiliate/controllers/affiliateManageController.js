@@ -1,9 +1,9 @@
 ﻿'use strict';
 
 angular.module('app.modules.affiliate.controllers.affiliateManageController', [])
-.controller('affiliateManageController', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal',
+.controller('affiliateManageController', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$uibModal',
     'affiliateService', 'customerService', 'modalUtil', 'toaster', 'confirmUtil', 'promiseTracker',
-    function ($scope, $rootScope, $state, $stateParams, $timeout, $modal, affiliateService, customerService, modalUtil, toaster, confirmUtil, promiseTracker)
+    function ($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, affiliateService, customerService, modalUtil, toaster, confirmUtil, promiseTracker)
     {
         $scope.refreshTracker = promiseTracker("get");
         $scope.resetTracker = promiseTracker("reset");

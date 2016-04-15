@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.core.utils.confirmation.confirmController', [])
-.controller('confirmController', ['$scope', '$modalInstance', 'data', function ($scope, $modalInstance, data) {
+.controller('confirmController', ['$scope', '$uibModalInstance', 'data', function ($scope, $uibModalInstance, data) {
 	function initialize() {
 		var confirmText = "Are you sure?";
 		if (data.confirmText != null) {
@@ -30,14 +30,14 @@ angular.module('app.core.utils.confirmation.confirmController', [])
 	    {
 	        $scope.okHandler();
 	    }
-	    $modalInstance.close(false);
+	    $uibModalInstance.close(false);
 	};
 
 	$scope.close = function () {
 		if ($scope.cancelHandler) {
 			$scope.cancelHandler();
 		}
-		$modalInstance.close(false);
+		$uibModalInstance.close(false);
 	};
 
 	initialize();

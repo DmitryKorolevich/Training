@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.product.controllers.promotionManageController', [])
-.controller('promotionManageController', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', 'productService', 'promotionService', 'toaster', 'confirmUtil', 'promiseTracker',
-    function ($scope, $rootScope, $state, $stateParams, $timeout, $modal, productService, promotionService, toaster, confirmUtil, promiseTracker)
+.controller('promotionManageController', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$uibModal', 'productService', 'promotionService', 'toaster', 'confirmUtil', 'promiseTracker',
+    function ($scope, $rootScope, $state, $stateParams, $timeout, $uibModal, productService, promotionService, toaster, confirmUtil, promiseTracker)
     {
         $scope.refreshTracker = promiseTracker("get");
 

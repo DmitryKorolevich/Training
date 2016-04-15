@@ -1,14 +1,14 @@
 ﻿'use strict';
 
 angular.module('app.modules.demo.controllers.modalAddSubProductController', [])
-.controller('modalAddSubProductController', ['$scope', '$modalInstance', 'items', function ($scope, $modalInstance, items) {
+.controller('modalAddSubProductController', ['$scope', '$uibModalInstance', 'items', function ($scope, $uibModalInstance, items) {
 	$scope.items = items;
 
 	$scope.ok = function () {
-		$modalInstance.close();
+		$uibModalInstance.close();
 	};
 
 	$scope.cancel = function () {
-		$modalInstance.close();
+		$uibModalInstance.close();
 	};
 }]);

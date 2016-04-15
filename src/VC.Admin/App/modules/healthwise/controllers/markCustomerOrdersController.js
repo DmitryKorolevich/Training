@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.healthwise.controllers.markCustomerOrdersController', [])
-.controller('markCustomerOrdersController', ['$scope', '$modalInstance', 'data', 'customerService', 'healthwiseService', 'toaster', 'promiseTracker', '$rootScope', 'confirmUtil',
-    function ($scope, $modalInstance, data, customerService, healthwiseService, toaster, promiseTracker, $rootScope, confirmUtil)
+.controller('markCustomerOrdersController', ['$scope', '$uibModalInstance', 'data', 'customerService', 'healthwiseService', 'toaster', 'promiseTracker', '$rootScope', 'confirmUtil',
+    function ($scope, $uibModalInstance, data, customerService, healthwiseService, toaster, promiseTracker, $rootScope, confirmUtil)
     {
         $scope.refreshTracker = promiseTracker("refresh");
 
@@ -13,7 +13,7 @@ angular.module('app.modules.healthwise.controllers.markCustomerOrdersController'
                 if (result.Data)
                 {
                     toaster.pop('success', "Success!", "Successfully flagged");
-                    $modalInstance.close();
+                    $uibModalInstance.close();
                     data.thenCallback();
                 }
                 else
@@ -95,7 +95,7 @@ angular.module('app.modules.healthwise.controllers.markCustomerOrdersController'
 
         $scope.cancel = function ()
         {
-            $modalInstance.close();
+            $uibModalInstance.close();
         };
 
         initialize();

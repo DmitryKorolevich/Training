@@ -1,5 +1,5 @@
 ﻿angular.module('app.modules.setting.controllers.addEditStateController', [])
-.controller('addEditStateController', ['$scope', '$modalInstance', 'data', 'settingService', 'toaster', 'promiseTracker', '$rootScope', function ($scope, $modalInstance, data, settingService, toaster, promiseTracker, $rootScope) {
+.controller('addEditStateController', ['$scope', '$uibModalInstance', 'data', 'settingService', 'toaster', 'promiseTracker', '$rootScope', function ($scope, $uibModalInstance, data, settingService, toaster, promiseTracker, $rootScope) {
     $scope.saveTracker = promiseTracker("save");
 
     function successSaveHandler(result) {
@@ -8,7 +8,7 @@
 
             $scope.state = result.Data;
             data.thenCallback($scope.state);
-            $modalInstance.close();
+            $uibModalInstance.close();
         } else {
             var messages = "";
             if (result.Messages) {
@@ -68,7 +68,7 @@
         };
 
         $scope.cancel = function () {
-            $modalInstance.close();
+            $uibModalInstance.close();
         };
     }
 

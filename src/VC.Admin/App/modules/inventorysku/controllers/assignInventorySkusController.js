@@ -1,6 +1,6 @@
 ﻿angular.module('app.modules.inventorysku.controllers.assignInventorySkusController', [])
-.controller('assignInventorySkusController', ['$scope', '$rootScope', '$state', '$modalInstance', 'inventorySkuService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil', 'data',
-    function ($scope, $rootScope, $state, $modalInstance, inventorySkuService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil, data)
+.controller('assignInventorySkusController', ['$scope', '$rootScope', '$state', '$uibModalInstance', 'inventorySkuService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil', 'data',
+    function ($scope, $rootScope, $state, $uibModalInstance, inventorySkuService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil, data)
     {
         $scope.refreshTracker = promiseTracker("refresh");
 
@@ -81,7 +81,7 @@
             if ($scope.forms.InventorySkus.$valid)
             {
                 data.thenCallback($scope.assignedItems);
-                $modalInstance.close();
+                $uibModalInstance.close();
             }
             else
             {
@@ -127,7 +127,7 @@
 
         $scope.cancel = function ()
         {
-            $modalInstance.close();
+            $uibModalInstance.close();
         };
 
         initialize();

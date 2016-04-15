@@ -1,5 +1,5 @@
 ﻿angular.module('app.modules.product.controllers.addProductPopupController', [])
-.controller('addProductPopupController', ['$scope', '$modalInstance', 'data', 'settingService', 'toaster', 'promiseTracker', '$rootScope', function ($scope, $modalInstance, data, settingService, toaster, promiseTracker, $rootScope) {
+.controller('addProductPopupController', ['$scope', '$uibModalInstance', 'data', 'settingService', 'toaster', 'promiseTracker', '$rootScope', function ($scope, $uibModalInstance, data, settingService, toaster, promiseTracker, $rootScope) {
 
     function initialize() {
         $scope.types = $rootScope.ReferenceData.ProductTypes;
@@ -8,11 +8,11 @@
 
         $scope.save = function () {
             data.thenCallback($scope.type);
-            $modalInstance.close();
+            $uibModalInstance.close();
         };
 
         $scope.cancel = function () {
-            $modalInstance.close();
+            $uibModalInstance.close();
         };
     }
 

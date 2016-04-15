@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.affiliate.controllers.affiliateSendEmailController', [])
-.controller('affiliateSendEmailController', ['$scope', '$modalInstance', 'data', 'affiliateService', 'toaster', 'promiseTracker', '$rootScope',
-    function ($scope, $modalInstance, data, affiliateService , toaster, promiseTracker, $rootScope) {
+.controller('affiliateSendEmailController', ['$scope', '$uibModalInstance', 'data', 'affiliateService', 'toaster', 'promiseTracker', '$rootScope',
+    function ($scope, $uibModalInstance, data, affiliateService , toaster, promiseTracker, $rootScope) {
 	$scope.saveTracker = promiseTracker("save");
 
 	function successSaveHandler(result) {
@@ -12,7 +12,7 @@ angular.module('app.modules.affiliate.controllers.affiliateSendEmailController',
 	        if (data.thenCallback) {
 	            data.thenCallback(result.Data);
 	        }
-	        $modalInstance.close();
+	        $uibModalInstance.close();
 	    } else {
 	        var messages = "";
 	        if (result.Messages) {
@@ -87,7 +87,7 @@ angular.module('app.modules.affiliate.controllers.affiliateSendEmailController',
 
 	$scope.cancel = function ()
 	{
-	    $modalInstance.close();
+	    $uibModalInstance.close();
 	};
     
 	initialize();

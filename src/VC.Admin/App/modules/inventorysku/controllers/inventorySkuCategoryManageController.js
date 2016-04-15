@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.inventorysku.controllers.inventorySkuCategoryManageController', [])
-.controller('inventorySkuCategoryManageController', ['$scope', '$modalInstance', 'data', 'inventorySkuService', 'toaster', 'confirmUtil', 'promiseTracker',
-    function ($scope, $modalInstance, data, inventorySkuService, toaster, confirmUtil, promiseTracker)
+.controller('inventorySkuCategoryManageController', ['$scope', '$uibModalInstance', 'data', 'inventorySkuService', 'toaster', 'confirmUtil', 'promiseTracker',
+    function ($scope, $uibModalInstance, data, inventorySkuService, toaster, confirmUtil, promiseTracker)
     {
         $scope.refreshTracker = promiseTracker("get");
         $scope.editTracker = promiseTracker("edit");
@@ -13,7 +13,7 @@ angular.module('app.modules.inventorysku.controllers.inventorySkuCategoryManageC
                 $scope.id = result.Data.Id;
                 $scope.category.Id = result.Data.Id;
                 data.thenCallback($scope.category);
-                $modalInstance.close();
+                $uibModalInstance.close();
             } else {
                 var messages = "";
                 if (result.Messages) {
@@ -77,7 +77,7 @@ angular.module('app.modules.inventorysku.controllers.inventorySkuCategoryManageC
         };
 
         $scope.cancel = function () {
-            $modalInstance.close();
+            $uibModalInstance.close();
         };
 
         initialize();

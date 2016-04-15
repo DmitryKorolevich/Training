@@ -65,8 +65,10 @@ use `laddaProvider`
 ```js
 angular.module(xxxx)
   .config(function (laddaProvider) {
-    laddaProvider.setOption({
-      style: 'expand-left'
+    laddaProvider.setOption({ /* optional */
+      style: 'expand-left',
+      spinnerSize: 35,
+      spinnerColor: '#ffffff'
     });
   })
 ```
@@ -134,11 +136,8 @@ in your package.json, add the following object:
     ...
 },
 "browserify-shim": {
-
     "ladda": "global:Ladda",
-
     "spin.js": "global:Spinner"
-
 }
 ```
 
@@ -150,6 +149,26 @@ window.Ladda = require('/components/ladda/js/ladda');
 require('/components/angular-ladda/dist/angular-ladda');
 ```
 
+## Using ladda-themeless.min.css
+
+overrides in your `bower.json` (Thanks @benjamincharity)
+
+```
+{
+  "name": "client",
+  "version": "0.0.0",
+  "dependencies": {
+    "ladda": "~0.9.8"
+  },
+  "overrides": {
+      "ladda": {
+          "main": [
+              "dist/ladda-themeless.min.css"
+          ]
+      }
+  }
+}
+```
 
 ## Links
 

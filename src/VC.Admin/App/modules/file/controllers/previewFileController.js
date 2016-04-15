@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.file.controllers.previewFileController', [])
-.controller('previewFileController', ['$scope', '$rootScope', '$modalInstance', 'data',
-    function ($scope, $rootScope, $modalInstance, data) {
+.controller('previewFileController', ['$scope', '$rootScope', '$uibModalInstance', 'data',
+    function ($scope, $rootScope, $uibModalInstance, data) {
 	
     function initialize() {
         if ($rootScope.ReferenceData.PublicHost) {
@@ -16,7 +16,7 @@ angular.module('app.modules.file.controllers.previewFileController', [])
 	}
 
 	$scope.cancel = function () {
-	    $modalInstance.close();
+	    $uibModalInstance.close();
 	};
 
 	initialize();

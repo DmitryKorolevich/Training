@@ -1,6 +1,6 @@
 ﻿angular.module('app.modules.product.controllers.topPurchasedProductsController',[])
-.controller('topPurchasedProductsController',['$scope','$modalInstance','data','productService','toaster','promiseTracker','$rootScope',
-    function($scope,$modalInstance,data,productService,toaster,promiseTracker,$rootScope) {
+.controller('topPurchasedProductsController',['$scope','$uibModalInstance','data','productService','toaster','promiseTracker','$rootScope',
+    function($scope,$uibModalInstance,data,productService,toaster,promiseTracker,$rootScope) {
     $scope.refreshTracker=promiseTracker("get");
 
 	function errorHandler(result) {
@@ -45,11 +45,11 @@
 	    });
 
 	    data.thenCallback(addedProducts);
-	    $modalInstance.close();
+	    $uibModalInstance.close();
 	};
 
 	$scope.cancel=function() {
-	    $modalInstance.close();
+	    $uibModalInstance.close();
 	};
     
 	initialize();

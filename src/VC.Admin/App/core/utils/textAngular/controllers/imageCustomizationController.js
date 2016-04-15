@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.core.utils.textAngular.controllers.imageCustomizationController', [])
-.controller('imageCustomizationController', ['$scope', '$modalInstance', 'data', 'toaster', function ($scope, $modalInstance, data, toaster) {
+.controller('imageCustomizationController', ['$scope', '$uibModalInstance', 'data', 'toaster', function ($scope, $uibModalInstance, data, toaster) {
 
 		function intitialize() {
 			$scope.alignmentLookup = [
@@ -33,12 +33,12 @@ angular.module('app.core.utils.textAngular.controllers.imageCustomizationControl
 			if (!$scope.image || !$scope.image.FileUrl) {
 				toaster.pop('error', "Error!", 'Please select an image first.', null, 'trustedHtml');
 			} else {
-				$modalInstance.close($scope.image);
+				$uibModalInstance.close($scope.image);
 			}
 		};
 
 		$scope.remove = function() {
-			$modalInstance.dismiss();
+			$uibModalInstance.dismiss();
 
 			if (data.Remove) {
 				data.Remove();
@@ -46,7 +46,7 @@ angular.module('app.core.utils.textAngular.controllers.imageCustomizationControl
 		};
 
 		$scope.cancel = function() {
-			$modalInstance.dismiss();
+			$uibModalInstance.dismiss();
 
 			if (data.Cancel) {
 				data.Cancel();

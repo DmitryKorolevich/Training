@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.product.controllers.inventoryCategoryManageController', [])
-.controller('inventoryCategoryManageController', ['$scope', '$modalInstance', 'data', 'productService', 'toaster', 'confirmUtil', 'promiseTracker',
-    function ($scope, $modalInstance, data, productService, toaster, confirmUtil, promiseTracker) {
+.controller('inventoryCategoryManageController', ['$scope', '$uibModalInstance', 'data', 'productService', 'toaster', 'confirmUtil', 'promiseTracker',
+    function ($scope, $uibModalInstance, data, productService, toaster, confirmUtil, promiseTracker) {
         $scope.refreshTracker = promiseTracker("get");
         $scope.editTracker = promiseTracker("edit");
 
@@ -12,7 +12,7 @@ angular.module('app.modules.product.controllers.inventoryCategoryManageControlle
                 $scope.id = result.Data.Id;
                 $scope.category.Id = result.Data.Id;
                 data.thenCallback($scope.category);
-                $modalInstance.close();
+                $uibModalInstance.close();
             } else {
                 var messages = "";
                 if (result.Messages) {
@@ -75,7 +75,7 @@ angular.module('app.modules.product.controllers.inventoryCategoryManageControlle
         };
 
         $scope.cancel = function () {
-            $modalInstance.close();
+            $uibModalInstance.close();
         };
 
         initialize();

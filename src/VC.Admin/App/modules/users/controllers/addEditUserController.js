@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.modules.users.controllers.addEditUserController', [])
-.controller('addEditUserController', ['$scope', '$modalInstance', 'data', 'userService', 'toaster', 'promiseTracker', '$rootScope', function ($scope, $modalInstance, data, userService, toaster, promiseTracker, $rootScope)
+.controller('addEditUserController', ['$scope', '$uibModalInstance', 'data', 'userService', 'toaster', 'promiseTracker', '$rootScope', function ($scope, $uibModalInstance, data, userService, toaster, promiseTracker, $rootScope)
 {
     $scope.refreshTracker = promiseTracker("refresh");
     $scope.saveTracker = promiseTracker("save");
@@ -11,7 +11,7 @@ angular.module('app.modules.users.controllers.addEditUserController', [])
 	function successHandler(result) {
 		if (result.Success) {
 			toaster.pop('success', "Success!", "Successfully saved");
-			$modalInstance.close();
+			$uibModalInstance.close();
 
 			if ($scope.editMode && $scope.signedInUser) {
 			    $rootScope.currentUser.Email = $scope.user.Email;
@@ -108,7 +108,7 @@ angular.module('app.modules.users.controllers.addEditUserController', [])
                     if (result.Success)
                     {
                         toaster.pop('success', "Success!", "Successfully sent");
-                        $modalInstance.close();
+                        $uibModalInstance.close();
                     } else
                     {
                         var messages = "";
@@ -137,7 +137,7 @@ angular.module('app.modules.users.controllers.addEditUserController', [])
                     if (result.Success)
                     {
                         toaster.pop('success', "Success!", "Successfully reset");
-                        $modalInstance.close();
+                        $uibModalInstance.close();
                     } else
                     {
                         var messages = "";
@@ -160,7 +160,7 @@ angular.module('app.modules.users.controllers.addEditUserController', [])
 
 	    $scope.cancel = function ()
 	    {
-	        $modalInstance.close();
+	        $uibModalInstance.close();
 	    };
 
 	    userService.getAdminTeams($scope.refreshTracker).success(function (result)

@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.modules.setting.controllers.errorDetailsController', [])
-.controller('errorDetailsController', ['$scope', '$modalInstance', 'data', 'toaster', function ($scope, $modalInstance, data, toaster)
+.controller('errorDetailsController', ['$scope', '$uibModalInstance', 'data', 'toaster', function ($scope, $uibModalInstance, data, toaster)
 {
     function initialize()
     {
@@ -14,7 +14,7 @@ angular.module('app.modules.setting.controllers.errorDetailsController', [])
 
         $scope.cancel = function ()
         {
-            $modalInstance.close();
+            $uibModalInstance.close();
         };
     }
 
