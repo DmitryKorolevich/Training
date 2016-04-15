@@ -500,7 +500,7 @@ namespace VC.Public.Controllers
 
                     if (model.UseBillingAddress)
                     {
-                        cart.Order.Data.PreferredShipMethod = PreferredShipMethod.Best;
+                        cart.Order.ShippingAddress.Data.PreferredShipMethod = PreferredShipMethod.Best;
                     }
 
                     cart.Order.Data.GiftOrder = model.IsGiftOrder;
