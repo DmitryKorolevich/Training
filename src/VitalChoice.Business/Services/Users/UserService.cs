@@ -497,7 +497,7 @@ namespace VitalChoice.Business.Services.Users
 									   x.Email.ToLower().Contains(keyword));
 			}
 
-			var queryable = UserManager.Users.AsNoTracking().Where(query);
+			var queryable = UserManager.Users.Include(p=>p.Profile).ThenInclude(p=>p.AdminTeam).AsNoTracking().Where(query);
 			var overallCount = queryable.Count();
 
 			var sortOrder = filter.Sorting.SortOrder;
