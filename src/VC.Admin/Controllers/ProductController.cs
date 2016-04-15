@@ -113,20 +113,16 @@ namespace VC.Admin.Controllers
             ICollection<SkuWithStatisticListItemModel> toReturn = new List<SkuWithStatisticListItemModel>();
 
             FilterBase idsFilter = new FilterBase();
-            idsFilter.Paging.PageIndex = 1;
-            idsFilter.Paging.PageItemCount = 20;
+            idsFilter.Paging = null;
             Dictionary<int, int> items = await productService.GetTopPurchasedSkuIdsAsync(idsFilter, id);
-            //items.Add(54, 20);
-            //items.Add(55, 5);
-            //items.Add(25, 10);
-            //items.Add(1, 1);
 
             VProductSkuFilter filter = new VProductSkuFilter();
             filter.Ids = items.Select(p => p.Key).ToList();
-            filter.Paging.PageIndex = 1;
-            filter.Paging.PageItemCount = 20;
+            filter.Paging = null;
 
             var result = await productService.GetSkusAsync(filter);
+            //only in stock
+            result = result.Where(p => p.DisregardStock || p.Stock > 0).ToList();
             foreach (var sku in result)
             {
                 foreach (var item in items)
@@ -138,8 +134,8 @@ namespace VC.Admin.Controllers
                     }
                 }
             }
-
-            return toReturn.ToArray();
+            
+            return toReturn.OrderByDescending(p => p.Ordered).Take(20).ToList();
         }
 
         [HttpPost]
