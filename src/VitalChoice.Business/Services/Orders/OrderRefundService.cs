@@ -23,6 +23,7 @@ using VitalChoice.ObjectMapping.Base;
 using System.Linq.Expressions;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Infrastructure.Context;
+using Microsoft.Extensions.Logging;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -146,8 +147,9 @@ namespace VitalChoice.Business.Services.Orders
 
                     transaction.Commit();
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -175,8 +177,9 @@ namespace VitalChoice.Business.Services.Orders
 
                     transaction.Commit();
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -197,8 +200,9 @@ namespace VitalChoice.Business.Services.Orders
 
                     transaction.Commit();
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -225,8 +229,9 @@ namespace VitalChoice.Business.Services.Orders
 
                     transaction.Commit();
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }

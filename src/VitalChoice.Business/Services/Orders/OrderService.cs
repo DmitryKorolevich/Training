@@ -203,8 +203,9 @@ namespace VitalChoice.Business.Services.Orders
                     }
                     transaction.Commit();
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -243,8 +244,9 @@ namespace VitalChoice.Business.Services.Orders
                     await uow.SaveChangesAsync();
                     transaction.Commit();
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -302,8 +304,9 @@ namespace VitalChoice.Business.Services.Orders
                     await uow.SaveChangesAsync();
                     transaction.Commit();
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -363,8 +366,9 @@ namespace VitalChoice.Business.Services.Orders
 
                     transaction.Commit();
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -928,11 +932,10 @@ namespace VitalChoice.Business.Services.Orders
 
 						    success = true;
 					    }
-					    catch(Exception ex)
-					    {
-							transaction.Rollback();
-
-							Logger.LogError($"AutoShip {autoShip.Id} skipped due to error ocurred. Error: {ex.Message}", ex);
+                        catch (Exception e)
+                        {
+                            Logger.LogError($"AutoShip {autoShip.Id} skipped due to error ocurred. Error: {e.Message}", e);
+                            transaction.Rollback();
 
 							success = false;
 						}
@@ -1048,8 +1051,9 @@ namespace VitalChoice.Business.Services.Orders
 
                             toReturn = true;
                         }
-                        catch
+                        catch (Exception e)
                         {
+                            Logger.LogError(e.Message, e);
                             transaction.Rollback();
                             throw;
                         }
@@ -1091,8 +1095,9 @@ namespace VitalChoice.Business.Services.Orders
 
                         transaction.Commit();
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
+                        Logger.LogError(e.Message, e);
                         transaction.Rollback();
                         throw;
                     }
@@ -1192,8 +1197,9 @@ namespace VitalChoice.Business.Services.Orders
 
                         transaction.Commit();
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
+                        Logger.LogError(e.Message, e);
                         transaction.Rollback();
                         throw;
                     }

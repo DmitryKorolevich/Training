@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.Data.Entity;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Business.Mail;
 using VitalChoice.Data.Context;
@@ -35,6 +36,7 @@ namespace VitalChoice.Business.Services.Users
 		private readonly IEcommerceRepositoryAsync<User> _ecommerceRepositoryAsync;
 		private readonly IUserValidator<ApplicationUser> _userValidator;
 	    private readonly ITransactionAccessor<VitalChoiceContext> _transactionAccessor;
+	    private readonly ILogger _logger;
 
 	    protected IAppInfrastructureService AppInfrastructureService { get; }
 
@@ -51,7 +53,7 @@ namespace VitalChoice.Business.Services.Users
 	    protected UserService(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, VitalChoiceContext context,
 	        SignInManager<ApplicationUser> signInManager, IAppInfrastructureService appInfrastructureService,
 	        INotificationService notificationService, IOptions<AppOptions> options, IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync,
-	        IUserValidator<ApplicationUser> userValidator, ITransactionAccessor<VitalChoiceContext> transactionAccessor)
+	        IUserValidator<ApplicationUser> userValidator, ITransactionAccessor<VitalChoiceContext> transactionAccessor, ILoggerProviderExtended loggerProvider)
 	    {
 	        UserManager = userManager;
 	        RoleManager = roleManager;
@@ -63,6 +65,8 @@ namespace VitalChoice.Business.Services.Users
 	        this._userValidator = userValidator;
 	        _transactionAccessor = transactionAccessor;
 	        Options = options.Value;
+	        _logger = loggerProvider.CreateLoggerDefault();
+
 	    }
 
 	    protected abstract Task SendActivationInternalAsync(ApplicationUser dbUser);
@@ -270,9 +274,10 @@ namespace VitalChoice.Business.Services.Users
 						throw new AppValidationException(AggregateIdentityErrors(createResult.Errors));
 					}
 				}
-				catch (Exception)
-				{
-					user.Id = 0;
+                catch (Exception e)
+                {
+                    _logger.LogError(e.Message, e);
+                    user.Id = 0;
                     transaction.Rollback();
 					throw;
 				}
@@ -320,9 +325,10 @@ namespace VitalChoice.Business.Services.Users
 
 					return user;
 				}
-				catch (Exception)
-				{
-					transaction.Rollback();
+                catch (Exception e)
+                {
+                    _logger.LogError(e.Message, e);
+                    transaction.Rollback();
 					throw;
 				}
 			}
@@ -472,9 +478,10 @@ namespace VitalChoice.Business.Services.Users
 
 					return user;
 				}
-				catch (Exception)
-				{
-					transaction.Rollback();
+                catch (Exception e)
+                {
+                    _logger.LogError(e.Message, e);
+                    transaction.Rollback();
 					throw;
 				}
 			}

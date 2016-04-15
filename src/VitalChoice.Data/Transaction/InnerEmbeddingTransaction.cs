@@ -25,10 +25,6 @@ namespace VitalChoice.Data.Transaction
                 Closed = true;
                 _referenceCount--;
                 _transaction.Dispose();
-                if (DbContext.Disposed)
-                {
-                    DbContext.Dispose();
-                }
             }
             else
             {
@@ -57,7 +53,14 @@ namespace VitalChoice.Data.Transaction
             if (_referenceCount > 0)
             {
                 _referenceCount = 0;
-                _transaction.Rollback();
+                try
+                {
+                    _transaction.Rollback();
+                }
+                catch (Exception e)
+                {
+                    
+                }
                 OnTransactionRollback();
             }
         }

@@ -36,21 +36,23 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
         {
             if (GroupInfo == null || expression?.Condition == null)
                 return new TValueGroup[0];
-            var values = new HashSet<TValue>();
-            var items = new HashSet<TValueGroup>();
-            WalkConditionTree(expression.Condition, items, values);
-            if (values.Count != GroupInfo.Count)
-                values.Clear();
-            if (items.Any() || values.Any() && values.Count == GroupInfo.Count)
+            var freeValues = new HashSet<TValue>();
+            var containsSets = new HashSet<TValue>();
+            var itemSets = new HashSet<TValueGroup>();
+            WalkConditionTree(expression.Condition, itemSets, freeValues, containsSets);
+            if (freeValues.Count != GroupInfo.Count)
+                freeValues.Clear();
+            if (itemSets.Any() || freeValues.Any() || containsSets.Any())
             {
-                return GetKeys(GroupInfo, items, values);
+                return GetKeys(GroupInfo, itemSets, freeValues, containsSets);
             }
             return new TValueGroup[0];
         }
 
         protected virtual bool WalkConditionTree(Condition top,
             HashSet<TValueGroup> itemsSet,
-            HashSet<TValue> valuesSet)
+            HashSet<TValue> freeValues,
+            HashSet<TValue> containsSets)
         {
             if (top == null)
             {
@@ -68,7 +70,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
                     if (member != null && value != null && member.Expression.Type == typeof (T) &&
                         GroupInfo.TryGet(member.Member.Name, out info))
                     {
-                        valuesSet.Add(ValueFactory(info, value));
+                        freeValues.Add(ValueFactory(info, value));
                     }
                     else
                     {
@@ -77,12 +79,12 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
                     return true;
                 case ExpressionType.AndAlso:
                     var and = (BinaryCondition) top;
-                    if (!WalkConditionTree(and.Left, itemsSet, valuesSet))
+                    if (!WalkConditionTree(and.Left, itemsSet, freeValues, containsSets))
                         return false;
-                    return WalkConditionTree(and.Right, itemsSet, valuesSet);
+                    return WalkConditionTree(and.Right, itemsSet, freeValues, containsSets);
                 case ExpressionType.OrElse:
                     itemsSet.Clear();
-                    valuesSet.Clear();
+                    freeValues.Clear();
                     return false;
                 case ExpressionType.Call:
                     var method = top.Expression as MethodCallExpression;
@@ -104,7 +106,13 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
                             }
                             else
                             {
-                                //TODO: parse pared sequnces
+                                if (values is IEnumerable)
+                                {
+                                    foreach (var item in values as IEnumerable)
+                                    {
+                                        containsSets.Add(ValueFactory(info, item));
+                                    }
+                                }
                             }
                         }
                     }
@@ -119,33 +127,84 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
         protected abstract TValueGroup GroupFactory(IEnumerable<TValue> values);
         protected abstract TValue ValueFactory(TInfo info, object value);
 
-        protected virtual ICollection<TValueGroup> GetKeys(EntityValueGroupInfo<TInfo> keyInfo,
-            HashSet<TValueGroup> result, HashSet<TValue> keyValues)
+        protected virtual ICollection<TValueGroup> GetKeys(EntityValueGroupInfo<TInfo> keyInfo, HashSet<TValueGroup> result,
+            HashSet<TValue> freeSets, HashSet<TValue> containsSets)
         {
             try
             {
-                if (result.Any())
+                //Two different primary key values with AND
+                if (freeSets.Any() && freeSets.GroupBy(f => f.ValueInfo).Any(g => g.Count() > 1))
                 {
-                    if (keyInfo.Count == keyValues.Count)
+                    return new TValueGroup[0];
+                }
+
+                Dictionary<TInfo, HashSet<TValue>> resultedSets = keyInfo.InfoCollection.ToDictionary(info => info,
+                    info => new HashSet<TValue>());
+
+                if (containsSets.Any())
+                {
+                    var containsGroups = containsSets.GroupBy(f => f.ValueInfo);
+                    foreach (var group in containsGroups)
                     {
-                        var newKey = GroupFactory(keyValues);
-                        if (result.Contains(newKey))
+                        resultedSets[group.Key].AddRange(group);
+                    }
+                }
+
+                foreach (var value in freeSets)
+                {
+                    var set = resultedSets[value.ValueInfo];
+                    if (set.Any())
+                    {
+                        if (set.Contains(value))
                         {
-                            result.Clear();
-                            result.Add(newKey);
+                            set.Clear();
+                            set.Add(value);
+                        }
+                        //No crossed keys on ordinary list and in Contains() collection.
+                        else
+                        {
+                            return new TValueGroup[0];
+                        }
+                    }
+                    else
+                    {
+                        set.Add(value);
+                    }
+                }
+
+                if (resultedSets.Values.All(v => v.Any()))
+                {
+                    var iterators = new IEnumerator<TValue>[resultedSets.Count];
+                    int index = 0;
+                    foreach (var set in resultedSets)
+                    {
+                        iterators[index] = set.Value.GetEnumerator();
+                        if (index < iterators.Length - 1)
+                            iterators[index].MoveNext();
+                        index++;
+                    }
+                    index = iterators.Length - 1;
+                    while (true)
+                    {
+                        if (iterators[index].MoveNext())
+                        {
+                            while (index < iterators.Length - 1)
+                            {
+                                index++;
+                                iterators[index].Reset();
+                                iterators[index].MoveNext();
+                            }
+
+                            result.Add(GroupFactory(iterators.Select(iterator => iterator.Current)));
                         }
                         else
                         {
-                            result.Clear();
+                            iterators[index].Reset();
+                            iterators[index].MoveNext();
+                            index--;
                         }
-                    }
-                }
-                else
-                {
-                    if (keyInfo.Count == keyValues.Count)
-                    {
-                        var newKey = GroupFactory(keyValues);
-                        result.Add(newKey);
+                        if (index < 0)
+                            break;
                     }
                 }
             }

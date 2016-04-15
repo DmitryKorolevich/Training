@@ -677,13 +677,15 @@ namespace VitalChoice.DynamicData.Base
             return result;
         }
 
-        public virtual void UpdateObject<TModel>(TModel model, TDynamic obj, int idObjectType)
+        public virtual void UpdateObject<TModel>(TModel model, TDynamic obj, int idObjectType, bool loadDefaults = true)
             where TModel : class, new()
         {
             if (obj != null)
                 obj.IdObjectType = idObjectType;
-
-            UpdateObjectWithDefaults(obj, idObjectType).GetAwaiter().GetResult();
+            if (loadDefaults)
+            {
+                UpdateObjectWithDefaults(obj, idObjectType).GetAwaiter().GetResult();
+            }
             UpdateObject(model, obj);
         }
 
@@ -694,14 +696,17 @@ namespace VitalChoice.DynamicData.Base
             return result;
         }
 
-        public virtual async Task UpdateObjectAsync<TModel>(TModel model, TDynamic obj, int idObjectType)
+        public virtual async Task UpdateObjectAsync<TModel>(TModel model, TDynamic obj, int idObjectType, bool loadDefaults = true)
             where TModel : class, new()
         {
             
             if (obj != null)
                 obj.IdObjectType = idObjectType;
 
-            await UpdateObjectWithDefaults(obj, idObjectType);
+            if (loadDefaults)
+            {
+                await UpdateObjectWithDefaults(obj, idObjectType);
+            }
             UpdateObject(model, obj);
         }
 

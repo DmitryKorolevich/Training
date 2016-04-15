@@ -18,11 +18,11 @@ namespace VC.Admin.Models.Settings
 
         public string ClassTypeName { get; set; }
 
-        public ICollection<ProfileScopeListItemModel> SubScopes { get; set; }
+        public IEnumerable<ProfileScopeListItemModel> SubScopes { get; set; }
 
-	    public ProfileScopeListItemModel(ProfilingScope item)
+        public ProfileScopeListItemModel(ProfilingScope item)
         {
-            if(item!=null)
+            if (item != null)
             {
                 Data = item.Data.ToString();
                 ShortData = Data.Length > BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE
@@ -31,7 +31,7 @@ namespace VC.Admin.Models.Settings
                 ClassTypeName = item.ClassType.FullName;
                 TimeElapsed = item.TimeElapsed.TotalMilliseconds;
                 MethodName = item.MethodName;
-                SubScopes = item.SubScopes?.Select(p => new ProfileScopeListItemModel(p)).ToList() ?? new List<ProfileScopeListItemModel>();
+                SubScopes = item.SubScopes?.Select(p => new ProfileScopeListItemModel(p)) ?? Enumerable.Empty<ProfileScopeListItemModel>();
             }
         }
     }
