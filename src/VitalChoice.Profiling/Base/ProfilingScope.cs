@@ -115,12 +115,14 @@ namespace VitalChoice.Profiling.Base
         {
             if (data == null)
                 return;
-
-            if (_additionalData == null)
+            lock (_additionalData)
             {
-                _additionalData = new List<object>();
+                if (_additionalData == null)
+                {
+                    _additionalData = new List<object>();
+                }
+                _additionalData.Add(data);
             }
-            _additionalData.Add(data);
         }
 
         ~ProfilingScope()
