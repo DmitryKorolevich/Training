@@ -8,10 +8,12 @@ namespace VC.Public.Models.Checkout
 {
     public class AddUpdateShippingMethodModel: ShippingInfoModel
 	{
+        [Map("GiftOrder")]
 		public bool IsGiftOrder { get; set; }
 
 		[Display(Name = "Gift Message")]
 		[MaxLength(255)]
+        [Map]
 		public string GiftMessage { get; set; }
 
 		public bool UseBillingAddress { get; set; }

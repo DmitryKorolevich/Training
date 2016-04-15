@@ -56,6 +56,7 @@ namespace VC.Public.Controllers
         private readonly IProductService _productService;
         private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _orderPaymentMethodConverter;
         private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
+        private readonly IDynamicMapper<OrderDynamic, Order> _orderMapper;
         private readonly ReferenceData _appInfrastructure;
         private readonly ICountryService _countryService;
         private readonly BrontoService _brontoService;
@@ -75,7 +76,7 @@ namespace VC.Public.Controllers
             ICountryService countryService,
             BrontoService brontoService,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
-            IPageResultService pageResultService, ISettingService settingService, ILoggerProviderExtended loggerProvider)
+            IPageResultService pageResultService, ISettingService settingService, ILoggerProviderExtended loggerProvider, IDynamicMapper<OrderDynamic, Order> orderMapper)
             : base(
                 contextAccessor, customerService, infrastructureService, authorizationService, checkoutService, orderService,
                 skuMapper, productMapper, pageResultService, settingService)
@@ -88,6 +89,7 @@ namespace VC.Public.Controllers
             _countryService = countryService;
             _brontoService = brontoService;
             _transactionAccessor = transactionAccessor;
+            _orderMapper = orderMapper;
             _affiliateService = affiliateService;
             _appInfrastructure = appInfrastructureService.Get();
             _logger = loggerProvider.CreateLoggerDefault();
@@ -462,9 +464,8 @@ namespace VC.Public.Controllers
                                 await _addressConverter.FromModelAsync(
                                     _addressConverter.ToModel<AddUpdateShippingMethodModel>(cart.Order.PaymentMethod.Address),
                                     (int) AddressType.Shipping);
-							cart.Order.Data.DeliveryInstructions = model.DeliveryInstructions;
-							cart.Order.Data.PreferredShipMethod = PreferredShipMethod.Best;
-							cart.Order.Data.AddressType = model.AddressType;
+							//cart.Order.Data.DeliveryInstructions = model.DeliveryInstructions;
+							//cart.Order.Data.AddressType = model.AddressType;
 						}
                         else
                         {
@@ -476,13 +477,12 @@ namespace VC.Public.Controllers
                         if (model.UseBillingAddress)
                         {
                             await _addressConverter.UpdateObjectAsync(model, cart.Order.ShippingAddress, (int)AddressType.Shipping);
-                            await _addressConverter.UpdateObjectAsync(
+                            _addressConverter.UpdateObject(
                                 _addressConverter.ToModel<AddUpdateShippingMethodModel>(cart.Order.PaymentMethod.Address),
-                                cart.Order.ShippingAddress, (int) AddressType.Shipping, false);
-							cart.Order.Data.DeliveryInstructions = model.DeliveryInstructions;
-                            cart.Order.Data.PreferredShipMethod = PreferredShipMethod.Best;
-                            cart.Order.Data.AddressType = model.AddressType;
-						}
+                                cart.Order.ShippingAddress);
+                            //cart.Order.Data.DeliveryInstructions = model.DeliveryInstructions;
+                            //cart.Order.Data.AddressType = model.AddressType;
+                        }
                         else
                         {
                             await _addressConverter.UpdateObjectAsync(model, cart.Order.ShippingAddress, (int) AddressType.Shipping);
@@ -495,8 +495,14 @@ namespace VC.Public.Controllers
 		                customerAddressIdToUpdate = model.ShipAddressIdToOverride;
 	                }
 
-                    cart.Order.Data.GiftOrder = model.IsGiftOrder;
-                    cart.Order.Data.GiftMessage = model.GiftMessage;
+                    if (model.UseBillingAddress)
+                    {
+                        cart.Order.Data.PreferredShipMethod = PreferredShipMethod.Best;
+                    }
+
+                    _orderMapper.UpdateObject(model, cart.Order);
+                    //cart.Order.Data.GiftOrder = model.IsGiftOrder;
+                    //cart.Order.Data.GiftMessage = model.GiftMessage;
                     //cart.Order.Data.DeliveryInstructions = model.DeliveryInstructions;
                     await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
                     if (await CheckoutService.UpdateCart(cart, customerAddressIdToUpdate))
