@@ -13,6 +13,7 @@ using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Base;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Data.Context;
+using VitalChoice.Profiling.Base;
 
 namespace VitalChoice.Caching.Services
 {
@@ -25,7 +26,8 @@ namespace VitalChoice.Caching.Services
 
         public CacheStateManager(IInternalEntityEntryFactory factory, IInternalEntityEntrySubscriber subscriber,
             IInternalEntityEntryNotifier notifier, IValueGenerationManager valueGeneration, IModel model, IDatabase database,
-            DbContext context, IInternalEntityCacheFactory cacheFactory, ICacheSyncProvider cacheSyncProvider, ILoggerFactory loggerFactory) : base(factory, subscriber, notifier, valueGeneration, model, database, context)
+            DbContext context, IInternalEntityCacheFactory cacheFactory, ICacheSyncProvider cacheSyncProvider, ILoggerFactory loggerFactory)
+            : base(factory, subscriber, notifier, valueGeneration, model, database, context)
         {
             CacheFactory = cacheFactory;
             CacheSyncProvider = cacheSyncProvider;
@@ -38,7 +40,8 @@ namespace VitalChoice.Caching.Services
             return (List<ImmutableEntryState>) DataContext.Tag;
         }
 
-        protected override Task<int> SaveChangesAsync(IReadOnlyList<InternalEntityEntry> entriesToSave, CancellationToken cancellationToken = new CancellationToken())
+        protected override Task<int> SaveChangesAsync(IReadOnlyList<InternalEntityEntry> entriesToSave,
+            CancellationToken cancellationToken = new CancellationToken())
         {
             DataContext.Tag = new List<ImmutableEntryState>(entriesToSave.Select(e => new ImmutableEntryState(e)));
             return base.SaveChangesAsync(entriesToSave, cancellationToken);
@@ -96,7 +99,7 @@ namespace VitalChoice.Caching.Services
             foreach (var group in entriesToSave.Where(e => e.EntityType != null).GroupBy(e => e.EntityType))
             {
                 var cache = CacheFactory.GetCache(group.Key);
-                foreach (var entry in group.OrderBy(e => e.State))
+                foreach (var entry in group)
                 {
                     EntityKey primaryKey;
                     switch (entry.State)
@@ -128,66 +131,96 @@ namespace VitalChoice.Caching.Services
             }
         }
 
+        private class SyncOp
+        {
+            public ImmutableEntryState Entry;
+            public EntityKey PrimaryKey;
+            public IInternalEntityCache Cache;
+        }
+
         private IEnumerable<SyncOperation> UpdateCache(ICollection<ImmutableEntryState> entriesToSave)
         {
             var syncOperations = new List<SyncOperation>();
             var dbContext = DataContext as DbContext;
-            foreach (var group in entriesToSave.Where(e => e.EntityType != null).GroupBy(e => e.EntityType))
+            var entryGroups = entriesToSave.Where(e => e.EntityType != null).Select(e => new SyncOp
+            {
+                Entry = e
+            }).GroupBy(e => e.Entry.EntityType).ToArray();
+
+            //Update in two stages, first mark all for update/add
+            foreach (var group in entryGroups)
             {
                 var cache = CacheFactory.GetCache(group.Key);
-                foreach (var entry in group.OrderBy(e => e.State))
+                foreach (var op in group)
                 {
-                    EntityKey primaryKey;
-                    switch (entry.State)
+                    op.Cache = cache;
+                    switch (op.Entry.State)
                     {
                         case EntityState.Modified:
-                            primaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entry.Entity);
-                            if (primaryKey.IsValid)
+                            op.PrimaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(op.Entry.Entity);
+                            if (op.PrimaryKey.IsValid)
                             {
-                                if (!cache.Update(entry.Entity, dbContext))
-                                {
-                                    if (cache.ItemExist(primaryKey))
-                                    {
-                                        //Logger.LogWarning($"Cannot update <{group.Key.FullName}>{primaryKey}");
-                                    }
-                                }
+                                cache.MarkForUpdate(op.PrimaryKey);
                                 syncOperations.Add(new SyncOperation
                                 {
-                                    Key = primaryKey.ToExportable(group.Key),
+                                    Key = op.PrimaryKey.ToExportable(group.Key),
                                     SyncType = SyncType.Update,
                                     EntityType = group.Key.FullName
                                 });
                             }
                             break;
                         case EntityState.Deleted:
-                            primaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entry.Entity);
-                            if (primaryKey.IsValid)
+                            op.PrimaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(op.Entry.Entity);
+                            if (op.PrimaryKey.IsValid)
                             {
-                                if (!cache.TryRemove(primaryKey))
-                                {
-                                    if (cache.ItemExist(primaryKey))
-                                    {
-                                        //Logger.LogWarning($"Cannot remove <{group.Key.FullName}>{primaryKey}");
-                                    }
-                                }
+                                cache.MarkForUpdate(op.PrimaryKey);
                                 syncOperations.Add(new SyncOperation
                                 {
-                                    Key = primaryKey.ToExportable(group.Key),
+                                    Key = op.PrimaryKey.ToExportable(group.Key),
                                     SyncType = SyncType.Delete,
                                     EntityType = group.Key.FullName
                                 });
                             }
                             break;
                         case EntityState.Added:
-                            primaryKey = cache.MarkForAdd(entry.Entity);
-                            if (primaryKey.IsValid)
+                            op.PrimaryKey = cache.MarkForAdd(op.Entry.Entity);
+                            if (op.PrimaryKey.IsValid)
                             {
                                 syncOperations.Add(new SyncOperation
                                 {
-                                    Key = primaryKey.ToExportable(group.Key),
+                                    Key = op.PrimaryKey.ToExportable(group.Key),
                                     SyncType = SyncType.Add,
                                     EntityType = group.Key.FullName
                                 });
+                            }
+                            break;
+                    }
+                }
+            }
+
+            //Update in two stages, perform update
+            foreach (var group in entryGroups)
+            {
+                foreach (var op in group)
+                {
+                    switch (op.Entry.State)
+                    {
+                        case EntityState.Modified:
+                            if (op.PrimaryKey.IsValid)
+                            {
+                                using (new ProfilingScope("Cache TryUpdate"))
+                                {
+                                    op.Cache.Update(op.Entry.Entity, dbContext);
+                                }
+                            }
+                            break;
+                        case EntityState.Deleted:
+                            if (op.PrimaryKey.IsValid)
+                            {
+                                using (new ProfilingScope("Cache TryRemove"))
+                                {
+                                    op.Cache.TryRemove(op.PrimaryKey);
+                                }
                             }
                             break;
                     }

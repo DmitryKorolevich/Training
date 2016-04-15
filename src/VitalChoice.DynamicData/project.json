@@ -12,7 +12,8 @@
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
     "Autofac.Extensions.DependencyInjection": "4.0.0-*",
-    "VitalChoice.ObjectMapping": ""
+    "VitalChoice.ObjectMapping": "",
+    "VitalChoice.Profiling": ""
   },
 
   "frameworks": {

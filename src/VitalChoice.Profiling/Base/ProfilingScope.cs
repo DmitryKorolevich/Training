@@ -100,7 +100,7 @@ namespace VitalChoice.Profiling.Base
             return ProfileScope.Pop();
         }
 
-        public IReadOnlyCollection<ProfilingScope> SubScopes => _subScopes?.OrderByDescending(s => s.TimeElapsed).ToArray() ?? EmptyList;
+        public IReadOnlyCollection<ProfilingScope> SubScopes => _subScopes?.ToArray() ?? EmptyList;
 
         public Type ClassType { get; }
 

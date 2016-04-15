@@ -247,17 +247,16 @@ namespace VitalChoice.Caching.Services.Cache
                 EntityRelationalReferenceInfo relationReference = null;
                 _entityInfo.RelationReferences?.TryGetValue(pair.Key.Name, out relationReference);
 
-                //Collection reference, update always if not null
                 if (relationReference == null)
                 {
                     cached.NeedUpdateRelated.Remove(pair.Key.Name);
-                    pair.Key.SetRelatedObject(oldEntity, (newRelated as IEnumerable).Clone(pair.Key.RelationType));
+                    pair.Key.SetRelatedObject(oldEntity, (newRelated as IEnumerable<object>).DeepCloneCreateList(pair.Key));
                 }
                 else
                 {
                     var newRelatedKey = relationReference.GetPrimaryKeyValue(entity);
                     cached.NeedUpdateRelated.Remove(pair.Key.Name);
-                    pair.Key.SetRelatedObject(oldEntity, newRelatedKey.IsValid ? newRelated.Clone(pair.Key.RelationType) : null);
+                    pair.Key.SetRelatedObject(oldEntity, newRelatedKey.IsValid ? newRelated.DeepCloneItem(pair.Key) : null);
                 }
             }
 

@@ -209,8 +209,6 @@ namespace VitalChoice.Caching.Services.Cache
             if (entity == null)
                 return false;
 
-            MarkForUpdate(entity);
-
             var trackData = _infoStorage.GetTrackData(context);
 
             var result = CacheStorage.AllCacheDatas.Any();
@@ -385,7 +383,6 @@ namespace VitalChoice.Caching.Services.Cache
         {
             if (pk == null)
                 return false;
-            MarkForUpdateInternal(pk, CacheStorage.AllCacheDatas, null);
             var datas = CacheStorage.AllCacheDatas;
             datas.ForEach(data =>
             {

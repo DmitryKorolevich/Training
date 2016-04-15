@@ -59,20 +59,23 @@ namespace VitalChoice.Caching.Services
                     var results = elementType != null
                         ? cacheExecutor.Execute(out cacheGetResult)
                         : cacheExecutor.ExecuteFirst(out cacheGetResult);
-                    using (var updateScope = new ProfilingScope(cacheGetResult))
+                    if (cacheGetResult != CacheGetResult.NotFound)
                     {
-                        switch (cacheGetResult)
+                        using (var updateScope = new ProfilingScope(cacheGetResult))
                         {
-                            case CacheGetResult.Found:
-                                return (TResult) results;
-                            case CacheGetResult.Update:
-                                results = base.Execute<TResult>(expression);
+                            switch (cacheGetResult)
+                            {
+                                case CacheGetResult.Found:
+                                    return (TResult) results;
+                                case CacheGetResult.Update:
+                                    results = base.Execute<TResult>(expression);
 
-                                updateScope.AddScopeData(elementType != null
-                                    ? cacheExecutor.UpdateList(results)
-                                    : cacheExecutor.Update(results));
+                                    updateScope.AddScopeData(elementType != null
+                                        ? cacheExecutor.UpdateList(results)
+                                        : cacheExecutor.Update(results));
 
-                                return (TResult) results;
+                                    return (TResult) results;
+                            }
                         }
                     }
                 }
@@ -98,17 +101,20 @@ namespace VitalChoice.Caching.Services
                         return base.ExecuteAsync<TResult>(cacheExecutor.ReparsedExpression);
                     CacheGetResult cacheGetResult;
                     var result = (List<TResult>) cacheExecutor.Execute(out cacheGetResult);
-                    using (var updateScope = new ProfilingScope(cacheGetResult))
+                    if (cacheGetResult != CacheGetResult.NotFound)
                     {
-                        switch (cacheGetResult)
+                        using (var updateScope = new ProfilingScope(cacheGetResult))
                         {
-                            case CacheGetResult.Found:
-                                return result.ToAsyncEnumerable();
-                            case CacheGetResult.Update:
-                                var asyncResult = base.ExecuteAsync<TResult>(expression);
-                                var results = asyncResult.ToList().GetAwaiter().GetResult();
-                                updateScope.AddScopeData(cacheExecutor.UpdateList(results));
-                                return results.ToAsyncEnumerable();
+                            switch (cacheGetResult)
+                            {
+                                case CacheGetResult.Found:
+                                    return result.ToAsyncEnumerable();
+                                case CacheGetResult.Update:
+                                    var asyncResult = base.ExecuteAsync<TResult>(expression);
+                                    var results = asyncResult.ToList().GetAwaiter().GetResult();
+                                    updateScope.AddScopeData(cacheExecutor.UpdateList(results));
+                                    return results.ToAsyncEnumerable();
+                            }
                         }
                     }
                 }
@@ -141,19 +147,22 @@ namespace VitalChoice.Caching.Services
                     var result = elementType != null
                         ? cacheExecutor.Execute(out cacheGetResult)
                         : cacheExecutor.ExecuteFirst(out cacheGetResult);
-                    using (var updateScope = new ProfilingScope(cacheGetResult))
+                    if (cacheGetResult != CacheGetResult.NotFound)
                     {
-                        switch (cacheGetResult)
+                        using (var updateScope = new ProfilingScope(cacheGetResult))
                         {
-                            case CacheGetResult.Found:
-                                return (TResult) result;
-                            case CacheGetResult.Update:
-                                var results = (object) await base.ExecuteAsync<TResult>(expression, cancellationToken);
+                            switch (cacheGetResult)
+                            {
+                                case CacheGetResult.Found:
+                                    return (TResult) result;
+                                case CacheGetResult.Update:
+                                    var results = (object) await base.ExecuteAsync<TResult>(expression, cancellationToken);
 
-                                updateScope.AddScopeData(elementType != null
-                                    ? cacheExecutor.UpdateList(results)
-                                    : cacheExecutor.Update(results));
-                                return (TResult) results;
+                                    updateScope.AddScopeData(elementType != null
+                                        ? cacheExecutor.UpdateList(results)
+                                        : cacheExecutor.Update(results));
+                                    return (TResult) results;
+                            }
                         }
                     }
                 }
@@ -232,7 +241,10 @@ namespace VitalChoice.Caching.Services
                 }
                 try
                 {
-                    return _cache.Update(_queryData, (T) entity);
+                    using (new ProfilingScope("Cache Update"))
+                    {
+                        return _cache.Update(_queryData, (T) entity);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -249,7 +261,10 @@ namespace VitalChoice.Caching.Services
                 }
                 try
                 {
-                    return _cache.Update(_queryData, (IEnumerable<T>)entities);
+                    using (new ProfilingScope("Cache Update"))
+                    {
+                        return _cache.Update(_queryData, (IEnumerable<T>) entities);
+                    }
                 }
                 catch (Exception e)
                 {

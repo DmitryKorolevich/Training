@@ -302,21 +302,33 @@ namespace VitalChoice.Caching.Services
             if (context == null)
                 return null;
             Dictionary<TrackedEntityKey, EntityEntry> trackData = new Dictionary<TrackedEntityKey, EntityEntry>();
-            foreach (var group in context.ChangeTracker.Entries().Where(e => e.Entity != null && e.State != EntityState.Detached).GroupBy(e => e.Entity.GetType()))
+            try
             {
-                var keyInfo = GetPrimaryKeyInfo(group.Key);
-                if (keyInfo == null)
-                    continue;
-
-                foreach (var entry in group)
+                foreach (
+                    var group in
+                        context.ChangeTracker.Entries()
+                            .Where(e => e.Entity != null && e.State != EntityState.Detached)
+                            .GroupBy(e => e.Entity.GetType()))
                 {
-                    var key = new TrackedEntityKey(group.Key,
-                        keyInfo.GetPrimaryKeyValue(entry.Entity));
-                    if (!trackData.ContainsKey(key))
-                        trackData.Add(key, entry);
+                    var keyInfo = GetPrimaryKeyInfo(group.Key);
+                    if (keyInfo == null)
+                        continue;
+
+                    foreach (var entry in group)
+                    {
+                        var key = new TrackedEntityKey(group.Key,
+                            keyInfo.GetPrimaryKeyValue(entry.Entity));
+                        if (!trackData.ContainsKey(key))
+                            trackData.Add(key, entry);
+                    }
                 }
+                return trackData;
             }
-            return trackData;
+            catch (Exception e)
+            {
+                Logger.LogError(e.Message, e);
+                return trackData;
+            }
         }
 
         public Dictionary<TrackedEntityKey, EntityEntry> GetTrackData(DbContext context, out HashSet<object> trackedObjects)
