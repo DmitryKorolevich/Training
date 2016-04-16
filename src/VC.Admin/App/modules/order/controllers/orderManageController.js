@@ -350,6 +350,8 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
     };
 
     $scope.save = function () {
+        var deferredRecalculate = $q.defer();
+        $scope.addEditTracker.addPromise(deferredRecalculate.promise);
         $scope.requestRecalculate(function () {
             $scope.clearServerValidation();
             var valid = true;
@@ -365,6 +367,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
             if (valid && $scope.skusClientValid()) {
                 if (!orderEditService.isProductsValid($scope)) {
+                    deferredRecalculate.reject();
                     return;
                 }
 
@@ -463,15 +466,18 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 if (billingErrorMessages) {
                     $scope.paymentInfoTab.active = true;
                     toaster.pop('error', 'Error!', billingErrorMessages, null, 'trustedHtml');
+                    deferredRecalculate.reject();
                     return;
                 }
 
                 var order = orderEditService.orderDataProcessingBeforeSave($scope);
 
                 orderService.updateOrder(order, $scope.addEditTracker).success(function (result) {
+                    deferredRecalculate.resolve();
                     successSaveHandler(result);
                 }).
                 error(function (result) {
+                    deferredRecalculate.resolve();
                     errorHandler(result);
                 });
                 //billing info - for exist order all data should be sent and backend will save only needed one based on IdPaymentMethodType
@@ -490,6 +496,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 $scope.forms.submitted['marketing'] = true;
                 $scope.forms.submitted['vcwellness'] = true;
                 toaster.pop('error', "Error!", "Validation errors, please correct field values.", null, 'trustedHtml');
+                deferredRecalculate.reject();
             }
         });
     };

@@ -37,7 +37,7 @@ angular.module('app.core.utils.confirmation.confirmController', [])
 		if ($scope.cancelHandler) {
 			$scope.cancelHandler();
 		}
-		$uibModalInstance.close(false);
+		$uibModalInstance.dismiss(false);
 	};
 
 	initialize();
