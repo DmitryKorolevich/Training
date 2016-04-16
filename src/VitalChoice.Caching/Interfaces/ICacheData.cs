@@ -19,6 +19,7 @@ namespace VitalChoice.Caching.Interfaces
         IEnumerable<CachedEntity> GetAllUntyped();
         CachedEntity TryRemoveUntyped(EntityKey key);
         CachedEntity Update(object entity);
+        CachedEntity UpdateExist(object entity);
         bool ItemExist(EntityKey key);
         bool GetHasRelation(string name);
         bool FullCollection { get; }
@@ -35,8 +36,10 @@ namespace VitalChoice.Caching.Interfaces
         ICollection<CachedEntity<T>> GetAll();
         CachedEntity<T> TryRemove(EntityKey key);
         CachedEntity<T> Update(T entity);
+        CachedEntity<T> UpdateExist(T entity);
         CachedEntity<T> UpdateKeepRelations(T entity, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities);
         bool Update(IEnumerable<T> entity);
+        bool UpdateExist(IEnumerable<T> entities);
         bool UpdateAll(IEnumerable<T> entity);
         void SetNull(EntityKey key);
         void SetNull(IEnumerable<EntityKey> keys);

@@ -10,6 +10,8 @@ namespace VC.Admin.Models.Settings
     {
         public string Data { get; set; }
 
+        public IEnumerable<string> AdditionalData { get; set; }
+
         public string ShortData { get; set; }
 
         public double TimeElapsed { get; set; }
@@ -25,13 +27,14 @@ namespace VC.Admin.Models.Settings
             if (item != null)
             {
                 Data = item.Data.ToString();
-                ShortData = Data.Length > BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE
-                    ? Data.Substring(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                ShortData = Data.Length > 50
+                    ? Data.Substring(0, 50)
                     : Data;
                 ClassTypeName = item.ClassType.FullName;
-                TimeElapsed = item.TimeElapsed.TotalMilliseconds;
+                TimeElapsed = Math.Round(item.TimeElapsed.TotalMilliseconds, 2);
                 MethodName = item.MethodName;
                 SubScopes = item.SubScopes?.Select(p => new ProfileScopeListItemModel(p)) ?? Enumerable.Empty<ProfileScopeListItemModel>();
+                AdditionalData = item.AdditionalData?.Select(d => d?.ToString()) ?? Enumerable.Empty<string>();
             }
         }
     }

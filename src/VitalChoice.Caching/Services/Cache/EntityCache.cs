@@ -58,6 +58,10 @@ namespace VitalChoice.Caching.Services.Cache
                 IEnumerable<CacheResult<T>> results;
                 if (query.FullCollection)
                 {
+                    if (!_internalCache.IsFullCollection(query.RelationInfo))
+                    {
+                        return TranslateResult(query, Enumerable.Repeat<CacheResult<T>>(CacheGetResult.Update, 1), out entities);
+                    }
                     results = _internalCache.GetAll(query.RelationInfo);
                     return TranslateResult(query, results,
                         out entities);
@@ -107,6 +111,10 @@ namespace VitalChoice.Caching.Services.Cache
                 IEnumerable<CacheResult<T>> results;
                 if (query.FullCollection)
                 {
+                    if (!_internalCache.IsFullCollection(query.RelationInfo))
+                    {
+                        return TranslateFirstResult(query, Enumerable.Repeat<CacheResult<T>>(CacheGetResult.Update, 1), out entity);
+                    }
                     results = _internalCache.GetAll(query.RelationInfo);
                     return TranslateFirstResult(query, results,
                         out entity);

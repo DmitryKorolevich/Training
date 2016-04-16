@@ -39,7 +39,7 @@ namespace VitalChoice.Caching.Services
 
         public override TResult Execute<TResult>(Expression expression)
         {
-            using (new ProfilingScope(new ExpressionStringFormatter(expression)))
+            using (var queryScope = new ProfilingScope(new ExpressionStringFormatter(expression)))
             {
                 var cacheObjectType = typeof (TResult);
                 var elementType = typeof (TResult).TryGetElementType(typeof (IEnumerable<>));
@@ -59,27 +59,25 @@ namespace VitalChoice.Caching.Services
                     var results = elementType != null
                         ? cacheExecutor.Execute(out cacheGetResult)
                         : cacheExecutor.ExecuteFirst(out cacheGetResult);
-                    if (cacheGetResult != CacheGetResult.NotFound)
+                    queryScope.AddScopeData(cacheGetResult);
+                    switch (cacheGetResult)
                     {
-                        using (var updateScope = new ProfilingScope(cacheGetResult))
-                        {
-                            switch (cacheGetResult)
+                        case CacheGetResult.Found:
+                            return (TResult) results;
+                        case CacheGetResult.Update:
+                            using (var updateScope = new ProfilingScope(cacheGetResult))
                             {
-                                case CacheGetResult.Found:
-                                    return (TResult) results;
-                                case CacheGetResult.Update:
-                                    results = base.Execute<TResult>(expression);
+                                results = base.Execute<TResult>(expression);
 
-                                    updateScope.AddScopeData(elementType != null
-                                        ? cacheExecutor.UpdateList(results)
-                                        : cacheExecutor.Update(results));
+                                updateScope.AddScopeData(elementType != null
+                                    ? cacheExecutor.UpdateList(results)
+                                    : cacheExecutor.Update(results));
 
-                                    return (TResult) results;
+                                return (TResult) results;
                             }
-                        }
                     }
                 }
-                using (new ProfilingScope(CacheGetResult.NotFound))
+                using (new ProfilingScope("Can't cache type"))
                 {
                     return base.Execute<TResult>(expression);
                 }
@@ -88,7 +86,7 @@ namespace VitalChoice.Caching.Services
 
         public override IAsyncEnumerable<TResult> ExecuteAsync<TResult>(Expression expression)
         {
-            using (new ProfilingScope(new ExpressionStringFormatter(expression)))
+            using (var queryScope = new ProfilingScope(new ExpressionStringFormatter(expression)))
             {
                 var cacheObjectType = typeof (TResult);
                 if (_cacheFactory.CanCache(cacheObjectType))
@@ -101,33 +99,32 @@ namespace VitalChoice.Caching.Services
                         return base.ExecuteAsync<TResult>(cacheExecutor.ReparsedExpression);
                     CacheGetResult cacheGetResult;
                     var result = (List<TResult>) cacheExecutor.Execute(out cacheGetResult);
-                    if (cacheGetResult != CacheGetResult.NotFound)
+                    queryScope.AddScopeData(cacheGetResult);
+
+                    switch (cacheGetResult)
                     {
-                        using (var updateScope = new ProfilingScope(cacheGetResult))
-                        {
-                            switch (cacheGetResult)
+                        case CacheGetResult.Found:
+                            return result.ToAsyncEnumerable();
+                        case CacheGetResult.Update:
+                            using (var updateScope = new ProfilingScope(cacheGetResult))
                             {
-                                case CacheGetResult.Found:
-                                    return result.ToAsyncEnumerable();
-                                case CacheGetResult.Update:
-                                    var asyncResult = base.ExecuteAsync<TResult>(expression);
-                                    var results = asyncResult.ToList().GetAwaiter().GetResult();
-                                    updateScope.AddScopeData(cacheExecutor.UpdateList(results));
-                                    return results.ToAsyncEnumerable();
+                                var asyncResult = base.ExecuteAsync<TResult>(expression);
+                                var results = asyncResult.ToList().GetAwaiter().GetResult();
+                                updateScope.AddScopeData(cacheExecutor.UpdateList(results));
+                                return results.ToAsyncEnumerable();
                             }
-                        }
                     }
                 }
-                using (new ProfilingScope(CacheGetResult.NotFound))
+                using (new ProfilingScope("Can't cache type"))
                 {
-                    return base.ExecuteAsync<TResult>(expression).ToList().GetAwaiter().GetResult().ToAsyncEnumerable();
+                    return base.ExecuteAsync<TResult>(expression);
                 }
             }
         }
 
         public override async Task<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken)
         {
-            using (new ProfilingScope(new ExpressionStringFormatter(expression)))
+            using (var queryScope = new ProfilingScope(new ExpressionStringFormatter(expression)))
             {
                 var cacheObjectType = typeof (TResult);
                 var elementType = typeof (TResult).TryGetElementType(typeof (IEnumerable<>));
@@ -147,26 +144,26 @@ namespace VitalChoice.Caching.Services
                     var result = elementType != null
                         ? cacheExecutor.Execute(out cacheGetResult)
                         : cacheExecutor.ExecuteFirst(out cacheGetResult);
-                    if (cacheGetResult != CacheGetResult.NotFound)
-                    {
-                        using (var updateScope = new ProfilingScope(cacheGetResult))
-                        {
-                            switch (cacheGetResult)
-                            {
-                                case CacheGetResult.Found:
-                                    return (TResult) result;
-                                case CacheGetResult.Update:
-                                    var results = (object) await base.ExecuteAsync<TResult>(expression, cancellationToken);
 
-                                    updateScope.AddScopeData(elementType != null
-                                        ? cacheExecutor.UpdateList(results)
-                                        : cacheExecutor.Update(results));
-                                    return (TResult) results;
+                    queryScope.AddScopeData(cacheGetResult);
+
+                    switch (cacheGetResult)
+                    {
+                        case CacheGetResult.Found:
+                            return (TResult) result;
+                        case CacheGetResult.Update:
+                            using (var updateScope = new ProfilingScope(cacheGetResult))
+                            {
+                                var results = (object) await base.ExecuteAsync<TResult>(expression, cancellationToken);
+
+                                updateScope.AddScopeData(elementType != null
+                                    ? cacheExecutor.UpdateList(results)
+                                    : cacheExecutor.Update(results));
+                                return (TResult) results;
                             }
-                        }
                     }
                 }
-                using (new ProfilingScope(CacheGetResult.NotFound))
+                using (new ProfilingScope("Can't cache type"))
                 {
                     return await base.ExecuteAsync<TResult>(expression, cancellationToken);
                 }

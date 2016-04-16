@@ -54,7 +54,7 @@ namespace VitalChoice.Profiling.Base
 
         private Stopwatch _stopwatch;
         private ConcurrentBag<ProfilingScope> _subScopes;
-        private List<object> _additionalData;
+        public List<object> AdditionalData { get; private set; }
 
         public ProfilingScope(object data)
         {
@@ -82,7 +82,7 @@ namespace VitalChoice.Profiling.Base
         {
 #if !DOTNET5_4
             return
-                $"{{\"{ClassType.FullName}::{MethodName}\":\"{Data?.ToString().Replace("\"", "\\\"")}\", \"time\": {TimeElapsed.TotalMilliseconds}{(_additionalData == null ? string.Empty : $", \"additional\": [{string.Join(",", _additionalData.Select(d => $"\"{d}\""))}]")} {(_subScopes == null ? string.Empty : $", \"subTrace\": [{string.Join(",", _subScopes.Select(s => s.ToString()))}]")}}}";
+                $"{{\"{ClassType.FullName}::{MethodName}\":\"{Data?.ToString().Replace("\"", "\\\"")}\", \"time\": {TimeElapsed.TotalMilliseconds}{(AdditionalData == null ? string.Empty : $", \"additional\": [{string.Join(",", AdditionalData.Select(d => $"\"{d}\""))}]")} {(_subScopes == null ? string.Empty : $", \"subTrace\": [{string.Join(",", _subScopes.Select(s => s.ToString()))}]")}}}";
 #else
             return Data?.ToString();
 #endif
@@ -115,13 +115,13 @@ namespace VitalChoice.Profiling.Base
         {
             if (data == null)
                 return;
-            if (_additionalData == null)
+            if (AdditionalData == null)
             {
-                _additionalData = new List<object>();
+                AdditionalData = new List<object>();
             }
-            lock (_additionalData)
+            lock (AdditionalData)
             {
-                _additionalData.Add(data);
+                AdditionalData.Add(data);
             }
         }
 

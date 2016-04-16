@@ -19,11 +19,25 @@ namespace VitalChoice.Caching.Services.Cache.Base
         }
 
         public CachedEntity<T> Update(TKey pk, T entity, Func<T, CachedEntity<T>> createFunc,
-            Func<T, CachedEntity<T>, CachedEntity<T>> updateFunc)
+            Action<T, CachedEntity<T>> updateFunc)
         {
             return _cluster.AddOrUpdate(pk,
                 key => createFunc(entity),
-                (key, exist) => updateFunc(entity, exist));
+                (key, exist) =>
+                {
+                    updateFunc(entity, exist);
+                    return exist;
+                });
+        }
+
+        public CachedEntity<T> Update(TKey pk, T entity, Action<T, CachedEntity<T>> updateFunc)
+        {
+            var exist = Get(pk);
+            if (exist != null)
+            {
+                updateFunc(entity, exist);
+            }
+            return exist;
         }
 
         public void Update(TKey pk, CachedEntity<T> newCached)

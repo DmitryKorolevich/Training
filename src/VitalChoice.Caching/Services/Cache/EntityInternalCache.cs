@@ -150,6 +150,11 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
+        public bool IsFullCollection(RelationInfo relations)
+        {
+            return CacheStorage.GetCacheData(relations).FullCollection;
+        }
+
         public IEnumerable<CacheResult<T>> GetAll(RelationInfo relations)
         {
             if (!CacheStorage.GetCacheExist(relations))
@@ -158,6 +163,7 @@ namespace VitalChoice.Caching.Services.Cache
             if (!data.FullCollection)
             {
                 yield return CacheGetResult.NotFound;
+                yield break;
             }
             var allItems = data.GetAll();
             if (data.NeedUpdate || data.Empty || allItems.Any(cached => cached.NeedUpdate))

@@ -15,6 +15,7 @@ using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.ObjectMapping.Base;
 using VitalChoice.ObjectMapping.Extensions;
+using VitalChoice.Profiling.Base;
 
 namespace VitalChoice.Caching.Services.Cache
 {
@@ -143,6 +144,11 @@ namespace VitalChoice.Caching.Services.Cache
             return Update((T) entity);
         }
 
+        public CachedEntity UpdateExist(object entity)
+        {
+            return UpdateExist((T) entity);
+        }
+
         public bool ItemExist(EntityKey key)
         {
             return _mainCluster.Exist(key);
@@ -193,6 +199,17 @@ namespace VitalChoice.Caching.Services.Cache
             {
                 var pk = _entityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
                 return _mainCluster.Update(pk, entity, e => CreateNew(pk, e), (e, exist) => UpdateExist(pk, e, exist));
+            }
+        }
+
+        public CachedEntity<T> UpdateExist(T entity)
+        {
+            if (entity == null)
+                return null;
+            lock (_lockObj)
+            {
+                var pk = _entityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
+                return _mainCluster.Update(pk, entity, (e, exist) => UpdateExist(pk, e, exist));
             }
         }
 
@@ -358,6 +375,17 @@ namespace VitalChoice.Caching.Services.Cache
             return true;
         }
 
+        public bool UpdateExist(IEnumerable<T> entities)
+        {
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (var entity in entities)
+            {
+                if (UpdateExist(entity) == null)
+                    return false;
+            }
+            return true;
+        }
+
         public bool UpdateAll(IEnumerable<T> entities)
         {
             Clear();
@@ -417,17 +445,23 @@ namespace VitalChoice.Caching.Services.Cache
                         continue;
 
                     var cache = _cacheFactory.GetCache(elementType);
-                    var data = cache.GetCacheData(relation);
-                    foreach (var item in obj as IEnumerable)
+                    if (cache.GetCacheExist(relation))
                     {
-                        data.Update(item);
+                        var data = cache.GetCacheData(relation);
+                        foreach (var item in obj as IEnumerable)
+                        {
+                            data.UpdateExist(item);
+                        }
                     }
                 }
                 else
                 {
                     var cache = _cacheFactory.GetCache(objType);
-                    var data = cache.GetCacheData(relation);
-                    data.Update(obj);
+                    if (cache.GetCacheExist(relation))
+                    {
+                        var data = cache.GetCacheData(relation);
+                        data.UpdateExist(obj);
+                    }
                 }
             }
         }
@@ -480,7 +514,7 @@ namespace VitalChoice.Caching.Services.Cache
             return cached;
         }
 
-        private CachedEntity<T> UpdateExist(EntityKey pk, T entity, CachedEntity<T> exist)
+        private void UpdateExist(EntityKey pk, T entity, CachedEntity<T> exist)
         {
             lock (exist)
             {
@@ -502,7 +536,6 @@ namespace VitalChoice.Caching.Services.Cache
                     }
                 }
             }
-            return exist;
         }
 
         private void SyncInternalCache(EntityKey pk, T entity, CachedEntity<T> exist)

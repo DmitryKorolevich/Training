@@ -33,6 +33,7 @@ namespace VitalChoice.Caching.Interfaces
         bool GetIsCacheFullCollection(RelationInfo relationInfo);
         IEnumerable<ICacheData> GetAllCaches();
         ICacheData GetCacheData(RelationInfo relationInfo);
+        bool IsFullCollection(RelationInfo relations);
         EntityInfo EntityInfo { get; }
     }
 
