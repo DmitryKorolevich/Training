@@ -197,10 +197,10 @@ namespace VitalChoice.Caching.Services
                                 }
                                 break;
                         }
-                        if (op.Entry.State != EntityState.Detached && op.Entry.State != EntityState.Unchanged)
-                        {
-                            scope.AddScopeData($"{group.Key.FullName}[{op.Entry.State}]{op.PrimaryKey}");
-                        }
+                        //if (op.Entry.State != EntityState.Detached && op.Entry.State != EntityState.Unchanged)
+                        //{
+                        //    scope.AddScopeData($"{group.Key.FullName}[{op.Entry.State}]{op.PrimaryKey}");
+                        //}
                     }
                 }
 
