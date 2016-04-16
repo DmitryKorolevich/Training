@@ -464,32 +464,35 @@ namespace VC.Public.Controllers
                                 await _addressConverter.FromModelAsync(
                                     _addressConverter.ToModel<AddUpdateShippingMethodModel>(cart.Order.PaymentMethod.Address),
                                     (int) AddressType.Shipping);
-							//cart.Order.Data.DeliveryInstructions = model.DeliveryInstructions;
-							//cart.Order.Data.AddressType = model.AddressType;
-						}
-                        else
-                        {
-                            cart.Order.ShippingAddress = await _addressConverter.FromModelAsync(model, (int) AddressType.Shipping);
-                        }
-                    }
-                    else
-                    {
-                        if (model.UseBillingAddress)
-                        {
-                            await _addressConverter.UpdateObjectAsync(model, cart.Order.ShippingAddress, (int)AddressType.Shipping);
-                            _addressConverter.UpdateObject(
-                                _addressConverter.ToModel<AddUpdateShippingMethodModel>(cart.Order.PaymentMethod.Address),
-                                cart.Order.ShippingAddress);
                             //cart.Order.Data.DeliveryInstructions = model.DeliveryInstructions;
                             //cart.Order.Data.AddressType = model.AddressType;
                         }
                         else
                         {
+                            cart.Order.ShippingAddress = await _addressConverter.FromModelAsync(model, (int) AddressType.Shipping);
+                        }
+                        cart.Order.ShippingAddress.Id = 0;
+                    }
+                    else
+                    {
+                        if (model.UseBillingAddress)
+                        {
                             await _addressConverter.UpdateObjectAsync(model, cart.Order.ShippingAddress, (int) AddressType.Shipping);
+                            var billingMapped = _addressConverter.ToModel<AddUpdateShippingMethodModel>(cart.Order.PaymentMethod.Address);
+                            _addressConverter.UpdateObject(billingMapped, cart.Order.ShippingAddress);
+                            cart.Order.ShippingAddress.Id = model.Id;
+                            //cart.Order.Data.DeliveryInstructions = model.DeliveryInstructions;
+                            //cart.Order.Data.AddressType = model.AddressType;
+                        }
+                        else
+                        {
+                            var oldId = cart.Order.ShippingAddress.Id;
+                            await _addressConverter.UpdateObjectAsync(model, cart.Order.ShippingAddress, (int) AddressType.Shipping);
+                            cart.Order.ShippingAddress.Id = oldId;
                         }
                     }
 
-	                int? customerAddressIdToUpdate = null;
+                    int? customerAddressIdToUpdate = null;
 	                if (model.SaveToProfile && model.ShipAddressIdToOverride.HasValue)
 	                {
 		                customerAddressIdToUpdate = model.ShipAddressIdToOverride;
@@ -497,12 +500,14 @@ namespace VC.Public.Controllers
 
                     if (model.UseBillingAddress)
                     {
-                        cart.Order.Data.PreferredShipMethod = PreferredShipMethod.Best;
+                        cart.Order.ShippingAddress.Data.PreferredShipMethod = PreferredShipMethod.Best;
                     }
 
-                    _orderMapper.UpdateObject(model, cart.Order);
-                    //cart.Order.Data.GiftOrder = model.IsGiftOrder;
-                    //cart.Order.Data.GiftMessage = model.GiftMessage;
+                    cart.Order.Data.GiftOrder = model.IsGiftOrder;
+                    if (model.IsGiftOrder)
+                    {
+                        cart.Order.Data.GiftMessage = model.GiftMessage;
+                    }
                     //cart.Order.Data.DeliveryInstructions = model.DeliveryInstructions;
                     await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
                     if (await CheckoutService.UpdateCart(cart, customerAddressIdToUpdate))
