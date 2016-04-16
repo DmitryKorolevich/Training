@@ -8,7 +8,7 @@
 			     pageChanged: '=',
 			     ngModel: '=',
 			 },
-			 template: '<pagination boundary-links="true" total-items="totalItems" items-per-page="itemsPerPage" data-ng-model="ngModel" ' +
-                       'previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" data-ng-change="pageChanged"></pagination>'
+			 template: '<uib-pagination boundary-links="true" total-items="totalItems" items-per-page="itemsPerPage" data-ng-model="ngModel" ' +
+                       'previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" data-ng-change="pageChanged"></uib-pagination>'
 		 };
 	 })

@@ -19,8 +19,8 @@
     <div class="right-pane-main">
         <div class="container-fluid">
             <div class="row">
-                <tabset>
-                    <tab heading="Affiliate Details" active="detailsTab.active">
+                <uib-tabset>
+                    <uib-tab heading="Affiliate Details" active="detailsTab.active">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -485,8 +485,8 @@
                                 </spinner-overlay>
                             </div>
                         </div>
-                    </tab>
-                    <tab heading="Customers" active="customersTab.active">
+                    </uib-tab>
+                    <uib-tab heading="Customers" active="customersTab.active">
                         <div class="container-fluid">
                             <div class="well row">
                                 <div class="row form-group" data-ng-if="customersTotalItems>0">
@@ -519,7 +519,7 @@
                                         </tbody>
                                     </table>
                                 </spinner-overlay>
-                                <pagination boundary-links="true"
+                                <uib-pagination boundary-links="true"
                                             total-items="customersTotalItems"
                                             items-per-page="customerFilter.Paging.PageItemCount"
                                             data-ng-model="customerFilter.Paging.PageIndex"
@@ -528,17 +528,17 @@
                                             first-text="&laquo;"
                                             last-text="&raquo;"
                                             data-ng-change="customersPageChanged()">
-                                </pagination>
+                                </uib-pagination>
                             </div>
                         </div>
-                    </tab>
-                    <tab heading="Orders" active="ordersTab.active">
+                    </uib-tab>
+                    <uib-tab heading="Orders" active="ordersTab.active">
                         <div class="container-fluid">
                             <div class="well row orders">
                                 <div class="row form-group" data-ng-if="affiliate.Id">
                                     <div class="col-md-3">
                                         <p class="input-group">
-                                            <input type="text" name="test" class="form-control" placeholder="From" datepicker-popup="dd-MMM-yyyy" ng-model="orderFilter.From" is-open="fromOpened" />
+                                            <input type="text" name="test" class="form-control" placeholder="From" uib-datepicker-popup="dd-MMM-yyyy" ng-model="orderFilter.From" is-open="fromOpened" />
                                             <span class="input-group-btn">
                                                 <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                             </span>
@@ -546,7 +546,7 @@
                                     </div>
                                     <div class="col-md-3">
                                         <p class="input-group">
-                                            <input type="text" name="test" class="form-control" placeholder="To" datepicker-popup="dd-MMM-yyyy" ng-model="orderFilter.To" is-open="toOpened" />
+                                            <input type="text" name="test" class="form-control" placeholder="To" uib-datepicker-popup="dd-MMM-yyyy" ng-model="orderFilter.To" is-open="toOpened" />
                                             <span class="input-group-btn">
                                                 <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                             </span>
@@ -590,7 +590,7 @@
                                         </tbody>
                                     </table>
                                 </spinner-overlay>
-                                <pagination boundary-links="true"
+                                <uib-pagination boundary-links="true"
                                             total-items="ordersTotalItems"
                                             items-per-page="orderFilter.Paging.PageItemCount"
                                             data-ng-model="orderFilter.Paging.PageIndex"
@@ -599,11 +599,11 @@
                                             first-text="&laquo;"
                                             last-text="&raquo;"
                                             data-ng-change="ordersPageChanged()">
-                                </pagination>
+                                </uib-pagination>
                             </div>
                         </div>
-                    </tab>
-                    <tab heading="Payment History" active="paymentHistoryTab.active">
+                    </uib-tab>
+                    <uib-tab heading="Payment History" active="paymentHistoryTab.active">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshPaymentHistoryTracker.active()">
@@ -624,8 +624,8 @@
                                 </spinner-overlay>
                             </div>
                         </div>
-                    </tab>
-                </tabset>
+                    </uib-tab>
+                </uib-tabset>
             </div>
         </div>
     </div>

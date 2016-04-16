@@ -10,7 +10,7 @@
                 <div class="col-md-3">
                     <div class="input-group autocomplete">
                         <input type="text" name="Id" class="form-control" placeholder="Email" data-ng-model="address.Email" autocomplete="off" autofocus
-                               typeahead-min-length="1" typeahead="item as item for item in getByStaticAutoComplete($viewValue,'Email')" typeahead-loading="loadingByEmail">
+                               uib-typeahead-min-length="1" uib-typeahead="item as item for item in getByStaticAutoComplete($viewValue,'Email')" uib-typeahead-loading="loadingByEmail">
                         <span class="input-group-addon">
                             <i ng-show="loadingByEmail" class="glyphicon glyphicon-refresh"></i>
                         </span>
@@ -19,7 +19,7 @@
                 <div class="col-md-3">
                     <div class="input-group autocomplete">
                         <input type="text" name="Id" class="form-control" placeholder="Last Name" data-ng-model="address.LastName" autocomplete="off"
-                               typeahead-min-length="1" typeahead="item as item for item in getByProfileAddressAutoComplete($viewValue,'LastName')" typeahead-loading="loadingByLastName">
+                               uib-typeahead-min-length="1" uib-typeahead="item as item for item in getByProfileAddressAutoComplete($viewValue,'LastName')" uib-typeahead-loading="loadingByLastName">
                         <span class="input-group-addon">
                             <i ng-show="loadingByLastName" class="glyphicon glyphicon-refresh"></i>
                         </span>
@@ -36,7 +36,7 @@
                 <div class="col-md-3">
                     <div class="input-group autocomplete">
                         <input type="text" name="Id" class="form-control" placeholder="Customer #" data-ng-model="address.SearchText" numbers-only autocomplete="off"
-                               typeahead-min-length="1" typeahead="item as item for item in getByStaticAutoComplete($viewValue,'Id')" typeahead-loading="loadingById">
+                               uib-typeahead-min-length="1" uib-typeahead="item as item for item in getByStaticAutoComplete($viewValue,'Id')" uib-typeahead-loading="loadingById">
                         <span class="input-group-addon">
                             <i ng-show="loadingById" class="glyphicon glyphicon-refresh"></i>
                         </span>
@@ -45,7 +45,7 @@
                 <div class="col-md-3">
                     <div class="input-group autocomplete">
                         <input type="text" name="Id" class="form-control" placeholder="City" data-ng-model="address.City" autocomplete="off"
-                               typeahead-min-length="1" typeahead="item as item for item in getByProfileAddressAutoComplete($viewValue,'City')" typeahead-loading="loadingByCity">
+                               uib-typeahead-min-length="1" uib-typeahead="item as item for item in getByProfileAddressAutoComplete($viewValue,'City')" uib-typeahead-loading="loadingByCity">
                         <span class="input-group-addon">
                             <i ng-show="loadingByCity" class="glyphicon glyphicon-refresh"></i>
                         </span>
@@ -170,7 +170,7 @@
                 </tbody>
             </table>
         </spinner-overlay>
-        <pagination boundary-links="true"
+        <uib-pagination boundary-links="true"
                     total-items="totalItems"
                     items-per-page="filter.Paging.PageItemCount"
                     data-ng-model="filter.Paging.PageIndex"
@@ -180,6 +180,6 @@
                     last-text="&raquo;"
                     max-size="10"
                     data-ng-change="pageChanged()">
-        </pagination>
+        </uib-pagination>
     </div>
 </div>

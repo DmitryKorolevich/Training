@@ -18,8 +18,8 @@
     <div class="right-pane-main">
         <div class="container-fluid">
             <div class="row">
-                <tabset>
-                    <tab heading="Parent Details" active="parentDetailsTab.active">
+                <uib-tabset>
+                    <uib-tab heading="Parent Details" active="parentDetailsTab.active">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -364,8 +364,8 @@
                                 </spinner-overlay>
                             </div>
                         </div>
-                    </tab>
-                    <tab heading="Images" active="imagesTab.active">
+                    </uib-tab>
+                    <uib-tab heading="Images" active="imagesTab.active">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -389,8 +389,8 @@
                                 </spinner-overlay>
                             </div>
                         </div>
-                    </tab>
-                    <tab heading="Sub Products" active="subProductsTab.active">
+                    </uib-tab>
+                    <uib-tab heading="Sub Products" active="subProductsTab.active">
                         <div class="container container-left big-container">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -411,12 +411,12 @@
                                         <button data-ng-click="addSKU();" class="btn btn-info">Add New SKU</button>
                                     </div>
                                     <span class="help-block">*Drag and drop using icon to reorder sub products</span>
-                                    <!--<accordion class="sortable-accordion">-->
+                                    <!--<uib-accordion class="sortable-accordion">-->
                                     <form name="forms.SKUs" data-ng-class="{submitted: forms.skussubmitted}" novalidate unsaved-warning-form>
                                         <div class="panel-group sortable-accordion">
                                             <div ui-sortable="sortableOptionsSKU" data-ng-model="product.SKUs">
-                                                <!--<accordion-group>
-                                                <accordion-heading>-->
+                                                <!--<uib-accordion-group>
+                                                <uib-accordion-heading>-->
                                                 <div data-ng-repeat="subSku in product.SKUs" class="panel panel-default skus">
                                                     <div class="form-horizontal" ng-form="i{{$index}}" novalidate>
                                                         <fieldset>
@@ -484,7 +484,7 @@
                                                                     </a>
                                                                 </h4>
                                                             </div>
-                                                            <!--</accordion-heading>-->
+                                                            <!--</uib-accordion-heading>-->
                                                             <div class="panel-collapse" data-ng-class="{collapse: !subSku.IsOpen}">
                                                                 <div class="panel-body">
                                                                     <div class="form-horizontal">
@@ -685,7 +685,7 @@
                                                                                         <label for="lblDate{{subSku.Id}}" class="col-md-3 control-label">Born Date</label>
                                                                                         <div class="col-md-1 margin-right-15px">
                                                                                             <p class="input-group">
-                                                                                                <input type="text" id="lblDate{{subSku.Id}}" name="BornDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="subSku.BornDate" is-open="subSku.DateOpened"/>
+                                                                                                <input type="text" id="lblDate{{subSku.Id}}" name="BornDate" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="subSku.BornDate" is-open="subSku.DateOpened"/>
                                                                                                 <span class="input-group-btn">
                                                                                                     <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); subSku.DateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                                                                 </span>
@@ -717,19 +717,19 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <!--</accordion-group>-->
+                                                            <!--</uib-accordion-group>-->
                                                         </fieldset>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </form>
-                                    <!--</accordion>-->
+                                    <!--</uib-accordion>-->
                                 </spinner-overlay>
                             </div>
                         </div>
-                    </tab>
-                    <tab heading="Nutritional" active="nutritionalTab.active" data-ng-if="!(product.Type==3 || product.Type==4)">
+                    </uib-tab>
+                    <uib-tab heading="Nutritional" active="nutritionalTab.active" data-ng-if="!(product.Type==3 || product.Type==4)">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -967,8 +967,8 @@
                                 </spinner-overlay>
                             </div>
                         </div>
-                    </tab>
-                    <tab heading="Categories" active="categoriesTab.active">
+                    </uib-tab>
+                    <uib-tab heading="Categories" active="categoriesTab.active">
                         <div class="container container-left">
                             <div class="well row categories public">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -984,8 +984,8 @@
                                 </spinner-overlay>
                             </div>
                         </div>
-                    </tab>
-                    <tab heading="Cross Sell & Videos" active="crossSellProductsAndVideosTab.active">
+                    </uib-tab>
+                    <uib-tab heading="Cross Sell & Videos" active="crossSellProductsAndVideosTab.active">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -1146,8 +1146,8 @@
                                 </spinner-overlay>
                             </div>
                         </div>
-                    </tab>
-                    <tab heading="Sales Category" active="salesCategoriesTab.active">
+                    </uib-tab>
+                    <uib-tab heading="Sales Category" active="salesCategoriesTab.active">
                         <div class="container container-left">
                             <div class="well row categories sales">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -1163,8 +1163,8 @@
                                 </spinner-overlay>
                             </div>
                         </div>
-                    </tab>
-                    <tab heading="Template">
+                    </uib-tab>
+                    <uib-tab heading="Template">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -1200,8 +1200,8 @@
                                 </spinner-overlay>
                             </div>
                         </div>
-                    </tab>
-                </tabset>
+                    </uib-tab>
+                </uib-tabset>
             </div>
         </div>
     </div>

@@ -16,8 +16,8 @@
     <div class="right-pane-main">
         <div class="container-fluid">
             <div class="row">
-                <tabset>
-                    <tab heading="Discount Details" active="detailsTab.active">
+                <uib-tabset>
+                    <uib-tab heading="Discount Details" active="detailsTab.active">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -64,7 +64,7 @@
                                                 <label for="date" class="col-md-3 control-label">Valid From</label>
                                                 <div class="col-md-9">
                                                     <p class="input-group">
-                                                        <input type="text" name="StartDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="discount.StartDate" is-open="startDateOpened" required />
+                                                        <input type="text" name="StartDate" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="discount.StartDate" is-open="startDateOpened" required />
                                                         <span class="input-group-btn">
                                                             <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); startDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                         </span>
@@ -79,7 +79,7 @@
                                                 <label for="date" class="col-md-3 control-label">Valid To</label>
                                                 <div class="col-md-9">
                                                     <p class="input-group">
-                                                        <input type="text" name="ExpirationDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="discount.ExpirationDate" is-open="expirationDateOpened" required />
+                                                        <input type="text" name="ExpirationDate" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="discount.ExpirationDate" is-open="expirationDateOpened" required />
                                                         <span class="input-group-btn">
                                                             <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); expirationDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                         </span>
@@ -211,7 +211,7 @@
                                                 <div class="col-md-9">
                                                     <div class="input-group autocomplete">
                                                         <input type="text" name="ProductSKU" class="form-control" placeholder="Product SKU" data-ng-model="discount.ProductSKU" required
-                                                               typeahead-min-length="3" typeahead="code for code in getSkus($viewValue)" typeahead-loading="loadingSkus">
+                                                               uib-typeahead-min-length="3" uib-typeahead="code for code in getSkus($viewValue)" uib-typeahead-loading="loadingSkus">
                                                         <span class="input-group-addon">
                                                             <i ng-show="loadingSkus" class="glyphicon glyphicon-refresh"></i>
                                                         </span>
@@ -392,8 +392,8 @@
                                 </spinner-overlay>
                             </div>
                         </div>
-                    </tab>
-                    <tab heading="Filter Products">
+                    </uib-tab>
+                    <uib-tab heading="Filter Products">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -431,8 +431,8 @@
                                 </spinner-overlay>
                             </div>
                         </div>
-                    </tab>
-                    <tab heading="Filter Categories">
+                    </uib-tab>
+                    <uib-tab heading="Filter Categories">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -460,8 +460,8 @@
                                 </spinner-overlay>
                             </div>
                         </div>
-                    </tab>
-                </tabset>
+                    </uib-tab>
+                </uib-tabset>
             </div>
         </div>
     </div>

@@ -6,7 +6,7 @@
                 <div class="row form-group">
                     <div class="col-md-3">
                         <p class="input-group">
-                            <input type="text" class="form-control" name="From" data-ng-change="filterChanged();" datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
+                            <input type="text" class="form-control" name="From" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
                             <span class="input-group-btn">
                                 <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                             </span>
@@ -17,7 +17,7 @@
                     </div>
                     <div class="col-md-3">
                         <p class="input-group">
-                            <input type="text" class="form-control" name="To" data-ng-change="filterChanged();" datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" ng-required="true" />
+                            <input type="text" class="form-control" name="To" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" ng-required="true" />
                             <span class="input-group-btn">
                                 <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                             </span>
@@ -93,7 +93,7 @@
                 </tbody>
             </table>
         </spinner-overlay>
-        <pagination boundary-links="true"
+        <uib-pagination boundary-links="true"
                     total-items="totalRefundItems"
                     items-per-page="RefundPaging.PageItemCount"
                     data-ng-model="RefundPaging.PageIndex"
@@ -102,7 +102,7 @@
                     first-text="&laquo;"
                     last-text="&raquo;"
                     data-ng-change="refreshRefunds()">
-        </pagination>
+        </uib-pagination>
         <span class="legend">Reships</span>
         <div class="row form-group">
             <div class="col-md-12">
@@ -158,7 +158,7 @@
                 </tbody>
             </table>
         </spinner-overlay>
-        <pagination boundary-links="true"
+        <uib-pagination boundary-links="true"
                     total-items="totalReshipItems"
                     items-per-page="ReshipPaging.PageItemCount"
                     data-ng-model="ReshipPaging.PageIndex"
@@ -167,6 +167,6 @@
                     first-text="&laquo;"
                     last-text="&raquo;"
                     data-ng-change="refreshReships()">
-        </pagination>
+        </uib-pagination>
     </div>
 </div>

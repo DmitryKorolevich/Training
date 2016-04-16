@@ -25,13 +25,13 @@
                             </div>
                             <div class="col-md-7 form-control-static">
                                 <div ng-if="logFileRequest.state=='progress'">
-                                    <progressbar animate="true" value="logFileRequest.progress" type="success"><b>{{logFileRequest.progress}}%</b></progressbar>
+                                    <uib-progressbar animate="true" value="logFileRequest.progress" type="success"><b>{{logFileRequest.progress}}%</b></uib-progressbar>
                                 </div>
                                 <div ng-if="logFileRequest.state=='done'">
-                                    <progressbar animate="true" value="100" type="success"><b>Done</b></progressbar>
+                                    <uib-progressbar animate="true" value="100" type="success"><b>Done</b></uib-progressbar>
                                 </div>
                                 <div ng-if="logFileRequest.state=='error'">
-                                    <progressbar animate="true" value="100" type="danger"><b>Error</b></progressbar>
+                                    <uib-progressbar animate="true" value="100" type="danger"><b>Error</b></uib-progressbar>
                                 </div>
                             </div>
                         </div>

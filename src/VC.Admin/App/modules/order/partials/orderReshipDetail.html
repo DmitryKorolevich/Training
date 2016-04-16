@@ -38,8 +38,8 @@
                 </span>
             </div>
             <div class="row">
-                <tabset>
-                    <tab heading="{{mainTab.name}}" active="mainTab.active">
+                <uib-tabset>
+                    <uib-tab heading="{{mainTab.name}}" active="mainTab.active">
                         <div class="container container-left xbig-container">
                             <div class="well row">
                                 <spinner-overlay data-loading="addEditTracker.active()">
@@ -114,9 +114,9 @@
                                                         <td class="sku">
                                                             <div class="input-group autocomplete">
                                                                 <input type="text" name="SKU{{$index}}" class="form-control" placeholder="SKU" data-ng-model="item.Code"
-                                                                       typeahead-min-length="1" typeahead="sku.Code as sku.Code for sku in getSKUsBySKU($viewValue)" typeahead-loading="loadingSKUsBySKU"
-                                                                       typeahead-on-select="skuChanged($index)" data-ng-blur="skuChanged($index)"
-                                                                       typeahead-wait-ms="100" data-ng-disabled="orderEditDisabled">
+                                                                       uib-typeahead-min-length="1" uib-typeahead="sku.Code as sku.Code for sku in getSKUsBySKU($viewValue)" uib-typeahead-loading="loadingSKUsBySKU"
+                                                                       uib-typeahead-on-select="skuChanged($index)" data-ng-blur="skuChanged($index)"
+                                                                       uib-typeahead-wait-ms="100" data-ng-disabled="orderEditDisabled">
                                                             </div>
                                                         </td>
                                                         <td class="type">
@@ -131,8 +131,8 @@
                                                         <td class="product-name">
                                                             <div class="input-group autocomplete">
                                                                 <input type="text" name="ProductName{{$index}}" class="form-control" placeholder="Product Name" data-ng-model="item.ProductName"
-                                                                       typeahead-min-length="1" typeahead="sku.DescriptionName as sku.DescriptionName for sku in getSKUsByProductName($viewValue)" typeahead-loading="loadingSKUsByProductNane"
-                                                                       typeahead-on-select="productNameChanged($index)" typeahead-wait-ms="100" data-ng-disabled="orderEditDisabled">
+                                                                       uib-typeahead-min-length="1" uib-typeahead="sku.DescriptionName as sku.DescriptionName for sku in getSKUsByProductName($viewValue)" uib-typeahead-loading="loadingSKUsByProductNane"
+                                                                       uib-typeahead-on-select="productNameChanged($index)" uib-typeahead-wait-ms="100" data-ng-disabled="orderEditDisabled">
                                                             </div>
                                                             <div data-ng-if="item.GCCodes" class="input-group">
                                                                 <span data-ng-repeat="gc in item.GCCodes"><em>GC Code: {{gc}}</em><br /></span>
@@ -240,7 +240,7 @@
                                                         <label for="date" class="col-md-6 control-label">Ship Date</label>
                                                         <div class="col-md-6">
                                                             <p class="input-group">
-                                                                <input type="text" name="ShipDelayDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDate" is-open="shipDelayDateOpened" required data-ng-disabled="orderEditDisabled" />
+                                                                <input type="text" name="ShipDelayDate" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDate" is-open="shipDelayDateOpened" required data-ng-disabled="orderEditDisabled" />
                                                                 <span class="input-group-btn">
                                                                     <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                                 </span>
@@ -255,7 +255,7 @@
                                                         <label for="date" class="col-md-6 control-label">Perishable Ship Date</label>
                                                         <div class="col-md-6">
                                                             <p class="input-group">
-                                                                <input type="text" name="ShipDelayDateP" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateP" is-open="shipDelayDatePOpened" data-ng-disabled="orderEditDisabled" />
+                                                                <input type="text" name="ShipDelayDateP" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateP" is-open="shipDelayDatePOpened" data-ng-disabled="orderEditDisabled" />
                                                                 <span class="input-group-btn">
                                                                     <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDatePOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                                 </span>
@@ -270,7 +270,7 @@
                                                         <label for="date" class="col-md-6 control-label">Non-Perishable Ship Date</label>
                                                         <div class="col-md-6">
                                                             <p class="input-group">
-                                                                <input type="text" name="ShipDelayDateNP" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateNP" is-open="shipDelayDateNPOpened" data-ng-disabled="orderEditDisabled"/>
+                                                                <input type="text" name="ShipDelayDateNP" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateNP" is-open="shipDelayDateNPOpened" data-ng-disabled="orderEditDisabled"/>
                                                                 <span class="input-group-btn">
                                                                     <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDateNPOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                                 </span>
@@ -428,8 +428,8 @@
                                 </spinner-overlay>
                             </div>
                         </div>
-                    </tab>
-                    <tab heading="Shipping Address" active="shippingAddressTab.active">
+                    </uib-tab>
+                    <uib-tab heading="Shipping Address" active="shippingAddressTab.active">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="addEditTracker.active()">
@@ -437,8 +437,8 @@
                                 </spinner-overlay>
                             </div>
                         </div>
-                    </tab>
-                    <tab heading="Payment Information" active="paymentInfoTab.active">
+                    </uib-tab>
+                    <uib-tab heading="Payment Information" active="paymentInfoTab.active">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="addEditTracker.active()">
@@ -449,8 +449,8 @@
                                 </spinner-overlay>
                             </div>
                         </div>
-                    </tab>
-                </tabset>
+                    </uib-tab>
+                </uib-tabset>
             </div>
         </div>
     </div>

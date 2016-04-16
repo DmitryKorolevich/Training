@@ -6,7 +6,7 @@
                 <div class="row form-group">
                     <div class="col-md-3">
                         <p class="input-group">
-                            <input type="text" name="test" class="form-control" placeholder="From" datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" required data-ng-change="filterChanged();"/>
+                            <input type="text" name="test" class="form-control" placeholder="From" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" required data-ng-change="filterChanged();"/>
                             <span class="input-group-btn">
                                 <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                             </span>
@@ -17,7 +17,7 @@
                     </div>
                     <div class="col-md-3">
                         <p class="input-group">
-                            <input type="text" name="test" class="form-control" placeholder="To" datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" required data-ng-change="filterChanged();"/>
+                            <input type="text" name="test" class="form-control" placeholder="To" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" required data-ng-change="filterChanged();"/>
                             <span class="input-group-btn">
                                 <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                             </span>
@@ -130,7 +130,7 @@
                 </tbody>
             </table>
         </spinner-overlay>
-        <pagination boundary-links="true"
+        <uib-pagination boundary-links="true"
                     total-items="options.Count"
                     items-per-page="filter.Paging.PageItemCount"
                     data-ng-model="filter.Paging.PageIndex"
@@ -139,6 +139,6 @@
                     first-text="&laquo;"
                     last-text="&raquo;"
                     data-ng-change="pageChanged()">
-        </pagination>
+        </uib-pagination>
     </div>
 </div>

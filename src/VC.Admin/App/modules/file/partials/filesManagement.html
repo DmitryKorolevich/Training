@@ -17,13 +17,13 @@
                             <div ng-if="request.type=='upload'" class="col-md-4"><strong>Upload:</strong>&nbsp;{{request.name}}</div>
                             <div ng-if="request.type=='delete'" class="col-md-4"><strong>Delete:</strong>&nbsp;{{request.name}}</div>
                             <div ng-if="request.state=='progress'" class="col-md-3">
-                                <progressbar animate="true" value="request.progress" type="success"><b>{{request.progress}}%</b></progressbar>
+                                <uib-progressbar animate="true" value="request.progress" type="success"><b>{{request.progress}}%</b></uib-progressbar>
                             </div>
                             <div ng-if="request.state=='done'" class="col-md-3">
-                                <progressbar animate="true" value="100" type="success"><b>Done</b></progressbar>
+                                <uib-progressbar animate="true" value="100" type="success"><b>Done</b></uib-progressbar>
                             </div>
                             <div ng-if="request.state=='error'" class="col-md-3">
-                                <progressbar animate="true" value="100" type="danger"><b>Error</b></progressbar>
+                                <uib-progressbar animate="true" value="100" type="danger"><b>Error</b></uib-progressbar>
                             </div>
                             <div ng-if="request.state=='error'" class="col-md-5 error">{{request.messages}}</div>
                         </div>
@@ -93,7 +93,7 @@
                                             </tr>-->
                                         </tbody>
                                     </table>
-                                    <pagination boundary-links="true"
+                                    <uib-pagination boundary-links="true"
                                                 total-items="totalItems"
                                                 items-per-page="filter.Paging.PageItemCount"
                                                 data-ng-model="filter.Paging.PageIndex"
@@ -102,7 +102,7 @@
                                                 first-text="&laquo;"
                                                 last-text="&raquo;"
                                                 data-ng-change="pageChanged()">
-                                    </pagination>
+                                    </uib-pagination>
                                 </div>
                             </spinner-overlay>
                         </div>

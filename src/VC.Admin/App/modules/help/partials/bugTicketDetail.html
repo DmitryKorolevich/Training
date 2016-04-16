@@ -87,13 +87,13 @@
                                             </div>
                                             <div class="col-md-10 form-control-static">
                                                 <div ng-if="logTicketFileRequest.state=='progress'">
-                                                    <progressbar animate="true" value="logTicketFileRequest.progress" type="success"><b>{{logTicketFileRequest.progress}}%</b></progressbar>
+                                                    <uib-progressbar animate="true" value="logTicketFileRequest.progress" type="success"><b>{{logTicketFileRequest.progress}}%</b></uib-progressbar>
                                                 </div>
                                                 <div ng-if="logTicketFileRequest.state=='done'">
-                                                    <progressbar animate="true" value="100" type="success"><b>Done</b></progressbar>
+                                                    <uib-progressbar animate="true" value="100" type="success"><b>Done</b></uib-progressbar>
                                                 </div>
                                                 <div ng-if="logTicketFileRequest.state=='error'">
-                                                    <progressbar animate="true" value="100" type="danger"><b>Error</b></progressbar>
+                                                    <uib-progressbar animate="true" value="100" type="danger"><b>Error</b></uib-progressbar>
                                                 </div>
                                             </div>
                                         </div>
@@ -171,13 +171,13 @@
                                                 </div>
                                                 <div class="col-md-10 form-control-static">
                                                     <div ng-if="logTicketCommentFileRequest[comment.Id].state=='progress'">
-                                                        <progressbar animate="true" value="logTicketFileRequest.progress" type="success"><b>{{logTicketCommentFileRequest[comment.Id].progress}}%</b></progressbar>
+                                                        <uib-progressbar animate="true" value="logTicketFileRequest.progress" type="success"><b>{{logTicketCommentFileRequest[comment.Id].progress}}%</b></uib-progressbar>
                                                     </div>
                                                     <div ng-if="logTicketCommentFileRequest[comment.Id].state=='done'">
-                                                        <progressbar animate="true" value="100" type="success"><b>Done</b></progressbar>
+                                                        <uib-progressbar animate="true" value="100" type="success"><b>Done</b></uib-progressbar>
                                                     </div>
                                                     <div ng-if="logTicketCommentFileRequest[comment.Id].state=='error'">
-                                                        <progressbar animate="true" value="100" type="danger"><b>Error</b></progressbar>
+                                                        <uib-progressbar animate="true" value="100" type="danger"><b>Error</b></uib-progressbar>
                                                     </div>
                                                 </div>
                                             </div>

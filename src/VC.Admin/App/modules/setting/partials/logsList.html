@@ -7,7 +7,7 @@
             </div>
             <div class="col-md-3">
                 <p class="input-group">
-                    <input type="text" name="test" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
+                    <input type="text" name="test" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
                     <span class="input-group-btn">
                         <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                     </span>
@@ -15,7 +15,7 @@
             </div>
             <div class="col-md-3">
                 <p class="input-group">
-                    <input type="text" name="test" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" ng-required="true" />
+                    <input type="text" name="test" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" ng-required="true" />
                     <span class="input-group-btn">
                         <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                     </span>
@@ -86,7 +86,7 @@
 	            </tbody>
 	        </table>
 	    </spinner-overlay>
-            <pagination boundary-links="true"
+            <uib-pagination boundary-links="true"
                         total-items="totalItems"
                         items-per-page="filter.Paging.PageItemCount"
                         data-ng-model="filter.Paging.PageIndex"
@@ -95,6 +95,6 @@
                         first-text="&laquo;"
                         last-text="&raquo;"
                         data-ng-change="pageChanged()">
-            </pagination>
+            </uib-pagination>
 </div>
 </div>

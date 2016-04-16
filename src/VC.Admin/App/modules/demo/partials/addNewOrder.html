@@ -12,11 +12,11 @@
 	<div class="right-pane-main">
 		<div class="container-fluid">
 			<div class="row">
-				<tabset>
-					<tab heading="Order">
+				<uib-tabset>
+					<uib-tab heading="Order">
 
-					</tab>
-					<tab heading="History">
+					</uib-tab>
+					<uib-tab heading="History">
 						<div class="container-fluid">
 							<div class="row">
 							<a ui-sref="index.oneCol.dashboard">View Current Auto-Ships</a>
@@ -66,8 +66,8 @@
 							</div>
 							</div>
 						</div>
-					</tab>
-					<tab heading="Profile">
+					</uib-tab>
+					<uib-tab heading="Profile">
 						<div class="container container-left">
 							<div class="well row">
 								<form class="form-horizontal">
@@ -139,7 +139,7 @@
 												<label for="website" class="col-md-3 control-label">Inception Date</label>
 												<div class="col-md-9">
 													<p class="input-group">
-														<input type="text" name="test" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="date.InceptionDate" is-open="date.opened" datepicker-options="dateOptions" ng-required="true" />
+														<input type="text" name="test" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="date.InceptionDate" is-open="date.opened" datepicker-options="dateOptions" ng-required="true" />
 														<span class="input-group-btn">
 															<button type="button" class="btn btn-default" ng-disabled="false" ng-click="openDate($event)"><i class="glyphicon glyphicon-calendar"></i></button>
 														</span>
@@ -333,8 +333,8 @@
 								</form>
 							</div>
 						</div>
-					</tab>
-					<tab heading="Billing">
+					</uib-tab>
+					<uib-tab heading="Billing">
 						<div class="container container-left">
 							<div class="well row">
 								<form class="form-horizontal">
@@ -506,8 +506,8 @@
 								</form>
 							</div>
 						</div>
-					</tab>
-					<tab heading="Shipping">
+					</uib-tab>
+					<uib-tab heading="Shipping">
 						<div class="container container-left">
 							<div class="well row">
 								<form class="form-horizontal">
@@ -571,8 +571,8 @@
 								</form>
 							</div>
 						</div>
-					</tab>
-					<tab heading="Notes">
+					</uib-tab>
+					<uib-tab heading="Notes">
 						<div class="container container-left">
 							<div class="well row">
 								<form class="form-horizontal">
@@ -623,8 +623,8 @@
 								</table>
 							</div>
 						</div>
-					</tab>
-					<tab heading="Actions">
+					</uib-tab>
+					<uib-tab heading="Actions">
 						<div class="container container-left">
 							<div class="well row">
 								<span class="legend">Consolidate User Account</span>
@@ -704,8 +704,8 @@
 								</form>
 							</div>
 						</div>
-					</tab>
-					<tab heading="Reship / Refund">
+					</uib-tab>
+					<uib-tab heading="Reship / Refund">
 						<div class="container-fluid">
 							<div class="row">
 								<div class="well">
@@ -753,8 +753,8 @@
 								</div>
 							</div>
 						</div>
-					</tab>
-				</tabset>
+					</uib-tab>
+				</uib-tabset>
 			</div>
 		</div>
 	</div>
