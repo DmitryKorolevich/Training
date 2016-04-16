@@ -1,24 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using VitalChoice.Caching.Extensions;
 
 namespace VitalChoice.Caching.Relational.Base
 {
     public abstract class EntityValueGroupInfo<TInfo> : IEquatable<EntityValueGroupInfo<TInfo>>
         where TInfo: EntityValueInfo
     {
-        public virtual int Count => ValuesDictionary.Count;
+        public virtual int Count => InfoDictionary.Count;
 
-        internal readonly Dictionary<string, TInfo> ValuesDictionary;
+        internal readonly IReadOnlyDictionary<string, TInfo> InfoDictionary;
 
-        public virtual ICollection<TInfo> InfoCollection => ValuesDictionary.Values;
+        public TInfo[] Infos { get; }
 
         protected EntityValueGroupInfo(IEnumerable<TInfo> valueInfos)
         {
             if (valueInfos == null)
                 throw new ArgumentNullException(nameof(valueInfos));
 
-            ValuesDictionary = valueInfos.ToDictionary(v => v.Name);
+            var dict = valueInfos.ToDictionary(v => v.Name);
+            InfoDictionary = dict;
+            Infos = dict.Values.Normalize();
         }
 
         public bool Equals(EntityValueGroupInfo<TInfo> other)
@@ -27,9 +30,9 @@ namespace VitalChoice.Caching.Relational.Base
                 return true;
             if ((object)other == null)
                 return false;
-            if (ValuesDictionary.Count != other.ValuesDictionary.Count)
+            if (InfoDictionary.Count != other.InfoDictionary.Count)
                 return false;
-            return ValuesDictionary.All(i => other.ValuesDictionary.ContainsKey(i.Key));
+            return InfoDictionary.All(i => other.InfoDictionary.ContainsKey(i.Key));
         }
 
         public override bool Equals(object obj)
@@ -42,14 +45,14 @@ namespace VitalChoice.Caching.Relational.Base
 
         public override string ToString()
         {
-            return $"({string.Join(", ", ValuesDictionary.Values.Select(v => v.ToString()))})";
+            return $"({string.Join(", ", InfoDictionary.Values.Select(v => v.ToString()))})";
         }
 
         public override int GetHashCode()
         {
             int result = 0;
             // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (var value in ValuesDictionary.Values)
+            foreach (var value in InfoDictionary.Values)
                 result = (result*397) ^ value.GetHashCode();
             return result;
         }
@@ -71,7 +74,7 @@ namespace VitalChoice.Caching.Relational.Base
 
         public virtual bool TryGet(string name, out TInfo valueInfo)
         {
-            return ValuesDictionary.TryGetValue(name, out valueInfo);
+            return InfoDictionary.TryGetValue(name, out valueInfo);
         }
     }
 }

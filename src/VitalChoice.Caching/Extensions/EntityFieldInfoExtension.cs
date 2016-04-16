@@ -13,7 +13,7 @@ namespace VitalChoice.Caching.Extensions
     public static class EntityFieldInfoExtension
     {
         public static EntityForeignKey GetForeignKeyValue<T>(this EntityValueGroupInfo<T> pkInfo, object entity)
-            where T: EntityValueInfo
+            where T : EntityValueInfo
         {
             if (entity == null || pkInfo == null)
                 return null;
@@ -94,10 +94,17 @@ namespace VitalChoice.Caching.Extensions
             return new EntityIndex(GetValues(entity, conditionalInfo));
         }
 
-        private static IEnumerable<EntityValue<EntityValueInfo>> GetValues<T>(object entity, EntityValueGroupInfo<T> pkInfo)
-            where T: EntityValueInfo
+        private static EntityValue<EntityValueInfo>[] GetValues<T>(object entity, EntityValueGroupInfo<T> pkInfo)
+            where T : EntityValueInfo
         {
-            return pkInfo.InfoCollection.Select(keyInfo => new EntityValue<EntityValueInfo>(keyInfo, keyInfo.GetClrValue(entity)));
+            var itemsCount = pkInfo.Infos.Length;
+            var items = pkInfo.Infos;
+            var result = new EntityValue<EntityValueInfo>[itemsCount];
+            for (int i = 0; i < itemsCount; i++)
+            {
+                result[i] = new EntityValue<EntityValueInfo>(items[i], items[i].GetClrValue(entity));
+            }
+            return result;
         }
     }
 }

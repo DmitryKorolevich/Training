@@ -12,17 +12,17 @@
     </div>
 </div>
 <div data-ng-class="{hidden: collapsed}">
-    <div>
-        <span style="font-weight: bolder">{{::item.Data}}</span>
+    <div style="font-weight: bolder">
+        {{::item.Data}}
     </div>
-    <div data-ng-if="::item.AdditionalData.length > 0">
-        [<span style="font-weight: bold">{{::item.AdditionalData.join(', ')}}</span>]
+    <div style="font-weight: lighter;color: grey" data-ng-if="::item.AdditionalData.length > 0">
+        <div ng-repeat="additional in ::item.AdditionalData">{{::additional}}</div>
     </div>
     <div>
         {{::item.ClassTypeName}}::{{::item.MethodName}}
     </div>
 </div>
 <ol ui-tree-nodes="" data-ng-model="item.SubScopes" data-ng-class="{hidden: collapsed}">
-    <li ng-repeat="item in item.SubScopes" collapsed="true" ui-tree-node data-ng-include="'app/modules/setting/partials/profileScopeListItem.html'">
+    <li ng-repeat="item in ::item.SubScopes" collapsed="true" ui-tree-node data-ng-include="'app/modules/setting/partials/profileScopeListItem.html'">
     </li>
 </ol>

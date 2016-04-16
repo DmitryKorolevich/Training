@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Microsoft.Data.Entity.Internal;
+using Microsoft.Data.Entity.Query.Internal;
 
 namespace VitalChoice.Ecommerce.Domain.Helpers
 {
@@ -74,6 +75,11 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             {
                 if (e.NodeType == ExpressionType.Constant)
                 {
+                    var elementType = e.Type.TryGetElementType(typeof (EntityQueryable<>));
+                    if (elementType != null)
+                    {
+                        return Expression.Constant($"EF<{elementType.FullName}>");
+                    }
                     return e;
                 }
                 var convertRemoved = e.RemoveConvert();

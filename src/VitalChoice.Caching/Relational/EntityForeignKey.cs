@@ -8,13 +8,13 @@ namespace VitalChoice.Caching.Relational
 {
     public class EntityForeignKey : EntityValueGroup<EntityValue<EntityValueInfo>, EntityValueInfo>, IEquatable<EntityForeignKey>
     {
-        public EntityForeignKey(IEnumerable<EntityValue<EntityValueInfo>> keys) : base(keys)
-        {
-        }
-
         public bool Equals(EntityForeignKey other)
         {
             return base.Equals(other);
+        }
+
+        public EntityForeignKey(EntityValue<EntityValueInfo>[] orderedValues) : base(orderedValues)
+        {
         }
     }
 }

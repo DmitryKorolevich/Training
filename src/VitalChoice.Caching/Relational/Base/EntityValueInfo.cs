@@ -9,6 +9,7 @@ namespace VitalChoice.Caching.Relational.Base
     {
         private readonly IClrPropertyGetter _property;
         public Type PropertyType { get; }
+        public int ItemIndex { get; internal set; }
         private readonly Func<object, object> _valueConvert;
 
         public EntityValueInfo(string name, IClrPropertyGetter property, Type propertyType)
@@ -18,6 +19,7 @@ namespace VitalChoice.Caching.Relational.Base
 
             _property = property;
             PropertyType = propertyType;
+            ItemIndex = -1;
             if (propertyType.GetTypeInfo().IsEnum)
             {
 #if !DOTNET5_4

@@ -20,7 +20,14 @@ namespace VitalChoice.Caching.Expressions.Analyzers
 
         protected override EntityIndex GroupFactory(IEnumerable<EntityValue<EntityValueInfo>> values)
         {
-            return new EntityIndex(values);
+            EntityValue<EntityValueInfo>[] valuesOrdered = new EntityValue<EntityValueInfo>[GroupInfo.Count];
+            foreach (var value in values)
+            {
+                if (value.ValueInfo.ItemIndex == -1)
+                    throw new ArgumentException();
+                valuesOrdered[value.ValueInfo.ItemIndex] = value;
+            }
+            return new EntityIndex(valuesOrdered);
         }
 
         protected override EntityValue<EntityValueInfo> ValueFactory(EntityValueInfo info, object value)

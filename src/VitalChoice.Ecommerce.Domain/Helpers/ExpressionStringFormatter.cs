@@ -4,7 +4,8 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
 {
     public class ExpressionStringFormatter
     {
-        private readonly Expression _expression;
+        private Expression _expression;
+        private string _result;
 
         public ExpressionStringFormatter(Expression expression)
         {
@@ -13,7 +14,12 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
 
         public override string ToString()
         {
-            return _expression.AsStringWithParameters();
+            if (_expression != null)
+            {
+                _result = _expression.AsStringWithParameters();
+                _expression = null;
+            }
+            return _result;
         }
     }
 }

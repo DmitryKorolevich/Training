@@ -7,13 +7,13 @@ namespace VitalChoice.Caching.Relational
 {
     public class EntityIndex : EntityValueGroup<EntityValue<EntityValueInfo>, EntityValueInfo>, IEquatable<EntityIndex>
     {
-        public EntityIndex(IEnumerable<EntityValue<EntityValueInfo>> values):base(values)
-        {
-        }
-
         public bool Equals(EntityIndex other)
         {
             return base.Equals(other);
+        }
+
+        public EntityIndex(EntityValue<EntityValueInfo>[] orderedValues) : base(orderedValues)
+        {
         }
     }
 }

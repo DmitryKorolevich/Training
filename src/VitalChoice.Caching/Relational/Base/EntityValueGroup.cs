@@ -12,7 +12,12 @@ namespace VitalChoice.Caching.Relational.Base
     {
         internal readonly TValue[] Values;
 
-        protected EntityValueGroup(IEnumerable<TValue> values)
+        protected EntityValueGroup(TValue[] orderedValues)
+        {
+            Values = orderedValues;
+        }
+
+        private EntityValueGroup(IEnumerable<TValue> values)
         {
             Values = values.OrderBy(v => v.ValueInfo.Name, StringComparer.Ordinal).ToArray();
         }

@@ -11,7 +11,8 @@ namespace VitalChoice.Caching.Relational
         public PrincipalToIndexMap KeyMapping { get; }
         public string Name { get; }
 
-        public EntityCacheableIndexRelationInfo(ICollection<EntityValueInfo> foreignValues, string name, IEnumerable<EntityValueInfo> principalValues) : base(foreignValues)
+        public EntityCacheableIndexRelationInfo(ICollection<EntityValueInfo> foreignValues, string name,
+            IEnumerable<EntityValueInfo> principalValues) : base(foreignValues)
         {
             KeyMapping = new PrincipalToIndexMap(principalValues, foreignValues);
             Name = name;

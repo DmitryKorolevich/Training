@@ -50,7 +50,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
 
         public static string AsStringWithParameters(this Expression expression)
         {
-            var cachableExpression = Evaluator.PartialEval(expression, expression1 => true);
+            var cachableExpression = Evaluator.PartialEval(expression, expr => true);
             cachableExpression = LocalCollectionExpander.Rewrite(cachableExpression);
             string key = cachableExpression.ToString();
             return key;

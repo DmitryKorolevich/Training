@@ -227,14 +227,10 @@ namespace VitalChoice.Caching.Services.Cache
 
                 lock (cached)
                 {
-                    var oldEntity = cached.Entity;
-
-                    if (oldEntity == null)
+                    if (!UpdateEntityWithRelations(entity, trackedEntities, cached))
                         return null;
 
                     SyncInternalCache(pk, entity, cached);
-                    if (!UpdateEntityWithRelations(entity, trackedEntities, cached))
-                        return null;
                 }
                 return cached;
             }
@@ -243,13 +239,23 @@ namespace VitalChoice.Caching.Services.Cache
         private bool UpdateEntityWithRelations(T entity, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities, CachedEntity<T> cached)
         {
             var oldEntity = cached.Entity;
-            TypeConverter.CopyInto(oldEntity, entity, typeof(T),
-                type => !type.GetTypeInfo().IsValueType && type != typeof(string));
-
+            if (oldEntity != null)
+            {
+                TypeConverter.CopyInto(oldEntity, entity, typeof (T),
+                    type => !type.GetTypeInfo().IsValueType && type != typeof (string));
+            }
             if (!GetAllNormalizedAndTracked(entity, _relationInfo, trackedEntities))
             {
                 cached.NeedUpdate = true;
                 return false;
+            }
+
+            if (oldEntity == null)
+            {
+                cached.Entity = entity;
+                UpdateExistsRelations(entity);
+                cached.NeedUpdateRelated.Clear();
+                return true;
             }
 
             var relatedObjects =
@@ -266,18 +272,17 @@ namespace VitalChoice.Caching.Services.Cache
 
                 if (relationReference == null)
                 {
-                    cached.NeedUpdateRelated.Remove(pair.Key.Name);
                     pair.Key.SetRelatedObject(oldEntity, (newRelated as IEnumerable<object>).DeepCloneCreateList(pair.Key));
                 }
                 else
                 {
                     var newRelatedKey = relationReference.GetPrimaryKeyValue(entity);
-                    cached.NeedUpdateRelated.Remove(pair.Key.Name);
                     pair.Key.SetRelatedObject(oldEntity, newRelatedKey.IsValid ? newRelated.DeepCloneItem(pair.Key) : null);
                 }
             }
 
-            UpdateRelations(oldEntity);
+            UpdateExistsRelations(oldEntity);
+            cached.NeedUpdateRelated.Clear();
             return true;
         }
 
@@ -425,7 +430,7 @@ namespace VitalChoice.Caching.Services.Cache
 
         #region Helper Methods
 
-        private void UpdateRelations(T newEntity)
+        private void UpdateExistsRelations(T newEntity)
         {
             if (newEntity == null)
                 return;
@@ -438,7 +443,7 @@ namespace VitalChoice.Caching.Services.Cache
                     continue;
 
                 var objType = obj.GetType();
-                var elementType = objType.TryGetElementType(typeof (ICollection<>));
+                var elementType = objType.TryGetElementType(typeof(ICollection<>));
                 if (elementType != null)
                 {
                     if (!(obj is IEnumerable))
@@ -462,6 +467,41 @@ namespace VitalChoice.Caching.Services.Cache
                         var data = cache.GetCacheData(relation);
                         data.UpdateExist(obj);
                     }
+                }
+            }
+        }
+
+        private void UpdateRelations(T newEntity)
+        {
+            if (newEntity == null)
+                return;
+
+            foreach (var relation in _relationInfo.Relations)
+            {
+                var obj = relation.GetRelatedObject(newEntity);
+
+                if (obj == null)
+                    continue;
+
+                var objType = obj.GetType();
+                var elementType = objType.TryGetElementType(typeof (ICollection<>));
+                if (elementType != null)
+                {
+                    if (!(obj is IEnumerable))
+                        continue;
+
+                    var cache = _cacheFactory.GetCache(elementType);
+                    var data = cache.GetCacheData(relation);
+                    foreach (var item in obj as IEnumerable)
+                    {
+                        data.Update(item);
+                    }
+                }
+                else
+                {
+                    var cache = _cacheFactory.GetCache(objType);
+                    var data = cache.GetCacheData(relation);
+                    data.Update(obj);
                 }
             }
         }

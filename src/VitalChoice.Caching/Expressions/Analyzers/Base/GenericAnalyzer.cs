@@ -138,7 +138,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
                     return new TValueGroup[0];
                 }
 
-                Dictionary<TInfo, HashSet<TValue>> resultedSets = keyInfo.InfoCollection.ToDictionary(info => info,
+                Dictionary<TInfo, HashSet<TValue>> resultedSets = keyInfo.Infos.ToDictionary(info => info,
                     info => new HashSet<TValue>());
 
                 if (containsSets.Any())
