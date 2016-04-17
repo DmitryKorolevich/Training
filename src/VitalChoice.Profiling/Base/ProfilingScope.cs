@@ -14,7 +14,7 @@ namespace VitalChoice.Profiling.Base
 {
     public class ProfilingScope : IDisposable
     {
-        public static bool Enabled { get; set; } = true;
+        public static bool Enabled { get; set; }
 
         private static readonly string DataName = Guid.NewGuid().ToString();
 

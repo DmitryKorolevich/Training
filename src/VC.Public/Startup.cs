@@ -80,7 +80,6 @@ namespace VC.Public
 
             app.UseSession();
             //app.InjectProfiler();
-            ProfilingScope.Enabled = false;
             app.Use(async (context, next) =>
             {
                 var redirectViewService = context.RequestServices.GetService<IRedirectViewService>();

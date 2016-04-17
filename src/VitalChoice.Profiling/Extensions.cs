@@ -19,6 +19,7 @@ namespace VitalChoice.Profiling
     {
         public static IApplicationBuilder InjectProfiler(this IApplicationBuilder app)
         {
+            ProfilingScope.Enabled = true;
             return app.UseMiddleware<ProfilerMiddleware>();
         }
 
