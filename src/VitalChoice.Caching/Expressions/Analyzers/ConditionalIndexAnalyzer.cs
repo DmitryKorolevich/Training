@@ -18,7 +18,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers
         {
             if (expression.Expression.ContainsCondition(_indexInfo.LogicalUniquenessCondition))
                 return base.ParseValues(expression);
-            return new EntityIndex[0];
+            return null;
         }
     }
 }

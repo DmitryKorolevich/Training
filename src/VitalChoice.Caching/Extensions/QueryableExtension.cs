@@ -8,7 +8,7 @@ using Microsoft.Data.Entity.Query;
 
 namespace VitalChoice.Caching.Extensions
 {
-    internal static class QueriableExtension
+    internal static class QueryableExtension
     {
         public static IQueryable<T> AsNonCached<T>(this IQueryable<T> source)
         {

@@ -32,27 +32,52 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
             GroupInfo = indexInfo;
         }
 
+        protected class OptionalObject<TObj>
+            where TObj: class
+        {
+            private readonly Func<TObj> _initializer;
+
+            public OptionalObject(Func<TObj> initializer)
+            {
+                _initializer = initializer;
+            }
+
+            public TObj Value { get; set; }
+
+            public void Initialize()
+            {
+                Value = _initializer();
+            }
+
+            public static implicit operator TObj(OptionalObject<TObj> optional)
+            {
+                if (optional.Value == null)
+                {
+                    optional.Initialize();
+                }
+                return optional.Value;
+            }
+        }
+
         public virtual ICollection<TValueGroup> ParseValues(WhereExpression<T> expression)
         {
             if (GroupInfo == null || expression?.Condition == null)
-                return new TValueGroup[0];
+                return null;
             var freeValues = new HashSet<TValue>();
-            var containsSets = new HashSet<TValue>();
-            var itemSets = new HashSet<TValueGroup>();
+            var containsSets = new OptionalObject<HashSet<TValue>>(() => new HashSet<TValue>());
+            var itemSets = new OptionalObject<HashSet<TValueGroup>>(() => new HashSet<TValueGroup>());
             WalkConditionTree(expression.Condition, itemSets, freeValues, containsSets);
-            if (freeValues.Count != GroupInfo.Count)
-                freeValues.Clear();
-            if (itemSets.Any() || freeValues.Any() || containsSets.Any())
+            if (freeValues.Any() || itemSets.Value != null || containsSets.Value != null)
             {
                 return GetKeys(GroupInfo, itemSets, freeValues, containsSets);
             }
-            return new TValueGroup[0];
+            return null;
         }
 
         protected virtual bool WalkConditionTree(Condition top,
-            HashSet<TValueGroup> itemsSet,
+            OptionalObject<HashSet<TValueGroup>> itemsSet,
             HashSet<TValue> freeValues,
-            HashSet<TValue> containsSets)
+            OptionalObject<HashSet<TValue>> containsSets)
         {
             if (top == null)
             {
@@ -83,7 +108,10 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
                         return false;
                     return WalkConditionTree(and.Right, itemsSet, freeValues, containsSets);
                 case ExpressionType.OrElse:
-                    itemsSet.Clear();
+                    itemsSet.Value?.Clear();
+                    itemsSet.Value = null;
+                    containsSets.Value?.Clear();
+                    containsSets.Value = null;
                     freeValues.Clear();
                     return false;
                 case ExpressionType.Call:
@@ -102,15 +130,19 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
                         {
                             if (GroupInfo.Count == 1)
                             {
+                                if (itemsSet.Value == null)
+                                    itemsSet.Initialize();
                                 AddNewKeys(itemsSet, info, values);
                             }
                             else
                             {
+                                if (containsSets.Value == null)
+                                    containsSets.Initialize();
                                 if (values is IEnumerable)
                                 {
                                     foreach (var item in values as IEnumerable)
                                     {
-                                        containsSets.Add(ValueFactory(info, item));
+                                        containsSets.Value.Add(ValueFactory(info, item));
                                     }
                                 }
                             }
@@ -210,12 +242,12 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
             }
             catch
             {
-                return new TValueGroup[0];
+                return null;
             }
             return result;
         }
 
-        protected virtual void AddNewKeys(ISet<TValueGroup> pks, TInfo info, object values)
+        protected virtual void AddNewKeys(HashSet<TValueGroup> pks, TInfo info, object values)
         {
             var enumerable = values as IEnumerable;
             if (enumerable == null)

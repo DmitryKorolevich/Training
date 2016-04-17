@@ -82,7 +82,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if (node.Method.DeclaringType == typeof (QueriableExtension))
+            if (node.Method.DeclaringType == typeof (QueryableExtension))
             {
                 switch (node.Method.Name)
                 {
@@ -94,6 +94,22 @@ namespace VitalChoice.Caching.Expressions.Visitors
             if (node.Method.DeclaringType == typeof (RelationalQueryableExtensions))
             {
                 if (node.Method.Name == "FromSql")
+                {
+                    NonCached = true;
+                    return node;
+                }
+            }
+            if (node.Method.DeclaringType == typeof(Enumerable))
+            {
+                if (node.Method.Name == "Select" || node.Method.Name == "SelectMany")
+                {
+                    NonCached = true;
+                    return node;
+                }
+            }
+            if (node.Method.DeclaringType == typeof(Queryable))
+            {
+                if (node.Method.Name == "Select" || node.Method.Name == "SelectMany")
                 {
                     NonCached = true;
                     return node;

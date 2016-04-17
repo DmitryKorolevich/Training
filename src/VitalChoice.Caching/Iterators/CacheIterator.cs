@@ -23,6 +23,7 @@ namespace VitalChoice.Caching.Iterators
         {
             _source = source;
             _predicate = predicate;
+            HasResults = true;
         }
 
         public override void Dispose()
@@ -32,7 +33,7 @@ namespace VitalChoice.Caching.Iterators
             base.Dispose();
         }
 
-        public bool FoundAny { get; private set; }
+        public bool HasResults { get; private set; }
 
         public CacheGetResult AggregatedResult { get; private set; } = CacheGetResult.Found;
 
@@ -55,11 +56,11 @@ namespace VitalChoice.Caching.Iterators
                         CacheResult<TSource> item = _enumerator.Current;
                         if (item.Result != CacheGetResult.Found)
                         {
+                            HasResults = false;
                             AggregatedResult = item.Result;
                             Dispose();
                             break;
                         }
-                        FoundAny = true;
                         if (item.Entity != null && _predicate(item))
                         {
                             CurrentValue = item;
@@ -74,11 +75,11 @@ namespace VitalChoice.Caching.Iterators
                         CacheResult<TSource> item = _enumerator.Current;
                         if (item.Result != CacheGetResult.Found)
                         {
+                            HasResults = false;
                             AggregatedResult = item.Result;
                             Dispose();
                             break;
                         }
-                        FoundAny = true;
                         CurrentValue = item;
                         return true;
                     }

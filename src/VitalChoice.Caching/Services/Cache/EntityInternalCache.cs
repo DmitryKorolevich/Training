@@ -61,11 +61,13 @@ namespace VitalChoice.Caching.Services.Cache
                     if (cached.NeedUpdate)
                     {
                         yield return CacheGetResult.Update;
+                        yield break;
                     }
                 }
                 else
                 {
                     yield return CacheGetResult.Update;
+                    yield break;
                 }
                 yield return cached;
             }
@@ -91,11 +93,15 @@ namespace VitalChoice.Caching.Services.Cache
                 if (cached != null)
                 {
                     if (cached.NeedUpdate)
+                    {
                         yield return CacheGetResult.Update;
+                        yield break;
+                    }
                 }
                 else
                 {
                     yield return CacheGetResult.Update;
+                    yield break;
                 }
                 yield return cached;
             }
@@ -122,11 +128,15 @@ namespace VitalChoice.Caching.Services.Cache
                 if (cached != null)
                 {
                     if (cached.NeedUpdate)
+                    {
                         yield return CacheGetResult.Update;
+                        yield break;
+                    }
                 }
                 else
                 {
                     yield return CacheGetResult.Update;
+                    yield break;
                 }
                 yield return cached;
             }
@@ -138,11 +148,13 @@ namespace VitalChoice.Caching.Services.Cache
             if (!data.FullCollection)
             {
                 yield return CacheGetResult.NotFound;
+                yield break;
             }
             var allItems = data.GetAll();
             if (data.Empty || allItems.Any(cached => cached.NeedUpdate))
             {
                 yield return CacheGetResult.Update;
+                yield break;
             }
             foreach (var cached in allItems.Where(cached => whereFunc(cached)))
             {
@@ -157,8 +169,6 @@ namespace VitalChoice.Caching.Services.Cache
 
         public IEnumerable<CacheResult<T>> GetAll(RelationInfo relations)
         {
-            if (!CacheStorage.GetCacheExist(relations))
-                yield return CacheGetResult.Update;
             var data = CacheStorage.GetCacheData(relations);
             if (!data.FullCollection)
             {
@@ -169,6 +179,7 @@ namespace VitalChoice.Caching.Services.Cache
             if (data.NeedUpdate || data.Empty || allItems.Any(cached => cached.NeedUpdate))
             {
                 yield return CacheGetResult.Update;
+                yield break;
             }
             foreach (var cached in allItems)
             {
@@ -184,7 +195,9 @@ namespace VitalChoice.Caching.Services.Cache
             {
                 var removed = data.TryRemove(pk);
                 if (removed == null)
+                {
                     yield return CacheGetResult.NotFound;
+                }
                 yield return removed;
             }
         }

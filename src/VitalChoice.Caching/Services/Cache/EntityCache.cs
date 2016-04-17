@@ -219,7 +219,7 @@ namespace VitalChoice.Caching.Services.Cache
             out IEnumerable<CacheResult<T>> results)
         {
             var indexes = query.UniqueIndexes;
-            if (indexes.Count > 0)
+            if (indexes != null)
             {
                 results = _internalCache.TryGetEntities(indexes, query.RelationInfo);
                 return true;
@@ -232,7 +232,7 @@ namespace VitalChoice.Caching.Services.Cache
             out IEnumerable<CacheResult<T>> results)
         {
             var pks = query.PrimaryKeys;
-            if (pks.Count > 0)
+            if (pks != null)
             {
                 results = _internalCache.TryGetEntities(pks, query.RelationInfo);
                 return true;
@@ -294,7 +294,7 @@ namespace VitalChoice.Caching.Services.Cache
             {
                 return _internalCache.CanAddUpCache() ? cacheIterator.AggregatedResult : CacheGetResult.NotFound;
             }
-            if (cacheIterator.FoundAny)
+            if (cacheIterator.HasResults)
             {
                 return CacheGetResult.Found;
             }

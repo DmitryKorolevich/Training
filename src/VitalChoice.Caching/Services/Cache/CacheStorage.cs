@@ -49,12 +49,7 @@ namespace VitalChoice.Caching.Services.Cache
 
         public bool GetCacheExist(RelationInfo relationInfo)
         {
-            ICacheData<T> data;
-            if (_cacheData.TryGetValue(relationInfo, out data))
-            {
-                return !data.Empty;
-            }
-            return false;
+            return _cacheData.ContainsKey(relationInfo);
         }
 
         public bool GetIsCacheFullCollection(RelationInfo relationInfo)
