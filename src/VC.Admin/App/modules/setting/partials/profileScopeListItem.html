@@ -22,7 +22,7 @@
         {{::item.ClassTypeName}}::{{::item.MethodName}}
     </div>
 </div>
-<ol ui-tree-nodes="" data-ng-model="item.SubScopes" data-ng-class="{hidden: ::collapsed}">
+<ol ui-tree-nodes="" data-ng-model="item.SubScopes" data-ng-class="{hidden: collapsed}">
     <li ng-repeat="item in ::item.SubScopes" collapsed="true" ui-tree-node data-ng-include="'app/modules/setting/partials/profileScopeListItem.html'">
     </li>
 </ol>
