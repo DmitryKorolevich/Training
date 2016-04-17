@@ -67,7 +67,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
             var containsSets = new OptionalObject<HashSet<TValue>>(() => new HashSet<TValue>());
             var itemSets = new OptionalObject<HashSet<TValueGroup>>(() => new HashSet<TValueGroup>());
             WalkConditionTree(expression.Condition, itemSets, freeValues, containsSets);
-            if (freeValues.Any() || itemSets.Value != null || containsSets.Value != null)
+            if (freeValues.Any() && freeValues.Count == GroupInfo.Count || itemSets.Value != null || containsSets.Value != null)
             {
                 return GetKeys(GroupInfo, itemSets, freeValues, containsSets);
             }
