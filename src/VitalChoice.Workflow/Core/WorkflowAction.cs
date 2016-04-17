@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using VitalChoice.Profiling.Base;
 
 namespace VitalChoice.Workflow.Core
 {
@@ -20,21 +21,24 @@ namespace VitalChoice.Workflow.Core
             TResult result;
             if (Tree.TryGetActionResult(Name, context, out result))
                 return result;
-            foreach (var actionName in DependendActions)
+            using (new ProfilingScope(Name))
             {
-                context.ActionLock(actionName);
-                await Tree.GetAction(actionName).ExecuteAsync(context, executionContext);
-                context.ActionUnlock(actionName);
+                foreach (var actionName in DependendActions)
+                {
+                    context.ActionLock(actionName);
+                    await Tree.GetAction(actionName).ExecuteAsync(context, executionContext);
+                    context.ActionUnlock(actionName);
+                }
+                foreach (var actionName in AggreagatedActions)
+                {
+                    context.ActionLock(actionName);
+                    result = AggregateResult(await Tree.GetAction(actionName).ExecuteAsync(context, executionContext), result, actionName);
+                    context.ActionUnlock(actionName);
+                }
+                result = AggregateResult(await ExecuteActionAsync(context, executionContext), result, null);
+                context.ActionSetResult(Name, result);
+                return result;
             }
-            foreach (var actionName in AggreagatedActions)
-            {
-                context.ActionLock(actionName);
-                result = AggregateResult(await Tree.GetAction(actionName).ExecuteAsync(context, executionContext), result, actionName);
-                context.ActionUnlock(actionName);
-            }
-            result = AggregateResult(await ExecuteActionAsync(context, executionContext), result, null);
-            context.ActionSetResult(Name, result);
-            return result;
         }
 
         public List<string> DependendActions { get; }

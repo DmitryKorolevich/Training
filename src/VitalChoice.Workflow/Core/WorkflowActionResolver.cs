@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using VitalChoice.Profiling.Base;
 
 namespace VitalChoice.Workflow.Core
 {
@@ -22,25 +23,29 @@ namespace VitalChoice.Workflow.Core
             if (Tree.TryGetActionResult(Name, context, out result))
                 return result;
             //pre-execute dependent actions, do not aggregate
-            foreach (var dependentActionName in DependendActions)
+            using (new ProfilingScope(Name))
             {
-                context.ActionLock(dependentActionName);
-                await Tree.GetAction(dependentActionName).ExecuteAsync(context, executionContext);
-                context.ActionUnlock(dependentActionName);
-            }
+                foreach (var dependentActionName in DependendActions)
+                {
+                    context.ActionLock(dependentActionName);
+                    await Tree.GetAction(dependentActionName).ExecuteAsync(context, executionContext);
+                    context.ActionUnlock(dependentActionName);
+                }
 
-            var key = await GetActionKeyAsync(context, executionContext);
-            if (Actions.ContainsKey(key))
-            {
-                var actionName = Actions[key];
-                context.ActionLock(actionName);
-                result = await Tree.GetAction(actionName).ExecuteAsync(context, executionContext);
-                context.ActionUnlock(actionName);
-                context.ActionSetResult(Name, result);
-                return result;
+                var key = await GetActionKeyAsync(context, executionContext);
+                if (Actions.ContainsKey(key))
+                {
+                    var actionName = Actions[key];
+                    context.ActionLock(actionName);
+                    result = await Tree.GetAction(actionName).ExecuteAsync(context, executionContext);
+                    context.ActionUnlock(actionName);
+                    context.ActionSetResult(Name, result);
+                    return result;
+                }
+
+                context.ActionSetResult(Name, default(TResult));
+                return default(TResult);
             }
-            context.ActionSetResult(Name, default(TResult));
-            return default(TResult);
         }
 
         public Dictionary<int, string> Actions { get; }

@@ -305,7 +305,7 @@ namespace VitalChoice.DynamicData.Base
         protected async Task SetBigValuesAsync(IEnumerable<TEntity> entities, bool tracked = false)
         {
             var bigValueIds = new Dictionary<long, List<TOptionValue>>();
-            foreach (var value in entities.SelectMany(entity => entity.OptionValues.Where(v => v.IdBigString.HasValue)))
+            foreach (var value in entities.SelectMany(entity => entity.OptionValues.Where(v => v.IdBigString.HasValue && v.BigValue == null)))
             {
                 List<TOptionValue> valuesExist;
                 // ReSharper disable once PossibleInvalidOperationException
@@ -332,7 +332,7 @@ namespace VitalChoice.DynamicData.Base
 
         protected async Task SetBigValuesAsync(TEntity entity, bool tracked = false)
         {
-            var bigIdsList = entity.OptionValues.Where(v => v.IdBigString.HasValue)
+            var bigIdsList = entity.OptionValues.Where(v => v.IdBigString.HasValue && v.BigValue == null)
                 .Select(v => v.IdBigString.Value)
                 .ToList();
             if (bigIdsList.Any())

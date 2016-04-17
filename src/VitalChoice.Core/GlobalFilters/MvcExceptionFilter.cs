@@ -32,7 +32,7 @@ namespace VitalChoice.Core.GlobalFilters
             var systemException = context.Exception as SystemException;
 		    if (systemException != null)
 		    {
-		        var root = ProfilingScope.RootScope;
+		        var root = ProfilingScope.GetRootScope();
 		        if (root != null)
 		        {
 		            root.ForceLog = true;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Entities.Workflow;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Profiling.Base;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Data;
 
@@ -33,9 +34,12 @@ namespace VitalChoice.Workflow.Core
             if (context.DictionaryData.TryGetValue(actionName, out result)) {
                 return (TResult)result;
             }
-            using (var executionContext = new AutofacExecutionContext())
+            using (new ProfilingScope($"Workflow Tree: {Name}"))
             {
-                return await GetAction(actionName).ExecuteAsync(context, executionContext);
+                using (var executionContext = new AutofacExecutionContext())
+                {
+                    return await GetAction(actionName).ExecuteAsync(context, executionContext);
+                }
             }
         }
 
@@ -135,9 +139,12 @@ namespace VitalChoice.Workflow.Core
         public async Task<TResult> ExecuteAsync(string actionName, TContext context)
         {
             var action = GetAction(actionName);
-            using (var executionContext = new AutofacExecutionContext())
+            using (new ProfilingScope($"Workflow Tree: {Name}"))
             {
-                return await action.ExecuteAsync(context, executionContext);
+                using (var executionContext = new AutofacExecutionContext())
+                {
+                    return await action.ExecuteAsync(context, executionContext);
+                }
             }
         }
 
@@ -145,9 +152,12 @@ namespace VitalChoice.Workflow.Core
             where TAction : IWorkflowExecutor<TContext, TResult>
         {
             var action = GetAction<TAction>();
-            using (var executionContext = new AutofacExecutionContext())
+            using (new ProfilingScope($"Workflow Tree: {Name}"))
             {
-                return await action.ExecuteAsync(context, executionContext);
+                using (var executionContext = new AutofacExecutionContext())
+                {
+                    return await action.ExecuteAsync(context, executionContext);
+                }
             }
         }
 

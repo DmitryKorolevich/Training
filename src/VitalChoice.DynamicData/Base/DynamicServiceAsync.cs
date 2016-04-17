@@ -19,6 +19,7 @@ using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Entities.History;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.ObjectMapping.Base;
 
 namespace VitalChoice.DynamicData.Base
@@ -406,15 +407,19 @@ namespace VitalChoice.DynamicData.Base
                 await BeforeEntityChangesAsync(pair.Dynamic, pair.Entity, uow);
             }
 
-            await
-                bigValueRepository.DeleteAllAsync(
-                    items.SelectMany(i => i.Entity.OptionValues).Where(o => o.BigValue != null).Select(o => o.BigValue));
+            var itemsBeforeUpdate = items.SelectMany(i => i.Entity.OptionValues).Where(o => o.BigValue != null).Select(o => o.BigValue);
 
             await DynamicMapper.UpdateEntityRangeAsync(items);
 
-            await
-                bigValueRepository.InsertRangeAsync(
-                    items.SelectMany(i => i.Entity.OptionValues).Where(b => b.BigValue != null).Select(o => o.BigValue));
+            var removedItems =
+                itemsBeforeUpdate.ExceptKeyedWith(
+                    items.SelectMany(i => i.Entity.OptionValues).Where(o => o.BigValue != null).Select(o => o.BigValue), b => b.IdBigString);
+
+            await bigValueRepository.DeleteAllAsync(removedItems);
+
+            //await
+            //    bigValueRepository.InsertRangeAsync(
+            //        items.SelectMany(i => i.Entity.OptionValues).Where(b => b.BigValue != null).Select(o => o.BigValue));
 
             foreach (var pair in items)
             {

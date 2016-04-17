@@ -18,42 +18,8 @@ namespace VitalChoice.Profiling.Base
 
         private static readonly ProfilingScope[] EmptyList = new ProfilingScope[0];
 
-#if !DOTNET5_4
-        private class Wrapper : MarshalByRefObject
-        {
-            public Stack<ProfilingScope> Value { get; set; }
-        }
-
-        public static ProfilingScope RootScope => ProfileScope.Count == 0 ? null : ProfileScope.Last();
-
-        private static Stack<ProfilingScope> ProfileScope
-        {
-            get
-            {
-                var stack = (Wrapper) CallContext.LogicalGetData(DataName);
-                if (stack == null)
-                {
-                    stack = new Wrapper
-                    {
-                        Value = new Stack<ProfilingScope>()
-                    };
-                    CallContext.LogicalSetData(DataName, stack);
-                }
-                return stack.Value;
-            }
-        }
-#else
-        private static Stack<ProfilingScope> ProfileScope
-        {
-            get
-            {
-                return new Stack<ProfilingScope>();
-            }
-        }
-#endif
-
         private Stopwatch _stopwatch;
-        private ConcurrentBag<ProfilingScope> _subScopes;
+        private volatile List<ProfilingScope> _subScopes;
         public List<object> AdditionalData { get; private set; }
 
         public ProfilingScope(object data)
@@ -66,15 +32,11 @@ namespace VitalChoice.Profiling.Base
             MethodName = method.Name;
 #endif
             Data = data;
-            if (Current != null)
+            var scopeStack = GetProfileScope();
+            lock (scopeStack)
             {
-                if (Current._subScopes == null)
-                {
-                    Current._subScopes = new ConcurrentBag<ProfilingScope>();
-                }
-                Current._subScopes.Add(this);
+                scopeStack.Push(this);
             }
-            ProfileScope.Push(this);
             _stopwatch.Start();
         }
 
@@ -88,17 +50,32 @@ namespace VitalChoice.Profiling.Base
 #endif
         }
 
-        public static ProfilingScope Current => ProfileScope.Count == 0 ? null : ProfileScope.Peek();
-
-        public static void InitializeRoot(string requestUrl)
+#if !DOTNET5_4
+        public static ProfilingScope GetRootScope()
         {
-            ProfileScope.Push(new ProfilingScope(requestUrl));
+            var scope = GetProfileScope();
+            lock (scope)
+            {
+                return scope.Count == 0 ? null : scope.Last();
+            }
         }
 
-        public static ProfilingScope DeallocateRoot()
+        private static Stack<ProfilingScope> GetProfileScope()
         {
-            return ProfileScope.Pop();
+            var stack = (Stack<ProfilingScope>) CallContext.LogicalGetData(DataName);
+            if (stack == null)
+            {
+                stack = new Stack<ProfilingScope>();
+                CallContext.LogicalSetData(DataName, stack);
+            }
+            return stack;
         }
+#else
+        private static Stack<ProfilingScope> GetProfileScope()
+        {
+            return null;
+        }
+#endif
 
         public IReadOnlyCollection<ProfilingScope> SubScopes => _subScopes?.ToArray() ?? EmptyList;
 
@@ -142,7 +119,23 @@ namespace VitalChoice.Profiling.Base
             if (!_disposed)
             {
                 _disposed = true;
-                ProfileScope.Pop();
+                var stack = GetProfileScope();
+                if (stack.Count > 0)
+                {
+                    stack.Pop();
+                    if (stack.Count > 0)
+                    {
+                        var parent = stack.Peek();
+                        if (parent._subScopes == null)
+                        {
+                            parent._subScopes = new List<ProfilingScope>();
+                        }
+                        lock (parent._subScopes)
+                        {
+                            parent._subScopes.Add(this);
+                        }
+                    }
+                }
             }
         }
 

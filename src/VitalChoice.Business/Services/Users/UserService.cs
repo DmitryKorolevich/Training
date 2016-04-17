@@ -134,12 +134,10 @@ namespace VitalChoice.Business.Services.Users
             await SendForgotPasswordInternalAsync(user, token);
         }
 
-        private IList<string> GetRoleNamesByIds(IList<RoleType> roles)
-		{
-			return RoleManager.Roles.Where(x => roles.Contains((RoleType)x.Id))
-						.Select(x => x.Name)
-						.ToList();
-		}
+        private HashSet<string> GetRoleNamesByIds(IList<RoleType> roles)
+        {
+            return new HashSet<string>(RoleManager.Roles.Where(x => roles.Contains((RoleType) x.Id)).Select(x => x.Name));
+        }
 
 		private PermissionType RoleClaimValueToPermission(string value)
 		{
@@ -175,20 +173,22 @@ namespace VitalChoice.Business.Services.Users
 
 				if (roleIds != null)
 				{
-					var oldRoleNames = await UserManager.GetRolesAsync(user);
-					if (oldRoleNames.Any())
+                    var newRoleNames = GetRoleNamesByIds(roleIds);
+                    var oldRoleNames = new HashSet<string>(await UserManager.GetRolesAsync(user));
+				    var toRemove = oldRoleNames.Where(role => !newRoleNames.Contains(role)).ToArray();
+					if (toRemove.Any())
 					{
-						var deleteResult = await UserManager.RemoveFromRolesAsync(user, oldRoleNames);
+						var deleteResult = await UserManager.RemoveFromRolesAsync(user, toRemove);
 						if (!deleteResult.Succeeded)
 						{
 							throw new AppValidationException(AggregateIdentityErrors(deleteResult.Errors));
 						}
 					}
 
-					var roleNames = GetRoleNamesByIds(roleIds);
-					if (roleNames.Any())
+                    var toAdd = newRoleNames.Where(role => !oldRoleNames.Contains(role)).ToArray();
+                    if (toAdd.Any())
 					{
-						var addToRoleResult = await UserManager.AddToRolesAsync(user, roleNames);
+						var addToRoleResult = await UserManager.AddToRolesAsync(user, toAdd);
 						if (!addToRoleResult.Succeeded)
 							throw new AppValidationException(AggregateIdentityErrors(addToRoleResult.Errors));
 					}
@@ -196,10 +196,7 @@ namespace VitalChoice.Business.Services.Users
 
 				return user;
 			}
-			else
-			{
-				throw new AppValidationException(AggregateIdentityErrors(updateResult.Errors));
-			}
+		    throw new AppValidationException(AggregateIdentityErrors(updateResult.Errors));
 		}
 
         protected virtual async Task DisabledValidateUserOnSignIn(string login)
