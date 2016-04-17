@@ -23,6 +23,7 @@ using VitalChoice.Interfaces.Services;
 using Autofac;
 using Microsoft.AspNet.StaticFiles;
 using VitalChoice.Profiling;
+using VitalChoice.Profiling.Base;
 
 namespace VC.Public
 {
@@ -79,6 +80,7 @@ namespace VC.Public
 
             app.UseSession();
             //app.InjectProfiler();
+            ProfilingScope.Enabled = false;
             app.Use(async (context, next) =>
             {
                 var redirectViewService = context.RequestServices.GetService<IRedirectViewService>();

@@ -14,6 +14,8 @@ namespace VitalChoice.Profiling.Base
 {
     public class ProfilingScope : IDisposable
     {
+        public static bool Enabled { get; set; } = true;
+
         private static readonly string DataName = Guid.NewGuid().ToString();
 
         private static readonly ProfilingScope[] EmptyList = new ProfilingScope[0];
@@ -24,30 +26,37 @@ namespace VitalChoice.Profiling.Base
 
         public ProfilingScope(object data)
         {
-            _stopwatch = new Stopwatch();
-#if !DOTNET5_4
-            var stackFrame = new StackFrame(1, false);
-            var method = stackFrame.GetMethod();
-            ClassType = method.DeclaringType;
-            MethodName = method.Name;
-#endif
-            Data = data;
-            var scopeStack = GetProfileStack();
-            lock (scopeStack)
+            if (Enabled)
             {
-                scopeStack.Push(this);
+                var scopeStack = GetProfileStack();
+                lock (scopeStack)
+                {
+                    scopeStack.Push(this);
+                }
+                _stopwatch = new Stopwatch();
+#if !DOTNET5_4
+                var stackFrame = new StackFrame(1, false);
+                var method = stackFrame.GetMethod();
+                ClassType = method.DeclaringType;
+                MethodName = method.Name;
+#endif
+                Data = data;
+                _stopwatch.Start();
             }
-            _stopwatch.Start();
         }
 
         public override string ToString()
         {
+            if (Enabled)
+            {
 #if !DOTNET5_4
-            return
-                $"{{\"{ClassType.FullName}::{MethodName}\":\"{Data?.ToString().Replace("\"", "\\\"")}\", \"time\": {TimeElapsed.TotalMilliseconds}{(AdditionalData == null ? string.Empty : $", \"additional\": [{string.Join(",", AdditionalData.Select(d => $"\"{d}\""))}]")} {(_subScopes == null ? string.Empty : $", \"subTrace\": [{string.Join(",", _subScopes.Select(s => s.ToString()))}]")}}}";
+                return
+                    $"{{\"{ClassType.FullName}::{MethodName}\":\"{Data?.ToString().Replace("\"", "\\\"")}\", \"time\": {TimeElapsed.TotalMilliseconds}{(AdditionalData == null ? string.Empty : $", \"additional\": [{string.Join(",", AdditionalData.Select(d => $"\"{d}\""))}]")} {(_subScopes == null ? string.Empty : $", \"subTrace\": [{string.Join(",", _subScopes.Select(s => s.ToString()))}]")}}}";
 #else
             return Data?.ToString();
 #endif
+            }
+            return string.Empty;
         }
 
 #if !DOTNET5_4
@@ -90,15 +99,19 @@ namespace VitalChoice.Profiling.Base
 
         public void AddScopeData(object data)
         {
+
             if (data == null)
                 return;
-            if (AdditionalData == null)
+            if (Enabled)
             {
-                AdditionalData = new List<object>();
-            }
-            lock (AdditionalData)
-            {
-                AdditionalData.Add(data);
+                if (AdditionalData == null)
+                {
+                    AdditionalData = new List<object>();
+                }
+                lock (AdditionalData)
+                {
+                    AdditionalData.Add(data);
+                }
             }
         }
 
@@ -111,28 +124,31 @@ namespace VitalChoice.Profiling.Base
 
         protected void Dispose(bool disposing)
         {
-            Stop();
-            if (disposing)
+            if (Enabled)
             {
-                GC.SuppressFinalize(this);
-            }
-            if (!_disposed)
-            {
-                _disposed = true;
-                var stack = GetProfileStack();
-                if (stack.Count > 0)
+                Stop();
+                if (disposing)
                 {
-                    stack.Pop();
+                    GC.SuppressFinalize(this);
+                }
+                if (!_disposed)
+                {
+                    _disposed = true;
+                    var stack = GetProfileStack();
                     if (stack.Count > 0)
                     {
-                        var parent = stack.Peek();
-                        if (parent._subScopes == null)
+                        stack.Pop();
+                        if (stack.Count > 0)
                         {
-                            parent._subScopes = new List<ProfilingScope>();
-                        }
-                        lock (parent._subScopes)
-                        {
-                            parent._subScopes.Add(this);
+                            var parent = stack.Peek();
+                            if (parent._subScopes == null)
+                            {
+                                parent._subScopes = new List<ProfilingScope>();
+                            }
+                            lock (parent._subScopes)
+                            {
+                                parent._subScopes.Add(this);
+                            }
                         }
                     }
                 }
