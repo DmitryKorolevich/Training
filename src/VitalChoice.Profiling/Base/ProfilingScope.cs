@@ -32,7 +32,7 @@ namespace VitalChoice.Profiling.Base
             MethodName = method.Name;
 #endif
             Data = data;
-            var scopeStack = GetProfileScope();
+            var scopeStack = GetProfileStack();
             lock (scopeStack)
             {
                 scopeStack.Push(this);
@@ -53,14 +53,14 @@ namespace VitalChoice.Profiling.Base
 #if !DOTNET5_4
         public static ProfilingScope GetRootScope()
         {
-            var scope = GetProfileScope();
-            lock (scope)
+            var stack = GetProfileStack();
+            lock (stack)
             {
-                return scope.Count == 0 ? null : scope.Last();
+                return stack.Count == 0 ? null : stack.Last();
             }
         }
 
-        private static Stack<ProfilingScope> GetProfileScope()
+        private static Stack<ProfilingScope> GetProfileStack()
         {
             var stack = (Stack<ProfilingScope>) CallContext.LogicalGetData(DataName);
             if (stack == null)
@@ -71,7 +71,7 @@ namespace VitalChoice.Profiling.Base
             return stack;
         }
 #else
-        private static Stack<ProfilingScope> GetProfileScope()
+        private static Stack<ProfilingScope> GetProfileStack()
         {
             return null;
         }
@@ -119,7 +119,7 @@ namespace VitalChoice.Profiling.Base
             if (!_disposed)
             {
                 _disposed = true;
-                var stack = GetProfileScope();
+                var stack = GetProfileStack();
                 if (stack.Count > 0)
                 {
                     stack.Pop();

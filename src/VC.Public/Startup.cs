@@ -78,7 +78,7 @@ namespace VC.Public
             app.UseIdentity();
 
             app.UseSession();
-            app.InjectProfiler();
+            //app.InjectProfiler();
             app.Use(async (context, next) =>
             {
                 var redirectViewService = context.RequestServices.GetService<IRedirectViewService>();
