@@ -9,6 +9,7 @@ namespace VitalChoice.Core.DependencyInjection
 {
     public interface IDependencyConfig
     {
-		IContainer RegisterInfrastructure(IConfiguration configuration, IServiceCollection services, Assembly projectAssembly, IApplicationEnvironment appEnv = null);
+		IContainer RegisterInfrastructure(IConfiguration configuration, IServiceCollection services, Assembly projectAssembly,
+            IApplicationEnvironment appEnv = null, bool enableCache = true);
     }
 }

@@ -35,10 +35,11 @@ namespace VitalChoice.Jobs
 				var configuration = configurationBuilder.Build();
 
 				_container = new JobsDependencyConfig().RegisterInfrastructure(configuration, new ServiceCollection(),
-					typeof (JobsDependencyConfig).Assembly, env);
+					typeof (JobsDependencyConfig).Assembly, env, enableCache:false);
 
 				_logger = _container.Resolve<ILogger>();
-				var conf = _container.Resolve<IOptions<AppOptions>>().Value;
+                _logger.LogWarning("Scheduler start");
+                var conf = _container.Resolve<IOptions<AppOptions>>().Value;
 				var scheduler = _container.Resolve<IScheduler>();
 				var jobImpls = _container.Resolve<IEnumerable<IJob>>();
 				foreach (var impl in jobImpls)

@@ -103,13 +103,20 @@ namespace VitalChoice.Core.DependencyInjection
     public abstract class DefaultDependencyConfig : IDependencyConfig
     {
         public IContainer RegisterInfrastructure(IConfiguration configuration, IServiceCollection services,
-            Assembly projectAssembly, IApplicationEnvironment appEnv = null)
+            Assembly projectAssembly, IApplicationEnvironment appEnv = null, bool enableCache=true)
         {
             // Add EF services to the services container.
 #if !DOTNET5_4
-            services.AddEntityFramework()
-                .AddEntityFrameworkCache<ServiceBusCacheSyncProvider>(new[] {typeof (VitalChoiceContext), typeof (EcommerceContext)})
-                .AddSqlServer().InjectProfiler();
+            if (enableCache)
+            {
+                services.AddEntityFramework()
+                    .AddEntityFrameworkCache<ServiceBusCacheSyncProvider>(new[] {typeof (VitalChoiceContext), typeof (EcommerceContext)})
+                    .AddSqlServer().InjectProfiler();
+            }
+            else
+            {
+                services.AddEntityFramework().AddSqlServer().InjectProfiler();
+            }
 #else
             services.AddEntityFramework().AddEntityFrameworkCache<CacheSyncProvider>(new [] {typeof(VitalChoiceContext), typeof(EcommerceContext) }).AddSqlServer();
 #endif
