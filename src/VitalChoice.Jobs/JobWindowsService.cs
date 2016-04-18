@@ -15,18 +15,53 @@ namespace VitalChoice.Jobs
 {
 	public class JobWindowsService : ServiceBase
 	{
-		private readonly IOptions<AppOptions> _options;
+        /// <summary> 
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                components?.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Component Designer generated code
+
+        /// <summary> 
+        /// Required method for Designer support - do not modify 
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            // 
+            // ExportServiceManager
+            // 
+            this.ServiceName = "jobsService";
+        }
+
+        #endregion
+
+        private readonly IOptions<AppOptions> _options;
 		private readonly ILogger _logger;
 		private IContainer _container;
 
 		public JobWindowsService(IApplicationEnvironment env)
 		{
-			try
+            InitializeComponent();
+            try
 			{
-				Trace.Listeners.Add(new EventLogTraceListener(new EventLog("Application")
-				{
-					Source = "JobsWindowsService"
-				}));
+				//Trace.Listeners.Add(new EventLogTraceListener(new EventLog("Application")
+				//{
+				//	Source = "jobsService"
+    //            }));
 
 				var configurationBuilder = new ConfigurationBuilder()
 					.AddJsonFile("config.json")
