@@ -333,7 +333,11 @@ namespace VitalChoice.Core.DependencyInjection
 					configuration.GetSection("App:AzureStorage:BugTicketFilesContainerName").Value,
 				BugTicketCommentFilesContainerName =
 					configuration.GetSection("App:AzureStorage:BugTicketCommentFilesContainerName").Value,
-			};
+                AppFilesContainerName =
+                    configuration.GetSection("App:AzureStorage:AppFilesContainerName").Value,
+                ProductGoogleFeedFileName =
+                    configuration.GetSection("App:AzureStorage:ProductGoogleFeedFileName").Value,
+            };
 			options.FedExOptions = new FedExOptions()
 			{
 				AccountNumber = configuration.GetSection("App:FedExOptions:AccountNumber").Value,

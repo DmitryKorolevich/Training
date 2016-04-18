@@ -71,5 +71,10 @@
             $scope.categoriesExpanded = expand;
         };
 
+        $scope.toggle = function (item)
+        {
+            item.ShowInner = !item.ShowInner;
+        };
+
         initialize();
     }]);

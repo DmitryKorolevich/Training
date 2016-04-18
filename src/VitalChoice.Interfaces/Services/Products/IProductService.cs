@@ -50,6 +50,12 @@ namespace VitalChoice.Interfaces.Services.Products
 
         Task<List<SkuDynamic>> GetSkusAsync(ICollection<string> codes, bool withDefaults = false);
 
+	    Task<byte[]> GenerateSkuGoogleItemsReportFile();
+
+	    Task UpdateSkuGoogleItemsReportFile();
+
+	    Task<byte[]> GetSkuGoogleItemsReportFile();
+
         #endregion
 
         #region ProductOutOfStockRequests
@@ -74,7 +80,9 @@ namespace VitalChoice.Interfaces.Services.Products
 
         Task<ProductContentTransferEntity> SelectTransferAsync(int id, bool withDefaults = false);
 
-		Task<ProductContentTransferEntity> SelectTransferAsync(Guid id, bool withDefaults = false);
+	    Task<ICollection<ProductContentTransferEntity>> SelectTransferAsync(bool withDefaults = false);
+
+        Task<ProductContentTransferEntity> SelectTransferAsync(Guid id, bool withDefaults = false);
 
 		Task<ProductContentTransferEntity> SelectTransferAsync(string url, bool withDefaults = false);
 

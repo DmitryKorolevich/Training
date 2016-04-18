@@ -1,28 +1,28 @@
 ﻿<div>
-    <a class="btn btn-link pull-left" data-nodrag data-ng-click="toggle(this)">
-        <i class="glyphicon" ng-class="{'glyphicon-chevron-right': collapsed, 'glyphicon-chevron-down': !collapsed}"></i>
+    <a class="btn btn-link pull-left" data-ng-click="toggle(item)">
+        <i class="glyphicon" ng-class="{'glyphicon-chevron-right': item.ShowInner, 'glyphicon-chevron-down': !item.ShowInner}"></i>
     </a>
 </div>
-<div ui-tree-handle>
+<div class="angular-ui-tree-handle">
     <div class="ya-treeview-content clearfix">
         <div class="line">
-            <label>{{::item.ShortData}} <span style="font-weight:bolder"><span data-ng-if="item.TimeElapsed > 500" style="color: orangered">{{::item.TimeElapsed}}</span><span data-ng-if="item.TimeElapsed <= 500">{{::item.TimeElapsed}}</span> ms</span>
+            <label>{{::item.ShortData}} <span style="font-weight:bolder"><span data-ng-if="::item.TimeElapsed > 500" style="color: orangered">{{::item.TimeElapsed}}</span><span data-ng-if="::item.TimeElapsed <= 500">{{::item.TimeElapsed}}</span> ms</span>
             </label>
         </div>
     </div>
 </div>
-<div data-ng-class="{hidden: collapsed}">
+<div data-ng-if="item.ShowInner">
     <div style="font-weight: bolder">
         {{::item.Data}}
     </div>
     <div style="font-weight: lighter;color: grey">
-        <div ng-repeat="additional in item.AdditionalData">{{::additional}}</div>
+        <div ng-repeat="additional in ::item.AdditionalData">{{::additional}}</div>
     </div>
     <div>
         {{::item.ClassTypeName}}::{{::item.MethodName}}
     </div>
 </div>
-<ol ui-tree-nodes="" data-ng-model="item.SubScopes" data-ng-class="{hidden: collapsed}">
-    <li ng-repeat="item in ::item.SubScopes" collapsed="true" ui-tree-node data-ng-include="'app/modules/setting/partials/profileScopeListItem.html'">
+<ol data-ng-if="item.ShowInner" class="angular-ui-tree-nodes">
+    <li class="angular-ui-tree-node" data-ng-repeat="item in ::item.SubScopes track by item.Id" data-ng-include="'app/modules/setting/partials/profileScopeListItem.html'">
     </li>
 </ol>

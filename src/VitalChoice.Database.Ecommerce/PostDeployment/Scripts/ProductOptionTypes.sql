@@ -889,3 +889,36 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT * FROM Lookups WHERE Name='ProductSellers')
+BEGIN
+	
+	UPDATE Lookups
+	SET Name='ProductSellers'
+	WHERE Id=(SELECT TOP 1 IdLookup FROM LookupVariants WHERE ValueVariant='LowSeller')
+
+END
+
+GO
+
+IF NOT EXISTS(SELECT * FROM Lookups WHERE Name='GoogleCategories')
+BEGIN
+	
+	UPDATE Lookups
+	SET Name='GoogleCategories'
+	WHERE Id=(SELECT TOP 1 IdLookup FROM LookupVariants WHERE ValueVariant='Food, Beverages & Tobacco > Beverages > Tea & Infusions > Tea Bags & Loose Tea Leaves')
+
+END
+
+GO
+
+IF NOT EXISTS(SELECT * FROM Lookups WHERE Name='SpecialIcons')
+BEGIN
+	
+	UPDATE Lookups
+	SET Name='SpecialIcons'
+	WHERE Id=(SELECT TOP 1 IdLookup FROM LookupVariants WHERE ValueVariant='MSC Icon')
+
+END
+
+GO

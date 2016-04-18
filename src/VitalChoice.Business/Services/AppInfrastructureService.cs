@@ -111,6 +111,8 @@ namespace VitalChoice.Business.Services
             var shippingUpgrades = lookupRepository.Query(x => x.Name == LookupNames.ShippingUpgrades).Select(false).Single().Id;
             var autoshipOptions = lookupRepository.Query(x => x.Name == LookupNames.AutoShipSchedule).Select(false).Single().Id;
             var refundRedeemOptions = lookupRepository.Query(x => x.Name == LookupNames.RefundRedeemOptions).Select(false).Single().Id;
+            var productSellersOptions = lookupRepository.Query(x => x.Name == LookupNames.ProductSellers).Select(false).Single().Id;
+            var googleCategoriesOptions = lookupRepository.Query(x => x.Name == LookupNames.GoogleCategories).Select(false).Single().Id;
 
             var referenceData = new ReferenceData();
             referenceData.DefaultCountry = _backendSettingsService.GetDefaultCountry();
@@ -403,6 +405,22 @@ namespace VitalChoice.Business.Services
 				}).ToList();
             referenceData.RefundRedeemOptions = lookupVariantRepository.Query()
                 .Where(x => x.IdLookup == refundRedeemOptions)
+                .Select(false)
+                .Select(x => new LookupItem<int>()
+                {
+                    Key = x.Id,
+                    Text = x.ValueVariant
+                }).ToList();
+            referenceData.ProductSellers = lookupVariantRepository.Query()
+                .Where(x => x.IdLookup == productSellersOptions)
+                .Select(false)
+                .Select(x => new LookupItem<int>()
+                {
+                    Key = x.Id,
+                    Text = x.ValueVariant
+                }).ToList();
+            referenceData.GoogleCategories = lookupVariantRepository.Query()
+                .Where(x => x.IdLookup == googleCategoriesOptions)
                 .Select(false)
                 .Select(x => new LookupItem<int>()
                 {

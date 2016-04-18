@@ -88,6 +88,8 @@ namespace VC.Admin.Controllers
                     PersonTitles=referenceData.PersonTitles,
 					CartShippingOptions = referenceData.CartShippingOptions,
                     RefundRedeemOptions=referenceData.RefundRedeemOptions,
+                    ProductSellers = referenceData.ProductSellers,
+                    GoogleCategories = referenceData.GoogleCategories,
                 };
 	        }
 			else

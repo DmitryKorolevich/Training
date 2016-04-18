@@ -9,6 +9,8 @@
         public const string Terms = "Terms";
         public const string Fob = "Fob";
         public const string MarketingPromotionType = "MarketingPromotionType";
+        public const string ProductSellers = "ProductSellers";
+        public const string GoogleCategories = "GoogleCategories";
 
         public const string OrderSources = "OrderSources";
         public const string OrderSourcesCelebrityHealthAdvocate = "OrderSourcesCelebrityHealthAdvocate";
