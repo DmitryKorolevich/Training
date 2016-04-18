@@ -22,13 +22,21 @@ namespace VitalChoice.Business.Services
 
         }
 
-        public static IReadOnlyCollection<ProfilingScope> WorkedScopes
+        public static IReadOnlyCollection<ProfilingScope> GetWorkedScopes()
         {
-            get
+            lock (LockObject)
             {
-                lock (LockObject)
+                return Scopes.Where(s => s != null).ToArray();
+            }
+        }
+
+        public static void Clear()
+        {
+            lock (LockObject)
+            {
+                for (int i = 0; i < Scopes.Length; i++)
                 {
-                    return Scopes.Where(s => s != null).ToArray();
+                    Scopes[i] = null;
                 }
             }
         }

@@ -202,13 +202,18 @@ namespace VitalChoice.Caching.Services.Cache
             var conditionalIndexes = queryData.ConditionalIndexes;
             if (conditionalIndexes.Count > 0)
             {
-                var entityList = Enumerable.Empty<CacheResult<T>>();
-                results =
-                    conditionalIndexes.Select(
-                        indexPair =>
-                            _internalCache.TryGetEntities(indexPair.Value, indexPair.Key, queryData.RelationInfo))
-                        .Aggregate(entityList, (current, perminilaryResults) => current.Union(perminilaryResults))
-                        .DistinctObjects();
+                IEnumerable<CacheResult<T>> result = null;
+                foreach (var indexPair in conditionalIndexes.Where(c => c.Value != null))
+                {
+                    var enumerable = _internalCache.TryGetEntities(indexPair.Value, indexPair.Key, queryData.RelationInfo);
+                    result = result?.Union(enumerable) ?? enumerable;
+                }
+                if (result == null)
+                {
+                    results = null;
+                    return false;
+                }
+                results = result.DistinctObjects();
                 return true;
             }
             results = null;
