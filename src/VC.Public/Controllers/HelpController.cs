@@ -38,6 +38,7 @@ using Microsoft.Net.Http.Headers;
 using VitalChoice.Business.Models.Help;
 using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Mail;
+using VitalChoice.Interfaces.Services.Products;
 
 namespace VC.Public.Controllers
 {
@@ -53,6 +54,7 @@ namespace VC.Public.Controllers
         private readonly ReCaptchaValidator _reCaptchaValidator;
         private readonly IOptions<AppOptions> _options;
         private readonly INotificationService _notificationService;
+        private readonly IProductService _productService;
         private readonly ILogger _logger;
 
         public HelpController(
@@ -63,6 +65,7 @@ namespace VC.Public.Controllers
             IOptions<AppOptions> options,
             INotificationService notificationService,
             ILoggerProviderExtended loggerProvider,
+            IProductService productService,
             IPageResultService pageResultService) : base(pageResultService)
         {
             _catalogRequestAddressService = catalogRequestAddressService;
@@ -71,6 +74,7 @@ namespace VC.Public.Controllers
             _reCaptchaValidator = reCaptchaValidator;
             _options = options;
             _notificationService = notificationService;
+            _productService = productService;
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -218,11 +222,11 @@ namespace VC.Public.Controllers
 
         public async Task<FileResult> GoogleProductsFeed()
         {
-            var data =new byte[0];
+            var data = await _productService.GetSkuGoogleItemsReportFile();
 
             var contentDisposition = new ContentDispositionHeaderValue("attachment")
             {
-                FileName = String.Format(FileConstants.REGIONAL_SALES_STATISTIC, DateTime.Now)
+                FileName = FileConstants.GOOGLE_PRODUCTS_FEED
             };
 
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());

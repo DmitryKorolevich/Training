@@ -246,7 +246,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpGet]
-        public IActionResult ChangePassword()
+        public async Task<IActionResult> ChangePassword()
         {
             return View(new ChangePasswordModel());
         }

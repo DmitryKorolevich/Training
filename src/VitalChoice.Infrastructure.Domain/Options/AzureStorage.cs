@@ -9,5 +9,9 @@
         public string BugTicketFilesContainerName { get; set; }
 
         public string BugTicketCommentFilesContainerName { get; set; }
+
+        public string AppFilesContainerName { get; set; }
+
+        public string ProductGoogleFeedFileName { get; set; }
     }
 }

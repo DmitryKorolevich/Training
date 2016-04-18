@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNet.Mvc.ViewFeatures;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Profiling.Base;
 
@@ -8,6 +9,8 @@ namespace VC.Admin.Models.Settings
 {
     public class ProfileScopeListItemModel
     {
+        public long Id { get; set; }
+
         public string Data { get; set; }
 
         public IEnumerable<string> AdditionalData { get; set; }
@@ -26,6 +29,7 @@ namespace VC.Admin.Models.Settings
         {
             if (item != null)
             {
+                Id = item.Id;
                 Data = item.Data.ToString();
                 ShortData = Data.Length > 50
                     ? Data.Substring(0, 50)

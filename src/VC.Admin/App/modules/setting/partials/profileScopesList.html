@@ -2,11 +2,9 @@
     <div class="well categories">
         <span class="legend">Profile Scopes</span>
         <spinner-overlay data-loading="refreshTracker.active()">
-            <button data-ng-if="!categoriesExpanded" data-ng-click="updateCategoriesCollapsed(true);" class="btn btn-primary btn-xs expand-button">Expand All</button>
-            <button data-ng-if="categoriesExpanded" data-ng-click="updateCategoriesCollapsed(false);" class="btn btn-primary btn-xs expand-button">Collapse All</button>
-            <div ui-tree data-drag-enabled="false" class="ya-treeview">
-                <ol ui-tree-nodes data-ng-model="options.Items">
-                    <li ng-repeat="item in options.Items" collapsed="true" ui-tree-node data-ng-include="'app/modules/setting/partials/profileScopeListItem.html'">
+            <div class="ya-treeview ">
+                <ol class="angular-ui-tree-nodes">
+                    <li class="angular-ui-tree-node" data-ng-repeat="item in options.Items track by item.Id" data-ng-include="'app/modules/setting/partials/profileScopeListItem.html'">
                     </li>
                 </ol>
             </div>

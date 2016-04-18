@@ -63,5 +63,7 @@ namespace VC.Admin.Models.Infrastructure
         public IList<LookupItem<int>> ShippingUpgrades { get; set; }
         public IList<LookupItem<string>> PersonTitles { get; set; }
         public IList<LookupItem<int>> RefundRedeemOptions { get; set; }
+        public IList<LookupItem<int>> ProductSellers { get; set; }
+        public IList<LookupItem<int>> GoogleCategories { get; set; }
     }
 }

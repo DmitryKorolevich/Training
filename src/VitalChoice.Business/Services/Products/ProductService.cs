@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VitalChoice.Business.CsvExportMaps.Products;
 using VitalChoice.Business.Mail;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Business.Queries.Product;
@@ -28,11 +29,13 @@ using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Azure;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
@@ -63,13 +66,22 @@ namespace VitalChoice.Business.Services.Products
         private readonly IRepositoryAsync<ContentTypeEntity> _contentTypeRepository;
         private readonly IOptions<AppOptions> _options;
         private readonly IEcommerceRepositoryAsync<SkuOptionValue> _skuOptionValueRepositoryAsync;
+        private readonly ReferenceData _referenceData;
+        private readonly IProductCategoryService _productCategoryService;
+        private readonly ICsvExportService<SkuGoogleItem, SkuGoogleItemExportCsvMap> _skuGoogleItemCSVExportService;
+        private readonly IBlobStorageClient _storageClient;
 
         public async Task<ProductContent> SelectContentForTransfer(int id)
 		{
 			return (await _productContentRepository.Query(p => p.Id == id).Include(p => p.ContentItem).SelectAsync(false)).FirstOrDefault();
 		}
 
-	    public async Task<ICollection<ProductContent>> SelectProductContents(ICollection<int> ids)
+        public async Task<ICollection<ProductContent>> SelectContentsForTransfer()
+        {
+            return await _productContentRepository.Query(p => p.StatusCode!=RecordStatusCode.Deleted).Include(p => p.ContentItem).SelectAsync(false);
+        }
+
+        public async Task<ICollection<ProductContent>> SelectProductContents(ICollection<int> ids)
         {
             return (await _productContentRepository.Query(p => ids.Contains(p.Id)).Include(p => p.ContentItem).SelectAsync(false)).ToList();
         }
@@ -174,6 +186,10 @@ namespace VitalChoice.Business.Services.Products
             INotificationService notificationService,
             IRepositoryAsync<ProductContent> productContentRepository,
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
+            ICsvExportService<SkuGoogleItem, SkuGoogleItemExportCsvMap> skuGoogleItemCSVExportService,
+            IBlobStorageClient storageClient,
+            IProductCategoryService productCategoryService,
+            IAppInfrastructureService appInfrastructureService,
             IOptions<AppOptions> options,
             ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<VCustomerFavorite> vCustomerRepositoryAsync,
             DirectMapper<Product> directMapper, DynamicExtensionsRewriter queryVisitor, ITransactionAccessor<EcommerceContext> transactionAccessor)
@@ -194,6 +210,10 @@ namespace VitalChoice.Business.Services.Products
             _notificationService = notificationService;
             _productContentRepository = productContentRepository;
             _contentTypeRepository = contentTypeRepository;
+            _skuGoogleItemCSVExportService = skuGoogleItemCSVExportService;
+            _productCategoryService = productCategoryService;
+            _referenceData = appInfrastructureService.Get();
+            _storageClient = storageClient;
             _vCustomerFavoriteRepository = vCustomerRepositoryAsync;
             _options = options;
             _skuOptionValueRepositoryAsync = skuOptionValueRepositoryAsync;
@@ -465,6 +485,160 @@ namespace VitalChoice.Business.Services.Products
                      _mapper.FilterByType(sku.Product.IdObjectType);
             }
             return await _skuMapper.FromEntityRangeAsync(skus, withDefaults);
+        }
+
+        public async Task<byte[]> GenerateSkuGoogleItemsReportFile()
+        {
+            byte[] toReturn = null;
+            List<SkuGoogleItem> items=new List<SkuGoogleItem>();
+            var productCategories= await _productCategoryService.GetCategoriesTreeAsync(new ProductCategoryLiteFilter());
+            var products = await this.SelectTransferAsync(true);
+
+            foreach (var productContentTransferEntity in products)
+            {
+                if (productContentTransferEntity.ProductDynamic.StatusCode == (int) RecordStatusCode.Active 
+                    && !productContentTransferEntity.ProductDynamic.Hidden
+                    && productContentTransferEntity.ProductDynamic.Skus!=null)
+                {
+                    var activeSkus = productContentTransferEntity.ProductDynamic.Skus.Where(p=>p.StatusCode == (int)RecordStatusCode.Active && 
+                        !p.Hidden && p.SafeData.HideFromDataFeed!=true);
+
+                    if(!activeSkus.Any())
+                        continue;
+
+                    //find sku code group part in sku codes
+                    var skuGroupCode = activeSkus.First().Code.Length >= 4
+                        ? activeSkus.First().Code.Substring(0, 4)
+                        : activeSkus.First().Code;
+
+                    var find = false;
+                    while (!find && skuGroupCode.Length > 0)
+                    {
+                        find = true;
+                        foreach (var skuDynamic in activeSkus)
+                        {
+                            if (!skuDynamic.Code.StartsWith(skuGroupCode))
+                            {
+                                find = false;
+                                skuGroupCode = skuGroupCode.Substring(0, skuGroupCode.Length - 1);
+                                break;
+                            }
+                        }
+                    }
+
+                    foreach (var skuDynamic in activeSkus)
+                    {
+                        SkuGoogleItem item=new SkuGoogleItem();
+                        item.Id = skuDynamic.Id;
+                        item.Title = productContentTransferEntity.ProductDynamic.SafeData.GoogleFeedTitle;
+                        if (string.IsNullOrEmpty(item.Title))
+                        {
+                            item.Title=$"{productContentTransferEntity.ProductDynamic.Name} {productContentTransferEntity.ProductDynamic.SafeData.SubTitle}";
+                        }
+                        item.Url = $"https://{_options.Value.PublicHost}/product/{productContentTransferEntity.ProductContent?.Url}";
+                        item.RetailPrice = skuDynamic.Price;
+                        item.Description = productContentTransferEntity.ProductDynamic.SafeData.GoogleFeedDescription;
+                        item.Condition = "new";
+                        item.Brand = "Vital Choice";
+                        item.SkuCode = skuDynamic.Code;
+                        if (productContentTransferEntity.ProductDynamic.SafeData.Thumbnail != null)
+                        {
+                            item.Thumbnail =$"https://{_options.Value.PublicHost}{productContentTransferEntity.ProductDynamic.SafeData.Thumbnail}";
+                        }
+                        item.GoogleCategory =
+                            _referenceData.GoogleCategories.FirstOrDefault(
+                                p => p.Key == productContentTransferEntity.ProductDynamic.SafeData.GoogleCategory)?.Text;
+
+                        var category = GetProductCategory(productContentTransferEntity.ProductDynamic.CategoryIds.FirstOrDefault(), productCategories);
+                        item.ProductRootCategory = GetRootProductCategory(productCategories, category)?.Name;
+
+                        item.Availability = (productContentTransferEntity.ProductDynamic.IdObjectType == (int)ProductType.EGс || productContentTransferEntity.ProductDynamic.IdObjectType == (int)ProductType.Gc ||
+                            ((bool?)productContentTransferEntity.ProductDynamic.SafeData.DisregardStock ?? false) || ((int?)productContentTransferEntity.ProductDynamic.SafeData.Stock ?? 0) > 0) ?
+                            "in stock" : "out of stock";
+                        item.SkuCodeGroup = skuGroupCode;
+                        if (productContentTransferEntity.ProductDynamic.SafeData.MainProductImage != null)
+                        {
+                            item.MainProductImage = $"https://{_options.Value.PublicHost}{productContentTransferEntity.ProductDynamic.SafeData.MainProductImage}";
+                        }
+                        item.Quantity = skuDynamic.SafeData.QTY;
+                        item.Manufacturer= "Vital Choice";
+                        item.Seller = _referenceData.ProductSellers.FirstOrDefault(
+                                p => p.Key == productContentTransferEntity.ProductDynamic.SafeData.Seller)?.Text;
+
+                        items.Add(item);
+                    }
+                } 
+            }
+
+            items = items.OrderBy(p => p.Id).ToList();
+            toReturn = _skuGoogleItemCSVExportService.ExportToCsv(items);
+
+            return toReturn;
+        }
+
+        public async Task UpdateSkuGoogleItemsReportFile()
+        {
+            try
+            {
+                var file = await GenerateSkuGoogleItemsReportFile();
+                await _storageClient.UploadBlobAsync(_options.Value.AzureStorage.AppFilesContainerName, _options.Value.AzureStorage.ProductGoogleFeedFileName, 
+                    file, "text/csv");
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+            }
+        }
+
+        public async Task<byte[]> GetSkuGoogleItemsReportFile()
+        {
+            var blob = await _storageClient.DownloadBlobAsync(_options.Value.AzureStorage.AppFilesContainerName, _options.Value.AzureStorage.ProductGoogleFeedFileName);
+            return blob?.File;
+        }
+
+        private ProductCategory GetProductCategory(int? IdCategory, ProductCategory category)
+        {
+            if (IdCategory.HasValue)
+            {
+                if (category.Id == IdCategory.Value)
+                {
+                    return category;
+                }
+                foreach (var productCategory in category.SubCategories)
+                {
+                    var findCategory = GetProductCategory(IdCategory, productCategory);
+                    if (findCategory != null)
+                    {
+                        return findCategory;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private ProductCategory GetRootProductCategory(ProductCategory root, ProductCategory category)
+        {
+            if (category != null)
+            {
+                if (category.ParentId.HasValue)
+                {
+                    var findCategory = GetProductCategory(category.ParentId.Value, root);
+                    if (findCategory != null)
+                    {
+                        if (!findCategory.ParentId.HasValue)
+                        {
+                            return category;
+                        }
+                        else
+                        {
+                            return GetRootProductCategory(root, findCategory);
+                        }
+                    }
+                }
+            }
+
+            return null;
         }
 
         #endregion
@@ -867,7 +1041,20 @@ namespace VitalChoice.Business.Services.Products
             return toReturn;
         }
 
-		public async Task<ProductContentTransferEntity> SelectTransferAsync(Guid id, bool withDefaults = false)
+        public async Task<ICollection<ProductContentTransferEntity>> SelectTransferAsync(bool withDefaults = false)
+        {
+            var toReturn = (await this.SelectAsync(p => p.StatusCode != (int)RecordStatusCode.Deleted, withDefaults: withDefaults)).Select(p=>
+                new ProductContentTransferEntity { ProductDynamic =  p}).ToList();
+            var contents = await SelectContentsForTransfer();
+            foreach (var productContentTransferEntity in toReturn)
+            {
+                var content = contents.FirstOrDefault(p => p.Id == productContentTransferEntity.ProductDynamic.Id);
+                productContentTransferEntity.ProductContent = content;
+            }
+            return toReturn;
+        }
+
+        public async Task<ProductContentTransferEntity> SelectTransferAsync(Guid id, bool withDefaults = false)
 		{
 			var toReturn = new ProductContentTransferEntity
 			{
@@ -903,6 +1090,6 @@ namespace VitalChoice.Business.Services.Products
 		    return (await _productRepository.Query(productQuery).SelectAsync(x => x.Id)).FirstOrDefault();
 	    }
 
-	    #endregion
-	}
+        #endregion
+    }
 }
