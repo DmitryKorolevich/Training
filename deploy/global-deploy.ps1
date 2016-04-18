@@ -37,7 +37,7 @@ if (-Not(test-path "${RootDeploy}\logs\Logs.mdf")) {
 }
 Push-Location "${RootBuild}"
 echo "Restoring packages..."
-dnu restore --parallel >> restore.log
+dnu restore >> restore.log
 Pop-Location
 ls -Path "${RootBuild}\src" | `
 foreach{
