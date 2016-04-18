@@ -208,6 +208,11 @@ namespace VitalChoice.Caching.Services.Cache
                     var enumerable = _internalCache.TryGetEntities(indexPair.Value, indexPair.Key, queryData.RelationInfo);
                     result = result?.Union(enumerable) ?? enumerable;
                 }
+                if (result == null)
+                {
+                    results = null;
+                    return false;
+                }
                 results = result.DistinctObjects();
                 return true;
             }
