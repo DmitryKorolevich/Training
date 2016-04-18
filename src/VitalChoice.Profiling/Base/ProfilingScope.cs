@@ -14,7 +14,9 @@ namespace VitalChoice.Profiling.Base
 {
     public class ProfilingScope : IDisposable
     {
-        public static bool Enabled { get; set; }
+        private static readonly object LockObject = new object();
+
+        private static int _currentId;
 
         private static readonly string DataName = Guid.NewGuid().ToString();
 
@@ -22,12 +24,16 @@ namespace VitalChoice.Profiling.Base
 
         private Stopwatch _stopwatch;
         private volatile List<ProfilingScope> _subScopes;
-        public List<object> AdditionalData { get; private set; }
-
+        
         public ProfilingScope(object data)
         {
             if (Enabled)
             {
+                lock (LockObject)
+                {
+                    _currentId++;
+                    Id = _currentId;
+                }
                 var scopeStack = GetProfileStack();
                 lock (scopeStack)
                 {
@@ -85,6 +91,9 @@ namespace VitalChoice.Profiling.Base
             return null;
         }
 #endif
+        public long Id { get; }
+        public static bool Enabled { get; set; }
+        public List<object> AdditionalData { get; private set; }
 
         public IReadOnlyCollection<ProfilingScope> SubScopes => _subScopes?.ToArray() ?? EmptyList;
 
