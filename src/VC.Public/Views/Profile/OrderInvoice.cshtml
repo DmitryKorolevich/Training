@@ -129,9 +129,12 @@
                                     {
                                         <span class="cart-sku-code">@("(" + item.Code + ")")</span>
                                     }
-                                    @foreach (var gcCode in item.GeneratedGCCodes)
+                                    @if(item.GeneratedGCCodes!=null)
                                     {
-                                        <br/><span class="cart-sku-code"><em>GC Code: @gcCode</em></span>
+                                        foreach (var gcCode in item.GeneratedGCCodes)
+                                        {
+                                            <br/><span class="cart-sku-code"><em>GC Code: @gcCode</em></span>
+                                        }
                                     }
                                 </td>
                                 <td>@((item.Price ?? 0).ToString("C2"))</td>
@@ -176,9 +179,13 @@
                                         {
                                             <span class="cart-sku-code">@("(" + item.Code + ")")</span>
                                         }
-                                        @foreach (var gcCode in item.GeneratedGCCodes)
+                                        @if (item.GeneratedGCCodes != null)
                                         {
-                                            <br /><span class="cart-sku-code"><em>GC Code: @gcCode</em></span>
+                                             foreach (var gcCode in item.GeneratedGCCodes)
+                                             {
+                                                 <br/>
+                                                 <span class="cart-sku-code"><em>GC Code: @gcCode</em></span>
+                                             }
                                         }
                                     </td>
                                     <td>@((item.Price ?? 0).ToString("C2"))</td>

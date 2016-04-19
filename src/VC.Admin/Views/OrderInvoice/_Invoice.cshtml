@@ -69,7 +69,7 @@ else
                                         <span>@Model.BillingAddress.Company</span><br />
                                         <span>@Model.BillingAddress.FirstName @Model.BillingAddress.LastName</span><br />
                                         <span>@Model.BillingAddress.Address1</span><br />
-                                        @if (!string.IsNullOrEmpty(Model.BillingAddress.Address2))
+                                        if (!string.IsNullOrEmpty(Model.BillingAddress.Address2))
                                         {
                                             <span>@Model.BillingAddress.Address2</span><br />
                                         }
@@ -93,8 +93,7 @@ else
                                         }
                                         <span>@Model.ShippingAddress.City,&nbsp;@(!string.IsNullOrEmpty(Model.ShippingAddress.StateCode) ? Model.ShippingAddress.StateCode : Model.ShippingAddress.County )&nbsp;@Model.ShippingAddress.Zip</span><br />
                                         <span>@Model.ShippingAddress.Country.CountryCode</span><br />
-                                        <span>Tel:&nbsp;@Model.ShippingAddress.Phone</span><br />
-                                        <span>E-mail:&nbsp;@Model.ShippingAddress.Email</span>
+                                        <span>Tel:&nbsp;@Model.ShippingAddress.Phone</span>
                                     }
                                 </td>
                                 <td width="2%" valign="top">

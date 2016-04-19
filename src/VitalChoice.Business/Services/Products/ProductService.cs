@@ -570,7 +570,7 @@ namespace VitalChoice.Business.Services.Products
                 } 
             }
 
-            items = items.OrderBy(p => p.Id).ToList();
+            items = items.OrderBy(p => p.Url).ToList();
             toReturn = _skuGoogleItemCSVExportService.ExportToCsv(items);
 
             return toReturn;
