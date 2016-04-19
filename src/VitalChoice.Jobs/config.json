@@ -27,9 +27,18 @@
       "Schedules": {
         "AutoShipJob": "0 0 0/2 * * ?",
         "GoogleProductsFeedJob": "0 0 0/1 * * ?",
-        "ShipDelayJob": "0 0/1 * * * ?"
-        //"ShipDelayJob": "0 0 10 * * ?"
+        //"ShipDelayJob": "0 0/1 * * * ?"
+        "ShipDelayJob": "0 0 10 * * ?"
       }
+    },
+    "Avatax": {
+      "AccountNumber": "1100019190",
+      "LicenseKey": "B50461EFC03F20AB",
+      "ServiceUrl": "https://avatax.avalara.net/",
+      "AccountName": "Vital Choice Seafood Inc",
+      "ProfileName": "Vital Choice",
+      "CompanyCode": "VC001",
+      "TurnOffCommit": true
     },
     "Email": {
       "From": "admin.staging@g2designgroup.com",

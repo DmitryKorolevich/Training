@@ -6,11 +6,12 @@ using Microsoft.Extensions.PlatformAbstractions;
 namespace VitalChoice.Ecommerce.Domain.Helpers
 {
     public static class NativeHelper {
+
+#if DOTNET5_4
         private static readonly IAssemblyLoadContextAccessor LoadContextAccessor =
             (IAssemblyLoadContextAccessor)
                 CallContextServiceLocator.Locator.ServiceProvider.GetService(typeof (IAssemblyLoadContextAccessor));
 
-#if DOTNET5_4
         private static readonly Func<object> GetCurrentDomain;
         private static readonly Func<object, Assembly[]> AssembliesGetter;
 #endif
