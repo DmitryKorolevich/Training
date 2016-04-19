@@ -51,6 +51,12 @@ namespace VC.Admin.Validators.Product
                     .Must(model => model.HasValue)
                     .WithMessage(model => model.StartDate, ValidationMessages.FieldRequired);
 
+                RuleFor(model => model)
+                    .Must(model => model.ExpirationDate >= model.StartDate)
+                    .When(p => p.ExpirationDate.HasValue && p.StartDate.HasValue)
+                    .WithMessage("'Valid To' can't be less than 'Valid From'.")
+                    .WithName("ExpirationDate");
+
                 RuleFor(model => model.Percent)
                     .Cascade(CascadeMode.StopOnFirstFailure)
                     .GreaterThan(0)
