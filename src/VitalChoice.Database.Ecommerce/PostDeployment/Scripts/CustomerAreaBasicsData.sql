@@ -149,7 +149,6 @@ BEGIN
 	(N'Company', 4, NULL, NULL, NULL),
 	(N'FirstName', 4, NULL, NULL, NULL),
 	(N'LastName', 4, NULL, NULL, NULL),
-	(N'Company', 4, NULL, NULL, NULL),
 	(N'Address1', 4, NULL, NULL, NULL),
 	(N'Address2', 4, NULL, NULL, NULL),
 	(N'City', 4, NULL, NULL, NULL),

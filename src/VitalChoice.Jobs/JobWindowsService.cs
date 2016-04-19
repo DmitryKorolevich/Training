@@ -46,7 +46,7 @@ namespace VitalChoice.Jobs
 	            var configuration = configurationBuilder.Build();
 
 	            _container = new JobsDependencyConfig().RegisterInfrastructure(configuration, new ServiceCollection(),
-	                typeof(JobsDependencyConfig).Assembly, _env, enableCache: false);
+	                typeof(JobsDependencyConfig).Assembly, _env, enableCache: true);
 
 	            _logger = _container.Resolve<ILogger>();
 	            _logger.LogWarning("Scheduler start");

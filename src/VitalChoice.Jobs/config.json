@@ -26,8 +26,9 @@
     "JobSettings": {
       "Schedules": {
         "AutoShipJob": "0 0 0/2 * * ?",
-        "GoogleProductsFeedJob": "0 0 0/1 * * ?"
-        //"ShipDelayJob": "0 0 0/24 * * ?"
+        "GoogleProductsFeedJob": "0 0 0/1 * * ?",
+        "ShipDelayJob": "0 0/1 * * * ?"
+        //"ShipDelayJob": "0 0 10 * * ?"
       }
     },
     "Email": {
