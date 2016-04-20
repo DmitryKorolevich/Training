@@ -553,7 +553,7 @@ namespace VitalChoice.Business.Services.Products
                         item.ProductRootCategory = GetRootProductCategory(productCategories, category)?.Name;
 
                         item.Availability = (productContentTransferEntity.ProductDynamic.IdObjectType == (int)ProductType.EGс || productContentTransferEntity.ProductDynamic.IdObjectType == (int)ProductType.Gc ||
-                            ((bool?)productContentTransferEntity.ProductDynamic.SafeData.DisregardStock ?? false) || ((int?)productContentTransferEntity.ProductDynamic.SafeData.Stock ?? 0) > 0) ?
+                            ((bool?)skuDynamic.SafeData.DisregardStock ?? false) || ((int?)skuDynamic.SafeData.Stock ?? 0) > 0) ?
                             "in stock" : "out of stock";
                         item.SkuCodeGroup = skuGroupCode;
                         if (productContentTransferEntity.ProductDynamic.SafeData.MainProductImage != null)

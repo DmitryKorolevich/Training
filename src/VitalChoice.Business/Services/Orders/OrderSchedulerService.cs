@@ -101,30 +101,30 @@ namespace VitalChoice.Business.Services.Orders
 
                 if (ordersForUpdate.Count != 0)
                 {
-
                     foreach (var order in ordersForUpdate)
                     {
-                        try
-                        {
-                            order.Customer = await _customerService.SelectAsync(order.Customer.Id);
-                            var context = await _orderService.CalculateOrder(order, OrderStatus.Processed);
+                        ordersForUpdateAfterCalculating.Add(order);
+                        //try
+                        //{
+                        //    order.Customer = await _customerService.SelectAsync(order.Customer.Id);
+                        //    var context = await _orderService.CalculateOrder(order, OrderStatus.Processed);
 
-                            List<MessageInfo> messages =new List<MessageInfo>(context.Messages);
-                            messages.AddRange(context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages));
-                            messages.AddRange(context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages));
-                            if(messages.Count>0)
-                            {
-                                //TODO - add additioanl logic for this case
-                            }
-                            else
-                            {
-                                ordersForUpdateAfterCalculating.Add(context.Order);
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            _logger.LogCritical($"Error till ShipDelayed orders updating - calculating order({order.Id})", e);
-                        }
+                        //    List<MessageInfo> messages =new List<MessageInfo>(context.Messages);
+                        //    messages.AddRange(context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages));
+                        //    messages.AddRange(context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages));
+                        //    if(messages.Count>0)
+                        //    {
+                        //        //TODO - add additioanl logic for this case
+                        //    }
+                        //    else
+                        //    {
+                        //        ordersForUpdateAfterCalculating.Add(context.Order);
+                        //    }
+                        //}
+                        //catch (Exception e)
+                        //{
+                        //    _logger.LogCritical($"Error till ShipDelayed orders updating - calculating order({order.Id})", e);
+                        //}
                     }
                 }
 

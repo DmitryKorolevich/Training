@@ -55,6 +55,7 @@ namespace VC.Admin.Models.Infrastructure
         public IList<LookupItem<int>> AffiliateMonthlyEmailsSentOptions { get; set; }
         public IList<LookupItem<int>> AffiliateTiers { get; set; }
         public IList<LookupItem<int>> TicketStatuses { get; set; }
+        public IList<LookupItem<int>> BugTicketStatuses { get; set; }
         public IList<LookupItem<int>> Priorities { get; set; }
         public IList<LookupItem<int>> PromotionTypes { get; set; }
         public IList<LookupItem<int?>> ExpiredTypes { get; set; }

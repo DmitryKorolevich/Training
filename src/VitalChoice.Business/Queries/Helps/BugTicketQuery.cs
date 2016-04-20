@@ -25,7 +25,7 @@ namespace VitalChoice.Business.Queries.Help
             return this;
         }
 
-        public BugTicketQuery WithStatus(RecordStatusCode? status)
+        public BugTicketQuery WithStatus(BugTicketStatus? status)
         {
             if (status.HasValue)
             {
@@ -51,7 +51,7 @@ namespace VitalChoice.Business.Queries.Help
 
         public BugTicketQuery NotDeleted()
         {
-            Add(x => x.StatusCode != RecordStatusCode.Deleted);
+            Add(x => x.StatusCode != BugTicketStatus.Deleted);
             return this;
         }
     }

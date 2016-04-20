@@ -975,7 +975,7 @@
                                     <span class="legend">Categories</span>
                                     <button data-ng-if="!categoriesExpanded" data-ng-click="updateCategoriesCollapsed(true);" class="btn btn-primary btn-xs expand-button">Expand All</button>
                                     <button data-ng-if="categoriesExpanded" data-ng-click="updateCategoriesCollapsed(false);" class="btn btn-primary btn-xs expand-button">Collapse All</button>
-                                    <div ui-tree data-drag-enabled="false" class="ya-treeview">
+                                    <div ui-tree data-drag-enabled="false" name="public" class="ya-treeview">
                                         <ol ui-tree-nodes="" data-ng-model="rootCategory.SubItems">
                                             <li ng-repeat="item in rootCategory.SubItems" ui-tree-node collapsed="true" data-ng-include="'app/modules/content/partials/contentCategories.html'">
                                             </li>
@@ -1154,7 +1154,7 @@
                                     <span class="legend">Sales Category</span>
                                     <button data-ng-if="!salesCategoriesExpanded" data-ng-click="updateSalesCategoriesCollapsed(true);" class="btn btn-primary btn-xs expand-button">Expand All</button>
                                     <button data-ng-if="salesCategoriesExpanded" data-ng-click="updateSalesCategoriesCollapsed(false);" class="btn btn-primary btn-xs expand-button">Collapse All</button>
-                                    <div ui-tree data-drag-enabled="false" class="ya-treeview">
+                                    <div ui-tree data-drag-enabled="false" data-ng-model="rootInventoryCategory" class="ya-treeview">
                                         <ol ui-tree-nodes="" data-ng-model="rootInventoryCategory.SubItems">
                                             <li ng-repeat="item in rootInventoryCategory.SubItems" ui-tree-node collapsed="true" data-ng-include="'app/modules/product/partials/inventoryCategoriesAssign.html'">
                                             </li>

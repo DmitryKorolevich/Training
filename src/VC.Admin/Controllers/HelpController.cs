@@ -134,7 +134,7 @@ namespace VC.Admin.Controllers
         #region BugsArea
 
         [HttpPost]
-        public async Task<Result<PagedList<BugTicketListItemModel>>> GetBugTickets([FromBody]VHelpTicketFilter filter)
+        public async Task<Result<PagedList<BugTicketListItemModel>>> GetBugTickets([FromBody]BugTicketFilter filter)
         {
             if (filter.To.HasValue)
                 filter.To = filter.To.Value.AddDays(1);
@@ -168,7 +168,7 @@ namespace VC.Admin.Controllers
                 return new BugTicketManageModel(null)
                 {
                     PublicId= Guid.NewGuid(),
-                    StatusCode = RecordStatusCode.Active,
+                    StatusCode = BugTicketStatus.Active,
                     Priority = TicketPriority.Low,
                     IsAllowEdit=true,
                     Comments = new List<BugTicketCommentManageModel>(),

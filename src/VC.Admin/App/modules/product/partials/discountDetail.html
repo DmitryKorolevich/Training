@@ -381,7 +381,7 @@
                                         <div class="applied-categories categories">
                                             <button data-ng-if="!appliedCategoriesExpanded" data-ng-click="updateAppliedCategoriesCollapsed(true);" class="btn btn-primary btn-xs expand-button">Expand All</button>
                                             <button data-ng-if="appliedCategoriesExpanded" data-ng-click="updateAppliedCategoriesCollapsed(false);" class="btn btn-primary btn-xs expand-button">Collapse All</button>
-                                            <div ui-tree data-drag-enabled="false" class="ya-treeview">
+                                            <div ui-tree data-drag-enabled="false" name="applied-categories" class="ya-treeview">
                                                 <ol ui-tree-nodes="" data-ng-model="rootAppliedCategory.SubItems">
                                                     <li ng-repeat="item in rootAppliedCategory.SubItems" ui-tree-node collapsed="true" data-ng-include="'app/modules/content/partials/contentCategories.html'">
                                                     </li>
@@ -450,7 +450,7 @@
                                     <div class="filter-categories categories">
                                         <button data-ng-if="!categoriesExpanded" data-ng-click="updateCategoriesCollapsed(true);" class="btn btn-primary btn-xs expand-button">Expand All</button>
                                         <button data-ng-if="categoriesExpanded" data-ng-click="updateCategoriesCollapsed(false);" class="btn btn-primary btn-xs expand-button">Collapse All</button>
-                                        <div ui-tree data-drag-enabled="false" class="ya-treeview">
+                                        <div ui-tree data-drag-enabled="false" name="filter-categories" class="ya-treeview">
                                             <ol ui-tree-nodes="" data-ng-model="rootCategory.SubItems">
                                                 <li ng-repeat="item in rootCategory.SubItems" ui-tree-node collapsed="true" data-ng-include="'app/modules/content/partials/contentCategories.html'">
                                                 </li>

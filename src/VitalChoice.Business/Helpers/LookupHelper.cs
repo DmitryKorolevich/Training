@@ -426,6 +426,17 @@ namespace VitalChoice.Business.Helpers
             return toReturn;
         }
 
+        public static Dictionary<int, string> GetBugTicketStatuses()
+        {
+            Dictionary<int, string> toReturn = new Dictionary<int, string>
+            {
+                {(int) BugTicketStatus.Active, "Open"},
+                {(int) BugTicketStatus.Review, "Review"},
+                {(int) BugTicketStatus.NotActive, "Closed"},
+            };
+            return toReturn;
+        }
+
         public static Dictionary<int, string> GetPriorities()
         {
             Dictionary<int, string> toReturn = new Dictionary<int, string>

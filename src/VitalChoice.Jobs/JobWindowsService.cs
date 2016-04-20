@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.ServiceProcess;
+using System.Threading.Tasks;
 using Autofac;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -50,9 +51,9 @@ namespace VitalChoice.Jobs
 
 	            _logger = _container.Resolve<ILogger>();
 	            _logger.LogWarning("Scheduler start");
-	            var conf = _container.Resolve<IOptions<AppOptions>>().Value;
+                var conf = _container.Resolve<IOptions<AppOptions>>().Value;
 	            var scheduler = _container.Resolve<IScheduler>();
-	            var jobImpls = _container.Resolve<IEnumerable<IJob>>();
+                var jobImpls = _container.Resolve<IEnumerable<IJob>>();
 	            foreach (var impl in jobImpls)
 	            {
 	                var type = impl.GetType();
@@ -78,10 +79,21 @@ namespace VitalChoice.Jobs
 	    }
 
 	    protected override void OnStop()
-		{
-            _container.Dispose();
-			base.OnStop();
-			Trace.WriteLine("Jobs service stopped");
-		}
+        {
+            int timeout = 10000;
+            var task = Task.Factory.StartNew(() =>
+            {
+                var scheduler = _container.Resolve<IScheduler>();
+                scheduler.Shutdown(true);
+                //_container.Dispose();
+                //base.OnStop();
+                Trace.WriteLine("Jobs service stopped");
+            });
+            RequestAdditionalTime(timeout);
+            while (!task.Wait(timeout))
+            {
+                RequestAdditionalTime(timeout);
+            }
+        }
 	}
 }

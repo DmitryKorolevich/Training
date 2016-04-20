@@ -79,6 +79,7 @@ namespace VC.Admin.Controllers
                     AffiliateMonthlyEmailsSentOptions = referenceData.AffiliateMonthlyEmailsSentOptions,
                     AffiliateTiers = referenceData.AffiliateTiers,
                     TicketStatuses = referenceData.TicketStatuses,
+                    BugTicketStatuses = referenceData.BugTicketStatuses,
                     Priorities = referenceData.Priorities,
                     PromotionTypes = referenceData.PromotionTypes,
                     ExpiredTypes = referenceData.ExpiredTypes,

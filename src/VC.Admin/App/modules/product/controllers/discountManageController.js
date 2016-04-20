@@ -342,36 +342,28 @@ angular.module('app.modules.product.controllers.discountManageController', [])
             $scope.discount.DiscountsToSelectedSkus.splice(index, 1);
         };
 
-        var getCategoriesTreeViewScope = function () {
-            return angular.element($('.filter-categories .ya-treeview').get(0)).scope();
-        };
-
-        $scope.updateCategoriesCollapsed = function (expand) {
-            var scope = getCategoriesTreeViewScope();
-            if (expand) {
-                scope.expandAll();
+        $scope.updateCategoriesCollapsed = function (expand)
+        {
+            if (expand)
+            {
+                $scope.$broadcast('angular-ui-tree:expand-all', { name: 'filter-categories' });
             }
-            else {
-                scope.collapseAll();
+            else
+            {
+                $scope.$broadcast('angular-ui-tree:collapse-all', { name: 'filter-categories' });
             }
             $scope.categoriesExpanded = expand;
         };
 
-        var getAppliedCategoriesTreeViewScope = function ()
-        {
-            return angular.element($('.applied-categories .ya-treeview').get(0)).scope();
-        };
-
         $scope.updateAppliedCategoriesCollapsed = function (expand)
         {
-            var scope = getAppliedCategoriesTreeViewScope();
             if (expand)
             {
-                scope.expandAll();
+                $scope.$broadcast('angular-ui-tree:expand-all', { name: 'applied-categories' });
             }
             else
             {
-                scope.collapseAll();
+                $scope.$broadcast('angular-ui-tree:collapse-all', { name: 'applied-categories' });
             }
             $scope.appliedCategoriesExpanded = expand;
         };

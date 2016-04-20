@@ -492,7 +492,18 @@ namespace VC.Admin.Controllers
                         toReturn.ConfirmationEmailSent = false;
                         if (toReturn.SkuOrdereds != null && toReturn.PromoSkus != null)
                         {
-                            toReturn.SkuOrdereds.AddRange(toReturn.PromoSkus.Select(p=>p.ConvertToBase()).ToList());
+                            foreach (var promoSkuOrderedManageModel in toReturn.PromoSkus)
+                            {
+                                var existSku = toReturn.SkuOrdereds.FirstOrDefault(p => p.IdSku == promoSkuOrderedManageModel.IdSku);
+                                if (existSku != null)
+                                {
+                                    existSku.QTY += promoSkuOrderedManageModel.QTY;
+                                }
+                                else
+                                {
+                                    toReturn.SkuOrdereds.Add(promoSkuOrderedManageModel.ConvertToBase());
+                                }
+                            }
                             toReturn.PromoSkus=new List<PromoSkuOrderedManageModel>();
                         }
                         toReturn.SkuOrdereds?.ForEach(p =>

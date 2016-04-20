@@ -271,7 +271,8 @@ angular.module('app.modules.product.controllers.productManageController', [])
 
 			            refreshHistory();
 			            setSelected($scope.rootCategory, $scope.product.CategoryIds);
-			            setInventorySelected($scope.rootInventoryCategory, $scope.product.InventoryCategoryId);
+			            //setInventorySelected($scope.rootInventoryCategory, $scope.product.InventoryCategoryId);
+			            $scope.updateSalesCategoriesCollapsed(true);
 			            refreshPossiableProductTypes();
 			            setProductTypeWatch();
 			            initCrossses();
@@ -371,24 +372,26 @@ angular.module('app.modules.product.controllers.productManageController', [])
         };
 
         $scope.updateCategoriesCollapsed = function (expand) {
-            var scope = angular.element($('.categories.public .ya-treeview').get(0)).scope();
-            if (expand) {
-                scope.expandAll();
+            if (expand)
+            {
+                $scope.$broadcast('angular-ui-tree:expand-all', {name: 'public'});
+                //scope.expandAll();
             }
             else
             {
-                scope.collapseAll();
+                $scope.$broadcast('angular-ui-tree:collapse-all', {name: 'public'});
             }
             $scope.categoriesExpanded = expand;
         };
 
         $scope.updateSalesCategoriesCollapsed = function (expand) {
-            var scope = angular.element($('.categories.sales .ya-treeview').get(0)).scope();
-            if (expand) {
-                scope.expandAll();
+            if (expand)
+            {
+                $scope.$broadcast('angular-ui-tree:expand-all');
             }
-            else {
-                scope.collapseAll();
+            else
+            {
+                $scope.$broadcast('angular-ui-tree:collapse-all');
             }
             $scope.salesCategoriesExpanded = expand;
         };
@@ -535,7 +538,8 @@ angular.module('app.modules.product.controllers.productManageController', [])
             return angular.element($('.categories.sales .ya-treeview').get(0)).scope().$nodesScope.childNodes();
         }
 
-        function expandInventoryCategory(id) {
+        function expandInventoryCategory(id)
+        {
             var parentScopes = getInventoryScopePath(id);
 
             for (var i = 0; i < parentScopes.length; i++) {

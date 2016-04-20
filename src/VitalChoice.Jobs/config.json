@@ -15,6 +15,11 @@
       "CacheTimeToLeaveSeconds": 1800, //30 minutes
       "CacheScanPeriodSeconds": 900 //15 minutes
     },
+    "CacheSyncOptions": {
+      "ConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=hemZgxBH/foCscmtPdhF8wvbWfh8aF9GR4ShqfnCPnY=",
+      "ServiceBusQueueName": "caching",
+      "Enabled": true
+    },
     "AzureStorage": {
       "StorageConnectionString": "DefaultEndpointsProtocol=https;AccountName=stagingvcfiles;AccountKey=RxGv/t6KyB7aFPKaKIljivC0YtoYv/FR+0f5uGcORdie1h5WGigJKazfMiYL/gNJz+fGUWsUhEvGjdfwfZAq6A==;BlobEndpoint=https://stagingvcfiles.blob.core.windows.net/;TableEndpoint=https://stagingvcfiles.table.core.windows.net/;QueueEndpoint=https://stagingvcfiles.queue.core.windows.net/;FileEndpoint=https://stagingvcfiles.file.core.windows.net/",
       "CustomerContainerName": "customer-files",
@@ -27,9 +32,18 @@
       "Schedules": {
         "AutoShipJob": "0 0 0/2 * * ?",
         "GoogleProductsFeedJob": "0 0 0/1 * * ?",
-        "ShipDelayJob": "0 0/1 * * * ?"
-        //"ShipDelayJob": "0 0 10 * * ?"
+        "ShipDelayJob": "0 0 2 * * ?"
+        //"ShipDelayJob": "0 0/1 * * * ?"
       }
+    },
+    "Avatax": {
+      "AccountNumber": "1100019190",
+      "LicenseKey": "B50461EFC03F20AB",
+      "ServiceUrl": "https://avatax.avalara.net/",
+      "AccountName": "Vital Choice Seafood Inc",
+      "ProfileName": "Vital Choice",
+      "CompanyCode": "VC001",
+      "TurnOffCommit": true
     },
     "Email": {
       "From": "admin.staging@g2designgroup.com",
