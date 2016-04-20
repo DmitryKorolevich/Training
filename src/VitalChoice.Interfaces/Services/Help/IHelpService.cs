@@ -28,7 +28,7 @@ namespace VitalChoice.Interfaces.Services.Help
 
         #region BugTickets
 
-        Task<PagedList<BugTicket>> GetBugTicketsAsync(VHelpTicketFilter filter);
+        Task<PagedList<BugTicket>> GetBugTicketsAsync(BugTicketFilter filter);
 
         Task<BugTicket> GetBugTicketAsync(int id);
 

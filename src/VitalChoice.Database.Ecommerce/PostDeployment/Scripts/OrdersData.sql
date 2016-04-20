@@ -461,3 +461,15 @@ BEGIN
 	(N'AutoShipId', 3, NULL, 7, NULL)
 
 END
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[OrderOptionTypes] Where Name='ShipDelayDate' AND IdObjectType=5)
+BEGIN
+
+	INSERT INTO [dbo].[OrderOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'ShipDelayDate', 6, NULL, 5, NULL)
+
+END
+
+GO

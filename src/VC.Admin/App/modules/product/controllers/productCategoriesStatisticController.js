@@ -71,21 +71,15 @@
                 });
         };
 
-        var getCategoriesTreeViewScope = function ()
-        {
-            return angular.element($('.categories .ya-treeview').get(0)).scope();
-        };
-
         $scope.updateCategoriesCollapsed = function (expand)
         {
-            var scope = getCategoriesTreeViewScope();
             if (expand)
             {
-                scope.expandAll();
+                $scope.$broadcast('angular-ui-tree:expand-all');
             }
             else
             {
-                scope.collapseAll();
+                $scope.$broadcast('angular-ui-tree:collapse-all');
             }
             $scope.categoriesExpanded = expand;
         };

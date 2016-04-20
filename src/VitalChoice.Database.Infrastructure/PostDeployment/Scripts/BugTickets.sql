@@ -72,3 +72,13 @@ BEGIN
 	ALTER TABLE [dbo].[BugFiles] CHECK CONSTRAINT [FK_BugFiles_BugTicketComments]
 
 END
+
+GO
+
+IF OBJECT_ID(N'dbo.FK_BugTicketsToStatus', N'F') IS NOT NULL
+BEGIN
+
+ALTER TABLE [dbo].[BugTickets] DROP CONSTRAINT [FK_BugTicketsToStatus]
+END
+
+GO

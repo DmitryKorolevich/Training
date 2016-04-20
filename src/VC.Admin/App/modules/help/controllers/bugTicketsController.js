@@ -41,7 +41,7 @@
             $scope.priorities = angular.copy($rootScope.ReferenceData.Priorities);
             $scope.priorities.splice(0, 0, { Key: null, Text: 'All' });
 
-            $scope.statuses = angular.copy($rootScope.ReferenceData.TicketStatuses);
+            $scope.statuses = angular.copy($rootScope.ReferenceData.BugTicketStatuses);
             $.each($scope.statuses, function (index, item)
             {
                 item.Text="Show " + item.Text;

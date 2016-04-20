@@ -111,8 +111,9 @@
                         <td>{{::item.DateEdited | date:"MM/dd/yy"}}<br />{{::item.DateEdited | date:"h:mm a"}}<br />{{::item.EditedByAgent}}</td>
                         <td>{{::item.AddedBy}} ({{::item.AddedByAgent}})</td>
                         <td>
-                            <span data-ng-if="item.StatusCode == 1" class="label label-warning font-default">{{getReferenceItem(ReferenceData.TicketStatuses, item.StatusCode).Text}}</span>
-                            <span data-ng-if="item.StatusCode == 2" class="label label-info font-default">{{getReferenceItem(ReferenceData.TicketStatuses, item.StatusCode).Text}}</span>
+                            <span data-ng-if="item.StatusCode == 1" class="label label-warning font-default">{{getReferenceItem(ReferenceData.BugTicketStatuses, item.StatusCode).Text}}</span>
+                            <span data-ng-if="item.StatusCode == 2" class="label label-info font-default">{{getReferenceItem(ReferenceData.BugTicketStatuses, item.StatusCode).Text}}</span>
+                            <span data-ng-if="item.StatusCode == 4" class="label label-future font-default">{{getReferenceItem(ReferenceData.BugTicketStatuses, item.StatusCode).Text}}</span>
                         </td>
                         <td>
                             <button title="Edit" class="btn btn-default btn-success btn-xs" ui-sref="index.oneCol.bugTicketDetail({id:item.Id})">

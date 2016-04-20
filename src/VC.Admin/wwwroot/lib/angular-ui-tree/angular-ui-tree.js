@@ -354,6 +354,8 @@
               $trElm,
               emptyElmColspan;
 
+	    scope.name = attrs.name;
+
             angular.extend(config, treeConfig);
             if (config.treeClass) {
               element.addClass(config.treeClass);
@@ -604,12 +606,16 @@
               attrs.$set('collapsed', val);
             });
 
-            scope.$on('angular-ui-tree:collapse-all', function () {
-              scope.collapsed = true;
+            scope.$on('angular-ui-tree:collapse-all', function (event, data) {
+              if((data===undefined && scope.$treeScope.name===undefined) || (data!==undefined && data.name==scope.$treeScope.name)) {
+                scope.collapsed = true;
+	      }
             });
 
-            scope.$on('angular-ui-tree:expand-all', function () {
-              scope.collapsed = false;
+            scope.$on('angular-ui-tree:expand-all', function (event, data) {
+              if((data===undefined && scope.$treeScope.name===undefined) || (data!==undefined && data.name==scope.$treeScope.name)) {
+                scope.collapsed = false;
+	      }
             });
 
             /**

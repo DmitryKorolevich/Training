@@ -407,7 +407,7 @@ namespace VitalChoice.Business.Services.HelpService
 
         #region BugTickets
 
-        public async Task<PagedList<BugTicket>> GetBugTicketsAsync(VHelpTicketFilter filter)
+        public async Task<PagedList<BugTicket>> GetBugTicketsAsync(BugTicketFilter filter)
         {
             var conditions = new BugTicketQuery().NotDeleted().WithDateCreatedFrom(filter.From).WithDateCreatedTo(filter.To)
                 .WithStatus(filter.StatusCode).WithPriority(filter.Priority);
@@ -548,7 +548,7 @@ namespace VitalChoice.Business.Services.HelpService
                 {
                     if (item.Id == 0)
                     {
-                        item.StatusCode = RecordStatusCode.Active;
+                        item.StatusCode = BugTicketStatus.Active;
                         item.DateCreated = item.DateEdited = DateTime.Now;
                         item.IdAddedBy = item.IdEditedBy = adminId;
                         await _bugTicketRepository.InsertGraphAsync(item);
@@ -609,7 +609,7 @@ namespace VitalChoice.Business.Services.HelpService
                     return false;
                 }
 
-                item.StatusCode = RecordStatusCode.Deleted;
+                item.StatusCode = BugTicketStatus.Deleted;
                 item.DateEdited = DateTime.Now;
                 item.IdEditedBy = adminId;
 

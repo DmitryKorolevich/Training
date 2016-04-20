@@ -62,7 +62,7 @@
                                     <div class="form-group">
                                         <label for="status" class="col-md-3 control-label">Status</label>
                                         <div class="col-md-9">
-                                            <select class="form-control" id="status" data-ng-model="bugTicket.StatusCode" data-ng-options="item.Key as item.Text for item in ReferenceData.TicketStatuses" data-ng-disabled="!bugTicket.IsAllowEdit || bugTicket.Id==0"></select>
+                                            <select class="form-control" id="status" data-ng-model="bugTicket.StatusCode" data-ng-options="item.Key as item.Text for item in ReferenceData.BugTicketStatuses" data-ng-disabled="!bugTicket.IsAllowEdit || bugTicket.Id==0"></select>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -71,7 +71,7 @@
                                             <div>
                                                 <div data-ng-repeat="file in bugTicket.Files" class="form-control-static">
                                                     <a target="_blank" data-ng-href="/api/Help/GetBugTicketFile?fileName={{file.FileName}}&publicId={{bugTicket.PublicId}}&viewMode=true&buildNumber={{buildNumber}}">{{file.FileName}}</a>
-                                                    added <strong>{{::file.UploadDate | date:"MM/dd/yy"}} {{::file.UploadDate | date:"h:mm a"}}
+                                                    added <strong>{{::file.UploadDate | date:"MM/dd/yy"}} {{::file.UploadDate | date:"h:mm a"}}</strong>
                                                     <div class="pull-right">
                                                         <a title="Download" class="btn btn-xs btn-success" target="_self" data-ng-href="/api/Help/GetBugTicketFile?fileName={{file.FileName}}&publicId={{bugTicket.PublicId}}&viewMode=false&buildNumber={{buildNumber}}">
                                                             <i class="glyphicon glyphicon-download"></i>

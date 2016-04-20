@@ -61,6 +61,8 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<IEnumerable<MasterContentItemListItemModel>>> GetMasterContentItems([FromBody]MasterContentItemListFilter filter)
         {
+            await productService.GenerateSkuGoogleItemsReportFile();
+
             return (await masterContentService.GetMasterContentItemsAsync(filter)).Select(p=>new MasterContentItemListItemModel(p)).ToList();
         }
 

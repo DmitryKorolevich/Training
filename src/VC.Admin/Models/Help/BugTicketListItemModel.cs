@@ -15,7 +15,7 @@ namespace VC.Admin.Models.Help
 
         public DateTime DateEdited { get; set; }
 
-        public RecordStatusCode StatusCode { get; set; }
+        public BugTicketStatus StatusCode { get; set; }
 
         public TicketPriority Priority { get; set; }
 

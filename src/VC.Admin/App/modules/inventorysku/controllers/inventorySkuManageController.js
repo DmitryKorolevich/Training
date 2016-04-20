@@ -129,7 +129,8 @@ angular.module('app.modules.inventorysku.controllers.inventorySkuManageControlle
 			        if (result.Success) {
 			            $scope.inventorySku = result.Data;
 
-			            setInventorySelected($scope.rootInventoryCategory, $scope.inventorySku.IdInventorySkuCategory);
+			            $scope.updateSalesCategoriesCollapsed(true);
+			            //setInventorySelected($scope.rootInventoryCategory, $scope.inventorySku.IdInventorySkuCategory);
 			        } else {
 			            errorHandler(result);
 			        }
@@ -172,26 +173,16 @@ angular.module('app.modules.inventorysku.controllers.inventorySkuManageControlle
             }
         };
 
-        $scope.updateCategoriesCollapsed = function (expand) {
-            var scope = angular.element($('.categories.public .ya-treeview').get(0)).scope();
-            if (expand) {
-                scope.expandAll();
-            }
-            else
-            {
-                scope.collapseAll();
-            }
-            $scope.categoriesExpanded = expand;
-        };
 
         $scope.updateSalesCategoriesCollapsed = function (expand)
         {
-            var scope = angular.element($('.categories.sales .ya-treeview').get(0)).scope();
-            if (expand) {
-                scope.expandAll();
+            if (expand)
+            {
+                $scope.$broadcast('angular-ui-tree:expand-all');
             }
-            else {
-                scope.collapseAll();
+            else
+            {
+                $scope.$broadcast('angular-ui-tree:collapse-all');
             }
             $scope.salesCategoriesExpanded = expand;
         };

@@ -89,6 +89,7 @@ namespace VitalChoice.Jobs
                 //base.OnStop();
                 Trace.WriteLine("Jobs service stopped");
             });
+            RequestAdditionalTime(timeout);
             while (!task.Wait(timeout))
             {
                 RequestAdditionalTime(timeout);
