@@ -6,17 +6,15 @@ using Microsoft.Extensions.PlatformAbstractions;
 namespace VitalChoice.Ecommerce.Domain.Helpers
 {
     public static class NativeHelper {
+
+#if DOTNET5_4
         private static readonly IAssemblyLoadContextAccessor LoadContextAccessor =
             (IAssemblyLoadContextAccessor)
-                CallContextServiceLocator.Locator.ServiceProvider.GetService(typeof (IAssemblyLoadContextAccessor));
-
-#if DOTNET5_4
+                CallContextServiceLocator.Locator?.ServiceProvider?.GetService(typeof (IAssemblyLoadContextAccessor));
         private static readonly Func<object> GetCurrentDomain;
         private static readonly Func<object, Assembly[]> AssembliesGetter;
-#endif
 
         static NativeHelper() {
-#if DOTNET5_4
             var type = typeof(object).GetTypeInfo().Assembly.GetType("System.AppDomain");
             if (type == null) {
                 throw new InvalidOperationException("Cannot find System.AppDomain class in system library, investigate to issue and rewrite assembly list acquire");
@@ -28,10 +26,8 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             GetCurrentDomain = method.CompileStaticAccessor<object>();
             method = type.GetMethod("GetAssemblies", BindingFlags.Public | BindingFlags.Instance);
             AssembliesGetter = method.CompileAccessor<object, Assembly[]>();
-#endif
         }
 
-#if DOTNET5_4
         internal static Assembly[] GetAssemblies() {
             var domain = GetCurrentDomain();
             return AssembliesGetter(domain);
