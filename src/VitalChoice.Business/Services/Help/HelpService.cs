@@ -552,7 +552,7 @@ namespace VitalChoice.Business.Services.HelpService
                         item.DateCreated = item.DateEdited = DateTime.Now;
                         item.IdAddedBy = item.IdEditedBy = adminId;
                         await _bugTicketRepository.InsertGraphAsync(item);
-                        await _notificationService.SendNewBugTicketAddingForSuperAdminAsync(new BugTicketEmail { Id = item.Id });
+                        await _notificationService.SendBugTicketUpdaingForSuperAdminAsync(new BugTicketEmail { Id = item.Id });
 
                         var adminProfile = (await _adminProfileRepository.Query(p => p.Id == item.IdAddedBy).Include(p => p.User).SelectAsync(false)).FirstOrDefault();
                         if (adminProfile != null)
@@ -593,6 +593,10 @@ namespace VitalChoice.Business.Services.HelpService
             if (item.IdAddedBy != adminId)
             {
                 await NotifyAuthor(item.Id);
+            }
+            else
+            {
+                await NotifyMainSuperAdmin(item.Id);
             }
 
             return item;
@@ -708,9 +712,16 @@ namespace VitalChoice.Business.Services.HelpService
                 item.EditedByAgent = adminProfile.AgentId;
             }
 
-            if (bugTicket != null && bugTicket.IdAddedBy != item.IdEditedBy)
+            if (bugTicket != null)
             {
-                await NotifyAuthor(item.IdBugTicket);
+                if (bugTicket.IdAddedBy != item.IdEditedBy)
+                {
+                    await NotifyAuthor(item.IdBugTicket);
+                }
+                else
+                {
+                    await NotifyMainSuperAdmin(item.IdBugTicket);
+                }
             }
 
             return item;
@@ -739,6 +750,10 @@ namespace VitalChoice.Business.Services.HelpService
                     if (bugTicket.IdAddedBy != adminId)
                     {
                         await NotifyAuthor(item.IdBugTicket);
+                    }
+                    else
+                    {
+                        await NotifyMainSuperAdmin(item.IdBugTicket);
                     }
 
                     return true;
@@ -776,6 +791,19 @@ namespace VitalChoice.Business.Services.HelpService
             }
             return false;
         }
+
+        private async Task<bool> NotifyMainSuperAdmin(int idBugTicket)
+        {
+            var bugTicket = await GetBugTicketAsync(idBugTicket);
+            if (bugTicket != null)
+            {
+                await _notificationService.SendBugTicketUpdaingForSuperAdminAsync(new BugTicketEmail { Id = bugTicket.Id });
+
+                return true;
+            }
+            return false;
+        }
+
 
         #endregion
 

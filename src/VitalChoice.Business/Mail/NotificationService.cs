@@ -75,7 +75,7 @@ namespace VitalChoice.Business.Mail
             }
         }
 
-        public async Task SendNewBugTicketAddingForSuperAdminAsync(BugTicketEmail bugTicketEmail)
+        public async Task SendBugTicketUpdaingForSuperAdminAsync(BugTicketEmail bugTicketEmail)
         {
             bugTicketEmail.Url = $"https://{_adminHost}/help/bugs/tickets/{bugTicketEmail.Id}";
 
