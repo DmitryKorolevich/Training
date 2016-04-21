@@ -711,11 +711,18 @@ INSERT INTO [dbo].[ContentItems]
            ,'<%
 <body:body>
 {{
-	<p>New bug ticket was added - <a href="@(Url)">@(Url)</a></p>
+	<p>Bug ticket was updated - <a href="@(Url)">@(Url)</a></p>
+<br/><br/><br/>
+	Sincerely,<br/>
+	Vital Choice Wild Seafood & Organics
+	<br/><br/><br/><br/><br/>
+	<i>
+	*Please note. This is an automated message. Do not reply. This mailbox is not monitored.
+	</i>
 }}
 %>'
            ,''
-           ,'Vital Choice - new bug ticket was added #@(Id)'
+           ,'Bug ticket #@(Id) has been updated - Vital Choice Wild Seafood & Organics'
            ,NULL
            ,NULL)
 
@@ -736,7 +743,7 @@ INSERT INTO [dbo].[EmailTemplates]
            ,2
            ,NULL
            ,'BugTicketEmail'
-           ,'Bug ticket update super admin notification')
+           ,'Bug ticket add/update super admin notification')
 
 END
 
@@ -790,7 +797,7 @@ INSERT INTO [dbo].[EmailTemplates]
            ,2
            ,NULL
            ,'BugTicketEmail'
-           ,'Bug ticket update super admin notification')
+           ,'Bug ticket update super author notification')
 
 END
 

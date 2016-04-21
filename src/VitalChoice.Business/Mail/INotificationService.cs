@@ -16,7 +16,7 @@ namespace VitalChoice.Business.Mail
 
         Task SendHelpTicketUpdatingEmailForCustomerAsync(string email, HelpTicketEmail helpTicketEmail);
 
-        Task SendNewBugTicketAddingForSuperAdminAsync(BugTicketEmail bugTicketEmail);
+        Task SendBugTicketUpdaingForSuperAdminAsync(BugTicketEmail bugTicketEmail);
 
         Task SendBugTicketUpdatingEmailForAuthorAsync(string email, BugTicketEmail bugTicketEmail);
 

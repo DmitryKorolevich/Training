@@ -46,6 +46,7 @@
                     <ul data-ng-if="module.subMenu != null" class="dropdown-menu" role="menu">
                         <li data-ng-class="{'sub-dropdown': subModule.subMenu != null}" data-ng-repeat="subModule in module.subMenu" ui-sref-active="active" data-ng-if="subModule.access==null || validatePermission(subModule.access)">
                             <a ng-if="subModule.stateName" ui-sref="{{subModule.stateName}}({name:subModule.name})">{{subModule.stateLabel}}</a>
+                            <a ng-if="subModule.href" target="_blank" data-ng-href="{{subModule.href}}">{{subModule.stateLabel}}</a>
                             <a ng-if="subModule.handler" ng-click="subModule.handler();">{{subModule.stateLabel}}</a>
                             <a data-ng-if="subModule.subMenu != null" data-ng-click="$event.stopPropagation();$event.preventDefault();">
                                 {{subModule.stateLabel}}
