@@ -26,11 +26,28 @@ namespace VitalChoice.Jobs
 
 		private ILogger _logger;
 		private IContainer _container;
+	    private IScheduler _scheduler;
 
-		public JobWindowsService(IApplicationEnvironment env)
+        public JobWindowsService(IApplicationEnvironment env)
 		{
 		    _env = env;
-		    InitializeComponent();
+            try
+            {
+                var configurationBuilder = new ConfigurationBuilder()
+                    .AddJsonFile("config.json")
+                    .AddJsonFile("config.local.json", true);
+
+                var configuration = configurationBuilder.Build();
+
+                _container = new JobsDependencyConfig().RegisterInfrastructure(configuration, new ServiceCollection(),
+                    typeof(JobsDependencyConfig).Assembly, _env, enableCache: true);
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.Message, "Error");
+                _logger.LogCritical(e.Message, e);
+            }
+            InitializeComponent();
 		}
 
 	    protected override void OnStart(string[] args)
@@ -38,55 +55,37 @@ namespace VitalChoice.Jobs
 	        base.OnStart(args);
 	        RequestAdditionalTime(30000);
 	        Trace.WriteLine("Jobs service started initialization");
-	        try
-	        {
-	            var configurationBuilder = new ConfigurationBuilder()
-	                .AddJsonFile("config.json")
-	                .AddJsonFile("config.local.json", true);
+            _logger = _container.Resolve<ILogger>();
+            _logger.LogWarning("Scheduler start");
+            var conf = _container.Resolve<IOptions<AppOptions>>().Value;
+            _scheduler = _container.Resolve<IScheduler>();
+            var jobImpls = _container.Resolve<IEnumerable<IJob>>();
+            foreach (var impl in jobImpls)
+            {
+                var type = impl.GetType();
+                var job = JobBuilder.Create(type).WithIdentity(type.FullName).Build();
 
-	            var configuration = configurationBuilder.Build();
+                var trigger = TriggerBuilder.Create()
+                    .WithIdentity(type.FullName)
+                    .WithCronSchedule(conf.JobSettings.Schedules[type.Name])
+                    .StartNow()
+                    .Build();
 
-	            _container = new JobsDependencyConfig().RegisterInfrastructure(configuration, new ServiceCollection(),
-	                typeof(JobsDependencyConfig).Assembly, _env, enableCache: true);
+                _scheduler.ScheduleJob(job, trigger);
+            }
 
-	            _logger = _container.Resolve<ILogger>();
-	            _logger.LogWarning("Scheduler start");
-                var conf = _container.Resolve<IOptions<AppOptions>>().Value;
-	            var scheduler = _container.Resolve<IScheduler>();
-                var jobImpls = _container.Resolve<IEnumerable<IJob>>();
-	            foreach (var impl in jobImpls)
-	            {
-	                var type = impl.GetType();
-	                var job = JobBuilder.Create(type).WithIdentity(type.FullName).Build();
-
-	                var trigger = TriggerBuilder.Create()
-	                    .WithIdentity(type.FullName)
-	                    .WithCronSchedule(conf.JobSettings.Schedules[type.Name])
-	                    .StartNow()
-	                    .Build();
-
-	                scheduler.ScheduleJob(job, trigger);
-	            }
-
-	            scheduler.Start();
-	        }
-	        catch (Exception e)
-	        {
-	            Trace.WriteLine(e.Message, "Error");
-	            _logger.LogCritical(e.Message, e);
-	        }
-	        Trace.WriteLine("Jobs service operating normally");
+            _scheduler.Start();
+            Trace.WriteLine("Jobs service operating normally");
 	    }
 
 	    protected override void OnStop()
         {
+            base.OnStop();
             int timeout = 10000;
             var task = Task.Factory.StartNew(() =>
             {
-                var scheduler = _container.Resolve<IScheduler>();
-                scheduler.Shutdown(true);
-                //_container.Dispose();
-                //base.OnStop();
+                _scheduler.Shutdown(true);
+                _container.Dispose();
                 Trace.WriteLine("Jobs service stopped");
             });
             RequestAdditionalTime(timeout);

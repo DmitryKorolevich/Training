@@ -187,10 +187,16 @@ namespace VitalChoice.Caching.Services.Cache
                 return false;
             }
 
-            if (entity == null)
+            if (entity == null && queryData.PrimaryKeys != null)
             {
                 _internalCache.SetNull(queryData.PrimaryKeys, queryData.RelationInfo);
                 return true;
+            }
+            if (queryData.PrimaryKeys == null)
+            {
+                _logger.LogWarning(
+                    $"<Cache Update> can't update cache, preconditions not met: {typeof(T)}\r\nExpression:\r\n{queryData.WhereExpression?.Expression.AsString()}");
+                return false;
             }
             entity = DeepCloneItem(entity, queryData.RelationInfo);
             return _internalCache.Update(entity, queryData.RelationInfo);
