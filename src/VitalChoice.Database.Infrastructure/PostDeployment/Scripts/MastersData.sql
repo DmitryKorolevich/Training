@@ -2434,7 +2434,7 @@ BEGIN
 		<span class="product-accessories-title">Try one of these delicious recipes</span>
 		<div class="accessories-container">
 		    @list(YoutubeVideos) {{
-                <a class="product-related-link" href="javascript:function(){return false;}" data-video-id="@(VideoId)">
+                <a class="product-related-link" href="javascript:function(){return false;}" data-video-id="@(VideoId)" data-video-modal="true" data-video-autoplay="true" data-video-autoclose="true">
 				    <img src="@(Image)">
 			    	@(Text)
 			    </a>
