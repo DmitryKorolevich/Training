@@ -36,9 +36,11 @@ using Microsoft.AspNet.Mvc.Abstractions;
 using System.Net;
 using Microsoft.Net.Http.Headers;
 using VitalChoice.Business.Models.Help;
+using VitalChoice.Business.Services.Bronto;
 using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Mail;
 using VitalChoice.Interfaces.Services.Products;
+using VitalChoice.Validation.Models;
 
 namespace VC.Public.Controllers
 {
@@ -55,6 +57,7 @@ namespace VC.Public.Controllers
         private readonly IOptions<AppOptions> _options;
         private readonly INotificationService _notificationService;
         private readonly IProductService _productService;
+        private readonly BrontoService _brontoService;
         private readonly ILogger _logger;
 
         public HelpController(
@@ -66,6 +69,7 @@ namespace VC.Public.Controllers
             INotificationService notificationService,
             ILoggerProviderExtended loggerProvider,
             IProductService productService,
+            BrontoService brontoService,
             IPageResultService pageResultService) : base(pageResultService)
         {
             _catalogRequestAddressService = catalogRequestAddressService;
@@ -75,6 +79,7 @@ namespace VC.Public.Controllers
             _options = options;
             _notificationService = notificationService;
             _productService = productService;
+            _brontoService = brontoService;
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -170,7 +175,6 @@ namespace VC.Public.Controllers
             return PartialView("_PrivacyRequestForm");
         }       
 
-
         [HttpGet]
         public Task<IActionResult> SendContentUrlNotification(string name, string url, int type= (int)SendContentUrlType.Article)
         {
@@ -231,6 +235,13 @@ namespace VC.Public.Controllers
 
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
             return File(data, "text/csv");
+        }
+
+        [HttpGet]
+        public async Task<Result<bool>> SubscribeBronto(string id)
+        {
+            var toReturn = await _brontoService.Subscribe(id);
+            return toReturn;
         }
     }
 }

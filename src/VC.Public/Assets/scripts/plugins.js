@@ -384,6 +384,81 @@ $(function () {
 
 	    return false;
 	});
+
+	if ($('.bronto-subscribe-top-wrapper').length == 1)
+	{
+	    var header = $('header');
+	    if (Cookies.get('bronto-signup') !== "hidden")
+	    {
+	        setTimeout(function ()
+	        {
+	            header.find(".bronto-subscribe-top-wrapper").show();
+	            header.find(".bronto-form").show();
+	        }, 1000);
+	    }
+	    $(".btnPostEmail").click(function ()
+	    {
+	        if (header.find(".bronto-form").is(":visible"))
+	        {
+	            if (header.find(".txtEmail").val() !== "")
+	            {
+	                $.get("/Help/SubscribeBronto/" + encodeURIComponent(header.find("#bronto-subEmail").val()), null, function (data, status, xhr)
+	                {
+	                    if (!data.Data)
+	                    {
+	                        header.find(".bubble").show();
+	                    }
+	                    else
+	                    {
+	                        header.find(".bronto-form").hide();
+	                        header.find(".bronto-form-success").show();
+
+	                        setTimeout(function ()
+	                        {
+	                            header.find(".bronto-form-success").slideUp(400, function() {
+	                                header.find(".bronto-subscribe-top-wrapper").hide();
+	                            });
+	                        }, 5000);
+	                        Cookies.set("bronto-signup", "hidden", { expires: 1 });
+	                    }
+	                });
+	            }
+	            else
+	            {
+	                header.find(".bubble").show();
+	            }
+	        }
+	    });
+
+	    header.find(".txtEmail").click(function ()
+	    {
+	        if (header.find(".bubble").is(":visible"))
+	        {
+	            header.find(".bubble").hide();
+	        }
+	    });
+	    header.find(".txtEmail").keydown(function (ev)
+	    {
+	        if (ev.keyCode === 13)
+	        {
+	            if (header.find(".txtEmail").val() !== "")
+	            {
+	                header.find(".btnPostEmail").click();
+	            }
+	            else
+	            {
+	                header.find(".bubble").show();
+	            }
+	        }
+	    });
+	    header.find(".close-form").click(function ()
+	    {
+	        header.find(".bronto-form").slideUp(400, function() {
+	            header.find(".bronto-subscribe-top-wrapper").hide();
+	        });
+	        Cookies.set("bronto-signup", "hidden", { expires: 1 });
+	    });
+	};
 });
 
 var YouTubeModalPopup = {
