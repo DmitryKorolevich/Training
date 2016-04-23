@@ -9,8 +9,8 @@ namespace VitalChoice.Workflow.Core
     {
         Task<Type> GetTreeType(string treeName);
         Task<HashSet<ActionItem>> GetTreeActions(string treeName);
-        Task<Dictionary<int, ActionItem>> GetActionResolverPaths(string actionName);
-        Task<HashSet<ActionItem>> GetDependencies(string actionName);
-        Task<HashSet<ActionItem>> GetAggregations(string actionName);
+        Task<Dictionary<int, ActionItem>> GetActionResolverPaths(string actionName, Type implementation);
+        Task<HashSet<ActionItem>> GetDependencies(string actionName, Type implementation);
+        Task<HashSet<ActionItem>> GetAggregations(string actionName, Type implementation);
     }
 }

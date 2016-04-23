@@ -56,11 +56,11 @@ namespace VitalChoice.Business.Services.Workflow
                     }));
         }
 
-        public async Task<Dictionary<int, ActionItem>> GetActionResolverPaths(string actionName)
+        public async Task<Dictionary<int, ActionItem>> GetActionResolverPaths(string actionName, Type implementation)
         {
             var actions =
                 await
-                    _resolverPaths.Query(p => p.Resolver.Name == actionName)
+                    _resolverPaths.Query(p => p.Resolver.Name == actionName && p.Resolver.ImplementationType == implementation.FullName)
                         .Include(r => r.Resolver)
                         .Include(r => r.Executor)
                         .SelectAsync(false);
@@ -73,10 +73,10 @@ namespace VitalChoice.Business.Services.Workflow
             });
         }
 
-        public async Task<HashSet<ActionItem>> GetDependencies(string actionName)
+        public async Task<HashSet<ActionItem>> GetDependencies(string actionName, Type implementation)
         {
             var result =
-                await _executors.Query(new WorkflowExecutorQuery().WithName(actionName))
+                await _executors.Query(new WorkflowExecutorQuery().WithName(actionName).WithImplementationType(implementation))
                     .Include(t => t.Dependencies)
                     .ThenInclude(ta => ta.Dependent)
                     .SelectAsync(false);
@@ -92,10 +92,10 @@ namespace VitalChoice.Business.Services.Workflow
                     }));
         }
 
-        public async Task<HashSet<ActionItem>> GetAggregations(string actionName)
+        public async Task<HashSet<ActionItem>> GetAggregations(string actionName, Type implementation)
         {
             var result =
-                await _executors.Query(new WorkflowExecutorQuery().WithName(actionName))
+                await _executors.Query(new WorkflowExecutorQuery().WithName(actionName).WithImplementationType(implementation))
                     .Include(t => t.Aggreagations)
                     .ThenInclude(ta => ta.ToAggregate)
                     .SelectAsync(false);

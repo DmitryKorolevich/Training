@@ -74,7 +74,7 @@ namespace VitalChoice.Workflow.Core
                     Activator.CreateInstance(action.ActionType, this, action.ActionName);
             _actions.Add(action.ActionName, workflowAction);
             _reverseAccessActions.Add(action.ActionType, action.ActionName);
-            var dependencyItems = await _itemProvider.GetDependencies(action.ActionName);
+            var dependencyItems = await _itemProvider.GetDependencies(action.ActionName, action.ActionType);
             foreach (var dep in dependencyItems)
             {
                 workflowAction.DependendActions.Add(dep.ActionName);
@@ -83,7 +83,7 @@ namespace VitalChoice.Workflow.Core
                     await AddWalkAction(dep);
                 }
             }
-            var aggregatedItems = await _itemProvider.GetAggregations(action.ActionName);
+            var aggregatedItems = await _itemProvider.GetAggregations(action.ActionName, action.ActionType);
             foreach (var aggr in aggregatedItems)
             {
                 workflowAction.AggreagatedActions.Add(aggr.ActionName);
@@ -116,7 +116,7 @@ namespace VitalChoice.Workflow.Core
                     Activator.CreateInstance(action.ActionType, this, action.ActionName);
             _actions.Add(action.ActionName, workflowActionResolver);
             _reverseAccessActions.Add(action.ActionType, action.ActionName);
-            var dependencyItems = await _itemProvider.GetDependencies(action.ActionName);
+            var dependencyItems = await _itemProvider.GetDependencies(action.ActionName, action.ActionType);
             foreach (var dep in dependencyItems)
             {
                 workflowActionResolver.DependendActions.Add(dep.ActionName);
@@ -125,7 +125,7 @@ namespace VitalChoice.Workflow.Core
                     await AddWalkAction(dep);
                 }
             }
-            var paths = await _itemProvider.GetActionResolverPaths(action.ActionName);
+            var paths = await _itemProvider.GetActionResolverPaths(action.ActionName, action.ActionType);
             foreach (var path in paths)
             {
                 workflowActionResolver.Actions.Add(path.Key, path.Value.ActionName);
