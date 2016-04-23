@@ -377,7 +377,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
 	    public async Task<Result<PagedList<AutoShipHistoryItemModel>>> GetAutoShips([FromBody] OrderFilter filter)
 	    {
-			var infr = _appInfrastructureService.Get();
+			var infr = _appInfrastructureService.Data();
 			var countries = await _countryService.GetCountriesAsync();
 
 			filter.Sorting.SortOrder = VitalChoice.Infrastructure.Domain.Transfer.SortOrder.Desc;

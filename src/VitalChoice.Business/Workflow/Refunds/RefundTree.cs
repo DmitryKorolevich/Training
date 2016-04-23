@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VitalChoice.Business.Workflow.Refunds.Actions;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Core;
@@ -14,9 +15,11 @@ namespace VitalChoice.Business.Workflow.Refunds
         {
         }
 
-        public override Task<decimal> ExecuteAsync(OrderRefundDataContext context)
+        public override async Task<decimal> ExecuteAsync(OrderRefundDataContext context)
         {
-            throw new NotImplementedException();
+            var total = await ExecuteAsync<RefundTotal>(context);
+            context.Total = total;
+            return total;
         }
     }
 }

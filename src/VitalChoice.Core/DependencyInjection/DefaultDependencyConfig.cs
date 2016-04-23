@@ -564,6 +564,7 @@ namespace VitalChoice.Core.DependencyInjection
                 .As(typeof (IExtendedDynamicReadServiceAsync<,>)).InstancePerLifetimeScope();
 
             builder.RegisterGeneric(typeof (TreeSetup<,>)).As(typeof (ITreeSetup<,>)).InstancePerLifetimeScope();
+		    builder.RegisterType<TreeSetupCleaner>().As<ITreeSetupCleaner>().InstancePerLifetimeScope();
             builder.RegisterContentBase();
             builder.RegisterDynamicsBase();
             builder.RegisterType<DynamicExtensionsRewriter>()

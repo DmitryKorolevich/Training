@@ -50,7 +50,7 @@ namespace VC.Public.Controllers
             SkuMapper = skuMapper;
             ProductMapper = productMapper;
             SettingService = settingService;
-            AppInfrastructure = infrastructureService.Get();
+            AppInfrastructure = infrastructureService.Data();
         }
 
         protected async Task<bool> IsCartEmpty()

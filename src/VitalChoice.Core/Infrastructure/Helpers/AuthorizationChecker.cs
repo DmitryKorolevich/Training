@@ -13,7 +13,7 @@ namespace VitalChoice.Core.Infrastructure.Helpers
         {
             if (user.HasClaim(x => x.Type == IdentityConstants.CustomerRoleType))
             {
-                var customerRoles = service.Get().CustomerRoles;
+                var customerRoles = service.Data().CustomerRoles;
 
                 if (customerRoles.Any(role => user.IsInRole(role.Text.Normalize())))
                 {
@@ -27,7 +27,7 @@ namespace VitalChoice.Core.Infrastructure.Helpers
         {
             if (user.HasClaim(x => x.Type == IdentityConstants.AffiliateRole))
             {
-                var affiliateRoles = service.Get().AffiliateRoles;
+                var affiliateRoles = service.Data().AffiliateRoles;
 
                 if (affiliateRoles.Any(role => user.IsInRole(role.Text.Normalize())))
                 {
@@ -39,7 +39,7 @@ namespace VitalChoice.Core.Infrastructure.Helpers
 
         public static bool HasRole(this IAppInfrastructureService service, ClaimsPrincipal user, RoleType role)
         {
-            var appData = service.Get();
+            var appData = service.Data();
             var roleLookup =
                 appData.CustomerRoles.Union(appData.AffiliateRoles)
                     .Union(appData.AdminRoles)

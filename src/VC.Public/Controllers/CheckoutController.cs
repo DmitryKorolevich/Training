@@ -91,7 +91,7 @@ namespace VC.Public.Controllers
             _transactionAccessor = transactionAccessor;
             _orderMapper = orderMapper;
             _affiliateService = affiliateService;
-            _appInfrastructure = appInfrastructureService.Get();
+            _appInfrastructure = appInfrastructureService.Data();
             _logger = loggerProvider.CreateLoggerDefault();
         }
 

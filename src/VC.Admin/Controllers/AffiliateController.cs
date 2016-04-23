@@ -67,7 +67,7 @@ namespace VC.Admin.Controllers
             _affiliateUserService = affiliateUserService;
             _mapper = mapper;
             _objectHistoryLogService = objectHistoryLogService;
-            _defaultCountry = appInfrastructureService.Get().DefaultCountry;
+            _defaultCountry = appInfrastructureService.Data().DefaultCountry;
             _csvExportAffiliateOrderListItemService = csvExportAffiliateOrderListItemService;
             _orderService = orderService;
             _countryService = countryService;

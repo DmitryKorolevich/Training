@@ -31,11 +31,11 @@ namespace VitalChoice.ContentProcessing.Extensions
     {
         public override ExType InitStart(InitContext initContext, ExType dataType, ExType chainedType, ExType parent)
         {
-            var contentViewContext = initContext.CompileScope.Options.Data as ContentViewContext;
-            if (contentViewContext == null)
-            {
-                throw new TemplateProcessingException("ContentViewContext not found in options value");
-            }
+            //var contentViewContext = initContext.CompileScope.Options.Data as ContentViewContext;
+            //if (contentViewContext == null)
+            //{
+            //    throw new TemplateProcessingException("ContentViewContext not found in options value");
+            //}
             return ExType.Dynamic;
         }
 
@@ -45,14 +45,13 @@ namespace VitalChoice.ContentProcessing.Extensions
             var contentViewContext = scope.CallerData as ContentViewContext;
             if (contentViewContext == null)
             {
-                throw new TemplateProcessingException("ContentViewContext not found caller data");
+                throw new TemplateProcessingException("ContentViewContext not found in caller data");
             }
             try
             {
-                if (scope.ModelData is string && !String.IsNullOrEmpty((string)scope.ModelData) && scope.ChainedData!=null 
-                    && scope.ChainedData is Type)
+                var cookieName = scope.ModelData as string;
+                if (!string.IsNullOrEmpty(cookieName) && scope.ChainedData is Type)
                 {
-                    var cookieName= (string)scope.ModelData;
                     var modelType = (Type)scope.ChainedData;
                     string cookies = contentViewContext.ActionContext.HttpContext.Request.Cookies[cookieName];
                     if (!string.IsNullOrEmpty(cookies))

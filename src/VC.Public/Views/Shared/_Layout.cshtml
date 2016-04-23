@@ -38,7 +38,7 @@
 	</style>
 	<script>
 		@{
-			var appInfrastructure = appInfrastructureService.Get();
+			var appInfrastructure = appInfrastructureService.Data();
 		}
 
 		var appSettings = { DefaultCountryId : @(appInfrastructure.DefaultCountry?.Id) }

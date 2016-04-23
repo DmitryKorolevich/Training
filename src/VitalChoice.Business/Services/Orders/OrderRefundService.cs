@@ -87,9 +87,9 @@ namespace VitalChoice.Business.Services.Orders
             {
                 Order = order
             };
-            //var tree = await _treeFactory.CreateTreeAsync<OrderRefundDataContext, decimal>("OrderRefund");
-            //await tree.ExecuteAsync(context);
-            //UpdateOrderFromCalculationContext(order, context);
+            var tree = await _treeFactory.CreateTreeAsync<OrderRefundDataContext, decimal>("Refund");
+            await tree.ExecuteAsync(context);
+            UpdateOrderFromCalculationContext(order, context);
             return context;
         }
 

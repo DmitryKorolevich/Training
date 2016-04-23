@@ -90,7 +90,7 @@ namespace VC.Admin.Controllers
             this.logger = loggerProvider.CreateLoggerDefault();
 	        _storefrontUserService = storefrontUserService;
             _objectHistoryLogService = objectHistoryLogService;
-            _defaultCountry = appInfrastructureService.Get().DefaultCountry;
+            _defaultCountry = appInfrastructureService.Data().DefaultCountry;
             _csvExportCustomersForAffiliatesService = csvExportCustomersForAffiliatesService;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
 	        _paymentMethodService = paymentMethodService;

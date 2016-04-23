@@ -131,3 +131,11 @@ BEGIN
 		CONSTRAINT [FK_WorkflowActionAggregationToWorkflowAggregateAction] FOREIGN KEY (IdAggregate) REFERENCES [WorkflowExecutors] (Id)
 	)
 END
+
+IF EXISTS(SELECT * FROM sys.indexes WHERE name = N'UQ_ExecutorName')
+BEGIN
+	ALTER TABLE dbo.WorkflowExecutors
+	DROP CONSTRAINT UQ_ExecutorName
+
+	CREATE UNIQUE INDEX UQ_ExecutorTypeAndName ON dbo.WorkflowExecutors(Name, ImplementationType)
+END

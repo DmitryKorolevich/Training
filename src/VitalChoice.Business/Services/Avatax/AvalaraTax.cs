@@ -98,9 +98,9 @@ namespace VitalChoice.Business.Services.Avatax
 
             Address origin;
             Address destination;
-            FillAddresses(context, out origin, out destination);
+            FillAddresses(context.Order.ShippingAddress, out origin, out destination);
 
-            var request = FillGetTaxBaseRequest(context, taxGetType, destination, origin);
+            var request = FillGetTaxBaseRequest(context.Order.Customer, context.Order.Id, context.Order.DiscountTotal, taxGetType, destination, origin);
 
             var lines = ToTaxLines(context, taxGetType, 1).ToArray();
             if (!lines.Any())
@@ -119,10 +119,42 @@ namespace VitalChoice.Business.Services.Avatax
             return 0;
         }
 
-        private GetTaxRequest FillGetTaxBaseRequest(OrderDataContext context, TaxGetType taxGetType,
+        public async Task<decimal> GetTax(OrderRefundDataContext context)
+        {
+            if (!_countryNameCode.IsState(context.Order.ShippingAddress, "us", "va") &&
+                !_countryNameCode.IsState(context.Order.ShippingAddress, "us", "wa"))
+                return 0;
+
+            var taxGetType = CommitProtect(TaxGetType.UseBoth);
+
+            Address origin;
+            Address destination;
+            FillAddresses(context.Order.ShippingAddress, out origin, out destination);
+
+            var request = FillGetTaxBaseRequest(context.Order.Customer, context.Order.Id, context.Order.DiscountTotal, taxGetType,
+                destination, origin);
+
+            var lines = ToTaxLines(context, taxGetType, 1).ToArray();
+            if (!lines.Any())
+                return 0;
+            lines = UnionTaxShipping(lines, context).ToArray();
+            request.Lines = lines;
+
+            var result = await _taxService.GetTax(request);
+
+            if (result.ResultCode == SeverityLevel.Success)
+            {
+                return result.TotalTax;
+            }
+            _logger.LogWarning(string.Join("\n",
+                result.Messages.Select(m => $"[{m.Source}] {m.Summary}\r\n{result.DocCode}")));
+            return 0;
+        }
+
+        private GetTaxRequest FillGetTaxBaseRequest(CustomerDynamic customer, int idOrder, decimal discountTotal, TaxGetType taxGetType,
             Address destinationAddress, Address originAddress)
         {
-            int customerId = context.Order.Customer.Id;
+            int customerId = customer.Id;
 
             GetTaxRequest getTaxRequest = new GetTaxRequest
             {
@@ -130,27 +162,27 @@ namespace VitalChoice.Business.Services.Avatax
                 DocDate = DateTime.Now,
                 CompanyCode = _companyCode,
                 CustomerUsageType =
-                    context.Order.Customer.IdObjectType == (int) CustomerType.Wholesale &&
-                    context.Order.Customer.SafeData.TaxExempt == 1//Yes, Current Certificate
+                    customer.IdObjectType == (int) CustomerType.Wholesale &&
+                    customer.SafeData.TaxExempt == 1//Yes, Current Certificate
                         ? "G"
                         : null,
                 DocCode =
                     "TAX" +
-                    (taxGetType.HasFlag(TaxGetType.PerishableOnly) ? $"{context.Order.Id}-P" : $"{context.Order.Id}-NP"),
+                    (taxGetType.HasFlag(TaxGetType.PerishableOnly) ? $"{idOrder}-P" : $"{idOrder}-NP"),
                 DetailLevel = DetailLevel.Tax,
                 Commit = taxGetType.HasFlag(TaxGetType.Commit),
                 DocType =
                     taxGetType.HasFlag(TaxGetType.SavePermanent) ? DocType.SalesInvoice : DocType.SalesOrder,
                 PurchaseOrderNo =
-                    (taxGetType.HasFlag(TaxGetType.PerishableOnly) ? $"{context.Order.Id}-P" : $"{context.Order.Id}-NP"),
+                    (taxGetType.HasFlag(TaxGetType.PerishableOnly) ? $"{idOrder}-P" : $"{idOrder}-NP"),
                 CurrencyCode = "USD",
-                Discount = context.DiscountTotal,
+                Discount = discountTotal,
                 Addresses = new[] {originAddress, destinationAddress}
             };
             return getTaxRequest;
         }
 
-        private void FillAddresses(OrderDataContext orderDataContext, out Address originAddress,
+        private void FillAddresses(AddressDynamic shippingAddress, out Address originAddress,
             out Address destinationAddress)
         {
             originAddress = new Address
@@ -163,10 +195,10 @@ namespace VitalChoice.Business.Services.Avatax
                 Country = "US",
                 PostalCode = "98248"
             };
-            destinationAddress = _mapper.ToModel<Address>(orderDataContext.Order.ShippingAddress);
+            destinationAddress = _mapper.ToModel<Address>(shippingAddress);
             destinationAddress.AddressCode = "02";
-            destinationAddress.Country = _countryNameCode.GetCountryCode(orderDataContext.Order.ShippingAddress);
-            destinationAddress.Region = _countryNameCode.GetRegionOrStateCode(orderDataContext.Order.ShippingAddress);
+            destinationAddress.Country = _countryNameCode.GetCountryCode(shippingAddress);
+            destinationAddress.Region = _countryNameCode.GetRegionOrStateCode(shippingAddress);
         }
 
         private TaxGetType CommitProtect(TaxGetType taxGetType)
@@ -186,6 +218,29 @@ namespace VitalChoice.Business.Services.Avatax
         }
 
         private static IEnumerable<Line> UnionTaxShipping(IEnumerable<Line> lines, OrderDataContext order)
+        {
+            return lines.Union(new List<Line>
+            {
+                new Line
+                {
+                    Amount = order.ShippingTotal,
+                    Description = "Shipping Amount",
+                    DestinationCode = "02",
+                    OriginCode = "01",
+                    TaxCode = ShippingTaxCode,
+                    Qty = 1,
+                    ItemCode = "SHIPPING",
+                    LineNo = "01-SHIP",
+                    CustomerUsageType =
+                        order.Order.Customer.IdObjectType == (int) CustomerType.Wholesale &&
+                        order.Order.Customer.SafeData.TaxExempt == 1//Yes, Current Certificate
+                            ? "G"
+                            : null
+                }
+            });
+        }
+
+        private static IEnumerable<Line> UnionTaxShipping(IEnumerable<Line> lines, OrderRefundDataContext order)
         {
             return lines.Union(new List<Line>
             {
@@ -243,6 +298,42 @@ namespace VitalChoice.Business.Services.Avatax
                     CustomerUsageType =
                         order.Order.Customer.IdObjectType == (int) CustomerType.Wholesale &&
                         order.Order.Customer.SafeData.TaxExempt == 1//Yes, Current Certificate
+                            ? "G"
+                            : null
+                });
+        }
+
+        private static IEnumerable<Line> ToTaxLines(OrderRefundDataContext order, TaxGetType taxGetType, int startNumber)
+        {
+            IEnumerable<RefundSkuOrdered> items;
+            if (taxGetType.HasFlag(TaxGetType.PerishableOnly))
+            {
+                items = order.RefundSkus.Where(s => s.Sku.IdObjectType != (int) ProductType.NonPerishable);
+            }
+            else if (taxGetType.HasFlag(TaxGetType.NonPerishableOnly))
+            {
+                items = order.RefundSkus.Where(s => s.Sku.IdObjectType == (int) ProductType.NonPerishable);
+            }
+            else
+            {
+                items = order.RefundSkus;
+            }
+            return items.Select(
+                p => new Line
+                {
+                    Amount = p.RefundValue*(decimal) p.RefundPercent/(decimal) 100.0*p.Quantity,
+                    Description = p.Sku.Product.Name,
+                    DestinationCode = "02",
+                    OriginCode = "01",
+                    Discounted = order.DiscountTotal > 0,
+                    TaxCode = p.Sku.Product.SafeData.TaxCode,
+                    Qty = p.Quantity,
+                    ItemCode = p.Sku.Code,
+                    LineNo = (startNumber++).ToString(CultureInfo.InvariantCulture),
+                    Ref1 = p.Sku.Id.ToString(CultureInfo.InvariantCulture),
+                    CustomerUsageType =
+                        order.Order.Customer.IdObjectType == (int) CustomerType.Wholesale &&
+                        order.Order.Customer.SafeData.TaxExempt == 1 //Yes, Current Certificate
                             ? "G"
                             : null
                 });

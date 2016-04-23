@@ -41,24 +41,24 @@ namespace VitalChoice.ContentProcessing.Extensions
 
         public override object ProcessData(Scope scope)
         {
-            var contentViewContext = scope.CallerData as ContentViewContext;
-            if (contentViewContext == null)
+            if (_type == null)
             {
-                throw new TemplateProcessingException("ContentViewContext not found caller data");
-            }
-            try
-            {
-                if (!string.IsNullOrEmpty(scope.ModelData as string))
+                var contentViewContext = scope.CallerData as ContentViewContext;
+                if (contentViewContext == null)
                 {
-                    if (_type == null)
+                    throw new TemplateProcessingException("ContentViewContext not found caller data");
+                }
+                try
+                {
+                    if (!string.IsNullOrEmpty(scope.ModelData as string))
                     {
-                        Interlocked.CompareExchange(ref _type, ReflectionHelper.ResolveType((string)scope.ModelData, _namespaces), null);
+                        Interlocked.CompareExchange(ref _type, ReflectionHelper.ResolveType((string) scope.ModelData, _namespaces), null);
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                throw new TemplateProcessingException(e.Message + "\r\n" + (e.InnerException?.Message ?? string.Empty));
+                catch (Exception e)
+                {
+                    throw new TemplateProcessingException(e.Message + "\r\n" + (e.InnerException?.Message ?? string.Empty));
+                }
             }
             return _type;
         }

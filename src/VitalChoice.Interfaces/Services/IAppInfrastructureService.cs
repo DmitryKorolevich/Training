@@ -4,6 +4,6 @@ namespace VitalChoice.Interfaces.Services
 {
 	public interface IAppInfrastructureService
 	{
-		ReferenceData Get();
+		ReferenceData Data();
 	}
 }

@@ -145,7 +145,7 @@ namespace VC.Admin.ModelConverters
 
             if (dynamic.PaymentMethod != null)
             {
-                var paymentMethodInfo = _appInfrastructureService.Get().PaymentMethods.FirstOrDefault(p => p.Key == dynamic.PaymentMethod.IdObjectType);
+                var paymentMethodInfo = _appInfrastructureService.Data().PaymentMethods.FirstOrDefault(p => p.Key == dynamic.PaymentMethod.IdObjectType);
                 model.PaymentTypeName = paymentMethodInfo?.Text;
                 switch ((PaymentMethodType)dynamic.PaymentMethod.IdObjectType)
                 {
@@ -166,15 +166,15 @@ namespace VC.Admin.ModelConverters
                         model.ShowWholesaleNormalView = true;
                         if (model.ShippingAddress.PreferredShipMethod.HasValue)
                         {
-                            model.PreferredShipMethodName = _appInfrastructureService.Get().OrderPreferredShipMethod.FirstOrDefault(p => p.Key == (int)model.ShippingAddress.PreferredShipMethod.Value)?.Text;
+                            model.PreferredShipMethodName = _appInfrastructureService.Data().OrderPreferredShipMethod.FirstOrDefault(p => p.Key == (int)model.ShippingAddress.PreferredShipMethod.Value)?.Text;
                         }
                         if (dynamic.PaymentMethod.DictionaryData.ContainsKey("Fob") && dynamic.PaymentMethod.SafeData.Fob is int)
                         {
-                            model.OACFOB = _appInfrastructureService.Get().OacFob.FirstOrDefault(p => p.Key == (int)dynamic.PaymentMethod.SafeData.Fob)?.Text;
+                            model.OACFOB = _appInfrastructureService.Data().OacFob.FirstOrDefault(p => p.Key == (int)dynamic.PaymentMethod.SafeData.Fob)?.Text;
                         }
                         if (dynamic.PaymentMethod.DictionaryData.ContainsKey("Terms") && dynamic.PaymentMethod.SafeData.Terms is int)
                         {
-                            model.OACTerms = _appInfrastructureService.Get().OacTerms.FirstOrDefault(p => p.Key == (int)dynamic.PaymentMethod.SafeData.Terms)?.Text;
+                            model.OACTerms = _appInfrastructureService.Data().OacTerms.FirstOrDefault(p => p.Key == (int)dynamic.PaymentMethod.SafeData.Terms)?.Text;
                         }
                         break;
                 }

@@ -15,6 +15,7 @@ using Microsoft.Extensions.PlatformAbstractions;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
+using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Context;
 using VitalChoice.Ecommerce.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Options;
@@ -34,19 +35,46 @@ namespace VitalChoice.Workflow.Configuration
                 using (var scope = container.BeginLifetimeScope())
                 {
                     Console.WriteLine($"[{DateTime.Now:O}] Configuring DB");
-                    var setup = scope.Resolve<ITreeSetup<OrderDataContext, decimal>>();
-                    DefaultConfiguration.Configure(setup);
-                    if (setup.UpdateAsync().Result)
+                    var setups = DefaultConfiguration.Configure(scope);
+                    var setupCleaner = scope.Resolve<ITreeSetupCleaner>();
+                    var transactionAccessor = scope.Resolve<ITransactionAccessor<EcommerceContext>>();
+                    using (var transaction = transactionAccessor.BeginTransaction())
                     {
-                        Console.ForegroundColor = ConsoleColor.DarkGreen;
-                        Console.WriteLine($"[{DateTime.Now:O}] Update Success!");
-                        Console.ResetColor();
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.DarkRed;
-                        Console.WriteLine($"[{DateTime.Now:O}] Update Failed! See logs for details.");
-                        Console.ResetColor();
+                        try
+                        {
+                            if (!setupCleaner.CleanAllTrees().GetAwaiter().GetResult())
+                            {
+                                Console.ForegroundColor = ConsoleColor.DarkRed;
+                                Console.WriteLine($"[{DateTime.Now:O}] DB Clean Failed! See logs for details.");
+                                Console.ResetColor();
+                            }
+                            else
+                            {
+                                foreach (var setup in setups)
+                                {
+                                    if (setup.CreateTreesAsync().GetAwaiter().GetResult())
+                                    {
+                                        Console.ForegroundColor = ConsoleColor.DarkGreen;
+                                        Console.WriteLine($"[{DateTime.Now:O}] {setup.GetType().FullName} Update Success!");
+                                        Console.ResetColor();
+                                    }
+                                    else
+                                    {
+                                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                                        Console.WriteLine($"[{DateTime.Now:O}] {setup.GetType().FullName} Update Failed! See logs for details.");
+                                        Console.ResetColor();
+                                    }
+                                }
+                            }
+                            transaction.Commit();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkRed;
+                            Console.WriteLine($"[{e.Source}] Update Failed!\r\n{e.Message}\r\n{e.StackTrace}");
+                            Console.ResetColor();
+                            transaction.Rollback();
+                        }
                     }
                 }
             }
@@ -56,6 +84,7 @@ namespace VitalChoice.Workflow.Configuration
                 Console.WriteLine($"[{e.Source}] Update Failed!\r\n{e.Message}\r\n{e.StackTrace}");
                 Console.ResetColor();
             }
+            Console.ReadKey();
         }
 
         private static IContainer BuildContainer()

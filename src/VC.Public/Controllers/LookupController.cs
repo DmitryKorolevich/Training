@@ -48,7 +48,7 @@ namespace VC.Public.Controllers
 		[HttpGet]
 		public Result<IList<LookupItem<int>>> GetCreditCardTypes()
 		{
-			var referenceData = _appInfrastructureService.Get();
+			var referenceData = _appInfrastructureService.Data();
 
 			var creditCardTypes = referenceData.CreditCardTypes;
 
@@ -58,7 +58,7 @@ namespace VC.Public.Controllers
 		[HttpGet]
 		public Result<IList<LookupItem<int>>> GetCartShippingOptions()
 		{
-			var referenceData = _appInfrastructureService.Get();
+			var referenceData = _appInfrastructureService.Data();
 
 			var options = referenceData.CartShippingOptions;
 
@@ -68,7 +68,7 @@ namespace VC.Public.Controllers
 		[HttpGet]
 		public Result<IList<LookupItem<int>>> GetShippingPreferredOptions()
 		{
-			var referenceData = _appInfrastructureService.Get();
+			var referenceData = _appInfrastructureService.Data();
 
 			var shipMethods = referenceData.OrderPreferredShipMethod;
 

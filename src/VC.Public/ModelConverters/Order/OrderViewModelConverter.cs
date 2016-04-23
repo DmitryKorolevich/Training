@@ -39,7 +39,7 @@ namespace VC.Public.ModelConverters.Order
         {
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             _countryService = countryService;
-            _referenceData = appInfrastructureService.Get();
+            _referenceData = appInfrastructureService.Data();
             _skuMapper = skuMapper;
             _productMapper = productMapper;
         }

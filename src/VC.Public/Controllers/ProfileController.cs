@@ -101,7 +101,7 @@ namespace VC.Public.Controllers
 
 	    private async Task<PagedListEx<AutoShipHistoryItemModel>> PopulateAutoShipHistoryModel(OrderFilter filter)
 		{
-			var infr = InfrastructureService.Get();
+			var infr = InfrastructureService.Data();
 			var countries = await _countryService.GetCountriesAsync();
 
 			var customer = await GetCurrentCustomerDynamic();

@@ -88,7 +88,7 @@ namespace VC.Admin.Controllers
         {
             foreach (var period in model.Periods)
             {
-                period.AllowPayment = !period.PaidDate.HasValue && period.OrdersCount >= _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount;
+                period.AllowPayment = !period.PaidDate.HasValue && period.OrdersCount >= _appInfrastructureService.Data().AppSettings.HealthwisePeriodMaxItemsCount;
             }
         }
 

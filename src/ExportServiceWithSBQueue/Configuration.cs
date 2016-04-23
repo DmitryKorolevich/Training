@@ -335,6 +335,7 @@ namespace ExportServiceWithSBQueue
                 .As(typeof(IExtendedDynamicReadServiceAsync<,>));
 
             builder.RegisterGeneric(typeof(TreeSetup<,>)).As(typeof(ITreeSetup<,>));
+            builder.RegisterType<TreeSetupCleaner>().As<ITreeSetupCleaner>();
             builder.RegisterContentBase();
             builder.RegisterDynamicsBase();
             builder.RegisterType<DynamicExtensionsRewriter>()

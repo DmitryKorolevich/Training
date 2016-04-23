@@ -6,7 +6,7 @@ using VitalChoice.Interfaces.Services.Avatax;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Core;
 
-namespace VitalChoice.Business.Workflow.Orders.Actions.Tax
+namespace VitalChoice.Business.Workflow.Orders.Actions
 {
     public class GetTaxAction : ComputableAction<OrderDataContext>
     {

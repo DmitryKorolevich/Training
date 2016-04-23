@@ -118,7 +118,7 @@ namespace VC.Public.Controllers
 
 		    ViewBag.CreditCards = creditCards.ToDictionary(x => x.Id,
 		        y =>
-		            InfrastructureService.Get().CreditCardTypes.Single(z => z.Key == (int) y.Data.CardType).Text + ", ending in " +
+		            InfrastructureService.Data().CreditCardTypes.Single(z => z.Key == (int) y.Data.CardType).Text + ", ending in " +
 		            ((string) y.Data.CardNumber).Substring(((string) y.Data.CardNumber).Length - 4) +
 		            (y.SafeData.Default == true ? " (Default)" : ""));
 		}

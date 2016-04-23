@@ -868,7 +868,7 @@ namespace VitalChoice.Business.Services.Orders
 	    {
 		    var currentDate = DateTime.Now;
 
-			var frequencyAvailable = _appInfrastructureService.Get().AutoShipOptions.Select(x => x.Key).ToList();
+			var frequencyAvailable = _appInfrastructureService.Data().AutoShipOptions.Select(x => x.Key).ToList();
 
 			var toProcess = new List<int>();
 		    foreach (var frequency in frequencyAvailable)
@@ -1407,7 +1407,7 @@ namespace VitalChoice.Business.Services.Orders
                 HealthwiseOrder healthwiseOrder = (await healthwiseOrderRepository.Query(p => p.Id == model.Id).SelectAsync(false)).FirstOrDefault();
                 if (healthwiseOrder == null)
                 {
-                    var maxCount = _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount;
+                    var maxCount = _appInfrastructureService.Data().AppSettings.HealthwisePeriodMaxItemsCount;
                     var dateNow = DateTime.Now;
                     var periods = (await healthwisePeriodRepository.Query(p => p.IdCustomer == model.Customer.Id && dateNow >= p.StartDate && dateNow < p.EndDate && !p.PaidDate.HasValue).Include(p => p.HealthwiseOrders).SelectAsync(false)).ToList();
 
@@ -2307,7 +2307,7 @@ namespace VitalChoice.Business.Services.Orders
                         (await healthwiseOrderRepositoryAsync.Query(p => p.Id == order.Id).SelectAsync(false)).FirstOrDefault();
                     if (healthwiseOrder == null)
                     {
-                        var maxCount = _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount;
+                        var maxCount = _appInfrastructureService.Data().AppSettings.HealthwisePeriodMaxItemsCount;
                         var orderCreatedDate = order.DateCreated;
                         var periods =
                             (await

@@ -42,7 +42,7 @@ namespace VitalChoice.Business.ModelConverters
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             _countryService = countryService;
             _customerService = customerService;
-            _referenceData = appInfrastructureService.Get();
+            _referenceData = appInfrastructureService.Data();
             _addressMapper = addressMapper;
             _skuMapper = skuMapper;
             _productMapper = productMapper;

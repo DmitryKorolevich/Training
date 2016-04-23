@@ -40,7 +40,7 @@ namespace VitalChoice.Core.Infrastructure
                     {
                         var affiliateRoles =
                             context.HttpContext.RequestServices.GetService<IAppInfrastructureService>()
-                                .Get()
+                                .Data()
                                 .AffiliateRoles;
 
                         if (affiliateRoles.Any(affiliateRole => claimUser.IsInRole(affiliateRole.Text.Normalize())))

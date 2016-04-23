@@ -45,7 +45,7 @@ namespace VitalChoice.Core.Infrastructure
 				{
 					var customerRoles =
 						context.HttpContext.RequestServices.GetService<IAppInfrastructureService>()
-							.Get()
+							.Data()
 							.CustomerRoles;
 
 					if (customerRoles.Any(customerRole => claimUser.IsInRole(customerRole.Text.Normalize())))

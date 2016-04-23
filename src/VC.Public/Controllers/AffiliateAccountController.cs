@@ -308,7 +308,7 @@ namespace VC.Public.Controllers
 
         private void InitRegisterModel(AffiliateManageModel model,bool refresh=false)
         {
-            var settings = HttpContext.RequestServices.GetService<IAppInfrastructureService>().Get();
+            var settings = HttpContext.RequestServices.GetService<IAppInfrastructureService>().Data();
             model.MonthlyEmailsSentOptions = settings.AffiliateMonthlyEmailsSentOptions.Select(p => new SelectListItem()
             {
                 Value = p.Key.ToString(),

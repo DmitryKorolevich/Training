@@ -9,5 +9,6 @@ namespace VitalChoice.Interfaces.Services.Avatax
         Task<bool> CancelTax(string orderCode);
         Task<bool> CommitTax(int idOrder, TaxGetType taxGetType = TaxGetType.UseBoth);
         Task<decimal> GetTax(OrderDataContext context, TaxGetType taxGetType = TaxGetType.UseBoth);
+        Task<decimal> GetTax(OrderRefundDataContext context);
     }
 }

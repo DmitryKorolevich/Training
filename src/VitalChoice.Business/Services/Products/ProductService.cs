@@ -212,7 +212,7 @@ namespace VitalChoice.Business.Services.Products
             _contentTypeRepository = contentTypeRepository;
             _skuGoogleItemCSVExportService = skuGoogleItemCSVExportService;
             _productCategoryService = productCategoryService;
-            _referenceData = appInfrastructureService.Get();
+            _referenceData = appInfrastructureService.Data();
             _storageClient = storageClient;
             _vCustomerFavoriteRepository = vCustomerRepositoryAsync;
             _options = options;

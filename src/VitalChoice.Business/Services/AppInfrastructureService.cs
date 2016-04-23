@@ -10,6 +10,7 @@ using LookupHelper = VitalChoice.Business.Helpers.LookupHelper;
 using System.Collections.Generic;
 using VitalChoice.Interfaces.Services.Settings;
 using System.Globalization;
+using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Cache;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
@@ -41,7 +42,7 @@ namespace VitalChoice.Business.Services
         private readonly IEcommerceRepositoryAsync<OrderStatusEntity> orderStatusRepository;
         private readonly IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository;
         private readonly IEcommerceRepositoryAsync<PromotionTypeEntity> promotionTypeEntityRepository;
-        private readonly IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository;
+        private readonly IEcommerceRepositoryAsync<LookupVariant> _lookupVariantRepository;
         private readonly IEcommerceRepositoryAsync<Lookup> lookupRepository;
         private readonly IEcommerceRepositoryAsync<AppOption> appOptionRepository;
         private readonly IEcommerceRepositoryAsync<OrderTypeEntity> orderTypeEntityRepository;
@@ -79,7 +80,7 @@ namespace VitalChoice.Business.Services
             this.orderStatusRepository = orderStatusRepository;
             this.paymentMethodRepository = paymentMethodRepository;
             this.promotionTypeEntityRepository = promotionTypeEntityRepository;
-            this.lookupVariantRepository = lookupVariantRepository;
+            this._lookupVariantRepository = lookupVariantRepository;
             this.lookupRepository = lookupRepository;
             this.appOptionRepository = appOptionRepository;
             this.orderTypeEntityRepository = orderTypeEntityRepository;
@@ -91,28 +92,34 @@ namespace VitalChoice.Business.Services
 
         private ReferenceData Populate()
         {
-            var tradeLookup = lookupRepository.Query(x => x.Name == LookupNames.CustomerTradeClass).Select(false).Single().Id;
-            var taxExemptLookup = lookupRepository.Query(x => x.Name == LookupNames.CustomerTaxExempt).Select(false).Single().Id;
-            var priorityLookup = lookupRepository.Query(x => x.Name == LookupNames.CustomerNotePriorities).Select(false).Single().Id;
-            var tierLookup = lookupRepository.Query(x => x.Name == LookupNames.CustomerTier).Select(false).Single().Id;
-            var termsLookup = lookupRepository.Query(x => x.Name == LookupNames.Terms).Select(false).Single().Id;
-            var fobLookup = lookupRepository.Query(x => x.Name == LookupNames.Fob).Select(false).Single().Id;
-            var marketingPromotionTypesLookup = lookupRepository.Query(x => x.Name == LookupNames.MarketingPromotionType).Select(false).Single().Id;
-            var orderSourcesLookup = lookupRepository.Query(x => x.Name == LookupNames.OrderSources).Select(false).Single().Id;
-            var orderSourcesCelebrityHealthAdvocateLookup = lookupRepository.Query(x => x.Name == LookupNames.OrderSourcesCelebrityHealthAdvocate).Select(false).Single().Id;
-            var orderPreferredShipMethod = lookupRepository.Query(x => x.Name == LookupNames.OrderPreferredShipMethod).Select(false).Single().Id;
-            var OrderSourceTypes = lookupRepository.Query(x => x.Name == LookupNames.OrderSourceTypes).Select(false).Single().Id;
-            var pOrderTypes = lookupRepository.Query(x => x.Name == LookupNames.POrderTypes).Select(false).Single().Id;
-            var serviceCodes = lookupRepository.Query(x => x.Name == LookupNames.ServiceCodes).Select(false).Single().Id;
-            var affiliateProfessionalPractices = lookupRepository.Query(x => x.Name == LookupNames.AffiliateProfessionalPractices).Select(false).Single().Id;
-            var affiliateMonthlyEmailsSentOptions = lookupRepository.Query(x => x.Name == LookupNames.AffiliateMonthlyEmailsSentOptions).Select(false).Single().Id;
-            var affiliateTiers = lookupRepository.Query(x => x.Name == LookupNames.AffiliateTiers).Select(false).Single().Id;
-            var promotionBuyTypes = lookupRepository.Query(x => x.Name == LookupNames.PromotionBuyTypes).Select(false).Single().Id;
-            var shippingUpgrades = lookupRepository.Query(x => x.Name == LookupNames.ShippingUpgrades).Select(false).Single().Id;
-            var autoshipOptions = lookupRepository.Query(x => x.Name == LookupNames.AutoShipSchedule).Select(false).Single().Id;
-            var refundRedeemOptions = lookupRepository.Query(x => x.Name == LookupNames.RefundRedeemOptions).Select(false).Single().Id;
-            var productSellersOptions = lookupRepository.Query(x => x.Name == LookupNames.ProductSellers).Select(false).Single().Id;
-            var googleCategoriesOptions = lookupRepository.Query(x => x.Name == LookupNames.GoogleCategories).Select(false).Single().Id;
+            var lookups = lookupRepository.Query().Select(false);
+            var tradeLookup = lookups.Single(x => x.Name == LookupNames.CustomerTradeClass).Id;
+            var taxExemptLookup = lookups.Single(x => x.Name == LookupNames.CustomerTaxExempt).Id;
+            var priorityLookup = lookups.Single(x => x.Name == LookupNames.CustomerNotePriorities).Id;
+            var tierLookup = lookups.Single(x => x.Name == LookupNames.CustomerTier).Id;
+            var termsLookup = lookups.Single(x => x.Name == LookupNames.Terms).Id;
+            var fobLookup = lookups.Single(x => x.Name == LookupNames.Fob).Id;
+            var marketingPromotionTypesLookup = lookups.Single(x => x.Name == LookupNames.MarketingPromotionType).Id;
+            var orderSourcesLookup = lookups.Single(x => x.Name == LookupNames.OrderSources).Id;
+            var orderSourcesCelebrityHealthAdvocateLookup = lookups.Single(x => x.Name == LookupNames.OrderSourcesCelebrityHealthAdvocate).Id;
+            var orderPreferredShipMethod = lookups.Single(x => x.Name == LookupNames.OrderPreferredShipMethod).Id;
+            var orderSourceTypes = lookups.Single(x => x.Name == LookupNames.OrderSourceTypes).Id;
+            var pOrderTypes = lookups.Single(x => x.Name == LookupNames.POrderTypes).Id;
+            var serviceCodes = lookups.Single(x => x.Name == LookupNames.ServiceCodes).Id;
+            var affiliateProfessionalPractices = lookups.Single(x => x.Name == LookupNames.AffiliateProfessionalPractices).Id;
+            var affiliateMonthlyEmailsSentOptions = lookups.Single(x => x.Name == LookupNames.AffiliateMonthlyEmailsSentOptions).Id;
+            var affiliateTiers = lookups.Single(x => x.Name == LookupNames.AffiliateTiers).Id;
+            var promotionBuyTypes = lookups.Single(x => x.Name == LookupNames.PromotionBuyTypes).Id;
+            var shippingUpgrades = lookups.Single(x => x.Name == LookupNames.ShippingUpgrades).Id;
+            var autoshipOptions = lookups.Single(x => x.Name == LookupNames.AutoShipSchedule).Id;
+            var refundRedeemOptions = lookups.Single(x => x.Name == LookupNames.RefundRedeemOptions).Id;
+            var productSellersOptions = lookups.Single(x => x.Name == LookupNames.ProductSellers).Id;
+            var googleCategoriesOptions = lookups.Single(x => x.Name == LookupNames.GoogleCategories).Id;
+
+            var lookupVariants = _lookupVariantRepository.Query()
+                .Select(false)
+                .GroupBy(l => l.IdLookup)
+                .ToDictionary(l => l.Key, l => l.ToArray());
 
             var referenceData = new ReferenceData();
             referenceData.DefaultCountry = _backendSettingsService.GetDefaultCountry();
@@ -232,22 +239,22 @@ namespace VitalChoice.Business.Services
                 .ToList();
             var shortOrderTypes = (new List<LookupItem<int>>(referenceData.OrderTypes));
             referenceData.ShortOrderTypes = LookupHelper.GetShortOrderTypes(shortOrderTypes);
-            referenceData.TaxExempts = lookupVariantRepository.Query().Where(x => x.IdLookup == taxExemptLookup).Select(false).Select(x => new LookupItem<int>()
+            referenceData.TaxExempts = lookupVariants[taxExemptLookup].Select(x => new LookupItem<int>()
             {
                 Key = x.Id,
                 Text = x.ValueVariant
             }).ToList();
-            referenceData.Tiers = lookupVariantRepository.Query().Where(x => x.IdLookup == tierLookup).Select(false).Select(x => new LookupItem<int>()
+            referenceData.Tiers = lookupVariants[tierLookup].Select(x => new LookupItem<int>()
             {
                 Key = x.Id,
                 Text = x.ValueVariant
             }).ToList();
-            referenceData.TradeClasses = lookupVariantRepository.Query().Where(x => x.IdLookup == tradeLookup).Select(false).Select(x => new LookupItem<int>()
+            referenceData.TradeClasses = lookupVariants[tradeLookup].Select(x => new LookupItem<int>()
             {
                 Key = x.Id,
                 Text = x.ValueVariant
             }).ToList();
-            referenceData.CustomerNotePriorities = lookupVariantRepository.Query().Where(x => x.IdLookup == priorityLookup).Select(false).Select(x => new LookupItem<int>()
+            referenceData.CustomerNotePriorities = lookupVariants[priorityLookup].Select(x => new LookupItem<int>()
             {
                 Key = x.Id,
                 Text = x.ValueVariant
@@ -258,99 +265,75 @@ namespace VitalChoice.Business.Services
                 Text = x.Value
             }).ToList();
             referenceData.OacTerms =
-                lookupVariantRepository.Query()
-                    .Where(x => x.IdLookup == termsLookup)
-                    .Select(false)
+                lookupVariants[termsLookup]
                     .Select(x => new LookupItem<int>()
                     {
                         Key = x.Id,
                         Text = x.ValueVariant
                     }).ToList();
-            referenceData.OacFob = lookupVariantRepository.Query()
-                    .Where(x => x.IdLookup == fobLookup)
-                    .Select(false)
+            referenceData.OacFob = lookupVariants[fobLookup]
                     .Select(x => new LookupItem<int>()
                     {
                         Key = x.Id,
                         Text = x.ValueVariant
                     }).ToList();
             referenceData.MarketingPromotionTypes =
-                lookupVariantRepository.Query()
-                    .Where(x => x.IdLookup == marketingPromotionTypesLookup)
-                    .Select(false)
+                lookupVariants[marketingPromotionTypesLookup]
                     .Select(x => new LookupItem<int>()
                     {
                         Key = x.Id,
                         Text = x.ValueVariant
                     }).ToList();
-            referenceData.OrderSources = lookupVariantRepository.Query()
-                .Where(x => x.IdLookup == orderSourcesLookup)
-                .Select(false)
+            referenceData.OrderSources = lookupVariants[orderSourcesLookup]
                 .Select(x => new LookupItem<int>()
                 {
                     Key = x.Id,
                     Text = x.ValueVariant
                 }).ToList();
-            referenceData.OrderSourcesCelebrityHealthAdvocate = lookupVariantRepository.Query()
-                .Where(x => x.IdLookup == orderSourcesCelebrityHealthAdvocateLookup)
-                .Select(false)
+            referenceData.OrderSourcesCelebrityHealthAdvocate = lookupVariants[orderSourcesCelebrityHealthAdvocateLookup]
                 .Select(x => new LookupItem<int>()
                 {
                     Key = x.Id,
                     Text = x.ValueVariant
                 }).ToList();
-            referenceData.OrderPreferredShipMethod = lookupVariantRepository.Query()
-                .Where(x => x.IdLookup == orderPreferredShipMethod)
-                .Select(false)
+            referenceData.OrderPreferredShipMethod = lookupVariants[orderPreferredShipMethod]
                 .Select(x => new LookupItem<int>()
                 {
                     Key = x.Id,
                     Text = x.ValueVariant
                 }).ToList();
-            referenceData.OrderSourceTypes = lookupVariantRepository.Query()
-                .Where(x => x.IdLookup == OrderSourceTypes)
-                .Select(false)
+            referenceData.OrderSourceTypes = lookupVariants[orderSourceTypes]
                 .Select(x => new LookupItem<int>()
                 {
                     Key = x.Id,
                     Text = x.ValueVariant
                 }).ToList();
-            referenceData.POrderTypes = lookupVariantRepository.Query()
-                .Where(x => x.IdLookup == pOrderTypes)
-                .Select(false)
+            referenceData.POrderTypes = lookupVariants[pOrderTypes]
                 .Select(x => new LookupItem<int>()
                 {
                     Key = x.Id,
                     Text = x.ValueVariant
                 }).ToList();
             referenceData.FilterPNPOrderTypes = LookupHelper.GetFilterPNPOrderTypes();
-            referenceData.ServiceCodes = lookupVariantRepository.Query()
-                .Where(x => x.IdLookup == serviceCodes)
-                .Select(false)
+            referenceData.ServiceCodes = lookupVariants[serviceCodes]
                 .Select(x => new LookupItem<int>()
                 {
                     Key = x.Id,
                     Text = x.ValueVariant
                 }).ToList();
-            referenceData.AffiliateProfessionalPractices = lookupVariantRepository.Query()
-                .Where(x => x.IdLookup == affiliateProfessionalPractices)
-                .Select(false)
+            referenceData.AffiliateProfessionalPractices = lookupVariants[affiliateProfessionalPractices]
                 .Select(x => new LookupItem<int>()
                 {
                     Key = x.Id,
                     Text = x.ValueVariant
                 }).ToList();
-            referenceData.AffiliateMonthlyEmailsSentOptions = lookupVariantRepository.Query()
-                .Where(x => x.IdLookup == affiliateMonthlyEmailsSentOptions)
-                .Select(false)
+            referenceData.AffiliateMonthlyEmailsSentOptions = lookupVariants[affiliateMonthlyEmailsSentOptions]
                 .Select(x => new LookupItem<int>()
                 {
                     Key = x.Id,
                     Text = x.ValueVariant
                 }).ToList();
-            referenceData.AffiliateTiers = lookupVariantRepository.Query()
-                .Where(x => x.IdLookup == affiliateTiers)
-                .Select(false)
+            referenceData.AffiliateTiers = lookupVariants[affiliateTiers]
                 .Select(x => new LookupItem<int>()
                 {
                     Key = x.Id,
@@ -384,49 +367,37 @@ namespace VitalChoice.Business.Services
 				Key = x.Key,
 				Text = x.Value
 			}).ToList();
-            referenceData.PromotionBuyTypes = lookupVariantRepository.Query()
-                .Where(x => x.IdLookup == promotionBuyTypes)
-                .Select(false)
+            referenceData.PromotionBuyTypes = lookupVariants[promotionBuyTypes]
                 .Select(x => new LookupItem<int>()
                 {
                     Key = x.Id,
                     Text = x.ValueVariant
                 }).ToList();
-            referenceData.ShippingUpgrades = lookupVariantRepository.Query()
-                .Where(x => x.IdLookup == shippingUpgrades)
-                .Select(false)
+            referenceData.ShippingUpgrades = lookupVariants[shippingUpgrades]
                 .Select(x => new LookupItem<int>()
                 {
                     Key = x.Id,
                     Text = x.ValueVariant
                 }).ToList();
-			referenceData.AutoShipOptions = lookupVariantRepository.Query()
-				.Where(x => x.IdLookup == autoshipOptions)
-				.Select(false)
+			referenceData.AutoShipOptions = lookupVariants[autoshipOptions]
 				.Select(x => new LookupItem<int>()
 				{
 					Key = x.Id,
 					Text = x.ValueVariant
 				}).ToList();
-            referenceData.RefundRedeemOptions = lookupVariantRepository.Query()
-                .Where(x => x.IdLookup == refundRedeemOptions)
-                .Select(false)
+            referenceData.RefundRedeemOptions = lookupVariants[refundRedeemOptions]
                 .Select(x => new LookupItem<int>()
                 {
                     Key = x.Id,
                     Text = x.ValueVariant
                 }).ToList();
-            referenceData.ProductSellers = lookupVariantRepository.Query()
-                .Where(x => x.IdLookup == productSellersOptions)
-                .Select(false)
+            referenceData.ProductSellers = lookupVariants[productSellersOptions]
                 .Select(x => new LookupItem<int>()
                 {
                     Key = x.Id,
                     Text = x.ValueVariant
                 }).ToList();
-            referenceData.GoogleCategories = lookupVariantRepository.Query()
-                .Where(x => x.IdLookup == googleCategoriesOptions)
-                .Select(false)
+            referenceData.GoogleCategories = lookupVariants[googleCategoriesOptions]
                 .Select(x => new LookupItem<int>()
                 {
                     Key = x.Id,
@@ -465,7 +436,7 @@ namespace VitalChoice.Business.Services
             return referenceData;
         }
 
-        public ReferenceData Get()
+        public ReferenceData Data()
         {
             var referenceData = cache.GetItem<ReferenceData>(CacheKeys.AppInfrastructure);
 

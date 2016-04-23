@@ -10,6 +10,7 @@ using VitalChoice.Infrastructure.Context;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Workflow.Core;
 using VitalChoice.Workflow.Data;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 
 namespace VitalChoice.Business.Services.Workflow
 {
@@ -22,14 +23,14 @@ namespace VitalChoice.Business.Services.Workflow
         private readonly IEcommerceRepositoryAsync<WorkflowActionDependency> _actionDependenciesRepository;
         private readonly IEcommerceRepositoryAsync<WorkflowActionAggregation> _actionAggregationsRepository;
         private readonly ILogger _logger;
-        private ITransactionAccessor<EcommerceContext> _transactionAccessor;
+        private readonly ITransactionAccessor<EcommerceContext> _transactionAccessor;
 
         public TreeSetup(
             IEcommerceRepositoryAsync<WorkflowTree> treeRepository,
             IEcommerceRepositoryAsync<WorkflowExecutor> executorsRepository,
             IEcommerceRepositoryAsync<WorkflowResolverPath> resolverPathsRepository,
             IEcommerceRepositoryAsync<WorkflowActionDependency> actionDependenciesRepository,
-            IEcommerceRepositoryAsync<WorkflowActionAggregation> actionAggregationsRepository, EcommerceContext context,
+            IEcommerceRepositoryAsync<WorkflowActionAggregation> actionAggregationsRepository,
             ILoggerProviderExtended loggerProvider, ITransactionAccessor<EcommerceContext> transactionAccessor)
         {
             _treeRepository = treeRepository;
@@ -94,24 +95,12 @@ namespace VitalChoice.Business.Services.Workflow
             return this;
         }
 
-        public async Task<bool> UpdateAsync()
+        public async Task<bool> CreateTreesAsync()
         {
-            var trees = await _treeRepository.Query().SelectAsync();
-            var dependencies = await _actionDependenciesRepository.Query().SelectAsync();
-            var aggregations = await _actionAggregationsRepository.Query().SelectAsync();
-            var resolverPaths = await _resolverPathsRepository.Query().SelectAsync();
-            var executors = await _executorsRepository.Query().SelectAsync();
             using (var transaction = _transactionAccessor.BeginTransaction())
             {
                 try
                 {
-                    //Wipe out everything
-                    await _treeRepository.DeleteAllAsync(trees);
-                    await _actionAggregationsRepository.DeleteAllAsync(aggregations);
-                    await _actionDependenciesRepository.DeleteAllAsync(dependencies);
-                    await _resolverPathsRepository.DeleteAllAsync(resolverPaths);
-                    await _executorsRepository.DeleteAllAsync(executors);
-                    
                     //Insert executors
                     var dbExecutors = Actions.Select(a => new WorkflowExecutor
                     {
@@ -177,13 +166,22 @@ namespace VitalChoice.Business.Services.Workflow
                     var dbActionResolvers = new List<WorkflowResolverPath>();
                     foreach (var resolver in ActionResolvers)
                     {
-                        dbActionResolvers.AddRange(resolver.Value.Actions.Select(action => new WorkflowResolverPath
+                        foreach (var action in resolver.Value.Actions)
                         {
-                            IdResolver = actions[resolver.Key.FullName],
-                            IdExecutor = actions[action.Value.Type.FullName],
-                            Path = action.Key,
-                            Name = action.Value.Name
-                        }));
+                            if (!actions.ContainsKey(action.Value.Type.FullName))
+                            {
+                                throw new ApiException(
+                                    $"{action.Value.Type.FullName} is not initialized either as action or action resolver.");
+                            }
+                            var path = new WorkflowResolverPath
+                            {
+                                IdResolver = actions[resolver.Key.FullName],
+                                IdExecutor = actions[action.Value.Type.FullName],
+                                Path = action.Key,
+                                Name = action.Value.Name
+                            };
+                            dbActionResolvers.Add(path);
+                        }
                     }
                     await _resolverPathsRepository.InsertRangeAsync(dbActionResolvers);
 

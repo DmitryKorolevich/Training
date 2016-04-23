@@ -22,7 +22,7 @@ namespace VC.Admin.Controllers
         [HttpGet]
         public Result<RestrictedReferenceData> GetReferenceData()
         {
-            var referenceData = this.appInfrastructureService.Get();
+            var referenceData = this.appInfrastructureService.Data();
 
 	        RestrictedReferenceData referenceDataModel;
 

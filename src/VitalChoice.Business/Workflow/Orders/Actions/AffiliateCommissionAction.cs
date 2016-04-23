@@ -5,7 +5,7 @@ using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Core;
 
-namespace VitalChoice.Business.Workflow.Orders.Actions.Affiliates
+namespace VitalChoice.Business.Workflow.Orders.Actions
 {
     public class AffiliateCommissionAction : ComputableAction<OrderDataContext>
     {

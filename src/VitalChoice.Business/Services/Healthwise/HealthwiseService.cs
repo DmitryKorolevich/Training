@@ -108,7 +108,7 @@ namespace VitalChoice.Business.Services.Healthwise
         public async Task<ICollection<VHealthwisePeriod>> GetVHealthwisePeriodsAsync(VHealthwisePeriodFilter filter)
         {
             VHealthwisePeriodQuery conditions = new VHealthwisePeriodQuery().WithCustomerId(filter.IdCustomer).WithDateTo(filter.To).WithDateFrom(filter.From).
-                WithAllowPaymentOnly(filter.NotBilledOnly, _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount).WithNotPaid(filter.NotPaid);
+                WithAllowPaymentOnly(filter.NotBilledOnly, _appInfrastructureService.Data().AppSettings.HealthwisePeriodMaxItemsCount).WithNotPaid(filter.NotPaid);
 
             var toReturn = await _vHealthwisePeriodRepository.Query(conditions).SelectAsync(false);
             return toReturn;
@@ -134,7 +134,7 @@ namespace VitalChoice.Business.Services.Healthwise
                         var healthwise = (await vHealthwisePeriodRepository.Query(p => p.Id == id).SelectAsync()).FirstOrDefault();
 
                         if (healthwise != null && !healthwise.PaidDate.HasValue &&
-                            healthwise.OrdersCount >= _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount)
+                            healthwise.OrdersCount >= _appInfrastructureService.Data().AppSettings.HealthwisePeriodMaxItemsCount)
                         {
                             if (payAsGC)
                             {
@@ -206,7 +206,7 @@ namespace VitalChoice.Business.Services.Healthwise
 
             if (period != null && count != 0)
             {
-                int maxCount = _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount;
+                int maxCount = _appInfrastructureService.Data().AppSettings.HealthwisePeriodMaxItemsCount;
                 VHealthwisePeriodQuery conditions = new VHealthwisePeriodQuery().WithCustomerId(period.IdCustomer).WithNotPaid(true);
                 var items = await _vHealthwisePeriodRepository.Query(conditions).SelectAsync(false);
                 foreach (var item in items)
@@ -232,7 +232,7 @@ namespace VitalChoice.Business.Services.Healthwise
                     {
                         try
                         {
-                            int maxCount = _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount;
+                            int maxCount = _appInfrastructureService.Data().AppSettings.HealthwisePeriodMaxItemsCount;
                             var healthwiseOrderRepository = uow.RepositoryAsync<HealthwiseOrder>();
                             var orders = await healthwiseOrderRepository.Query(p => ids.Contains(p.Id)).Include(p => p.Order).SelectAsync();
 

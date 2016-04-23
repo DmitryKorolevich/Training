@@ -23,8 +23,7 @@ namespace VitalChoice.ContentProcessing.Extensions
             if (viewContext != null)
             {
                 viewContext.AppendScript(scripts);
-
-                //Consumed to collector
+                //Consumed by collector
                 return null;
             }
             return scripts;
