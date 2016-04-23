@@ -269,7 +269,7 @@ namespace VitalChoice.DynamicData.Base
             {
                 entity.OptionTypes = DynamicMapper.FilterByType(entity.IdObjectType);
             }
-            await SetBigValuesAsync(entities);
+            //await SetBigValuesAsync(entities);
             await AfterSelect(entities);
         }
 
@@ -293,63 +293,64 @@ namespace VitalChoice.DynamicData.Base
         {
             if (condition == null)
                 return
-                    (queryBuilder(new QueryLite<TEntity>(ObjectRepository.Query().Include(p => p.OptionValues))) as
+                    (queryBuilder(new QueryLite<TEntity>(ObjectRepository.Query().Include(p => p.OptionValues).ThenInclude(p => p.BigValue)))
+                        as
                         QueryLite<TEntity>)?.Query;
 
-            condition = (Expression<Func<TEntity, bool>>)QueryVisitor.Visit(condition);
-            IQueryFluent<TEntity> res = ObjectRepository.Query(condition).Include(p => p.OptionValues);
+            condition = (Expression<Func<TEntity, bool>>) QueryVisitor.Visit(condition);
+            IQueryFluent<TEntity> res = ObjectRepository.Query(condition).Include(p => p.OptionValues).ThenInclude(p => p.BigValue);
             res = (queryBuilder(new QueryLite<TEntity>(res)) as QueryLite<TEntity>)?.Query;
             return res;
         }
 
-        protected async Task SetBigValuesAsync(IEnumerable<TEntity> entities, bool tracked = false)
-        {
-            var bigValueIds = new Dictionary<long, List<TOptionValue>>();
-            foreach (var value in entities.SelectMany(entity => entity.OptionValues.Where(v => v.IdBigString.HasValue && v.BigValue == null)))
-            {
-                List<TOptionValue> valuesExist;
-                // ReSharper disable once PossibleInvalidOperationException
-                // ReSharper disable once AssignNullToNotNullAttribute
-                if (bigValueIds.TryGetValue(value.IdBigString.Value, out valuesExist))
-                {
-                    valuesExist.Add(value);
-                }
-                else
-                {
-                    bigValueIds.Add(value.IdBigString.Value, new List<TOptionValue> {value});
-                }
-            }
-            if (bigValueIds.Any())
-            {
-                var bigValues =
-                    (await BigStringRepository.Query(b => bigValueIds.Keys.Contains(b.IdBigString)).SelectAsync(tracked));
-                foreach (var bigValue in bigValues)
-                {
-                    bigValueIds[bigValue.IdBigString].ForEach(v => v.BigValue = bigValue);
-                }
-            }
-        }
+        //protected async Task SetBigValuesAsync(IEnumerable<TEntity> entities, bool tracked = false)
+        //{
+        //    var bigValueIds = new Dictionary<long, List<TOptionValue>>();
+        //    foreach (var value in entities.SelectMany(entity => entity.OptionValues.Where(v => v.IdBigString.HasValue && v.BigValue == null)))
+        //    {
+        //        List<TOptionValue> valuesExist;
+        //        // ReSharper disable once PossibleInvalidOperationException
+        //        // ReSharper disable once AssignNullToNotNullAttribute
+        //        if (bigValueIds.TryGetValue(value.IdBigString.Value, out valuesExist))
+        //        {
+        //            valuesExist.Add(value);
+        //        }
+        //        else
+        //        {
+        //            bigValueIds.Add(value.IdBigString.Value, new List<TOptionValue> {value});
+        //        }
+        //    }
+        //    if (bigValueIds.Any())
+        //    {
+        //        var bigValues =
+        //            (await BigStringRepository.Query(b => bigValueIds.Keys.Contains(b.IdBigString)).SelectAsync(tracked));
+        //        foreach (var bigValue in bigValues)
+        //        {
+        //            bigValueIds[bigValue.IdBigString].ForEach(v => v.BigValue = bigValue);
+        //        }
+        //    }
+        //}
 
-        protected async Task SetBigValuesAsync(TEntity entity, bool tracked = false)
-        {
-            var bigIdsList = entity.OptionValues.Where(v => v.IdBigString.HasValue && v.BigValue == null)
-                .Select(v => v.IdBigString.Value)
-                .ToList();
-            if (bigIdsList.Any())
-            {
-                var bigValues =
-                    (await BigStringRepository.Query(b => bigIdsList.Contains(b.IdBigString)).SelectAsync(tracked))
-                        .ToDictionary
-                        (b => b.IdBigString, b => b);
-                foreach (var value in entity.OptionValues)
-                {
-                    if (value.IdBigString != null)
-                    {
-                        value.BigValue = bigValues[value.IdBigString.Value];
-                    }
-                }
-            }
-        }
+        //protected async Task SetBigValuesAsync(TEntity entity, bool tracked = false)
+        //{
+        //    var bigIdsList = entity.OptionValues.Where(v => v.IdBigString.HasValue && v.BigValue == null)
+        //        .Select(v => v.IdBigString.Value)
+        //        .ToList();
+        //    if (bigIdsList.Any())
+        //    {
+        //        var bigValues =
+        //            (await BigStringRepository.Query(b => bigIdsList.Contains(b.IdBigString)).SelectAsync(tracked))
+        //                .ToDictionary
+        //                (b => b.IdBigString, b => b);
+        //        foreach (var value in entity.OptionValues)
+        //        {
+        //            if (value.IdBigString != null)
+        //            {
+        //                value.BigValue = bigValues[value.IdBigString.Value];
+        //            }
+        //        }
+        //    }
+        //}
 
         #endregion
     }

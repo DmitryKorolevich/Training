@@ -225,7 +225,8 @@ namespace VitalChoice.DynamicData.Base
             var ids = models.Select(m => m.Id).ToList();
             IQueryFluent<TEntity> query =
                 mainRepository.Query(o => ids.Contains(o.Id) && o.StatusCode != (int) RecordStatusCode.Deleted)
-                    .Include(p => p.OptionValues);
+                    .Include(p => p.OptionValues)
+                    .ThenInclude(p => p.BigValue);
             query = BuildQuery(query);
             if (query != null)
             {
@@ -259,7 +260,8 @@ namespace VitalChoice.DynamicData.Base
             var bigValueRepository = uow.RepositoryAsync<BigStringValue>();
             IQueryFluent<TEntity> query =
                 mainRepository.Query(o => o.Id == model.Id && o.StatusCode != (int) RecordStatusCode.Deleted)
-                    .Include(p => p.OptionValues);
+                    .Include(p => p.OptionValues)
+                    .ThenInclude(p => p.BigValue);
             query = BuildQuery(query);
             var entity = await query.SelectFirstOrDefaultAsync();
             if (entity == null)
@@ -401,22 +403,25 @@ namespace VitalChoice.DynamicData.Base
         private async Task UpdateItems(IUnitOfWorkAsync uow, ICollection<DynamicEntityPair<TDynamic, TEntity>> items,
             IRepositoryAsync<BigStringValue> bigValueRepository)
         {
-            await SetBigValuesAsync(items.Select(i => i.Entity), true);
+            //await SetBigValuesAsync(items.Select(i => i.Entity), true);
             foreach (var pair in items)
             {
                 await BeforeEntityChangesAsync(pair.Dynamic, pair.Entity, uow);
             }
 
-            var itemsBeforeUpdate = items.SelectMany(i => i.Entity.OptionValues).Where(o => o.BigValue != null).Select(o => o.BigValue);
+            var bigValuesBeforeUpdate = items.SelectMany(i => i.Entity.OptionValues).Where(o => o.BigValue != null).Select(o => o.BigValue).ToArray();
 
             await DynamicMapper.UpdateEntityRangeAsync(items);
 
-            var removedItems =
-                itemsBeforeUpdate.ExceptKeyedWith(
+            var removedBigValues =
+                bigValuesBeforeUpdate.ExceptKeyedWith(
                     items.SelectMany(i => i.Entity.OptionValues).Where(o => o.BigValue != null).Select(o => o.BigValue), b => b.IdBigString);
 
-            await bigValueRepository.DeleteAllAsync(removedItems);
-
+            await bigValueRepository.DeleteAllAsync(removedBigValues);
+            //var toAddBigValues = items.SelectMany(i => i.Entity.OptionValues)
+            //    .Where(o => o.BigValue != null && o.IdBigString == null)
+            //    .Select(o => o.BigValue);
+            //await bigValueRepository.InsertRangeAsync(toAddBigValues);
             //await
             //    bigValueRepository.InsertRangeAsync(
             //        items.SelectMany(i => i.Entity.OptionValues).Where(b => b.BigValue != null).Select(o => o.BigValue));

@@ -11,12 +11,18 @@ namespace VitalChoice.DynamicData.Helpers
     public static class MapperTypeConverter
     {
         public static object ConvertTo<TOptionValue, TOptionType>(TOptionValue value, FieldType typeId)
-            where TOptionValue: OptionValue<TOptionType> 
+            where TOptionValue : OptionValue<TOptionType>
             where TOptionType : OptionType
         {
             if (string.IsNullOrEmpty(value.Value) && value.BigValue == null)
                 return null;
-            return typeId == FieldType.LargeString ? value.BigValue?.Value : ConvertTo(value.Value, typeId);
+            if (typeId == FieldType.LargeString)
+            {
+                if (value.BigValue != null)
+                    return value.BigValue.Value;
+                return value.Value;
+            }
+            return ConvertTo(value.Value, typeId);
         }
 
         public static object ConvertTo(string value, FieldType typeId)
@@ -85,10 +91,28 @@ namespace VitalChoice.DynamicData.Helpers
                     option.Value = value as string;
                     break;
                 case FieldType.LargeString:
-                    option.BigValue = new BigStringValue
+                    var str = value as string;
+                    if (str != null && str.Length > 250)
                     {
-                        Value = value as string
-                    };
+                        if (option.BigValue == null)
+                        {
+                            option.BigValue = new BigStringValue
+                            {
+                                Value = str
+                            };
+                        }
+                        else
+                        {
+                            option.BigValue.Value = str;
+                        }
+                        option.Value = null;
+                    }
+                    else
+                    {
+                        option.BigValue = null;
+                        option.IdBigString = null;
+                        option.Value = str;
+                    }
                     break;
                 default:
                     var valueType = value.GetType();
