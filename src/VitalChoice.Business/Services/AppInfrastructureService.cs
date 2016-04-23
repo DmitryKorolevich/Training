@@ -43,7 +43,7 @@ namespace VitalChoice.Business.Services
         private readonly IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository;
         private readonly IEcommerceRepositoryAsync<PromotionTypeEntity> promotionTypeEntityRepository;
         private readonly IEcommerceRepositoryAsync<LookupVariant> _lookupVariantRepository;
-        private readonly IEcommerceRepositoryAsync<Lookup> lookupRepository;
+        private readonly IEcommerceRepositoryAsync<Lookup> _lookupRepository;
         private readonly IEcommerceRepositoryAsync<AppOption> appOptionRepository;
         private readonly IEcommerceRepositoryAsync<OrderTypeEntity> orderTypeEntityRepository;
         private readonly ISettingService settingService;
@@ -81,7 +81,7 @@ namespace VitalChoice.Business.Services
             this.paymentMethodRepository = paymentMethodRepository;
             this.promotionTypeEntityRepository = promotionTypeEntityRepository;
             this._lookupVariantRepository = lookupVariantRepository;
-            this.lookupRepository = lookupRepository;
+            this._lookupRepository = lookupRepository;
             this.appOptionRepository = appOptionRepository;
             this.orderTypeEntityRepository = orderTypeEntityRepository;
             this.settingService = settingService;
@@ -92,7 +92,7 @@ namespace VitalChoice.Business.Services
 
         private ReferenceData Populate()
         {
-            var lookups = lookupRepository.Query().Select(false);
+            var lookups = _lookupRepository.Query().Select(false);
             var tradeLookup = lookups.Single(x => x.Name == LookupNames.CustomerTradeClass).Id;
             var taxExemptLookup = lookups.Single(x => x.Name == LookupNames.CustomerTaxExempt).Id;
             var priorityLookup = lookups.Single(x => x.Name == LookupNames.CustomerNotePriorities).Id;
@@ -121,6 +121,7 @@ namespace VitalChoice.Business.Services
                 .GroupBy(l => l.IdLookup)
                 .ToDictionary(l => l.Key, l => l.ToArray());
 
+            // ReSharper disable once UseObjectOrCollectionInitializer
             var referenceData = new ReferenceData();
             referenceData.DefaultCountry = _backendSettingsService.GetDefaultCountry();
             referenceData.AdminRoles = roleManager.Roles.Where(x => x.IdUserType == UserType.Admin).Select(x => new LookupItem<int>
