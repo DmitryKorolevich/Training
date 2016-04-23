@@ -72,7 +72,7 @@ namespace VC.Public
             // Add static files to the request pipeline.
             app.UseStaticFiles(new StaticFileOptions
             {
-                OnPrepareResponse = context => context.Context.Response.Headers.Add("Cache-Control", "public, max-age=3600")
+                OnPrepareResponse = context => context.Context.Response.Headers.Add("Cache-Control", "public, max-age=604800")
             });
 
             // Add cookie-based authentication to the request pipeline.
