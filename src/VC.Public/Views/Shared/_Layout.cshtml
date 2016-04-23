@@ -127,6 +127,24 @@
             {
                 <div class="nav-shadow"></div>
             }
+		    <div class="@(ViewBag.HideMenuShadow != true ? "bronto-subscribe-top-wrapper" : "bronto-subscribe-top-wrapper no-shadow")">
+                <form class="bronto-form" onsubmit="return false;">
+                    <span>Get Special Offers, Recipes, Healthy News ... and more!</span>
+                    <div class="email-input-container">
+                        <input placeholder="Email Address" class="txtEmail" type="text" id="bronto-subEmail" />
+                        <div class="bubble">
+                            Please enter a valid email address
+                        </div>
+                    </div>
+                    <a href="javascript:void(0);" class="btnPostEmail">I'm on Board</a>
+                    <a class="close-form" href="javascript:void(0);">Hide this&nbsp;<img src="/Assets/images/cart/Close-128.png" /></a>
+                    <div class="bronto-form-shadow"></div>
+                </form>
+                <div class="bronto-form-success">
+                    <span>Got it! You are now signed up to receive our newsletter.</span>
+                    <div class="bronto-form-shadow"></div>
+                </div>
+		    </div>
 		</header>
 		<div class="content">
             <div class="alert-banner">
@@ -170,7 +188,7 @@
 						<a target="_blank" href="http://www.bcorporation.net/community/vital-choice">
 							<img alt="Certified Corporation" src="/Assets/images/BCorplogo.jpg" />
 						</a>
-						<a href="/content/vitalgreen">
+						<a href="/content/Vital-Green-Environmental-Stewardship-Program">
 							<img alt="Vital Green" src="/Assets/images/vitalgreen.jpg" />
 						</a>
 					</div>

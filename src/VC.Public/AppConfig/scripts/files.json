@@ -19,6 +19,7 @@
     "lib/moment/moment.js",
     "assets/scripts/vendor/knockout.mapping-latest.js",
     "assets/scripts/plugins.js",
-    "assets/scripts/vendor/modernizr-2.8.3.min.js"
+    "assets/scripts/vendor/modernizr-2.8.3.min.js",
+    "lib/js-cookie/js.cookie.js"
   ]
 }

@@ -192,7 +192,7 @@ namespace VitalChoice.Caching.Services.Cache
                 _internalCache.SetNull(queryData.PrimaryKeys, queryData.RelationInfo);
                 return true;
             }
-            if (queryData.PrimaryKeys == null)
+            if (entity == null && queryData.PrimaryKeys == null)
             {
                 _logger.LogWarning(
                     $"<Cache Update> can't update cache, preconditions not met: {typeof(T)}\r\nExpression:\r\n{queryData.WhereExpression?.Expression.AsString()}");

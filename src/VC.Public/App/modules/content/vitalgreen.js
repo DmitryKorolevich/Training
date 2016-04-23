@@ -1,35 +1,6 @@
 ﻿$(function ()
 {
-    getCountries(function (result)
-    {
-        var selectedCountry = $.grep(result.Data, function (country, countryIndex)
-        {
-            if (appSettings.DefaultCountryId == country.Id)
-            {
-                return country;
-            }
-        })[0];
-
-        if (selectedCountry && selectedCountry.States && selectedCountry.States.length > 0)
-        {
-            $("#ddState").html("");
-
-            $.each(selectedCountry.States, function (stateIndex, state)
-            {
-                $("#ddState").append($('<option></option>').val(state.StateCode).html(state.StateName));
-            });
-
-            var idState = $("#hdState").val();
-            if (idState)
-            {
-                $("#ddState").val(idState);
-            }
-        }
-
-    }, function (errorResult)
-    {
-        
-    });
+    refreshStates();
 
     var root = $('.vitalgreen');
     root.on("click", ".zone-description a", function (e)
@@ -58,7 +29,47 @@
     });
 });
 
+function refreshStates()
+{
+    getCountries(function (result)
+    {
+        var selectedCountry = $.grep(result.Data, function (country, countryIndex)
+        {
+            if (appSettings.DefaultCountryId == country.Id)
+            {
+                return country;
+            }
+        })[0];
+
+        if (selectedCountry && selectedCountry.States && selectedCountry.States.length > 0)
+        {
+            $("#ddState").html("");
+
+            $.each(selectedCountry.States, function (stateIndex, state)
+            {
+                $("#ddState").append($('<option></option>').val(state.StateCode).html(state.StateName));
+            });
+
+            var idState = $("#hdState").val();
+            if (idState)
+            {
+                $("#ddState").val(idState);
+            }
+        }
+
+    }, function (errorResult)
+    {
+
+    });
+};
+
 function vitalGreenStep1SubmitSuccess(data)
 {
-    $('.vitalgreen .step1').hide();
+    if (successMessage)
+    {
+        $('.vitalgreen .step1').hide();
+    } else
+    {
+        refreshStates();
+    }
 }
