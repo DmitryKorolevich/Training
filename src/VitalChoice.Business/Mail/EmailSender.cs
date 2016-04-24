@@ -1,4 +1,4 @@
-﻿#if !DOTNET5_4
+﻿#if !NETSTANDARD1_5
 using System.Net;
 using System.Net.Mail;
 #endif
@@ -12,14 +12,14 @@ namespace VitalChoice.Business.Mail
 {
     public class EmailSender :IEmailSender, IDisposable
     {
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
         private readonly Email _configuration;
 
 	    private readonly SmtpClient _client;
 #endif
 		public EmailSender(IOptions<AppOptions> options)
 	    {
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
             _configuration = options.Value.EmailConfiguration;
 		    if (!_configuration.Disabled)
 		    {
@@ -38,7 +38,7 @@ namespace VitalChoice.Business.Mail
             string fromEmail = null, string toDisplayName = "",
             bool isBodyHtml = true)
         {
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
             if (_configuration.Disabled)
                 return;
             var fromEmailAdddress = fromEmail;
@@ -84,7 +84,7 @@ namespace VitalChoice.Business.Mail
             {
                 if (disposing)
                 {
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
                     _client?.Dispose();
 #endif
                 }

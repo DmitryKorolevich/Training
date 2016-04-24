@@ -28,7 +28,7 @@ namespace VitalChoice.Core.GlobalFilters
 
 		public override void OnException(ExceptionContext context)
 		{
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
             var systemException = context.Exception as SystemException;
 		    if (systemException != null)
 		    {

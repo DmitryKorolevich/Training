@@ -94,7 +94,7 @@ using VitalChoice.Interfaces.Services.InventorySkus;
 using VitalChoice.Profiling;
 using VitalChoice.Profiling.Base;
 using VitalChoice.Profiling.Interfaces;
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Business.Services.Cache;
 #endif
@@ -107,7 +107,7 @@ namespace VitalChoice.Core.DependencyInjection
             Assembly projectAssembly, IApplicationEnvironment appEnv = null, bool enableCache = true)
         {
             // Add EF services to the services container.
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
             if (enableCache)
             {
                 services.AddEntityFramework()
@@ -587,7 +587,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<ReCaptchaValidator>().AsSelf().SingleInstance();
             builder.RegisterType<CountryNameCodeResolver>().As<ICountryNameCodeResolver>()
                 .InstancePerLifetimeScope();
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
             builder.RegisterType<EncryptedServiceBusHostClient>().As<IEncryptedServiceBusHostClient>().SingleInstance();
 #endif
             builder.RegisterType<ObjectEncryptionHost>()

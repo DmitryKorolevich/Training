@@ -21,7 +21,7 @@ namespace VC.Admin.Models.Setting
 
         public GlobalSettingsManageModel(ICollection<AppSettingItem> items)
         {
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
             foreach (var property in typeof(GlobalSettingsManageModel).GetProperties())
             {
                 AppSettingItem setting = items.FirstOrDefault(p => p.Name == property.Name);

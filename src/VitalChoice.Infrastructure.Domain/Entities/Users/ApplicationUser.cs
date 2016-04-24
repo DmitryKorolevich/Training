@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace VitalChoice.Infrastructure.Domain.Entities.Users
 {

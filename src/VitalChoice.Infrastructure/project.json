@@ -3,7 +3,7 @@
   "dependencies": {
     "EntityFramework.Core": "7.0.0-*",
     "EntityFramework.MicrosoftSqlServer": "7.0.0-*",
-    "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
+    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "3.0.0-*",
     "Microsoft.Extensions.OptionsModel": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
@@ -20,7 +20,7 @@
         "NLog": "4.0.1"
       }
     },
-    "dotnet5.4": {
+    "netstandard1.5": {
       "dependencies": {
         "System.Runtime": "4.0.21-*",
         "System.Security.Cryptography.X509Certificates": "4.0.0-*",

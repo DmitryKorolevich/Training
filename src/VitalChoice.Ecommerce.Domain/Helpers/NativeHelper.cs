@@ -7,7 +7,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
 {
     public static class NativeHelper {
 
-#if DOTNET5_4
+#if NETSTANDARD1_5
         private static readonly IAssemblyLoadContextAccessor LoadContextAccessor =
             (IAssemblyLoadContextAccessor)
                 CallContextServiceLocator.Locator?.ServiceProvider?.GetService(typeof (IAssemblyLoadContextAccessor));

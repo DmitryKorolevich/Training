@@ -10,7 +10,7 @@ namespace Azure.ApplicationHost.Services
     internal class ApplicationGlobalData
     {
         private readonly IApplicationEnvironment _hostEnvironment;
-#if DNXCORE50 || DOTNET5_4 || NETCORE50
+#if DNXCORE50 || NETSTANDARD1_5 || NETCORE50
         private readonly object _lock;
         private readonly Dictionary<string, object> _appGlobalData;
 #endif
@@ -18,7 +18,7 @@ namespace Azure.ApplicationHost.Services
         public ApplicationGlobalData(IApplicationEnvironment hostEnvironment)
         {
             _hostEnvironment = hostEnvironment;
-#if DNXCORE50 || DOTNET5_4 || NETCORE50
+#if DNXCORE50 || NETSTANDARD1_5 || NETCORE50
             // If there is no host environment that we are delegating to, we need a place to store this data in CoreCLR
             if (hostEnvironment == null)
             {

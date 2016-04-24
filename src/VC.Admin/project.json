@@ -21,7 +21,7 @@
     "Microsoft.AspNet.Mvc": "6.0.0-*",
     "Microsoft.AspNet.Diagnostics": "1.0.0-*",
     "Microsoft.AspNet.Diagnostics.Entity": "7.0.0-*",
-    "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
+    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "3.0.0-*",
     "Microsoft.AspNet.Server.WebListener": "1.0.0-*",
     "Microsoft.AspNet.StaticFiles": "1.0.0-*",
     "Microsoft.Extensions.Configuration.Json": "1.0.0-*",
@@ -42,7 +42,7 @@
         "EntityFramework.Commands": "7.0.0-*"
       }
     },
-    "dotnet5.4": {
+    "netstandard1.5": {
       "dependencies": {
         "System.Runtime": "4.0.21-*",
         "System.Net.Http": "4.0.1-*"

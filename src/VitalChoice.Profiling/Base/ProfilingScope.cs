@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
 using System.Runtime.Remoting.Messaging;
 #endif
 using System.Threading;
@@ -41,7 +41,7 @@ namespace VitalChoice.Profiling.Base
                     _scopeStack.Push(this);
                 }
                 _stopwatch = new Stopwatch();
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
                 var stackFrame = new StackFrame(skipFrames, false);
                 var method = stackFrame.GetMethod();
                 ClassType = method.DeclaringType;
@@ -60,7 +60,7 @@ namespace VitalChoice.Profiling.Base
         {
             if (Enabled)
             {
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
                 return
                     $"{{\"{ClassType.FullName}::{MethodName}\":\"{Data?.ToString().Replace("\"", "\\\"")}\", \"time\": {TimeElapsed.TotalMilliseconds}{(AdditionalData == null ? string.Empty : $", \"additional\": [{string.Join(",", AdditionalData.Select(d => $"\"{d}\""))}]")} {(_subScopes == null ? string.Empty : $", \"subTrace\": [{string.Join(",", _subScopes.Select(s => s.ToString()))}]")}}}";
 #else
@@ -75,7 +75,7 @@ namespace VitalChoice.Profiling.Base
             return _scopeStack?.Count ?? 0;
         }
 
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
 
         public static ProfilingScope GetRootScope()
         {

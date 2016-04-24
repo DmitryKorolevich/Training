@@ -11,7 +11,7 @@
 namespace VitalChoice.Business.Services.Bronto
 {
     //TODO: should be removed after rc2 release(reason MessageHeaderAttribute)
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     
     [System.Xml.Serialization.XmlSchemaProviderAttribute("ExportSchema")]

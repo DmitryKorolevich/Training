@@ -33,7 +33,7 @@ namespace VitalChoice.Profiling.Base
                 {
                     try
                     {
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
                         if (scope.GetStackCount() == 1)
                         {
                             scope.Stop();

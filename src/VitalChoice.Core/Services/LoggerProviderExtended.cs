@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
 using Microsoft.Extensions.PlatformAbstractions;
 using VitalChoice.Infrastructure.Domain.Options;
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
 using NLog;
 #endif
 using VitalChoice.Interfaces.Services;
@@ -18,7 +18,7 @@ using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace VitalChoice.Core.Services
 {
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
     public static class NLogLoggerFactoryExtensions
     {
         public static ILoggerFactory AddNLog(
@@ -124,7 +124,7 @@ namespace VitalChoice.Core.Services
             string basePath = env.ApplicationBasePath;
             string logPath = options.Value.LogPath;
             _factory = new LoggerFactory();
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
             int backLevelCount = 0;
             var searchPath = basePath;
             while (!File.Exists(searchPath + @"\nlog.config") && backLevelCount <= 5)
@@ -169,7 +169,7 @@ namespace VitalChoice.Core.Services
 
         public ILogger CreateLoggerDefault()
         {
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
             return CreateLogger(new StackFrame(1, false).GetMethod().DeclaringType);
 #else
             return CreateLogger(string.Empty);

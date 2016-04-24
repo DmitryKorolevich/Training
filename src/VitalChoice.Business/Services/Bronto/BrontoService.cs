@@ -32,7 +32,7 @@ namespace VitalChoice.Business.Services.Bronto
         private readonly ILogger _logger;
 
         //TODO: should be removed after rc2 release(reason MessageHeaderAttribute)
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
         private readonly BrontoSoapPortTypeClient _client;
 #endif
 
@@ -42,7 +42,7 @@ namespace VitalChoice.Business.Services.Bronto
             _brontoSettings = options.Value.Bronto;
             _logger = loggerProvider.CreateLoggerDefault();
 
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
             BasicHttpBinding binding = new BasicHttpBinding {Security = {Mode = BasicHttpSecurityMode.Transport}};
             EndpointAddress endpoint = new EndpointAddress(_brontoSettings.ApiUrl);
             _client = new BrontoSoapPortTypeClient(binding, endpoint);
@@ -133,7 +133,7 @@ namespace VitalChoice.Business.Services.Bronto
 
         public async Task<bool> Unsubscribe(string email)
         {
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
             List<contactObject> result = new List<contactObject>();
             int pageNumber = 1;
             contactObject[] lists;
@@ -174,7 +174,7 @@ namespace VitalChoice.Business.Services.Bronto
 
         public async Task<bool?> GetIsUnsubscribed(string email)
         {
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
             List<contactObject> result = new List<contactObject>();
             int pageNumber = 1;
             contactObject[] lists;
@@ -204,7 +204,7 @@ namespace VitalChoice.Business.Services.Bronto
             return true;
         }
 
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
         public async Task<contactObject[]> GetAllActiveContacts()
         {
             List<contactObject> result = new List<contactObject>();

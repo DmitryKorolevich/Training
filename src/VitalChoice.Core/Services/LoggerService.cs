@@ -13,7 +13,7 @@ namespace VitalChoice.Core.Services
 
         public static ILogger GetDefault()
         {
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
             return _loggerProviderExtended?.CreateLogger(new StackFrame(1, false).GetMethod().DeclaringType);
 #else
             return _loggerProviderExtended?.CreateLogger(string.Empty);
