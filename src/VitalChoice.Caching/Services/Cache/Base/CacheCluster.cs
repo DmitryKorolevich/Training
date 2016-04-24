@@ -35,6 +35,10 @@ namespace VitalChoice.Caching.Services.Cache.Base
 
         public void Update(TKey pk, CachedEntity<T> newCached)
         {
+            if (_cluster.ContainsKey(pk))
+            {
+                _cluster[pk] = newCached;
+            }
             _cluster.Add(pk, newCached);
         }
 
