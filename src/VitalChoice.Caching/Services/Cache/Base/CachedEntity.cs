@@ -21,13 +21,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
     public abstract class CachedEntity : ICachedEntity
     {
         protected DateTime LastAccess = DateTime.Now;
-        protected object ValueInternal;
         private volatile bool _needUpdate;
-
-        protected CachedEntity(object valueInternal)
-        {
-            ValueInternal = valueInternal;
-        }
 
         public DateTime LastAccessTime => LastAccess;
 
@@ -39,31 +33,24 @@ namespace VitalChoice.Caching.Services.Cache.Base
             set { _needUpdate = value; }
         }
 
-        public object EntityUntyped
-        {
-            get
-            {
-                lock (this)
-                {
-                    LastAccess = DateTime.Now;
-                    return ValueInternal;
-                }
-            }
-        }
+        public abstract object EntityUntyped { get; }
 
         public EntityIndex UniqueIndex { get; internal set; }
         public ICollection<KeyValuePair<EntityConditionalIndexInfo, EntityIndex>> ConditionalIndexes { get; internal set; }
         public ICollection<KeyValuePair<EntityCacheableIndexInfo, EntityIndex>> NonUniqueIndexes { get; internal set; }
         public ICollection<KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>> ForeignKeys { get; internal set; }
+
+        public abstract CachedEntity CopyUntyped();
     }
 
     public class CachedEntity<T> : CachedEntity, ICachedEntity<T>
     {
         private readonly ICacheData<T> _cacheData;
+        private T _value;
 
         public CachedEntity(T valueInternal, ICacheData<T> cacheData)
-            : base(valueInternal)
         {
+            Entity = valueInternal;
             _cacheData = cacheData;
         }
 
@@ -71,19 +58,13 @@ namespace VitalChoice.Caching.Services.Cache.Base
         {
             get
             {
-                lock (this)
-                {
-                    LastAccess = DateTime.Now;
-                    return (T) ValueInternal;
-                }
+                LastAccess = DateTime.Now;
+                return _value;
             }
             set
             {
-                lock (this)
-                {
-                    LastAccess = DateTime.Now;
-                    ValueInternal = value;
-                }
+                LastAccess = DateTime.Now;
+                _value = value;
             }
         }
 
@@ -91,6 +72,25 @@ namespace VitalChoice.Caching.Services.Cache.Base
         {
             get { return _cacheData.FullCollection && _cacheData.NeedUpdate || base.NeedUpdate || NeedUpdateRelated.Any(); }
             set { base.NeedUpdate = value; }
+        }
+
+        public override object EntityUntyped => Entity;
+
+        public override CachedEntity CopyUntyped()
+        {
+            return Copy();
+        }
+
+        public CachedEntity<T> Copy()
+        {
+            return new CachedEntity<T>(_value, _cacheData)
+            {
+                LastAccess = LastAccess,
+                ConditionalIndexes = ConditionalIndexes,
+                ForeignKeys = ForeignKeys,
+                NonUniqueIndexes = NonUniqueIndexes,
+                UniqueIndex = UniqueIndex
+            };
         }
 
         public static implicit operator T(CachedEntity<T> cached)

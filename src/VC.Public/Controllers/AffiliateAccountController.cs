@@ -31,7 +31,6 @@ namespace VC.Public.Controllers
         private readonly IAffiliateUserService _userService;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IAffiliateService _affiliateService;
-        private readonly IPaymentMethodService _paymentMethodService;
         private readonly IDynamicMapper<AffiliateDynamic, Affiliate> _affiliateMapper;
 
         public AffiliateAccountController(

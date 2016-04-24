@@ -181,7 +181,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             if (main == null)
                 throw new ArgumentNullException(nameof(main));
             if (toSearchIn != null)
-            { 
+            {
                 Dictionary<TKey, T> searchIn = toSearchIn.ToDictionary(keySelector);
                 foreach (var m in main)
                 {
@@ -243,7 +243,8 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
         }
 
         public static void MergeKeyed<T1, T2, TKey>(this ICollection<T1> main, ICollection<T2> toAdd,
-            Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T2, T1> projection, Action<T1, T2> updateAction, Action<ICollection<T1>> removeAction = null)
+            Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T2, T1> projection, Action<T1, T2> updateAction,
+            Action<ICollection<T1>> removeAction = null)
         {
             if (main == null)
                 throw new ArgumentNullException(nameof(main));
@@ -285,7 +286,8 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
         }
 
         public static void MergeKeyed<T1, T2, TKey>(this ICollection<T1> main, ICollection<T2> toAdd,
-            Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T2, T1> projection, Action<ICollection<T1>> removeAction = null)
+            Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T2, T1> projection,
+            Action<ICollection<T1>> removeAction = null)
         {
             if (main == null)
                 throw new ArgumentNullException(nameof(main));
@@ -382,8 +384,30 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             return string.Join("\r\n", src.Select(pair => $"[{pair.Key} = {pair.Value}]"));
         }
 
-        public static void AddOrUpdate<T1, T2>(this Dictionary<T1, T2> src, T1 key, Func<T2> valueFactory, Action<T2> updateAction)
-            where T2: class
+        public static T2 TryRemove<T1, T2>(this Dictionary<T1, T2> src, T1 key)
+            where T2 : class
+        {
+            T2 result;
+            if (src.TryGetValue(key, out result))
+            {
+                src.Remove(key);
+                return result;
+            }
+            return null;
+        }
+
+        public static bool TryRemove<T1, T2>(this Dictionary<T1, T2> src, T1 key, out T2 result)
+        {
+            if (src.TryGetValue(key, out result))
+            {
+                src.Remove(key);
+                return true;
+            }
+            return false;
+        }
+
+        public static T2 AddOrUpdate<T1, T2>(this Dictionary<T1, T2> src, T1 key, Func<T2> valueFactory, Action<T2> updateAction)
+            where T2 : class
         {
             if (src == null)
                 throw new ArgumentNullException(nameof(src));
@@ -392,15 +416,14 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             if (src.TryGetValue(key, out existValue))
             {
                 updateAction(existValue);
+                return existValue;
             }
-            else
-            {
-                src.Add(key, valueFactory());
-            }
+            var result = valueFactory();
+            src.Add(key, result);
+            return result;
         }
 
-        public static void AddOrUpdate<T1, T2>(this Dictionary<T1, T2> src, T1 key, Func<T2> valueFactory, Func<T2, T2> updateAction)
-            where T2 : struct
+        public static T2 AddOrUpdate<T1, T2>(this Dictionary<T1, T2> src, T1 key, Func<T2> valueFactory, Func<T2, T2> updateAction)
         {
             if (src == null)
                 throw new ArgumentNullException(nameof(src));
@@ -408,11 +431,15 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             T2 existValue;
             if (src.TryGetValue(key, out existValue))
             {
-                src[key] = updateAction(existValue);
+                var result = updateAction(existValue);
+                src[key] = result;
+                return result;
             }
             else
             {
-                src.Add(key, valueFactory());
+                var result = valueFactory();
+                src.Add(key, result);
+                return result;
             }
         }
     }

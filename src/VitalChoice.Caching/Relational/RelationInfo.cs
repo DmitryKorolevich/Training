@@ -19,6 +19,8 @@ namespace VitalChoice.Caching.Relational
 
     public class RelationInfo : IEquatable<RelationInfo>, IRelationAccessor
     {
+        public Type PropertyType { get; }
+        public bool IsCollection { get; }
         public string Name { get; }
         public Type RelationType { get; }
         public Type OwnedType { get; }
@@ -31,7 +33,10 @@ namespace VitalChoice.Caching.Relational
             IEnumerable<RelationInfo> subRelations = null)
         {
             Name = name;
-            RelationType = relatedType;
+            PropertyType = relatedType;
+            var elementType = relatedType.TryGetElementType(typeof(ICollection<>));
+            RelationType = elementType ?? relatedType;
+            IsCollection = elementType != null;
             OwnedType = ownedType;
             _relationAccessor = relationAccessor;
             RelationsDict = subRelations?.ToDictionary(r => r.Name) ??
@@ -135,6 +140,8 @@ namespace VitalChoice.Caching.Relational
         {
             return $"{Name}->\n\t{string.Join("\n", Relations)}";
         }
+
+        //public Type RelationObjectType => 
 
         public object GetRelatedObject(object entity)
         {

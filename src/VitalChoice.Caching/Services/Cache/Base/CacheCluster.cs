@@ -1,48 +1,41 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Services.Cache.Base
 {
     public class CacheCluster<TKey, T>
     {
-        private readonly ConcurrentDictionary<TKey, CachedEntity<T>> _cluster = new ConcurrentDictionary<TKey, CachedEntity<T>>();
+        private readonly Dictionary<TKey, CachedEntity<T>> _cluster = new Dictionary<TKey, CachedEntity<T>>();
 
         public CachedEntity<T> Remove(TKey pk)
         {
-            CachedEntity<T> cached;
-            if (_cluster.TryRemove(pk, out cached))
-            {
-                return cached;
-            }
-            return null;
+            return _cluster.TryRemove(pk);
         }
 
         public CachedEntity<T> Update(TKey pk, T entity, Func<T, CachedEntity<T>> createFunc,
-            Action<T, CachedEntity<T>> updateFunc)
+            Func<T, CachedEntity<T>, CachedEntity<T>> updateFunc)
         {
             return _cluster.AddOrUpdate(pk,
-                key => createFunc(entity),
-                (key, exist) =>
-                {
-                    updateFunc(entity, exist);
-                    return exist;
-                });
+                () => createFunc(entity),
+                exist => updateFunc(entity, exist));
         }
 
-        public CachedEntity<T> Update(TKey pk, T entity, Action<T, CachedEntity<T>> updateFunc)
+        public CachedEntity<T> Update(TKey pk, T entity, Func<T, CachedEntity<T>, CachedEntity<T>> updateFunc)
         {
             var exist = Get(pk);
             if (exist != null)
             {
-                updateFunc(entity, exist);
+                _cluster[pk] = updateFunc(entity, exist);
             }
             return exist;
         }
 
         public void Update(TKey pk, CachedEntity<T> newCached)
         {
-            _cluster.AddOrUpdate(pk, newCached, (key, exist) => newCached);
+            _cluster.Add(pk, newCached);
         }
 
         public CachedEntity<T> Get(TKey pk)
@@ -62,7 +55,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
 
         public ICollection<CachedEntity<T>> GetItems()
         {
-            return _cluster.Values;
+            return _cluster.Values.ToArray();
         }
 
         public void Clear()
@@ -70,6 +63,6 @@ namespace VitalChoice.Caching.Services.Cache.Base
             _cluster.Clear();
         }
 
-        public bool IsEmpty => _cluster.IsEmpty;
+        public bool IsEmpty => _cluster.Count <= 0;
     }
 }

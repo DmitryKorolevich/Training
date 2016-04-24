@@ -333,22 +333,26 @@ namespace VC.Admin.Controllers
 
             if (!string.IsNullOrEmpty(model?.Customer.Email) && model.SignUpNewsletter.HasValue)
             {
-                var unsubscribed = _brontoService.GetIsUnsubscribed(model.Customer.Email);
+                var unsubscribed = await _brontoService.GetIsUnsubscribed(model.Customer.Email);
                 if (model.SignUpNewsletter.Value && (!unsubscribed.HasValue || unsubscribed.Value))
                 {
-                    await _brontoService.Subscribe(model.Customer.Email);
+                    _brontoService.Subscribe(model.Customer.Email).Start();
                 }
                 if (!model.SignUpNewsletter.Value)
                 {
                     if (!unsubscribed.HasValue)
                     {
                         //Resolve issue with showing the default value only the first time
-                        await _brontoService.Subscribe(model.Customer.Email);
-                        _brontoService.Unsubscribe(model.Customer.Email);
+                        _brontoService.Subscribe(model.Customer.Email)
+                            .ContinueWith((task) =>
+                            {
+                                task.GetAwaiter().GetResult();
+                                _brontoService.Unsubscribe(model.Customer.Email).Start();
+                            }).Start();
                     }
                     else if (!unsubscribed.Value)
                     {
-                        _brontoService.Unsubscribe(model.Customer.Email);
+                        _brontoService.Unsubscribe(model.Customer.Email).Start();
                     }
                 }
             }
@@ -365,9 +369,9 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpGet]
-        public Task<Result<bool>> GetIsBrontoSubscribed(string id)
+        public async Task<Result<bool>> GetIsBrontoSubscribed(string id)
         {
-            return Task.FromResult<Result<bool>>(!(_brontoService.GetIsUnsubscribed(id) ?? false));
+            return !(await _brontoService.GetIsUnsubscribed(id) ?? false);
         }
 
         #endregion

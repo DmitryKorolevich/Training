@@ -235,7 +235,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Settings)]
-        public async Task<Result<PagedList<ProfileScopeListItemModel>>> GetProfileScopeItems([FromBody]FilterBase filter)
+        public Task<Result<PagedList<ProfileScopeListItemModel>>> GetProfileScopeItems([FromBody]FilterBase filter)
         {
             PagedList<ProfileScopeListItemModel> toReturn=new PagedList<ProfileScopeListItemModel>();
             var scopes = PerformanceRequestService.GetWorkedScopes();
@@ -243,7 +243,7 @@ namespace VC.Admin.Controllers
             toReturn.Items = scopes.Skip((filter.Paging.PageIndex-1) *filter.Paging.PageItemCount).
                 Take(filter.Paging.PageItemCount).Select(p=>new ProfileScopeListItemModel(p)).ToList();
 
-            return toReturn;
+            return Task.FromResult<Result<PagedList<ProfileScopeListItemModel>>>(toReturn);
         }
 
         #endregion

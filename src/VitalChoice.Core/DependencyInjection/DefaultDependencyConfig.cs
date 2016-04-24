@@ -92,6 +92,7 @@ using VitalChoice.Infrastructure.ServiceBus.Base;
 using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Interfaces.Services.InventorySkus;
 using VitalChoice.Profiling;
+using VitalChoice.Profiling.Base;
 using VitalChoice.Profiling.Interfaces;
 #if !DOTNET5_4
 using VitalChoice.Caching.Interfaces;
@@ -103,14 +104,14 @@ namespace VitalChoice.Core.DependencyInjection
     public abstract class DefaultDependencyConfig : IDependencyConfig
     {
         public IContainer RegisterInfrastructure(IConfiguration configuration, IServiceCollection services,
-            Assembly projectAssembly, IApplicationEnvironment appEnv = null, bool enableCache=true)
+            Assembly projectAssembly, IApplicationEnvironment appEnv = null, bool enableCache = true)
         {
             // Add EF services to the services container.
 #if !DOTNET5_4
             if (enableCache)
             {
                 services.AddEntityFramework()
-                    .AddEntityFrameworkCache<ServiceBusCacheSyncProvider>(new[] {typeof (VitalChoiceContext), typeof (EcommerceContext)})
+                    .AddEntityFrameworkCache<ServiceBusCacheSyncProvider>(new[] {typeof(VitalChoiceContext), typeof(EcommerceContext)})
                     .AddSqlServer().InjectProfiler();
             }
             else
@@ -132,7 +133,7 @@ namespace VitalChoice.Core.DependencyInjection
                 x.Password.RequireDigit = true;
                 x.Password.RequireNonLetterOrDigit = true;
 
-	            PopulateCookieIdentityOptions(x.Cookies.ApplicationCookie);
+                PopulateCookieIdentityOptions(x.Cookies.ApplicationCookie);
             })
                 .AddEntityFrameworkStores<VitalChoiceContext, int>()
                 .AddErrorDescriber<ExtendedIdentityErrorDescriber>()
@@ -140,7 +141,6 @@ namespace VitalChoice.Core.DependencyInjection
                 .AddUserValidator<AdminUserValidator>()
                 .AddUserManager<ExtendedUserManager>()
                 .AddTokenProvider<UserTokenProvider>(IdentityConstants.TokenProviderName);
-
             //Temp work arround for using custom pre-configuration action logic(BaseControllerActionInvoker).
             services.TryAdd(
                 ServiceDescriptor
@@ -168,17 +168,17 @@ namespace VitalChoice.Core.DependencyInjection
             });
 
             services.Configure<MvcOptions>(ConfigureMvcOptions);
-
             StartCustomServicesRegistration(services);
-
             var builder = new ContainerBuilder();
 
-			if (appEnv != null)
-	        {
-				builder.RegisterInstance(appEnv).As<IApplicationEnvironment>();
-			}
-
-			builder.Populate(services);
+            if (appEnv != null)
+            {
+                builder.RegisterInstance(appEnv).As<IApplicationEnvironment>();
+            }
+            using (new ProfilingScope("Populate"))
+            {
+                builder.Populate(services);
+            }
             builder.RegisterInstance(configuration).As<IConfiguration>();
             builder.RegisterType<LoggerProviderExtended>()
                 .As<ILoggerProviderExtended>()
@@ -188,10 +188,10 @@ namespace VitalChoice.Core.DependencyInjection
 
             //TODO: omit ILogger override in config parameter
             builder.Register((cc, pp) => cc.Resolve<ILoggerProviderExtended>().CreateLogger("Root")).As<ILogger>();
-            builder.RegisterGeneric(typeof (Logger<>))
-                .WithParameter((pi, cc) => pi.ParameterType == typeof (ILoggerFactory),
+            builder.RegisterGeneric(typeof(Logger<>))
+                .WithParameter((pi, cc) => pi.ParameterType == typeof(ILoggerFactory),
                     (pi, cc) => cc.Resolve<ILoggerProviderExtended>().Factory)
-                .As(typeof (ILogger<>));
+                .As(typeof(ILogger<>));
 
             builder.RegisterType<LocalizationService>()
                 .As<ILocalizationService>()
@@ -204,7 +204,10 @@ namespace VitalChoice.Core.DependencyInjection
             AutofacExecutionContext.Configure(container);
 
             UnitOfWorkBase.SetOptions(container.Resolve<IOptions<AppOptionsBase>>());
-            LoggerService.Build(container.Resolve<IOptions<AppOptions>>(), container.Resolve<IApplicationEnvironment>());
+            using (new ProfilingScope("Build logger"))
+            {
+                LoggerService.Build(container.Resolve<IOptions<AppOptions>>(), container.Resolve<IApplicationEnvironment>());
+            }
             EcommerceContextBase.ServiceProvider = container.Resolve<IServiceProvider>();
             return container;
         }
@@ -213,10 +216,10 @@ namespace VitalChoice.Core.DependencyInjection
         {
             var inputFormatter =
                 (JsonInputFormatter)
-                    o.InputFormatters.SingleOrDefault(f => f.GetType() == typeof (JsonInputFormatter));
+                    o.InputFormatters.SingleOrDefault(f => f.GetType() == typeof(JsonInputFormatter));
             var outputFormatter =
                 (JsonOutputFormatter)
-                    o.OutputFormatters.SingleOrDefault(f => f.GetType() == typeof (JsonOutputFormatter));
+                    o.OutputFormatters.SingleOrDefault(f => f.GetType() == typeof(JsonOutputFormatter));
 
             if (inputFormatter != null)
             {
@@ -281,122 +284,122 @@ namespace VitalChoice.Core.DependencyInjection
             };
         }
 
-		protected virtual void ConfigureAppOptions(IConfiguration configuration, AppOptions options)
-		{
-			ConfigureBaseOptions(configuration, options);
-			options.GenerateLowercaseUrls =
-				Convert.ToBoolean(configuration.GetSection("App:GenerateLowercaseUrls").Value);
-			options.EnableBundlingAndMinification =
-				Convert.ToBoolean(configuration.GetSection("App:EnableBundlingAndMinification").Value);
-			options.Versioning = new Versioning()
-			{
-				EnableStaticContentVersioning =
-					Convert.ToBoolean(configuration.GetSection("App:Versioning:EnableStaticContentVersioning").Value),
-				BuildNumber =
-					Convert.ToBoolean(configuration.GetSection("App:Versioning:AutoGenerateBuildNumber").Value)
-						? Guid.NewGuid().ToString("N")
-						: configuration.GetSection("App:Versioning:BuildNumber").Value
-			};
-			options.DefaultCacheExpirationTermMinutes =
-				Convert.ToInt32(configuration.GetSection("App:DefaultCacheExpirationTermMinutes").Value);
-			options.ActivationTokenExpirationTermDays =
-				Convert.ToInt32(configuration.GetSection("App:ActivationTokenExpirationTermDays").Value);
-			options.DefaultCultureId = configuration.GetSection("App:DefaultCultureId").Value;
-			options.PublicHost = configuration.GetSection("App:PublicHost").Value;
-			options.AdminHost = configuration.GetSection("App:AdminHost").Value;
-			options.MainSuperAdminEmail = configuration.GetSection("App:MainSuperAdminEmail").Value;
-			options.CustomerServiceToEmail = configuration.GetSection("App:CustomerServiceToEmail").Value;
-			options.CustomerFeedbackToEmail = configuration.GetSection("App:CustomerFeedbackToEmail").Value;
-			options.FilesRelativePath = configuration.GetSection("App:FilesRelativePath").Value;
-			options.FilesPath = configuration.GetSection("App:FilesPath").Value;
-			options.EmailConfiguration = new Email
-			{
-				From = configuration.GetSection("App:Email:From").Value,
-				Host = configuration.GetSection("App:Email:Host").Value,
-				Port = Convert.ToInt32(configuration.GetSection("App:Email:Port").Value),
-				Secured = Convert.ToBoolean(configuration.GetSection("App:Email:Secured").Value),
-				Username = configuration.GetSection("App:Email:Username").Value,
-				Password = configuration.GetSection("App:Email:Password").Value,
-				Disabled = Convert.ToBoolean(configuration.GetSection("App:Email:Disabled").Value)
-			};
-			options.ExportService = new ExportService
-			{
-				PlainConnectionString = configuration.GetSection("App:ExportService:PlainConnectionString").Value,
-				EncryptedConnectionString = configuration.GetSection("App:ExportService:EncryptedConnectionString").Value,
-				EncryptedQueueName = configuration.GetSection("App:ExportService:EncryptedQueueName").Value,
-				PlainQueueName = configuration.GetSection("App:ExportService:PlainQueueName").Value,
-				CertThumbprint = configuration.GetSection("App:ExportService:CertThumbprint").Value,
-				RootThumbprint = configuration.GetSection("App:ExportService:RootThumbprint").Value,
-				EncryptionHostSessionExpire =
-					Convert.ToBoolean(
-						configuration.GetSection("App:ExportService:EncryptionHostSessionExpire").Value),
-				ServerHostName = configuration.GetSection("App:ExportService:ServerHostName").Value
-			};
-			options.AzureStorage = new AzureStorage()
-			{
-				StorageConnectionString = configuration.GetSection("App:AzureStorage:StorageConnectionString").Value,
-				CustomerContainerName = configuration.GetSection("App:AzureStorage:CustomerContainerName").Value,
-				BugTicketFilesContainerName =
-					configuration.GetSection("App:AzureStorage:BugTicketFilesContainerName").Value,
-				BugTicketCommentFilesContainerName =
-					configuration.GetSection("App:AzureStorage:BugTicketCommentFilesContainerName").Value,
+        protected virtual void ConfigureAppOptions(IConfiguration configuration, AppOptions options)
+        {
+            ConfigureBaseOptions(configuration, options);
+            options.GenerateLowercaseUrls =
+                Convert.ToBoolean(configuration.GetSection("App:GenerateLowercaseUrls").Value);
+            options.EnableBundlingAndMinification =
+                Convert.ToBoolean(configuration.GetSection("App:EnableBundlingAndMinification").Value);
+            options.Versioning = new Versioning()
+            {
+                EnableStaticContentVersioning =
+                    Convert.ToBoolean(configuration.GetSection("App:Versioning:EnableStaticContentVersioning").Value),
+                BuildNumber =
+                    Convert.ToBoolean(configuration.GetSection("App:Versioning:AutoGenerateBuildNumber").Value)
+                        ? Guid.NewGuid().ToString("N")
+                        : configuration.GetSection("App:Versioning:BuildNumber").Value
+            };
+            options.DefaultCacheExpirationTermMinutes =
+                Convert.ToInt32(configuration.GetSection("App:DefaultCacheExpirationTermMinutes").Value);
+            options.ActivationTokenExpirationTermDays =
+                Convert.ToInt32(configuration.GetSection("App:ActivationTokenExpirationTermDays").Value);
+            options.DefaultCultureId = configuration.GetSection("App:DefaultCultureId").Value;
+            options.PublicHost = configuration.GetSection("App:PublicHost").Value;
+            options.AdminHost = configuration.GetSection("App:AdminHost").Value;
+            options.MainSuperAdminEmail = configuration.GetSection("App:MainSuperAdminEmail").Value;
+            options.CustomerServiceToEmail = configuration.GetSection("App:CustomerServiceToEmail").Value;
+            options.CustomerFeedbackToEmail = configuration.GetSection("App:CustomerFeedbackToEmail").Value;
+            options.FilesRelativePath = configuration.GetSection("App:FilesRelativePath").Value;
+            options.FilesPath = configuration.GetSection("App:FilesPath").Value;
+            options.EmailConfiguration = new Email
+            {
+                From = configuration.GetSection("App:Email:From").Value,
+                Host = configuration.GetSection("App:Email:Host").Value,
+                Port = Convert.ToInt32(configuration.GetSection("App:Email:Port").Value),
+                Secured = Convert.ToBoolean(configuration.GetSection("App:Email:Secured").Value),
+                Username = configuration.GetSection("App:Email:Username").Value,
+                Password = configuration.GetSection("App:Email:Password").Value,
+                Disabled = Convert.ToBoolean(configuration.GetSection("App:Email:Disabled").Value)
+            };
+            options.ExportService = new ExportService
+            {
+                PlainConnectionString = configuration.GetSection("App:ExportService:PlainConnectionString").Value,
+                EncryptedConnectionString = configuration.GetSection("App:ExportService:EncryptedConnectionString").Value,
+                EncryptedQueueName = configuration.GetSection("App:ExportService:EncryptedQueueName").Value,
+                PlainQueueName = configuration.GetSection("App:ExportService:PlainQueueName").Value,
+                CertThumbprint = configuration.GetSection("App:ExportService:CertThumbprint").Value,
+                RootThumbprint = configuration.GetSection("App:ExportService:RootThumbprint").Value,
+                EncryptionHostSessionExpire =
+                    Convert.ToBoolean(
+                        configuration.GetSection("App:ExportService:EncryptionHostSessionExpire").Value),
+                ServerHostName = configuration.GetSection("App:ExportService:ServerHostName").Value
+            };
+            options.AzureStorage = new AzureStorage()
+            {
+                StorageConnectionString = configuration.GetSection("App:AzureStorage:StorageConnectionString").Value,
+                CustomerContainerName = configuration.GetSection("App:AzureStorage:CustomerContainerName").Value,
+                BugTicketFilesContainerName =
+                    configuration.GetSection("App:AzureStorage:BugTicketFilesContainerName").Value,
+                BugTicketCommentFilesContainerName =
+                    configuration.GetSection("App:AzureStorage:BugTicketCommentFilesContainerName").Value,
                 AppFilesContainerName =
                     configuration.GetSection("App:AzureStorage:AppFilesContainerName").Value,
                 ProductGoogleFeedFileName =
                     configuration.GetSection("App:AzureStorage:ProductGoogleFeedFileName").Value,
             };
-			options.FedExOptions = new FedExOptions()
-			{
-				AccountNumber = configuration.GetSection("App:FedExOptions:AccountNumber").Value,
-				MeterNumber = configuration.GetSection("App:FedExOptions:MeterNumber").Value,
-				MerchantPhoneNumber = configuration.GetSection("App:FedExOptions:MerchantPhoneNumber").Value,
-				Key = configuration.GetSection("App:FedExOptions:Key").Value,
-				Password = configuration.GetSection("App:FedExOptions:Password").Value,
-				PayAccountNumber = configuration.GetSection("App:FedExOptions:PayAccountNumber").Value,
-				ShipServiceUrl = configuration.GetSection("App:FedExOptions:ShipServiceUrl").Value,
-				LocatorServiceUrl = configuration.GetSection("App:FedExOptions:LocatorServiceUrl").Value,
-			};
-			options.Avatax = new AvataxOptions
-			{
-				AccountNumber = configuration.GetSection("App:Avatax:AccountNumber").Value,
-				CompanyCode = configuration.GetSection("App:Avatax:CompanyCode").Value,
-				AccountName = configuration.GetSection("App:Avatax:AccountName").Value,
-				LicenseKey = configuration.GetSection("App:Avatax:LicenseKey").Value,
-				ProfileName = configuration.GetSection("App:Avatax:ProfileName").Value,
-				ServiceUrl = configuration.GetSection("App:Avatax:ServiceUrl").Value,
-				TurnOffCommit = Convert.ToBoolean(configuration.GetSection("App:Avatax:TurnOffCommit").Value)
-			};
-			options.GoogleCaptcha = new GoogleCaptcha
-			{
-				PublicKey = configuration.GetSection("App:GoogleCaptcha:PublicKey").Value,
-				SecretKey = configuration.GetSection("App:GoogleCaptcha:SecretKey").Value,
-				VerifyUrl = configuration.GetSection("App:GoogleCaptcha:VerifyUrl").Value
-			};
-			options.AuthorizeNet = new AuthorizeNet
-			{
-				ApiKey = configuration.GetSection("App:AuthorizeNet:ApiKey").Value,
-				ApiLogin = configuration.GetSection("App:AuthorizeNet:ApiLogin").Value,
-				TestEnv = Convert.ToBoolean(configuration.GetSection("App:AuthorizeNet:TestEnv").Value)
-			};
-			var section = configuration.GetSection("App:CacheSyncOptions");
-			options.CacheSyncOptions = new CacheSyncOptions
-			{
-				ConnectionString = section["ConnectionString"],
-				ServiceBusQueueName = section["ServiceBusQueueName"],
-				Enabled = Convert.ToBoolean(section["Enabled"])
-			};
-			section = configuration.GetSection("App:Bronto");
-			options.Bronto = new BrontoSettings
-			{
-				ApiKey = section["ApiKey"],
-				ApiUrl = section["ApiUrl"],
-				PublicFormUrl = section["PublicFormUrl"],
-				PublicFormSendData = section["PublicFormSendData"],
-				PublicFormSubscribeData = section["PublicFormSubscribeData"],
-			};
-		}
+            options.FedExOptions = new FedExOptions()
+            {
+                AccountNumber = configuration.GetSection("App:FedExOptions:AccountNumber").Value,
+                MeterNumber = configuration.GetSection("App:FedExOptions:MeterNumber").Value,
+                MerchantPhoneNumber = configuration.GetSection("App:FedExOptions:MerchantPhoneNumber").Value,
+                Key = configuration.GetSection("App:FedExOptions:Key").Value,
+                Password = configuration.GetSection("App:FedExOptions:Password").Value,
+                PayAccountNumber = configuration.GetSection("App:FedExOptions:PayAccountNumber").Value,
+                ShipServiceUrl = configuration.GetSection("App:FedExOptions:ShipServiceUrl").Value,
+                LocatorServiceUrl = configuration.GetSection("App:FedExOptions:LocatorServiceUrl").Value,
+            };
+            options.Avatax = new AvataxOptions
+            {
+                AccountNumber = configuration.GetSection("App:Avatax:AccountNumber").Value,
+                CompanyCode = configuration.GetSection("App:Avatax:CompanyCode").Value,
+                AccountName = configuration.GetSection("App:Avatax:AccountName").Value,
+                LicenseKey = configuration.GetSection("App:Avatax:LicenseKey").Value,
+                ProfileName = configuration.GetSection("App:Avatax:ProfileName").Value,
+                ServiceUrl = configuration.GetSection("App:Avatax:ServiceUrl").Value,
+                TurnOffCommit = Convert.ToBoolean(configuration.GetSection("App:Avatax:TurnOffCommit").Value)
+            };
+            options.GoogleCaptcha = new GoogleCaptcha
+            {
+                PublicKey = configuration.GetSection("App:GoogleCaptcha:PublicKey").Value,
+                SecretKey = configuration.GetSection("App:GoogleCaptcha:SecretKey").Value,
+                VerifyUrl = configuration.GetSection("App:GoogleCaptcha:VerifyUrl").Value
+            };
+            options.AuthorizeNet = new AuthorizeNet
+            {
+                ApiKey = configuration.GetSection("App:AuthorizeNet:ApiKey").Value,
+                ApiLogin = configuration.GetSection("App:AuthorizeNet:ApiLogin").Value,
+                TestEnv = Convert.ToBoolean(configuration.GetSection("App:AuthorizeNet:TestEnv").Value)
+            };
+            var section = configuration.GetSection("App:CacheSyncOptions");
+            options.CacheSyncOptions = new CacheSyncOptions
+            {
+                ConnectionString = section["ConnectionString"],
+                ServiceBusQueueName = section["ServiceBusQueueName"],
+                Enabled = Convert.ToBoolean(section["Enabled"])
+            };
+            section = configuration.GetSection("App:Bronto");
+            options.Bronto = new BrontoSettings
+            {
+                ApiKey = section["ApiKey"],
+                ApiUrl = section["ApiUrl"],
+                PublicFormUrl = section["PublicFormUrl"],
+                PublicFormSendData = section["PublicFormSendData"],
+                PublicFormSubscribeData = section["PublicFormSubscribeData"],
+            };
+        }
 
-		public IContainer BuildContainer(Assembly projectAssembly, ContainerBuilder builder)
+        public IContainer BuildContainer(Assembly projectAssembly, ContainerBuilder builder)
         {
             builder.RegisterType<VitalChoiceContext>()
                 .As<IDataContextAsync>()
@@ -405,18 +408,18 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<EcommerceContext>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<LogsContext>().InstancePerLifetimeScope();
-	        builder.RegisterGeneric(typeof (RepositoryAsync<>))
-                .As(typeof (IRepositoryAsync<>)).InstancePerLifetimeScope();
-            builder.RegisterGeneric(typeof (ReadRepositoryAsync<>))
-                .As(typeof (IReadRepositoryAsync<>)).InstancePerLifetimeScope(); 
-            builder.RegisterGeneric(typeof (EcommerceRepositoryAsync<>))
-                .As(typeof (IEcommerceRepositoryAsync<>))
+            builder.RegisterGeneric(typeof(RepositoryAsync<>))
+                .As(typeof(IRepositoryAsync<>)).InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof(ReadRepositoryAsync<>))
+                .As(typeof(IReadRepositoryAsync<>)).InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof(EcommerceRepositoryAsync<>))
+                .As(typeof(IEcommerceRepositoryAsync<>))
                 .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>()).InstancePerLifetimeScope();
-            builder.RegisterGeneric(typeof (LogsRepositoryAsync<>))
-                .As(typeof (ILogsRepositoryAsync<>))
+            builder.RegisterGeneric(typeof(LogsRepositoryAsync<>))
+                .As(typeof(ILogsRepositoryAsync<>))
                 .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<LogsContext>()).InstancePerLifetimeScope();
-            builder.RegisterGeneric(typeof (GenericService<>))
-                .As(typeof (IGenericService<>)).InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof(GenericService<>))
+                .As(typeof(IGenericService<>)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(CsvExportService<,>))
                 .As(typeof(ICsvExportService<,>)).SingleInstance();
             builder.RegisterType<ContentEditService>().As<IContentEditService>().InstancePerLifetimeScope();
@@ -433,29 +436,33 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<MemoryCache>().As<IMemoryCache>().SingleInstance();
             builder.RegisterType<CacheProvider>().As<ICacheProvider>().SingleInstance();
             builder.RegisterType<AppInfrastructureService>().As<IAppInfrastructureService>().InstancePerLifetimeScope();
-	        builder.RegisterType<AdminUserService>().As<IAdminUserService>().InstancePerLifetimeScope();
+            builder.RegisterType<AdminUserService>().As<IAdminUserService>().InstancePerLifetimeScope();
 
-	        builder.RegisterType<StorefrontUserStore>().Named<IUserStore<ApplicationUser>>("storefronUserStore").InstancePerLifetimeScope();
-	        builder.RegisterType<StorefrontUserValidator>().Named<IUserValidator<ApplicationUser>>("storefrontUserValidator").InstancePerLifetimeScope();
-	        builder.RegisterType<ExtendedUserManager>()
-		        .Named<ExtendedUserManager>("storefrontUserManager")
-		        .WithParameter((pi, cc) => pi.Name == "store",
-			        (pi, cc) => cc.ResolveNamed<IUserStore<ApplicationUser>>("storefronUserStore")).InstancePerLifetimeScope();
-	        builder.RegisterType<SignInManager<ApplicationUser>>()
-		        .Named<SignInManager<ApplicationUser>>("storefrontSignInManager")
-		        .WithParameter((pi, cc) => pi.Name == "userManager",
-			        (pi, cc) => cc.ResolveNamed<ExtendedUserManager>("storefrontUserManager")).InstancePerLifetimeScope();
-	        builder.RegisterType<StorefrontUserService>()
-		        .As<IStorefrontUserService>()
-		        .WithParameter((pi, cc) => pi.Name == "userManager",
-			        (pi, cc) => cc.ResolveNamed<ExtendedUserManager>("storefrontUserManager"))
-		        .WithParameter((pi, cc) => pi.Name == "userValidator",
-			        (pi, cc) => cc.ResolveNamed<IUserValidator<ApplicationUser>>("storefrontUserValidator"))
-		        .WithParameter((pi, cc) => pi.Name == "signInManager",
-			        (pi, cc) => cc.ResolveNamed<SignInManager<ApplicationUser>>("storefrontSignInManager")).InstancePerLifetimeScope();
+            builder.RegisterType<StorefrontUserStore>().Named<IUserStore<ApplicationUser>>("storefronUserStore").InstancePerLifetimeScope();
+            builder.RegisterType<StorefrontUserValidator>()
+                .Named<IUserValidator<ApplicationUser>>("storefrontUserValidator")
+                .InstancePerLifetimeScope();
+            builder.RegisterType<ExtendedUserManager>()
+                .Named<ExtendedUserManager>("storefrontUserManager")
+                .WithParameter((pi, cc) => pi.Name == "store",
+                    (pi, cc) => cc.ResolveNamed<IUserStore<ApplicationUser>>("storefronUserStore")).InstancePerLifetimeScope();
+            builder.RegisterType<SignInManager<ApplicationUser>>()
+                .Named<SignInManager<ApplicationUser>>("storefrontSignInManager")
+                .WithParameter((pi, cc) => pi.Name == "userManager",
+                    (pi, cc) => cc.ResolveNamed<ExtendedUserManager>("storefrontUserManager")).InstancePerLifetimeScope();
+            builder.RegisterType<StorefrontUserService>()
+                .As<IStorefrontUserService>()
+                .WithParameter((pi, cc) => pi.Name == "userManager",
+                    (pi, cc) => cc.ResolveNamed<ExtendedUserManager>("storefrontUserManager"))
+                .WithParameter((pi, cc) => pi.Name == "userValidator",
+                    (pi, cc) => cc.ResolveNamed<IUserValidator<ApplicationUser>>("storefrontUserValidator"))
+                .WithParameter((pi, cc) => pi.Name == "signInManager",
+                    (pi, cc) => cc.ResolveNamed<SignInManager<ApplicationUser>>("storefrontSignInManager")).InstancePerLifetimeScope();
 
             builder.RegisterType<AffiliateUserStore>().Named<IUserStore<ApplicationUser>>("affiliateUserStore").InstancePerLifetimeScope();
-            builder.RegisterType<UserValidator<ApplicationUser>>().Named<IUserValidator<ApplicationUser>>("affiliateUserValidator").InstancePerLifetimeScope();
+            builder.RegisterType<UserValidator<ApplicationUser>>()
+                .Named<IUserValidator<ApplicationUser>>("affiliateUserValidator")
+                .InstancePerLifetimeScope();
             builder.RegisterType<ExtendedUserManager>()
                 .Named<ExtendedUserManager>("affiliateUserManager")
                 .WithParameter((pi, cc) => pi.Name == "store",
@@ -472,8 +479,8 @@ namespace VitalChoice.Core.DependencyInjection
                     (pi, cc) => cc.ResolveNamed<IUserValidator<ApplicationUser>>("affiliateUserValidator"))
                 .WithParameter((pi, cc) => pi.Name == "signInManager",
                     (pi, cc) => cc.ResolveNamed<SignInManager<ApplicationUser>>("affiliateSignInManager")).InstancePerLifetimeScope();
-            builder.RegisterType<CategoryViewService>().As<ICategoryViewService>().InstancePerLifetimeScope(); 
-			builder.RegisterType<ProductViewService>().As<IProductViewService>().InstancePerLifetimeScope();
+            builder.RegisterType<CategoryViewService>().As<ICategoryViewService>().InstancePerLifetimeScope();
+            builder.RegisterType<ProductViewService>().As<IProductViewService>().InstancePerLifetimeScope();
             builder.RegisterType<ContentPageViewService>().As<IContentPageViewService>().InstancePerLifetimeScope();
             builder.RegisterType<ProductCategoryService>().As<IProductCategoryService>().InstancePerLifetimeScope();
             builder.RegisterType<InventoryCategoryService>().As<IInventoryCategoryService>().InstancePerLifetimeScope();
@@ -529,7 +536,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<CatalogRequestAddressService>().As<ICatalogRequestAddressService>().InstancePerLifetimeScope();
             builder.RegisterType<HealthwiseService>().As<IHealthwiseService>().InstancePerLifetimeScope();
             builder.RegisterType<RedirectService>().As<IRedirectService>().InstancePerLifetimeScope();
-			builder.RegisterType<EmailTemplateService>().As<IEmailTemplateService>().InstancePerLifetimeScope();
+            builder.RegisterType<EmailTemplateService>().As<IEmailTemplateService>().InstancePerLifetimeScope();
             builder.RegisterType<CheckoutService>().As<ICheckoutService>().InstancePerLifetimeScope();
             builder.RegisterType<TrackingService>().As<ITrackingService>().InstancePerLifetimeScope();
             builder.RegisterType<OrderSchedulerService>().As<IOrderSchedulerService>().InstancePerLifetimeScope();
@@ -537,14 +544,14 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<ContentCrossSellService>().As<IContentCrossSellService>().InstancePerLifetimeScope();
             builder.RegisterType<InventorySkuCategoryService>().As<IInventorySkuCategoryService>().InstancePerLifetimeScope();
             builder.RegisterType<InventorySkuService>().As<IInventorySkuService>().InstancePerLifetimeScope();
-            builder.RegisterType<BrontoService>().As<BrontoService>().InstancePerLifetimeScope();
+            builder.RegisterType<BrontoService>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<ServiceCodeService>().As<IServiceCodeService>().InstancePerLifetimeScope();
             builder.RegisterType<OrderReportService>().As<IOrderReportService>().InstancePerLifetimeScope();
             builder.RegisterMappers(typeof(ProductService).GetTypeInfo().Assembly, (type, registration) =>
             {
                 if (type == typeof(SkuMapper))
                 {
-                    return registration.OnActivated(a => ((SkuMapper)a.Instance).ProductMapper = a.Context.Resolve<ProductMapper>());
+                    return registration.OnActivated(a => ((SkuMapper) a.Instance).ProductMapper = a.Context.Resolve<ProductMapper>());
                 }
                 return registration;
             });
@@ -554,23 +561,23 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterGeneric(typeof(ExtendedEcommerceDynamicService<,,,>))
                 .As(typeof(IExtendedDynamicServiceAsync<,,,>)).InstancePerLifetimeScope();
 
-            builder.RegisterGenericServiceDecorator(typeof (EcommerceDynamicServiceDecorator<,>), "extendedService")
-                .As(typeof (IDynamicServiceAsync<,>)).InstancePerLifetimeScope();
+            builder.RegisterGenericServiceDecorator(typeof(EcommerceDynamicServiceDecorator<,>), "extendedService")
+                .As(typeof(IDynamicServiceAsync<,>)).InstancePerLifetimeScope();
 
             builder.RegisterGenericServiceDecorator(typeof(EcommerceDynamicReadServiceDecorator<,>), "extendedService")
                 .As(typeof(IDynamicReadServiceAsync<,>)).InstancePerLifetimeScope();
 
-            builder.RegisterGenericServiceDecorator(typeof (ExtendedEcommerceDynamicReadServiceDecorator<,>), "extendedService")
-                .As(typeof (IExtendedDynamicReadServiceAsync<,>)).InstancePerLifetimeScope();
+            builder.RegisterGenericServiceDecorator(typeof(ExtendedEcommerceDynamicReadServiceDecorator<,>), "extendedService")
+                .As(typeof(IExtendedDynamicReadServiceAsync<,>)).InstancePerLifetimeScope();
 
-            builder.RegisterGeneric(typeof (TreeSetup<,>)).As(typeof (ITreeSetup<,>)).InstancePerLifetimeScope();
-		    builder.RegisterType<TreeSetupCleaner>().As<ITreeSetupCleaner>().InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof(TreeSetup<,>)).As(typeof(ITreeSetup<,>)).InstancePerLifetimeScope();
+            builder.RegisterType<TreeSetupCleaner>().As<ITreeSetupCleaner>().InstancePerLifetimeScope();
             builder.RegisterContentBase();
             builder.RegisterDynamicsBase();
             builder.RegisterType<DynamicExtensionsRewriter>()
                 .AsSelf()
                 .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>()).InstancePerLifetimeScope();
-            builder.RegisterProcessors(typeof (ProductCategoryProcessor).GetTypeInfo().Assembly);
+            builder.RegisterProcessors(typeof(ProductCategoryProcessor).GetTypeInfo().Assembly);
             builder.RegisterType<TaxService>().As<ITaxService>().InstancePerLifetimeScope();
             builder.RegisterType<AddressService>().As<IAddressService>().InstancePerLifetimeScope();
             builder.RegisterType<AvalaraTax>().As<IAvalaraTax>().InstancePerLifetimeScope();
@@ -580,21 +587,22 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<ReCaptchaValidator>().AsSelf().SingleInstance();
             builder.RegisterType<CountryNameCodeResolver>().As<ICountryNameCodeResolver>()
                 .InstancePerLifetimeScope();
-#if NET451
+#if !DOTNET5_4
             builder.RegisterType<EncryptedServiceBusHostClient>().As<IEncryptedServiceBusHostClient>().SingleInstance();
 #endif
             builder.RegisterType<ObjectEncryptionHost>()
                 .As<IObjectEncryptionHost>()
-                .WithParameter((pi, cc) => pi.ParameterType == typeof (ILogger),
-                    (pi, cc) => cc.Resolve<ILoggerProviderExtended>().CreateLogger(typeof (ObjectEncryptionHost)))
+                .WithParameter((pi, cc) => pi.ParameterType == typeof(ILogger),
+                    (pi, cc) => cc.Resolve<ILoggerProviderExtended>().CreateLogger(typeof(ObjectEncryptionHost)))
                 .SingleInstance();
             builder.RegisterType<EncryptedOrderExportService>().As<IEncryptedOrderExportService>().InstancePerLifetimeScope();
-            builder.RegisterGeneric(typeof (TransactionAccessor<>)).As(typeof (ITransactionAccessor<>)).InstancePerLifetimeScope();
-			builder.RegisterType<ExtendedClaimsPrincipalFactory>().As<IUserClaimsPrincipalFactory<ApplicationUser>>().InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof(TransactionAccessor<>)).As(typeof(ITransactionAccessor<>)).InstancePerLifetimeScope();
+            builder.RegisterType<ExtendedClaimsPrincipalFactory>()
+                .As<IUserClaimsPrincipalFactory<ApplicationUser>>()
+                .InstancePerLifetimeScope();
             builder.RegisterType<PageResultService>().As<IPageResultService>().SingleInstance();
 
             FinishCustomRegistrations(builder);
-
             var container = builder.Build();
             return container;
         }
@@ -604,18 +612,18 @@ namespace VitalChoice.Core.DependencyInjection
 
         }
 
-		protected virtual void FinishCustomRegistrations(ContainerBuilder builder)
-	    {
-	    }
+        protected virtual void FinishCustomRegistrations(ContainerBuilder builder)
+        {
+        }
 
         protected virtual void AddMvc(IServiceCollection services)
         {
             services.AddMvc();
         }
 
-	    protected virtual void PopulateCookieIdentityOptions(CookieAuthenticationOptions options)
-	    {
-			options.AuthenticationScheme = IdentityCookieOptions.ApplicationCookieAuthenticationType;
-		}
+        protected virtual void PopulateCookieIdentityOptions(CookieAuthenticationOptions options)
+        {
+            options.AuthenticationScheme = IdentityCookieOptions.ApplicationCookieAuthenticationType;
+        }
     }
 }

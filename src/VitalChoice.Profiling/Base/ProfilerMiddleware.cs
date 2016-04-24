@@ -33,8 +33,13 @@ namespace VitalChoice.Profiling.Base
                 {
                     try
                     {
-                        scope.Stop();
-                        _request.OnFinishedRequest(scope);
+#if !DOTNET5_4
+                        if (scope.GetStackCount() == 1)
+                        {
+                            scope.Stop();
+                            _request.OnFinishedRequest(scope);
+                        }
+#endif
                     }
                     catch (Exception e)
                     {

@@ -415,6 +415,15 @@ namespace VitalChoice.Caching.Services.Cache
             return CacheStorage.AllCacheDatas.Any(d => d.ItemExist(pk));
         }
 
+        public bool ItemExistAndNotNull(EntityKey pk)
+        {
+            return CacheStorage.AllCacheDatas.Any(d =>
+            {
+                var cached = d.Get(pk);
+                return cached?.EntityUntyped != null;
+            });
+        }
+
         public bool GetCacheExist(RelationInfo relationInfo)
         {
             return CacheStorage.GetCacheExist(relationInfo);

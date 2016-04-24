@@ -24,8 +24,9 @@ namespace VitalChoice.Profiling.Base
 
         private Stopwatch _stopwatch;
         private volatile List<ProfilingScope> _subScopes;
-        
-        public ProfilingScope(object data)
+        private readonly Stack<ProfilingScope> _scopeStack;
+
+        public ProfilingScope(object data, int skipFrames = 1)
         {
             if (Enabled)
             {
@@ -34,17 +35,21 @@ namespace VitalChoice.Profiling.Base
                     _currentId++;
                     Id = _currentId;
                 }
-                var scopeStack = GetProfileStack();
-                lock (scopeStack)
+                _scopeStack = GetProfileStack();
+                lock (_scopeStack)
                 {
-                    scopeStack.Push(this);
+                    _scopeStack.Push(this);
                 }
                 _stopwatch = new Stopwatch();
 #if !DOTNET5_4
-                var stackFrame = new StackFrame(1, false);
+                var stackFrame = new StackFrame(skipFrames, false);
                 var method = stackFrame.GetMethod();
                 ClassType = method.DeclaringType;
                 MethodName = method.Name;
+                if (data == null)
+                {
+                    data = MethodName;
+                }
 #endif
                 Data = data;
                 _stopwatch.Start();
@@ -65,7 +70,13 @@ namespace VitalChoice.Profiling.Base
             return string.Empty;
         }
 
+        public int GetStackCount()
+        {
+            return _scopeStack?.Count ?? 0;
+        }
+
 #if !DOTNET5_4
+
         public static ProfilingScope GetRootScope()
         {
             var stack = GetProfileStack();
@@ -92,7 +103,9 @@ namespace VitalChoice.Profiling.Base
         }
 #endif
         public long Id { get; }
+
         public static bool Enabled { get; set; }
+
         public List<object> AdditionalData { get; private set; }
 
         public IReadOnlyCollection<ProfilingScope> SubScopes => _subScopes?.ToArray() ?? EmptyList;

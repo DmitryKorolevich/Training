@@ -23,8 +23,6 @@ namespace VC.Public.Controllers.Content
             _articleViewService = articleViewService;
         }
 
-        private readonly IContentEditService _contentService;
-
         [HttpGet]
         public async Task<IActionResult> Categories()
         {

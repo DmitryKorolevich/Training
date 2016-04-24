@@ -121,7 +121,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
                 MemberExpression memberExpression;
                 string name;
                 Type relationType;
-                Type elementType;
+                //Type elementType;
                 switch (node.Method.Name)
                 {
                     case "Include":
@@ -131,7 +131,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
                         relationType = memberExpression?.Type;
                         Type ownType = memberExpression?.Expression.Type;
 
-                        elementType = relationType.TryGetElementType(typeof (ICollection<>)) ?? relationType;
+                        //elementType = relationType.TryGetElementType(typeof (ICollection<>)) ?? relationType;
 
                         if (name == null)
                         {
@@ -140,7 +140,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
 
                         if (!Relations.RelationsDict.TryGetValue(name, out _currentRelation))
                         {
-                            _currentRelation = CompiledRelationsCache.GetRelation(name, elementType, ownType, lambda);
+                            _currentRelation = CompiledRelationsCache.GetRelation(name, relationType, ownType, lambda);
                             Relations.RelationsDict.Add(_currentRelation.Name, _currentRelation);
                         }
                         break;
@@ -154,7 +154,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
                         }
                         relationType = memberExpression.Type;
 
-                        elementType = relationType.TryGetElementType(typeof(ICollection<>)) ?? relationType;
+                        //elementType = relationType.TryGetElementType(typeof(ICollection<>)) ?? relationType;
 
                         if (_currentRelation == null)
                             throw new InvalidOperationException("ThenInclude used before Include, need investigation");
@@ -162,7 +162,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
                         RelationInfo newCurrent;
                         if (!_currentRelation.RelationsDict.TryGetValue(name, out newCurrent))
                         {
-                            var relationInfo = CompiledRelationsCache.GetRelation(name, elementType, _currentRelation.RelationType,
+                            var relationInfo = CompiledRelationsCache.GetRelation(name, relationType, _currentRelation.RelationType,
                                 lambdaExpression);
                             _currentRelation.RelationsDict.Add(name, relationInfo);
                             newCurrent = relationInfo;
