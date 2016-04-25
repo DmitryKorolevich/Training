@@ -126,7 +126,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 $scope.countries = result.countriesCall.data.Data;
 
                 $scope.currentCustomer = result.customerGetCall.data.Data;
-
+                if ($scope.currentCustomer.InceptionDate)
+                {
+                    $scope.currentCustomer.InceptionDate = Date.parseDateTime($scope.currentCustomer.InceptionDate);
+                }
                 $scope.options.DBStatusCode = $scope.currentCustomer.StatusCode;
 
                 customerEditService.syncCountry($scope, $scope.order.Shipping);

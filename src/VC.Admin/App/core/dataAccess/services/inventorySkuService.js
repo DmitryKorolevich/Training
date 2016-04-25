@@ -69,5 +69,9 @@ angular.module('app.core.dataAccess.services.inventorySkuService', [])
 	        return baseUrl + 'GetInventorySkuUsageReportFile?from={0}&to={1}&skuids={2}&invskuids={3}&buildNumber={4}'
                 .format(filter.From, filter.To, filter.sSkuIds, filter.sInvSkuIds, buildNumber);
 	    },
+	    getInventoriesSummaryUsageReport: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetInventoriesSummaryUsageReport', filter, getConfig(tracker));
+	    },
 	};
 }]);

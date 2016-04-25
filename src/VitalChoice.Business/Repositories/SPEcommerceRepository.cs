@@ -86,5 +86,26 @@ namespace VitalChoice.Data.Repositories.Customs
                 filter.From, filter.To, sSkuIds, sInvSkuIds).ToListAsync();
             return toReturn;
         }
+
+        public async Task<ICollection<InventoriesSummaryUsageRawReportItem>> GetInventoriesSummaryUsageReportAsync(InventoriesSummaryUsageReportFilter filter)
+        {
+            string sIdsInvCat = null;
+            if (filter.IdsInvCat != null && filter.IdsInvCat.Count > 0)
+            {
+                sIdsInvCat = string.Empty;
+                for (int i = 0; i < filter.IdsInvCat.Count; i++)
+                {
+                    sIdsInvCat += filter.IdsInvCat[i];
+                    if (i != filter.IdsInvCat.Count - 1)
+                    {
+                        sIdsInvCat += ",";
+                    }
+                }
+            }
+
+            var toReturn = await Context.Set<InventoriesSummaryUsageRawReportItem>().FromSql("[dbo].[SPGetInventoriesSummaryUsageReport] @from={0}, @to={1}, @sku={2}, @invsku={3}, @assemble={4} @idsinvcat={5}",
+                filter.From, filter.To, filter.Sku, filter.InvSku, filter.Assemble, sIdsInvCat).ToListAsync();
+            return toReturn;
+        }
     }
 }

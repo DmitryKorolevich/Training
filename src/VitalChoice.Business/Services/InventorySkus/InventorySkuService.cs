@@ -24,6 +24,7 @@ using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Content;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.InventorySkus;
@@ -303,6 +304,116 @@ namespace VitalChoice.Business.Services.InventorySkus
             }
 
             return null;
+        }
+
+        public async Task<InventoriesSummaryUsageReport> GetInventoriesSummaryUsageReportAsync(InventoriesSummaryUsageReportFilter filter)
+        {
+            InventoriesSummaryUsageReport toReturn=new InventoriesSummaryUsageReport();
+
+            var categoryTree = new InventorySkuCategory();
+            categoryTree.SubCategories = await _inventorySkuCategoryService.GetCategoriesTreeAsync(new InventorySkuCategoryTreeFilter());
+            var data = await _sPEcommerceRepository.GetInventoriesSummaryUsageReportAsync(filter);
+            var invIds = data.Select(p => p.IdInventorySku).Distinct().ToList();
+            var inventories = await this.SelectAsync(invIds);
+
+            List<InventoriesSummaryUsageDateItem> dates=new List<InventoriesSummaryUsageDateItem>();
+
+            DateTime current = filter.From;
+            current = new DateTime(current.Year, current.Month, 1, current.Hour, current.Minute, current.Second);
+            dates.Add(new InventoriesSummaryUsageDateItem()
+            {
+                Date = current
+            });
+            while (current.AddMonths(1) < filter.To)
+            {
+                current = current.AddMonths(1);
+                dates.Add(new InventoriesSummaryUsageDateItem()
+                {
+                    Date = current
+                });
+            }
+
+            toReturn.TotalItems=new List<InventoriesSummaryUsageDateItem>(dates);
+
+            foreach (var inventoriesSummaryUsageRawReportItem in data)
+            {
+                var inventory = inventories.FirstOrDefault(p=>p.Id==inventoriesSummaryUsageRawReportItem.IdInventorySku);
+                if(inventory==null)
+                    continue;
+
+                InventoriesSummaryUsageCategoryItem categoryItem = null;
+                var category = FindUICategory(categoryTree, inventory.IdInventorySkuCategory);
+                if (category != null)
+                {
+                    categoryItem = toReturn.Categories.FirstOrDefault(p => p.Id == category.Id);
+                    if (categoryItem == null)
+                    {
+                        categoryItem = new InventoriesSummaryUsageCategoryItem()
+                        {
+                            Id = category.Id,
+                            Name = category.Name,
+                            TotalItems = new List<InventoriesSummaryUsageDateItem>(dates),
+                        };
+                        toReturn.Categories.Add(categoryItem);
+                    }
+                }
+                else
+                {
+                    categoryItem = toReturn.Categories.FirstOrDefault(p => !p.Id.HasValue);
+                    if (categoryItem == null)
+                    {
+                        categoryItem = new InventoriesSummaryUsageCategoryItem()
+                        {
+                            Id = null,
+                            Name = "Not Specified",
+                            TotalItems = new List<InventoriesSummaryUsageDateItem>(dates),
+                        };
+                        toReturn.Categories.Add(categoryItem);
+                    }
+                }
+
+                InventoriesSummaryUsageInventoryItem inventoryItem = categoryItem.Inventories.FirstOrDefault(p => p.Id == inventoriesSummaryUsageRawReportItem.IdInventorySku);
+                if (inventoryItem == null)
+                {
+                    inventoryItem = new InventoriesSummaryUsageInventoryItem()
+                    {
+                        Id = inventory.Id,
+                        Code = inventory.Code,
+                        Description = inventory.Description,
+                        UnitOfMeasure = inventory.SafeData.UnitOfMeasure,
+                        UnitOfMeasureAmount = inventory.SafeData.UnitOfMeasureAmount,
+                        Items = new List<InventoriesSummaryUsageDateItem>(dates),
+                    };
+                    categoryItem.Inventories.Add(inventoryItem);
+                }
+
+                InventoriesSummaryUsageDateItem dateItem = inventoryItem.Items.FirstOrDefault(p=>p.Date== inventoriesSummaryUsageRawReportItem.Date);
+                if (dateItem != null)
+                {
+                    var quantity = inventoriesSummaryUsageRawReportItem.Quantity*inventory.SafeData.Quantity;
+                    dateItem.Quantity += quantity;
+                    inventoryItem.GrandTotal += quantity;
+                }
+            }
+
+            foreach (var inventoriesSummaryUsageCategoryItem in toReturn.Categories)
+            {
+                foreach (var dateItem in inventoriesSummaryUsageCategoryItem.TotalItems)
+                {
+                    dateItem.Quantity = inventoriesSummaryUsageCategoryItem.Inventories.SelectMany(p => p.Items)
+                            .Where(p => p.Date == dateItem.Date)
+                            .Sum(p => p.Quantity);
+                    inventoriesSummaryUsageCategoryItem.GrandTotal += dateItem.Quantity;
+                }
+            }
+
+            foreach (var dateItem in toReturn.TotalItems)
+            {
+                dateItem.Quantity = toReturn.Categories.SelectMany(p => p.TotalItems).Where(p => p.Date == dateItem.Date).Sum(p => p.Quantity);
+                toReturn.GrandTotal += dateItem.Quantity;
+            }
+
+            return toReturn;
         }
     }
 }

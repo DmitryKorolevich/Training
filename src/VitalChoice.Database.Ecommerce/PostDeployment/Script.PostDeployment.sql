@@ -39,3 +39,4 @@ Post-Deployment Script Template
 :r .\Scripts\VAutoShips.sql
 :r .\Scripts\TFGetTableIdsByString.sql
 :r .\Scripts\SPGetInventorySkusUsageReport.sql
+:r .\Scripts\SPGetInventoriesSummaryUsageReport.sql

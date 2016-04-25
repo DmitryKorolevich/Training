@@ -268,6 +268,15 @@ namespace VC.Admin.Controllers
             return File(data, "text/csv");
         }
 
+        [HttpPost]
+        public async Task<Result<InventoriesSummaryUsageReport>> GetInventoriesSummaryUsageReport([FromBody]InventoriesSummaryUsageReportFilter filter)
+        {
+            filter.To = filter.To.AddDays(1);
+            var toReturn = await _inventorySkuService.GetInventoriesSummaryUsageReportAsync(filter);
+
+            return toReturn;
+        }
+
         #endregion
 
     }

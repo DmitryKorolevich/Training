@@ -13,7 +13,7 @@ CREATE PROCEDURE SPGetInventorySkusUsageReport
 	@skus nvarchar(MAX),
 	@invskus nvarchar(MAX)
 AS
-BEGIN
+BEGIN		
 	SELECT
 	CAST(ROW_NUMBER() OVER (ORDER BY s.Code DESC) AS INT) As Id,
 	invStatPart.IdSku,
@@ -39,7 +39,9 @@ BEGIN
 				(SELECT o.Id,os.IdSku,os.Quantity FROM
 					(SELECT Id FROM Orders
 					WHERE DateCreated>=@from AND DateCreated<=@to AND StatusCode!=3 AND 
-					(OrderStatus=2 OR OrderStatus=3 OR OrderStatus=5 OR OrderStatus=6 OR OrderStatus=7)) o
+					(OrderStatus=2 OR OrderStatus=3 OR OrderStatus=5 OR OrderStatus=6 OR OrderStatus=7
+					OR POrderStatus=2 OR POrderStatus=3 OR POrderStatus=5 OR POrderStatus=6 OR POrderStatus=7
+					OR NPOrderStatus=2 OR NPOrderStatus=3 OR NPOrderStatus=5 OR NPOrderStatus=6 OR NPOrderStatus=7)) o
 				JOIN OrderToSkus os ON o.Id=os.IdOrder
 				LEFT JOIN TFGetTableIdsByString(@skus, DEFAULT) idskus ON os.IdSku=idskus.Id
 				WHERE @skus IS NULL OR idskus.Id IS NOT NULL) os
@@ -52,8 +54,10 @@ BEGIN
 				(SELECT o.Id,op.IdSku,op.Quantity FROM
 					(SELECT Id FROM Orders
 					WHERE DateCreated>=@from AND DateCreated<=@to AND StatusCode!=3 AND 
-					(OrderStatus=2 OR OrderStatus=3 OR OrderStatus=5 OR OrderStatus=6 OR OrderStatus=7)) o
-				JOIN OrderToPromos op ON o.Id=op.IdOrder
+					(OrderStatus=2 OR OrderStatus=3 OR OrderStatus=5 OR OrderStatus=6 OR OrderStatus=7
+					OR POrderStatus=2 OR POrderStatus=3 OR POrderStatus=5 OR POrderStatus=6 OR POrderStatus=7
+					OR NPOrderStatus=2 OR NPOrderStatus=3 OR NPOrderStatus=5 OR NPOrderStatus=6 OR NPOrderStatus=7)) o
+				JOIN OrderToPromos op ON o.Id=op.IdOrder AND op.[Disabled]=0
 				LEFT JOIN TFGetTableIdsByString(@skus, DEFAULT) idskus ON op.IdSku=idskus.Id
 				WHERE @skus IS NULL OR idskus.Id IS NOT NULL) op
 			LEFT JOIN OrderToPromosToInventorySkus opToinvs ON op.Id=opToinvs.IdOrder AND op.IdSku=opToinvs.IdSku
@@ -66,15 +70,19 @@ BEGIN
 				(SELECT o.Id,os.IdSku,os.Quantity FROM
 					(SELECT Id FROM Orders
 					WHERE DateCreated>=@from AND DateCreated<=@to AND StatusCode!=3 AND 
-					(OrderStatus=2 OR OrderStatus=3 OR OrderStatus=5 OR OrderStatus=6 OR OrderStatus=7)) o
+					(OrderStatus=2 OR OrderStatus=3 OR OrderStatus=5 OR OrderStatus=6 OR OrderStatus=7
+					OR POrderStatus=2 OR POrderStatus=3 OR POrderStatus=5 OR POrderStatus=6 OR POrderStatus=7
+					OR NPOrderStatus=2 OR NPOrderStatus=3 OR NPOrderStatus=5 OR NPOrderStatus=6 OR NPOrderStatus=7)) o
 				JOIN OrderToSkus os ON o.Id=os.IdOrder
 
 				UNION ALL
 				SELECT o.Id,op.IdSku,op.Quantity FROM
 					(SELECT Id FROM Orders
 					WHERE DateCreated>=@from AND DateCreated<=@to AND StatusCode!=3 AND 
-					(OrderStatus=2 OR OrderStatus=3 OR OrderStatus=5 OR OrderStatus=6 OR OrderStatus=7)) o
-				JOIN OrderToPromos op ON o.Id=op.IdOrder) tempSkuStatPart
+					(OrderStatus=2 OR OrderStatus=3 OR OrderStatus=5 OR OrderStatus=6 OR OrderStatus=7
+					OR POrderStatus=2 OR POrderStatus=3 OR POrderStatus=5 OR POrderStatus=6 OR POrderStatus=7
+					OR NPOrderStatus=2 OR NPOrderStatus=3 OR NPOrderStatus=5 OR NPOrderStatus=6 OR NPOrderStatus=7)) o
+				JOIN OrderToPromos op ON o.Id=op.IdOrder AND op.[Disabled]=0) tempSkuStatPart
 			GROUP BY tempSkuStatPart.IdSku) skuStatPart
 		ON invStatPart.IdSku=skuStatPart.IdSku
 
