@@ -219,7 +219,7 @@ namespace VitalChoice.Caching.Services.Cache
         private CachedEntity<T> UpdateUnsafe(T entity)
         {
             var pk = _entityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
-            return _mainCluster.Update(pk, entity, e => CreateNew(pk, e), (e, exist) => UpdateExist(pk, e, exist));
+            return _mainCluster.AddOrUpdate(pk, entity, e => CreateNew(pk, e), (e, exist) => UpdateExist(pk, e, exist));
         }
 
         public CachedEntity<T> UpdateExist(T entity)
@@ -458,7 +458,7 @@ namespace VitalChoice.Caching.Services.Cache
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void SetNullUnsafe(EntityKey pk)
         {
-            _mainCluster.Update(pk, new CachedEntity<T>(default(T), this));
+            _mainCluster.AddOrUpdate(pk, new CachedEntity<T>(default(T), this));
         }
 
         public void SetNull(IEnumerable<EntityKey> keys)
@@ -586,21 +586,21 @@ namespace VitalChoice.Caching.Services.Cache
                 };
                 UpdateRelations(entity);
                 if (indexValue != null)
-                    _indexedCluster.Update(indexValue, cached);
+                    _indexedCluster.AddOrUpdate(indexValue, cached);
                 foreach (var conditionalIndex in conditional)
                 {
-                    _conditionalIndexedDictionary[conditionalIndex.Key].Update(conditionalIndex.Value, cached);
+                    _conditionalIndexedDictionary[conditionalIndex.Key].AddOrUpdate(conditionalIndex.Value, cached);
                 }
                 foreach (var nonUniquePartition in nonUnique)
                 {
                     _nonUniqueIndexedDictionary[nonUniquePartition.Key].AddOrUpdate(nonUniquePartition.Value, index =>
                     {
                         var cluster = new CacheCluster<EntityKey, T>();
-                        cluster.Update(pk, cached);
+                        cluster.AddOrUpdate(pk, cached);
                         return cluster;
                     }, (index, cluster) =>
                     {
-                        cluster.Update(pk, cached);
+                        cluster.AddOrUpdate(pk, cached);
                         return cluster;
                     });
                 }
@@ -645,7 +645,7 @@ namespace VitalChoice.Caching.Services.Cache
                 _indexedCluster.Remove(exist.UniqueIndex);
             }
             if (indexValue != null)
-                _indexedCluster.Update(indexValue, exist);
+                _indexedCluster.AddOrUpdate(indexValue, exist);
             IEnumerable<EntityConditionalIndexInfo> removeList;
             if (conditional.Any(c => c.Value == null))
             {
@@ -655,7 +655,7 @@ namespace VitalChoice.Caching.Services.Cache
             {
                 foreach (var conditionalIndex in conditional)
                 {
-                    _conditionalIndexedDictionary[conditionalIndex.Key].Update(conditionalIndex.Value, exist);
+                    _conditionalIndexedDictionary[conditionalIndex.Key].AddOrUpdate(conditionalIndex.Value, exist);
                 }
                 removeList = _conditionalIndexedDictionary.Keys.Where(key => !conditional.ContainsKey(key));
             }
@@ -683,11 +683,11 @@ namespace VitalChoice.Caching.Services.Cache
                 _nonUniqueIndexedDictionary[nonUniquePartition.Key].AddOrUpdate(nonUniquePartition.Value, index =>
                 {
                     var cluster = new CacheCluster<EntityKey, T>();
-                    cluster.Update(pk, exist);
+                    cluster.AddOrUpdate(pk, exist);
                     return cluster;
                 }, (index, cluster) =>
                 {
-                    cluster.Update(pk, exist);
+                    cluster.AddOrUpdate(pk, exist);
                     return cluster;
                 });
             }

@@ -15,7 +15,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
             return _cluster.TryRemove(pk);
         }
 
-        public CachedEntity<T> Update(TKey pk, T entity, Func<T, CachedEntity<T>> createFunc,
+        public CachedEntity<T> AddOrUpdate(TKey pk, T entity, Func<T, CachedEntity<T>> createFunc,
             Func<T, CachedEntity<T>, CachedEntity<T>> updateFunc)
         {
             return _cluster.AddOrUpdate(pk,
@@ -33,13 +33,16 @@ namespace VitalChoice.Caching.Services.Cache.Base
             return exist;
         }
 
-        public void Update(TKey pk, CachedEntity<T> newCached)
+        public void AddOrUpdate(TKey pk, CachedEntity<T> newCached)
         {
             if (_cluster.ContainsKey(pk))
             {
                 _cluster[pk] = newCached;
             }
-            _cluster.Add(pk, newCached);
+            else
+            {
+                _cluster.Add(pk, newCached);
+            }
         }
 
         public CachedEntity<T> Get(TKey pk)
