@@ -6,7 +6,7 @@
   "projectUrl": "",
   "licenseUrl": "",
   "dependencies": {
-    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "3.0.0-*",
+    "Microsoft.EntityFrameworkCore": "1.0.0-*",
     "VitalChoice.Ecommerce.Domain": "",
     "VitalChoice.Workflow": "1.0.0-*"
   },

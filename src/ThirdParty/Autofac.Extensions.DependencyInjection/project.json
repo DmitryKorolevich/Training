@@ -1,0 +1,39 @@
+﻿{
+  "version": "4.0.0-rc2-*",
+  "authors": [ "Autofac Contributors" ],
+  "description": "Autofac implementation of the .NET Framework dependency injection abstraction.",
+  "projectUrl": "http://autofac.org",
+  "licenseUrl": "http://www.opensource.org/licenses/mit-license.php",
+  "iconUrl": "https://cloud.githubusercontent.com/assets/1156571/13684110/16b8f152-e6bf-11e5-84ae-22c66c6d351a.png",
+  "requireLicenseAcceptance": false,
+  "tags": [ "autofac", "di", "ioc", "dependencyinjection", "aspnet" ],
+  "compilationOptions": {
+    "keyFile": "../../Autofac.snk",
+    "nowarn": [
+      "CS1591"
+    ],
+    "warningsAsErrors": true,
+    "xmlDoc": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/autofac/Autofac"
+  },
+  "dependencies": {
+    "Autofac": "4.0.0-*",
+    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0-*"
+  },
+  "frameworks": {
+    "netstandard1.1": {
+      "dependencies": {
+        "System.Collections": "4.0.11-*",
+        "System.Diagnostics.Contracts": "4.0.1-*",
+        "System.Runtime": "4.1.0-*",
+        "System.Threading.Tasks": "4.0.11-*"
+      },
+      "imports": [
+        "dotnet5.2"
+      ]
+    }
+  }
+}

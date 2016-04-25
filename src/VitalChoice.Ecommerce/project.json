@@ -6,9 +6,8 @@
   "projectUrl": "",
   "licenseUrl": "",
   "dependencies": {
-    "EntityFramework.Core": "7.0.0-*",
-    "EntityFramework.MicrosoftSqlServer": "7.0.0-*",
-    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "3.0.0-*",
+    "Microsoft.EntityFrameworkCore.SqlServer": "1.0.0-*",
+    "Microsoft.EntityFrameworkCore": "1.0.0-*",
     "Microsoft.Extensions.OptionsModel": "1.0.0-*",
     "VitalChoice.Ecommerce.Domain": "",
     "VitalChoice.Data": "",

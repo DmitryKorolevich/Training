@@ -2,8 +2,7 @@
   
   "version": "1.0.0-*",
   "dependencies": {
-    "EntityFramework.Core": "7.0.0-*",
-    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "3.0.0-*",
+    "Microsoft.EntityFrameworkCore": "1.0.0-*",
     "Microsoft.AspNet.Mvc": "6.0.0-*",
     "Microsoft.Extensions.Logging": "1.0.0-*",
     "Microsoft.Extensions.Logging.Console": "1.0.0-*",

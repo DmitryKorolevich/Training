@@ -8,15 +8,15 @@
   "licenseUrl": "",
 
   "dependencies": {
+    "Microsoft.AspNetCore.Mvc.Abstractions": "1.0.0-*",
+    "Microsoft.AspNetCore.Mvc.Core": "1.0.0-*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
     "VitalChoice.Infrastructure.Domain": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.DynamicData": "1.0.0-*",
     "VitalChoice.Workflow": "1.0.0-*",
     "VitalChoice.ContentProcessing": "",
-    "CsvHelper": "2.13.2-*",
-    "Microsoft.AspNet.Mvc.Abstractions": "6.0.0-*",
-    "Microsoft.AspNet.Mvc.Core": "6.0.0-*"
+    "CsvHelper": "2.13.2-*"
   },
 
   "frameworks": {

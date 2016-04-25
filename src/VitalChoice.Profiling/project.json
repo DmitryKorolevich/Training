@@ -6,9 +6,9 @@
   "projectUrl": "",
   "licenseUrl": "",
   "dependencies": {
-    "Microsoft.AspNet.Mvc.Abstractions": "6.0.0-*",
-    "EntityFramework.Relational": "7.0.0-*",
-    "EntityFramework.MicrosoftSqlServer": "7.0.0-*",
+    "Microsoft.AspNetCore.Mvc.Abstractions": "1.0.0-*",
+    "Microsoft.EntityFrameworkCore.Relational": "1.0.0-*",
+    "Microsoft.EntityFrameworkCore.SqlServer": "1.0.0-*",
     "VitalChoice.Ecommerce.Domain": ""
   },
   "frameworks": {
@@ -21,7 +21,7 @@
       "dependencies": {
         "Microsoft.CSharp": "4.0.1-*",
         "System.Collections": "4.0.11-*",
-        "System.Linq": "4.0.1-*",
+        "System.Linq": "4.1.0-*",
         "System.Runtime": "4.0.21-*",
         "System.Threading": "4.0.11-*"
       }

@@ -8,10 +8,10 @@
   "dependencies": {
     "VitalChoice.Ecommerce.Domain": "",
     "VitalChoice.ObjectMapping": "",
-    "EntityFramework.Relational": "7.0.0-*",
+    "Microsoft.EntityFrameworkCore.Relational": "1.0.0-*",
     "VitalChoice.Data": "",
     "VitalChoice.Profiling": "",
-    "EntityFramework.Core": "7.0.0-*"
+    "Microsoft.EntityFrameworkCore": "1.0.0-*"
   },
   "frameworks": {
     "net451": {

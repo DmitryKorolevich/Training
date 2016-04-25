@@ -23,7 +23,8 @@
 
   "frameworks": {
     "dnx451": { },
-    "dnxcore50": {
+    "netcoreapp1.0": {
+      "imports": ["dnxcore50"],
       "dependencies": {
         "Microsoft.CSharp": "4.0.1-*",
         "System.Collections": "4.0.11-*",

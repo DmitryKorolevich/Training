@@ -1,9 +1,8 @@
 {
   "version": "1.0.0-*",
   "dependencies": {
-    "EntityFramework.Core": "7.0.0-*",
-    "EntityFramework.MicrosoftSqlServer": "7.0.0-*",
-    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "3.0.0-*",
+    "Microsoft.EntityFrameworkCore": "1.0.0-*",
+    "Microsoft.EntityFrameworkCore.SqlServer": "1.0.0-*",
     "Microsoft.Extensions.OptionsModel": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
@@ -23,8 +22,8 @@
     "netstandard1.5": {
       "dependencies": {
         "System.Runtime": "4.0.21-*",
-        "System.Security.Cryptography.X509Certificates": "4.0.0-*",
-        "System.Security.Cryptography.Algorithms": "4.0.0-*"
+        "System.Security.Cryptography.X509Certificates": "4.1.0-*",
+        "System.Security.Cryptography.Algorithms": "4.1.0-*"
       }
     }
   }

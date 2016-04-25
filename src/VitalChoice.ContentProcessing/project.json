@@ -11,12 +11,12 @@
     "VitalChoice.Infrastructure": "",
     "VitalChoice.Data": "",
     "Autofac": "4.0.0-*",
-    "Microsoft.AspNet.Mvc.Abstractions": "6.0.0-*",
-    "Microsoft.AspNet.Mvc.Core": "6.0.0-*",
-    "Microsoft.AspNet.Mvc.ViewFeatures": "6.0.0-*",
+    "Microsoft.AspNetCore.Mvc.Abstractions": "1.0.0-*",
+    "Microsoft.AspNetCore.Mvc.Core": "1.0.0-*",
+    "Microsoft.AspNetCore.Mvc.ViewFeatures": "1.0.0-*",
     "Microsoft.Extensions.Logging": "1.0.0-*",
     "Microsoft.Extensions.Logging.Console": "1.0.0-*",
-    "Templates": "2.7.5-rc1"
+    "Templates": "2.7.6-rc2"
   },
   "frameworks": {
     "net451": { },
@@ -24,8 +24,8 @@
       "dependencies": {
         "Microsoft.CSharp": "4.0.1-*",
         "System.Collections": "4.0.11-*",
-        "System.Linq": "4.0.1-*",
-        "System.Runtime": "4.0.21-*",
+        "System.Linq": "4.1.0-*",
+        "System.Runtime": "4.1.0-*",
         "System.Threading": "4.0.11-*"
       }
     }
