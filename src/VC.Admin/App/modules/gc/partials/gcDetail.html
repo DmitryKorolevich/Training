@@ -122,7 +122,8 @@
                                                 <td>
                                                     <a ui-sref="{{::item.IdObjectType==5 ? 'index.oneCol.orderReshipDetail({id: item.Id })' : item.IdObjectType==6 ? 'index.oneCol.orderRefundDetail({id: item.Id })' : 'index.oneCol.orderDetail({id: item.Id })'}}">{{::item.Id}}</a>
                                                 </td>
-                                                <td>{{::item.Total | currency}}</td>
+                                                <td data-ng-if="::item.IdObjectType!=6">{{::item.Total | currency}}</td>
+                                                <td data-ng-if="::item.IdObjectType==6">({{::item.Total | currency}})</td>
                                                 <td>{{::item.CustomerShipFirstName}} {{::item.CustomerShipLastName}}</td>
                                                 <td>{{::item.GCAmountUsed | currency}}</td>
                                             </tr>

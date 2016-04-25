@@ -40,6 +40,8 @@ namespace VitalChoice.Interfaces.Services.Products
 
         Task<List<SkuOrdered>> GetSkusOrderedAsync(ICollection<int> ids);
 
+        Task<List<RefundSkuOrdered>> GetRefundSkusOrderedAsync(ICollection<int> ids);
+
         Task<SkuDynamic> GetSkuAsync(string code, bool withDefaults = false);
 
         Task<SkuDynamic> GetSkuAsync(int id, bool withDefaults = false);

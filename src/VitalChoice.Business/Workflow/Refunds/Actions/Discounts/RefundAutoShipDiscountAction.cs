@@ -19,7 +19,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Discounts
                     -(decimal)
                         (dataContext.RefundSkus.FirstOrDefault(s => (bool?) s.Sku.SafeData.AutoShipProduct ?? false)?.Sku.Data.OffPercent ??
                          0)*
-                    (decimal) dataContext.Data.DiscountableSubtotal/100);
+                    (decimal) dataContext.Data.RefundDiscountableSubtotal / 100);
         }
     }
 }

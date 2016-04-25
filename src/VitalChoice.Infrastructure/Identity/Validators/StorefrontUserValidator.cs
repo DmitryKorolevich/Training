@@ -87,12 +87,12 @@ namespace VitalChoice.Infrastructure.Identity.Validators
                 return;
             }
 #endif
-            var owner = await manager.FindByEmailAsync(email);
-            if (owner != null &&
-                !string.Equals(await manager.GetUserIdAsync(owner), await manager.GetUserIdAsync(user)))
-            {
-                errors.Add(Describer.DuplicateEmail(email));
-            }
+            //var owner = await manager.FindByEmailAsync(email);
+            //if (owner != null &&
+            //    !string.Equals(await manager.GetUserIdAsync(owner), await manager.GetUserIdAsync(user)))
+            //{
+            //    errors.Add(Describer.DuplicateEmail(email));
+            //}
         }
     }
 }

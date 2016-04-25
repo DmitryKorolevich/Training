@@ -150,6 +150,12 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(p => p.Id);
             });
 
+            builder.Entity<InventoriesSummaryUsageRawReportItem>(entity =>
+            {
+                entity.HasKey(p => new {p.IdInventorySku, p.Date });
+                entity.Ignore(p => p.Id);
+            });
+
             builder.Entity<OrdersZipStatisticItem>(entity =>
             {
                 entity.HasKey(p => p.Zip);

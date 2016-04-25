@@ -126,7 +126,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 $scope.countries = result.countriesCall.data.Data;
 
                 $scope.currentCustomer = result.customerGetCall.data.Data;
-
+                if ($scope.currentCustomer.InceptionDate)
+                {
+                    $scope.currentCustomer.InceptionDate = Date.parseDateTime($scope.currentCustomer.InceptionDate);
+                }
                 $scope.options.DBStatusCode = $scope.currentCustomer.StatusCode;
 
                 customerEditService.syncCountry($scope, $scope.order.Shipping);
@@ -177,19 +180,16 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         }
         else
         {
-            console.log('requestRecalculate');
-            return;
+            var orderForCalculating = angular.copy($scope.order);
+            orderForCalculating.Customer = angular.copy($scope.currentCustomer);
 
-            var orderForCalculating = angular.copy(uiScope.order);
-            orderForCalculating.Customer = angular.copy(uiScope.currentCustomer);
-
-            uiScope.oldOrderForCalculating = orderForCalculating;
-            if (uiScope.currectCalculateCanceller)
+            $scope.oldOrderForCalculating = orderForCalculating;
+            if ($scope.currectCalculateCanceller)
             {
-                uiScope.currectCalculateCanceller.resolve("canceled");
+                $scope.currectCalculateCanceller.resolve("canceled");
             }
-            uiScope.currectCalculateCanceller = $q.defer();
-            orderService.calculateRefundOrder(orderForCalculating, uiScope.currectCalculateCanceller)
+            $scope.currectCalculateCanceller = $q.defer();
+            orderService.calculateRefundOrder(orderForCalculating, $scope.currectCalculateCanceller)
                 .success(function (result)
                 {
                     if (result.Success)
@@ -199,10 +199,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     {
                         errorHandler(result);
                     }
-                    if (uiScope.currectCalculateCanceller)
+                    if ($scope.currectCalculateCanceller)
                     {
-                        uiScope.currectCalculateCanceller.reject();
-                        uiScope.currectCalculateCanceller = null;
+                        $scope.currectCalculateCanceller.reject();
+                        $scope.currectCalculateCanceller = null;
                     }
                     if (callback) {
                         callback(result);
@@ -213,10 +213,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     if (result == "canceled")
                     {
                         errorHandler(result);
-                        if (uiScope.currectCalculateCanceller)
+                        if ($scope.currectCalculateCanceller)
                         {
-                            uiScope.currectCalculateCanceller.reject();
-                            uiScope.currectCalculateCanceller = null;
+                            $scope.currectCalculateCanceller.reject();
+                            $scope.currectCalculateCanceller = null;
                         }
                     }
                     if (callback) {
@@ -228,20 +228,20 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
     function successCalculateHandler(data)
     {
-        uiScope.order.ShippingTotal = data.ShippingTotal;
-        uiScope.order.ProductsSubtotal = data.ProductsSubtotal;
-        uiScope.order.DiscountTotal = data.DiscountTotal;
-        uiScope.order.DiscountedSubtotal = data.DiscountedSubtotal;
-        uiScope.order.DiscountMessage = data.DiscountMessage;
-        uiScope.order.TaxTotal = data.TaxTotal;
-        uiScope.order.AutoTotal = data.AutoTotal;
-        uiScope.order.Total = data.Total;
+        $scope.order.ShippingTotal = data.ShippingTotal;
+        $scope.order.ProductsSubtotal = data.ProductsSubtotal;
+        $scope.order.DiscountTotal = data.DiscountTotal;
+        $scope.order.DiscountedSubtotal = data.DiscountedSubtotal;
+        $scope.order.DiscountMessage = data.DiscountMessage;
+        $scope.order.TaxTotal = data.TaxTotal;
+        $scope.order.AutoTotal = data.AutoTotal;
+        $scope.order.Total = data.Total;
 
-        uiScope.order.ManualShippingTotal = data.ManualShippingTotal;
-        uiScope.order.RefundGCsUsedOnOrder = data.RefundGCsUsedOnOrder;
-        uiScope.order.ManualRefundOverride = data.ManualRefundOverride;
+        $scope.order.ManualShippingTotal = data.ManualShippingTotal;
+        $scope.order.RefundGCsUsedOnOrder = data.RefundGCsUsedOnOrder;
+        $scope.order.ManualRefundOverride = data.ManualRefundOverride;
 
-        $.each(uiScope.order.RefundSkus, function (index, uiSku)
+        $.each($scope.order.RefundSkus, function (index, uiSku)
         {
             var found = false;
             $.each(data.RefundSkus, function (index, sku)
@@ -254,7 +254,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             });
         });
 
-        $.each(uiScope.order.RefundOrderToGiftCertificates, function (index, uiGc)
+        $.each($scope.order.RefundOrderToGiftCertificates, function (index, uiGc)
         {
             var found = false;
             $.each(data.RefundOrderToGiftCertificates, function (index, gc)
@@ -280,73 +280,81 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
     $scope.save = function ()
     {
-        $scope.clearServerValidation();
+        var deferredRecalculate = $q.defer();
+        $scope.addEditTracker.addPromise(deferredRecalculate.promise);
+        $scope.requestRecalculate(function () {
+            $scope.clearServerValidation();
 
-        var valid = true;
-        $.each($scope.forms, function (index, form)
-        {
-            if (form && index != 'submitted')
+            var valid = true;
+            $.each($scope.forms, function (index, form)
             {
-                if (!form.$valid)
+                if (form && index != 'submitted')
                 {
-                    valid = false;
-                    $scope.activateTab(index);
-                    return false;
-                }
-            }
-        });
-
-        if (valid)
-        {
-            $scope.order.IdPaymentMethodType = $scope.paymentInfoTab.PaymentMethodType;
-            var billingErrorMessages = '';
-
-            if (!$scope.order.OnHold)
-            {
-                if ($scope.order.IdPaymentMethodType == 2)//oac
-                {
-                    if ($scope.order.Oac == null)
+                    if (!form.$valid)
                     {
-                        billingErrorMessages += "On Approved Credit is required. ";
+                        valid = false;
+                        $scope.activateTab(index);
+                        return false;
                     }
                 }
-            }
-
-            if (billingErrorMessages)
-            {
-                $scope.paymentInfoTab.active = true;
-                toaster.pop('error', 'Error!', billingErrorMessages, null, 'trustedHtml');
-                return;
-            }
-
-            var order = orderEditService.orderDataProcessingBeforeSave($scope);
-
-            orderService.addRefundOrder(order, $scope.addEditTracker).success(function (result)
-            {
-                successSaveHandler(result);
-            }).
-            error(function (result)
-            {
-                errorHandler(result);
             });
-            //billing info - for exist order all data should be sent and backend will save only needed one based on IdPaymentMethodType
-        } else
-        {
-            if ($scope.forms.topForm != null)
+
+            if (valid)
             {
-                $scope.forms.topForm.submitted = true;
-            }
-            $scope.forms.mainForm.submitted = true;
-            $scope.forms.mainForm2.submitted = true;
-            $scope.forms.submitted['shipping'] = true;
-            $scope.forms.submitted['card'] = true;
-            $scope.forms.submitted['oac'] = true;
-            $scope.forms.submitted['check'] = true;
-            $scope.forms.submitted['wiretransfer'] = true;
-            $scope.forms.submitted['marketing'] = true;
-            $scope.forms.submitted['vcwellness'] = true;
-            toaster.pop('error', "Error!", "Validation errors, please correct field values.", null, 'trustedHtml');
-        }
+                $scope.order.IdPaymentMethodType = $scope.paymentInfoTab.PaymentMethodType;
+                var billingErrorMessages = '';
+
+                if (!$scope.order.OnHold)
+                {
+                    if ($scope.order.IdPaymentMethodType == 2)//oac
+                    {
+                        if ($scope.order.Oac == null)
+                        {
+                            billingErrorMessages += "On Approved Credit is required. ";
+                        }
+                    }
+                }
+
+                if (billingErrorMessages)
+                {
+                    $scope.paymentInfoTab.active = true;
+                    toaster.pop('error', 'Error!', billingErrorMessages, null, 'trustedHtml');
+                    deferredRecalculate.reject();
+                    return;
+                }
+
+                var order = orderEditService.orderDataProcessingBeforeSave($scope);
+
+                orderService.addRefundOrder(order, $scope.addEditTracker).success(function (result)
+                {
+                    deferredRecalculate.reject();
+                    successSaveHandler(result);
+                }).
+                error(function (result)
+                {
+                    deferredRecalculate.reject();
+                    errorHandler(result);
+                });
+                //billing info - for exist order all data should be sent and backend will save only needed one based on IdPaymentMethodType
+            } else
+            {
+                if ($scope.forms.topForm != null)
+                {
+                    $scope.forms.topForm.submitted = true;
+                }
+                $scope.forms.mainForm.submitted = true;
+                $scope.forms.mainForm2.submitted = true;
+                $scope.forms.submitted['shipping'] = true;
+                $scope.forms.submitted['card'] = true;
+                $scope.forms.submitted['oac'] = true;
+                $scope.forms.submitted['check'] = true;
+                $scope.forms.submitted['wiretransfer'] = true;
+                $scope.forms.submitted['marketing'] = true;
+                $scope.forms.submitted['vcwellness'] = true;
+                toaster.pop('error', "Error!", "Validation errors, please correct field values.", null, 'trustedHtml');
+                deferredRecalculate.reject();
+            }                               
+        });
     };
 
     $scope.cancelRefund = function ()

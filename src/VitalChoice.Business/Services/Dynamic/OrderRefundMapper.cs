@@ -136,7 +136,7 @@ namespace VitalChoice.Business.Services.Dynamic
                         IdGiftCertificate = s.IdGiftCertificate,
                         Amount = s.Amount,
                         OrderToGiftCertificate = _orderToGiftCertificateRepository.Query(p=> p.IdOrder == s.IdOrder &&
-                            p.IdGiftCertificate==s.IdGiftCertificate).Include(p=>p.GiftCertificate).SelectFirstOrDefaultAsync().Result,
+                            p.IdGiftCertificate==s.IdGiftCertificate).Include(p=>p.GiftCertificate).SelectFirstOrDefaultAsync(true).Result,
                     }));
                 foreach (var refundOrderToGiftCertificate in entity.RefundOrderToGiftCertificates)
                 {
@@ -145,6 +145,8 @@ namespace VitalChoice.Business.Services.Dynamic
                         refundOrderToGiftCertificate.OrderToGiftCertificate.GiftCertificate.Balance +=
                             refundOrderToGiftCertificate.Amount;
                     }
+                    if (refundOrderToGiftCertificate != null)
+                        refundOrderToGiftCertificate.OrderToGiftCertificate = null;
                 }
             });
         }

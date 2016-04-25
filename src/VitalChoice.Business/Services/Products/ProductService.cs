@@ -305,7 +305,19 @@ namespace VitalChoice.Business.Services.Products
 			return skuOrdered;
 		}
 
-	    public async Task<SkuOrdered> GetSkuOrderedAsync(string code)
+        private async Task<RefundSkuOrdered> PopulateRefundSkuOrderedAsync(Sku sku)
+        {
+            var skuDynamic = await _skuMapper.FromEntityAsync(sku, true);
+            var skuOrdered = new RefundSkuOrdered
+            {
+                Sku = skuDynamic
+            };
+
+            return skuOrdered;
+        }
+
+
+        public async Task<SkuOrdered> GetSkuOrderedAsync(string code)
         {
             if (code == null)
                 throw new ArgumentNullException(nameof(code));
@@ -394,6 +406,33 @@ namespace VitalChoice.Business.Services.Products
 
 			return res;
 		}
+
+        public async Task<List<RefundSkuOrdered>> GetRefundSkusOrderedAsync(ICollection<int> ids)
+        {
+            if (ids == null)
+                throw new ArgumentNullException(nameof(ids));
+
+            if (!ids.Any())
+                return new List<RefundSkuOrdered>();
+
+            var skus =
+                await _skuRepository.Query(s => ids.Contains(s.Id) && s.StatusCode != (int)RecordStatusCode.Deleted)
+                    .Include(s => s.OptionValues)
+                    .Include(s => s.Product)
+                    .ThenInclude(p => p.OptionValues)
+                    .Include(s => s.Product)
+                    .ThenInclude(p => p.ProductsToCategories)
+                    .SelectAsync(false);
+
+            var res = new List<RefundSkuOrdered>();
+            foreach (var temp in skus)
+            {
+                var skuOrdered = await PopulateRefundSkuOrderedAsync(temp);
+                res.Add(skuOrdered);
+            }
+
+            return res;
+        }
 
         public async Task<SkuDynamic> GetSkuAsync(string code, bool withDefaults = false)
         {
