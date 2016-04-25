@@ -55,12 +55,12 @@ namespace VC.Public.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Step1(VitalGreenRequestModel model)
+        public Task<IActionResult> Step1(VitalGreenRequestModel model)
         {
             string cookies;
             if (!Validate(model))
             {
-                return PartialView("_Step1", model);
+                return Task.FromResult<IActionResult>(PartialView("_Step1", model));
             }
 
             cookies = Convert.ToBase64String(Encoding.UTF8.GetBytes(model.ToJson()));
@@ -69,7 +69,7 @@ namespace VC.Public.Controllers
                 Expires = DateTime.Now.AddHours(VITAL_GREEN_COOKIE_EXPIRED_HOURS),
             });
 
-            return RedirectToAction("ShipTo");
+            return Task.FromResult<IActionResult>(RedirectToAction("ShipTo"));
         }
 
         [HttpGet]

@@ -11,11 +11,13 @@ namespace VitalChoice.Profiling.Base
 
         public DefaultPerformanceRequest(ILoggerFactory factory)
         {
-            _logger = factory.CreateLogger<ProfilerMiddleware>();
+            _logger = factory?.CreateLogger<ProfilerMiddleware>();
         }
 
         public virtual void OnFinishedRequest(ProfilingScope scope)
         {
+            if (_logger == null)
+                return;
             if (scope.ForceLog)
             {
                 _logger.LogError(scope.ToString());

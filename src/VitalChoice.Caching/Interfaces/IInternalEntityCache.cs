@@ -29,6 +29,7 @@ namespace VitalChoice.Caching.Interfaces
         bool TryRemove(object entity);
         bool TryRemove(EntityKey pk);
         bool ItemExist(EntityKey pk);
+        bool ItemExistAndNotNull(EntityKey pk);
         bool GetCacheExist(RelationInfo relationInfo);
         bool GetIsCacheFullCollection(RelationInfo relationInfo);
         IEnumerable<ICacheData> GetAllCaches();

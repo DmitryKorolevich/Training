@@ -30,13 +30,13 @@ namespace VC.Admin.Models.Settings
             if (item != null)
             {
                 Id = item.Id;
-                Data = item.Data.ToString();
+                Data = item.Data?.ToString() ?? string.Empty;
                 ShortData = Data.Length > 50
                     ? Data.Substring(0, 50)
                     : Data;
-                ClassTypeName = item.ClassType.FullName;
+                ClassTypeName = item.ClassType?.FullName ?? string.Empty;
                 TimeElapsed = Math.Round(item.TimeElapsed.TotalMilliseconds, 2);
-                MethodName = item.MethodName;
+                MethodName = item.MethodName ?? string.Empty;
                 SubScopes = item.SubScopes?.Select(p => new ProfileScopeListItemModel(p)) ?? Enumerable.Empty<ProfileScopeListItemModel>();
                 AdditionalData = item.AdditionalData?.Select(d => d?.ToString()) ?? Enumerable.Empty<string>();
             }

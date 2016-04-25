@@ -66,14 +66,14 @@ namespace VitalChoice.Business.Repositories
             // ReSharper disable once PossibleNullReferenceException
             var orderOptionValueQuery = (this.Context as DbContext).Set<OrderOptionValue>().Where(p => p.IdOptionType == orderTypeOption.Id);
 
-            var result = (from o in orderQuery
+            var result = await (from o in orderQuery
                          join v in orderOptionValueQuery on o.Id equals v.IdOrder into grouping
                          from d in grouping.DefaultIfEmpty()
                          select new
                          {
                              Order = o,
                              OrderType =d
-                         }).ToList();
+                         }).ToListAsync();
 
             return result.Select(p => new OrderForAgentReport()
             {

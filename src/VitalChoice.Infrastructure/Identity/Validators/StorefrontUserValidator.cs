@@ -17,13 +17,10 @@ namespace VitalChoice.Infrastructure.Identity.Validators
         private IdentityOptions _options;
 
         public StorefrontUserValidator(IOptions<IdentityOptions> optionsAccessor, IdentityErrorDescriber errors = null)
-            : base(errors)
+            : base(errors ?? new IdentityErrorDescriber())
         {
             _options = optionsAccessor?.Value ?? new IdentityOptions();
-            Describer = errors ?? new IdentityErrorDescriber();
         }
-
-        public IdentityErrorDescriber Describer { get; private set; }
 
         public override async Task<IdentityResult> ValidateAsync(UserManager<ApplicationUser> manager, ApplicationUser user)
         {

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc.ModelBinding.Metadata;
+using VitalChoice.Profiling.Base;
 
 namespace VitalChoice.Core.GlobalFilters
 {
@@ -45,7 +46,7 @@ namespace VitalChoice.Core.GlobalFilters
                     var metadata = bindingContext.ModelMetadata as DefaultModelMetadata;
                     var preventFilteringXSS = metadata?.Attributes.PropertyAttributes?.Any(x => x is AllowXSSAttribute) ?? false;
 
-                    
+
                     if (!preventFilteringXSS)
                     {
                         var containForbidden = ForbiddenStringsRegex.IsMatch(modelAsString);

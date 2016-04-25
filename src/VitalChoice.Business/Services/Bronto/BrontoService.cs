@@ -43,8 +43,7 @@ namespace VitalChoice.Business.Services.Bronto
             _logger = loggerProvider.CreateLoggerDefault();
 
 #if !DOTNET5_4
-            BasicHttpBinding binding = new BasicHttpBinding();
-            binding.Security.Mode = BasicHttpSecurityMode.Transport;
+            BasicHttpBinding binding = new BasicHttpBinding {Security = {Mode = BasicHttpSecurityMode.Transport}};
             EndpointAddress endpoint = new EndpointAddress(_brontoSettings.ApiUrl);
             _client = new BrontoSoapPortTypeClient(binding, endpoint);
 #endif
@@ -70,7 +69,7 @@ namespace VitalChoice.Business.Services.Bronto
                 {
                     using (var writer = new StreamWriter(stream))
                     {
-                        writer.Write(toSend);
+                        await writer.WriteAsync(toSend);
                     }
 
                     WebResponse response = await request.GetResponseAsync();
@@ -79,23 +78,22 @@ namespace VitalChoice.Business.Services.Bronto
                     {
                         using (var reader = new StreamReader(responseStream))
                         {
-                            var data = reader.ReadToEnd();
+                            await reader.ReadToEndAsync();
                         }
                         return true;
                     }
                 }
             }
-            catch (WebException e)
+            catch (Exception e)
             {
+                _logger.LogError(e.Message, e);
             }
             return false;
         }
 
         public async Task<bool> Subscribe(string email)
         {
-            EmailValidator emailValidator = new EmailValidator();
-            var emailRegex = new Regex(emailValidator.Expression, RegexOptions.IgnoreCase);
-            if (!emailRegex.IsMatch(email))
+            if (!EmailValidator.RegexExpression.IsMatch(email))
                 return false;
 
             try
@@ -111,7 +109,7 @@ namespace VitalChoice.Business.Services.Bronto
                 {
                     using (var writer = new StreamWriter(stream))
                     {
-                        writer.Write(toSend);
+                        await writer.WriteAsync(toSend);
                     }
 
                     WebResponse response = await request.GetResponseAsync();
@@ -120,59 +118,61 @@ namespace VitalChoice.Business.Services.Bronto
                     {
                         using (var reader = new StreamReader(responseStream))
                         {
-                            var data = reader.ReadToEnd();
+                            await reader.ReadToEndAsync();
                         }
                         return true;
                     }
                 }
             }
-            catch (WebException e)
+            catch (Exception e)
             {
+                _logger.LogError(e.Message, e);
             }
             return false;
         }
 
-        public bool Unsubscribe(string email)
+        public async Task<bool> Unsubscribe(string email)
         {
 #if !DOTNET5_4
             List<contactObject> result = new List<contactObject>();
             int pageNumber = 1;
             contactObject[] lists;
-            var brontoEmailAddress = new stringValue { value = email };
-            var sessionHeader = new sessionHeader { sessionId = _client.login(_brontoSettings.ApiKey) };
+            var brontoEmailAddress = new stringValue {value = email};
+            var sessionHeader = new sessionHeader {sessionId = _client.login(_brontoSettings.ApiKey)};
             do
             {
-                lists = _client.readContacts(sessionHeader, new readContacts
+                lists = (await _client.readContactsAsync(sessionHeader, new readContacts
                 {
                     pageNumber = pageNumber,
                     filter = new contactFilter
                     {
-                        email = new[] { brontoEmailAddress }
+                        email = new[] {brontoEmailAddress}
                     },
                     includeLists = false,
                     includeSMSKeywords = false
-                });
+                })).@return;
                 if (lists != null)
                 {
                     result.AddRange(lists);
                     pageNumber++;
                 }
             } while (lists != null && lists.Length > 0);
-            var contactsToUpdate = result.Where(c => c.status.ToLower() == "active" || c.status.ToLower() == "onboarding").Select(c => new contactObject
-            {
-                id = c.id,
-                status = "unsub"
-            }).ToArray();
+            var contactsToUpdate =
+                result.Where(c => c.status.ToLower() == "active" || c.status.ToLower() == "onboarding").Select(c => new contactObject
+                {
+                    id = c.id,
+                    status = "unsub"
+                }).ToArray();
             if (contactsToUpdate.Length > 0)
             {
-                var results = _client.updateContacts(sessionHeader, contactsToUpdate).results;
+                var results = (await _client.updateContactsAsync(sessionHeader, contactsToUpdate)).@return.results;
                 return results.All(s => !s.isError);
             }
 #endif
             return true;
         }
 
-        public bool? GetIsUnsubscribed(string email)
+        public async Task<bool?> GetIsUnsubscribed(string email)
         {
 #if !DOTNET5_4
             List<contactObject> result = new List<contactObject>();
@@ -182,16 +182,16 @@ namespace VitalChoice.Business.Services.Bronto
             var sessionHeader = new sessionHeader { sessionId = _client.login(_brontoSettings.ApiKey) };
             do
             {
-                lists = _client.readContacts(sessionHeader, new readContacts
+                lists = (await _client.readContactsAsync(sessionHeader, new readContacts
                 {
                     pageNumber = pageNumber,
                     filter = new contactFilter
                     {
-                        email = new[] { brontoEmailAddress }
+                        email = new[] {brontoEmailAddress}
                     },
                     includeLists = false,
                     includeSMSKeywords = false
-                });
+                })).@return;
                 if (lists != null)
                 {
                     result.AddRange(lists);
@@ -205,7 +205,7 @@ namespace VitalChoice.Business.Services.Bronto
         }
 
 #if !DOTNET5_4
-        public contactObject[] GetAllActiveContacts()
+        public async Task<contactObject[]> GetAllActiveContacts()
         {
             List<contactObject> result = new List<contactObject>();
             int pageNumber = 1;
@@ -213,7 +213,7 @@ namespace VitalChoice.Business.Services.Bronto
             var sessionHeader = new sessionHeader { sessionId = _client.login(_brontoSettings.ApiKey) };
             do
             {
-                lists = _client.readContacts(sessionHeader, new readContacts
+                lists = (await _client.readContactsAsync(sessionHeader, new readContacts
                 {
                     pageNumber = pageNumber,
                     filter = new contactFilter
@@ -222,7 +222,7 @@ namespace VitalChoice.Business.Services.Bronto
                     },
                     includeLists = false,
                     includeSMSKeywords = false
-                });
+                })).@return;
                 if (lists != null)
                 {
                     result.AddRange(lists);
@@ -237,7 +237,7 @@ namespace VitalChoice.Business.Services.Bronto
             return info.Count(c => c.created > startDate && c.created < endDate.AddDays(1));
         }
 
-        public deliveryObject[] GetInfo()
+        public async Task<deliveryObject[]> GetInfo()
         {
             int pageNumber = 1;
             deliveryObject[] deliveries;
@@ -245,13 +245,13 @@ namespace VitalChoice.Business.Services.Bronto
             var sessionHeader = new sessionHeader { sessionId = _client.login(_brontoSettings.ApiKey) };
             do
             {
-                deliveries = _client.readDeliveries(sessionHeader, new readDeliveries
+                deliveries = (await _client.readDeliveriesAsync(sessionHeader, new readDeliveries
                 {
                     filter = new deliveryFilter(),
                     includeContent = false,
                     includeRecipients = false,
                     pageNumber = pageNumber
-                });
+                })).@return;
                 if (deliveries != null)
                 {
                     result.AddRange(deliveries);

@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.ChangeTracking;
 using VitalChoice.Caching.Extensions;
@@ -63,7 +64,6 @@ namespace VitalChoice.Caching.Services.Cache
         public CacheCluster<EntityKey, T> Get(EntityCacheableIndexInfo nonUniqueIndexInfo, EntityIndex index)
         {
             ConcurrentDictionary<EntityIndex, CacheCluster<EntityKey, T>> indexedPartition;
-            // ReSharper disable once InconsistentlySynchronizedField
             if (_nonUniqueIndexedDictionary.TryGetValue(nonUniqueIndexInfo, out indexedPartition))
             {
                 CacheCluster<EntityKey, T> cluster;
@@ -77,26 +77,34 @@ namespace VitalChoice.Caching.Services.Cache
 
         public CachedEntity<T> Get(EntityKey key)
         {
-            // ReSharper disable once InconsistentlySynchronizedField
-            return _mainCluster.Get(key);
+            lock (_lockObj)
+            {
+                return _mainCluster.Get(key);
+            }
         }
 
         public CachedEntity<T> Get(EntityIndex key)
         {
-            // ReSharper disable once InconsistentlySynchronizedField
-            return _indexedCluster.Get(key);
+            lock (_lockObj)
+            {
+                return _indexedCluster.Get(key);
+            }
         }
 
         public CachedEntity<T> Get(EntityConditionalIndexInfo conditionalIndex, EntityIndex key)
         {
-            // ReSharper disable once InconsistentlySynchronizedField
-            return _conditionalIndexedDictionary[conditionalIndex].Get(key);
+            lock (_lockObj)
+            {
+                return _conditionalIndexedDictionary[conditionalIndex].Get(key);
+            }
         }
 
         public ICollection<CachedEntity<T>> GetAll()
         {
-            // ReSharper disable once InconsistentlySynchronizedField
-            return _mainCluster.GetItems();
+            lock (_lockObj)
+            {
+                return _mainCluster.GetItems().ToArray();
+            }
         }
 
         public void Clear()
@@ -130,8 +138,10 @@ namespace VitalChoice.Caching.Services.Cache
 
         public IEnumerable<CachedEntity> GetAllUntyped()
         {
-            // ReSharper disable once InconsistentlySynchronizedField
-            return _mainCluster.GetItems();
+            lock (_lockObj)
+            {
+                return _mainCluster.GetItems().ToArray();
+            }
         }
 
         public CachedEntity TryRemoveUntyped(EntityKey key)
@@ -151,7 +161,10 @@ namespace VitalChoice.Caching.Services.Cache
 
         public bool ItemExist(EntityKey key)
         {
-            return _mainCluster.Exist(key);
+            lock (_lockObj)
+            {
+                return _mainCluster.Exist(key);
+            }
         }
 
         public bool GetHasRelation(string name)
@@ -182,7 +195,8 @@ namespace VitalChoice.Caching.Services.Cache
                             cluster.Remove(key);
                             if (cluster.IsEmpty)
                             {
-                                _nonUniqueIndexedDictionary[nonUniquePartition.Key].TryRemove(nonUniquePartition.Value, out cluster);
+                                CacheCluster<EntityKey, T> temp;
+                                _nonUniqueIndexedDictionary[nonUniquePartition.Key].TryRemove(nonUniquePartition.Value, out temp);
                             }
                         }
                     }
@@ -197,9 +211,15 @@ namespace VitalChoice.Caching.Services.Cache
                 return null;
             lock (_lockObj)
             {
-                var pk = _entityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
-                return _mainCluster.Update(pk, entity, e => CreateNew(pk, e), (e, exist) => UpdateExist(pk, e, exist));
+                return UpdateUnsafe(entity);
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private CachedEntity<T> UpdateUnsafe(T entity)
+        {
+            var pk = _entityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
+            return _mainCluster.AddOrUpdate(pk, entity, e => CreateNew(pk, e), (e, exist) => UpdateExist(pk, e, exist));
         }
 
         public CachedEntity<T> UpdateExist(T entity)
@@ -208,9 +228,15 @@ namespace VitalChoice.Caching.Services.Cache
                 return null;
             lock (_lockObj)
             {
-                var pk = _entityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
-                return _mainCluster.Update(pk, entity, (e, exist) => UpdateExist(pk, e, exist));
+                return UpdateExistUnsafe(entity);
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private CachedEntity<T> UpdateExistUnsafe(T entity)
+        {
+            var pk = _entityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
+            return _mainCluster.Update(pk, entity, (e, exist) => UpdateExist(pk, e, exist));
         }
 
         public CachedEntity<T> UpdateKeepRelations(T entity, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities)
@@ -225,65 +251,53 @@ namespace VitalChoice.Caching.Services.Cache
                 if (cached == null)
                     return null;
 
-                lock (cached)
-                {
                     if (!UpdateEntityWithRelations(entity, trackedEntities, cached))
                         return null;
 
                     SyncInternalCache(pk, entity, cached);
-                }
                 return cached;
             }
         }
 
         private bool UpdateEntityWithRelations(T entity, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities, CachedEntity<T> cached)
         {
-            var oldEntity = cached.Entity;
-            if (oldEntity != null)
-            {
-                TypeConverter.CopyInto(oldEntity, entity, typeof (T),
-                    type => !type.GetTypeInfo().IsValueType && type != typeof (string));
-            }
             if (!GetAllNormalizedAndTracked(entity, _relationInfo, trackedEntities))
             {
                 cached.NeedUpdate = true;
                 return false;
             }
-
-            if (oldEntity == null)
-            {
-                cached.Entity = entity;
-                UpdateExistsRelations(entity);
-                cached.NeedUpdateRelated.Clear();
-                return true;
-            }
-
-            var relatedObjects =
-                _relationInfo.Relations.Select(
-                    relation =>
-                        new KeyValuePair<RelationInfo, object>(relation, relation.GetRelatedObject(oldEntity)))
-                    .ToArray();
-
-            foreach (var pair in relatedObjects)
-            {
-                var newRelated = pair.Key.GetRelatedObject(entity);
-                EntityRelationalReferenceInfo relationReference = null;
-                _entityInfo.RelationReferences?.TryGetValue(pair.Key.Name, out relationReference);
-
-                if (relationReference == null)
-                {
-                    pair.Key.SetRelatedObject(oldEntity, (newRelated as IEnumerable<object>).DeepCloneCreateList(pair.Key));
-                }
-                else
-                {
-                    var newRelatedKey = relationReference.GetPrimaryKeyValue(entity);
-                    pair.Key.SetRelatedObject(oldEntity, newRelatedKey.IsValid ? newRelated.DeepCloneItem(pair.Key) : null);
-                }
-            }
-
-            UpdateExistsRelations(oldEntity);
+            cached.Entity = (T)entity.DeepCloneItem(_relationInfo);
+            UpdateRelations(cached.Entity);
             cached.NeedUpdateRelated.Clear();
             return true;
+            
+
+            //var relatedObjects =
+            //    _relationInfo.Relations.Select(
+            //        relation =>
+            //            new KeyValuePair<RelationInfo, object>(relation, relation.GetRelatedObject(oldEntity)))
+            //        .ToArray();
+
+            //foreach (var pair in relatedObjects)
+            //{
+            //    var newRelated = pair.Key.GetRelatedObject(entity);
+            //    EntityRelationalReferenceInfo relationReference = null;
+            //    _entityInfo.RelationReferences?.TryGetValue(pair.Key.Name, out relationReference);
+
+            //    if (relationReference == null)
+            //    {
+            //        pair.Key.SetRelatedObject(oldEntity, (newRelated as IEnumerable<object>).DeepCloneCreateList(pair.Key));
+            //    }
+            //    else
+            //    {
+            //        var newRelatedKey = relationReference.GetPrimaryKeyValue(entity);
+            //        pair.Key.SetRelatedObject(oldEntity, newRelatedKey.IsValid ? newRelated.DeepCloneItem(pair.Key) : null);
+            //    }
+            //}
+
+            //UpdateExistsRelations(oldEntity);
+            //cached.NeedUpdateRelated.Clear();
+            //return true;
         }
 
         private bool GetAllNormalizedAndTracked(object entity, RelationInfo relations, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities)
@@ -299,7 +313,7 @@ namespace VitalChoice.Caching.Services.Cache
                 EntityRelationalReferenceInfo relationReference = null;
                 entityInfo.RelationReferences?.TryGetValue(relation.Name, out relationReference);
 
-                if (relationReference == null)
+                if (relation.IsCollection)
                 {
                     if (!(newRelated is IEnumerable<object>))
                     {
@@ -336,14 +350,38 @@ namespace VitalChoice.Caching.Services.Cache
                         }
                     }
                 }
-                else
+                else if (relationReference != null)
                 {
                     var newRelatedKey = relationReference.GetPrimaryKeyValue(entity);
                     if (newRelatedKey.IsValid)
                     {
                         if (newRelated == null)
                         {
-                            return false;
+                            if (relationReference != entityInfo.PrimaryKey)
+                            {
+                                return false;
+                            }
+                            if (trackedEntities == null)
+                            {
+                                return false;
+                            }
+                            EntityEntry entry;
+                            if (trackedEntities.TryGetValue(new TrackedEntityKey(relation.RelationType, newRelatedKey), out entry))
+                            {
+                                if (entry.Entity != null)
+                                {
+                                    return false;
+                                }
+                            }
+                            if (_cacheFactory.CacheExist(relation.RelationType))
+                            {
+                                var cache = _cacheFactory.GetCache(relation.RelationType);
+                                if (cache.ItemExistAndNotNull(newRelatedKey))
+                                {
+                                    return false;
+                                }
+                            }
+                            continue;
                         }
                         if (trackedEntities != null)
                         {
@@ -369,35 +407,42 @@ namespace VitalChoice.Caching.Services.Cache
 
         public bool Update(IEnumerable<T> entities)
         {
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (var entity in entities)
+            lock (_lockObj)
             {
-                if (Update(entity) == null)
+                foreach (var entity in entities)
                 {
-                    return false;
+                    if (entity != null && UpdateUnsafe(entity) == null)
+                    {
+                        return false;
+                    }
                 }
+                return true;
             }
-            return true;
         }
 
         public bool UpdateExist(IEnumerable<T> entities)
         {
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (var entity in entities)
+            lock (_lockObj)
             {
-                if (UpdateExist(entity) == null)
-                    return false;
+                foreach (var entity in entities)
+                {
+                    if (entity != null && UpdateExistUnsafe(entity) == null)
+                        return false;
+                }
             }
             return true;
         }
 
         public bool UpdateAll(IEnumerable<T> entities)
         {
-            Clear();
-            var result = Update(entities);
-            FullCollection = true;
-            NeedUpdate = false;
-            return result;
+            lock (_lockObj)
+            {
+                Clear();
+                var result = Update(entities);
+                FullCollection = true;
+                NeedUpdate = false;
+                return result;
+            }
         }
 
         public void SetNull(EntityKey pk)
@@ -406,15 +451,24 @@ namespace VitalChoice.Caching.Services.Cache
                 return;
             lock (_lockObj)
             {
-                _mainCluster.Update(pk, new CachedEntity<T>(default(T), this));
+                SetNullUnsafe(pk);
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void SetNullUnsafe(EntityKey pk)
+        {
+            _mainCluster.AddOrUpdate(pk, new CachedEntity<T>(default(T), this));
         }
 
         public void SetNull(IEnumerable<EntityKey> keys)
         {
-            foreach (var key in keys)
+            lock (_lockObj)
             {
-                SetNull(key);
+                foreach (var key in keys)
+                {
+                    SetNullUnsafe(key);
+                }
             }
         }
 
@@ -532,21 +586,21 @@ namespace VitalChoice.Caching.Services.Cache
                 };
                 UpdateRelations(entity);
                 if (indexValue != null)
-                    _indexedCluster.Update(indexValue, cached);
+                    _indexedCluster.AddOrUpdate(indexValue, cached);
                 foreach (var conditionalIndex in conditional)
                 {
-                    _conditionalIndexedDictionary[conditionalIndex.Key].Update(conditionalIndex.Value, cached);
+                    _conditionalIndexedDictionary[conditionalIndex.Key].AddOrUpdate(conditionalIndex.Value, cached);
                 }
                 foreach (var nonUniquePartition in nonUnique)
                 {
                     _nonUniqueIndexedDictionary[nonUniquePartition.Key].AddOrUpdate(nonUniquePartition.Value, index =>
                     {
                         var cluster = new CacheCluster<EntityKey, T>();
-                        cluster.Update(pk, cached);
+                        cluster.AddOrUpdate(pk, cached);
                         return cluster;
                     }, (index, cluster) =>
                     {
-                        cluster.Update(pk, cached);
+                        cluster.AddOrUpdate(pk, cached);
                         return cluster;
                     });
                 }
@@ -554,28 +608,26 @@ namespace VitalChoice.Caching.Services.Cache
             return cached;
         }
 
-        private void UpdateExist(EntityKey pk, T entity, CachedEntity<T> exist)
+        private CachedEntity<T> UpdateExist(EntityKey pk, T entity, CachedEntity<T> exist)
         {
-            lock (exist)
+            if (exist.NeedUpdate && exist.EntityUntyped != (object) entity)
             {
-                if (exist.NeedUpdate && exist.EntityUntyped != (object) entity)
+                var updated = exist.Copy();
+                SyncInternalCache(pk, entity, updated);
+                if (entity != null)
                 {
-                    SyncInternalCache(pk, entity, exist);
-
-                    if (entity != null)
-                    {
-                        //if (!UpdateEntityWithRelations(entity, trackedEntities, exist))
-                        //    return null;
-                        exist.Entity = entity;
-                        UpdateRelations(entity);
-                        exist.NeedUpdateRelated.Clear();
-                    }
-                    else
-                    {
-                        exist.Entity = default(T);
-                    }
+                    //if (!UpdateEntityWithRelations(entity, trackedEntities, exist))
+                    //    return null;
+                    updated.Entity = entity;
+                    UpdateRelations(entity);
                 }
+                else
+                {
+                    updated.Entity = default(T);
+                }
+                return updated;
             }
+            return exist;
         }
 
         private void SyncInternalCache(EntityKey pk, T entity, CachedEntity<T> exist)
@@ -593,7 +645,7 @@ namespace VitalChoice.Caching.Services.Cache
                 _indexedCluster.Remove(exist.UniqueIndex);
             }
             if (indexValue != null)
-                _indexedCluster.Update(indexValue, exist);
+                _indexedCluster.AddOrUpdate(indexValue, exist);
             IEnumerable<EntityConditionalIndexInfo> removeList;
             if (conditional.Any(c => c.Value == null))
             {
@@ -603,7 +655,7 @@ namespace VitalChoice.Caching.Services.Cache
             {
                 foreach (var conditionalIndex in conditional)
                 {
-                    _conditionalIndexedDictionary[conditionalIndex.Key].Update(conditionalIndex.Value, exist);
+                    _conditionalIndexedDictionary[conditionalIndex.Key].AddOrUpdate(conditionalIndex.Value, exist);
                 }
                 removeList = _conditionalIndexedDictionary.Keys.Where(key => !conditional.ContainsKey(key));
             }
@@ -631,11 +683,11 @@ namespace VitalChoice.Caching.Services.Cache
                 _nonUniqueIndexedDictionary[nonUniquePartition.Key].AddOrUpdate(nonUniquePartition.Value, index =>
                 {
                     var cluster = new CacheCluster<EntityKey, T>();
-                    cluster.Update(pk, exist);
+                    cluster.AddOrUpdate(pk, exist);
                     return cluster;
                 }, (index, cluster) =>
                 {
-                    cluster.Update(pk, exist);
+                    cluster.AddOrUpdate(pk, exist);
                     return cluster;
                 });
             }

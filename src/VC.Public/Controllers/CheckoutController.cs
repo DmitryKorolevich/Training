@@ -215,7 +215,7 @@ namespace VC.Public.Controllers
 
             if (!string.IsNullOrEmpty(addUpdateModel.Email))
             {
-                addUpdateModel.SendNews = !(_brontoService.GetIsUnsubscribed(addUpdateModel.Email) ?? false);
+                addUpdateModel.SendNews = !(await _brontoService.GetIsUnsubscribed(addUpdateModel.Email) ?? false);
             }
 
             return View(addUpdateModel);
@@ -294,21 +294,25 @@ namespace VC.Public.Controllers
 
                         if (!string.IsNullOrEmpty(model.Email))
                         {
-                            var unsubscribed = _brontoService.GetIsUnsubscribed(model.Email);
+                            var unsubscribed = await _brontoService.GetIsUnsubscribed(model.Email);
                             if (model.SendNews && (!unsubscribed.HasValue || unsubscribed.Value))
                             {
-                                await _brontoService.Subscribe(model.Email);
+                                _brontoService.Subscribe(model.Email).Start();
                             }
                             if (!model.SendNews)
                             {
                                 if (!unsubscribed.HasValue)
                                 {
-                                    await _brontoService.Subscribe(model.Email);
-                                    _brontoService.Unsubscribe(model.Email);
+                                    _brontoService.Subscribe(model.Email)
+                                        .ContinueWith(task =>
+                                        {
+                                            task.GetAwaiter().GetResult();
+                                            _brontoService.Unsubscribe(model.Email).Start();
+                                        }).Start();
                                 }
                                 else if (!unsubscribed.Value)
                                 {
-                                    _brontoService.Unsubscribe(model.Email);
+                                    _brontoService.Unsubscribe(model.Email).Start();
                                 }
                             }
                         }

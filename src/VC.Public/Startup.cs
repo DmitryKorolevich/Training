@@ -22,6 +22,7 @@ using Microsoft.AspNet.Authentication.Cookies;
 using VitalChoice.Interfaces.Services;
 using Autofac;
 using Microsoft.AspNet.StaticFiles;
+using VitalChoice.Business.Services;
 using VitalChoice.Profiling;
 using VitalChoice.Profiling.Base;
 
@@ -47,8 +48,8 @@ namespace VC.Public
             var reg = new StorefrontDependencyConfig();
             var container = reg.RegisterInfrastructure(Configuration, services, typeof(Startup).GetTypeInfo().Assembly);
 
-			return container.Resolve<IServiceProvider>();
-		}
+            return container.Resolve<IServiceProvider>();
+        }
 
         // Configure is called after ConfigureServices is called.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerfactory)
