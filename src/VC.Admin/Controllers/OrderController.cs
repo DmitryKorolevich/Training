@@ -656,7 +656,10 @@ namespace VC.Admin.Controllers
                             IdObjectType = (int)PaymentMethodType.Oac,
                         };
                         toReturn = _orderRefundMapper.ToModel<OrderRefundManageModel>(refund);
-                        toReturn.ManualShippingTotal = order.ShippingTotal;
+                        if (!toReturn.DisableShippingRefunded)
+                        {
+                            toReturn.ManualShippingTotal = order.ShippingTotal;
+                        }
                     }
                 }
             }

@@ -16,7 +16,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Discounts
         public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
             dataContext.DiscountMessage = dataContext.Order.Discount.GetDiscountMessage();
-            return Task.FromResult<decimal>(-Math.Min(dataContext.Data.RefundProducts, dataContext.Order.Discount.Data.Amount));
+            return Task.FromResult<decimal>(-Math.Min(dataContext.Data.RefundDiscountableSubtotal, dataContext.Order.Discount.Data.Amount));
         }
     }
 }

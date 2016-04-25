@@ -200,7 +200,8 @@
                         <td>
                             <a ui-sref="{{::item.IdObjectType==5 ? 'index.oneCol.orderReshipDetail({id: item.Id })' : item.IdObjectType==6 ? 'index.oneCol.orderRefundDetail({id: item.Id })' : 'index.oneCol.orderDetail({id: item.Id })'}}">{{::item.Id}}</a>
                         </td>
-                        <td>{{::item.Total | currency}}</td>
+                        <td data-ng-if="::item.IdObjectType!=6">{{::item.Total | currency}}</td>
+                        <td data-ng-if="::item.IdObjectType==6">({{::item.Total | currency}})</td>
                         <td>{{::item.DateEdited | date:"MM/dd/yy"}}<br />{{::item.DateEdited | date:"h:mm a"}}<br />{{::item.EditedByAgentId}}</td>
                         <td>
                             <a class="btn btn-default btn-primary btn-xs" target="_blank" data-ng-href="/api/orderinvoice/base/{{::item.Id}}">

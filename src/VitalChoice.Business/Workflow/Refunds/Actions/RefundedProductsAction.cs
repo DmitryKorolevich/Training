@@ -17,11 +17,14 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions
         public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext context, IWorkflowExecutionContext executionContext)
         {
             decimal productsSubtotal = 0;
+            context.RefundSkus = context.Order.RefundSkus.ToList();
             foreach (var refundSku in context.RefundSkus)
             {
-                productsSubtotal += refundSku.RefundValue*(decimal) refundSku.RefundPercent/(decimal) 100.0*refundSku.Quantity;
+                refundSku.RefundValue = refundSku.RefundPrice * (decimal)refundSku.RefundPercent / (decimal)100.0 * refundSku.Quantity;
+                productsSubtotal += refundSku.RefundValue;
             }
             context.RefundSkus = context.RefundSkus.ToList();
+            context.ProductsSubtotal = productsSubtotal;
             return Task.FromResult(productsSubtotal);
         }
     }

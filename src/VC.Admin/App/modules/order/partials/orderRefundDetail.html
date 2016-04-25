@@ -218,17 +218,18 @@
                                                         <span class="legend">Gift Certificates Used On Order</span>
                                                         <div class="form-group margin-bottom-0px" data-ng-repeat="item in order.RefundOrderToGiftCertificates">
                                                             <label for="shippingrefunded" class="col-md-3 control-label">Gift Certificate</label>
-                                                            <div class="col-md-6 form-control-static">
+                                                            <div class="col-md-7 form-control-static">
                                                                 <div>
                                                                     <span>
                                                                         <span>{{item.Code}}</span>
-                                                                        <span data-ng-if="">&nbsp;(Refunded {{item.AmountRefunded | currency}})</span>
+                                                                        <span data-ng-if="item.AmountRefunded">&nbsp;(Refunded {{item.AmountRefunded | currency}})</span>
+                                                                        <span data-ng-if="item.Amount && order.Id">&nbsp;(In this refund {{item.Amount | currency}})</span>
                                                                         <span>&nbsp;(Amount {{item.AmountUsedOnSourceOrder | currency}})</span>
                                                                     </span>
                                                                 </div>
                                                             </div>
                                                             <div data-ng-if="$last">
-                                                                <label class="col-md-2 control-label">Amount</label>
+                                                                <label class="col-md-1 control-label">Amount</label>
                                                                 <div class="col-md-1 padding-left-zero form-control-static">
                                                                     <span>({{order.GiftCertificatesUsedAmountOnSourceOrder | currency}})</span>
                                                                 </div>

@@ -18,9 +18,8 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions
 
         public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext context, IWorkflowExecutionContext executionContext)
         {
-            context.RefundOrderToGiftCertificates = new List<RefundOrderToGiftCertificateUsed>();
             decimal total = Math.Min((decimal) context.Order.Data.RefundGCsUsedOnOrder,
-                (decimal) context.Data.RefundSubtotal);
+                (decimal) context.AutoTotal);
             decimal maxRefunded = 0;
             foreach (var gc in context.Order.RefundOrderToGiftCertificates)
             {
@@ -32,22 +31,13 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions
                         throw new ApiException("Opps something went wrong with Gift Certificates refund");
                     }
                     var toRefundNew = Math.Min(total, possibleToRefund);
-                    var newGc = new RefundOrderToGiftCertificateUsed
-                    {
-                        Amount = gc.Amount + toRefundNew,
-                        AmountRefunded = gc.AmountRefunded + toRefundNew,
-                        AmountUsedOnSourceOrder = gc.AmountUsedOnSourceOrder,
-                        Code = gc.Code,
-                        IdGiftCertificate = gc.IdGiftCertificate,
-                        IdOrder = gc.IdOrder,
-                        Messages = new List<string>()
-                    };
-                    context.RefundOrderToGiftCertificates.Add(newGc);
+                    gc.Amount = toRefundNew;
                     total -= toRefundNew;
                     maxRefunded += toRefundNew;
                 }
             }
             context.RefundGCsUsedOnOrder = maxRefunded;
+            context.RefundOrderToGiftCertificates = context.Order.RefundOrderToGiftCertificates;
             return Task.FromResult(-maxRefunded);
         }
     }

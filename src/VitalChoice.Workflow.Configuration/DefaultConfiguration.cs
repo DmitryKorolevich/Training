@@ -17,6 +17,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Core;
 using ReductionType = VitalChoice.Business.Workflow.Orders.ActionResolvers.ReductionType;
 using VitalChoice.Business.Workflow.Refunds.Actions.Discounts;
+using VitalChoice.Business.Workflow.Refunds.Actions.Products;
 
 namespace VitalChoice.Workflow.Configuration
 {
@@ -238,6 +239,7 @@ namespace VitalChoice.Workflow.Configuration
             {
                 action.Aggregate<RefundSubtotal>();
                 action.Aggregate<RefundGiftCertificatesAction>();
+                action.Aggregate<ManualOverrideAction>();
             });
 
             refund.Action<RefundGiftCertificatesAction>("GiftCertificates", action =>
@@ -248,7 +250,7 @@ namespace VitalChoice.Workflow.Configuration
             refund.Action<RefundSubtotal>("RefundSubtotal", action =>
             {
                 action.Aggregate<RefundReductionTypeActionResolver>();
-                action.Aggregate<ManualOverrideAction>();
+
                 action.Aggregate<RefundedProductsAction>();
                 action.Aggregate<RefundGetTaxAction>();
                 action.Aggregate<RefundShippingAction>();
@@ -264,7 +266,7 @@ namespace VitalChoice.Workflow.Configuration
 
             refund.Action<RefundedProductsAction>("RefundProducts");
 
-            refund.Action<RefundGetTaxAction>("RefundProducts", action =>
+            refund.Action<RefundGetTaxAction>("TaxTotal", action =>
             {
                 action.Dependency<RefundedProductsAction>();
                 action.Dependency<RefundReductionTypeActionResolver>();
@@ -275,18 +277,33 @@ namespace VitalChoice.Workflow.Configuration
 
             refund.ActionResolver<RefundDiscountTypeActionResolver>("NormalDiscount", action =>
             {
-                action.Dependency<RefundedProductsAction>();
-
                 action.ResolvePath<RefundDiscountPercentAction>((int) DiscountType.PercentDiscount, "PercentDiscount");
                 action.ResolvePath<RefundDiscountPriceAction>((int) DiscountType.PriceDiscount, "PriceDiscount");
                 action.ResolvePath<RefundDiscountTieredAction>((int) DiscountType.Tiered, "TieredDiscount");
             });
 
-            refund.Action<RefundDiscountPercentAction>("PercentDiscount");
-            refund.Action<RefundDiscountPriceAction>("PriceDiscount");
-            refund.Action<RefundDiscountTieredAction>("TieredDiscount");
+            refund.Action<RefundDiscountPercentAction>("PercentDiscount", action =>
+            {
+                action.Dependency<RefundDiscountableProductsAction>();
+            });
+            refund.Action<RefundDiscountPriceAction>("PriceDiscount", action =>
+            {
+                action.Dependency<RefundDiscountableProductsAction>();
+            });
+            refund.Action<RefundDiscountTieredAction>("TieredDiscount", action =>
+            {
+                action.Dependency<RefundDiscountableProductsAction>();
+            });
 
-            refund.Action<RefundAutoShipDiscountAction>("AutoshipDiscount");
+            refund.Action<RefundDiscountableProductsAction>("RefundDiscountableSubtotal", action =>
+            {
+                action.Dependency<RefundedProductsAction>();
+            });
+
+            refund.Action<RefundAutoShipDiscountAction>("AutoshipDiscount", action =>
+            {
+                action.Dependency<RefundDiscountableProductsAction>();
+            });
 
             refund.Tree<RefundTree>("Refund", startup =>
             {

@@ -230,127 +230,137 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
     $scope.save = function ()
     {
-        $scope.clearServerValidation();
-
-        var valid = true;
-        $.each($scope.forms, function (index, form)
+        var deferredRecalculate = $q.defer();
+        $scope.addEditTracker.addPromise(deferredRecalculate.promise);
+        $scope.requestRecalculate(function ()
         {
-            if (form && index != 'submitted')
+            $scope.clearServerValidation();
+
+            var valid = true;
+            $.each($scope.forms, function (index, form)
             {
-                if (!form.$valid)
+                if (form && index != 'submitted')
                 {
-                    valid = false;
-                    $scope.activateTab(index);
-                    return false;
+                    if (!form.$valid)
+                    {
+                        valid = false;
+                        $scope.activateTab(index);
+                        return false;
+                    }
                 }
-            }
-        });
-
-        if (valid && $scope.skusClientValid())
-        {
-            if (!orderEditService.isProductsValid($scope))
-            {
-                return;
-            }
-
-            angular.forEach($scope.currentCustomer.Shipping, function (shippingItem, index)
-            {
-                shippingItem.IsSelected = index.toString() == $scope.shippingAddressTab.AddressIndex;
             });
 
-            $scope.order.IdPaymentMethodType = $scope.paymentInfoTab.PaymentMethodType;
-            var billingErrorMessages = '';
-            if ($scope.order.IdPaymentMethodType == 1)//card
+            if (valid && $scope.skusClientValid())
             {
-                if ($scope.currentCustomer.CreditCards.length != 0)
+                if (!orderEditService.isProductsValid($scope))
                 {
-                    angular.forEach($scope.currentCustomer.CreditCards, function (cardItem, index)
-                    {
-                        cardItem.IsSelected = index.toString() == $scope.paymentInfoTab.CreditCardIndex;
-                    });
+                    deferredRecalculate.reject();
+                    return;
                 }
-            }
-            if (!$scope.order.OnHold)
-            {
+
+                angular.forEach($scope.currentCustomer.Shipping, function (shippingItem, index)
+                {
+                    shippingItem.IsSelected = index.toString() == $scope.shippingAddressTab.AddressIndex;
+                });
+
+                $scope.order.IdPaymentMethodType = $scope.paymentInfoTab.PaymentMethodType;
+                var billingErrorMessages = '';
                 if ($scope.order.IdPaymentMethodType == 1)//card
                 {
-                    if ($scope.order.CreditCard == null)
+                    if ($scope.currentCustomer.CreditCards.length != 0)
                     {
-                        billingErrorMessages += "Credit Card is required. ";
+                        angular.forEach($scope.currentCustomer.CreditCards, function (cardItem, index)
+                        {
+                            cardItem.IsSelected = index.toString() == $scope.paymentInfoTab.CreditCardIndex;
+                        });
                     }
                 }
-                if ($scope.order.IdPaymentMethodType == 2)//oac
+                if (!$scope.order.OnHold)
                 {
-                    if ($scope.order.Oac == null)
+                    if ($scope.order.IdPaymentMethodType == 1)//card
                     {
-                        billingErrorMessages += "On Approved Credit is required. ";
+                        if ($scope.order.CreditCard == null)
+                        {
+                            billingErrorMessages += "Credit Card is required. ";
+                        }
+                    }
+                    if ($scope.order.IdPaymentMethodType == 2)//oac
+                    {
+                        if ($scope.order.Oac == null)
+                        {
+                            billingErrorMessages += "On Approved Credit is required. ";
+                        }
+                    }
+                    if ($scope.order.IdPaymentMethodType == 3)//check
+                    {
+                        if ($scope.order.Check == null)
+                        {
+                            billingErrorMessages += "Check is required. ";
+                        }
+                    }
+                    if ($scope.order.IdPaymentMethodType == 6)
+                    {
+                        if ($scope.order.WireTransfer == null)
+                        {
+                            billingErrorMessages += "Wire Transfer is required. ";
+                        }
+                    }
+                    if ($scope.order.IdPaymentMethodType == 7)
+                    {
+                        if ($scope.order.Marketing == null)
+                        {
+                            billingErrorMessages += "Marketing payment info is required. ";
+                        }
+                    }
+                    if ($scope.order.IdPaymentMethodType == 8)
+                    {
+                        if ($scope.order.VCWellness == null)
+                        {
+                            billingErrorMessages += "VC Wellness Employee Program is required. ";
+                        }
                     }
                 }
-                if ($scope.order.IdPaymentMethodType == 3)//check
-                {
-                    if ($scope.order.Check == null)
-                    {
-                        billingErrorMessages += "Check is required. ";
-                    }
-                }
-                if ($scope.order.IdPaymentMethodType == 6)
-                {
-                    if ($scope.order.WireTransfer == null)
-                    {
-                        billingErrorMessages += "Wire Transfer is required. ";
-                    }
-                }
-                if ($scope.order.IdPaymentMethodType == 7)
-                {
-                    if ($scope.order.Marketing == null)
-                    {
-                        billingErrorMessages += "Marketing payment info is required. ";
-                    }
-                }
-                if ($scope.order.IdPaymentMethodType == 8)
-                {
-                    if ($scope.order.VCWellness == null)
-                    {
-                        billingErrorMessages += "VC Wellness Employee Program is required. ";
-                    }
-                }
-            }
 
-            if (billingErrorMessages)
-            {
-                $scope.paymentInfoTab.active = true;
-                toaster.pop('error', 'Error!', billingErrorMessages, null, 'trustedHtml');
-                return;
-            }
+                if (billingErrorMessages)
+                {
+                    $scope.paymentInfoTab.active = true;
+                    toaster.pop('error', 'Error!', billingErrorMessages, null, 'trustedHtml');
+                    deferredRecalculate.reject();
+                    return;
+                }
 
-            var order = orderEditService.orderDataProcessingBeforeSave($scope);
+                var order = orderEditService.orderDataProcessingBeforeSave($scope);
 
-            orderService.updateReshipOrder(order, $scope.addEditTracker).success(function (result)
+                orderService.updateReshipOrder(order, $scope.addEditTracker).success(function (result)
+                {
+                    deferredRecalculate.reject();
+                    successSaveHandler(result);
+                }).
+                error(function (result)
+                {
+                    deferredRecalculate.reject();
+                    errorHandler(result);
+                });
+                //billing info - for exist order all data should be sent and backend will save only needed one based on IdPaymentMethodType
+            } else
             {
-                successSaveHandler(result);
-            }).
-            error(function (result)
-            {
-                errorHandler(result);
-            });
-            //billing info - for exist order all data should be sent and backend will save only needed one based on IdPaymentMethodType
-        } else
-        {
-            if ($scope.forms.topForm != null)
-            {
-                $scope.forms.topForm.submitted = true;
+                if ($scope.forms.topForm != null)
+                {
+                    $scope.forms.topForm.submitted = true;
+                }
+                $scope.forms.mainForm.submitted = true;
+                $scope.forms.mainForm2.submitted = true;
+                $scope.forms.submitted['shipping'] = true;
+                $scope.forms.submitted['card'] = true;
+                $scope.forms.submitted['oac'] = true;
+                $scope.forms.submitted['check'] = true;
+                $scope.forms.submitted['wiretransfer'] = true;
+                $scope.forms.submitted['marketing'] = true;
+                $scope.forms.submitted['vcwellness'] = true;
+                toaster.pop('error', "Error!", "Validation errors, please correct field values.", null, 'trustedHtml');
+                deferredRecalculate.reject();
             }
-            $scope.forms.mainForm.submitted = true;
-            $scope.forms.mainForm2.submitted = true;
-            $scope.forms.submitted['shipping'] = true;
-            $scope.forms.submitted['card'] = true;
-            $scope.forms.submitted['oac'] = true;
-            $scope.forms.submitted['check'] = true;
-            $scope.forms.submitted['wiretransfer'] = true;
-            $scope.forms.submitted['marketing'] = true;
-            $scope.forms.submitted['vcwellness'] = true;
-            toaster.pop('error', "Error!", "Validation errors, please correct field values.", null, 'trustedHtml');
-        }
+        });
     };
 
     initialize();

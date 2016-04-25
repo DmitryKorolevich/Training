@@ -17,7 +17,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Discounts
             dataContext.DiscountMessage = dataContext.Order.Discount.GetDiscountMessage();
             return
                 Task.FromResult<decimal>(-dataContext.Order.Discount.Data.Percent*
-                                         (decimal) dataContext.Data.RefundProducts/100);
+                                         (decimal) dataContext.Data.RefundDiscountableSubtotal / 100);
         }
     }
 }
