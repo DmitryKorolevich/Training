@@ -16,7 +16,7 @@
     "Microsoft.AspNet.Mvc.ViewFeatures": "6.0.0-*",
     "Microsoft.Extensions.Logging": "1.0.0-*",
     "Microsoft.Extensions.Logging.Console": "1.0.0-*",
-    "Templates": "2.7.6-rc1"
+    "Templates": "2.7.7-rc1"
   },
   "frameworks": {
     "net451": { },
