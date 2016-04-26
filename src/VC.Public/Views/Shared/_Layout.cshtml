@@ -93,7 +93,7 @@
 							<a class="view-cart" href="@Url.Action("ViewCart", "Cart")">
 								<div class="cart-icon"></div>
 								<div class="item-total">
-									<span>@await Component.InvokeAsync("CartLite")</span>
+									<span id="cart-lite-component">@await Component.InvokeAsync("CartLite")</span>
 									<span>Item(s)</span>
 								</div>
 							</a>

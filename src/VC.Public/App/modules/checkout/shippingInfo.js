@@ -53,6 +53,8 @@ function controlSectionState(selector, controlId) {
 	}
 }
 
+var lastPrefShipMethodLabel = "Best";
+
 function controlUseBillingState(selector, controlId) {
 	jSel = $(selector);
 	jDrop = $("#ddShippingAddressesSelection").closest(".form-group");
@@ -61,6 +63,7 @@ function controlUseBillingState(selector, controlId) {
 	jChkContainer = $("#updateSaved");
 
 	jSpan = $("#spEnterAddress");
+	jPrefShipMethod = $("#PreferredShipMethodLabel");
 
 	if ($(controlId).is(":checked")) {
 		jSel.hide();
@@ -69,12 +72,14 @@ function controlUseBillingState(selector, controlId) {
 		jChk.trigger("change");
 		jChkContainer.hide();
 		jSpan.hide();
+		lastPrefShipMethodLabel = jPrefShipMethod.text();
+		jPrefShipMethod.text("Best");
 	} else {
 		jSel.show();
 		jDrop.show();
 		jChkContainer.show();
 		jSpan.show();
-
+		jPrefShipMethod.text(lastPrefShipMethodLabel);
 		//controlSectionState("#ddShippingAddressesSelection", "#chkSelectOther");
 	}
 }
