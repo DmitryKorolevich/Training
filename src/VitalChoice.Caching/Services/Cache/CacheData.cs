@@ -661,7 +661,7 @@ namespace VitalChoice.Caching.Services.Cache
             }
             foreach (var indexInfo in removeList)
             {
-                _conditionalIndexedDictionary[indexInfo].Remove(indexInfo.GetConditionalIndexValue(exist));
+                _conditionalIndexedDictionary[indexInfo].Remove(indexInfo.GetConditionalIndexValue(exist.EntityUntyped));
             }
             if (exist.NonUniqueIndexes != null)
             {
