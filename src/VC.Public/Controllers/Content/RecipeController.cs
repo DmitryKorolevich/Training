@@ -13,16 +13,22 @@ namespace VC.Public.Controllers.Content
         private readonly IRecipeCategoryViewService _recipeCategoryViewService;
         private readonly IRecipeViewService _recipeViewService;
         private readonly IContentEditService _contentService;
+        private readonly ICategoryService _categoryService;
+        private readonly IRecipeService _recipeService;
 
         public RecipeController(
             IRecipeCategoryViewService recipeCategoryViewService,
             IRecipeViewService recipeViewService,
             IContentEditService contentService,
+            ICategoryService categoryService,
+            IRecipeService recipeService,
             IPageResultService pageResultService) : base(pageResultService)
         {
             _recipeCategoryViewService = recipeCategoryViewService;
             _recipeViewService = recipeViewService;
             _contentService = contentService;
+            _categoryService = categoryService;
+            _recipeService = recipeService;
         }
 
         [HttpGet]
@@ -48,6 +54,22 @@ namespace VC.Public.Controllers.Content
         }
 
         [HttpGet]
+        public async Task<IActionResult> CategoryByIdOld([FromQuery]string idCategory)
+        {
+            int idold;
+            if (Int32.TryParse(idCategory, out idold))
+            {
+                var item = await _categoryService.GetCategoryByIdOldAsync(idold);
+                if (!string.IsNullOrEmpty(item?.Url) && item?.Type==ContentType.RecipeCategory)
+                {
+                    return RedirectPermanent($"/recipes/{item.Url}");
+                }
+            }
+
+            return BaseNotFoundView();
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Recipe(string url)
         {
             var toReturn = await _recipeViewService.GetContentAsync(ActionContext, BindingContext, User);
@@ -55,6 +77,22 @@ namespace VC.Public.Controllers.Content
             {
                 return BaseView(new ContentPageViewModel(toReturn));
             }
+            return BaseNotFoundView();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RecipeByIdOld([FromQuery]string RecipeId)
+        {
+            int idold;
+            if (Int32.TryParse(RecipeId, out idold))
+            {
+                var item = await _recipeService.GetRecipeByIdOldAsync(idold);
+                if (!string.IsNullOrEmpty(item?.Url))
+                {
+                    return RedirectPermanent($"/recipe/{item.Url}");
+                }
+            }
+
             return BaseNotFoundView();
         }
 

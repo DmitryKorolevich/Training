@@ -187,7 +187,15 @@ namespace VitalChoice.Business.Services.Content
 	        return toReturn;
         }
 
-	    public async Task<IList<RecipeDefaultSetting>> GetRecipeSettingsAsync()
+        public async Task<Recipe> GetRecipeByIdOldAsync(int id)
+        {
+            RecipeQuery query = new RecipeQuery().WithIdOld(id).NotDeleted();
+            var toReturn = (await recipeRepository.Query(query).SelectAsync(false)).FirstOrDefault();
+
+            return toReturn;
+        }
+
+        public async Task<IList<RecipeDefaultSetting>> GetRecipeSettingsAsync()
 	    {
 		    return await _recipeSettingRepository.Query().SelectAsync(false);
 	    }

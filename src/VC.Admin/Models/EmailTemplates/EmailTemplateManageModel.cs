@@ -5,6 +5,7 @@ using VC.Admin.Validators;
 using VC.Admin.Validators.ContentManagement;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Content.Base;
+using VitalChoice.Infrastructure.Domain.Content.Emails;
 using VitalChoice.Infrastructure.Domain.Content.Recipes;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Attributes;

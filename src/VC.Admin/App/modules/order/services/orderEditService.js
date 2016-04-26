@@ -187,7 +187,8 @@ angular.module('app.modules.order.services.orderEditService', [])
                 {
                     for (var j = i + 1; j < uiScope.order.SkuOrdereds.length; j++)
                     {
-                        if (current.Code == uiScope.order.SkuOrdereds[j].Code)
+                        if (current.Code == uiScope.order.SkuOrdereds[j].Code || (current.Code && uiScope.order.SkuOrdereds[j].Code
+                            && current.Code.toUpperCase() == uiScope.order.SkuOrdereds[j].Code.toUpperCase()))
                         {
                             uiScope.order.SkuOrdereds[j].ClientMessages.push("Duplicate SKU");
                             isValid = false;
@@ -304,7 +305,7 @@ angular.module('app.modules.order.services.orderEditService', [])
                         var add = true;
                         $.each(uiScope.order.SkuOrdereds, function (index, product)
                         {
-                            if (newProduct.Code == product.Code)
+                            if (newProduct.Code == product.Code || (newProduct.Code && product.Code && newProduct.Code.toUpperCase() == product.Code.toUpperCase()))
                             {
                                 add = false;
                                 return false;
@@ -444,7 +445,7 @@ angular.module('app.modules.order.services.orderEditService', [])
                         uiScope.requestRecalculate();
                     }
                 }
-            }, 20);
+            }, 100);
         };
 
         uiScope.getSKUsByProductName = function (val)
@@ -691,8 +692,9 @@ angular.module('app.modules.order.services.orderEditService', [])
                 var found = false;
                 $.each(data.SkuOrdereds, function (index, sku)
                 {
-                    if (uiSku.Code == sku.Code)
+                    if (uiSku.Code == sku.Code || (uiSku.Code && sku.Code && uiSku.Code.toUpperCase() == sku.Code.toUpperCase()))
                     {
+                        uiSku.Code == sku.Code;
                         uiSku.Price = sku.Price;
                         uiSku.Amount = sku.Amount;
                         uiSku.Quantity = sku.Quantity;
@@ -703,15 +705,6 @@ angular.module('app.modules.order.services.orderEditService', [])
                         return false;
                     }
                 });
-                if (!found && uiSku.Id != null)
-                {
-                    toDeleteIdxs.push(index);
-                }
-            });
-
-            $.each(toDeleteIdxs, function (index, item)
-            {
-                uiScope.order.SkuOrdereds.splice(item, 1);
             });
 
             uiScope.order.PromoSkus = data.PromoSkus;

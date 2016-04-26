@@ -30,6 +30,7 @@ using System.Dynamic;
 using Templates.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using Templates.Runtime;
+using VitalChoice.Infrastructure.Domain.Content.Emails;
 
 namespace VitalChoice.Business.Services
 {

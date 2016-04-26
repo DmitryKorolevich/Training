@@ -23,6 +23,13 @@ namespace VitalChoice.Business.Queries.Content
             return this;
         }
 
+        public CategoryQuery WithIdOld(int idOld)
+        {
+            Add(x => x.IdOld == idOld);
+
+            return this;
+        }
+
         public CategoryQuery WithParentId(int id)
         {
             Add(x => x.ParentId ==id);

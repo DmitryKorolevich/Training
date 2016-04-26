@@ -10,6 +10,7 @@ namespace VitalChoice.Interfaces.Services.Content
     {
         Task<PagedList<Recipe>> GetRecipesAsync(RecipeListFilter filter);
         Task<Recipe> GetRecipeAsync(int id);
+	    Task<Recipe> GetRecipeByIdOldAsync(int id);
         Task<Recipe> UpdateRecipeAsync(Recipe recipe);
         Task<bool> AttachRecipeToCategoriesAsync(int id, IEnumerable<int> categoryIds);
         Task<bool> DeleteRecipeAsync(int id);

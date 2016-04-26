@@ -12,14 +12,20 @@ namespace VC.Public.Controllers.Content
     {
         private readonly IFAQCategoryViewService _faqCategoryViewService;
         private readonly IFAQViewService _faqViewService;
+        private readonly ICategoryService _categoryService;
+        private readonly IFAQService _fAQService;
 
         public FaqController(
             IFAQCategoryViewService faqCategoryViewService,
             IFAQViewService faqViewService,
+            ICategoryService categoryService,
+            IFAQService fAQService,
             IPageResultService pageResultService) : base(pageResultService)
         {
             _faqCategoryViewService = faqCategoryViewService;
             _faqViewService = faqViewService;
+            _categoryService = categoryService;
+            _fAQService = fAQService;
         }
 
         [HttpGet]
@@ -45,6 +51,22 @@ namespace VC.Public.Controllers.Content
         }
 
         [HttpGet]
+        public async Task<IActionResult> CategoryByIdOld([FromQuery]string idSLC)
+        {
+            int idold;
+            if (Int32.TryParse(idSLC, out idold))
+            {
+                var item = await _categoryService.GetCategoryByIdOldAsync(idold);
+                if (!string.IsNullOrEmpty(item?.Url) && item?.Type == ContentType.FaqCategory)
+                {
+                    return RedirectPermanent($"/faqs/{item.Url}");
+                }
+            }
+
+            return BaseNotFoundView();
+        }
+
+        [HttpGet]
         public async Task<IActionResult> FAQ(string url)
         {
             var toReturn = await _faqViewService.GetContentAsync(ActionContext, BindingContext, User);
@@ -52,6 +74,22 @@ namespace VC.Public.Controllers.Content
             {
                 return BaseView(new ContentPageViewModel(toReturn));
             }
+            return BaseNotFoundView();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> FAQByIdOld([FromQuery]string idFAQ)
+        {
+            int idold;
+            if (Int32.TryParse(idFAQ, out idold))
+            {
+                var item = await _fAQService.GetFAQByIdOldAsync(idold);
+                if (!string.IsNullOrEmpty(item?.Url))
+                {
+                    return RedirectPermanent($"/faq/{item.Url}");
+                }
+            }
+
             return BaseNotFoundView();
         }
     }
