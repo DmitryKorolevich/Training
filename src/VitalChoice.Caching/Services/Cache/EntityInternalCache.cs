@@ -509,10 +509,10 @@ namespace VitalChoice.Caching.Services.Cache
                     var collectionForeignKey = foreignKey.Key as EntityForeignKeyCollectionInfo;
                     if (collectionForeignKey != null)
                     {
-                        var collection = foreignKey.Value.Values[0].Value as IEnumerable;
+                        var collection = foreignKey.Value.Values[0].Value as IEnumerable<object>;
                         if (collection != null)
                         {
-                            cache.MarkForUpdate(collection.Cast<object>().Select(item => cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(item)),
+                            cache.MarkForUpdate(collection.Select(item => cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(item)),
                                 foreignKey.Key.Name);
                         }
                     }
