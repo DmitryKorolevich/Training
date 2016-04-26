@@ -38,7 +38,7 @@
                                             <div class="form-group">
                                                 <label for="subtitle" class="col-md-3 control-label">Subtitle</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" name="Subtitle" class="form-control" placeholder="Subtitle" data-ng-model="recipe.Subtitle" required>
+                                                    <input type="text" name="Subtitle" class="form-control" placeholder="Subtitle" data-ng-model="recipe.Subtitle">
                                                     <div class="error-container" ng-show="forms.recipeForm.submitted && forms.recipeForm.Subtitle.$invalid">
                                                         <small class="error" ng-show="forms.recipeForm.Subtitle.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Subtitle")}}</small>
                                                     </div>
@@ -58,7 +58,7 @@
                                             <div class="form-group">
                                                 <label class="control-label  col-md-3">Video Image</label>
                                                 <div class="col-md-9">
-                                                    <filefield name="YoutubeImage" placeholder="Video Image" ng-model="recipe.YoutubeImage" required></filefield>
+                                                    <filefield name="YoutubeImage" placeholder="Video Image" ng-model="recipe.YoutubeImage"></filefield>
                                                     <div class="error-container" ng-show="forms.recipeForm.submitted && forms.recipeForm.YoutubeImage.$invalid">
                                                         <small class="error" ng-show="forms.recipeForm.YoutubeImage.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Video Image")}}</small>
                                                     </div>
@@ -68,7 +68,7 @@
                                                 <label class="control-label col-md-3">Video</label>
                                                 <div class="col-md-9">
                                                     <div class="input-group">
-                                                        <input type="text" name="YoutubeVideo" class="form-control" placeholder="Video" data-ng-model="recipe.YoutubeVideo" required>
+                                                        <input type="text" name="YoutubeVideo" class="form-control" placeholder="Video" data-ng-model="recipe.YoutubeVideo">
                                                         <span class="input-group-btn">
                                                             <a target="_blank" data-ng-href="{{recipe.YoutubeVideo ? youTubeBaseUrl.format(recipe.YoutubeVideo) : ''}}" class="btn btn-default"><i class="glyphicon glyphicon-eye-open"></i></a>
                                                         </span>

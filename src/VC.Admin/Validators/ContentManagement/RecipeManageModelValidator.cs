@@ -39,9 +39,7 @@ namespace VC.Admin.Validators.ContentManagement
 				   .WithMessage(model => model.Name, ValidationMessages.FieldLength,
 					   BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
 
-	            RuleFor(model => model.Name)
-		            .NotEmpty()
-		            .WithMessage(model => model.Subtitle, ValidationMessages.FieldRequired)
+	            RuleFor(model => model.Subtitle)
 					.Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE)
 					.WithMessage(model => model.Subtitle, ValidationMessages.FieldLength,
 			            BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
@@ -57,13 +55,7 @@ namespace VC.Admin.Validators.ContentManagement
                     .NotEmpty()
                     .WithMessage(model => model.Description, ValidationMessages.FieldRequired);
 
-				RuleFor(model => model.YoutubeImage)
-					.NotEmpty()
-					.WithMessage(model => model.YoutubeImage, ValidationMessages.FieldRequired);
-
 				RuleFor(model => model.YoutubeVideo)
-				   .NotEmpty()
-				   .WithMessage(model => model.YoutubeVideo, ValidationMessages.FieldRequired)
 				   .Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE)
 				   .WithMessage(model => model.YoutubeVideo, ValidationMessages.FieldLength,
 					   BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
