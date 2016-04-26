@@ -13,6 +13,13 @@ namespace VitalChoice.Business.Queries.Content
             return this;
         }
 
+        public ArticleQuery WithIdOld(int idOld)
+        {
+            Add(x => x.IdOld == idOld);
+
+            return this;
+        }
+
         public ArticleQuery WithName(string name)
         {
             if (!string.IsNullOrEmpty(name))

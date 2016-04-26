@@ -128,6 +128,14 @@ namespace VitalChoice.Business.Services.Content
             return toReturn;
         }
 
+        public async Task<FAQ> GetFAQByIdOldAsync(int id)
+        {
+            FAQQuery query = new FAQQuery().WithIdOld(id).NotDeleted();
+            var toReturn = (await faqRepository.Query(query).SelectAsync(false)).FirstOrDefault();
+
+            return toReturn;
+        }
+
         public async Task<FAQ> UpdateFAQAsync(FAQ model)
         {
             FAQ dbItem = null;

@@ -158,6 +158,14 @@ namespace VitalChoice.Business.Services.Content
             return toReturn;
         }
 
+        public async Task<Article> GetArticleByIdOldAsync(int id)
+        {
+            ArticleQuery query = new ArticleQuery().WithIdOld(id).NotDeleted();
+            var toReturn = (await _articleRepository.Query(query).SelectAsync(false)).FirstOrDefault();
+
+            return toReturn;
+        }
+
         public async Task<Article> UpdateArticleAsync(Article model)
         {
             Article dbItem = null;

@@ -14,6 +14,13 @@ namespace VitalChoice.Business.Queries.Content
             return this;
         }
 
+        public FAQQuery WithIdOld(int idOld)
+        {
+            Add(x => x.IdOld == idOld);
+
+            return this;
+        }
+
         public FAQQuery WithName(string name)
         {
             if (!String.IsNullOrEmpty(name))

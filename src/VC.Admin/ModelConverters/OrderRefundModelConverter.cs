@@ -104,7 +104,7 @@ namespace VC.Admin.ModelConverters
                             refundSku.Active = refundSku.Disabled;
                             model.RefundSkus.Add(refundSku);
                         }
-                        foreach (var skuOrdered in source?.PromoSkus)
+                        foreach (var skuOrdered in source?.PromoSkus.Where(p=>p.Enabled))
                         {
                             var refundSku = new RefundSkuManageModel(skuOrdered);
                             var refundWithSkuExist = existAllRefunds.SelectMany(p => p.RefundSkus).FirstOrDefault(p => p?.Sku.Id == refundSku.IdSku);

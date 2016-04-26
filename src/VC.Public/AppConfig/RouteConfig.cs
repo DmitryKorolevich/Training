@@ -18,9 +18,24 @@ namespace VC.Public.AppConfig
                 defaults: new { controller = "Recipe", action = "Category" });
 
             routeBuilder.MapRoute(
+                name: "Recipes_Category_ByIdOld",
+                template: "shop/pc/recipes.asp",
+                defaults: new { controller = "Recipe", action = "CategoryByIdOld" });
+
+            routeBuilder.MapRoute(
                 name: "Recipes_Recipe",
                 template: "recipe/{url}",
                 defaults: new { controller = "Recipe", action = "Recipe" });
+
+            routeBuilder.MapRoute(
+                name: "Recipes_Recipe_ByIdOld",
+                template: "shop/pc/viewrecipes.asp",
+                defaults: new { controller = "Recipe", action = "RecipeByIdOld" });
+
+            routeBuilder.MapRoute(
+                name: "Recipes_Recipe_ByIdOld2",
+                template: "shop/pc/viewrecipes_itk.asp",
+                defaults: new { controller = "Recipe", action = "RecipeByIdOld" });
 
             routeBuilder.MapRoute(
                 name: "FAQs_Categories",
@@ -33,9 +48,19 @@ namespace VC.Public.AppConfig
                 defaults: new { controller = "FAQ", action = "Category" });
 
             routeBuilder.MapRoute(
+                name: "FAQs_Category_ByIdOld",
+                template: "shop/pc/FAQView.asp",
+                defaults: new { controller = "FAQ", action = "CategoryByIdOld" });
+
+            routeBuilder.MapRoute(
                 name: "FAQs_FAQ",
                 template: "faq/{url}",
                 defaults: new { controller = "FAQ", action = "FAQ" });
+
+            routeBuilder.MapRoute(
+                name: "FAQs_FAQ_ByIdOld",
+                template: "shop/pc/FAQ_QView.asp",
+                defaults: new { controller = "FAQ", action = "FAQByIdOld" });
 
             routeBuilder.MapRoute(
                 name: "Articles_Categories",
@@ -48,9 +73,19 @@ namespace VC.Public.AppConfig
                 defaults: new { controller = "Article", action = "Category" });
 
             routeBuilder.MapRoute(
+                name: "Articles_Category_ByIdOld",
+                template: "shop/pc/articles.asp",
+                defaults: new { controller = "Article", action = "CategoryByIdOld" });
+
+            routeBuilder.MapRoute(
                 name: "Articles_Article",
                 template: "article/{url}",
                 defaults: new { controller = "Article", action = "Article" });
+
+            routeBuilder.MapRoute(
+                name: "Articles_Article_ByIdOld",
+                template: "shop/pc/articlesView.asp",
+                defaults: new { controller = "Article", action = "ArticleByIdOld" });
 
             routeBuilder.MapRoute(
                 name: "ContentPages_Categories",

@@ -10,6 +10,7 @@ namespace VitalChoice.Interfaces.Services.Content
     {
         Task<PagedList<FAQ>> GetFAQsAsync(FAQListFilter filter);
         Task<FAQ> GetFAQAsync(int id);
+	    Task<FAQ> GetFAQByIdOldAsync(int id);
         Task<FAQ> UpdateFAQAsync(FAQ faq);
         Task<bool> AttachFAQToCategoriesAsync(int id, IEnumerable<int> categoryIds);
         Task<bool> DeleteFAQAsync(int id);

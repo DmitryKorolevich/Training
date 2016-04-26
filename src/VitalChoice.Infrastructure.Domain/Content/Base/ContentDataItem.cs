@@ -23,5 +23,7 @@ namespace VitalChoice.Infrastructure.Domain.Content.Base
         public int? UserId { get; set; }
 
         public ApplicationUser User { get; set; }
+
+        public int? IdOld { get; set; }
     }
 }
