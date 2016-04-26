@@ -201,8 +201,7 @@ namespace VitalChoice.Business.Services.Dynamic
                     });
                 
                 dynamic.RefundOrderToGiftCertificates = dynamic.RefundOrderToGiftCertificates ?? new List<RefundOrderToGiftCertificateUsed>();
-                entity.RefundOrderToGiftCertificates.RemoveAll(p=> dynamic.RefundOrderToGiftCertificates.
-                    FirstOrDefault(pp=>pp.IdOrder==p.IdOrder && pp.IdGiftCertificate==p.IdGiftCertificate)==null);
+
                 //new
                 foreach (var refundOrderToGiftCertificate in dynamic.RefundOrderToGiftCertificates)
                 {
@@ -230,6 +229,7 @@ namespace VitalChoice.Business.Services.Dynamic
                         {
                             existItem.OrderToGiftCertificate.GiftCertificate.Balance = existItem.OrderToGiftCertificate.GiftCertificate.Balance - diff >= 0 ?
                                 existItem.OrderToGiftCertificate.GiftCertificate.Balance-diff : 0;
+                            refundOrderToGiftCertificate.GCBalanceAfterUpdate= existItem.OrderToGiftCertificate.GiftCertificate.Balance;
                         }
                     }
                 }

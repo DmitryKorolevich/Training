@@ -24,6 +24,7 @@ using System.Linq.Expressions;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Infrastructure.Context;
 using Microsoft.Extensions.Logging;
+using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -31,6 +32,7 @@ namespace VitalChoice.Business.Services.Orders
         IOrderRefundService
     {
         private readonly IWorkflowFactory _treeFactory;
+        private readonly IGcService _gcService;
 
         public OrderRefundService(
             OrderRepository orderRepository,
@@ -42,12 +44,14 @@ namespace VitalChoice.Business.Services.Orders
             DirectMapper<Order> directMapper,
             DynamicExtensionsRewriter queryVisitor,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
+            IGcService gcService,
             IWorkflowFactory treeFactory)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
         {
             _treeFactory = treeFactory;
+            _gcService = gcService;
         }
 
         protected override Expression<Func<Order, bool>> AdditionalDefaultConditions => 
@@ -130,6 +134,17 @@ namespace VitalChoice.Business.Services.Orders
                     refundOrderToGiftCertificateUsed.Amount = 0;
                 }
                 await UpdateAsync(order);
+
+                //foreach (var refundOrderToGiftCertificateUsed in order.RefundOrderToGiftCertificates)
+                //{
+                //    if (refundOrderToGiftCertificateUsed.GCBalanceAfterUpdate.HasValue)
+                //    {
+                //        var gc = await _gcService.GetGiftCertificateAsync(refundOrderToGiftCertificateUsed.IdGiftCertificate);
+                //        gc.Balance = refundOrderToGiftCertificateUsed.GCBalanceAfterUpdate.Value;
+                //        await _gcService.UpdateGiftCertificateAsync(gc);
+                //    }
+                //}
+
                 return true;
             }
             return toReturn;

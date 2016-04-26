@@ -23,6 +23,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 
         public string Code { get; set; }
 
+        public decimal? GCBalanceAfterUpdate { get; set; }
+
         public IList<string> Messages { get; set; }
     }
 }
