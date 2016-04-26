@@ -49,6 +49,31 @@ namespace VitalChoice.Business.Services.Bronto
 #endif
         }
 
+        public void PushSubscribe(string email, bool subscribe)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                var unsubscribed = GetIsUnsubscribed(email).GetAwaiter().GetResult();
+                if (subscribe && (unsubscribed ?? true))
+                {
+                    Subscribe(email).Start();
+                }
+                if (!subscribe)
+                {
+                    if (!unsubscribed.HasValue)
+                    {
+                        //Resolve issue with showing the default value only the first time
+                        Subscribe(email).GetAwaiter().GetResult();
+                        Unsubscribe(email).GetAwaiter().GetResult();
+                    }
+                    else if (!unsubscribed.Value)
+                    {
+                        Unsubscribe(email).GetAwaiter().GetResult();
+                    }
+                }
+            });
+        }
+
         public async Task<bool> Send(string email)
         {
             EmailValidator emailValidator = new EmailValidator();

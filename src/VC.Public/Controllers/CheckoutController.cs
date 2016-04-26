@@ -294,27 +294,7 @@ namespace VC.Public.Controllers
 
                         if (!string.IsNullOrEmpty(model.Email))
                         {
-                            var unsubscribed = await _brontoService.GetIsUnsubscribed(model.Email);
-                            if (model.SendNews && (!unsubscribed.HasValue || unsubscribed.Value))
-                            {
-                                _brontoService.Subscribe(model.Email).Start();
-                            }
-                            if (!model.SendNews)
-                            {
-                                if (!unsubscribed.HasValue)
-                                {
-                                    _brontoService.Subscribe(model.Email)
-                                        .ContinueWith(task =>
-                                        {
-                                            task.GetAwaiter().GetResult();
-                                            _brontoService.Unsubscribe(model.Email).Start();
-                                        }).Start();
-                                }
-                                else if (!unsubscribed.Value)
-                                {
-                                    _brontoService.Unsubscribe(model.Email).Start();
-                                }
-                            }
+                            _brontoService.PushSubscribe(model.Email, model.SendNews);
                         }
 
                         return RedirectToAction("AddUpdateShippingMethod");
