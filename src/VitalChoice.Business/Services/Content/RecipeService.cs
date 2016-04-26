@@ -236,10 +236,10 @@ namespace VitalChoice.Business.Services.Content
 
 			    //what is the purpose of such strange code? both model and dbItem are of the same type. Why do we need to maintain additional object?
 			    dbItem.Name = model.Name;
-			    dbItem.Subtitle = model.Subtitle;
-			    dbItem.YoutubeVideo = model.YoutubeVideo;
-			    dbItem.YoutubeImage = model.YoutubeImage;
-			    dbItem.Url = model.Url;
+			    dbItem.Subtitle = model.Subtitle ?? String.Empty;
+			    dbItem.YoutubeVideo = model.YoutubeVideo ?? String.Empty;
+                dbItem.YoutubeImage = model.YoutubeImage ?? String.Empty;
+                dbItem.Url = model.Url;
 			    dbItem.FileUrl = model.FileUrl;
 			    dbItem.UserId = model.UserId;
 			    dbItem.AboutChef = model.AboutChef;
