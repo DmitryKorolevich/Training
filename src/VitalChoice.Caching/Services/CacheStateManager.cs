@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Base;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Data.Context;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Profiling.Base;
 
 namespace VitalChoice.Caching.Services
@@ -57,19 +59,27 @@ namespace VitalChoice.Caching.Services
             CancellationToken cancellationToken = new CancellationToken())
         {
             var result = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-            var entriesToSave = GetEntriesToSave();
-            if (entriesToSave != null)
+            try
             {
-                if (DataContext.InTransaction)
+                var entriesToSave = GetEntriesToSave();
+                if (entriesToSave != null)
                 {
-                    UpdateCache(entriesToSave);
-                    DataContext.TransactionCommit += () => CacheSyncProvider.SendChanges(UpdateCache(entriesToSave));
-                    DataContext.TransactionRollback += () => UpdateRollback(entriesToSave);
+                    if (DataContext.InTransaction)
+                    {
+                        UpdateCache(entriesToSave);
+                        DataContext.TransactionCommit += () => CacheSyncProvider.SendChanges(UpdateCache(entriesToSave));
+                        DataContext.TransactionRollback += () => UpdateRollback(entriesToSave);
+                    }
+                    else
+                    {
+                        CacheSyncProvider.SendChanges(UpdateCache(entriesToSave));
+                    }
                 }
-                else
-                {
-                    CacheSyncProvider.SendChanges(UpdateCache(entriesToSave));
-                }
+                DataContext.Tag = null;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.Message, e);
             }
             return result;
         }
@@ -77,19 +87,27 @@ namespace VitalChoice.Caching.Services
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
             var result = base.SaveChanges(acceptAllChangesOnSuccess);
-            var entriesToSave = GetEntriesToSave();
-            if (entriesToSave != null)
+            try
             {
-                if (DataContext.InTransaction)
+                var entriesToSave = GetEntriesToSave();
+                if (entriesToSave != null)
                 {
-                    UpdateCache(entriesToSave);
-                    DataContext.TransactionCommit += () => CacheSyncProvider.SendChanges(UpdateCache(entriesToSave));
-                    DataContext.TransactionRollback += () => UpdateRollback(entriesToSave);
+                    if (DataContext.InTransaction)
+                    {
+                        UpdateCache(entriesToSave);
+                        DataContext.TransactionCommit += () => CacheSyncProvider.SendChanges(UpdateCache(entriesToSave));
+                        DataContext.TransactionRollback += () => UpdateRollback(entriesToSave);
+                    }
+                    else
+                    {
+                        CacheSyncProvider.SendChanges(UpdateCache(entriesToSave));
+                    }
                 }
-                else
-                {
-                    CacheSyncProvider.SendChanges(UpdateCache(entriesToSave));
-                }
+                DataContext.Tag = null;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.Message, e);
             }
             return result;
         }
@@ -153,54 +171,70 @@ namespace VitalChoice.Caching.Services
                 foreach (var group in entryGroups)
                 {
                     var cache = CacheFactory.GetCache(group.Key);
+                    var toMarkForAdd = new List<SyncOp>();
+                    var toUpdate = new List<SyncOp>();
+                    var toDelete = new List<SyncOp>();
                     foreach (var op in group)
                     {
                         op.Cache = cache;
                         switch (op.Entry.State)
                         {
                             case EntityState.Modified:
-                                op.PrimaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(op.Entry.Entity);
-                                if (op.PrimaryKey.IsValid)
-                                {
-                                    cache.MarkForUpdate(op.PrimaryKey);
-                                    syncOperations.Add(new SyncOperation
-                                    {
-                                        Key = op.PrimaryKey.ToExportable(group.Key),
-                                        SyncType = SyncType.Update,
-                                        EntityType = group.Key.FullName
-                                    });
-                                }
+                                toUpdate.Add(op);
                                 break;
                             case EntityState.Deleted:
-                                op.PrimaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(op.Entry.Entity);
-                                if (op.PrimaryKey.IsValid)
-                                {
-                                    cache.MarkForUpdate(op.PrimaryKey);
-                                    syncOperations.Add(new SyncOperation
-                                    {
-                                        Key = op.PrimaryKey.ToExportable(group.Key),
-                                        SyncType = SyncType.Delete,
-                                        EntityType = group.Key.FullName
-                                    });
-                                }
+                                toDelete.Add(op);
                                 break;
                             case EntityState.Added:
-                                op.PrimaryKey = cache.MarkForAdd(op.Entry.Entity);
-                                if (op.PrimaryKey.IsValid)
-                                {
-                                    syncOperations.Add(new SyncOperation
-                                    {
-                                        Key = op.PrimaryKey.ToExportable(group.Key),
-                                        SyncType = SyncType.Add,
-                                        EntityType = group.Key.FullName
-                                    });
-                                }
+                                toMarkForAdd.Add(op);
                                 break;
                         }
                         //if (op.Entry.State != EntityState.Detached && op.Entry.State != EntityState.Unchanged)
                         //{
                         //    scope.AddScopeData($"{group.Key.FullName}[{op.Entry.State}]{op.PrimaryKey}");
                         //}
+                    }
+                    foreach (var opPair in toMarkForAdd.SimpleJoin(cache.MarkForAdd(toMarkForAdd.Select(op => op.Entry.Entity).ToArray())))
+                    {
+                        var op = opPair.Key;
+                        op.PrimaryKey = opPair.Value;
+                        if (op.PrimaryKey.IsValid)
+                        {
+                            syncOperations.Add(new SyncOperation
+                            {
+                                Key = op.PrimaryKey.ToExportable(group.Key),
+                                SyncType = SyncType.Add,
+                                EntityType = group.Key.FullName
+                            });
+                        }
+                    }
+                    foreach (var opPair in toUpdate.SimpleJoin(cache.MarkForUpdate(toUpdate.Select(op => op.Entry.Entity))))
+                    {
+                        var op = opPair.Key;
+                        op.PrimaryKey = opPair.Value;
+                        if (op.PrimaryKey.IsValid)
+                        {
+                            syncOperations.Add(new SyncOperation
+                            {
+                                Key = op.PrimaryKey.ToExportable(group.Key),
+                                SyncType = SyncType.Update,
+                                EntityType = group.Key.FullName
+                            });
+                        }
+                    }
+                    foreach (var opPair in toDelete.SimpleJoin(cache.MarkForUpdate(toDelete.Select(op => op.Entry.Entity))))
+                    {
+                        var op = opPair.Key;
+                        op.PrimaryKey = opPair.Value;
+                        if (op.PrimaryKey.IsValid)
+                        {
+                            syncOperations.Add(new SyncOperation
+                            {
+                                Key = op.PrimaryKey.ToExportable(group.Key),
+                                SyncType = SyncType.Delete,
+                                EntityType = group.Key.FullName
+                            });
+                        }
                     }
                 }
 

@@ -145,6 +145,12 @@ namespace VC.Public.Controllers
 			return crossSellModels;
 		}
 
+        [HttpGet]
+        public Task<IActionResult> GetCartLiteComponent()
+        {
+            return Task.FromResult<IActionResult>(ViewComponent("CartLite"));
+        }
+
 		[HttpGet]
         public async Task<Result<ViewCartModel>> InitCartModel()
         {

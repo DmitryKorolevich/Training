@@ -481,6 +481,7 @@ namespace VitalChoice.Caching.Services.Cache
         }
 
         public bool Empty => _mainCluster.IsEmpty;
+        public RelationInfo Relations => _relationInfo;
 
         #region Helper Methods
 

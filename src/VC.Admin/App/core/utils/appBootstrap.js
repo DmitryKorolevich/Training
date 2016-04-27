@@ -97,19 +97,19 @@ angular.module('app.core.utils.appBootstrap', [])
 	    };
 
 	    function cacheStatus() {
-	        cacheService.getCacheStatus()
-            .success(function (cacheResult) {
-                if (cacheResult.Success && cacheResult.Data) {
-                    $rootScope.cacheState = cacheResult.Data;
-                }
-                if ($rootScope.authenticated)
-                    setTimeout(cacheStatus, 5000);
-            })
-            .error(function () {
-                $rootScope.cacheState = [{"Error": 0}];
-                if ($rootScope.authenticated)
-                    setTimeout(cacheStatus, 60000);
-            });
+	        //cacheService.getCacheStatus()
+            //.success(function (cacheResult) {
+            //    if (cacheResult.Success && cacheResult.Data) {
+            //        $rootScope.cacheState = cacheResult.Data;
+            //    }
+            //    if ($rootScope.authenticated)
+            //        setTimeout(cacheStatus, 5000);
+            //})
+            //.error(function () {
+            //    $rootScope.cacheState = [{"Error": 0}];
+            //    if ($rootScope.authenticated)
+            //        setTimeout(cacheStatus, 60000);
+            //});
 	    }
 
 	    function initialize() {

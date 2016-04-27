@@ -220,8 +220,6 @@ namespace VitalChoice.Business.Services.Dynamic
                         sku.RefundPercent = ordered.RefundPercent;
                     });
                 
-                dynamic.RefundOrderToGiftCertificates = dynamic.RefundOrderToGiftCertificates ?? new List<RefundOrderToGiftCertificateUsed>();
-
                 //new
                 foreach (var refundOrderToGiftCertificate in dynamic.RefundOrderToGiftCertificates)
                 {
@@ -233,9 +231,15 @@ namespace VitalChoice.Business.Services.Dynamic
                         newItem.IdOrder = refundOrderToGiftCertificate.IdOrder;
                         newItem.IdGiftCertificate = refundOrderToGiftCertificate.IdGiftCertificate;
                         newItem.Amount = refundOrderToGiftCertificate.Amount;
-                        newItem.OrderToGiftCertificate = _orderToGiftCertificateRepository.Query(p => p.IdOrder == refundOrderToGiftCertificate.IdOrder &&
-                            p.IdGiftCertificate == refundOrderToGiftCertificate.IdGiftCertificate).Include(p => p.GiftCertificate).SelectFirstOrDefaultAsync().Result;
-                        if (newItem?.OrderToGiftCertificate?.GiftCertificate != null)
+                        newItem.OrderToGiftCertificate =
+                            await
+                                _orderToGiftCertificateRepository.Query(
+                                    p =>
+                                        p.IdOrder == refundOrderToGiftCertificate.IdOrder &&
+                                        p.IdGiftCertificate == refundOrderToGiftCertificate.IdGiftCertificate)
+                                    .Include(p => p.GiftCertificate)
+                                    .SelectFirstOrDefaultAsync();
+                        if (newItem.OrderToGiftCertificate?.GiftCertificate != null)
                         {
                             newItem.OrderToGiftCertificate.GiftCertificate.Balance += newItem.Amount;
                         }
@@ -244,8 +248,10 @@ namespace VitalChoice.Business.Services.Dynamic
                     else
                     {
                         var diff = existItem.Amount - refundOrderToGiftCertificate.Amount;
+                        if (diff == 0)
+                            throw new InvalidOperationException();
                         existItem.Amount = refundOrderToGiftCertificate.Amount;
-                        if (existItem?.OrderToGiftCertificate?.GiftCertificate != null)
+                        if (existItem.OrderToGiftCertificate?.GiftCertificate != null)
                         {
                             existItem.OrderToGiftCertificate.GiftCertificate.Balance = existItem.OrderToGiftCertificate.GiftCertificate.Balance - diff >= 0 ?
                                 existItem.OrderToGiftCertificate.GiftCertificate.Balance-diff : 0;

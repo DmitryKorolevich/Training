@@ -24,10 +24,9 @@ namespace VitalChoice.Caching.Relational.Base
             var result = new EntityValue<T>[values.Length];
             for (var i = 0; i < values.Length; i++)
             {
-                var info = _keyMapping[i].Value;
-                if (info.ItemIndex == -1)
-                    throw new ArgumentException();
-                result[info.ItemIndex] = new EntityValue<T>(info, values[i].Value);
+                var destInfo = _keyMapping[i].Value;
+                var sourceInfo = _keyMapping[i].Key;
+                result[destInfo.ItemIndex] = new EntityValue<T>(destInfo, values[sourceInfo.ItemIndex].Value);
             }
             return result;
         }
