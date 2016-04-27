@@ -271,9 +271,8 @@ namespace VitalChoice.Business.Services.Users
 						throw new AppValidationException(AggregateIdentityErrors(createResult.Errors));
 					}
 				}
-                catch (Exception e)
+                catch
                 {
-                    _logger.LogError(e.Message, e);
                     user.Id = 0;
                     transaction.Rollback();
 					throw;
@@ -322,9 +321,8 @@ namespace VitalChoice.Business.Services.Users
 
 					return user;
 				}
-                catch (Exception e)
+                catch
                 {
-                    _logger.LogError(e.Message, e);
                     transaction.Rollback();
 					throw;
 				}
@@ -475,9 +473,8 @@ namespace VitalChoice.Business.Services.Users
 
 					return user;
 				}
-                catch (Exception e)
+                catch
                 {
-                    _logger.LogError(e.Message, e);
                     transaction.Rollback();
 					throw;
 				}

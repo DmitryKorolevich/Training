@@ -94,9 +94,8 @@ namespace VitalChoice.Business.Services.Content
 							transaction.Commit();
 						}
 					}
-                    catch (Exception e)
+                    catch
                     {
-                        _logger.LogError(e.Message, e);
                         transaction.Rollback();
 						throw;
 					}

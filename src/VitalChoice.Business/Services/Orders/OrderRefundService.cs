@@ -164,9 +164,8 @@ namespace VitalChoice.Business.Services.Orders
 
                     transaction.Commit();
                 }
-                catch (Exception e)
+                catch
                 {
-                    Logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -194,9 +193,8 @@ namespace VitalChoice.Business.Services.Orders
 
                     transaction.Commit();
                 }
-                catch (Exception e)
+                catch
                 {
-                    Logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -217,9 +215,8 @@ namespace VitalChoice.Business.Services.Orders
 
                     transaction.Commit();
                 }
-                catch (Exception e)
+                catch
                 {
-                    Logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -246,9 +243,8 @@ namespace VitalChoice.Business.Services.Orders
 
                     transaction.Commit();
                 }
-                catch (Exception e)
+                catch
                 {
-                    Logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }

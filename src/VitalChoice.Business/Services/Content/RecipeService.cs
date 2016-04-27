@@ -324,9 +324,8 @@ namespace VitalChoice.Business.Services.Content
 
                         await _objectLogItemExternalService.LogItem(dbItem);
                     }
-                    catch (Exception e)
+                    catch
                     {
-                        logger.LogError(e.Message, e);
                         transaction.Rollback();
 					    throw;
 				    }

@@ -57,7 +57,7 @@ namespace VitalChoice.Data.Transaction
                 {
                     _transaction.Rollback();
                 }
-                catch (Exception)
+                catch(InvalidOperationException)
                 {
                     
                 }

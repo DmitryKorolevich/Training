@@ -330,9 +330,8 @@ namespace VC.Public.Controllers
                     }
                     throw new AppValidationException(newMessages);
                 }
-                catch (Exception e)
+                catch
                 {
-                    _logger.LogError(e.Message, e);
                     transaction.Rollback();
                     if (loginTask != null)
                     {
