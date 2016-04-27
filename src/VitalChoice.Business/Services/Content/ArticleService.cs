@@ -66,54 +66,58 @@ namespace VitalChoice.Business.Services.Content
         {
             ArticleQuery query = new ArticleQuery();
             List<int> ids = null;
-            if(filter.CategoryId.HasValue)
+            if (filter.CategoryId.HasValue)
             {
                 if (filter.CategoryId.Value != -1)
                 {
-                    ids = (await _articleToContentCategoryRepository.Query(p => p.ContentCategoryId == filter.CategoryId.Value).SelectAsync(false)).Select(p => p.ArticleId).ToList();
-                    if(ids.Count==0)
+                    ids =
+                        (await
+                            _articleToContentCategoryRepository.Query(p => p.ContentCategoryId == filter.CategoryId.Value)
+                                .SelectAsync(false)).Select(p => p.ArticleId).ToList();
+                    if (ids.Count == 0)
                     {
                         return new PagedList<Article>()
                         {
-                            Count=0,
-                            Items =new List<Article>(),
+                            Count = 0,
+                            Items = new List<Article>(),
                         };
                     }
                     query = query.WithIds(ids);
                 }
                 else
                 {
-                    ids = (await _articleToContentCategoryRepository.Query().SelectAsync(false)).Select(p => p.ArticleId).Distinct().ToList();
+                    ids =
+                        (await _articleToContentCategoryRepository.Query().SelectAsync(false)).Select(p => p.ArticleId).Distinct().ToList();
                     query = query.NotWithIds(ids);
                 }
             }
-            query=query.WithName(filter.Name).NotDeleted().NotWithIds(filter.ExcludeIds);
+            query = query.WithName(filter.Name).NotDeleted().NotWithIds(filter.ExcludeIds);
 
-			Func<IQueryable<Article>, IOrderedQueryable<Article>> sortable = x => x.OrderBy(y => y.Name);
-			var sortOrder = filter.Sorting.SortOrder;
-	        switch (filter.Sorting.Path)
-	        {
-		        case ArticleSortPath.Title:
-			        sortable =
-				        (x) =>
-					        sortOrder == SortOrder.Asc
-						        ? x.OrderBy(y => y.Name)
-						        : x.OrderByDescending(y => y.Name);
-			        break;
-		        case ArticleSortPath.Url:
-			        sortable =
-				        (x) =>
-					        sortOrder == SortOrder.Asc
-						        ? x.OrderBy(y => y.Url)
-						        : x.OrderByDescending(y => y.Url);
-			        break;
-		        case ArticleSortPath.Updated:
-			        sortable =
-				        (x) =>
-					        sortOrder == SortOrder.Asc
-						        ? x.OrderBy(y => y.ContentItem.Updated)
-						        : x.OrderByDescending(y => y.ContentItem.Updated);
-			        break;
+            Func<IQueryable<Article>, IOrderedQueryable<Article>> sortable = x => x.OrderBy(y => y.Name);
+            var sortOrder = filter.Sorting.SortOrder;
+            switch (filter.Sorting.Path)
+            {
+                case ArticleSortPath.Title:
+                    sortable =
+                        (x) =>
+                            sortOrder == SortOrder.Asc
+                                ? x.OrderBy(y => y.Name)
+                                : x.OrderByDescending(y => y.Name);
+                    break;
+                case ArticleSortPath.Url:
+                    sortable =
+                        (x) =>
+                            sortOrder == SortOrder.Asc
+                                ? x.OrderBy(y => y.Url)
+                                : x.OrderByDescending(y => y.Url);
+                    break;
+                case ArticleSortPath.Updated:
+                    sortable =
+                        (x) =>
+                            sortOrder == SortOrder.Asc
+                                ? x.OrderBy(y => y.ContentItem.Updated)
+                                : x.OrderByDescending(y => y.ContentItem.Updated);
+                    break;
                 case ArticleSortPath.PublishedDate:
                     sortable =
                         (x) =>
@@ -123,9 +127,16 @@ namespace VitalChoice.Business.Services.Content
                     break;
             }
 
-	        var toReturn = await _articleRepository.Query(query).Include(p=>p.ContentItem).Include(p => p.ArticlesToContentCategories).ThenInclude(p => p.ContentCategory).OrderBy(sortable).
-                Include(p => p.User).ThenInclude(p => p.Profile).
-                SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            var toReturn =
+                await
+                    _articleRepository.Query(query)
+                        .Include(p => p.ContentItem)
+                        .Include(p => p.ArticlesToContentCategories)
+                        .ThenInclude(p => p.ContentCategory)
+                        .Include(p => p.User)
+                        .ThenInclude(p => p.Profile)
+                        .OrderBy(sortable)
+                        .SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
             return toReturn;
         }
 
