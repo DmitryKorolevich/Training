@@ -24,6 +24,8 @@ using System.Linq.Expressions;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Infrastructure.Context;
 using Microsoft.Extensions.Logging;
+using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Orders

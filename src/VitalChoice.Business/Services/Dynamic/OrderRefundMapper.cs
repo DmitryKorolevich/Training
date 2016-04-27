@@ -130,13 +130,13 @@ namespace VitalChoice.Business.Services.Dynamic
                 }));
 
                 entity.RefundOrderToGiftCertificates = new List<RefundOrderToGiftCertificate>(dynamic.RefundOrderToGiftCertificates.
-                    Where(p=>p.Amount>0).Select(s => new RefundOrderToGiftCertificate
+                    Where(p => p.Amount > 0).Select(s => new RefundOrderToGiftCertificate
                     {
                         IdOrder = s.IdOrder,
                         IdGiftCertificate = s.IdGiftCertificate,
                         Amount = s.Amount,
-                        OrderToGiftCertificate = _orderToGiftCertificateRepository.Query(p=> p.IdOrder == s.IdOrder &&
-                            p.IdGiftCertificate==s.IdGiftCertificate).Include(p=>p.GiftCertificate).SelectFirstOrDefaultAsync(true).Result,
+                        OrderToGiftCertificate = _orderToGiftCertificateRepository.Query(p => p.IdOrder == s.IdOrder &&
+                            p.IdGiftCertificate == s.IdGiftCertificate).Include(p => p.GiftCertificate).SelectFirstOrDefaultAsync(true).Result,
                     }));
                 foreach (var refundOrderToGiftCertificate in entity.RefundOrderToGiftCertificates)
                 {
