@@ -238,14 +238,14 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 if ($scope.id)
                 {
                     //$scope.shippingAddressTab.AddressIndex = "0";
-                    $scope.$watch('shippingAddressTab.AddressIndex', function (newValue, oldValue)
-                    {
-                        if (newValue && oldValue != newValue)
-                        {
-                            $scope.shippingAddressTab.OrderShippingEditModel = undefined;
-                            $scope.order.Shipping = angular.copy($scope.currentCustomer.Shipping[parseInt(newValue)]);
-                        }
-                    });
+                    //$scope.$watch('shippingAddressTab.AddressIndex', function (newValue, oldValue)
+                    //{
+                    //    if ($scope.options.EnableShippingAddressIndexUpdate && newValue && oldValue != newValue)
+                    //    {
+                    //        $scope.shippingAddressTab.OrderShippingEditModel = undefined;
+                    //        $scope.order.Shipping = angular.copy($scope.currentCustomer.Shipping[parseInt(newValue)]);
+                    //    }
+                    //});
                 }
                 else
                 {

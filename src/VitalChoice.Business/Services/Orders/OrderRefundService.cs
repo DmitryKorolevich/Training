@@ -24,6 +24,8 @@ using System.Linq.Expressions;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Infrastructure.Context;
 using Microsoft.Extensions.Logging;
+using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Orders
@@ -157,6 +159,31 @@ namespace VitalChoice.Business.Services.Orders
             {
                 try
                 {
+                    //var refundGCs = model?.RefundOrderToGiftCertificates.Where(p => p.Amount > 0).ToList();
+                    //if (refundGCs?.Count > 0)
+                    //{
+                    //    var ids = refundGCs.Select(p => p.IdGiftCertificate).ToList();
+                    //    var giftCertificateRepository = uow.RepositoryAsync<GiftCertificate>();
+                    //    List<GiftCertificate> dbGCs = await
+                    //                giftCertificateRepository.Query(
+                    //                    p => ids.Contains(p.Id) && p.StatusCode != RecordStatusCode.Deleted).SelectAsync();
+                    //    if (dbGCs.Count > 0)
+                    //    {
+                    //        foreach (var refundOrderToGiftCertificateUsed in refundGCs)
+                    //        {
+                    //            var dbGC =
+                    //                dbGCs.FirstOrDefault(p => p.Id == refundOrderToGiftCertificateUsed.IdGiftCertificate);
+                    //            if (dbGC != null)
+                    //            {
+                    //                dbGC.Balance += refundOrderToGiftCertificateUsed.Amount;
+                    //            }
+                    //        }
+
+                    //        await uow.SaveChangesAsync();
+                    //        giftCertificateRepository.DetachAll(dbGCs);
+                    //    }
+                    //}
+
                     entity = await base.InsertAsync(model, uow);
                     model.IdAddedBy = entity.IdEditedBy;
 

@@ -138,7 +138,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     customerEditService.syncCountry($scope, shippingItem);
                 });
 
-                $scope.$watch('shippingAddressTab.AddressIndex', function (newValue, oldValue)
+                $scope.options.ShippingAddressIndexWatch = $scope.$watch('shippingAddressTab.AddressIndex', function (newValue, oldValue)
                 {
                     if (newValue && oldValue != newValue)
                     {

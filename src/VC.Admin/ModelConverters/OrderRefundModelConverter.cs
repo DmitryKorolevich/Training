@@ -173,6 +173,10 @@ namespace VC.Admin.ModelConverters
             {
                 var addressDynamic = _addressMapper.FromModel(model.Shipping, (int)AddressType.Shipping);
                 dynamic.ShippingAddress = addressDynamic;
+                if (model.Id == 0)
+                {
+                    dynamic.ShippingAddress.Id = 0;
+                }
             }
             if (model.IdPaymentMethodType.HasValue)
             {

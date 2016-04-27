@@ -1089,12 +1089,12 @@ SET	[Updated] = GETDATE(),
         </div>
         <div class="body">
             <div class="margin-bottom-medium">
-                <div class="video margin-right-small not-printable">
-                @if(@model.Model.YoutubeVideo)
+			    @if(@!string.IsNullOrEmpty(model.Model.YoutubeVideo))
                 {{
+                <div class="video margin-right-small not-printable">
                 <iframe width="470" height="265" src="https://www.youtube.com/embed/@(@model.Model.YoutubeVideo)?rel=0&amp;enablejsapi=1" frameborder="0"></iframe>
-                }}
                 </div>
+				}}
                 @if(@!string.IsNullOrEmpty(model.Model.AboutChef))
                 {{
                 <div class="panel panel-border chef">
