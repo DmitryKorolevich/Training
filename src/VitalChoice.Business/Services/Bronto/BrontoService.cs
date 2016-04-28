@@ -56,7 +56,7 @@ namespace VitalChoice.Business.Services.Bronto
                 var unsubscribed = GetIsUnsubscribed(email).GetAwaiter().GetResult();
                 if (subscribe && (unsubscribed ?? true))
                 {
-                    Subscribe(email).Start();
+                    Subscribe(email).GetAwaiter().GetResult();
                 }
                 if (!subscribe)
                 {
