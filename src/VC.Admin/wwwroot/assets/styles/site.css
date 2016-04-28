@@ -1217,6 +1217,9 @@ th.sortable-column {
   display: inline-block;
   margin-right: 15px;
 }
+.inventory-usage-summary-report table td div.description {
+  max-width: 250px;
+}
 .object-history {
   padding: 19px 0 0;
 }

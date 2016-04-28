@@ -69,7 +69,7 @@ namespace VitalChoice.Business.Services.InventorySkus
 
         public async Task<PagedList<InventorySkuListItemModel>> GetInventorySkusAsync(InventorySkuFilter filter)
         {
-            var conditions =new InventorySkuQuery().NotDeleted().WithIds(filter.Ids).WithStatus(filter.StatusCode)
+            var conditions = new InventorySkuQuery().NotDeleted().WithIds(filter.Ids).WithStatus(filter.StatusCode)
                 .WithExactCode(filter.ExactCode)
                 .WithCode(filter.Code)
                 .WithDescription(filter.Description);
@@ -124,16 +124,16 @@ namespace VitalChoice.Business.Services.InventorySkus
             else
             {
                 var items = await query.OrderBy(sortable).SelectAsync(false);
-                result =new PagedList<InventorySku>()
+                result = new PagedList<InventorySku>()
                 {
                     Items = items,
                     Count = items.Count,
                 };
             }
 
-            var toReturn=new PagedList<InventorySkuListItemModel>()
+            var toReturn = new PagedList<InventorySkuListItemModel>()
             {
-                Items = result.Items.Select(p=>new InventorySkuListItemModel(p)).ToList(),
+                Items = result.Items.Select(p => new InventorySkuListItemModel(p)).ToList(),
                 Count = result.Count,
             };
 
@@ -156,11 +156,11 @@ namespace VitalChoice.Business.Services.InventorySkus
             return toReturn;
         }
 
-        public async Task<Dictionary<int,List<SkuToInventorySku>>> GetAssignedInventorySkusAsync(ICollection<int> skuIds)
+        public async Task<Dictionary<int, List<SkuToInventorySku>>> GetAssignedInventorySkusAsync(ICollection<int> skuIds)
         {
             skuIds = skuIds.Distinct().ToList();
             var items = await _skuToInventorySkuRepository.Query(p => skuIds.Contains(p.IdSku)).SelectAsync(false);
-            var toReturn =new Dictionary<int, List<SkuToInventorySku>>();
+            var toReturn = new Dictionary<int, List<SkuToInventorySku>>();
             foreach (var skuToInventorySku in items)
             {
                 List<SkuToInventorySku> assignedInventories;
@@ -188,7 +188,7 @@ namespace VitalChoice.Business.Services.InventorySkus
                 var item = toReturn.FirstOrDefault(p => p.IdSku == inventorySkuUsageRawReportItem.IdSku);
                 if (item == null)
                 {
-                    item=new InventorySkuUsageReportItem();
+                    item = new InventorySkuUsageReportItem();
                     item.IdSku = inventorySkuUsageRawReportItem.IdSku;
                     item.SkuCode = inventorySkuUsageRawReportItem.SkuCode;
                     item.TotalSkuQuantity = inventorySkuUsageRawReportItem.TotalSkuQuantity;
@@ -233,7 +233,7 @@ namespace VitalChoice.Business.Services.InventorySkus
 
             foreach (var inventorySkuUsageReportItem in data)
             {
-                InventorySkuUsageReportItemForExport item=new InventorySkuUsageReportItemForExport();
+                InventorySkuUsageReportItemForExport item = new InventorySkuUsageReportItemForExport();
                 item.IdSku = inventorySkuUsageReportItem.IdSku;
                 item.SkuCode = inventorySkuUsageReportItem.SkuCode;
                 item.TotalSkuQuantity = inventorySkuUsageReportItem.TotalSkuQuantity;
@@ -243,7 +243,7 @@ namespace VitalChoice.Business.Services.InventorySkus
                 var lookup = lookups.FirstOrDefault(p => p.Name == SettingConstants.INVENTORY_SKU_LOOKUP_CHANNEL_NAME);
                 if (lookup != null)
                 {
-                    item.InventorySkuChannel=lookup.LookupVariants.FirstOrDefault(p=>p.Id==inventorySkuUsageReportItem.InventorySkuChannel)?.ValueVariant;
+                    item.InventorySkuChannel = lookup.LookupVariants.FirstOrDefault(p => p.Id == inventorySkuUsageReportItem.InventorySkuChannel)?.ValueVariant;
                 }
 
                 toReturn.Add(item);
@@ -273,7 +273,7 @@ namespace VitalChoice.Business.Services.InventorySkus
                         item.PurchaseUnitOfMeasure = lookup.LookupVariants.FirstOrDefault(p => p.Id == subInventorySkuUsageReportItem.PurchaseUnitOfMeasure)?.ValueVariant;
                     }
 
-                    item.TotalInvQuantityWithInvCorrection=subInventorySkuUsageReportItem.TotalInvQuantityWithInvCorrection;
+                    item.TotalInvQuantityWithInvCorrection = subInventorySkuUsageReportItem.TotalInvQuantityWithInvCorrection;
                     item.TotalUnitOfMeasureAmount = subInventorySkuUsageReportItem.TotalUnitOfMeasureAmount;
                     item.PurchaseUnitOfMeasureAmount = subInventorySkuUsageReportItem.PurchaseUnitOfMeasureAmount;
 
@@ -308,7 +308,7 @@ namespace VitalChoice.Business.Services.InventorySkus
 
         public async Task<InventoriesSummaryUsageReport> GetInventoriesSummaryUsageReportAsync(InventoriesSummaryUsageReportFilter filter)
         {
-            InventoriesSummaryUsageReport toReturn=new InventoriesSummaryUsageReport();
+            InventoriesSummaryUsageReport toReturn = new InventoriesSummaryUsageReport();
 
             var categoryTree = new InventorySkuCategory();
             categoryTree.SubCategories = await _inventorySkuCategoryService.GetCategoriesTreeAsync(new InventorySkuCategoryTreeFilter());
@@ -316,10 +316,10 @@ namespace VitalChoice.Business.Services.InventorySkus
             var invIds = data.Select(p => p.IdInventorySku).Distinct().ToList();
             var inventories = await this.SelectAsync(invIds);
 
-            List<InventoriesSummaryUsageDateItem> dates=new List<InventoriesSummaryUsageDateItem>();
+            List<InventoriesSummaryUsageDateItem> dates = new List<InventoriesSummaryUsageDateItem>();
 
             DateTime current = filter.From;
-            current = new DateTime(current.Year, current.Month, 1, current.Hour, current.Minute, current.Second);
+            current = new DateTime(current.Year, current.Month, 1, 0, 0, 0);
             dates.Add(new InventoriesSummaryUsageDateItem()
             {
                 Date = current
@@ -333,12 +333,12 @@ namespace VitalChoice.Business.Services.InventorySkus
                 });
             }
 
-            toReturn.TotalItems=new List<InventoriesSummaryUsageDateItem>(dates);
+            toReturn.TotalItems = dates.Select(p => new InventoriesSummaryUsageDateItem() { Date = p.Date, }).ToList();
 
             foreach (var inventoriesSummaryUsageRawReportItem in data)
             {
-                var inventory = inventories.FirstOrDefault(p=>p.Id==inventoriesSummaryUsageRawReportItem.IdInventorySku);
-                if(inventory==null)
+                var inventory = inventories.FirstOrDefault(p => p.Id == inventoriesSummaryUsageRawReportItem.IdInventorySku);
+                if (inventory == null)
                     continue;
 
                 InventoriesSummaryUsageCategoryItem categoryItem = null;
@@ -352,8 +352,8 @@ namespace VitalChoice.Business.Services.InventorySkus
                         {
                             Id = category.Id,
                             Name = category.Name,
-                            TotalItems = new List<InventoriesSummaryUsageDateItem>(dates),
-                        };
+                            TotalItems = dates.Select(p => new InventoriesSummaryUsageDateItem() { Date = p.Date, }).ToList(),
+                    };
                         toReturn.Categories.Add(categoryItem);
                     }
                 }
@@ -366,7 +366,7 @@ namespace VitalChoice.Business.Services.InventorySkus
                         {
                             Id = null,
                             Name = "Not Specified",
-                            TotalItems = new List<InventoriesSummaryUsageDateItem>(dates),
+                            TotalItems = dates.Select(p => new InventoriesSummaryUsageDateItem() { Date = p.Date, }).ToList(),
                         };
                         toReturn.Categories.Add(categoryItem);
                     }
@@ -382,15 +382,15 @@ namespace VitalChoice.Business.Services.InventorySkus
                         Description = inventory.Description,
                         UnitOfMeasure = inventory.SafeData.UnitOfMeasure,
                         UnitOfMeasureAmount = inventory.SafeData.UnitOfMeasureAmount,
-                        Items = new List<InventoriesSummaryUsageDateItem>(dates),
+                        Items = dates.Select(p => new InventoriesSummaryUsageDateItem() { Date = p.Date, }).ToList(),
                     };
                     categoryItem.Inventories.Add(inventoryItem);
                 }
 
-                InventoriesSummaryUsageDateItem dateItem = inventoryItem.Items.FirstOrDefault(p=>p.Date== inventoriesSummaryUsageRawReportItem.Date);
+                InventoriesSummaryUsageDateItem dateItem = inventoryItem.Items.FirstOrDefault(p => p.Date == inventoriesSummaryUsageRawReportItem.Date);
                 if (dateItem != null)
                 {
-                    var quantity = inventoriesSummaryUsageRawReportItem.Quantity*inventory.SafeData.Quantity;
+                    var quantity = inventoriesSummaryUsageRawReportItem.Quantity * inventory.SafeData.Quantity;
                     dateItem.Quantity += quantity;
                     inventoryItem.GrandTotal += quantity;
                 }
@@ -411,6 +411,12 @@ namespace VitalChoice.Business.Services.InventorySkus
             {
                 dateItem.Quantity = toReturn.Categories.SelectMany(p => p.TotalItems).Where(p => p.Date == dateItem.Date).Sum(p => p.Quantity);
                 toReturn.GrandTotal += dateItem.Quantity;
+            }
+
+            var notSpecifiedCategory = toReturn.Categories.FirstOrDefault(p => !p.Id.HasValue);
+            if (notSpecifiedCategory != null)
+            {
+                toReturn.Categories.Remove(notSpecifiedCategory);
             }
 
             return toReturn;
