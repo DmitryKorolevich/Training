@@ -279,6 +279,9 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<bool> SetDiscountUsed(DiscountDynamic discount, int idCustomer, bool addUsage = true)
         {
+            if (discount == null)
+                return false;
+
             if ((int?)discount.SafeData.MaxTimesUse > 0)
             {
                 if (addUsage)

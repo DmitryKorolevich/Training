@@ -270,9 +270,8 @@ namespace VitalChoice.Business.Services.Affiliates
                     transaction.Commit();
                     return toReturn;
                 }
-                catch(Exception e)
+                catch
                 {
-                    Logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -346,9 +345,8 @@ namespace VitalChoice.Business.Services.Affiliates
 
                     return affiliate;
                 }
-                catch (Exception e)
+                catch
                 {
-                    Logger.LogError(e.Message, e);
                     if (appUser.Id > 0)
                     {
                         await _affiliateUserService.DeleteAsync(appUser);
@@ -415,9 +413,8 @@ namespace VitalChoice.Business.Services.Affiliates
 
                     return affiliate;
                 }
-                catch (Exception e)
+                catch
                 {
-                    Logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -556,9 +553,8 @@ namespace VitalChoice.Business.Services.Affiliates
 
                         transaction.Commit();
                     }
-                    catch (Exception e)
+                    catch
                     {
-                        Logger.LogError(e.Message, e);
                         transaction.Rollback();
                         throw;
                     }

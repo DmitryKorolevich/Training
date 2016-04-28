@@ -150,9 +150,8 @@ namespace VitalChoice.Business.Services.Payment
 
 					transaction.Commit();
 				}
-                catch (Exception e)
+                catch
                 {
-                    _logger.LogError(e.Message, e);
                     transaction.Rollback();
 					throw;
 				}

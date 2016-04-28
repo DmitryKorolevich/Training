@@ -228,8 +228,6 @@ namespace VitalChoice.Business.Services.Dynamic
                     else
                     {
                         var diff = existItem.Amount - refundOrderToGiftCertificate.Amount;
-                        if (diff == 0)
-                            throw new InvalidOperationException();
                         existItem.Amount = refundOrderToGiftCertificate.Amount;
                         if (existItem.OrderToGiftCertificate?.GiftCertificate != null)
                         {

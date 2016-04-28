@@ -106,11 +106,13 @@ namespace VC.Public.Controllers
 					return skuOrdered;
 				},
 				(ordered, skuModel) => ordered.Quantity += 1);
-			SetCartUid(cart.CartUid);
-			if (!await _checkoutService.UpdateCart(cart))
-				throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
 
-			var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
+			SetCartUid(cart.CartUid);
+
+            var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
+
+            if (!await _checkoutService.UpdateCart(cart))
+				throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
 
 		    return new Tuple<OrderDataContext, CustomerCartOrder>(context, cart);
 	    }

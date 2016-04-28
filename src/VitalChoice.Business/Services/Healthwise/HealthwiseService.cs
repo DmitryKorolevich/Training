@@ -164,9 +164,8 @@ namespace VitalChoice.Business.Services.Healthwise
                             transaction.Commit();
                         }
                     }
-                    catch (Exception e)
+                    catch
                     {
-                        _logger.LogError(e.Message, e);
                         transaction.Rollback();
                         throw;
                     }
@@ -262,9 +261,8 @@ namespace VitalChoice.Business.Services.Healthwise
                             await uow.SaveChangesAsync();
                             transaction.Commit();
                         }
-                        catch (Exception e)
+                        catch
                         {
-                            _logger.LogError(e.Message, e);
                             transaction.Rollback();
                             throw;
                         }

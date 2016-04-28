@@ -15,7 +15,7 @@ namespace VC.Admin.Models.ContentManagement
 
         public string Url { get; set; }
 
-        public ICollection<string> Categories { get; set; }
+        public IEnumerable<string> Categories { get; set; }
 
         public DateTime Created { get; set; }
 
@@ -44,7 +44,7 @@ namespace VC.Admin.Models.ContentManagement
                 PublishedDate = item.PublishedDate;
                 if (item.ArticlesToContentCategories != null)
                 {
-                    Categories = item.ArticlesToContentCategories.OrderBy(p => p.ContentCategory.Name).Select(p => p.ContentCategory.Name).ToArray();
+                    Categories = item.ArticlesToContentCategories.OrderBy(p => p.ContentCategory.Name).Select(p => p.ContentCategory.Name).Distinct();
                 }
                 if(item.ContentItem!=null)
                 {

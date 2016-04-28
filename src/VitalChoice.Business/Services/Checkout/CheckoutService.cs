@@ -257,9 +257,8 @@ namespace VitalChoice.Business.Services.Checkout
                     transaction.Rollback();
                     throw;
                 }
-                catch (Exception e)
+                catch
                 {
-                    _logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -369,9 +368,8 @@ namespace VitalChoice.Business.Services.Checkout
                     transaction.Rollback();
                     throw;
                 }
-                catch (Exception e)
+                catch
                 {
-                    _logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -453,9 +451,8 @@ namespace VitalChoice.Business.Services.Checkout
                     transaction.Rollback();
                     throw;
                 }
-                catch (Exception e)
+                catch
                 {
-                    _logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
