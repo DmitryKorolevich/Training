@@ -6,7 +6,7 @@
                 <div class="row form-group">
                     <div class="col-md-3">
                         <p class="input-group">
-                            <input type="text" class="form-control" name="From" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
+                            <input type="text" class="form-control" name="From" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
                             <span class="input-group-btn">
                                 <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                             </span>
@@ -17,7 +17,7 @@
                     </div>
                     <div class="col-md-3">
                         <p class="input-group">
-                            <input type="text" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" ng-required="true" />
+                            <input type="text" class="form-control" name="To" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" ng-required="true" />
                             <span class="input-group-btn">
                                 <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                             </span>
@@ -29,18 +29,19 @@
                 </div>
                 <div class="row form-group">
                     <div class="col-md-3">
-                        <select class="form-control" name="FrequencyType" data-ng-model="filter.FrequencyType" ng-options="item.Key as item.Text for item in frequencyTypes"></select>
+                        <select class="form-control" name="FrequencyType" data-ng-change="filterChanged();" data-ng-model="filter.FrequencyType" ng-options="item.Key as item.Text for item in frequencyTypes"></select>
                     </div>
                     <div data-ng-if="options.allowSeeFullReport" class="col-md-3">
-                        <select class="form-control" name="IdAdminTeam" data-ng-model="filter.IdAdminTeam" data-ng-change="idAdminTeamChanged()" ng-options="item.Id as item.Name for item in teams"></select>
+                        <select class="form-control" name="IdAdminTeam" data-ng-change="filterChanged();" data-ng-model="filter.IdAdminTeam" data-ng-change="idAdminTeamChanged()" ng-options="item.Id as item.Name for item in teams"></select>
                     </div>
                     <div data-ng-if="options.allowSeeFullReport" class="col-md-3">
-                        <select class="form-control" name="IdAdmin" data-ng-model="filter.IdAdmin" data-ng-change="idAdminChanged()" ng-options="item.Id as item.AgentId for item in admins"></select>
+                        <select class="form-control" name="IdAdmin" data-ng-change="filterChanged();" data-ng-model="filter.IdAdmin" data-ng-change="idAdminChanged()" ng-options="item.Id as item.AgentId for item in admins"></select>
                     </div>
                 </div>
                 <div class="row form-group">
-                    <div class="col-md-4">
+                    <div class="col-md-12">
                         <button class="btn btn-info" data-ng-click="filterItems();" type="button">Filter</button>
+                        <a target="_self" class="btn btn-primary pull-right" data-ng-href={{options.exportUrl}} data-ng-click="exportClick($event)">Export</a>
                     </div>
                 </div>
             </fieldset>

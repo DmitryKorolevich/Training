@@ -70,6 +70,7 @@ namespace VitalChoice.Business.Services.Content
             {
                 if (filter.CategoryId.Value != -1)
                 {
+                    //query = query.WithCategoryId(filter.CategoryId.Value);
                     ids =
                         (await
                             _articleToContentCategoryRepository.Query(p => p.ContentCategoryId == filter.CategoryId.Value)
@@ -86,6 +87,7 @@ namespace VitalChoice.Business.Services.Content
                 }
                 else
                 {
+                    //query = query.WithoutCategory();
                     ids =
                         (await _articleToContentCategoryRepository.Query().SelectAsync(false)).Select(p => p.ArticleId).Distinct().ToList();
                     query = query.NotWithIds(ids);

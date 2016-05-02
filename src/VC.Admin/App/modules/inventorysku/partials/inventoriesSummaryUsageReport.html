@@ -6,7 +6,7 @@
                 <div class="row form-group">
                     <div class="col-md-3">
                         <p class="input-group">
-                            <input type="text" class="form-control" name="From" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
+                            <input type="text" class="form-control" name="From" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
                             <span class="input-group-btn">
                                 <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                             </span>
@@ -17,7 +17,7 @@
                     </div>
                     <div class="col-md-3">
                         <p class="input-group">
-                            <input type="text" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" ng-required="true" />
+                            <input type="text" class="form-control" name="To" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" ng-required="true" />
                             <span class="input-group-btn">
                                 <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                             </span>
@@ -29,7 +29,7 @@
                     <div class="col-md-2">
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" name="ShipDate" data-ng-model="filter.ShipDate" />
+                                <input type="checkbox" name="ShipDate" data-ng-change="filterChanged();" data-ng-model="filter.ShipDate" />
                                 Ship Date
                             </label>
                         </div>
@@ -38,7 +38,7 @@
                 <div class="row form-group">
                     <div class="col-md-3">
                         <div class="input-group autocomplete col-md-12">
-                            <input type="text" name="Sku" class="form-control" placeholder="Product SKU" data-ng-model="filter.Sku" autocomplete="off" data-ng-minlength="3"
+                            <input type="text" name="Sku" class="form-control" placeholder="Product SKU" data-ng-change="filterChanged();" data-ng-model="filter.Sku" autocomplete="off" data-ng-minlength="3"
                                    uib-typeahead-min-length="1" uib-typeahead="sku.Code as sku.Code for sku in getSKUsBySKU($viewValue)" uib-typeahead-loading="loadingSKUsBySKU"
                                    uib-typeahead-wait-ms="100">
                         </div>
@@ -48,7 +48,7 @@
                     </div>
                     <div class="col-md-3">
                         <div class="input-group autocomplete col-md-12">
-                            <input type="text" name="InvSku" class="form-control" placeholder="Part SKU" data-ng-model="filter.InvSku" autocomplete="off" data-ng-minlength="3"
+                            <input type="text" name="InvSku" class="form-control" placeholder="Part SKU" data-ng-change="filterChanged();" data-ng-model="filter.InvSku" autocomplete="off" data-ng-minlength="3"
                                    uib-typeahead-min-length="1" uib-typeahead="sku.Code as sku.Code for sku in getInvSKUsBySKU($viewValue)" uib-typeahead-loading="loadingInvSKUsBySKU"
                                    uib-typeahead-wait-ms="100">
                         </div>
@@ -57,15 +57,16 @@
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <select class="form-control" data-ng-model="filter.IdsInvCat" ng-options="item.Key as item.Text for item in filterCategories"></select>
+                        <select class="form-control" data-ng-change="filterChanged();" data-ng-model="filter.IdsInvCat" ng-options="item.Key as item.Text for item in filterCategories"></select>
                     </div>
                     <div class="col-md-3">
-                        <select class="form-control" data-ng-model="filter.Assemble" ng-options="item.Key as item.Text for item in assembles"></select>
+                        <select class="form-control" data-ng-change="filterChanged();" data-ng-model="filter.Assemble" ng-options="item.Key as item.Text for item in assembles"></select>
                     </div>
                 </div>
                 <div class="row form-group">
-                    <div class="col-md-4">
+                    <div class="col-md-12">
                         <button class="btn btn-info" data-ng-click="filterItems();" type="button">Filter</button>
+                        <a target="_self" class="btn btn-primary pull-right" data-ng-href={{options.exportUrl}} data-ng-click="exportClick($event)">Export</a>
                     </div>
                 </div>
             </fieldset>

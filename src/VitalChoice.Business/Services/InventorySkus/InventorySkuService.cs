@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -319,7 +320,7 @@ namespace VitalChoice.Business.Services.InventorySkus
             List<InventoriesSummaryUsageDateItem> dates = new List<InventoriesSummaryUsageDateItem>();
 
             DateTime current = filter.From;
-            current = new DateTime(current.Year, current.Month, 1, 0, 0, 0);
+            current = new DateTime(current.Year, current.Month, 2, 0, 0, 0);
             dates.Add(new InventoriesSummaryUsageDateItem()
             {
                 Date = current
@@ -334,6 +335,10 @@ namespace VitalChoice.Business.Services.InventorySkus
             }
 
             toReturn.TotalItems = dates.Select(p => new InventoriesSummaryUsageDateItem() { Date = p.Date, }).ToList();
+            foreach (var inventoriesSummaryUsageRawReportItem in data)
+            {
+                inventoriesSummaryUsageRawReportItem.Date = inventoriesSummaryUsageRawReportItem.Date.AddDays(1);
+            }
 
             foreach (var inventoriesSummaryUsageRawReportItem in data)
             {
@@ -420,6 +425,85 @@ namespace VitalChoice.Business.Services.InventorySkus
             }
 
             return toReturn;
+        }
+
+        public void ConvertInventoriesSummaryUsageReportForExport(InventoriesSummaryUsageReport report, out IList<DynamicExportColumn> columns, out IList<ExpandoObject> items)
+        {
+            columns =new List<DynamicExportColumn>();
+            items=new List<ExpandoObject>();
+
+            DynamicExportColumn column = new DynamicExportColumn();
+            column.DisplayName = "Inventory Code";
+            column.Name = "InventoryCode";
+            columns.Add(column);
+
+            column = new DynamicExportColumn();
+            column.DisplayName = "Inventory Description";
+            column.Name = "InventoryDescription";
+            columns.Add(column);
+
+            column = new DynamicExportColumn();
+            column.DisplayName = "UOM";
+            column.Name = "UOM";
+            columns.Add(column);
+
+            foreach (var inventoriesSummaryUsageDateItem in report.TotalItems)
+            {
+                column = new DynamicExportColumn();
+                column.DisplayName = inventoriesSummaryUsageDateItem.Date.ToString("MMM-yy");
+                column.Name = inventoriesSummaryUsageDateItem.Date.ToString("MMMyy");
+                columns.Add(column);
+            }
+
+            column = new DynamicExportColumn();
+            column.DisplayName = "Total";
+            column.Name = "Total";
+            columns.Add(column);
+
+            dynamic item = null;
+            IDictionary<string, object> map = null;
+            foreach (var category in report.Categories)
+            {
+                foreach (var inventory in category.Inventories)
+                {
+                    item=new ExpandoObject();
+                    map = (IDictionary<string, object>) item;
+                    item.InventoryCode = inventory.Code;
+                    item.InventoryDescription = inventory.Description;
+                    item.UOM = inventory.UnitOfMeasureAmount;
+                    foreach (var dateItem in inventory.Items)
+                    {
+                        map.Add(dateItem.Date.ToString("MMMyy"), dateItem.Quantity);
+                    }
+                    item.Total = inventory.GrandTotal;
+                    items.Add((ExpandoObject)item);
+                }
+
+                item = new ExpandoObject();
+                map = (IDictionary<string, object>)item;
+                item.InventoryCode = category.Name;
+                item.InventoryDescription = null;
+                item.UOM = null;
+                foreach (var dateItem in category.TotalItems)
+                {
+                    map.Add(dateItem.Date.ToString("MMMyy"), dateItem.Quantity);
+                }
+                item.Total = category.GrandTotal;
+                items.Add((ExpandoObject)item);
+            }
+
+
+            item = new ExpandoObject();
+            map = (IDictionary<string, object>)item;
+            item.InventoryCode = "Total";
+            item.InventoryDescription = null;
+            item.UOM = null;
+            foreach (var dateItem in report.TotalItems)
+            {
+                map.Add(dateItem.Date.ToString("MMMyy"), dateItem.Quantity);
+            }
+            item.Total = report.GrandTotal;
+            items.Add((ExpandoObject)item);
         }
     }
 }

@@ -21,7 +21,7 @@ namespace VitalChoice.Business.Helpers
 
         public static string FormatAsPhone(this string data, string mask)
         {
-            if(!string.IsNullOrEmpty(data) && !string.IsNullOrEmpty(mask))
+            if (!string.IsNullOrEmpty(data) && !string.IsNullOrEmpty(mask))
             {
                 var result = mask.ToCharArray();
                 for (int i = 0; i < data.Length; i++)
@@ -67,6 +67,20 @@ namespace VitalChoice.Business.Helpers
                 data = sResult;
             }
             return data;
+        }
+
+        public static DateTime? GetDateFromQueryStringInPst(this string value, TimeZoneInfo pst)
+        {
+            DateTime? toReturn = null;
+            DateTimeOffset temp;
+            if (!DateTimeOffset.TryParse(value, out temp))
+            {
+                return null;
+            }
+            toReturn = temp.DateTime;
+            toReturn = TimeZoneInfo.ConvertTime(toReturn.Value, pst, TimeZoneInfo.Local);
+
+            return toReturn;
         }
     }
 }

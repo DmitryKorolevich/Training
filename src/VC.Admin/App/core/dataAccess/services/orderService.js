@@ -145,6 +145,11 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    {
 	        return $http.post(baseUrl + 'GetOrdersAgentReport', filter, getConfig(tracker));
 	    },
+	    getOrdersAgentReportFile: function (filter, buildNumber)
+	    {
+	        return baseUrl + 'GetOrdersAgentReportFile?from={0}&to={1}&frequencytype={2}&idadminteam={3}&idadmin={4}&buildNumber={5}'
+                .format(filter.From, filter.To, filter.FrequencyType, filter.IdAdminTeam, filter.IdAdmin,buildNumber);
+	    },
 
         //gcs
 	    getGCOrders: function (id, tracker)

@@ -14,7 +14,10 @@
         public const string RESHIPS_REPORT = "Reships_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
 
         public const string INVENTORY_SKUS_REPORT = "Parts_Usage_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
+        public const string INVENTORY_SUMMARY_REPORT = "Parts_Usage_Summary_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
 
         public const string GOOGLE_PRODUCTS_FEED = "datafeed.csv";
+
+        public const string ORDERS_AGENT_REPORT = "Agents_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
     }
 }

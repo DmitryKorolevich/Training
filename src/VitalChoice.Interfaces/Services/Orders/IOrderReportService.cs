@@ -20,5 +20,7 @@ namespace VitalChoice.Interfaces.Services.Orders
 	public interface IOrderReportService
 	{
 	    Task<OrdersAgentReport> GetOrdersAgentReportAsync(OrdersAgentReportFilter filter);
-	}
+
+	    ICollection<OrdersAgentReportExportItem> ConvertOrdersAgentReportToExportItems(OrdersAgentReport report, bool fullReport);
+    }
 }

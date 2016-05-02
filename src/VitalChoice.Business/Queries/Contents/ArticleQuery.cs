@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Content.Articles;
@@ -29,11 +30,23 @@ namespace VitalChoice.Business.Queries.Content
             return this;
         }
 
+        public ArticleQuery WithCategoryId(int id)
+        {
+            Add(x => x.ArticlesToContentCategories.Select(p => p.ContentCategoryId).Any(p=>p==id));
+            return this;
+        }
+
+        public ArticleQuery WithoutCategory()
+        {
+            Add(x => !x.ArticlesToContentCategories.Any());
+            return this;
+        }
+
         public ArticleQuery WithIds(ICollection<int> ids)
         {
             if (ids.Count > 0)
             {
-                Or(x => ids.Contains(x.Id));
+                And(x => ids.Contains(x.Id));
             }
             return this;
         }

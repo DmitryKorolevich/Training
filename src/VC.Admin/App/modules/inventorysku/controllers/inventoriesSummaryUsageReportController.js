@@ -108,6 +108,7 @@
                         $scope.filterCategories = [{ Key: null, Text: 'All' }];
                         initCategory($scope.rootCategory, 0);
 
+                        $scope.filterChanged();
                         refreshItems();
                     } else
                     {
@@ -145,24 +146,80 @@
         {
             if ($scope.forms.form.$valid)
             {
-                if ($scope.filter.From > $scope.filter.To)
+                var msg = getValidFrequencyMessage();
+                if (msg == null)
                 {
-                    toaster.pop('error', "Error!", "'To' date can't be less than 'From' date.", null, 'trustedHtml');
-                    return;
+                    refreshItems();
                 }
-                var months = $scope.filter.To.getMonth() - $scope.filter.From.getMonth()
-                    + (12 * ($scope.filter.To.getFullYear() - $scope.filter.From.getFullYear()));
-                if (months > 12)
+                else
                 {
-                    toaster.pop('error', "Error!", "Date range can't be more than 12 months.", null, 'trustedHtml');
-                    return;
+                    $scope.forms.form.submitted = true;
+                    toaster.pop('error', "Error!", msg, null, 'trustedHtml');
                 }
-                $scope.forms.form.submitted = false;
-                refreshItems();
             }
             else
             {
                 $scope.forms.form.submitted = true;
+            }
+        };
+
+
+        var getValidFrequencyMessage = function ()
+        {
+            var msg = null;
+            if ($scope.filter.From > $scope.filter.To)
+            {
+                msg = "'To' date can't be less than 'From' date.";
+            }
+            var months = $scope.filter.To.getMonth() - $scope.filter.From.getMonth()
+                + (12 * ($scope.filter.To.getFullYear() - $scope.filter.From.getFullYear()));
+            if (months > 12)
+            {
+                msg = "Date range can't be more than 12 months.";
+            }
+            return msg;
+        };
+
+        $scope.filterChanged = function ()
+        {
+            if ($scope.forms.form.$valid)
+            {
+                var msg = getValidFrequencyMessage();
+                if (msg)
+                {
+                    $scope.options.exportMsg = msg;
+                    $scope.options.exportUrl = null;
+                    $scope.forms.form.submitted = true;
+                    return;
+                }
+                var data = {};
+                angular.copy($scope.filter, data);
+                if (data.From)
+                {
+                    data.From = data.From.toServerDateTime();
+                }
+                if (data.To)
+                {
+                    data.To = data.To.toServerDateTime();
+                }
+                $scope.options.exportUrl = inventorySkuService.getInventoriesSummaryUsageReportFile(data, $rootScope.buildNumber);
+            }
+            else
+            {
+                $scope.forms.form.submitted = true;
+            }
+        };
+
+        $scope.exportClick = function (event)
+        {
+            if (!$scope.options.exportUrl)
+            {
+                $scope.forms.form.submitted = true;
+                if ($scope.options.exportMsg)
+                {
+                    toaster.pop('error', "Error!", $scope.options.exportMsg, null, 'trustedHtml');
+                }
+                event.preventDefault();
             }
         };
 

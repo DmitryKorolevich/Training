@@ -127,6 +127,7 @@
                         $scope.admins.splice(0, 0, { Id: null, AgentId: 'All' });
                     }
 
+                    $scope.filterChanged();
                     refreshItems();
                 }
                 else
@@ -140,46 +141,99 @@
         {
             if ($scope.forms.form.$valid)
             {
-                if ($scope.filter.From > $scope.filter.To)
+                var msg = getValidFrequencyMessage();
+                if (msg == null)
                 {
-                    toaster.pop('error', "Error!", "'To' date can't be less than 'From' date.", null, 'trustedHtml');
-                    return;
+                    refreshItems();
                 }
-                if ($scope.filter.FrequencyType==3)
+                else
                 {
-                    var months = $scope.filter.To.getMonth() - $scope.filter.From.getMonth()
-                        + (12 * ($scope.filter.To.getFullYear() - $scope.filter.From.getFullYear()));
-                    if (months > 12)
-                    {
-                        toaster.pop('error', "Error!", "Date range can't be more than 12 months.", null, 'trustedHtml');
-                        return;
-                    }
+                    $scope.forms.form.submitted = true;
+                    toaster.pop('error', "Error!", msg, null, 'trustedHtml');
                 }
-                if ($scope.filter.FrequencyType == 2)
-                {
-                    var days = Math.round(Math.abs($scope.filter.To.getTime() - $scope.filter.From.getTime()) / 8.64e7);
-                    var weeks = Math.round(days / 7);
-                    if (weeks > 16)
-                    {
-                        toaster.pop('error', "Error!", "Date range can't be more than 16 weeks.", null, 'trustedHtml');
-                        return;
-                    }
-                }
-                if ($scope.filter.FrequencyType == 1)
-                {
-                    var days = Math.round(Math.abs($scope.filter.To.getTime() - $scope.filter.From.getTime()) / 8.64e7);
-                    if (days > 14)
-                    {
-                        toaster.pop('error', "Error!", "Date range can't be more than 14 days.", null, 'trustedHtml');
-                        return;
-                    }
-                }
-                $scope.forms.form.submitted = false;
-                refreshItems();
             }
             else
             {
                 $scope.forms.form.submitted = true;
+            }
+        };
+
+        var getValidFrequencyMessage = function ()
+        {
+            var msg = null;
+            if ($scope.filter.From > $scope.filter.To)
+            {
+                msg = "'To' date can't be less than 'From' date.";
+            }
+            if ($scope.filter.FrequencyType == 3)
+            {
+                var months = $scope.filter.To.getMonth() - $scope.filter.From.getMonth()
+                    + (12 * ($scope.filter.To.getFullYear() - $scope.filter.From.getFullYear()));
+                if (months > 12)
+                {
+                    msg = "Date range can't be more than 12 months.";
+                }
+            }
+            if ($scope.filter.FrequencyType == 2)
+            {
+                var days = Math.round(Math.abs($scope.filter.To.getTime() - $scope.filter.From.getTime()) / 8.64e7);
+                var weeks = Math.round(days / 7);
+                if (weeks > 16)
+                {
+                    msg = "Date range can't be more than 16 weeks.";
+                }
+            }
+            if ($scope.filter.FrequencyType == 1)
+            {
+                var days = Math.round(Math.abs($scope.filter.To.getTime() - $scope.filter.From.getTime()) / 8.64e7);
+                if (days > 14)
+                {
+                    msg = "Date range can't be more than 14 days.";
+                }
+            }
+            return msg;
+        };
+
+        $scope.filterChanged = function ()
+        {
+            if ($scope.forms.form.$valid)
+            {
+                var msg = getValidFrequencyMessage();
+                if (msg)
+                {
+                    $scope.options.exportMsg = msg;
+                    $scope.options.exportUrl = null;
+                    $scope.forms.form.submitted = true;
+                    return;
+                }
+                var data = {};
+                angular.copy($scope.filter, data);
+                if (data.From)
+                {
+                    data.From = data.From.toServerDateTime();
+                }
+                if (data.To)
+                {
+                    data.To = data.To.toServerDateTime();
+                }
+                $scope.options.exportUrl = orderService.getOrdersAgentReportFile(data, $rootScope.buildNumber);
+            }
+            else
+            {
+                $scope.forms.form.submitted = true;
+            }
+        };
+
+        $scope.exportClick = function (event)
+        {
+            if (!$scope.options.exportUrl)
+            {
+                $scope.forms.form.submitted = true;
+                if ($scope.options.exportMsg)
+                {
+                    toaster.pop('error', "Error!", $scope.options.exportMsg, null, 'trustedHtml');
+                }
+                event.preventDefault();
             }
         };
 
