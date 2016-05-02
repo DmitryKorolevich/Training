@@ -1317,10 +1317,10 @@ BEGIN
                     <a href="/content/contact-customer-service">Customer Service page</a>.
                 </li>
             </ol>
-            <div class="input-wrapper margin-bottom-medium">
-                <input type="text" autocomplete="off" placeholder="Enter your search term here">
-                <input class="yellow" type="button" value="Search FAQs">
-            </div>
+            <form class="input-wrapper margin-bottom-medium" action="/help/searchfaq" method="get">
+                <input type="text" name="q" placeholder="Enter your search term here" value="" dir="ltr" autocomplete="off" spellcheck="false">
+                <input class="yellow" type="submit" value="Search FAQs">
+            </form>
             @list(FAQCategories.AllCategories){{
                 <strong>@(Name)</strong>
                 <ul>

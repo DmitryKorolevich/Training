@@ -102,6 +102,12 @@ namespace VC.Public.Controllers
             return Task.FromResult<IActionResult>(View());
         }
 
+        [HttpGet]
+        public Task<IActionResult> SearchFAQ(string q)
+        {
+            return Task.FromResult<IActionResult>(View());
+        }
+
         [HttpPost]
         public async Task<IActionResult> RequestCatalog(CatalogRequestAddressModel model)
         {

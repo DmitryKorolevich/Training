@@ -15,6 +15,7 @@ var lhnScriptSrc = lhnJsHost + 'www.livehelpnow.net/lhn/scripts/livehelpnow.aspx
 var lhnScript = document.createElement("script"); lhnScript.type = "text/javascript"; lhnScript.src = lhnScriptSrc;
 
 var googleSearchcx = '006613472277305802095:2wviofnvpvs';
+var googleSearchFAQcx = '006613472277305802095:ne3iw8mrxlk';
 
 
 // Avoid `console` errors in browsers that lack a console.
