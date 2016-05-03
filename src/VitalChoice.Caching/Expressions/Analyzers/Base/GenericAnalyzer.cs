@@ -160,12 +160,12 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
         protected abstract TValue ValueFactory(TInfo info, object value);
 
         protected virtual ICollection<TValueGroup> GetKeys(EntityValueGroupInfo<TInfo> keyInfo, HashSet<TValueGroup> result,
-            HashSet<TValue> freeSets, HashSet<TValue> containsSets)
+            HashSet<TValue> freeSet, HashSet<TValue> containsSet)
         {
             try
             {
                 //Two different primary key values with AND
-                if (freeSets.Any() && freeSets.GroupBy(f => f.ValueInfo).Any(g => g.Count() > 1))
+                if (freeSet.Any() && freeSet.GroupBy(f => f.ValueInfo).Any(g => g.Count() > 1))
                 {
                     return new TValueGroup[0];
                 }
@@ -173,17 +173,21 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
                 Dictionary<TInfo, HashSet<TValue>> resultedSets = keyInfo.Infos.ToDictionary(info => info,
                     info => new HashSet<TValue>());
 
-                if (containsSets.Any())
+                HashSet<TInfo> keyTypes = new HashSet<TInfo>();
+
+                if (containsSet.Any())
                 {
-                    var containsGroups = containsSets.GroupBy(f => f.ValueInfo);
+                    var containsGroups = containsSet.GroupBy(f => f.ValueInfo);
                     foreach (var group in containsGroups)
                     {
                         resultedSets[group.Key].AddRange(group);
+                        keyTypes.Add(group.Key);
                     }
                 }
 
-                foreach (var value in freeSets)
+                foreach (var value in freeSet)
                 {
+                    keyTypes.Add(value.ValueInfo);
                     var set = resultedSets[value.ValueInfo];
                     if (set.Any())
                     {
@@ -203,6 +207,9 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
                         set.Add(value);
                     }
                 }
+
+                if (keyTypes.Count < keyInfo.Infos.Length)
+                    return null;
 
                 if (resultedSets.Values.All(v => v.Any()))
                 {
