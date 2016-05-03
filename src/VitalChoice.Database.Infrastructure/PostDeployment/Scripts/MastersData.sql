@@ -541,8 +541,10 @@ BEGIN
 	    @rightwrapper(){{
 		    <a href="#"><img src="/assets/images/news-baby-spot-8-29-13a-210x157px.png"></a>
 		}}
+		@if(ArticleBonusLink){{
 	    @rightwrapper(){{
-		    <a href="#"><img src="/assets/images/bonus-tile-10-30-12A.jpg"></a>
+		    <a href="@(ArticleBonusLink.Url)"><img src="/assets/images/bonus-tile-10-30-12A.jpg"></a>
+		}}
 		}}
 	    @rightwrapper(){{
 		    <a href="#"><img src="/assets/images/guarantee-spot-8-29-13-210px.jpg"></a>
@@ -695,9 +697,11 @@ BEGIN
             <a href="#">View a recent issue</a>
         </div>
     </div>
+	@if(ArticleBonusLink){{
     <div class="right-wrapper">
-	    <a href="#"><img src="/assets/images//bonus-tile-10-30-12A.jpg"></a>
+        <a href="@(ArticleBonusLink.Url)"><img src="/assets/images/bonus-tile-10-30-12A.jpg"></a>
     </div>
+	}}
 }}
 
 <right_recent_articles>

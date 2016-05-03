@@ -271,3 +271,29 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentProcessors] WHERE [Type] = N'ArticleBonusLinkProcessor')
+BEGIN
+
+	INSERT INTO [dbo].[ContentProcessors]
+	(Id, [Type], Name, Description)
+	VALUES
+	(25, N'ArticleBonusLinkProcessor', N'Article Bonus Link Processor', N'Article Bonus Link Processor')
+
+	INSERT INTO [dbo].[MasterContentItemsToContentProcessors]
+	([MasterContentItemId],[ContentProcessorId])
+	SELECT [Id], 25 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Article Individual'
+
+	INSERT INTO [dbo].[MasterContentItemsToContentProcessors]
+	([MasterContentItemId],[ContentProcessorId])
+	SELECT [Id], 25 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Article Sub Category'
+
+	INSERT ContentItemsToContentProcessors
+	(ContentItemId,ContentItemProcessorId)
+	SELECT TOP 1 Id, 25 FROM ContentItems
+	WHERE Id =(
+	SELECT TOP 1 ContentItemId FROM ContentPages
+	WHERE Url ='newsletter-sign-up')
+END
+
+GO
