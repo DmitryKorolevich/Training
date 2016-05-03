@@ -140,6 +140,7 @@ namespace VitalChoice.Business.ModelConverters
                 model.ShipToAddress = _addressMapper.ToModel<AddressEmailItem>(dynamic.ShippingAddress);
                 model.ShipToAddress.Country = countries.FirstOrDefault(p => p.Id == dynamic.ShippingAddress.IdCountry)?.CountryName;
                 model.ShipToAddress.StateCodeOrCounty = BusinessHelper.ResolveStateOrCounty(countries, dynamic.ShippingAddress);
+                model.DeliveryInstructions = model.ShipToAddress.DeliveryInstructions;
             }
 
             switch (dynamic?.PaymentMethod.IdObjectType)
