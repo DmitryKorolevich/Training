@@ -525,10 +525,22 @@ function processCharcount(ev) {
 
 function initLiveHelp() {
 	if (window.addEventListener) {
-		window.addEventListener('load', function () { document.getElementById('lhnContainer').appendChild(lhnScript); }, false);
+	    window.addEventListener('load',
+	        function() {
+	            setTimeout(function() {
+	                document.getElementById('lhnContainer').appendChild(lhnScript);
+	            }, 1);
+	        },
+	        false);
 	}
 	else if (window.attachEvent) {
-		window.attachEvent('onload', function () { document.getElementById('lhnContainer').appendChild(lhnScript); });
+	    window.attachEvent('onload',
+	        function() {
+	            setTimeout(function() {
+	                    document.getElementById('lhnContainer').appendChild(lhnScript);
+	                },
+	                1);
+	        });
 	}
 }
 
