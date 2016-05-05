@@ -72,16 +72,32 @@ namespace VitalChoice.Caching.GC
                         {
                             if (cache.FullCollection)
                             {
-                                if (cache.GetAllUntyped().Any(e => now - e.LastAccessTime > _timeToLeave))
+                                lock (cache.LockObj)
                                 {
-                                    cache.Clear();
+                                    if (cache.GetAllUntyped().Any(e => now - e.LastUpdateTime < _timeToLeave))
+                                    {
+                                        foreach (
+                                            var entity in cache.GetAllUntyped().Where(entity => now - entity.LastUpdateTime < _timeToLeave)
+                                            )
+                                        {
+                                            var pk = internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity.EntityUntyped);
+                                            internalCache.MarkForUpdate(pk);
+                                        }
+                                        cache.Clear();
+                                    }
                                 }
                             }
                             else
                             {
-                                foreach (var entity in cache.GetAllUntyped().Where(entity => now - entity.LastAccessTime > _timeToLeave))
+                                lock (cache.LockObj)
                                 {
-                                    cache.TryRemoveUntyped(internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity.EntityUntyped));
+                                    foreach (var entity in cache.GetAllUntyped().Where(entity => now - entity.LastUpdateTime < _timeToLeave)
+                                        )
+                                    {
+                                        var pk = internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity.EntityUntyped);
+                                        internalCache.MarkForUpdate(pk);
+                                        cache.TryRemoveUntyped(internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity.EntityUntyped));
+                                    }
                                 }
                             }
                         }

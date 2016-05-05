@@ -14,22 +14,15 @@ using VitalChoice.Jobs.Jobs;
 
 namespace VitalChoice.Jobs
 {
-	public class Program
-	{
-		private readonly IApplicationEnvironment _env;
-
-		public Program(IApplicationEnvironment env)
-		{
-			_env = env;
-		}
-
-		public void Main(string[] args)
-		{
-			var servicesToRun = new ServiceBase[]
-			{
-				new JobWindowsService(_env)
-			};
-			ServiceBase.Run(servicesToRun);
-		}
-	}
+    public static class Program
+    {
+        public static void Main(string[] args)
+        {
+            var servicesToRun = new ServiceBase[]
+            {
+                new JobWindowsService(PlatformServices.Default.Application)
+            };
+            ServiceBase.Run(servicesToRun);
+        }
+    }
 }

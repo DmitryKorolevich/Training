@@ -13,7 +13,6 @@ using VitalChoice.ObjectMapping.Extensions;
 namespace VitalChoice.Caching.Iterators
 {
     internal class CacheIterator<TSource> : SimpleIterator<TSource>
-        where TSource : class, new()
     {
         private readonly IEnumerable<CacheResult<TSource>> _source;
         private readonly Func<TSource, bool> _predicate;

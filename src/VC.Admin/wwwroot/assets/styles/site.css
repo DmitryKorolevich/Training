@@ -13,10 +13,10 @@ a.block {
   max-width: 2500px;
 }
 .table > tbody > tr.selected {
-  background-color: #ddf0fb;
+  background-color: #DDF0FB;
 }
 .table > tbody > tr.warning > td {
-  background-color: #ffd9dc;
+  background-color: #FFD9DC;
   color: red;
 }
 .table > tbody > tr.message-warning > td {
@@ -180,10 +180,10 @@ img.thumb {
   cursor: pointer;
 }
 .angular-ui-tree-handle:hover {
-  background-color: #ededed;
+  background-color: #EDEDED;
 }
 .angular-ui-tree-handle.selected {
-  background-color: #ddf0fb;
+  background-color: #DDF0FB;
 }
 .angular-ui-tree-handle .ya-treview-buttons {
   display: none;
@@ -472,7 +472,7 @@ button.main-button {
 }
 .custom-navbar-top {
   border-radius: 3px  3px 0px 0px;
-  background: #ffffff;
+  background: #fff;
 }
 .sidebar .navbar-collapse {
   height: auto;
@@ -912,10 +912,10 @@ ul.navbar-custom-header li .dropdown-menu {
   margin-bottom: 0;
 }
 .file-manager .center-pane .table tbody > tr:hover {
-  background-color: #ededed;
+  background-color: #EDEDED;
 }
 .file-manager .center-pane .table > tbody > tr.selected {
-  background-color: #ddf0fb;
+  background-color: #DDF0FB;
 }
 .image-box {
   border-radius: 4px;
@@ -1142,7 +1142,7 @@ th.sortable-column {
   min-width: 105px;
 }
 .help-tickets .table > tbody > tr.success > td {
-  background-color: #99ff99;
+  background-color: #99FF99;
 }
 .help-tickets .table > tbody > tr.warning > td {
   background-color: #fffaa3;
@@ -1181,7 +1181,7 @@ th.sortable-column {
   width: 40px;
 }
 .bug-tickets .table > tbody > tr.success > td {
-  background-color: #99ff99;
+  background-color: #99FF99;
 }
 .bug-tickets .table > tbody > tr.warning > td {
   background-color: #fffaa3;
@@ -1311,7 +1311,7 @@ th.sortable-column {
   background: #fffaa3;
 }
 .healthwise-customers table > tbody > tr.period-row.paid {
-  background: #99ff99;
+  background: #99FF99;
 }
 .product-categories-statistic .categories.full-lines .ya-treeview-content .flex-left {
   padding-right: 210px;
@@ -1366,8 +1366,8 @@ th.sortable-column {
   width: 23%;
 }
 .order-agents-report .legend.dates {
-  background-image: -webkit-linear-gradient(#04519b, #033c73 60%, #02325f);
-  background-image: -o-linear-gradient(#04519b, #033c73 60%, #02325f);
+  background-image: -webkit-linear-gradient(#04519b, #033C73 60%, #02325f);
+  background-image: -o-linear-gradient(#04519b, #033C73 60%, #02325f);
   background-image: ca;
   color: white;
   padding-left: 10px;

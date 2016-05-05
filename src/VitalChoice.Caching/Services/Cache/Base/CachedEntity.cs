@@ -8,7 +8,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
 {
     public interface ICachedEntity
     {
-        DateTime LastAccessTime { get; }
+        DateTime LastUpdateTime { get; }
         bool NeedUpdate { get; set; }
         object EntityUntyped { get; }
     }
@@ -20,10 +20,10 @@ namespace VitalChoice.Caching.Services.Cache.Base
 
     public abstract class CachedEntity : ICachedEntity
     {
-        protected DateTime LastAccess = DateTime.Now;
+        protected DateTime LastUpdate = DateTime.Now;
         private volatile bool _needUpdate;
 
-        public DateTime LastAccessTime => LastAccess;
+        public DateTime LastUpdateTime => LastUpdate;
 
         public HashSet<string> NeedUpdateRelated { get; } = new HashSet<string>();
 
@@ -58,12 +58,11 @@ namespace VitalChoice.Caching.Services.Cache.Base
         {
             get
             {
-                LastAccess = DateTime.Now;
                 return _value;
             }
             set
             {
-                LastAccess = DateTime.Now;
+                LastUpdate = DateTime.Now;
                 _value = value;
             }
         }
@@ -74,7 +73,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
             set { base.NeedUpdate = value; }
         }
 
-        public override object EntityUntyped => Entity;
+        public override object EntityUntyped => _value;
 
         public override CachedEntity CopyUntyped()
         {
@@ -85,7 +84,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
         {
             return new CachedEntity<T>(_value, _cacheData)
             {
-                LastAccess = LastAccess,
+                LastUpdate = LastUpdate,
                 ConditionalIndexes = ConditionalIndexes,
                 ForeignKeys = ForeignKeys,
                 NonUniqueIndexes = NonUniqueIndexes,

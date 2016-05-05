@@ -151,15 +151,18 @@ namespace VitalChoice.Caching.Services.Cache
                 yield return CacheGetResult.NotFound;
                 yield break;
             }
-            var allItems = data.GetAll();
-            if (data.Empty || allItems.Any(cached => cached.NeedUpdate))
+            lock (data.LockObj)
             {
-                yield return CacheGetResult.Update;
-                yield break;
-            }
-            foreach (var cached in allItems.Where(cached => whereFunc(cached)))
-            {
-                yield return cached;
+                var allItems = data.GetAll();
+                if (data.Empty || allItems.Any(cached => cached.NeedUpdate))
+                {
+                    yield return CacheGetResult.Update;
+                    yield break;
+                }
+                foreach (var cached in allItems.Where(cached => whereFunc(cached)))
+                {
+                    yield return cached;
+                }
             }
         }
 
@@ -176,15 +179,18 @@ namespace VitalChoice.Caching.Services.Cache
                 yield return CacheGetResult.NotFound;
                 yield break;
             }
-            var allItems = data.GetAll();
-            if (data.NeedUpdate || data.Empty || allItems.Any(cached => cached.NeedUpdate))
+            lock (data.LockObj)
             {
-                yield return CacheGetResult.Update;
-                yield break;
-            }
-            foreach (var cached in allItems)
-            {
-                yield return cached;
+                var allItems = data.GetAll();
+                if (data.NeedUpdate || data.Empty || allItems.Any(cached => cached.NeedUpdate))
+                {
+                    yield return CacheGetResult.Update;
+                    yield break;
+                }
+                foreach (var cached in allItems)
+                {
+                    yield return cached;
+                }
             }
         }
 
@@ -623,7 +629,7 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        private void MarkForUpdateForeignKeys(Dictionary<EntityForeignKeyInfo, HashSet<EntityForeignKey>> foreignKeys)
+        private void MarkForUpdateForeignKeys(IDictionary<EntityForeignKeyInfo, HashSet<EntityForeignKey>> foreignKeys)
         {
             if (foreignKeys == null)
                 return;
