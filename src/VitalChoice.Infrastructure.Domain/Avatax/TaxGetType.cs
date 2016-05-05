@@ -6,9 +6,9 @@ namespace VitalChoice.Infrastructure.Domain.Avatax
     public enum TaxGetType
     {
         Commit = 1,
-        PerishableOnly = 2,
-        NonPerishableOnly = 4,
-        UseBoth = PerishableOnly | NonPerishableOnly,
+        Perishable = 2,
+        NonPerishable = 4,
+        UseBoth = Perishable | NonPerishable,
         SavePermanent = 8
     }
 }

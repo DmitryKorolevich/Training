@@ -20,7 +20,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions
             context.RefundSkus = context.Order.RefundSkus.ToList();
             foreach (var refundSku in context.RefundSkus)
             {
-                refundSku.RefundValue = refundSku.RefundPrice * (decimal)refundSku.RefundPercent / (decimal)100.0 * refundSku.Quantity;
+                refundSku.RefundValue = refundSku.RefundPrice * (decimal)refundSku.RefundPercent / 100 * refundSku.Quantity;
                 productsSubtotal += refundSku.RefundValue;
             }
             context.RefundSkus = context.RefundSkus.ToList();

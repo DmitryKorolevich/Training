@@ -17,9 +17,16 @@ namespace VitalChoice.Business.Workflow.Orders.Actions
         public override async Task<decimal> ExecuteActionAsync(OrderDataContext context, IWorkflowExecutionContext executionContext)
         {
             var taxService = executionContext.Resolve<IAvalaraTax>();
-            context.TaxTotal = (await
-                Task.WhenAll(taxService.GetTax(context, TaxGetType.PerishableOnly),
-                    taxService.GetTax(context, TaxGetType.NonPerishableOnly))).Sum();
+            if (context.SplitInfo.ShouldSplit)
+            {
+                context.TaxTotal = (await
+                    Task.WhenAll(taxService.GetTax(context, TaxGetType.Perishable),
+                        taxService.GetTax(context, TaxGetType.NonPerishable))).Sum();
+            }
+            else
+            {
+                context.TaxTotal = await taxService.GetTax(context);
+            }
             return context.TaxTotal;
         }
     }

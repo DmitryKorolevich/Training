@@ -56,6 +56,7 @@ namespace VitalChoice.Workflow.Configuration
             order.Action<GetTaxAction>("TaxTotal", action =>
             {
                 action.Dependency<OrderSubTotalAction>();
+                action.Dependency<ProductsSplitAction>();
             });
 
             order.Action<OrderSubTotalAction>("SubTotal", action =>
@@ -250,7 +251,6 @@ namespace VitalChoice.Workflow.Configuration
             refund.Action<RefundSubtotal>("RefundSubtotal", action =>
             {
                 action.Aggregate<RefundReductionTypeActionResolver>();
-
                 action.Aggregate<RefundedProductsAction>();
                 action.Aggregate<RefundGetTaxAction>();
                 action.Aggregate<RefundShippingAction>();

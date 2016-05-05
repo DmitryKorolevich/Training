@@ -158,7 +158,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
                     skus = selectedSkus;
                 }
             }
-            return Task.FromResult(skus.Where(s => !((bool?)s.Sku.SafeData.NonDiscountable ?? false)).Sum(s => s.RefundPrice * (decimal)s.RefundPercent / (decimal)100.0 * s.Quantity));
+            return Task.FromResult(skus.Where(s => !((bool?)s.Sku.SafeData.NonDiscountable ?? false)).Sum(s => s.RefundPrice * (decimal)s.RefundPercent / 100 * s.Quantity));
         }
     }
 }
