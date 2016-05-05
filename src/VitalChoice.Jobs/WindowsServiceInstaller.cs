@@ -24,15 +24,15 @@ namespace VitalChoice.Jobs {
 
             //# Service Information
 
-            serviceInstaller.DisplayName = "Vital Choice Export Service";
-            serviceInstaller.Description = "VeraCore Integrations";
+            serviceInstaller.DisplayName = "Vital Choice Jobs";
+            serviceInstaller.Description = "Background Jobs";
             serviceInstaller.StartType = ServiceStartMode.Automatic;
 
             //# This must be identical to the WindowsService.ServiceBase name
 
             //# set in the constructor of WindowsService.cs
 
-            serviceInstaller.ServiceName = "exportservice";
+            serviceInstaller.ServiceName = "jobsService";
             Installers.Add(serviceProcessInstaller);
             Installers.Add(serviceInstaller);
         }
