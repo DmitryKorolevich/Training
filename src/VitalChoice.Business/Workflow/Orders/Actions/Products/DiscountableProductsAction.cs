@@ -19,7 +19,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
 
         public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            IEnumerable<SkuOrdered> skus = dataContext.SkuOrdereds;
+            var skus = dataContext.SkuOrdereds;
             if (dataContext.Order.Discount != null)
             {
                 if (dataContext.Order.Discount.ExcludeCategories)

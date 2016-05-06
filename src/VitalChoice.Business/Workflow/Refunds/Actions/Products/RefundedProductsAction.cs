@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Core;
 
-namespace VitalChoice.Business.Workflow.Refunds.Actions
+namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
 {
     public class RefundedProductsAction:ComputableAction<OrderRefundDataContext>
     {

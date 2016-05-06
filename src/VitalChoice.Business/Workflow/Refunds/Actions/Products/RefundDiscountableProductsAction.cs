@@ -19,7 +19,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
 
         public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            IEnumerable<RefundSkuOrdered> skus = dataContext.RefundSkus;
+            var skus = dataContext.RefundSkus;
             if (dataContext.Order.Discount != null)
             {
                 if (dataContext.Order.Discount.ExcludeCategories)
