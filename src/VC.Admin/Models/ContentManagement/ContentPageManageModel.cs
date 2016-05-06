@@ -35,6 +35,8 @@ namespace VC.Admin.Models.ContentManagement
 
         public int MasterContentItemId { get; set; }
 
+        public int? IdOld { get; set; }
+
         public DateTime Created { get; set; }
 
         public DateTime Updated { get; set; }
@@ -66,6 +68,7 @@ namespace VC.Admin.Models.ContentManagement
             Created = item.ContentItem.Created;
             Updated = item.ContentItem.Updated;
             MasterContentItemId = item.MasterContentItemId;
+            IdOld = item.IdOld;
             ProcessorIds =
                 item.ContentItem.ContentItemToContentProcessors?.Select(p => p.ContentItemProcessorId).ToList() ??
                 new List<int>();
@@ -83,6 +86,7 @@ namespace VC.Admin.Models.ContentManagement
                 StatusCode = StatusCode,
                 Assigned = Assigned,
                 MasterContentItemId = MasterContentItemId,
+                IdOld = IdOld,
                 ContentItem = new ContentItem
                 {
                     Template = Template,

@@ -16,9 +16,9 @@ BEGIN
 	(CASE WHEN op.Id <=
 			ALL(
 			SELECT opIn.Id 
-			FROM AffiliateOrderPayments AS opIn
-			INNER JOIN Orders AS oIn ON oIn.Id = opIn.Id
-			INNER JOIN Affiliates afIn ON afIn.Id=opIn.IdAffiliate
+			FROM AffiliateOrderPayments AS opIn WITH(NOLOCK)
+			INNER JOIN Orders AS oIn WITH(NOLOCK) ON oIn.Id = opIn.Id
+			INNER JOIN Affiliates afIn WITH(NOLOCK) ON afIn.Id=opIn.IdAffiliate
 			WHERE oIn.idCustomer = o.idCustomer
 			AND opIn.IdAffiliate = op.idAffiliate
 			AND afIn.StatusCode!=3
@@ -28,9 +28,9 @@ BEGIN
 			o.NPOrderStatus=2 OR o.NPOrderStatus=3 OR o.NPOrderStatus=5)
 			) THEN 1 ELSE 2 END) As IdType,
 	op.Amount As Amount
-	FROM AffiliateOrderPayments AS op
-	INNER JOIN Orders AS o ON o.Id = op.Id
-	INNER JOIN Affiliates af ON af.Id=op.IdAffiliate
+	FROM AffiliateOrderPayments AS op WITH(NOLOCK)
+	INNER JOIN Orders AS o WITH(NOLOCK) ON o.Id = op.Id
+	INNER JOIN Affiliates af WITH(NOLOCK) ON af.Id=op.IdAffiliate
 	WHERE af.StatusCode!=3
 	AND o.StatusCode!=3
 	AND (o.OrderStatus=2 OR o.OrderStatus=3 OR o.OrderStatus=5 OR

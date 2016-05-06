@@ -89,6 +89,28 @@
                     }
                 }
             </div>
+            @if (!string.IsNullOrEmpty(Model.DeliveryInstructions))
+            {
+                <div class="reivew-info-box">
+                    <div class="review-header-container">
+                        <span>Delivery Instructions</span>
+                    </div>
+                    <div class="review-box-line">
+                        @Model.DeliveryInstructions
+                    </div>
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(Model.GiftMessage))
+            {
+                <div class="reivew-info-box">
+                    <div class="review-header-container">
+                        <span>Gift Message</span>
+                    </div>
+                    <div class="review-box-line">
+                        @Model.GiftMessage
+                    </div>
+                </div>
+            }
         </div>
         <div class="form-buttons-group">
             @Html.ActionLink("Back", "AddUpdateShippingMethod", "Checkout", null, new { @class = "button arrow-left-red" })

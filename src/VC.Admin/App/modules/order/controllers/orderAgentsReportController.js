@@ -26,6 +26,18 @@
             {
                 data.To = data.To.toServerDateTime();
             }
+            var ids = [];
+            if (data.IdAdminTeams.length > 0)
+            {
+                for (i = 0; i < data.IdAdminTeams.length; i++)
+                {
+                    if (data.IdAdminTeams[i] != null)
+                    {
+                        ids.push(data.IdAdminTeams[i]);
+                    }
+                }
+            }
+            data.IdAdminTeams = ids;
 
             orderService.getOrdersAgentReport(data, $scope.refreshTracker)
                 .success(function (result) {
@@ -104,7 +116,7 @@
                 To: currentDate.shiftDate('+1d'),
                 From: currentDate.shiftDate('-1m'),
                 FrequencyType: 2,//weekly
-                IdAdminTeam: null,
+                IdAdminTeams: [null],
                 IdAdmin: null,
             };
 
@@ -215,6 +227,21 @@
                 if (data.To)
                 {
                     data.To = data.To.toServerDateTime();
+                }
+                data.sIdAdminTeams = '';
+                if (data.IdAdminTeams.length > 0)
+                {
+                    for (i = 0; i < data.IdAdminTeams.length; i++)
+                    {
+                        if (data.IdAdminTeams[i] != null)
+                        {
+                            data.sIdAdminTeams += data.IdAdminTeams[i];
+                            if (i != data.IdAdminTeams.length - 1)
+                            {
+                                data.sIdAdminTeams += ',';
+                            }
+                        }
+                    }
                 }
                 $scope.options.exportUrl = orderService.getOrdersAgentReportFile(data, $rootScope.buildNumber);
             }

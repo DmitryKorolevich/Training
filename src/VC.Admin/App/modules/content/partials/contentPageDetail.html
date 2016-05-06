@@ -84,6 +84,17 @@
                                                     <textarea type="text" class="form-control" placeholder="Meta Description" rows="10" data-ng-model="contentPage.MetaDescription"></textarea>
                                                 </div>
                                             </div>
+
+                                            <span class="legend">Old Content Redirect</span>   
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">idpage</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="IdOld" class="form-control" placeholder="idpage" numbers-only data-ng-model="contentPage.IdOld">
+                                                    <div class="error-container" ng-show="forms.contentPageForm.submitted && forms.contentPageForm.IdOld.$invalid">
+                                                        <small class="error" ng-show="forms.contentPageForm.IdOld.$error.server">{{serverMessages.GetMessage('IdOld')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </fieldset>
                                     </form>
                                 </spinner-overlay>
