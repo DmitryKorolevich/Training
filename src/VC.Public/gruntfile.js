@@ -11,9 +11,15 @@ module.exports = function (grunt) {
 	}
 
 	var cssFiles = cssConfig.files;
+
 	for (var j = 0; j < cssFiles.length; j++) {
 		cssFiles[j] = "wwwroot/" + cssFiles[j];
 	}
+
+	var mainIndex = cssFiles.indexOf('wwwroot/assets/styles/main.css');
+	cssFiles[mainIndex] = 'temp/less/main.css';
+	var siteIndex = cssFiles.indexOf('wwwroot/assets/styles/site.css');
+	cssFiles[siteIndex] = 'temp/less/site.css';
 
 	grunt.initConfig({
 		jsMinifiedFileName: jsConfig.minifiedFileName,

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNet.Mvc;
 using VitalChoice.Core.GlobalFilters;
+using VitalChoice.Core.Infrastructure;
 using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Constants;
 
@@ -17,13 +18,13 @@ namespace VitalChoice.Core.Base
         }
 
         public virtual IActionResult BaseNotFoundView()
-		{
-		    return _pageResultService.GetResult(PageResult.NotFound);
-		}
+        {
+            return new HttpNotFoundResult();
+        }
 
 		public virtual IActionResult GetItemNotAccessibleResult()
 		{
-			return _pageResultService.GetResult(PageResult.Forbidden);
+			return new HttpForbiddenResult();
         }
 	}
 }
