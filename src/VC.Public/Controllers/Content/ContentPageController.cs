@@ -73,7 +73,7 @@ namespace VC.Public.Controllers.Content
             int idold;
             if (Int32.TryParse(idpage, out idold))
             {
-                var item = await _contentPageService.GetContentPageAsync(idold);
+                var item = await _contentPageService.GetContentPageByIdOldAsync(idold);
                 if (!string.IsNullOrEmpty(item?.Url))
                 {
                     return RedirectPermanent($"/content/{item.Url}");
