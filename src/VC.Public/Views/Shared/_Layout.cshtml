@@ -230,8 +230,8 @@
 			</div>
 		</footer>
 	</div>
-	<script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.sync.bootstrap.min.js"></script>
-    <script src="https://www.google.com/jsapi" type="text/javascript"></script>
+	<script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.sync.bootstrap.min.js" defer="defer"></script>
+    <script src="https://www.google.com/jsapi" type="text/javascript" defer="defer"></script>
 	@await Component.InvokeAsync("Assets", "scripts")
 	@RenderSection("PageScripts", false)
     @RenderSection("EndPageStyles", false)

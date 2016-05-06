@@ -101,10 +101,7 @@ namespace VitalChoice.Caching.Services.Cache
 
         public ICollection<CachedEntity<T>> GetAll()
         {
-            lock (_lockObj)
-            {
-                return _mainCluster.GetItems().ToArray();
-            }
+            return _mainCluster.GetItems();
         }
 
         public void Clear()
@@ -138,10 +135,7 @@ namespace VitalChoice.Caching.Services.Cache
 
         public IEnumerable<CachedEntity> GetAllUntyped()
         {
-            lock (_lockObj)
-            {
-                return _mainCluster.GetItems().ToArray();
-            }
+            return _mainCluster.GetItems();
         }
 
         public CachedEntity TryRemoveUntyped(EntityKey key)
@@ -239,7 +233,7 @@ namespace VitalChoice.Caching.Services.Cache
             return _mainCluster.Update(pk, entity, (e, exist) => UpdateExist(pk, e, exist));
         }
 
-        public CachedEntity<T> UpdateKeepRelations(T entity, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities)
+        public CachedEntity<T> UpdateKeepRelations(T entity, IDictionary<TrackedEntityKey, EntityEntry> trackedEntities)
         {
             if (entity == null)
                 return null;
@@ -259,7 +253,7 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        private bool UpdateEntityWithRelations(T entity, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities, CachedEntity<T> cached)
+        private bool UpdateEntityWithRelations(T entity, IDictionary<TrackedEntityKey, EntityEntry> trackedEntities, CachedEntity<T> cached)
         {
             if (!GetAllNormalizedAndTracked(entity, _relationInfo, trackedEntities))
             {
@@ -300,7 +294,7 @@ namespace VitalChoice.Caching.Services.Cache
             //return true;
         }
 
-        private bool GetAllNormalizedAndTracked(object entity, RelationInfo relations, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities)
+        private bool GetAllNormalizedAndTracked(object entity, RelationInfo relations, IDictionary<TrackedEntityKey, EntityEntry> trackedEntities)
         {
             EntityInfo entityInfo;
             if (!_infoStorage.GetEntityInfo(relations.RelationType, out entityInfo))
@@ -482,6 +476,11 @@ namespace VitalChoice.Caching.Services.Cache
 
         public bool Empty => _mainCluster.IsEmpty;
         public RelationInfo Relations => _relationInfo;
+
+        public object LockObj
+        {
+            get { return _lockObj; }
+        }
 
         #region Helper Methods
 

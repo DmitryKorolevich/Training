@@ -119,13 +119,13 @@ namespace VitalChoice.Business.Services.Avatax
             return 0;
         }
 
-        public async Task<decimal> GetTax(OrderRefundDataContext context)
+        public async Task<decimal> GetTax(OrderRefundDataContext context, TaxGetType taxGetType = TaxGetType.UseBoth)
         {
             if (!_countryNameCode.IsState(context.Order.ShippingAddress, "us", "va") &&
                 !_countryNameCode.IsState(context.Order.ShippingAddress, "us", "wa"))
                 return 0;
 
-            var taxGetType = CommitProtect(TaxGetType.UseBoth);
+            taxGetType = CommitProtect(taxGetType);
 
             Address origin;
             Address destination;
@@ -168,13 +168,13 @@ namespace VitalChoice.Business.Services.Avatax
                         : null,
                 DocCode =
                     "TAX" +
-                    (taxGetType.HasFlag(TaxGetType.PerishableOnly) ? $"{idOrder}-P" : $"{idOrder}-NP"),
+                    (taxGetType.HasFlag(TaxGetType.Perishable) ? $"{idOrder}-P" : $"{idOrder}-NP"),
                 DetailLevel = DetailLevel.Tax,
                 Commit = taxGetType.HasFlag(TaxGetType.Commit),
                 DocType =
                     taxGetType.HasFlag(TaxGetType.SavePermanent) ? DocType.SalesInvoice : DocType.SalesOrder,
                 PurchaseOrderNo =
-                    (taxGetType.HasFlag(TaxGetType.PerishableOnly) ? $"{idOrder}-P" : $"{idOrder}-NP"),
+                    (taxGetType.HasFlag(TaxGetType.Perishable) ? $"{idOrder}-P" : $"{idOrder}-NP"),
                 CurrencyCode = "USD",
                 Discount = discountTotal,
                 Addresses = new[] {originAddress, destinationAddress}
@@ -265,22 +265,18 @@ namespace VitalChoice.Business.Services.Avatax
 
         private static IEnumerable<Line> ToTaxLines(OrderDataContext order, TaxGetType taxGetType, int startNumber)
         {
-            IEnumerable<SkuOrdered> items;
-            if (taxGetType.HasFlag(TaxGetType.PerishableOnly))
+            IEnumerable<SkuOrdered> items = Enumerable.Empty<SkuOrdered>();
+            if (taxGetType.HasFlag(TaxGetType.Perishable))
             {
                 items =
-                    order.SkuOrdereds.Union(order.PromoSkus.Where(p => p.Enabled))
-                        .Where(s => s.Sku.IdObjectType != (int) ProductType.NonPerishable);
+                    items.Union(order.SkuOrdereds.Union(order.PromoSkus.Where(p => p.Enabled))
+                        .Where(s => s.Sku.IdObjectType == (int) ProductType.Perishable));
             }
-            else if (taxGetType.HasFlag(TaxGetType.NonPerishableOnly))
+            if (taxGetType.HasFlag(TaxGetType.NonPerishable))
             {
                 items =
-                    order.SkuOrdereds.Union(order.PromoSkus.Where(p => p.Enabled))
-                        .Where(s => s.Sku.IdObjectType == (int) ProductType.NonPerishable);
-            }
-            else
-            {
-                items = order.SkuOrdereds.Union(order.PromoSkus.Where(p => p.Enabled));
+                    items.Union(order.SkuOrdereds.Union(order.PromoSkus.Where(p => p.Enabled))
+                        .Where(s => s.Sku.IdObjectType == (int) ProductType.NonPerishable));
             }
             return items.Select(
                 p => new Line
@@ -297,7 +293,7 @@ namespace VitalChoice.Business.Services.Avatax
                     Ref1 = p.Sku.Id.ToString(CultureInfo.InvariantCulture),
                     CustomerUsageType =
                         order.Order.Customer.IdObjectType == (int) CustomerType.Wholesale &&
-                        order.Order.Customer.SafeData.TaxExempt == 1//Yes, Current Certificate
+                        order.Order.Customer.SafeData.TaxExempt == 1 //Yes, Current Certificate
                             ? "G"
                             : null
                 });
@@ -305,23 +301,19 @@ namespace VitalChoice.Business.Services.Avatax
 
         private static IEnumerable<Line> ToTaxLines(OrderRefundDataContext order, TaxGetType taxGetType, int startNumber)
         {
-            IEnumerable<RefundSkuOrdered> items;
-            if (taxGetType.HasFlag(TaxGetType.PerishableOnly))
+            IEnumerable<RefundSkuOrdered> items = Enumerable.Empty<RefundSkuOrdered>();
+            if (taxGetType.HasFlag(TaxGetType.Perishable))
             {
-                items = order.RefundSkus.Where(s => s.Sku.IdObjectType != (int) ProductType.NonPerishable);
+                items = items.Union(order.RefundSkus.Where(s => s.Sku.IdObjectType == (int) ProductType.Perishable));
             }
-            else if (taxGetType.HasFlag(TaxGetType.NonPerishableOnly))
+            if (taxGetType.HasFlag(TaxGetType.NonPerishable))
             {
-                items = order.RefundSkus.Where(s => s.Sku.IdObjectType == (int) ProductType.NonPerishable);
-            }
-            else
-            {
-                items = order.RefundSkus;
+                items = items.Union(order.RefundSkus.Where(s => s.Sku.IdObjectType == (int) ProductType.NonPerishable));
             }
             return items.Select(
                 p => new Line
                 {
-                    Amount = p.RefundValue*(decimal) p.RefundPercent/(decimal) 100.0*p.Quantity,
+                    Amount = p.RefundValue*(decimal) p.RefundPercent/100,
                     Description = p.Sku.Product.Name,
                     DestinationCode = "02",
                     OriginCode = "01",

@@ -1676,6 +1676,11 @@ namespace VitalChoice.Business.Services.Orders
             {
                 foreach (var item in items)
                 {
+                    if (!(bool?)item.SafeData.GiftOrder ?? false)
+                    {
+                        item.Data.GiftMessage = null;
+                    }
+
                     if ((bool?) item.Customer?.SafeData.Guest ?? false)
                     {
                         item.Data.Guest = true;

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using VitalChoice.Caching.Interfaces;
 
 namespace VitalChoice.Caching.Services.Cache.Base
