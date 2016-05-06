@@ -17,7 +17,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 
         public FrequencyType FrequencyType { get; set; }
 
-        public int? IdAdminTeam { get; set; }
+        public ICollection<int> IdAdminTeams { get; set; }
 
         public int? IdAdmin { get; set; }
     }

@@ -1224,7 +1224,8 @@ INSERT INTO [dbo].[ContentItems]
                                                 @if(BillToAddress.Address2){{
                                                 @(BillToAddress.Address2)<br />
                                                 }}
-                                                @(BillToAddress.City), @(BillToAddress.StateCodeOrCounty) @(BillToAddress.Zip) @(BillToAddress.Country)
+                                                @(BillToAddress.City), @(BillToAddress.StateCodeOrCounty) @(BillToAddress.Zip)<br />
+												@(BillToAddress.Country)
                                             </td>
                         					<td align="left" valign="top" style="padding: 5px 25px 5px 10px; font-size: 13px; color: #6d6e72; font-family: Arial, helvetica, sans-serif;">
                                                 @(ShipToAddress.FirstName) @(ShipToAddress.LastName)<br />
@@ -1235,11 +1236,11 @@ INSERT INTO [dbo].[ContentItems]
                                                 @if(ShipToAddress.Address2){{
                                                 @(ShipToAddress.Address2)<br />
                                                 }}
-                                                @(ShipToAddress.City), @(ShipToAddress.StateCodeOrCounty) @(ShipToAddress.Zip) @(ShipToAddress.Country)
+                                                @(ShipToAddress.City), @(ShipToAddress.StateCodeOrCounty) @(ShipToAddress.Zip)<br />
+												@(ShipToAddress.Country)
                                             </td>
                         					<td align="left" valign="top" style="padding: 5px 0 5px 5px; font-size: 13px; color: #6d6e72; font-family: Arial, helvetica, sans-serif;">
-                                                Order#: <br/>
-                                                @(Id) <br/>
+                                                Order #: @(Id) <br/>
                                                 See "Additional Information"<br />below for shipping guidance.<br/>
                                                 Purchase Date: <br/>
                                                 @date(DateCreated){{MM''/''dd''/''yyyy}}<br/>
@@ -1264,18 +1265,19 @@ INSERT INTO [dbo].[ContentItems]
                         						@(GiftMessage)
                                             </td>
                                             <td align="left" valign="top" style="padding: 5px 25px 5px 10px; font-size: 13px; color: #6d6e72; font-family: Arial, helvetica, sans-serif; text-align: center;">
-                                                Week of<br/>
-            		                            @if(ShipDelayDate){{
+                                                @if(ShipDelayDate){{
+                                                    Week of<br/>
             		                                @date(ShipDelayDate){{MM''/''dd''/''yyyy}}
             		                            }}
-            		                            @ifnot(ShipDelayDate){{
-            		                                @if(ShipDelayDateNP){{
-            		                                    Perishable Foods <br />
-            		                                    @date(ShipDelayDateNP){{MM''/''dd''/''yyyy}}<br />
-            		                                }}
+            		                            @if(@(model.ShipDelayDateNP!=null || model.ShipDelayDateP!=null)){{
+                                                    Week of<br/>
             		                                @if(ShipDelayDateP){{
-            		                                    Non-Perishable Goods <br />
+            		                                    Perishable Foods <br />
             		                                    @date(ShipDelayDateP){{MM''/''dd''/''yyyy}}<br />
+            		                                }}
+            		                                @if(ShipDelayDateNP){{
+            		                                    Non-Perishable Goods <br />
+            		                                    @date(ShipDelayDateNP){{MM''/''dd''/''yyyy}}<br />
             		                                }}
             		                            }}
                                             </td>

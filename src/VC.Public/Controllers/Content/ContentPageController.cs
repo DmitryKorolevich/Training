@@ -21,38 +21,17 @@ namespace VC.Public.Controllers.Content
     {
         private readonly IContentEditService _contentService;
         private readonly IContentPageViewService _contentPageViewService;
+        private readonly IContentPageService _contentPageService;
 
         public ContentPageController(
             IContentEditService contentService,
             IContentPageViewService contentPageViewService,
+            IContentPageService contentPageService,
             IPageResultService pageResultService) : base(pageResultService)
         {
 		    _contentService = contentService;
             _contentPageViewService = contentPageViewService;
-        }
-
-	    [HttpGet]
-        public async Task<IActionResult> Categories()
-        {
-            throw new NotImplementedException();
-            //var toReturn = await _contentService.GetCategoryContentAsync(ContentType.ContentPageCategory, GetParameters());
-            //if (toReturn != null)
-            //{
-            //    return BaseView(new ContentPageViewModel(toReturn));
-            //}
-            //return BaseNotFoundView();
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Category(string url)
-        {
-            throw new NotImplementedException();
-            //var toReturn = await _contentService.GetCategoryContentAsync(ContentType.ContentPageCategory, GetParameters(), url);
-            //if (toReturn != null)
-            //{
-            //    return BaseView(new ContentPageViewModel(toReturn));
-            //}
-            //return BaseNotFoundView();
+            _contentPageService = contentPageService;
         }
 
         [HttpGet]
@@ -85,6 +64,22 @@ namespace VC.Public.Controllers.Content
 						return View("AccessDenied");
 				}
 			}
+            return BaseNotFoundView();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ContentPageByIdOld([FromQuery]string idpage)
+        {
+            int idold;
+            if (Int32.TryParse(idpage, out idold))
+            {
+                var item = await _contentPageService.GetContentPageAsync(idold);
+                if (!string.IsNullOrEmpty(item?.Url))
+                {
+                    return RedirectPermanent($"/content/{item.Url}");
+                }
+            }
+
             return BaseNotFoundView();
         }
 

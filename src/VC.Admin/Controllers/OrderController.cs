@@ -55,6 +55,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using VitalChoice.Business.Helpers;
+using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 
 namespace VC.Admin.Controllers
 {
@@ -76,6 +77,7 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> _ordersZipStatisticItemCSVExportService;
         private readonly ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> _vOrderWithRegionInfoItemCSVExportService;
         private readonly ICsvExportService<OrdersAgentReportExportItem, OrdersAgentReportExportItemCsvMap> _ordersAgentReportExportItemCSVExportService;
+        private readonly ICsvExportService<WholesaleDropShipReportOrderItem, WholesaleDropShipReportOrderItemCsvMap> _wholesaleDropShipReportOrderItemCSVExportService;
         private readonly INotificationService _notificationService;
         private readonly BrontoService _brontoService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
@@ -96,6 +98,7 @@ namespace VC.Admin.Controllers
             ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> ordersZipStatisticItemCSVExportService,
             ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> vOrderWithRegionInfoItemCSVExportService,
             ICsvExportService<OrdersAgentReportExportItem, OrdersAgentReportExportItemCsvMap> ordersAgentReportExportItemCSVExportService,
+            ICsvExportService<WholesaleDropShipReportOrderItem, WholesaleDropShipReportOrderItemCsvMap> wholesaleDropShipReportOrderItemCSVExportService,
             INotificationService notificationService,
             BrontoService brontoService,
             IOrderReportService orderReportService,
@@ -110,6 +113,7 @@ namespace VC.Admin.Controllers
             _ordersZipStatisticItemCSVExportService = ordersZipStatisticItemCSVExportService;
             _vOrderWithRegionInfoItemCSVExportService = vOrderWithRegionInfoItemCSVExportService;
             _ordersAgentReportExportItemCSVExportService = ordersAgentReportExportItemCSVExportService;
+            _wholesaleDropShipReportOrderItemCSVExportService = wholesaleDropShipReportOrderItemCSVExportService;
             _notificationService = notificationService;
             _brontoService = brontoService;
             _orderReportService = orderReportService;
@@ -897,7 +901,7 @@ namespace VC.Admin.Controllers
 
         [HttpGet]
         public async Task<FileResult> GetOrdersAgentReportFile([FromQuery]string from, [FromQuery]string to,
-            [FromQuery]FrequencyType frequencytype, [FromQuery]int? idadminteam = null, [FromQuery]int? idadmin = null)
+            [FromQuery]FrequencyType frequencytype, [FromQuery]string idadminteams = null, [FromQuery]int? idadmin = null)
         {
             var dFrom = from.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
             var dTo = to.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
@@ -911,7 +915,8 @@ namespace VC.Admin.Controllers
                 From = dFrom.Value,
                 To = dTo.Value.AddDays(1),
                 FrequencyType = frequencytype,
-                IdAdminTeam = idadminteam,
+                IdAdminTeams = !string.IsNullOrEmpty(idadminteams) ? idadminteams.Split(',').Where(p => !string.IsNullOrEmpty(p)).Select(p=>Int32.Parse(p)).ToList()
+                    : new List<int>(),
                 IdAdmin = idadmin,
             };
 
@@ -944,6 +949,69 @@ namespace VC.Admin.Controllers
             var contentDisposition = new ContentDispositionHeaderValue("attachment")
             {
                 FileName = String.Format(FileConstants.ORDERS_AGENT_REPORT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<WholesaleDropShipReport>> GetWholesaleDropShipReport([FromBody]WholesaleDropShipReportFilter filter)
+        {
+            var toReturn = await _orderReportService.GetWholesaleDropShipReportAsync(filter);
+            return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<PagedList<WholesaleDropShipReportOrderItem>>> GetOrdersForWholesaleDropShipReport([FromBody]WholesaleDropShipReportFilter filter)
+        {
+            var toReturn = await _orderReportService.GetOrdersForWholesaleDropShipReportAsync(filter);
+            return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpGet]
+        public async Task<FileResult> GetOrdersForWholesaleDropShipReportFile([FromQuery]string from, [FromQuery]string to, [FromQuery]string shipfrom=null, [FromQuery]string shipto=null,
+            [FromQuery]int? idcustomertype = null, [FromQuery]int? idtradeclass = null, [FromQuery]string customerfirstname = null, [FromQuery]string customerlastname = null,
+            [FromQuery]string shipfirstname = null, [FromQuery]string shiplastname = null, [FromQuery]string shipidconfirm = null, [FromQuery]int? idorder = null,
+            [FromQuery]string ponumber = null)
+        {
+            var dFrom = from.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            if (!dFrom.HasValue || !dTo.HasValue)
+            {
+                return null;
+            }
+            DateTime? dShipFrom = !string.IsNullOrEmpty(shipfrom) ? shipfrom.GetDateFromQueryStringInPst(_pstTimeZoneInfo) : null;
+            DateTime? dShipTo = !string.IsNullOrEmpty(shipto) ? shipto.GetDateFromQueryStringInPst(_pstTimeZoneInfo) : null;
+
+            WholesaleDropShipReportFilter filter = new WholesaleDropShipReportFilter()
+            {
+                From = dFrom.Value,
+                To = dTo.Value.AddDays(1),
+                ShipFrom = dShipFrom,
+                ShipTo = dShipTo?.AddDays(1) ?? dShipTo,
+                IdCustomerType = idcustomertype,
+                IdTradeClass = idtradeclass,
+                CustomerFirstName = customerfirstname,
+                CustomerLastName = customerlastname,
+                ShipFirstName = shipfirstname,
+                ShipLastName = shiplastname,
+                ShippingIdConfirmation = shipidconfirm,
+                IdOrder = idorder,
+                PoNumber = ponumber,
+            };
+            filter.Paging = null;
+
+            var data = await _orderReportService.GetOrdersForWholesaleDropShipReportAsync(filter);
+
+            var result = _wholesaleDropShipReportOrderItemCSVExportService.ExportToCsv(data.Items);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.WHOLESALE_DROPSHIP_REPORT, DateTime.Now)
             };
 
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());

@@ -128,6 +128,14 @@ namespace VitalChoice.Business.Services.Content
             return toReturn;
         }
 
+        public async Task<ContentPage> GetContentPageByIdOldAsync(int id)
+        {
+            ContentPageQuery query = new ContentPageQuery().WithIdOld(id).NotDeleted();
+            var toReturn = (await contentPageRepository.Query(query).SelectAsync(false)).FirstOrDefault();
+
+            return toReturn;
+        }
+
         public async Task<ContentPage> UpdateContentPageAsync(ContentPage model)
         {
             ContentPage dbItem = null;
@@ -164,6 +172,15 @@ namespace VitalChoice.Business.Services.Content
                 {
                     throw new AppValidationException("Url","Content page with the same URL already exists, please use a unique URL.");
                 }
+                if (model.IdOld.HasValue)
+                {
+                    var oldIdDublicatesExist = await contentPageRepository.Query(p => p.IdOld == model.IdOld && p.Id != dbItem.Id
+                        && p.StatusCode != RecordStatusCode.Deleted).SelectAnyAsync();
+                    if (oldIdDublicatesExist)
+                    {
+                        throw new AppValidationException("IdOld", "Content page with the same idpage already exists, please use a unique idpage.");
+                    }
+                }
 
                 dbItem.Name = model.Name;
                 dbItem.Url = model.Url;
@@ -174,6 +191,7 @@ namespace VitalChoice.Business.Services.Content
                 }
                 dbItem.Assigned = model.Assigned;
                 dbItem.MasterContentItemId = model.MasterContentItemId;
+                dbItem.IdOld = model.IdOld;
                 dbItem.ContentItem.Updated = DateTime.Now;
                 dbItem.ContentItem.Template = model.ContentItem.Template;
                 dbItem.ContentItem.Description = model.ContentItem.Description;

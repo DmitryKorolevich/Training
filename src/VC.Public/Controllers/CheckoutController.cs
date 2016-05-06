@@ -610,6 +610,9 @@ namespace VC.Public.Controllers
             var shippingAddress = cart.Order.ShippingAddress;
             reviewOrderModel.ShipToAddress = shippingAddress.PopulateShippingAddressDetails(countries);
 
+            reviewOrderModel.DeliveryInstructions = shippingAddress.SafeData.DeliveryInstructions;
+            reviewOrderModel.GiftMessage = cart.Order.SafeData.GiftMessage;
+
             return cart;
         }
 
@@ -635,6 +638,9 @@ namespace VC.Public.Controllers
 
             var shippingAddress = order.ShippingAddress;
             reviewOrderModel.ShipToAddress = shippingAddress.PopulateShippingAddressDetails(countries);
+
+            reviewOrderModel.DeliveryInstructions = shippingAddress.SafeData.DeliveryInstructions;
+            reviewOrderModel.GiftMessage = order.SafeData.GiftMessage;
 
             return order;
         }

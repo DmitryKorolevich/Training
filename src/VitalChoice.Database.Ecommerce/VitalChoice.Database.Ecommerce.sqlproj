@@ -266,4 +266,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\SPGetInventoriesSummaryUsageReport.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPsForWholesaleDropShipReport.sql" />
+  </ItemGroup>
 </Project>

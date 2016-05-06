@@ -28,11 +28,12 @@ BEGIN
 	BEGIN
 		INSERT INTO @InvIds
 		(Id)
-		SELECT DISTINCT sToInv.IdInventorySku FROM Skus s
-		JOIN SkusToInventorySkus sToInv ON s.Id=sToInv.IdSku
-		JOIN InventorySkus inv ON inv.Id=sToInv.IdInventorySku
-		LEFT JOIN ProductOptionTypes AS oopt ON oopt.Name = N'Assemble'
-		LEFT JOIN SkuOptionValues AS oval ON oval.IdSku = s.Id AND oval.IdOptionType = oopt.Id
+		SELECT DISTINCT sToInv.IdInventorySku 
+		FROM Skus s WITH(NOLOCK)
+		JOIN SkusToInventorySkus sToInv WITH(NOLOCK) ON s.Id=sToInv.IdSku
+		JOIN InventorySkus inv WITH(NOLOCK) ON inv.Id=sToInv.IdInventorySku
+		LEFT JOIN ProductOptionTypes AS oopt WITH(NOLOCK) ON oopt.Name = N'Assemble'
+		LEFT JOIN SkuOptionValues AS oval WITH(NOLOCK) ON oval.IdSku = s.Id AND oval.IdOptionType = oopt.Id
 		WHERE (@sku IS NULL OR s.Code LIKE '%'+@sku+'%') AND
 		(@invsku IS NULL OR inv.Code LIKE '%'+@invsku+'%') AND
 		(@idsinvcat IS NULL OR inv.IdInventorySkuCategory IN
@@ -43,9 +44,10 @@ BEGIN
 	SELECT dateadd(mm, (DATEPART(Year, DateCreated) - 1900) * 12 + DATEPART(Month, DateCreated) - 1 , 0) As Date,
 		temp.IdInventorySku, SUM(temp.Quantity) AS Quantity
 		FROM
-		(SELECT o.DateCreated, osToInv.IdInventorySku, os.Quantity*osToInv.Quantity AS Quantity FROM Orders o
-		JOIN OrderToSkus os ON o.Id=os.IdOrder
-		JOIN OrderToSkusToInventorySkus osToInv ON os.IdOrder=osToInv.IdOrder AND os.IdSku=osToInv.IdSku
+		(SELECT o.DateCreated, osToInv.IdInventorySku, os.Quantity*osToInv.Quantity AS Quantity 
+		FROM Orders o WITH(NOLOCK)
+		JOIN OrderToSkus os WITH(NOLOCK) ON o.Id=os.IdOrder
+		JOIN OrderToSkusToInventorySkus osToInv WITH(NOLOCK) ON os.IdOrder=osToInv.IdOrder AND os.IdSku=osToInv.IdSku
 		LEFT JOIN @InvIds invId ON osToInv.IdInventorySku=invId.Id
 		WHERE DateCreated>=@from AND DateCreated<=@to AND StatusCode!=3 AND 
 			(OrderStatus=2 OR OrderStatus=3 OR OrderStatus=5 OR OrderStatus=6 OR OrderStatus=7
@@ -53,9 +55,10 @@ BEGIN
 			OR NPOrderStatus=2 OR NPOrderStatus=3 OR NPOrderStatus=5 OR NPOrderStatus=6 OR NPOrderStatus=7) AND 
 			((@sku IS NULL AND @invsku IS NULL AND @assemble IS NULL AND @idsinvcat IS NULL) OR invId.Id is NOT NULL)
 		UNION ALL
-		SELECT o.DateCreated, opToInv.IdInventorySku, op.Quantity*opToInv.Quantity AS Quantity FROM Orders o
-		JOIN OrderToPromos op ON o.Id=op.IdOrder AND op.[Disabled]=0
-		JOIN OrderToPromosToInventorySkus opToInv ON op.IdOrder=opToInv.IdOrder AND op.IdSku=opToInv.IdSku
+		SELECT o.DateCreated, opToInv.IdInventorySku, op.Quantity*opToInv.Quantity AS Quantity
+		FROM Orders o WITH(NOLOCK)
+		JOIN OrderToPromos op WITH(NOLOCK) ON o.Id=op.IdOrder AND op.[Disabled]=0
+		JOIN OrderToPromosToInventorySkus opToInv WITH(NOLOCK) ON op.IdOrder=opToInv.IdOrder AND op.IdSku=opToInv.IdSku
 		LEFT JOIN @InvIds invId ON opToInv.IdInventorySku=invId.Id
 		WHERE DateCreated>=@from AND DateCreated<=@to AND StatusCode!=3 AND 
 			(OrderStatus=2 OR OrderStatus=3 OR OrderStatus=5 OR OrderStatus=6 OR OrderStatus=7

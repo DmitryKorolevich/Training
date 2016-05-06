@@ -40,3 +40,4 @@ Post-Deployment Script Template
 :r .\Scripts\TFGetTableIdsByString.sql
 :r .\Scripts\SPGetInventorySkusUsageReport.sql
 :r .\Scripts\SPGetInventoriesSummaryUsageReport.sql
+:r .\Scripts\SPsForWholesaleDropShipReport.sql
