@@ -48,7 +48,7 @@
             <label class="bold">Ship Delay Date</label>@(":")<span>@Model.ShippingDate?.ToString("MM/dd/yyyy")</span>
         </div>
     }
-    <div class="reivew-order-info receipt-step">
+    <div class="reivew-order-info receipt-step two-columns">
         <div class="reivew-info-box">
             <div class="review-header-container">
                 <span>Bill to Details</span>
@@ -125,24 +125,24 @@
                 {
                     foreach (var t in Model.Skus)
                     {
-                <tr>
-                    <td class="qty">@t.Quantity</td>
-                    <td class="sku">@t.Code</td>
-                    <td>
-                        <a class="cart-text-link" href="@t.ProductPageUrl">@t.DisplayName @(!string.IsNullOrWhiteSpace(t.SubTitle) ? $"{t.SubTitle} " : string.Empty)(@t.PortionsCount)</a>
-                        @foreach (var gcCode in t.GeneratedGCCodes)
+                        <tr>
+                            <td class="qty">@t.Quantity</td>
+                            <td class="sku">@t.Code</td>
+                            <td>
+                                <a class="cart-text-link" href="@t.ProductPageUrl">@t.DisplayName @(!string.IsNullOrWhiteSpace(t.SubTitle) ? $"{t.SubTitle} " : string.Empty)(@t.PortionsCount)</a>
+                                @foreach (var gcCode in t.GeneratedGCCodes)
                                 {
-                                <br /><span class="cart-sku-code"><em>GC Code: @gcCode</em></span>
+                                    <br /><span class="cart-sku-code"><em>GC Code: @gcCode</em></span>
                                 }
-                    </td>
-                    <td class="unit-price">@((t.Price ?? 0).ToString("C2"))</td>
-                    <td class="price">@((t.SubTotal ?? 0).ToString("C2"))</td>
-                </tr>
+                            </td>
+                            <td class="unit-price">@((t.Price ?? 0).ToString("C2"))</td>
+                            <td class="price">@((t.SubTotal ?? 0).ToString("C2"))</td>
+                        </tr>
                     }
                 }
                 else
                 {
-                <tr><td colspan="6">No Items Added</td></tr>
+                    <tr><td colspan="6">No Items Added</td></tr>
                 }
             </tbody>
         </table>
@@ -174,23 +174,23 @@
                 <tbody>
                     @foreach (var t in Model.PromoSkus)
                     {
-                    <tr>
-                        <td class="qty">@t.Quantity</td>
-                        <td class="sku">@t.Code</td>
-                        <td>
-                            <a class="cart-text-link" href="@t.ProductPageUrl">@t.DisplayName @(!string.IsNullOrWhiteSpace(t.SubTitle) ? $"{t.SubTitle} " : string.Empty)(@t.PortionsCount)</a>
-                            @if (t.GeneratedGCCodes != null)
+                        <tr>
+                            <td class="qty">@t.Quantity</td>
+                            <td class="sku">@t.Code</td>
+                            <td>
+                                <a class="cart-text-link" href="@t.ProductPageUrl">@t.DisplayName @(!string.IsNullOrWhiteSpace(t.SubTitle) ? $"{t.SubTitle} " : string.Empty)(@t.PortionsCount)</a>
+                                @if (t.GeneratedGCCodes != null)
                                 {
                                     foreach (var gcCode in t.GeneratedGCCodes)
                                     {
-                                <br />
-                                <span class="cart-sku-code"><em>GC Code: @gcCode</em></span>
+                                        <br />
+                                        <span class="cart-sku-code"><em>GC Code: @gcCode</em></span>
                                     }
                                 }
-                        </td>
-                        <td class="unit-price">@((t.Price ?? 0).ToString("C2"))</td>
-                        <td class="price">@((t.SubTotal ?? 0).ToString("C2"))</td>
-                    </tr>
+                            </td>
+                            <td class="unit-price">@((t.Price ?? 0).ToString("C2"))</td>
+                            <td class="price">@((t.SubTotal ?? 0).ToString("C2"))</td>
+                        </tr>
                     }
                 </tbody>
             </table>
@@ -206,19 +206,19 @@
             </div>
             @if (Model.ShippingUpgradeNP.HasValue)
             {
-            <div class="receipt-shipping-line">
-                <label class="cart-total-value">
-                    Non-Perishable: @Model.ShippingUpgradeNPOptions.Single(x => x.Key == Model.ShippingUpgradeNP).Text
-                </label>
-            </div>
+                <div class="receipt-shipping-line">
+                    <label class="cart-total-value">
+                        Non-Perishable: @Model.ShippingUpgradeNPOptions.Single(x => x.Key == Model.ShippingUpgradeNP).Text
+                    </label>
+                </div>
             }
             @if (Model.ShippingUpgradeP.HasValue)
             {
-            <div class="receipt-shipping-line">
-                <label class="cart-total-value">
-                    Perishable: @Model.ShippingUpgradePOptions.Single(x => x.Key == Model.ShippingUpgradeP).Text
-                </label>
-            </div>
+                <div class="receipt-shipping-line">
+                    <label class="cart-total-value">
+                        Perishable: @Model.ShippingUpgradePOptions.Single(x => x.Key == Model.ShippingUpgradeP).Text
+                    </label>
+                </div>
             }
         </div>
     </div>
@@ -270,24 +270,30 @@
         </div>
     </div>
     @if (!string.IsNullOrEmpty(Model.DeliveryInstructions))
-            {
-        <div class="reivew-info-box">
-            <div class="review-header-container">
-                <span>Delivery Instructions</span>
-            </div>
-            <div class="review-box-line">
-                @Model.DeliveryInstructions
+    {
+
+        <div class="reivew-order-info receipt-step">
+            <div class="reivew-info-box">
+                <div class="review-header-container">
+                    <span>Delivery Instructions</span>
+                </div>
+                <div class="review-box-line">
+                    @Model.DeliveryInstructions
+                </div>
             </div>
         </div>
     }
     @if (!string.IsNullOrEmpty(Model.GiftMessage))
             {
-        <div class="reivew-info-box">
-            <div class="review-header-container">
-                <span>Gift Message</span>
-            </div>
-            <div class="review-box-line">
-                @Model.GiftMessage
+
+        <div class="reivew-order-info receipt-step">
+            <div class="reivew-info-box">
+                <div class="review-header-container">
+                    <span>Gift Message</span>
+                </div>
+                <div class="review-box-line">
+                    @Model.GiftMessage
+                </div>
             </div>
         </div>
     }

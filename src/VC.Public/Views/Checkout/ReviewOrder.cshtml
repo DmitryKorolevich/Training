@@ -73,7 +73,7 @@
             <div class="reivew-info-box">
                 <div class="review-header-container">
                     <span>Ship to Details</span>
-                    @Html.ActionLink("Edit", "AddUpdateShippingMethod", "Checkout", null, new {@class = "button"})
+                    @Html.ActionLink("Edit", "AddUpdateShippingMethod", "Checkout", null, new { @class = "button" })
                 </div>
                 @foreach (var item in Model.ShipToAddress)
                 {
