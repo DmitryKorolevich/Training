@@ -56,7 +56,6 @@ namespace VC.Public.Controllers
         private readonly IProductService _productService;
         private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _orderPaymentMethodConverter;
         private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
-        private readonly IDynamicMapper<OrderDynamic, Order> _orderMapper;
         private readonly ReferenceData _appInfrastructure;
         private readonly ICountryService _countryService;
         private readonly BrontoService _brontoService;
@@ -64,7 +63,7 @@ namespace VC.Public.Controllers
         private readonly IAffiliateService _affiliateService;
         private readonly ILogger _logger;
 
-        public CheckoutController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
+        public CheckoutController(IStorefrontUserService storefrontUserService,
             ICustomerService customerService,
             IAffiliateService affiliateService,
             IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter,
@@ -76,9 +75,9 @@ namespace VC.Public.Controllers
             ICountryService countryService,
             BrontoService brontoService,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
-            IPageResultService pageResultService, ISettingService settingService, ILoggerProviderExtended loggerProvider, IDynamicMapper<OrderDynamic, Order> orderMapper)
+            IPageResultService pageResultService, ISettingService settingService, ILoggerProviderExtended loggerProvider)
             : base(
-                contextAccessor, customerService, infrastructureService, authorizationService, checkoutService, orderService,
+                customerService, infrastructureService, authorizationService, checkoutService, orderService,
                 skuMapper, productMapper, pageResultService, settingService)
         {
             _storefrontUserService = storefrontUserService;
@@ -89,7 +88,6 @@ namespace VC.Public.Controllers
             _countryService = countryService;
             _brontoService = brontoService;
             _transactionAccessor = transactionAccessor;
-            _orderMapper = orderMapper;
             _affiliateService = affiliateService;
             _appInfrastructure = appInfrastructureService.Data();
             _logger = loggerProvider.CreateLoggerDefault();
@@ -550,7 +548,7 @@ namespace VC.Public.Controllers
             {
                 if (await CheckoutService.SaveOrder(cart))
                 {
-                    ContextAccessor.HttpContext.Session.SetInt32(CheckoutConstants.ReceiptSessionOrderId, cart.Order.Id);
+                    HttpContext.Session.SetInt32(CheckoutConstants.ReceiptSessionOrderId, cart.Order.Id);
                     return Url.Action("Receipt", "Checkout");
                 }
             }
@@ -565,7 +563,7 @@ namespace VC.Public.Controllers
         [CustomerStatusCheck]
         public async Task<IActionResult> Receipt()
         {
-            var idOrder = ContextAccessor.HttpContext.Session.GetInt32(CheckoutConstants.ReceiptSessionOrderId);
+            var idOrder = HttpContext.Session.GetInt32(CheckoutConstants.ReceiptSessionOrderId);
             if (idOrder == null)
             {
                 return View("EmptyCart");

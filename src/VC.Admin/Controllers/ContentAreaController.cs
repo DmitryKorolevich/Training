@@ -20,12 +20,10 @@ namespace VC.Admin.Controllers
 	public class ContentAreaController:BaseApiController
     {
 		private readonly IContentAreaService _contentAreaService;
-		private readonly IHttpContextAccessor _contextAccessor;
 
-		public ContentAreaController(IContentAreaService contentAreaService, IHttpContextAccessor contextAccessor)
+		public ContentAreaController(IContentAreaService contentAreaService)
 		{
 			_contentAreaService = contentAreaService;
-			_contextAccessor = contextAccessor;
 		}
 
 		[HttpGet]
@@ -57,7 +55,7 @@ namespace VC.Admin.Controllers
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
 			}
 
-			var context = _contextAccessor.HttpContext;
+			var context = HttpContext;
 			contentArea.IdEditedBy = Convert.ToInt32(context.User.GetUserId());
 			contentArea.Updated = DateTime.Now;
 			contentArea.Template = model.Template;

@@ -18,12 +18,10 @@ namespace VC.Admin.Controllers
     public class AccountController : BaseApiController
     {
 	    private readonly IAdminUserService userService;
-		private readonly IHttpContextAccessor contextAccessor;
 
-		public AccountController(IAdminUserService userService, IHttpContextAccessor contextAccessor)
+		public AccountController(IAdminUserService userService)
 		{
 			this.userService = userService;
-			this.contextAccessor = contextAccessor;
 		}
 
 		private async Task<UserInfoModel> PopulateUserInfoModel(ApplicationUser user)
@@ -124,7 +122,7 @@ namespace VC.Admin.Controllers
 		[HttpGet]
 		public async Task<Result<UserInfoModel>> GetCurrentUser()
 		{
-			var context = contextAccessor.HttpContext;
+			var context = HttpContext;
 
 			if (context.User.Identity.IsAuthenticated)
 			{
@@ -143,7 +141,7 @@ namespace VC.Admin.Controllers
 		[HttpPost]
 		public async Task<bool> Logout([FromBody] object model)
 		{
-			var context = contextAccessor.HttpContext;
+			var context = HttpContext;
 
 			if (context.User.Identity.IsAuthenticated)
 			{

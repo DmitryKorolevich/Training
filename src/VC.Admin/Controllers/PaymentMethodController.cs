@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using VitalChoice.Core.Infrastructure;
@@ -39,7 +41,7 @@ namespace VC.Admin.Controllers
 		[HttpPost]
 		public async Task<Result<bool>> SetState([FromBody]IList<PaymentMethodsAvailability> paymentMethodsAvailability)
 		{
-			await _paymentMethodService.SetStateAsync(paymentMethodsAvailability);
+		    await _paymentMethodService.SetStateAsync(paymentMethodsAvailability, Convert.ToInt32(HttpContext.User.GetUserId()));
 
 			return true;
 		}

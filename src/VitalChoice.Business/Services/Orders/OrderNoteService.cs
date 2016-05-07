@@ -27,24 +27,24 @@ namespace VitalChoice.Business.Services.Orders
 	public class OrderNoteService : IOrderNoteService
 	{
 		private readonly IEcommerceRepositoryAsync<OrderNote> _orderNoteRepository;
-		private readonly IHttpContextAccessor _contextAccessor;
 		private readonly IEcommerceRepositoryAsync<OrderNoteToCustomerType> _orderNoteToCustomerTypeRepository;
 		private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
 		private readonly ILogger _logger;
 	    private readonly ITransactionAccessor<EcommerceContext> _infrastructureTransactionAccessor;
 
-	    public OrderNoteService(IEcommerceRepositoryAsync<OrderNote> orderNoteRepository, IHttpContextAccessor contextAccessor,
-			IEcommerceRepositoryAsync<OrderNoteToCustomerType> orderNoteToCustomerTypeRepository, IRepositoryAsync<AdminProfile> adminProfileRepository, ILoggerProviderExtended loggerProvider, ITransactionAccessor<EcommerceContext> infrastructureTransactionAccessor)
-		{
-			_orderNoteRepository = orderNoteRepository;
-			_contextAccessor = contextAccessor;
-			_orderNoteToCustomerTypeRepository = orderNoteToCustomerTypeRepository;
-			_adminProfileRepository = adminProfileRepository;
+	    public OrderNoteService(IEcommerceRepositoryAsync<OrderNote> orderNoteRepository,
+	        IEcommerceRepositoryAsync<OrderNoteToCustomerType> orderNoteToCustomerTypeRepository,
+	        IRepositoryAsync<AdminProfile> adminProfileRepository, ILoggerProviderExtended loggerProvider,
+	        ITransactionAccessor<EcommerceContext> infrastructureTransactionAccessor)
+	    {
+	        _orderNoteRepository = orderNoteRepository;
+	        _orderNoteToCustomerTypeRepository = orderNoteToCustomerTypeRepository;
+	        _adminProfileRepository = adminProfileRepository;
 	        _infrastructureTransactionAccessor = infrastructureTransactionAccessor;
 	        _logger = loggerProvider.CreateLoggerDefault();
-		}
+	    }
 
-		public async Task<PagedList<ExtendedOrderNote>> GetOrderNotesAsync(FilterBase filter)
+	    public async Task<PagedList<ExtendedOrderNote>> GetOrderNotesAsync(FilterBase filter)
 		{
 			Func<IQueryable<OrderNote>, IOrderedQueryable<OrderNote>> sortable = x => x.OrderByDescending(y => y.DateEdited);
 			var sortOrder = filter.Sorting.SortOrder;
@@ -131,7 +131,7 @@ namespace VitalChoice.Business.Services.Orders
 			return orderNote;
 		}
 
-		public async Task<OrderNote> AddOrderNoteAsync(OrderNote orderNote)
+		public async Task<OrderNote> AddOrderNoteAsync(OrderNote orderNote, int userId)
 		{
 			if (await _orderNoteRepository.Query(new OrderNoteQuery().NotDeleted().MatchByName(orderNote.Title, null)).SelectAnyAsync())
 			{
@@ -140,13 +140,13 @@ namespace VitalChoice.Business.Services.Orders
 
 			orderNote.StatusCode = RecordStatusCode.Active;
 			orderNote.DateCreated = orderNote.DateEdited = DateTime.Now;
-			orderNote.IdEditedBy = Convert.ToInt32(_contextAccessor.HttpContext.User.GetUserId());
+		    orderNote.IdEditedBy = userId;
             await _orderNoteRepository.InsertGraphAsync(orderNote);
 
 			return orderNote;
 		}
 
-		public async Task<OrderNote> UpdateOrderNoteAsync(OrderNote orderNote)
+		public async Task<OrderNote> UpdateOrderNoteAsync(OrderNote orderNote, int userId)
 		{
 			if (await _orderNoteRepository.Query(new OrderNoteQuery().NotDeleted().MatchByName(orderNote.Title, orderNote.Id)).SelectAnyAsync())
 			{
@@ -155,8 +155,9 @@ namespace VitalChoice.Business.Services.Orders
 
 			orderNote.StatusCode = RecordStatusCode.Active;
 			orderNote.DateEdited = DateTime.Now;
-			orderNote.IdEditedBy = Convert.ToInt32(_contextAccessor.HttpContext.User.GetUserId());
-			using (var transaction = _infrastructureTransactionAccessor.BeginTransaction())
+		    orderNote.IdEditedBy = userId;
+
+            using (var transaction = _infrastructureTransactionAccessor.BeginTransaction())
 			{
 				try
 				{
@@ -190,7 +191,7 @@ namespace VitalChoice.Business.Services.Orders
 			return orderNote;
 		}
 
-		public async Task<bool> DeleteOrderNoteAsync(int id)
+		public async Task<bool> DeleteOrderNoteAsync(int id, int userId)
 		{
 			if (await _orderNoteRepository.Query(new OrderNoteQuery().NotDeleted().MatchByid(id).HasCustomerAssignments()).Include(n => n.Customers).SelectAnyAsync())
 			{
@@ -203,7 +204,7 @@ namespace VitalChoice.Business.Services.Orders
 			{
 				orderNote.StatusCode = RecordStatusCode.Deleted;
 				orderNote.DateEdited = DateTime.Now;
-				orderNote.IdEditedBy = Convert.ToInt32(_contextAccessor.HttpContext.User.GetUserId());
+				orderNote.IdEditedBy = userId;
 
 				await _orderNoteRepository.UpdateAsync(orderNote);
 

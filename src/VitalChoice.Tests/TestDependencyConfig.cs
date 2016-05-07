@@ -1,20 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Autofac;
-using Microsoft.AspNet.Http;
 using Microsoft.Extensions.Configuration;
 using VitalChoice.Core.DependencyInjection;
 using VitalChoice.Infrastructure.Domain.Options;
-using VitalChoice.Jobs.Infrastructure;
 
-namespace VitalChoice.Jobs
+namespace VitalChoice.Tests
 {
-    public class JobsDependencyConfig : DefaultDependencyConfig
+    public class TestDependencyConfig : DefaultDependencyConfig
     {
         protected override void FinishCustomRegistrations(ContainerBuilder builder)
         {
-            builder.RegisterModule(new QuartzAutofacFactoryModule());
-            builder.RegisterModule(new QuartzAutofacJobsModule(typeof(JobsDependencyConfig).Assembly));
         }
 
         protected override void ConfigureAppOptions(IConfiguration configuration, AppOptions options)

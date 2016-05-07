@@ -30,24 +30,15 @@ namespace VC.Public.Controllers
         public const string VITAL_GREEN_COOKIE_NAME = "VitalGreen";
         private const int VITAL_GREEN_COOKIE_EXPIRED_HOURS = 24;
 
-        private readonly IStorefrontUserService _userService;
-        private readonly IHttpContextAccessor _contextAccessor;
-        private readonly ICountryService _countryService;
         private readonly IVitalGreenService _vitalGreenService;
         private readonly IFedExService _fedExService;
         private readonly ILogger _logger;
 
-        public VitalGreenController(IStorefrontUserService userService,
-                                    IHttpContextAccessor contextAccessor,
-                                    ICountryService countryService,
-                                    IVitalGreenService vitalGreenService,
+        public VitalGreenController(IVitalGreenService vitalGreenService,
                                     IFedExService fedExService,
                                     ILoggerProviderExtended loggerProvider,
                                     IPageResultService pageResultService) : base(pageResultService)
         {
-            _userService = userService;
-            _contextAccessor = contextAccessor;
-            _countryService = countryService;
             _vitalGreenService = vitalGreenService;
             _fedExService = fedExService;
             _logger = loggerProvider.CreateLoggerDefault();
