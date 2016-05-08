@@ -16,6 +16,16 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions
 
         public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext context, IWorkflowExecutionContext executionContext)
         {
+            decimal discount = 0;
+            if (context.DictionaryData.Keys.Contains("Discount"))
+            {
+                discount = context.Data.Discount;
+            }
+
+            context.DiscountTotal = -discount;
+            context.DiscountedSubtotal = context.ProductsSubtotal + discount;
+            context.AutoTotal = context.DiscountedSubtotal + context.ShippingTotal + context.TaxTotal;
+
             return Task.FromResult<decimal>(0);
         }
     }

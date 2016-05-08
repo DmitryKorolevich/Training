@@ -13,6 +13,7 @@ using VitalChoice.Infrastructure.Domain.Content.Articles;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Content.ContentCrossSells;
 using VitalChoice.Infrastructure.Domain.Content.ContentPages;
+using VitalChoice.Infrastructure.Domain.Content.Emails;
 using VitalChoice.Infrastructure.Domain.Content.Faq;
 using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Content.Recipes;
@@ -367,6 +368,11 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasIndex(p => new { p.Url, p.StatusCode }).HasName("IX_Articles_Url_StatusCode");
             });
 
+            builder.Entity<ArticleBonusLink>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("ArticleBonusLinks");
+            });
 
             builder.Entity<ContentPage>(entity =>
             {
@@ -437,6 +443,7 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("EmailTemplates");
                 entity.Ignore(p => p.Url);
                 entity.Ignore(p => p.ModelPropertyNames);
+                entity.Ignore(p => p.IdOld);
                 entity
                     .HasOne(p => p.MasterContentItem)
                     .WithMany()

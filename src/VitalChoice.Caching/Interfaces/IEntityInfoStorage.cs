@@ -17,8 +17,8 @@ namespace VitalChoice.Caching.Interfaces
         Type GetContextType(Type entityType);
         object GetEntity(Type entityType, ICollection<EntityValueExportable> keyValues);
         object GetEntity(Type entityType, EntityKey pk);
-        Dictionary<TrackedEntityKey, EntityEntry> GetTrackData(DbContext context);
-        Dictionary<TrackedEntityKey, EntityEntry> GetTrackData(DbContext context, out HashSet<object> trackedObjects);
+        IDictionary<TrackedEntityKey, EntityEntry> GetTrackData(DbContext context);
+        IDictionary<TrackedEntityKey, EntityEntry> GetTrackData(DbContext context, out HashSet<object> trackedObjects);
 
         EntityPrimaryKeyInfo GetPrimaryKeyInfo(Type entityType);
         EntityCacheableIndexInfo GetIndexInfo(Type entityType);

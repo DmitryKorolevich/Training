@@ -56,7 +56,6 @@ namespace VC.Public.Controllers
         private readonly IProductService _productService;
         private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _orderPaymentMethodConverter;
         private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
-        private readonly IDynamicMapper<OrderDynamic, Order> _orderMapper;
         private readonly ReferenceData _appInfrastructure;
         private readonly ICountryService _countryService;
         private readonly BrontoService _brontoService;
@@ -64,7 +63,7 @@ namespace VC.Public.Controllers
         private readonly IAffiliateService _affiliateService;
         private readonly ILogger _logger;
 
-        public CheckoutController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
+        public CheckoutController(IStorefrontUserService storefrontUserService,
             ICustomerService customerService,
             IAffiliateService affiliateService,
             IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter,
@@ -76,9 +75,9 @@ namespace VC.Public.Controllers
             ICountryService countryService,
             BrontoService brontoService,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
-            IPageResultService pageResultService, ISettingService settingService, ILoggerProviderExtended loggerProvider, IDynamicMapper<OrderDynamic, Order> orderMapper)
+            IPageResultService pageResultService, ISettingService settingService, ILoggerProviderExtended loggerProvider)
             : base(
-                contextAccessor, customerService, infrastructureService, authorizationService, checkoutService, orderService,
+                customerService, infrastructureService, authorizationService, checkoutService, orderService,
                 skuMapper, productMapper, pageResultService, settingService)
         {
             _storefrontUserService = storefrontUserService;
@@ -89,7 +88,6 @@ namespace VC.Public.Controllers
             _countryService = countryService;
             _brontoService = brontoService;
             _transactionAccessor = transactionAccessor;
-            _orderMapper = orderMapper;
             _affiliateService = affiliateService;
             _appInfrastructure = appInfrastructureService.Data();
             _logger = loggerProvider.CreateLoggerDefault();
@@ -294,27 +292,7 @@ namespace VC.Public.Controllers
 
                         if (!string.IsNullOrEmpty(model.Email))
                         {
-                            var unsubscribed = await _brontoService.GetIsUnsubscribed(model.Email);
-                            if (model.SendNews && (!unsubscribed.HasValue || unsubscribed.Value))
-                            {
-                                _brontoService.Subscribe(model.Email).Start();
-                            }
-                            if (!model.SendNews)
-                            {
-                                if (!unsubscribed.HasValue)
-                                {
-                                    _brontoService.Subscribe(model.Email)
-                                        .ContinueWith(task =>
-                                        {
-                                            task.GetAwaiter().GetResult();
-                                            _brontoService.Unsubscribe(model.Email).Start();
-                                        }).Start();
-                                }
-                                else if (!unsubscribed.Value)
-                                {
-                                    _brontoService.Unsubscribe(model.Email).Start();
-                                }
-                            }
+                            _brontoService.PushSubscribe(model.Email, model.SendNews);
                         }
 
                         return RedirectToAction("AddUpdateShippingMethod");
@@ -350,9 +328,8 @@ namespace VC.Public.Controllers
                     }
                     throw new AppValidationException(newMessages);
                 }
-                catch (Exception e)
+                catch
                 {
-                    _logger.LogError(e.Message, e);
                     transaction.Rollback();
                     if (loginTask != null)
                     {
@@ -571,7 +548,7 @@ namespace VC.Public.Controllers
             {
                 if (await CheckoutService.SaveOrder(cart))
                 {
-                    ContextAccessor.HttpContext.Session.SetInt32(CheckoutConstants.ReceiptSessionOrderId, cart.Order.Id);
+                    HttpContext.Session.SetInt32(CheckoutConstants.ReceiptSessionOrderId, cart.Order.Id);
                     return Url.Action("Receipt", "Checkout");
                 }
             }
@@ -586,7 +563,7 @@ namespace VC.Public.Controllers
         [CustomerStatusCheck]
         public async Task<IActionResult> Receipt()
         {
-            var idOrder = ContextAccessor.HttpContext.Session.GetInt32(CheckoutConstants.ReceiptSessionOrderId);
+            var idOrder = HttpContext.Session.GetInt32(CheckoutConstants.ReceiptSessionOrderId);
             if (idOrder == null)
             {
                 return View("EmptyCart");
@@ -631,6 +608,9 @@ namespace VC.Public.Controllers
             var shippingAddress = cart.Order.ShippingAddress;
             reviewOrderModel.ShipToAddress = shippingAddress.PopulateShippingAddressDetails(countries);
 
+            reviewOrderModel.DeliveryInstructions = shippingAddress.SafeData.DeliveryInstructions;
+            reviewOrderModel.GiftMessage = cart.Order.SafeData.GiftMessage;
+
             return cart;
         }
 
@@ -656,6 +636,9 @@ namespace VC.Public.Controllers
 
             var shippingAddress = order.ShippingAddress;
             reviewOrderModel.ShipToAddress = shippingAddress.PopulateShippingAddressDetails(countries);
+
+            reviewOrderModel.DeliveryInstructions = shippingAddress.SafeData.DeliveryInstructions;
+            reviewOrderModel.GiftMessage = order.SafeData.GiftMessage;
 
             return order;
         }

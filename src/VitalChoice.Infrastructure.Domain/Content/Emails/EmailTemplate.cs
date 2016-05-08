@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 
-namespace VitalChoice.Infrastructure.Domain.Content.Recipes
+namespace VitalChoice.Infrastructure.Domain.Content.Emails
 {
     public class EmailTemplate : ContentDataItem
     {

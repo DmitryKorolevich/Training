@@ -28,16 +28,22 @@ namespace VC.Admin.ModelConverters
         private readonly OrderRefundService _orderRefundService;
         private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
         private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _paymentMethodMapper;
+        private readonly IDiscountService _discountService;
+        private readonly IProductService _productService;
 
         public OrderRefundModelConverter(OrderService orderService,
             OrderRefundService orderRefundService,
             IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
-            IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> paymentMethodMapper)
+            IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> paymentMethodMapper,
+            IDiscountService discountService,
+            IProductService productService)
         {
             _orderService = orderService;
             _orderRefundService = orderRefundService;
             _addressMapper = addressMapper;
             _paymentMethodMapper = paymentMethodMapper;
+            _discountService = discountService;
+            _productService = productService;
         }
 
         public override void DynamicToModel(OrderRefundManageModel model, OrderRefundDynamic dynamic)
@@ -67,31 +73,46 @@ namespace VC.Admin.ModelConverters
                         p.OrderStatus!=OrderStatus.Cancelled, withDefaults:false);
                     var existDifferentRefunds = existAllRefunds.Where(p => p.Id != dynamic.Id).ToList();
 
+                    model.DiscountedSubtotal = model.ProductsSubtotal;
                     if (source.Discount != null)
                     {
                         model.DiscountCode = source.Discount.Code;
                         model.DiscountMessage = source.Discount.GetDiscountMessage((int?)dynamic.SafeData.IdDiscountTier);
+                        model.DiscountedSubtotal -= model.DiscountTotal;
                     }
 
                     if (dynamic.Id ==0)
                     {
                         var refundWithShippingRefunded = existAllRefunds.FirstOrDefault(p => p.SafeData.ShippingRefunded == true);
-                        model.ShippingRefunded = refundWithShippingRefunded != null;
+                        if (refundWithShippingRefunded != null)
+                        {
+                            model.DisableShippingRefunded = true;
+                            model.ShippingRefunded = true;
+                            model.ManualShippingTotal = 0;
+                        }
 
                         model.RefundSkus=new List<RefundSkuManageModel>();
                         foreach (var skuOrdered in source?.Skus)
                         {
                             var refundSku = new RefundSkuManageModel(skuOrdered);
                             var refundWithSkuExist = existAllRefunds.SelectMany(p => p.RefundSkus).FirstOrDefault(p => p?.Sku.Id == refundSku.IdSku);
-                            refundSku.Disabled = refundWithSkuExist != null;
+                            if (refundWithSkuExist != null)
+                            {
+                                refundSku.Disabled = true;
+                                refundSku.Redeem = refundWithSkuExist.Redeem;
+                            }
                             refundSku.Active = refundSku.Disabled;
                             model.RefundSkus.Add(refundSku);
                         }
-                        foreach (var skuOrdered in source?.PromoSkus)
+                        foreach (var skuOrdered in source?.PromoSkus.Where(p=>p.Enabled))
                         {
                             var refundSku = new RefundSkuManageModel(skuOrdered);
                             var refundWithSkuExist = existAllRefunds.SelectMany(p => p.RefundSkus).FirstOrDefault(p => p?.Sku.Id == refundSku.IdSku);
-                            refundSku.Disabled = refundWithSkuExist != null;
+                            if (refundWithSkuExist != null)
+                            {
+                                refundSku.Disabled = true;
+                                refundSku.Redeem = refundWithSkuExist.Redeem;
+                            }
                             refundSku.Active = refundSku.Disabled;
                             model.RefundSkus.Add(refundSku);
                         }
@@ -143,10 +164,19 @@ namespace VC.Admin.ModelConverters
 
         public override void ModelToDynamic(OrderRefundManageModel model, OrderRefundDynamic dynamic)
         {
+            if (!string.IsNullOrEmpty(model.DiscountCode))
+            {
+                dynamic.Discount = _discountService.GetByCode(model.DiscountCode).Result;
+            }
+
             if (model.Shipping != null)
             {
                 var addressDynamic = _addressMapper.FromModel(model.Shipping, (int)AddressType.Shipping);
                 dynamic.ShippingAddress = addressDynamic;
+                if (model.Id == 0)
+                {
+                    dynamic.ShippingAddress.Id = 0;
+                }
             }
             if (model.IdPaymentMethodType.HasValue)
             {
@@ -158,7 +188,7 @@ namespace VC.Admin.ModelConverters
             }
             dynamic.Customer=new CustomerDynamic() { Id =model.IdCustomer};
 
-            dynamic.RefundSkus = model.RefundSkus.Where(p => p.Active && p.IdSku.HasValue).Select(p => new RefundSkuOrdered()
+            dynamic.RefundSkus = model.RefundSkus.Where(p => p.Active && !p.Disabled && p.IdSku.HasValue).Select(p => new RefundSkuOrdered()
             {
                 Sku = new SkuDynamic() { Id = p.IdSku.Value},
                 Redeem = p.Redeem,
@@ -167,6 +197,18 @@ namespace VC.Admin.ModelConverters
                 RefundValue = p.RefundValue,
                 RefundPercent = p.RefundPercent,
             }).ToList();
+
+            var task = _productService.GetRefundSkusOrderedAsync(dynamic.RefundSkus.Select(p=>p.Sku.Id).ToArray());
+            var fullSkus = task.Result;
+
+            foreach (var refundSkuOrdered in dynamic.RefundSkus)
+            {
+                var fullSku = fullSkus.FirstOrDefault(p => p.Sku.Id == refundSkuOrdered.Sku.Id);
+                if (fullSku != null)
+                {
+                    refundSkuOrdered.Sku = fullSku.Sku;
+                }
+            }
 
             dynamic.RefundOrderToGiftCertificates=model.RefundOrderToGiftCertificates.Select(p=>new RefundOrderToGiftCertificateUsed()
             {

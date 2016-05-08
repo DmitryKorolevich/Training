@@ -1,7 +1,7 @@
 {
   "App": {
     "GenerateLowercaseUrls": true,
-    "EnableBundlingAndMinification": false,
+    "EnableBundlingAndMinification": true,
     "Versioning": {
       "EnableStaticContentVersioning": true,
       "AutoGenerateBuildNumber": true

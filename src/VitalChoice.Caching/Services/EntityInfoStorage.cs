@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -139,7 +140,7 @@ namespace VitalChoice.Caching.Services
             return uniqueIndex;
         }
 
-        private static HashSet<EntityCacheableIndexInfo> SetupForeignKeys(IEntityType entityType, Dictionary<Type, EntityInfo> entityInfos)
+        private static HashSet<EntityCacheableIndexInfo> SetupForeignKeys(IEntityType entityType, IDictionary<Type, EntityInfo> entityInfos)
         {
             var nonUniqueList = new HashSet<EntityCacheableIndexInfo>();
             var externalForeignKeys = new List<KeyValuePair<Type, EntityForeignKeyInfo>>();
@@ -297,11 +298,11 @@ namespace VitalChoice.Caching.Services
             return (LambdaExpression) fullCacheAnnotation?.Value;
         }
 
-        public Dictionary<TrackedEntityKey, EntityEntry> GetTrackData(DbContext context)
+        public IDictionary<TrackedEntityKey, EntityEntry> GetTrackData(DbContext context)
         {
             if (context == null)
                 return null;
-            Dictionary<TrackedEntityKey, EntityEntry> trackData = new Dictionary<TrackedEntityKey, EntityEntry>();
+            var trackData = new Dictionary<TrackedEntityKey, EntityEntry>();
             try
             {
                 foreach (
@@ -331,14 +332,14 @@ namespace VitalChoice.Caching.Services
             }
         }
 
-        public Dictionary<TrackedEntityKey, EntityEntry> GetTrackData(DbContext context, out HashSet<object> trackedObjects)
+        public IDictionary<TrackedEntityKey, EntityEntry> GetTrackData(DbContext context, out HashSet<object> trackedObjects)
         {
             if (context == null)
             {
                 trackedObjects = null;
                 return null;
             }
-            Dictionary<TrackedEntityKey, EntityEntry> trackData = new Dictionary<TrackedEntityKey, EntityEntry>();
+            var trackData = new Dictionary<TrackedEntityKey, EntityEntry>();
             trackedObjects = new HashSet<object>();
             foreach (var group in context.ChangeTracker.Entries().Where(e => e.Entity != null && e.State != EntityState.Detached).GroupBy(e => e.Entity.GetType()))
             {

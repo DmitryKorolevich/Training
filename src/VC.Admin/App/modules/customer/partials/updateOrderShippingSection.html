@@ -6,7 +6,7 @@
             <div class="col-md-9">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" id="shippingCustomerSaved" data-ng-model="shippingCustomerSaved" data-ng-disabled="orderEditDisabled">
+                        <input type="checkbox" id="shippingCustomerSaved" data-ng-model="options.shippingCustomerSaved" data-ng-change="shippingCustomerSavedChanged()" data-ng-disabled="orderEditDisabled">
                         <strong>Customer Saved Address</strong>
                     </label>
                 </div>
@@ -16,7 +16,9 @@
             <div class="col-md-3">
              </div>
             <div class="col-md-7">
-                <select class="form-control" id="shippingAddresses" data-ng-disabled="!shippingCustomerSaved || orderEditDisabled" data-ng-model="shippingAddressTab.AddressIndex" data-ng-options="idx as (shippingAddress.FirstName && shippingAddress.LastName && shippingAddress.Address1 ? (shippingAddress.FirstName + ' ' + shippingAddress.LastName + ' - ' + shippingAddress.Address1 + (shippingAddress.Default ? ' (Default)' : '')) : '') for (idx, shippingAddress) in currentCustomer.Shipping"></select>
+                <select class="form-control" id="shippingAddresses" data-ng-disabled="!options.shippingCustomerSaved || orderEditDisabled" data-ng-model="shippingAddressTab.AddressIndex" data-ng-options="idx as (shippingAddress.FirstName && shippingAddress.LastName && shippingAddress.Address1 ? (shippingAddress.FirstName + ' ' + shippingAddress.LastName + ' - ' + shippingAddress.Address1 + (shippingAddress.Default ? ' (Default)' : '')) : '') for (idx, shippingAddress) in currentCustomer.Shipping">
+                    
+                </select>
             </div>
         </div>
         <div data-ng-include="'app/modules/customer/partials/shippingAddress.html'" data-ng-repeat="model in [buildOrderShippingAddressForPartial(order.OnHold && !order.UpdateShippingAddressForCustomer)]"></div>

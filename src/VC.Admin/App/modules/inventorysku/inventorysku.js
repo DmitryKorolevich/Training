@@ -7,6 +7,7 @@ angular.module('app.modules.inventorysku', [
 	'app.modules.inventorysku.controllers.inventorySkuManageController',
 	'app.modules.inventorysku.controllers.assignInventorySkusController',
 	'app.modules.inventorysku.controllers.inventorySkusUsageReportController',
+	'app.modules.inventorysku.controllers.inventoriesSummaryUsageReportController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -40,6 +41,11 @@ angular.module('app.modules.inventorysku', [
 		            url: '/report/inventoryskus-usage',
 		            templateUrl: 'app/modules/inventorysku/partials/inventorySkusUsageReport.html',
 		            controller: 'inventorySkusUsageReportController'
+		        })
+		        .state('index.oneCol.inventoriesSummaryUsageReport', {
+		            url: '/report/inventoryskus-usage-summary',
+		            templateUrl: 'app/modules/inventorysku/partials/inventoriesSummaryUsageReport.html',
+		            controller: 'inventoriesSummaryUsageReportController'
 		        });
 
 		}

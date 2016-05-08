@@ -66,6 +66,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Exceptions;
 using VitalChoice.Infrastructure.Extensions;
+using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -203,9 +204,8 @@ namespace VitalChoice.Business.Services.Orders
                     }
                     transaction.Commit();
                 }
-                catch (Exception e)
+                catch
                 {
-                    Logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -244,9 +244,8 @@ namespace VitalChoice.Business.Services.Orders
                     await uow.SaveChangesAsync();
                     transaction.Commit();
                 }
-                catch (Exception e)
+                catch
                 {
-                    Logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -304,9 +303,8 @@ namespace VitalChoice.Business.Services.Orders
                     await uow.SaveChangesAsync();
                     transaction.Commit();
                 }
-                catch (Exception e)
+                catch
                 {
-                    Logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -366,9 +364,8 @@ namespace VitalChoice.Business.Services.Orders
 
                     transaction.Commit();
                 }
-                catch (Exception e)
+                catch
                 {
-                    Logger.LogError(e.Message, e);
                     transaction.Rollback();
                     throw;
                 }
@@ -505,30 +502,30 @@ namespace VitalChoice.Business.Services.Orders
                     orderToSku.Sku.OptionTypes = optionTypes;
                     orderToSku.Sku.Product.OptionTypes = optionTypes;
                 }
-                var invalidSkuOrdered =
-                    entities.SelectMany(o => o.Skus)
-                        .Where(s => s.Sku?.Product == null || s.Sku.OptionTypes == null)
-                        .ToArray();
-                var skuIds = new HashSet<int>(invalidSkuOrdered.Select(s => s.IdSku));
-                var invalidSkus = (await _skusRepository.Query(p => skuIds.Contains(p.Id))
-                    .Include(s => s.OptionValues)
-                    .Include(s => s.Product)
-                    .ThenInclude(p => p.OptionValues)
-                    .Include(s => s.Product)
-                    .ThenInclude(p => p.ProductsToCategories)
-                    .SelectAsync(false)).ToDictionary(s => s.Id);
-                foreach (var orderToSku in invalidSkuOrdered)
-                {
-                    Sku sku;
-                    if (invalidSkus.TryGetValue(orderToSku.IdSku, out sku))
-                    {
-                        var optionTypes = _productMapper.FilterByType(sku.Product.IdObjectType);
-                        orderToSku.Sku = sku;
-                        orderToSku.Sku.Product = sku.Product;
-                        orderToSku.Sku.OptionTypes = optionTypes;
-                        orderToSku.Sku.Product.OptionTypes = optionTypes;
-                    }
-                }
+                //var invalidSkuOrdered =
+                //    entities.SelectMany(o => o.Skus)
+                //        .Where(s => s.Sku?.Product == null || s.Sku.OptionTypes == null)
+                //        .ToArray();
+                //var skuIds = new HashSet<int>(invalidSkuOrdered.Select(s => s.IdSku));
+                //var invalidSkus = (await _skusRepository.Query(p => skuIds.Contains(p.Id))
+                //    .Include(s => s.OptionValues)
+                //    .Include(s => s.Product)
+                //    .ThenInclude(p => p.OptionValues)
+                //    .Include(s => s.Product)
+                //    .ThenInclude(p => p.ProductsToCategories)
+                //    .SelectAsync(false)).ToDictionary(s => s.Id);
+                //foreach (var orderToSku in invalidSkuOrdered)
+                //{
+                //    Sku sku;
+                //    if (invalidSkus.TryGetValue(orderToSku.IdSku, out sku))
+                //    {
+                //        var optionTypes = _productMapper.FilterByType(sku.Product.IdObjectType);
+                //        orderToSku.Sku = sku;
+                //        orderToSku.Sku.Product = sku.Product;
+                //        orderToSku.Sku.OptionTypes = optionTypes;
+                //        orderToSku.Sku.Product.OptionTypes = optionTypes;
+                //    }
+                //}
             }
             if (entities.All(e => e.PromoSkus != null))
             {
@@ -540,30 +537,30 @@ namespace VitalChoice.Business.Services.Orders
                     orderToSku.Sku.OptionTypes = optionTypes;
                     orderToSku.Sku.Product.OptionTypes = optionTypes;
                 }
-                var invalidSkuOrdered =
-                    entities.SelectMany(o => o.Skus)
-                        .Where(s => s.Sku?.Product == null || s.Sku.OptionTypes == null)
-                        .ToArray();
-                var skuIds = new HashSet<int>(invalidSkuOrdered.Select(s => s.IdSku));
-                var invalidSkus = (await _skusRepository.Query(p => skuIds.Contains(p.Id))
-                    .Include(s => s.OptionValues)
-                    .Include(s => s.Product)
-                    .ThenInclude(p => p.OptionValues)
-                    .Include(s => s.Product)
-                    .ThenInclude(p => p.ProductsToCategories)
-                    .SelectAsync(false)).ToDictionary(s => s.Id);
-                foreach (var orderToSku in invalidSkuOrdered)
-                {
-                    Sku sku;
-                    if (invalidSkus.TryGetValue(orderToSku.IdSku, out sku))
-                    {
-                        var optionTypes = _productMapper.FilterByType(sku.Product.IdObjectType);
-                        orderToSku.Sku = sku;
-                        orderToSku.Sku.Product = sku.Product;
-                        orderToSku.Sku.OptionTypes = optionTypes;
-                        orderToSku.Sku.Product.OptionTypes = optionTypes;
-                    }
-                }
+                //var invalidSkuOrdered =
+                //    entities.SelectMany(o => o.Skus)
+                //        .Where(s => s.Sku?.Product == null || s.Sku.OptionTypes == null)
+                //        .ToArray();
+                //var skuIds = new HashSet<int>(invalidSkuOrdered.Select(s => s.IdSku));
+                //var invalidSkus = (await _skusRepository.Query(p => skuIds.Contains(p.Id))
+                //    .Include(s => s.OptionValues)
+                //    .Include(s => s.Product)
+                //    .ThenInclude(p => p.OptionValues)
+                //    .Include(s => s.Product)
+                //    .ThenInclude(p => p.ProductsToCategories)
+                //    .SelectAsync(false)).ToDictionary(s => s.Id);
+                //foreach (var orderToSku in invalidSkuOrdered)
+                //{
+                //    Sku sku;
+                //    if (invalidSkus.TryGetValue(orderToSku.IdSku, out sku))
+                //    {
+                //        var optionTypes = _productMapper.FilterByType(sku.Product.IdObjectType);
+                //        orderToSku.Sku = sku;
+                //        orderToSku.Sku.Product = sku.Product;
+                //        orderToSku.Sku.OptionTypes = optionTypes;
+                //        orderToSku.Sku.Product.OptionTypes = optionTypes;
+                //    }
+                //}
             }
         }
 
@@ -1050,9 +1047,8 @@ namespace VitalChoice.Business.Services.Orders
 
                             toReturn = true;
                         }
-                        catch (Exception e)
+                        catch
                         {
-                            Logger.LogError(e.Message, e);
                             transaction.Rollback();
                             throw;
                         }
@@ -1094,9 +1090,8 @@ namespace VitalChoice.Business.Services.Orders
 
                         transaction.Commit();
                     }
-                    catch (Exception e)
+                    catch
                     {
-                        Logger.LogError(e.Message, e);
                         transaction.Rollback();
                         throw;
                     }
@@ -1196,9 +1191,8 @@ namespace VitalChoice.Business.Services.Orders
 
                         transaction.Commit();
                     }
-                    catch (Exception e)
+                    catch
                     {
-                        Logger.LogError(e.Message, e);
                         transaction.Rollback();
                         throw;
                     }
@@ -1247,9 +1241,8 @@ namespace VitalChoice.Business.Services.Orders
 
                         transaction.Commit();
                     }
-                    catch (Exception e)
+                    catch
                     {
-                        Logger.LogError(e.Message, e);
                         transaction.Rollback();
                         throw;
                     }
@@ -1312,9 +1305,8 @@ namespace VitalChoice.Business.Services.Orders
 
                         transaction.Commit();
                     }
-                    catch (Exception e)
+                    catch
                     {
-                        Logger.LogError(e.Message, e);
                         transaction.Rollback();
                         throw;
                     }
@@ -1559,6 +1551,12 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<PagedList<VOrder>> GetOrdersAsync(VOrderFilter filter)
         {
+            //var tFilter = new WholesaleDropShipReportFilter();
+            //tFilter.From = DateTime.Now.AddMonths(-4);
+            //tFilter.To =DateTime.Now;;
+            //var data = await _sPEcommerceRepository.GetCountOrderIdsForWholesaleDropShipReportAsync(tFilter);
+
+
             var conditions = new VOrderQuery();
             conditions = conditions.WithCustomerId(filter.IdCustomer);
 
@@ -1678,6 +1676,11 @@ namespace VitalChoice.Business.Services.Orders
             {
                 foreach (var item in items)
                 {
+                    if (!(bool?)item.SafeData.GiftOrder ?? false)
+                    {
+                        item.Data.GiftMessage = null;
+                    }
+
                     if ((bool?) item.Customer?.SafeData.Guest ?? false)
                     {
                         item.Data.Guest = true;

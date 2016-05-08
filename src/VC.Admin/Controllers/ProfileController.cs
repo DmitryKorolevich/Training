@@ -18,19 +18,17 @@ namespace VC.Admin.Controllers
     public class ProfileController : BaseApiController
     {
 	    private readonly IAdminUserService userService;
-	    private readonly IHttpContextAccessor contextAccessor;
 
-		public ProfileController(IAdminUserService userService, IHttpContextAccessor contextAccessor)
+		public ProfileController(IAdminUserService userService)
 	    {
 		    this.userService = userService;
-			this.contextAccessor = contextAccessor;
         }
 
 	    [HttpPost]
 		[ControlMode(UpdateProfileMode.Default, typeof(UpdateProfileSettings))]
 		public async Task<Result<GetProfileModel>> UpdateProfile([FromBody]UpdateProfileModel profileModel)
 		{
-			var context = contextAccessor.HttpContext;
+			var context = HttpContext;
 
 		    if (context.User.Identity.IsAuthenticated)
 		    {
@@ -81,7 +79,7 @@ namespace VC.Admin.Controllers
 		[HttpGet]
 	    public async Task<Result<GetProfileModel>> GetProfile()
 		{
-			var context = contextAccessor.HttpContext;
+			var context = HttpContext;
 
 			if (context.User.Identity.IsAuthenticated)
 			{

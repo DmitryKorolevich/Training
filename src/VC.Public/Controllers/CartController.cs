@@ -46,13 +46,13 @@ namespace VC.Public.Controllers
 	    private readonly IContentCrossSellService _contentCrossSellService;
 
 
-	    public CartController(IHttpContextAccessor contextAccessor,
+	    public CartController(
             ICustomerService customerService,
             IOrderService orderService, IProductService productService, ICheckoutService checkoutService,
             IAuthorizationService authorizationService, IAppInfrastructureService appInfrastructureService,
             IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
             IDiscountService discountService, IGcService gcService, IContentCrossSellService contentCrossSellService, IPageResultService pageResultService, ISettingService settingService)
-            : base(contextAccessor, customerService, appInfrastructureService, authorizationService, checkoutService, orderService, skuMapper,productMapper, pageResultService, settingService)
+            : base(customerService, appInfrastructureService, authorizationService, checkoutService, orderService, skuMapper,productMapper, pageResultService, settingService)
         {
 	        _productService = productService;
             _checkoutService = checkoutService;
@@ -106,11 +106,13 @@ namespace VC.Public.Controllers
 					return skuOrdered;
 				},
 				(ordered, skuModel) => ordered.Quantity += 1);
-			SetCartUid(cart.CartUid);
-			if (!await _checkoutService.UpdateCart(cart))
-				throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
 
-			var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
+			SetCartUid(cart.CartUid);
+
+            var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
+
+            if (!await _checkoutService.UpdateCart(cart))
+				throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
 
 		    return new Tuple<OrderDataContext, CustomerCartOrder>(context, cart);
 	    }
@@ -144,6 +146,12 @@ namespace VC.Public.Controllers
 
 			return crossSellModels;
 		}
+
+        [HttpGet]
+        public Task<IActionResult> GetCartLiteComponent()
+        {
+            return Task.FromResult<IActionResult>(ViewComponent("CartLite"));
+        }
 
 		[HttpGet]
         public async Task<Result<ViewCartModel>> InitCartModel()
@@ -211,7 +219,7 @@ namespace VC.Public.Controllers
 
 			await FillModel(result, res.Item2.Order, res.Item1);
             SetCartUid(res.Item2.CartUid);
-            ContextAccessor.HttpContext.Session.Remove(CheckoutConstants.ReceiptSessionOrderId);
+            HttpContext.Session.Remove(CheckoutConstants.ReceiptSessionOrderId);
             return result;
         }
 

@@ -57,3 +57,4 @@ set dateformat mdy
 :r .\Scripts\ContentCrossSellsDefaultData.sql
 
 :r .\Scripts\AdminTeams.sql
+:r .\Scripts\ContentOldIds.sql

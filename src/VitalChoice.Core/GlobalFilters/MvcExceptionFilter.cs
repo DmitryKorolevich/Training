@@ -126,16 +126,16 @@ namespace VitalChoice.Core.GlobalFilters
 				}
 				else
 				{
-				    var pageService = context.HttpContext.RequestServices.GetService<IPageResultService>();
+				    //var pageService = context.HttpContext.RequestServices.GetService<IPageResultService>();
 
                     if (apiException.Status == HttpStatusCode.NotFound)
 					{
-						context.Result = pageService.GetResult(PageResult.NotFound);
+						context.Result = new HttpNotFoundResult();
 						return;
 					}
 					if (apiException.Status == HttpStatusCode.Forbidden)
 					{
-						context.Result = pageService.GetResult(PageResult.Forbidden);
+						context.Result = new HttpForbiddenResult();
                         return;
 					}
 					var viewName = "Error";

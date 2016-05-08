@@ -218,17 +218,18 @@
                                                         <span class="legend">Gift Certificates Used On Order</span>
                                                         <div class="form-group margin-bottom-0px" data-ng-repeat="item in order.RefundOrderToGiftCertificates">
                                                             <label for="shippingrefunded" class="col-md-3 control-label">Gift Certificate</label>
-                                                            <div class="col-md-6 form-control-static">
+                                                            <div class="col-md-7 form-control-static">
                                                                 <div>
                                                                     <span>
                                                                         <span>{{item.Code}}</span>
-                                                                        <span data-ng-if="">&nbsp;(Refunded {{item.AmountRefunded | currency}})</span>
+                                                                        <span data-ng-if="item.AmountRefunded">&nbsp;(Refunded {{item.AmountRefunded | currency}})</span>
+                                                                        <span data-ng-if="item.Amount && order.Id">&nbsp;(In this refund {{item.Amount | currency}})</span>
                                                                         <span>&nbsp;(Amount {{item.AmountUsedOnSourceOrder | currency}})</span>
                                                                     </span>
                                                                 </div>
                                                             </div>
                                                             <div data-ng-if="$last">
-                                                                <label class="col-md-2 control-label">Amount</label>
+                                                                <label class="col-md-1 control-label">Amount</label>
                                                                 <div class="col-md-1 padding-left-zero form-control-static">
                                                                     <span>({{order.GiftCertificatesUsedAmountOnSourceOrder | currency}})</span>
                                                                 </div>
@@ -255,13 +256,13 @@
                                                                 <div class="form-group margin-bottom-0px">
                                                                     <label class="col-md-8 control-label">Tax</label>
                                                                     <div class="col-md-4 form-control-static">
-                                                                        <span>({{order.TaxTotal | currency}})</span>
+                                                                        <span>{{order.TaxTotal | currency}}</span>
                                                                     </div>
                                                                 </div>
                                                                 <div class="form-group margin-bottom-0px">
                                                                     <label class="col-md-8 control-label">Total to be Refunded</label>
                                                                     <div class="col-md-4 form-control-static">
-                                                                        <span>{{order.AutoTotal | currency}}</span>
+                                                                        <span>({{order.AutoTotal | currency}})</span>
                                                                     </div>
                                                                 </div>
                                                             </div></div>
@@ -326,7 +327,7 @@
                                                             <div>
                                                                 <label class="col-md-9 control-label">Refund To Be Submitted</label>
                                                                 <div class="col-md-3 form-control-static">
-                                                                    <span>{{order.Total | currency}}</span>
+                                                                    <span>({{order.Total | currency}})</span>
                                                                 </div>
                                                             </div>
                                                         </div>

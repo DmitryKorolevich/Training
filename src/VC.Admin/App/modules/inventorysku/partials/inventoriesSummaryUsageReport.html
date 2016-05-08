@@ -1,0 +1,113 @@
+﻿<div class="container-fluid inventory-usage-summary-report">
+    <div class="well">
+        <span class="legend">Product Shipment Summary</span>
+        <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate>
+            <fieldset>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="From" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.From.$invalid">
+                            <small class="error" ng-show="forms.form.From.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","From")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="To" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.To.$invalid">
+                            <small class="error" ng-show="forms.form.To.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","To")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="ShipDate" data-ng-change="filterChanged();" data-ng-model="filter.ShipDate" />
+                                Ship Date
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <div class="input-group autocomplete col-md-12">
+                            <input type="text" name="Sku" class="form-control" placeholder="Product SKU" data-ng-change="filterChanged();" data-ng-model="filter.Sku" autocomplete="off" data-ng-minlength="3"
+                                   uib-typeahead-min-length="1" uib-typeahead="sku.Code as sku.Code for sku in getSKUsBySKU($viewValue)" uib-typeahead-loading="loadingSKUsBySKU"
+                                   uib-typeahead-wait-ms="100">
+                        </div>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.Sku.$invalid">
+                            <small class="error" ng-show="forms.form.Sku.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Product SKU")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group autocomplete col-md-12">
+                            <input type="text" name="InvSku" class="form-control" placeholder="Inventory Code" data-ng-change="filterChanged();" data-ng-model="filter.InvSku" autocomplete="off" data-ng-minlength="3"
+                                   uib-typeahead-min-length="1" uib-typeahead="sku.Code as sku.Code for sku in getInvSKUsBySKU($viewValue)" uib-typeahead-loading="loadingInvSKUsBySKU"
+                                   uib-typeahead-wait-ms="100">
+                        </div>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.InvSku.$invalid">
+                            <small class="error" ng-show="forms.form.InvSku.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Part SKU")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control" data-ng-change="filterChanged();" data-ng-model="filter.IdsInvCat" ng-options="item.Key as item.Text for item in filterCategories"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control" data-ng-change="filterChanged();" data-ng-model="filter.Assemble" ng-options="item.Key as item.Text for item in assembles"></select>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <button class="btn btn-info" data-ng-click="filterItems();" type="button">Filter</button>
+                        <a target="_self" class="btn btn-primary pull-right" data-ng-href={{options.exportUrl}} data-ng-click="exportClick($event)">Export</a>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+        <spinner-overlay data-loading="refreshTracker.active()">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Inventory Code</th>
+                        <th>Inventory Description</th>
+                        <th>UOM</th>
+                        <th data-ng-repeat="item in report.TotalItems">{{item.Date | date:"MMM-yy"}}</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat-start="category in report.Categories"></tr>
+                    <tr data-ng-repeat="inventory in category.Inventories">
+                        <td>{{inventory.Code}}</td>
+                        <td><div class="description">{{inventory.Description}}</div></td>
+                        <td>{{inventory.UnitOfMeasureAmount}}</td>
+                        <td data-ng-repeat="item in inventory.Items">{{item.Quantity}}</td>
+                        <td><strong>{{inventory.GrandTotal}}</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>{{category.Name}} Total</strong></td>
+                        <td></td>
+                        <td><div class="description"></div></td>
+                        <td data-ng-repeat="item in category.TotalItems"><strong>{{item.Quantity}}</strong></td>
+                        <td><strong>{{category.GrandTotal}}</strong></td>
+                    </tr>
+                    <tr data-ng-repeat-end></tr>
+                    <tr>
+                        <td><strong>Total</strong></td>
+                        <td></td>
+                        <td><div class="description"></div></td>
+                        <td data-ng-repeat="item in report.TotalItems"><strong>{{item.Quantity}}</strong></td>
+                        <td><strong>{{report.GrandTotal}}</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </spinner-overlay>
+    </div>
+</div>

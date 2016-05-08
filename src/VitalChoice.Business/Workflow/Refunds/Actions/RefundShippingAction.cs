@@ -20,6 +20,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions
             context.ManualShippingTotal = context.Order.Data.ManualShippingTotal;
             if (context.ShippingRefunded)
             {
+                context.ShippingTotal = context.ManualShippingTotal;
                 return Task.FromResult(context.ManualShippingTotal);
             }
             return Task.FromResult<decimal>(0);

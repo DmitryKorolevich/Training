@@ -106,6 +106,14 @@ angular.module('app.core.dataAccess.services.contentService', [])
 		deleteArticle: function (id, tracker) {
 		    return $http.post(baseUrl + 'DeleteArticle/' + id, null, getConfig(tracker));
 		},
+		getArticleBonusLinks: function (tracker)
+		{
+		    return $http.get(baseUrl + 'GetArticleBonusLinks', getConfig(tracker));
+		},
+		updateArticleBonusLinks: function (model, tracker)
+		{
+		    return $http.post(baseUrl + 'UpdateArticleBonusLinks', model, getConfig(tracker));
+		},
 
 	    //recipes
 		getContentPages: function(filter,tracker) {

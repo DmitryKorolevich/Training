@@ -20,5 +20,9 @@ namespace VC.Public.Models.Checkout
         public IList<KeyValuePair<string, string>> CreditCardDetails { get; set; }
 
         public IList<KeyValuePair<string, string>> ShipToAddress { get; set; }
+
+        public string DeliveryInstructions { get; set; }
+
+        public string GiftMessage { get; set; }
     }
 }

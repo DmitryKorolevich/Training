@@ -187,7 +187,8 @@ angular.module('app.modules.order.services.orderEditService', [])
                 {
                     for (var j = i + 1; j < uiScope.order.SkuOrdereds.length; j++)
                     {
-                        if (current.Code == uiScope.order.SkuOrdereds[j].Code)
+                        if (current.Code == uiScope.order.SkuOrdereds[j].Code || (current.Code && uiScope.order.SkuOrdereds[j].Code
+                            && current.Code.toUpperCase() == uiScope.order.SkuOrdereds[j].Code.toUpperCase()))
                         {
                             uiScope.order.SkuOrdereds[j].ClientMessages.push("Duplicate SKU");
                             isValid = false;
@@ -204,32 +205,44 @@ angular.module('app.modules.order.services.orderEditService', [])
             {
                 if (form)
                 {
-                    if (index == "GCs")
+                    $.each(form, function (index, element)
                     {
-                        $.each(form, function (index, subForm)
+                        if (element && element.$name == "DiscountCode")
                         {
-                            if (index.indexOf('i') == 0)
-                            {
-                                $.each(subForm, function (index, element)
-                                {
-                                    if (element && element.$name == index)
-                                    {
-                                        element.$setValidity("server", true);
-                                    }
-                                });
-                            }
-                        });
-                    }
-                    else
-                    {
-                        $.each(form, function (index, element)
+                            return false;
+                        }
+                        if (element && element.$name == index)
                         {
-                            if (element && element.$name == index)
-                            {
-                                element.$setValidity("server", true);
-                            }
-                        });
-                    }
+                            element.$setValidity("server", true);
+                        }
+                    });
+
+                    //if (index == "GCs")
+                    //{
+                    //    $.each(form, function (index, subForm)
+                    //    {
+                    //        if (index.indexOf('i') == 0)
+                    //        {
+                    //            $.each(subForm, function (index, element)
+                    //            {
+                    //                if (element && element.$name == index)
+                    //                {
+                    //                    element.$setValidity("server", true);
+                    //                }
+                    //            });
+                    //        }
+                    //    });
+                    //}
+                    //else
+                    //{
+                    //    $.each(form, function (index, element)
+                    //    {
+                    //        if (element && element.$name == index)
+                    //        {
+                    //            element.$setValidity("server", true);
+                    //        }
+                    //    });
+                    //}
                 }
             });
         };        
@@ -304,7 +317,7 @@ angular.module('app.modules.order.services.orderEditService', [])
                         var add = true;
                         $.each(uiScope.order.SkuOrdereds, function (index, product)
                         {
-                            if (newProduct.Code == product.Code)
+                            if (newProduct.Code == product.Code || (newProduct.Code && product.Code && newProduct.Code.toUpperCase() == product.Code.toUpperCase()))
                             {
                                 add = false;
                                 return false;
@@ -444,7 +457,7 @@ angular.module('app.modules.order.services.orderEditService', [])
                         uiScope.requestRecalculate();
                     }
                 }
-            }, 20);
+            }, 100);
         };
 
         uiScope.getSKUsByProductName = function (val)
@@ -560,6 +573,37 @@ angular.module('app.modules.order.services.orderEditService', [])
         uiScope.goToCustomer = function ()
         {
             $state.go('index.oneCol.customerDetail', { id: uiScope.idCustomer });
+        };
+
+        uiScope.shippingCustomerSavedChanged = function ()
+        {
+            if (!uiScope.options.shippingCustomerSaved)
+            {
+                uiScope.order.Shipping = angular.copy(uiScope.order.OldShipping);
+            }
+            else
+            {
+                if (uiScope.shippingAddressTab.AddressIndex)
+                {
+                    uiScope.shippingAddressTab.OrderShippingEditModel = undefined;
+                    uiScope.order.Shipping = angular.copy(uiScope.currentCustomer.Shipping[parseInt(uiScope.shippingAddressTab.AddressIndex)]);
+                }
+            }
+        };
+
+        uiScope.creditCardCustomerSavedChanged = function ()
+        {
+            if (!uiScope.options.creditCardCustomerSaved)
+            {
+                uiScope.order.CreditCard = angular.copy(uiScope.order.OldCreditCard);
+            }
+            else
+            {
+                if (uiScope.paymentInfoTab.CreditCardIndex)
+                {
+                    uiScope.order.CreditCard = angular.copy(uiScope.currentCustomer.CreditCards[parseInt(uiScope.paymentInfoTab.CreditCardIndex)]);
+                }
+            }
         };
     };
 
@@ -691,8 +735,9 @@ angular.module('app.modules.order.services.orderEditService', [])
                 var found = false;
                 $.each(data.SkuOrdereds, function (index, sku)
                 {
-                    if (uiSku.Code == sku.Code)
+                    if (uiSku.Code == sku.Code || (uiSku.Code && sku.Code && uiSku.Code.toUpperCase() == sku.Code.toUpperCase()))
                     {
+                        uiSku.Code == sku.Code;
                         uiSku.Price = sku.Price;
                         uiSku.Amount = sku.Amount;
                         uiSku.Quantity = sku.Quantity;
@@ -703,15 +748,6 @@ angular.module('app.modules.order.services.orderEditService', [])
                         return false;
                     }
                 });
-                if (!found && uiSku.Id != null)
-                {
-                    toDeleteIdxs.push(index);
-                }
-            });
-
-            $.each(toDeleteIdxs, function (index, item)
-            {
-                uiScope.order.SkuOrdereds.splice(item, 1);
             });
 
             uiScope.order.PromoSkus = data.PromoSkus;
@@ -818,6 +854,12 @@ angular.module('app.modules.order.services.orderEditService', [])
         {
             uiScope.options.ignoneMinimumPerishableThreshold = uiScope.order.IgnoneMinimumPerishableThreshold;
         }
+        uiScope.order.OldShipping = angular.copy(uiScope.order.Shipping);
+        uiScope.order.OldCreditCard = angular.copy(uiScope.order.CreditCard);
+        uiScope.options.shippingCustomerSaved = false;
+        uiScope.options.creditCardCustomerSaved = false;
+        uiScope.shippingAddressTab.AddressIndex = null;
+        uiScope.paymentInfoTab.CreditCardIndex = null;
     };
 
     var initOrderOptions = function (uiScope)
@@ -919,14 +961,31 @@ angular.module('app.modules.order.services.orderEditService', [])
             uiScope.currentCustomer.SourceValue = sourceName;
         }
 
+        if (uiScope.options.ShippingAddressIndexWatch)
+        {
+            uiScope.options.ShippingAddressIndexWatch();
+        }
+        uiScope.paymentInfoTab.CreditCardIndex = "0";
         angular.forEach(uiScope.currentCustomer.CreditCards, function (creditCard, index)
         {
             creditCard.formName = "card";
             customerEditService.syncCountry(uiScope, creditCard.Address);
-            uiScope.paymentInfoTab.CreditCardIndex = "0";
             if (creditCard.Default)
             {
                 uiScope.paymentInfoTab.CreditCardIndex = index.toString();
+            }
+        });
+        
+        if (uiScope.options.CreditCardIndexWatch)
+        {
+            uiScope.options.CreditCardIndexWatch();
+        }
+        uiScope.shippingAddressTab.AddressIndex = "0";
+        angular.forEach(uiScope.currentCustomer.Shipping, function (shippingItem, index)
+        {
+            if (shippingItem.Default)
+            {
+                uiScope.shippingAddressTab.AddressIndex = index.toString();
             }
         });
 
@@ -1000,12 +1059,25 @@ angular.module('app.modules.order.services.orderEditService', [])
 
         uiScope.paymentInfoTab.PaymentMethodType = uiScope.order.IdPaymentMethodType;
 
-        uiScope.$watch('paymentInfoTab.CreditCardIndex', function (newValue, oldValue)
+        if (uiScope.options.ShippingAddressIndexWatch)
+        {
+            uiScope.options.ShippingAddressIndexWatch();
+        }
+        uiScope.options.ShippingAddressIndexWatch = uiScope.$watch('shippingAddressTab.AddressIndex', function (newValue, oldValue)
+        {
+            if (newValue && oldValue != newValue)
+            {
+                uiScope.shippingAddressTab.OrderShippingEditModel = undefined;
+                uiScope.order.Shipping = angular.copy(uiScope.currentCustomer.Shipping[parseInt(newValue)]);
+            }
+        });
+
+        uiScope.options.CreditCardIndexWatch = uiScope.$watch('paymentInfoTab.CreditCardIndex', function (newValue, oldValue)
         {
             if (newValue && oldValue != newValue)
             {
                 //uiScope.order.CreditCard = angular.copy(uiScope.currentCustomer.CreditCards[parseInt(newValue)]);
-                uiScope.order.CreditCard = uiScope.currentCustomer.CreditCards[parseInt(newValue)];
+                uiScope.order.CreditCard = angular.copy(uiScope.currentCustomer.CreditCards[parseInt(newValue)]);
             }
         });
 
@@ -1013,7 +1085,8 @@ angular.module('app.modules.order.services.orderEditService', [])
         {
             if (uiScope.currentCustomer.CreditCards && uiScope.currentCustomer.CreditCards[0])
             {
-                uiScope.order.CreditCard = uiScope.currentCustomer.CreditCards[0];
+                uiScope.order.CreditCard = angular.copy(uiScope.currentCustomer.CreditCards[0]);
+                uiScope.order.OldCreditCard = angular.copy(uiScope.currentCustomer.CreditCards[0]);
             }
         }
         if (!uiScope.order.Oac)

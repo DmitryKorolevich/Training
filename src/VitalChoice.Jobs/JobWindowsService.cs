@@ -16,21 +16,18 @@ namespace VitalChoice.Jobs
 {
 	public class JobWindowsService : ServiceBase
 	{
-	    private readonly IApplicationEnvironment _env;
-        
-        private void InitializeComponent()
+	    private void InitializeComponent()
         {
             this.ServiceName = "jobsService";
             this.CanStop = true;
         }
 
 		private ILogger _logger;
-		private IContainer _container;
+		private readonly IContainer _container;
 	    private IScheduler _scheduler;
 
         public JobWindowsService(IApplicationEnvironment env)
 		{
-		    _env = env;
             try
             {
                 var configurationBuilder = new ConfigurationBuilder()
@@ -40,7 +37,7 @@ namespace VitalChoice.Jobs
                 var configuration = configurationBuilder.Build();
 
                 _container = new JobsDependencyConfig().RegisterInfrastructure(configuration, new ServiceCollection(),
-                    typeof(JobsDependencyConfig).Assembly, _env, enableCache: true);
+                    typeof(JobsDependencyConfig).Assembly, env, enableCache: true);
             }
             catch (Exception e)
             {

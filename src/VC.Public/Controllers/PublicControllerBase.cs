@@ -28,24 +28,22 @@ namespace VC.Public.Controllers
     {
         protected readonly IAppInfrastructureService InfrastructureService;
         protected readonly IAuthorizationService AuthorizationService;
-        protected readonly IHttpContextAccessor ContextAccessor;
         protected readonly ICustomerService CustomerService;
         protected readonly ICheckoutService CheckoutService;
 
-        protected PublicControllerBase(IHttpContextAccessor contextAccessor, ICustomerService customerService,
+        protected PublicControllerBase(ICustomerService customerService,
             IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService, ICheckoutService checkoutService,
             IPageResultService pageResultService) : base(pageResultService)
         {
             CheckoutService = checkoutService;
             InfrastructureService = infrastructureService;
             AuthorizationService = authorizationService;
-            ContextAccessor = contextAccessor;
 			CustomerService = customerService;
         }
 
         protected async Task<bool> CustomerLoggedIn()
         {
-            var context = ContextAccessor.HttpContext;
+            var context = HttpContext;
             var signedIn = await AuthorizationService.AuthorizeAsync(context.User, null, IdentityConstants.IdentityBasicProfile);
             if (signedIn)
             {
@@ -61,13 +59,13 @@ namespace VC.Public.Controllers
         {
             if (role != RoleType.Retail && role != RoleType.Wholesale)
                 return false;
-            var context = ContextAccessor.HttpContext;
+            var context = HttpContext;
             return InfrastructureService.HasRole(context.User, role);
         }
 
         protected int GetInternalCustomerId()
         {
-            var context = ContextAccessor.HttpContext;
+            var context = HttpContext;
             var internalId = Convert.ToInt32(context.User.GetUserId());
 
             return internalId;

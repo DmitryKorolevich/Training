@@ -29,13 +29,11 @@ namespace VC.Admin.Controllers
     {
 	    private readonly IAdminUserService userService;
 	    private readonly IOptions<AppOptions> appOptions;
-		private readonly IHttpContextAccessor contextAccessor;
 
-		public UserManagementController(IAdminUserService userService, IOptions<AppOptions> appOptions, IHttpContextAccessor contextAccessor)
+		public UserManagementController(IAdminUserService userService, IOptions<AppOptions> appOptions)
 	    {
 		    this.userService = userService;
 		    this.appOptions = appOptions;
-			this.contextAccessor = contextAccessor;
         }
 
 	    [HttpGet]
@@ -118,13 +116,13 @@ namespace VC.Admin.Controllers
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
 			}
 
-			var context = contextAccessor.HttpContext;
+			var context = HttpContext;
 			if (user.Id == Convert.ToInt32(context.User.GetUserId()) && user.Status != userModel.Status)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CurrentUserStatusUpdate]);
 			}
 
-			var isCurrentUser = user.Email.Equals(contextAccessor.HttpContext.User.GetUserName());
+			var isCurrentUser = user.Email.Equals(HttpContext.User.GetUserName());
 
 			user.FirstName = userModel.FirstName;
 			user.LastName = userModel.LastName;
@@ -178,7 +176,7 @@ namespace VC.Admin.Controllers
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
 			}
 
-			var context = contextAccessor.HttpContext;
+			var context = HttpContext;
 			if (user.Id == Convert.ToInt32(context.User.GetUserId()))
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CurrentUserRemoval]);

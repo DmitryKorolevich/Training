@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using VitalChoice.Validation.Models;
 using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Content.Emails;
 using VitalChoice.Infrastructure.Domain.Content.Recipes;
 
 

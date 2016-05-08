@@ -12,9 +12,13 @@ var lhnCustom2 = '';
 var lhnCustom3 = '';
 var lhnTrackingEnabled = 't';
 var lhnScriptSrc = lhnJsHost + 'www.livehelpnow.net/lhn/scripts/livehelpnow.aspx?lhnid=' + lhnAccountN + '&iv=' + lhnInviteEnabled + '&d=' + lhnDepartmentN + '&ver=' + lhnVersion + '&rnd=' + Math.random();
-var lhnScript = document.createElement("script"); lhnScript.type = "text/javascript"; lhnScript.src = lhnScriptSrc;
+var lhnScript = document.createElement("script");
+lhnScript.setAttribute("defer", "defer");
+lhnScript.type = "text/javascript";
+lhnScript.src = lhnScriptSrc;
 
 var googleSearchcx = '006613472277305802095:2wviofnvpvs';
+var googleSearchFAQcx = '006613472277305802095:ne3iw8mrxlk';
 
 
 // Avoid `console` errors in browsers that lack a console.
@@ -521,10 +525,22 @@ function processCharcount(ev) {
 
 function initLiveHelp() {
 	if (window.addEventListener) {
-		window.addEventListener('load', function () { document.getElementById('lhnContainer').appendChild(lhnScript); }, false);
+	    window.addEventListener('load',
+	        function() {
+	            setTimeout(function() {
+	                document.getElementById('lhnContainer').appendChild(lhnScript);
+	            }, 1);
+	        },
+	        false);
 	}
 	else if (window.attachEvent) {
-		window.attachEvent('onload', function () { document.getElementById('lhnContainer').appendChild(lhnScript); });
+	    window.attachEvent('onload',
+	        function() {
+	            setTimeout(function() {
+	                    document.getElementById('lhnContainer').appendChild(lhnScript);
+	                },
+	                1);
+	        });
 	}
 }
 
@@ -736,5 +752,22 @@ function trySetFormErrors(result) {
                 notifyError(globalErrors[i]);
             }
         }
+    }
+}
+
+function brontoSignupValidateEmail(e)
+{
+    var emailRegex = /^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])$/;
+
+    var email = $(e.target).find('.bronto-email').val();
+    if (emailRegex.test(email))
+    {
+        $(e.target).find(".sugnup-bubble").hide();
+        return true;
+    }
+    else
+    {
+        $(e.target).find(".sugnup-bubble").show();
+        return false;
     }
 }

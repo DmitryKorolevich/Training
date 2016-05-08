@@ -541,8 +541,10 @@ BEGIN
 	    @rightwrapper(){{
 		    <a href="#"><img src="/assets/images/news-baby-spot-8-29-13a-210x157px.png"></a>
 		}}
+		@if(ArticleBonusLink){{
 	    @rightwrapper(){{
-		    <a href="#"><img src="/assets/images/bonus-tile-10-30-12A.jpg"></a>
+		    <a href="@(ArticleBonusLink.Url)"><img src="/assets/images/bonus-tile-10-30-12A.jpg"></a>
+		}}
 		}}
 	    @rightwrapper(){{
 		    <a href="#"><img src="/assets/images/guarantee-spot-8-29-13-210px.jpg"></a>
@@ -658,7 +660,10 @@ BEGIN
                 </a>
             </div>
             <div class="body">
+			    @if(@!string.IsNullOrEmpty(model.Model.FileUrl))
+                {{
                 <img class="main-img" src="@(@model.Model.FileUrl)"/>
+                }}
                 @(@model.Model.ContentItem.Description)
             </div>
 	</div>
@@ -674,22 +679,29 @@ BEGIN
             </strong>
             <br>
             <div class="input-wrapper">
-                <form method="post" name="search" action="https://app.bronto.com/public/webform/process/">
-            		<input type="hidden" value="92galxckiog3fu5rrpft43l7m738f" name="fid"/>
-					<input type="hidden" value="09dcaffa5c9971f4be87813780496171" name="sid"/>
-					<input type="hidden" value="" name="delid"/>
-					<input type="hidden" value="" name="subid"/>
-					<input type="hidden" value="true" name="24793[291714]"/>
-                    <input type="text" name="24791" autocomplete="off" placeholder="Enter email here">
-                    <input class="yellow" type="submit" value="Go">
-                </form>
+                <form method="post" name="search" onsubmit="return brontoSignupValidateEmail(event)" action="https://app.bronto.com/public/webform/process/">
+                		<input type="hidden" value="98fbmg41k7lrzlevfi29oph85r7l8" name="fid"/>
+    					<input type="hidden" value="09dcaffa5c9971f4be87813780496171" name="sid"/>
+    					<input type="hidden" value="" name="delid"/>
+    					<input type="hidden" value="" name="subid"/>
+                        <input type="hidden" name="td" value="">
+                        <input type="hidden" name="formtype" value="addcontact">
+    					<input type="hidden" value="true" name="74699[291714]"/>
+                        <input type="text" name="74686" autocomplete="off" class="bronto-email" placeholder="Enter email here">
+                        <input class="yellow" type="submit" value="Go">
+                        <div class="sugnup-bubble" style="left:-82px;">
+                            Please enter a valid email address
+                        </div>
+                    </form>
             </div>
             <a href="#">View a recent issue</a>
         </div>
     </div>
+	@if(ArticleBonusLink){{
     <div class="right-wrapper">
-	    <a href="#"><img src="/assets/images//bonus-tile-10-30-12A.jpg"></a>
+        <a href="@(ArticleBonusLink.Url)"><img src="/assets/images/bonus-tile-10-30-12A.jpg"></a>
     </div>
+	}}
 }}
 
 <right_recent_articles>
@@ -1089,12 +1101,12 @@ SET	[Updated] = GETDATE(),
         </div>
         <div class="body">
             <div class="margin-bottom-medium">
-                <div class="video margin-right-small not-printable">
-                @if(@model.Model.YoutubeVideo)
+			    @if(@!string.IsNullOrEmpty(model.Model.YoutubeVideo))
                 {{
+                <div class="video margin-right-small not-printable">
                 <iframe width="470" height="265" src="https://www.youtube.com/embed/@(@model.Model.YoutubeVideo)?rel=0&amp;enablejsapi=1" frameborder="0"></iframe>
-                }}
                 </div>
+				}}
                 @if(@!string.IsNullOrEmpty(model.Model.AboutChef))
                 {{
                 <div class="panel panel-border chef">
@@ -1309,10 +1321,10 @@ BEGIN
                     <a href="/content/contact-customer-service">Customer Service page</a>.
                 </li>
             </ol>
-            <div class="input-wrapper margin-bottom-medium">
-                <input type="text" autocomplete="off" placeholder="Enter your search term here">
-                <input class="yellow" type="button" value="Search FAQs">
-            </div>
+            <form class="input-wrapper margin-bottom-medium" action="/help/searchfaq" method="get">
+                <input type="text" name="q" placeholder="Enter your search term here" value="" dir="ltr" autocomplete="off" spellcheck="false">
+                <input class="yellow" type="submit" value="Search FAQs">
+            </form>
             @list(FAQCategories.AllCategories){{
                 <strong>@(Name)</strong>
                 <ul>

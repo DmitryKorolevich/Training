@@ -5,6 +5,7 @@ using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Validation.Models;
 using System;
+using System.Dynamic;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
 using System.Security.Claims;
@@ -44,6 +45,9 @@ using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer.InventorySkus;
 using VitalChoice.Interfaces.Services.InventorySkus;
+using VitalChoice.Business.Helpers;
+using VitalChoice.Business.Services;
+using VitalChoice.Infrastructure.Domain.Entities;
 
 namespace VC.Admin.Controllers
 {
@@ -54,6 +58,7 @@ namespace VC.Admin.Controllers
         private readonly InventorySkuMapper _mapper;
         private readonly ISettingService _settingService;
         private readonly ICsvExportService<InventorySkuUsageReportItemForExport, InventorySkuUsageReportItemForExportCsvMap> _inventorySkuUsageReportItemForExportCSVExportService;
+        private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly ILogger _logger;
 
         public InventorySkuController(
@@ -62,6 +67,7 @@ namespace VC.Admin.Controllers
             InventorySkuMapper mapper,
             ISettingService settingService,
             ICsvExportService<InventorySkuUsageReportItemForExport, InventorySkuUsageReportItemForExportCsvMap> inventorySkuUsageReportItemForExportCSVExportService,
+            ICsvExportService<ExpandoObject, InventoriesSummaryUsageReportItemForExportCsvMap> inventoriesSummaryUsageReportItemForExportCSVExportService,
             ILoggerProviderExtended loggerProvider)
         {
             _inventorySkuCategoryService = inventorySkuCategoryService;
@@ -69,6 +75,7 @@ namespace VC.Admin.Controllers
             _mapper = mapper;
             _settingService = settingService;
             _inventorySkuUsageReportItemForExportCSVExportService = inventorySkuUsageReportItemForExportCSVExportService;
+            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -242,13 +249,20 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<FileResult> GetInventorySkuUsageReportFile([FromQuery]DateTime from, [FromQuery]DateTime to,
+        public async Task<FileResult> GetInventorySkuUsageReportFile([FromQuery]string from, [FromQuery]string to,
              [FromQuery]string skuids, [FromQuery]string invskuids)
         {
+            var dFrom = from.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            if (!dFrom.HasValue || !dTo.HasValue)
+            {
+                return null;
+            }
+
             InventorySkuUsageReportFilter filter = new InventorySkuUsageReportFilter()
             {
-                From = from,
-                To = to,
+                From = dFrom.Value,
+                To = dTo.Value,
                 SkuIds =!string.IsNullOrEmpty(skuids) ? skuids.Split(',').Select(Int32.Parse).ToList() : new List<int>(),
                 InvSkuIds = !string.IsNullOrEmpty(invskuids) ? invskuids.Split(',').Select(Int32.Parse).ToList() : new List<int>(),
             };
@@ -262,6 +276,54 @@ namespace VC.Admin.Controllers
             var contentDisposition = new ContentDispositionHeaderValue("attachment")
             {
                 FileName = String.Format(FileConstants.INVENTORY_SKUS_REPORT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(data, "text/csv");
+        }
+
+        [HttpPost]
+        public async Task<Result<InventoriesSummaryUsageReport>> GetInventoriesSummaryUsageReport([FromBody]InventoriesSummaryUsageReportFilter filter)
+        {
+            filter.To = filter.To.AddDays(1);
+            var toReturn = await _inventorySkuService.GetInventoriesSummaryUsageReportAsync(filter);
+
+            return toReturn;
+        }
+
+        [HttpGet]
+        public async Task<FileResult> GetInventoriesSummaryUsageReportFile([FromQuery]string from, [FromQuery]string to,
+             [FromQuery]string sku, [FromQuery]string invsku, [FromQuery]bool? assemble, [FromQuery]string idsinvcat)
+        {
+            var dFrom = from.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            if (!dFrom.HasValue || !dTo.HasValue)
+            {
+                return null;
+            }
+
+            InventoriesSummaryUsageReportFilter filter = new InventoriesSummaryUsageReportFilter()
+            {
+                From = dFrom.Value,
+                To = dTo.Value,
+                Sku = sku,
+                InvSku = invsku,
+                Assemble = assemble,
+                IdsInvCat = !string.IsNullOrEmpty(idsinvcat) ? idsinvcat.Split(',').Select(Int32.Parse).ToList() : null,
+            };
+
+            filter.To = filter.To.AddDays(1);
+
+            var result = await _inventorySkuService.GetInventoriesSummaryUsageReportAsync(filter);
+            IList<DynamicExportColumn> columns = null;
+            IList<ExpandoObject> items = null;
+            _inventorySkuService.ConvertInventoriesSummaryUsageReportForExport(result, out columns, out items);
+
+            var data = CsvExportService.ExportToCsv(columns, items);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.INVENTORY_SUMMARY_REPORT, DateTime.Now)
             };
 
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());

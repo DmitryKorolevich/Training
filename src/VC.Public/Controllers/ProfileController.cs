@@ -70,7 +70,7 @@ namespace VC.Public.Controllers
 	    private readonly ICountryService _countryService;
         private readonly ILogger _logger;
 
-        public ProfileController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
+        public ProfileController(IStorefrontUserService storefrontUserService,
             ICustomerService customerService, IDynamicMapper<AddressDynamic, Address> addressConverter,
             IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter,
             IDynamicMapper<OrderDynamic, Order> orderConverter,
@@ -81,7 +81,7 @@ namespace VC.Public.Controllers
             IAuthorizationService authorizationService, ICheckoutService checkoutService,
             ILoggerProviderExtended loggerProvider,
             IPageResultService pageResultService, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper, ICountryService countryService, IDynamicMapper<OrderDynamic, Order> orderMapper, IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodConverter)
-            : base(contextAccessor, customerService, infrastructureService, authorizationService, checkoutService, pageResultService)
+            : base(customerService, infrastructureService, authorizationService, checkoutService, pageResultService)
         {
             _storefrontUserService = storefrontUserService;
             _addressConverter = addressConverter;
@@ -260,7 +260,7 @@ namespace VC.Public.Controllers
                 return View(model);
             }
 
-            var context = ContextAccessor.HttpContext;
+            var context = HttpContext;
 
             var user = await _storefrontUserService.FindAsync(context.User.GetUserName());
             if (user == null)

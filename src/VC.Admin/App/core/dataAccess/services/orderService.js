@@ -145,6 +145,11 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    {
 	        return $http.post(baseUrl + 'GetOrdersAgentReport', filter, getConfig(tracker));
 	    },
+	    getOrdersAgentReportFile: function (filter, buildNumber)
+	    {
+	        return baseUrl + 'GetOrdersAgentReportFile?from={0}&to={1}&frequencytype={2}&idadminteams={3}&idadmin={4}&buildNumber={5}'
+                .format(filter.From, filter.To, filter.FrequencyType, filter.sIdAdminTeams, filter.IdAdmin,buildNumber);
+	    },
 
         //gcs
 	    getGCOrders: function (id, tracker)
@@ -156,6 +161,25 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    getServiceCodesReport: function (filter, tracker)
 	    {
 	        return $http.post(baseUrl + 'GetServiceCodesReport', filter, getConfig(tracker));
+	    },
+
+	    //wholesale dropship report
+	    getWholesaleDropShipReport: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetWholesaleDropShipReport', filter, getConfig(tracker));
+	    },
+	    getOrdersForWholesaleDropShipReport: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetOrdersForWholesaleDropShipReport', filter, getConfig(tracker));
+	    },
+	    getOrdersForWholesaleDropShipReportFile: function (filter, buildNumber)
+	    {
+	        return baseUrl + ('GetOrdersForWholesaleDropShipReportFile?from={0}&to={1}&shipfrom={2}&shipto={3}idcustomertype={4}&idtradeclass={5}'+
+                '&customerfirstname={6}&customerlastname={7}&shipfirstname={8}&shiplastname={9}' +
+                '&shipidconfirm={10}&idorder={11}&ponumber={12}&buildNumber={13}')
+                .format(filter.From, filter.To, filter.ShipFrom, filter.ShipTo, filter.IdCustomerType, filter.IdTradeClass,
+                filter.CustomerFirstName, filter.CustomerLastName, filter.ShipFirstName, filter.ShipLastName,
+                filter.ShippingIdConfirmation, filter.IdOrder, filter.PoNumber, buildNumber);
 	    },
 	};
 }]);

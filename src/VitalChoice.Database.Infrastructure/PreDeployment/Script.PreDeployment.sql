@@ -12,3 +12,4 @@ Post-Deployment Script Template
 
 :r .\Scripts\ContentCrossSells.sql
 :r .\Scripts\AdminTeams.sql
+:r .\Scripts\ArticleBonusLinks.sql

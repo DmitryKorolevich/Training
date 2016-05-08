@@ -18,12 +18,10 @@ namespace VC.Admin.Controllers
 	public class StylesController : BaseApiController
     {
 		private readonly IStylesService _stylesService;
-		private readonly IHttpContextAccessor _contextAccessor;
 
-		public StylesController(IStylesService contentAreaService, IHttpContextAccessor contextAccessor)
+		public StylesController(IStylesService contentAreaService)
 		{
 			_stylesService = contentAreaService;
-			_contextAccessor = contextAccessor;
 		}
 
 		[HttpGet]
@@ -47,7 +45,7 @@ namespace VC.Admin.Controllers
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
 			}
 
-			var context = _contextAccessor.HttpContext;
+			var context = HttpContext;
 			res.IdEditedBy = Convert.ToInt32(context.User.GetUserId());
 			res.Updated = DateTime.Now;
 			res.Styles = model.CSS;

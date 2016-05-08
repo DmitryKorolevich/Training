@@ -15,6 +15,13 @@ namespace VitalChoice.Business.Queries.Contents
             return this;
         }
 
+        public RecipeQuery WithIdOld(int idOld)
+        {
+            Add(x => x.IdOld == idOld);
+
+            return this;
+        }
+
         public RecipeQuery WithName(string name)
         {
             if (!String.IsNullOrEmpty(name))

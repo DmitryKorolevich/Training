@@ -130,13 +130,13 @@ namespace VitalChoice.Business.Services.Dynamic
                 }));
 
                 entity.RefundOrderToGiftCertificates = new List<RefundOrderToGiftCertificate>(dynamic.RefundOrderToGiftCertificates.
-                    Where(p=>p.Amount>0).Select(s => new RefundOrderToGiftCertificate
+                    Where(p => p.Amount > 0).Select(s => new RefundOrderToGiftCertificate
                     {
                         IdOrder = s.IdOrder,
                         IdGiftCertificate = s.IdGiftCertificate,
                         Amount = s.Amount,
-                        OrderToGiftCertificate = _orderToGiftCertificateRepository.Query(p=> p.IdOrder == s.IdOrder &&
-                            p.IdGiftCertificate==s.IdGiftCertificate).Include(p=>p.GiftCertificate).SelectFirstOrDefaultAsync().Result,
+                        OrderToGiftCertificate = _orderToGiftCertificateRepository.Query(p => p.IdOrder == s.IdOrder &&
+                            p.IdGiftCertificate == s.IdGiftCertificate).Include(p => p.GiftCertificate).SelectFirstOrDefaultAsync(true).Result,
                     }));
                 foreach (var refundOrderToGiftCertificate in entity.RefundOrderToGiftCertificates)
                 {
@@ -145,6 +145,8 @@ namespace VitalChoice.Business.Services.Dynamic
                         refundOrderToGiftCertificate.OrderToGiftCertificate.GiftCertificate.Balance +=
                             refundOrderToGiftCertificate.Amount;
                     }
+                    if (refundOrderToGiftCertificate != null)
+                        refundOrderToGiftCertificate.OrderToGiftCertificate = null;
                 }
             });
         }
@@ -198,9 +200,6 @@ namespace VitalChoice.Business.Services.Dynamic
                         sku.RefundPercent = ordered.RefundPercent;
                     });
                 
-                dynamic.RefundOrderToGiftCertificates = dynamic.RefundOrderToGiftCertificates ?? new List<RefundOrderToGiftCertificateUsed>();
-                entity.RefundOrderToGiftCertificates.RemoveAll(p=> dynamic.RefundOrderToGiftCertificates.
-                    FirstOrDefault(pp=>pp.IdOrder==p.IdOrder && pp.IdGiftCertificate==p.IdGiftCertificate)==null);
                 //new
                 foreach (var refundOrderToGiftCertificate in dynamic.RefundOrderToGiftCertificates)
                 {
@@ -212,9 +211,15 @@ namespace VitalChoice.Business.Services.Dynamic
                         newItem.IdOrder = refundOrderToGiftCertificate.IdOrder;
                         newItem.IdGiftCertificate = refundOrderToGiftCertificate.IdGiftCertificate;
                         newItem.Amount = refundOrderToGiftCertificate.Amount;
-                        newItem.OrderToGiftCertificate = _orderToGiftCertificateRepository.Query(p => p.IdOrder == refundOrderToGiftCertificate.IdOrder &&
-                            p.IdGiftCertificate == refundOrderToGiftCertificate.IdGiftCertificate).Include(p => p.GiftCertificate).SelectFirstOrDefaultAsync().Result;
-                        if (newItem?.OrderToGiftCertificate?.GiftCertificate != null)
+                        newItem.OrderToGiftCertificate =
+                            await
+                                _orderToGiftCertificateRepository.Query(
+                                    p =>
+                                        p.IdOrder == refundOrderToGiftCertificate.IdOrder &&
+                                        p.IdGiftCertificate == refundOrderToGiftCertificate.IdGiftCertificate)
+                                    .Include(p => p.GiftCertificate)
+                                    .SelectFirstOrDefaultAsync();
+                        if (newItem.OrderToGiftCertificate?.GiftCertificate != null)
                         {
                             newItem.OrderToGiftCertificate.GiftCertificate.Balance += newItem.Amount;
                         }
@@ -224,10 +229,11 @@ namespace VitalChoice.Business.Services.Dynamic
                     {
                         var diff = existItem.Amount - refundOrderToGiftCertificate.Amount;
                         existItem.Amount = refundOrderToGiftCertificate.Amount;
-                        if (existItem?.OrderToGiftCertificate?.GiftCertificate != null)
+                        if (existItem.OrderToGiftCertificate?.GiftCertificate != null)
                         {
                             existItem.OrderToGiftCertificate.GiftCertificate.Balance = existItem.OrderToGiftCertificate.GiftCertificate.Balance - diff >= 0 ?
                                 existItem.OrderToGiftCertificate.GiftCertificate.Balance-diff : 0;
+                            refundOrderToGiftCertificate.GCBalanceAfterUpdate= existItem.OrderToGiftCertificate.GiftCertificate.Balance;
                         }
                     }
                 }

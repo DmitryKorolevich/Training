@@ -17,6 +17,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             toaster.pop('success', "Success!", "Successfully saved.");
             if (!$scope.id)
             {
+                $rootScope.BrontoSubscribedStatus = {
+                    Id: result.Data.Id,
+                    Value: $scope.options.BrontoSubscribedStatus,
+                };
                 $state.go('index.oneCol.orderDetail', { id: result.Data.Id });
             }
             else
@@ -116,6 +120,12 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         tabs.push($scope.customerFilesTab);
         $scope.tabs = tabs;
 
+        $scope.giftOrderChanged = function() {
+            if (!$scope.order.GiftOrder) {
+                $scope.order.GiftMessage = "";
+            }
+        }
+
         loadOrder();
     };
 
@@ -126,7 +136,6 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
             if(!$scope.options.inited)
             {
-                $scope.options.inited=true;
                 customerEditService.initBase($scope);
                 orderEditService.initBase($scope);
                 orderEditService.initAutoShipLogic($scope);
@@ -225,7 +234,11 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     $state.go('index.oneCol.customerDetail', { id: $scope.currentCustomer.Id });
                     return;
                 }
-                loadBrontoSubscribedStatus();
+                if (!$scope.options.inited)
+                {
+                    $scope.options.inited = true;
+                    loadBrontoSubscribedStatus();
+                }
 
                 $scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
                 customerEditService.syncCountry($scope, $scope.currentCustomer.ProfileAddress);
@@ -238,14 +251,14 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 if ($scope.id)
                 {
                     //$scope.shippingAddressTab.AddressIndex = "0";
-                    $scope.$watch('shippingAddressTab.AddressIndex', function (newValue, oldValue)
-                    {
-                        if (newValue && oldValue != newValue)
-                        {
-                            $scope.shippingAddressTab.OrderShippingEditModel = undefined;
-                            $scope.order.Shipping = angular.copy($scope.currentCustomer.Shipping[parseInt(newValue)]);
-                        }
-                    });
+                    //$scope.$watch('shippingAddressTab.AddressIndex', function (newValue, oldValue)
+                    //{
+                    //    if ($scope.options.EnableShippingAddressIndexUpdate && newValue && oldValue != newValue)
+                    //    {
+                    //        $scope.shippingAddressTab.OrderShippingEditModel = undefined;
+                    //        $scope.order.Shipping = angular.copy($scope.currentCustomer.Shipping[parseInt(newValue)]);
+                    //    }
+                    //});
                 }
                 else
                 {
@@ -297,21 +310,30 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
     var loadBrontoSubscribedStatus = function ()
     {
-        if ($scope.currentCustomer.Email)
+        if ($rootScope.BrontoSubscribedStatus && $rootScope.BrontoSubscribedStatus.Id == $scope.order.Id)
         {
-            orderService.getIsBrontoSubscribed($scope.currentCustomer.Email)
-                .success(function (result)
-                {
-                    if (result.Success)
-                    {
-                        $scope.options.BrontoSubscribedStatus = result.Data;
-                        $scope.options.BrontoSubscribedStatusLoaded = true;
-                    }
-                })
-                .error(function (result)
-                {
-                });
+            $scope.options.BrontoSubscribedStatus = $rootScope.BrontoSubscribedStatus.Value;
+            $scope.options.BrontoSubscribedStatusLoaded = true;
         }
+        else
+        {
+            if ($scope.currentCustomer.Email)
+            {
+                orderService.getIsBrontoSubscribed($scope.currentCustomer.Email)
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            $scope.options.BrontoSubscribedStatus = result.Data;
+                            $scope.options.BrontoSubscribedStatusLoaded = true;
+                        }
+                    })
+                    .error(function (result)
+                    {
+                    });
+            }
+        }
+        $rootScope.BrontoSubscribedStatus = null;
     };
     
     var initOrder = function ()

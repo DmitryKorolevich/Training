@@ -761,13 +761,18 @@ INSERT INTO [dbo].[ContentItems]
             <div class="body">
                 <div class="input-wrapper">
                     <form method="post" name="search" action="https://app.bronto.com/public/webform/process/">
-                		<input type="hidden" value="92galxckiog3fu5rrpft43l7m738f" name="fid"/>
+                		<input type="hidden" value="98fbmg41k7lrzlevfi29oph85r7l8" name="fid"/>
     					<input type="hidden" value="09dcaffa5c9971f4be87813780496171" name="sid"/>
     					<input type="hidden" value="" name="delid"/>
     					<input type="hidden" value="" name="subid"/>
-    					<input type="hidden" value="true" name="24793[291714]"/>
-                        <input type="text" name="24791" autocomplete="off" placeholder="Enter email here">
+                        <input type="hidden" name="td" value="">
+                        <input type="hidden" name="formtype" value="addcontact">
+    					<input type="hidden" value="true" name="74699[291714]"/>
+                        <input type="text" name="74686" autocomplete="off" class="bronto-email" placeholder="Enter email here">
                         <input class="yellow" type="submit" value="Go">
+                        <div class="sugnup-bubble">
+                            Please enter a valid email address
+                        </div>
                     </form>
                 </div>
             </div>

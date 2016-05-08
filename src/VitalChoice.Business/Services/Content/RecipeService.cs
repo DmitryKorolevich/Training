@@ -187,7 +187,15 @@ namespace VitalChoice.Business.Services.Content
 	        return toReturn;
         }
 
-	    public async Task<IList<RecipeDefaultSetting>> GetRecipeSettingsAsync()
+        public async Task<Recipe> GetRecipeByIdOldAsync(int id)
+        {
+            RecipeQuery query = new RecipeQuery().WithIdOld(id).NotDeleted();
+            var toReturn = (await recipeRepository.Query(query).SelectAsync(false)).FirstOrDefault();
+
+            return toReturn;
+        }
+
+        public async Task<IList<RecipeDefaultSetting>> GetRecipeSettingsAsync()
 	    {
 		    return await _recipeSettingRepository.Query().SelectAsync(false);
 	    }
@@ -236,10 +244,10 @@ namespace VitalChoice.Business.Services.Content
 
 			    //what is the purpose of such strange code? both model and dbItem are of the same type. Why do we need to maintain additional object?
 			    dbItem.Name = model.Name;
-			    dbItem.Subtitle = model.Subtitle;
-			    dbItem.YoutubeVideo = model.YoutubeVideo;
-			    dbItem.YoutubeImage = model.YoutubeImage;
-			    dbItem.Url = model.Url;
+			    dbItem.Subtitle = model.Subtitle ?? String.Empty;
+			    dbItem.YoutubeVideo = model.YoutubeVideo ?? String.Empty;
+                dbItem.YoutubeImage = model.YoutubeImage ?? String.Empty;
+                dbItem.Url = model.Url;
 			    dbItem.FileUrl = model.FileUrl;
 			    dbItem.UserId = model.UserId;
 			    dbItem.AboutChef = model.AboutChef;
@@ -316,9 +324,8 @@ namespace VitalChoice.Business.Services.Content
 
                         await _objectLogItemExternalService.LogItem(dbItem);
                     }
-                    catch (Exception e)
+                    catch
                     {
-                        logger.LogError(e.Message, e);
                         transaction.Rollback();
 					    throw;
 				    }

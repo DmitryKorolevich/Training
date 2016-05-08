@@ -21,6 +21,7 @@ using VitalChoice.Infrastructure.Domain.Entities.CatalogRequests;
 using VitalChoice.Infrastructure.Domain.Entities.Checkout;
 using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.Entities.InventorySkus;
+using VitalChoice.Infrastructure.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Entities.Products;
 
 namespace VitalChoice.Infrastructure.Context
@@ -48,6 +49,8 @@ namespace VitalChoice.Infrastructure.Context
         {
             base.OnModelCreating(builder);
 
+            #region SPs
+
             builder.Entity<CountModel>(entity =>
             {
                 entity.HasKey(f => f.Id);
@@ -57,6 +60,13 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.HasKey(f => f.Id);
             });
+
+            builder.Entity<WholesaleDropShipReportSkuRawItem>(entity =>
+            {
+                entity.HasKey(f => f.Id);
+            });
+
+            #endregion
 
             builder.Entity<VCustomerFavorite>(entity =>
             {
@@ -148,6 +158,12 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<InventorySkuUsageRawReportItem>(entity =>
             {
                 entity.HasKey(p => p.Id);
+            });
+
+            builder.Entity<InventoriesSummaryUsageRawReportItem>(entity =>
+            {
+                entity.HasKey(p => new {p.IdInventorySku, p.Date });
+                entity.Ignore(p => p.Id);
             });
 
             builder.Entity<OrdersZipStatisticItem>(entity =>

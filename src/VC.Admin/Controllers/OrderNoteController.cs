@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using VC.Admin.Models.OrderNote;
@@ -66,7 +68,7 @@ namespace VC.Admin.Controllers
 				}).ToList(),
 			};
 
-			await _orderNoteService.AddOrderNoteAsync(orderNote);
+			await _orderNoteService.AddOrderNoteAsync(orderNote, Convert.ToInt32(HttpContext.User.GetUserId()));
 
 			return true;
 		}
@@ -90,7 +92,7 @@ namespace VC.Admin.Controllers
 				IdCustomerType = x
 			}).ToList();
 
-			await _orderNoteService.UpdateOrderNoteAsync(orderNote);
+			await _orderNoteService.UpdateOrderNoteAsync(orderNote, Convert.ToInt32(HttpContext.User.GetUserId()));
 
 			return true;
 		}
@@ -116,7 +118,7 @@ namespace VC.Admin.Controllers
 		[HttpGet]
 	    public async Task<Result<bool>> DeleteOrderNote(int id)
 	    {
-			await _orderNoteService.DeleteOrderNoteAsync(id);
+			await _orderNoteService.DeleteOrderNoteAsync(id, Convert.ToInt32(HttpContext.User.GetUserId()));
 
 			return true;
 	    }

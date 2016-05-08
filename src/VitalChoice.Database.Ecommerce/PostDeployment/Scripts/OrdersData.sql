@@ -473,3 +473,14 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT Id FROM OrderOptionTypes WHERE [Name]=N'PoNumber' AND [IdObjectType]=5)
+BEGIN
+
+	INSERT INTO [dbo].[OrderOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'PoNumber', 4, NULL, 5, NULL)
+
+END
+GO

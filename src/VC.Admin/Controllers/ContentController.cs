@@ -443,6 +443,20 @@ namespace VC.Admin.Controllers
             return await articleService.DeleteArticleAsync(id);
         }
 
+        [HttpGet]
+        [AdminAuthorize(PermissionType.Content)]
+        public async Task<Result<ICollection<ArticleBonusLink>>> GetArticleBonusLinks()
+        {
+            return (await articleService.GetArticleBonusLinksAsync()).ToList();
+        }
+
+        [HttpPost]
+        [AdminAuthorize(PermissionType.Content)]
+        public async Task<Result<bool>> UpdateArticleBonusLinks([FromBody]ICollection<ArticleBonusLink> model)
+        {
+            return await articleService.UpdateArticleBonusLinksAsync(model);
+        }
+
         #endregion
 
         #region ContentPages

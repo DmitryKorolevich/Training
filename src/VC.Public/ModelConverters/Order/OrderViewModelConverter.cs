@@ -66,6 +66,7 @@ namespace VC.Public.ModelConverters.Order
             if (dynamic?.ShippingAddress != null)
             {
                 model.ShipToAddress = dynamic.ShippingAddress.PopulateShippingAddressDetails(countries);
+                model.DeliveryInstructions = dynamic.ShippingAddress.SafeData.DeliveryInstructions;
             }
             
             model.IdPaymentMethodType = dynamic?.PaymentMethod.IdObjectType;

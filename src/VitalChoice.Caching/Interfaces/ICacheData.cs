@@ -13,6 +13,7 @@ namespace VitalChoice.Caching.Interfaces
 {
     public interface ICacheData
     {
+        object LockObj { get; }
         void Clear();
         IEnumerable<CachedEntity> GetUntyped(EntityCacheableIndexInfo nonUniqueIndexInfo, EntityIndex index);
         CachedEntity GetUntyped(EntityKey pk);
@@ -25,6 +26,7 @@ namespace VitalChoice.Caching.Interfaces
         bool FullCollection { get; }
         bool NeedUpdate { get; set; }
         bool Empty { get; }
+        RelationInfo Relations { get; }
     }
 
     public interface ICacheData<T> : ICacheData
@@ -37,7 +39,7 @@ namespace VitalChoice.Caching.Interfaces
         CachedEntity<T> TryRemove(EntityKey key);
         CachedEntity<T> Update(T entity);
         CachedEntity<T> UpdateExist(T entity);
-        CachedEntity<T> UpdateKeepRelations(T entity, Dictionary<TrackedEntityKey, EntityEntry> trackedEntities);
+        CachedEntity<T> UpdateKeepRelations(T entity, IDictionary<TrackedEntityKey, EntityEntry> trackedEntities);
         bool Update(IEnumerable<T> entity);
         bool UpdateExist(IEnumerable<T> entities);
         bool UpdateAll(IEnumerable<T> entity);

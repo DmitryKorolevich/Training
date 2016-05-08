@@ -119,6 +119,14 @@ namespace VitalChoice.Business.Services.Content
             return toReturn;
         }
 
+        public async Task<ContentCategory> GetCategoryByIdOldAsync(int id)
+        {
+            CategoryQuery query = new CategoryQuery().WithIdOld(id).NotDeleted();
+            var toReturn = (await contentCategoryRepository.Query(query).Include(p => p.ContentItem).ThenInclude(p => p.ContentItemToContentProcessors).
+                SelectAsync(false)).FirstOrDefault();
+            return toReturn;
+        }
+
         public async Task<int?> GetIdRootCategoryAsync(ContentType type)
         {
             CategoryQuery query = new CategoryQuery().RootCategory().WithType(type).NotDeleted();

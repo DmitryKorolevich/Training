@@ -8,7 +8,7 @@ using VitalChoice.Caching.Services.Cache.Base;
 
 namespace VitalChoice.Caching.Interfaces
 {
-    public interface IInternalEntityCache: IEntityCollectorInfo, IDisposable
+    public interface IInternalEntityCache : IEntityCollectorInfo, IDisposable
     {
         CachedEntity Update(RelationInfo relations, object entity);
         IEnumerable<CachedEntity> Update(RelationInfo relations, IEnumerable<object> entity);
@@ -17,15 +17,13 @@ namespace VitalChoice.Caching.Interfaces
         bool Update(object entity, DbContext context);
         bool UpdateAll(IEnumerable<object> entities, RelationInfo relationInfo);
         EntityKey MarkForUpdate(object entity);
-        IEnumerable<EntityKey> MarkForUpdate(IEnumerable<object> entities);
+        ICollection<EntityKey> MarkForUpdate(IEnumerable<object> entities);
         void SetNull(IEnumerable<EntityKey> keys, RelationInfo relationInfo);
         void SetNull(EntityKey key, RelationInfo relationInfo);
-        void MarkForUpdate(EntityKey pk);
-        void MarkForUpdate(EntityKey pk, string hasRelation);
-        void MarkForUpdate(IEnumerable<EntityKey> pks);
-        void MarkForUpdate(IEnumerable<EntityKey> pks, string hasRelation);
+        void MarkForUpdate(EntityKey pk, string hasRelation = null);
+        void MarkForUpdate(ICollection<EntityKey> pks, string hasRelation = null);
         EntityKey MarkForAdd(object entity);
-        IEnumerable<EntityKey> MarkForAdd(IEnumerable<object> entities);
+        ICollection<EntityKey> MarkForAdd(ICollection<object> entities);
         bool TryRemove(object entity);
         bool TryRemove(EntityKey pk);
         bool ItemExist(EntityKey pk);
@@ -65,8 +63,8 @@ namespace VitalChoice.Caching.Interfaces
         IEnumerable<CachedEntity<T>> Update(RelationInfo relations, IEnumerable<T> entities);
         bool UpdateAll(IEnumerable<T> entities, RelationInfo relationInfo);
         EntityKey MarkForUpdate(T entity);
-        IEnumerable<EntityKey> MarkForUpdate(IEnumerable<T> entities);
+        ICollection<EntityKey> MarkForUpdate(IEnumerable<T> entities);
         EntityKey MarkForAdd(T entity);
-        IEnumerable<EntityKey> MarkForAdd(IEnumerable<T> entities);
+        ICollection<EntityKey> MarkForAdd(ICollection<T> entities);
     }
 }

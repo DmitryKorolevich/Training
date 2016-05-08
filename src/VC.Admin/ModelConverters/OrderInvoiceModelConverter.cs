@@ -65,6 +65,7 @@ namespace VC.Admin.ModelConverters
             {
                 model.ShippingAddress = _addressMapper.ToModel<AddressModel>(dynamic.ShippingAddress);
                 FillAdditionalAddressFields(model.ShippingAddress, _countryService);
+                model.DeliveryInstructions = model.ShippingAddress.DeliveryInstructions;
             }
             if (dynamic?.PaymentMethod.IdObjectType == (int)PaymentMethodType.NoCharge && dynamic.Customer.ProfileAddress != null)
             {

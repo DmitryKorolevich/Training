@@ -115,6 +115,10 @@ form.submitted p.ng-invalid input {
     cursor: default;
 }
 
+.form-control select[multiple]{
+    overflow-y: auto;
+}
+
 .container{
 	width:850px;
 }
@@ -1252,6 +1256,8 @@ th.sortable-column {
 
 .inventory-usage-report table > tbody > tr.sub-item-row {  background:white;}
 .inventory-usage-report .filtered-item {display: inline-block; margin-right: 15px;}
+
+.inventory-usage-summary-report table td div.description { max-width: 250px; }
 
 .object-history { padding: 19px 0 0;}
 .object-history .header { margin-left: 19px; margin-right: 19px; text-align: center;}

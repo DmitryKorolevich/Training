@@ -23,30 +23,35 @@ namespace VitalChoice.Profiling.Base
 
         public async Task Invoke(HttpContext context)
         {
-            using (var scope = new ProfilingScope(context.Request.Path + context.Request.QueryString))
+#if !DOTNET5_4
+            if (ProfilingScope.GetRootScope() == null)
             {
-                try
-                {
-                    await _requestDelegate.Invoke(context);
-                }
-                finally
+                using (var scope = new ProfilingScope(context.Request.Path + context.Request.QueryString))
                 {
                     try
                     {
+<<<<<<< HEAD
 #if !NETSTANDARD1_5
                         if (scope.GetStackCount() == 1)
+=======
+                        await _requestDelegate.Invoke(context);
+                    }
+                    finally
+                    {
+                        try
+>>>>>>> master
                         {
                             scope.Stop();
                             _request.OnFinishedRequest(scope);
                         }
-#endif
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.LogError(e.Message, e);
+                        catch (Exception e)
+                        {
+                            _logger.LogError(e.Message, e);
+                        }
                     }
                 }
             }
+#endif
         }
     }
 }

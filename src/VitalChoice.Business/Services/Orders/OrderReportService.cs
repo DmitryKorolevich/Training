@@ -13,10 +13,15 @@ using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Queries.Orders;
 using VitalChoice.Business.Repositories;
 using VitalChoice.Data.Repositories;
+using VitalChoice.Data.Repositories.Customs;
+using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Content.Articles;
 using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
+using VitalChoice.Infrastructure.Domain.Transfer.Reports;
+using VitalChoice.Data.Helpers;
+using VitalChoice.Interfaces.Services.Settings;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -26,6 +31,8 @@ namespace VitalChoice.Business.Services.Orders
         private readonly OrderRepository _orderRepository;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly IRepositoryAsync<AdminTeam> _adminTeamRepository;
+        private readonly SPEcommerceRepository _sPEcommerceRepository;
+        private readonly ICountryService _countryService;
         private readonly ILogger _logger;
 
         public OrderReportService(
@@ -33,23 +40,27 @@ namespace VitalChoice.Business.Services.Orders
             OrderRepository orderRepository,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IRepositoryAsync<AdminTeam> adminTeamRepository,
+            SPEcommerceRepository sPEcommerceRepository,
+            ICountryService countryService,
             ILoggerProviderExtended loggerProvider)
         {
             _orderService = orderService;
             _orderRepository = orderRepository;
             _adminProfileRepository = adminProfileRepository;
             _adminTeamRepository = adminTeamRepository;
+            _sPEcommerceRepository = sPEcommerceRepository;
+            _countryService = countryService;
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
         public async Task<OrdersAgentReport> GetOrdersAgentReportAsync(OrdersAgentReportFilter filter)
         {
             OrdersAgentReport toReturn = new OrdersAgentReport();
-            toReturn.IdAdminTeam = filter.IdAdminTeam;
+            toReturn.IdAdminTeams = filter.IdAdminTeams;
             toReturn.IdAdmin = filter.IdAdmin;
             toReturn.FrequencyType = filter.FrequencyType;
 
-            var agents = await _adminProfileRepository.Query(p=>p.User.Status!=UserStatus.Disabled).Include(p=>p.User).SelectAsync(false);
+            var agents = await _adminProfileRepository.Query(p => p.User.Status != UserStatus.Disabled).Include(p => p.User).SelectAsync(false);
             var teams = await _adminTeamRepository.Query().SelectAsync(false);
 
             List<int> specififcAgentIds = null;
@@ -92,7 +103,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 current = filter.To;
             }
-            var period = CreateAgentReportPeriod(filter.From, current, filter.IdAdmin, filter.IdAdminTeam, teams, agents);
+            var period = CreateAgentReportPeriod(filter.From, current, filter.IdAdmin, filter.IdAdminTeams, teams, agents);
             toReturn.Periods.Add(period);
 
             while (current < filter.To)
@@ -116,7 +127,7 @@ namespace VitalChoice.Business.Services.Orders
                     nextCurrent = filter.To;
                 }
 
-                period = CreateAgentReportPeriod(current, nextCurrent, filter.IdAdmin, filter.IdAdminTeam, teams, agents);
+                period = CreateAgentReportPeriod(current, nextCurrent, filter.IdAdmin, filter.IdAdminTeams, teams, agents);
                 toReturn.Periods.Add(period);
                 current = nextCurrent;
             }
@@ -127,22 +138,22 @@ namespace VitalChoice.Business.Services.Orders
             {
                 orderTotalWithoutShipping = orderForAgentReport.Order.Total - orderForAgentReport.Order.ShippingTotal;
                 orderTotalWithoutShipping = orderTotalWithoutShipping > 0 ? orderTotalWithoutShipping : 0;
-                period = toReturn.Periods.FirstOrDefault(p=>p.From<=orderForAgentReport.Order.DateCreated && p.To>orderForAgentReport.Order.DateCreated);
+                period = toReturn.Periods.FirstOrDefault(p => p.From <= orderForAgentReport.Order.DateCreated && p.To > orderForAgentReport.Order.DateCreated);
                 if (period != null)
                 {
                     if (orderForAgentReport.OrderType == SourceOrderType.Phone)
                     {
-                        if(orderForAgentReport.Order.IdAddedBy.HasValue)
-                        { 
+                        if (orderForAgentReport.Order.IdAddedBy.HasValue)
+                        {
                             //phone orders for agent
-                            var agent=period.Teams.SelectMany(p=>p.Agents).FirstOrDefault(p=>p.IdAdmin== orderForAgentReport.Order.IdAddedBy.Value);
+                            var agent = period.Teams.SelectMany(p => p.Agents).FirstOrDefault(p => p.IdAdmin == orderForAgentReport.Order.IdAddedBy.Value);
                             if (agent != null)
                             {
-                                if (orderForAgentReport.Order.IdObjectType == (int) OrderType.Refund)
+                                if (orderForAgentReport.Order.IdObjectType == (int)OrderType.Refund)
                                 {
                                     agent.RefundsCount++;
                                 }
-                                else if(orderForAgentReport.Order.IdObjectType == (int)OrderType.Reship)
+                                else if (orderForAgentReport.Order.IdObjectType == (int)OrderType.Reship)
                                 {
                                     agent.ReshipsCount++;
                                 }
@@ -154,7 +165,7 @@ namespace VitalChoice.Business.Services.Orders
                                     {
                                         agent.HighestOrderAmount = orderTotalWithoutShipping;
                                     }
-                                    if (agent.LowestOrderAmount==0 || (agent.LowestOrderAmount > orderTotalWithoutShipping && orderTotalWithoutShipping!=0))
+                                    if (agent.LowestOrderAmount == 0 || (agent.LowestOrderAmount > orderTotalWithoutShipping && orderTotalWithoutShipping != 0))
                                     {
                                         agent.LowestOrderAmount = orderTotalWithoutShipping;
                                     }
@@ -220,8 +231,8 @@ namespace VitalChoice.Business.Services.Orders
                 ordersAgentReportPeriodItem.AllAverageOrdersAmount = ordersAgentReportPeriodItem.AllOrdersCount != 0
                     ? ordersAgentReportPeriodItem.AllTotalOrdersAmount / ordersAgentReportPeriodItem.AllOrdersCount
                     : 0;
-                ordersAgentReportPeriodItem.AgentOrdersPercent = ordersAgentReportPeriodItem.TotalOrdersAmount!=0 ?
-                    Math.Round(ordersAgentReportPeriodItem.TotalOrdersAmount *100/ ordersAgentReportPeriodItem.AllTotalOrdersAmount, 2)
+                ordersAgentReportPeriodItem.AgentOrdersPercent = ordersAgentReportPeriodItem.TotalOrdersAmount != 0 ?
+                    Math.Round(ordersAgentReportPeriodItem.TotalOrdersAmount * 100 / ordersAgentReportPeriodItem.AllTotalOrdersAmount, 2)
                     : 0;
                 ordersAgentReportPeriodItem.AverageOrdersAmountDifference = ordersAgentReportPeriodItem.AverageOrdersAmount - ordersAgentReportPeriodItem.AllAverageOrdersAmount;
 
@@ -230,7 +241,7 @@ namespace VitalChoice.Business.Services.Orders
                     foreach (var ordersAgentReportAgentItem in ordersAgentReportTeamItem.Agents)
                     {
                         ordersAgentReportAgentItem.AverageOrdersAmount = ordersAgentReportAgentItem.OrdersCount != 0
-                            ? ordersAgentReportAgentItem.TotalOrdersAmount/ordersAgentReportAgentItem.OrdersCount
+                            ? ordersAgentReportAgentItem.TotalOrdersAmount / ordersAgentReportAgentItem.OrdersCount
                             : 0;
 
                         ordersAgentReportTeamItem.OrdersCount += ordersAgentReportAgentItem.OrdersCount;
@@ -253,8 +264,8 @@ namespace VitalChoice.Business.Services.Orders
                         ? ordersAgentReportTeamItem.TotalOrdersAmount / ordersAgentReportTeamItem.OrdersCount
                         : 0;
 
-                    ordersAgentReportTeamItem.AgentOrdersPercent = ordersAgentReportTeamItem.TotalOrdersAmount!=0 
-                        ? Math.Round(ordersAgentReportTeamItem.TotalOrdersAmount *100 / ordersAgentReportPeriodItem.TotalOrdersAmount,2)
+                    ordersAgentReportTeamItem.AgentOrdersPercent = ordersAgentReportTeamItem.TotalOrdersAmount != 0
+                        ? Math.Round(ordersAgentReportTeamItem.TotalOrdersAmount * 100 / ordersAgentReportPeriodItem.TotalOrdersAmount, 2)
                         : 0;
                     ordersAgentReportTeamItem.AverageOrdersAmountDifference = ordersAgentReportTeamItem.AverageOrdersAmount - ordersAgentReportPeriodItem.AverageOrdersAmount;
                 }
@@ -263,7 +274,131 @@ namespace VitalChoice.Business.Services.Orders
             return toReturn;
         }
 
-        private OrdersAgentReportPeriodItem CreateAgentReportPeriod(DateTime from, DateTime to,int? idAdmin, int? idAdminTeam, List<AdminTeam> teams,
+        public ICollection<OrdersAgentReportExportItem> ConvertOrdersAgentReportToExportItems(OrdersAgentReport report, bool fullReport)
+        {
+            List<OrdersAgentReportExportItem> toReturn = new List<OrdersAgentReportExportItem>();
+            foreach (var period in report.Periods)
+            {
+                var item = new OrdersAgentReportExportItem();
+                if (report.FrequencyType == FrequencyType.Daily)
+                {
+                    item.Agent = $"{period.From:MM/dd/yy}";
+                }
+                else
+                {
+
+                    item.Agent = $"{period.From:MM/dd/yy} - {period.To:MM/dd/yy}";
+                }
+                toReturn.Add(item);
+                toReturn.Add(new OrdersAgentReportExportItem());
+                foreach (var team in period.Teams)
+                {
+                    if (!string.IsNullOrEmpty(team.AdminTeamName))
+                    {
+                        toReturn.Add(new OrdersAgentReportExportItem()
+                        {
+                            Agent = team.AdminTeamName
+                        });
+                    }
+
+                    if (team.Agents.Count > 0)
+                    {
+                        toReturn.Add(new OrdersAgentReportExportItem()
+                        {
+                            Agent = "Agent",
+                            OrdersCount = "# of Orders",
+                            TotalOrdersAmount = "Total Order Value",
+                            AverageOrdersAmount = "Average Order Value",
+                            LowestOrderAmount = "Lowest Order Value",
+                            HighestOrderAmount = "Highest Order Value",
+                            RefundsCount = "# Refunds",
+                            ReshipsCount = "# Reships",
+                        });
+                    }
+                    foreach (var agent in team.Agents)
+                    {
+                        toReturn.Add(new OrdersAgentReportExportItem()
+                        {
+                            Agent = agent.AgentId,
+                            OrdersCount = agent.OrdersCount.ToString(),
+                            TotalOrdersAmount = agent.TotalOrdersAmount.ToString("C2"),
+                            AverageOrdersAmount = agent.AverageOrdersAmount.ToString("C2"),
+                            LowestOrderAmount = agent.LowestOrderAmount.ToString("C2"),
+                            HighestOrderAmount = agent.HighestOrderAmount.ToString("C2"),
+                            RefundsCount = agent.RefundsCount.ToString(),
+                            ReshipsCount = agent.ReshipsCount.ToString(),
+                        });
+                    }
+
+                    if (fullReport && !report.IdAdmin.HasValue)
+                    {
+                        toReturn.Add(new OrdersAgentReportExportItem()
+                        {
+                            Agent = "Team Total",
+                            OrdersCount = team.OrdersCount.ToString(),
+                            TotalOrdersAmount = team.TotalOrdersAmount.ToString("C2"),
+                            AverageOrdersAmount = team.AverageOrdersAmount.ToString("C2"),
+                            LowestOrderAmount = team.LowestOrderAmount.ToString("C2"),
+                            HighestOrderAmount = team.HighestOrderAmount.ToString("C2"),
+                            RefundsCount = team.RefundsCount.ToString(),
+                            ReshipsCount = team.ReshipsCount.ToString(),
+                        });
+                    }
+
+                    if (fullReport)
+                    {
+                        team.AgentOrdersPercent = team.AgentOrdersPercent != 0 ? team.AgentOrdersPercent / 100 : 0;
+                        toReturn.Add(new OrdersAgentReportExportItem()
+                        {
+                            Agent = "% of total phone orders",
+                            OrdersCount = $"{team.AgentOrdersPercent:P2}",
+                            AverageOrdersAmount = team.AverageOrdersAmountDifference.ToString("C2"),
+                        });
+                    }
+
+                    toReturn.Add(new OrdersAgentReportExportItem());
+                }
+
+                if (fullReport)
+                {
+                    toReturn.Add(new OrdersAgentReportExportItem()
+                    {
+                        Agent = "Overall Teams Total(phone orders)",
+                        OrdersCount = period.OrdersCount.ToString(),
+                        TotalOrdersAmount = period.TotalOrdersAmount.ToString("C2"),
+                        AverageOrdersAmount = period.AverageOrdersAmount.ToString("C2"),
+                        LowestOrderAmount = period.LowestOrderAmount.ToString("C2"),
+                        HighestOrderAmount = period.HighestOrderAmount.ToString("C2"),
+                        RefundsCount = period.RefundsCount.ToString(),
+                        ReshipsCount = period.ReshipsCount.ToString(),
+                    });
+                    period.AgentOrdersPercent = period.AgentOrdersPercent != 0 ? period.AgentOrdersPercent/100 : 0;
+                    toReturn.Add(new OrdersAgentReportExportItem()
+                    {
+                        Agent = "% of total orders",
+                        OrdersCount = $"{period.AgentOrdersPercent:P2}",
+                        AverageOrdersAmount = period.AverageOrdersAmountDifference.ToString("C2"),
+                    });
+                    toReturn.Add(new OrdersAgentReportExportItem()
+                    {
+                        Agent = "Total Orders",
+                        OrdersCount = period.AllOrdersCount.ToString(),
+                        TotalOrdersAmount = period.AllTotalOrdersAmount.ToString("C2"),
+                        AverageOrdersAmount = period.AllAverageOrdersAmount.ToString("C2"),
+                        LowestOrderAmount = period.AllLowestOrderAmount.ToString("C2"),
+                        HighestOrderAmount = period.AllHighestOrderAmount.ToString("C2"),
+                        RefundsCount = period.AllRefundsCount.ToString(),
+                        ReshipsCount = period.AllReshipsCount.ToString(),
+                    });
+
+                    toReturn.Add(new OrdersAgentReportExportItem());
+                }
+            }
+
+            return toReturn;
+        }
+
+        private OrdersAgentReportPeriodItem CreateAgentReportPeriod(DateTime from, DateTime to, int? idAdmin, ICollection<int> idAdminTeams, List<AdminTeam> teams,
             List<AdminProfile> agents)
         {
             OrdersAgentReportPeriodItem period = new OrdersAgentReportPeriodItem();
@@ -271,8 +406,8 @@ namespace VitalChoice.Business.Services.Orders
             period.To = to;
             if (!idAdmin.HasValue)
             {
-                var currentTeams = idAdminTeam.HasValue
-                    ? teams.Where(p => p.Id == idAdminTeam.Value).ToList()
+                var currentTeams = idAdminTeams!=null && idAdminTeams.Count>0
+                    ? teams.Where(p => idAdminTeams.Contains(p.Id)).ToList()
                     : teams;
                 foreach (var team in currentTeams)
                 {
@@ -287,7 +422,7 @@ namespace VitalChoice.Business.Services.Orders
                     period.Teams.Add(teamItem);
                 }
                 //admins without team
-                if (!idAdminTeam.HasValue)
+                if (idAdminTeams == null || idAdminTeams.Count == 0)
                 {
                     OrdersAgentReportTeamItem teamItem = new OrdersAgentReportTeamItem();
                     teamItem.AdminTeamName = "Not Specified";
@@ -295,7 +430,7 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         IdAdmin = p.Id,
                         AgentId = p.AgentId,
-                    }).OrderBy(p=>p.AgentId).ToList();
+                    }).OrderBy(p => p.AgentId).ToList();
                     period.Teams.Add(teamItem);
                 }
             }
@@ -310,6 +445,87 @@ namespace VitalChoice.Business.Services.Orders
                 period.Teams.Add(teamItem);
             }
             return period;
+        }
+
+        public async Task<WholesaleDropShipReport> GetWholesaleDropShipReportAsync(WholesaleDropShipReportFilter filter)
+        {
+            WholesaleDropShipReport toReturn=new WholesaleDropShipReport();
+
+            var skus = await _sPEcommerceRepository.GetWholesaleDropShipReportSkusSummaryAsync(filter);
+            if (skus.Count > 0)
+            {
+                var sku = skus.First();
+                toReturn.DiscountedSubtotal = sku.ProductsSubtotal - sku.DiscountTotal;
+                toReturn.Shipping = sku.ShippingTotal;
+                toReturn.Total = sku.Total;
+                toReturn.Skus = skus.Select(p => new WholesaleDropShipReportSkuSummary()
+                {
+                    Id = p.Id,
+                    Code = p.Code,
+                    Amount = p.Amount,
+                    Quantity = p.Quantity,
+                }).ToList();
+
+                toReturn.SkusTotal=new WholesaleDropShipReportSkuSummary()
+                {
+                    Amount = toReturn.Skus.Sum(p=>p.Amount),
+                    Quantity = toReturn.Skus.Sum(p => p.Quantity),
+                };
+            }
+
+            return toReturn;
+        }
+
+        public async Task<PagedList<WholesaleDropShipReportOrderItem>> GetOrdersForWholesaleDropShipReportAsync(WholesaleDropShipReportFilter filter)
+        {
+            PagedList<WholesaleDropShipReportOrderItem> toReturn = new PagedList<WholesaleDropShipReportOrderItem>();
+
+            var countries = await _countryService.GetCountriesAsync();
+
+            toReturn.Count= await _sPEcommerceRepository.GetCountOrderIdsForWholesaleDropShipReportAsync(filter);
+            var ids = await _sPEcommerceRepository.GetOrderIdsForWholesaleDropShipReportAsync(filter);
+            var orders = await _orderService.SelectAsync(ids, includesOverride: x => x
+                .Include(o => o.Skus)
+                .ThenInclude(s => s.Sku)
+                .Include(o => o.PromoSkus)
+                .ThenInclude(p => p.Sku)
+                .Include(o => o.ShippingAddress)
+                .ThenInclude(s => s.OptionValues));
+
+            orders.ForEach(p =>
+            {
+                WholesaleDropShipReportOrderItem item = new WholesaleDropShipReportOrderItem();
+                item.IdOrder = p.Id;
+                item.OrderStatus = p.OrderStatus;
+                item.POrderStatus = p.POrderStatus;
+                item.NPOrderStatus = p.NPOrderStatus;
+                item.DiscountedSubtotal = p.ProductsSubtotal - p.DiscountTotal;
+                item.Shipping = p.ShippingTotal;
+                item.Total = p.Total;
+                item.OrderNotes = p.SafeData.OrderNotes;
+                item.PoNumber = p.SafeData.PoNumber;
+                item.ShippingCompany = p.ShippingAddress?.SafeData.Company;
+                item.ShippingFirstName = p.ShippingAddress?.SafeData.FirstName;
+                item.ShippingLastName = p.ShippingAddress?.SafeData.LastName;
+                item.ShippingAddress1 = p.ShippingAddress?.SafeData.Address1;
+                item.ShippingAddress1 = p.ShippingAddress?.SafeData.Address2;
+                item.City = p.ShippingAddress?.SafeData.City;
+                item.Country = countries.FirstOrDefault(x=>x.Id==p.ShippingAddress?.IdCountry)?.CountryCode;
+                item.StateCode = countries.SelectMany(x=>x.States).FirstOrDefault(x => x.Id == p.ShippingAddress?.IdState)?.StateCode;
+                item.Phone = p.ShippingAddress?.SafeData.Phone;
+
+                item.Skus = p.Skus.Select(x => new WholesaleDropShipReportSkuItem()
+                {
+                    Id = x.Sku?.Id ?? 0,
+                    Code = x.Sku?.Code,
+                    Price = x.Amount,
+                    Quantity = x.Quantity,
+                }).ToList();
+
+                toReturn.Items.Add(item);
+            });
+
+            return toReturn;
         }
     }
 }

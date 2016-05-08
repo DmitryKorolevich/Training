@@ -14,6 +14,13 @@ namespace VitalChoice.Business.Queries.Content
             return this;
         }
 
+        public ContentPageQuery WithIdOld(int idOld)
+        {
+            Add(x => x.IdOld == idOld);
+
+            return this;
+        }
+
         public ContentPageQuery WithName(string name)
         {
             if (!String.IsNullOrEmpty(name))

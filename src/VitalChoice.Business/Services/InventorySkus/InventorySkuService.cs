@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -24,6 +25,7 @@ using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Content;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.InventorySkus;
@@ -68,7 +70,7 @@ namespace VitalChoice.Business.Services.InventorySkus
 
         public async Task<PagedList<InventorySkuListItemModel>> GetInventorySkusAsync(InventorySkuFilter filter)
         {
-            var conditions =new InventorySkuQuery().NotDeleted().WithIds(filter.Ids).WithStatus(filter.StatusCode)
+            var conditions = new InventorySkuQuery().NotDeleted().WithIds(filter.Ids).WithStatus(filter.StatusCode)
                 .WithExactCode(filter.ExactCode)
                 .WithCode(filter.Code)
                 .WithDescription(filter.Description);
@@ -123,16 +125,16 @@ namespace VitalChoice.Business.Services.InventorySkus
             else
             {
                 var items = await query.OrderBy(sortable).SelectAsync(false);
-                result =new PagedList<InventorySku>()
+                result = new PagedList<InventorySku>()
                 {
                     Items = items,
                     Count = items.Count,
                 };
             }
 
-            var toReturn=new PagedList<InventorySkuListItemModel>()
+            var toReturn = new PagedList<InventorySkuListItemModel>()
             {
-                Items = result.Items.Select(p=>new InventorySkuListItemModel(p)).ToList(),
+                Items = result.Items.Select(p => new InventorySkuListItemModel(p)).ToList(),
                 Count = result.Count,
             };
 
@@ -155,11 +157,11 @@ namespace VitalChoice.Business.Services.InventorySkus
             return toReturn;
         }
 
-        public async Task<Dictionary<int,List<SkuToInventorySku>>> GetAssignedInventorySkusAsync(ICollection<int> skuIds)
+        public async Task<Dictionary<int, List<SkuToInventorySku>>> GetAssignedInventorySkusAsync(ICollection<int> skuIds)
         {
             skuIds = skuIds.Distinct().ToList();
             var items = await _skuToInventorySkuRepository.Query(p => skuIds.Contains(p.IdSku)).SelectAsync(false);
-            var toReturn =new Dictionary<int, List<SkuToInventorySku>>();
+            var toReturn = new Dictionary<int, List<SkuToInventorySku>>();
             foreach (var skuToInventorySku in items)
             {
                 List<SkuToInventorySku> assignedInventories;
@@ -187,7 +189,7 @@ namespace VitalChoice.Business.Services.InventorySkus
                 var item = toReturn.FirstOrDefault(p => p.IdSku == inventorySkuUsageRawReportItem.IdSku);
                 if (item == null)
                 {
-                    item=new InventorySkuUsageReportItem();
+                    item = new InventorySkuUsageReportItem();
                     item.IdSku = inventorySkuUsageRawReportItem.IdSku;
                     item.SkuCode = inventorySkuUsageRawReportItem.SkuCode;
                     item.TotalSkuQuantity = inventorySkuUsageRawReportItem.TotalSkuQuantity;
@@ -232,7 +234,7 @@ namespace VitalChoice.Business.Services.InventorySkus
 
             foreach (var inventorySkuUsageReportItem in data)
             {
-                InventorySkuUsageReportItemForExport item=new InventorySkuUsageReportItemForExport();
+                InventorySkuUsageReportItemForExport item = new InventorySkuUsageReportItemForExport();
                 item.IdSku = inventorySkuUsageReportItem.IdSku;
                 item.SkuCode = inventorySkuUsageReportItem.SkuCode;
                 item.TotalSkuQuantity = inventorySkuUsageReportItem.TotalSkuQuantity;
@@ -242,7 +244,7 @@ namespace VitalChoice.Business.Services.InventorySkus
                 var lookup = lookups.FirstOrDefault(p => p.Name == SettingConstants.INVENTORY_SKU_LOOKUP_CHANNEL_NAME);
                 if (lookup != null)
                 {
-                    item.InventorySkuChannel=lookup.LookupVariants.FirstOrDefault(p=>p.Id==inventorySkuUsageReportItem.InventorySkuChannel)?.ValueVariant;
+                    item.InventorySkuChannel = lookup.LookupVariants.FirstOrDefault(p => p.Id == inventorySkuUsageReportItem.InventorySkuChannel)?.ValueVariant;
                 }
 
                 toReturn.Add(item);
@@ -272,7 +274,7 @@ namespace VitalChoice.Business.Services.InventorySkus
                         item.PurchaseUnitOfMeasure = lookup.LookupVariants.FirstOrDefault(p => p.Id == subInventorySkuUsageReportItem.PurchaseUnitOfMeasure)?.ValueVariant;
                     }
 
-                    item.TotalInvQuantityWithInvCorrection=subInventorySkuUsageReportItem.TotalInvQuantityWithInvCorrection;
+                    item.TotalInvQuantityWithInvCorrection = subInventorySkuUsageReportItem.TotalInvQuantityWithInvCorrection;
                     item.TotalUnitOfMeasureAmount = subInventorySkuUsageReportItem.TotalUnitOfMeasureAmount;
                     item.PurchaseUnitOfMeasureAmount = subInventorySkuUsageReportItem.PurchaseUnitOfMeasureAmount;
 
@@ -303,6 +305,205 @@ namespace VitalChoice.Business.Services.InventorySkus
             }
 
             return null;
+        }
+
+        public async Task<InventoriesSummaryUsageReport> GetInventoriesSummaryUsageReportAsync(InventoriesSummaryUsageReportFilter filter)
+        {
+            InventoriesSummaryUsageReport toReturn = new InventoriesSummaryUsageReport();
+
+            var categoryTree = new InventorySkuCategory();
+            categoryTree.SubCategories = await _inventorySkuCategoryService.GetCategoriesTreeAsync(new InventorySkuCategoryTreeFilter());
+            var data = await _sPEcommerceRepository.GetInventoriesSummaryUsageReportAsync(filter);
+            var invIds = data.Select(p => p.IdInventorySku).Distinct().ToList();
+            var inventories = await this.SelectAsync(invIds);
+
+            List<InventoriesSummaryUsageDateItem> dates = new List<InventoriesSummaryUsageDateItem>();
+
+            DateTime current = filter.From;
+            current = new DateTime(current.Year, current.Month, 2, 0, 0, 0);
+            dates.Add(new InventoriesSummaryUsageDateItem()
+            {
+                Date = current
+            });
+            while (current.AddMonths(1) < filter.To)
+            {
+                current = current.AddMonths(1);
+                dates.Add(new InventoriesSummaryUsageDateItem()
+                {
+                    Date = current
+                });
+            }
+
+            toReturn.TotalItems = dates.Select(p => new InventoriesSummaryUsageDateItem() { Date = p.Date, }).ToList();
+            foreach (var inventoriesSummaryUsageRawReportItem in data)
+            {
+                inventoriesSummaryUsageRawReportItem.Date = inventoriesSummaryUsageRawReportItem.Date.AddDays(1);
+            }
+
+            foreach (var inventoriesSummaryUsageRawReportItem in data)
+            {
+                var inventory = inventories.FirstOrDefault(p => p.Id == inventoriesSummaryUsageRawReportItem.IdInventorySku);
+                if (inventory == null)
+                    continue;
+
+                InventoriesSummaryUsageCategoryItem categoryItem = null;
+                var category = FindUICategory(categoryTree, inventory.IdInventorySkuCategory);
+                if (category != null)
+                {
+                    categoryItem = toReturn.Categories.FirstOrDefault(p => p.Id == category.Id);
+                    if (categoryItem == null)
+                    {
+                        categoryItem = new InventoriesSummaryUsageCategoryItem()
+                        {
+                            Id = category.Id,
+                            Name = category.Name,
+                            TotalItems = dates.Select(p => new InventoriesSummaryUsageDateItem() { Date = p.Date, }).ToList(),
+                    };
+                        toReturn.Categories.Add(categoryItem);
+                    }
+                }
+                else
+                {
+                    categoryItem = toReturn.Categories.FirstOrDefault(p => !p.Id.HasValue);
+                    if (categoryItem == null)
+                    {
+                        categoryItem = new InventoriesSummaryUsageCategoryItem()
+                        {
+                            Id = null,
+                            Name = "Not Specified",
+                            TotalItems = dates.Select(p => new InventoriesSummaryUsageDateItem() { Date = p.Date, }).ToList(),
+                        };
+                        toReturn.Categories.Add(categoryItem);
+                    }
+                }
+
+                InventoriesSummaryUsageInventoryItem inventoryItem = categoryItem.Inventories.FirstOrDefault(p => p.Id == inventoriesSummaryUsageRawReportItem.IdInventorySku);
+                if (inventoryItem == null)
+                {
+                    inventoryItem = new InventoriesSummaryUsageInventoryItem()
+                    {
+                        Id = inventory.Id,
+                        Code = inventory.Code,
+                        Description = inventory.Description,
+                        UnitOfMeasure = inventory.SafeData.UnitOfMeasure,
+                        UnitOfMeasureAmount = inventory.SafeData.UnitOfMeasureAmount,
+                        Items = dates.Select(p => new InventoriesSummaryUsageDateItem() { Date = p.Date, }).ToList(),
+                    };
+                    categoryItem.Inventories.Add(inventoryItem);
+                }
+
+                InventoriesSummaryUsageDateItem dateItem = inventoryItem.Items.FirstOrDefault(p => p.Date == inventoriesSummaryUsageRawReportItem.Date);
+                if (dateItem != null)
+                {
+                    var quantity = inventoriesSummaryUsageRawReportItem.Quantity * inventory.SafeData.Quantity;
+                    dateItem.Quantity += quantity;
+                    inventoryItem.GrandTotal += quantity;
+                }
+            }
+
+            foreach (var inventoriesSummaryUsageCategoryItem in toReturn.Categories)
+            {
+                foreach (var dateItem in inventoriesSummaryUsageCategoryItem.TotalItems)
+                {
+                    dateItem.Quantity = inventoriesSummaryUsageCategoryItem.Inventories.SelectMany(p => p.Items)
+                            .Where(p => p.Date == dateItem.Date)
+                            .Sum(p => p.Quantity);
+                    inventoriesSummaryUsageCategoryItem.GrandTotal += dateItem.Quantity;
+                }
+            }
+
+            foreach (var dateItem in toReturn.TotalItems)
+            {
+                dateItem.Quantity = toReturn.Categories.SelectMany(p => p.TotalItems).Where(p => p.Date == dateItem.Date).Sum(p => p.Quantity);
+                toReturn.GrandTotal += dateItem.Quantity;
+            }
+
+            var notSpecifiedCategory = toReturn.Categories.FirstOrDefault(p => !p.Id.HasValue);
+            if (notSpecifiedCategory != null)
+            {
+                toReturn.Categories.Remove(notSpecifiedCategory);
+            }
+
+            return toReturn;
+        }
+
+        public void ConvertInventoriesSummaryUsageReportForExport(InventoriesSummaryUsageReport report, out IList<DynamicExportColumn> columns, out IList<ExpandoObject> items)
+        {
+            columns =new List<DynamicExportColumn>();
+            items=new List<ExpandoObject>();
+
+            DynamicExportColumn column = new DynamicExportColumn();
+            column.DisplayName = "Inventory Code";
+            column.Name = "InventoryCode";
+            columns.Add(column);
+
+            column = new DynamicExportColumn();
+            column.DisplayName = "Inventory Description";
+            column.Name = "InventoryDescription";
+            columns.Add(column);
+
+            column = new DynamicExportColumn();
+            column.DisplayName = "UOM";
+            column.Name = "UOM";
+            columns.Add(column);
+
+            foreach (var inventoriesSummaryUsageDateItem in report.TotalItems)
+            {
+                column = new DynamicExportColumn();
+                column.DisplayName = inventoriesSummaryUsageDateItem.Date.ToString("MMM-yy");
+                column.Name = inventoriesSummaryUsageDateItem.Date.ToString("MMMyy");
+                columns.Add(column);
+            }
+
+            column = new DynamicExportColumn();
+            column.DisplayName = "Total";
+            column.Name = "Total";
+            columns.Add(column);
+
+            dynamic item = null;
+            IDictionary<string, object> map = null;
+            foreach (var category in report.Categories)
+            {
+                foreach (var inventory in category.Inventories)
+                {
+                    item=new ExpandoObject();
+                    map = (IDictionary<string, object>) item;
+                    item.InventoryCode = inventory.Code;
+                    item.InventoryDescription = inventory.Description;
+                    item.UOM = inventory.UnitOfMeasureAmount;
+                    foreach (var dateItem in inventory.Items)
+                    {
+                        map.Add(dateItem.Date.ToString("MMMyy"), dateItem.Quantity);
+                    }
+                    item.Total = inventory.GrandTotal;
+                    items.Add((ExpandoObject)item);
+                }
+
+                item = new ExpandoObject();
+                map = (IDictionary<string, object>)item;
+                item.InventoryCode = category.Name;
+                item.InventoryDescription = null;
+                item.UOM = null;
+                foreach (var dateItem in category.TotalItems)
+                {
+                    map.Add(dateItem.Date.ToString("MMMyy"), dateItem.Quantity);
+                }
+                item.Total = category.GrandTotal;
+                items.Add((ExpandoObject)item);
+            }
+
+
+            item = new ExpandoObject();
+            map = (IDictionary<string, object>)item;
+            item.InventoryCode = "Total";
+            item.InventoryDescription = null;
+            item.UOM = null;
+            foreach (var dateItem in report.TotalItems)
+            {
+                map.Add(dateItem.Date.ToString("MMMyy"), dateItem.Quantity);
+            }
+            item.Total = report.GrandTotal;
+            items.Add((ExpandoObject)item);
         }
     }
 }

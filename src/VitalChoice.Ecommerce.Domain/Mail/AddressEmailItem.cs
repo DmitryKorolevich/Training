@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Attributes;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
 
 namespace VitalChoice.Ecommerce.Domain.Mail
 {
@@ -54,5 +55,11 @@ namespace VitalChoice.Ecommerce.Domain.Mail
 
         [Map]
         public string Email { get; set; }
+
+        [Map]
+        public string DeliveryInstructions { get; set; }
+
+        [Map]
+        public PreferredShipMethod? PreferredShipMethod { get; set; }
     }
 }

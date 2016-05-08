@@ -193,4 +193,10 @@
   <ItemGroup>
     <None Include="PreDeployment\Scripts\AdminTeams.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\ContentOldIds.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\ArticleBonusLinks.sql" />
+  </ItemGroup>
 </Project>

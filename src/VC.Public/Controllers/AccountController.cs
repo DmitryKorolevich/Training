@@ -28,7 +28,6 @@ namespace VC.Public.Controllers
     public class AccountController : BaseMvcController
 	{
 		private readonly IStorefrontUserService _userService;
-		private readonly IHttpContextAccessor _contextAccessor;
 		private readonly ICustomerService _customerService;
         private readonly IAffiliateService _affiliateService;
         private readonly IPaymentMethodService _paymentMethodService;
@@ -36,7 +35,6 @@ namespace VC.Public.Controllers
 
 		public AccountController(
             IStorefrontUserService userService,
-            IHttpContextAccessor contextAccessor, 
             IDynamicMapper<CustomerDynamic, Customer> customerMapper, 
             ICustomerService customerService,
             IAffiliateService affiliateService,
@@ -44,7 +42,6 @@ namespace VC.Public.Controllers
             IPageResultService pageResultService) : base(pageResultService)
 		{
 			_userService = userService;
-			_contextAccessor = contextAccessor;
 			_customerMapper = customerMapper;
 			_customerService = customerService;
             _affiliateService = affiliateService;
@@ -113,7 +110,7 @@ namespace VC.Public.Controllers
 
         public async Task<IActionResult> Logout()
 		{
-			var context = _contextAccessor.HttpContext;
+			var context = HttpContext;
 
 			if (context.User.Identity.IsAuthenticated)
 			{

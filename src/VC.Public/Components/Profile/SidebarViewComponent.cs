@@ -13,17 +13,15 @@ namespace VC.Public.Components.Profile
 	public class SidebarViewComponent : ViewComponent
 	{
 		private readonly IStorefrontUserService _storefrontUserService;
-		private readonly IHttpContextAccessor _contextAccessor;
 
-		public SidebarViewComponent(IStorefrontUserService storefrontUserService, IHttpContextAccessor contextAccessor)
+		public SidebarViewComponent(IStorefrontUserService storefrontUserService)
 		{
 			_storefrontUserService = storefrontUserService;
-			_contextAccessor = contextAccessor;
 		}
 
 		public async Task<IViewComponentResult> InvokeAsync()
 		{
-			var userId = Convert.ToInt32(_contextAccessor.HttpContext.User.GetUserId());
+			var userId = Convert.ToInt32(HttpContext.User.GetUserId());
 
 			var user = await _storefrontUserService.GetAsync(userId);
 		    if (user != null && user.IsConfirmed && user.Status == UserStatus.Active)
