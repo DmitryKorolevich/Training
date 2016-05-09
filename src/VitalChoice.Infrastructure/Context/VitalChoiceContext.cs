@@ -368,6 +368,11 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasIndex(p => new { p.Url, p.StatusCode }).HasName("IX_Articles_Url_StatusCode");
             });
 
+            builder.Entity<ArticleBonusLink>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("ArticleBonusLinks");
+            });
 
             builder.Entity<ContentPage>(entity =>
             {

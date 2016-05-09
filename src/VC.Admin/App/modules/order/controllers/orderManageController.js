@@ -120,6 +120,12 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         tabs.push($scope.customerFilesTab);
         $scope.tabs = tabs;
 
+        $scope.giftOrderChanged = function() {
+            if (!$scope.order.GiftOrder) {
+                $scope.order.GiftMessage = "";
+            }
+        }
+
         loadOrder();
     };
 

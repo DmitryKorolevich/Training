@@ -10,13 +10,10 @@ namespace VC.Admin.Controllers
     public class InfrastructureController : BaseApiController
     {
         private readonly IAppInfrastructureService appInfrastructureService;
-        private readonly IHttpContextAccessor contextAccessor;
 
-        public InfrastructureController(IAppInfrastructureService appInfrastructureService, IHttpContextAccessor contextAccessor,
-            ILoggerProviderExtended loggerProvider)
+        public InfrastructureController(IAppInfrastructureService appInfrastructureService)
         {
             this.appInfrastructureService = appInfrastructureService;
-            this.contextAccessor = contextAccessor;
         }
 
         [HttpGet]
@@ -26,7 +23,7 @@ namespace VC.Admin.Controllers
 
 	        RestrictedReferenceData referenceDataModel;
 
-			if (contextAccessor.HttpContext.User.Identity.IsAuthenticated)
+			if (HttpContext.User.Identity.IsAuthenticated)
 	        {
                 referenceDataModel = new FullReferenceDataModel()
                 {

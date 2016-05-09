@@ -63,7 +63,7 @@
                                                     </form>
                                                 </div>
                                                 <label data-ng-if="order.IdObjectType!=3" class="checkbox-inline">
-                                                    <input type="checkbox" data-ng-model="order.GiftOrder" data-ng-disabled="orderEditDisabled">Gift Order
+                                                    <input type="checkbox" data-ng-model="order.GiftOrder" data-ng-disabled="orderEditDisabled" data-ng-change="giftOrderChanged()">Gift Order
                                                     <i class="fa fa-gift"></i>
                                                 </label>
                                                 <label data-ng-if="order.IdObjectType!=3" class="checkbox-inline">

@@ -15,6 +15,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.AspNet.Http;
 using System.Globalization;
+using System.Net;
 using Microsoft.AspNet.Http.Features;
 using Microsoft.AspNet.Mvc;
 using System.Threading.Tasks;
@@ -25,6 +26,8 @@ using Microsoft.AspNet.StaticFiles;
 using VitalChoice.Business.Services;
 using VitalChoice.Profiling;
 using VitalChoice.Profiling.Base;
+using VitalChoice.Core.Services;
+using VitalChoice.Infrastructure.Domain.Constants;
 
 namespace VC.Public
 {
@@ -91,7 +94,8 @@ namespace VC.Public
                     await next();
                 }
             });
-            app.UseStatusCodePagesWithReExecute("/help/error/{0}");
+            app.UseStatusCodeExecutePath("/content/" + ContentConstants.NOT_FOUND_PAGE_URL, HttpStatusCode.NotFound);
+            app.UseStatusCodeExecutePath("/content/" + ContentConstants.ACESS_DENIED_PAGE_URL, HttpStatusCode.Forbidden);
             app.UseMvc(RouteConfig.RegisterRoutes);
         }
     }

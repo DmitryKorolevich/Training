@@ -10,6 +10,7 @@ namespace VitalChoice.Interfaces.Services.Content
     {
         Task<PagedList<ContentPage>> GetContentPagesAsync(ContentPageListFilter filter);
         Task<ContentPage> GetContentPageAsync(int id);
+	    Task<ContentPage> GetContentPageByIdOldAsync(int id);
         Task<ContentPage> UpdateContentPageAsync(ContentPage contentPage);
         Task<bool> AttachContentPageToCategoriesAsync(int id, IEnumerable<int> categoryIds);
         Task<bool> DeleteContentPageAsync(int id);

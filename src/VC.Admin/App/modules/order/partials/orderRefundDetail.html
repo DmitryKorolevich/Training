@@ -256,13 +256,13 @@
                                                                 <div class="form-group margin-bottom-0px">
                                                                     <label class="col-md-8 control-label">Tax</label>
                                                                     <div class="col-md-4 form-control-static">
-                                                                        <span>({{order.TaxTotal | currency}})</span>
+                                                                        <span>{{order.TaxTotal | currency}}</span>
                                                                     </div>
                                                                 </div>
                                                                 <div class="form-group margin-bottom-0px">
                                                                     <label class="col-md-8 control-label">Total to be Refunded</label>
                                                                     <div class="col-md-4 form-control-static">
-                                                                        <span>{{order.AutoTotal | currency}}</span>
+                                                                        <span>({{order.AutoTotal | currency}})</span>
                                                                     </div>
                                                                 </div>
                                                             </div></div>
@@ -327,7 +327,7 @@
                                                             <div>
                                                                 <label class="col-md-9 control-label">Refund To Be Submitted</label>
                                                                 <div class="col-md-3 form-control-static">
-                                                                    <span>{{order.Total | currency}}</span>
+                                                                    <span>({{order.Total | currency}})</span>
                                                                 </div>
                                                             </div>
                                                         </div>

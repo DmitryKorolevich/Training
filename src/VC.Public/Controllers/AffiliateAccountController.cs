@@ -29,19 +29,16 @@ namespace VC.Public.Controllers
     public class AffiliateAccountController : BaseMvcController
     {
         private readonly IAffiliateUserService _userService;
-        private readonly IHttpContextAccessor _contextAccessor;
         private readonly IAffiliateService _affiliateService;
         private readonly IDynamicMapper<AffiliateDynamic, Affiliate> _affiliateMapper;
 
         public AffiliateAccountController(
             IAffiliateUserService userService,
-            IHttpContextAccessor contextAccessor,
             IDynamicMapper<AffiliateDynamic, Affiliate> affiliateMapper,
             IAffiliateService affiliateService,
             IPageResultService pageResultService) : base(pageResultService)
         {
             _userService = userService;
-            _contextAccessor = contextAccessor;
             _affiliateMapper = affiliateMapper;
             _affiliateService = affiliateService;
         }
@@ -93,7 +90,7 @@ namespace VC.Public.Controllers
 
         public async Task<IActionResult> Logout()
         {
-            var context = _contextAccessor.HttpContext;
+            var context = HttpContext;
 
             if (context.User.Identity.IsAuthenticated)
             {

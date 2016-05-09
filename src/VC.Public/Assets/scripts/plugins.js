@@ -12,7 +12,10 @@ var lhnCustom2 = '';
 var lhnCustom3 = '';
 var lhnTrackingEnabled = 't';
 var lhnScriptSrc = lhnJsHost + 'www.livehelpnow.net/lhn/scripts/livehelpnow.aspx?lhnid=' + lhnAccountN + '&iv=' + lhnInviteEnabled + '&d=' + lhnDepartmentN + '&ver=' + lhnVersion + '&rnd=' + Math.random();
-var lhnScript = document.createElement("script"); lhnScript.type = "text/javascript"; lhnScript.src = lhnScriptSrc;
+var lhnScript = document.createElement("script");
+lhnScript.setAttribute("defer", "defer");
+lhnScript.type = "text/javascript";
+lhnScript.src = lhnScriptSrc;
 
 var googleSearchcx = '006613472277305802095:2wviofnvpvs';
 var googleSearchFAQcx = '006613472277305802095:ne3iw8mrxlk';
@@ -522,10 +525,22 @@ function processCharcount(ev) {
 
 function initLiveHelp() {
 	if (window.addEventListener) {
-		window.addEventListener('load', function () { document.getElementById('lhnContainer').appendChild(lhnScript); }, false);
+	    window.addEventListener('load',
+	        function() {
+	            setTimeout(function() {
+	                document.getElementById('lhnContainer').appendChild(lhnScript);
+	            }, 1);
+	        },
+	        false);
 	}
 	else if (window.attachEvent) {
-		window.attachEvent('onload', function () { document.getElementById('lhnContainer').appendChild(lhnScript); });
+	    window.attachEvent('onload',
+	        function() {
+	            setTimeout(function() {
+	                    document.getElementById('lhnContainer').appendChild(lhnScript);
+	                },
+	                1);
+	        });
 	}
 }
 

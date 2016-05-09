@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using VitalChoice.Ecommerce.Domain.Helpers;
@@ -8,7 +7,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
 {
     public class CacheCluster<TKey, T>
     {
-        private readonly Dictionary<TKey, CachedEntity<T>> _cluster = new Dictionary<TKey, CachedEntity<T>>();
+        private readonly Dictionary<TKey, CachedEntity<T>> _cluster = new Dictionary<TKey, CachedEntity<T>>(10);
 
         public CachedEntity<T> Remove(TKey pk)
         {
@@ -62,7 +61,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
 
         public ICollection<CachedEntity<T>> GetItems()
         {
-            return _cluster.Values.ToArray();
+            return _cluster.Values;
         }
 
         public void Clear()

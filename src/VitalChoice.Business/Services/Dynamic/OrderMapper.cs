@@ -115,7 +115,7 @@ namespace VitalChoice.Business.Services.Dynamic
                         GcsGenerated = s.GeneratedGiftCertificates
                     }));
 
-                    if (dynamic.Skus != null && dynamic.Skus.Count != 0)
+                    if (dynamic.Skus != null && dynamic.Skus.Count != 0 && dynamic.Skus.First().Sku?.Product != null)
                     {
                         var productContents =
                             await _productService.SelectProductContents(dynamic.Skus.Select(p => p.Sku.IdProduct).Distinct().ToList());
@@ -146,7 +146,7 @@ namespace VitalChoice.Business.Services.Dynamic
                         Enabled = !s.Disabled
                     }));
 
-                    if (dynamic.PromoSkus.Count != 0)
+                    if (dynamic.PromoSkus!=null && dynamic.PromoSkus.Count != 0 && dynamic.PromoSkus.First().Sku?.Product!=null)
                     {
                         var productContents =
                             await _productService.SelectProductContents(dynamic.PromoSkus.Select(p => p.Sku.IdProduct).Distinct().ToList());

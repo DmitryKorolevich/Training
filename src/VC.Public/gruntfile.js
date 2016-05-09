@@ -11,6 +11,7 @@ module.exports = function (grunt) {
 	}
 
 	var cssFiles = cssConfig.files;
+
 	for (var j = 0; j < cssFiles.length; j++) {
 		cssFiles[j] = "wwwroot/" + cssFiles[j];
 	}

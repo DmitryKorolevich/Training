@@ -24,7 +24,8 @@ angular.module('app.modules.content', [
 	'app.modules.content.controllers.manageStylesController',
 	'app.modules.content.controllers.emailTemplatesController',
 	'app.modules.content.controllers.emailTemplateManageController',
-	'app.modules.content.controllers.contentCrossSellsManageController'
+	'app.modules.content.controllers.contentCrossSellsManageController',
+	'app.modules.content.controllers.articleBonusLinksController'
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',

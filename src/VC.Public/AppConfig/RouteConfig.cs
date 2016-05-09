@@ -102,6 +102,11 @@ namespace VC.Public.AppConfig
                 template: "content/{url}",
                 defaults: new { controller = "ContentPage", action = "ContentPage" });
 
+            routeBuilder.MapRoute(
+                name: "ContentPages_ContentPage_ByIdOld",
+                template: "shop/pc/viewContent.asp",
+                defaults: new { controller = "ContentPage", action = "ContentPageByIdOld" });
+
 
             routeBuilder.MapRoute(
                 name: "Products_Categories",

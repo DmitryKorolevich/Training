@@ -46,13 +46,13 @@ namespace VC.Public.Controllers
 	    private readonly IContentCrossSellService _contentCrossSellService;
 
 
-	    public CartController(IHttpContextAccessor contextAccessor,
+	    public CartController(
             ICustomerService customerService,
             IOrderService orderService, IProductService productService, ICheckoutService checkoutService,
             IAuthorizationService authorizationService, IAppInfrastructureService appInfrastructureService,
             IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
             IDiscountService discountService, IGcService gcService, IContentCrossSellService contentCrossSellService, IPageResultService pageResultService, ISettingService settingService)
-            : base(contextAccessor, customerService, appInfrastructureService, authorizationService, checkoutService, orderService, skuMapper,productMapper, pageResultService, settingService)
+            : base(customerService, appInfrastructureService, authorizationService, checkoutService, orderService, skuMapper,productMapper, pageResultService, settingService)
         {
 	        _productService = productService;
             _checkoutService = checkoutService;
@@ -219,7 +219,7 @@ namespace VC.Public.Controllers
 
 			await FillModel(result, res.Item2.Order, res.Item1);
             SetCartUid(res.Item2.CartUid);
-            ContextAccessor.HttpContext.Session.Remove(CheckoutConstants.ReceiptSessionOrderId);
+            HttpContext.Session.Remove(CheckoutConstants.ReceiptSessionOrderId);
             return result;
         }
 

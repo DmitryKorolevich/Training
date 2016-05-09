@@ -40,10 +40,10 @@ namespace VC.Public.Controllers
         protected readonly IDynamicMapper<ProductDynamic, Product> ProductMapper;
         protected readonly ReferenceData AppInfrastructure;
 
-        protected CheckoutControllerBase(IHttpContextAccessor contextAccessor, ICustomerService customerService,
+        protected CheckoutControllerBase(ICustomerService customerService,
             IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService, ICheckoutService checkoutService,
             IOrderService orderService, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
-            IPageResultService pageResultService, ISettingService settingService) : base(contextAccessor, customerService,
+            IPageResultService pageResultService, ISettingService settingService) : base(customerService,
                 infrastructureService, authorizationService, checkoutService, pageResultService)
         {
             OrderService = orderService;

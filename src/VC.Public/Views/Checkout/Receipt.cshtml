@@ -39,16 +39,16 @@
     <div class="receipt-info-line">
         @Html.LabelFor(x => x.OrderNumber, null, new { @class = "bold" }):<span>@Model.OrderNumber</span>
     </div>
-	<div class="receipt-info-line">
-		@Html.LabelFor(x => x.OrderDate, null, new {@class = "bold"}):<span>@Model.OrderDate.ToString("MM/dd/yyyy")</span>
-	</div>
-	@if (!Model.ShipAsap && Model.ShippingDate.HasValue)
-	{
-		<div class="receipt-info-line">
-			<label class="bold">Ship Delay Date</label>@(":")<span>@Model.ShippingDate?.ToString("MM/dd/yyyy")</span>
-		</div>
-	}
-    <div class="reivew-order-info receipt-step">
+    <div class="receipt-info-line">
+        @Html.LabelFor(x => x.OrderDate, null, new { @class = "bold" }):<span>@Model.OrderDate.ToString("MM/dd/yyyy")</span>
+    </div>
+    @if (!Model.ShipAsap && Model.ShippingDate.HasValue)
+    {
+        <div class="receipt-info-line">
+            <label class="bold">Ship Delay Date</label>@(":")<span>@Model.ShippingDate?.ToString("MM/dd/yyyy")</span>
+        </div>
+    }
+    <div class="reivew-order-info receipt-step two-columns">
         <div class="reivew-info-box">
             <div class="review-header-container">
                 <span>Bill to Details</span>
@@ -183,7 +183,7 @@
                                 {
                                     foreach (var gcCode in t.GeneratedGCCodes)
                                     {
-                                        <br/>
+                                        <br />
                                         <span class="cart-sku-code"><em>GC Code: @gcCode</em></span>
                                     }
                                 }
@@ -231,12 +231,12 @@
         </div>
         @if (Model.DiscountTotal.HasValue && Model.DiscountTotal.Value != 0)
         {
-	        <div class="cart-total-line">
-		        @Html.LabelFor(x => x.DiscountTotal)
-		        <label class="cart-total-value">
-			        @Model.DiscountTotal.Value.ToString("C2")
-		        </label>
-	        </div>
+            <div class="cart-total-line">
+                @Html.LabelFor(x => x.DiscountTotal)
+                <label class="cart-total-value">
+                    @Model.DiscountTotal.Value.ToString("C2")
+                </label>
+            </div>
         }
         <div class="cart-total-line">
             @Html.LabelFor(x => x.ShippingCost)
@@ -244,15 +244,15 @@
                 @(Model.ShippingCost.HasValue ? Model.ShippingCost.Value.ToString("C2") : "FREE!")
             </label>
         </div>
-	    @if (Model.Tax != 0)
-	    {
-		    <div class="cart-total-line">
-			    @Html.LabelFor(x => x.Tax)
-			    <label class="cart-total-value">
-				    @Model.Tax.ToString("C2")
-			    </label>
-		    </div>
-	    }
+        @if (Model.Tax != 0)
+        {
+            <div class="cart-total-line">
+                @Html.LabelFor(x => x.Tax)
+                <label class="cart-total-value">
+                    @Model.Tax.ToString("C2")
+                </label>
+            </div>
+        }
         @if (Model.GiftCertificatesTotal.HasValue && Model.GiftCertificatesTotal.Value != 0)
         {
             <div class="cart-total-line">
@@ -269,4 +269,32 @@
             </label>
         </div>
     </div>
+    @if (!string.IsNullOrEmpty(Model.DeliveryInstructions))
+    {
+
+        <div class="reivew-order-info receipt-step">
+            <div class="reivew-info-box">
+                <div class="review-header-container">
+                    <span>Delivery Instructions</span>
+                </div>
+                <div class="review-box-line">
+                    @Model.DeliveryInstructions
+                </div>
+            </div>
+        </div>
+    }
+    @if (!string.IsNullOrEmpty(Model.GiftMessage))
+            {
+
+        <div class="reivew-order-info receipt-step">
+            <div class="reivew-info-box">
+                <div class="review-header-container">
+                    <span>Gift Message</span>
+                </div>
+                <div class="review-box-line">
+                    @Model.GiftMessage
+                </div>
+            </div>
+        </div>
+    }
 </div>

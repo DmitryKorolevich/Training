@@ -14,10 +14,10 @@ namespace VitalChoice.Interfaces.Services.Orders
 
 		Task<ExtendedOrderNote> GetExtendedAsync(int id);
 
-		Task<OrderNote> AddOrderNoteAsync(OrderNote orderNote);
+		Task<OrderNote> AddOrderNoteAsync(OrderNote orderNote, int userId);
 
-		Task<OrderNote> UpdateOrderNoteAsync(OrderNote orderNote);
+		Task<OrderNote> UpdateOrderNoteAsync(OrderNote orderNote, int userId);
 
-		Task<bool> DeleteOrderNoteAsync(int id);
+		Task<bool> DeleteOrderNoteAsync(int id, int userId);
 	}
 }

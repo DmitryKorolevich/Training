@@ -11,7 +11,7 @@ namespace VitalChoice.Interfaces.Services.Payments
     {
 	    Task<IList<ExtendedPaymentMethod>> GetApprovedPaymentMethodsAsync();
 
-	    Task SetStateAsync(IList<PaymentMethodsAvailability> paymentMethodsAvailability);
+	    Task SetStateAsync(IList<PaymentMethodsAvailability> paymentMethodsAvailability, int currentUserId);
 
 	    Task<PaymentMethod> GetStorefrontDefaultPaymentMethod();
 

@@ -21,14 +21,12 @@ using VitalChoice.ObjectMapping.Extensions;
 namespace VitalChoice.Caching.Services.Cache
 {
     public class EntityCache<T> : IEntityCache<T>
-        //where T : Entity, new()
-        where T : class, new()
     {
         private readonly IInternalEntityCache<T> _internalCache;
         private readonly IEntityInfoStorage _infoStorage;
         private readonly DbContext _context;
         private readonly ILogger _logger;
-        private Dictionary<TrackedEntityKey, EntityEntry> _trackData;
+        private IDictionary<TrackedEntityKey, EntityEntry> _trackData;
         private HashSet<object> _trackedObjects;
 
         public EntityCache(IInternalEntityCache<T> internalCache, IEntityInfoStorage infoStorage, DbContext context, ILogger logger)
@@ -97,7 +95,7 @@ namespace VitalChoice.Caching.Services.Cache
             if (_internalCache == null)
             {
                 _logger.LogInformation($"Cache doesn't exist for type: {typeof (T)}");
-                entity = null;
+                entity = default(T);
                 return CacheGetResult.NotFound;
             }
 
@@ -145,31 +143,31 @@ namespace VitalChoice.Caching.Services.Cache
             return CacheGetResult.NotFound;
         }
 
-        public bool Update(QueryData<T> queryData, IEnumerable<T> entities)
+        public bool Update(QueryData<T> query, IEnumerable<T> entities)
         {
             if (_internalCache == null)
             {
-                _logger.LogWarning($"<Cache Update> Cache doesn't exist for type: {typeof (T)}");
+                _logger.LogWarning($"<Cache Update> Cache doesn't exist for type: {typeof(T)}");
                 return false;
             }
 
-            bool fullCollection = queryData.FullCollection;
+            bool fullCollection = query.FullCollection;
 
-            if (!fullCollection && !queryData.CanCollectionCache)
+            if (!fullCollection && !query.CanCollectionCache)
             {
                 _logger.LogWarning(
-                    $"<Cache Update> can't update cache, preconditions not met: {typeof (T)}\r\n{queryData.WhereExpression?.Expression.AsString()}");
+                    $"<Cache Update> can't update cache, preconditions not met: {typeof(T)}\r\n{query.WhereExpression?.Expression.AsString()}");
                 return false;
             }
 
-            entities = DeepCloneList(entities, queryData.RelationInfo);
+            var clonedItems = DeepCloneList(entities, query.RelationInfo);
 
             if (fullCollection)
             {
-                return _internalCache.UpdateAll(entities, queryData.RelationInfo);
+                return _internalCache.UpdateAll(clonedItems, query.RelationInfo);
             }
 
-            return _internalCache.Update(entities, queryData.RelationInfo);
+            return _internalCache.Update(clonedItems, query.RelationInfo);
         }
 
         public bool Update(QueryData<T> queryData, T entity)

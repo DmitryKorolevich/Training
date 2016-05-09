@@ -36,20 +36,17 @@ namespace VitalChoice.Business.Services.Payment
 		private readonly IEcommerceRepositoryAsync<PaymentMethod> _paymentMethodRepository;
 		private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
 		private readonly IEcommerceRepositoryAsync<PaymentMethodToCustomerType> _paymentMethodToCustomerTypeRepository;
-		private readonly IHttpContextAccessor _contextAccessor;
 	    private readonly IOptions<AppOptions> _options;
 	    private readonly ICountryNameCodeResolver _countryNameCode;
 	    private readonly ILogger _logger;
 	    private readonly ITransactionAccessor<EcommerceContext> _transactionAccessor;
 	    private readonly ISettingService _settingService;
 
-	    public PaymentMethodService(IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository,
-	        IHttpContextAccessor contextAccessor, IRepositoryAsync<AdminProfile> adminProfileRepository,
+	    public PaymentMethodService(IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository, IRepositoryAsync<AdminProfile> adminProfileRepository,
 	        IEcommerceRepositoryAsync<PaymentMethodToCustomerType> paymentMethodToCustomerTypeRepository,
 	        ILoggerProviderExtended loggerProvider, IOptions<AppOptions> options, ICountryNameCodeResolver countryNameCode, ITransactionAccessor<EcommerceContext> transactionAccessor, ISettingService settingService)
 	    {
 	        _paymentMethodRepository = paymentMethodRepository;
-	        _contextAccessor = contextAccessor;
 	        _adminProfileRepository = adminProfileRepository;
 	        _paymentMethodToCustomerTypeRepository = paymentMethodToCustomerTypeRepository;
 	        _options = options;
@@ -90,10 +87,8 @@ namespace VitalChoice.Business.Services.Payment
 			return result;
 		}
 
-		public async Task SetStateAsync(IList<PaymentMethodsAvailability> paymentMethodsAvailability)
+		public async Task SetStateAsync(IList<PaymentMethodsAvailability> paymentMethodsAvailability, int currentUserId)
 		{
-			var currentUserId = Convert.ToInt32(_contextAccessor.HttpContext.User.GetUserId());
-
 			var paymentMethods =
 				await
 					_paymentMethodRepository.Query(new PaymentMethodQuery().NotDeleted())

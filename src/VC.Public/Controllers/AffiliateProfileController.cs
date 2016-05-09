@@ -30,21 +30,18 @@ namespace VC.Public.Controllers
     [AffiliateAuthorize]
     public class AffiliateProfileController : BaseMvcController
     {
-        private readonly IHttpContextAccessor _contextAccessor;
         private readonly IAffiliateUserService _affiliateUserService;
         private readonly IAffiliateService _affiliateService;
         private readonly IDynamicMapper<AffiliateDynamic, Affiliate> _affiliateMapper;
         private readonly IOptions<AppOptions> _appOptions;
 
         public AffiliateProfileController(
-            IHttpContextAccessor contextAccessor,
             IAffiliateUserService affiliateUserService,
             IAffiliateService affiliateService,
             IDynamicMapper<AffiliateDynamic, Affiliate> affiliateMapper,
             IOptions<AppOptions> appOptions,
             IPageResultService pageResultService) : base(pageResultService)
         {
-            _contextAccessor = contextAccessor;
             _affiliateUserService = affiliateUserService;
             _affiliateService = affiliateService;
             _affiliateMapper = affiliateMapper;
@@ -53,7 +50,7 @@ namespace VC.Public.Controllers
 
         private int GetInternalAffiliateId()
         {
-            var context = _contextAccessor.HttpContext;
+            var context = HttpContext;
             var internalId = Convert.ToInt32(context.User.GetUserId());
 
             return internalId;
@@ -113,7 +110,7 @@ namespace VC.Public.Controllers
                 return View(model);
             }
 
-            var context = _contextAccessor.HttpContext;
+            var context = HttpContext;
 
             var user = await _affiliateUserService.FindAsync(context.User.GetUserName());
             if (user == null)

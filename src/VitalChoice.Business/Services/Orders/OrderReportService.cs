@@ -13,10 +13,15 @@ using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Queries.Orders;
 using VitalChoice.Business.Repositories;
 using VitalChoice.Data.Repositories;
+using VitalChoice.Data.Repositories.Customs;
+using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Content.Articles;
 using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
+using VitalChoice.Infrastructure.Domain.Transfer.Reports;
+using VitalChoice.Data.Helpers;
+using VitalChoice.Interfaces.Services.Settings;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -26,6 +31,8 @@ namespace VitalChoice.Business.Services.Orders
         private readonly OrderRepository _orderRepository;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly IRepositoryAsync<AdminTeam> _adminTeamRepository;
+        private readonly SPEcommerceRepository _sPEcommerceRepository;
+        private readonly ICountryService _countryService;
         private readonly ILogger _logger;
 
         public OrderReportService(
@@ -33,19 +40,23 @@ namespace VitalChoice.Business.Services.Orders
             OrderRepository orderRepository,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IRepositoryAsync<AdminTeam> adminTeamRepository,
+            SPEcommerceRepository sPEcommerceRepository,
+            ICountryService countryService,
             ILoggerProviderExtended loggerProvider)
         {
             _orderService = orderService;
             _orderRepository = orderRepository;
             _adminProfileRepository = adminProfileRepository;
             _adminTeamRepository = adminTeamRepository;
+            _sPEcommerceRepository = sPEcommerceRepository;
+            _countryService = countryService;
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
         public async Task<OrdersAgentReport> GetOrdersAgentReportAsync(OrdersAgentReportFilter filter)
         {
             OrdersAgentReport toReturn = new OrdersAgentReport();
-            toReturn.IdAdminTeam = filter.IdAdminTeam;
+            toReturn.IdAdminTeams = filter.IdAdminTeams;
             toReturn.IdAdmin = filter.IdAdmin;
             toReturn.FrequencyType = filter.FrequencyType;
 
@@ -92,7 +103,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 current = filter.To;
             }
-            var period = CreateAgentReportPeriod(filter.From, current, filter.IdAdmin, filter.IdAdminTeam, teams, agents);
+            var period = CreateAgentReportPeriod(filter.From, current, filter.IdAdmin, filter.IdAdminTeams, teams, agents);
             toReturn.Periods.Add(period);
 
             while (current < filter.To)
@@ -116,7 +127,7 @@ namespace VitalChoice.Business.Services.Orders
                     nextCurrent = filter.To;
                 }
 
-                period = CreateAgentReportPeriod(current, nextCurrent, filter.IdAdmin, filter.IdAdminTeam, teams, agents);
+                period = CreateAgentReportPeriod(current, nextCurrent, filter.IdAdmin, filter.IdAdminTeams, teams, agents);
                 toReturn.Periods.Add(period);
                 current = nextCurrent;
             }
@@ -387,7 +398,7 @@ namespace VitalChoice.Business.Services.Orders
             return toReturn;
         }
 
-        private OrdersAgentReportPeriodItem CreateAgentReportPeriod(DateTime from, DateTime to, int? idAdmin, int? idAdminTeam, List<AdminTeam> teams,
+        private OrdersAgentReportPeriodItem CreateAgentReportPeriod(DateTime from, DateTime to, int? idAdmin, ICollection<int> idAdminTeams, List<AdminTeam> teams,
             List<AdminProfile> agents)
         {
             OrdersAgentReportPeriodItem period = new OrdersAgentReportPeriodItem();
@@ -395,8 +406,8 @@ namespace VitalChoice.Business.Services.Orders
             period.To = to;
             if (!idAdmin.HasValue)
             {
-                var currentTeams = idAdminTeam.HasValue
-                    ? teams.Where(p => p.Id == idAdminTeam.Value).ToList()
+                var currentTeams = idAdminTeams!=null && idAdminTeams.Count>0
+                    ? teams.Where(p => idAdminTeams.Contains(p.Id)).ToList()
                     : teams;
                 foreach (var team in currentTeams)
                 {
@@ -411,7 +422,7 @@ namespace VitalChoice.Business.Services.Orders
                     period.Teams.Add(teamItem);
                 }
                 //admins without team
-                if (!idAdminTeam.HasValue)
+                if (idAdminTeams == null || idAdminTeams.Count == 0)
                 {
                     OrdersAgentReportTeamItem teamItem = new OrdersAgentReportTeamItem();
                     teamItem.AdminTeamName = "Not Specified";
@@ -434,6 +445,87 @@ namespace VitalChoice.Business.Services.Orders
                 period.Teams.Add(teamItem);
             }
             return period;
+        }
+
+        public async Task<WholesaleDropShipReport> GetWholesaleDropShipReportAsync(WholesaleDropShipReportFilter filter)
+        {
+            WholesaleDropShipReport toReturn=new WholesaleDropShipReport();
+
+            var skus = await _sPEcommerceRepository.GetWholesaleDropShipReportSkusSummaryAsync(filter);
+            if (skus.Count > 0)
+            {
+                var sku = skus.First();
+                toReturn.DiscountedSubtotal = sku.ProductsSubtotal - sku.DiscountTotal;
+                toReturn.Shipping = sku.ShippingTotal;
+                toReturn.Total = sku.Total;
+                toReturn.Skus = skus.Select(p => new WholesaleDropShipReportSkuSummary()
+                {
+                    Id = p.Id,
+                    Code = p.Code,
+                    Amount = p.Amount,
+                    Quantity = p.Quantity,
+                }).ToList();
+
+                toReturn.SkusTotal=new WholesaleDropShipReportSkuSummary()
+                {
+                    Amount = toReturn.Skus.Sum(p=>p.Amount),
+                    Quantity = toReturn.Skus.Sum(p => p.Quantity),
+                };
+            }
+
+            return toReturn;
+        }
+
+        public async Task<PagedList<WholesaleDropShipReportOrderItem>> GetOrdersForWholesaleDropShipReportAsync(WholesaleDropShipReportFilter filter)
+        {
+            PagedList<WholesaleDropShipReportOrderItem> toReturn = new PagedList<WholesaleDropShipReportOrderItem>();
+
+            var countries = await _countryService.GetCountriesAsync();
+
+            toReturn.Count= await _sPEcommerceRepository.GetCountOrderIdsForWholesaleDropShipReportAsync(filter);
+            var ids = await _sPEcommerceRepository.GetOrderIdsForWholesaleDropShipReportAsync(filter);
+            var orders = await _orderService.SelectAsync(ids, includesOverride: x => x
+                .Include(o => o.Skus)
+                .ThenInclude(s => s.Sku)
+                .Include(o => o.PromoSkus)
+                .ThenInclude(p => p.Sku)
+                .Include(o => o.ShippingAddress)
+                .ThenInclude(s => s.OptionValues));
+
+            orders.ForEach(p =>
+            {
+                WholesaleDropShipReportOrderItem item = new WholesaleDropShipReportOrderItem();
+                item.IdOrder = p.Id;
+                item.OrderStatus = p.OrderStatus;
+                item.POrderStatus = p.POrderStatus;
+                item.NPOrderStatus = p.NPOrderStatus;
+                item.DiscountedSubtotal = p.ProductsSubtotal - p.DiscountTotal;
+                item.Shipping = p.ShippingTotal;
+                item.Total = p.Total;
+                item.OrderNotes = p.SafeData.OrderNotes;
+                item.PoNumber = p.SafeData.PoNumber;
+                item.ShippingCompany = p.ShippingAddress?.SafeData.Company;
+                item.ShippingFirstName = p.ShippingAddress?.SafeData.FirstName;
+                item.ShippingLastName = p.ShippingAddress?.SafeData.LastName;
+                item.ShippingAddress1 = p.ShippingAddress?.SafeData.Address1;
+                item.ShippingAddress1 = p.ShippingAddress?.SafeData.Address2;
+                item.City = p.ShippingAddress?.SafeData.City;
+                item.Country = countries.FirstOrDefault(x=>x.Id==p.ShippingAddress?.IdCountry)?.CountryCode;
+                item.StateCode = countries.SelectMany(x=>x.States).FirstOrDefault(x => x.Id == p.ShippingAddress?.IdState)?.StateCode;
+                item.Phone = p.ShippingAddress?.SafeData.Phone;
+
+                item.Skus = p.Skus.Select(x => new WholesaleDropShipReportSkuItem()
+                {
+                    Id = x.Sku?.Id ?? 0,
+                    Code = x.Sku?.Code,
+                    Price = x.Amount,
+                    Quantity = x.Quantity,
+                }).ToList();
+
+                toReturn.Items.Add(item);
+            });
+
+            return toReturn;
         }
     }
 }

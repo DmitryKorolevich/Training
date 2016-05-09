@@ -19,7 +19,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
 
         public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            IEnumerable<RefundSkuOrdered> skus = dataContext.RefundSkus;
+            var skus = dataContext.RefundSkus;
             if (dataContext.Order.Discount != null)
             {
                 if (dataContext.Order.Discount.ExcludeCategories)
@@ -158,7 +158,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
                     skus = selectedSkus;
                 }
             }
-            return Task.FromResult(skus.Where(s => !((bool?)s.Sku.SafeData.NonDiscountable ?? false)).Sum(s => s.RefundPrice * (decimal)s.RefundPercent / (decimal)100.0 * s.Quantity));
+            return Task.FromResult(skus.Where(s => !((bool?)s.Sku.SafeData.NonDiscountable ?? false)).Sum(s => s.RefundPrice * (decimal)s.RefundPercent / 100 * s.Quantity));
         }
     }
 }

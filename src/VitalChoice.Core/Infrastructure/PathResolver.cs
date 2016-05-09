@@ -9,9 +9,7 @@ namespace VitalChoice.Core.Infrastructure
 		{
 			get
 			{
-				var locator = CallContextServiceLocator.Locator;
-
-				var appEnv = (IApplicationEnvironment)locator.ServiceProvider.GetService(typeof(IApplicationEnvironment));
+			    var appEnv = PlatformServices.Default.Application;
 				return appEnv.ApplicationBasePath;
 			}
 		}

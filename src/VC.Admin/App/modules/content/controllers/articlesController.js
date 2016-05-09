@@ -121,5 +121,14 @@
 		}, 'Are you sure you want to delete this article?');
 	};
 
+	$scope.openBonusLinks = function (sku)
+	{
+	    modalUtil.open('app/modules/content/partials/articleBonusLinksPopup.html', 'articleBonusLinksController', {
+	        thenCallback: function (data)
+	        {
+	        }
+	    }, { size: 'xs' });
+	};
+
 	initialize();
 }]);
