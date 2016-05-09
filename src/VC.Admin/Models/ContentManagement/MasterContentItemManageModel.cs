@@ -10,6 +10,11 @@ using VitalChoice.Validation.Attributes;
 
 namespace VC.Admin.Models.ContentManagement
 {
+    public class TemplateValidationModel
+    {
+        public string Template { get; set; }
+    }
+
     [ApiValidator(typeof(MasterContentItemManageModelValidator))]
     public class MasterContentItemManageModel : BaseModel
     {

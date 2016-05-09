@@ -8,6 +8,9 @@ using VC.Admin.Models.ContentManagement;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Validation.Models;
 using System.Security.Claims;
+using Templates;
+using Templates.Data;
+using Templates.Runtime;
 using VitalChoice.Core.Base;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -20,6 +23,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.ContentManagement;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VC.Admin.Models.EmailTemplates;
+using VitalChoice.ContentProcessing.Base;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Content.ContentCrossSells;
@@ -84,6 +88,22 @@ namespace VC.Admin.Controllers
             var user = HttpContext.Request.HttpContext.User.GetUserId();
 
             return new MasterContentItemManageModel((await masterContentService.GetMasterContentItemAsync(id)));
+        }
+
+        [HttpPost]
+        [AdminAuthorize(PermissionType.Content)]
+        public Task<Result<IReadOnlyCollection<TtlCompileError>>> TryCompileTemplate([FromBody] TemplateValidationModel template)
+        {
+            using (var ttlTemplate = new TtlTemplate())
+            {
+                var results = ttlTemplate.TryCompilation(template.Template, new TemplateOptions
+                {
+                    AllowCSharp = true,
+                    ForceRemoveWhitespace = true,
+                    Data = new ContentViewContext(new Dictionary<string, object>(), null, ClaimsPrincipal.Current, ActionContext)
+                });
+                return Task.FromResult(new Result<IReadOnlyCollection<TtlCompileError>>(true, results.ErrorList));
+            }
         }
 
         [HttpPost]

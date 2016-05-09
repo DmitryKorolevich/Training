@@ -2,20 +2,11 @@
 
 angular.module('app.core.dataAccess.services.templateService', [])
 .service('templateService', ['$http', function ($http) {
-    var baseUrl = '/Api/Template/';
-
-    function getConfig(tracker) {
-        var config = {};
-        if (tracker) {
-            config.tracker = tracker;
-        }
-        return config;
-    };
+    var baseUrl = '/Api/Content/';
 
     return {
-        //categories
-        tryCompileTemplate: function (template, tracker) {
-            return $http.post(baseUrl + 'TryCompileTemplate', template, getConfig(tracker));
+        tryCompileTemplate: function (template) {
+            return $http.post(baseUrl + 'TryCompileTemplate', { Template: template });
         }
     };
 }]);

@@ -12441,7 +12441,7 @@ ace.define("ace/mode/ttl_worker",["require","exports","module","ace/mode/ttl/Doc
                 });
             }
             this.sender.emit("annotate", errors);
-            if (results.length == 0) {
+            if (results.length === 0) {
                 this.sender.emit("codeok", value);
             }
         };

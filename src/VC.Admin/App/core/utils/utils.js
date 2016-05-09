@@ -35,4 +35,4 @@ angular.module('app.utils', [
 	'app.core.utils.webStorageUtil',
 	'app.core.utils.dataStateRemediator',
     'app.core.utils.uiAceTtlDirective',
-	])
+]);
