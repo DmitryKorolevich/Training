@@ -33,5 +33,6 @@ angular.module('app.utils', [
 	'app.core.utils.parts.cancelDirective',
 	'app.core.utils.textAngular',
 	'app.core.utils.webStorageUtil',
-	'app.core.utils.dataStateRemediator'
+	'app.core.utils.dataStateRemediator',
+    'app.core.utils.uiAceTtlDirective',
 	])
