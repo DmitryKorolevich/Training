@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Business.Helpers;
 using VitalChoice.DynamicData.Base;
@@ -32,9 +33,6 @@ namespace VitalChoice.Business.ModelConverters
             IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
             ICountryService countryService,
             ICustomerService customerService,
-            IAppInfrastructureService appInfrastructureService,
-            IDynamicMapper<SkuDynamic, Sku> skuMapper,
-            IDynamicMapper<ProductDynamic, Product> productMapper,
             IOptions<AppOptions> options)
         {
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
@@ -44,11 +42,11 @@ namespace VitalChoice.Business.ModelConverters
             _options = options;
         }
 
-        public override void DynamicToModel(OrderShippingConfirmationEmail model, OrderDynamic dynamic)
+        public override async Task DynamicToModelAsync(OrderShippingConfirmationEmail model, OrderDynamic dynamic)
         {
-            var countries = _countryService.GetCountriesAsync().Result;
+            var countries = await _countryService.GetCountriesAsync();
 
-            dynamic.Customer = _customerService.SelectAsync(dynamic.Customer.Id).Result;
+            dynamic.Customer = await _customerService.SelectAsync(dynamic.Customer.Id);
             model.PublicHost = _options.Value.PublicHost;
             
             model.Email = dynamic.Customer.Email;
@@ -70,29 +68,30 @@ namespace VitalChoice.Business.ModelConverters
             //Dates in the needed timezone
             model.DateCreated = TimeZoneInfo.ConvertTime(model.DateCreated, TimeZoneInfo.Local, _pstTimeZoneInfo);
 
-            if (dynamic?.PaymentMethod.IdObjectType == (int)PaymentMethodType.NoCharge && dynamic.Customer.ProfileAddress != null)
+            if (dynamic.PaymentMethod.IdObjectType == (int)PaymentMethodType.NoCharge && dynamic.Customer.ProfileAddress != null)
             {
-                model.BillToAddress = _addressMapper.ToModel<AddressEmailItem>(dynamic.Customer.ProfileAddress);
+                model.BillToAddress = await _addressMapper.ToModelAsync<AddressEmailItem>(dynamic.Customer.ProfileAddress);
                 model.BillToAddress.Country = countries.FirstOrDefault(p => p.Id == dynamic.Customer.ProfileAddress.IdCountry)?.CountryName;
                 model.BillToAddress.StateCodeOrCounty = BusinessHelper.ResolveStateOrCounty(countries, dynamic.Customer.ProfileAddress);
             }
-            else if (dynamic?.PaymentMethod?.Address != null)
+            else if (dynamic.PaymentMethod?.Address != null)
             {
-                model.BillToAddress = _addressMapper.ToModel<AddressEmailItem>(dynamic.PaymentMethod.Address);
+                model.BillToAddress = await _addressMapper.ToModelAsync<AddressEmailItem>(dynamic.PaymentMethod.Address);
                 model.BillToAddress.Country = countries.FirstOrDefault(p => p.Id == dynamic.PaymentMethod.Address.IdCountry)?.CountryName;
                 model.BillToAddress.StateCodeOrCounty = BusinessHelper.ResolveStateOrCounty(countries, dynamic.PaymentMethod.Address);
             }
 
-            if (dynamic?.ShippingAddress != null)
+            if (dynamic.ShippingAddress != null)
             {
-                model.ShipToAddress = _addressMapper.ToModel<AddressEmailItem>(dynamic.ShippingAddress);
+                model.ShipToAddress = await _addressMapper.ToModelAsync<AddressEmailItem>(dynamic.ShippingAddress);
                 model.ShipToAddress.Country = countries.FirstOrDefault(p => p.Id == dynamic.ShippingAddress.IdCountry)?.CountryName;
                 model.ShipToAddress.StateCodeOrCounty = BusinessHelper.ResolveStateOrCounty(countries, dynamic.ShippingAddress);
             }
         }
 
-        public override void ModelToDynamic(OrderShippingConfirmationEmail model, OrderDynamic dynamic)
+        public override Task ModelToDynamicAsync(OrderShippingConfirmationEmail model, OrderDynamic dynamic)
         {
+            return Task.Delay(0);
         }
     }
 }

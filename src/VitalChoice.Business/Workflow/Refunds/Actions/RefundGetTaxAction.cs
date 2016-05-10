@@ -20,12 +20,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions
         public override async Task<decimal> ExecuteActionAsync(OrderRefundDataContext context, IWorkflowExecutionContext executionContext)
         {
             var taxService = executionContext.Resolve<IAvalaraTax>();
-            var orderRep = executionContext.Resolve<IEcommerceRepositoryAsync<Order>>();
-            var shouldSplit =
-                await
-                    orderRep.Query(o => o.Id == context.Order.IdOrderSource && o.POrderStatus != null && o.NPOrderStatus != null)
-                        .SelectAnyAsync();
-            if (shouldSplit)
+            if (context.Order.OriginalOrder.NPOrderStatus != null && context.Order.OriginalOrder.POrderStatus != null)
             {
                 context.TaxTotal = (await
                     Task.WhenAll(taxService.GetTax(context, TaxGetType.Perishable),

@@ -121,7 +121,6 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<bool> CancelRefundOrderAsync(int id)
         {
-            var toReturn = false;
             var order = await SelectAsync(id, false);
             if (order != null)
             {
@@ -149,7 +148,7 @@ namespace VitalChoice.Business.Services.Orders
 
                 return true;
             }
-            return toReturn;
+            return false;
         }
 
         protected override async Task<Order> InsertAsync(OrderRefundDynamic model, IUnitOfWorkAsync uow)

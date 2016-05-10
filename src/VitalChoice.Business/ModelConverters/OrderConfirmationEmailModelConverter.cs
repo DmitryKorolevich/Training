@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Business.Helpers;
 using VitalChoice.DynamicData.Base;
@@ -49,11 +50,11 @@ namespace VitalChoice.Business.ModelConverters
             _options = options;
         }
 
-        public override void DynamicToModel(OrderConfirmationEmail model, OrderDynamic dynamic)
+        public override async Task DynamicToModelAsync(OrderConfirmationEmail model, OrderDynamic dynamic)
         {
-            var countries = _countryService.GetCountriesAsync().Result;
+            var countries = await _countryService.GetCountriesAsync();
 
-            dynamic.Customer = _customerService.SelectAsync(dynamic.Customer.Id).Result;
+            dynamic.Customer = await _customerService.SelectAsync(dynamic.Customer.Id);
             model.PublicHost = _options.Value.PublicHost;
 
             //Dates in the needed timezone
@@ -71,10 +72,10 @@ namespace VitalChoice.Business.ModelConverters
                 model.ShipDelayDateNP = TimeZoneInfo.ConvertTime(model.ShipDelayDateNP.Value, TimeZoneInfo.Local, _pstTimeZoneInfo);
             }
 
-            model.Skus.AddRange(dynamic?.Skus?.Select(sku =>
+            model.Skus.AddRange(await Task.WhenAll(dynamic.Skus?.Select(async sku =>
             {
-                var result = _skuMapper.ToModel<SkuEmailItem>(sku.Sku);
-                _productMapper.UpdateModel(result, sku.Sku.Product);
+                var result = await _skuMapper.ToModelAsync<SkuEmailItem>(sku.Sku);
+                await _productMapper.UpdateModelAsync(result, sku.Sku.Product);
                 result.Price = sku.Amount;
                 result.Quantity = sku.Quantity;
                 result.SubTotal = sku.Quantity * sku.Amount;
@@ -82,7 +83,7 @@ namespace VitalChoice.Business.ModelConverters
                 result.GeneratedGCCodes = sku.GcsGenerated?.Select(s => s.Code).ToList();
 
                 return result;
-            }) ?? Enumerable.Empty<SkuEmailItem>());
+            })) ?? Enumerable.Empty<SkuEmailItem>());
 
             model.Skus.ForEach(p =>
             {
@@ -94,10 +95,10 @@ namespace VitalChoice.Business.ModelConverters
                 p.DisplayName += $" ({p.PortionsCount})";
             });
 
-            model.PromoSkus.AddRange(dynamic?.PromoSkus.Where(p => p.Enabled)?.Select(sku =>
+            model.PromoSkus.AddRange(await Task.WhenAll(dynamic.PromoSkus.Where(p => p.Enabled).Select(async sku =>
             {
-                var result = _skuMapper.ToModel<SkuEmailItem>(sku.Sku);
-                _productMapper.UpdateModel(result, sku.Sku.Product);
+                var result = await _skuMapper.ToModelAsync<SkuEmailItem>(sku.Sku);
+                await _productMapper.UpdateModelAsync(result, sku.Sku.Product);
                 result.Price = sku.Amount;
                 result.Quantity = sku.Quantity;
                 result.SubTotal = sku.Quantity * sku.Amount;
@@ -105,7 +106,7 @@ namespace VitalChoice.Business.ModelConverters
                 result.GeneratedGCCodes = sku.GcsGenerated?.Select(s => s.Code).ToList();
 
                 return result;
-            }) ?? Enumerable.Empty<SkuEmailItem>());
+            })) ?? Enumerable.Empty<SkuEmailItem>());
 
             model.PromoSkus.ForEach(p =>
             {
@@ -122,28 +123,28 @@ namespace VitalChoice.Business.ModelConverters
                 model.AutoShipFrequencyProductName = model.Skus.First().DisplayName;
             }
 
-            if (dynamic?.PaymentMethod.IdObjectType == (int)PaymentMethodType.NoCharge && dynamic.Customer.ProfileAddress != null)
+            if (dynamic.PaymentMethod.IdObjectType == (int)PaymentMethodType.NoCharge && dynamic.Customer.ProfileAddress != null)
             {
-                model.BillToAddress = _addressMapper.ToModel<AddressEmailItem>(dynamic.Customer.ProfileAddress);
+                model.BillToAddress = await _addressMapper.ToModelAsync<AddressEmailItem>(dynamic.Customer.ProfileAddress);
                 model.BillToAddress.Country = countries.FirstOrDefault(p => p.Id == dynamic.Customer.ProfileAddress.IdCountry)?.CountryName;
                 model.BillToAddress.StateCodeOrCounty = BusinessHelper.ResolveStateOrCounty(countries, dynamic.Customer.ProfileAddress);
             }
-            else if (dynamic?.PaymentMethod?.Address != null)
+            else if (dynamic.PaymentMethod?.Address != null)
             {
-                model.BillToAddress = _addressMapper.ToModel<AddressEmailItem>(dynamic.PaymentMethod.Address);
+                model.BillToAddress = await _addressMapper.ToModelAsync<AddressEmailItem>(dynamic.PaymentMethod.Address);
                 model.BillToAddress.Country = countries.FirstOrDefault(p => p.Id == dynamic.PaymentMethod.Address.IdCountry)?.CountryName;
                 model.BillToAddress.StateCodeOrCounty = BusinessHelper.ResolveStateOrCounty(countries, dynamic.PaymentMethod.Address);
             }
 
-            if (dynamic?.ShippingAddress != null)
+            if (dynamic.ShippingAddress != null)
             {
-                model.ShipToAddress = _addressMapper.ToModel<AddressEmailItem>(dynamic.ShippingAddress);
+                model.ShipToAddress = await _addressMapper.ToModelAsync<AddressEmailItem>(dynamic.ShippingAddress);
                 model.ShipToAddress.Country = countries.FirstOrDefault(p => p.Id == dynamic.ShippingAddress.IdCountry)?.CountryName;
                 model.ShipToAddress.StateCodeOrCounty = BusinessHelper.ResolveStateOrCounty(countries, dynamic.ShippingAddress);
                 model.DeliveryInstructions = model.ShipToAddress.DeliveryInstructions;
             }
 
-            switch (dynamic?.PaymentMethod.IdObjectType)
+            switch (dynamic.PaymentMethod.IdObjectType)
             {
                 case (int)PaymentMethodType.CreditCard:
                     string cartType = string.Empty;
@@ -178,20 +179,21 @@ namespace VitalChoice.Business.ModelConverters
                 case (int)PaymentMethodType.Marketing:
                 case (int)PaymentMethodType.VCWellnessEmployeeProgram:
                     model.PaymentTypeMessage = string.Format("Payment Method: {0}",
-                        _referenceData.PaymentMethods.FirstOrDefault(p => p.Key == dynamic?.PaymentMethod.IdObjectType));
+                        _referenceData.PaymentMethods.FirstOrDefault(p => p.Key == dynamic.PaymentMethod.IdObjectType));
                     break;
                 default:
                     break;
             }
 
-            if (dynamic?.GiftCertificates != null)
+            if (dynamic.GiftCertificates != null)
             {
                 model.GiftCertificatesTotal = dynamic.GiftCertificates.Sum(p => p.Amount);
             }
         }
 
-        public override void ModelToDynamic(OrderConfirmationEmail model, OrderDynamic dynamic)
+        public override Task ModelToDynamicAsync(OrderConfirmationEmail model, OrderDynamic dynamic)
         {
+            return Task.Delay(0);
         }
     }
 }

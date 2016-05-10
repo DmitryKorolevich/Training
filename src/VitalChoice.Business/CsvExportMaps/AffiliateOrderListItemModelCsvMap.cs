@@ -8,9 +8,14 @@ using VitalChoice.Business.CsvExportMaps.Orders;
 
 namespace VitalChoice.Business.CsvExportMaps
 {
-    public class AffiliateOrderListItemModelCsvMap : CsvClassMap<AffiliateOrderListItemModel>
+    public sealed class AffiliateOrderListItemModelCsvMap : CsvClassMap<AffiliateOrderListItemModel>
     {
         public AffiliateOrderListItemModelCsvMap()
+        {
+            MapValues();
+        }
+
+        private void MapValues()
         {
             Map(m => m.IdOrder).Name("Order Id").Index(0);
             Map(m => m.DateCreated).Name("Order Date").Index(1);

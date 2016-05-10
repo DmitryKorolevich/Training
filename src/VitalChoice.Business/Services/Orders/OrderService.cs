@@ -57,6 +57,7 @@ using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using FluentValidation.Validators;
 using System.Text.RegularExpressions;
+using VitalChoice.Business.CsvImportMaps;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Infrastructure.Domain.Mail;
 using VitalChoice.Business.Mail;
@@ -490,7 +491,7 @@ namespace VitalChoice.Business.Services.Orders
                     .ThenInclude(g => g.Sku);
         }
 
-        protected override async Task AfterSelect(ICollection<Order> entities)
+        protected override Task AfterSelect(ICollection<Order> entities)
         {
             if (entities.All(e => e.Skus != null))
             {
@@ -562,6 +563,7 @@ namespace VitalChoice.Business.Services.Orders
                 //    }
                 //}
             }
+            return Task.Delay(0);
         }
 
         protected override async Task AfterEntityChangesAsync(OrderDynamic model, Order updated, Order initial, IUnitOfWorkAsync uow)
@@ -942,7 +944,7 @@ namespace VitalChoice.Business.Services.Orders
 			    {
 					try
 					{
-						var emailModel = Mapper.ToModel<VitalChoice.Ecommerce.Domain.Mail.OrderConfirmationEmail>(standardOrder);
+						var emailModel = await Mapper.ToModelAsync<VitalChoice.Ecommerce.Domain.Mail.OrderConfirmationEmail>(standardOrder);
 						if (emailModel != null)
 						{
 							await _notificationService.SendOrderConfirmationEmailAsync(standardOrder.Customer.Email, emailModel);
@@ -1771,7 +1773,7 @@ namespace VitalChoice.Business.Services.Orders
                 throw new AppValidationException(messages);
             }
 
-            var map = OrdersForImportBaseConvert(records, orderType, customer, idAddedBy);
+            var map = await OrdersForImportBaseConvert(records, orderType, customer, idAddedBy);
 
             await LoadSkusDynamic(map, customer);
             //not found SKU errors
@@ -1870,7 +1872,7 @@ namespace VitalChoice.Business.Services.Orders
             }
         }
 
-        private List<OrderImportItemOrderDynamic> OrdersForImportBaseConvert(List<OrderBaseImportItem> records, OrderType orderType, CustomerDynamic customer,
+        private async Task<List<OrderImportItemOrderDynamic>> OrdersForImportBaseConvert(List<OrderBaseImportItem> records, OrderType orderType, CustomerDynamic customer,
             int idAddedBy)
         {
             List<OrderImportItemOrderDynamic> toReturn = new List<OrderImportItemOrderDynamic>();
@@ -1879,7 +1881,7 @@ namespace VitalChoice.Business.Services.Orders
                 var order = Mapper.CreatePrototype((int)orderType);
                 order.IdEditedBy = idAddedBy;
                 order.Customer = customer;
-                order.ShippingAddress = _addressMapper.FromModel(record, (int)AddressType.Shipping);
+                order.ShippingAddress = await _addressMapper.FromModelAsync(record, (int)AddressType.Shipping);
                 record.SetFields(order);
                 toReturn.Add(new OrderImportItemOrderDynamic
                 {
@@ -1954,7 +1956,7 @@ namespace VitalChoice.Business.Services.Orders
                     toReturn.Add(item);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw new AppValidationException("Invalid file format");
             }

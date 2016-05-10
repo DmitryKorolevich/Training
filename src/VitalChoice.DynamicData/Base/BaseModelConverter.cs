@@ -1,22 +1,23 @@
-﻿using VitalChoice.DynamicData.Interfaces;
+﻿using System.Threading.Tasks;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.DynamicData.Base
 {
     public abstract class BaseModelConverter<TModel, TDynamic> : IModelConverter<TModel, TDynamic>
     {
-        public void DynamicToModel(object model, object dynamic)
+        public Task DynamicToModelAsync(object model, object dynamic)
         {
-            DynamicToModel((TModel)model, (TDynamic)dynamic);
+            return DynamicToModelAsync((TModel)model, (TDynamic)dynamic);
         }
 
-        public void ModelToDynamic(object model, object dynamic)
+        public Task ModelToDynamicAsync(object model, object dynamic)
         {
-            ModelToDynamic((TModel)model, (TDynamic)dynamic);
+            return ModelToDynamicAsync((TModel)model, (TDynamic)dynamic);
         }
 
-        public abstract void DynamicToModel(TModel model, TDynamic dynamic);
+        public abstract Task DynamicToModelAsync(TModel model, TDynamic dynamic);
 
-        public abstract void ModelToDynamic(TModel model, TDynamic dynamic);
+        public abstract Task ModelToDynamicAsync(TModel model, TDynamic dynamic);
     }
 }

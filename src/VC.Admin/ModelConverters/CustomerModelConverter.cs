@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using VC.Admin.Models.Customer;
 using VC.Admin.Models.Customers;
 using VitalChoice.DynamicData.Base;
@@ -26,21 +27,21 @@ namespace VC.Admin.ModelConverters
             _paymentMethodMapper = paymentMethodMapper;
         }
 
-        public override void DynamicToModel(AddUpdateCustomerModel model, CustomerDynamic dynamic)
+        public override async Task DynamicToModelAsync(AddUpdateCustomerModel model, CustomerDynamic dynamic)
 	    {
 		    if (dynamic.CustomerNotes.Any())
 		    {
 			    foreach (var customerNote in dynamic.CustomerNotes)
 			    {
-					model.CustomerNotes.Add(_customerNoteMapper.ToModel<CustomerNoteModel>(customerNote));
+					model.CustomerNotes.Add(await _customerNoteMapper.ToModelAsync<CustomerNoteModel>(customerNote));
                 }
 		    }
-            model.ProfileAddress = _addressMapper.ToModel<AddressModel>(dynamic.ProfileAddress);
+            model.ProfileAddress = await _addressMapper.ToModelAsync<AddressModel>(dynamic.ProfileAddress);
             if (dynamic.ShippingAddresses.Any())
             {
                 foreach (var address in dynamic.ShippingAddresses)
                 {
-                    model.Shipping.Add(_addressMapper.ToModel<AddressModel>(address));
+                    model.Shipping.Add(await _addressMapper.ToModelAsync<AddressModel>(address));
                 }
             }
             var oacPaymentType =
@@ -53,15 +54,15 @@ namespace VC.Admin.ModelConverters
                 dynamic.CustomerPaymentMethods.SingleOrDefault(p => p.IdObjectType == (int)PaymentMethodType.Marketing);
             var vcWellnessType =
                 dynamic.CustomerPaymentMethods.SingleOrDefault(p => p.IdObjectType == (int)PaymentMethodType.VCWellnessEmployeeProgram);
-	        model.Oac = _paymentMethodMapper.ToModel<OacPaymentModel>(oacPaymentType);
-	        model.Check = _paymentMethodMapper.ToModel<CheckPaymentModel>(checkType);
+	        model.Oac = await _paymentMethodMapper.ToModelAsync<OacPaymentModel>(oacPaymentType);
+	        model.Check = await _paymentMethodMapper.ToModelAsync<CheckPaymentModel>(checkType);
 	        foreach (var creditCard in dynamic.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard))
 	        {
-	            model.CreditCards.Add(_paymentMethodMapper.ToModel<CreditCardModel>(creditCard));
+	            model.CreditCards.Add(await _paymentMethodMapper.ToModelAsync<CreditCardModel>(creditCard));
 	        }
-            model.WireTransfer = _paymentMethodMapper.ToModel<WireTransferPaymentModel>(wireTransferType);
-            model.Marketing = _paymentMethodMapper.ToModel<MarketingPaymentModel>(marketingType);
-            model.VCWellness = _paymentMethodMapper.ToModel<VCWellnessEmployeeProgramPaymentModel>(vcWellnessType);
+            model.WireTransfer = await _paymentMethodMapper.ToModelAsync<WireTransferPaymentModel>(wireTransferType);
+            model.Marketing = await _paymentMethodMapper.ToModelAsync<MarketingPaymentModel>(marketingType);
+            model.VCWellness = await _paymentMethodMapper.ToModelAsync<VCWellnessEmployeeProgramPaymentModel>(vcWellnessType);
 
             if (dynamic.Files!=null && dynamic.Files.Any())
 			{
@@ -76,13 +77,13 @@ namespace VC.Admin.ModelConverters
 					model.Files.Add(fileDynamic);
 				}
 			}
-		}
+        }
 
-	    public override void ModelToDynamic(AddUpdateCustomerModel model, CustomerDynamic dynamic)
+	    public override async Task ModelToDynamicAsync(AddUpdateCustomerModel model, CustomerDynamic dynamic)
         {
 			if (model.CustomerNotes.Any() && !string.IsNullOrWhiteSpace(model.CustomerNotes[0].Text))
 			{
-				foreach (var customerNoteDynamic in model.CustomerNotes.Select(customerNote => _customerNoteMapper.FromModel(customerNote)))
+				foreach (var customerNoteDynamic in await Task.WhenAll(model.CustomerNotes.Select(async customerNote => await _customerNoteMapper.FromModelAsync(customerNote))))
 				{
 					dynamic.CustomerNotes.Add(customerNoteDynamic);
 				}
@@ -90,12 +91,12 @@ namespace VC.Admin.ModelConverters
 
 	        if (model.ProfileAddress != null)
 	        {
-	            dynamic.ProfileAddress = _addressMapper.FromModel(model.ProfileAddress, (int)AddressType.Profile);
+	            dynamic.ProfileAddress = await _addressMapper.FromModelAsync(model.ProfileAddress, (int)AddressType.Profile);
 	            dynamic.ProfileAddress.Data.Email = model.Email;
 	        }
 	        if (model.Shipping.Any())
 			{
-				foreach (var addressDynamic in model.Shipping.Select(shipping => _addressMapper.FromModel(shipping, (int)AddressType.Shipping)))
+				foreach (var addressDynamic in await Task.WhenAll(model.Shipping.Select(async shipping => await _addressMapper.FromModelAsync(shipping, (int)AddressType.Shipping))))
 				{
 					dynamic.ShippingAddresses.Add(addressDynamic);
 				}
@@ -103,32 +104,32 @@ namespace VC.Admin.ModelConverters
 	        foreach (var creditCard in model.CreditCards)
 	        {
                 creditCard.PaymentMethodType = PaymentMethodType.CreditCard;
-                dynamic.CustomerPaymentMethods.Add(_paymentMethodMapper.FromModel(creditCard));
+                dynamic.CustomerPaymentMethods.Add(await _paymentMethodMapper.FromModelAsync(creditCard));
 	        }
 	        if (model.Oac?.Address != null)
 	        {
                 model.Oac.PaymentMethodType = PaymentMethodType.Oac;
-                dynamic.CustomerPaymentMethods.Add(_paymentMethodMapper.FromModel(model.Oac));
+                dynamic.CustomerPaymentMethods.Add(await _paymentMethodMapper.FromModelAsync(model.Oac));
 	        }
             if (model.Check?.Address != null)
             {
                 model.Check.PaymentMethodType = PaymentMethodType.Check;
-                dynamic.CustomerPaymentMethods.Add(_paymentMethodMapper.FromModel(model.Check));
+                dynamic.CustomerPaymentMethods.Add(await _paymentMethodMapper.FromModelAsync(model.Check));
             }
             if (model.WireTransfer?.Address != null)
             {
                 model.WireTransfer.PaymentMethodType = PaymentMethodType.WireTransfer;
-                dynamic.CustomerPaymentMethods.Add(_paymentMethodMapper.FromModel(model.WireTransfer));
+                dynamic.CustomerPaymentMethods.Add(await _paymentMethodMapper.FromModelAsync(model.WireTransfer));
             }
             if (model.Marketing?.Address != null)
             {
                 model.Marketing.PaymentMethodType = PaymentMethodType.Marketing;
-                dynamic.CustomerPaymentMethods.Add(_paymentMethodMapper.FromModel(model.Marketing));
+                dynamic.CustomerPaymentMethods.Add(await _paymentMethodMapper.FromModelAsync(model.Marketing));
             }
             if (model.VCWellness?.Address != null)
             {
                 model.VCWellness.PaymentMethodType = PaymentMethodType.VCWellnessEmployeeProgram;
-                dynamic.CustomerPaymentMethods.Add(_paymentMethodMapper.FromModel(model.VCWellness));
+                dynamic.CustomerPaymentMethods.Add(await _paymentMethodMapper.FromModelAsync(model.VCWellness));
             }
 	        foreach (var customerPaymentMethodDynamic in dynamic.CustomerPaymentMethods)
 	        {
@@ -153,6 +154,6 @@ namespace VC.Admin.ModelConverters
 					dynamic.Files.Add(fileModel);
 				}
 			}
-		}
+        }
 	}
 }

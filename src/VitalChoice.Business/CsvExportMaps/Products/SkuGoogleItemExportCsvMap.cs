@@ -12,6 +12,11 @@ namespace VitalChoice.Business.CsvExportMaps.Products
     {
         public SkuGoogleItemExportCsvMap()
         {
+            MapValues();
+        }
+
+        private void MapValues()
+        {
             Map(m => m.Id).Name("id").Index(0);
             Map(m => m.Title).Name("title").Index(1);
             Map(m => m.Url).Name("link").Index(2);

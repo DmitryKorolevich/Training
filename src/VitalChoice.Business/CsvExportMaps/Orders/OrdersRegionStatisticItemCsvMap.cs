@@ -10,6 +10,11 @@ namespace VitalChoice.Business.CsvExportMaps.Orders
     {
         public OrdersRegionStatisticItemCsvMap()
         {
+            MapValues();
+        }
+
+        private void MapValues()
+        {
             Map(m => m.Region).Name("Region").Index(0);
             Map(m => m.Amount).Name("Sales").Index(1).TypeConverterOption("c");
             Map(m => m.Count).Name("Orders").Index(2);

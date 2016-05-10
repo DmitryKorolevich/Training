@@ -33,7 +33,7 @@ namespace VitalChoice.Core.Infrastructure
                     if(Int32.TryParse(sUserId, out userId))
                     {
                         var customerService = context.HttpContext.RequestServices.GetService<ICustomerService>();
-                        var status = customerService.GetCustomerStatusAsync(userId).Result;
+                        var status = await customerService.GetCustomerStatusAsync(userId);
                         if (status == CustomerStatus.Suspended)
                         {
                             var acceptHeader = context.HttpContext.Request.Headers["Accept"];

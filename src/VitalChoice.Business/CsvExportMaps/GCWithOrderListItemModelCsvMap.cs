@@ -7,9 +7,14 @@ using VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates;
 
 namespace VitalChoice.Business.CsvExportMaps
 {
-    public class GCWithOrderListItemModelCsvMap : CsvClassMap<GCWithOrderListItemModel>
+    public class GcWithOrderListItemModelCsvMap : CsvClassMap<GCWithOrderListItemModel>
     {
-        public GCWithOrderListItemModelCsvMap()
+        public GcWithOrderListItemModelCsvMap()
+        {
+            
+        }
+
+        private void MapValues()
         {
             Map(m => m.Code).Name("Gift Certificate").Index(0);
             Map(m => m.Created).Name("Creation Date").Index(1).TypeConverterOption(CultureInfo.InvariantCulture).TypeConverterOption("MM/dd/yyyy hh:mm tt");

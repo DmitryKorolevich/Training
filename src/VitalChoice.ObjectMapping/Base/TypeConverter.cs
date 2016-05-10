@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Autofac.Features.Indexed;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Helpers;
@@ -46,7 +47,7 @@ namespace VitalChoice.ObjectMapping.Base
             return obj;
         }
 
-        public virtual object ConvertFromModel(Type sourceType, Type destType, object obj, ConvertWithAttribute convertWith = null)
+        public virtual async Task<object> ConvertFromModelAsync(Type sourceType, Type destType, object obj, ConvertWithAttribute convertWith = null)
         {
             if (convertWith != null)
                 return ConvertObject(convertWith, obj);
@@ -80,7 +81,7 @@ namespace VitalChoice.ObjectMapping.Base
 
             var mapper = GetMapper(destType);
             if (mapper != null)
-                return mapper.FromModel(sourceType, obj);
+                return await mapper.FromModelAsync(sourceType, obj);
 
             Type destElementType = destType.TryGetElementType(typeof (ICollection<>));
             Type srcElementType = sourceType.TryGetElementType(typeof (ICollection<>));
@@ -96,14 +97,14 @@ namespace VitalChoice.ObjectMapping.Base
                 {
                     foreach (var item in (IEnumerable) obj)
                     {
-                        results.Add(itemMapper.FromModel(srcElementType, item));
+                        results.Add(await itemMapper.FromModelAsync(srcElementType, item));
                     }
                 }
                 else
                 {
                     foreach (var item in (IEnumerable) obj)
                     {
-                        results.Add(ConvertFromModel(srcElementType, destElementType, item));
+                        results.Add(await ConvertFromModelAsync(srcElementType, destElementType, item));
                     }
                 }
                 return results;
@@ -111,7 +112,7 @@ namespace VitalChoice.ObjectMapping.Base
             try
             {
                 mapper = MapperFactory.CreateMapper(destType);
-                return mapper.FromModel(sourceType, obj);
+                return await mapper.FromModelAsync(sourceType, obj);
             }
             catch
             {
@@ -119,7 +120,7 @@ namespace VitalChoice.ObjectMapping.Base
             }
         }
 
-        public virtual object ConvertToModel(Type sourceType, Type destType, object obj, ConvertWithAttribute convertWith = null)
+        public virtual async Task<object> ConvertToModelAsync(Type sourceType, Type destType, object obj, ConvertWithAttribute convertWith = null)
         {
             if (convertWith?.ConverterType != null)
                 return ConvertObject(convertWith, obj);
@@ -146,7 +147,7 @@ namespace VitalChoice.ObjectMapping.Base
 
             var mapper = GetMapper(sourceType);
             if (mapper != null)
-                return mapper.ToModel(obj, destType);
+                return await mapper.ToModelAsync(obj, destType);
 
             Type destElementType = destType.TryGetElementType(typeof (ICollection<>));
             Type srcElementType = sourceType.TryGetElementType(typeof (ICollection<>));
@@ -162,22 +163,22 @@ namespace VitalChoice.ObjectMapping.Base
                 {
                     foreach (var item in (IEnumerable) obj)
                     {
-                        results.Add(itemMapper.ToModel(item, destElementType));
+                        results.Add(await itemMapper.ToModelAsync(item, destElementType));
                     }
                 }
                 else
                 {
                     foreach (var item in (IEnumerable) obj)
                     {
-                        results.Add(ConvertToModel(srcElementType, destElementType, item));
+                        results.Add(await ConvertToModelAsync(srcElementType, destElementType, item));
                     }
                 }
                 return results;
             }
             try
             {
-                mapper = MapperFactory.CreateMapper(sourceType);
-                return mapper.ToModel(obj, destType);
+                mapper =  MapperFactory.CreateMapper(sourceType);
+                return await mapper.ToModelAsync(obj, destType);
             }
             catch
             {

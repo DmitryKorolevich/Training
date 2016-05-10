@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using VC.Public.Models.Auth;
 using VitalChoice.Business.Helpers;
 using VitalChoice.DynamicData.Base;
@@ -18,25 +19,25 @@ namespace VC.Public.ModelConverters.Customer
             _addressMapper = addressMapper;
         }
 
-        public override void DynamicToModel(RegisterAccountModel model, CustomerDynamic dynamic)
+        public override Task DynamicToModelAsync(RegisterAccountModel model, CustomerDynamic dynamic)
 	    {
-		    throw new NotImplementedException();
-		}
+            return Task.Delay(0);
+        }
 
-	    public override void ModelToDynamic(RegisterAccountModel model, CustomerDynamic dynamic)
+	    public override async Task ModelToDynamicAsync(RegisterAccountModel model, CustomerDynamic dynamic)
 	    {
             dynamic.Data.Phone = model.Phone?.ClearPhone();
             dynamic.Data.Fax = model.Fax?.ClearPhone();
 
-            var profileAddress = _addressMapper.FromModel(model, (int)AddressType.Profile);
+            var profileAddress = await _addressMapper.FromModelAsync(model, (int)AddressType.Profile);
 				
 			dynamic.ProfileAddress = profileAddress;
 
-		    var shippingAddress = _addressMapper.FromModel(model, (int)AddressType.Shipping);
+		    var shippingAddress = await _addressMapper.FromModelAsync(model, (int)AddressType.Shipping);
 		    shippingAddress.Data.Default = true;
 			dynamic.ShippingAddresses.Add(shippingAddress);
 
 			dynamic.StatusCode = (int)RecordStatusCode.Active;
-	    }
+        }
 	}
 }

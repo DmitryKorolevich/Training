@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using VC.Admin.Models.Products;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Infrastructure.Domain.Constants;
@@ -8,7 +9,7 @@ namespace VC.Admin.ModelConverters
 {
     public class ProductModelConverter : BaseModelConverter<ProductManageModel, ProductDynamic>
     {
-        public override void DynamicToModel(ProductManageModel model, ProductDynamic dynamic)
+        public override Task DynamicToModelAsync(ProductManageModel model, ProductDynamic dynamic)
         {
             model.CrossSellProducts = new List<CrossSellProductModel>()
             {
@@ -53,9 +54,10 @@ namespace VC.Admin.ModelConverters
                     video.Video = (string)dynamic.DictionaryData[ProductConstants.FIELD_NAME_YOUTUBE_VIDEO + i];
                 }
             }
+            return Task.Delay(0);
         }
 
-        public override void ModelToDynamic(ProductManageModel model, ProductDynamic dynamic)
+        public override Task ModelToDynamicAsync(ProductManageModel model, ProductDynamic dynamic)
         {
             if (model.CrossSellProducts != null)
             {
@@ -75,6 +77,7 @@ namespace VC.Admin.ModelConverters
                     dynamic.DictionaryData.Add(ProductConstants.FIELD_NAME_YOUTUBE_VIDEO + (i + 1), model.Videos[i].Video);
                 }
             }
+            return Task.Delay(0);
         }
     }
 }

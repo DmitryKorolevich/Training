@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using VC.Admin.Models.Customer;
 using VC.Admin.Models.Customers;
 using VitalChoice.DynamicData.Base;
@@ -8,7 +9,7 @@ namespace VC.Admin.ModelConverters
 {
     public class OrderCreditCardModelConverter : BaseModelConverter<CreditCardModel, OrderPaymentMethodDynamic>
     {
-        public override void DynamicToModel(CreditCardModel model, OrderPaymentMethodDynamic dynamic)
+        public override Task DynamicToModelAsync(CreditCardModel model, OrderPaymentMethodDynamic dynamic)
         {
             if (dynamic.DictionaryData.ContainsKey("ExpDate"))
             {
@@ -16,9 +17,10 @@ namespace VC.Admin.ModelConverters
                 model.ExpirationDateMonth = exp?.Month;
                 model.ExpirationDateYear = exp?.Year%2000;
             }
+            return Task.Delay(0);
         }
 
-        public override void ModelToDynamic(CreditCardModel model, OrderPaymentMethodDynamic dynamic)
+        public override Task ModelToDynamicAsync(CreditCardModel model, OrderPaymentMethodDynamic dynamic)
         {
             if (model.ExpirationDateYear.HasValue && model.ExpirationDateMonth.HasValue)
             {
@@ -26,6 +28,7 @@ namespace VC.Admin.ModelConverters
                 dynamic.Data.ExpDate = exp;
             }
             dynamic.IdCustomerPaymentMethod = model.IdCustomerPaymentMethod;
+            return Task.Delay(0);
         }
     }
 }

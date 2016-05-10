@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using VC.Admin.Models.Products;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Promotions;
@@ -9,7 +10,7 @@ namespace VC.Admin.ModelConverters
 {
     public class PromotionModelConverter : BaseModelConverter<PromotionManageModel, PromotionDynamic>
     {
-        public override void DynamicToModel(PromotionManageModel model, PromotionDynamic dynamic)
+        public override Task DynamicToModelAsync(PromotionManageModel model, PromotionDynamic dynamic)
         {
             if(model.PromotionBuyType == 0)
             {
@@ -47,9 +48,10 @@ namespace VC.Admin.ModelConverters
                     });
                 }
             }
+            return Task.Delay(0);
         }
 
-        public override void ModelToDynamic(PromotionManageModel model, PromotionDynamic dynamic)
+        public override Task ModelToDynamicAsync(PromotionManageModel model, PromotionDynamic dynamic)
         {
             if (model.PromotionsToBuySkus != null)
             {
@@ -83,6 +85,7 @@ namespace VC.Admin.ModelConverters
                     });
                 }
             }
+            return Task.Delay(0);
         }
     }
 }

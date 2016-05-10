@@ -1,12 +1,16 @@
 ﻿using CsvHelper.Configuration;
 using VitalChoice.Infrastructure.Domain.Entities.Orders;
-using VitalChoice.Infrastructure.Domain.Entities.VitalGreen;
 
-namespace VitalChoice.Business.CsvExportMaps
+namespace VitalChoice.Business.CsvImportMaps
 {
     public class OrderGiftListImportItemCsvMap : CsvClassMap<OrderGiftListImportItem>
     {
         public OrderGiftListImportItemCsvMap()
+        {
+            MapValues();
+        }
+
+        private void MapValues()
         {
             Map(m => m.OrderNotes).Name("order notes");
             Map(m => m.FirstName).Name("First Name");

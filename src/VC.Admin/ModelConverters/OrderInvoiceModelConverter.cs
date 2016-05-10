@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using VC.Admin.Models.Customer;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.DynamicData.Interfaces;
@@ -51,31 +52,31 @@ namespace VC.Admin.ModelConverters
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
 
-        public override void DynamicToModel(OrderInvoiceModel model, OrderDynamic dynamic)
+        public override async Task DynamicToModelAsync(OrderInvoiceModel model, OrderDynamic dynamic)
         {
-            dynamic.Customer = _customerService.SelectAsync(dynamic.Customer.Id).Result;
+            dynamic.Customer = await _customerService.SelectAsync(dynamic.Customer.Id);
 
             AdminProfile adminProfile = null;
             if (dynamic.IdEditedBy.HasValue)
             {
-                adminProfile = _adminUserService.GetAdminProfileAsync(dynamic.IdEditedBy.Value).Result;
+                adminProfile = await _adminUserService.GetAdminProfileAsync(dynamic.IdEditedBy.Value);
             }
 
             if (dynamic.ShippingAddress != null)
             {
-                model.ShippingAddress = _addressMapper.ToModel<AddressModel>(dynamic.ShippingAddress);
-                FillAdditionalAddressFields(model.ShippingAddress, _countryService);
+                model.ShippingAddress = await _addressMapper.ToModelAsync<AddressModel>(dynamic.ShippingAddress);
+                await FillAdditionalAddressFields(model.ShippingAddress, _countryService);
                 model.DeliveryInstructions = model.ShippingAddress.DeliveryInstructions;
             }
-            if (dynamic?.PaymentMethod.IdObjectType == (int)PaymentMethodType.NoCharge && dynamic.Customer.ProfileAddress != null)
+            if (dynamic.PaymentMethod.IdObjectType == (int)PaymentMethodType.NoCharge && dynamic.Customer.ProfileAddress != null)
             {
-                model.BillingAddress = _addressMapper.ToModel<AddressModel>(dynamic.Customer.ProfileAddress);
-                FillAdditionalAddressFields(model.BillingAddress, _countryService);
+                model.BillingAddress = await _addressMapper.ToModelAsync<AddressModel>(dynamic.Customer.ProfileAddress);
+                await FillAdditionalAddressFields(model.BillingAddress, _countryService);
             }
-            else if (dynamic?.PaymentMethod?.Address != null)
+            else if (dynamic.PaymentMethod?.Address != null)
             {
-                model.BillingAddress = _addressMapper.ToModel<AddressModel>(dynamic.PaymentMethod.Address);
-                FillAdditionalAddressFields(model.BillingAddress, _countryService);
+                model.BillingAddress = await _addressMapper.ToModelAsync<AddressModel>(dynamic.PaymentMethod.Address);
+                await FillAdditionalAddressFields(model.BillingAddress, _countryService);
             }
 
             model.IdCustomer = dynamic.Customer.Id;
@@ -137,7 +138,7 @@ namespace VC.Admin.ModelConverters
             }
             else
             {
-                if (dynamic.Customer.IdObjectType == (int)CustomerType.Wholesale && dynamic?.PaymentMethod?.IdObjectType != (int)PaymentMethodType.Oac)
+                if (dynamic.Customer.IdObjectType == (int)CustomerType.Wholesale && dynamic.PaymentMethod?.IdObjectType != (int)PaymentMethodType.Oac)
                 {
                     model.ShowVitalChoiceTaxId = true;
                     model.ShowWholesaleShortView = true;
@@ -182,11 +183,11 @@ namespace VC.Admin.ModelConverters
             }
         }
 
-        private void FillAdditionalAddressFields(AddressModel addressModel, ICountryService countryService)
+        private async Task FillAdditionalAddressFields(AddressModel addressModel, ICountryService countryService)
         {
             if (addressModel?.Country != null)
             {
-                var country = countryService.GetCountryAsync(addressModel.Country.Id).Result;
+                var country = await countryService.GetCountryAsync(addressModel.Country.Id);
                 if (country != null)
                 {
                     addressModel.Country.CountryCode = country.CountryCode;
@@ -204,9 +205,9 @@ namespace VC.Admin.ModelConverters
             }
         }
 
-        public override void ModelToDynamic(OrderInvoiceModel model, OrderDynamic dynamic)
+        public override Task ModelToDynamicAsync(OrderInvoiceModel model, OrderDynamic dynamic)
         {
-        
+            return Task.Delay(0);
         }
         
     }

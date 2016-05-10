@@ -56,7 +56,7 @@ namespace Authorize.Net.AIM.Requests
             Queue(ApiFields.Amount, post[ApiFields.Amount]);
         }
 
-        protected virtual void SetQueue(string cardNumber, string expirationMonthAndYear, decimal amount, string description)
+        private void SetQueue(string cardNumber, string expirationMonthAndYear, decimal amount, string description)
         {
             Queue(ApiFields.CreditCardNumber, cardNumber);
             Queue(ApiFields.CreditCardExpiration, expirationMonthAndYear);

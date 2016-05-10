@@ -100,7 +100,7 @@ namespace VC.Public.Controllers
 			cart.Order.Skus.AddUpdateKeyed(Enumerable.Repeat(sku, 1).ToArray(),
 				ordered => ordered.Sku.Code, skuModel => skuModel.Sku.Code, skuModel =>
 				{
-					var skuOrdered = _productService.GetSkuOrderedAsync(skuModel.Sku.Code).Result;
+					var skuOrdered = _productService.GetSkuOrderedAsync(skuModel.Sku.Code).GetAwaiter().GetResult();
 					skuOrdered.Quantity = 1;
 					skuOrdered.Amount = HasRole(RoleType.Wholesale) ? skuModel.Sku.WholesalePrice : skuModel.Sku.Price;
 					return skuOrdered;
@@ -252,7 +252,7 @@ namespace VC.Public.Controllers
             cart.Order.Skus?.MergeKeyed(model.Skus.Where(s => s.Quantity > 0).ToArray(), ordered => ordered.Sku.Code,
                 skuModel => skuModel.Code, skuModel =>
                 {
-                    var result = _productService.GetSkuOrderedAsync(skuModel.Code).Result;
+                    var result = _productService.GetSkuOrderedAsync(skuModel.Code).GetAwaiter().GetResult();
                     result.Quantity = skuModel.Quantity;
                     return result;
                 }, (ordered, skuModel) => ordered.Quantity = skuModel.Quantity);

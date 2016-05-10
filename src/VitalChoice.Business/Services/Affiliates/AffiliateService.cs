@@ -513,7 +513,6 @@ namespace VitalChoice.Business.Services.Affiliates
 
         public async Task<bool> PayForAffiliateOrders(int idAffiliate, DateTime to)
         {
-            var toReturn = true;
             bool exist = await this.SelectAnyAsync(idAffiliate);
             if (!exist)
             {
@@ -561,7 +560,7 @@ namespace VitalChoice.Business.Services.Affiliates
                 }
             }
 
-            return toReturn;
+            return true;
         }
 
         public async Task<AffiliatesSummaryModel> GetAffiliatesSummary()

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using VC.Public.Helpers;
 using VC.Public.Models.Cart;
 using VC.Public.Models.Profile;
@@ -44,37 +45,37 @@ namespace VC.Public.ModelConverters.Order
             _productMapper = productMapper;
         }
 
-        public override void DynamicToModel(OrderViewModel model, OrderDynamic dynamic)
+        public override async Task DynamicToModelAsync(OrderViewModel model, OrderDynamic dynamic)
         {
-            var countries = _countryService.GetCountriesAsync().Result;
-            if (dynamic?.PaymentMethod.IdObjectType == (int)PaymentMethodType.NoCharge && dynamic.Customer.ProfileAddress != null)
+            var countries = await _countryService.GetCountriesAsync();
+            if (dynamic.PaymentMethod.IdObjectType == (int)PaymentMethodType.NoCharge && dynamic.Customer.ProfileAddress != null)
             {
                 model.BillToAddress = dynamic.Customer.ProfileAddress.PopulateBillingAddressDetails(countries,
                     dynamic.Customer.Email);
             }
-            else if (dynamic?.PaymentMethod?.Address != null)
+            else if (dynamic.PaymentMethod?.Address != null)
             {
                 model.BillToAddress = dynamic.PaymentMethod.Address.PopulateBillingAddressDetails(countries,
                     dynamic.Customer.Email);
             }
 
-            if (dynamic?.PaymentMethod?.IdObjectType == (int)PaymentMethodType.CreditCard)
+            if (dynamic.PaymentMethod?.IdObjectType == (int)PaymentMethodType.CreditCard)
             {
                 model.CreditCardDetails = dynamic.PaymentMethod.PopulateCreditCardDetails(_referenceData, true);
             }
 
-            if (dynamic?.ShippingAddress != null)
+            if (dynamic.ShippingAddress != null)
             {
                 model.ShipToAddress = dynamic.ShippingAddress.PopulateShippingAddressDetails(countries);
                 model.DeliveryInstructions = dynamic.ShippingAddress.SafeData.DeliveryInstructions;
             }
             
-            model.IdPaymentMethodType = dynamic?.PaymentMethod.IdObjectType;
+            model.IdPaymentMethodType = dynamic.PaymentMethod.IdObjectType;
 
-            model.Skus.AddRange(dynamic?.Skus?.Select(sku =>
+            model.Skus.AddRange(await Task.WhenAll(dynamic.Skus?.Select(async sku =>
                 {
-                    var result = _skuMapper.ToModel<CartSkuModel>(sku.Sku);
-                    _productMapper.UpdateModel(result, sku.Sku.Product);
+                    var result = await _skuMapper.ToModelAsync<CartSkuModel>(sku.Sku);
+                    await _productMapper.UpdateModelAsync(result, sku.Sku.Product);
                     result.Price = sku.Amount;
                     result.Quantity = sku.Quantity;
                     result.SubTotal = sku.Quantity * sku.Amount;
@@ -82,7 +83,7 @@ namespace VC.Public.ModelConverters.Order
                     result.GeneratedGCCodes = sku.GcsGenerated?.Select(g => g.Code).ToList() ?? new List<string>();
 
                     return result;
-                }) ?? Enumerable.Empty<CartSkuModel>());
+                })) ?? Enumerable.Empty<CartSkuModel>());
 
             model.Skus.ForEach(p =>
             {
@@ -94,16 +95,16 @@ namespace VC.Public.ModelConverters.Order
                 p.DisplayName += $" ({p.PortionsCount})";
             });
 
-            model.PromoSkus.AddRange(dynamic?.PromoSkus?.Where(p => p.Enabled).Select(sku =>
+            model.PromoSkus.AddRange(await Task.WhenAll(dynamic.PromoSkus?.Where(p => p.Enabled).Select(async sku =>
             {
-                var result = _skuMapper.ToModel<CartSkuModel>(sku.Sku);
-                _productMapper.UpdateModel(result, sku.Sku.Product);
+                var result = await _skuMapper.ToModelAsync<CartSkuModel>(sku.Sku);
+                await _productMapper.UpdateModelAsync(result, sku.Sku.Product);
                 result.Price = sku.Amount;
                 result.Quantity = sku.Quantity;
                 result.SubTotal = sku.Quantity * sku.Amount;
                 
                 return result;
-            }) ?? Enumerable.Empty<CartSkuModel>());
+            })) ?? Enumerable.Empty<CartSkuModel>());
 
             model.PromoSkus.ForEach(p =>
             {
@@ -118,18 +119,18 @@ namespace VC.Public.ModelConverters.Order
             model.ShippingSurcharge = model.AlaskaHawaiiSurcharge + model.CanadaSurcharge - model.SurchargeOverride;
             model.TotalShipping = model.ShippingTotal - model.ShippingSurcharge;
 
-            if (dynamic?.GiftCertificates != null)
+            if (dynamic.GiftCertificates != null)
             {
                 model.GiftCertificatesTotal = dynamic.GiftCertificates.Sum(p => p.Amount);
             }
 
-            if (dynamic?.Discount != null)
+            if (dynamic.Discount != null)
             {
                 model.DiscountCode = dynamic.Discount.Code;
                 model.DiscountCodeMessage = dynamic.Discount.GetDiscountMessage((int?)dynamic.SafeData.IdDiscountTier);
             }
 
-            model.GCs = dynamic?.GiftCertificates?.Select(item => new GCInvoiceEntity()
+            model.GCs = dynamic.GiftCertificates?.Select(item => new GCInvoiceEntity()
             {
                 Amount = item.Amount,
                 Code = item.GiftCertificate.Code,
@@ -151,8 +152,9 @@ namespace VC.Public.ModelConverters.Order
             }
         }
 
-        public override void ModelToDynamic(OrderViewModel model, OrderDynamic dynamic)
+        public override Task ModelToDynamicAsync(OrderViewModel model, OrderDynamic dynamic)
         {
+            return Task.Delay(0);
         }
     }
 }

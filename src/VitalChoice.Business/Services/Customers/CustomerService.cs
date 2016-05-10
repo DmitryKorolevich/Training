@@ -523,11 +523,12 @@ namespace VitalChoice.Business.Services.Customers
 	    {
 		    return await _storageClient.DownloadBlobAsync(_customerContainerName, $"{customerPublicId}/{fileName}");
 	    }
-		public async Task<ICollection<string>> GetAddressFieldValuesByValueAsync(ValuesByFieldValueFilter filter)
+
+        public async Task<ICollection<string>> GetAddressFieldValuesByValueAsync(ValuesByFieldValueFilter filter)
         {
             ICollection<string> toReturn = new List<string>();
             var fields = _customerAddressMapper.OptionTypes.Where(p => p.Name == filter.FieldName).ToList();
-            if (fields != null && fields.Count>0)
+            if (fields.Count > 0)
             {
                 filter.FieldIds = fields.Select(p => p.Id).ToList();
                 toReturn = await _addressOptionValueRepositoryAsync.GetAddressFieldValuesByValue(filter);

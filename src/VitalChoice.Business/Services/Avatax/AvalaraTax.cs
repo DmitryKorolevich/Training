@@ -195,7 +195,7 @@ namespace VitalChoice.Business.Services.Avatax
                 Country = "US",
                 PostalCode = "98248"
             };
-            destinationAddress = _mapper.ToModel<Address>(shippingAddress);
+            destinationAddress = _mapper.ToModelAsync<Address>(shippingAddress).GetAwaiter().GetResult();
             destinationAddress.AddressCode = "02";
             destinationAddress.Country = _countryNameCode.GetCountryCode(shippingAddress);
             destinationAddress.Region = _countryNameCode.GetRegionOrStateCode(shippingAddress);

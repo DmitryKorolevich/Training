@@ -262,7 +262,7 @@ namespace VC.Admin.Controllers
         {
             if (!Validate(model))
                 return null;
-            var note = _noteMapper.FromModel(model);
+            var note = await _noteMapper.FromModelAsync(model);
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
             if (int.TryParse(sUserId, out userId))
@@ -271,7 +271,7 @@ namespace VC.Admin.Controllers
                 note.IdCustomer = idCustomer;
             }
             note = await _notesService.InsertAsync(note);
-            var toReturn = _noteMapper.ToModel<CustomerNoteModel>(note);
+            var toReturn = await _noteMapper.ToModelAsync<CustomerNoteModel>(note);
             return toReturn;
         }
 
@@ -290,7 +290,7 @@ namespace VC.Admin.Controllers
         {
             if (!Validate(model))
                 return null;
-            var address = _addressMapper.FromModel(model);
+            var address = await _addressMapper.FromModelAsync(model);
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
             if (int.TryParse(sUserId, out userId))
@@ -298,7 +298,7 @@ namespace VC.Admin.Controllers
                 address.IdEditedBy = userId;
             }
             address = await _addressService.InsertAsync(address);
-            var toReturn = _addressMapper.ToModel<AddressModel>(address);
+            var toReturn = await _addressMapper.ToModelAsync<AddressModel>(address);
             return toReturn;
         }
 
@@ -344,7 +344,7 @@ namespace VC.Admin.Controllers
                     await _storefrontUserService.SendActivationAsync(customer.Email);
                 }
             }
-            var toReturn = _customerMapper.ToModel<AddUpdateCustomerModel>(customer);
+            var toReturn = await _customerMapper.ToModelAsync<AddUpdateCustomerModel>(customer);
 
 			toReturn.IsConfirmed = addUpdateCustomerModel.IsConfirmed;
 			toReturn.PublicUserId = addUpdateCustomerModel.PublicUserId;
@@ -445,7 +445,7 @@ namespace VC.Admin.Controllers
                 result.Data.InceptionDate = DateTime.Now;
             }
 
-            var customerModel = _customerMapper.ToModel<AddUpdateCustomerModel>(result);
+            var customerModel = await _customerMapper.ToModelAsync<AddUpdateCustomerModel>(result);
 
 	        var login = await _storefrontUserService.GetAsync(customerModel.Id);
 	        if (login == null)
@@ -563,7 +563,7 @@ namespace VC.Admin.Controllers
             if (toReturn.Main != null && !String.IsNullOrEmpty(toReturn.Main.Data))
             {
                 var dynamic = (CustomerDynamic)JsonConvert.DeserializeObject(toReturn.Main.Data, typeof(CustomerDynamic));
-                var model = _customerMapper.ToModel<AddUpdateCustomerModel>(dynamic);
+                var model = await _customerMapper.ToModelAsync<AddUpdateCustomerModel>(dynamic);
                 toReturn.Main.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
@@ -573,7 +573,7 @@ namespace VC.Admin.Controllers
             if (toReturn.Before != null && !String.IsNullOrEmpty(toReturn.Before.Data))
             {
                 var dynamic = (CustomerDynamic)JsonConvert.DeserializeObject(toReturn.Before.Data, typeof(CustomerDynamic));
-                var model = _customerMapper.ToModel<AddUpdateCustomerModel>(dynamic);
+                var model = await _customerMapper.ToModelAsync<AddUpdateCustomerModel>(dynamic);
                 toReturn.Before.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,

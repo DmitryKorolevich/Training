@@ -77,7 +77,7 @@ namespace VC.Public.Controllers
 		    {
 			    user = await _userService.SignInAsync(model.Email, model.Password);
 		    }
-		    catch (WholesalePendingException e)
+		    catch (WholesalePendingException)
 		    {
 			    return Redirect("/content/wholesale-review");
 		    }
