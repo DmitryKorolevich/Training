@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Dynamic;
+using VitalChoice.Ecommerce.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 
 namespace VitalChoice.Workflow.Core
@@ -7,14 +8,18 @@ namespace VitalChoice.Workflow.Core
     public abstract class WorkflowDataContext<T>
     {
         private readonly ExpandoObject _data;
+        private readonly SafeDynamicObject _safeData;
 
         protected WorkflowDataContext()
         {
             _data = new ExpandoObject();
             _actionRunningList = new HashSet<string>();
+            _safeData = new SafeDynamicObject(_data);
         }
 
         public dynamic Data => _data;
+
+        public dynamic SafeData => _safeData;
 
         public IDictionary<string, object> DictionaryData => _data as IDictionary<string, object>;
 
