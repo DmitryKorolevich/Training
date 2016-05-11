@@ -22,6 +22,7 @@ using VitalChoice.Infrastructure.Domain.Constants;
 using System.Linq;
 using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
 
 namespace VC.Public.Controllers
 {
@@ -29,19 +30,16 @@ namespace VC.Public.Controllers
     public class AffiliateAccountController : BaseMvcController
     {
         private readonly IAffiliateUserService _userService;
-        private readonly IHttpContextAccessor _contextAccessor;
         private readonly IAffiliateService _affiliateService;
         private readonly IDynamicMapper<AffiliateDynamic, Affiliate> _affiliateMapper;
 
         public AffiliateAccountController(
             IAffiliateUserService userService,
-            IHttpContextAccessor contextAccessor,
             IDynamicMapper<AffiliateDynamic, Affiliate> affiliateMapper,
             IAffiliateService affiliateService,
             IPageResultService pageResultService) : base(pageResultService)
         {
             _userService = userService;
-            _contextAccessor = contextAccessor;
             _affiliateMapper = affiliateMapper;
             _affiliateService = affiliateService;
         }
@@ -93,14 +91,17 @@ namespace VC.Public.Controllers
 
         public async Task<IActionResult> Logout()
         {
-            var context = _contextAccessor.HttpContext;
+            var context = HttpContext;
 
             if (context.User.Identity.IsAuthenticated)
             {
                 var user = await _userService.FindAsync(context.User.GetUserName());
                 if (user == null)
                 {
-                    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+                    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser])
+                    {
+                        ViewName = "Login"
+                    };
                 }
 
                 await _userService.SignOutAsync(user);
@@ -112,14 +113,29 @@ namespace VC.Public.Controllers
         [HttpGet]
         public async Task<IActionResult> Activate(Guid id)
         {
-            var result = await _userService.GetByTokenAsync(id);
+            ApplicationUser result;
+            try
+            {
+                result = await _userService.GetByTokenAsync(id);
+            }
+            catch (AppValidationException e)
+            {
+                e.ViewName = "Login";
+                throw;
+            }
             if (result == null)
             {
-                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUserByActivationToken]);
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUserByActivationToken])
+                {
+                    ViewName = "Login"
+                };
             }
 			if (result.IsConfirmed)
 			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserAlreadyConfirmed]);
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserAlreadyConfirmed])
+                {
+                    ViewName = "Login"
+                };
 			}
 
 			return View(new CreateAccountModel()
@@ -166,10 +182,22 @@ namespace VC.Public.Controllers
         [HttpGet]
         public async Task<IActionResult> ResetPassword(Guid id)
         {
-            var result = await _userService.GetByTokenAsync(id);
+            ApplicationUser result;
+            try
+            {
+                result = await _userService.GetByTokenAsync(id);
+            }
+            catch (AppValidationException e)
+            {
+                e.ViewName = "Login";
+                throw;
+            }
             if (result == null)
             {
-                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUserByActivationToken]);
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUserByActivationToken])
+                {
+                    ViewName = "Login"
+                };
             }
 
             return View(new ResetPasswordModel()
@@ -287,10 +315,22 @@ namespace VC.Public.Controllers
         [HttpGet]
         public async Task<IActionResult> LoginAsAffiliate(Guid id)
         {
-            var result = await _userService.GetByTokenAsync(id);
+            ApplicationUser result;
+            try
+            {
+                result = await _userService.GetByTokenAsync(id);
+            }
+            catch (AppValidationException e)
+            {
+                e.ViewName = "Login";
+                throw;
+            }
             if (result == null)
             {
-                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindLogin]);
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindLogin])
+                {
+                    ViewName = "Login"
+                };
             }
 
             result.ConfirmationToken = Guid.Empty;
@@ -299,7 +339,10 @@ namespace VC.Public.Controllers
             result = await _userService.SignInAsync(result);
             if (result == null)
             {
-                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn])
+                {
+                    ViewName = "Login"
+                };
             }
 
             return RedirectToAction("ChangeProfile", "AffiliateProfile");

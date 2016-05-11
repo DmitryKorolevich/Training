@@ -12,6 +12,8 @@ namespace VC.Public.Components
 	{
 		private readonly AppOptions _appOptions;
 		private readonly IUrlHelper _urlHelper;
+	    private static string _minifiedJsName;
+	    private static string _minifiedCssName;
 
 		public AssetsViewComponent(IUrlHelper urlHelper, IOptions<AppOptions> appOptionsAccessor)
 		{
@@ -37,15 +39,20 @@ namespace VC.Public.Components
 			if (assetType.Equals("scripts", StringComparison.OrdinalIgnoreCase))
 			{
 				viewName = "Scripts";
-				var assetInfo = FrontEndAssetManager.GetScripts();
 				if (_appOptions.EnableBundlingAndMinification)
 				{
+				    if (_minifiedJsName == null)
+				    {
+                        var assetInfo = FrontEndAssetManager.GetScripts();
+                        _minifiedJsName = assetInfo.MinifiedFileName;
+				    }
 					filePaths.Add(_urlHelper.Content(
-						$"~/{assetInfo.MinifiedFileName}.min.js{versionQueryString}"));
+						$"~/{_minifiedJsName}.min.js{versionQueryString}"));
 				}
 				else
 				{
-					foreach (var assetFileInfo in assetInfo.Files)
+                    var assetInfo = FrontEndAssetManager.GetScripts();
+                    foreach (var assetFileInfo in assetInfo.Files)
 					{
 						filePaths.Add(_urlHelper.Content($"~/{assetFileInfo}{versionQueryString}"));
 					}
@@ -54,15 +61,20 @@ namespace VC.Public.Components
 			else if (assetType.Equals("styles", StringComparison.OrdinalIgnoreCase))
 			{
 				viewName = "Styles";
-				var assetInfo = FrontEndAssetManager.GetStyles();
 				if (_appOptions.EnableBundlingAndMinification)
 				{
+				    if (_minifiedCssName == null)
+				    {
+                        var assetInfo = FrontEndAssetManager.GetStyles();
+				        _minifiedCssName = assetInfo.MinifiedFileName;
+				    }
 					filePaths.Add(_urlHelper.Content(
-						$"~/{assetInfo.MinifiedFileName}.min.css{versionQueryString}"));
+						$"~/{_minifiedCssName}.min.css{versionQueryString}"));
 				}
 				else
 				{
-					foreach (var assetFileInfo in assetInfo.Files)
+                    var assetInfo = FrontEndAssetManager.GetStyles();
+                    foreach (var assetFileInfo in assetInfo.Files)
 					{
 						filePaths.Add(_urlHelper.Content($"~/{assetFileInfo}{versionQueryString}"));
 					}

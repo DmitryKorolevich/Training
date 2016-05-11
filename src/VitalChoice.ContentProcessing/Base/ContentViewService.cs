@@ -138,7 +138,7 @@ namespace VitalChoice.ContentProcessing.Base
             ActionContext context)
         {
             var viewContext = new ContentViewContext<TEntity>(queryData, null, user, context);
-            viewContext.Entity = await GetDataInternal((TParametersModel)_mapper.FromDictionary(queryData, false), viewContext);
+            viewContext.Entity = await GetDataInternal((TParametersModel)await _mapper.FromDictionaryAsync(queryData, false), viewContext);
 
             if (viewContext.Entity == null)
             {

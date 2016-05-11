@@ -10,6 +10,11 @@ namespace VitalChoice.Business.CsvExportMaps.Orders
     {
         public ServiceCodeRefundItemCsvMap()
         {
+            MapValues();
+        }
+
+        private void MapValues()
+        {
             Map(m => m.Id).Name("Order Number").Index(0);
             Map(m => m.DateCreated).Name("Order Date").Index(1).TypeConverterOption(CultureInfo.InvariantCulture).TypeConverterOption("MM/dd/yyyy");
             Map(m => m.IdOrderSource).Name("Original Order Number").Index(2);

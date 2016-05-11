@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using VC.Public.Models.Profile;
 using VitalChoice.Business.Helpers;
 using VitalChoice.DynamicData.Base;
@@ -8,7 +9,7 @@ namespace VC.Public.ModelConverters.Customer
 {
 	public class BillingInfoModelConverter : BaseModelConverter<BillingInfoModel, CustomerPaymentMethodDynamic>
 	{
-		public override void DynamicToModel(BillingInfoModel model, CustomerPaymentMethodDynamic dynamic)
+		public override Task DynamicToModelAsync(BillingInfoModel model, CustomerPaymentMethodDynamic dynamic)
 		{
 			if (dynamic.DictionaryData.ContainsKey("ExpDate"))
 			{
@@ -16,9 +17,10 @@ namespace VC.Public.ModelConverters.Customer
 				model.ExpirationDateMonth = exp.Month;
 				model.ExpirationDateYear = exp.Year % 2000;
 			}
-		}
+            return Task.Delay(0);
+        }
 
-		public override void ModelToDynamic(BillingInfoModel model, CustomerPaymentMethodDynamic dynamic)
+		public override Task ModelToDynamicAsync(BillingInfoModel model, CustomerPaymentMethodDynamic dynamic)
 		{
             dynamic.Data.Phone = model.Phone?.ClearPhone();
             dynamic.Data.Fax = model.Fax?.ClearPhone();
@@ -28,6 +30,7 @@ namespace VC.Public.ModelConverters.Customer
 				DateTime exp = new DateTime(model.ExpirationDateYear.Value + 2000, model.ExpirationDateMonth.Value, 1);
 				dynamic.Data.ExpDate = exp;
 			}
-		}
+            return Task.Delay(0);
+        }
 	}
 }

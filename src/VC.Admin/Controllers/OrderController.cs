@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Extensions.Logging;
 using VitalChoice.Validation.Models;
 using System;
 using VitalChoice.Core.Base;
@@ -12,7 +11,6 @@ using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Settings;
 using Newtonsoft.Json;
-using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
@@ -21,7 +19,6 @@ using VitalChoice.Infrastructure.Domain.Entities.Permissions;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 using System.Linq;
-using Microsoft.Data.Entity;
 using Microsoft.Extensions.OptionsModel;
 using VC.Admin.Models.Orders;
 using VitalChoice.Ecommerce.Domain.Transfer;
@@ -30,32 +27,24 @@ using VitalChoice.Business.CsvExportMaps.Orders;
 using VitalChoice.Infrastructure.Domain.Constants;
 using Microsoft.Net.Http.Headers;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
-using VitalChoice.Core.Infrastructure.Helpers;
-using VitalChoice.Infrastructure.Domain.Transfer.Products;
-using VC.Admin.ModelConverters;
 using VC.Admin.Models.Customers;
 using VC.Admin.Models.Products;
 using VitalChoice.Business.Mail;
 using VitalChoice.Business.Services.Bronto;
 using VitalChoice.Business.Services.Dynamic;
-using VitalChoice.Caching.Extensions;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
-using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Mail;
-using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Options;
-using VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates;
 using VitalChoice.SharedWeb.Models.Orders;
 using VitalChoice.Business.Helpers;
 using VitalChoice.SharedWeb.Helpers;
-using System.Security.Claims;
 using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Identity;
-using Microsoft.Extensions.DependencyInjection;
-using VitalChoice.Business.Helpers;
 using VitalChoice.Infrastructure.Domain.Transfer.Reports;
+using System.Security.Claims;
+using VitalChoice.Core.Infrastructure.Helpers;
 
 namespace VC.Admin.Controllers
 {
@@ -224,7 +213,7 @@ namespace VC.Admin.Controllers
                     order.Data.OrderNotes = await _customerService.GetNewOrderNotesBasedOnCustomer(idcustomer.Value);
                 }
 
-                var model = _mapper.ToModel<OrderManageModel>(order);
+                var model = await _mapper.ToModelAsync<OrderManageModel>(order);
                 model.UseShippingAndBillingFromCustomer = true;
                 model.GCs = new List<GCListItemModel>() { new GCListItemModel(null) };
                 model.SkuOrdereds = new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) };
@@ -259,7 +248,7 @@ namespace VC.Admin.Controllers
                 }
             }
 
-            OrderManageModel toReturn = _mapper.ToModel<OrderManageModel>(item);
+            OrderManageModel toReturn = await _mapper.ToModelAsync<OrderManageModel>(item);
 
             return toReturn;
         }
@@ -268,7 +257,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<OrderCalculateModel>> CalculateOrder([FromBody]OrderManageModel model)
         {
-            var order = _mapper.FromModel(model);
+            var order = await _mapper.FromModelAsync(model);
             var orderContext = await _orderService.CalculateOrder(order, model.CombinedEditOrderStatus);
 
             OrderCalculateModel toReturn = new OrderCalculateModel(orderContext);
@@ -283,7 +272,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
 
-            var order = _mapper.FromModel(model);
+            var order = await _mapper.FromModelAsync(model);
 
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
@@ -333,14 +322,14 @@ namespace VC.Admin.Controllers
 
             if (sendOrderConfirm && !string.IsNullOrEmpty(model.Customer?.Email))//&& order.IdObjectType != (int)OrderType.AutoShip
             {
-                var emailModel = _mapper.ToModel<OrderConfirmationEmail>(order);
+                var emailModel = await _mapper.ToModelAsync<OrderConfirmationEmail>(order);
                 if (emailModel != null)
                 {
                     await _notificationService.SendOrderConfirmationEmailAsync(order.Customer.Email, emailModel);
                 }
             }
 
-            OrderManageModel toReturn = _mapper.ToModel<OrderManageModel>(order);
+            OrderManageModel toReturn = await _mapper.ToModelAsync<OrderManageModel>(order);
 
             if (!string.IsNullOrEmpty(model.Customer.Email) && model.SignUpNewsletter.HasValue)
             {
@@ -383,7 +372,7 @@ namespace VC.Admin.Controllers
             var helper = new AutoShipModelHelper(_skuMapper, _productMapper, _orderMapper, infr, countries);
             var ordersModel = new PagedList<AutoShipHistoryItemModel>
             {
-                Items = orders.Items.Select(p => helper.PopulateAutoShipItemModel(p)).ToList(),
+                Items = (await Task.WhenAll(orders.Items.Select(async p => await helper.PopulateAutoShipItemModel(p)))).ToList(),
                 Count = orders.Count
             };
 
@@ -397,19 +386,18 @@ namespace VC.Admin.Controllers
             var model = new List<CreditCardModel>();
 
             var order = await _orderService.SelectAsync(orderId);
-            var orderCreditCard = _addressMapper.ToModel<CreditCardModel>(order.PaymentMethod.Address);
-            _orderPaymentMethodMapper.UpdateModel(orderCreditCard, order.PaymentMethod);
+            var orderCreditCard = await _addressMapper.ToModelAsync<CreditCardModel>(order.PaymentMethod.Address);
+            await _orderPaymentMethodMapper.UpdateModelAsync(orderCreditCard, order.PaymentMethod);
 
             orderCreditCard.IsSelected = true;
             model.Add(orderCreditCard);
 
             var customer = await _customerService.SelectAsync(customerId);
-            var dynamics = customer.CustomerPaymentMethods
-            .Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard).ToList();
+            var dynamics = customer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard).ToList();
             foreach (var item in dynamics)
             {
-                var tempModel = _addressMapper.ToModel<CreditCardModel>(item.Address);
-                _customerPaymentMethodMapper.UpdateModel(tempModel, item);
+                var tempModel = await _addressMapper.ToModelAsync<CreditCardModel>(item.Address);
+                await _customerPaymentMethodMapper.UpdateModelAsync(tempModel, item);
 
                 model.Add(tempModel);
             }
@@ -434,8 +422,8 @@ namespace VC.Admin.Controllers
             order.PaymentMethod.Address.Id = addressId;
 
             order = await _orderService.UpdateAsync(order);
-            var orderCreditCard = _addressMapper.ToModel<CreditCardModel>(order.PaymentMethod.Address);
-            _orderPaymentMethodMapper.UpdateModel(orderCreditCard, order.PaymentMethod);
+            var orderCreditCard = await _addressMapper.ToModelAsync<CreditCardModel>(order.PaymentMethod.Address);
+            await _orderPaymentMethodMapper.UpdateModelAsync(orderCreditCard, order.PaymentMethod);
 
             return orderCreditCard;
         }
@@ -476,7 +464,7 @@ namespace VC.Admin.Controllers
                     {
                         order.GiftCertificates = new List<GiftCertificateInOrder>();
                         order.Discount = null;
-                        toReturn = _mapper.ToModel<OrderReshipManageModel>(order);
+                        toReturn = await _mapper.ToModelAsync<OrderReshipManageModel>(order);
                         toReturn.KeyCode = "RESHIP";
                         toReturn.IdObjectType = (int)OrderType.Reship;
                         toReturn.IdOrderSource = toReturn.Id;
@@ -524,7 +512,7 @@ namespace VC.Admin.Controllers
                 {
                     throw new AccessDeniedException();
                 }
-                toReturn = _mapper.ToModel<OrderReshipManageModel>(item);
+                toReturn = await _mapper.ToModelAsync<OrderReshipManageModel>(item);
             }
 
             return toReturn;
@@ -537,7 +525,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
 
-            var order = _mapper.FromModel(model);
+            var order = await _mapper.FromModelAsync(model);
 
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
@@ -573,14 +561,14 @@ namespace VC.Admin.Controllers
 
             if (sendOrderConfirm && !string.IsNullOrEmpty(model.Customer?.Email))
             {
-                var emailModel = _mapper.ToModel<OrderConfirmationEmail>(order);
+                var emailModel = await _mapper.ToModelAsync<OrderConfirmationEmail>(order);
                 if (emailModel != null)
                 {
                     await _notificationService.SendOrderConfirmationEmailAsync(model.Customer.Email, emailModel);
                 }
             }
 
-            OrderReshipManageModel toReturn = _mapper.ToModel<OrderReshipManageModel>(order);
+            OrderReshipManageModel toReturn = await _mapper.ToModelAsync<OrderReshipManageModel>(order);
 
             return toReturn;
         }
@@ -593,7 +581,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<OrderRefundCalculateModel>> CalculateRefundOrder([FromBody]OrderRefundManageModel model)
         {
-            var order = _orderRefundMapper.FromModel(model);
+            var order = await _orderRefundMapper.FromModelAsync(model);
             var orderContext = await _orderRefundService.CalculateRefundOrder(order);
 
             OrderRefundCalculateModel toReturn = new OrderRefundCalculateModel(orderContext);
@@ -645,7 +633,7 @@ namespace VC.Admin.Controllers
                             Address = paymentAddress,
                             IdObjectType = (int)PaymentMethodType.Oac,
                         };
-                        toReturn = _orderRefundMapper.ToModel<OrderRefundManageModel>(refund);
+                        toReturn = await _orderRefundMapper.ToModelAsync<OrderRefundManageModel>(refund);
                         if (!toReturn.DisableShippingRefunded)
                         {
                             toReturn.ManualShippingTotal = order.ShippingTotal;
@@ -661,7 +649,7 @@ namespace VC.Admin.Controllers
                 {
                     throw new AccessDeniedException();
                 }
-                toReturn = _orderRefundMapper.ToModel<OrderRefundManageModel>(item);
+                toReturn = await _orderRefundMapper.ToModelAsync<OrderRefundManageModel>(item);
                 toReturn.ManualShippingTotal = toReturn.ShippingTotal;
             }
 
@@ -675,7 +663,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
 
-            var order = _orderRefundMapper.FromModel(model);
+            var order = await _orderRefundMapper.FromModelAsync(model);
 
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
@@ -695,7 +683,7 @@ namespace VC.Admin.Controllers
                 }
             }
 
-            OrderRefundManageModel toReturn = _orderRefundMapper.ToModel<OrderRefundManageModel>(order);
+            OrderRefundManageModel toReturn = await _orderRefundMapper.ToModelAsync<OrderRefundManageModel>(order);
 
             return toReturn;
         }
@@ -720,7 +708,7 @@ namespace VC.Admin.Controllers
             if (toReturn.Main != null && !string.IsNullOrEmpty(toReturn.Main.Data))
             {
                 var dynamic = (OrderDynamic)JsonConvert.DeserializeObject(toReturn.Main.Data, typeof(OrderDynamic));
-                var model = GetOrderManageModel(dynamic, toReturn.Main.Data);
+                var model = await GetOrderManageModel(dynamic, toReturn.Main.Data);
                 toReturn.Main.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
@@ -730,7 +718,7 @@ namespace VC.Admin.Controllers
             if (toReturn.Before != null && !string.IsNullOrEmpty(toReturn.Before.Data))
             {
                 var dynamic = (OrderDynamic)JsonConvert.DeserializeObject(toReturn.Before.Data, typeof(OrderDynamic));
-                var model = GetOrderManageModel(dynamic, toReturn.Before.Data);
+                var model = await GetOrderManageModel(dynamic, toReturn.Before.Data);
                 toReturn.Before.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
@@ -741,22 +729,22 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
-        private object GetOrderManageModel(OrderDynamic dynamic, string data)
+        private async Task<object> GetOrderManageModel(OrderDynamic dynamic, string data)
         {
             object model;
             if (dynamic.IdObjectType == (int)OrderType.Reship)
             {
-                OrderReshipManageModel model2 = _mapper.ToModel<OrderReshipManageModel>(dynamic);
+                OrderReshipManageModel model2 = await _mapper.ToModelAsync<OrderReshipManageModel>(dynamic);
                 model = model2;
             }
             else if (dynamic.IdObjectType == (int)OrderType.Refund)
             {
                 var refund = (OrderRefundDynamic)JsonConvert.DeserializeObject(data, typeof(OrderRefundDynamic));
-                model = _orderRefundMapper.ToModel<OrderRefundManageModel>(refund);
+                model = await _orderRefundMapper.ToModelAsync<OrderRefundManageModel>(refund);
             }
             else
             {
-                model = _mapper.ToModel<OrderManageModel>(dynamic);
+                model = await _mapper.ToModelAsync<OrderManageModel>(dynamic);
             }
             return model;
         }
@@ -920,7 +908,7 @@ namespace VC.Admin.Controllers
                 IdAdmin = idadmin,
             };
 
-            var superAdmin = HttpContext.RequestServices.GetService<IAppInfrastructureService>()
+            var superAdmin = _appInfrastructureService
                 .Data()
                 .AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser)
                 .Text;
@@ -1077,7 +1065,7 @@ namespace VC.Admin.Controllers
                 return false;
             }
 
-            var emailModel = _mapper.ToModel<OrderConfirmationEmail>(order);
+            var emailModel = await _mapper.ToModelAsync<OrderConfirmationEmail>(order);
             if (emailModel == null)
                 return false;
 
@@ -1097,7 +1085,7 @@ namespace VC.Admin.Controllers
 
             if (model.SendAll)
             {
-                var emailModel = _mapper.ToModel<OrderShippingConfirmationEmail>(order);
+                var emailModel = await _mapper.ToModelAsync<OrderShippingConfirmationEmail>(order);
                 if (emailModel == null)
                     return false;
                 await _notificationService.SendOrderShippingConfirmationEmailAsync(model.Email, emailModel);
@@ -1107,7 +1095,7 @@ namespace VC.Admin.Controllers
                 if (model.SendP)
                 {
                     order.SendSide = (int)POrderType.P;
-                    var emailModel = _mapper.ToModel<OrderShippingConfirmationEmail>(order);
+                    var emailModel = await _mapper.ToModelAsync<OrderShippingConfirmationEmail>(order);
                     if (emailModel == null)
                         return false;
 
@@ -1116,7 +1104,7 @@ namespace VC.Admin.Controllers
                 if (model.SendNP)
                 {
                     order.SendSide = (int)POrderType.NP;
-                    var emailModel = _mapper.ToModel<OrderShippingConfirmationEmail>(order);
+                    var emailModel = await _mapper.ToModelAsync<OrderShippingConfirmationEmail>(order);
                     if (emailModel == null)
                         return false;
 

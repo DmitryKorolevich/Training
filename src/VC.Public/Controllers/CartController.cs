@@ -46,13 +46,13 @@ namespace VC.Public.Controllers
 	    private readonly IContentCrossSellService _contentCrossSellService;
 
 
-	    public CartController(IHttpContextAccessor contextAccessor,
+	    public CartController(
             ICustomerService customerService,
             IOrderService orderService, IProductService productService, ICheckoutService checkoutService,
             IAuthorizationService authorizationService, IAppInfrastructureService appInfrastructureService,
             IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
             IDiscountService discountService, IGcService gcService, IContentCrossSellService contentCrossSellService, IPageResultService pageResultService, ISettingService settingService)
-            : base(contextAccessor, customerService, appInfrastructureService, authorizationService, checkoutService, orderService, skuMapper,productMapper, pageResultService, settingService)
+            : base(customerService, appInfrastructureService, authorizationService, checkoutService, orderService, skuMapper,productMapper, pageResultService, settingService)
         {
 	        _productService = productService;
             _checkoutService = checkoutService;
@@ -100,7 +100,7 @@ namespace VC.Public.Controllers
 			cart.Order.Skus.AddUpdateKeyed(Enumerable.Repeat(sku, 1).ToArray(),
 				ordered => ordered.Sku.Code, skuModel => skuModel.Sku.Code, skuModel =>
 				{
-					var skuOrdered = _productService.GetSkuOrderedAsync(skuModel.Sku.Code).Result;
+					var skuOrdered = _productService.GetSkuOrderedAsync(skuModel.Sku.Code).GetAwaiter().GetResult();
 					skuOrdered.Quantity = 1;
 					skuOrdered.Amount = HasRole(RoleType.Wholesale) ? skuModel.Sku.WholesalePrice : skuModel.Sku.Price;
 					return skuOrdered;
@@ -219,7 +219,7 @@ namespace VC.Public.Controllers
 
 			await FillModel(result, res.Item2.Order, res.Item1);
             SetCartUid(res.Item2.CartUid);
-            ContextAccessor.HttpContext.Session.Remove(CheckoutConstants.ReceiptSessionOrderId);
+            HttpContext.Session.Remove(CheckoutConstants.ReceiptSessionOrderId);
             return result;
         }
 
@@ -252,7 +252,7 @@ namespace VC.Public.Controllers
             cart.Order.Skus?.MergeKeyed(model.Skus.Where(s => s.Quantity > 0).ToArray(), ordered => ordered.Sku.Code,
                 skuModel => skuModel.Code, skuModel =>
                 {
-                    var result = _productService.GetSkuOrderedAsync(skuModel.Code).Result;
+                    var result = _productService.GetSkuOrderedAsync(skuModel.Code).GetAwaiter().GetResult();
                     result.Quantity = skuModel.Quantity;
                     return result;
                 }, (ordered, skuModel) => ordered.Quantity = skuModel.Quantity);

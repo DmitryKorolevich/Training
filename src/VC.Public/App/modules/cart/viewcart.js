@@ -175,8 +175,6 @@ function initCart() {
             viewModel = new Cart(result.Data);
 
             processServerMessages(viewModel.Model);
-
-            $("body").on("click", ".proposals-item-link", function () { addToCart($(this), viewModel); return false; });
         } else {
             if (result.Data) {
                 viewModel = new Cart(result.Data);
@@ -187,6 +185,7 @@ function initCart() {
             viewModel.refreshing(false);
             processErrorResponse(result);
         }
+        $("body").on("click", ".proposals-item-link", function () { addToCart($(this), viewModel); return false; });
 
         if (!binded) {
             ko.applyBindings(viewModel);

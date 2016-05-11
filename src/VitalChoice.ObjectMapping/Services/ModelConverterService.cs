@@ -4,6 +4,7 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.ObjectMapping.Base;
 using VitalChoice.ObjectMapping.Interfaces;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace VitalChoice.ObjectMapping.Services
 {
@@ -16,7 +17,7 @@ namespace VitalChoice.ObjectMapping.Services
             _converters = converters;
         }
 
-        public void DynamicToModel<TModel, TDynamic>(TModel model, TDynamic dynamic)
+        public async Task DynamicToModelAsync<TModel, TDynamic>(TModel model, TDynamic dynamic)
         {
             var baseList = typeof (TModel).GetBaseTypes();
             IModelConverter converter;
@@ -24,16 +25,16 @@ namespace VitalChoice.ObjectMapping.Services
             {
                 if (_converters.TryGetValue(new TypePair(type, typeof (TDynamic)), out converter))
                 {
-                    converter.DynamicToModel(model, dynamic);
+                    await converter.DynamicToModelAsync(model, dynamic);
                 }
             }
             if (_converters.TryGetValue(new TypePair(typeof (TModel), typeof (TDynamic)), out converter))
             {
-                ((IModelConverter<TModel, TDynamic>)converter).DynamicToModel(model, dynamic);
+                await ((IModelConverter<TModel, TDynamic>)converter).DynamicToModelAsync(model, dynamic);
             }
         }
 
-        public void ModelToDynamic<TModel, TDynamic>(TModel model, TDynamic dynamic)
+        public async Task ModelToDynamicAsync<TModel, TDynamic>(TModel model, TDynamic dynamic)
         {
             var baseList = typeof(TModel).GetBaseTypes();
             IModelConverter converter;
@@ -41,16 +42,16 @@ namespace VitalChoice.ObjectMapping.Services
             {
                 if (_converters.TryGetValue(new TypePair(type, typeof(TDynamic)), out converter))
                 {
-                    converter.ModelToDynamic(model, dynamic);
+                    await converter.ModelToDynamicAsync(model, dynamic);
                 }
             }
             if (_converters.TryGetValue(new TypePair(typeof(TModel), typeof(TDynamic)), out converter))
             {
-                ((IModelConverter<TModel, TDynamic>) converter).ModelToDynamic(model, dynamic);
+                await ((IModelConverter<TModel, TDynamic>) converter).ModelToDynamicAsync(model, dynamic);
             }
         }
 
-        public void DynamicToModel(Type modelType, Type dynamicType, object model, object dynamic)
+        public async Task DynamicToModelAsync(Type modelType, Type dynamicType, object model, object dynamic)
         {
             var baseList = modelType.GetBaseTypes();
             IModelConverter converter;
@@ -58,16 +59,16 @@ namespace VitalChoice.ObjectMapping.Services
             {
                 if (_converters.TryGetValue(new TypePair(type, dynamicType), out converter))
                 {
-                    converter.DynamicToModel(model, dynamic);
+                    await converter.DynamicToModelAsync(model, dynamic);
                 }
             }
             if (_converters.TryGetValue(new TypePair(modelType, dynamicType), out converter))
             {
-                converter.DynamicToModel(model, dynamic);
+                await converter.DynamicToModelAsync(model, dynamic);
             }
         }
 
-        public void ModelToDynamic(Type modelType, Type dynamicType, object model, object dynamic)
+        public async Task ModelToDynamicAsync(Type modelType, Type dynamicType, object model, object dynamic)
         {
             var baseList = modelType.GetBaseTypes();
             IModelConverter converter;
@@ -75,12 +76,12 @@ namespace VitalChoice.ObjectMapping.Services
             {
                 if (_converters.TryGetValue(new TypePair(type, dynamicType), out converter))
                 {
-                    converter.ModelToDynamic(model, dynamic);
+                    await converter.ModelToDynamicAsync(model, dynamic);
                 }
             }
             if (_converters.TryGetValue(new TypePair(modelType, dynamicType), out converter))
             {
-                converter.ModelToDynamic(model, dynamic);
+                await converter.ModelToDynamicAsync(model, dynamic);
             }
         }
     }

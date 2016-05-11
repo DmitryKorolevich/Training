@@ -30,13 +30,11 @@ namespace VC.Public.Controllers
     [CustomerStatusCheck]
     public class GCController : BaseMvcController
 	{
-		private readonly IHttpContextAccessor _contextAccessor;
 		private readonly IGcService _gcService;
 
-		public GCController(IHttpContextAccessor contextAccessor, IGcService gcService,
+		public GCController(IGcService gcService,
             IPageResultService pageResultService) : base(pageResultService)
 		{
-			_contextAccessor = contextAccessor;
             _gcService = gcService;
 		}
 

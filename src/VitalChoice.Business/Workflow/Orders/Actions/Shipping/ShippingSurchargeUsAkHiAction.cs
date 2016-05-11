@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Core;
@@ -22,7 +23,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Shipping
             {
                 result = (decimal) 19.95;
             }
-            dataContext.AlaskaHawaiiSurcharge = result;
+            dataContext.AlaskaHawaiiSurcharge = Math.Round(result, 2);
             return Task.FromResult(result);
         }
     }

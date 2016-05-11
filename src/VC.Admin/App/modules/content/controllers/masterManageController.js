@@ -69,6 +69,10 @@ function ($scope, $rootScope, $stateParams, contentService, toaster, confirmUtil
             error(function (result) {
                 errorHandler(result);
             });
+
+        $scope.aceChanged = function (e) {
+
+        };
     }
 
     function setProcessors(ids) {

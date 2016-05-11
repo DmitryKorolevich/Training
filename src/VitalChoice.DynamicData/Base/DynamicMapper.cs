@@ -152,23 +152,23 @@ namespace VitalChoice.DynamicData.Base
 
         public TDynamic FromEntity(TEntity entity, bool withDefaults = false)
         {
-            return FromEntityAsync(entity, withDefaults).Result;
+            return FromEntityAsync(entity, withDefaults).GetAwaiter().GetResult();
         }
 
         public List<TEntity> ToEntityRange(ICollection<TDynamic> items, ICollection<TOptionType> optionTypes = null)
         {
-            return ToEntityRangeAsync(items, optionTypes).Result;
+            return ToEntityRangeAsync(items, optionTypes).GetAwaiter().GetResult();
         }
 
         public ICollection<DynamicEntityPair<TDynamic, TEntity>> ToEntityRange(
             ICollection<GenericObjectPair<TDynamic, ICollection<TOptionType>>> items)
         {
-            return ToEntityRangeAsync(items).Result;
+            return ToEntityRangeAsync(items).GetAwaiter().GetResult();
         }
 
         public List<TDynamic> FromEntityRange(ICollection<TEntity> items, bool withDefaults = false)
         {
-            return FromEntityRangeAsync(items, withDefaults).Result;
+            return FromEntityRangeAsync(items, withDefaults).GetAwaiter().GetResult();
         }
 
         public async Task UpdateEntityAsync(TDynamic dynamic, TEntity entity)
@@ -197,7 +197,7 @@ namespace VitalChoice.DynamicData.Base
 
         public TEntity ToEntity(TDynamic dynamic, ICollection<TOptionType> optionTypes = null)
         {
-            return ToEntityAsync(dynamic, optionTypes).Result;
+            return ToEntityAsync(dynamic, optionTypes).GetAwaiter().GetResult();
         }
 
         public async Task<TEntity> ToEntityAsync(TDynamic dynamic, ICollection<TOptionType> optionTypes = null)
@@ -321,9 +321,9 @@ namespace VitalChoice.DynamicData.Base
             return results.Select(r => r.Dynamic).ToList();
         }
 
-        protected override void FromDictionaryInternal(object obj, IDictionary<string, object> model, Type objectType, bool caseSense)
+        protected override async Task FromDictionaryInternal(object obj, IDictionary<string, object> model, Type objectType, bool caseSense)
         {
-            base.FromDictionaryInternal(obj, model, objectType, caseSense);
+            await base.FromDictionaryInternal(obj, model, objectType, caseSense);
             var dynamic = obj as MappedObject;
             if (dynamic != null)
             {
@@ -362,10 +362,10 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        protected override void ToModelInternal(object obj, object result,
+        protected override async Task ToModelInternal(object obj, object result,
             Type modelType, Type objectType)
         {
-            base.ToModelInternal(obj, result, modelType, objectType);
+            await base.ToModelInternal(obj, result, modelType, objectType);
             var dynamic = obj as MappedObject;
             if (dynamic != null)
             {
@@ -381,7 +381,7 @@ namespace VitalChoice.DynamicData.Base
                         object dynamicValue;
                         if (data.TryGetValue(mappingName, out dynamicValue))
                         {
-                            var value = _typeConverter.ConvertToModel(dynamicValue?.GetType(), pair.Value.PropertyType, dynamicValue,
+                            var value = await _typeConverter.ConvertToModelAsync(dynamicValue?.GetType(), pair.Value.PropertyType, dynamicValue,
                                 pair.Value.Converter);
                             if (value != null)
                             {
@@ -395,10 +395,10 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        protected override void FromModelInternal(object obj, object model,
+        protected override async Task FromModelInternal(object obj, object model,
             Type modelType, Type objectType)
         {
-            base.FromModelInternal(obj, model, modelType, objectType);
+            await base.FromModelInternal(obj, model, modelType, objectType);
             var dynamic = obj as MappedObject;
             if (dynamic != null)
             {
@@ -670,29 +670,10 @@ namespace VitalChoice.DynamicData.Base
                 });
         }
 
-        public virtual TDynamic FromModel<TModel>(TModel model, int idObjectType)
-        {
-            var result = CreatePrototype(idObjectType);
-            UpdateObject(model, result);
-            return result;
-        }
-
-        public virtual void UpdateObject<TModel>(TModel model, TDynamic obj, int idObjectType, bool loadDefaults = true)
-            where TModel : class, new()
-        {
-            if (obj != null)
-                obj.IdObjectType = idObjectType;
-            if (loadDefaults)
-            {
-                UpdateObjectWithDefaults(obj, idObjectType).GetAwaiter().GetResult();
-            }
-            UpdateObject(model, obj);
-        }
-
         public virtual async Task<TDynamic> FromModelAsync<TModel>(TModel model, int idObjectType)
         {
             var result = await CreatePrototypeAsync(idObjectType);
-            UpdateObject(model, result);
+            await UpdateObjectAsync(model, result);
             return result;
         }
 
@@ -707,7 +688,7 @@ namespace VitalChoice.DynamicData.Base
             {
                 await UpdateObjectWithDefaults(obj, idObjectType);
             }
-            UpdateObject(model, obj);
+            await UpdateObjectAsync(model, obj);
         }
 
         private async Task UpdateObjectWithDefaults(TDynamic obj, int idObjectType)
@@ -729,13 +710,13 @@ namespace VitalChoice.DynamicData.Base
 
         public TDynamic CreatePrototype(int idObjectType)
         {
-            return CreatePrototypeAsync(idObjectType).Result;
+            return CreatePrototypeAsync(idObjectType).GetAwaiter().GetResult();
         }
 
         public TModel CreatePrototypeFor<TModel>(int idObjectType)
             where TModel : class, new()
         {
-            return CreatePrototypeForAsync<TModel>(idObjectType).Result;
+            return CreatePrototypeForAsync<TModel>(idObjectType).GetAwaiter().GetResult();
         }
 
         public virtual async Task<TDynamic> CreatePrototypeAsync(int idObjectType)
@@ -748,7 +729,7 @@ namespace VitalChoice.DynamicData.Base
         public virtual async Task<TModel> CreatePrototypeForAsync<TModel>(int idObjectType)
             where TModel : class, new()
         {
-            return ToModel<TModel>(await CreatePrototypeAsync(idObjectType));
+            return await ToModelAsync<TModel>(await CreatePrototypeAsync(idObjectType));
         }
     }
 }

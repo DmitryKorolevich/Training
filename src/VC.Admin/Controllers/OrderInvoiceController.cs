@@ -106,7 +106,7 @@ namespace VC.Admin.Controllers
                 return View(null);
             }
 
-            OrderInvoiceModel model = _mapper.ToModel<OrderInvoiceModel>(order);
+            OrderInvoiceModel model = await _mapper.ToModelAsync<OrderInvoiceModel>(order);
             string invoicePageUrl = String.Format(BaseAppConstants.ORDER_INVOICE_PAGE_URL_TEMPLATE, _options.Value.AdminHost, token.IdToken.ToString().ToLower());
             model.PDFUrl = String.Format(BaseAppConstants.PDF_URL_GENERATE_ORDER_INVOICE_TEMPLATE,_options.Value.PDFMyUrl.ServiceUrl,
                 _options.Value.PDFMyUrl.LicenseKey, WebUtility.UrlEncode(invoicePageUrl), order.Id);
@@ -144,7 +144,7 @@ namespace VC.Admin.Controllers
                 return View(null);
             }
 
-            OrderInvoiceModel model = _mapper.ToModel<OrderInvoiceModel>(order);
+            OrderInvoiceModel model = await _mapper.ToModelAsync<OrderInvoiceModel>(order);
             return View(model);
         } 
     }

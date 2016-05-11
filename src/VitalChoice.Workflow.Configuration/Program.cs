@@ -84,7 +84,6 @@ namespace VitalChoice.Workflow.Configuration
                 Console.WriteLine($"[{e.Source}] Update Failed!\r\n{e.Message}\r\n{e.StackTrace}");
                 Console.ResetColor();
             }
-            Console.ReadKey();
         }
 
         private static IContainer BuildContainer()

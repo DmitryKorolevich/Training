@@ -127,7 +127,7 @@ namespace VC.Admin.Controllers
             {
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
             }
-            AffiliateManageModel toReturn = _mapper.ToModel<AffiliateManageModel>(item);
+            AffiliateManageModel toReturn = await _mapper.ToModelAsync<AffiliateManageModel>(item);
 
             var login = await _affiliateUserService.GetAsync(toReturn.Id);
             if (login == null)
@@ -159,7 +159,7 @@ namespace VC.Admin.Controllers
         {
             if (!Validate(model))
                 return null;
-            var affiliate = _mapper.FromModel(model);
+            var affiliate = await _mapper.FromModelAsync(model);
 
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
@@ -176,7 +176,7 @@ namespace VC.Admin.Controllers
                 affiliate = await _affiliateService.InsertAsync(affiliate);
             }
 
-            var toReturn = _mapper.ToModel<AffiliateManageModel>(affiliate);
+            var toReturn = await _mapper.ToModelAsync<AffiliateManageModel>(affiliate);
 
             toReturn.IsConfirmed = model.IsConfirmed;
             toReturn.PublicUserId = model.PublicUserId;
@@ -275,7 +275,7 @@ namespace VC.Admin.Controllers
             if (toReturn.Main != null && !String.IsNullOrEmpty(toReturn.Main.Data))
             {
                 var dynamic = (AffiliateDynamic)JsonConvert.DeserializeObject(toReturn.Main.Data, typeof(AffiliateDynamic));
-                var model = _mapper.ToModel<AffiliateManageModel>(dynamic);
+                var model = await _mapper.ToModelAsync<AffiliateManageModel>(dynamic);
                 toReturn.Main.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
@@ -285,7 +285,7 @@ namespace VC.Admin.Controllers
             if (toReturn.Before != null && !String.IsNullOrEmpty(toReturn.Before.Data))
             {
                 var dynamic = (AffiliateDynamic)JsonConvert.DeserializeObject(toReturn.Before.Data, typeof(AffiliateDynamic));
-                var model = _mapper.ToModel<AffiliateManageModel>(dynamic);
+                var model = await _mapper.ToModelAsync<AffiliateManageModel>(dynamic);
                 toReturn.Before.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,

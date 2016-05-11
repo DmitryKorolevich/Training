@@ -438,7 +438,7 @@ namespace VitalChoice.Business.Services.Checkout
 								mailOrder = cartOrder.Order;
 							}
 
-							var emailModel = _orderMapper.ToModel<OrderConfirmationEmail>(mailOrder);
+							var emailModel = await _orderMapper.ToModelAsync<OrderConfirmationEmail>(mailOrder);
                             if (emailModel != null)
                             {
                                 await _notificationService.SendOrderConfirmationEmailAsync(customer.Email, emailModel);

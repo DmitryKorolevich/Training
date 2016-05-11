@@ -24,6 +24,8 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
 
         public CustomerDynamic Customer { get; set; }
 
+        public OrderDynamic OriginalOrder { get; set; }
+
         public OrderPaymentMethodDynamic PaymentMethod { get; set; }
 
         public AddressDynamic ShippingAddress { get; set; }
@@ -40,7 +42,7 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
 
         public decimal DiscountTotal { get; set; }
 
-        public int? IdOrderSource { get; set; }
+        public int IdOrderSource { get; set; }
 
         public ICollection<RefundSkuOrdered> RefundSkus { get; set; }
 

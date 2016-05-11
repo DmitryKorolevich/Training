@@ -13,9 +13,6 @@ namespace VitalChoice.Jobs
     {
         protected override void FinishCustomRegistrations(ContainerBuilder builder)
         {
-            //required by our buisness layer which is bad(
-            builder.RegisterType<DummyHttpContextAccessor>().As<IHttpContextAccessor>();
-
             builder.RegisterModule(new QuartzAutofacFactoryModule());
             builder.RegisterModule(new QuartzAutofacJobsModule(typeof(JobsDependencyConfig).Assembly));
         }

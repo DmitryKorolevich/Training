@@ -69,10 +69,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             if (collection == null)
                 throw new ArgumentNullException(nameof(collection));
 
-            foreach (var item in items)
-            {
-                collection.Add(await item);
-            }
+            collection.AddRange(await Task.WhenAll(items));
         }
 
         public static IEnumerable<T> DistinctObjects<T>(this IEnumerable<T> source)

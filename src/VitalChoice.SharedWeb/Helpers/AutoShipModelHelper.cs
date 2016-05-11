@@ -32,13 +32,13 @@ namespace VitalChoice.SharedWeb.Helpers
 		    _countries = countries;
 	    }
 
-	    public AutoShipHistoryItemModel PopulateAutoShipItemModel(OrderDynamic orderDynamic)
+	    public async Task<AutoShipHistoryItemModel> PopulateAutoShipItemModel(OrderDynamic orderDynamic)
 	    {
 			var skuItem = orderDynamic.Skus.First();
 
-			var result = _skuMapper.ToModel<AutoShipHistoryItemModel>(skuItem.Sku);
-			_productMapper.UpdateModel(result, skuItem.Sku.Product);
-			_orderMapper.UpdateModel(result, orderDynamic);
+			var result = await _skuMapper.ToModelAsync<AutoShipHistoryItemModel>(skuItem.Sku);
+			await _productMapper.UpdateModelAsync(result, skuItem.Sku.Product);
+            await _orderMapper.UpdateModelAsync(result, orderDynamic);
 
 			var paymentMethod = orderDynamic.PaymentMethod;
 			result.PaymentMethodDetails = paymentMethod.PopulateCreditCardDetails(_referenceData);

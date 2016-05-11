@@ -5,6 +5,7 @@ namespace VitalChoice.Ecommerce.Domain.Exceptions
 {
     public class AppValidationException : Exception
     {
+        public string ViewName { get; set; }
         public List<MessageInfo> Messages = new List<MessageInfo>();
 
         public AppValidationException(IEnumerable<MessageInfo> messages) : base("See messages")
@@ -12,12 +13,12 @@ namespace VitalChoice.Ecommerce.Domain.Exceptions
             this.Messages.AddRange(messages);
         }
 
-        public AppValidationException(string field,string message) : base("See messages")
+        public AppValidationException(string field, string message) : base("See messages")
         {
             Messages.Add(new MessageInfo()
             {
-                Field=field,
-                Message=message,
+                Field = field,
+                Message = message,
             });
         }
 

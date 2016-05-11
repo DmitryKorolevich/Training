@@ -8,6 +8,11 @@ namespace VitalChoice.Business.CsvExportMaps
     {
         public CustomersForAffiliatesCsvMap()
         {
+            MapValues();
+        }
+
+        private void MapValues()
+        {
             Map(m => m.Id).Name("Customer Id").Index(0);
             Map(m => m.Email).Name("Email").Index(1);
             Map(m => m.FirstName).Name("FirstName").Index(2);

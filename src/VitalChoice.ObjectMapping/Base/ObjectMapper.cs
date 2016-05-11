@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.ObjectMapping.Interfaces;
 using VitalChoice.ObjectMapping.Services;
@@ -49,38 +50,39 @@ namespace VitalChoice.ObjectMapping.Base
             return (T)Base.TypeConverter.Clone(obj, typeof (T), typeof (TBase), o => cloneBaseFunc((TBase) o));
         }
 
-        public object FromDictionary(IDictionary<string, object> model, bool caseSense = true)
+        public async Task<object> FromDictionaryAsync(IDictionary<string, object> model, bool caseSense = true)
         {
             if (model == null)
                 return null;
 
             var result = new T();
 
-            UpdateObject(result, model, caseSense);
+            await UpdateObjectAsync(result, model, caseSense);
 
             return result;
         }
 
-        public T FromModel<TModel>(TModel model)
+        public async Task<T> FromModelAsync<TModel>(TModel model)
         {
+            // ReSharper disable once CompareNonConstrainedGenericWithNull
             if (model == null)
                 return null;
 
             var result = new T();
 
-            UpdateObject(model, result);
+            await UpdateObjectAsync(model, result);
 
             return result;
         }
 
-        object IObjectMapper.FromModel(Type modelType, object model)
+        async Task<object> IObjectMapper.FromModelAsync(Type modelType, object model)
         {
             if (model == null)
                 return null;
 
             var result = new T();
 
-            (this as IObjectMapper).UpdateObject(modelType, model, result);
+            await (this as IObjectMapper).UpdateObjectAsync(modelType, model, result);
 
             return result;
         }

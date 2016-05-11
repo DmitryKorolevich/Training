@@ -30,13 +30,13 @@ namespace VC.Admin.Controllers
     {
         private readonly IGcService GCService;
         private readonly IOrderSchedulerService OrderSchedulerService;
-        private readonly ICsvExportService<GCWithOrderListItemModel, GCWithOrderListItemModelCsvMap> _gCWithOrderListItemModelCsvMapCSVExportService;
+        private readonly ICsvExportService<GCWithOrderListItemModel, GcWithOrderListItemModelCsvMap> _gCWithOrderListItemModelCsvMapCSVExportService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly ILogger logger;
 
         public GCController(IGcService GCService,
             IOrderSchedulerService OrderSchedulerService,
-            ICsvExportService<GCWithOrderListItemModel, GCWithOrderListItemModelCsvMap> gCWithOrderListItemModelCsvMapCSVExportService,
+            ICsvExportService<GCWithOrderListItemModel, GcWithOrderListItemModelCsvMap> gCWithOrderListItemModelCsvMapCSVExportService,
             ILoggerProviderExtended loggerProvider)
         {
             this.GCService = GCService;

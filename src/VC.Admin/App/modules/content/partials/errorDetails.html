@@ -1,0 +1,15 @@
+﻿<div class="modal-header">
+	<h3 class="modal-title">Error Details</h3>
+</div>
+<div class="modal-body">
+    <h4>{{::error.Error}}</h4>
+    <div data-ng-if="error.Exception">
+        {{::error.Exception.Message}}
+        <p class="text-break-message">
+            {{::error.Exception.StackTrace}}
+        </p>
+    </div>
+</div>
+<div class="modal-footer">
+	<button class="btn btn-default" data-ng-click="cancel()">Close</button>
+</div>

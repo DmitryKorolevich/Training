@@ -13,6 +13,7 @@
         </div>
     </div>
     <div class="right-pane-main">
+        <spinner-overlay data-loading="refreshTracker.active()">
             <div class="container-fluid">
                 <div class="row">
                     <uib-tabset>
@@ -61,18 +62,7 @@
                                                 <span class="legend">Manage Template</span>
                                                 <div class="form-group">
                                                     <div class="col-md-12">
-                                                        <div data-ng-model="master.Template" ui-ace="{
-				                                require: ['ace/ext/language_tools'],
-				                                advanced: {
-					                                enableSnippets: true,
-					                                enableBasicAutocompletion: true,
-					                                enableLiveAutocompletion: true
-				                                },
-				                                theme:'cobalt',
-				                                mode: 'ttl',
-				                                onLoad: aceLoaded,
-				                                onChange: aceChanged
-		                                }">
+                                                        <div data-ng-model="master.Template" ui-ace-ttl>
                                                         </div>
                                                     </div>
                                                 </div>

@@ -1,0 +1,25 @@
+﻿{
+  "version": "1.0.0-*",
+  "description": "VitalChoice.Tests Class Library",
+  "authors": [ "multi_000" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+  "dependencies": {
+    "xunit": "2.1.0",
+    "xunit.runner.dnx": "2.1.0-rc1-*",
+    "Autofac": "4.0.0-rc1-*",
+    "VitalChoice.Business": "1.0.0-*",
+    "VitalChoice.Core": "1.0.0-*",
+    "VitalChoice.Interfaces": "1.0.0-*"
+  },
+
+  "commands": {
+    "test": "xunit.runner.dnx"
+  },
+
+  "frameworks": {
+    "dnx451": {
+    }
+  }
+}

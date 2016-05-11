@@ -17,6 +17,11 @@ namespace VitalChoice.Business.CsvExportMaps.Orders
     {
         public WholesaleDropShipReportOrderItemCsvMap()
         {
+            MapValues();
+        }
+
+        private void MapValues()
+        {
             Map(m => m.IdOrder).Name("Order ID").Index(0);
             Map(m => m.OrderStatus).Name("Status").Index(1).TypeConverter<OrderStatusConverter>();
             Map(m => m.POrderStatus).Name("P Status").Index(2).TypeConverter<OrderStatusConverter>();
@@ -42,24 +47,12 @@ namespace VitalChoice.Business.CsvExportMaps.Orders
             Map(m => m.Skus).Name("Products").Index(22).TypeConverter<SkusConverter>();
         }
 
-        public class SkusConverter : DefaultTypeConverter
+        private class SkusConverter : DefaultTypeConverter
         {
             public override string ConvertToString(TypeConverterOptions options, object value)
             {
-                var data = value != null ? ((ICollection<WholesaleDropShipReportSkuItem>)value).ToList() : null;
-                var toReturn = string.Empty;
-                if (data!=null)
-                {
-                    for (int i = 0; i < data.Count; i++)
-                    {
-                        toReturn += $"{data[i].Code} ({data[i].Quantity})";
-                        if (i != data.Count - 1)
-                        {
-                            toReturn += ", ";
-                        }
-                    }
-                }
-                return toReturn;
+                var data = value as ICollection<WholesaleDropShipReportSkuItem>;
+                return data != null ? string.Join(", ", data.Select(d => $"{d.Code} ({d.Quantity})")) : string.Empty;
             }
 
             public override bool CanConvertTo(Type type)

@@ -136,18 +136,7 @@
 
                                             <div class="form-group">
                                                 <div class="col-md-12">
-                                                    <div data-ng-model="contentPage.Template" ui-ace="{
-				                                require: ['ace/ext/language_tools'],
-				                                advanced: {
-					                                enableSnippets: true,
-					                                enableBasicAutocompletion: true,
-					                                enableLiveAutocompletion: true
-				                                },
-				                                theme:'cobalt',
-				                                mode: 'ttl',
-				                                onLoad: aceLoaded,
-				                                onChange: aceChanged
-		                                }">
+                                                    <div data-ng-model="contentPage.Template" ui-ace-ttl master-id="contentPage.MasterContentItemId">
                                                     </div>
                                                 </div>
                                             </div>

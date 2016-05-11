@@ -12,17 +12,15 @@ namespace VC.Public.Components.AffiliateProfile
 	public class SidebarViewComponent : ViewComponent
 	{
 		private readonly IAffiliateUserService _affiliateUserService;
-		private readonly IHttpContextAccessor _contextAccessor;
 
-		public SidebarViewComponent(IAffiliateUserService affiliateUserService, IHttpContextAccessor contextAccessor)
+		public SidebarViewComponent(IAffiliateUserService affiliateUserService)
 		{
             _affiliateUserService = affiliateUserService;
-			_contextAccessor = contextAccessor;
 		}
 
 		public async Task<IViewComponentResult> InvokeAsync()
 		{
-			var userId = Convert.ToInt32(_contextAccessor.HttpContext.User.GetUserId());
+			var userId = Convert.ToInt32(HttpContext.User.GetUserId());
 
 			var user = await _affiliateUserService.GetAsync(userId);
 			

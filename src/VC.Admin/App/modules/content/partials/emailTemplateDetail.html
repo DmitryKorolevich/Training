@@ -55,18 +55,7 @@
                                     </div>
                                     <div class="form-group">
                                         <div class="col-md-12">
-                                            <div data-ng-model="emailTemplate.Template" ui-ace="{
-				                                require: ['ace/ext/language_tools'],
-				                                advanced: {
-					                                enableSnippets: true,
-					                                enableBasicAutocompletion: true,
-					                                enableLiveAutocompletion: true
-				                                },
-				                                theme:'cobalt',
-				                                mode: 'ttl',
-				                                onLoad: aceLoaded,
-				                                onChange: aceChanged
-		                                }">
+                                            <div data-ng-model="emailTemplate.Template" ui-ace-ttl master-id="emailTemplate.MasterContentItemId">
                                             </div>
                                         </div>
                                         <div class="error-container" ng-show="forms.form.submitted && forms.form.Template.$invalid">

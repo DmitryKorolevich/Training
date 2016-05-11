@@ -88,7 +88,7 @@ namespace VC.Admin.Controllers
             }
 
             var item = await _discountService.SelectAsync(id);
-            DiscountManageModel toReturn = _mapper.ToModel<DiscountManageModel>(item);
+            DiscountManageModel toReturn = await _mapper.ToModelAsync<DiscountManageModel>(item);
             return toReturn;
         }
 
@@ -97,7 +97,7 @@ namespace VC.Admin.Controllers
         {
             if (!Validate(model))
                 return null;
-            var discount = _mapper.FromModel(model);
+            var discount = await _mapper.FromModelAsync(model);
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
             if (Int32.TryParse(sUserId, out userId))
@@ -113,7 +113,7 @@ namespace VC.Admin.Controllers
                 discount = await _discountService.InsertAsync(discount);
             }
 
-            return _mapper.ToModel<DiscountManageModel>(discount);
+            return await _mapper.ToModelAsync<DiscountManageModel>(discount);
         }
 
         [HttpPost]
@@ -132,7 +132,7 @@ namespace VC.Admin.Controllers
             if (toReturn.Main != null && !String.IsNullOrEmpty(toReturn.Main.Data))
             {
                 var dynamic = (DiscountDynamic)JsonConvert.DeserializeObject(toReturn.Main.Data, typeof(DiscountDynamic));
-                var model = _mapper.ToModel<DiscountManageModel>(dynamic);
+                var model = await _mapper.ToModelAsync<DiscountManageModel>(dynamic);
                 toReturn.Main.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
@@ -142,7 +142,7 @@ namespace VC.Admin.Controllers
             if (toReturn.Before != null && !String.IsNullOrEmpty(toReturn.Before.Data))
             {
                 var dynamic = (DiscountDynamic)JsonConvert.DeserializeObject(toReturn.Before.Data, typeof(DiscountDynamic));
-                var model = _mapper.ToModel<DiscountManageModel>(dynamic);
+                var model = await _mapper.ToModelAsync<DiscountManageModel>(dynamic);
                 toReturn.Before.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,

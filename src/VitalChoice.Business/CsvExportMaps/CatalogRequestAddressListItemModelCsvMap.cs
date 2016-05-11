@@ -7,6 +7,11 @@ namespace VitalChoice.Business.CsvExportMaps
     {
         public CatalogRequestAddressListItemModelCsvMap()
         {
+            MapValues();
+        }
+
+        private void MapValues()
+        {
             Map(m => m.PersonTitle).Name("Title").Index(0);
             Map(m => m.FirstName).Name("First Name").Index(1);
             Map(m => m.LastName).Name("Last Name").Index(2);

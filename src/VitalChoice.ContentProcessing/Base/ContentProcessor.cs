@@ -34,11 +34,10 @@ namespace VitalChoice.ContentProcessing.Base
 
         protected abstract Task<TResult> ExecuteAsync(ProcessorViewContext viewContext);
 
-        public Task<TResult> ExecuteAsync(ContentViewContext viewContext)
+        public async Task<TResult> ExecuteAsync(ContentViewContext viewContext)
         {
-            return
-                ExecuteAsync(
-                    new ProcessorViewContext((TModel) _mapper.FromDictionary(viewContext.Parameters as IDictionary<string, object>, false),
+            return await ExecuteAsync(
+                    new ProcessorViewContext((TModel)await _mapper.FromDictionaryAsync(viewContext.Parameters as IDictionary<string, object>, false),
                         viewContext.BaseEntity, viewContext.User));
         }
 
@@ -48,7 +47,7 @@ namespace VitalChoice.ContentProcessing.Base
                 await
                     ExecuteAsync(
                         new ProcessorViewContext(
-                            (TModel) _mapper.FromDictionary(viewContext.Parameters as IDictionary<string, object>, false),
+                            (TModel) await _mapper.FromDictionaryAsync(viewContext.Parameters as IDictionary<string, object>, false),
                             viewContext.BaseEntity, viewContext.User));
         }
 
@@ -82,11 +81,11 @@ namespace VitalChoice.ContentProcessing.Base
 
         protected abstract Task<TResult> ExecuteAsync(ProcessorViewContext viewContext);
 
-        public Task<TResult> ExecuteAsync(ContentViewContext viewContext)
+        public async Task<TResult> ExecuteAsync(ContentViewContext viewContext)
         {
             return
-                ExecuteAsync(
-                    new ProcessorViewContext((TModel) _mapper.FromDictionary(viewContext.Parameters as IDictionary<string, object>, false),
+                await ExecuteAsync(
+                    new ProcessorViewContext((TModel)await _mapper.FromDictionaryAsync(viewContext.Parameters as IDictionary<string, object>, false),
                         (TEntity) viewContext.BaseEntity, viewContext.User));
         }
 
@@ -96,7 +95,7 @@ namespace VitalChoice.ContentProcessing.Base
                 await
                     ExecuteAsync(
                         new ProcessorViewContext(
-                            (TModel) _mapper.FromDictionary(viewContext.Parameters as IDictionary<string, object>, false),
+                            (TModel)await _mapper.FromDictionaryAsync(viewContext.Parameters as IDictionary<string, object>, false),
                             (TEntity) viewContext.BaseEntity, viewContext.User));
         }
 
