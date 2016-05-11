@@ -22,7 +22,7 @@
 	@using (Html.BeginForm("ChangeProfile", "AffiliateProfile", null, FormMethod.Post, new { @class = "form-regular medium-small border-form-left", role = "form" }))
     {
         <h4>Manage Affiliate Profile</h4>
-        await Html.RenderPartialAsync("/Views/AffiliateAccount/_AffiliateManage", Model);
+        await Html.RenderPartialAsync("/Views/AffiliateAccount/_AffiliateManage.cshtml", Model);
 
 		<div class="form-buttons-group">
 			<input data-back-button="@Url.Action("Index","AffiliateProfile")" type="button" value="Back" />

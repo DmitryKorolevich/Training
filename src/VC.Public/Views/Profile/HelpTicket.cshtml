@@ -26,14 +26,14 @@
         <div class="border-form-left">
             @if (Model != null)
             {
-                @using (Html.BeginForm("HelpTicket", "Profile", null, FormMethod.Post, new { @class = "form-regular main medium-small inner " + (Model.Id == 0 ? "margin-bottom-big" : ""), role = "form" }))
+                using (Html.BeginForm("HelpTicket", "Profile", null, FormMethod.Post, new { @class = "form-regular main medium-small inner " + (Model.Id == 0 ? "margin-bottom-big" : ""), role = "form" }))
                 {
                     @Html.AntiForgeryToken()
                     <h4>Help Desk</h4>
                     @Html.ValidationSummary(true, "")
                     <input name="IdOrder" value="@Html.DisplayForEx(x => x.IdOrder)" type="hidden">
                     <input name="Id" value="@Html.DisplayForEx(x => x.Id)" type="hidden">
-                    @if (Model.Id != 0)
+                    if (Model.Id != 0)
                     {
                         <div class="form-group">
                             @Html.LabelFor(m => m.Id, new { @class = "control-label" })
@@ -51,7 +51,7 @@
                             <label class="form-control-static bold">@Html.DisplayForEx(m => m.IdOrder)</label>
                         </div>
                     </div>
-                    @if (Model.Id != 0)
+                    if (Model.Id != 0)
                     {
                         <div class="form-group">
                             @Html.LabelFor(m => m.DateCreated, new { @class = "control-label" })
@@ -102,7 +102,7 @@
                             @Html.ValidationMessageFor(m => m.Description, "")
                         </div>
                     </div>
-                    @if (Model.Id != 0)
+                    if (Model.Id != 0)
                     {
                         <div class="form-group">
                             @Html.LabelFor(m => m.StatusCode, new { @class = "control-label" })
@@ -120,16 +120,16 @@
                         </div>
                     }
                 }
-                @using (Html.BeginForm("DeleteHelpTicket", "Profile", null, FormMethod.Post, new { @class = "delete-ticket", role = "form" }))
+                using (Html.BeginForm("DeleteHelpTicket", "Profile", null, FormMethod.Post, new { @class = "delete-ticket", role = "form" }))
                 {
                     <input name="IdOrder" value="@Html.DisplayForEx(x => x.IdOrder)" type="hidden">
                     <input name="Id" value="@Html.DisplayForEx(x => x.Id)" type="hidden">
                 }
-                @if (Model.Id != 0)
+                if (Model.Id != 0)
                 {
-                    @foreach (var comment in Model.Comments)
+                    foreach (var comment in Model.Comments)
                     {
-                        @using (Html.BeginForm("UpdateHelpTicketComment", "Profile", null, FormMethod.Post, new { @class = "form-regular exist-comment medium-small inner", role = "form" }))
+                        using (Html.BeginForm("UpdateHelpTicketComment", "Profile", null, FormMethod.Post, new { @class = "form-regular exist-comment medium-small inner", role = "form" }))
                         {
                             <div class="comment">
                                 <div class="form-group">
@@ -166,7 +166,7 @@
                         }
                     }
 
-                    @using (Html.BeginForm("UpdateHelpTicketComment", "Profile", null, FormMethod.Post, new { @class = "form-regular new-comment medium-small inner", role = "form" }))
+                    using (Html.BeginForm("UpdateHelpTicketComment", "Profile", null, FormMethod.Post, new { @class = "form-regular new-comment medium-small inner", role = "form" }))
                     {
                         <form class="form-regular new-comment medium-small inner margin-bottom-big" role="form" novalidate="novalidate">
                             <div class="sub-title"><span>Add New Comment</span></div>

@@ -6,7 +6,7 @@
 @if (Model != null)
 {
     <a id="linksource" class="hide" href="@Model.Url"></a>
-    @for (int i = 0; i < Model.Locations.Count; i++)
+    for (int i = 0; i < Model.Locations.Count; i++)
     {
         <div class="item">
             <strong>@Model.Locations[i].BusinessName</strong><br />
@@ -19,7 +19,7 @@
                 <span>Saturdays: @Model.Locations[i].Saturdays</span><br />
             </div>
         </div>
-            @if (i % 2 == 1)
+            if (i % 2 == 1)
             {
                 <div class="clear"></div>
             }

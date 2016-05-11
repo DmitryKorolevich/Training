@@ -56,6 +56,8 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
 
         public bool IsHealthwise { get; set; }
 
+        public bool IsFirstHealthwise { get; set; }
+
         public ICollection<PromoOrdered> PromoSkus { get; set; }
 
         //Don't storing in DB, should be set be calculating logic

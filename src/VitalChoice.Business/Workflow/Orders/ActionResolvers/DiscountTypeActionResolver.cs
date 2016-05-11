@@ -86,12 +86,12 @@ namespace VitalChoice.Business.Workflow.Orders.ActionResolvers
                 {
                     var orderRepository = executionContext.Resolve<IEcommerceRepositoryAsync<Order>>();
                     var originalOrder = await orderRepository.Query(o => o.Id == dataContext.Order.Id).SelectFirstOrDefaultAsync(false);
-                    if (originalOrder?.IdDiscount != null && originalOrder.IdDiscount.Value == dataContext.Order.Discount?.Id)
+                    if (originalOrder?.IdDiscount != null && originalOrder.IdDiscount.Value == dataContext.Order.Discount.Id)
                     {
                         usageCount--;
                     }
                 }
-                if (usageCount >= (int?) dataContext.Order.Discount?.SafeData.MaxTimesUse)
+                if (usageCount >= (int?) dataContext.Order.Discount.SafeData.MaxTimesUse)
                 {
                     dataContext.Messages.Add(new MessageInfo
                     {
@@ -100,6 +100,20 @@ namespace VitalChoice.Business.Workflow.Orders.ActionResolvers
                     });
                     noIssues = false;
                 }
+                
+                if (((bool?) dataContext.Order.Discount.SafeData.AllowHealthwise ?? false) && dataContext.Order.Data.OrderType == (int)SourceOrderType.Web)
+                {
+                    if ((bool?) dataContext.Order.Customer?.SafeData.HasHealthwiseOrders ?? false)
+                    {
+                        dataContext.Order.IsFirstHealthwise = false;
+                        dataContext.Order.IsHealthwise = true;
+                    }
+                }
+                else
+                {
+                    dataContext.Order.IsHealthwise = false;
+                }
+                
             }
 
             return noIssues;

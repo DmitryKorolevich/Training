@@ -11,11 +11,11 @@
         <input id="hdCountry" value="@Html.DisplayForEx(x => x.IdCountry)" type="hidden">
         <input id="hdState" value="@Html.DisplayForEx(x => x.IdState)" type="hidden">
         <input id="hdCurrentEmail" name="CurrentEmail" value="@Html.DisplayForEx(x => x.CurrentEmail)" type="hidden">
-        @if (String.IsNullOrEmpty(Model.CurrentEmail))
+        if (String.IsNullOrEmpty(Model.CurrentEmail))
         {
             <div class="sub-title"><span>Specify an Email</span></div>
         }
-        @if (!String.IsNullOrEmpty(Model.CurrentEmail))
+        if (!String.IsNullOrEmpty(Model.CurrentEmail))
         {
             <div class="form-group">
                 @Html.LabelFor(m => m.CurrentEmail, new { @class = "control-label" })
@@ -56,7 +56,7 @@
             </div>
         }
 
-        @if (String.IsNullOrEmpty(Model.CurrentEmail))
+        if (String.IsNullOrEmpty(Model.CurrentEmail))
         {
             <div class="sub-title"><span>Create a Password</span></div>
             <span class="form-control-important-info">Must be at least 8 characters long, contain at least 1 numerical digit, 1 capital character and 1 special character.<br />Example: Dontuse!#1</span>
@@ -76,7 +76,7 @@
             </div>
         }
 
-        @if (String.IsNullOrEmpty(Model.CurrentEmail))
+        if (String.IsNullOrEmpty(Model.CurrentEmail))
         {
             <div class="promote-area">
                 <div class="sub-title"><span>Promoting Vital Choice</span></div>
@@ -168,7 +168,7 @@
             </div>
         }
 
-        @if (String.IsNullOrEmpty(Model.CurrentEmail))
+        if (String.IsNullOrEmpty(Model.CurrentEmail))
         {
         <div class="sub-title"><span>Details</span></div>
         }
@@ -310,7 +310,7 @@
         </div>
 
 
-        @if (String.IsNullOrEmpty(Model.CurrentEmail))
+        if (String.IsNullOrEmpty(Model.CurrentEmail))
         {
             <div class="form-group">
                 <hr />
