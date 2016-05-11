@@ -40,7 +40,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions
                     context.Order.AffiliateNewCustomerOrder = true;
                     result = baseAmount*affiliate.CommissionFirst/100;
                 }
-                context.Order.AffiliatePaymentAmount = result;
+                context.Order.AffiliatePaymentAmount = decimal.Round(result, 2);
                 return result;
             }
             return 0;

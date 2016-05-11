@@ -22,7 +22,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Shipping
             {
                 result = (decimal) 19.95;
             }
-            dataContext.AlaskaHawaiiSurcharge = result;
+            dataContext.AlaskaHawaiiSurcharge = decimal.Round(result, 2);
             return Task.FromResult(result);
         }
     }

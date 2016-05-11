@@ -41,7 +41,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Promo
                     {
                         if (sku.Amount == sku.Sku.Price)
                         {
-                            sku.Amount = sku.Sku.Price - sku.Sku.Price*(decimal) promo.Data.Percent/100;
+                            sku.Amount = sku.Sku.Price - decimal.Round(sku.Sku.Price*(decimal) promo.Data.Percent/100, 2);
                         }
                     }
                 }
