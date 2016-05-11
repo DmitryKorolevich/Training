@@ -212,7 +212,7 @@ namespace VitalChoice.Business.Services.Products
         {
             return SelectAsync(
                 new PromotionQuery().IsActive()
-                    .WithExpiredType(ExpiredType.NotExpired)
+                    .WithDateStatus(DateStatus.Live)
                     .AllowCustomerType(customerType), withDefaults: true);
         }
 
