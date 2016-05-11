@@ -70,7 +70,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Promo
                 foreach (var sku in promoSkus)
                 {
                     var promoGetSku = skuListCache[sku.Sku.Id];
-                    sku.Amount = sku.Sku.Price - decimal.Round(sku.Sku.Price*promoGetSku.Percent/100, 2);
+                    sku.Amount = sku.Sku.Price - Math.Round(sku.Sku.Price*promoGetSku.Percent/100, 2);
                     sku.Quantity = promoGetSku.Quantity*applyCount;
                     context.PromoSkus.Add(new PromoOrdered(sku, promo, GetPromoEnabled(context.Order.PromoSkus, promo.Id, sku.Sku.Id)));
                 }

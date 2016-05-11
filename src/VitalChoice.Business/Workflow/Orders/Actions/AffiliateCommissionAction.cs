@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Interfaces.Services.Affiliates;
 using VitalChoice.Interfaces.Services.Customers;
@@ -40,7 +41,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions
                     context.Order.AffiliateNewCustomerOrder = true;
                     result = baseAmount*affiliate.CommissionFirst/100;
                 }
-                context.Order.AffiliatePaymentAmount = decimal.Round(result, 2);
+                context.Order.AffiliatePaymentAmount = Math.Round(result, 2);
                 return result;
             }
             return 0;

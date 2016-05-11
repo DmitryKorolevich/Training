@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Workflow.Base
@@ -11,7 +12,7 @@ namespace VitalChoice.Workflow.Base
 
         public sealed override decimal AggregateResult(decimal result, decimal currentValue, string actionName)
         {
-            return decimal.Round(currentValue + result, 2);
+            return Math.Round(currentValue + result, 2);
         }
 
         public abstract override Task<decimal> ExecuteActionAsync(TContext context, IWorkflowExecutionContext executionContext);
