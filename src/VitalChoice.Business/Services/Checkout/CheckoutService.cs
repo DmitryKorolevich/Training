@@ -141,9 +141,17 @@ namespace VitalChoice.Business.Services.Checkout
                 Amount = g.Amount,
                 GiftCertificate = g.GiftCertificate
             }).ToList() ?? new List<GiftCertificateInOrder>();
-            if (cart.IdDiscount.HasValue)
+            if (!string.IsNullOrEmpty(cart.DiscountCode))
             {
-                newOrder.Discount = await _discountService.SelectAsync(cart.IdDiscount.Value, true);
+                if (cart.DiscountCode.ToLower() == "healthwise")
+                {
+                    newOrder.Data.IsHealthwise = true;
+                }
+                else
+                {
+                    newOrder.Data.IsHealthwise = false;
+                    newOrder.Discount = await _discountService.GetByCode(cart.DiscountCode);
+                }
             }
             newOrder.Skus = cart.Skus?.Select(s =>
             {
@@ -327,7 +335,7 @@ namespace VitalChoice.Business.Services.Checkout
                         cartOrder.Order.Customer = customerBackup;
                         cart.IdCustomer = cartOrder.Order?.Customer?.Id;
                         cart.IdOrder = cartOrder.Order?.Id;
-                        cart.IdDiscount = null;
+                        cart.DiscountCode = null;
                         cart.GiftCertificates?.Clear();
                         cart.Skus?.Clear();
                         cart.ShipDelayDate = null;
@@ -336,7 +344,14 @@ namespace VitalChoice.Business.Services.Checkout
                     }
                     else
                     {
-                        cart.IdDiscount = cartOrder.Order.Discount?.Id;
+                        if ((bool?) cartOrder.Order.SafeData.IsHealthwise ?? false)
+                        {
+                            cart.DiscountCode = "HEALTHWISE";
+                        }
+                        else
+                        {
+                            cart.DiscountCode = cartOrder.Order.Discount?.Code;
+                        }
                         cart.GiftCertificates?.MergeKeyed(cartOrder.Order.GiftCertificates, c => c.IdGiftCertificate,
                             co => co.GiftCertificate.Id,
                             co => new CartToGiftCertificate
@@ -411,7 +426,7 @@ namespace VitalChoice.Business.Services.Checkout
                         cartOrder.Order = await _orderService.UpdateAsync(cartOrder.Order);
                         cart.IdCustomer = cartOrder.Order?.Customer?.Id;
                         cart.IdOrder = null;
-                        cart.IdDiscount = null;
+                        cart.DiscountCode = null;
                         cart.GiftCertificates?.Clear();
                         cart.Skus?.Clear();
                         cart.ShipDelayDate = null;

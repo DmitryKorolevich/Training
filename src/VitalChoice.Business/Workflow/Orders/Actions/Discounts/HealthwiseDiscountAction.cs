@@ -16,7 +16,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Discounts
         {
             dataContext.FreeShipping = true;
 
-            return Task.FromResult((decimal) dataContext.Data.DiscountableSubtotal*5M/100);
+            return Task.FromResult(-(decimal) dataContext.Data.DiscountableSubtotal*5M/100);
         }
     }
 }

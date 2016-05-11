@@ -28,7 +28,7 @@ namespace VitalChoice.Business.Workflow.Orders.ActionResolvers
                 return Task.FromResult((int) ReductionType.AutoShip);
             if (dataContext.Order.Customer.IdObjectType == (int) CustomerType.Retail)
             {
-                if (dataContext.Order.IsHealthwise && !((bool?)dataContext.Order.Customer.SafeData.HasHealthwiseOrders ?? false))
+                if (((bool?)dataContext.Order.SafeData.IsHealthwise ?? false) && !((bool?)dataContext.Order.Customer.SafeData.HasHealthwiseOrders ?? false))
                 {
                     dataContext.Order.IsFirstHealthwise = true;
                     return Task.FromResult((int) ReductionType.HealthWise);
@@ -36,7 +36,7 @@ namespace VitalChoice.Business.Workflow.Orders.ActionResolvers
             }
             else
             {
-                dataContext.Order.IsHealthwise = false;
+                dataContext.Order.Data.IsHealthwise = false;
             }
             return Task.FromResult((int)ReductionType.Discount);
         }

@@ -283,7 +283,7 @@ namespace VC.Public.Controllers
             }
             cart.Order.Data.ShippingUpgradeP = model.ShippingUpgradeP;
             cart.Order.Data.ShippingUpgradeNP = model.ShippingUpgradeNP;
-            cart.Order.IsHealthwise = model.DiscountCode?.ToLower() == "healthwise";
+            cart.Order.Data.IsHealthwise = model.DiscountCode?.ToLower() == "healthwise";
             var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
             await FillModel(model, cart.Order, context);
             SetCartUid(cart.CartUid);

@@ -1478,7 +1478,7 @@ namespace VitalChoice.Business.Services.Orders
                     StateCode = countries.SelectMany(pp => pp.States).FirstOrDefault(pp => pp.Id == p.ShippingAddress?.IdState)?.StateCode,
                     ShipTo = p?.ShippingAddress.SafeData.FirstName + " " + p?.ShippingAddress.SafeData.LastName,
                     PreferredShipMethod = p.SafeData.PreferredShipMethod,
-                    Healthwise = p.IsHealthwise,
+                    Healthwise = (bool?)p.SafeData.IsHealthwise ?? false,
                 }).ToList(),
                 Count = orders.Count
             };
@@ -2259,7 +2259,7 @@ namespace VitalChoice.Business.Services.Orders
         private async Task UpdateHealthwiseOrderWithOrder(OrderDynamic model, IUnitOfWorkAsync uow)
         {
             //model.IsHealthwise = true;
-            await UpdateHealthwiseOrderInnerAsync(uow, model.Id, model.Customer.Id, DateTime.Now, model.IsHealthwise, model.IsFirstHealthwise);
+            await UpdateHealthwiseOrderInnerAsync(uow, model.Id, model.Customer.Id, DateTime.Now, (bool?)model.SafeData.IsHealthwise ?? false, model.IsFirstHealthwise);
         }
 
         private async Task UpdateHealthwiseOrderInnerAsync(IUnitOfWorkAsync uow, int idOrder, int idCustomer, DateTime orderDateCreated,

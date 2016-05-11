@@ -39,7 +39,6 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("Carts");
                 entity.HasKey(c => c.Id);
                 entity.HasIndex(c => c.CartUid).IsUnique();
-                entity.HasOne(c => c.Discount).WithMany().HasForeignKey(c => c.IdDiscount).IsRequired(false).HasPrincipalKey(d => d.Id);
                 entity.HasMany(c => c.GiftCertificates).WithOne().HasForeignKey(g => g.IdCart).HasPrincipalKey(c => c.Id);
                 entity.HasMany(c => c.Skus).WithOne().HasForeignKey(s => s.IdCart).HasPrincipalKey(c => c.Id);
             });

@@ -54,8 +54,6 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
 
         public AffiliateOrderPayment AffiliateOrderPayment { get; set; }
 
-        public bool IsHealthwise { get; set; }
-
         public bool IsFirstHealthwise { get; set; }
 
         public ICollection<PromoOrdered> PromoSkus { get; set; }
