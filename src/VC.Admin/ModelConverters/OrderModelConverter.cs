@@ -457,12 +457,24 @@ namespace VC.Admin.ModelConverters
             if (model.SkuOrdereds != null)
             {
                 var promotionIds = model.PromoSkus.Where(p => p.Id.HasValue && p.IsAllowDisable).Select(p => p.Id.Value).ToList();
+                var skuIds = model.PromoSkus.Where(p => p.IdSku.HasValue).Select(p => p.IdSku.Value).ToList();
                 var promotions = await _promotionService.SelectAsync(promotionIds, true);
-                dynamic.PromoSkus = promotions.Select(p => new PromoOrdered
-                {
-                    Promotion = p,
-                    Enabled = model.PromoSkus?.FirstOrDefault(m => m.Id.HasValue && m.Id.Value == p.Id)?.IsEnabled ?? true
-                }).ToList();
+                var promoSkus = await _productService.GetSkusOrderedAsync(skuIds);
+                dynamic.PromoSkus =
+                    model.PromoSkus.Where(p => p.Id.HasValue && p.IdSku.HasValue && p.IsAllowDisable)
+                        .Select(
+                            p =>
+                            {
+                                var sku = promoSkus.FirstOrDefault(s => s.Sku.Id == p.IdSku.Value);
+                                if (sku != null)
+                                {
+                                    sku.Amount = p.Amount ?? 0;
+                                    sku.Quantity = p.QTY ?? 1;
+                                }
+                                var promo = promotions.FirstOrDefault(dbp => dbp.Id == p.Id.Value);
+                                return new PromoOrdered(sku, promo, p.IsEnabled);
+                            })
+                        .ToList();
                 model.SkuOrdereds = model.SkuOrdereds.Where(s => !(s.Promo ?? false)).ToList();
 
                 var validList = model.SkuOrdereds.Where(s => s.Id.HasValue).Select(s => s.Id.Value).ToList();
