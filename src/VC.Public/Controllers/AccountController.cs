@@ -452,10 +452,18 @@ namespace VC.Public.Controllers
 			}
 
 			result.ConfirmationToken = Guid.Empty;
-			await _userService.UpdateAsync(result);
+		    try
+		    {
+		        await _userService.UpdateAsync(result);
 
-			result = await _userService.SignInAsync(result);
-			if (result == null)
+		        result = await _userService.SignInAsync(result);
+		    }
+		    catch (AppValidationException e)
+		    {
+                e.ViewName = "Login";
+                throw;
+            }
+		    if (result == null)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn])
                 {

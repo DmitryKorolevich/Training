@@ -61,3 +61,17 @@ BEGIN
 	ShippingUpgradeP INT NULL,
 	ShippingUpgradeNP INT NULL
 END
+
+GO
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'dbo.Carts') AND name = N'DiscountCode')
+BEGIN
+	ALTER TABLE Carts
+	DROP CONSTRAINT [FK_CartToDiscount]
+
+	ALTER TABLE Carts
+	DROP COLUMN [IdDiscount]
+
+	ALTER TABLE Carts
+	ADD DiscountCode NVARCHAR(250) NULL
+END

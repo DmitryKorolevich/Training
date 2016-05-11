@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Base;
@@ -10,7 +11,7 @@ namespace VitalChoice.Business.Workflow.Orders.ActionResolvers
 	{
 		AutoShip = 1,
 		Discount = 2,
-		HealthWise = 3//todo: handle it
+		HealthWise = 3
 	}
 
 	public class ReductionTypeActionResolver : ComputableActionResolver<OrderDataContext>
@@ -22,11 +23,22 @@ namespace VitalChoice.Business.Workflow.Orders.ActionResolvers
 
         public override Task<int> GetActionKeyAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            return
-                Task.FromResult((dataContext.Order.IdObjectType == (int) OrderType.AutoShip ||
-                                 dataContext.Order.IdObjectType == (int) OrderType.AutoShipOrder)
-                    ? (int) ReductionType.AutoShip
-                    : (int) ReductionType.Discount);
+            if (dataContext.Order.IdObjectType == (int) OrderType.AutoShip ||
+                dataContext.Order.IdObjectType == (int) OrderType.AutoShipOrder)
+                return Task.FromResult((int) ReductionType.AutoShip);
+            if (dataContext.Order.Customer.IdObjectType == (int) CustomerType.Retail)
+            {
+                if (((bool?)dataContext.Order.SafeData.IsHealthwise ?? false) && !((bool?)dataContext.Order.Customer.SafeData.HasHealthwiseOrders ?? false))
+                {
+                    dataContext.Order.IsFirstHealthwise = true;
+                    return Task.FromResult((int) ReductionType.HealthWise);
+                }
+            }
+            else
+            {
+                dataContext.Order.Data.IsHealthwise = false;
+            }
+            return Task.FromResult((int)ReductionType.Discount);
         }
     }
 }

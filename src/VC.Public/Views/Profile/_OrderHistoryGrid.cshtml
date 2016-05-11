@@ -42,12 +42,12 @@
                             @infrastructure.OrderStatuses.Single(x => x.Key == (int)item.OrderStatus.Value).Text
                         } else
                         {
-                            @if (item.POrderStatus.HasValue)
+                            if (item.POrderStatus.HasValue)
                             {
                                 @:P - @infrastructure.OrderStatuses.Single(x => x.Key == (int)item.POrderStatus.Value).Text
                                 <br/>
                             }
-                            @if (item.NPOrderStatus.HasValue)
+                            if (item.NPOrderStatus.HasValue)
                             {
                                 @:NP - @infrastructure.OrderStatuses.Single(x => x.Key == (int)item.NPOrderStatus.Value).Text
                                 <br />

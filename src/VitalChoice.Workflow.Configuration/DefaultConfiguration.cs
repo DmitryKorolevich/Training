@@ -187,8 +187,14 @@ namespace VitalChoice.Workflow.Configuration
 
             order.ActionResolver<ReductionTypeActionResolver>("Discount", action =>
             {
+                action.ResolvePath<HealthwiseDiscountAction>((int)ReductionType.HealthWise, "HealthwiseDiscount");
                 action.ResolvePath<AutoShipDiscountAction>((int) ReductionType.AutoShip, "AutoShipDiscount");
                 action.ResolvePath<DiscountTypeActionResolver>((int) ReductionType.Discount, "NormalDiscount");
+            });
+
+            order.Action<HealthwiseDiscountAction>("HealthwiseDiscount", action =>
+            {
+                action.Dependency<DiscountableProductsAction>();
             });
 
             order.Action<AutoShipDiscountAction>("AutoShipDiscount", action =>

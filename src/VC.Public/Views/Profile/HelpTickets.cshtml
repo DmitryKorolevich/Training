@@ -48,7 +48,7 @@
                     <tbody>
                         @if (Model.Any())
                         {
-                            @foreach (var item in Model)
+                            foreach (var item in Model)
                             {
                                 <tr>
                                     <td>
@@ -63,7 +63,7 @@
                                     <td>
                                         <span class="label @(item.StatusCode == VitalChoice.Ecommerce.Domain.Entities.RecordStatusCode.NotActive ? "label-warning" : "label-info" )">
                                             @infrastructure.TicketStatuses.Single(x => x.Key == (int)item.StatusCode).Text
-                                            <span>
+                                            </span>
                                     </td>
                                 </tr>
                             }
