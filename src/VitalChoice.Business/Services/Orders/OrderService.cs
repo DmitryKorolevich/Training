@@ -2250,7 +2250,7 @@ namespace VitalChoice.Business.Services.Orders
         {
             using (var uow = CreateUnitOfWork())
             {
-                await UpdateHealthwiseOrderInnerAsync(uow, order.Id, order.Customer.Id, order.DateCreated, isHealthwise);
+                await UpdateHealthwiseOrderInnerAsync(uow, order.Id, order.Customer.Id, order.DateCreated, isHealthwise, false);
                 await uow.SaveChangesAsync();
                 return true;
             }
@@ -2259,10 +2259,11 @@ namespace VitalChoice.Business.Services.Orders
         private async Task UpdateHealthwiseOrderWithOrder(OrderDynamic model, IUnitOfWorkAsync uow)
         {
             //model.IsHealthwise = true;
-            await UpdateHealthwiseOrderInnerAsync(uow, model.Id, model.Customer.Id, DateTime.Now, model.IsHealthwise);
+            await UpdateHealthwiseOrderInnerAsync(uow, model.Id, model.Customer.Id, DateTime.Now, model.IsHealthwise, model.IsFirstHealthwise);
         }
 
-        private async Task UpdateHealthwiseOrderInnerAsync(IUnitOfWorkAsync uow, int idOrder, int idCustomer, DateTime orderDateCreated, bool isHealthwise)
+        private async Task UpdateHealthwiseOrderInnerAsync(IUnitOfWorkAsync uow, int idOrder, int idCustomer, DateTime orderDateCreated,
+            bool isHealthwise, bool isFirstHealthwise)
         {
             var healthwiseOrderRepositoryAsync = uow.RepositoryAsync<HealthwiseOrder>();
             var healthwisePeriodRepositoryAsync = uow.RepositoryAsync<HealthwisePeriod>();
@@ -2280,10 +2281,10 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         try
                         {
-                            healthwiseOrderRepositoryAsync.Delete(order.Id);
-                            if (order.IsFirstHealthwise)
+                            healthwiseOrderRepositoryAsync.Delete(idOrder);
+                            if (isFirstHealthwise)
                             {
-                                var customer = await _customerService.SelectAsync(order.Customer.Id, true);
+                                var customer = await _customerService.SelectAsync(idCustomer, true);
                                 customer.Data.HasHealthwiseOrders = false;
                                 await _customerService.UpdateAsync(customer);
                             }
@@ -2325,27 +2326,26 @@ namespace VitalChoice.Business.Services.Orders
                         period.StartDate = orderCreatedDate;
                         period.EndDate = period.StartDate.AddYears(1);
                         period.HealthwiseOrders = new List<HealthwiseOrder>()
+                        {
+                            new HealthwiseOrder() {Id = idOrder}
+                        };
+                        using (var transaction = uow.BeginTransaction())
+                        {
+                            try
                             {
-                                new HealthwiseOrder() {Id = idOrder}
-                            };
-                            using (var transaction = uow.BeginTransaction())
+                                healthwisePeriodRepositoryAsync.InsertGraph(period);
+                                if (isFirstHealthwise)
+                                {
+                                    var customer = await _customerService.SelectAsync(idCustomer, true);
+                                    customer.Data.HasHealthwiseOrders = true;
+                                    await _customerService.UpdateAsync(customer);
+                                }
+                                transaction.Commit();
+                            }
+                            catch
                             {
-                                try
-                                {
-                                    healthwisePeriodRepositoryAsync.InsertGraph(period);
-                                    if (order.IsFirstHealthwise)
-                                    {
-                                        var customer = await _customerService.SelectAsync(order.Customer.Id, true);
-                                        customer.Data.HasHealthwiseOrders = true;
-                                        await _customerService.UpdateAsync(customer);
-                                    }
-                                    transaction.Commit();
-                                }
-                                catch
-                                {
-                                    transaction.Rollback();
-                                    throw;
-                                }
+                                transaction.Rollback();
+                                throw;
                             }
                         }
                     }
