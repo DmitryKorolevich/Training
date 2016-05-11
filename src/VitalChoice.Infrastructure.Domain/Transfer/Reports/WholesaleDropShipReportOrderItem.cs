@@ -42,6 +42,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Reports
 
         public string ShippingAddress2 { get; set; }
 
+        public string Zip { get; set; }
+
         public string City { get; set; }
 
         public string StateCode { get; set; }

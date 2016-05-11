@@ -471,6 +471,7 @@ namespace VitalChoice.Business.Services.Products
                 .WithExactDescriptionName(filter.ExactDescriptionName)
                 .WithIds(filter.Ids)
                 .WithIdProducts(filter.IdProducts)
+                .WithIdProductTypes(filter.IdProductTypes)
                 .ActiveOnly(filter.ActiveOnly).NotHiddenOnly(filter.NotHiddenOnly);
             var query = _vSkuRepository.Query(conditions);
 

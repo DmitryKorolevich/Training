@@ -111,7 +111,17 @@ namespace VitalChoice.Business.Queries.Product
             return this;
         }
 
-	    public VSkuQuery NotHiddenOnly(bool notHidden)
+        public VSkuQuery WithIdProductTypes(IList<ProductType> idProductTypes)
+        {
+            if (idProductTypes != null && idProductTypes.Count > 0)
+            {
+                Add(x => idProductTypes.Contains(x.IdProductType));
+            }
+
+            return this;
+        }
+
+        public VSkuQuery NotHiddenOnly(bool notHidden)
 	    {
 			if (notHidden)
 			{

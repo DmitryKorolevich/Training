@@ -38,12 +38,13 @@ namespace VitalChoice.Business.CsvExportMaps.Orders
             Map(m => m.ShippingAddress2).Name("Address 2").Index(13);
             Map(m => m.City).Name("City").Index(14);
             Map(m => m.StateCode).Name("State").Index(15);
-            Map(m => m.Country).Name("Country").Index(16);
-            Map(m => m.Phone).Name("Phone").Index(17);
-            Map(m => m.ShipDate).Name("Ship Date").Index(18);
-            Map(m => m.ShippingCarrier).Name("Shipping Carrier").Index(19);
-            Map(m => m.ShippingIdConfirmation).Name("Shipping Confirmation #").Index(20);
-            Map(m => m.Skus).Name("Products").Index(21).TypeConverter<SkusConverter>();
+            Map(m => m.Zip).Name("Postal Code").Index(16);
+            Map(m => m.Country).Name("Country").Index(17);
+            Map(m => m.Phone).Name("Phone").Index(18);
+            Map(m => m.ShipDate).Name("Ship Date").Index(19);
+            Map(m => m.ShippingCarrier).Name("Shipping Carrier").Index(20);
+            Map(m => m.ShippingIdConfirmation).Name("Shipping Confirmation #").Index(21);
+            Map(m => m.Skus).Name("Products").Index(22).TypeConverter<SkusConverter>();
         }
 
         private class SkusConverter : DefaultTypeConverter
@@ -56,7 +57,7 @@ namespace VitalChoice.Business.CsvExportMaps.Orders
 
             public override bool CanConvertTo(Type type)
             {
-                return type == typeof(ICollection<WholesaleDropShipReportSkuItem>);
+                return true;
             }
         }
     }

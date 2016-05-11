@@ -1,0 +1,230 @@
+﻿<div class="container-fluid wholesale-dropship-report">
+    <div class="well">
+        <span class="legend">Wholesale Drop Ship Orders Report</span>
+        <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate>
+            <fieldset>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="From" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.From.$invalid">
+                            <small class="error" ng-show="forms.form.From.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","From")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="To" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.To.$invalid">
+                            <small class="error" ng-show="forms.form.To.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","To")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="ShipFrom" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.ShipFrom" is-open="shipFromOpened" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="stopPropagation($event); shipFromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="ShipTo" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.ShipTo" is-open="shipToOpened" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="stopPropagation($event); shipToOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <select class="form-control" name="IdCustomerType" data-ng-change="filterChanged();" data-ng-model="filter.IdCustomerType" ng-options="item.Key as item.Text for item in customerTypes"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control" name="IdTradeClass" data-ng-change="filterChanged();" data-ng-model="filter.IdTradeClass" ng-options="item.Key as item.Text for item in tradeClasses"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" name="IdOrder" class="form-control" placeholder="Order #" data-ng-change="filterChanged();" data-ng-model="filter.IdOrder" numbers-only autocomplete="off" data-ng-minlength="3">
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.IdOrder.$invalid">
+                            <small class="error" ng-show="forms.form.IdOrder.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Order #")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" name="PoNumber" class="form-control" placeholder="PO #" data-ng-change="filterChanged();" data-ng-model="filter.PoNumber" autocomplete="off" data-ng-minlength="3">
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.PoNumber.$invalid">
+                            <small class="error" ng-show="forms.form.PoNumber.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","PO #")}}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <input type="text" name="CustomerFirstName" class="form-control" placeholder="Customer First Name" data-ng-change="filterChanged();" data-ng-model="filter.CustomerFirstName" autocomplete="off" data-ng-minlength="3">
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.CustomerFirstName.$invalid">
+                            <small class="error" ng-show="forms.form.CustomerFirstName.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Customer First Name")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" name="CustomerLastName" class="form-control" placeholder="Customer Last Name" data-ng-change="filterChanged();" data-ng-model="filter.CustomerLastName" autocomplete="off" data-ng-minlength="3">
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.CustomerLastName.$invalid">
+                            <small class="error" ng-show="forms.form.CustomerLastName.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Customer Last Name")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" name="ShipFirstName" class="form-control" placeholder="Ship to First Name" data-ng-change="filterChanged();" data-ng-model="filter.ShipFirstName" autocomplete="off" data-ng-minlength="3">
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.ShipFirstName.$invalid">
+                            <small class="error" ng-show="forms.form.ShipFirstName.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Ship to First Name")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" name="ShipLastName" class="form-control" placeholder="Ship To Last Name" data-ng-change="filterChanged();" data-ng-model="filter.ShipLastName" autocomplete="off" data-ng-minlength="3">
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.ShipLastName.$invalid">
+                            <small class="error" ng-show="forms.form.ShipLastName.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Ship To Last Name")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" name="ShippingIdConfirmation" class="form-control" placeholder="Shipping Confirmation #" data-ng-change="filterChanged();" data-ng-model="filter.ShippingIdConfirmation" autocomplete="off" data-ng-minlength="3">
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.ShippingIdConfirmation.$invalid">
+                            <small class="error" ng-show="forms.form.ShippingIdConfirmation.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Shipping Confirmation #")}}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <button class="btn btn-info" data-ng-click="filterItems();" type="button">Filter</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+        <spinner-overlay data-loading="refreshTracker.active()">
+            <span class="legend">Order Summary</span>
+            <table class="table table-striped orders-total">
+                <thead>
+                    <tr>
+                        <th>Discounted Subtotal</th>
+                        <th>Shipping Total</th>
+                        <th>Grand Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{report.DiscountedSubtotal | currency}}</td>
+                        <td>{{report.Shipping | currency}}</td>
+                        <td>{{report.Total | currency}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <span class="legend">Sku Summary</span>
+            <table class="table table-striped skus-total">
+                <thead>
+                    <tr>
+                        <th>Sku</th>
+                        <th>Total Quantity</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="sku in report.Skus">
+                        <td>{{sku.Code}}</td>
+                        <td>{{sku.Quantity}}</td>
+                        <td>{{sku.Amount | currency}}</td>
+                    </tr>
+                    <tr>
+                        <td>Grand Total</td>
+                        <td>{{report.SkusTotal.Quantity}}</td>
+                        <td>{{report.SkusTotal.Amount | currency}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <hr />
+            <div class="form-horizontal">
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <a target="_self" class="btn btn-primary pull-right" data-ng-href="{{options.exportUrl}}">Export</a>
+                    </div>
+                </div>
+            </div>
+            <div class="orders">
+                <table class="table table-striped order-statuses">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th class="status">Status</th>
+                            <th>Total</th>
+                            <th>Discounted Subtotal</th>
+                            <th>Shipping</th>
+                            <th>Order Specific Notes</th>
+                            <th>PO #</th>
+                            <th>Profile Company Name</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Address 1</th>
+                            <th>Address 2</th>
+                            <th>City</th>
+                            <th>State</th>
+                            <th>Postal Code</th>
+                            <th>Country</th>
+                            <th>Phone</th>
+                            <th>Ship Date</th>
+                            <th>Ship Carrier</th>
+                            <th>Ship Confirmation #</th>
+                            <th>Products</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-ng-repeat="item in items">
+                            <td>
+                                <a ui-sref="index.oneCol.orderDetail({id: item.IdOrder })">{{::item.IdOrder}}</a>
+                            </td>
+                            <td>
+                                <div data-ng-include="'app/modules/order/partials/orderStatusSection.html'"></div>
+                            </td>
+                            <td>{{::item.Total | currency}}</td>
+                            <td>{{::item.DiscountedSubtotal | currency}}</td>
+                            <td>{{::item.Shipping | currency}}</td>
+                            <td>{{::item.OrderNotes}}</td>
+                            <td>{{::item.PoNumber}}</td>
+                            <td>{{::item.ShippingCompany}}</td>
+                            <td>{{::item.ShippingFirstName}}</td>
+                            <td>{{::item.ShippingLastName}}</td>
+                            <td>{{::item.ShippingAddress1}}</td>
+                            <td>{{::item.ShippingAddress2}}</td>
+                            <td>{{::item.City}}</td>
+                            <td>{{::item.StateCode}}</td>
+                            <td>{{::item.Zip}}</td>
+                            <td>{{::item.Country}}</td>
+                            <td>{{::item.Phone}}</td>
+                            <td>{{::item.ShipDate | date:"MM/dd/yy"}}<br />{{::item.ShipDate | date:"h:mm a"}}</td>
+                            <td>{{::item.ShippingCarrier}}</td>
+                            <td>
+                                <a href="#">{{::item.ShippingIdConfirmation}}</a>
+                            </td>
+                            <td>
+                                <span data-ng-repeat="sku in item.Skus">
+                                    <span>{{sku.Code}} ({{sku.Quantity}})</span>
+                                    {{$last!=true ? ", " : ""}}
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </spinner-overlay>
+        <uib-pagination boundary-links="true"
+                        total-items="totalItems"
+                        items-per-page="filter.Paging.PageItemCount"
+                        data-ng-model="filter.Paging.PageIndex"
+                        previous-text="&lsaquo;"
+                        next-text="&rsaquo;"
+                        first-text="&laquo;"
+                        last-text="&raquo;"
+                        data-ng-change="pageChanged()">
+        </uib-pagination>
+    </div>
+</div>

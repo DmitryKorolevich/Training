@@ -125,6 +125,7 @@ BEGIN
 		SELECT Id FROM
 			(SELECT Id, ROW_NUMBER() OVER (ORDER BY Id DESC) AS RowNumber FROM orderids) temp
 		WHERE @pageindex is NULL OR (RowNumber>(@pageindex-1)*@pagesize AND RowNumber<=@pageindex*@pagesize)
+		ORDER BY Id DESC
 	END	 
 
 END

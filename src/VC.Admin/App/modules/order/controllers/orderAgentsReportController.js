@@ -266,18 +266,20 @@
 
         $scope.idAdminTeamChanged = function ()
         {
-            if ($scope.filter.IdAdminTeam != null)
+            if ($scope.filter.IdAdminTeams.length == 1 || $scope.filter.IdAdminTeams[0]==null)
             {
                 $scope.filter.IdAdmin = null;
             }
+            filterChanged();
         };
 
         $scope.idAdminChanged = function ()
         {
             if ($scope.filter.IdAdmin != null)
             {
-                $scope.filter.IdAdminTeam = null;
+                $scope.filter.IdAdminTeams = [null];
             }
+            filterChanged();
         };
 
         initialize();

@@ -174,7 +174,7 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    },
 	    getOrdersForWholesaleDropShipReportFile: function (filter, buildNumber)
 	    {
-	        return baseUrl + ('GetOrdersForWholesaleDropShipReportFile?from={0}&to={1}&shipfrom={2}&shipto={3}idcustomertype={4}&idtradeclass={5}'+
+	        return baseUrl + ('GetOrdersForWholesaleDropShipReportFile?from={0}&to={1}&shipfrom={2}&shipto={3}&idcustomertype={4}&idtradeclass={5}'+
                 '&customerfirstname={6}&customerlastname={7}&shipfirstname={8}&shiplastname={9}' +
                 '&shipidconfirm={10}&idorder={11}&ponumber={12}&buildNumber={13}')
                 .format(filter.From, filter.To, filter.ShipFrom, filter.ShipTo, filter.IdCustomerType, filter.IdTradeClass,

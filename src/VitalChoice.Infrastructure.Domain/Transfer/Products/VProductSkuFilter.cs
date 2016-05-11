@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
 
 namespace VitalChoice.Infrastructure.Domain.Transfer.Products
 {
@@ -18,7 +19,9 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Products
 
         public IList<int> IdProducts { get; set; }
 
-	    public bool ActiveOnly { get; set; }
+        public IList<ProductType> IdProductTypes { get; set; }
+
+        public bool ActiveOnly { get; set; }
 
 	    public bool NotHiddenOnly { get; set; }
     }
