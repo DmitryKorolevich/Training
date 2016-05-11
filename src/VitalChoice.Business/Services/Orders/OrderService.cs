@@ -191,7 +191,7 @@ namespace VitalChoice.Business.Services.Orders
                     if (model.IsAnyNotIncomplete())
                     {
                         await UpdateAffiliateOrderPayment(model, entity.Id, uow);
-                        await UpdateHealthwiseOrder(model, uow);
+                        await UpdateHealthwiseOrderWithOrder(model, uow);
                         await ChargeGiftCertificates(model, uow);
                         await ChargeOnetimeDiscount(model);
                         await uow.SaveChangesAsync();
@@ -237,7 +237,7 @@ namespace VitalChoice.Business.Services.Orders
                         if (entity != null)
                         {
                             await UpdateAffiliateOrderPayment(model, entity.Id, uow);
-                            await UpdateHealthwiseOrder(model, uow);
+                            await UpdateHealthwiseOrderWithOrder(model, uow);
                         }
                         await ChargeGiftCertificates(model, uow);
                     }
@@ -292,7 +292,7 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         //storefront update
                         await UpdateAffiliateOrderPayment(model, model.Id, uow);
-                        await UpdateHealthwiseOrder(model, uow);
+                        await UpdateHealthwiseOrderWithOrder(model, uow);
                         //charge one-time discount, remove old charge if different
                         paymentCopy.IdOrder = entity.Id;
                         if (!await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy))
@@ -358,7 +358,7 @@ namespace VitalChoice.Business.Services.Orders
 
                         //storefront update
                         await UpdateAffiliateOrderPayment(model, model.Id, uow);
-                        await UpdateHealthwiseOrder(model, uow);
+                        await UpdateHealthwiseOrderWithOrder(model, uow);
                     }
                     await uow.SaveChangesAsync();
 
@@ -1383,56 +1383,7 @@ namespace VitalChoice.Business.Services.Orders
                 }
             }
         }
-
-        private async Task UpdateHealthwiseOrder(OrderDynamic model, IUnitOfWorkAsync uow)
-        {
-            //model.IsHealthwise = true;
-            var healthwisePeriodRepository = uow.RepositoryAsync<HealthwisePeriod>();
-            var healthwiseOrderRepository = uow.RepositoryAsync<HealthwiseOrder>();
-            if (!model.IsHealthwise)
-            {
-                await healthwiseOrderRepository.DeleteAsync(model.Id);
-            }
-            else
-            {
-                HealthwiseOrder healthwiseOrder = (await healthwiseOrderRepository.Query(p => p.Id == model.Id).SelectAsync(false)).FirstOrDefault();
-                if (healthwiseOrder == null)
-                {
-                    var maxCount = _appInfrastructureService.Data().AppSettings.HealthwisePeriodMaxItemsCount;
-                    var dateNow = DateTime.Now;
-                    var periods = (await healthwisePeriodRepository.Query(p => p.IdCustomer == model.Customer.Id && dateNow >= p.StartDate && dateNow < p.EndDate && !p.PaidDate.HasValue).Include(p => p.HealthwiseOrders).SelectAsync(false)).ToList();
-
-                    bool addedToPeriod = false;
-                    foreach (var period in periods)
-                    {
-                        if (period.HealthwiseOrders.Count < maxCount)
-                        {
-                            healthwiseOrder = new HealthwiseOrder()
-                            {
-                                Id = model.Id,
-                                IdHealthwisePeriod = period.Id
-                            };
-                            await healthwiseOrderRepository.InsertAsync(healthwiseOrder);
-                            addedToPeriod = true;
-                            break;
-                        }
-                    }
-                    if (!addedToPeriod)
-                    {
-                        var period = new HealthwisePeriod();
-                        period.IdCustomer = model.Customer.Id;
-                        period.StartDate = dateNow;
-                        period.EndDate = period.StartDate.AddYears(1);
-                        period.HealthwiseOrders = new List<HealthwiseOrder>()
-                            {
-                                new HealthwiseOrder() {Id = model.Id}
-                            };
-                        await healthwisePeriodRepository.InsertGraphAsync(period);
-                    }
-                }
-            }
-        }
-
+        
         public async Task<PagedList<OrderInfoItem>> GetOrdersAsync2(VOrderFilter filter)
         {
             var conditions = new OrderQuery();
@@ -2278,7 +2229,7 @@ namespace VitalChoice.Business.Services.Orders
                 throw new AppValidationException(messages);
             }
 
-            return await UpdateHealthwiseOrderInnerAsync(order, isHealthwise);
+            return await UpdateHealthwiseOrderManualAsync(order, isHealthwise);
         }
 
         public async Task<bool> UpdateHealthwiseOrderAsync(int orderId, bool isHealthwise)
@@ -2290,64 +2241,75 @@ namespace VitalChoice.Business.Services.Orders
                 return false;
             }
 
-            return await UpdateHealthwiseOrderInnerAsync(order, isHealthwise);
+            return await UpdateHealthwiseOrderManualAsync(order, isHealthwise);
         }
 
-        private async Task<bool> UpdateHealthwiseOrderInnerAsync(OrderDynamic order, bool isHealthwise)
+        private async Task<bool> UpdateHealthwiseOrderManualAsync(OrderDynamic order, bool isHealthwise)
         {
             using (var uow = CreateUnitOfWork())
             {
-                var healthwiseOrderRepositoryAsync = uow.RepositoryAsync<HealthwiseOrder>();
-                var healthwisePeriodRepositoryAsync = uow.RepositoryAsync<HealthwisePeriod>();
-                if (!isHealthwise)
-                {
-                    healthwiseOrderRepositoryAsync.Delete(order.Id);
-                }
-                else
-                {
-                    HealthwiseOrder healthwiseOrder =
-                        (await healthwiseOrderRepositoryAsync.Query(p => p.Id == order.Id).SelectAsync(false)).FirstOrDefault();
-                    if (healthwiseOrder == null)
-                    {
-                        var maxCount = _appInfrastructureService.Data().AppSettings.HealthwisePeriodMaxItemsCount;
-                        var orderCreatedDate = order.DateCreated;
-                        var periods =
-                            (await
-                                healthwisePeriodRepositoryAsync.Query(
-                                    p =>
-                                        p.IdCustomer == order.Customer.Id && orderCreatedDate >= p.StartDate && orderCreatedDate < p.EndDate &&
-                                        !p.PaidDate.HasValue).Include(p => p.HealthwiseOrders).SelectAsync(false)).ToList();
-                        bool addedToPeriod = false;
-                        foreach (var period in periods)
-                        {
-                            if (period.HealthwiseOrders.Count < maxCount)
-                            {
-                                healthwiseOrder = new HealthwiseOrder()
-                                {
-                                    Id = order.Id,
-                                    IdHealthwisePeriod = period.Id
-                                };
-                                healthwiseOrderRepositoryAsync.Insert(healthwiseOrder);
-                                addedToPeriod = true;
-                                break;
-                            }
-                        }
-                        if (!addedToPeriod)
-                        {
-                            var period = new HealthwisePeriod();
-                            period.IdCustomer = order.Customer.Id;
-                            period.StartDate = orderCreatedDate;
-                            period.EndDate = period.StartDate.AddYears(1);
-                            period.HealthwiseOrders = new List<HealthwiseOrder>()
-                            {
-                                new HealthwiseOrder() {Id = order.Id}
-                            };
-                            healthwisePeriodRepositoryAsync.InsertGraph(period);
-                        }
-                    }
-                }
+                await UpdateHealthwiseOrderInnerAsync(uow, order.Id, order.Customer.Id, order.DateCreated, isHealthwise);
                 await uow.SaveChangesAsync();
                 return true;
+            }
+        }
+
+        private async Task UpdateHealthwiseOrderWithOrder(OrderDynamic model, IUnitOfWorkAsync uow)
+        {
+            //model.IsHealthwise = true;
+            await UpdateHealthwiseOrderInnerAsync(uow, model.Id, model.Customer.Id, DateTime.Now, model.IsHealthwise);
+        }
+
+        private async Task UpdateHealthwiseOrderInnerAsync(IUnitOfWorkAsync uow, int idOrder, int idCustomer, DateTime orderDateCreated, bool isHealthwise)
+        {
+            var healthwiseOrderRepositoryAsync = uow.RepositoryAsync<HealthwiseOrder>();
+            var healthwisePeriodRepositoryAsync = uow.RepositoryAsync<HealthwisePeriod>();
+            if (!isHealthwise)
+            {
+                healthwiseOrderRepositoryAsync.Delete(idOrder);
+            }
+            else
+            {
+                HealthwiseOrder healthwiseOrder =
+                    (await healthwiseOrderRepositoryAsync.Query(p => p.Id == idOrder).SelectAsync(false)).FirstOrDefault();
+                if (healthwiseOrder == null)
+                {
+                    var maxCount = _appInfrastructureService.Data().AppSettings.HealthwisePeriodMaxItemsCount;
+                    var orderCreatedDate = orderDateCreated;
+                    var periods =
+                        (await
+                            healthwisePeriodRepositoryAsync.Query(
+                                p =>
+                                    p.IdCustomer == idCustomer && orderCreatedDate >= p.StartDate && orderCreatedDate < p.EndDate &&
+                                    !p.PaidDate.HasValue).Include(p => p.HealthwiseOrders).SelectAsync(false)).ToList();
+                    bool addedToPeriod = false;
+                    foreach (var period in periods)
+                    {
+                        if (period.HealthwiseOrders.Count < maxCount)
+                        {
+                            healthwiseOrder = new HealthwiseOrder()
+                            {
+                                Id = idOrder,
+                                IdHealthwisePeriod = period.Id
+                            };
+                            healthwiseOrderRepositoryAsync.Insert(healthwiseOrder);
+                            addedToPeriod = true;
+                            break;
+                        }
+                    }
+                    if (!addedToPeriod)
+                    {
+                        var period = new HealthwisePeriod();
+                        period.IdCustomer = idCustomer;
+                        period.StartDate = orderCreatedDate;
+                        period.EndDate = period.StartDate.AddYears(1);
+                        period.HealthwiseOrders = new List<HealthwiseOrder>()
+                            {
+                                new HealthwiseOrder() {Id = idOrder}
+                            };
+                        healthwisePeriodRepositoryAsync.InsertGraph(period);
+                    }
+                }
             }
         }
 

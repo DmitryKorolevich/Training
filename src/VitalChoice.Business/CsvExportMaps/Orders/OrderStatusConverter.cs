@@ -41,7 +41,7 @@ namespace VitalChoice.Business.CsvExportMaps.Orders
 
         public override bool CanConvertTo(Type type)
         {
-            return type == typeof(OrderStatus);
+            return true;
         }
     }
 }

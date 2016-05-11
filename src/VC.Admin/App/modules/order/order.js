@@ -17,7 +17,8 @@ angular.module('app.modules.order', [
 	'app.modules.order.controllers.serviceCodeDetailController',
 	'app.modules.order.controllers.customerAutoShipsController',
 	'app.modules.order.controllers.manageAutoShipBillingController',
-	'app.modules.order.controllers.orderAgentsReportController'
+	'app.modules.order.controllers.orderAgentsReportController',
+	'app.modules.order.controllers.wholesaleDropShipReportController'
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -93,6 +94,11 @@ angular.module('app.modules.order', [
 				    url: '/report/order-agents',
 				    templateUrl: 'app/modules/order/partials/orderAgentsReport.html',
 				    controller: 'orderAgentsReportController'
+				})
+				.state('index.oneCol.wholesaleDropShipReport', {
+				    url: '/report/wholesale-dropship',
+				    templateUrl: 'app/modules/order/partials/wholesaleDropShipReport.html',
+				    controller: 'wholesaleDropShipReportController'
 				});
 		}
 ]);

@@ -21,6 +21,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 using VitalChoice.Data.Helpers;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Interfaces.Services.Settings;
 
 namespace VitalChoice.Business.Services.Orders
@@ -509,6 +510,7 @@ namespace VitalChoice.Business.Services.Orders
                 item.ShippingLastName = p.ShippingAddress?.SafeData.LastName;
                 item.ShippingAddress1 = p.ShippingAddress?.SafeData.Address1;
                 item.ShippingAddress1 = p.ShippingAddress?.SafeData.Address2;
+                item.Zip = p.ShippingAddress?.SafeData.Zip;
                 item.City = p.ShippingAddress?.SafeData.City;
                 item.Country = countries.FirstOrDefault(x=>x.Id==p.ShippingAddress?.IdCountry)?.CountryCode;
                 item.StateCode = countries.SelectMany(x=>x.States).FirstOrDefault(x => x.Id == p.ShippingAddress?.IdState)?.StateCode;
@@ -521,6 +523,14 @@ namespace VitalChoice.Business.Services.Orders
                     Price = x.Amount,
                     Quantity = x.Quantity,
                 }).ToList();
+
+                item.Skus.AddRange(p.PromoSkus.Select(x => new WholesaleDropShipReportSkuItem()
+                {
+                    Id = x.Sku?.Id ?? 0,
+                    Code = x.Sku?.Code,
+                    Price = x.Amount,
+                    Quantity = x.Quantity,
+                }));
 
                 toReturn.Items.Add(item);
             });

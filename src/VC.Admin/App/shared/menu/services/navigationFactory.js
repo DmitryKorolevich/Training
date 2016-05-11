@@ -84,7 +84,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				    stateLabel: 'Wholesale',
 				    subMenu: [
                     //    { name: 'wholesaleSummaryReport', stateName: 'index.oneCol.wholesaleSummaryReport', stateLabel: 'Wholesale Summary Report', access: 3 },
-                    //    { name: 'wholesaleDropShipOrdersReport', stateName: 'index.oneCol.wholesaleDropShipOrdersReport', stateLabel: 'Wholesale Drop Ship Orders Report', access: 3 },
+                        { name: 'wholesaleDropShipReport', stateName: 'index.oneCol.wholesaleDropShipReport', stateLabel: 'Wholesale Drop Ship Orders Report', access: 3 },
 				    ]
 				},
 				{

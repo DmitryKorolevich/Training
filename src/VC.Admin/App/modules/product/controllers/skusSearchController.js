@@ -62,6 +62,14 @@
             };
         }
 
+        $scope.$on('skusSearch#in#init', function (event, args)
+        {
+            if (args.name == $scope.name)
+            {
+                $scope.filter.IdProductTypes = args.IdProductTypes;
+            };
+        });
+
         $scope.$on('skusSearch#in#setBlockIds', function (event, args) {
             if (args.name == $scope.name) {
                 var blockIds = args.blockIds;

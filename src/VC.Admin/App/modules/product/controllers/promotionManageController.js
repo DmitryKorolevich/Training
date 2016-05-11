@@ -164,6 +164,7 @@ angular.module('app.modules.product.controllers.promotionManageController', [])
 
 			            setSelected($scope.rootCategory, $scope.promotion.SelectedCategoryIds);
 			            addProductsListWatchers();
+			            initGetProductsSearch();
 			        } else
 			        {
 			            errorHandler(result);
@@ -173,6 +174,14 @@ angular.module('app.modules.product.controllers.promotionManageController', [])
 			    {
 			        errorHandler(result);
 			    });
+        };
+
+        var initGetProductsSearch = function ()
+        {
+            var data = {};
+            data.name = "PromotionsToGetSkus";
+            data.IdProductTypes = [1,2];//not gcs or egcs
+            $scope.$broadcast('skusSearch#in#init', data);
         };
 
         $scope.save = function ()
