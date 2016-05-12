@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Interfaces.Services.Affiliates;
@@ -25,7 +26,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions
                 var hasOrders =
                     await customerService.GetCustomerHasAffiliateOrders(context.Order.Customer.Id, context.Order.Id);
                 var affiliate = await affiliateService.SelectAsync(context.Order.Customer.IdAffiliate.Value, true);
-                if (affiliate != null)
+                if (affiliate?.StatusCode == (int)AffiliateStatus.Active)
                 {
                     decimal result;
 
