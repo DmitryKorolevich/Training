@@ -19,14 +19,14 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Promo
         public override Task<decimal> ExecuteActionAsync(OrderDataContext context,
             IWorkflowExecutionContext executionContext)
         {
-            IEnumerable<PromotionDynamic> eligiable;
+            IEnumerable<PromotionDynamic> eligiable = context.Promotions.Where(p => p.IdObjectType == (int)PromotionType.CategoryDiscount);
             if (context.Order.Discount != null && context.Order.Discount.Id != 0)
             {
-                eligiable = context.Promotions.Where(p => p.IdObjectType == (int)PromotionType.CategoryDiscount && (bool)p.Data.CanUseWithDiscount);
+                eligiable = eligiable.Where(p => (bool)p.Data.CanUseWithDiscount);
             }
-            else
+            if ((bool?) context.Order.SafeData.IsHealthwise ?? false)
             {
-                eligiable = context.Promotions.Where(p => p.IdObjectType == (int)PromotionType.CategoryDiscount);
+                eligiable = context.Promotions.Where(p => (bool) p.Data.AllowHealthwise);
             }
             foreach (var promo in eligiable)
             {

@@ -78,10 +78,12 @@ namespace VitalChoice.Workflow.Configuration
             order.Action<SetupPromoAction>("PromoSetup");
             order.Action<CategoryPromoAction>("CategoryPromotions", action =>
             {
+                action.Dependency<HealthwiseSetupAction>();
                 action.Dependency<SetupPromoAction>();
             });
             order.Action<BuyXGetYPromoAction>("PromoBuyXGetY", action =>
             {
+                action.Dependency<HealthwiseSetupAction>();
                 action.Dependency<SetupPromoAction>();
             });
 
@@ -187,10 +189,14 @@ namespace VitalChoice.Workflow.Configuration
 
             order.ActionResolver<ReductionTypeActionResolver>("Discount", action =>
             {
+                action.Dependency<HealthwiseSetupAction>();
+
                 action.ResolvePath<HealthwiseDiscountAction>((int)ReductionType.HealthWise, "HealthwiseDiscount");
                 action.ResolvePath<AutoShipDiscountAction>((int) ReductionType.AutoShip, "AutoShipDiscount");
                 action.ResolvePath<DiscountTypeActionResolver>((int) ReductionType.Discount, "NormalDiscount");
             });
+
+            order.Action<HealthwiseSetupAction>("HealthwiseSetup");
 
             order.Action<HealthwiseDiscountAction>("HealthwiseDiscount", action =>
             {

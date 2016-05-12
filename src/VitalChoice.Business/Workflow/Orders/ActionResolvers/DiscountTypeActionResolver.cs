@@ -106,7 +106,6 @@ namespace VitalChoice.Business.Workflow.Orders.ActionResolvers
                     if ((bool?) dataContext.Order.Customer?.SafeData.HasHealthwiseOrders ?? false)
                     {
                         dataContext.Order.IsFirstHealthwise = false;
-                        dataContext.Order.Data.IsHealthwise = true;
                     }
                 }
                 else
