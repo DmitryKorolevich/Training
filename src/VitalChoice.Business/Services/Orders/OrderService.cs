@@ -713,12 +713,15 @@ namespace VitalChoice.Business.Services.Orders
                     orderType = (int)SourceOrderType.Phone;
                 }
                 order.Data.OrderType = orderType.Value;
-                //order.ShippingAddress.Id = 0;
-                //if (order.PaymentMethod.Address != null)
-                //{
-                //    order.PaymentMethod.Address.Id = 0;
-                //}
-                //order.PaymentMethod.Id = 0;
+                order.ShippingAddress.Id = 0;
+                if (order.PaymentMethod != null)
+                {
+                    order.PaymentMethod.Id = 0;
+                    if (order.PaymentMethod.Address != null)
+                    {
+                        order.PaymentMethod.Address.Id = 0;
+                    }
+                }
             }
         }
 
