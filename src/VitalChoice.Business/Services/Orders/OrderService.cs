@@ -1066,6 +1066,7 @@ namespace VitalChoice.Business.Services.Orders
 
             if (model.IdObjectType == (int)OrderType.AutoShip)
             {
+                int? idAutoShipOrder=null;
                 using (var transaction = uow.BeginTransaction())
                 {
                     try
@@ -1087,10 +1088,16 @@ namespace VitalChoice.Business.Services.Orders
 							model.Id = 0;
                             model.ShippingAddress.Id = 0;
 
-							await InsertAsyncInternal(model, uow);
+                            idAutoShipOrder = (await InsertAsyncInternal(model, uow)).Id;
                         }
 
                         transaction.Commit();
+
+                        if (idAutoShipOrder.HasValue)
+                        {
+                            var entity = await SelectEntityFirstAsync(o => o.Id == idAutoShipOrder.Value);
+                            await LogItemChanges(new[] { await DynamicMapper.FromEntityAsync(entity) });
+                        }
                     }
                     catch
                     {
@@ -1160,6 +1167,7 @@ namespace VitalChoice.Business.Services.Orders
             List<Order> res = new List<Order>();
             if (autoShips.Any())
             {
+                List<int> autoShipOrderIds = null;
                 using (var transaction = uow.BeginTransaction())
                 {
                     try
@@ -1188,10 +1196,16 @@ namespace VitalChoice.Business.Services.Orders
                                 model.Id = 0;
                             }
 
-                            await InsertRangeInternalAsync(completed, uow);
+                            autoShipOrderIds =(await InsertRangeInternalAsync(completed, uow)).Select(p=>p.Id).ToList();
                         }
 
                         transaction.Commit();
+
+                        if (autoShipOrderIds!=null)
+                        {
+                            var entities = await SelectEntitiesAsync(o => autoShipOrderIds.Contains(o.Id));
+                            await LogItemChanges(await DynamicMapper.FromEntityRangeAsync(entities));
+                        }
                     }
                     catch
                     {
@@ -1218,7 +1232,7 @@ namespace VitalChoice.Business.Services.Orders
             if (model.IdObjectType == (int)OrderType.AutoShip)
             {
                 var previous = await SelectEntityFirstAsync(x => x.Id == model.Id);
-
+                int? idAutoShipOrder = null;
                 using (var transaction = uow.BeginTransaction())
                 {
                     try
@@ -1238,10 +1252,13 @@ namespace VitalChoice.Business.Services.Orders
                             model.PaymentMethod.Id = 0;
                             model.ShippingAddress.Id = 0;
 
-                            await InsertAsyncInternal(model, uow);
+                            idAutoShipOrder =(await InsertAsyncInternal(model, uow)).Id;
                         }
 
                         transaction.Commit();
+
+                        var entity = await SelectEntityFirstAsync(o => o.Id == idAutoShipOrder.Value);
+                        await LogItemChanges(new[] { await DynamicMapper.FromEntityAsync(entity) });
                     }
                     catch
                     {
@@ -1267,6 +1284,7 @@ namespace VitalChoice.Business.Services.Orders
             List<Order> res = new List<Order>();
             if (autoShips.Any())
             {
+                List<int> autoShipOrderIds = null;
                 using (var transaction = uow.BeginTransaction())
                 {
                     try
@@ -1301,11 +1319,18 @@ namespace VitalChoice.Business.Services.Orders
 
                             if (toInsert.Any())
                             {
-                                await InsertRangeInternalAsync(toInsert, uow);
+                                autoShipOrderIds = (await InsertRangeInternalAsync(toInsert, uow)).Select(p=>p.Id).ToList();
                             }
                         }
 
                         transaction.Commit();
+
+
+                        if (autoShipOrderIds != null)
+                        {
+                            var entities = await SelectEntitiesAsync(o => autoShipOrderIds.Contains(o.Id));
+                            await LogItemChanges(await DynamicMapper.FromEntityRangeAsync(entities));
+                        }
                     }
                     catch
                     {

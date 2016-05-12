@@ -49,7 +49,7 @@
                                                 <div data-ng-if="order.IdObjectType==1 || order.IdObjectType==2" class="inline-block">
                                                     <form class="form-horizontal" name="forms.topForm" data-ng-submit="save()" data-ng-class="{submitted: forms.topForm.submitted}" novalidate unsaved-warning-form>
                                                         <label data-ng-if="autoShipOrderOptionShow" class="checkbox-inline">
-                                                            <input type="checkbox" data-ng-model="order.IdObjectType" data-ng-change="requestRecalculate()"  ng-true-value="2" ng-false-value="1" data-ng-disabled="orderEditDisabled">Auto-Ship Order
+                                                            <input type="checkbox" data-ng-model="order.IdObjectType" data-ng-change="requestRecalculate()" ng-true-value="2" ng-false-value="1" data-ng-disabled="orderEditDisabled">Auto-Ship Order
                                                             <i class="fa fa-history"></i>
                                                         </label>
                                                         <div data-ng-if="autoShipOrderOptionShow" class="auto-ship-frequency">
@@ -107,7 +107,7 @@
                                                                        uib-typeahead-on-select="productNameChanged($index)" uib-typeahead-wait-ms="100" data-ng-disabled="orderEditDisabled">
                                                             </div>
                                                             <div data-ng-if="item.GCCodes" class="input-group">
-                                                                <span data-ng-repeat="gc in item.GCCodes"><em>GC Code: {{gc}}</em><br/></span>
+                                                                <span data-ng-repeat="gc in item.GCCodes"><em>GC Code: {{gc}}</em><br /></span>
                                                             </div>
                                                         </td>
                                                         <td class="price">
@@ -245,32 +245,32 @@
                                                             </div>
                                                         </div>
                                                     </div>
-	                                                <div data-ng-hide="order.IdObjectType==2">
-		                                                <span class="legend">Ship Delay</span>
-		                                                <div class="form-group">
-			                                                <label class="col-md-12 control-label left">Ship Delay Order?</label>
-			                                                <div class="col-md-12">
-				                                                <label class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="0" type="radio" data-ng-disabled="orderEditDisabled">None</label>
-				                                                <label class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="1" type="radio" data-ng-disabled="orderEditDisabled">Entire Order</label>
-				                                                <label data-ng-if="order.ShouldSplit && order.IdObjectType!=3" class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="2" type="radio" data-ng-disabled="orderEditDisabled">Perishable & Non-Perishable</label>
-			                                                </div>
-		                                                </div>
-		                                                <div data-ng-if="order.ShipDelayType==1" class="form-group">
-			                                                <label for="date" class="col-md-6 control-label">Ship Date</label>
-			                                                <div class="col-md-6">
-				                                                <p class="input-group">
-					                                                <input type="text" name="ShipDelayDate" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDate" is-open="shipDelayDateOpened" required data-ng-disabled="orderEditDisabled"/>
-					                                                <span class="input-group-btn">
-                                                                    <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
-                                                                </span>
-				                                                </p>
-				                                                <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.ShipDelayDate.$invalid">
-					                                                <small class="error" ng-show="forms.mainForm.ShipDelayDate.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Date")}}</small>
-					                                                <small class="error" ng-show="forms.mainForm.ShipDelayDate.$error.server">{{serverMessages.GetMessage('ShipDelayDate')}}</small>
-				                                                </div>
-			                                                </div>
-		                                                </div>
-	                                                </div>
+                                                    <div data-ng-hide="order.IdObjectType==2">
+                                                        <span class="legend">Ship Delay</span>
+                                                        <div class="form-group">
+                                                            <label class="col-md-12 control-label left">Ship Delay Order?</label>
+                                                            <div class="col-md-12">
+                                                                <label class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="0" type="radio" data-ng-disabled="orderEditDisabled">None</label>
+                                                                <label class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="1" type="radio" data-ng-disabled="orderEditDisabled">Entire Order</label>
+                                                                <label data-ng-if="order.ShouldSplit && order.IdObjectType!=3" class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="2" type="radio" data-ng-disabled="orderEditDisabled">Perishable & Non-Perishable</label>
+                                                            </div>
+                                                        </div>
+                                                        <div data-ng-if="order.ShipDelayType==1" class="form-group">
+                                                            <label for="date" class="col-md-6 control-label">Ship Date</label>
+                                                            <div class="col-md-6">
+                                                                <p class="input-group">
+                                                                    <input type="text" name="ShipDelayDate" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDate" is-open="shipDelayDateOpened" required data-ng-disabled="orderEditDisabled" />
+                                                                    <span class="input-group-btn">
+                                                                        <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                                    </span>
+                                                                </p>
+                                                                <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.ShipDelayDate.$invalid">
+                                                                    <small class="error" ng-show="forms.mainForm.ShipDelayDate.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Date")}}</small>
+                                                                    <small class="error" ng-show="forms.mainForm.ShipDelayDate.$error.server">{{serverMessages.GetMessage('ShipDelayDate')}}</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                     <div data-ng-if="order.ShipDelayType==2 && order.ShouldSplit" class="form-group">
                                                         <label for="date" class="col-md-6 control-label">Perishable Ship Date</label>
                                                         <div class="col-md-6">
@@ -519,16 +519,16 @@
                             </div>
                         </div>
                     </uib-tab>
-                <uib-tab heading="Order History">
-	                <div class="container-fluid">
-		                <div ng-controller="customerOrdersController" onload="name = 'CustomerOrders'" data-ng-include="'app/modules/order/partials/customerOrdersList.html'"></div>
-	                </div>
-                </uib-tab>
-					<uib-tab heading="Auto-Ship">
-						<div class="container-fluid">
-							<div ng-controller="customerAutoShipsController" data-ng-include="'app/modules/order/partials/autoShipList.html'"></div>
-						</div>
-					</uib-tab>
+                    <uib-tab heading="Order History">
+                        <div class="container-fluid">
+                            <div ng-controller="customerOrdersController" onload="name = 'CustomerOrders'" data-ng-include="'app/modules/order/partials/customerOrdersList.html'"></div>
+                        </div>
+                    </uib-tab>
+                    <uib-tab heading="Auto-Ship">
+                        <div class="container-fluid">
+                            <div ng-controller="customerAutoShipsController" data-ng-include="'app/modules/order/partials/autoShipList.html'"></div>
+                        </div>
+                    </uib-tab>
                     <uib-tab data-ng-if="!id" heading="Account Profile" active="accountProfileTab.active">
                         <div class="container container-left">
                             <div class="well row">
@@ -614,11 +614,10 @@
                                             <span class="legend">Profile Details</span>
                                             <div class="form-group">
                                                 <label for="linked" class="col-md-3 control-label">Linked to Affiliate</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" name="LinkedToAffiliate" class="form-control" id="linked" data-ng-model="currentCustomer.LinkedToAffiliate" placeholder="Linked to Affiliate" data-ng-maxlength="100" autocomplete="off" data-ng-disabled="orderEditDisabled">
-                                                    <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.LinkedToAffiliate.$invalid">
-                                                        <small class="error" ng-show="forms.profile.LinkedToAffiliate.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Linked to Affiliate", "100"])}}</small>
-                                                        <small class="error" ng-show="forms.profile.LinkedToAffiliate.$error.server">{{serverMessages.GetMessage('LinkedToAffiliate')}}</small>
+                                                <div class="col-md-3">
+                                                    <input type="text" name="IdAffiliate" class="form-control" id="linked" data-ng-model="currentCustomer.IdAffiliate" numbers-only numbers-only-deny-zero placeholder="Linked to Affiliate" autocomplete="off">
+                                                    <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.IdAffiliate.$invalid">
+                                                        <small class="error" ng-show="forms.profile.IdAffiliate.$error.server">{{serverMessages.GetMessage('IdAffiliate')}}</small>
                                                     </div>
                                                 </div>
                                             </div>

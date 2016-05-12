@@ -61,6 +61,7 @@ namespace VC.Admin.ModelConverters
                 model.DiscountCode = dynamic.Discount.Code;
                 model.DiscountMessage = dynamic.Discount.GetDiscountMessage((int?)dynamic.SafeData.IdDiscountTier);
             }
+            model.DiscountedSubtotal = model.ProductsSubtotal - model.DiscountTotal;
 
             if(dynamic.GiftCertificates!=null && dynamic.GiftCertificates.Count>0)
             {
