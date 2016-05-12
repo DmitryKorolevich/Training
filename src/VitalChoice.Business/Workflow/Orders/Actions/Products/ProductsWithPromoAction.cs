@@ -43,6 +43,10 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
                     promo.Enabled = false;
 
                 }
+                if (!(bool)promo.Promotion.Data.AllowHealthwise)
+                {
+                    dataContext.Order.Data.IsHealthwise = false;
+                }
             }
             dataContext.ProductsSubtotal = dataContext.Data.Products + promoAmount;
             return Task.FromResult(promoAmount);

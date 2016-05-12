@@ -27,10 +27,6 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Promo
             {
                 eligiable = eligiable.Where(p => (bool)p.Data.CanUseWithDiscount);
             }
-            if ((bool?)context.Order.SafeData.IsHealthwise ?? false)
-            {
-                eligiable = context.Promotions.Where(p => (bool)p.Data.AllowHealthwise);
-            }
             var productService = executionContext.Resolve<IProductService>();
             foreach (var promo in eligiable)
             {

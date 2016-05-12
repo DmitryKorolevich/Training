@@ -299,7 +299,8 @@ namespace VitalChoice.Ecommerce.Context
 
             builder.Entity<ProductToCategory>(entity =>
             {
-                entity.HasKey(p => p.Id);
+                entity.Ignore(p => p.Id);
+                entity.HasKey(p => new { p.IdProduct, p.IdCategory });
                 entity.ToTable("ProductsToCategories");
             });
 
