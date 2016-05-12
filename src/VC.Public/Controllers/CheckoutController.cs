@@ -390,20 +390,15 @@ namespace VC.Public.Controllers
                 if (cart.Order.ShippingAddress != null && cart.Order.ShippingAddress.Id != 0 &&
                     !string.IsNullOrEmpty(cart.Order.ShippingAddress.SafeData.FirstName))
                 {
-                    await _addressConverter.UpdateModelAsync<ShippingInfoModel>(shippingMethodModel, cart.Order.ShippingAddress);
+                    await _addressConverter.UpdateModelAsync(shippingMethodModel, cart.Order.ShippingAddress);
                 }
                 else if (defaultShipping != null)
                 {
-                    await _addressConverter.UpdateModelAsync<ShippingInfoModel>(shippingMethodModel, defaultShipping);
+                    await _addressConverter.UpdateModelAsync(shippingMethodModel, defaultShipping);
 					shippingMethodModel.ShipAddressIdToOverride = defaultShipping.Id;
 				}
-                //else
-                //{
-                //    _addressConverter.UpdateModel<ShippingInfoModel>(shippingMethodModel, currentCustomer.ProfileAddress);
-                //}
                 shippingMethodModel.IsGiftOrder = cart.Order.SafeData.GiftOrder;
                 shippingMethodModel.GiftMessage = cart.Order.SafeData.GiftMessage;
-                //shippingMethodModel.DeliveryInstructions = cart.Order.SafeData.DeliveryInstructions;
                 var addresses = GetShippingAddresses(cart.Order, currentCustomer);
                 var i = 0;
                 ViewBag.ShippingAddresses = addresses.ToDictionary(x => i++,
@@ -445,8 +440,6 @@ namespace VC.Public.Controllers
                                 await _addressConverter.FromModelAsync(
                                     await _addressConverter.ToModelAsync<AddUpdateShippingMethodModel>(cart.Order.PaymentMethod.Address),
                                     (int) AddressType.Shipping);
-                            //cart.Order.Data.DeliveryInstructions = model.DeliveryInstructions;
-                            //cart.Order.Data.AddressType = model.AddressType;
                         }
                         else
                         {
@@ -462,8 +455,6 @@ namespace VC.Public.Controllers
                             var billingMapped = await _addressConverter.ToModelAsync<AddUpdateShippingMethodModel>(cart.Order.PaymentMethod.Address);
                             await _addressConverter.UpdateObjectAsync(billingMapped, cart.Order.ShippingAddress);
                             cart.Order.ShippingAddress.Id = model.Id;
-                            //cart.Order.Data.DeliveryInstructions = model.DeliveryInstructions;
-                            //cart.Order.Data.AddressType = model.AddressType;
                         }
                         else
                         {
