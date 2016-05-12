@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Base;
@@ -23,13 +24,24 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
                     if (promo.Sku.SafeData.Stock < promo.Quantity)
                     {
                         promo.Messages.Add(
-                                new MessageInfo()
-                                {
-                                    MessageLevel = MessageLevel.Error,
-                                    Message = "Сurrently out of stock. Please remove to continue."
-                                });
+                            new MessageInfo()
+                            {
+                                MessageLevel = MessageLevel.Error,
+                                Message = "Сurrently out of stock. Please remove to continue."
+                            });
                         promo.Enabled = false;
                     }
+                }
+                if (promo.Sku.IdObjectType == (int) ProductType.EGс || promo.Sku.IdObjectType == (int) ProductType.Gc)
+                {
+                    promo.Messages.Add(
+                        new MessageInfo()
+                        {
+                            MessageLevel = MessageLevel.Error,
+                            Message = "Promo product can't be a gift certificate. Gift certificates can't be discounted."
+                        });
+                    promo.Enabled = false;
+
                 }
             }
             dataContext.ProductsSubtotal = dataContext.Data.Products + promoAmount;
