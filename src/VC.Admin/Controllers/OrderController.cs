@@ -258,6 +258,7 @@ namespace VC.Admin.Controllers
         public async Task<Result<OrderCalculateModel>> CalculateOrder([FromBody]OrderManageModel model)
         {
             var order = await _mapper.FromModelAsync(model);
+            await _orderService.OrderTypeSetup(order);
             var orderContext = await _orderService.CalculateOrder(order, model.CombinedEditOrderStatus);
 
             OrderCalculateModel toReturn = new OrderCalculateModel(orderContext);
