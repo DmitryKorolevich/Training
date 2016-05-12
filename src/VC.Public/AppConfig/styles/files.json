@@ -10,6 +10,6 @@
     "assets/styles/main.css",
     "assets/scripts/vendor/jquery-ui/jquery-ui.min.css",
     "assets/styles/site.css",
-    "scripts/vendor/nivoslider/default.css"
+    "assets/scripts/vendor/nivoslider/default.css"
   ]
 }
