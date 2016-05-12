@@ -938,6 +938,29 @@ angular.module('app.modules.order.services.orderEditService', [])
         {
             uiScope.legend.CustomerId = uiScope.idCustomer;
         }
+
+        if (uiScope.order.ShippingUpgradeP)
+        {
+            var options = $.grep($rootScope.ReferenceData.ShippingUpgrades, function (item, index)
+            {
+                return item.Key == uiScope.order.ShippingUpgradeP;
+            });
+            if (options.length > 0)
+            {
+                uiScope.shippingUpgradePOptions = options;
+            }
+        }
+        if (uiScope.order.ShippingUpgradeNP)
+        {
+            var options = $.grep($rootScope.ReferenceData.ShippingUpgrades, function (item, index)
+            {
+                return item.Key == uiScope.order.ShippingUpgradeNP;
+            });
+            if (options.length > 0)
+            {
+                uiScope.shippingUpgradeNPOptions = options;
+            }
+        }
     };
 
     var baseReferencedDataInit = function(uiScope){

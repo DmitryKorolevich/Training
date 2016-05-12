@@ -153,6 +153,8 @@ namespace VC.Admin.ModelConverters
                             }
                         }
                     }
+
+                    model.RefundGCsUsedOnOrder = model.RefundOrderToGiftCertificates.Sum(p => p.Amount);
                 }
 
                 //sync AmountRefunded on refundgcs

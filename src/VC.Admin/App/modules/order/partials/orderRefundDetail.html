@@ -33,12 +33,12 @@
                             <a ui-sref="index.oneCol.orderRefundDetail({id: item })"><strong>{{item}}</strong></a><br />
                         </span>
                     </span>
-                    <span data-ng-if="legend.CustomerName" class="item">Customer: <strong>{{legend.CustomerName}}</strong></span>
-                    <span data-ng-if="legend.CustomerId" class="item">Customer ID: <strong>{{legend.CustomerId}}</strong></span>
+                    <span class="item">Customer: <strong>{{legend.CustomerName}}</strong></span>
+                    <span class="item">Customer ID: <strong>{{legend.CustomerId}}</strong></span>
                     <br />
-                    <span data-ng-if="legend.OrderSourceDateCreated" class="item">Order Date: <strong>{{::legend.OrderSourceDateCreated | date:"MM/dd/yy"}} {{::legend.OrderSourceDateCreated | date:"h:mm a"}}</strong></span>
-                    <span data-ng-if="legend.OrderSourceTotal" class="item">Total Order Amount: <strong>{{legend.OrderSourceTotal | currency}}</strong></span>
-                    <span data-ng-if="legend.OrderSourcePaymentMethodType" class="item">Form of Payment: <strong>{{::getReferenceItem(ReferenceData.PaymentMethods, legend.OrderSourcePaymentMethodType).Text}}</strong></span>
+                    <span class="item">Order Date: <strong>{{::legend.OrderSourceDateCreated | date:"MM/dd/yy"}} {{::legend.OrderSourceDateCreated | date:"h:mm a"}}</strong></span>
+                    <span class="item">Total Order Amount: <strong>{{legend.OrderSourceTotal | currency}}</strong></span>
+                    <span class="item">Form of Payment: <strong>{{::getReferenceItem(ReferenceData.PaymentMethods, legend.OrderSourcePaymentMethodType).Text}}</strong></span>
                     <br />
                     <span data-ng-if="legend.OrderId" class="item">Order ID: <strong>{{legend.OrderId}}</strong></span>
                     <span data-ng-if="legend.OrderDate" class="item">Order Date: <strong>{{legend.OrderDate | date:"MM/dd/yy"}} {{::legend.OrderDate | date:"h:mm a"}}</strong></span>
