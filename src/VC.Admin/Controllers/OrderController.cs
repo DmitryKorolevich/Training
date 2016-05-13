@@ -1059,13 +1059,6 @@ namespace VC.Admin.Controllers
 
         #region OrderEmails
 
-        [HttpGet]
-        public async Task<Result<bool>> TestReviewEmail(int id)
-        {
-            await _orderSchedulerService.SendOrderProductReviewEmailTest(id);
-            return true;
-        }
-
         [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
         public async Task<Result<bool>> SendOrderConfirmationEmail(int id, [FromBody]OrderManualSendConfirmationModel model)

@@ -23,6 +23,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Validation.Models;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
+using VitalChoice.Interfaces.Services.Orders;
 
 namespace VC.Public.Controllers
 {
@@ -35,6 +36,8 @@ namespace VC.Public.Controllers
         private readonly IPaymentMethodService _paymentMethodService;
 		private readonly IDynamicMapper<CustomerDynamic, Customer> _customerMapper;
         private readonly INotificationService _notificationService;
+        private readonly IOrderSchedulerService _orderSchedulerService;
+
 
         public AccountController(
             IStorefrontUserService userService,
@@ -43,6 +46,7 @@ namespace VC.Public.Controllers
             IAffiliateService affiliateService,
             IPaymentMethodService paymentMethodService,
             INotificationService notificationService,
+            IOrderSchedulerService orderSchedulerService,
             IPageResultService pageResultService) : base(pageResultService)
 		{
 			_userService = userService;
@@ -51,7 +55,16 @@ namespace VC.Public.Controllers
             _affiliateService = affiliateService;
             _paymentMethodService = paymentMethodService;
             _notificationService = notificationService;
+            _orderSchedulerService = orderSchedulerService;
+
 		}
+
+        [HttpGet]
+        public async Task<Result<bool>> TestReviewEmail(int id)
+        {
+            await _orderSchedulerService.SendOrderProductReviewEmailTest(id);
+            return true;
+        }
 
         [HttpGet]
         public IActionResult Login(string alreadyTakenEmail = null, bool forgot = false, int? type=null, string returnUrl = null)
