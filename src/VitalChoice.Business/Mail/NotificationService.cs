@@ -1,9 +1,13 @@
-﻿using Microsoft.Extensions.OptionsModel;
+﻿using System.Collections.Generic;
+using Microsoft.Extensions.OptionsModel;
 using System.Threading.Tasks;
+using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Entities.Newsletters;
 using VitalChoice.Infrastructure.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Mail
@@ -12,22 +16,27 @@ namespace VitalChoice.Business.Mail
     {
 	    private readonly IEmailSender emailSender;
         private readonly IEmailTemplateService _emailTemplateService;
+        private readonly IEcommerceRepositoryAsync<NewsletterBlockedEmail> _newsletterBlockedEmailRepository;
         private static string _mainSuperAdminEmail;
         private static string _adminHost;
         private static string _publicHost;
 
         public NotificationService(IEmailSender emailSender,
             IEmailTemplateService emailTemplateService,
+            IEcommerceRepositoryAsync<NewsletterBlockedEmail> newsletterBlockedEmailRepository,
             IOptions<AppOptions> appOptions)
 	    {
 		    this.emailSender = emailSender;
             _emailTemplateService = emailTemplateService;
+            _newsletterBlockedEmailRepository = newsletterBlockedEmailRepository;
             _mainSuperAdminEmail = appOptions.Value.MainSuperAdminEmail;
             _adminHost = appOptions.Value.AdminHost;
             _publicHost = appOptions.Value.PublicHost;
         }
 
-	    public async Task SendAdminUserActivationAsync(string email, UserActivation activation)
+        #region SendEmails
+
+        public async Task SendAdminUserActivationAsync(string email, UserActivation activation)
 	    {
             var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.AdminRegistration, activation);
 
@@ -245,5 +254,42 @@ namespace VitalChoice.Business.Mail
                 await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body);
             }
         }
+
+        public async Task SendOrderProductReviewEmailAsync(ICollection<OrderProductReviewEmail> models)
+        {
+            var items = await _emailTemplateService.GenerateEmailsAsync(EmailConstants.OrderProductReviewEmail, models);
+
+            if (items != null)
+            {
+                foreach (var item in items)
+                {
+                    await emailSender.SendEmailAsync(item.Key.Email, item.Value.Subject, item.Value.Body);
+                }
+            }
+        }
+
+        #endregion
+
+        #region Newsletters
+
+        public async Task<bool> IsEmailUnsubscribedAsync(int idNewsletter, string email)
+        {
+            return await _newsletterBlockedEmailRepository.Query(p=>p.IdNewsletter== idNewsletter && p.Email==email).SelectAnyAsync();
+        }
+
+        public async Task<bool> UnsubscribeEmailAsync(int idNewsletter, string email)
+        {
+            var exist = await _newsletterBlockedEmailRepository.Query(p => p.IdNewsletter == idNewsletter && p.Email == email).SelectAnyAsync();
+            if (!exist)
+            {
+                NewsletterBlockedEmail item=new NewsletterBlockedEmail();
+                item.IdNewsletter = idNewsletter;
+                item.Email = email;
+                await _newsletterBlockedEmailRepository.InsertAsync(item);
+            }
+            return true;
+        }
+
+        #endregion
     }
 }

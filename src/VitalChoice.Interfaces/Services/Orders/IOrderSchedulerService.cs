@@ -14,5 +14,9 @@ namespace VitalChoice.Interfaces.Services.Orders
 	public interface IOrderSchedulerService
 	{
         Task UpdateShipDelayedOrders();
-    }
+
+	    Task SendOrderProductReviewEmails();
+
+	    Task SendOrderProductReviewEmailTest(int id);
+	}
 }

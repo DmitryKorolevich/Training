@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using Authorize.Net.Util;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -10,6 +12,13 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.OptionsModel;
+using VitalChoice.Business.Mail;
+using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Ecommerce.Domain.Mail;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -17,15 +26,21 @@ namespace VitalChoice.Business.Services.Orders
     {
         private readonly OrderService _orderService;
         private readonly ICustomerService _customerService;
+        private readonly INotificationService _notificationService;
+        private readonly IOptions<AppOptions> _options;
         private readonly ILogger _logger;
 
         public OrderSchedulerService(
             OrderService orderService,
             ICustomerService customerService,
+            INotificationService notificationService,
+            IOptions<AppOptions> options,
             ILoggerProviderExtended loggerProvider)
         {
             _orderService = orderService;
             _customerService = customerService;
+            _notificationService = notificationService;
+            _options = options;
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -137,6 +152,39 @@ namespace VitalChoice.Business.Services.Orders
             {
                 _logger.LogCritical("Error till ShipDelayed orders updating", e);
             }
+        }
+
+        public async Task SendOrderProductReviewEmails()
+        {
+            //get orders by part ship date in range from EmailConstants.OrderProductReviewEmailDaysCount to EmailConstants.OrderProductReviewEmailDaysCount+1
+            //and check that customers of these orders have emails and these emails aren't in the black list and then send emails for them
+        }
+
+        public async Task SendOrderProductReviewEmailTest(int id)
+        {
+            var order = await _orderService.SelectAsync(id);
+            var customer = await _customerService.SelectAsync(order.Customer.Id);
+
+            OrderProductReviewEmail model=new OrderProductReviewEmail();
+            model.PublicHost = _options.Value.PublicHost;
+            model.CustomerName =$"{customer.ProfileAddress.SafeData.FirstName} {customer.ProfileAddress.SafeData.LastName}";
+            model.Email = customer.Email;
+            model.UrlEncodedEmail = WebUtility.UrlEncode(customer.Email);
+            foreach (var sku in order.Skus)
+            {
+                OrderProductReviewEmailProductItem item = new OrderProductReviewEmailProductItem();
+                item.Thumbnail = sku.Sku.Product.SafeData.Thumbnail;
+                item.ProductUrl = "/product/" + sku.Sku.Product.Url;
+                item.DisplayName = sku.Sku.Product.Name ?? String.Empty;
+                if (!string.IsNullOrEmpty(sku.Sku.Product.SafeData.SubTitle))
+                {
+                    item.DisplayName += " " + sku.Sku.Product.SafeData.SubTitle;
+                }
+                item.DisplayName += $" ({sku.Sku.SafeData.QTY})";
+                model.Products.Add(item);
+            }
+
+            await _notificationService.SendOrderProductReviewEmailAsync(new[] {model});
         }
     }
 }

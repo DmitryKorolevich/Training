@@ -62,9 +62,6 @@
                                 Status
                             </th>
                             <th>
-                                Order Name
-                            </th>
-                            <th>
                                 Order Total
                             </th>
                             <th>
@@ -78,7 +75,7 @@
                             foreach (var item in Model.Items)
                             {
                                 <tr>
-                                    <td><a href="#">@item.Id</a></td>
+                                    <td>@Html.ActionLink(item.Id.ToString(), "OrderInvoice", new { id = item.Id })</td>
                                     <td>
                                         @if (item.OrderStatus.HasValue)
                                         {
@@ -98,7 +95,6 @@
                                             }
                                         }
                                     </td>
-                                    <td></td>
                                     <td>@item.Total.ToString("C2")</td>
                                     <td>@item.DateCreated.ToString("MM/dd/yyyy")</td>
                                 </tr>

@@ -74,6 +74,7 @@ namespace VC.Admin.Controllers
         private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
         private readonly IDynamicMapper<OrderDynamic, Order> _orderMapper;
         private readonly IOrderReportService _orderReportService;
+        private readonly IOrderSchedulerService _orderSchedulerService;
 
         public OrderController(
             IOrderService orderService,
@@ -91,6 +92,7 @@ namespace VC.Admin.Controllers
             INotificationService notificationService,
             BrontoService brontoService,
             IOrderReportService orderReportService,
+            IOrderSchedulerService orderSchedulerService,
             IObjectHistoryLogService objectHistoryLogService, IOptions<AppOptions> options, IAppInfrastructureService appInfrastructureService, ICountryService countryService, IDynamicMapper<OrderDynamic, Order> orderMapper, IDynamicMapper<ProductDynamic, Product> productMapper, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodMapper, IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> customerPaymentMethodMapper, IDynamicMapper<AddressDynamic, Address> addressMapper1)
         {
             _orderService = orderService;
@@ -106,6 +108,7 @@ namespace VC.Admin.Controllers
             _notificationService = notificationService;
             _brontoService = brontoService;
             _orderReportService = orderReportService;
+            _orderSchedulerService = orderSchedulerService;
             _objectHistoryLogService = objectHistoryLogService;
             _appInfrastructureService = appInfrastructureService;
             _countryService = countryService;
@@ -1054,6 +1057,13 @@ namespace VC.Admin.Controllers
         #endregion
 
         #region OrderEmails
+
+        [HttpGet]
+        public async Task<Result<bool>> TestReviewEmail(int id)
+        {
+            await _orderSchedulerService.SendOrderProductReviewEmailTest(id);
+            return true;
+        }
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]

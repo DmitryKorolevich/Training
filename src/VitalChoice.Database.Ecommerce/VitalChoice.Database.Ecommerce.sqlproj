@@ -270,4 +270,10 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\SPsForWholesaleDropShipReport.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\Newsletters.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\NewslettersData.sql" />
+  </ItemGroup>
 </Project>

@@ -62,8 +62,13 @@ namespace VC.Admin.ModelConverters
                 model.DiscountMessage = dynamic.Discount.GetDiscountMessage((int?)dynamic.SafeData.IdDiscountTier);
             }
             model.DiscountedSubtotal = model.ProductsSubtotal - model.DiscountTotal;
+            model.TotalShipping = model.ShippingTotal;
+            if (model.ShippingOverride.HasValue)
+            {
+                model.TotalShipping += model.ShippingOverride.Value;
+            }
 
-            if(dynamic.GiftCertificates!=null && dynamic.GiftCertificates.Count>0)
+            if (dynamic.GiftCertificates!=null && dynamic.GiftCertificates.Count>0)
             {
                 if(model.GCs==null)
                 {

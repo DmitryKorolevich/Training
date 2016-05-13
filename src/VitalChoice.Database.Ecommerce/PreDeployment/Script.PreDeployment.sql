@@ -59,3 +59,5 @@
 :r .\Scripts\GiftCetfificatesUpdateSku.sql
 
 :r .\Scripts\DiscountsUsed.sql
+
+:r .\Scripts\Newsletters.sql

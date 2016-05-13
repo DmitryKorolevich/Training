@@ -21,6 +21,7 @@ using VitalChoice.Infrastructure.Domain.Entities.CatalogRequests;
 using VitalChoice.Infrastructure.Domain.Entities.Checkout;
 using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.Entities.InventorySkus;
+using VitalChoice.Infrastructure.Domain.Entities.Newsletters;
 using VitalChoice.Infrastructure.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Entities.Products;
 
@@ -291,6 +292,23 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("OneTimeDiscountToCustomerUsages");
 
                 entity.HasKey(e => new {e.IdCustomer, e.IdDiscount});
+            });
+
+            builder.Entity<Newsletter>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("Newsletters");
+                entity.HasMany(p => p.BlockedEmails)
+                    .WithOne()
+                    .HasForeignKey(e => e.IdNewsletter)
+                    .HasPrincipalKey(s => s.Id);
+            });
+
+            builder.Entity<NewsletterBlockedEmail>(entity =>
+            {
+                entity.HasKey(p => new { p.IdNewsletter, p.Email });
+                entity.ToTable("NewsletterBlockedEmails");
+                entity.Ignore(p => p.Id);
             });
         }
     }

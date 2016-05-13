@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Mail;
 
@@ -6,9 +7,11 @@ namespace VitalChoice.Business.Mail
 {
     public interface INotificationService
     {
-	    Task SendAdminUserActivationAsync(string email, UserActivation activation);
-        
-		Task SendAdminPasswordResetAsync(string email, PasswordReset passwordReset);
+        #region SendEmails
+
+        Task SendAdminUserActivationAsync(string email, UserActivation activation);
+
+        Task SendAdminPasswordResetAsync(string email, PasswordReset passwordReset);
 
         Task SendCustomerPasswordResetAsync(string email, PasswordReset passwordReset);
 
@@ -47,5 +50,17 @@ namespace VitalChoice.Business.Mail
         Task SendOrderConfirmationEmailAsync(string email, OrderConfirmationEmail model);
 
         Task SendOrderShippingConfirmationEmailAsync(string email, OrderShippingConfirmationEmail model);
+
+        Task SendOrderProductReviewEmailAsync(ICollection<OrderProductReviewEmail> models);
+
+        #endregion
+
+        #region Newsletters
+
+        Task<bool> IsEmailUnsubscribedAsync(int idNewsletter, string email);
+
+        Task<bool> UnsubscribeEmailAsync(int idNewsletter, string email);
+
+        #endregion
     }
 }

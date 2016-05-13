@@ -13,6 +13,7 @@ using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Interfaces.Services.Affiliates;
 using Microsoft.AspNet.Authorization;
+using VitalChoice.Business.Mail;
 using VitalChoice.Core.Services;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -21,6 +22,7 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Validation.Models;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 
 namespace VC.Public.Controllers
 {
@@ -32,13 +34,15 @@ namespace VC.Public.Controllers
         private readonly IAffiliateService _affiliateService;
         private readonly IPaymentMethodService _paymentMethodService;
 		private readonly IDynamicMapper<CustomerDynamic, Customer> _customerMapper;
+        private readonly INotificationService _notificationService;
 
-		public AccountController(
+        public AccountController(
             IStorefrontUserService userService,
             IDynamicMapper<CustomerDynamic, Customer> customerMapper, 
             ICustomerService customerService,
             IAffiliateService affiliateService,
             IPaymentMethodService paymentMethodService,
+            INotificationService notificationService,
             IPageResultService pageResultService) : base(pageResultService)
 		{
 			_userService = userService;
@@ -46,6 +50,7 @@ namespace VC.Public.Controllers
 			_customerService = customerService;
             _affiliateService = affiliateService;
             _paymentMethodService = paymentMethodService;
+            _notificationService = notificationService;
 		}
 
         [HttpGet]
@@ -473,5 +478,20 @@ namespace VC.Public.Controllers
 
 			return RedirectToAction("ChangeProfile", "Profile");
 		}
+
+	    [HttpGet]
+	    public async Task<IActionResult> Unsubscribe([FromQuery]string email, [FromQuery]int type)
+	    {
+            CustomerFilter filter =new CustomerFilter();
+	        filter.Email = email;
+	        var customerExist = (await _customerService.GetCustomersAsync(filter))!=null;
+	        var blockedEmailExist = await _notificationService.IsEmailUnsubscribedAsync(type, email);
+	        if (!customerExist || blockedEmailExist)
+	        {
+	            return Redirect("/content/unsubscribe-email-not-found");
+	        }
+            await _notificationService.UnsubscribeEmailAsync(type, email);
+            return Redirect("/content/email-unsubscribed");
+        }
 	}
 }

@@ -2153,3 +2153,129 @@ INSERT INTO [dbo].[EmailTemplates]
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[EmailTemplates] WHERE [Name] = 'OrderProductReviewEmail')
+BEGIN
+
+DECLARE @contentItemId int
+
+INSERT INTO [dbo].[ContentItems]
+           ([Created]
+           ,[Updated]
+           ,[Template]
+           ,[Description]
+           ,[Title]
+           ,[MetaKeywords]
+           ,[MetaDescription])
+     VALUES
+           (GETDATE()
+           ,GETDATE()
+           ,'<%
+<body:body>
+{{
+}} :: VitalChoice.Ecommerce.Domain.Mail.OrderProductReviewEmail
+%>'
+           ,''
+           ,'Your opinion matters, tell us what you think!'
+           ,NULL
+           ,NULL)
+
+SET @contentItemId=@@identity
+
+INSERT INTO [dbo].[EmailTemplates]
+           ([Name]
+           ,[ContentItemId]
+           ,[MasterContentItemId]
+           ,[StatusCode]
+           ,[UserId]
+           ,[ModelType]
+           ,[EmailDescription])
+     VALUES
+           ('OrderProductReviewEmail'
+           ,@contentItemId
+           ,(SELECT Id FROM MasterContentItems WHERE Name='StoreFront Email Template')
+           ,2
+           ,NULL
+           ,'VitalChoice.Ecommerce.Domain.Mail.OrderProductReviewEmail'
+           ,'Order Product ReviewEmail')
+
+INSERT INTO [dbo].[ContentItems]
+           ([Created]
+           ,[Updated]
+           ,[Template]
+           ,[Description]
+           ,[Title]
+           ,[MetaKeywords]
+           ,[MetaDescription])
+     VALUES
+           (GETDATE()
+           ,GETDATE()
+           ,''
+           ,'<h1>Email Not Found</h1>'
+           ,'Unsubscribe Email Not Found'
+           ,NULL
+           ,NULL)
+
+SET @contentItemId=@@identity
+
+INSERT INTO [dbo].[ContentPages]
+           ([Url]
+           ,[Name]
+           ,[FileUrl]
+           ,[ContentItemId]
+           ,[MasterContentItemId]
+           ,[StatusCode]
+           ,[Assigned]
+           ,[UserId])
+     VALUES
+           ('unsubscribe-email-not-found'
+           ,'Unsubscribe Email Not Found'
+           ,NULL
+           ,@contentItemId
+           ,(SELECT Id FROM MasterContentItems WHERE Name='Content Individual')
+           ,2
+           ,1
+           ,NULL)
+
+
+INSERT INTO [dbo].[ContentItems]
+           ([Created]
+           ,[Updated]
+           ,[Template]
+           ,[Description]
+           ,[Title]
+           ,[MetaKeywords]
+           ,[MetaDescription])
+     VALUES
+           (GETDATE()
+           ,GETDATE()
+           ,''
+           ,'<h1>Email Unsubscribed</h1>'
+           ,'Email Unsubscribed'
+           ,NULL
+           ,NULL)
+
+SET @contentItemId=@@identity
+
+INSERT INTO [dbo].[ContentPages]
+           ([Url]
+           ,[Name]
+           ,[FileUrl]
+           ,[ContentItemId]
+           ,[MasterContentItemId]
+           ,[StatusCode]
+           ,[Assigned]
+           ,[UserId])
+     VALUES
+           ('email-unsubscribed'
+           ,'Email Unsubscribed'
+           ,NULL
+           ,@contentItemId
+           ,(SELECT Id FROM MasterContentItems WHERE Name='Content Individual')
+           ,2
+           ,1
+           ,NULL)
+
+END
+
+GO
