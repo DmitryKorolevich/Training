@@ -322,10 +322,10 @@ GO
 
 	INSERT [VitalChoice.Infrastructure].dbo.ProductCategories
 	(Id, ContentItemId, MasterContentItemId, IdOld, NavLabel, StatusCode, Url, NavIdVisible, FileImageLargeUrl, FileImageSmallUrl, HideLongDescription, HideLongDescriptionBottom, LongDescription, LongDescriptionBottom)
-	SELECT ca.idCategory, c.Id, @articleSubMaster, ca.idCategory, ca.categoryDesc,  
+	SELECT ca.idCategory, c.Id, @articleSubMaster, ca.idCategory, REPLACE(ca.categoryDesc, '&amp;', '&'),  
 		2/*Active*/, REPLACE(RTRIM(LTRIM(LOWER([vitalchoice2.0].[dbo].RegexReplace('[^a-zA-Z0-9]+', ca.categoryDesc, ' ')))) COLLATE SQL_Latin1_General_CP1_CI_AS,' ','-'),
 		CASE WHEN ISNULL(ca.iBTOhide, 0) <> 0 THEN NULL ELSE CASE WHEN ISNULL(ca.pcCats_RetailHide, 0) <> 0 THEN 2 ELSE 1 END END,
-		N'/files/catalog/' + ca.largeimage, N'/files/catalog/' + ca.image, CASE WHEN ISNULL(ca.HideDesc, 0) <> 0 THEN 1 ELSE 0 END, CASE WHEN ISNULL(ca.HideDesc, 0) <> 0 THEN 1 ELSE 0 END, ca.LDesc, ca.LDesc2
+		REPLACE(N'/files/catalog/' + ca.largeimage, '//', '/'), REPLACE(N'/files/catalog/' + ca.image, '//', '/'), CASE WHEN ISNULL(ca.HideDesc, 0) <> 0 THEN 1 ELSE 0 END, CASE WHEN ISNULL(ca.HideDesc, 0) <> 0 THEN 1 ELSE 0 END, ca.LDesc, ca.LDesc2
 	FROM [vitalchoice2.0].dbo.categories AS ca
 	INNER JOIN [VitalChoice.Infrastructure].dbo.ContentItems AS c ON c.TempCategoryId = ca.idCategory
 	WHERE ca.type=@oldContentType AND ca.idCategory <> 1
@@ -373,7 +373,7 @@ GO
 
 	INSERT [VitalChoice.Ecommerce].dbo.ProductCategories
 	(Id, Name, StatusCode, [Order])
-	SELECT ca.idCategory, ca.categoryDesc, 2/*Active*/, ISNULL(ca.[priority], 0)
+	SELECT ca.idCategory, REPLACE(ca.categoryDesc, '&amp;', '&'), 2/*Active*/, ISNULL(ca.[priority], 0)
 	FROM [vitalchoice2.0].dbo.categories AS ca
 	WHERE ca.type=@oldContentType AND ca.idCategory <> 1
 	ORDER BY ca.idParentCategory
@@ -557,8 +557,8 @@ GO
 	EXEC dbo.MoveProductSmallField @destFieldName = N'SubProductGroupName', @sourceFieldName = N'idProduct', @fieldOperation = N'(SELECT ogi.OptionGroupDesc FROM [vitalchoice2.0].[dbo].[pcProductsOptions] AS po INNER JOIN [vitalchoice2.0].[dbo].optionsGroups AS ogi ON ogi.idOptionGroup = po.idOptionGroup WHERE po.idProduct = a.idProduct)'
 	EXEC dbo.MoveProductSmallField @destFieldName = N'SpecialIcon', @sourceFieldName = N'mscicon', @fieldOperation = N'CAST(a.mscicon AS NVARCHAR(250))'
 	EXEC dbo.MoveProductSmallField @destFieldName = N'TaxCode', @sourceFieldName = N'TaxCode'
-	EXEC dbo.MoveProductSmallField @destFieldName = N'Thumbnail', @sourceFieldName = N'smallImageUrl', @fieldOperation = N'''/files/catalog/'' + a.smallImageUrl'
-	EXEC dbo.MoveProductSmallField @destFieldName = N'MainProductImage', @sourceFieldName = N'imageUrl', @fieldOperation = N'''/files/catalog/'' + a.imageUrl'
+	EXEC dbo.MoveProductSmallField @destFieldName = N'Thumbnail', @sourceFieldName = N'smallImageUrl', @fieldOperation = N'REPLACE(''/files/catalog/'' + a.smallImageUrl, ''//'', ''/'')'
+	EXEC dbo.MoveProductSmallField @destFieldName = N'MainProductImage', @sourceFieldName = N'imageUrl', @fieldOperation = N'REPLACE(''/files/catalog/'' + a.imageUrl, ''//'', ''/'')'
 	
 	EXEC dbo.MoveProductSmallField @destFieldName = N'CrossSellImage1', @sourceFieldName = N'crossSellImg1', @fieldOperation = N'REPLACE(a.crossSellImg1, ''/shop/pc/catalog/'',''/files/catalog/'')'
 	EXEC dbo.MoveProductSmallField @destFieldName = N'CrossSellImage2', @sourceFieldName = N'crossSellImg2', @fieldOperation = N'REPLACE(a.crossSellImg2, ''/shop/pc/catalog/'',''/files/catalog/'')'
