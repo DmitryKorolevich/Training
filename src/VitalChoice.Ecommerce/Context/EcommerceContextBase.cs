@@ -296,13 +296,12 @@ namespace VitalChoice.Ecommerce.Context
                 entity.Ignore(d => d.IdBigString);
             });
 
-
             builder.Entity<ProductToCategory>(entity =>
             {
-                entity.HasKey(p => p.Id);
+                entity.Ignore(p => p.Id);
+                entity.HasKey(p => new { p.IdProduct, p.IdCategory });
                 entity.ToTable("ProductsToCategories");
             });
-
 
             builder.Entity<Product>(entity =>
             {

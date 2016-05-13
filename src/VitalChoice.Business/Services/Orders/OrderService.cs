@@ -665,7 +665,7 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task OrderTypeSetup(OrderDynamic order)
         {
-            var orderType = order.Data.MailOrder ? (int?)SourceOrderType.MailOrder : null;
+            var orderType = ((bool?)order.SafeData.MailOrder ?? false) ? (int?)SourceOrderType.MailOrder : null;
             var idOrder = order.Id;
             if (idOrder != 0)
             {
@@ -714,11 +714,14 @@ namespace VitalChoice.Business.Services.Orders
                 }
                 order.Data.OrderType = orderType.Value;
                 order.ShippingAddress.Id = 0;
-                if (order.PaymentMethod.Address != null)
+                if (order.PaymentMethod != null)
                 {
-                    order.PaymentMethod.Address.Id = 0;
+                    order.PaymentMethod.Id = 0;
+                    if (order.PaymentMethod.Address != null)
+                    {
+                        order.PaymentMethod.Address.Id = 0;
+                    }
                 }
-                order.PaymentMethod.Id = 0;
             }
         }
 
