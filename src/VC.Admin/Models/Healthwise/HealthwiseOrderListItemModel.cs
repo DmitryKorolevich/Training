@@ -15,6 +15,8 @@ namespace VC.Admin.Models.Healthwise
 
         public decimal ProductsSubtotal { get; set; }
 
+        public decimal DiscountedSubtotal { get; set; }
+
         public HealthwiseOrderListItemModel(HealthwiseOrder item)
         {
             if(item!=null)
@@ -22,6 +24,7 @@ namespace VC.Admin.Models.Healthwise
                 Id = item.Id;
                 DateCreated = item.Order.DateCreated;
                 ProductsSubtotal = item.Order.ProductsSubtotal;
+                DiscountedSubtotal = item.Order.ProductsSubtotal - item.Order.DiscountTotal;
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
@@ -901,13 +902,13 @@ namespace VC.Public.Controllers
                     orderModel.OrderStatus = healthWiseOrder.Order.OrderStatus;
                     orderModel.POrderStatus = healthWiseOrder.Order.POrderStatus;
                     orderModel.NPOrderStatus = healthWiseOrder.Order.NPOrderStatus;
-                    orderModel.Total = healthWiseOrder.Order.ProductsSubtotal;
+                    orderModel.DiscountedSubtotal = healthWiseOrder.Order.ProductsSubtotal - healthWiseOrder.Order.DiscountTotal;
                     toReturn.Items.Add(orderModel);
                 }
                 if (toReturn.Items.Count > 0)
                 {
                     toReturn.Count = toReturn.Items.Count;
-                    toReturn.AverageAmount = toReturn.Items.Sum(p => p.Total)/toReturn.Count;
+                    toReturn.AverageAmount = Math.Round(toReturn.Items.Sum(p => p.DiscountedSubtotal) /toReturn.Count,2);
                 }
             }
 

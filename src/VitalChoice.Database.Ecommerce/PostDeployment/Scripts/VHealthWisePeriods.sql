@@ -6,10 +6,10 @@ CREATE VIEW [dbo].[VHealthwisePeriods]
 AS
 SELECT hp.Id,hp.StartDate,hp.EndDate, hp.PaidAmount, hp.PaidDate, hp.IdCustomer, 
 	   options.FirstName AS CustomerFirstName, options.LastName AS CustomerLastName, c.Email As CustomerEmail,
-	   ISNULL(ho.Count,0) As OrdersCount, ISNULL(ho.ProductsSubtotals,0) As OrderSubtotals, ho.LastOrderDate LastOrderDate
+	   ISNULL(ho.Count,0) As OrdersCount, ISNULL(ho.DiscountedSubtotal,0) As DiscountedSubtotal, ho.LastOrderDate LastOrderDate
 FROM
 	dbo.HealthwisePeriods hp
-LEFT JOIN (SELECT ho.IdHealthwisePeriod, COUNT(ho.IdHealthwisePeriod) As Count, SUM(o.ProductsSubtotal) ProductsSubtotals, MAX(o.DateCreated) As LastOrderDate
+LEFT JOIN (SELECT ho.IdHealthwisePeriod, COUNT(ho.IdHealthwisePeriod) As Count, SUM(o.ProductsSubtotal - o.DiscountTotal) DiscountedSubtotal, MAX(o.DateCreated) As LastOrderDate
 	FROM dbo.HealthwiseOrders ho
 	INNER JOIN dbo.Orders o ON ho.Id=o.Id
 	WHERE (o.OrderStatus IN (2,3,5) OR o.POrderStatus IN (2,3,5) OR o.NPOrderStatus IN (2,3,5)) AND o.StatusCode!=3

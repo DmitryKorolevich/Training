@@ -13,10 +13,10 @@ a.block {
   max-width: 2500px;
 }
 .table > tbody > tr.selected {
-  background-color: #DDF0FB;
+  background-color: #ddf0fb;
 }
 .table > tbody > tr.warning > td {
-  background-color: #FFD9DC;
+  background-color: #ffd9dc;
   color: red;
 }
 .table > tbody > tr.message-warning > td {
@@ -183,10 +183,10 @@ img.thumb {
   cursor: pointer;
 }
 .angular-ui-tree-handle:hover {
-  background-color: #EDEDED;
+  background-color: #ededed;
 }
 .angular-ui-tree-handle.selected {
-  background-color: #DDF0FB;
+  background-color: #ddf0fb;
 }
 .angular-ui-tree-handle .ya-treview-buttons {
   display: none;
@@ -475,7 +475,7 @@ button.main-button {
 }
 .custom-navbar-top {
   border-radius: 3px  3px 0px 0px;
-  background: #fff;
+  background: #ffffff;
 }
 .sidebar .navbar-collapse {
   height: auto;
@@ -915,10 +915,10 @@ ul.navbar-custom-header li .dropdown-menu {
   margin-bottom: 0;
 }
 .file-manager .center-pane .table tbody > tr:hover {
-  background-color: #EDEDED;
+  background-color: #ededed;
 }
 .file-manager .center-pane .table > tbody > tr.selected {
-  background-color: #DDF0FB;
+  background-color: #ddf0fb;
 }
 .image-box {
   border-radius: 4px;
@@ -1145,7 +1145,7 @@ th.sortable-column {
   min-width: 105px;
 }
 .help-tickets .table > tbody > tr.success > td {
-  background-color: #99FF99;
+  background-color: #99ff99;
 }
 .help-tickets .table > tbody > tr.warning > td {
   background-color: #fffaa3;
@@ -1184,7 +1184,7 @@ th.sortable-column {
   width: 40px;
 }
 .bug-tickets .table > tbody > tr.success > td {
-  background-color: #99FF99;
+  background-color: #99ff99;
 }
 .bug-tickets .table > tbody > tr.warning > td {
   background-color: #fffaa3;
@@ -1314,7 +1314,7 @@ th.sortable-column {
   background: #fffaa3;
 }
 .healthwise-customers table > tbody > tr.period-row.paid {
-  background: #99FF99;
+  background: #99ff99;
 }
 .product-categories-statistic .categories.full-lines .ya-treeview-content .flex-left {
   padding-right: 210px;
@@ -1369,11 +1369,17 @@ th.sortable-column {
   width: 23%;
 }
 .order-agents-report .legend.dates {
-  background-image: -webkit-linear-gradient(#04519b, #033C73 60%, #02325f);
-  background-image: -o-linear-gradient(#04519b, #033C73 60%, #02325f);
+  background-image: -webkit-linear-gradient(#04519b, #033c73 60%, #02325f);
+  background-image: -o-linear-gradient(#04519b, #033c73 60%, #02325f);
   /*    background-image: ca;*/
   color: white;
   padding-left: 10px;
+}
+.wholesale-dropship-report .skus-total {
+  width: 500px;
+}
+.wholesale-dropship-report .orders-total {
+  width: 500px;
 }
 .ace-errors {
   position: relative;

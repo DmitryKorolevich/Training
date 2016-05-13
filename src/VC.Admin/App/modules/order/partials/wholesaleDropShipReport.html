@@ -5,6 +5,11 @@
             <fieldset>
                 <div class="row form-group">
                     <div class="col-md-3">
+                        <strong>Order Date</strong>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-3">
                         <p class="input-group">
                             <input type="text" class="form-control" name="From" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
                             <span class="input-group-btn">
@@ -26,6 +31,13 @@
                             <small class="error" ng-show="forms.form.To.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","To")}}</small>
                         </div>
                     </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <strong>Ship Date</strong>
+                    </div>
+                </div>
+                <div class="row form-group">
                     <div class="col-md-3">
                         <p class="input-group">
                             <input type="text" class="form-control" name="ShipFrom" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.ShipFrom" is-open="shipFromOpened" />
@@ -43,6 +55,7 @@
                         </p>
                     </div>
                 </div>
+                <hr />
                 <div class="row form-group">
                     <div class="col-md-3">
                         <select class="form-control" name="IdCustomerType" data-ng-change="filterChanged();" data-ng-model="filter.IdCustomerType" ng-options="item.Key as item.Text for item in customerTypes"></select>
@@ -76,19 +89,21 @@
                             <small class="error" ng-show="forms.form.CustomerLastName.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Customer Last Name")}}</small>
                         </div>
                     </div>
-                    <div class="col-md-2">
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-3">
                         <input type="text" name="ShipFirstName" class="form-control" placeholder="Ship to First Name" data-ng-change="filterChanged();" data-ng-model="filter.ShipFirstName" autocomplete="off" data-ng-minlength="3">
                         <div class="error-container" ng-show="forms.form.submitted && forms.form.ShipFirstName.$invalid">
                             <small class="error" ng-show="forms.form.ShipFirstName.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Ship to First Name")}}</small>
                         </div>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <input type="text" name="ShipLastName" class="form-control" placeholder="Ship To Last Name" data-ng-change="filterChanged();" data-ng-model="filter.ShipLastName" autocomplete="off" data-ng-minlength="3">
                         <div class="error-container" ng-show="forms.form.submitted && forms.form.ShipLastName.$invalid">
                             <small class="error" ng-show="forms.form.ShipLastName.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Ship To Last Name")}}</small>
                         </div>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <input type="text" name="ShippingIdConfirmation" class="form-control" placeholder="Shipping Confirmation #" data-ng-change="filterChanged();" data-ng-model="filter.ShippingIdConfirmation" autocomplete="off" data-ng-minlength="3">
                         <div class="error-container" ng-show="forms.form.submitted && forms.form.ShippingIdConfirmation.$invalid">
                             <small class="error" ng-show="forms.form.ShippingIdConfirmation.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Shipping Confirmation #")}}</small>

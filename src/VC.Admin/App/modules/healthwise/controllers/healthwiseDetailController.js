@@ -99,7 +99,7 @@ function ($scope, $rootScope, $state, $stateParams, healthwiseService, toaster, 
                             {
                                 $scope.payment.Id = data.Periods[0].Id;
                                 $scope.payment.AllowPayment=true;
-                                $scope.payment.Amount=(data.Periods[0].OrderSubtotals / data.Periods[0].OrdersCount).toFixed(2);
+                                $scope.payment.Amount = data.Periods[0].AverageDiscountedSubtotal;
                                 $scope.payment.Date = Date.parseDateTime(data.Periods[0].LastOrderDate);
                                 $scope.payment.PayAsGC=true;
                             }
