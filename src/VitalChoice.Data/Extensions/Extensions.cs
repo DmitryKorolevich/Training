@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace VitalChoice.Data.Extensions
@@ -60,13 +61,12 @@ namespace VitalChoice.Data.Extensions
                 action(element);
         }
 
-        public static async Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, Task> action)
+        public static Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, Task> action)
         {
             if (source == null)
-                return;
+                return Task.Delay(0);
 
-            foreach (var element in source)
-                await action(element);
+            return Task.WhenAll(source.Select(action));
         }
     }
 }
