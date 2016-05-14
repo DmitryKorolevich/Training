@@ -26,6 +26,28 @@
                    $scope.editor.gotoLine(error.LinePosition.Line, 1);
                }
 
+               function errorHandler(result) {
+                   var messages = "";
+                   if (result.Messages) {
+                       $.each(result.Messages, function (index, value) {
+                           messages += value.Message + "<br />";
+                       });
+                       toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+                   }
+                   else {
+                       toaster.pop('error', "Error!", "Server error occured");
+                   }
+               };
+
+               function getLinesCount(text) {
+                   var current = -1;
+                   var count = 1;
+                   while ((current = text.indexOf("\n", current + 1)) !== -1) {
+                       count++;
+                   }
+                   return count;
+               }
+
                $scope.onChangedNoErrors = function (e) {
                    var template = e.data;
                    if ($scope.masterId) {
@@ -33,7 +55,7 @@
                            .success(function (result) {
                                if (result.Success) {
                                    template = result.Data.Template + template;
-                                   $scope.validateTemplate(template);
+                                   $scope.validateTemplate(template, getLinesCount(result.Data.Template) - 1);
                                } else {
                                    errorHandler(result);
                                }
@@ -46,7 +68,7 @@
                    }
                }
 
-               $scope.validateTemplate = function (template) {
+               $scope.validateTemplate = function (template, skipLines) {
                    templateService.tryCompileTemplate(template)
                    .success(function (results) {
                        var session = $scope.editor.getSession();
@@ -55,6 +77,9 @@
                            var list = [];
                            for (var i = 0; i < errors.length; i++) {
                                var error = errors[i];
+                               if (skipLines) {
+                                   error.LinePosition.Line = error.LinePosition.Line - skipLines;
+                               }
                                if (!error || !error.LinePosition)
                                    continue;
                                var position = error.LinePosition;
@@ -69,7 +94,7 @@
                            $scope.errors = errors;
                        }
                        else {
-                           //TODO: show toas error
+                           errorHandler(results);
                        }
                    })
                    .error(function (result) {
