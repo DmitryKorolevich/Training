@@ -4,10 +4,10 @@
   "dependencies": {
     "EntityFramework.Core": "7.0.0-*",
     "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
-    "Microsoft.AspNet.Mvc": "6.0.0-*",
-    "Microsoft.Extensions.Logging": "1.0.0-*",
-    "Microsoft.Extensions.Logging.Console": "1.0.0-*",
-    "Autofac.Extensions.DependencyInjection": "4.0.0-*",
+    "Microsoft.AspNet.Mvc": "6.0.0-rc1-final",
+    "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
+    "Microsoft.Extensions.Logging.Console": "1.0.0-rc1-final",
+    "Autofac.Extensions.DependencyInjection": "4.0.0-rc1-177",
     "Avalara.Avatax.Rest": "1.0.0-*",
     "CsvHelper": "2.13.2-*",
     "FluentValidation": "5.6.0.5-*",
@@ -31,16 +31,16 @@
     },
     "dotnet5.4": {
       "dependencies": {
-        "System.Runtime": "4.0.21-*",
-        "System.IO.FileSystem": "4.0.1-*",
-        "System.IO": "4.0.11-*",
-        "System.ServiceModel.Http": "4.0.11-*",
-        "System.ServiceModel.Security": "4.0.1-*",
-        "System.ServiceModel.Primitives": "4.0.1-*",
-        "System.Xml.XPath": "4.0.1-*",
-        "System.Xml.XmlDocument": "4.0.1-*",
-        "System.Xml.XmlSerializer": "4.0.11-*",
-        "System.Runtime.Serialization.Xml": "4.0.11-*"
+        "System.Runtime": "4.0.21-beta-23516",
+        "System.IO.FileSystem": "4.0.1-beta-23516",
+        "System.IO": "4.0.11-beta-23516",
+        "System.ServiceModel.Http": "4.0.11-beta-23516",
+        "System.ServiceModel.Security": "4.0.1-beta-23516",
+        "System.ServiceModel.Primitives": "4.1.0-beta-23516",
+        "System.Xml.XPath": "4.0.1-beta-23516",
+        "System.Xml.XmlDocument": "4.0.1-beta-23516",
+        "System.Xml.XmlSerializer": "4.0.11-beta-23516",
+        "System.Runtime.Serialization.Xml": "4.0.11-beta-23516"
       }
     }
   }

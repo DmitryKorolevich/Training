@@ -3,9 +3,9 @@
   "version": "1.0.0-*",
   "dependencies": {
     "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
-    "Autofac.Extensions.DependencyInjection": "4.0.0-*",
+    "Autofac.Extensions.DependencyInjection": "4.0.0-rc1-177",
     "EntityFramework.Core": "7.0.0-*",
-    "VitalChoice.Ecommerce.Domain": ""
+    "VitalChoice.Ecommerce.Domain": "1.0.0-*"
   },
 
   "frameworks": {
@@ -13,8 +13,8 @@
     },
     "dotnet5.4": {
       "dependencies": {
-        "System.Runtime": "4.0.21-*",
-        "System.Linq": "4.0.1-*"
+        "System.Runtime": "4.0.21-beta-23516",
+        "System.Linq": "4.0.1-beta-23516"
       }
     }
   }

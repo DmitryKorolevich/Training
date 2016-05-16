@@ -7,14 +7,14 @@
   "licenseUrl": "",
 
   "dependencies": {
-    "Autofac.Extensions.DependencyInjection": "4.0.0-*",
-    "Microsoft.Extensions.Configuration.Json": "1.0.0-*",
-    "Microsoft.Extensions.Configuration.Abstractions": "1.0.0-*",
-    "Microsoft.Extensions.Logging.Console": "1.0.0-*",
+    "Autofac.Extensions.DependencyInjection": "4.0.0-rc1-177",
+    "Microsoft.Extensions.Configuration.Json": "1.0.0-rc1-final",
+    "Microsoft.Extensions.Configuration.Abstractions": "1.0.0-rc1-final",
+    "Microsoft.Extensions.Logging.Console": "1.0.0-rc1-final",
     "VitalChoice.Core": "1.0.0-*",
     "VitalChoice.Interfaces": "1.0.0-*",
     "VitalChoice.Business": "1.0.0-*",
-    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-*"
+    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-rc1-final"
   },
 
   "commands": {
@@ -25,11 +25,11 @@
     "dnx451": { },
     "dnxcore50": {
       "dependencies": {
-        "Microsoft.CSharp": "4.0.1-*",
-        "System.Collections": "4.0.11-*",
-        "System.Console": "4.0.0-*",
-        "System.Linq": "4.0.1-*",
-        "System.Threading": "4.0.11-*"
+        "Microsoft.CSharp": "4.0.1-beta-23516",
+        "System.Collections": "4.0.11-beta-23516",
+        "System.Console": "4.0.0-beta-23516",
+        "System.Linq": "4.0.1-beta-23516",
+        "System.Threading": "4.0.11-beta-23516"
       }
     }
   }

@@ -13,10 +13,10 @@
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.DynamicData": "1.0.0-*",
     "VitalChoice.Workflow": "1.0.0-*",
-    "VitalChoice.ContentProcessing": "",
+    "VitalChoice.ContentProcessing": "1.0.0-*",
     "CsvHelper": "2.13.2-*",
-    "Microsoft.AspNet.Mvc.Abstractions": "6.0.0-*",
-    "Microsoft.AspNet.Mvc.Core": "6.0.0-*"
+    "Microsoft.AspNet.Mvc.Abstractions": "6.0.0-rc1-final",
+    "Microsoft.AspNet.Mvc.Core": "6.0.0-rc1-final"
   },
 
   "frameworks": {
@@ -24,10 +24,10 @@
     },
     "dotnet5.4": {
       "dependencies": {
-        "System.Collections": "4.0.11-*",
-        "System.Linq": "4.0.1-*",
-        "System.Threading": "4.0.11-*",
-        "Microsoft.CSharp": "4.0.1-*"
+        "System.Collections": "4.0.11-beta-23516",
+        "System.Linq": "4.0.1-beta-23516",
+        "System.Threading": "4.0.11-beta-23516",
+        "Microsoft.CSharp": "4.0.1-beta-23516"
       }
     }
   }

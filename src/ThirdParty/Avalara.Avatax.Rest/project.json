@@ -6,10 +6,9 @@
   "projectUrl": "",
   "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0",
   "dependencies": {
-    "Microsoft.Extensions.OptionsModel": "1.0.0-*",
+    "Microsoft.Extensions.OptionsModel": "1.0.0-rc1-final",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
     "VitalChoice.Infrastructure.Domain": "1.0.0-*",
-    "System.Net.Http": "4.0.1-*",
     "Newtonsoft.Json": "7.0.1",
     "VitalChoice.Interfaces": "1.0.0-*"
   },
@@ -18,13 +17,14 @@
     },
     "dotnet5.4": {
       "dependencies": {
-        "Microsoft.CSharp": "4.0.1-*",
-        "System.Collections": "4.0.11-*",
-        "System.Linq": "4.0.1-*",
-        "System.Runtime": "4.0.21-*",
-        "System.Threading": "4.0.11-*",
-        "System.Net.Requests": "4.0.11-*",
-        "System.Collections.Specialized": "4.0.1-*"
+        "Microsoft.CSharp": "4.0.1-beta-23516",
+        "System.Collections": "4.0.11-beta-23516",
+        "System.Linq": "4.0.1-beta-23516",
+        "System.Runtime": "4.0.21-beta-23516",
+        "System.Threading": "4.0.11-beta-23516",
+        "System.Net.Http": "4.0.1-beta-23516",
+        "System.Net.Requests": "4.0.11-beta-23516",
+        "System.Collections.Specialized": "4.0.1-beta-23516"
       }
     }
   }

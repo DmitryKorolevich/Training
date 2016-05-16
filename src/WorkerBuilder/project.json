@@ -20,8 +20,8 @@
   "frameworks": {
     "dnx451": {
       "dependencies": {
-        "ExportServiceWithSBQueue": "",
-        "Microsoft.Dnx.Compilation.CSharp": "1.0.0-*"
+        "ExportServiceWithSBQueue": "1.0.0-*",
+        "Microsoft.Dnx.Compilation.CSharp": "1.0.0-rc1-final"
       }
     }
   }

@@ -6,7 +6,7 @@
   "projectUrl": "",
   "licenseUrl": "",
   "dependencies": {
-    "Microsoft.Extensions.Logging.Abstractions": "1.0.0-*"
+    "Microsoft.Extensions.Logging.Abstractions": "1.0.0-rc1-final"
   },
   "frameworks": {
     "net451": {
@@ -14,20 +14,20 @@
     },
     "dotnet5.4": {
       "dependencies": {
-        "Microsoft.CSharp": "4.0.1-*",
-        "System.Collections": "4.0.11-*",
-        "System.Linq": "4.0.1-*",
-        "System.Runtime": "4.0.21-*",
-        "System.Threading": "4.0.11-*",
-        "System.Collections.Specialized": "4.0.1-*",
-        "System.ServiceModel.Http": "4.0.11-*",
-        "System.Xml.XmlSerializer": "4.0.11-*",
-        "System.Xml.ReaderWriter": "4.0.11-*",
-        "System.Xml.XmlDocument": "4.0.1-*",
-        "System.Net.Requests": "4.0.11-*",
-        "System.Net.Http": "4.0.1-*",
-        "System.Security.Cryptography.X509Certificates": "4.0.0-*",
-        "System.Security.Cryptography.Algorithms": "4.0.0-*"
+        "Microsoft.CSharp": "4.0.1-beta-23516",
+        "System.Collections": "4.0.11-beta-23516",
+        "System.Linq": "4.0.1-beta-23516",
+        "System.Runtime": "4.0.21-beta-23516",
+        "System.Threading": "4.0.11-beta-23516",
+        "System.Collections.Specialized": "4.0.1-beta-23516",
+        "System.ServiceModel.Http": "4.0.11-beta-23516",
+        "System.Xml.XmlSerializer": "4.0.11-beta-23516",
+        "System.Xml.ReaderWriter": "4.0.11-beta-23516",
+        "System.Xml.XmlDocument": "4.0.1-beta-23516",
+        "System.Net.Requests": "4.0.11-beta-23516",
+        "System.Net.Http": "4.0.1-beta-23516",
+        "System.Security.Cryptography.X509Certificates": "4.0.0-beta-23516",
+        "System.Security.Cryptography.Algorithms": "4.0.0-beta-23516"
       }
     }
   }

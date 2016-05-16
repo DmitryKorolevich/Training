@@ -8,7 +8,7 @@
   "licenseUrl": "",
 
   "dependencies": {
-    "Microsoft.AspNet.Mvc": "6.0.0-*",
+    "Microsoft.AspNet.Mvc": "6.0.0-rc1-final",
     "FluentValidation": "5.6.0.5-*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*"
   },
@@ -18,11 +18,11 @@
     },
     "dotnet5.4": {
       "dependencies": {
-        "System.Runtime": "4.0.21-*",
-        "System.Collections": "4.0.11-*",
-        "System.Linq": "4.0.1-*",
-        "System.Threading": "4.0.11-*",
-        "Microsoft.CSharp": "4.0.1-*"
+        "System.Runtime": "4.0.21-beta-23516",
+        "System.Collections": "4.0.11-beta-23516",
+        "System.Linq": "4.0.1-beta-23516",
+        "System.Threading": "4.0.11-beta-23516",
+        "Microsoft.CSharp": "4.0.1-beta-23516"
       }
     }
   }

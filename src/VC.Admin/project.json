@@ -16,16 +16,16 @@
     "**.vspscc"
   ],
   "dependencies": {
-    "Microsoft.AspNet.Server.Kestrel": "1.0.0-*",
-    "Microsoft.AspNet.IISPlatformHandler": "1.0.0-*",
-    "Microsoft.AspNet.Mvc": "6.0.0-*",
-    "Microsoft.AspNet.Diagnostics": "1.0.0-*",
-    "Microsoft.AspNet.Diagnostics.Entity": "7.0.0-*",
+    "Microsoft.AspNet.Server.Kestrel": "1.0.0-rc1-final",
+    "Microsoft.AspNet.IISPlatformHandler": "1.0.0-rc1-final",
+    "Microsoft.AspNet.Mvc": "6.0.0-rc1-final",
+    "Microsoft.AspNet.Diagnostics": "1.0.0-rc1-final",
+    "Microsoft.AspNet.Diagnostics.Entity": "7.0.0-rc1-final",
     "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
-    "Microsoft.AspNet.Server.WebListener": "1.0.0-*",
-    "Microsoft.AspNet.StaticFiles": "1.0.0-*",
-    "Microsoft.Extensions.Configuration.Json": "1.0.0-*",
-    "Microsoft.Extensions.Logging.Console": "1.0.0-*",
+    "Microsoft.AspNet.Server.WebListener": "1.0.0-rc1-final",
+    "Microsoft.AspNet.StaticFiles": "1.0.0-rc1-final",
+    "Microsoft.Extensions.Configuration.Json": "1.0.0-rc1-final",
+    "Microsoft.Extensions.Logging.Console": "1.0.0-rc1-final",
     "EntityFramework.Core": "7.0.0-*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
     "VitalChoice.Infrastructure.Domain": "1.0.0-*",
@@ -33,7 +33,7 @@
     "VitalChoice.Infrastructure": "1.0.0-*",
     "VitalChoice.Core": "1.0.0-*",
     "VitalChoice.Validation": "1.0.0-*",
-    "VitalChoice.DynamicData": "1.0.0-*",    
+    "VitalChoice.DynamicData": "1.0.0-*",
     "VitalChoice.SharedWeb": "1.0.0-*"
   },
   "frameworks": {
@@ -44,8 +44,8 @@
     },
     "dotnet5.4": {
       "dependencies": {
-        "System.Runtime": "4.0.21-*",
-        "System.Net.Http": "4.0.1-*"
+        "System.Runtime": "4.0.21-beta-23516",
+        "System.Net.Http": "4.0.1-beta-23516"
       }
     }
   },
