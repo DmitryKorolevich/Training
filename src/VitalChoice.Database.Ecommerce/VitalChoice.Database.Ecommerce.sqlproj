@@ -276,4 +276,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\NewslettersData.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetTransactionAndRefundReport.sql" />
+  </ItemGroup>
 </Project>

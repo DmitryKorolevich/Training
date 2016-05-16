@@ -21,5 +21,6 @@
         public const string ORDERS_AGENT_REPORT = "Agents_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
 
         public const string WHOLESALE_DROPSHIP_REPORT = "Wholesale_Dropship_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
+        public const string TRANSACTION_REFUND_REPORT = "Transaction_Refund_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
     }
 }

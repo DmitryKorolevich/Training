@@ -27,5 +27,7 @@ namespace VitalChoice.Interfaces.Services.Orders
 	    Task<WholesaleDropShipReport> GetWholesaleDropShipReportAsync(WholesaleDropShipReportFilter filter);
 
         Task<PagedList<WholesaleDropShipReportOrderItem>> GetOrdersForWholesaleDropShipReportAsync(WholesaleDropShipReportFilter filter);
-    }
+
+	    Task<PagedList<TransactionAndRefundReportItem>> GetTransactionAndRefundReportItemsAsync(TransactionAndRefundReportFilter filter);
+	}
 }

@@ -67,6 +67,7 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> _vOrderWithRegionInfoItemCSVExportService;
         private readonly ICsvExportService<OrdersAgentReportExportItem, OrdersAgentReportExportItemCsvMap> _ordersAgentReportExportItemCSVExportService;
         private readonly ICsvExportService<WholesaleDropShipReportOrderItem, WholesaleDropShipReportOrderItemCsvMap> _wholesaleDropShipReportOrderItemCSVExportService;
+        private readonly ICsvExportService<TransactionAndRefundReportItem, TransactionAndRefundReportItemCsvMap> _transactionAndRefundReportItemCSVExportService;
         private readonly INotificationService _notificationService;
         private readonly BrontoService _brontoService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
@@ -89,6 +90,7 @@ namespace VC.Admin.Controllers
             ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> vOrderWithRegionInfoItemCSVExportService,
             ICsvExportService<OrdersAgentReportExportItem, OrdersAgentReportExportItemCsvMap> ordersAgentReportExportItemCSVExportService,
             ICsvExportService<WholesaleDropShipReportOrderItem, WholesaleDropShipReportOrderItemCsvMap> wholesaleDropShipReportOrderItemCSVExportService,
+            ICsvExportService<TransactionAndRefundReportItem, TransactionAndRefundReportItemCsvMap> transactionAndRefundReportItemCSVExportService,
             INotificationService notificationService,
             BrontoService brontoService,
             IOrderReportService orderReportService,
@@ -105,6 +107,7 @@ namespace VC.Admin.Controllers
             _vOrderWithRegionInfoItemCSVExportService = vOrderWithRegionInfoItemCSVExportService;
             _ordersAgentReportExportItemCSVExportService = ordersAgentReportExportItemCSVExportService;
             _wholesaleDropShipReportOrderItemCSVExportService = wholesaleDropShipReportOrderItemCSVExportService;
+            _transactionAndRefundReportItemCSVExportService = transactionAndRefundReportItemCSVExportService;
             _notificationService = notificationService;
             _brontoService = brontoService;
             _orderReportService = orderReportService;
@@ -1004,6 +1007,56 @@ namespace VC.Admin.Controllers
             var contentDisposition = new ContentDispositionHeaderValue("attachment")
             {
                 FileName = String.Format(FileConstants.WHOLESALE_DROPSHIP_REPORT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<PagedList<TransactionAndRefundReportItem>>> GetTransactionAndRefundReport([FromBody]TransactionAndRefundReportFilter filter)
+        {
+            var toReturn = await _orderReportService.GetTransactionAndRefundReportItemsAsync(filter);
+            return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpGet]
+        public async Task<FileResult> GetTransactionAndRefundReportFile([FromQuery]string from, [FromQuery]string to,
+            [FromQuery]int? idcustomertype = null, [FromQuery]int? idservicecode = null, [FromQuery]string customerfirstname = null, [FromQuery]string customerlastname = null,
+            [FromQuery]int? idcustomer = null, [FromQuery]int? idorder = null,
+            [FromQuery]int? idorderstatus = null, [FromQuery]int? idordertype = null)
+        {
+            var dFrom = from.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            if (!dFrom.HasValue || !dTo.HasValue)
+            {
+                return null;
+            }
+
+            TransactionAndRefundReportFilter filter = new TransactionAndRefundReportFilter()
+            {
+                From = dFrom.Value,
+                To = dTo.Value.AddDays(1),
+                IdCustomerType = idcustomertype,
+                IdServiceCode = idservicecode,
+                CustomerFirstName = customerfirstname,
+                CustomerLastName = customerlastname,
+                IdCustomer = idcustomer,
+                IdOrder = idorder,
+                IdOrderStatus = idorderstatus,
+                IdOrderType = idordertype,
+            };
+            filter.Paging = null;
+
+            var data = await _orderReportService.GetTransactionAndRefundReportItemsAsync(filter);
+
+            var result = _transactionAndRefundReportItemCSVExportService.ExportToCsv(data.Items);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.TRANSACTION_REFUND_REPORT, DateTime.Now)
             };
 
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());

@@ -57,6 +57,7 @@ using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using FluentValidation.Validators;
 using System.Text.RegularExpressions;
+using Microsoft.CodeAnalysis.CSharp;
 using VitalChoice.Business.CsvImportMaps;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Infrastructure.Domain.Mail;
@@ -1532,12 +1533,6 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<PagedList<VOrder>> GetOrdersAsync(VOrderFilter filter)
         {
-            //var tFilter = new WholesaleDropShipReportFilter();
-            //tFilter.From = DateTime.Now.AddMonths(-4);
-            //tFilter.To =DateTime.Now;;
-            //var data = await _sPEcommerceRepository.GetCountOrderIdsForWholesaleDropShipReportAsync(tFilter);
-
-
             var conditions = new VOrderQuery();
             conditions = conditions.WithCustomerId(filter.IdCustomer);
 
@@ -2332,8 +2327,22 @@ namespace VitalChoice.Business.Services.Orders
                                 p =>
                                     p.IdCustomer == idCustomer && orderCreatedDate >= p.StartDate && orderCreatedDate < p.EndDate &&
                                     !p.PaidDate.HasValue).Include(p => p.HealthwiseOrders).SelectAsync(false)).ToList();
+                    foreach (var healthwisePeriod in periods)
+                    {
+                        healthwisePeriod.HealthwiseOrders =
+                            healthwisePeriod.HealthwiseOrders.Where(
+                                p => p.Order.OrderStatus == OrderStatus.Processed ||
+                                     p.Order.OrderStatus == OrderStatus.Exported ||
+                                     p.Order.OrderStatus == OrderStatus.Shipped ||
+                                     p.Order.POrderStatus == OrderStatus.Processed ||
+                                     p.Order.POrderStatus == OrderStatus.Exported ||
+                                     p.Order.POrderStatus == OrderStatus.Shipped ||
+                                     p.Order.NPOrderStatus == OrderStatus.Processed ||
+                                     p.Order.NPOrderStatus == OrderStatus.Exported ||
+                                     p.Order.NPOrderStatus == OrderStatus.Shipped).ToList();
+                    }
                     bool addedToPeriod = false;
-                    foreach (var period in periods)
+                    foreach (var period in periods.OrderBy(p=>p.StartDate))
                     {
                         if (period.HealthwiseOrders.Count < maxCount)
                         {

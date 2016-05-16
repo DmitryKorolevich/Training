@@ -200,6 +200,27 @@ namespace VitalChoice.Business.Helpers
             return toReturn;
         }
 
+        public static string GetShortProductTypeName(ProductType type)
+        {
+            string toReturn = null;
+            switch (type)
+            {
+                case ProductType.Perishable:
+                    toReturn = "P";
+                    break;
+                case ProductType.NonPerishable:
+                    toReturn = "NP";
+                    break;
+                case ProductType.Gc:
+                    toReturn = "GIFT";
+                    break;
+                case ProductType.EGс:
+                    toReturn = "EGIFT";
+                    break;
+            }
+            return toReturn;
+        }
+
         public static Dictionary<int, string> GetDiscountTypes()
         {
             Dictionary<int, string> toReturn = new Dictionary<int, string>
@@ -346,6 +367,36 @@ namespace VitalChoice.Business.Helpers
                         });
                         break;
                 }
+            }
+            return toReturn;
+        }
+
+        public static string GetShortPaymentMethodName(PaymentMethodType type)
+        {
+            string toReturn = null;
+            switch (type)
+            {
+                case PaymentMethodType.CreditCard:
+                    toReturn = "CC";
+                    break;
+                case PaymentMethodType.Oac:
+                    toReturn = "OAC";
+                    break;
+                case PaymentMethodType.Check:
+                    toReturn = "Check";
+                    break;
+                case PaymentMethodType.NoCharge:
+                    toReturn = "NC";
+                    break;
+                case PaymentMethodType.WireTransfer:
+                    toReturn = "Wire";
+                    break;
+                case PaymentMethodType.Marketing:
+                    toReturn = "Marketing";
+                    break;
+                case PaymentMethodType.VCWellnessEmployeeProgram:
+                    toReturn = "Employee";
+                    break;
             }
             return toReturn;
         }

@@ -24,6 +24,7 @@ using VitalChoice.Infrastructure.Domain.Entities.InventorySkus;
 using VitalChoice.Infrastructure.Domain.Entities.Newsletters;
 using VitalChoice.Infrastructure.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Entities.Products;
+using VitalChoice.Infrastructure.Domain.Entities.Reports;
 
 namespace VitalChoice.Infrastructure.Context
 {
@@ -64,6 +65,12 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<WholesaleDropShipReportSkuRawItem>(entity =>
             {
                 entity.HasKey(f => f.Id);
+            });
+
+            builder.Entity<TransactionAndRefundRawItem>(entity =>
+            {
+                entity.HasKey(f => f.RowNumber);
+                entity.Ignore(f => f.Id);
             });
 
             #endregion

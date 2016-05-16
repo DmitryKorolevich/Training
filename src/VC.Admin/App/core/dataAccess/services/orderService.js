@@ -181,5 +181,19 @@ angular.module('app.core.dataAccess.services.orderService', [])
                 filter.CustomerFirstName, filter.CustomerLastName, filter.ShipFirstName, filter.ShipLastName,
                 filter.ShippingIdConfirmation, filter.IdOrder, filter.PoNumber, buildNumber);
 	    },
+	    //transaction refund report
+	    getTransactionAndRefundReport: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetTransactionAndRefundReport', filter, getConfig(tracker));
+	    },
+	    getTransactionAndRefundReportFile: function (filter, buildNumber)
+	    {
+	        return baseUrl + ('GetTransactionAndRefundReportFile?from={0}&to={1}&idcustomertype={2}&idservicecode={3}' +
+                '&customerfirstname={4}&customerlastname={5}&idcustomer={6}' +
+                '&idorder={7}&idorderstatus={8}&idordertype={9}&buildNumber={10}')
+                .format(filter.From, filter.To, filter.IdCustomerType, filter.IdServiceCode,
+                filter.CustomerFirstName, filter.CustomerLastName, filter.IdCustomer,
+                filter.IdOrder, filter.IdOrderStatus, filter.IdOrderType, buildNumber);
+	    },
 	};
 }]);
