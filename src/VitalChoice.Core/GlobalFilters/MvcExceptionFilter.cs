@@ -144,28 +144,35 @@ namespace VitalChoice.Core.GlobalFilters
 
         private static async Task<string> GetRefferedAction(ExceptionContext context, string referer, string actionName, string controllerName)
         {
-            if (!string.IsNullOrWhiteSpace(referer))
+            try
             {
-                if ((referer.StartsWith($"http://{context.HttpContext.Request.Host}") ||
-                     referer.StartsWith($"https://{context.HttpContext.Request.Host}")) &&
-                    referer.ToLower().Contains(controllerName.ToLower()))
+                if (!string.IsNullOrWhiteSpace(referer))
                 {
-                    var uri = new Uri(referer);
-                    var contextFactory = context.HttpContext.RequestServices.GetService<IHttpContextFactory>();
-                    //var requestFactory = context.HttpContext.RequestServices.GetService<IHttpRequestFeature>();
-                    var fakeContext = contextFactory.Create(context.HttpContext.RequestServices.GetService<IFeatureCollection>());
-                    fakeContext.Request.QueryString = new QueryString(uri.Query);
-                    fakeContext.Request.Scheme = uri.Scheme;
-                    fakeContext.Request.Host = context.HttpContext.Request.Host;
-                    fakeContext.Request.Path = new PathString(uri.AbsolutePath);
-                    var routeContext = new RouteContext(fakeContext);
-                    var actionSelector = context.HttpContext.RequestServices.GetService<IActionSelector>();
-                    var actionDescriptor = await actionSelector.SelectAsync(routeContext);
-                    if (!string.IsNullOrEmpty(actionDescriptor?.Name))
+                    if ((referer.StartsWith($"http://{context.HttpContext.Request.Host}") ||
+                         referer.StartsWith($"https://{context.HttpContext.Request.Host}")) &&
+                        referer.ToLower().Contains(controllerName.ToLower()))
                     {
-                        return actionDescriptor.Name;
+                        var uri = new Uri(referer);
+                        var contextFactory = context.HttpContext.RequestServices.GetService<IHttpContextFactory>();
+                        //var requestFactory = context.HttpContext.RequestServices.GetService<IHttpRequestFeature>();
+                        var fakeContext = contextFactory.Create(context.HttpContext.RequestServices.GetService<IFeatureCollection>());
+                        fakeContext.Request.QueryString = new QueryString(uri.Query);
+                        fakeContext.Request.Scheme = uri.Scheme;
+                        fakeContext.Request.Host = context.HttpContext.Request.Host;
+                        fakeContext.Request.Path = new PathString(uri.AbsolutePath);
+                        var routeContext = new RouteContext(fakeContext);
+                        var actionSelector = context.HttpContext.RequestServices.GetService<IActionSelector>();
+                        var actionDescriptor = await actionSelector.SelectAsync(routeContext);
+                        if (!string.IsNullOrEmpty(actionDescriptor?.Name))
+                        {
+                            return actionDescriptor.Name;
+                        }
                     }
                 }
+            }
+            catch
+            {
+                return actionName;
             }
             return actionName;
         }

@@ -174,7 +174,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
                     Label = eProduct.Name,
                     Url = productContent.Url
                 });
-                if(!string.IsNullOrEmpty(eProduct.SafeData.SubTitle))
+                if (!string.IsNullOrEmpty(eProduct.SafeData.SubTitle))
                 {
                     breadcrumbItems.Last().Label += " " + eProduct.Data.SubTitle;
                 }
@@ -190,16 +190,20 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             toReturn.SpecialIcon = eProduct.Data.SpecialIcon;
             toReturn.SubProductGroupName = eProduct.Data.SubProductGroupName;
             toReturn.BreadcrumbOrderedItems = breadcrumbItems;
-            toReturn.Skus = eProduct.Skus.Where(x => !x.Hidden && targetStatusCodes.Contains((RecordStatusCode)x.StatusCode)).OrderBy(x => x.Order).Select(x => new TtlProductPageSkuModel()
-            {
-                Code = x.Code,
-                SalesText = x.Data.SalesText,
-                Price = viewContext.Parameters.Role == RoleType.Wholesale ? x.WholesalePrice : x.Price,
-                PortionsCount = x.Data.QTY,
-                InStock = (x.SafeData.DisregardStock !=null && x.SafeData.DisregardStock == true) || x.SafeData.DisregardStock==null
-                    || x.SafeData.Stock>0,
-				AutoShip = x.SafeData.AutoShipProduct!=null ? x.Data.AutoShipProduct : false,
-            }).ToList();
+            toReturn.Skus =
+                eProduct.Skus.Where(x => !x.Hidden && targetStatusCodes.Contains((RecordStatusCode) x.StatusCode))
+                    .OrderBy(x => x.Order)
+                    .Select(x => new TtlProductPageSkuModel()
+                    {
+                        Code = x.Code,
+                        SalesText = x.Data.SalesText,
+                        Price = viewContext.Parameters.Role == RoleType.Wholesale ? x.WholesalePrice : x.Price,
+                        PortionsCount = (int?)x.SafeData.QTY ?? 0,
+                        InStock =
+                            (x.SafeData.DisregardStock != null && x.SafeData.DisregardStock == true) || x.SafeData.DisregardStock == null
+                            || ((int?) x.SafeData.Stock ?? 0) > 0,
+                        AutoShip = x.SafeData.AutoShipProduct != null ? x.Data.AutoShipProduct : false,
+                    }).ToList();
             toReturn.YoutubeVideos = new List<TtlRelatedYoutubeVideoModel>()
             {
                 new TtlRelatedYoutubeVideoModel()
