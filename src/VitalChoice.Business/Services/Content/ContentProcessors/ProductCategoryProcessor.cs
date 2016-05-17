@@ -135,11 +135,6 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
 
 			if (category != null)
             {
-				if (!viewContext.Entity.NavIdVisible.HasValue)
-				{
-					throw new ApiException("Category not found", HttpStatusCode.NotFound);
-				}
-
 				var wholesaleCustomer =
 				viewContext.User.IsInRole(IdentityConstants.WholesaleCustomer);
 
@@ -175,14 +170,41 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                  productContents = (await _productContentRepository.Query(p => productIds.Contains(p.Id)).SelectAsync(false)).ToList();
             }
 
-            var rootNavCategory =
+            var allRootCategory =
                 await _productCategoryService.GetLiteCategoriesTreeAsync(rootCategory, new ProductCategoryLiteFilter()
                 {
-                    Visibility = customerVisibility,
-					Statuses = targetStatuses
+					Statuses = targetStatuses,
+                    ShowAll = true,
                 });
 
-            return PopulateCategoryTemplateModel(viewContext.Entity, subCategoriesContent, products, productContents, rootNavCategory);
+	        var rootNavCategory = GetFilteredByVisibilityCategories(allRootCategory, customerVisibility);
+
+            return PopulateCategoryTemplateModel(viewContext.Entity, subCategoriesContent, products, productContents, rootNavCategory, allRootCategory);
+        }
+
+        private ProductNavCategoryLite GetFilteredByVisibilityCategories(ProductNavCategoryLite navCategory,IList<CustomerTypeCode> visibility)
+        {
+            if (navCategory != null && (!navCategory.ProductCategory.ParentId.HasValue || 
+                (navCategory.NavIdVisible.HasValue && visibility.Contains(navCategory.NavIdVisible.Value))))
+            {
+                ProductNavCategoryLite toReturn = new ProductNavCategoryLite();
+                toReturn.Id = navCategory.Id;
+                toReturn.ProductCategory = navCategory.ProductCategory;
+                toReturn.NavLabel = navCategory.NavLabel;
+                toReturn.NavIdVisible = navCategory.NavIdVisible;
+                toReturn.Url = navCategory.Url;
+                toReturn.SubItems=new List<ProductNavCategoryLite>();
+                foreach (var productNavCategoryLite in navCategory.SubItems)
+                {
+                    var item = GetFilteredByVisibilityCategories(productNavCategoryLite, visibility);
+                    if (item != null)
+                    {
+                        toReturn.SubItems.Add(item);
+                    }
+                }
+                return toReturn;
+            }
+            return null;
         }
 
         private ProductCategory FindTargetCategory(ProductCategory root, int idToFind)
@@ -208,58 +230,86 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             return null;
         }
 
-        private bool BuildBreadcrumb(ProductNavCategoryLite rootCategory, string url,
+        private void BuildBreadcrumb(ProductNavCategoryLite rootCategory, ProductNavCategoryLite currentCategory, int categoryId,
             IList<TtlBreadcrumbItemModel> breadcrumbItems)
         {
-            if (rootCategory == null)
-                return false;
-            if (!rootCategory.SubItems.Any())
+            if (currentCategory != null)
             {
-                if (!rootCategory.Url.Equals(url, StringComparison.OrdinalIgnoreCase))
+                if (currentCategory.Id.Equals(categoryId))
                 {
-					var last = breadcrumbItems.LastOrDefault();
-					if (last != null)
-					{
-						breadcrumbItems.Remove(last);
-					}
-					return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-
-            foreach (var subItem in rootCategory.SubItems)
-            {
-                breadcrumbItems.Add(new TtlBreadcrumbItemModel()
-                {
-                    Label = subItem.ProductCategory.Name,
-                    Url = subItem.Url
-                });
-
-                if (!subItem.Url.Equals(url, StringComparison.OrdinalIgnoreCase))
-                {
-                    var found = BuildBreadcrumb(subItem, url, breadcrumbItems);
-                    if (found)
+                    if (currentCategory.ProductCategory.ParentId.HasValue)
                     {
-                        return true;
+                        breadcrumbItems.Add(new TtlBreadcrumbItemModel()
+                        {
+                            Label = currentCategory.ProductCategory.Name,
+                            Url = currentCategory.Url
+                        });
+
+                        BuildBreadcrumb(rootCategory, rootCategory, currentCategory.ProductCategory.ParentId.Value, breadcrumbItems);
                     }
                 }
                 else
                 {
-                    return true;
+                    foreach (var subItem in currentCategory.SubItems)
+                    {
+                        BuildBreadcrumb(rootCategory, subItem, categoryId, breadcrumbItems);
+                    }
                 }
             }
-
-			var lastRoot = breadcrumbItems.LastOrDefault();
-			if (lastRoot != null)
-			{
-				breadcrumbItems.Remove(lastRoot);
-			}
-
-			return false;
         }
+
+   //     private bool BuildBreadcrumb(ProductNavCategoryLite rootCategory, string url,
+   //         IList<TtlBreadcrumbItemModel> breadcrumbItems)
+   //     {
+   //         if (rootCategory == null)
+   //             return false;
+   //         if (!rootCategory.SubItems.Any())
+   //         {
+   //             if (!rootCategory.Url.Equals(url, StringComparison.OrdinalIgnoreCase))
+   //             {
+			//		var last = breadcrumbItems.LastOrDefault();
+			//		if (last != null)
+			//		{
+			//			breadcrumbItems.Remove(last);
+			//		}
+			//		return false;
+   //             }
+   //             else
+   //             {
+   //                 return true;
+   //             }
+   //         }
+
+   //         foreach (var subItem in rootCategory.SubItems)
+   //         {
+   //             breadcrumbItems.Add(new TtlBreadcrumbItemModel()
+   //             {
+   //                 Label = subItem.ProductCategory.Name,
+   //                 Url = subItem.Url
+   //             });
+
+   //             if (!subItem.Url.Equals(url, StringComparison.OrdinalIgnoreCase))
+   //             {
+   //                 var found = BuildBreadcrumb(subItem, url, breadcrumbItems);
+   //                 if (found)
+   //                 {
+   //                     return true;
+   //                 }
+   //             }
+   //             else
+   //             {
+   //                 return true;
+   //             }
+   //         }
+
+			//var lastRoot = breadcrumbItems.LastOrDefault();
+			//if (lastRoot != null)
+			//{
+			//	breadcrumbItems.Remove(lastRoot);
+			//}
+
+			//return false;
+   //     }
 
         private IList<TtlSidebarMenuItemModel> ConvertToSideMenuModelLevel(
             IList<ProductNavCategoryLite> productCategoryLites)
@@ -274,10 +324,11 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
 
         private TtlCategoryModel PopulateCategoryTemplateModel(ProductCategoryContent productCategoryContent,
             IList<ProductCategoryContent> subProductCategoryContent = null, IList<VProductSku> products = null, IList<ProductContent> productContents=null,
-            ProductNavCategoryLite rootNavCategory = null)
+            ProductNavCategoryLite rootNavCategory = null, ProductNavCategoryLite rootAllCategory = null)
         {
             IList<TtlBreadcrumbItemModel> breadcrumbItems = new List<TtlBreadcrumbItemModel>();
-            BuildBreadcrumb(rootNavCategory, productCategoryContent.Url, breadcrumbItems);
+            BuildBreadcrumb(rootAllCategory, rootAllCategory, productCategoryContent.Id, breadcrumbItems);
+            breadcrumbItems = breadcrumbItems.Reverse().ToList();
             var toReturn = new TtlCategoryModel
             {
                 Name = productCategoryContent.ProductCategory.Name,
@@ -307,7 +358,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                     var productContent = productContents.FirstOrDefault(p => p.Id == product.Id);
                     if(productContent!=null)
                     {
-                        product.Url = productContent.Url;
+                        product.Url = productContent.Url+"?cat="+ productCategoryContent.Id;
                     }
                 }
             }

@@ -133,6 +133,27 @@ namespace VitalChoice.Business.Services.Products
             return toReturn;
         }
 
+
+        public async Task<ProductCategoryContent> GetCategoryByIdOldAsync(int id)
+        {
+            ProductCategoryContent toReturn = (await productCategoryRepository.Query(p => p.IdOld == id).Include(p => p.ContentItem).
+                    SelectAsync(false)).FirstOrDefault();
+            if(toReturn!=null)
+            { 
+                ProductCategoryQuery query = new ProductCategoryQuery().WithId(toReturn.Id).NotDeleted();
+                var categoryEcommerce = (await productCategoryEcommerceRepository.Query(query).SelectAsync(false)).FirstOrDefault();
+                if (categoryEcommerce != null)
+                {
+                    toReturn.ProductCategory = categoryEcommerce;
+                }
+                else
+                {
+                    toReturn = null;
+                }
+            }
+            return toReturn;
+        }
+
         private async Task UpdateCategory(ProductCategoryContent categoryContent, ProductCategoryContent model)
         {
             var idDbItem = categoryContent.Id;
@@ -314,6 +335,7 @@ namespace VitalChoice.Business.Services.Products
                 {
                     Id = p.Id,
                     NavLabel = p.NavLabel,
+                    NavIdVisible = p.NavIdVisible,
                     Url = p.Url
                 }, false)).ToDictionary(c => c.Id);
 
@@ -322,6 +344,7 @@ namespace VitalChoice.Business.Services.Products
                 Id = productRootCategory.Id,
                 ProductCategory = productRootCategory,
                 NavLabel = contentCategories[productRootCategory.Id].NavLabel,
+                NavIdVisible = contentCategories[productRootCategory.Id].NavIdVisible,
                 Url = contentCategories[productRootCategory.Id].Url,
                 SubItems =
                     ConvertToTransferCategory(productRootCategory.SubCategories, contentCategories)
@@ -393,7 +416,8 @@ namespace VitalChoice.Business.Services.Products
                 Id = x.Id,
                 ProductCategory = x,
 				NavLabel = contentCategories[x.Id].NavLabel,
-				Url = contentCategories[x.Id].Url,
+                NavIdVisible = contentCategories[x.Id].NavIdVisible,
+                Url = contentCategories[x.Id].Url,
 				SubItems = ConvertToTransferCategory(x.SubCategories, contentCategories)
 			}).ToList();
 	    }
