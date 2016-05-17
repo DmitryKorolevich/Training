@@ -25,8 +25,8 @@
                                         <div class="col-md-9">
                                             <div class="input-group autocomplete">
                                                 <input type="text" name="Id" class="form-control" placeholder="Order #" data-ng-model="order.Id" required numbers-only
-                                                       uib-typeahead-min-length="3" uib-typeahead="item.Id as item.Id for item in getOrders($viewValue)" uib-typeahead-loading="loadingOrders"
-                                                       uib-typeahead-on-select="idLoaded($item, $model, $label)" data-ng-change="idChanged()" autocomplete="off"
+                                                       typeahead-min-length="3" uib-typeahead="item.Id as item.Id for item in getOrders($viewValue)" typeahead-loading="loadingOrders"
+                                                       typeahead-on-select="idLoaded($item, $model, $label)" data-ng-change="idChanged()" autocomplete="off"
                                                        data-ng-keypress="$event.keyCode==13 ? getOrderSettings($event) : null" data-ng-blur="lostFocus()">
                                                 <span class="input-group-addon">
                                                     <i ng-show="loadingOrders" class="glyphicon glyphicon-refresh"></i>

@@ -21,7 +21,7 @@
                                         <div class="col-md-9">
                                             <div class="input-group autocomplete">
                                                 <input type="text" name="Id" class="form-control" placeholder="Order #" data-ng-model="order.Id" required numbers-only
-                                                       uib-typeahead-min-length="3" uib-typeahead="item.Id as item.Id for item in getOrders($viewValue)" uib-typeahead-loading="loadingOrders">
+                                                       typeahead-min-length="3" uib-typeahead="item.Id as item.Id for item in getOrders($viewValue)" typeahead-loading="loadingOrders">
                                                 <span class="input-group-addon">
                                                     <i ng-show="loadingOrders" class="glyphicon glyphicon-refresh"></i>
                                                 </span>
@@ -37,7 +37,7 @@
                                         <div class="col-md-9">
                                             <div class="input-group autocomplete">
                                                 <input type="text" name="IdCustomer" class="form-control" placeholder="New Customer #" data-ng-model="order.IdCustomer" required numbers-only
-                                                       uib-typeahead-min-length="3" uib-typeahead="item.Id as item.Id+' - '+item.Name for item in getCustomers($viewValue)" uib-typeahead-loading="loadingCustomers">
+                                                       typeahead-min-length="3" uib-typeahead="item.Id as item.Id+' - '+item.Name for item in getCustomers($viewValue)" typeahead-loading="loadingCustomers">
                                                 <span class="input-group-addon">
                                                     <i ng-show="loadingCustomers" class="glyphicon glyphicon-refresh"></i>
                                                 </span>
