@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Data.Common;
-using Microsoft.Data.Entity.Storage;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Data.Context;
 
@@ -8,11 +8,11 @@ namespace VitalChoice.Data.Transaction
 {
     public class InnerEmbeddingTransaction : IInnerEmbeddingTransaction
     {
-        private readonly IRelationalTransaction _transaction;
+        private readonly IDbContextTransaction _transaction;
         public IDataContextAsync DbContext { get; }
         private int _referenceCount;
 
-        public InnerEmbeddingTransaction(IRelationalTransaction transaction, IDataContextAsync dbContext)
+        public InnerEmbeddingTransaction(IDbContextTransaction transaction, IDataContextAsync dbContext)
         {
             _transaction = transaction;
             DbContext = dbContext;
@@ -32,7 +32,7 @@ namespace VitalChoice.Data.Transaction
             }
         }
 
-        public DbTransaction Instance => _transaction.Instance;
+        public DbTransaction Instance => _transaction.GetDbTransaction();
 
         public void Commit()
         {
@@ -73,8 +73,6 @@ namespace VitalChoice.Data.Transaction
         }
 
         public bool Closed { get; private set; }
-
-        public IRelationalConnection Connection => _transaction.Connection;
 
         public event Action TransactionCommit;
 

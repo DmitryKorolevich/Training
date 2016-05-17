@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Data.Entity.Storage;
 
 namespace VitalChoice.Data.Repositories
 {

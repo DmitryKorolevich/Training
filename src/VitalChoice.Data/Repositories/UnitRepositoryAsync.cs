@@ -1,14 +1,10 @@
-﻿#region
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using VitalChoice.Data.Context;
 using VitalChoice.Ecommerce.Domain;
-
-#endregion
 
 namespace VitalChoice.Data.Repositories
 {

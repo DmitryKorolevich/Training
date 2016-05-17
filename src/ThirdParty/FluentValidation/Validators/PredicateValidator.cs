@@ -13,14 +13,17 @@
 // See the License for the specific language governing permissions and 
 // limitations under the License.
 // 
-// The latest version of this file can be found at http://www.codeplex.com/FluentValidation
+// The latest version of this file can be found at https://github.com/jeremyskinner/FluentValidation
 #endregion
 
 namespace FluentValidation.Validators {
-    using Internal;
+	using System;
+	using Attributes;
+	using Internal;
 	using Resources;
+	using Results;
 
-    public class PredicateValidator : PropertyValidator, IPredicateValidator {
+	public class PredicateValidator : PropertyValidator, IPredicateValidator {
         public delegate bool Predicate(object instanceToValidate, object propertyValue, PropertyValidatorContext propertyValidatorContext);
 
 		private readonly Predicate predicate;

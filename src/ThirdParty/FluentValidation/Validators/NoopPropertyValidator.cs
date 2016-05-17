@@ -13,13 +13,16 @@
 // See the License for the specific language governing permissions and 
 // limitations under the License.
 // 
-// The latest version of this file can be found at http://www.codeplex.com/FluentValidation
+// The latest version of this file can be found at https://github.com/jeremyskinner/FluentValidation
 #endregion
 
 namespace FluentValidation.Validators {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq.Expressions;
+	using System.Threading;
 	using System.Threading.Tasks;
+	using FluentValidation.Internal;
 	using Resources;
 	using Results;
 
@@ -33,9 +36,14 @@ namespace FluentValidation.Validators {
 			get { return false; }
 		}
 
+		public IStringSource ErrorCodeSource {
+			get { return null; }
+			set { }
+		}
+
 		public abstract IEnumerable<ValidationFailure> Validate(PropertyValidatorContext context);
 
-		public virtual Task<IEnumerable<ValidationFailure>> ValidateAsync(PropertyValidatorContext context) {
+		public virtual Task<IEnumerable<ValidationFailure>> ValidateAsync(PropertyValidatorContext context, CancellationToken cancellation) {
 			return TaskHelpers.FromResult(Validate(context));
 		}
 
@@ -51,5 +59,7 @@ namespace FluentValidation.Validators {
 			get { return null; }
 			set { }
 		}
+
+		public Severity Severity { get; set; }
 	}
 }

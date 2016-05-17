@@ -1,32 +1,33 @@
-﻿{
+{
   "version": "1.0.0-*",
   "description": "VitalChoice.ContentProcessing Class Library",
   "authors": [ "multi_000" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
   "dependencies": {
-    "VitalChoice.Infrastructure.Domain": "",
-    "VitalChoice.DynamicData": "",
-    "VitalChoice.Infrastructure": "",
-    "VitalChoice.Data": "",
-    "Autofac": "4.0.0-*",
+    "VitalChoice.Infrastructure.Domain": "1.0.0-*",
+    "VitalChoice.DynamicData": "1.0.0-*",
+    "VitalChoice.Infrastructure": "1.0.0-*",
+    "VitalChoice.Data": "1.0.0-*",
+    "Autofac": "4.0.0-rc2",
     "Microsoft.AspNetCore.Mvc.Abstractions": "1.0.0-*",
     "Microsoft.AspNetCore.Mvc.Core": "1.0.0-*",
     "Microsoft.AspNetCore.Mvc.ViewFeatures": "1.0.0-*",
     "Microsoft.Extensions.Logging": "1.0.0-*",
     "Microsoft.Extensions.Logging.Console": "1.0.0-*",
-    "Templates": "2.7.8-rc1"
+    "Templates": "2.7.11-rc2"
   },
   "frameworks": {
-    "net451": { },
+    "net461": { },
     "netstandard1.5": {
+      "imports": [
+        "dnxcore50",
+        "portable-net45+win8"
+      ],
       "dependencies": {
-        "Microsoft.CSharp": "4.0.1-*",
-        "System.Collections": "4.0.11-*",
-        "System.Linq": "4.1.0-*",
-        "System.Runtime": "4.1.0-*",
-        "System.Threading": "4.0.11-*"
+        "Microsoft.CSharp": "4.0.1-rc2-*",
+        "System.Collections": "4.0.11-rc2-*",
+        "System.Linq": "4.1.0-rc2-*",
+        "System.Runtime": "4.1.0-rc2-*",
+        "System.Threading": "4.0.11-rc2-*"
       }
     }
   }

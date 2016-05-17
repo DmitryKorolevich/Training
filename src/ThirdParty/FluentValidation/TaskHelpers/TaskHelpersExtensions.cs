@@ -451,7 +451,7 @@ namespace System.Threading.Tasks
 #if NETFX_CORE
             return task => task.GetAwaiter().GetResult();
 #else
-			MethodInfo getAwaiterMethod = typeof(Task).GetDeclaredMethod("GetAwaiter");
+			MethodInfo getAwaiterMethod = typeof(Task).GetTypeInfo().GetDeclaredMethod("GetAwaiter");
 			if (getAwaiterMethod != null)
 			{
 				// .NET 4.5 - dump the same code the 'await' keyword would have dumped
@@ -466,7 +466,7 @@ namespace System.Threading.Tasks
 			else
 			{
 				Func<Exception, Exception> prepForRemoting = null;
-#if !PORTABLE && !PORTABLE40 && !NETSTANDARD1_5
+#if !PORTABLE && !PORTABLE40 && !CoreCLR
 				try
 				{
 					if (AppDomain.CurrentDomain.IsFullyTrusted)
@@ -515,8 +515,9 @@ namespace System.Threading.Tasks
 		[SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "unused", Justification = "We only call the property getter for its side effect; we don't care about the value.")]
 		private static void MarkExceptionsObserved(this Task task)
 		{
+#if !WIN10
 			Contract.Assert(task.IsCompleted);
-
+#endif
 			Exception unused = task.Exception;
 		}
 
@@ -770,7 +771,9 @@ namespace System.Threading.Tasks
 
 		protected CatchInfoBase(TTask task, CancellationToken cancellationToken)
 		{
+#if !WIN10
 			Contract.Assert(task != null);
+#endif
 			_task = task;
 			if (task.IsFaulted)
 			{

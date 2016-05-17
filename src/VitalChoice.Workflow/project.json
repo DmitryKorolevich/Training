@@ -1,20 +1,28 @@
-﻿{
+{
   
   "version": "1.0.0-*",
   "dependencies": {
     "Microsoft.EntityFrameworkCore": "1.0.0-*",
-    "Microsoft.Extensions.OptionsModel": "1.0.0-*",
-    "Autofac.Extensions.DependencyInjection": "4.0.0-*",
-    "VitalChoice.Ecommerce.Domain": "",
-    "VitalChoice.Profiling": ""
+    "Microsoft.Extensions.Options": "1.0.0-*",
+    "Autofac.Extensions.DependencyInjection": "4.0.0-rc2",
+    "VitalChoice.Ecommerce.Domain": "1.0.0-*",
+    "VitalChoice.Profiling": "1.0.0-*"
   },
 
   "frameworks": {
-    "net451": {
+    "net461": {
     },
     "netstandard1.5": {
+      "imports": [
+        "dnxcore50",
+        "portable-net45+win8"
+      ],
       "dependencies": {
-        "System.Runtime": "4.0.21-*"
+        "Microsoft.NETCore.Platforms": {
+          "type": "build",
+          "version": "1.0.1-*"
+        },
+        "System.Runtime": "4.1.0-rc2-*"
       }
     }
   }

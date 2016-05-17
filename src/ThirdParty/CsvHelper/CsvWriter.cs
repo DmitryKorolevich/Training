@@ -5,22 +5,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
-
-#if !NET_2_0
 using System.Linq;
+#if !NET_2_0
 using System.Linq.Expressions;
-#endif
-
-#if NET_2_0
-using CsvHelper.MissingFrom20;
-#endif
-
-#if PCL
-using CsvHelper.MissingFromPcl;
 #endif
 
 namespace CsvHelper
@@ -461,7 +454,8 @@ namespace CsvHelper
 				if( genericEnumerable != null )
 				{
 					recordType = genericEnumerable.GetGenericArguments().Single();
-					if( configuration.HasHeaderRecord && !hasHeaderBeenWritten && !recordType.GetTypeInfo().IsPrimitive )
+					var isPrimitive = recordType.GetTypeInfo().IsPrimitive;
+					if( configuration.HasHeaderRecord && !hasHeaderBeenWritten && !isPrimitive )
 					{
 						WriteHeader( recordType );
 					}
@@ -472,7 +466,8 @@ namespace CsvHelper
 					// If records is a List<dynamic>, the header hasn't been written yet.
 					// Write the header based on the record type.
 					recordType = record.GetType();
-					if( configuration.HasHeaderRecord && !hasHeaderBeenWritten && !recordType.GetTypeInfo().IsPrimitive )
+					var isPrimitive = recordType.GetTypeInfo().IsPrimitive;
+					if( configuration.HasHeaderRecord && !hasHeaderBeenWritten && !isPrimitive )
 					{
 						WriteHeader( recordType );
 					}
@@ -584,8 +579,7 @@ namespace CsvHelper
 					continue;
 				}
 
-				var isReferenceValueType = refMap.Data.Property.PropertyType.GetTypeInfo().IsValueType;
-				if( isReferenceValueType )
+				if( refMap.Data.Property.PropertyType.GetTypeInfo().IsValueType )
 				{
 					return propertyExpression;
 				}
@@ -616,10 +610,10 @@ namespace CsvHelper
 		}
 #endif
 
-		/// <summary>
-		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-		/// </summary>
-		/// <filterpriority>2</filterpriority>
+				/// <summary>
+				/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+				/// </summary>
+				/// <filterpriority>2</filterpriority>
 		public void Dispose()
 		{
 			Dispose( true );
@@ -839,5 +833,5 @@ namespace CsvHelper
 			return !cantWrite;
 		}
 #endif
-	}
+			}
 }

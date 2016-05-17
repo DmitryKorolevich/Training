@@ -13,17 +13,20 @@
 // See the License for the specific language governing permissions and 
 // limitations under the License.
 // 
-// The latest version of this file can be found at http://www.codeplex.com/FluentValidation
+// The latest version of this file can be found at https://github.com/jeremyskinner/FluentValidation
 #endregion
 
 namespace FluentValidation.Internal {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 	using System.Linq.Expressions;
 	using System.Reflection;
 	using System.Text.RegularExpressions;
+	using System.Threading.Tasks;
+	using Validators;
 
-    /// <summary>
+	/// <summary>
 	/// Useful extensions
 	/// </summary>
 	public static class Extensions {
@@ -37,6 +40,10 @@ namespace FluentValidation.Internal {
 			if (string.IsNullOrEmpty(str)) {
 				throw new ArgumentNullException(message);
 			}
+		}
+
+		public static bool IsParameterExpression(this LambdaExpression expression) {
+			return expression.Body.NodeType == ExpressionType.Parameter;
 		}
 
 		/// <summary>
@@ -107,6 +114,31 @@ namespace FluentValidation.Internal {
 		} 
 
 		public static Func<object, bool> CoerceToNonGeneric<T>(this Func<T, bool> func) {
+			return x => func((T)x);
+		}
+
+		public static Func<object, Task<bool>> CoerceToNonGeneric<T>(this Func<T, Task<bool>> func)
+		{
+			return x => func((T)x);
+		}
+
+		public static Func<object, int> CoerceToNonGeneric<T>(this Func<T, int> func)
+		{
+			return x => func((T)x);
+		}
+
+		public static Func<object, long> CoerceToNonGeneric<T>(this Func<T, long> func)
+		{
+			return x => func((T)x);
+		}
+
+		public static Func<object, string> CoerceToNonGeneric<T>(this Func<T, string> func)
+		{
+			return x => func((T)x);
+		}
+
+		public static Func<object, System.Text.RegularExpressions.Regex> CoerceToNonGeneric<T>(this Func<T, System.Text.RegularExpressions.Regex> func)
+		{
 			return x => func((T)x);
 		}
 

@@ -2,40 +2,55 @@
   "version": "1.0.0-*",
   "description": "VitalChoice.Ecommerce.Domain Class Library",
   "authors": [ "multi_000" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
   "dependencies": {
     "Newtonsoft.Json": "8.0.3",
     "Microsoft.EntityFrameworkCore": "1.0.0-*",
-    "Microsoft.AspNet.Http": "1.0.0-*",
-    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-*"
+    "Microsoft.AspNetCore.Http": "1.0.0-rc2-*",
+    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-*",
+    "Microsoft.Extensions.DependencyModel": "1.0.0-rc2-final"
   },
-  "compilationOptions": {"allowUnsafe": true},
+  "buildOptions": {
+    "allowUnsafe": true 
+  },
   "frameworks": {
-    "net451": {
+    "net461": {
       "frameworkAssemblies": {
-        "System.Runtime.Serialization": "4.0.0.0",
-        "System.Xml": "4.0.0.0",
-        "System.Runtime": "4.0.10.0",
-        "System.Collections": "4.0.0.0"
+        "System.Runtime.Serialization": "",
+        "System.Xml": "",
+        "System.Runtime": "",
+        "System.Collections": "",
+        "System.Text.Encoding": "",
+        "System.Threading.Tasks": "",
+        "System.IO": "",
+        "System.ComponentModel": "",
+        "Microsoft.CSharp": ""
       }
     },
     "netstandard1.5": {
+      "imports": [
+        "dnxcore50",
+        "portable-net45+win8"
+      ],
       "dependencies": {
-        "Microsoft.CSharp": "4.0.1-*",
-        "System.Collections": "4.0.11-*",
-        "System.Linq": "4.0.1-*",
-        "System.Runtime": "4.0.21-*",
-        "System.Reflection.Extensions": "4.0.1-*",
-        "System.Threading": "4.0.11-*",
-        "System.Dynamic.Runtime": "4.0.11-*",
-        "System.Reflection": "4.1.0-*",
-        "System.Reflection.Emit": "4.0.1-*",
-        "System.Reflection.Emit.ILGeneration": "4.0.1-*",
-        "System.Reflection.Emit.Lightweight": "4.0.1-*",
-        "System.Runtime.Serialization.Primitives": "4.1.0-*",
-        "System.Xml.XmlSerializer": "4.0.11-*"
+        "Microsoft.NETCore.Platforms": {
+          "type": "build",
+          "version": "1.0.1-*"
+        },
+        "System.Runtime.Loader": "4.0.0-rc2-*",
+        "Microsoft.CSharp": "4.0.1-rc2-*",
+        "System.Collections": "4.0.11-rc2-*",
+        "System.Linq": "4.1.0-rc2-*",
+        "System.Runtime": "4.1.0-rc2-*",
+        "System.Reflection.Extensions": "4.0.1-rc2-*",
+        "System.Text.RegularExpressions": "4.0.12-rc2-*",
+        "System.Threading": "4.0.11-rc2-*",
+        "System.Dynamic.Runtime": "4.0.11-rc2-*",
+        "System.Reflection": "4.1.0-rc2-*",
+        "System.Reflection.Emit": "4.0.1-rc2-*",
+        "System.Reflection.Emit.ILGeneration": "4.0.1-rc2-*",
+        "System.Reflection.Emit.Lightweight": "4.0.1-rc2-*",
+        "System.Runtime.Serialization.Primitives": "4.1.1-rc2-*",
+        "System.Xml.XmlSerializer": "4.0.11-rc2-*"
       }
     }
   }

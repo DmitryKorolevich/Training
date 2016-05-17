@@ -1,29 +1,34 @@
-﻿{
+{
   "version": "1.0.0-*",
   "description": "VitalChoice.Profiling Class Library",
   "authors": [ "multi_000" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
   "dependencies": {
     "Microsoft.AspNetCore.Mvc.Abstractions": "1.0.0-*",
     "Microsoft.EntityFrameworkCore.Relational": "1.0.0-*",
     "Microsoft.EntityFrameworkCore.SqlServer": "1.0.0-*",
-    "VitalChoice.Ecommerce.Domain": ""
+    "VitalChoice.Ecommerce.Domain": "1.0.0-*"
   },
   "frameworks": {
-    "net451": {
+    "net461": {
       "frameworkAssemblies": {
-        "System.Runtime": "4.0.10.0"
+        "System.Runtime": ""
       }
     },
     "netstandard1.5": {
+      "imports": [
+        "dnxcore50",
+        "portable-net45+win8"
+      ],
       "dependencies": {
-        "Microsoft.CSharp": "4.0.1-*",
-        "System.Collections": "4.0.11-*",
-        "System.Linq": "4.1.0-*",
-        "System.Runtime": "4.0.21-*",
-        "System.Threading": "4.0.11-*"
+        "Microsoft.NETCore.Platforms": {
+          "type": "build",
+          "version": "1.0.1-*"
+        },
+        "Microsoft.CSharp": "4.0.1-rc2-*",
+        "System.Collections": "4.0.11-rc2-*",
+        "System.Linq": "4.1.0-rc2-*",
+        "System.Runtime": "4.1.0-rc2-*",
+        "System.Threading": "4.0.11-rc2-*"
       }
     }
   }

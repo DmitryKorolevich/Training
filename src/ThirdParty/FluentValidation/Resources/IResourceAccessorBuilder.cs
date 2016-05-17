@@ -39,7 +39,11 @@ namespace FluentValidation.Resources {
 				throw new InvalidOperationException(string.Format("Property '{0}' on type '{1}' does not return a string", resourceName, resourceType));
 			}
 
-			var accessor = property.CreateGetter();
+#if PORTABLE40
+			var accessor = (Func<string>)Delegate.CreateDelegate(typeof(Func<string>), property.GetGetMethod());
+#else
+			var accessor = (Func<string>)property.GetMethod.CreateDelegate(typeof(Func<string>));
+#endif
 
 		    return new ResourceAccessor {
 		        Accessor = accessor,
@@ -55,7 +59,7 @@ namespace FluentValidation.Resources {
 		/// to replace the type/name of the resource before the delegate is constructed.
 		/// </summary>
 		protected virtual PropertyInfo GetResourceProperty(ref Type resourceType, ref string resourceName) {
-			return resourceType.GetPublicStaticProperty(resourceName);
+			return resourceType.GetRuntimeProperty(resourceName);
 		}
 	}
 
@@ -74,7 +78,7 @@ namespace FluentValidation.Resources {
 			// to redirect error messages away from the default Messages class.
 
 			if (ValidatorOptions.ResourceProviderType != null) {
-				var property = ValidatorOptions.ResourceProviderType.GetPublicStaticProperty(resourceName);
+				var property = ValidatorOptions.ResourceProviderType.GetRuntimeProperty(resourceName);
 
 				if (property != null) {
 					// We found a matching property on the Resource Provider.

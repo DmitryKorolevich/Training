@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Data;
-using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.Storage;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Ecommerce.Domain.Options;

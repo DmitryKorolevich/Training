@@ -2,15 +2,16 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:					2015-07-02
-// Last Modified:			2015-10-26
+// Last Modified:			2016-05-16
 // 
 
-using Microsoft.AspNet.Mvc.ViewFeatures;
-using Microsoft.AspNet.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNet.Razor.TagHelpers;
+using System.Text;
 
 
 namespace cloudscribe.Web.Pagination
@@ -26,6 +27,8 @@ namespace cloudscribe.Web.Pagination
         private const string MaxPagerItemsAttributeName = "cs-paging-maxpageritems";
         private const string AjaxTargetAttributeName = "cs-ajax-target";
         private const string AjaxModeAttributeName = "cs-ajax-mode";
+        private const string AjaxSuccessAttributeName = "cs-ajax-success";
+        private const string AjaxFailureAttributeName = "cs-ajax-failure";
         private const string PageNumberParamAttributeName = "cs-pagenumber-param";
 
         private const string ActionAttributeName = "asp-action";
@@ -38,11 +41,16 @@ namespace cloudscribe.Web.Pagination
         private const string RouteValuesPrefix = "asp-route-";
 
        
-        public PagerTagHelper(IHtmlGenerator generator, IBuildPaginationLinks linkBuilder)
+        public PagerTagHelper(
+            IHtmlGenerator generator, 
+            IBuildPaginationLinks linkBuilder = null)
         {
             Generator = generator;
-            this.linkBuilder = linkBuilder;
+            this.linkBuilder = linkBuilder ?? new PaginationLinkBuilder();
         }
+
+        [ViewContext]
+        public ViewContext ViewContext { get; set; }
 
         private IBuildPaginationLinks linkBuilder;
 
@@ -69,11 +77,30 @@ namespace cloudscribe.Web.Pagination
         [HtmlAttributeName(AjaxModeAttributeName)]
         public string AjaxMode { get; set; } = "replace";
 
+        [HtmlAttributeName(AjaxSuccessAttributeName)]
+        public string AjaxSuccess { get; set; } = string.Empty;
+
+        [HtmlAttributeName(AjaxFailureAttributeName)]
+        public string AjaxFailure { get; set; } = string.Empty;
+
         [HtmlAttributeName(PageNumberParamAttributeName)]
         public string PageNumberParam { get; set; } = "pageNumber";
 
         [HtmlAttributeName("cs-show-first-last")]
         public bool ShowFirstLast { get; set; } = false;
+
+        [HtmlAttributeName("cs-show-numbered")]
+        public bool ShowNumbered { get; set; } = true;
+
+        [HtmlAttributeName("cs-use-reverse-increment")]
+        public bool UseReverseIncrement { get; set; } = false;
+
+        [HtmlAttributeName("cs-suppress-empty-nextprev")]
+        public bool SuppressEmptyNextPrev { get; set; } = false;
+
+        [HtmlAttributeName("cs-suppress-inactive-firstlast")]
+        public bool SuppressInActiveFirstLast { get; set; } = false;
+        
 
         [HtmlAttributeName("cs-first-page-text")]
         public string FirstPageText { get; set; } = "<";
@@ -172,7 +199,31 @@ namespace cloudscribe.Web.Pagination
                 PagingModel.ItemsPerPage = PageSize;
                 PagingModel.TotalItems = TotalItems;
                 PagingModel.MaxPagerItems = MaxPagerItems;
+                PagingModel.SuppressEmptyNextPrev = SuppressEmptyNextPrev;
+                PagingModel.SuppressInActiveFirstLast = SuppressInActiveFirstLast;
             }
+
+            if(ShowFirstLast)
+            {
+                PagingModel.ShowFirstLast = true;
+            }
+
+            if(!ShowNumbered)
+            {
+                PagingModel.ShowNumbered = false;
+            }
+
+            if(UseReverseIncrement)
+            {
+                PagingModel.UseReverseIncrement = true;
+
+                if(SuppressEmptyNextPrev)
+                {
+                    PagingModel.SuppressEmptyNextPrev = true;
+                }
+            }
+
+
             int totalPages = (int)Math.Ceiling(PagingModel.TotalItems / (double)PagingModel.ItemsPerPage);
             // don't render if only 1 page 
             if (totalPages <= 1) 
@@ -188,7 +239,7 @@ namespace cloudscribe.Web.Pagination
 
             //prepare things needed by generatpageeurl function
             TagBuilder linkTemplate = GenerateLinkTemplate();
-            baseHref = linkTemplate.Attributes["href"];
+            baseHref = linkTemplate.Attributes["href"] ?? string.Empty;
             querySeparator = baseHref.Contains("?") ? "&" : "?";
             baseHref = baseHref + querySeparator + PageNumberParam + "=";
 
@@ -221,7 +272,7 @@ namespace cloudscribe.Web.Pagination
 
                 var a = new TagBuilder("a");
 
-                if(link.Url.Length > 0)
+                if(link.Active && (link.Url.Length > 0))
                 {
                     a.MergeAttribute("href", link.Url);
                 }
@@ -230,18 +281,15 @@ namespace cloudscribe.Web.Pagination
                     a.MergeAttribute("href", "#");
                 }
                 
-                
+
                 if (link.Text == "«")
                 {
-                    //a.InnerHtml = "&laquo;";
                     a.InnerHtml.AppendHtml("&laquo;");
                     
                 }
                 else if (link.Text == "»")
                 {
-                    //a.InnerHtml = "&raquo;";
                     a.InnerHtml.AppendHtml("&raquo;");
-
                 }
                 else
                 {
@@ -258,11 +306,19 @@ namespace cloudscribe.Web.Pagination
                     a.MergeAttribute("data-ajax", "true");
                     a.MergeAttribute("data-ajax-mode", AjaxMode);
                     a.MergeAttribute("data-ajax-update", AjaxTarget);
+                    if (AjaxSuccess.Length > 0)
+                    {
+                        a.MergeAttribute("data-ajax-success", AjaxSuccess);
+                    }
+                    if (AjaxFailure.Length > 0)
+                    {
+                        a.MergeAttribute("data-ajax-failure", AjaxFailure);
+                    }
                 }
                 
-                li.InnerHtml.Append(a);
+                li.InnerHtml.AppendHtml(a);
                 
-                output.Content.Append(li);
+                output.Content.AppendHtml(li);
             }
 
             output.Attributes.Clear();
@@ -293,14 +349,16 @@ namespace cloudscribe.Web.Pagination
             TagBuilder tagBuilder;
             if (Route == null)
             {
-                tagBuilder = Generator.GenerateActionLink(linkText: string.Empty,
-                                                          actionName: Action,
-                                                          controllerName: Controller,
-                                                          protocol: Protocol,
-                                                          hostname: Host,
-                                                          fragment: Fragment,
-                                                          routeValues: routeValues,
-                                                          htmlAttributes: null);
+                tagBuilder = Generator.GenerateActionLink(
+                    ViewContext,
+                    linkText: string.Empty,
+                    actionName: Action,
+                    controllerName: Controller,
+                    protocol: Protocol,
+                    hostname: Host,
+                    fragment: Fragment,
+                    routeValues: routeValues,
+                    htmlAttributes: null);
             }
             else if (Action != null || Controller != null)
             {
@@ -309,13 +367,15 @@ namespace cloudscribe.Web.Pagination
             }
             else
             {
-                tagBuilder = Generator.GenerateRouteLink(linkText: string.Empty,
-                                                         routeName: Route,
-                                                         protocol: Protocol,
-                                                         hostName: Host,
-                                                         fragment: Fragment,
-                                                         routeValues: routeValues,
-                                                         htmlAttributes: null);
+                tagBuilder = Generator.GenerateRouteLink(
+                    ViewContext,
+                    linkText: string.Empty,
+                    routeName: Route,
+                    protocol: Protocol,
+                    hostName: Host,
+                    fragment: Fragment,
+                    routeValues: routeValues,
+                    htmlAttributes: null);
             }
 
             return tagBuilder;

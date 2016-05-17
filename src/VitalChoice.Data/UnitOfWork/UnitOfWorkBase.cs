@@ -1,8 +1,7 @@
 ﻿using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Data.Entity.Storage;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Transaction;

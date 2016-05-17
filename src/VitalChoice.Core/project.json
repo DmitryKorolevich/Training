@@ -1,22 +1,22 @@
 {
   "version": "1.0.0-*",
   "dependencies": {
-    "Autofac.Extensions.DependencyInjection": "4.0.0-rc1-177",
+    "Autofac.Extensions.DependencyInjection": "4.0.0-rc2",
     "Avalara.Avatax.Rest": "1.0.0-*",
-    "cloudscribe.Web.Pagination": "1.0.0-*",
-    "Microsoft.AspNet.Authentication.Cookies": "1.0.0-rc1-final",
-    "Microsoft.AspNet.Http": "1.0.0-rc1-final",
-    "Microsoft.AspNet.Identity": "3.0.0-*",
-    "Microsoft.AspNet.Mvc": "6.0.0-rc1-final",
-    "Microsoft.AspNet.Mvc.TagHelpers": "6.0.0-rc1-final",
-    "Microsoft.AspNet.Session": "1.0.0-rc1-final",
-    "Microsoft.AspNet.Tooling.Razor": "1.0.0-rc1-final",
-    "Microsoft.AspNet.Diagnostics": "1.0.0-rc1-final",
-    "Microsoft.Extensions.Configuration.Json": "1.0.0-rc1-final",
-    "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
-    "Microsoft.Extensions.OptionsModel": "1.0.0-rc1-final",
+    "cloudscribe.Web.Pagination": "1.0.1-*",
+    "Microsoft.AspNetCore.Authentication.Cookies": "1.0.0-*",
+    "Microsoft.AspNetCore.Http": "1.0.0-*",
+    "Microsoft.AspNetCore.Identity": "1.0.0-*",
+    "Microsoft.AspNetCore.Mvc": "1.0.0-*",
+    "Microsoft.AspNetCore.Mvc.TagHelpers": "1.0.0-*",
+    "Microsoft.AspNetCore.Session": "1.0.0-*",
+    "Microsoft.AspNetCore.Razor": "1.0.0-*",
+    "Microsoft.AspNetCore.Diagnostics": "1.0.0-*",
+    "Microsoft.Extensions.Configuration.Json": "1.0.0-*",
+    "Microsoft.Extensions.Logging": "1.0.0-*",
+    "Microsoft.Extensions.Options": "1.0.0-*",
     "VitalChoice.Business": "1.0.0-*",
-    "VitalChoice.ContentProcessing": "",
+    "VitalChoice.ContentProcessing": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
     "VitalChoice.Infrastructure.Domain": "1.0.0-*",
@@ -25,19 +25,27 @@
     "VitalChoice.Interfaces": "1.0.0-*",
     "VitalChoice.Validation": "1.0.0-*",
     "VitalChoice.Caching": "1.0.0-*",
-    "VitalChoice.Profiling": ""
+    "VitalChoice.Profiling": "1.0.0-*"
   },
 
   "frameworks": {
-    "net451": {
+    "net461": {
       "dependencies": {
-        "NLog": "4.0.1"
+        "NLog": "4.3.4"
       }
     },
     "netstandard1.5": {
+      "imports": [
+        "dnxcore50",
+        "portable-net45+win8"
+      ],
       "dependencies": {
-        "System.Runtime": "4.0.21-beta-23516",
-        "System.Diagnostics.Process": "4.1.0-beta-23516"
+        "Microsoft.NETCore.Platforms": {
+          "type": "build",
+          "version": "1.0.1-*"
+        },
+        "System.Runtime": "4.1.0-rc2-*",
+        "System.Diagnostics.Process": "4.1.0-rc2-*"
       }
     }
   }

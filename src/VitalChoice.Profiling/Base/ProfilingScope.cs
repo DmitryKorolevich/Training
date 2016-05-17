@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 #if !NETSTANDARD1_5
 using System.Runtime.Remoting.Messaging;
 #endif
-using System.Threading;
 
 namespace VitalChoice.Profiling.Base
 {

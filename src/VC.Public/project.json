@@ -1,38 +1,44 @@
 {
-  
+
   "webroot": "wwwroot",
   "version": "1.0.0-*",
-  "exclude": [
-    "wwwroot",
-    "node_modules",
-    "bower_components",
-    "deploy"
-  ],
-  "publishExclude": [
-    "node_modules",
-    "bower_components",
-    "deploy",
-    "**.kproj",
-    "**.user",
-    "**.vspscc"
-  ],
+  "buildOptions": {
+    "compile": {
+      "exclude": [
+        "wwwroot",
+        "node_modules",
+        "bower_components",
+        "deploy"
+      ]
+    }
+  },
+  "packOptions": {
+    "exclude": [
+      "node_modules",
+      "bower_components",
+      "deploy",
+      "**.xproj",
+      "**.user",
+      "**.vspscc"
+    ]
+  },
   "dependencies": {
-    "cloudscribe.Web.Pagination": "1.0.0-*",
-    "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-*",
-    "Microsoft.AspNetCore.IISPlatformHandler": "1.0.0-*",
-    "Microsoft.AspNetCore.Mvc": "1.0.0-*",
-    "Microsoft.AspNetCore.Mvc.TagHelpers": "1.0.0-*",
-    "Microsoft.AspNetCore.Diagnostics": "1.0.0-*",
-    "Microsoft.EntityFrameworkCore": "1.0.0-*",
-    "Microsoft.AspNetCore.StaticFiles": "1.0.0-*",
-    "Microsoft.AspNetCore.Http": "1.0.0-*",
-    "Microsoft.AspNetCore.Session": "1.0.0-*",
-    "Microsoft.Extensions.Configuration.Json": "1.0.0-*",
-    "Microsoft.Extensions.Logging": "1.0.0-*",
-    "Microsoft.Extensions.Logging.Console": "1.0.0-*",
-    "Microsoft.Extensions.WebEncoders": "1.0.0-*",
+    "cloudscribe.Web.Pagination": "1.0.1",
+    "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-rc2-final",
+    "Microsoft.AspNetCore.Server.IISIntegration": "1.0.0-rc2-final",
+    "Microsoft.AspNetCore.Mvc": "1.0.0-rc2-final",
+    "Microsoft.AspNetCore.Mvc.TagHelpers": "1.0.0-rc2-final",
+    "Microsoft.AspNetCore.Diagnostics": "1.0.0-rc2-final",
+    "Microsoft.EntityFrameworkCore": "1.0.0-rc2-final",
+    "Microsoft.AspNetCore.StaticFiles": "1.0.0-rc2-final",
+    "Microsoft.AspNetCore.Http": "1.0.0-rc2-final",
+    "Microsoft.AspNetCore.Session": "1.0.0-rc2-final",
+    "Microsoft.Extensions.Configuration.Json": "1.0.0-rc2-final",
+    "Microsoft.Extensions.Logging": "1.0.0-rc2-final",
+    "Microsoft.Extensions.Logging.Console": "1.0.0-rc2-final",
+    "Microsoft.Extensions.WebEncoders": "1.0.0-rc2-final",
     "Newtonsoft.Json": "8.0.3",
-    "Microsoft.AspNetCore.Razor": "1.0.0-*",
+    "Microsoft.AspNetCore.Razor": "1.0.0-rc2-final",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
     "VitalChoice.Infrastructure.Domain": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*",
@@ -42,12 +48,19 @@
     "VitalChoice.SharedWeb": "1.0.0-*"
   },
   "frameworks": {
-    "dnx451": {
-      "dependencies": {"EntityFramework.Commands": "7.0.0-*"}
+    "net461": {
     },
-    "netstandard1.5": {
+    "netcoreapp1.0": {
+      "imports": [
+        "dnxcore50",
+        "portable-net45+win8"
+      ],
       "dependencies": {
-        "System.Runtime": "4.0.21-*"
+        "Microsoft.NETCore.Platforms": {
+          "type": "platform",
+          "version": "1.0.1-rc2-*"
+        },
+        "System.Runtime": "4.1.0-rc2-*"
       }
     }
   },

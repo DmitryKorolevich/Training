@@ -2,19 +2,27 @@
   
   "version": "1.0.0-*",
   "dependencies": {
-    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0-*",
-    "Autofac.Extensions.DependencyInjection": "4.0.0-*",
-    "Microsoft.EntityFrameworkCore": "1.0.0-*",
-    "VitalChoice.Ecommerce.Domain": ""
+    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0-rc2-*",
+    "Autofac.Extensions.DependencyInjection": "4.0.0-rc2",
+    "Microsoft.EntityFrameworkCore": "1.0.0-rc2-*",
+    "VitalChoice.Ecommerce.Domain": "1.0.0-*"
   },
 
   "frameworks": {
-    "net451": {
+    "net461": {
     },
     "netstandard1.5": {
+      "imports": [
+        "dnxcore50",
+        "portable-net45+win8"
+      ],
       "dependencies": {
-        "System.Runtime": "4.0.21-*",
-        "System.Linq": "4.0.1-*"
+        "Microsoft.NETCore.Platforms": {
+          "version": "1.0.1-rc2-*",
+          "type": "build"
+        },
+        "System.Runtime": "4.1.0-rc2-*",
+        "System.Linq": "4.1.0-rc2-*"
       }
     }
   }

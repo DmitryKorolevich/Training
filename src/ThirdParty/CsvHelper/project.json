@@ -1,19 +1,42 @@
-﻿{
-  "version": "2.13.2-*",
-
-  "frameworks": {
-    "net451": {},
+{
+	"title": "CsvHelper",
+	"version": "2.14.2",
+	"authors": [ "Josh Close" ],
+	"copyright": "Copyright � 2009-2016 Josh Close and Contributors",
+	"description": "A library for reading and writing CSV files. Extremely fast, flexible, and easy to use. Supports reading and writing of custom class objects.",
+	"frameworks": {
+		"net461": {
+      "buildOptions": {
+        "define": [ "NET_4_5" ]
+      },
+      "frameworkAssemblies": {
+        "System.Linq": "",
+        "System.Text.RegularExpressions": "",
+        "System.Globalization": "",
+        "System.Diagnostics.Debug": "",
+        "Microsoft.CSharp": ""
+      }
+		},
     "netstandard1.5": {
+      "imports": [
+        "dnxcore50",
+        "portable-net45+win8"
+      ],
+      "buildOptions": {
+        "define": [ "COREFX" ]
+      },
       "dependencies": {
-        "System.Runtime": "4.0.21-beta-23516",
-        "System.Runtime.Serialization.Primitives": "4.1.0-beta-23516",
-        "System.Linq": "4.0.1-beta-23516",
-        "System.Linq.Expressions": "4.0.11-beta-23516",
-        "System.Text.RegularExpressions": "4.0.11-beta-23516",
-        "System.Reflection": "4.1.0-beta-23516",
-        "System.Reflection.Extensions": "4.0.1-beta-23516",
-        "System.Reflection.TypeExtensions": "4.1.0-beta-23516"
+        "Microsoft.CSharp": "4.0.1-rc2-*",
+        "System.Collections": "4.0.11-rc2-*",
+        "System.Linq": "4.1.0-rc2-*",
+        "System.Reflection.TypeExtensions": "4.1.0-rc2-*",
+        "System.Runtime": "4.1.0-rc2-*",
+        "System.Globalization": "4.0.11-rc2-*",
+        "System.Text.RegularExpressions": "4.0.12-rc2-*",
+        "System.Diagnostics.Debug": "4.0.11-rc2-*",
+        "System.Runtime.InteropServices": "4.1.0-rc2-*",
+        "System.Runtime.Extensions": "4.1.0-rc2-*"
       }
     }
-  }
+	}
 }

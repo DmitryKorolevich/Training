@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and 
 // limitations under the License.
 // 
-// The latest version of this file can be found at http://www.codeplex.com/FluentValidation
+// The latest version of this file can be found at https://github.com/jeremyskinner/FluentValidation
 #endregion
 
 namespace FluentValidation.Internal {
@@ -56,6 +56,12 @@ namespace FluentValidation.Internal {
 			var members = propertyExpressions.Select(MemberFromExpression).ToList();
 			return new MemberNameValidatorSelector(members);
 		}
+
+		public static string[] MemberNamesFromExpressions<T>(params Expression<Func<T, object>>[] propertyExpressions) {
+			var members = propertyExpressions.Select(MemberFromExpression).ToArray();
+			return members;
+		}
+
 
 		private static string MemberFromExpression<T>(Expression<Func<T, object>> expression) {
 			var chain = PropertyChain.FromExpression(expression);

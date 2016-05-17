@@ -1,14 +1,28 @@
-// --------------------------------------------------------------------------
-//  <copyright file="ChildCollectionValidatorAdaptor.cs" company="Microsoft">
-//      Copyright (c) Microsoft Corporation. All rights reserved.
-//  </copyright>
-// --------------------------------------------------------------------------
+#region License
+// Copyright (c) Jeremy Skinner (http://www.jeremyskinner.co.uk)
+// 
+// Licensed under the Apache License, Version 2.0 (the "License"); 
+// you may not use this file except in compliance with the License. 
+// You may obtain a copy of the License at 
+// 
+// http://www.apache.org/licenses/LICENSE-2.0 
+// 
+// Unless required by applicable law or agreed to in writing, software 
+// distributed under the License is distributed on an "AS IS" BASIS, 
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+// See the License for the specific language governing permissions and 
+// limitations under the License.
+// 
+// The latest version of this file can be found at https://github.com/jeremyskinner/FluentValidation
+#endregion
 
 namespace FluentValidation.Validators {
 	using System;
 	using System.Collections;
 	using System.Collections.Generic;
 	using System.Linq;
+	using System.Linq.Expressions;
+	using System.Threading;
 	using System.Threading.Tasks;
 	using FluentValidation.Results;
 
@@ -51,7 +65,7 @@ namespace FluentValidation.Validators {
 			);
 		}
 
-		public override Task<IEnumerable<ValidationFailure>> ValidateAsync(PropertyValidatorContext context) {
+		public override Task<IEnumerable<ValidationFailure>> ValidateAsync(PropertyValidatorContext context, CancellationToken cancellation) {
 			return ValidateInternal(
 				context,
 				items => {
@@ -59,7 +73,7 @@ namespace FluentValidation.Validators {
 					var tasks = items.Select(tuple => {
 						var ctx = tuple.Item1;
 						var validator = tuple.Item2;
-						return validator.ValidateAsync(ctx).Then(res => failures.AddRange(res.Errors), runSynchronously: true);
+						return validator.ValidateAsync(ctx, cancellation).Then(res => failures.AddRange(res.Errors), runSynchronously: true);
 					});
 					return TaskHelpers.Iterate(tasks).Then(() => failures.AsEnumerable(), runSynchronously: true);
 				},
@@ -72,10 +86,6 @@ namespace FluentValidation.Validators {
 			Func<IEnumerable<Tuple<ValidationContext, IValidator>>, TResult> validatorApplicator,
 			TResult emptyResult
 		) {
-			if (context.Rule.Member == null) {
-				throw new InvalidOperationException(string.Format("Nested validators can only be used with Member Expressions."));
-			}
-
 			var collection = context.PropertyValue as IEnumerable;
 
 			if (collection == null) {
@@ -84,14 +94,20 @@ namespace FluentValidation.Validators {
 
 			var predicate = Predicate ?? (x => true);
 
+			string propertyName = context.Rule.PropertyName;
+
+			if (string.IsNullOrEmpty(propertyName)) {
+				propertyName = InferPropertyName(context.Rule.Expression);
+			}
+
 			var itemsToValidate = collection
 				.Cast<object>()
 				.Select((item, index) => new { item, index })
 				.Where(a => a.item != null && predicate(a.item))
 				.Select(a => {
 					var newContext = context.ParentContext.CloneForChildValidator(a.item);
-					newContext.PropertyChain.Add(context.Rule.PropertyName);
-					newContext.PropertyChain.AddIndexer(a.index);
+					newContext.PropertyChain.Add(propertyName);
+					newContext.PropertyChain.AddIndexer(a.item is IIndexedCollectionItem ? ((IIndexedCollectionItem)a.item).Index : a.index.ToString());
 
 					var validator = childValidatorProvider(context.Instance);
 
@@ -100,5 +116,20 @@ namespace FluentValidation.Validators {
 
 			return validatorApplicator(itemsToValidate);
 		}
+
+		private string InferPropertyName(LambdaExpression expression) {
+			var paramExp = expression.Body as ParameterExpression;
+
+			if (paramExp == null) {
+				throw new InvalidOperationException("Could not infer property name for expression: " + expression + ". Please explicitly specify a property name by calling OverridePropertyName as part of the rule chain. Eg: RuleFor(x => x).SetCollectionValidator(new MyFooValidator()).OverridePropertyName(\"MyProperty\")");
+			}
+
+			return paramExp.Name;
+		}
 	}
+
+    public interface IIndexedCollectionItem
+    {
+        string Index { get; }
+    }
 }

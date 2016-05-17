@@ -107,7 +107,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers {
                 return modelType;
             modelType = Type.GetType(typeName, false);
             if (modelType == null) {
-                Assembly[] assemblies = NativeHelper.GetAssemblies();
+                var assemblies = NativeHelper.GetAssemblies();
                 foreach (Assembly assembly in assemblies) {
                     modelType = assembly.GetType(typeName);
                     if (modelType != null)

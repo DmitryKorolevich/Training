@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and 
 // limitations under the License.
 // 
-// The latest version of this file can be found at http://www.codeplex.com/FluentValidation
+// The latest version of this file can be found at https://github.com/jeremyskinner/FluentValidation
 #endregion
 
 namespace FluentValidation {
@@ -80,6 +80,26 @@ namespace FluentValidation {
 			       where Equals(rule.Member, accessor.Member)
 			       from validator in rule.Validators
 			       select validator;
+		}
+
+
+		public IEnumerable<RulesetMetadata> GetRulesByRuleset() {
+			var query = from rule in Rules.OfType<PropertyRule>()
+				group rule by rule.RuleSet
+				into grp
+				select new RulesetMetadata(grp.Key, grp);
+
+			return query.ToList();
 		} 
+
+		public class RulesetMetadata {
+			public RulesetMetadata(string name, IEnumerable<PropertyRule> rules) {
+				Name = name;
+				Rules = rules;
+			}
+
+			public string Name { get; private set; }
+			public IEnumerable<PropertyRule> Rules { get; private set; }
+		}
 	}
 }

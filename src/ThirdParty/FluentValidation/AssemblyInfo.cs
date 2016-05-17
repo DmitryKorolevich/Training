@@ -13,17 +13,18 @@
 // See the License for the specific language governing permissions and 
 // limitations under the License.
 // 
-// The latest version of this file can be found at http://www.codeplex.com/FluentValidation
+// The latest version of this file can be found at https://github.com/jeremyskinner/FluentValidation
 #endregion
 
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security;
 
 [assembly: AssemblyTitle("FluentValidation")]
 [assembly: AssemblyDescription("FluentValidation")]
 [assembly: AssemblyProduct("FluentValidation")]
-[assembly: AssemblyCopyright("Copyright (c) Jeremy Skinner 2008-2014")]
+[assembly: AssemblyCopyright("Copyright (c) Jeremy Skinner 2008-2016")]
 #if !PORTABLE && !PORTABLE40
 [assembly: ComVisible(false)]
 #endif

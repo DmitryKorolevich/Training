@@ -3,13 +3,12 @@
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // http://csvhelper.com
 using System;
+using System.Collections.Generic;
 using System.Globalization;
-#if !NET_2_0
-#else
-using CsvHelper.MissingFrom20;
-#endif
+using System.Linq;
 using System.Reflection;
 using System.Text;
+using CsvHelper.TypeConversion;
 
 namespace CsvHelper.Configuration
 {

@@ -13,17 +13,19 @@
 // See the License for the specific language governing permissions and 
 // limitations under the License.
 // 
-// The latest version of this file can be found at http://www.codeplex.com/FluentValidation
+// The latest version of this file can be found at https://github.com/jeremyskinner/FluentValidation
 #endregion
 
 namespace FluentValidation {
 	using System;
 	using System.Linq;
 	using System.Linq.Expressions;
+	using System.Threading.Tasks;
 	using Internal;
 	using Resources;
+	using Validators;
 
-    /// <summary>
+	/// <summary>
 	/// Default options that can be used to configure a validator.
 	/// </summary>
 	public static class DefaultValidatorOptions {
@@ -112,7 +114,21 @@ namespace FluentValidation {
 					.Select(func => new Func<object, object, object>((instance, value) => func((T)instance, (TProperty)value)))
 					.ForEach(config.CurrentValidator.CustomMessageFormatArguments.Add);
 			});
-		} 
+		}
+
+		/// <summary>
+		/// Specifies a custom error code to use if validation fails.
+		/// </summary>
+		/// <param name="rule">The current rule</param>
+		/// <param name="errorCode">The error code to use</param>
+		/// <returns></returns>
+		public static IRuleBuilderOptions<T, TProperty> WithErrorCode<T, TProperty>(this IRuleBuilderOptions<T, TProperty> rule, string errorCode) {
+			errorCode.Guard("A error code must be specified when calling WithErrorCode.");
+
+			return rule.Configure(config => {
+				config.CurrentValidator.ErrorCodeSource = new StaticStringSource(errorCode);
+			});
+		}
 
 		/// <summary>
 		/// Specifies a custom error message resource to use when validation fails.
@@ -201,6 +217,63 @@ namespace FluentValidation {
 			return rule.When(x => !predicate(x), applyConditionTo);
 		}
 
+		/// <summary>
+		/// Specifies an asynchronous condition limiting when the validator should run. 
+		/// The validator will only be executed if the result of the lambda returns true.
+		/// </summary>
+		/// <param name="rule">The current rule</param>
+		/// <param name="predicate">A lambda expression that specifies a condition for when the validator should run</param>
+		/// <param name="applyConditionTo">Whether the condition should be applied to the current rule or all rules in the chain</param>
+		/// <returns></returns>
+		public static IRuleBuilderOptions<T, TProperty> WhenAsync<T, TProperty>(this IRuleBuilderOptions<T, TProperty> rule, Func<T, Task<bool>> predicate, ApplyConditionTo applyConditionTo = ApplyConditionTo.AllValidators)
+		{
+			predicate.Guard("A predicate must be specified when calling WhenAsync.");
+			// Default behaviour for When/Unless as of v1.3 is to apply the condition to all previous validators in the chain.
+			return rule.Configure(config => {
+				config.ApplyAsyncCondition(predicate.CoerceToNonGeneric(), applyConditionTo);
+			});
+		}
+
+		/// <summary>
+		/// Specifies an asynchronous condition limiting when the validator should not run. 
+		/// The validator will only be executed if the result of the lambda returns false.
+		/// </summary>
+		/// <param name="rule">The current rule</param>
+		/// <param name="predicate">A lambda expression that specifies a condition for when the validator should not run</param>
+		/// <param name="applyConditionTo">Whether the condition should be applied to the current rule or all rules in the chain</param>
+		/// <returns></returns>
+		public static IRuleBuilderOptions<T, TProperty> UnlessAsync<T, TProperty>(this IRuleBuilderOptions<T, TProperty> rule, Func<T, Task<bool>> predicate, ApplyConditionTo applyConditionTo = ApplyConditionTo.AllValidators)
+		{
+			predicate.Guard("A predicate must be specified when calling UnlessAsync");
+			return rule.WhenAsync(x => predicate(x).Then(y => !y), applyConditionTo);
+		}
+
+
+		/// <summary>
+		/// Triggers an action when the rule passes. Typically used to configure dependent rules. This applies to all preceding rules in the chain. 
+		/// </summary>
+		/// <param name="rule">The current rule</param>
+		/// <param name="action">An action to be invoked if the rule is valid</param>
+		/// <returns></returns>
+		public static IRuleBuilderOptions<T, TProperty> DependentRules<T, TProperty>(this IRuleBuilderOptions<T, TProperty> rule, Action<DependentRules<T>>  action) {
+			var dependencyContainer = new DependentRules<T>();
+			action(dependencyContainer);
+
+			rule.Configure(cfg => {
+
+				if (!string.IsNullOrEmpty(cfg.RuleSet)) {
+					foreach (var dependentRule in dependencyContainer) {
+						var propRule = dependentRule as PropertyRule;
+						if (propRule != null && string.IsNullOrEmpty(propRule.RuleSet)) {
+							propRule.RuleSet = cfg.RuleSet;
+						}
+					}
+				}
+
+				cfg.DependentRules.AddRange(dependencyContainer);
+			});
+			return rule;
+		}
 
 		/// <summary>
 		/// Specifies a custom property name to use within the error message.
@@ -268,6 +341,18 @@ namespace FluentValidation {
 			return rule.Configure(config => config.CurrentValidator.CustomStateProvider = stateProvider.CoerceToNonGeneric());
 		}
 
+          /// Specifies custom severity that should be stored alongside the validation message when validation fails for this rule.
+          /// </summary>
+          /// <typeparam name="T"></typeparam>
+          /// <typeparam name="TProperty"></typeparam>
+          /// <param name="rule"></param>
+          /// <param name="severity"></param>
+          /// <returns></returns>
+          public static IRuleBuilderOptions<T, TProperty> WithSeverity<T, TProperty>(this IRuleBuilderOptions<T, TProperty> rule, Severity severity)
+          {
+              return rule.Configure(config => config.CurrentValidator.Severity = severity);
+          }
+  
 		static Func<T, object>[] ConvertArrayOfObjectsToArrayOfDelegates<T>(object[] objects) {
 			if(objects == null || objects.Length == 0) {
 				return new Func<T, object>[0];

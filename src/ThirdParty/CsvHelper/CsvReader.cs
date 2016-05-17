@@ -3,21 +3,18 @@
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // http://csvhelper.com
 using System;
-using System.Reflection;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
-#if NET_2_0
-using CsvHelper.MissingFrom20;
-#endif
-#if !NET_2_0
 using System.Linq;
+#if !NET_2_0
 using System.Linq.Expressions;
+using System.Reflection;
 #endif
-#if !NET_2_0 && !NET_3_5 && !PCL && !NETSTANDARD1_5
+#if !NET_2_0 && !NET_3_5 && !PCL
 using System.Dynamic;
 #endif
 
@@ -171,7 +168,13 @@ namespace CsvHelper
 
 			if( configuration.HasHeaderRecord && headerRecord == null )
 			{
-				headerRecord = parser.Read();
+				do
+				{
+					currentRecord = parser.Read();
+				}
+				while( ShouldSkipRecord() );
+				headerRecord = currentRecord;
+				currentRecord = null;
 				ParseNamedIndexes();
 			}
 
@@ -1268,12 +1271,12 @@ namespace CsvHelper
 		/// <returns>The created record.</returns>
 		protected virtual T CreateRecord<T>() 
 		{
-#if !NET_3_5 && !PCL && !NETSTANDARD1_5
-            // If the type is an object, a dynamic
-            // object will be created. That is the
-            // only way we can dynamically add properties
-            // to a type of object.
-            if ( typeof( T ) == typeof( object ) )
+#if !NET_3_5 && !PCL
+			// If the type is an object, a dynamic
+			// object will be created. That is the
+			// only way we can dynamically add properties
+			// to a type of object.
+			if( typeof( T ) == typeof( object ) )
 			{
 				return CreateDynamic();
 			}
@@ -1289,12 +1292,12 @@ namespace CsvHelper
 		/// <returns>The created record.</returns>
 		protected virtual object CreateRecord( Type type )
 		{
-#if !NET_3_5 && !PCL && !NETSTANDARD1_5
-            // If the type is an object, a dynamic
-            // object will be created. That is the
-            // only way we can dynamically add properties
-            // to a type of object.
-            if ( type == typeof( object ) )
+#if !NET_3_5 && !PCL
+			// If the type is an object, a dynamic
+			// object will be created. That is the
+			// only way we can dynamically add properties
+			// to a type of object.
+			if( type == typeof( object ) )
 			{
 				return CreateDynamic();
 			}
@@ -1578,12 +1581,12 @@ namespace CsvHelper
 		}
 #endif
 
-#if !NET_2_0 && !NET_3_5 && !PCL && !NETSTANDARD1_5
-        /// <summary>
-        /// Creates a dynamic object from the current record.
-        /// </summary>
-        /// <returns>The dynamic object.</returns>
-        protected virtual dynamic CreateDynamic()
+#if !NET_2_0 && !NET_3_5 && !PCL
+		/// <summary>
+		/// Creates a dynamic object from the current record.
+		/// </summary>
+		/// <returns>The dynamic object.</returns>
+		protected virtual dynamic CreateDynamic()
 		{
 			var obj = new ExpandoObject();
 			var dict = obj as IDictionary<string, object>;
@@ -1609,5 +1612,5 @@ namespace CsvHelper
 			return obj;
 		}
 #endif
-	}
+		}
 }

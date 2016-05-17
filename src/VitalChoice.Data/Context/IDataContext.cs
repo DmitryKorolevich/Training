@@ -1,9 +1,6 @@
-﻿
-
-using Microsoft.Data.Entity;
-using System;
+﻿using System;
 using System.Data;
-using Microsoft.Data.Entity.Storage;
+using Microsoft.EntityFrameworkCore;
 using VitalChoice.Data.Transaction;
 
 namespace VitalChoice.Data.Context

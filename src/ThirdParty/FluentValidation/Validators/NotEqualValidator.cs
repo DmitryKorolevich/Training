@@ -13,13 +13,15 @@
 // See the License for the specific language governing permissions and 
 // limitations under the License.
 // 
-// The latest version of this file can be found at http://www.codeplex.com/FluentValidation
+// The latest version of this file can be found at https://github.com/jeremyskinner/FluentValidation
 #endregion
 
 namespace FluentValidation.Validators {
 	using System;
 	using System.Collections;
 	using System.Reflection;
+	using Attributes;
+	using Internal;
 	using Resources;
 
 	public class NotEqualValidator : PropertyValidator, IComparisonValidator {
@@ -86,7 +88,7 @@ namespace FluentValidation.Validators {
 				return Internal.Comparer.GetEqualsResult((IComparable)comparisonValue, (IComparable)propertyValue);
 			}
 
-			return comparisonValue == propertyValue;
+			return Object.Equals(comparisonValue, propertyValue);
 		}
 	}
 }

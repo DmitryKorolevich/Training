@@ -1,8 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Profiling.Interfaces;
 
@@ -23,23 +22,18 @@ namespace VitalChoice.Profiling.Base
 
         public async Task Invoke(HttpContext context)
         {
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
             if (ProfilingScope.GetRootScope() == null)
             {
                 using (var scope = new ProfilingScope(context.Request.Path + context.Request.QueryString))
                 {
                     try
                     {
-<<<<<<< HEAD
-#if !NETSTANDARD1_5
-                        if (scope.GetStackCount() == 1)
-=======
                         await _requestDelegate.Invoke(context);
                     }
                     finally
                     {
                         try
->>>>>>> master
                         {
                             scope.Stop();
                             _request.OnFinishedRequest(scope);
@@ -64,6 +58,8 @@ namespace VitalChoice.Profiling.Base
             {
                 await _requestDelegate.Invoke(context);
             }
+#else
+            await _requestDelegate.Invoke(context);
 #endif
         }
     }

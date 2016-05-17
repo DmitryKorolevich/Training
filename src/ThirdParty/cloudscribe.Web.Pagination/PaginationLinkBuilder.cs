@@ -1,6 +1,6 @@
 ﻿// Author:					Martijn Boland/Joe Audette
 // Created:					2015-07-06
-// Last Modified:			2015-07-15
+// Last Modified:			2016-02-14
 //
 // borrowed most code for building the list of links from Martijn Boland
 // https://github.com/martijnboland/MvcPaging/blob/master/src/MvcPaging/Pager.cs MIT License
@@ -44,7 +44,8 @@ namespace cloudscribe.Web.Pagination
             string nextPageTitle,
             string lastPageText,
             string lastPageTitle,
-            string spacerText = "...")
+            string spacerText = "..."
+            )
         {
             List<PaginationLink> paginationLinks = new List<PaginationLink>();
 
@@ -53,10 +54,12 @@ namespace cloudscribe.Web.Pagination
             // First page
             if (paginationSettings.ShowFirstLast)
             {
+                var isActive = paginationSettings.CurrentPage > 1;
+                if(isActive || !paginationSettings.SuppressInActiveFirstLast)
                 paginationLinks.Add(
                     new PaginationLink
                     {
-                        Active = (paginationSettings.CurrentPage > 1 ? true : false),
+                        Active = isActive,
                         Text = firstPageText,
                         Title = firstPageTitle,
                         PageNumber = 1,
@@ -65,162 +68,288 @@ namespace cloudscribe.Web.Pagination
             }
 
             // Previous page
-            paginationLinks.Add(
-                paginationSettings.CurrentPage > 1 ? new PaginationLink
-                {
-                    Active = true,
-                    Text = previousPageText,
-                    Title = previousPageTitle,
-                    PageNumber = paginationSettings.CurrentPage - 1,
-                    Url = generateUrl(paginationSettings.CurrentPage - 1)
-                } : new PaginationLink {
-                    Active = false,
-                    Text = previousPageText,
-                    PageNumber = 1,
-                    Url = generateUrl(1)
-                });
-
-            var start = 1;
-            var end = totalPages;
-            var nrOfPagesToDisplay = paginationSettings.MaxPagerItems;
-
-            if (totalPages > nrOfPagesToDisplay)
+            if (paginationSettings.UseReverseIncrement)
             {
-                var middle = (int)Math.Ceiling(nrOfPagesToDisplay / 2d) - 1;
-                var below = (paginationSettings.CurrentPage - middle);
-                var above = (paginationSettings.CurrentPage + middle);
+                var isActive = paginationSettings.CurrentPage < totalPages;
 
-                if (below < 2)
+                //SuppressEmptyNextPrev
+                if(isActive)
                 {
-                    above = nrOfPagesToDisplay;
-                    below = 1;
+                    paginationLinks.Add(
+                        new PaginationLink
+                        {
+                            Active = true,
+                            PageNumber = paginationSettings.CurrentPage + 1,
+                            Text = previousPageText,
+                            Title = previousPageTitle,
+                            Url = generateUrl(paginationSettings.CurrentPage + 1)
+                        });
                 }
-                else if (above > (totalPages - 2))
+                else
                 {
-                    above = totalPages;
-                    below = (totalPages - nrOfPagesToDisplay + 1);
+                    if(!paginationSettings.SuppressEmptyNextPrev)
+                    {
+                        paginationLinks.Add(
+                        new PaginationLink
+                        {
+                            Active = false,
+                            Text = previousPageText,
+                            PageNumber = totalPages
+                        });
+                    }
+                    
                 }
 
-                start = below;
-                end = above;
+               
             }
-
-            if (start > 1)
+            else
             {
-                paginationLinks.Add(new PaginationLink
-                {
-                    Active = true,
-                    PageNumber = 1,
-                    IsCurrent = (paginationSettings.CurrentPage == 1 ? true : false),
-                    Text = "1",
-                    Url = generateUrl(1)
-                });
-
-                if (start > 3)
+                var isActive = paginationSettings.CurrentPage > 1;
+                if(isActive)
                 {
                     paginationLinks.Add(new PaginationLink
                     {
                         Active = true,
-                        PageNumber = 2,
-                        IsCurrent = (paginationSettings.CurrentPage == 2 ? true : false),
-                        Text = "2",
-                        Url = generateUrl(2)
-                    });
-                }
-
-                if (start > 2)
-                {
-                    paginationLinks.Add(new PaginationLink
-                    {
-                        Active = false,
-                        Text = spacerText,
-                        IsSpacer = true
-                    });
-                }
-            }
-
-            for (var i = start; i <= end; i++)
-            {
-                if (i == paginationSettings.CurrentPage || (paginationSettings.CurrentPage <= 0 && i == 1))
-                {
-                    paginationLinks.Add(new PaginationLink
-                    {
-                        Active = true,
-                        PageNumber = i,
-                        IsCurrent = (paginationSettings.CurrentPage == i ? true : false),
-                        Text = i.ToString(),
-                        Url = generateUrl(i)
+                        Text = previousPageText,
+                        Title = previousPageTitle,
+                        PageNumber = paginationSettings.CurrentPage - 1,
+                        Url = generateUrl(paginationSettings.CurrentPage - 1)
                     });
                 }
                 else
                 {
-                    paginationLinks.Add(new PaginationLink
+                    if(!paginationSettings.SuppressEmptyNextPrev)
                     {
-                        Active = true,
-                        PageNumber = i,
-                        Text = i.ToString(),
-                        IsCurrent = (paginationSettings.CurrentPage == i ? true : false),
-                        Url = generateUrl(i)
-                    });
+                        paginationLinks.Add(new PaginationLink
+                        {
+                            Active = false,
+                            Text = previousPageText,
+                            PageNumber = 1,
+                            Url = generateUrl(1)
+                        });
+                    }
+                    
                 }
-            }
 
-            if (end < totalPages)
+                
+            }
+            
+
+
+            if (paginationSettings.ShowNumbered)
             {
-                if (end < totalPages - 1)
+                var start = 1;
+                var end = totalPages;
+                var nrOfPagesToDisplay = paginationSettings.MaxPagerItems;
+
+                if (totalPages > nrOfPagesToDisplay)
                 {
-                    paginationLinks.Add(new PaginationLink
+                    var middle = (int)Math.Ceiling(nrOfPagesToDisplay / 2d) - 1;
+                    var below = (paginationSettings.CurrentPage - middle);
+                    var above = (paginationSettings.CurrentPage + middle);
+
+                    if (below < 2)
                     {
-                        Active = false,
-                        Text = spacerText,
-                        IsSpacer = true
-                    });
+                        above = nrOfPagesToDisplay;
+                        below = 1;
+                    }
+                    else if (above > (totalPages - 2))
+                    {
+                        above = totalPages;
+                        below = (totalPages - nrOfPagesToDisplay + 1);
+                    }
+
+                    start = below;
+                    end = above;
                 }
-                if (totalPages - 2 > end)
+
+                if (start > 1)
                 {
                     paginationLinks.Add(new PaginationLink
                     {
                         Active = true,
-                        PageNumber = totalPages - 1,
-                        Text = (totalPages - 1).ToString(),
-                        IsCurrent = (paginationSettings.CurrentPage == (totalPages - 1) ? true : false),
-                        Url = generateUrl(totalPages - 1)
+                        PageNumber = 1,
+                        IsCurrent = (paginationSettings.CurrentPage == 1 ? true : false),
+                        Text = "1",
+                        Url = generateUrl(1)
+                    });
+
+                    if (start > 3)
+                    {
+                        paginationLinks.Add(new PaginationLink
+                        {
+                            Active = true,
+                            PageNumber = 2,
+                            IsCurrent = (paginationSettings.CurrentPage == 2 ? true : false),
+                            Text = "2",
+                            Url = generateUrl(2)
+                        });
+                    }
+
+                    if (start > 2)
+                    {
+                        paginationLinks.Add(new PaginationLink
+                        {
+                            Active = false,
+                            Text = spacerText,
+                            IsSpacer = true
+                        });
+                    }
+                }
+
+                for (var i = start; i <= end; i++)
+                {
+                    if (i == paginationSettings.CurrentPage || (paginationSettings.CurrentPage <= 0 && i == 1))
+                    {
+                        paginationLinks.Add(new PaginationLink
+                        {
+                            Active = true,
+                            PageNumber = i,
+                            IsCurrent = (paginationSettings.CurrentPage == i ? true : false),
+                            Text = i.ToString(),
+                            Url = generateUrl(i)
+                        });
+                    }
+                    else
+                    {
+                        paginationLinks.Add(new PaginationLink
+                        {
+                            Active = true,
+                            PageNumber = i,
+                            Text = i.ToString(),
+                            IsCurrent = (paginationSettings.CurrentPage == i ? true : false),
+                            Url = generateUrl(i)
+                        });
+                    }
+                }
+
+                if (end < totalPages)
+                {
+                    if (end < totalPages - 1)
+                    {
+                        paginationLinks.Add(new PaginationLink
+                        {
+                            Active = false,
+                            Text = spacerText,
+                            IsSpacer = true
+                        });
+                    }
+                    if (totalPages - 2 > end)
+                    {
+                        paginationLinks.Add(new PaginationLink
+                        {
+                            Active = true,
+                            PageNumber = totalPages - 1,
+                            Text = (totalPages - 1).ToString(),
+                            IsCurrent = (paginationSettings.CurrentPage == (totalPages - 1) ? true : false),
+                            Url = generateUrl(totalPages - 1)
+                        });
+                    }
+
+                    paginationLinks.Add(new PaginationLink
+                    {
+                        Active = true,
+                        PageNumber = totalPages,
+                        Text = totalPages.ToString(),
+                        IsCurrent = (paginationSettings.CurrentPage == totalPages ? true : false),
+                        Url = generateUrl(totalPages)
                     });
                 }
 
-                paginationLinks.Add(new PaginationLink
-                {
-                    Active = true,
-                    PageNumber = totalPages,
-                    Text = totalPages.ToString(),
-                    IsCurrent = (paginationSettings.CurrentPage == totalPages? true : false),
-                    Url = generateUrl(totalPages)
-                });
             }
+
+
 
             // Next page
-            paginationLinks.Add(
-                paginationSettings.CurrentPage < totalPages ? new PaginationLink
+            if (paginationSettings.UseReverseIncrement)
+            {
+
+
+                //SuppressEmptyNextPrev
+                var isActive = paginationSettings.CurrentPage > 1;
+
+                if(isActive)
                 {
-                    Active = true,
-                    PageNumber = paginationSettings.CurrentPage + 1,
-                    Text = nextPageText,
-                    Title = nextPageTitle,
-                    Url = generateUrl(paginationSettings.CurrentPage + 1)
+                    paginationLinks.Add(
+                        new PaginationLink
+                        {
+                            Active = true,
+                            Text = nextPageText,
+                            Title = nextPageTitle,
+                            PageNumber = paginationSettings.CurrentPage - 1,
+                            Url = generateUrl(paginationSettings.CurrentPage - 1)
+                        });
                 }
-                : new PaginationLink
+                else
                 {
-                    Active = false,
-                    Text = nextPageText,
-                    PageNumber = totalPages
-                });
+                    if(!paginationSettings.SuppressEmptyNextPrev)
+                    {
+                        paginationLinks.Add(
+                            new PaginationLink
+                            {
+                                Active = false,
+                                Text = nextPageText,
+                                PageNumber = 1,
+                                Url = generateUrl(1)
+                            });
+                    }
+                }
+
+                //paginationLinks.Add(
+                // paginationSettings.CurrentPage > 1 ? new PaginationLink
+                // {
+                //     Active = true,
+                //     Text = nextPageText,
+                //     Title = nextPageTitle,
+                //     PageNumber = paginationSettings.CurrentPage + 1,
+                //     Url = generateUrl(paginationSettings.CurrentPage + 1)
+                // } : new PaginationLink
+                // {
+                //     Active = false,
+                //     Text = nextPageText,
+                //     PageNumber = 1,
+                //     Url = generateUrl(1)
+                // });
+            }
+            else
+            {
+                var isActive = paginationSettings.CurrentPage < totalPages;
+                if(isActive)
+                {
+                    paginationLinks.Add(new PaginationLink
+                    {
+                        Active = true,
+                        PageNumber = paginationSettings.CurrentPage + 1,
+                        Text = nextPageText,
+                        Title = nextPageTitle,
+                        Url = generateUrl(paginationSettings.CurrentPage + 1)
+                    });
+                }
+                else
+                {
+                    if(!paginationSettings.SuppressEmptyNextPrev)
+                    {
+                        paginationLinks.Add(new PaginationLink
+                        {
+                            Active = false,
+                            Text = nextPageText,
+                            PageNumber = totalPages
+                        });
+                    }
+                    
+                }
+ 
+            }
+                
 
             // Last page
             if (paginationSettings.ShowFirstLast)
             {
+                var isActive = paginationSettings.CurrentPage < totalPages;
+                if(isActive || !paginationSettings.SuppressInActiveFirstLast)
                 paginationLinks.Add(new PaginationLink
                 {
-                    Active = (paginationSettings.CurrentPage < totalPages ? true : false),
+                    Active = isActive,
                     Text = lastPageText,
                     Title = lastPageTitle,
                     PageNumber = totalPages,

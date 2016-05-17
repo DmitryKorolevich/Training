@@ -13,12 +13,13 @@
 // See the License for the specific language governing permissions and 
 // limitations under the License.
 // 
-// The latest version of this file can be found at http://www.codeplex.com/FluentValidation
+// The latest version of this file can be found at https://github.com/jeremyskinner/FluentValidation
 #endregion
 
 namespace FluentValidation.Resources {
 	using System;
 	using System.Linq.Expressions;
+	using System.Reflection;
 	using Internal;
 
 	/// <summary>

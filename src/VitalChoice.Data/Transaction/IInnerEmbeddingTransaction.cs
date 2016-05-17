@@ -1,10 +1,10 @@
 ﻿using System;
-using Microsoft.Data.Entity.Storage;
+using Microsoft.EntityFrameworkCore.Storage;
 using VitalChoice.Data.Context;
 
 namespace VitalChoice.Data.Transaction
 {
-    public interface IInnerEmbeddingTransaction: IRelationalTransaction
+    public interface IInnerEmbeddingTransaction: IDbContextTransaction
     {
         IDataContextAsync DbContext { get; }
         bool Closed { get; }

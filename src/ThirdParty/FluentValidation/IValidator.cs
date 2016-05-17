@@ -13,12 +13,15 @@
 // See the License for the specific language governing permissions and 
 // limitations under the License.
 // 
-// The latest version of this file can be found at http://www.codeplex.com/FluentValidation
+// The latest version of this file can be found at https://github.com/jeremyskinner/FluentValidation
 #endregion
 
 namespace FluentValidation {
 	using System;
+	using System.Collections.Generic;
+	using System.Threading;
 	using System.Threading.Tasks;
+	using Internal;
 	using Results;
 
 	/// <summary>
@@ -38,7 +41,7 @@ namespace FluentValidation {
 		/// </summary>
 		/// <param name="instance">The instance to validate</param>
 		/// <returns>A ValidationResult object containing any validation failures.</returns>
-		Task<ValidationResult> ValidateAsync(T instance);
+		Task<ValidationResult> ValidateAsync(T instance, CancellationToken cancellation = new CancellationToken());
 
 		/// <summary>
 		/// Sets the cascade mode for all rules within this validator.
@@ -61,8 +64,9 @@ namespace FluentValidation {
 		/// Validates the specified instance asynchronously
 		/// </summary>
 		/// <param name="instance"></param>
+		/// <param name="cancellation">Cancellation token</param>
 		/// <returns>A ValidationResult containing any validation failures</returns>
-		Task<ValidationResult> ValidateAsync(object instance);
+		Task<ValidationResult> ValidateAsync(object instance, CancellationToken cancellation = new CancellationToken());
 
 		/// <summary>
 		/// Validates the specified instance.
@@ -75,8 +79,9 @@ namespace FluentValidation {
 		/// Validates the specified instance asynchronously.
 		/// </summary>
 		/// <param name="context">A ValidationContext</param>
+		/// <param name="cancellation">Cancellation token</param>
 		/// <returns>A ValidationResult object containy any validation failures.</returns>		
-		Task<ValidationResult> ValidateAsync(ValidationContext context);
+		Task<ValidationResult> ValidateAsync(ValidationContext context, CancellationToken cancellation = new CancellationToken());
 
 		/// <summary>
 		/// Creates a hook to access various meta data properties

@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and 
 // limitations under the License.
 // 
-// The latest version of this file can be found at http://www.codeplex.com/FluentValidation
+// The latest version of this file can be found at https://github.com/jeremyskinner/FluentValidation
 #endregion
 
 namespace FluentValidation.Results {
@@ -21,8 +21,8 @@ namespace FluentValidation.Results {
 	using System.Collections.Generic;
 	using System.Linq;
 
-#if !SILVERLIGHT && !PORTABLE && !PORTABLE40 && !NETSTANDARD1_5
-    [Serializable]
+#if !SILVERLIGHT && !PORTABLE && !PORTABLE40 && !CoreCLR
+	[Serializable]
 #endif
 	public class ValidationResult {
 		private readonly List<ValidationFailure> errors = new List<ValidationFailure>();

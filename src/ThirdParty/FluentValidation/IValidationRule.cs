@@ -13,13 +13,15 @@
 // See the License for the specific language governing permissions and 
 // limitations under the License.
 // 
-// The latest version of this file can be found at http://www.codeplex.com/FluentValidation
+// The latest version of this file can be found at https://github.com/jeremyskinner/FluentValidation
 #endregion
 
 namespace FluentValidation {
 	using System;
 	using System.Collections.Generic;
+	using System.Threading;
 	using System.Threading.Tasks;
+	using Internal;
 	using Results;
 	using Validators;
 
@@ -47,9 +49,12 @@ namespace FluentValidation {
 		/// Performs validation using a validation context and returns a collection of Validation Failures asynchronoulsy.
 		/// </summary>
 		/// <param name="context">Validation Context</param>
+		/// <param name="cancellation">Cancellation token</param>
 		/// <returns>A collection of validation failures</returns>
-		Task<IEnumerable<ValidationFailure>> ValidateAsync(ValidationContext context);
+		Task<IEnumerable<ValidationFailure>> ValidateAsync(ValidationContext context, CancellationToken cancellation);
 
 		void ApplyCondition(Func<object, bool> predicate, ApplyConditionTo applyConditionTo = ApplyConditionTo.AllValidators);
+
+		void ApplyAsyncCondition(Func<object, Task<bool>> predicate, ApplyConditionTo applyConditionTo = ApplyConditionTo.AllValidators);
 	}
 }

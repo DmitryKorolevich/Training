@@ -1,7 +1,7 @@
 using System;
 using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore.Query;
 using VitalChoice.Data.Repositories;
-using Microsoft.Data.Entity.Query;
 using VitalChoice.Ecommerce.Domain;
 
 namespace VitalChoice.Data.Helpers

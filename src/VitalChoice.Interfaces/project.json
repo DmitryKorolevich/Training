@@ -1,12 +1,8 @@
-﻿{
+{
   
   "version": "1.0.0-*",
   "description": "",
   "authors": [ "" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
-
   "dependencies": {
     "Microsoft.AspNetCore.Mvc.Abstractions": "1.0.0-*",
     "Microsoft.AspNetCore.Mvc.Core": "1.0.0-*",
@@ -15,19 +11,27 @@
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.DynamicData": "1.0.0-*",
     "VitalChoice.Workflow": "1.0.0-*",
-    "VitalChoice.ContentProcessing": "",
-    "CsvHelper": "2.13.2-*"
+    "VitalChoice.ContentProcessing": "1.0.0-*",
+    "CsvHelper": "2.14.2"
   },
 
   "frameworks": {
-    "net451": {
+    "net461": {
     },
     "netstandard1.5": {
+      "imports": [
+        "dnxcore50",
+        "portable-net45+win8"
+      ],
       "dependencies": {
-        "System.Collections": "4.0.11-*",
-        "System.Linq": "4.0.1-*",
-        "System.Threading": "4.0.11-*",
-        "Microsoft.CSharp": "4.0.1-*"
+        "Microsoft.NETCore.Platforms": {
+          "type": "build",
+          "version": "1.0.1-*"
+        },
+        "System.Collections": "4.0.11-rc2-*",
+        "System.Linq": "4.1.0-rc2-*",
+        "System.Threading": "4.0.11-rc2-*",
+        "Microsoft.CSharp": "4.0.1-rc2-*"
       }
     }
   }
