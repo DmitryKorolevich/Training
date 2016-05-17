@@ -483,4 +483,15 @@ BEGIN
 	(N'PoNumber', 4, NULL, 5, NULL)
 
 END
+
+
+IF NOT EXISTS(SELECT Id FROM OrderOptionTypes WHERE [Name]=N'IsHealthwise' AND [IdObjectType]=1)
+BEGIN
+
+	INSERT INTO [dbo].[OrderOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'IsHealthwise', 5, NULL, 1, N'False')
+
+END
 GO

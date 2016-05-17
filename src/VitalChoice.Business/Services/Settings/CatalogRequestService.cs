@@ -26,7 +26,8 @@ using VitalChoice.Infrastructure.Context;
 
 namespace VitalChoice.Business.Services.Settings
 {
-    public class CatalogRequestAddressService : ExtendedEcommerceDynamicService<AddressDynamic, CatalogRequestAddress, AddressOptionType, CatalogRequestAddressOptionValue>, 
+    public class CatalogRequestAddressService :
+        ExtendedEcommerceDynamicService<AddressDynamic, CatalogRequestAddress, AddressOptionType, CatalogRequestAddressOptionValue>,
         ICatalogRequestAddressService
     {
         private readonly ICountryService _countryService;
@@ -39,7 +40,7 @@ namespace VitalChoice.Business.Services.Settings
             IEcommerceRepositoryAsync<CatalogRequestAddress> catalogRequestAddressRepository,
             IEcommerceRepositoryAsync<CatalogRequestAddressOptionValue> catalogRequestAddressValueRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
-            DirectMapper<CatalogRequestAddress> directMapper, 
+            DirectMapper<CatalogRequestAddress> directMapper,
             DynamicExtensionsRewriter queryVisitor,
             IObjectLogItemExternalService objectLogItemExternalService,
             ILoggerProviderExtended loggerProvider, ITransactionAccessor<EcommerceContext> transactionAccessor)
@@ -54,17 +55,18 @@ namespace VitalChoice.Business.Services.Settings
 
         public async Task<ICollection<CatalogRequestAddressListItemModel>> GetCatalogRequestsAsync()
         {
-            var data = (await SelectAsync(p => p.StatusCode != (int)RecordStatusCode.Deleted)).ToList();
+            var data = (await SelectAsync(p => p.StatusCode != (int) RecordStatusCode.Deleted)).ToList();
 
-            var toReturn = data.Select(p => Mapper.ToModel<CatalogRequestAddressListItemModel>(p)).ToList();
+            var toReturn =
+                (await Task.WhenAll(data.Select(async p => await Mapper.ToModelAsync<CatalogRequestAddressListItemModel>(p)))).ToList();
 
             var countries = await _countryService.GetCountriesAsync(new CountryFilter());
             var states = countries.SelectMany(p => p.States).ToList();
-            foreach(var item in toReturn)
+            foreach (var item in toReturn)
             {
                 var country = countries.FirstOrDefault(p => p.Id == item.IdCountry);
                 item.Country = country?.CountryName;
-                if(item.IdState!=0)
+                if (item.IdState != 0)
                 {
                     var state = states.FirstOrDefault(p => p.Id == item.IdState);
                     item.StateCode = state?.StateCode;
@@ -76,13 +78,15 @@ namespace VitalChoice.Business.Services.Settings
 
         public async Task<bool> DeleteCatalogRequestsAsync()
         {
-            var items = (await _catalogRequestAddressRepository.Query(p => p.StatusCode != (int)RecordStatusCode.Deleted).SelectAsync(false)).ToList();
-            foreach(var item in items)
+            var items =
+                (await _catalogRequestAddressRepository.Query(p => p.StatusCode != (int) RecordStatusCode.Deleted).SelectAsync(false))
+                    .ToList();
+            foreach (var item in items)
             {
-                item.StatusCode = (int)RecordStatusCode.Deleted;
+                item.StatusCode = (int) RecordStatusCode.Deleted;
             }
             await _catalogRequestAddressRepository.UpdateRangeAsync(items);
-            
+
             return true;
         }
     }

@@ -32,16 +32,16 @@
                         <select class="form-control" name="FrequencyType" data-ng-change="filterChanged();" data-ng-model="filter.FrequencyType" ng-options="item.Key as item.Text for item in frequencyTypes"></select>
                     </div>
                     <div data-ng-if="options.allowSeeFullReport" class="col-md-3">
-                        <select class="form-control" multiple name="IdAdminTeams" data-ng-change="filterChanged();" data-ng-model="filter.IdAdminTeams" data-ng-change="idAdminTeamChanged()" ng-options="item.Id as item.Name for item in teams"></select>
+                        <select class="form-control" multiple name="IdAdminTeams" data-ng-model="filter.IdAdminTeams" data-ng-change="idAdminTeamChanged()" ng-options="item.Id as item.Name for item in teams"></select>
                     </div>
                     <div data-ng-if="options.allowSeeFullReport" class="col-md-3">
-                        <select class="form-control" name="IdAdmin" data-ng-change="filterChanged();" data-ng-model="filter.IdAdmin" data-ng-change="idAdminChanged()" ng-options="item.Id as item.AgentId for item in admins"></select>
+                        <select class="form-control" name="IdAdmin" data-ng-model="filter.IdAdmin" data-ng-change="idAdminChanged()" ng-options="item.Id as item.AgentId for item in admins"></select>
                     </div>
                 </div>
                 <div class="row form-group">
                     <div class="col-md-12">
                         <button class="btn btn-info" data-ng-click="filterItems();" type="button">Filter</button>
-                        <a target="_self" class="btn btn-primary pull-right" data-ng-href={{options.exportUrl}} data-ng-click="exportClick($event)">Export</a>
+                        <a target="_self" class="btn btn-primary pull-right" data-ng-href="{{options.exportUrl}}" data-ng-click="exportClick($event)">Export</a>
                     </div>
                 </div>
             </fieldset>

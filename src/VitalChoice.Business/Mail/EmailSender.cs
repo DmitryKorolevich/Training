@@ -65,7 +65,7 @@ namespace VitalChoice.Business.Mail
             {
                 await _client.SendMailAsync(mailmsg);
             }
-            catch (SmtpFailedRecipientException e)
+            catch (SmtpFailedRecipientException)
             {
 
             }

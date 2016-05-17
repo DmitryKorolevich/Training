@@ -174,12 +174,26 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    },
 	    getOrdersForWholesaleDropShipReportFile: function (filter, buildNumber)
 	    {
-	        return baseUrl + ('GetOrdersForWholesaleDropShipReportFile?from={0}&to={1}&shipfrom={2}&shipto={3}idcustomertype={4}&idtradeclass={5}'+
+	        return baseUrl + ('GetOrdersForWholesaleDropShipReportFile?from={0}&to={1}&shipfrom={2}&shipto={3}&idcustomertype={4}&idtradeclass={5}'+
                 '&customerfirstname={6}&customerlastname={7}&shipfirstname={8}&shiplastname={9}' +
                 '&shipidconfirm={10}&idorder={11}&ponumber={12}&buildNumber={13}')
                 .format(filter.From, filter.To, filter.ShipFrom, filter.ShipTo, filter.IdCustomerType, filter.IdTradeClass,
                 filter.CustomerFirstName, filter.CustomerLastName, filter.ShipFirstName, filter.ShipLastName,
                 filter.ShippingIdConfirmation, filter.IdOrder, filter.PoNumber, buildNumber);
+	    },
+	    //transaction refund report
+	    getTransactionAndRefundReport: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetTransactionAndRefundReport', filter, getConfig(tracker));
+	    },
+	    getTransactionAndRefundReportFile: function (filter, buildNumber)
+	    {
+	        return baseUrl + ('GetTransactionAndRefundReportFile?from={0}&to={1}&idcustomertype={2}&idservicecode={3}' +
+                '&customerfirstname={4}&customerlastname={5}&idcustomer={6}' +
+                '&idorder={7}&idorderstatus={8}&idordertype={9}&buildNumber={10}')
+                .format(filter.From, filter.To, filter.IdCustomerType, filter.IdServiceCode,
+                filter.CustomerFirstName, filter.CustomerLastName, filter.IdCustomer,
+                filter.IdOrder, filter.IdOrderStatus, filter.IdOrderType, buildNumber);
 	    },
 	};
 }]);

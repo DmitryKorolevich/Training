@@ -280,7 +280,9 @@ namespace VC.Admin.Models.Orders
 
         [Map]
         public decimal ShippingTotal { get; set; }
-        
+
+        public decimal TotalShipping { get; set; }
+
         [Map]
         public decimal ProductsSubtotal { get; set; }
 

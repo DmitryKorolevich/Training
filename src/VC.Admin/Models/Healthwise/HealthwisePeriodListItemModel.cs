@@ -20,7 +20,9 @@ namespace VC.Admin.Models.Healthwise
 
         public int OrdersCount { get; set; }
 
-        public decimal OrderSubtotals { get; set; }
+        public decimal DiscountedSubtotal { get; set; }
+
+        public decimal AverageDiscountedSubtotal { get; set; }
 
         public DateTime? LastOrderDate { get; set; }
 
@@ -36,8 +38,9 @@ namespace VC.Admin.Models.Healthwise
                 PaidAmount = item.PaidAmount;
                 PaidDate = item.PaidDate;
                 OrdersCount = item.OrdersCount;
-                OrderSubtotals = item.OrderSubtotals;
+                DiscountedSubtotal = item.DiscountedSubtotal;
                 LastOrderDate = item.LastOrderDate;
+                AverageDiscountedSubtotal = OrdersCount!= 0 ? Math.Round(DiscountedSubtotal/OrdersCount, 2) : 0;
             }
         }
     }

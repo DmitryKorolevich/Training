@@ -12,9 +12,7 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Checkout
 
         public int? IdOrder { get; set; }
 
-        public int? IdDiscount { get; set; }
-
-        public Discount Discount { get; set; }
+        public string DiscountCode { get; set; }
 
         public ICollection<CartToGiftCertificate> GiftCertificates { get; set; }
 

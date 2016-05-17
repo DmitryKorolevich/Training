@@ -2153,3 +2153,526 @@ INSERT INTO [dbo].[EmailTemplates]
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[EmailTemplates] WHERE [Name] = 'OrderProductReviewEmail')
+BEGIN
+
+DECLARE @contentItemId int
+
+INSERT INTO [dbo].[ContentItems]
+           ([Created]
+           ,[Updated]
+           ,[Template]
+           ,[Description]
+           ,[Title]
+           ,[MetaKeywords]
+           ,[MetaDescription])
+     VALUES
+           (GETDATE()
+           ,GETDATE()
+           ,'<%
+<body:body>
+{{
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="viewport"  content="width=device-width, initial-scale=1" />
+<title>Vital Choice: Wild Seafood & Organics</title>
+<style>
+		
+table.stack {table-layout:fixed !important;}
+table.stack tr {display:table-row !important;}
+table.stack td {display:table-cell !important;}
+
+@{@}@media only screen and (min-device-width : 320px) and (max-device-width : 568px), screen and (max-device-width: 640px), screen and (max-width: 640px) {
+	table[class=stack] {table-layout:auto !important;}
+	table[class=stack] tr {display:block !important;}
+	table[class=stack] td {display:inline-block !important; max-width:none !important;}
+	table[class=message], td[class=message] {width:320px !important;}
+	
+	*[class~=third] {width:100% !important; text-align:center !important; padding:0px !important;}
+	*[class~=third] img {width:100% !important; text-align:center !important;}
+	td[class=headerswap] {width:320px !important; height:150px !important; background-image: url(''http://placehold.it/320x150/aaa/666'') !important; background-size: cover;}
+	td[class=headerswap] img {display:none !important;}
+
+	table[class=cta] {margin:10px !important; }
+	td[class=cta] {width:280px !important; display:inline-block !important; padding:10px; font-size:24px !important; border-radius:0;}
+	
+	table[class=center], td[class=center], img[class=center] {text-align:center !important;}
+	a[class=embiggen] {font-size:130% !important;}
+	
+	*[class~=mobhide] { display: none !important;}       
+    *[class~=mobshow] {
+        display : block !important;
+        width : auto !important;
+        max-height: inherit !important;
+        overflow : visible !important;
+        float : none !important;
+		padding:5px !important;
+    }
+	
+}
+
+
+@{@}@media only screen and (min-device-width : 320px) and (max-device-width : 568px) and (-webkit-min-device-pixel-ratio: 2) {
+	
+}
+
+table.content tr {display:table-row !important;}
+table.content td {display:table-cell !important;}
+
+/** Various Cleanups**/
+ 		.ExternalClass {width:100%;} 
+        .ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td, .ExternalClass div {line-height: 100%;} 
+                         
+		body {-webkit-text-size-adjust:none; -ms-text-size-adjust:none;} 
+		body {margin:0; padding:0;} 
+		table td {border-collapse:collapse !important; border:0px !important;  mso-table-lspace:0pt !important; mso-table-rspace:0pt !important;}    
+ 
+		p {margin:0; padding:0; margin-bottom:0;}        
+
+		body, #body_style {
+		   	-webkit-font-smoothing: antialiased;
+        	-webkit-text-size-adjust:none;
+		   } 
+			
+		span.yshortcuts { color:#000000; background-color:none; border:none;}
+		span.yshortcuts:hover,
+		span.yshortcuts:active,
+		span.yshortcuts:focus {color:#000000; background-color:none; border:none;}
+	
+</style>
+</head>
+
+<body style="padding:0; -webkit-text-size-adjust:none; -ms-text-size-adjust:none;" yahoo="fix"> 
+<div id="body_style" style="text-align:center; width:100%;"> 
+<!-- Outer Container -->
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse; "><tbody><tr>
+<td bgcolor="#f0f0f0">
+
+    <!-- Message Body -->
+    <table class="message" align="center" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;"><tbody><tr>
+    <td class="message" width="640" bgcolor="#ffffff">
+
+		<!-- Full-Width Scalable Header Outer -->
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;"><tbody><tr>
+        <td bgcolor="#ffffff">
+        
+        	<!--Full-Width Scalable Header Inner -->
+        	<table align="center" border="0" cellpadding="0" width="100%" cellspacing="0" style="border-collapse:collapse;"><tbody><tr>
+            <td align="center" valign="top" bgcolor="#ffffff" style="display:inline-block; max-width:640px;">
+                
+
+                
+            </td>
+            </tr></tbody></table>
+            <!-- End Full-Width Scalable Header Inner-->
+        
+        </td></tr></tbody></table>
+		<!-- End Full-Width Scalable Header Outer -->
+ 
+		<!-- Full-Width Swappable Header Outer -->
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;"><tbody><tr>
+        <td bgcolor="#ffffff">
+        
+        	<!--Full-Width Swappable Header Inner -->
+        	<table class="stack" align="center" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;"><tbody><tr>
+            <td align="center" valign="top" bgcolor="#ffffff" style="display:inline-block; max-width:640px;">
+                
+                <!--Full-Width Swappable Content -->
+                <table align="center" border="0" cellpadding="10" cellspacing="0" width="100%" style="border-collapse:collapse;"><tbody><tr>
+                <td class="content">
+                    <a href="https://@(PublicHost)/">
+                        <img src="https://@(PublicHost)/assets/images/header-logo.png" width="100%" style="display:block; max-width:100%; height:auto;" border="0" />
+                    </a>
+                </td>
+                </tr></tbody></table>
+                <!-- EndFull-Width Swappable Content -->
+                
+            </td>
+            </tr></tbody></table>
+            <!-- End Full-Width Swappable Header Inner-->
+        
+        </td></tr></tbody></table>
+		<!-- End Full-Width Swappable Header Outer -->      
+        
+              
+        <!-- Mobile Hidden Navigation -->
+        <table border="0" cellpadding="0" cellspacing="0" align="center" width="100%" style="border-collapse:collapse;"><tbody><tr>
+        <td bgcolor="#ffffff" class="mobhide" align="center" >
+            
+            <!-- Mobile Hidden Navigation Cells -->
+            <table class="stack" align="center" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+                <tr align="center" style="display:block; font-size:0;">
+                    <td align="center" valign="top" style="display:inline-block; padding:5px 8px; font-family:Arial, Helvetica, sans-serif; font-size:11px; font-weight:bold; border-right:1px solid #6d6e71 !important;">
+                        <a href="https://@(PublicHost)/products/wild-salmon" class="embiggen" style="text-decoration:none; color:#6d6e71;">Wild Salmon</a>
+                    </td>
+                    <td align="center" valign="top" style="display:inline-block; padding:5px 8px; font-family:Arial, Helvetica, sans-serif; font-size:11px; font-weight:bold; border-right:1px solid #6d6e71 !important;">
+                        <a href="https://@(PublicHost)/products/wild-cod-tuna-halibut-more" class="embiggen" style="text-decoration:none; color:#6d6e71;">Wild Cod, Tuna & Halibut</a>
+                    </td>
+                    <td align="center" valign="top" style="display:inline-block; padding:5px 8px; font-family:Arial, Helvetica, sans-serif; font-size:11px; font-weight:bold; border-right:1px solid #6d6e71 !important;">
+                        <a href="https://@(PublicHost)/products/wild-shrimp-shellfish" class="embiggen" style="text-decoration:none; color:#6d6e71;">Shellfish</a>
+                    </td>
+                    <td align="center" valign="top" style="display:inline-block; padding:5px 8px; font-family:Arial, Helvetica, sans-serif; font-size:11px; font-weight:bold; border-right:1px solid #6d6e71 !important;">
+                        <a href="https://@(PublicHost)/products/canned-pouched-wild-seafood" class="embiggen" style="text-decoration:none; color:#6d6e71;">Canned Seafood</a>
+                    </td>
+                    <td align="center" valign="top" style="display:inline-block; padding:5px 8px; font-family:Arial, Helvetica, sans-serif; font-size:11px; font-weight:bold; border-right:1px solid #6d6e71 !important;">
+                        <a href="#" class="embiggen" style="text-decoration:none; color:#6d6e71;">Omega-3''s & Supplements</a>
+                    </td>
+                    <td align="center" valign="top" style="display:inline-block; padding:5px 8px; font-family:Arial, Helvetica, sans-serif; font-size:11px; font-weight:bold;">
+                        <a href="https://@(PublicHost)/products/specials-top-sellers" class="embiggen" style="text-decoration:none; color:#6d6e71;">Top Sellers</a>
+                    </td>
+                </tr>
+            </table>
+            <!--End Mobile Hidden Navigation Cells -->
+            
+        </td>
+        </tr></tbody></table>
+        <!-- End Mobile Hidden Navigation -->  
+
+        	<!--Full-Width WYSIWYG Inner -->
+             <div section="1">
+        	<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;"><tbody><tr>
+            <td align="center" valign="top" bgcolor="#ffffff" style="font-family: Arial, Helvetica, sans-serif; font-size:14px; color:#000000; padding:0 1px;">
+                
+                <div><img src="https://@(PublicHost)/Assets/images/productreviewemail/product-review-hero-v4.jpg" width="638" style="display:block; max-width:100%; height:auto;" border="0"/></div>
+                
+            </td>
+            </tr></tbody></table>
+            </div>
+            <!-- End Full-Width WYSIWYG Inner-->
+            
+                  <!-- Full Width Body -->
+        <div section="2">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;"><tbody><tr>
+        <td>
+        
+        	<!-- Full Width Body Content -->
+            <table class="content" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;"><tbody><tr>
+            <td align="center" style="padding:15px 1px; font-family: Arial, Helvetica, sans-serif; font-size:14px; color:#6d6e72;">
+               
+                <div style="font-size:18px; color:#6d6e72;">Greetings @(CustomerName),</div>
+                <br />
+<div><span style="font-size:18px; font-weight:bold;">Everyone benefits when people share product reviews.</span><br>
+Did everything meet your expectations?<br>
+We want you to be fully satisfied, so <a href="https://@(PublicHost)/content/contact-customer-service" style="color:#6d6e72;">please report any concerns.</a><br>
+And if you were truly delighted, please let your friends and family know!<br><br>
+</div>         
+            </td>
+            </tr></tbody></table>
+            <!-- End Full Width Body Content-->
+        
+        </td>
+        </tr></tbody></table>
+        </div>
+        <!-- End Full Width Body -->
+            
+ 
+    <!-- Cart Contents -->
+        
+      
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;"><tbody><tr><td bgcolor="#ffffff" style="padding:0 0 1px 0;">        
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;"><tbody>
+        <tr>
+        <td bgcolor="#ffffff">
+        
+        	<!-- Stacking Halves Content -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+            <tbody>
+                @list(Products)
+                {{
+                <tr>
+                    <td width="100" valign="top" align="left" style="padding: 5px 5px 15px 15px;">
+						<img height="100" width="100" src="https://@(@root.Model.PublicHost)@(Thumbnail)" style="display: block;" border="0" />
+					</td>
+					<td align="left" valign="top" style="font-family: Arial, Helvetica, sans-serif; color: #6d6e72; font-size: 14px; padding: 5px;">
+						@(DisplayName)
+					</td>
+					<td width="156" align="right" valign="top">
+						<table cellpadding="5" align="right" cellspacing="0" border="0" class="cta">
+						    <tbody>
+						        <tr>
+                                    <td align="center" class="cta" valign="middle" bgcolor="#f15c22" style="font-size: 12pt; text-transform: capitalize; font-family: Arial, Helvetica, sans-serif; font-weight:bold; color:#FFFFFF; padding:8px 25px;">
+                                    <a href="https://@(@root.Model.PublicHost)@(ProductUrl)?review=true" target="_blank" style="color:#ffffff; text-decoration:none; white-space:nowrap; margin:auto;">REVIEW ITEM</a>
+                                </td>
+                                </tr>
+                            </tbody>
+                        </table>
+					</td>
+                </tr>
+                }}
+                </tbody>
+            </table>
+            <!-- End Stacking Halves Content-->
+        
+        </td>
+        </tr>
+        </tbody></table>
+      </td></tr></tbody></table>
+        
+         
+        <!-- End Cart Contents -->
+<br /><br />
+
+       <!-- Scaling Thirds Outer -->
+        <div section="3">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;"><tbody><tr>
+        <td>
+        
+        	<!-- Scaling Thirds Inner -->
+        	<table class="content" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;"><tbody><tr>
+            <td style="padding:0 1px;">
+
+                <table border="0" align="left" cellpadding="0" cellspacing="0" style="border-collapse:collapse;"><tbody><tr>
+        		<td align="left" width="213">
+                        
+                        <p style="mso-table-lspace:0;mso-table-rspace:0; margin:0;"> 
+                        <!-- Content One Inner -->
+                        <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;"><tbody><tr>
+                        <td align="left" style="font-family: Arial, Helvetica, sans-serif; color:#000000; font-size:14px;">
+                        
+                                <!-- Image Table -->
+                                <table align="center" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;"><tbody><tr>
+                                <td align="center" >
+                                    <div>
+                                        <a href="https://@(PublicHost)/content/in-the-kitchen">
+                                            <img src="https://@(PublicHost)/Assets/images/productreviewemail/Welcome1A-column1.png" width="213" style="display:block; max-width:100%; height:auto;" border="0"/>
+                                        </a>
+                                    </div> 
+                                </td>
+                                </tr></tbody></table>
+                                <!-- End Right Image Table -->
+                            
+                           
+                            
+                         </td>
+                         </tr></tbody></table>
+                         <!-- End Content One Inner -->
+                         </p>
+                            
+                </td>
+        		<td align="left" width="212">
+                        
+                        <p style="mso-table-lspace:0;mso-table-rspace:0; margin:0;"> 
+                        <!-- Content Two Inner -->
+                        <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;"><tbody><tr>
+                        <td align="left" style="font-family: Arial, Helvetica, sans-serif; color:#000000; font-size:14px;">
+                        
+                                <!-- Image Table -->
+                                <table align="center" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;"><tbody><tr>
+                                <td align="center" >
+                                    <div>
+                                        <a href="#">
+                                            <img src="https://@(PublicHost)/Assets/images/productreviewemail/Welcome1A-column2.png" width="212" style="display:block; max-width:100%; height:auto;" border="0"/>
+                                        </a>
+                                    </div>
+                                </td>
+                                </tr></tbody></table>
+                                <!-- End Right Image Table -->
+                            
+                            
+                            
+                         </td>
+                         </tr></tbody></table>
+                         <!-- End Content Two Inner -->
+                         </p>
+                            
+                </td>
+        		<td align="left" width="213">
+                        
+                        <p style="mso-table-lspace:0;mso-table-rspace:0; margin:0;"> 
+                        <!-- Content Three Inner -->
+                        <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;"><tbody><tr>
+                        <td align="left" style="font-family: Arial, Helvetica, sans-serif; color:#000000; font-size:14px;">
+                        
+                                <!-- Image Table -->
+                                <table align="center" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;"><tbody><tr>
+                                <td align="center" >
+                                    <div>
+                                        <a href="#">
+                                            <img src="https://@(PublicHost)/Assets/images/productreviewemail/Welcome1A-column3.png" width="213" style="display:block; max-width:100%; height:auto;" border="0"/>
+                                        </a>
+                                    </div> 
+                                </td>
+                                </tr></tbody></table>
+                                <!-- End Right Image Table -->
+                            
+                            
+                            
+                         </td>
+                         </tr></tbody></table>
+                         <!-- End Content One Inner -->
+                         </p>
+                            
+                </td>
+                </tr></tbody></table>
+                <!-- End Content Three -->
+    
+            </td>
+            
+            </tr></tbody></table>
+            <!-- End Stacking Thirds Inner-->
+        
+        </td></tr></tbody></table>
+        </div>
+		<!-- End Scaling Thirds Outer -->
+
+        	<!--Full-Width WYSIWYG Inner -->
+             <div section="4">
+        	<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;"><tbody><tr>
+            <td align="center" valign="top" bgcolor="#ffffff" style="font-family: Arial, Helvetica, sans-serif; font-size:14px; color:#000000; padding:0 1px;">
+                <div>
+                    <a href="#">
+                        <img src="https://@(PublicHost)/Assets/images/productreviewemail/shipping-banner-new.png" width="638" style="display:block; max-width:100%; height:auto;" border="0"/>
+                    </a>
+                </div>
+            </td>
+            </tr></tbody></table>
+            </div>
+            <!-- End Full-Width WYSIWYG Inner-->
+	</td></tr></tbody></table>
+<!-- End Message Body-->
+
+<!-- Begin Social Icons -->  
+        
+        <table align="center" border="0" cellpadding="5" cellspacing="0" style="border-collapse:collapse;">
+            <tr>
+                <td align="center" valign="middle"><a href="https://www.facebook.com/vitalchoice" target="blank"><img src="https://@(PublicHost)/Assets/images/VC-Facebook.png" height="40" width="40" style="border:none; display:block;" alt="Facebook" /></a></td>
+                <td align="center" valign="middle"><a href="#" target="blank"><img src="https://@(PublicHost)/Assets/images/VC-Blog.png" height="40" width="40" style="border:none; display:block;" alt="Blogt" /></a></td>
+                <td align="center" valign="middle"><a href="https://twitter.com/vitalchoice" target="blank"><img src="https://@(PublicHost)/Assets/images/VC-Twitter.png" height="40" width="40" style="border:none; display:block;" alt="Twitter" /></a></td>
+                <td align="center" valign="middle"><a href="https://plus.google.com/109701577970251794205/posts" target="blank"><img src="https://@(PublicHost)/Assets/images/VC-Google.png" height="40" width="40" style="border:none; display:block;" alt="Google Plus" /></a></td>
+                <td align="center" valign="middle"><a href="https://www.pinterest.com/vitalchoice/" target="blank"><img src="https://@(PublicHost)/Assets/images/VC-Pinterest.png" height="40" width="40" style="border:none; display:block;" alt="Pinterest" /></a></td>
+                <td align="center" valign="middle"><a href="https://instagram.com/vitalchoice/" target="blank"><img src="https://@(PublicHost)/Assets/images/social-icons-Insta.png" height="40" width="40" style="border:none; display:block;" alt="Instagram" /></a></td>
+                <td align="center" valign="middle"><a href="https://www.bcorporation.net/community/vital-choice" target="blank"><img src="https://@(PublicHost)/Assets/images/VC-BCorp.png" height="40" width="40" style="border:none; display:block;" alt="B Corp" /></a></td>
+            </tr>
+        </table>
+        <!-- End Social Icons -->   
+           
+        
+		<!-- Footer Outer -->
+        <table border="0" align="center" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;"><tbody><tr>
+        <td align="center" >
+        
+        	<!--Footer Inner -->
+        	<table align="center" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;"><tbody><tr>
+            <td align="center" valign="top" style="padding:10px; color:#000000; font-family:Arial, Helvetica, sans-serif; font-size:10px; line-height:18px;"><br /><br />
+                <a href="https://@(PublicHost)/account/unsubscribe?email=@(UrlEncodedEmail)&type=1">Click Here to Stop Receiving Product Review Invitations</a><br /><br />
+            </td>
+            </tr></tbody></table>
+            <!-- End Footer Inner-->
+        
+        </td></tr></tbody></table>
+		<!-- End Footer Outer -->
+
+<img src="https://@(PublicHost)/Assets/images/spacer.gif" style="display:block;" height="1" width="1"/>
+</td></tr></tbody></table>
+<!-- End Outer Container -->
+</div>
+</body>
+</html>
+}} :: VitalChoice.Ecommerce.Domain.Mail.OrderProductReviewEmail
+%>'
+           ,''
+           ,'Your opinion matters, tell us what you think!'
+           ,NULL
+           ,NULL)
+
+SET @contentItemId=@@identity
+
+INSERT INTO [dbo].[EmailTemplates]
+           ([Name]
+           ,[ContentItemId]
+           ,[MasterContentItemId]
+           ,[StatusCode]
+           ,[UserId]
+           ,[ModelType]
+           ,[EmailDescription])
+     VALUES
+           ('OrderProductReviewEmail'
+           ,@contentItemId
+           ,(SELECT Id FROM MasterContentItems WHERE Name='StoreFront Email Template')
+           ,2
+           ,NULL
+           ,'VitalChoice.Ecommerce.Domain.Mail.OrderProductReviewEmail'
+           ,'Order Product ReviewEmail')
+
+INSERT INTO [dbo].[ContentItems]
+           ([Created]
+           ,[Updated]
+           ,[Template]
+           ,[Description]
+           ,[Title]
+           ,[MetaKeywords]
+           ,[MetaDescription])
+     VALUES
+           (GETDATE()
+           ,GETDATE()
+           ,''
+           ,'<h1>Email Not Found</h1>'
+           ,'Unsubscribe Email Not Found'
+           ,NULL
+           ,NULL)
+
+SET @contentItemId=@@identity
+
+INSERT INTO [dbo].[ContentPages]
+           ([Url]
+           ,[Name]
+           ,[FileUrl]
+           ,[ContentItemId]
+           ,[MasterContentItemId]
+           ,[StatusCode]
+           ,[Assigned]
+           ,[UserId])
+     VALUES
+           ('unsubscribe-email-not-found'
+           ,'Unsubscribe Email Not Found'
+           ,NULL
+           ,@contentItemId
+           ,(SELECT Id FROM MasterContentItems WHERE Name='Content Individual')
+           ,2
+           ,1
+           ,NULL)
+
+
+INSERT INTO [dbo].[ContentItems]
+           ([Created]
+           ,[Updated]
+           ,[Template]
+           ,[Description]
+           ,[Title]
+           ,[MetaKeywords]
+           ,[MetaDescription])
+     VALUES
+           (GETDATE()
+           ,GETDATE()
+           ,''
+           ,'<h1>Email Unsubscribed</h1>'
+           ,'Email Unsubscribed'
+           ,NULL
+           ,NULL)
+
+SET @contentItemId=@@identity
+
+INSERT INTO [dbo].[ContentPages]
+           ([Url]
+           ,[Name]
+           ,[FileUrl]
+           ,[ContentItemId]
+           ,[MasterContentItemId]
+           ,[StatusCode]
+           ,[Assigned]
+           ,[UserId])
+     VALUES
+           ('email-unsubscribed'
+           ,'Email Unsubscribed'
+           ,NULL
+           ,@contentItemId
+           ,(SELECT Id FROM MasterContentItems WHERE Name='Content Individual')
+           ,2
+           ,1
+           ,NULL)
+
+END
+
+GO

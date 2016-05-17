@@ -52,7 +52,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Content
                     var customer = await _customerService.SelectAsync(internalId);
                     if (customer?.ProfileAddress != null)
                     {
-                        toReturn = _catalogRequestAddressMapper.ToModel<CatalogRequestAddressModel>(customer.ProfileAddress);
+                        toReturn = await _catalogRequestAddressMapper.ToModelAsync<CatalogRequestAddressModel>(customer.ProfileAddress);
                     }
                 }
             }

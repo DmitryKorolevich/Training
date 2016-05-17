@@ -17,7 +17,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions
         public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext context, IWorkflowExecutionContext executionContext)
         {
             decimal discount = 0;
-            if (context.DictionaryData.Keys.Contains("Discount"))
+            if (context.SafeData.Discount != null)
             {
                 discount = context.Data.Discount;
             }

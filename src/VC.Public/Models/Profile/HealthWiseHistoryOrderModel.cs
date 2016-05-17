@@ -7,7 +7,7 @@ namespace VC.Public.Models.Profile
     {
 		public int Id { get; set; }
 
-        public decimal Total { get; set; }
+        public decimal DiscountedSubtotal { get; set; }
 
         public DateTime DateCreated { get; set; }
 

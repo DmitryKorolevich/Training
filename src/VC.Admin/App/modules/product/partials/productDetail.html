@@ -452,7 +452,12 @@
                                                                                     <div class="fixed-accordion-row extra-spacing" data-ng-click="$event.stopPropagation()">
                                                                                         <label class="control-label">QTY</label>
                                                                                         <div class="col-md-1">
-                                                                                            <input type="text" name="QTY" class="form-control qty" placeholder="QTY" data-ng-model="subSku.QTY">
+                                                                                            <input type="text" name="QTY" class="form-control qty" placeholder="QTY" required data-ng-model="subSku.QTY" min="1" numbers-only>
+                                                                                            <div class="error-container small-block" ng-show="forms.skussubmitted && forms.SKUs.i{{$index}}.QTY.$invalid">
+                                                                                                <small class="error" ng-show="forms.SKUs.i{{$index}}.QTY.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","QTY")}}</small>
+                                                                                                <small class="error" ng-show="forms.SKUs.i{{$index}}.QTY.$error.min">{{getValidationMessage("ValidationMessages.FieldMin","QTY",1)}}</small>
+                                                                                                <small class="error" ng-show="forms.SKUs.i{{$index}}.QTY.$error.server">{{serverMessages.GetMessage('QTY','SKUs',$index)}}</small>
+                                                                                            </div>
                                                                                         </div>
                                                                                     </div>
                                                                                     <div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">
@@ -685,7 +690,7 @@
                                                                                         <label for="lblDate{{subSku.Id}}" class="col-md-3 control-label">Born Date</label>
                                                                                         <div class="col-md-1 margin-right-15px">
                                                                                             <p class="input-group">
-                                                                                                <input type="text" id="lblDate{{subSku.Id}}" name="BornDate" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="subSku.BornDate" is-open="subSku.DateOpened"/>
+                                                                                                <input type="text" id="lblDate{{subSku.Id}}" name="BornDate" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="subSku.BornDate" is-open="subSku.DateOpened" />
                                                                                                 <span class="input-group-btn">
                                                                                                     <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); subSku.DateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                                                                 </span>
@@ -1180,18 +1185,7 @@
                                             <span class="legend">Manage Template</span>
                                             <div class="form-group">
                                                 <div class="col-md-12">
-                                                    <div data-ng-model="product.Template" ui-ace="{
-				                                require: ['ace/ext/language_tools'],
-				                                advanced: {
-					                                enableSnippets: true,
-					                                enableBasicAutocompletion: true,
-					                                enableLiveAutocompletion: true
-				                                },
-				                                theme:'cobalt',
-				                                mode: 'ttl',
-				                                onLoad: aceLoaded,
-				                                onChange: aceChanged
-		                                }">
+                                                    <div data-ng-model="product.Template" ui-ace-ttl master-id="product.MasterContentItemId">
                                                     </div>
                                                 </div>
                                             </div>

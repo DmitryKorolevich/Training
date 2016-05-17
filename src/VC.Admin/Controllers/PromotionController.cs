@@ -87,7 +87,7 @@ namespace VC.Admin.Controllers
             }
 
             var item = await _promotionService.SelectAsync(id);
-            PromotionManageModel toReturn = _mapper.ToModel<PromotionManageModel>(item);
+            PromotionManageModel toReturn = await _mapper.ToModelAsync<PromotionManageModel>(item);
 
             return toReturn;
         }
@@ -97,7 +97,7 @@ namespace VC.Admin.Controllers
         {
             if (!Validate(model))
                 return null;
-            var promotion = _mapper.FromModel(model);
+            var promotion = await _mapper.FromModelAsync(model);
 
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
@@ -114,7 +114,7 @@ namespace VC.Admin.Controllers
                 promotion = await _promotionService.InsertAsync(promotion);
             }
 
-            return _mapper.ToModel<PromotionManageModel>(promotion);
+            return await _mapper.ToModelAsync<PromotionManageModel>(promotion);
         }
 
         [HttpPost]
@@ -133,7 +133,7 @@ namespace VC.Admin.Controllers
             if (toReturn.Main != null && !String.IsNullOrEmpty(toReturn.Main.Data))
             {
                 var dynamic = (PromotionDynamic)JsonConvert.DeserializeObject(toReturn.Main.Data, typeof(PromotionDynamic));
-                var model = _mapper.ToModel<PromotionManageModel>(dynamic);
+                var model = await _mapper.ToModelAsync<PromotionManageModel>(dynamic);
                 toReturn.Main.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
@@ -143,7 +143,7 @@ namespace VC.Admin.Controllers
             if (toReturn.Before != null && !String.IsNullOrEmpty(toReturn.Before.Data))
             {
                 var dynamic = (PromotionDynamic)JsonConvert.DeserializeObject(toReturn.Before.Data, typeof(PromotionDynamic));
-                var model = _mapper.ToModel<PromotionManageModel>(dynamic);
+                var model = await _mapper.ToModelAsync<PromotionManageModel>(dynamic);
                 toReturn.Before.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,

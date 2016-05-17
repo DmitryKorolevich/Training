@@ -200,6 +200,27 @@ namespace VitalChoice.Business.Helpers
             return toReturn;
         }
 
+        public static string GetShortProductTypeName(ProductType type)
+        {
+            string toReturn = null;
+            switch (type)
+            {
+                case ProductType.Perishable:
+                    toReturn = "P";
+                    break;
+                case ProductType.NonPerishable:
+                    toReturn = "NP";
+                    break;
+                case ProductType.Gc:
+                    toReturn = "GIFT";
+                    break;
+                case ProductType.EGс:
+                    toReturn = "EGIFT";
+                    break;
+            }
+            return toReturn;
+        }
+
         public static Dictionary<int, string> GetDiscountTypes()
         {
             Dictionary<int, string> toReturn = new Dictionary<int, string>
@@ -350,6 +371,36 @@ namespace VitalChoice.Business.Helpers
             return toReturn;
         }
 
+        public static string GetShortPaymentMethodName(PaymentMethodType type)
+        {
+            string toReturn = null;
+            switch (type)
+            {
+                case PaymentMethodType.CreditCard:
+                    toReturn = "CC";
+                    break;
+                case PaymentMethodType.Oac:
+                    toReturn = "OAC";
+                    break;
+                case PaymentMethodType.Check:
+                    toReturn = "Check";
+                    break;
+                case PaymentMethodType.NoCharge:
+                    toReturn = "NC";
+                    break;
+                case PaymentMethodType.WireTransfer:
+                    toReturn = "Wire";
+                    break;
+                case PaymentMethodType.Marketing:
+                    toReturn = "Marketing";
+                    break;
+                case PaymentMethodType.VCWellnessEmployeeProgram:
+                    toReturn = "Employee";
+                    break;
+            }
+            return toReturn;
+        }
+
         public static IList<LookupItem<int>> GetShortOrderTypes(IList<LookupItem<int>> orderTypes)
         {
             List<LookupItem<int>> toReturn = new List<LookupItem<int>>();
@@ -400,6 +451,33 @@ namespace VitalChoice.Business.Helpers
                         });
                         break;
                 }
+            }
+            return toReturn;
+        }
+
+        public static string GetShortOrderTypeName(OrderType type)
+        {
+            string toReturn = null;
+            switch (type)
+            {
+                case OrderType.Normal:
+                    toReturn = "S";
+                    break;
+                case OrderType.AutoShipOrder:
+                    toReturn = "AS";
+                    break;
+                case OrderType.DropShip:
+                    toReturn = "DS";
+                    break;
+                case OrderType.GiftList:
+                    toReturn = "GL";
+                    break;
+                case OrderType.Reship:
+                    toReturn = "RS";
+                    break;
+                case OrderType.Refund:
+                    toReturn = "RF";
+                    break;
             }
             return toReturn;
         }

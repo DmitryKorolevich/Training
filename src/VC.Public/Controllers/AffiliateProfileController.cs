@@ -130,7 +130,7 @@ namespace VC.Public.Controllers
         {
             var affiliate = await GetCurrentAffiliateDynamic();
 
-            var model = _affiliateMapper.ToModel<AffiliateManageModel>(affiliate);
+            var model = await _affiliateMapper.ToModelAsync<AffiliateManageModel>(affiliate);
             model.CurrentEmail = model.Email;
             model.Email = String.Empty;
 
@@ -176,7 +176,7 @@ namespace VC.Public.Controllers
 
                 ViewBag.SuccessMessage = InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullyUpdated];
 
-                model = _affiliateMapper.ToModel<AffiliateManageModel>(affiliate);
+                model = await _affiliateMapper.ToModelAsync<AffiliateManageModel>(affiliate);
                 model.CurrentEmail = model.Email;
                 CleanProfileEmailFields(model);
             }

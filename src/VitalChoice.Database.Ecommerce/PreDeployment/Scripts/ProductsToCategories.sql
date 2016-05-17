@@ -9,3 +9,19 @@ BEGIN
 		CONSTRAINT [FK_ProductsToCategories_ToProductCategory] FOREIGN KEY ([IdCategory]) REFERENCES [ProductCategories]([Id])
 	)
 END
+
+IF EXISTS (SELECT * FROM sys.columns WHERE object_id =  OBJECT_ID(N'[dbo].[ProductsToCategories]', N'U') AND name='Id')
+BEGIN
+	DECLARE @drop_sql NVARCHAR(MAX)
+
+	SET @drop_sql = N'ALTER TABLE [dbo].[ProductsToCategories] DROP CONSTRAINT ' + 
+		(SELECT name FROM sys.objects WHERE parent_object_id = OBJECT_ID(N'[dbo].[ProductsToCategories]', N'U') AND type = N'PK')
+
+	EXEC (@drop_sql)
+
+	ALTER TABLE [dbo].[ProductsToCategories]
+	DROP COLUMN Id
+
+	ALTER TABLE [dbo].[ProductsToCategories]
+	ADD CONSTRAINT PK_ProductsToCategories PRIMARY KEY (IdCategory, IdProduct)
+END

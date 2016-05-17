@@ -471,6 +471,7 @@ namespace VitalChoice.Business.Services.Products
                 .WithExactDescriptionName(filter.ExactDescriptionName)
                 .WithIds(filter.Ids)
                 .WithIdProducts(filter.IdProducts)
+                .WithIdProductTypes(filter.IdProductTypes)
                 .ActiveOnly(filter.ActiveOnly).NotHiddenOnly(filter.NotHiddenOnly);
             var query = _vSkuRepository.Query(conditions);
 
@@ -539,8 +540,9 @@ namespace VitalChoice.Business.Services.Products
                     && !productContentTransferEntity.ProductDynamic.Hidden
                     && productContentTransferEntity.ProductDynamic.Skus!=null)
                 {
-                    var activeSkus = productContentTransferEntity.ProductDynamic.Skus.Where(p=>p.StatusCode == (int)RecordStatusCode.Active && 
-                        !p.Hidden && p.SafeData.HideFromDataFeed!=true);
+                    var activeSkus =
+                        productContentTransferEntity.ProductDynamic.Skus.Where(p => p.StatusCode == (int) RecordStatusCode.Active &&
+                                                                                    !p.Hidden && p.SafeData.HideFromDataFeed != true).ToArray();
 
                     if(!activeSkus.Any())
                         continue;

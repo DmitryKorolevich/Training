@@ -1,7 +1,6 @@
-﻿using System;
-using VitalChoice.Ecommerce.Domain;
+﻿using VitalChoice.Ecommerce.Domain;
 
-namespace VitalChoice.Infrastructure.Domain.Entities.Orders
+namespace VitalChoice.Infrastructure.Domain.Entities.Reports
 {
     public class WholesaleDropShipReportSkuRawItem : Entity
     { 

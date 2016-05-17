@@ -188,18 +188,7 @@
                                             <span class="legend">Manage Template</span>
                                             <div class="form-group">
                                                 <div class="col-md-12">
-                                                    <div data-ng-model="productCategory.Template" ui-ace="{
-				                                require: ['ace/ext/language_tools'],
-				                                advanced: {
-					                                enableSnippets: true,
-					                                enableBasicAutocompletion: true,
-					                                enableLiveAutocompletion: true
-				                                },
-				                                theme:'cobalt',
-				                                mode: 'ttl',
-				                                onLoad: aceLoaded,
-				                                onChange: aceChanged
-		                                }">
+                                                    <div data-ng-model="productCategory.Template" ui-ace-ttl master-id="productCategory.MasterContentItemId">
                                                     </div>
                                                 </div>
                                             </div>

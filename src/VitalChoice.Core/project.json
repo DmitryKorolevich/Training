@@ -1,20 +1,20 @@
 {
   "version": "1.0.0-*",
   "dependencies": {
-    "Autofac.Extensions.DependencyInjection": "4.0.0-*",
+    "Autofac.Extensions.DependencyInjection": "4.0.0-rc1-177",
     "Avalara.Avatax.Rest": "1.0.0-*",
-    "cloudscribe.Web.Pagination": "",
-    "Microsoft.AspNet.Authentication.Cookies": "1.0.0-*",
-    "Microsoft.AspNet.Http": "1.0.0-*",
+    "cloudscribe.Web.Pagination": "1.0.0-*",
+    "Microsoft.AspNet.Authentication.Cookies": "1.0.0-rc1-final",
+    "Microsoft.AspNet.Http": "1.0.0-rc1-final",
     "Microsoft.AspNet.Identity": "3.0.0-*",
-    "Microsoft.AspNet.Mvc": "6.0.0-*",
-    "Microsoft.AspNet.Mvc.TagHelpers": "6.0.0-*",
-    "Microsoft.AspNet.Session": "1.0.0-*",
-    "Microsoft.AspNet.Tooling.Razor": "1.0.0-*",
-    "Microsoft.AspNet.Diagnostics": "1.0.0-*",
-    "Microsoft.Extensions.Configuration.Json": "1.0.0-*",
-    "Microsoft.Extensions.Logging": "1.0.0-*",
-    "Microsoft.Extensions.OptionsModel": "1.0.0-*",
+    "Microsoft.AspNet.Mvc": "6.0.0-rc1-final",
+    "Microsoft.AspNet.Mvc.TagHelpers": "6.0.0-rc1-final",
+    "Microsoft.AspNet.Session": "1.0.0-rc1-final",
+    "Microsoft.AspNet.Tooling.Razor": "1.0.0-rc1-final",
+    "Microsoft.AspNet.Diagnostics": "1.0.0-rc1-final",
+    "Microsoft.Extensions.Configuration.Json": "1.0.0-rc1-final",
+    "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
+    "Microsoft.Extensions.OptionsModel": "1.0.0-rc1-final",
     "VitalChoice.Business": "1.0.0-*",
     "VitalChoice.ContentProcessing": "",
     "VitalChoice.Data": "1.0.0-*",
@@ -36,8 +36,8 @@
     },
     "netstandard1.5": {
       "dependencies": {
-        "System.Runtime": "4.0.21-*",
-        "System.Diagnostics.Process": "4.0.0-*"
+        "System.Runtime": "4.0.21-beta-23516",
+        "System.Diagnostics.Process": "4.1.0-beta-23516"
       }
     }
   }

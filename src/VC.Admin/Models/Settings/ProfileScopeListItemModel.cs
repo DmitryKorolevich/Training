@@ -37,7 +37,7 @@ namespace VC.Admin.Models.Settings
                 ClassTypeName = item.ClassType?.FullName ?? string.Empty;
                 TimeElapsed = Math.Round(item.TimeElapsed.TotalMilliseconds, 2);
                 MethodName = item.MethodName ?? string.Empty;
-                SubScopes = item.SubScopes?.Select(p => new ProfileScopeListItemModel(p)) ?? Enumerable.Empty<ProfileScopeListItemModel>();
+                SubScopes = item.SubScopes?.Select(p => new ProfileScopeListItemModel(p)).ToArray() ?? Enumerable.Empty<ProfileScopeListItemModel>();
                 AdditionalData = item.AdditionalData?.Select(d => d?.ToString()) ?? Enumerable.Empty<string>();
             }
         }

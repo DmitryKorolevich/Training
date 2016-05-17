@@ -13,6 +13,7 @@ using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Interfaces.Services.Affiliates;
 using Microsoft.AspNet.Authorization;
+using VitalChoice.Business.Mail;
 using VitalChoice.Core.Services;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -21,6 +22,8 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Validation.Models;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Domain.Transfer.Customers;
+using VitalChoice.Interfaces.Services.Orders;
 
 namespace VC.Public.Controllers
 {
@@ -32,13 +35,18 @@ namespace VC.Public.Controllers
         private readonly IAffiliateService _affiliateService;
         private readonly IPaymentMethodService _paymentMethodService;
 		private readonly IDynamicMapper<CustomerDynamic, Customer> _customerMapper;
+        private readonly INotificationService _notificationService;
+        private readonly IOrderSchedulerService _orderSchedulerService;
 
-		public AccountController(
+
+        public AccountController(
             IStorefrontUserService userService,
             IDynamicMapper<CustomerDynamic, Customer> customerMapper, 
             ICustomerService customerService,
             IAffiliateService affiliateService,
             IPaymentMethodService paymentMethodService,
+            INotificationService notificationService,
+            IOrderSchedulerService orderSchedulerService,
             IPageResultService pageResultService) : base(pageResultService)
 		{
 			_userService = userService;
@@ -46,7 +54,17 @@ namespace VC.Public.Controllers
 			_customerService = customerService;
             _affiliateService = affiliateService;
             _paymentMethodService = paymentMethodService;
+            _notificationService = notificationService;
+            _orderSchedulerService = orderSchedulerService;
+
 		}
+
+        [HttpGet]
+        public async Task<Result<bool>> TestReviewEmail(int id)
+        {
+            await _orderSchedulerService.SendOrderProductReviewEmailTest(id);
+            return true;
+        }
 
         [HttpGet]
         public IActionResult Login(string alreadyTakenEmail = null, bool forgot = false, int? type=null, string returnUrl = null)
@@ -77,7 +95,7 @@ namespace VC.Public.Controllers
 		    {
 			    user = await _userService.SignInAsync(model.Email, model.Password);
 		    }
-		    catch (WholesalePendingException e)
+		    catch (WholesalePendingException)
 		    {
 			    return Redirect("/content/wholesale-review");
 		    }
@@ -110,14 +128,17 @@ namespace VC.Public.Controllers
 
         public async Task<IActionResult> Logout()
 		{
-			var context = HttpContext;
+            var context = HttpContext;
 
 			if (context.User.Identity.IsAuthenticated)
 			{
 				var user = await _userService.FindAsync(context.User.GetUserName());
 				if (user == null)
 				{
-                    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+                    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser])
+                    {
+                        ViewName = "Login"
+                    };
 				}
 
 				await _userService.SignOutAsync(user);
@@ -129,14 +150,29 @@ namespace VC.Public.Controllers
 		[HttpGet]
 		public async Task<IActionResult> Activate(Guid id)
 		{
-			var result = await _userService.GetByTokenAsync(id);
-			if (result == null)
+            ApplicationUser result;
+            try
+            {
+                result = await _userService.GetByTokenAsync(id);
+            }
+            catch (AppValidationException e)
+            {
+                e.ViewName = "Login";
+                throw;
+            }
+            if (result == null)
 			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUserByActivationToken]);
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUserByActivationToken])
+                {
+                    ViewName = "Login"
+                };
 			}
 			if (result.IsConfirmed)
 			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserAlreadyConfirmed]);
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserAlreadyConfirmed])
+                {
+                    ViewName = "Login"
+                };
 			}
 
 			return View(new CreateAccountModel()
@@ -320,10 +356,22 @@ namespace VC.Public.Controllers
         [HttpGet]
 		public async Task<IActionResult> ResetPassword(Guid id)
 		{
-			var result = await _userService.GetByTokenAsync(id);
-			if (result == null)
+            ApplicationUser result;
+            try
+            {
+                result = await _userService.GetByTokenAsync(id);
+            }
+            catch (AppValidationException e)
+            {
+                e.ViewName = "Login";
+                throw;
+            }
+            if (result == null)
 			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUserByActivationToken]);
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUserByActivationToken])
+                {
+                    ViewName = "Login"
+                };
 			}
 
 			return View(new ResetPasswordModel()
@@ -403,22 +451,60 @@ namespace VC.Public.Controllers
 		[HttpGet]
 		public async Task<IActionResult> LoginAsCustomer(Guid id)
 		{
-			var result = await _userService.GetByTokenAsync(id);
-			if (result == null)
+            ApplicationUser result;
+            try
+            {
+                result = await _userService.GetByTokenAsync(id);
+            }
+            catch (AppValidationException e)
+            {
+                e.ViewName = "Login";
+                throw;
+            }
+            if (result == null)
 			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindLogin]);
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindLogin])
+                {
+                    ViewName = "Login"
+                };
 			}
 
 			result.ConfirmationToken = Guid.Empty;
-			await _userService.UpdateAsync(result);
+		    try
+		    {
+		        await _userService.UpdateAsync(result);
 
-			result = await _userService.SignInAsync(result);
-			if (result == null)
+		        result = await _userService.SignInAsync(result);
+		    }
+		    catch (AppValidationException e)
+		    {
+                e.ViewName = "Login";
+                throw;
+            }
+		    if (result == null)
 			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn])
+                {
+                    ViewName = "Login"
+                };
 			}
 
 			return RedirectToAction("ChangeProfile", "Profile");
 		}
+
+	    [HttpGet]
+	    public async Task<IActionResult> Unsubscribe([FromQuery]string email, [FromQuery]int type)
+	    {
+            CustomerFilter filter =new CustomerFilter();
+	        filter.Email = email;
+	        var customerExist = (await _customerService.GetCustomersAsync(filter))!=null;
+	        var blockedEmailExist = await _notificationService.IsEmailUnsubscribedAsync(type, email);
+	        if (!customerExist || blockedEmailExist)
+	        {
+	            return Redirect("/content/unsubscribe-email-not-found");
+	        }
+            await _notificationService.UnsubscribeEmailAsync(type, email);
+            return Redirect("/content/email-unsubscribed");
+        }
 	}
 }

@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
@@ -12,6 +11,7 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.ObjectMapping.Interfaces;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.ObjectMapping.Extensions;
+using VitalChoice.Data.Extensions;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
@@ -65,9 +65,7 @@ namespace VitalChoice.Business.Services.Dynamic
 
                 if (dynamic.SkusToInventorySkus != null)
                 {
-                    entity.SkusToInventorySkus.MergeKeyed(dynamic.SkusToInventorySkus, p => p.IdInventorySku, (sku, rsku) => {
-                        sku.Quantity = rsku.Quantity;
-                    });
+                    entity.SkusToInventorySkus.MergeKeyed(dynamic.SkusToInventorySkus, p => p.IdInventorySku, (sku, rsku) => sku.Quantity = rsku.Quantity);
                 }
             });
             return Task.Delay(0);

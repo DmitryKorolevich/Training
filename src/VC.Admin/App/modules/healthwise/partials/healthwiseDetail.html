@@ -92,7 +92,7 @@
                                         <tr>
                                             <th>Order #</th>
                                             <th>Order Date</th>
-                                            <th>Orders Total</th>
+                                            <th>Discounted Subtotal</th>
                                             <th>Details</th>
                                             <th data-ng-if="options.AllowMove">
                                                 <div class="checkbox-inline">
@@ -113,7 +113,7 @@
                                                 {{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}
                                             </td>
                                             <td>
-                                                {{::item.ProductsSubtotal | currency}}
+                                                {{::item.DiscountedSubtotal | currency}}
                                             </td>
                                             <td>
                                                 <button title="View" class="btn btn-default btn-success btn-xs" data-ng-click="openOrder(item.Id);">

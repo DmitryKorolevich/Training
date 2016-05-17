@@ -41,3 +41,5 @@ Post-Deployment Script Template
 :r .\Scripts\SPGetInventorySkusUsageReport.sql
 :r .\Scripts\SPGetInventoriesSummaryUsageReport.sql
 :r .\Scripts\SPsForWholesaleDropShipReport.sql
+:r .\Scripts\NewslettersData.sql
+:r .\Scripts\SPGetTransactionAndRefundReport.sql

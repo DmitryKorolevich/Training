@@ -21,7 +21,7 @@ namespace CsvHelper.TypeConversion
 		{
 			if( text == null )
 			{
-				return base.ConvertFromString( options, text );
+				return base.ConvertFromString( options, null );
 			}
 
 			return new Guid( text );

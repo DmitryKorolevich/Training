@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using VC.Admin.Models.Customer;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.DynamicData.Interfaces;
@@ -30,7 +31,7 @@ namespace VC.Admin.ModelConverters
             _orderService = orderService;
         }
 
-        public override void DynamicToModel(OrderReshipManageModel model, OrderDynamic dynamic)
+        public override async Task DynamicToModelAsync(OrderReshipManageModel model, OrderDynamic dynamic)
         {
             model.ReshipProblemSkus = dynamic.ReshipProblemSkus?.Select(p => new ReshipProblemSkuModel()
             {
@@ -50,7 +51,7 @@ namespace VC.Admin.ModelConverters
 
             if (dynamic.IdOrderSource.HasValue)
             {
-                var source = _orderService.SelectAsync(dynamic.IdOrderSource.Value,false, p => p).Result;
+                var source = await _orderService.SelectAsync(dynamic.IdOrderSource.Value,false, p => p);
                 if (source != null)
                 {
                     model.OrderSourceDateCreated = source.DateCreated;
@@ -59,12 +60,13 @@ namespace VC.Admin.ModelConverters
             }
         }
 
-        public override void ModelToDynamic(OrderReshipManageModel model, OrderDynamic dynamic)
+        public override Task ModelToDynamicAsync(OrderReshipManageModel model, OrderDynamic dynamic)
         {
             dynamic.ReshipProblemSkus = model.ReshipProblemSkus?.Where(p => p.Used).Select(p => new ReshipProblemSkuOrdered()
                 {
                     IdSku = p.IdSku,
                 }).ToList();
+            return Task.Delay(0);
         }
     }
 }

@@ -21,8 +21,10 @@ using VitalChoice.Infrastructure.Domain.Entities.CatalogRequests;
 using VitalChoice.Infrastructure.Domain.Entities.Checkout;
 using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.Entities.InventorySkus;
+using VitalChoice.Infrastructure.Domain.Entities.Newsletters;
 using VitalChoice.Infrastructure.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Entities.Products;
+using VitalChoice.Infrastructure.Domain.Entities.Reports;
 
 namespace VitalChoice.Infrastructure.Context
 {
@@ -39,7 +41,6 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("Carts");
                 entity.HasKey(c => c.Id);
                 entity.HasIndex(c => c.CartUid).IsUnique();
-                entity.HasOne(c => c.Discount).WithMany().HasForeignKey(c => c.IdDiscount).IsRequired(false).HasPrincipalKey(d => d.Id);
                 entity.HasMany(c => c.GiftCertificates).WithOne().HasForeignKey(g => g.IdCart).HasPrincipalKey(c => c.Id);
                 entity.HasMany(c => c.Skus).WithOne().HasForeignKey(s => s.IdCart).HasPrincipalKey(c => c.Id);
             });
@@ -64,6 +65,12 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<WholesaleDropShipReportSkuRawItem>(entity =>
             {
                 entity.HasKey(f => f.Id);
+            });
+
+            builder.Entity<TransactionAndRefundRawItem>(entity =>
+            {
+                entity.HasKey(f => f.RowNumber);
+                entity.Ignore(f => f.Id);
             });
 
             #endregion
@@ -292,6 +299,23 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("OneTimeDiscountToCustomerUsages");
 
                 entity.HasKey(e => new {e.IdCustomer, e.IdDiscount});
+            });
+
+            builder.Entity<Newsletter>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("Newsletters");
+                entity.HasMany(p => p.BlockedEmails)
+                    .WithOne()
+                    .HasForeignKey(e => e.IdNewsletter)
+                    .HasPrincipalKey(s => s.Id);
+            });
+
+            builder.Entity<NewsletterBlockedEmail>(entity =>
+            {
+                entity.HasKey(p => new { p.IdNewsletter, p.Email });
+                entity.ToTable("NewsletterBlockedEmails");
+                entity.Ignore(p => p.Id);
             });
         }
     }

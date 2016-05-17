@@ -13,6 +13,8 @@ namespace VitalChoice.Jobs
     {
         protected override void FinishCustomRegistrations(ContainerBuilder builder)
         {
+            builder.RegisterType<DummyHttpContextAccessor>().As<IHttpContextAccessor>();
+
             builder.RegisterModule(new QuartzAutofacFactoryModule());
             builder.RegisterModule(new QuartzAutofacJobsModule(typeof(JobsDependencyConfig).Assembly));
         }

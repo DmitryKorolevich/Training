@@ -133,7 +133,7 @@ namespace VC.Admin.Controllers
             {
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
             }
-            InventorySkuManageModel toReturn = _mapper.ToModel<InventorySkuManageModel>(item);
+            InventorySkuManageModel toReturn = await _mapper.ToModelAsync<InventorySkuManageModel>(item);
 
             return toReturn;
         }
@@ -144,7 +144,7 @@ namespace VC.Admin.Controllers
         {
             if (!Validate(model))
                 return null;
-            var item = _mapper.FromModel(model);
+            var item = await _mapper.FromModelAsync(model);
 
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
@@ -161,7 +161,7 @@ namespace VC.Admin.Controllers
                 item = await _inventorySkuService.InsertAsync(item);
             }
 
-            var toReturn = _mapper.ToModel<InventorySkuManageModel> (item);
+            var toReturn = await _mapper.ToModelAsync<InventorySkuManageModel> (item);
 
             return toReturn;
         }
@@ -191,7 +191,7 @@ namespace VC.Admin.Controllers
         public async Task<Result<bool>> UpdateInventorySkuCategoriesTree([FromBody]IList<InventorySkuCategoryTreeItemModel> model)
         {
             IList<InventorySkuCategory> categories = new List<InventorySkuCategory>();
-            if (categories != null)
+            if (model != null)
             {
                 foreach (var modelCategory in model)
                 {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
@@ -116,7 +117,7 @@ namespace VC.Public.Controllers
 			var helper = new AutoShipModelHelper(_skuMapper, _productMapper, _orderMapper, infr, countries);
 			var ordersModel = new PagedListEx<AutoShipHistoryItemModel>
 			{
-				Items = orders.Items.Select(p => helper.PopulateAutoShipItemModel(p)).ToList(),
+				Items = (await Task.WhenAll(orders.Items.Select(async p => await helper.PopulateAutoShipItemModel(p)))).ToList(),
 				Count = orders.Count,
 				Index = filter.Paging.PageIndex
 			};
@@ -133,14 +134,14 @@ namespace VC.Public.Controllers
 			{
 				var dynamic = currentCustomer.CustomerPaymentMethods
 				.Single(p => p.IdObjectType == (int)PaymentMethodType.CreditCard && p.Id == id);
-				model = _addressConverter.ToModel<BillingInfoModel>(dynamic.Address);
-				_customerPaymentMethodConverter.UpdateModel(model, dynamic);
+				model = await _addressConverter.ToModelAsync<BillingInfoModel>(dynamic.Address);
+                await _customerPaymentMethodConverter.UpdateModelAsync(model, dynamic);
 			}
 			else if(orderId > 0)
 			{
 				var order = await _orderService.SelectAsync(orderId);
-				model = _addressConverter.ToModel<BillingInfoModel>(order.PaymentMethod.Address);
-				_orderPaymentMethodConverter.UpdateModel(model, order.PaymentMethod);
+				model = await _addressConverter.ToModelAsync<BillingInfoModel>(order.PaymentMethod.Address);
+                await _orderPaymentMethodConverter.UpdateModelAsync(model, order.PaymentMethod);
 			}
 			else
 			{
@@ -179,15 +180,15 @@ namespace VC.Public.Controllers
             return ordersModel;
         }
 
-        private BillingInfoModel PopulateCreditCard(CustomerDynamic currentCustomer, int selectedId = 0)
+        private async Task<BillingInfoModel> PopulateCreditCard(CustomerDynamic currentCustomer, int selectedId = 0)
         {
             var creditCards = new List<BillingInfoModel>();
             foreach (
                 var creditCard in
                     currentCustomer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard))
             {
-                var billingInfoModel = _addressConverter.ToModel<BillingInfoModel>(creditCard.Address);
-                _customerPaymentMethodConverter.UpdateModel(billingInfoModel, creditCard);
+                var billingInfoModel = await _addressConverter.ToModelAsync<BillingInfoModel>(creditCard.Address);
+                await _customerPaymentMethodConverter.UpdateModelAsync(billingInfoModel, creditCard);
 
                 creditCards.Add(billingInfoModel);
             }
@@ -208,12 +209,12 @@ namespace VC.Public.Controllers
             return model;
         }
 
-        private ShippingInfoModel PopulateShippingAddress(CustomerDynamic currentCustomer, int selectedId = 0)
+        private async Task<ShippingInfoModel> PopulateShippingAddress(CustomerDynamic currentCustomer, int selectedId = 0)
         {
             var shippingAddresses = new List<ShippingInfoModel>();
             foreach (var shipping in currentCustomer.ShippingAddresses)
             {
-                var shippingModel = _addressConverter.ToModel<ShippingInfoModel>(shipping);
+                var shippingModel = await _addressConverter.ToModelAsync<ShippingInfoModel>(shipping);
 
                 shippingAddresses.Add(shippingModel);
             }
@@ -281,7 +282,7 @@ namespace VC.Public.Controllers
             var currentCustomer = await GetCurrentCustomerDynamic();
 
             var model =
-                _addressConverter.ToModel<ChangeProfileModel>(currentCustomer.ProfileAddress);
+                await _addressConverter.ToModelAsync<ChangeProfileModel>(currentCustomer.ProfileAddress);
 
             return View(model);
         }
@@ -324,7 +325,7 @@ namespace VC.Public.Controllers
             ViewBag.SuccessMessage = InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullyUpdated];
 
             model =
-                _addressConverter.ToModel<ChangeProfileModel>(customer.ProfileAddress);
+                await _addressConverter.ToModelAsync<ChangeProfileModel>(customer.ProfileAddress);
 
             return View(model);
         }
@@ -334,7 +335,7 @@ namespace VC.Public.Controllers
         {
             var currentCustomer = await GetCurrentCustomerDynamic();
 
-            return View(PopulateCreditCard(currentCustomer));
+            return View(await PopulateCreditCard(currentCustomer));
         }
 
         [HttpPost]
@@ -345,7 +346,7 @@ namespace VC.Public.Controllers
 
             if (!ModelState.IsValid)
             {
-                PopulateCreditCard(currentCustomer, model.Id);
+                await PopulateCreditCard(currentCustomer, model.Id);
                 return View(model);
             }
 
@@ -388,7 +389,7 @@ namespace VC.Public.Controllers
                     ModelState.AddModelError(string.Empty, message.Message);
                 }
 
-	            PopulateCreditCard(await GetCurrentCustomerDynamic(), model.Id);
+	            await PopulateCreditCard(await GetCurrentCustomerDynamic(), model.Id);
 
                 return View(model);
             }
@@ -406,7 +407,7 @@ namespace VC.Public.Controllers
                         model.Id = currentCustomer.CustomerPaymentMethods.Last(x => x.IdObjectType == (int) PaymentMethodType.CreditCard).Id
                 });
             }
-            return View(PopulateCreditCard(currentCustomer, model.Id));
+            return View(await PopulateCreditCard(currentCustomer, model.Id));
         }
 
         [HttpPost]
@@ -433,7 +434,7 @@ namespace VC.Public.Controllers
         {
             var currentCustomer = await GetCurrentCustomerDynamic();
 
-            return View(PopulateShippingAddress(currentCustomer));
+            return View(await PopulateShippingAddress(currentCustomer));
         }
 
         [HttpPost]
@@ -444,7 +445,7 @@ namespace VC.Public.Controllers
 
             if (!ModelState.IsValid)
             {
-                PopulateShippingAddress(currentCustomer, model.Id);
+                await PopulateShippingAddress(currentCustomer, model.Id);
                 return View(model);
             }
 
@@ -478,7 +479,7 @@ namespace VC.Public.Controllers
                 ModelState["Id"].RawValue = model.Id = currentCustomer.ShippingAddresses.Last().Id;
             }
 
-            return View(PopulateShippingAddress(currentCustomer, model.Id));
+            return View(await PopulateShippingAddress(currentCustomer, model.Id));
         }
 
         [HttpPost]
@@ -748,7 +749,7 @@ namespace VC.Public.Controllers
             if (order != null && order.Customer.Id==internalId)
             {
                 order.Customer = await CustomerService.SelectAsync(order.Customer.Id, true);
-                var model = _orderConverter.ToModel<OrderViewModel>(order);
+                var model = await _orderConverter.ToModelAsync<OrderViewModel>(order);
 
                 return View(model);
             }
@@ -901,13 +902,13 @@ namespace VC.Public.Controllers
                     orderModel.OrderStatus = healthWiseOrder.Order.OrderStatus;
                     orderModel.POrderStatus = healthWiseOrder.Order.POrderStatus;
                     orderModel.NPOrderStatus = healthWiseOrder.Order.NPOrderStatus;
-                    orderModel.Total = healthWiseOrder.Order.ProductsSubtotal;
+                    orderModel.DiscountedSubtotal = healthWiseOrder.Order.ProductsSubtotal - healthWiseOrder.Order.DiscountTotal;
                     toReturn.Items.Add(orderModel);
                 }
                 if (toReturn.Items.Count > 0)
                 {
                     toReturn.Count = toReturn.Items.Count;
-                    toReturn.AverageAmount = toReturn.Items.Sum(p => p.Total)/toReturn.Count;
+                    toReturn.AverageAmount = Math.Round(toReturn.Items.Sum(p => p.DiscountedSubtotal) /toReturn.Count,2);
                 }
             }
 

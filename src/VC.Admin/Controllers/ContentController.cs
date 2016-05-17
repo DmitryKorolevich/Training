@@ -8,6 +8,9 @@ using VC.Admin.Models.ContentManagement;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Validation.Models;
 using System.Security.Claims;
+using Templates;
+using Templates.Data;
+using Templates.Runtime;
 using VitalChoice.Core.Base;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -20,6 +23,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.ContentManagement;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VC.Admin.Models.EmailTemplates;
+using VitalChoice.ContentProcessing.Base;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Content.ContentCrossSells;
@@ -61,8 +65,6 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<IEnumerable<MasterContentItemListItemModel>>> GetMasterContentItems([FromBody]MasterContentItemListFilter filter)
         {
-            await productService.GenerateSkuGoogleItemsReportFile();
-
             return (await masterContentService.GetMasterContentItemsAsync(filter)).Select(p=>new MasterContentItemListItemModel(p)).ToList();
         }
 
@@ -84,6 +86,22 @@ namespace VC.Admin.Controllers
             var user = HttpContext.Request.HttpContext.User.GetUserId();
 
             return new MasterContentItemManageModel((await masterContentService.GetMasterContentItemAsync(id)));
+        }
+
+        [HttpPost]
+        [AdminAuthorize(PermissionType.Content)]
+        public Task<Result<IReadOnlyCollection<TtlCompileError>>> TryCompileTemplate([FromBody] TemplateValidationModel template)
+        {
+            using (var ttlTemplate = new TtlTemplate())
+            {
+                var results = ttlTemplate.TryCompilation(template.Template, new TemplateOptions
+                {
+                    AllowCSharp = true,
+                    ForceRemoveWhitespace = true,
+                    Data = new ContentViewContext(new Dictionary<string, object>(), null, ClaimsPrincipal.Current, ActionContext)
+                });
+                return Task.FromResult(new Result<IReadOnlyCollection<TtlCompileError>>(true, results.ErrorList));
+            }
         }
 
         [HttpPost]
@@ -522,23 +540,30 @@ namespace VC.Admin.Controllers
 
 		#endregion
 
-		#region
+		#region CrossItems
 
-	    private async Task<ContentCrossSellItemModel> PopulateContentCrossSellItemModel(ContentCrossSell item)
+	    private async Task<ContentCrossSellItemModel> PopulateContentCrossSellItemModel(ContentCrossSell item, ContentCrossSellType type)
 	    {
 		    var sku = await productService.GetSkuAsync(item.IdSku);
 
-		    return new ContentCrossSellItemModel()
-		    {
-			    Type = item.Type,
-			    Title = item.Title,
-			    ImageUrl = item.ImageUrl,
-			    IdSku = item.IdSku,
-			    Id = item.Id,
-				SkuCode = sku.Code,
-				RetailPrice = sku.Price,
-				WholesalePrice = sku.WholesalePrice
-		    };
+	        if (sku != null)
+	        {
+	            return new ContentCrossSellItemModel()
+	            {
+	                Type = item.Type,
+	                Title = item.Title,
+	                ImageUrl = item.ImageUrl,
+	                IdSku = item.IdSku,
+	                Id = item.Id,
+	                SkuCode = sku.Code,
+	                RetailPrice = sku.Price,
+	                WholesalePrice = sku.WholesalePrice
+	            };
+	        }
+	        else
+	        {
+	            return new ContentCrossSellItemModel() {Type = type};
+	        }
 	    }
 
 		private async Task<ContentCrossSellModel> PopulateContentCrossSellModel(IList<ContentCrossSell> contentCrossSells, ContentCrossSellType type)
@@ -548,7 +573,7 @@ namespace VC.Admin.Controllers
 			for (var i = 0; i < ContentConstants.CONTENT_CROSS_SELL_LIMIT; i++)
 			{
 				var item = contentCrossSells.SingleOrDefault(x => x.Order == i + 1);
-				var modelItem = item != null ? await PopulateContentCrossSellItemModel(item) : new ContentCrossSellItemModel() { Type = type };
+				var modelItem = item != null ? await PopulateContentCrossSellItemModel(item, type) : new ContentCrossSellItemModel() { Type = type };
 
 				model.Items.Add(modelItem);
 			}

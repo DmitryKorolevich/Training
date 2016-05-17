@@ -12,6 +12,7 @@ using VitalChoice.Interfaces.Services.Orders;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Queries.Orders;
 using VitalChoice.Business.Repositories;
+using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Ecommerce.Domain.Transfer;
@@ -21,6 +22,11 @@ using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 using VitalChoice.Data.Helpers;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Entities.Discounts;
+using VitalChoice.Ecommerce.Domain.Entities.Payment;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Interfaces.Services.Settings;
 
 namespace VitalChoice.Business.Services.Orders
@@ -33,6 +39,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IRepositoryAsync<AdminTeam> _adminTeamRepository;
         private readonly SPEcommerceRepository _sPEcommerceRepository;
         private readonly ICountryService _countryService;
+        private readonly IAppInfrastructureService _appInfrastructureService;
         private readonly ILogger _logger;
 
         public OrderReportService(
@@ -42,6 +49,7 @@ namespace VitalChoice.Business.Services.Orders
             IRepositoryAsync<AdminTeam> adminTeamRepository,
             SPEcommerceRepository sPEcommerceRepository,
             ICountryService countryService,
+            IAppInfrastructureService appInfrastructureService,
             ILoggerProviderExtended loggerProvider)
         {
             _orderService = orderService;
@@ -50,6 +58,7 @@ namespace VitalChoice.Business.Services.Orders
             _adminTeamRepository = adminTeamRepository;
             _sPEcommerceRepository = sPEcommerceRepository;
             _countryService = countryService;
+            _appInfrastructureService = appInfrastructureService;
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -509,6 +518,7 @@ namespace VitalChoice.Business.Services.Orders
                 item.ShippingLastName = p.ShippingAddress?.SafeData.LastName;
                 item.ShippingAddress1 = p.ShippingAddress?.SafeData.Address1;
                 item.ShippingAddress1 = p.ShippingAddress?.SafeData.Address2;
+                item.Zip = p.ShippingAddress?.SafeData.Zip;
                 item.City = p.ShippingAddress?.SafeData.City;
                 item.Country = countries.FirstOrDefault(x=>x.Id==p.ShippingAddress?.IdCountry)?.CountryCode;
                 item.StateCode = countries.SelectMany(x=>x.States).FirstOrDefault(x => x.Id == p.ShippingAddress?.IdState)?.StateCode;
@@ -522,8 +532,71 @@ namespace VitalChoice.Business.Services.Orders
                     Quantity = x.Quantity,
                 }).ToList();
 
+                item.Skus.AddRange(p.PromoSkus.Select(x => new WholesaleDropShipReportSkuItem()
+                {
+                    Id = x.Sku?.Id ?? 0,
+                    Code = x.Sku?.Code,
+                    Price = x.Amount,
+                    Quantity = x.Quantity,
+                }));
+
                 toReturn.Items.Add(item);
             });
+
+            return toReturn;
+        }
+
+        public async Task<PagedList<TransactionAndRefundReportItem>> GetTransactionAndRefundReportItemsAsync(TransactionAndRefundReportFilter filter)
+        {
+            PagedList<TransactionAndRefundReportItem> toReturn = new PagedList<TransactionAndRefundReportItem>();
+
+            var dbItems = await _sPEcommerceRepository.GetTransactionAndRefundReportItemsAsync(filter);
+
+            dbItems.ForEach(p =>
+            {
+                TransactionAndRefundReportItem item = new TransactionAndRefundReportItem();
+                item.IdOrder = p.IdOrder;
+                item.IdOrderSource = p.IdOrderSource;
+                item.Rank = p.Rank;
+                item.IdObjectType = (OrderType)p.IdObjectType;
+                item.OrderStatus = (OrderStatus?) p.OrderStatus;
+                item.POrderStatus = (OrderStatus?)p.POrderStatus;
+                item.NPOrderStatus = (OrderStatus?)p.NPOrderStatus;
+                item.ServiceCode = p.ServiceCode;
+                item.ServiceCodeName =  p.ServiceCode.HasValue ? _appInfrastructureService.Data().ServiceCodes.FirstOrDefault(pp=>p.ServiceCode.Value==pp.Key)?.Text : null;
+                item.IdCustomer = p.IdCustomer;
+                item.CustomerFirstName = p.CustomerFirstName;
+                item.CustomerLastName = p.CustomerLastName;
+                item.CustomerIdObjectType = (CustomerType)p.CustomerIdObjectType;
+                item.ProductsSubtotal = p.ProductsSubtotal;
+                item.DiscountTotal = p.DiscountTotal;
+                item.DiscountedSubtotal = p.IdObjectType == (int) OrderType.Refund ? -(p.ProductsSubtotal - p.DiscountTotal) : p.ProductsSubtotal - p.DiscountTotal;
+                item.ShippingTotal = p.ShippingTotal;
+                item.TaxTotal = p.TaxTotal;
+                item.Total = p.IdObjectType == (int)OrderType.Refund ? -p.Total : p.Total;
+                item.ReturnAssociated = p.ReturnAssociated;
+                item.PaymentMethodIdObjectType = (PaymentMethodType?)p.PaymentMethodIdObjectType;
+                item.DiscountIdObjectType = (DiscountType?)p.DiscountIdObjectType;
+                item.DiscountPercent = p.DiscountPercent;
+                item.IdSku = p.IdSku;
+                item.IdProduct = p.IdProduct;
+                item.Code = p.Code;
+                item.DisplayName = p.ProductName;
+                if (!string.IsNullOrEmpty(p.ProductSubTitle))
+                {
+                    item.DisplayName += " " + p.ProductSubTitle;
+                }
+                item.DisplayName += $" ({p.SkuQTY})";
+                item.OrderQuantity = p.OrderQuantity;
+                item.ProductIdObjectType = (ProductType?)p.ProductIdObjectType;
+                item.Price = p.IdObjectType==(int)OrderType.Refund ? -p.Price : p.Price;
+                item.RefundIdRedeemType = (RedeemType?)p.RefundIdRedeemType;
+                item.RefundProductPercent = p.RefundProductPercent;
+                item.Override = "no";
+
+                toReturn.Items.Add(item);
+            });
+            toReturn.Count = dbItems.Count > 0 ? dbItems.First().TotalCount : 0;
 
             return toReturn;
         }

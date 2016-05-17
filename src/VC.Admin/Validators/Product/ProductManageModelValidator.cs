@@ -31,21 +31,22 @@ namespace VC.Admin.Validators.Product
         public VideoModelValidator()
         {
             RuleFor(model => model.Image)
-                .NotEmpty()
-                .WithMessage(model => model.Image, ValidationMessages.FieldRequired)
-                .Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
+                //.NotEmpty()
+                //.WithMessage(model => model.Image, ValidationMessages.FieldRequired)
+                .Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE)
+                .WithMessage(model => model.Video, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
 
             RuleFor(model => model.Video)
                 .Cascade(CascadeMode.StopOnFirstFailure)
-                .NotEmpty()
-                .WithMessage(model => model.Video, ValidationMessages.FieldRequired)
+                //.NotEmpty()
+                //.WithMessage(model => model.Video, ValidationMessages.FieldRequired)
                 .Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE)
                 .WithMessage(model => model.Video, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
 
             RuleFor(model => model.Text)
                 .Cascade(CascadeMode.StopOnFirstFailure)
-                .NotEmpty()
-                .WithMessage(model => model.Text, ValidationMessages.FieldRequired)
+                //.NotEmpty()
+                //.WithMessage(model => model.Text, ValidationMessages.FieldRequired)
                 .Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE)
                 .WithMessage(model => model.Text, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
         }
@@ -223,6 +224,11 @@ namespace VC.Admin.Validators.Product
         {
             public SKUModelValidator()
             {
+                RuleFor(model => model.QTY)
+                    .Cascade(CascadeMode.StopOnFirstFailure)
+                    .NotEmpty()
+                    .WithMessage(model => model.QTY, ValidationMessages.FieldRequired);
+
                 RuleFor(model => model.Name)
                     .NotEmpty()
                     .WithMessage(model => model.Name, ValidationMessages.FieldRequired)

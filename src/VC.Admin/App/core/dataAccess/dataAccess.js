@@ -25,5 +25,6 @@ angular.module('app.dataAccess', [
 	'app.core.dataAccess.services.redirectService',
     'app.core.dataAccess.services.cacheService',
     'app.core.dataAccess.services.inventorySkuService',
-    'app.core.dataAccess.services.serviceCodeService'
+    'app.core.dataAccess.services.serviceCodeService',
+    'app.core.dataAccess.services.templateService'
 ]);

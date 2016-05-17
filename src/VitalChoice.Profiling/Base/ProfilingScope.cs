@@ -34,10 +34,7 @@ namespace VitalChoice.Profiling.Base
                 {
                     _currentId++;
                     Id = _currentId;
-                }
-                _scopeStack = GetProfileStack();
-                lock (_scopeStack)
-                {
+                    _scopeStack = GetProfileStack();
                     _scopeStack.Push(this);
                 }
                 _stopwatch = new Stopwatch();
@@ -126,12 +123,12 @@ namespace VitalChoice.Profiling.Base
                 return;
             if (Enabled)
             {
-                if (AdditionalData == null)
+                lock (LockObject)
                 {
-                    AdditionalData = new List<object>();
-                }
-                lock (AdditionalData)
-                {
+                    if (AdditionalData == null)
+                    {
+                        AdditionalData = new List<object>();
+                    }
                     AdditionalData.Add(data);
                 }
             }
@@ -153,23 +150,25 @@ namespace VitalChoice.Profiling.Base
                 {
                     GC.SuppressFinalize(this);
                 }
-                if (!_disposed)
+                if (!_disposed && _scopeStack != null)
                 {
-                    _disposed = true;
-                    var stack = GetProfileStack();
-                    if (stack.Count > 0)
+                    lock (LockObject)
                     {
-                        stack.Pop();
-                        if (stack.Count > 0)
+                        _disposed = true;
+                        if (_scopeStack.Count > 0)
                         {
-                            var parent = stack.Peek();
-                            if (parent._subScopes == null)
+                            _scopeStack.Pop();
+                            if (_scopeStack.Count > 0)
                             {
-                                parent._subScopes = new List<ProfilingScope>();
-                            }
-                            lock (parent._subScopes)
-                            {
-                                parent._subScopes.Add(this);
+                                var parent = _scopeStack.Peek();
+                                if (parent._subScopes == null)
+                                {
+                                    parent._subScopes = new List<ProfilingScope>();
+                                }
+                                lock (parent._subScopes)
+                                {
+                                    parent._subScopes.Add(this);
+                                }
                             }
                         }
                     }

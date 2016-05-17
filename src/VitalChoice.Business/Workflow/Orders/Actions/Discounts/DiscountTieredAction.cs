@@ -18,7 +18,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Discounts
         public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
             dataContext.FreeShipping = dataContext.Order.Discount.Data.FreeShipping;
-            var discountableSubtotal = dataContext.Data.DiscountableSubtotal;
+            var discountableSubtotal = (decimal)dataContext.Data.DiscountableSubtotal;
             foreach (var tier in dataContext.Order.Discount.DiscountTiers)
             {
                 if (discountableSubtotal >= tier.From && (tier.To == null || discountableSubtotal <= tier.To))
@@ -28,9 +28,9 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Discounts
                     switch (tier.IdDiscountType)
                     {
                         case DiscountType.PriceDiscount:
-                            return Task.FromResult<decimal>(-Math.Min(discountableSubtotal, tier.Amount ?? 0));
+                            return Task.FromResult(-Math.Min(discountableSubtotal, tier.Amount ?? 0));
                         case DiscountType.PercentDiscount:
-                            return Task.FromResult(-(tier.Percent ?? 0)*(decimal) discountableSubtotal/100);
+                            return Task.FromResult(-(tier.Percent ?? 0)*discountableSubtotal/100);
                         default:
                             throw new ArgumentOutOfRangeException();
                     }

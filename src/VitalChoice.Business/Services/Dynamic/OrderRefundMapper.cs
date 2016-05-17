@@ -12,11 +12,13 @@ using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Interfaces.Services.InventorySkus;
+using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.ObjectMapping.Interfaces;
 
@@ -28,19 +30,21 @@ namespace VitalChoice.Business.Services.Dynamic
         private readonly IEcommerceRepositoryAsync<OrderToGiftCertificate> _orderToGiftCertificateRepository;
         private readonly OrderAddressMapper _orderAddressMapper;
         private readonly OrderPaymentMethodMapper _orderPaymentMethodMapper;
+        private readonly IOrderService _orderService;
 
         public OrderRefundMapper(ITypeConverter converter,
             IModelConverterService converterService,
             IEcommerceRepositoryAsync<OrderOptionType> orderRepositoryAsync, OrderAddressMapper orderAddressMapper,
             OrderPaymentMethodMapper orderPaymentMethodMapper, 
             SkuMapper skuMapper,
-            IEcommerceRepositoryAsync<OrderToGiftCertificate> orderToGiftCertificateRepository)
+            IEcommerceRepositoryAsync<OrderToGiftCertificate> orderToGiftCertificateRepository, IOrderService orderService)
             : base(converter, converterService, orderRepositoryAsync)
         {
             _skuMapper = skuMapper;
             _orderAddressMapper = orderAddressMapper;
             _orderPaymentMethodMapper = orderPaymentMethodMapper;
             _orderToGiftCertificateRepository = orderToGiftCertificateRepository;
+            _orderService = orderService;
         }
 
         protected override async Task FromEntityRangeInternalAsync(
@@ -58,7 +62,11 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.ShippingTotal = entity.ShippingTotal;
                 dynamic.TaxTotal = entity.TaxTotal;
                 dynamic.Total = entity.Total;
-                dynamic.IdOrderSource = entity.IdOrderSource;
+                if (!entity.IdOrderSource.HasValue)
+                {
+                    throw new ApiException("Cannot get original order id");
+                }
+                dynamic.IdOrderSource = entity.IdOrderSource.Value;
 
                 dynamic.Customer = new CustomerDynamic() { Id = entity.IdCustomer };
 
@@ -84,7 +92,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 if (entity.RefundOrderToGiftCertificates != null)
                 {
                     dynamic.RefundOrderToGiftCertificates.AddRange(entity.RefundOrderToGiftCertificates.Select(
-                        s => new RefundOrderToGiftCertificateUsed()
+                        s => new RefundOrderToGiftCertificateUsed
                         {
                             IdOrder = s.IdOrder,
                             IdGiftCertificate = s.IdGiftCertificate,
@@ -93,6 +101,7 @@ namespace VitalChoice.Business.Services.Dynamic
                             Code = s.OrderToGiftCertificate?.GiftCertificate?.Code,
                         }));
                 }
+                dynamic.OriginalOrder = await _orderService.SelectAsync(entity.IdOrderSource ?? -1, true);
             });
         }
 
@@ -129,15 +138,20 @@ namespace VitalChoice.Business.Services.Dynamic
                     IdSku = s.Sku.Id,
                 }));
 
-                entity.RefundOrderToGiftCertificates = new List<RefundOrderToGiftCertificate>(dynamic.RefundOrderToGiftCertificates.
-                    Where(p => p.Amount > 0).Select(s => new RefundOrderToGiftCertificate
-                    {
-                        IdOrder = s.IdOrder,
-                        IdGiftCertificate = s.IdGiftCertificate,
-                        Amount = s.Amount,
-                        OrderToGiftCertificate = _orderToGiftCertificateRepository.Query(p => p.IdOrder == s.IdOrder &&
-                            p.IdGiftCertificate == s.IdGiftCertificate).Include(p => p.GiftCertificate).SelectFirstOrDefaultAsync(true).Result,
-                    }));
+                entity.RefundOrderToGiftCertificates = new List<RefundOrderToGiftCertificate>();
+                await entity.RefundOrderToGiftCertificates.AddRangeAsync(
+                    dynamic.RefundOrderToGiftCertificates.
+                        Where(p => p.Amount > 0).Select(async s => new RefundOrderToGiftCertificate
+                        {
+                            IdOrder = s.IdOrder,
+                            IdGiftCertificate = s.IdGiftCertificate,
+                            Amount = s.Amount,
+                            OrderToGiftCertificate = await _orderToGiftCertificateRepository.Query(p => p.IdOrder == s.IdOrder &&
+                                                                                                        p.IdGiftCertificate ==
+                                                                                                        s.IdGiftCertificate)
+                                .Include(p => p.GiftCertificate)
+                                .SelectFirstOrDefaultAsync(true),
+                        }));
                 foreach (var refundOrderToGiftCertificate in entity.RefundOrderToGiftCertificates)
                 {
                     if (refundOrderToGiftCertificate?.OrderToGiftCertificate?.GiftCertificate != null)

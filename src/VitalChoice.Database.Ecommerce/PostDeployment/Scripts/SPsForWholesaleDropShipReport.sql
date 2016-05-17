@@ -13,7 +13,7 @@ CREATE PROCEDURE [dbo].[SPGetOrderIdsForWholesaleDropShipReport]
 	@shipfrom datetime2 = NULL,
 	@shipto datetime2 = NULL, 
 	@idcustomertype int = NULL,
-	@idtradeclass nvarchar(250) = NULL,
+	@idtradeclass int = NULL,
 	@customerfirstname nvarchar(250) = NULL,
 	@customerlastname nvarchar(250) = NULL,
 	@shipfirstname nvarchar(250) = NULL,
@@ -56,7 +56,7 @@ BEGIN
 				JOIN Customers c WITH(NOLOCK) ON o.IdCustomer=c.Id
 				WHERE
 					o.DateCreated>=@from AND o.DateCreated<=@to AND
-					o.StatusCode!=3 AND o.IdObjectType!=5 AND o.IdObjectType!=6 AND
+					o.StatusCode!=3 AND o.IdObjectType!=5 AND o.IdObjectType!=6 AND o.IdObjectType!=2 AND
 					((o.OrderStatus IS NOT NULL AND o.OrderStatus!=1 AND o.OrderStatus!=4) OR 
 					(o.OrderStatus IS NULL AND o.POrderStatus!=1 AND o.POrderStatus!=4 AND
 					o.NPOrderStatus!=1 AND o.NPOrderStatus!=4)) AND
@@ -95,7 +95,7 @@ BEGIN
 				JOIN Customers c WITH(NOLOCK) ON o.IdCustomer=c.Id
 				WHERE
 					o.DateCreated>=@from AND o.DateCreated<=@to AND
-					o.StatusCode!=3 AND o.IdObjectType!=5 AND o.IdObjectType!=6 AND
+					o.StatusCode!=3 AND o.IdObjectType!=5 AND o.IdObjectType!=6 AND o.IdObjectType!=2 AND 
 					((o.OrderStatus IS NOT NULL AND o.OrderStatus!=1 AND o.OrderStatus!=4) OR 
 					(o.OrderStatus IS NULL AND o.POrderStatus!=1 AND o.POrderStatus!=4 AND
 					o.NPOrderStatus!=1 AND o.NPOrderStatus!=4)) AND
@@ -125,6 +125,7 @@ BEGIN
 		SELECT Id FROM
 			(SELECT Id, ROW_NUMBER() OVER (ORDER BY Id DESC) AS RowNumber FROM orderids) temp
 		WHERE @pageindex is NULL OR (RowNumber>(@pageindex-1)*@pagesize AND RowNumber<=@pageindex*@pagesize)
+		ORDER BY Id DESC
 	END	 
 
 END
@@ -146,7 +147,7 @@ CREATE PROCEDURE [dbo].[SPGetWholesaleDropShipReportSkusSummary]
 	@shipfrom datetime2 = NULL,
 	@shipto datetime2 = NULL, 
 	@idcustomertype int = NULL,
-	@idtradeclass nvarchar(250) = NULL,
+	@idtradeclass int = NULL,
 	@customerfirstname nvarchar(250) = NULL,
 	@customerlastname nvarchar(250) = NULL,
 	@shipfirstname nvarchar(250) = NULL,

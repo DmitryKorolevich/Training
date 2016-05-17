@@ -19,7 +19,33 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
 
         public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            var skus = dataContext.RefundSkus;
+            List<RefundSkuOrdered> skus = new List<RefundSkuOrdered>();
+            var originalPromos = dataContext.Order.OriginalOrder.PromoSkus.ToDictionary(p => p.Sku.Id);
+            foreach (var refundSku in dataContext.Order.RefundSkus)
+            {
+                PromoOrdered promo;
+                if (originalPromos.TryGetValue(refundSku.Sku.Id, out promo))
+                {
+                    var newQuantity = refundSku.Quantity - promo.Quantity;
+                    if (newQuantity > 0)
+                    {
+                        skus.Add(new RefundSkuOrdered
+                        {
+                            RefundValue = refundSku.RefundValue,
+                            RefundPercent = refundSku.RefundPercent,
+                            Quantity = newQuantity,
+                            Sku = refundSku.Sku,
+                            Redeem = refundSku.Redeem,
+                            Messages = refundSku.Messages,
+                            RefundPrice = refundSku.RefundPrice
+                        });
+                    }
+                }
+                else
+                {
+                    skus.Add(refundSku);
+                }
+            }
             if (dataContext.Order.Discount != null)
             {
                 if (dataContext.Order.Discount.ExcludeCategories)
@@ -126,7 +152,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
                 if (dataContext.Order.Discount.SkusAppliedOnlyTo?.Any() ?? false)
                 {
                     var selectedSkus = skus.IntersectKeyedWith(dataContext.Order.Discount.SkusAppliedOnlyTo, sku => sku.Sku.Id,
-                        selectedSku => selectedSku.IdSku).ToArray();
+                        selectedSku => selectedSku.IdSku).ToList();
                     if (!selectedSkus.Any())
                     {
                         dataContext.Messages.Add(new MessageInfo
@@ -145,8 +171,8 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
                     }
                     HashSet<int> categories = new HashSet<int>(dataContext.Order.Discount.CategoryIdsAppliedOnlyTo);
                     var selectedSkus =
-                        skus.Where(s => s.Sku.Product.CategoryIds.Any(c => categories.Contains(c))).ToArray();
-                    
+                        skus.Where(s => s.Sku.Product.CategoryIds.Any(c => categories.Contains(c))).ToList();
+
                     if (!selectedSkus.Any())
                     {
                         dataContext.Messages.Add(new MessageInfo
@@ -158,7 +184,10 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
                     skus = selectedSkus;
                 }
             }
-            return Task.FromResult(skus.Where(s => !((bool?)s.Sku.SafeData.NonDiscountable ?? false)).Sum(s => s.RefundPrice * (decimal)s.RefundPercent / 100 * s.Quantity));
+            return
+                Task.FromResult(
+                    skus.Where(s => !((bool?) s.Sku.SafeData.NonDiscountable ?? false))
+                        .Sum(s => s.RefundPrice*(decimal) s.RefundPercent/100*s.Quantity));
         }
     }
 }

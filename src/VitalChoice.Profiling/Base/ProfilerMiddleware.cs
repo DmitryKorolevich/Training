@@ -50,6 +50,19 @@ namespace VitalChoice.Profiling.Base
                         }
                     }
                 }
+                try
+                {
+                    var root = ProfilingScope.GetRootScope();
+                    root?.Dispose();
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e.Message, e);
+                }
+            }
+            else
+            {
+                await _requestDelegate.Invoke(context);
             }
 #endif
         }

@@ -9,6 +9,11 @@ namespace VitalChoice.Business.CsvExportMaps
     {
         public ProductCategoryStatisticTreeItemCsvMap()
         {
+            MapValues();
+        }
+
+        private void MapValues()
+        {
             Map(m => m.Id).Name("Id").Index(0);
             Map(m => m.Name).Name("Name").Index(1);
             Map(m => m.Amount).Name("Tota").Index(2).TypeConverterOption("c");

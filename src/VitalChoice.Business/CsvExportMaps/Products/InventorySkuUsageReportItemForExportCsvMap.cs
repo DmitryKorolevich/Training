@@ -11,6 +11,11 @@ namespace VitalChoice.Business.CsvExportMaps.Products
     {
         public InventorySkuUsageReportItemForExportCsvMap()
         {
+            MapValues();
+        }
+
+        private void MapValues()
+        {
             Map(m => m.SkuCode).Name("Product SKU").Index(0);
             Map(m => m.TotalSkuQuantity).Name("Quantity").Index(1);
             Map(m => m.Assemble).Name("Assemble").Index(2);

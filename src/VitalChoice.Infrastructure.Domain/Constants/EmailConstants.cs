@@ -22,5 +22,8 @@
         public const string GLOrdersImportEmail = "GLOrdersImportEmail";
         public const string OrderConfirmationEmail = "OrderConfirmationEmail";
         public const string OrderShippingConfirmationEmail = "OrderShippingConfirmationEmail";
+        public const string OrderProductReviewEmail = "OrderProductReviewEmail";
+        
+        public const int OrderProductReviewEmailDaysCount = 15;
     }
 }

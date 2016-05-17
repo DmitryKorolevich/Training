@@ -78,7 +78,7 @@ function controlSectionState(selector, controlId) {
     }
 }
 
-var lastPrefShipMethodLabel = "Best";
+var lastPrefShipMethodLabel = null;
 
 function controlUseBillingState(selector, controlId) {
     var jSel = $(selector);
@@ -104,7 +104,9 @@ function controlUseBillingState(selector, controlId) {
         jDrop.show();
         jChkContainer.show();
         jSpan.show();
-        jPrefShipMethod.text(lastPrefShipMethodLabel);
+        if (lastPrefShipMethodLabel !== null) {
+            jPrefShipMethod.text(lastPrefShipMethodLabel);
+        }
         //controlSectionState("#ddShippingAddressesSelection", "#chkSelectOther");
     }
 }

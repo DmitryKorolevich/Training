@@ -9,14 +9,11 @@ using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.DynamicData.Interfaces
 {
+    // ReSharper disable once UnusedTypeParameter
     public interface IDynamicMapper<TDynamic, TEntity> : IObjectMapper<TDynamic> 
         where TDynamic : MappedObject, new()
         where TEntity: DynamicDataEntity
     {
-        TDynamic FromModel<TModel>(TModel model, int idObjectType);
-        void UpdateObject<TModel>(TModel model, TDynamic obj, int idObjectType, bool loadDefaults = true)
-            where TModel : class, new();
-
         Task<TDynamic> FromModelAsync<TModel>(TModel model, int idObjectType);
         Task UpdateObjectAsync<TModel>(TModel model, TDynamic obj, int idObjectType, bool loadDefaults = true)
             where TModel : class, new();

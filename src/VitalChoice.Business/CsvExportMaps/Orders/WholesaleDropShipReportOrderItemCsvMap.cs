@@ -17,6 +17,11 @@ namespace VitalChoice.Business.CsvExportMaps.Orders
     {
         public WholesaleDropShipReportOrderItemCsvMap()
         {
+            MapValues();
+        }
+
+        private void MapValues()
+        {
             Map(m => m.IdOrder).Name("Order ID").Index(0);
             Map(m => m.OrderStatus).Name("Status").Index(1).TypeConverter<OrderStatusConverter>();
             Map(m => m.POrderStatus).Name("P Status").Index(2).TypeConverter<OrderStatusConverter>();
@@ -33,37 +38,26 @@ namespace VitalChoice.Business.CsvExportMaps.Orders
             Map(m => m.ShippingAddress2).Name("Address 2").Index(13);
             Map(m => m.City).Name("City").Index(14);
             Map(m => m.StateCode).Name("State").Index(15);
-            Map(m => m.Country).Name("Country").Index(16);
-            Map(m => m.Phone).Name("Phone").Index(17);
-            Map(m => m.ShipDate).Name("Ship Date").Index(18);
-            Map(m => m.ShippingCarrier).Name("Shipping Carrier").Index(19);
-            Map(m => m.ShippingIdConfirmation).Name("Shipping Confirmation #").Index(20);
-            Map(m => m.Skus).Name("Products").Index(21).TypeConverter<SkusConverter>();
+            Map(m => m.Zip).Name("Postal Code").Index(16);
+            Map(m => m.Country).Name("Country").Index(17);
+            Map(m => m.Phone).Name("Phone").Index(18);
+            Map(m => m.ShipDate).Name("Ship Date").Index(19);
+            Map(m => m.ShippingCarrier).Name("Shipping Carrier").Index(20);
+            Map(m => m.ShippingIdConfirmation).Name("Shipping Confirmation #").Index(21);
+            Map(m => m.Skus).Name("Products").Index(22).TypeConverter<SkusConverter>();
         }
 
-        public class SkusConverter : DefaultTypeConverter
+        private class SkusConverter : DefaultTypeConverter
         {
             public override string ConvertToString(TypeConverterOptions options, object value)
             {
-                var data = value != null ? ((ICollection<WholesaleDropShipReportSkuItem>)value).ToList() : null;
-                var toReturn = string.Empty;
-                if (data!=null)
-                {
-                    for (int i = 0; i < data.Count; i++)
-                    {
-                        toReturn += $"{data[i].Code} ({data[i].Quantity})";
-                        if (i != data.Count - 1)
-                        {
-                            toReturn += ", ";
-                        }
-                    }
-                }
-                return toReturn;
+                var data = value as ICollection<WholesaleDropShipReportSkuItem>;
+                return data != null ? string.Join(", ", data.Select(d => $"{d.Code} ({d.Quantity})")) : string.Empty;
             }
 
             public override bool CanConvertTo(Type type)
             {
-                return type == typeof(ICollection<WholesaleDropShipReportSkuItem>);
+                return true;
             }
         }
     }

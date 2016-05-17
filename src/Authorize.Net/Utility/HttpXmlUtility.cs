@@ -276,7 +276,7 @@ namespace Authorize.Net.Utility
                         break;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //BUG: log
             }

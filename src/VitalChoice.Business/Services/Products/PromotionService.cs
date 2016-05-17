@@ -77,8 +77,8 @@ namespace VitalChoice.Business.Services.Products
         protected override IQueryLite<Promotion> BuildIncludes(IQueryLite<Promotion> query)
         {
             return query.Include(p => p.PromotionsToBuySkus)
-                        .Include(p => p.PromotionsToGetSkus)
-                        .Include(p => p.PromotionsToSelectedCategories);
+                .Include(p => p.PromotionsToGetSkus)
+                .Include(p => p.PromotionsToSelectedCategories);
         }
 
         protected override async Task AfterSelect(ICollection<Promotion> entities)
@@ -212,7 +212,7 @@ namespace VitalChoice.Business.Services.Products
         {
             return SelectAsync(
                 new PromotionQuery().IsActive()
-                    .WithExpiredType(ExpiredType.NotExpired)
+                    .WithDateStatus(DateStatus.Live)
                     .AllowCustomerType(customerType), withDefaults: true);
         }
 

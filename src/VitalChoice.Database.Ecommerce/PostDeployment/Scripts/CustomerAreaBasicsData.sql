@@ -559,4 +559,12 @@ BEGIN
 	WHERE IdObjectType=3
 END
 
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[CustomerOptionTypes] WHERE IdObjectType = 1 AND Name=N'HasHealthwiseOrders')
+BEGIN
+	INSERT INTO CustomerOptionTypes
+	(Name, IdFieldType, IdLookup, IdObjectType, DefaultValue)
+	VALUES
+	(N'HasHealthwiseOrders', 5, NULL, 1, N'False')
+END
+
 GO

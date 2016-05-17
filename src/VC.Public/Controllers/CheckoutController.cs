@@ -119,7 +119,7 @@ namespace VC.Public.Controllers
             {
                 user = await _storefrontUserService.SignInAsync(model.Email, model.Password);
             }
-            catch (WholesalePendingException e)
+            catch (WholesalePendingException)
             {
                 return Redirect("/content/wholesale-review");
             }
@@ -143,8 +143,8 @@ namespace VC.Public.Controllers
                 var creditCard = currentCustomer.CustomerPaymentMethods
                     .Single(p => p.IdObjectType == (int) PaymentMethodType.CreditCard && p.Id == id);
 
-                var billingInfoModel = _addressConverter.ToModel<AddUpdateBillingAddressModel>(creditCard.Address);
-                _paymentMethodConverter.UpdateModel<BillingInfoModel>(billingInfoModel, creditCard);
+                var billingInfoModel = await _addressConverter.ToModelAsync<AddUpdateBillingAddressModel>(creditCard.Address);
+                await _paymentMethodConverter.UpdateModelAsync<BillingInfoModel>(billingInfoModel, creditCard);
 
                 billingInfoModel.Email = currentCustomer.Email;
 
@@ -179,13 +179,13 @@ namespace VC.Public.Controllers
                 {
                     if (cart.Order.PaymentMethod?.Address == null || cart.Order.PaymentMethod.Id == 0)
                     {
-                        _addressConverter.UpdateModel(addUpdateModel, firstCreditCard.Address);
-                        _paymentMethodConverter.UpdateModel<BillingInfoModel>(addUpdateModel, firstCreditCard);
+                        await _addressConverter.UpdateModelAsync(addUpdateModel, firstCreditCard.Address);
+                        await _paymentMethodConverter.UpdateModelAsync<BillingInfoModel>(addUpdateModel, firstCreditCard);
                     }
                     else
                     {
-                        _addressConverter.UpdateModel(addUpdateModel, cart.Order.PaymentMethod.Address);
-                        _orderPaymentMethodConverter.UpdateModel<BillingInfoModel>(addUpdateModel, cart.Order.PaymentMethod);
+                        await _addressConverter.UpdateModelAsync(addUpdateModel, cart.Order.PaymentMethod.Address);
+                        await _orderPaymentMethodConverter.UpdateModelAsync<BillingInfoModel>(addUpdateModel, cart.Order.PaymentMethod);
                     }
 
                     await PopulateCreditCardsLookup();
@@ -194,8 +194,8 @@ namespace VC.Public.Controllers
                 {
                     if (cart.Order.PaymentMethod?.Address != null && cart.Order.PaymentMethod.Id != 0)
                     {
-                        _addressConverter.UpdateModel(addUpdateModel, cart.Order.PaymentMethod.Address);
-                        _orderPaymentMethodConverter.UpdateModel<BillingInfoModel>(addUpdateModel, cart.Order.PaymentMethod);
+                        await _addressConverter.UpdateModelAsync(addUpdateModel, cart.Order.PaymentMethod.Address);
+                        await _orderPaymentMethodConverter.UpdateModelAsync<BillingInfoModel>(addUpdateModel, cart.Order.PaymentMethod);
                     }
                 }
 
@@ -205,8 +205,8 @@ namespace VC.Public.Controllers
             {
                 if (cart.Order.PaymentMethod?.Address != null && cart.Order.PaymentMethod.Id != 0)
                 {
-                    _addressConverter.UpdateModel(addUpdateModel, cart.Order.PaymentMethod.Address);
-                    _orderPaymentMethodConverter.UpdateModel<BillingInfoModel>(addUpdateModel, cart.Order.PaymentMethod);
+                    await _addressConverter.UpdateModelAsync(addUpdateModel, cart.Order.PaymentMethod.Address);
+                    await _orderPaymentMethodConverter.UpdateModelAsync<BillingInfoModel>(addUpdateModel, cart.Order.PaymentMethod);
                 }
                 addUpdateModel.Email = cart.Order.Customer?.Email;
             }
@@ -356,7 +356,7 @@ namespace VC.Public.Controllers
 
             var shippingModel = new AddUpdateShippingMethodModel();
 
-            _addressConverter.UpdateModel<ShippingInfoModel>(shippingModel, shipping);
+            await _addressConverter.UpdateModelAsync<ShippingInfoModel>(shippingModel, shipping);
 
 			shippingModel.ShipAddressIdToOverride = shipping.Id == cart.Order.ShippingAddress.Id ? null : (int?)shipping.Id;
 
@@ -390,20 +390,15 @@ namespace VC.Public.Controllers
                 if (cart.Order.ShippingAddress != null && cart.Order.ShippingAddress.Id != 0 &&
                     !string.IsNullOrEmpty(cart.Order.ShippingAddress.SafeData.FirstName))
                 {
-                    _addressConverter.UpdateModel<ShippingInfoModel>(shippingMethodModel, cart.Order.ShippingAddress);
+                    await _addressConverter.UpdateModelAsync(shippingMethodModel, cart.Order.ShippingAddress);
                 }
                 else if (defaultShipping != null)
                 {
-                    _addressConverter.UpdateModel<ShippingInfoModel>(shippingMethodModel, defaultShipping);
+                    await _addressConverter.UpdateModelAsync(shippingMethodModel, defaultShipping);
 					shippingMethodModel.ShipAddressIdToOverride = defaultShipping.Id;
 				}
-                //else
-                //{
-                //    _addressConverter.UpdateModel<ShippingInfoModel>(shippingMethodModel, currentCustomer.ProfileAddress);
-                //}
                 shippingMethodModel.IsGiftOrder = cart.Order.SafeData.GiftOrder;
                 shippingMethodModel.GiftMessage = cart.Order.SafeData.GiftMessage;
-                //shippingMethodModel.DeliveryInstructions = cart.Order.SafeData.DeliveryInstructions;
                 var addresses = GetShippingAddresses(cart.Order, currentCustomer);
                 var i = 0;
                 ViewBag.ShippingAddresses = addresses.ToDictionary(x => i++,
@@ -443,10 +438,8 @@ namespace VC.Public.Controllers
                         {
                             cart.Order.ShippingAddress =
                                 await _addressConverter.FromModelAsync(
-                                    _addressConverter.ToModel<AddUpdateShippingMethodModel>(cart.Order.PaymentMethod.Address),
+                                    await _addressConverter.ToModelAsync<AddUpdateShippingMethodModel>(cart.Order.PaymentMethod.Address),
                                     (int) AddressType.Shipping);
-                            //cart.Order.Data.DeliveryInstructions = model.DeliveryInstructions;
-                            //cart.Order.Data.AddressType = model.AddressType;
                         }
                         else
                         {
@@ -459,11 +452,9 @@ namespace VC.Public.Controllers
                         if (model.UseBillingAddress)
                         {
                             await _addressConverter.UpdateObjectAsync(model, cart.Order.ShippingAddress, (int) AddressType.Shipping);
-                            var billingMapped = _addressConverter.ToModel<AddUpdateShippingMethodModel>(cart.Order.PaymentMethod.Address);
-                            _addressConverter.UpdateObject(billingMapped, cart.Order.ShippingAddress);
+                            var billingMapped = await _addressConverter.ToModelAsync<AddUpdateShippingMethodModel>(cart.Order.PaymentMethod.Address);
+                            await _addressConverter.UpdateObjectAsync(billingMapped, cart.Order.ShippingAddress);
                             cart.Order.ShippingAddress.Id = model.Id;
-                            //cart.Order.Data.DeliveryInstructions = model.DeliveryInstructions;
-                            //cart.Order.Data.AddressType = model.AddressType;
                         }
                         else
                         {

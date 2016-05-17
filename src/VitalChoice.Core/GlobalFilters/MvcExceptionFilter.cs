@@ -2,12 +2,14 @@
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Features;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Core.Services;
 using Microsoft.AspNet.Mvc.Filters;
+using Microsoft.AspNet.Mvc.Infrastructure;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Mvc.Routing;
 using Microsoft.AspNet.Mvc.ViewFeatures;
@@ -26,7 +28,7 @@ namespace VitalChoice.Core.GlobalFilters
 	{
         private readonly ApiExceptionFilterAttribute _apiExceptionFilter = new ApiExceptionFilterAttribute();
 
-		public override void OnException(ExceptionContext context)
+		public override async Task OnExceptionAsync(ExceptionContext context)
 		{
 #if !NETSTANDARD1_5
             var systemException = context.Exception as SystemException;
@@ -52,30 +54,11 @@ namespace VitalChoice.Core.GlobalFilters
 			}
 			else
             {
-                //var referer = (string)context.HttpContext.Request.Headers["Referer"];
-
-                //if (!string.IsNullOrWhiteSpace(referer))
-                //{
-                //    if (referer.StartsWith($"http://{context.HttpContext.Request.Host}") || referer.StartsWith($"https://{context.HttpContext.Request.Host}"))
-                //    {
-                //        var uri = new Uri(referer);
-                //        var contextFactory = context.HttpContext.RequestServices.GetService<IHttpContextFactory>();
-                //        //var requestFactory = context.HttpContext.RequestServices.GetService<IHttpRequestFeature>();
-                //        var fakeContext = contextFactory.Create(context.HttpContext.RequestServices.GetService<IFeatureCollection>());
-                //        fakeContext.Request.QueryString = new QueryString(uri.Query);
-                //        fakeContext.Request.Scheme = uri.Scheme;
-                //        fakeContext.Request.Host = context.HttpContext.Request.Host;
-                //        fakeContext.Request.Path = new PathString(uri.AbsolutePath);
-                //        QueryStringValueProviderFactory valueProviderFactory = new QueryStringValueProviderFactory();
-                //        var valueProvider =
-                //            (ReadableStringCollectionValueProvider)valueProviderFactory.GetValueProviderAsync(new ValueProviderFactoryContext(fakeContext, null)).Result;
-                //    }
-                    
-                //}
+                var referer = (string)context.HttpContext.Request.Headers["Referer"];
                 var currentActionName = (string)context.RouteData.Values["action"];
-                var currentControllerName = (string) context.RouteData.Values["controller"];
+                var currentControllerName = (string)context.RouteData.Values["controller"];
 
-				var result = new ViewResult
+                var result = new ViewResult
 				{
 					ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), context.ModelState),
 					TempData = context.HttpContext.RequestServices.GetRequiredService<ITempDataDictionary>()
@@ -95,22 +78,31 @@ namespace VitalChoice.Core.GlobalFilters
 				        {
 				            if (message.Field == "ConcurrencyFailure")
 				            {
-				                SetDataChangedError(context, result, currentActionName, currentControllerName);
+				                SetDataChangedError(context, result);
 				            }
 				            else
 				            {
 				                context.ModelState.AddModelError(string.Empty, message.Message);
 				            }
 				        }
-				        result.ViewName = currentActionName;
-				        result.StatusCode = (int) HttpStatusCode.OK;
+				        if (exception.ViewName != null)
+				        {
+                            result.ViewName = exception.ViewName;
+                            result.StatusCode = (int)HttpStatusCode.OK;
+                        }
+				        else
+				        {
+                            currentActionName = await GetRefferedAction(context, referer, currentActionName, currentControllerName);
+                            result.ViewName = currentActionName;
+                            result.StatusCode = (int)HttpStatusCode.OK;
+                        }
 				    }
 				    else
 				    {
 				        var dbUpdateException = context.Exception as DbUpdateException;
 				        if (dbUpdateException != null)
 				        {
-				            SetDataChangedError(context, result, currentActionName, currentControllerName);
+				            SetDataChangedError(context, result);
 				            var logger = LoggerService.GetDefault();
 				            logger.LogError(context.Exception.Message, context.Exception);
 				        }
@@ -150,9 +142,43 @@ namespace VitalChoice.Core.GlobalFilters
 			}
 		}
 
-        private static void SetDataChangedError(ExceptionContext context, ViewResult result, string currentActionName, string controllerName)
+        private static async Task<string> GetRefferedAction(ExceptionContext context, string referer, string actionName, string controllerName)
         {
-            result.ViewName = currentActionName;
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(referer))
+                {
+                    if ((referer.StartsWith($"http://{context.HttpContext.Request.Host}") ||
+                         referer.StartsWith($"https://{context.HttpContext.Request.Host}")) &&
+                        referer.ToLower().Contains(controllerName.ToLower()))
+                    {
+                        var uri = new Uri(referer);
+                        var contextFactory = context.HttpContext.RequestServices.GetService<IHttpContextFactory>();
+                        //var requestFactory = context.HttpContext.RequestServices.GetService<IHttpRequestFeature>();
+                        var fakeContext = contextFactory.Create(context.HttpContext.RequestServices.GetService<IFeatureCollection>());
+                        fakeContext.Request.QueryString = new QueryString(uri.Query);
+                        fakeContext.Request.Scheme = uri.Scheme;
+                        fakeContext.Request.Host = context.HttpContext.Request.Host;
+                        fakeContext.Request.Path = new PathString(uri.AbsolutePath);
+                        var routeContext = new RouteContext(fakeContext);
+                        var actionSelector = context.HttpContext.RequestServices.GetService<IActionSelector>();
+                        var actionDescriptor = await actionSelector.SelectAsync(routeContext);
+                        if (!string.IsNullOrEmpty(actionDescriptor?.Name))
+                        {
+                            return actionDescriptor.Name;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                return actionName;
+            }
+            return actionName;
+        }
+
+        private static void SetDataChangedError(ExceptionContext context, ViewResult result)
+        {
             result.StatusCode = (int) HttpStatusCode.OK;
             context.ModelState.AddModelError(string.Empty, "The data has been changed, please Reload page to see changes");
         }

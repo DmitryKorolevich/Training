@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using VC.Public.Models.Profile;
 using VitalChoice.Business.Helpers;
 using VitalChoice.DynamicData.Base;
@@ -10,7 +11,7 @@ namespace VC.Public.ModelConverters.Customer
 {
 	public class ShippingInfoModelConverter : BaseModelConverter<ShippingInfoModel, AddressDynamic>
 	{
-		public override void DynamicToModel(ShippingInfoModel model, AddressDynamic dynamic)
+		public override Task DynamicToModelAsync(ShippingInfoModel model, AddressDynamic dynamic)
 		{
 			if (dynamic.SafeData.PreferredShipMethod == null && dynamic.IdObjectType == (int)AddressType.Shipping)
 			{
@@ -20,21 +21,23 @@ namespace VC.Public.ModelConverters.Customer
 			{
 				model.AddressType = ShippingAddressType.Residential;
 			}
-		}
+            return Task.Delay(0);
+        }
 
-		public override void ModelToDynamic(ShippingInfoModel model, AddressDynamic dynamic)
+		public override Task ModelToDynamicAsync(ShippingInfoModel model, AddressDynamic dynamic)
 		{
             dynamic.Data.Phone = model.Phone?.ClearPhone();
             dynamic.Data.Fax = model.Fax?.ClearPhone();
+            return Task.Delay(0);
 
-			//if (!model.PreferredShipMethod.HasValue && dynamic.IdObjectType == (int)AddressType.Shipping)
-			//{
-			//	dynamic.Data.PreferredShipMethod = PreferredShipMethod.Best;
-			//}
-			//if (!model.AddressType.HasValue && dynamic.IdObjectType == (int)AddressType.Shipping)
-			//{
-			//	dynamic.Data.ShippingAddressType = ShippingAddressType.Residential;
-			//}
-		}
+            //if (!model.PreferredShipMethod.HasValue && dynamic.IdObjectType == (int)AddressType.Shipping)
+            //{
+            //	dynamic.Data.PreferredShipMethod = PreferredShipMethod.Best;
+            //}
+            //if (!model.AddressType.HasValue && dynamic.IdObjectType == (int)AddressType.Shipping)
+            //{
+            //	dynamic.Data.ShippingAddressType = ShippingAddressType.Residential;
+            //}
+        }
 	}
 }

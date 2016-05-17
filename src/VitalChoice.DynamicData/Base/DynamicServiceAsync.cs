@@ -482,42 +482,42 @@ namespace VitalChoice.DynamicData.Base
     {
         public TDynamic Insert(TDynamic model)
         {
-            return InsertAsync(model).Result;
+            return InsertAsync(model).GetAwaiter().GetResult();
         }
 
         public TDynamic Update(TDynamic model)
         {
-            return UpdateAsync(model).Result;
+            return UpdateAsync(model).GetAwaiter().GetResult();
         }
 
         public List<TDynamic> InsertRange(ICollection<TDynamic> models)
         {
-            return InsertRangeAsync(models).Result;
+            return InsertRangeAsync(models).GetAwaiter().GetResult();
         }
 
         public List<TDynamic> UpdateRange(ICollection<TDynamic> models)
         {
-            return UpdateRangeAsync(models).Result;
+            return UpdateRangeAsync(models).GetAwaiter().GetResult();
         }
 
         public bool DeleteAll(ICollection<TDynamic> models, bool physically = false)
         {
-            return DeleteAllAsync(models, physically).Result;
+            return DeleteAllAsync(models, physically).GetAwaiter().GetResult();
         }
 
         public bool Delete(TDynamic model, bool physically = false)
         {
-            return DeleteAsync(model, physically).Result;
+            return DeleteAsync(model, physically).GetAwaiter().GetResult();
         }
 
         public bool DeleteAll(ICollection<int> list, bool physically = false)
         {
-            return DeleteAllAsync(list, physically).Result;
+            return DeleteAllAsync(list, physically).GetAwaiter().GetResult();
         }
 
         public bool Delete(int id, bool physically = false)
         {
-            return DeleteAsync(id, physically).Result;
+            return DeleteAsync(id, physically).GetAwaiter().GetResult();
         }
     }
 }

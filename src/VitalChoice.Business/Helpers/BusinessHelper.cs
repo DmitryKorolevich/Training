@@ -24,7 +24,7 @@ namespace VitalChoice.Business.Helpers
 		{
 			string toReturn = null;
 			if (discount == null)
-				return toReturn;
+				return null;
 			switch (discount.IdObjectType)
 			{
 				case (int)DiscountType.FreeShipping:

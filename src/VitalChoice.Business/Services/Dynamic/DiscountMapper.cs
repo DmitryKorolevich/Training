@@ -27,9 +27,9 @@ namespace VitalChoice.Business.Services.Dynamic
             _productService = productService;
         }
 
-        protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<DiscountDynamic, Discount>> items, bool withDefaults = false)
+        protected override async Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<DiscountDynamic, Discount>> items, bool withDefaults = false)
         {
-            items.ForEach(pair =>
+            await items.ForEachAsync(async pair =>
             {
                 var entity = pair.Entity;
                 var dynamic = pair.Dynamic;
@@ -50,11 +50,9 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.DiscountTiers = entity.DiscountTiers?.ToList();
                 if (dynamic.IdObjectType == (int)DiscountType.Threshold && withDefaults)
                 {
-                    var task = _productService.GetSkuOrderedAsync((string)dynamic.Data.ProductSKU);
-                    dynamic.Data.ThresholdSku = task.Result;
+                    dynamic.Data.ThresholdSku = await _productService.GetSkuOrderedAsync((string) dynamic.Data.ProductSKU);
                 }
             });
-            return Task.Delay(0);
         }
 
         protected override Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<DiscountDynamic, Discount>> items)

@@ -194,7 +194,7 @@ namespace VC.Admin.Controllers
 
             var item = await productService.SelectTransferAsync(id);
             
-            ProductManageModel toReturn = _mapper.ToModel<ProductManageModel>(item?.ProductDynamic);
+            ProductManageModel toReturn = await _mapper.ToModelAsync<ProductManageModel>(item?.ProductDynamic);
             if (item.ProductContent != null)
             {
                 toReturn.Url = item.ProductContent.Url;
@@ -227,7 +227,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             
-            var product = _mapper.FromModel(model);
+            var product = await _mapper.FromModelAsync(model);
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
             if (Int32.TryParse(sUserId, out userId))
@@ -256,7 +256,7 @@ namespace VC.Admin.Controllers
 				product = (await productService.InsertAsync(transferEntity));
 			}
 
-			ProductManageModel toReturn = _mapper.ToModel<ProductManageModel>(product);
+			ProductManageModel toReturn = await _mapper.ToModelAsync<ProductManageModel>(product);
 	        toReturn.MasterContentItemId = transferEntity.ProductContent.MasterContentItemId;
 
 			return toReturn;
@@ -442,7 +442,7 @@ namespace VC.Admin.Controllers
         public async Task<Result<bool>> UpdateInventoryCategoriesTree([FromBody]IList<InventoryCategoryTreeItemModel> model)
         {
             IList<InventoryCategory> categories = new List<InventoryCategory>();
-            if(categories!=null)
+            if(model != null)
             {
                 foreach(var modelCategory in model)
                 {
@@ -598,7 +598,7 @@ namespace VC.Admin.Controllers
             if (toReturn.Main != null && !String.IsNullOrEmpty(toReturn.Main.Data))
             {
                 var dynamic = (ProductDynamic)JsonConvert.DeserializeObject(toReturn.Main.Data, typeof(ProductDynamic));
-                var model = _mapper.ToModel<ProductManageModel>(dynamic);
+                var model = await _mapper.ToModelAsync<ProductManageModel>(dynamic);
                 if (string.IsNullOrEmpty(model.Url))
                 {
                     model.Url = dynamic.SafeData.Url;
@@ -612,7 +612,7 @@ namespace VC.Admin.Controllers
             if (toReturn.Before != null && !String.IsNullOrEmpty(toReturn.Before.Data))
             {
                 var dynamic = (ProductDynamic)JsonConvert.DeserializeObject(toReturn.Before.Data, typeof(ProductDynamic));
-                var model = _mapper.ToModel<ProductManageModel>(dynamic);
+                var model = await _mapper.ToModelAsync<ProductManageModel>(dynamic);
                 if (string.IsNullOrEmpty(model.Url))
                 {
                     model.Url = dynamic.SafeData.Url;

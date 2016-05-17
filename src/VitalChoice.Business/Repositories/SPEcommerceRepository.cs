@@ -16,6 +16,7 @@ using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Infrastructure.Domain.Entities.InventorySkus;
 using VitalChoice.Infrastructure.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Entities.Products;
+using VitalChoice.Infrastructure.Domain.Entities.Reports;
 using VitalChoice.Infrastructure.Domain.Transfer.InventorySkus;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Reports;
@@ -133,7 +134,7 @@ namespace VitalChoice.Data.Repositories.Customs
                 filter.ShipLastName, filter.ShippingIdConfirmation, filter.IdOrder, filter.PoNumber, true).FirstOrDefaultAsync();
             return toReturn?.Count ?? 0;
         }
-        
+
         public async Task<ICollection<WholesaleDropShipReportSkuRawItem>> GetWholesaleDropShipReportSkusSummaryAsync(WholesaleDropShipReportFilter filter)
         {
             var toReturn = await Context.Set<WholesaleDropShipReportSkuRawItem>().FromSql
@@ -143,6 +144,18 @@ namespace VitalChoice.Data.Repositories.Customs
                 filter.From, filter.To, filter.ShipFrom, filter.ShipTo,
                 filter.IdCustomerType, filter.IdTradeClass, filter.CustomerFirstName, filter.CustomerLastName, filter.ShipFirstName,
                 filter.ShipLastName, filter.ShippingIdConfirmation, filter.IdOrder, filter.PoNumber).ToListAsync();
+            return toReturn;
+        }
+
+        public async Task<ICollection<TransactionAndRefundRawItem>> GetTransactionAndRefundReportItemsAsync(TransactionAndRefundReportFilter filter)
+        {
+            var toReturn = await Context.Set<TransactionAndRefundRawItem>().FromSql
+                ("[dbo].[SPGetTransactionAndRefundReport] @from={0}, @to={1}," +
+                " @idcustomertype={2}, @idservicecode={3}, @idcustomer={4}, @customerfirstname={5}, @customerlastname={6}," +
+                " @idorder={7}, @idorderstatus={8}, @idordertype={9}, @pageindex={10}, @pagesize={11}",
+                filter.From, filter.To, 
+                filter.IdCustomerType, filter.IdServiceCode, filter.IdCustomer, filter.CustomerFirstName, filter.CustomerLastName,
+                filter.IdOrder, filter.IdOrderStatus, filter.IdOrderType, filter.Paging?.PageIndex, filter.Paging?.PageItemCount).ToListAsync();
             return toReturn;
         }
     }

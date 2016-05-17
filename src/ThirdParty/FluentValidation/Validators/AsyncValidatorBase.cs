@@ -21,7 +21,7 @@ namespace FluentValidation.Validators {
 		}
 
 		protected override bool IsValid(PropertyValidatorContext context) {
-			return IsValidAsync(context).Result;
+			return IsValidAsync(context).GetAwaiter().GetResult();
 		}
 
 		protected abstract override Task<bool> IsValidAsync(PropertyValidatorContext context);

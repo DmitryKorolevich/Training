@@ -80,11 +80,18 @@
 						<div class="actions-top-nav">
 							<a href="@Url.Action("Index", "Profile")">Your Account</a>
 							@if (User.Identity.IsAuthenticated)
-							{
-								<a href="@Url.Action("Logout", "Account")">Log Out</a>
-							}
-							else
-							{
+                            {
+                                if (User.HasClaim(IdentityConstants.AffiliateRole, "true"))
+                                {
+                                    <a href="@Url.Action("Logout", "AffiliateAccount")">Log Out</a>
+                                }
+                                else
+                                {
+                                    <a href="@Url.Action("Logout", "Account")">Log Out</a>
+                                }
+                            }
+                            else
+                            {
 								<a href="@Url.Action("RegisterEmail", "Account")">Register</a>
 							}
 							<a class="last-child" href="/content/contact-customer-service">Contact Us</a>

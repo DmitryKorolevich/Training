@@ -12412,7 +12412,7 @@ ace.define("ace/mode/ttl_worker",["require","exports","module","ace/mode/ttl/Doc
 
     oop.inherits(TtlWorker, Mirror);
 
-    (function() {
+    (function () {
         this.setOptions = function(options) {
             this.options = options || {};
             this.doc.getValue() && this.deferredUpdate.schedule(100);
@@ -12441,6 +12441,9 @@ ace.define("ace/mode/ttl_worker",["require","exports","module","ace/mode/ttl/Doc
                 });
             }
             this.sender.emit("annotate", errors);
+            if (results.length === 0) {
+                this.sender.emit("codeok", value);
+            }
         };
 
     }).call(TtlWorker.prototype);

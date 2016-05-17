@@ -10,6 +10,11 @@ namespace VitalChoice.Business.CsvExportMaps.Orders
     {
         public VOrderWithRegionInfoItemCsvMap()
         {
+            MapValues();
+        }
+
+        private void MapValues()
+        {
             Map(m => m.Id).Name("Order #").Index(0);
             Map(m => m.DateCreated).Name("Order Date").Index(1).TypeConverterOption(CultureInfo.InvariantCulture).TypeConverterOption("MM/dd/yyyy hh:mm tt");
             Map(m => m.Total).Name("Order Amount").Index(2).TypeConverterOption("c");

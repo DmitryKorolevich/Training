@@ -49,7 +49,7 @@ namespace VC.Admin.ModelConverters
             _gcInOrderRep = gcInOrderRep;
         }
 
-        public override void DynamicToModel(OrderManageModel model, OrderDynamic dynamic)
+        public override async Task DynamicToModelAsync(OrderManageModel model, OrderDynamic dynamic)
         {
             if(dynamic.Customer!=null)
             {
@@ -61,8 +61,14 @@ namespace VC.Admin.ModelConverters
                 model.DiscountCode = dynamic.Discount.Code;
                 model.DiscountMessage = dynamic.Discount.GetDiscountMessage((int?)dynamic.SafeData.IdDiscountTier);
             }
+            model.DiscountedSubtotal = model.ProductsSubtotal - model.DiscountTotal;
+            model.TotalShipping = model.ShippingTotal;
+            if (model.ShippingOverride.HasValue)
+            {
+                model.TotalShipping += model.ShippingOverride.Value;
+            }
 
-            if(dynamic.GiftCertificates!=null && dynamic.GiftCertificates.Count>0)
+            if (dynamic.GiftCertificates!=null && dynamic.GiftCertificates.Count>0)
             {
                 if(model.GCs==null)
                 {
@@ -134,44 +140,43 @@ namespace VC.Admin.ModelConverters
                 }
             }
 
-            model.Shipping = _addressMapper.ToModel<AddressModel>(dynamic.ShippingAddress);
+            model.Shipping = await _addressMapper.ToModelAsync<AddressModel>(dynamic.ShippingAddress);
             if (dynamic.PaymentMethod != null)
             {
                 model.IdPaymentMethodType = dynamic.PaymentMethod.IdObjectType;
                 switch (dynamic.PaymentMethod.IdObjectType)
                 {
                     case (int) PaymentMethodType.CreditCard:
-                        model.CreditCard = _paymentMethodMapper.ToModel<CreditCardModel>(dynamic.PaymentMethod);
+                        model.CreditCard = await _paymentMethodMapper.ToModelAsync<CreditCardModel>(dynamic.PaymentMethod);
                         break;
                     case (int) PaymentMethodType.Oac:
-                        model.Oac = _paymentMethodMapper.ToModel<OacPaymentModel>(dynamic.PaymentMethod);
+                        model.Oac = await _paymentMethodMapper.ToModelAsync<OacPaymentModel>(dynamic.PaymentMethod);
                         break;
                     case (int) PaymentMethodType.Check:
-                        model.Check = _paymentMethodMapper.ToModel<CheckPaymentModel>(dynamic.PaymentMethod);
+                        model.Check = await _paymentMethodMapper.ToModelAsync<CheckPaymentModel>(dynamic.PaymentMethod);
                         break;
                     case (int) PaymentMethodType.WireTransfer:
-                        model.WireTransfer = _paymentMethodMapper.ToModel<WireTransferPaymentModel>(dynamic.PaymentMethod);
+                        model.WireTransfer = await _paymentMethodMapper.ToModelAsync<WireTransferPaymentModel>(dynamic.PaymentMethod);
                         break;
                     case (int) PaymentMethodType.Marketing:
-                        model.Marketing = _paymentMethodMapper.ToModel<MarketingPaymentModel>(dynamic.PaymentMethod);
+                        model.Marketing = await _paymentMethodMapper.ToModelAsync<MarketingPaymentModel>(dynamic.PaymentMethod);
                         break;
                     case (int) PaymentMethodType.VCWellnessEmployeeProgram:
-                        model.VCWellness = _paymentMethodMapper.ToModel<VCWellnessEmployeeProgramPaymentModel>(dynamic.PaymentMethod);
+                        model.VCWellness = await _paymentMethodMapper.ToModelAsync<VCWellnessEmployeeProgramPaymentModel>(dynamic.PaymentMethod);
                         break;
                 }
             }
         }
 
-        public override void ModelToDynamic(OrderManageModel model, OrderDynamic dynamic)
+        public override async Task ModelToDynamicAsync(OrderManageModel model, OrderDynamic dynamic)
         {
             if (!string.IsNullOrEmpty(model.DiscountCode))
             {
-                dynamic.Discount = _discountService.GetByCode(model.DiscountCode).Result;
+                dynamic.Discount = await _discountService.GetByCode(model.DiscountCode);
             }
 
-            ModelToGcsDynamic(model, dynamic).GetAwaiter().GetResult();
-
-            ModelToSkusDynamic(model, dynamic);
+            await ModelToGcsDynamic(model, dynamic);
+            await ModelToSkusDynamic(model, dynamic);
 
             if (dynamic.SafeData.ShipDelayType!=null)
             {
@@ -203,7 +208,7 @@ namespace VC.Admin.ModelConverters
             {
                 if (model.Shipping != null)
                 {
-                    var addressDynamic = _addressMapper.FromModel(model.Shipping, (int)AddressType.Shipping);
+                    var addressDynamic = await _addressMapper.FromModelAsync(model.Shipping, (int)AddressType.Shipping);
                     dynamic.ShippingAddress = addressDynamic;
                 }
             }
@@ -212,22 +217,22 @@ namespace VC.Admin.ModelConverters
                 var shippingAddress = model.Customer?.Shipping.FirstOrDefault(p => p.IsSelected);
                 if(shippingAddress!=null)
                 {
-                    var addressDynamic = _addressMapper.FromModel(shippingAddress, (int)AddressType.Shipping);
+                    var addressDynamic = await _addressMapper.FromModelAsync(shippingAddress, (int)AddressType.Shipping);
                     dynamic.ShippingAddress = addressDynamic;
                 }
             }
 
-            ModelToPaymentDynamic(model, dynamic);
+            await ModelToPaymentDynamic(model, dynamic);
 
-            UpdateCustomer(model, dynamic);
+            await UpdateCustomer(model, dynamic);
         }
 
-        private void UpdateCustomer(OrderManageModel model, OrderDynamic dynamic)
+        private async Task UpdateCustomer(OrderManageModel model, OrderDynamic dynamic)
         {
             if (model.Customer != null)
             {
                 //update customer
-                var dbCustomer = _customerService.Select(model.Customer.Id, true);
+                var dbCustomer = await _customerService.SelectAsync(model.Customer.Id, true);
                 if (dbCustomer != null)
                 {
                     dbCustomer.IdObjectType = (int) model.Customer.CustomerType;
@@ -356,7 +361,7 @@ namespace VC.Admin.ModelConverters
             }
         }
 
-        private void ModelToPaymentDynamic(OrderManageModel model, OrderDynamic dynamic)
+        private async Task ModelToPaymentDynamic(OrderManageModel model, OrderDynamic dynamic)
         {
             if (!model.UseShippingAndBillingFromCustomer)
             {
@@ -365,22 +370,22 @@ namespace VC.Admin.ModelConverters
                     switch (model.IdPaymentMethodType.Value)
                     {
                         case (int) PaymentMethodType.CreditCard:
-                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.CreditCard, model.IdPaymentMethodType.Value);
+                            dynamic.PaymentMethod = await _paymentMethodMapper.FromModelAsync(model.CreditCard, model.IdPaymentMethodType.Value);
                             break;
                         case (int) PaymentMethodType.Oac:
-                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Oac, model.IdPaymentMethodType.Value);
+                            dynamic.PaymentMethod = await _paymentMethodMapper.FromModelAsync(model.Oac, model.IdPaymentMethodType.Value);
                             break;
                         case (int) PaymentMethodType.Check:
-                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Check, model.IdPaymentMethodType.Value);
+                            dynamic.PaymentMethod = await _paymentMethodMapper.FromModelAsync(model.Check, model.IdPaymentMethodType.Value);
                             break;
                         case (int)PaymentMethodType.WireTransfer:
-                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.WireTransfer, model.IdPaymentMethodType.Value);
+                            dynamic.PaymentMethod = await _paymentMethodMapper.FromModelAsync(model.WireTransfer, model.IdPaymentMethodType.Value);
                             break;
                         case (int)PaymentMethodType.Marketing:
-                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Marketing, model.IdPaymentMethodType.Value);
+                            dynamic.PaymentMethod = await _paymentMethodMapper.FromModelAsync(model.Marketing, model.IdPaymentMethodType.Value);
                             break;
                         case (int)PaymentMethodType.VCWellnessEmployeeProgram:
-                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.VCWellness, model.IdPaymentMethodType.Value);
+                            dynamic.PaymentMethod = await _paymentMethodMapper.FromModelAsync(model.VCWellness, model.IdPaymentMethodType.Value);
                             break;
                         default:
                             dynamic.PaymentMethod = new OrderPaymentMethodDynamic() {IdObjectType = model.IdPaymentMethodType.Value };
@@ -398,28 +403,28 @@ namespace VC.Admin.ModelConverters
                             var card = model.Customer?.CreditCards.FirstOrDefault(p => p.IsSelected);
                             if (card != null)
                             {
-                                dynamic.PaymentMethod = _paymentMethodMapper.FromModel(card, model.IdPaymentMethodType.Value);
+                                dynamic.PaymentMethod = await _paymentMethodMapper.FromModelAsync(card, model.IdPaymentMethodType.Value);
                             }
                             break;
                         case (int) PaymentMethodType.Oac:
                             if (model.Customer != null)
-                                dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Customer.Oac, model.IdPaymentMethodType.Value);
+                                dynamic.PaymentMethod = await _paymentMethodMapper.FromModelAsync(model.Customer.Oac, model.IdPaymentMethodType.Value);
                             break;
                         case (int) PaymentMethodType.Check:
                             if (model.Customer != null)
-                                dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Customer.Check, model.IdPaymentMethodType.Value);
+                                dynamic.PaymentMethod = await _paymentMethodMapper.FromModelAsync(model.Customer.Check, model.IdPaymentMethodType.Value);
                             break;
                         case (int)PaymentMethodType.WireTransfer:
                             if (model.Customer != null)
-                                dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Customer.WireTransfer, model.IdPaymentMethodType.Value);
+                                dynamic.PaymentMethod = await _paymentMethodMapper.FromModelAsync(model.Customer.WireTransfer, model.IdPaymentMethodType.Value);
                             break;
                         case (int)PaymentMethodType.Marketing:
                             if (model.Customer != null)
-                                dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Customer.Marketing, model.IdPaymentMethodType.Value);
+                                dynamic.PaymentMethod = await _paymentMethodMapper.FromModelAsync(model.Customer.Marketing, model.IdPaymentMethodType.Value);
                             break;
                         case (int)PaymentMethodType.VCWellnessEmployeeProgram:
                             if (model.Customer != null)
-                                dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Customer.VCWellness, model.IdPaymentMethodType.Value);
+                                dynamic.PaymentMethod = await _paymentMethodMapper.FromModelAsync(model.Customer.VCWellness, model.IdPaymentMethodType.Value);
                             break;
                         default:
                             dynamic.PaymentMethod = new OrderPaymentMethodDynamic() { IdObjectType = model.IdPaymentMethodType.Value };
@@ -427,7 +432,7 @@ namespace VC.Admin.ModelConverters
                     }
                 }
             }
-            if (dynamic?.PaymentMethod?.Address != null)
+            if (dynamic.PaymentMethod?.Address != null)
             {
                 dynamic.PaymentMethod.Address.IdObjectType = (int)AddressType.Billing;
             }
@@ -453,25 +458,35 @@ namespace VC.Admin.ModelConverters
             }
         }
 
-        private void ModelToSkusDynamic(OrderManageModel model, OrderDynamic dynamic)
+        private async Task ModelToSkusDynamic(OrderManageModel model, OrderDynamic dynamic)
         {
             if (model.SkuOrdereds != null)
             {
                 var promotionIds = model.PromoSkus.Where(p => p.Id.HasValue && p.IsAllowDisable).Select(p => p.Id.Value).ToList();
-                var promotions = _promotionService.Select(promotionIds, true);
-                dynamic.PromoSkus = promotions.Select(p => new PromoOrdered
-                {
-                    Promotion = p,
-                    Enabled = model.PromoSkus?.FirstOrDefault(m => m.Id.HasValue && m.Id.Value == p.Id)?.IsEnabled ?? true
-                }).ToList();
+                var skuIds = model.PromoSkus.Where(p => p.IdSku.HasValue).Select(p => p.IdSku.Value).ToList();
+                var promotions = await _promotionService.SelectAsync(promotionIds, true);
+                var promoSkus = await _productService.GetSkusOrderedAsync(skuIds);
+                dynamic.PromoSkus =
+                    model.PromoSkus.Where(p => p.Id.HasValue && p.IdSku.HasValue && p.IsAllowDisable)
+                        .Select(
+                            p =>
+                            {
+                                var sku = promoSkus.FirstOrDefault(s => s.Sku.Id == p.IdSku.Value);
+                                if (sku != null)
+                                {
+                                    sku.Amount = p.Amount ?? 0;
+                                    sku.Quantity = p.QTY ?? 1;
+                                }
+                                var promo = promotions.FirstOrDefault(dbp => dbp.Id == p.Id.Value);
+                                return new PromoOrdered(sku, promo, p.IsEnabled);
+                            })
+                        .ToList();
                 model.SkuOrdereds = model.SkuOrdereds.Where(s => !(s.Promo ?? false)).ToList();
 
                 var validList = model.SkuOrdereds.Where(s => s.Id.HasValue).Select(s => s.Id.Value).ToList();
                 var notValidList = model.SkuOrdereds.Where(s => !s.Id.HasValue).Select(s => s.Code).ToList();
-                var task = _productService.GetSkusOrderedAsync(validList);
-                var validSkus = task.Result;
-                task = _productService.GetSkusOrderedAsync(notValidList);
-                var notValidSkus = task.Result;
+                var validSkus = await _productService.GetSkusOrderedAsync(validList);
+                var notValidSkus = await _productService.GetSkusOrderedAsync(notValidList);
                 Dictionary<int, SkuOrderedManageModel> valid =
                     // ReSharper disable once PossibleInvalidOperationException
                     model.SkuOrdereds.Where(s => s.Id.HasValue).ToDictionary(s => s.Id.Value, s => s);

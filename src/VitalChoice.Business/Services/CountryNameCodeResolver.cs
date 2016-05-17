@@ -14,7 +14,7 @@ namespace VitalChoice.Business.Services
     {
         public CountryNameCodeResolver(ICountryService countryService)
         {
-            var countries = countryService.GetCountriesAsync().Result;
+            var countries = countryService.GetCountriesAsync().GetAwaiter().GetResult();
             _coutries = countries.ToDictionary(c => c.CountryCode, c => c.Id, StringComparer.OrdinalIgnoreCase);
             _states = countries.ToDictionary(c => c.CountryCode,
                 c => c.States.ToDictionary(s => s.StateCode, s => s.Id, StringComparer.OrdinalIgnoreCase),

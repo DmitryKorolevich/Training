@@ -16,20 +16,13 @@ namespace VitalChoice.Business.Workflow.Refunds.ActionResolvers
 
         }
 
-        public override async Task<int> GetActionKeyAsync(OrderRefundDataContext dataContext, IWorkflowExecutionContext executionContext)
+        public override Task<int> GetActionKeyAsync(OrderRefundDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            if (dataContext.Order.IdOrderSource != null)
+            if (dataContext.Order.OriginalOrder.IdObjectType == (int) OrderType.AutoShipOrder)
             {
-                var orderRep = executionContext.Resolve<IEcommerceRepositoryAsync<Order>>();
-                if (
-                    await
-                        orderRep.Query(o => o.Id == dataContext.Order.IdOrderSource && o.IdObjectType == (int) OrderType.AutoShipOrder)
-                            .SelectAnyAsync())
-                {
-                    return (int) ReductionType.AutoShip;
-                }
+                return Task.FromResult((int) ReductionType.AutoShip);
             }
-            return (int) ReductionType.Discount;
+            return Task.FromResult((int) ReductionType.Discount);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using VC.Admin.Models.Products;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -19,15 +20,17 @@ namespace VC.Admin.ModelConverters
             _inventorySkuService = inventorySkuService;
         }
 
-        public override void DynamicToModel(SKUManageModel model, SkuDynamic dynamic)
+        public override async Task DynamicToModelAsync(SKUManageModel model, SkuDynamic dynamic)
         {
             model.Active = dynamic.StatusCode == (int)RecordStatusCode.Active;
             model.InventorySkus=new List<InventorySkuListItemModel>();
             if (dynamic.SkusToInventorySkus != null && dynamic.SkusToInventorySkus.Count != 0)
             {
-                InventorySkuFilter filter = new InventorySkuFilter();
-                filter.Ids = dynamic.SkusToInventorySkus.Select(p => p.IdInventorySku).ToList();
-                var items = _inventorySkuService.GetInventorySkusAsync(filter).Result.Items;
+                InventorySkuFilter filter = new InventorySkuFilter
+                {
+                    Ids = dynamic.SkusToInventorySkus.Select(p => p.IdInventorySku).ToList()
+                };
+                var items = (await _inventorySkuService.GetInventorySkusAsync(filter)).Items;
                 model.InventorySkus = items;
                 foreach (var item in model.InventorySkus)
                 {
@@ -40,10 +43,10 @@ namespace VC.Admin.ModelConverters
             }
         }
 
-        public override void ModelToDynamic(SKUManageModel model, SkuDynamic dynamic)
+        public override Task ModelToDynamicAsync(SKUManageModel model, SkuDynamic dynamic)
         {
             dynamic.StatusCode = model.Active ? (int)RecordStatusCode.Active : (int)RecordStatusCode.NotActive;
-            dynamic.Code = dynamic?.Code.Trim();
+            dynamic.Code = dynamic.Code.Trim();
             if (!dynamic.Data.AutoShipProduct)
             {
                 dynamic.DictionaryData.Remove("AutoShipFrequency1");
@@ -57,6 +60,7 @@ namespace VC.Admin.ModelConverters
                 IdInventorySku=p.Id,
                 Quantity=p.Quantity ?? 1,
             }).ToList();
+            return Task.Delay(0);
         }
     }
 }

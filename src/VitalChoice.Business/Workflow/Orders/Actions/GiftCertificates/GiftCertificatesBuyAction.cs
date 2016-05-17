@@ -121,10 +121,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.GiftCertificates
         private static void AddAll(OrderDataContext context)
         {
             context.SkuOrdereds.Where(s => s.Sku.IdObjectType == (int) ProductType.EGс || s.Sku.IdObjectType == (int) ProductType.Gc)
-                .ForEach(sku =>
-                {
-                    sku.GcsGenerated = CreateGiftCertificates(sku, sku.Quantity, context);
-                });
+                .ForEach(sku => sku.GcsGenerated = CreateGiftCertificates(sku, sku.Quantity, context));
         }
     }
 }

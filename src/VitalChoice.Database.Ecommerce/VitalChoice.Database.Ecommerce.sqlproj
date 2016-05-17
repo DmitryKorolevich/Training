@@ -88,6 +88,7 @@
     <None Include="PreDeployment\Scripts\PromoUpdate.sql" />
     <None Include="PostDeployment\Scripts\VTopProducts.sql" />
     <None Include="PreDeployment\Scripts\DiscountsUsed.sql" />
+    <None Include="VitalChoice_1.Database.Ecommerce.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="VitalChoice.Database.Ecommerce.refactorlog" />
@@ -268,5 +269,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\Scripts\SPsForWholesaleDropShipReport.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\Newsletters.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\NewslettersData.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetTransactionAndRefundReport.sql" />
   </ItemGroup>
 </Project>

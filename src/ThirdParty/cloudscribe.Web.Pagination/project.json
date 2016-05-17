@@ -13,8 +13,8 @@
   "releaseNotes": "",
 
   "dependencies": {
-    "Microsoft.AspNet.Mvc": "6.0.0-*",
-    "Microsoft.AspNet.Mvc.TagHelpers": "6.0.0-*"
+    "Microsoft.AspNet.Mvc": "6.0.0-rc1-final",
+    "Microsoft.AspNet.Mvc.TagHelpers": "6.0.0-rc1-final"
 
   },
 
@@ -22,12 +22,12 @@
     "net451": { },
     "netstandard1.5": {
       "dependencies": {
-        "Microsoft.CSharp": "4.0.1-*",
-        "System.Collections": "4.0.11-*",
-        "System.Linq": "4.0.1-*",
-        "System.Linq.Queryable": "4.0.1-*",
-        "System.Runtime": "4.0.21-*",
-        "System.Threading": "4.0.11-*"
+        "Microsoft.CSharp": "4.0.1-beta-23516",
+        "System.Collections": "4.0.11-beta-23516",
+        "System.Linq": "4.0.1-beta-23516",
+        "System.Linq.Queryable": "4.0.1-beta-23516",
+        "System.Runtime": "4.0.21-beta-23516",
+        "System.Threading": "4.0.11-beta-23516"
       }
     }
   }

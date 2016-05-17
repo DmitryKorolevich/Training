@@ -105,12 +105,11 @@ namespace System.Threading.Tasks
 		{
 			Contract.Assert(asyncIterator != null);
 
-			IEnumerator<Task> enumerator = null;
-			try
+		    try
 			{
-				enumerator = asyncIterator.GetEnumerator();
+				var enumerator = asyncIterator.GetEnumerator();
 				Task task = IterateImpl(enumerator, cancellationToken, breakCondition);
-				return (disposeEnumerator && enumerator != null) ? task.Finally(enumerator.Dispose, runSynchronously: true) : task;
+				return disposeEnumerator ? task.Finally(enumerator.Dispose, runSynchronously: true) : task;
 			}
 			catch (Exception ex)
 			{

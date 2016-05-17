@@ -18,23 +18,19 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions
 
         public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext context, IWorkflowExecutionContext executionContext)
         {
-            decimal total = Math.Min((decimal) context.Order.Data.RefundGCsUsedOnOrder,
-                (decimal) context.AutoTotal);
+            decimal total = Math.Min((decimal) context.Order.Data.RefundGCsUsedOnOrder, context.AutoTotal);
             decimal maxRefunded = 0;
             foreach (var gc in context.Order.RefundOrderToGiftCertificates)
             {
-                if (total > 0)
+                var possibleToRefund = gc.AmountUsedOnSourceOrder - gc.AmountRefunded;
+                if (possibleToRefund < 0)
                 {
-                    var possibleToRefund = gc.AmountUsedOnSourceOrder - gc.AmountRefunded;
-                    if (possibleToRefund < 0)
-                    {
-                        throw new ApiException("Opps something went wrong with Gift Certificates refund");
-                    }
-                    var toRefundNew = Math.Min(total, possibleToRefund);
-                    gc.Amount = toRefundNew;
-                    total -= toRefundNew;
-                    maxRefunded += toRefundNew;
+                    throw new ApiException("Oops something went wrong with Gift Certificates refund");
                 }
+                var toRefundNew = Math.Min(total, possibleToRefund);
+                gc.Amount = toRefundNew;
+                total -= toRefundNew;
+                maxRefunded += toRefundNew;
             }
             context.RefundGCsUsedOnOrder = maxRefunded;
             context.RefundOrderToGiftCertificates = context.Order.RefundOrderToGiftCertificates;

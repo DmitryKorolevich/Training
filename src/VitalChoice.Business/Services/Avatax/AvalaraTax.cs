@@ -100,7 +100,7 @@ namespace VitalChoice.Business.Services.Avatax
             Address destination;
             FillAddresses(context.Order.ShippingAddress, out origin, out destination);
 
-            var request = FillGetTaxBaseRequest(context.Order.Customer, context.Order.Id, context.Order.DiscountTotal, taxGetType, destination, origin);
+            var request = FillGetTaxBaseRequest(context.Order.Customer, context.Order.Id, -(decimal?)context.SafeData.Discount ?? 0, taxGetType, destination, origin);
 
             var lines = ToTaxLines(context, taxGetType, 1).ToArray();
             if (!lines.Any())
@@ -131,7 +131,7 @@ namespace VitalChoice.Business.Services.Avatax
             Address destination;
             FillAddresses(context.Order.ShippingAddress, out origin, out destination);
 
-            var request = FillGetTaxBaseRequest(context.Order.Customer, context.Order.Id, context.Order.DiscountTotal, taxGetType,
+            var request = FillGetTaxBaseRequest(context.Order.Customer, context.Order.Id, -(decimal?)context.SafeData.Discount ?? 0, taxGetType,
                 destination, origin);
 
             var lines = ToTaxLines(context, taxGetType, 1).ToArray();
@@ -195,7 +195,7 @@ namespace VitalChoice.Business.Services.Avatax
                 Country = "US",
                 PostalCode = "98248"
             };
-            destinationAddress = _mapper.ToModel<Address>(shippingAddress);
+            destinationAddress = _mapper.ToModelAsync<Address>(shippingAddress).GetAwaiter().GetResult();
             destinationAddress.AddressCode = "02";
             destinationAddress.Country = _countryNameCode.GetCountryCode(shippingAddress);
             destinationAddress.Region = _countryNameCode.GetRegionOrStateCode(shippingAddress);
@@ -285,7 +285,7 @@ namespace VitalChoice.Business.Services.Avatax
                     Description = p.Sku.Product.Name,
                     DestinationCode = "02",
                     OriginCode = "01",
-                    Discounted = order.DiscountTotal > 0,
+                    Discounted = (-(decimal?)order.SafeData.Discount ?? 0) > 0,
                     TaxCode = p.Sku.Product.SafeData.TaxCode,
                     Qty = p.Quantity,
                     ItemCode = p.Sku.Code,
@@ -317,7 +317,7 @@ namespace VitalChoice.Business.Services.Avatax
                     Description = p.Sku.Product.Name,
                     DestinationCode = "02",
                     OriginCode = "01",
-                    Discounted = order.DiscountTotal > 0,
+                    Discounted = (-(decimal?)order.SafeData.Discount ?? 0) > 0,
                     TaxCode = p.Sku.Product.SafeData.TaxCode,
                     Qty = p.Quantity,
                     ItemCode = p.Sku.Code,
