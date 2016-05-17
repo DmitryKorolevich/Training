@@ -56,7 +56,7 @@ BEGIN
 				FROM Orders o
 				JOIN Customers c WITH(NOLOCK) ON o.IdCustomer=c.Id
 				WHERE 
-					o.DateCreated>=@from AND o.DateCreated<=@to AND o.StatusCode!=3 AND 
+					o.DateCreated>=@from AND o.DateCreated<=@to AND o.StatusCode!=3  AND o.IdObjectType!=2 AND 
 					((o.OrderStatus IS NOT NULL AND o.OrderStatus!=1) OR 
 					(o.OrderStatus IS NULL AND o.POrderStatus!=1 AND o.NPOrderStatus!=1)) AND
 					(@idorder IS NULL OR o.Id = @idorder) AND
@@ -110,7 +110,7 @@ BEGIN
 					FROM Orders o
 					JOIN Customers c WITH(NOLOCK) ON o.IdCustomer=c.Id
 					WHERE 
-						o.DateCreated>=@from AND o.DateCreated<=@to AND o.StatusCode!=3 AND 
+						o.DateCreated>=@from AND o.DateCreated<=@to AND o.StatusCode!=3  AND o.IdObjectType!=2 AND 
 						((o.OrderStatus IS NOT NULL AND o.OrderStatus!=1) OR 
 						(o.OrderStatus IS NULL AND o.POrderStatus!=1 AND o.NPOrderStatus!=1)) AND
 						(@idorder IS NULL OR o.Id = @idorder) AND

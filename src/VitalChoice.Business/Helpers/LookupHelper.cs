@@ -455,6 +455,33 @@ namespace VitalChoice.Business.Helpers
             return toReturn;
         }
 
+        public static string GetShortOrderTypeName(OrderType type)
+        {
+            string toReturn = null;
+            switch (type)
+            {
+                case OrderType.Normal:
+                    toReturn = "S";
+                    break;
+                case OrderType.AutoShipOrder:
+                    toReturn = "AS";
+                    break;
+                case OrderType.DropShip:
+                    toReturn = "DS";
+                    break;
+                case OrderType.GiftList:
+                    toReturn = "GL";
+                    break;
+                case OrderType.Reship:
+                    toReturn = "RS";
+                    break;
+                case OrderType.Refund:
+                    toReturn = "RF";
+                    break;
+            }
+            return toReturn;
+        }
+
         public static IList<LookupItem<int?>> GetVisibleOptions()
         {
             IList<LookupItem<int?>> toReturn = new List<LookupItem<int?>>

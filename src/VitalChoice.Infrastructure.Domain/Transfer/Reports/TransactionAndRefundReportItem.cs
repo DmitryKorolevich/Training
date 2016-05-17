@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
@@ -20,17 +21,19 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Reports
 
         public OrderType IdObjectType { get; set; }
 
-        public OrderType? OrderStatus { get; set; }
+        public OrderStatus? OrderStatus { get; set; }
 
-        public OrderType? POrderStatus { get; set; }
+        public OrderStatus? POrderStatus { get; set; }
 
-        public OrderType? NPOrderStatus { get; set; }
+        public OrderStatus? NPOrderStatus { get; set; }
 
         public int? ServiceCode { get; set; }
 
+        public string ServiceCodeName { get; set; }
+
         public int IdCustomer { get; set; }
 
-        public CustomerTypeCode CustomerIdObjectType { get; set; }
+        public CustomerType CustomerIdObjectType { get; set; }
 
         public string CustomerFirstName { get; set; }
 

@@ -1,0 +1,171 @@
+﻿<div class="container-fluid transactions-refunds-report">
+    <div class="well">
+        <span class="legend">Transaction & Refund Report</span>
+        <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate>
+            <fieldset>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="From" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.From.$invalid">
+                            <small class="error" ng-show="forms.form.From.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","From")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="To" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.To.$invalid">
+                            <small class="error" ng-show="forms.form.To.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","To")}}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <select class="form-control" name="IdCustomerType" data-ng-change="filterChanged();" data-ng-model="filter.IdCustomerType" ng-options="item.Key as item.Text for item in customerTypes"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control" name="IdServiceCode" data-ng-change="filterChanged();" data-ng-model="filter.IdServiceCode" ng-options="item.Key as item.Text for item in serviceCodes"></select>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <input type="text" name="IdCustomer" class="form-control" placeholder="Customer #" data-ng-change="filterChanged();" data-ng-model="filter.IdCustomer" numbers-only autocomplete="off" data-ng-minlength="3">
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.IdCustomer.$invalid">
+                            <small class="error" ng-show="forms.form.IdCustomer.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Customer #")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" name="CustomerFirstName" class="form-control" placeholder="Customer First Name" data-ng-change="filterChanged();" data-ng-model="filter.CustomerFirstName" autocomplete="off" data-ng-minlength="3">
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.CustomerFirstName.$invalid">
+                            <small class="error" ng-show="forms.form.CustomerFirstName.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Customer First Name")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" name="CustomerLastName" class="form-control" placeholder="Customer Last Name" data-ng-change="filterChanged();" data-ng-model="filter.CustomerLastName" autocomplete="off" data-ng-minlength="3">
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.CustomerLastName.$invalid">
+                            <small class="error" ng-show="forms.form.CustomerLastName.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Customer Last Name")}}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <input type="text" name="IdOrder" class="form-control" placeholder="Order #" data-ng-change="filterChanged();" data-ng-model="filter.IdOrder" numbers-only autocomplete="off" data-ng-minlength="3">
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.IdOrder.$invalid">
+                            <small class="error" ng-show="forms.form.IdOrder.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Order #")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control" name="IdOrderType" data-ng-change="filterChanged();" data-ng-model="filter.IdOrderType" ng-options="item.Key as item.Text for item in orderTypes"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control" name="IdOrderStatus" data-ng-change="filterChanged();" data-ng-model="filter.IdOrderStatus" ng-options="item.Key as item.Text for item in orderStatuses"></select>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <button class="btn btn-info" data-ng-click="filterItems();" type="button">Filter</button>
+                        <a target="_self" class="btn btn-primary pull-right" data-ng-href="{{options.exportUrl}}">Export</a>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+        <spinner-overlay data-loading="refreshTracker.active()">            
+            <div class="orders">
+                <table class="table table-striped order-statuses">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Key</th>
+                            <th class="status">Status</th>
+                            <th>O Type</th>
+                            <th>Redeem</th>
+                            <th>SKU</th>
+                            <th>Description</th>
+                            <th>Quantity</th>
+                            <th>Product Type</th>
+                            <th>Customer</th>
+                            <th>C Type</th>
+                            <th>Payment</th>
+                            <th>Price</th>
+                            <th>Product %</th>
+                            <th>Discount Type</th>
+                            <th>Discount %</th>
+                            <th>Discounted Subtotal</th>
+                            <th>Override</th>
+                            <th>Service Code</th>
+                            <th>Return</th>
+                            <th>Shipping</th>
+                            <th>Tax</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-ng-repeat="item in items">
+                            <td>
+                                <a ui-sref="{{::item.IdObjectType==5 ? 'index.oneCol.orderReshipDetail({id: item.IdOrder })' : item.IdObjectType==6 ? 'index.oneCol.orderRefundDetail({id: item.IdOrder })' : 'index.oneCol.orderDetail({id: item.IdOrder })'}}">{{::item.IdOrder}}</a>
+                            </td>
+                            <td>{{::item.Rank}}</td>
+                            <td>
+                                <div data-ng-include="'app/modules/order/partials/orderStatusSection.html'"></div>
+                            </td>
+                            <td>
+                                <span class="label font-default" data-ng-class="::{'label-retail': (item.IdObjectType==1 || item.IdObjectType==7 ||item.IdObjectType==3 || item.IdObjectType==4), 'label-primary':  item.IdObjectType==5, 'label-success':  item.IdObjectType==6}">{{::getReferenceItem(ReferenceData.ShortOrderTypes, item.IdObjectType).Text}}</span>
+                            </td>
+                            <td>{{::getReferenceItem(ReferenceData.RefundRedeemOptions, item.RefundIdRedeemType).Text}}</td>
+                            <td>{{::item.Code}}</td>
+                            <td>{{::item.DisplayName}}</td>
+                            <td>{{::item.OrderQuantity}}</td>
+                            <td>{{getReferenceItem(ReferenceData.ShortProductTypes, item.ProductIdObjectType).Text}}</td>
+                            <td>
+                                <a ui-sref="index.oneCol.customerDetail({id: item.IdCustomer})">{{::item.CustomerFirstName}} {{::item.CustomerLastName}}</a>
+                            </td>
+                            <td>
+                                <span data-ng-if="::item.CustomerIdObjectType == 1" class="label label-retail font-default">{{::getReferenceItem(ReferenceData.ShortCustomerTypes, item.CustomerIdObjectType).Text}}</span>
+                                <span data-ng-if="::item.CustomerIdObjectType == 2" class="label label-wholesale font-default">{{::getReferenceItem(ReferenceData.ShortCustomerTypes, item.CustomerIdObjectType).Text}}</span>
+                            </td>
+                            <td>{{::getReferenceItem(ReferenceData.ShortPaymentMethods, item.PaymentMethodIdObjectType).Text}}</td>
+                            <td>
+                                <span data-ng-if="::item.IdObjectType!=6">{{::item.Price | currency}}</span>
+                                <span data-ng-if="::item.IdObjectType==6">({{Math.abs(item.Price) | currency}})</span>
+                            </td>
+                            <td><span data-ng-if="::item.RefundProductPercent">{{::item.RefundProductPercent}}%</span></td>
+                            <td>{{::getReferenceItem(ReferenceData.DiscountTypes, item.DiscountIdObjectType).Text}}</td>
+                            <td><span data-ng-if="::item.DiscountPercent">{{::item.DiscountPercent}}%</span></td>
+                            <td>
+                                <span data-ng-if="::item.IdObjectType!=6">{{::item.DiscountedSubtotal | currency}}</span>
+                                <span data-ng-if="::item.IdObjectType==6">({{Math.abs(item.DiscountedSubtotal) | currency}})</span>
+                            </td>
+                            <td>no</td>
+                            <td>{{getReferenceItem(ReferenceData.ServiceCodes, item.ServiceCode).Text}}</td>
+                            <td>{{::item.ReturnAssociated}}</td>
+                            <td>{{::item.ShippingTotal | currency}}</td>
+                            <td>{{::item.TaxTotal | currency}}</td>
+                            <td>
+                                <span data-ng-if="::item.IdObjectType!=6">{{::item.Total | currency}}</span>
+                                <span data-ng-if="::item.IdObjectType==6">({{Math.abs(item.Total) | currency}})</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </spinner-overlay>
+        <uib-pagination boundary-links="true"
+                        total-items="totalItems"
+                        items-per-page="filter.Paging.PageItemCount"
+                        data-ng-model="filter.Paging.PageIndex"
+                        previous-text="&lsaquo;"
+                        next-text="&rsaquo;"
+                        first-text="&laquo;"
+                        last-text="&raquo;"
+                        data-ng-change="pageChanged()">
+        </uib-pagination>
+    </div>
+</div>

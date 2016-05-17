@@ -22,6 +22,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 using VitalChoice.Data.Helpers;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
@@ -38,6 +39,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IRepositoryAsync<AdminTeam> _adminTeamRepository;
         private readonly SPEcommerceRepository _sPEcommerceRepository;
         private readonly ICountryService _countryService;
+        private readonly IAppInfrastructureService _appInfrastructureService;
         private readonly ILogger _logger;
 
         public OrderReportService(
@@ -47,6 +49,7 @@ namespace VitalChoice.Business.Services.Orders
             IRepositoryAsync<AdminTeam> adminTeamRepository,
             SPEcommerceRepository sPEcommerceRepository,
             ICountryService countryService,
+            IAppInfrastructureService appInfrastructureService,
             ILoggerProviderExtended loggerProvider)
         {
             _orderService = orderService;
@@ -55,6 +58,7 @@ namespace VitalChoice.Business.Services.Orders
             _adminTeamRepository = adminTeamRepository;
             _sPEcommerceRepository = sPEcommerceRepository;
             _countryService = countryService;
+            _appInfrastructureService = appInfrastructureService;
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -551,21 +555,25 @@ namespace VitalChoice.Business.Services.Orders
             dbItems.ForEach(p =>
             {
                 TransactionAndRefundReportItem item = new TransactionAndRefundReportItem();
-                item.IdOrder = p.Id;
+                item.IdOrder = p.IdOrder;
                 item.IdOrderSource = p.IdOrderSource;
                 item.Rank = p.Rank;
                 item.IdObjectType = (OrderType)p.IdObjectType;
-                item.OrderStatus = (OrderType?) p.OrderStatus;
-                item.POrderStatus = (OrderType?)p.POrderStatus;
-                item.NPOrderStatus = (OrderType?)p.NPOrderStatus;
+                item.OrderStatus = (OrderStatus?) p.OrderStatus;
+                item.POrderStatus = (OrderStatus?)p.POrderStatus;
+                item.NPOrderStatus = (OrderStatus?)p.NPOrderStatus;
                 item.ServiceCode = p.ServiceCode;
+                item.ServiceCodeName =  p.ServiceCode.HasValue ? _appInfrastructureService.Data().ServiceCodes.FirstOrDefault(pp=>p.ServiceCode.Value==pp.Key)?.Text : null;
                 item.IdCustomer = p.IdCustomer;
+                item.CustomerFirstName = p.CustomerFirstName;
+                item.CustomerLastName = p.CustomerLastName;
+                item.CustomerIdObjectType = (CustomerType)p.CustomerIdObjectType;
                 item.ProductsSubtotal = p.ProductsSubtotal;
                 item.DiscountTotal = p.DiscountTotal;
-                item.DiscountedSubtotal = p.ProductsSubtotal - p.DiscountTotal;
+                item.DiscountedSubtotal = p.IdObjectType == (int) OrderType.Refund ? -(p.ProductsSubtotal - p.DiscountTotal) : p.ProductsSubtotal - p.DiscountTotal;
                 item.ShippingTotal = p.ShippingTotal;
                 item.TaxTotal = p.TaxTotal;
-                item.Total = p.Total;
+                item.Total = p.IdObjectType == (int)OrderType.Refund ? -p.Total : p.Total;
                 item.ReturnAssociated = p.ReturnAssociated;
                 item.PaymentMethodIdObjectType = (PaymentMethodType?)p.PaymentMethodIdObjectType;
                 item.DiscountIdObjectType = (DiscountType?)p.DiscountIdObjectType;
@@ -581,7 +589,7 @@ namespace VitalChoice.Business.Services.Orders
                 item.DisplayName += $" ({p.SkuQTY})";
                 item.OrderQuantity = p.OrderQuantity;
                 item.ProductIdObjectType = (ProductType?)p.ProductIdObjectType;
-                item.Price = p.Price;
+                item.Price = p.IdObjectType==(int)OrderType.Refund ? -p.Price : p.Price;
                 item.RefundIdRedeemType = (RedeemType?)p.RefundIdRedeemType;
                 item.RefundProductPercent = p.RefundProductPercent;
                 item.Override = "no";

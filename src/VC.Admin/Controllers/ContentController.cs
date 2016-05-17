@@ -540,23 +540,30 @@ namespace VC.Admin.Controllers
 
 		#endregion
 
-		#region
+		#region CrossItems
 
-	    private async Task<ContentCrossSellItemModel> PopulateContentCrossSellItemModel(ContentCrossSell item)
+	    private async Task<ContentCrossSellItemModel> PopulateContentCrossSellItemModel(ContentCrossSell item, ContentCrossSellType type)
 	    {
 		    var sku = await productService.GetSkuAsync(item.IdSku);
 
-		    return new ContentCrossSellItemModel()
-		    {
-			    Type = item.Type,
-			    Title = item.Title,
-			    ImageUrl = item.ImageUrl,
-			    IdSku = item.IdSku,
-			    Id = item.Id,
-				SkuCode = sku.Code,
-				RetailPrice = sku.Price,
-				WholesalePrice = sku.WholesalePrice
-		    };
+	        if (sku != null)
+	        {
+	            return new ContentCrossSellItemModel()
+	            {
+	                Type = item.Type,
+	                Title = item.Title,
+	                ImageUrl = item.ImageUrl,
+	                IdSku = item.IdSku,
+	                Id = item.Id,
+	                SkuCode = sku.Code,
+	                RetailPrice = sku.Price,
+	                WholesalePrice = sku.WholesalePrice
+	            };
+	        }
+	        else
+	        {
+	            return new ContentCrossSellItemModel() {Type = type};
+	        }
 	    }
 
 		private async Task<ContentCrossSellModel> PopulateContentCrossSellModel(IList<ContentCrossSell> contentCrossSells, ContentCrossSellType type)
@@ -566,7 +573,7 @@ namespace VC.Admin.Controllers
 			for (var i = 0; i < ContentConstants.CONTENT_CROSS_SELL_LIMIT; i++)
 			{
 				var item = contentCrossSells.SingleOrDefault(x => x.Order == i + 1);
-				var modelItem = item != null ? await PopulateContentCrossSellItemModel(item) : new ContentCrossSellItemModel() { Type = type };
+				var modelItem = item != null ? await PopulateContentCrossSellItemModel(item, type) : new ContentCrossSellItemModel() { Type = type };
 
 				model.Items.Add(modelItem);
 			}
