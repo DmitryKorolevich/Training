@@ -9,7 +9,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage
     {
 	    public int ReviewsCount { get; set; }
 
-	    public int AverageRatings { get; set; }
+	    public double AverageRatings { get; set; }
 
 		public IList<TtlProductReviewModel> Reviews { get; set; } 
     }

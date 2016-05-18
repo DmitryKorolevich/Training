@@ -13,7 +13,7 @@ namespace VitalChoice.Interfaces.Services.Products
 
         Task<int> GetApprovedCountAsync(int productId);
 
-        Task<int> GetApprovedAverageRatingsAsync(int productId);
+        Task<double> GetApprovedAverageRatingsAsync(int productId);
 
         Task<ProductReview> GetProductReviewAsync(int id);
 

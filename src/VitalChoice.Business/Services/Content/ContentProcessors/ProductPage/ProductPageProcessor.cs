@@ -146,7 +146,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 
         private async Task<TtlProductPageModel> PopulateProductPageTemplateModel(
             ProcessorViewContext viewContext, ProductNavCategoryLite rootAllCategory,
-            PagedList<ProductReview> lastProductReviews, int reviewsCount, int ratingsAverage, IList<RecordStatusCode> targetStatusCodes, int? idCategory)
+            PagedList<ProductReview> lastProductReviews, int reviewsCount, double ratingsAverage, IList<RecordStatusCode> targetStatusCodes, int? idCategory)
         {
             IList<TtlBreadcrumbItemModel> breadcrumbItems = new List<TtlBreadcrumbItemModel>();
 
