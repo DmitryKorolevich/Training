@@ -89,7 +89,9 @@ angular.module('app.modules.content.controllers.contentCrossSellsManageControlle
 
 				$scope.title = $scope.id == 1 ? "Manage Add To Cart Cross Selling" : "Manage View Cart Cross Selling";
 
-				$scope.skusFilter = {};
+				$scope.skusFilter = {
+				    Paging: { PageIndex: 1, PageItemCount: 20 },
+				};
 
 				refreshCrossSells();
 
