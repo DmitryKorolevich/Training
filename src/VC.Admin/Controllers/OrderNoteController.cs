@@ -72,7 +72,7 @@ namespace VC.Admin.Controllers
 				}).ToList(),
 			};
 
-			await _orderNoteService.AddOrderNoteAsync(orderNote, Convert.ToInt32(_userManager.GetUserId(HttpContext.User)));
+			await _orderNoteService.AddOrderNoteAsync(orderNote, Convert.ToInt32(_userManager.GetUserId(User)));
 
 			return true;
 		}
@@ -96,7 +96,7 @@ namespace VC.Admin.Controllers
 				IdCustomerType = x
 			}).ToList();
 
-			await _orderNoteService.UpdateOrderNoteAsync(orderNote, Convert.ToInt32(_userManager.GetUserId(HttpContext.User)));
+			await _orderNoteService.UpdateOrderNoteAsync(orderNote, Convert.ToInt32(_userManager.GetUserId(User)));
 
 			return true;
 		}
@@ -122,7 +122,7 @@ namespace VC.Admin.Controllers
 		[HttpGet]
 	    public async Task<Result<bool>> DeleteOrderNote(int id)
 	    {
-			await _orderNoteService.DeleteOrderNoteAsync(id, Convert.ToInt32(_userManager.GetUserId(HttpContext.User)));
+			await _orderNoteService.DeleteOrderNoteAsync(id, Convert.ToInt32(_userManager.GetUserId(User)));
 
 			return true;
 	    }

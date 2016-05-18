@@ -31,7 +31,7 @@ namespace VC.Admin.Controllers
         {
             _vitalGreenService = vitalGreenService;
             _csvExportVitalGreenRequestService = csvExportVitalGreenRequestService;
-            this._logger = loggerProvider.CreateLogger<>();
+            this._logger = loggerProvider.CreateLogger<VitalGreenController>();
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
 

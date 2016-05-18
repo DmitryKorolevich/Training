@@ -102,7 +102,7 @@ namespace VC.Admin.Controllers
                 return null;
             var promotion = await _mapper.FromModelAsync(model);
 
-            var sUserId = _userManager.GetUserId(HttpContext.User);
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {

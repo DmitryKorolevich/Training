@@ -2,19 +2,14 @@
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Microsoft.Net.Http.Server;
 using VC.Public.Controllers.Content;
 using VC.Public.Models;
 using VC.Public.Models.Product;
-using VC.Public.Models.Profile;
 using VitalChoice.Core.Infrastructure.Helpers.ReCaptcha;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
-using VitalChoice.Ecommerce.Domain.Entities.Users;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Constants;
-using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services.Products;
@@ -81,7 +76,7 @@ namespace VC.Public.Controllers
 	    [HttpGet]
         public async Task<IActionResult> Categories()
         {
-            var toReturn = await _categoryViewService.GetContentAsync(ActionContext, BindingContext, User);
+            var toReturn = await _categoryViewService.GetContentAsync(ControllerContext, User);
             if (toReturn?.Body != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
@@ -92,7 +87,7 @@ namespace VC.Public.Controllers
         [HttpGet]
         public async Task<IActionResult> Category(string url)
         {
-            var toReturn = await _categoryViewService.GetContentAsync(ActionContext, BindingContext, User);
+            var toReturn = await _categoryViewService.GetContentAsync(ControllerContext, User);
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
@@ -103,7 +98,7 @@ namespace VC.Public.Controllers
 		[HttpGet]
 		public async Task<IActionResult> Product(string url)
 		{
-			var toReturn = await _productViewService.GetContentAsync(ActionContext, BindingContext, User);
+			var toReturn = await _productViewService.GetContentAsync(ControllerContext, User);
             if (toReturn != null)
 			{
 				return View("~/Views/Content/ProductPage.cshtml", new ContentPageViewModel(toReturn));

@@ -108,7 +108,7 @@ namespace VitalChoice.Core.DependencyInjection
     public abstract class DefaultDependencyConfig : IDependencyConfig
     {
         public Autofac.IContainer RegisterInfrastructure(IConfiguration configuration, IServiceCollection services,
-            Assembly projectAssembly, IHostingEnvironment appEnv = null, bool enableCache = true)
+            Assembly projectAssembly, IHostingEnvironment appEnv, bool enableCache = true)
         {
             // Add EF services to the services container.
 #if !NETSTANDARD1_5

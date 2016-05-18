@@ -120,12 +120,12 @@ namespace VC.Admin.Controllers
 			}
 
 			var context = HttpContext;
-			if (user.Id == Convert.ToInt32(_userManager.GetUserId(HttpContext.User)) && user.Status != userModel.Status)
+			if (user.Id == Convert.ToInt32(_userManager.GetUserId(User)) && user.Status != userModel.Status)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CurrentUserStatusUpdate]);
 			}
 
-			var isCurrentUser = user.Email.Equals(_userManager.GetUserName(HttpContext.User));
+			var isCurrentUser = user.Email.Equals(_userManager.GetUserName(User));
 
 			user.FirstName = userModel.FirstName;
 			user.LastName = userModel.LastName;
@@ -180,7 +180,7 @@ namespace VC.Admin.Controllers
 			}
 
 			var context = HttpContext;
-			if (user.Id == Convert.ToInt32(_userManager.GetUserId(HttpContext.User)))
+			if (user.Id == Convert.ToInt32(_userManager.GetUserId(User)))
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CurrentUserRemoval]);
 			}

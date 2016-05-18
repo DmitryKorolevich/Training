@@ -61,7 +61,7 @@ namespace VC.Admin.Controllers
                 return null;
             var item = model.Convert();
 
-            var sUserId = _userManager.GetUserId(HttpContext.User);
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
@@ -75,7 +75,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<bool>> DeleteRedirect(int id, [FromBody] object model)
         {
-            var sUserId = _userManager.GetUserId(HttpContext.User);
+            var sUserId = _userManager.GetUserId(User);
             int userId = Int32.Parse(sUserId);
             return await _redirectService.DeleteRedirectAsync(id, userId);
         }

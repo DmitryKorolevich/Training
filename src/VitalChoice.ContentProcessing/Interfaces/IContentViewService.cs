@@ -9,7 +9,7 @@ namespace VitalChoice.ContentProcessing.Interfaces
 {
     public interface IContentViewService
     {
-        Task<ContentViewModel> GetContentAsync(ActionContext context, ModelBindingContext bindingContext, ClaimsPrincipal user,
+        Task<ContentViewModel> GetContentAsync(ControllerContext context, ClaimsPrincipal user,
             object additionalParameters = null);
     }
 }

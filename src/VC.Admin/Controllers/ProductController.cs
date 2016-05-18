@@ -232,7 +232,7 @@ namespace VC.Admin.Controllers
                 return null;
             
             var product = await _mapper.FromModelAsync(model);
-            var sUserId = _userManager.GetUserId(HttpContext.User);
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
@@ -350,7 +350,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var item = model.Convert();
-            var sUserId = _userManager.GetUserId(HttpContext.User);
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {

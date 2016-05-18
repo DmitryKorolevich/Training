@@ -2,30 +2,14 @@
 using System.IO;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using VC.Public.AppConfig;
-using VitalChoice.Core.DependencyInjection;
-using VitalChoice.Core.GlobalFilters;
-using VitalChoice.Core.Infrastructure;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.PlatformAbstractions;
-using Microsoft.AspNetCore.Http;
-using System.Globalization;
 using System.Net;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using VitalChoice.Interfaces.Services;
 using Autofac;
-using Microsoft.AspNetCore.StaticFiles;
-using VitalChoice.Business.Services;
-using VitalChoice.Profiling;
-using VitalChoice.Profiling.Base;
 using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Constants;
 
@@ -33,57 +17,70 @@ namespace VC.Public
 {
     public class Startup
     {
-        public IConfiguration Configuration { get; set; }
+        private readonly IHostingEnvironment _hostingEnvironment;
+        public IConfiguration Configuration { get; }
 
-
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public Startup(IHostingEnvironment hostingEnvironment)
         {
-            var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
-
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(applicationEnvironment.ApplicationBasePath)
+            _hostingEnvironment = hostingEnvironment;
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(hostingEnvironment.ContentRootPath)
                 .AddJsonFile("config.json")
                 .AddJsonFile("config.local.json", true)
                 .AddEnvironmentVariables();
 
-            Configuration = configuration.Build();
+            Configuration = builder.Build();
+        }
 
+        public IServiceProvider ConfigureServices(IServiceCollection services)
+        {
             var reg = new StorefrontDependencyConfig();
-            var container = reg.RegisterInfrastructure(Configuration, services, typeof(Startup).GetTypeInfo().Assembly);
-
+            var container = reg.RegisterInfrastructure(Configuration, services, typeof(Startup).GetTypeInfo().Assembly, _hostingEnvironment);
             return container.Resolve<IServiceProvider>();
         }
 
-        // Configure is called after ConfigureServices is called.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerfactory)
+        public void ConfigureDevelopment(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
-            // Add the following to the request pipeline only in development environment.
-            if (string.Equals(env.EnvironmentName, "Development", StringComparison.OrdinalIgnoreCase))
-            {
-                app.UseDeveloperExceptionPage(new ErrorPageOptions()
-                {
-                    SourceCodeLineCount = 25
-                });
-                //app.UseDatabaseErrorPage(DatabaseErrorPageOptions.ShowAll);
-            }
-            else
-            {
-                // Add Error handling middleware which catches all application specific errors and
-                // send the request to the following path or controller action.
-                app.UseExceptionHandler("/Shared/Error");
-            }
+            loggerFactory.AddConsole(minLevel: LogLevel.Information);
 
-            // Add static files to the request pipeline.
+            app.UseDeveloperExceptionPage(new DeveloperExceptionPageOptions
+            {
+                SourceCodeLineCount = 25
+            });
+
+            app.UseDatabaseErrorPage();
+
+            Configure(app);
+        }
+
+        public void ConfigureStaging(IApplicationBuilder app, ILoggerFactory loggerFactory)
+        {
+            loggerFactory.AddConsole(minLevel: LogLevel.Warning);
+
+            app.UseExceptionHandler("/Home/Error");
+
+            Configure(app);
+        }
+
+        public void ConfigureProduction(IApplicationBuilder app, ILoggerFactory loggerFactory)
+        {
+            loggerFactory.AddConsole(minLevel: LogLevel.Warning);
+
+            app.UseExceptionHandler("/Home/Error");
+
+            Configure(app);
+        }
+
+        public void Configure(IApplicationBuilder app)
+        {
             app.UseStaticFiles(new StaticFileOptions
             {
                 OnPrepareResponse = context => context.Context.Response.Headers.Add("Cache-Control", "public, max-age=604800")
             });
 
-            // Add cookie-based authentication to the request pipeline.
             app.UseIdentity();
 
             app.UseSession();
-            //app.InjectProfiler();
             app.Use(async (context, next) =>
             {
                 var redirectViewService = context.RequestServices.GetService<IRedirectViewService>();

@@ -3,58 +3,73 @@ using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.PlatformAbstractions;
 using VC.Admin.AppConfig;
-using VitalChoice.Core.DependencyInjection;
 using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using VitalChoice.Business.Services;
 using VitalChoice.Profiling;
-using VitalChoice.Profiling.Base;
 
 namespace VC.Admin
 {
     public class Startup
     {
+        private readonly IHostingEnvironment _hostingEnvironment;
         public IConfiguration Configuration { get; set; }
 
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public Startup(IHostingEnvironment hostingEnvironment)
         {
-            var serviceProvider = services.BuildServiceProvider();
-            var applicationEnvironment = serviceProvider.GetRequiredService<IHostingEnvironment>();
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(applicationEnvironment.WebRootPath)
+            _hostingEnvironment = hostingEnvironment;
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(hostingEnvironment.ContentRootPath)
                 .AddJsonFile("config.json")
                 .AddJsonFile("config.local.json", true)
                 .AddEnvironmentVariables();
 
+            Configuration = builder.Build();
+        }
 
-            Configuration = configuration.Build();
-
+        public IServiceProvider ConfigureServices(IServiceCollection services)
+        {
             var reg = new AdminDependencyConfig();
 
-            var container = reg.RegisterInfrastructure(Configuration, services, typeof(Startup).GetTypeInfo().Assembly);
+            var container = reg.RegisterInfrastructure(Configuration, services, typeof(Startup).GetTypeInfo().Assembly, _hostingEnvironment);
             return container.Resolve<IServiceProvider>();
         }
 
-        // Configure is called after ConfigureServices is called.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerfactory)
+        public void ConfigureDevelopment(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
-            // Add the following to the request pipeline only in development environment.
-            if (string.Equals(env.EnvironmentName, "Development", StringComparison.OrdinalIgnoreCase))
+            loggerFactory.AddConsole(minLevel: LogLevel.Information);
+
+            app.UseDeveloperExceptionPage(new DeveloperExceptionPageOptions
             {
-                app.UseDeveloperExceptionPage(new DeveloperExceptionPageOptions
-                {
-                    SourceCodeLineCount = 250
-                });
-            }
-            else
-            {
-                // Add Error handling middleware which catches all application specific errors and
-                // send the request to the following path or controller action.
-            }
-            // Add static files to the request pipeline.
+                SourceCodeLineCount = 25
+            });
+
+            app.UseDatabaseErrorPage();
+
+            Configure(app);
+        }
+
+        public void ConfigureStaging(IApplicationBuilder app, ILoggerFactory loggerFactory)
+        {
+            loggerFactory.AddConsole(minLevel: LogLevel.Warning);
+
+            app.UseExceptionHandler("/Home/Error");
+
+            Configure(app);
+        }
+
+        public void ConfigureProduction(IApplicationBuilder app, ILoggerFactory loggerFactory)
+        {
+            loggerFactory.AddConsole(minLevel: LogLevel.Warning);
+
+            app.UseExceptionHandler("/Home/Error");
+
+            Configure(app);
+        }
+
+        public void Configure(IApplicationBuilder app)
+        {
             app.UseStaticFiles(new StaticFileOptions
             {
                 OnPrepareResponse = context => context.Context.Response.Headers.Add("Cache-Control", "public, max-age=604800")

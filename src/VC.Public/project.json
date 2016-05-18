@@ -10,7 +10,23 @@
         "bower_components",
         "deploy"
       ]
-    }
+    },
+    "copyToOutput": {
+      "include": [
+        "Areas",
+        "Views",
+        "Assets",
+        "wwwroot",
+        "config.json",
+        "web.config"
+      ]
+    },
+    "preserveCompilationContext": true,
+    "emitEntryPoint": true
+  },
+  "runtimeOptions": {
+    "gcServer": false,
+    "gcConcurrent": true
   },
   "packOptions": {
     "exclude": [
@@ -20,6 +36,16 @@
       "**.xproj",
       "**.user",
       "**.vspscc"
+    ]
+  },
+  "publishOptions": {
+    "include": [
+      "Areas",
+      "Views",
+      "Assets",
+      "wwwroot",
+      "config.json",
+      "web.config"
     ]
   },
   "dependencies": {
@@ -45,7 +71,9 @@
     "VitalChoice.Infrastructure": "1.0.0-*",
     "VitalChoice.Core": "1.0.0-*",
     "VitalChoice.Validation": "1.0.0-*",
-    "VitalChoice.SharedWeb": "1.0.0-*"
+    "VitalChoice.SharedWeb": "1.0.0-*",
+    "Microsoft.Extensions.Configuration.EnvironmentVariables": "1.0.0-rc2-final",
+    "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": "1.0.0-rc2-final"
   },
   "frameworks": {
     "net461": {

@@ -124,7 +124,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return false;
 
-            var sUserId = _userManager.GetUserId(HttpContext.User);
+            var sUserId = _userManager.GetUserId(User);
             int tempId;
             int? userId = null;
             if (Int32.TryParse(sUserId, out tempId))

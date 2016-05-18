@@ -41,6 +41,7 @@ using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Affiliates;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.SharedWeb.Helpers;
@@ -75,10 +76,10 @@ namespace VC.Public.Controllers
             ICountryService countryService,
             BrontoService brontoService,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
-            IPageResultService pageResultService, ISettingService settingService, ILoggerProviderExtended loggerProvider)
+            IPageResultService pageResultService, ISettingService settingService, ILoggerProviderExtended loggerProvider, ExtendedUserManager userManager)
             : base(
                 customerService, infrastructureService, authorizationService, checkoutService, orderService,
-                skuMapper, productMapper, pageResultService, settingService)
+                skuMapper, productMapper, pageResultService, settingService, userManager)
         {
             _storefrontUserService = storefrontUserService;
             _paymentMethodConverter = paymentMethodConverter;
@@ -90,7 +91,7 @@ namespace VC.Public.Controllers
             _transactionAccessor = transactionAccessor;
             _affiliateService = affiliateService;
             _appInfrastructure = appInfrastructureService.Data();
-            _logger = loggerProvider.CreateLogger<>();
+            _logger = loggerProvider.CreateLogger<CheckoutController>();
         }
 
         public async Task<IActionResult> Welcome(bool forgot = false)
@@ -424,7 +425,13 @@ namespace VC.Public.Controllers
             if (model.UseBillingAddress)
             {
                 HashSet<string> propertyNames = new HashSet<string>(typeof (AddressModel).GetRuntimeProperties().Select(p => p.Name));
-                ModelState.RemoveAll(pair => propertyNames.Contains(pair.Key));
+                foreach (var item in ModelState)
+                {
+                    if (propertyNames.Contains(item.Key))
+                    {
+                        ModelState.Remove(item.Key);
+                    }
+                }
             }
             var cart = await GetCurrentCart();
             var loggedIn = await EnsureLoggedIn(cart);

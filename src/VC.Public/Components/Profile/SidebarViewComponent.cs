@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VC.Public.Models.Profile;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Users;
 
 namespace VC.Public.Components.Profile
@@ -13,13 +14,15 @@ namespace VC.Public.Components.Profile
 	public class SidebarViewComponent : ViewComponent
 	{
 		private readonly IStorefrontUserService _storefrontUserService;
+	    private readonly ExtendedUserManager _userManager;
 
-		public SidebarViewComponent(IStorefrontUserService storefrontUserService)
-		{
-			_storefrontUserService = storefrontUserService;
-		}
+	    public SidebarViewComponent(IStorefrontUserService storefrontUserService, ExtendedUserManager userManager)
+	    {
+	        _storefrontUserService = storefrontUserService;
+	        _userManager = userManager;
+	    }
 
-		public async Task<IViewComponentResult> InvokeAsync()
+	    public async Task<IViewComponentResult> InvokeAsync()
 		{
 			var userId = Convert.ToInt32(_userManager.GetUserId(HttpContext.User));
 

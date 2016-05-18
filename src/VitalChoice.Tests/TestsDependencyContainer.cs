@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using Autofac;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.PlatformAbstractions;
@@ -12,14 +14,14 @@ namespace VitalChoice.Tests
 
         static TestsDependencyContainer()
         {
-            var configurationBuilder = new ConfigurationBuilder()
-                .AddJsonFile("config.json")
-                .AddJsonFile("config.local.json", true);
+            var host = new WebHostBuilder()
+                .UseContentRoot(Directory.GetCurrentDirectory())
+                .UseStartup<Startup>()
+                .Build();
 
-            var configuration = configurationBuilder.Build();
+            host.Run();
 
-            RootScope = new TestDependencyConfig().RegisterInfrastructure(configuration, new ServiceCollection(),
-                typeof(TestDependencyConfig).Assembly, PlatformServices.Default.Application, enableCache: true);
+            RootScope = host.Services.GetRequiredService<ILifetimeScope>();
         }
     }
 }

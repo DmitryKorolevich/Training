@@ -67,7 +67,7 @@ namespace VC.Admin.Controllers
             this.objectHistoryLogService = objectHistoryLogService;
             _catalogRequestAddressService = catalogRequestAddressService;
             _exportCatalogRequestAddressService = exportCatalogRequestAddressService;
-            this.logger = loggerProvider.CreateLogger<>();
+            this.logger = loggerProvider.CreateLogger<SettingController>();
         }
 
         #region Lookups

@@ -88,7 +88,7 @@ namespace VC.Admin.Controllers
                     IsDefault = false,
                 };
             }
-            var user = _userManager.GetUserId(HttpContext.User);
+            var user = _userManager.GetUserId(User);
 
             return new MasterContentItemManageModel((await masterContentService.GetMasterContentItemAsync(id)));
         }
@@ -116,7 +116,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var item = model.Convert();
-            var sUserId = _userManager.GetUserId(HttpContext.User);
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if(Int32.TryParse(sUserId,out userId))
             {
@@ -179,7 +179,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var item = model.Convert();
-            var sUserId = _userManager.GetUserId(HttpContext.User);
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
@@ -239,7 +239,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var item = model.Convert();
-            var sUserId = _userManager.GetUserId(HttpContext.User);
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
@@ -322,7 +322,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var item = model.Convert();
-            var sUserId = _userManager.GetUserId(HttpContext.User);
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
@@ -383,7 +383,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var item = model.Convert();
-            var sUserId = _userManager.GetUserId(HttpContext.User);
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
@@ -446,7 +446,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var item = model.Convert();
-            var sUserId = _userManager.GetUserId(HttpContext.User);
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
@@ -523,7 +523,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var item = model.Convert();
-            var sUserId = _userManager.GetUserId(HttpContext.User);
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
@@ -602,7 +602,7 @@ namespace VC.Admin.Controllers
 			if (!Validate(contentCrossSellsModel))
 				return null;
 
-			var sUserId = _userManager.GetUserId(HttpContext.User);
+			var sUserId = _userManager.GetUserId(User);
 			var userId = Convert.ToInt32(sUserId);
 
 			var alreadyExists = await contentCrossSellService.GetContentCrossSellsAsync(contentCrossSellsModel.Type);

@@ -21,6 +21,7 @@ using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services.Checkout;
 using System.Linq;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 
 namespace VC.Public.Controllers
 {
@@ -30,12 +31,14 @@ namespace VC.Public.Controllers
         protected readonly IAuthorizationService AuthorizationService;
         protected readonly ICustomerService CustomerService;
         protected readonly ICheckoutService CheckoutService;
+        private readonly ExtendedUserManager _userManager;
 
         protected PublicControllerBase(ICustomerService customerService,
             IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService, ICheckoutService checkoutService,
-            IPageResultService pageResultService) : base(pageResultService)
+            IPageResultService pageResultService, ExtendedUserManager userManager) : base(pageResultService)
         {
             CheckoutService = checkoutService;
+            _userManager = userManager;
             InfrastructureService = infrastructureService;
             AuthorizationService = authorizationService;
 			CustomerService = customerService;
@@ -66,7 +69,7 @@ namespace VC.Public.Controllers
         protected int GetInternalCustomerId()
         {
             var context = HttpContext;
-            var internalId = Convert.ToInt32(_userManager.GetUserId(HttpContext.User));
+            var internalId = Convert.ToInt32(_userManager.GetUserId(User));
 
             return internalId;
         }

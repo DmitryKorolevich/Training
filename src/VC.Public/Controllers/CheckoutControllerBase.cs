@@ -26,6 +26,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 using VitalChoice.Infrastructure.Identity;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Settings;
@@ -43,8 +44,8 @@ namespace VC.Public.Controllers
         protected CheckoutControllerBase(ICustomerService customerService,
             IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService, ICheckoutService checkoutService,
             IOrderService orderService, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
-            IPageResultService pageResultService, ISettingService settingService) : base(customerService,
-                infrastructureService, authorizationService, checkoutService, pageResultService)
+            IPageResultService pageResultService, ISettingService settingService, ExtendedUserManager userManager) : base(customerService,
+                infrastructureService, authorizationService, checkoutService, pageResultService, userManager)
         {
             OrderService = orderService;
             SkuMapper = skuMapper;

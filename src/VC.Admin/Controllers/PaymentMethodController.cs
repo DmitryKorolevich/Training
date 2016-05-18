@@ -45,7 +45,7 @@ namespace VC.Admin.Controllers
 		[HttpPost]
 		public async Task<Result<bool>> SetState([FromBody]IList<PaymentMethodsAvailability> paymentMethodsAvailability)
 		{
-		    await _paymentMethodService.SetStateAsync(paymentMethodsAvailability, Convert.ToInt32(_userManager.GetUserId(HttpContext.User)));
+		    await _paymentMethodService.SetStateAsync(paymentMethodsAvailability, Convert.ToInt32(_userManager.GetUserId(User)));
 
 			return true;
 		}

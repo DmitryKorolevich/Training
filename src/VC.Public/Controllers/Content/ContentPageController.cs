@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using VitalChoice.Infrastructure.Domain.Constants;
 using System.Net;
+using Microsoft.Extensions.DependencyInjection;
 using VitalChoice.Core.Services;
 
 namespace VC.Public.Controllers.Content
@@ -37,7 +38,7 @@ namespace VC.Public.Controllers.Content
         [HttpGet]
         public async Task<IActionResult> ContentPage(string url)
         {
-            var toReturn = await _contentPageViewService.GetContentAsync(ActionContext, BindingContext, User);
+            var toReturn = await _contentPageViewService.GetContentAsync(ControllerContext, User);
 
 			switch (url)
 			{
@@ -96,8 +97,8 @@ namespace VC.Public.Controllers.Content
 
             using (StringWriter sw = new StringWriter())
             {
-                var engine = HttpContext.RequestServices.GetService(typeof(ICompositeViewEngine)) as ICompositeViewEngine;
-                ViewEngineResult viewResult = engine.FindPartialView(actionContext, viewName);
+                var engine = HttpContext.RequestServices.GetRequiredService<ICompositeViewEngine>();
+                ViewEngineResult viewResult = engine.FindView(actionContext, viewName, false);
 
                 ViewContext viewContext = new ViewContext(actionContext, viewResult.View, viewData, tempData, sw, new HtmlHelperOptions());
                 

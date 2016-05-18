@@ -241,7 +241,7 @@ namespace VC.Admin.Controllers
                 DateCreated = DateTime.Now,
                 DateEdited = DateTime.Now,
             };
-            var sUserId = _userManager.GetUserId(HttpContext.User);
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
@@ -266,7 +266,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var note = await _noteMapper.FromModelAsync(model);
-            var sUserId = _userManager.GetUserId(HttpContext.User);
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if (int.TryParse(sUserId, out userId))
             {
@@ -294,7 +294,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var address = await _addressMapper.FromModelAsync(model);
-            var sUserId = _userManager.GetUserId(HttpContext.User);
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if (int.TryParse(sUserId, out userId))
             {
@@ -322,7 +322,7 @@ namespace VC.Admin.Controllers
             if (!Validate(addUpdateCustomerModel))
                 return null;
             var customer = await _customerMapper.FromModelAsync(addUpdateCustomerModel, (int) CustomerType.Retail);
-            var sUserId = _userManager.GetUserId(HttpContext.User);
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if (int.TryParse(sUserId, out userId))
             {

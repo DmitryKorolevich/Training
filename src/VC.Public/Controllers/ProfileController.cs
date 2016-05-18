@@ -43,6 +43,7 @@ using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.SharedWeb.Helpers;
 using VitalChoice.SharedWeb.Models.Orders;
@@ -60,6 +61,7 @@ namespace VC.Public.Controllers
         private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
         private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _customerPaymentMethodConverter;
         private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _orderPaymentMethodConverter;
+        private readonly ExtendedUserManager _userManager;
         private readonly IDynamicMapper<OrderDynamic, Order> _orderConverter;
 		private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
 		private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
@@ -81,8 +83,11 @@ namespace VC.Public.Controllers
             IHealthwiseService healthwiseService, IAppInfrastructureService infrastructureService,
             IAuthorizationService authorizationService, ICheckoutService checkoutService,
             ILoggerProviderExtended loggerProvider,
-            IPageResultService pageResultService, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper, ICountryService countryService, IDynamicMapper<OrderDynamic, Order> orderMapper, IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodConverter)
-            : base(customerService, infrastructureService, authorizationService, checkoutService, pageResultService)
+            IPageResultService pageResultService, IDynamicMapper<SkuDynamic, Sku> skuMapper,
+            IDynamicMapper<ProductDynamic, Product> productMapper, ICountryService countryService,
+            IDynamicMapper<OrderDynamic, Order> orderMapper,
+            IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodConverter, ExtendedUserManager userManager)
+            : base(customerService, infrastructureService, authorizationService, checkoutService, pageResultService, userManager)
         {
             _storefrontUserService = storefrontUserService;
             _addressConverter = addressConverter;
@@ -92,15 +97,16 @@ namespace VC.Public.Controllers
             _productService = productService;
             _helpService = helpService;
             _healthwiseService = healthwiseService;
-	        _skuMapper = skuMapper;
-	        _productMapper = productMapper;
-	        _countryService = countryService;
-	        _orderMapper = orderMapper;
-	        _orderPaymentMethodConverter = orderPaymentMethodConverter;
-	        _logger = loggerProvider.CreateLogger<>();
+            _skuMapper = skuMapper;
+            _productMapper = productMapper;
+            _countryService = countryService;
+            _orderMapper = orderMapper;
+            _orderPaymentMethodConverter = orderPaymentMethodConverter;
+            _userManager = userManager;
+            _logger = loggerProvider.CreateLogger<ProfileController>();
         }
 
-	    private async Task<PagedListEx<AutoShipHistoryItemModel>> PopulateAutoShipHistoryModel(OrderFilter filter)
+        private async Task<PagedListEx<AutoShipHistoryItemModel>> PopulateAutoShipHistoryModel(OrderFilter filter)
 		{
 			var infr = InfrastructureService.Data();
 			var countries = await _countryService.GetCountriesAsync();
@@ -237,8 +243,8 @@ namespace VC.Public.Controllers
         private void CleanProfileEmailFields(ChangeProfileModel model)
         {
             model.ConfirmEmail = model.NewEmail = string.Empty;
-            ModelState["NewEmail"] = new ModelStateEntry();
-            ModelState["ConfirmEmail"] = new ModelStateEntry();
+            ModelState.Remove("NewEmail");
+            ModelState.Remove("ConfirmEmail");
         }
 
         public IActionResult Index()
@@ -261,9 +267,7 @@ namespace VC.Public.Controllers
                 return View(model);
             }
 
-            var context = HttpContext;
-
-            var user = await _storefrontUserService.FindAsync(context.User.GetUserName());
+            var user = await _storefrontUserService.FindAsync(_userManager.GetUserName(User));
             if (user == null)
             {
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
@@ -401,11 +405,7 @@ namespace VC.Public.Controllers
             ModelState.Clear();
             if (model.Id == 0)
             {
-                ModelState.Add("Id", new ModelStateEntry
-                {
-                    RawValue =
-                        model.Id = currentCustomer.CustomerPaymentMethods.Last(x => x.IdObjectType == (int) PaymentMethodType.CreditCard).Id
-                });
+                model.Id = currentCustomer.CustomerPaymentMethods.Last(x => x.IdObjectType == (int) PaymentMethodType.CreditCard).Id;
             }
             return View(await PopulateCreditCard(currentCustomer, model.Id));
         }

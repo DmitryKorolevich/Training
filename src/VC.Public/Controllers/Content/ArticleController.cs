@@ -32,7 +32,7 @@ namespace VC.Public.Controllers.Content
         [HttpGet]
         public async Task<IActionResult> Categories()
         {
-            var toReturn = await _articleCategoryViewService.GetContentAsync(ActionContext, BindingContext, User);
+            var toReturn = await _articleCategoryViewService.GetContentAsync(ControllerContext, User);
             if (toReturn?.Body != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
@@ -43,7 +43,7 @@ namespace VC.Public.Controllers.Content
         [HttpGet]
         public async Task<IActionResult> Category(string url)
         {
-            var toReturn = await _articleCategoryViewService.GetContentAsync(ActionContext, BindingContext, User);
+            var toReturn = await _articleCategoryViewService.GetContentAsync(ControllerContext, User);
             if (toReturn?.Body != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
@@ -70,7 +70,7 @@ namespace VC.Public.Controllers.Content
         [HttpGet]
         public async Task<IActionResult> Article(string url)
         {
-            var toReturn = await _articleViewService.GetContentAsync(ActionContext, BindingContext, User);
+            var toReturn = await _articleViewService.GetContentAsync(ControllerContext, User);
             if (toReturn?.Body != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
