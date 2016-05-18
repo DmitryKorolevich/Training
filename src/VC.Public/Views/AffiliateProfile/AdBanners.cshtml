@@ -11,6 +11,6 @@
 		@await Component.InvokeAsync("AffiliateProfileSidebar")
 	</div>
 	<div class="right-pane clean-indent">
-        @await Component.InvokeAsync("Area", "Affiliate Ad Banners")
+        @await Component.InvokeAsync("Area", new { name = "Affiliate Ad Banners" })
 	</div>
 </div>

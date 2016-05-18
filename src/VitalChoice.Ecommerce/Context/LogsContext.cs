@@ -11,7 +11,7 @@ namespace VitalChoice.Ecommerce.Context
     {
         protected readonly IOptions<AppOptionsBase> Options;
 
-        public LogsContext(IOptions<AppOptionsBase> options)
+        public LogsContext(IOptions<AppOptionsBase> options, DbContextOptions<LogsContext> contextOptions) : base(contextOptions)
         {
             Options = options;
         }

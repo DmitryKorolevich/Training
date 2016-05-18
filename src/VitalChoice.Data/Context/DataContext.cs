@@ -12,7 +12,7 @@ namespace VitalChoice.Data.Context
     {
         private IInnerEmbeddingTransaction _transaction;
 
-        protected DataContext()
+        protected DataContext(DbContextOptions contextOptions) :base(contextOptions)
         {
             InstanceId = Guid.NewGuid();
         }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Options;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Infrastructure.Domain.Options;
@@ -10,23 +12,20 @@ namespace VC.Public.Components
 	[ViewComponent(Name = "Assets")]
 	public class AssetsViewComponent : ViewComponent
 	{
-		private readonly AppOptions _appOptions;
+	    private readonly IFrontEndAssetManager _assetManager;
+	    private readonly AppOptions _appOptions;
 		private readonly IUrlHelper _urlHelper;
 	    private static string _minifiedJsName;
 	    private static string _minifiedCssName;
 
-		public AssetsViewComponent(IUrlHelper urlHelper, IOptions<AppOptions> appOptionsAccessor)
+		public AssetsViewComponent(IUrlHelperFactory urlHelper, IOptions<AppOptions> appOptionsAccessor, IFrontEndAssetManager assetManager, IActionContextAccessor actionContextAccessor)
 		{
-			if (urlHelper == null)
-			{
-				throw new ArgumentNullException(nameof(urlHelper));
-			}
-
+		    _assetManager = assetManager;
 			if (appOptionsAccessor == null)
 			{
 				throw new ArgumentNullException(nameof(appOptionsAccessor));
 			}
-			_urlHelper = urlHelper;
+			_urlHelper = urlHelper.GetUrlHelper(actionContextAccessor.ActionContext);
 			_appOptions = appOptionsAccessor.Value;
 		}
 
@@ -43,7 +42,7 @@ namespace VC.Public.Components
 				{
 				    if (_minifiedJsName == null)
 				    {
-                        var assetInfo = FrontEndAssetManager.GetScripts();
+                        var assetInfo = _assetManager.GetScripts();
                         _minifiedJsName = assetInfo.MinifiedFileName;
 				    }
 					filePaths.Add(_urlHelper.Content(
@@ -51,7 +50,7 @@ namespace VC.Public.Components
 				}
 				else
 				{
-                    var assetInfo = FrontEndAssetManager.GetScripts();
+                    var assetInfo = _assetManager.GetScripts();
                     foreach (var assetFileInfo in assetInfo.Files)
 					{
 						filePaths.Add(_urlHelper.Content($"~/{assetFileInfo}{versionQueryString}"));
@@ -65,7 +64,7 @@ namespace VC.Public.Components
 				{
 				    if (_minifiedCssName == null)
 				    {
-                        var assetInfo = FrontEndAssetManager.GetStyles();
+                        var assetInfo = _assetManager.GetStyles();
 				        _minifiedCssName = assetInfo.MinifiedFileName;
 				    }
 					filePaths.Add(_urlHelper.Content(
@@ -73,7 +72,7 @@ namespace VC.Public.Components
 				}
 				else
 				{
-                    var assetInfo = FrontEndAssetManager.GetStyles();
+                    var assetInfo = _assetManager.GetStyles();
                     foreach (var assetFileInfo in assetInfo.Files)
 					{
 						filePaths.Add(_urlHelper.Content($"~/{assetFileInfo}{versionQueryString}"));

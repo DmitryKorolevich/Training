@@ -67,6 +67,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Internal;
+using Microsoft.AspNetCore.Mvc.Routing;
 using VitalChoice.Business.Repositories;
 using VitalChoice.Core.Infrastructure.Helpers.ReCaptcha;
 using VitalChoice.DynamicData.Interfaces;
@@ -115,6 +118,9 @@ namespace VitalChoice.Core.DependencyInjection
             if (enableCache)
             {
                 services.AddEntityFramework()
+                    .AddDbContext<VitalChoiceContext>()
+                    .AddDbContext<EcommerceContext>()
+                    .AddDbContext<LogsContext>()
                     .AddEntityFrameworkCache<ServiceBusCacheSyncProvider>(new[] {typeof(VitalChoiceContext), typeof(EcommerceContext)})
                     .AddEntityFrameworkSqlServer().InjectProfiler();
             }
@@ -125,6 +131,8 @@ namespace VitalChoice.Core.DependencyInjection
 #else
             services.AddEntityFramework().AddEntityFrameworkSqlServer();
 #endif
+            services.TryAddEnumerable(ServiceDescriptor.Transient<IActionInvokerProvider, CustomControllerActionInvokerProvider>());
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddScoped<IPerformanceRequest, PerformanceRequestService>();
             // Add Identity services to the services container.
             services.AddIdentity<ApplicationUser, ApplicationRole>(x =>
@@ -424,11 +432,12 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<ArticleService>().As<IArticleService>().InstancePerLifetimeScope();
             builder.RegisterType<ContentPageService>().As<IContentPageService>().InstancePerLifetimeScope();
             builder.RegisterType<TtlGlobalCache>().As<ITtlGlobalCache>().SingleInstance();
-            builder.RegisterType<CustomUrlHelper>().As<IUrlHelper>().InstancePerLifetimeScope();
+            builder.RegisterType<CustomUrlHelperFactory>().As<IUrlHelperFactory>().InstancePerLifetimeScope();
             builder.RegisterType<MemoryCache>().As<IMemoryCache>().SingleInstance();
             builder.RegisterType<CacheProvider>().As<ICacheProvider>().SingleInstance();
             builder.RegisterType<AppInfrastructureService>().As<IAppInfrastructureService>().InstancePerLifetimeScope();
             builder.RegisterType<AdminUserService>().As<IAdminUserService>().InstancePerLifetimeScope();
+            builder.RegisterType<FrontEndAssetManager>().As<IFrontEndAssetManager>().SingleInstance();
 
             builder.RegisterType<StorefrontUserStore>().Named<IUserStore<ApplicationUser>>("storefronUserStore").InstancePerLifetimeScope();
             builder.RegisterType<StorefrontUserValidator>()

@@ -156,7 +156,7 @@ namespace VitalChoice.Core.Services
 
         public ILogger<T> CreateLogger<T>()
         {
-            return (ILogger<T>)CreateLogger(typeof(T).FullName);
+            return _factory.CreateLogger<T>();
         }
 
         public void Dispose()

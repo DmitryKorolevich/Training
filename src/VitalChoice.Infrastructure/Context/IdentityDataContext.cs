@@ -11,11 +11,11 @@ using VitalChoice.Infrastructure.Domain.Entities.Users;
 
 namespace VitalChoice.Infrastructure.Context
 {
-	public class IdentityDataContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>, IDataContextAsync
+	public abstract class IdentityDataContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>, IDataContextAsync
     {
         private IInnerEmbeddingTransaction _transaction;
 
-        protected IdentityDataContext()
+        protected IdentityDataContext(DbContextOptions contextOptions) : base(contextOptions)
         {
             InstanceId = Guid.NewGuid();
         }

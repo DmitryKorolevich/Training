@@ -10,7 +10,7 @@
     </div>
     <div class="right-pane clean-indent">
         <div class="border-form-left">
-            @await Component.InvokeAsync("Area", "Affiliate Landing Area", Model)
+            @await Component.InvokeAsync("Area", new { name = "Affiliate Landing Area", data = Model })
         </div>
     </div>
 </div>

@@ -4,7 +4,7 @@
     <base href="/">
     <title>Vital Choice Admin</title>
     <link rel="icon" type="img/ico" href="/assets/miscellaneous/favicon.ico">
-    @await Component.InvokeAsync("Assets", "styles-order-invoice")
+    @await Component.InvokeAsync("Assets", new { assetType = "styles-order-invoice" })
 </head>
 <body>
     @RenderBody()

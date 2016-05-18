@@ -20,7 +20,6 @@ namespace VitalChoice.Core.Base
         protected BaseController()
         {
             Settings = ControllerSettings.Create();
-            Configure();
         }
 
         [NonAction]
@@ -98,7 +97,7 @@ namespace VitalChoice.Core.Base
         public ControllerSettings Settings { get; }
 
         [NonAction]
-        public void Configure()
+        public virtual void Configure()
         {
             var controlMode = GetControlMode();
             if (controlMode != null)

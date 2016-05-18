@@ -677,3 +677,116 @@ GO
 
 ALTER TABLE [VitalChoice.Infrastructure].dbo.ContentItems
 	DROP COLUMN TempId, COLUMN TempCategoryId
+
+ALTER TABLE [VitalChoice.Ecommerce].dbo.BigStringValues
+ADD IdProduct INT
+
+GO
+
+DECLARE @fieldType INT, @textId BIGINT
+DECLARE @textData NVARCHAR(MAX), @IdProduct INT, @idObjectType INT
+DECLARE @bigId TABLE(Id BIGINT NOT NULL, IdProduct INT NOT NULL)
+
+SET @textData = N'Frozen foods are packed with dry ice<br />
+and ship Monday through Wednesday (except holidays).<br />
+ <br />
+Frozen foods ship via 2nd Day Air service or 1-3 Day Express Ground service, depending on shipping date and destination.<br />
+<a href="/shop/pc/viewContent.asp?idpage=16"><img src="/files/catalog/image001.jpg" border="0" style="margin-top:3px;"/></a>
+<br />
+<u>Standard Shipping Fees</u>
+<ul>
+<li>Up to $49.99 = $4.95 shipping</li>
+<li>$50 - $98.99 = $9.95 shipping</li>
+<li>$99 and over = FREE shipping</li>
+</ul>
+Overnight shipping and other premium services cost extra; for more information, see our <a href="/shop/pc/viewContent.asp?idpage=16">Shipping page</a>. (Live shellfish ship overnight at no extra cost.)
+<ul> 
+<li>We cannot ship perishable goods to PO boxes.</li>
+<li>Free standard shipping applies to all orders of $99 or more sent to any U.S. street address.</li>
+<li>Perishable shipments to Alaska and Hawaii are subject to surcharges; please see our <a href="/shop/pc/viewContent.asp?idpage=16">Shipping page</a>.</li>
+</ul> 
+<u>When will my frozen foods arrive?</u>
+<ul>
+<li>Orders placed Saturday, Sunday, Monday, or before 10 AM Tuesday will ship on Tuesday* to arrive 1-3 days later.</li>
+<li>Orders placed between 10 AM Tuesday and 10 AM Wednesday will ship on Wednesday* to arrive 1-2 days later.</li>
+<li>Orders placed after 10 AM on Wednesday through 12:00 midnight Friday will ship on Monday* to arrive 1-3 days later.</li>
+</ul> 
+*Except when a holiday falls on the designated shipping day.<br />
+ <br />
+For more information, see our <a href="/shop/pc/viewContent.asp?idpage=16">Shipping page</a>.'
+
+SELECT TOP 1 @fieldType = Id FROM [VitalChoice.Ecommerce].dbo.ProductOptionTypes WHERE Name = N'Shipping' AND IdObjectType = 2
+
+DELETE FROM [VitalChoice.Ecommerce].dbo.BigStringValues
+WHERE IdBigString IN (SELECT v.IdBigString FROM [VitalChoice.Ecommerce].dbo.ProductOptionValues AS v WHERE IdOptionType = @fieldType)
+
+DELETE FROM [VitalChoice.Ecommerce].dbo.ProductOptionValues
+WHERE IdOptionType = @fieldType
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.BigStringValues
+(Value, IdProduct)
+OUTPUT inserted.IdBigString, inserted.IdProduct INTO @bigId
+SELECT @textData, Id FROM [VitalChoice.Ecommerce].dbo.Products
+WHERE IdObjectType = 2
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.ProductOptionValues
+(IdProduct, IdOptionType, IdBigString)
+SELECT IdProduct, @fieldType, Id FROM @bigId
+
+DELETE FROM @bigId
+
+SET @textData = N'Non-perishable goods ship via Ground service Monday - Friday (except
+holidays) and normally arrive in 3-7 days, depending upon destination.<br />
+ <br />
+Non-perishable shipments to Washington State, Oregon, Idaho, and<br />
+Northern California may arrive faster, in 1 or 2 days.<br />
+<a href="/shop/pc/viewContent.asp?idpage=16"><img src="/files/catalog/image001.jpg" border="0" /></a>
+<br />
+Standard Shipping Fees
+<ul>
+<li>Up to $49.99 = $4.95 shipping</li>
+<li>$50 - $98.99 = $9.95 shipping</li>
+<li>$99 and over = FREE shipping</li>
+</ul>
+Free standard shipping applies to orders of $99 or more per U.S.<br />
+address, including non-perishables sent to Alaska and Hawaii.<br />
+ <br />
+Overnight shipping and other premium services cost more; for<br />
+more information on this and all shipping topics, see our <a href="/shop/pc/viewContent.asp?idpage=16">Shipping page</a>.'
+
+SELECT TOP 1 @fieldType = Id FROM [VitalChoice.Ecommerce].dbo.ProductOptionTypes WHERE Name = N'Shipping' AND IdObjectType = 1
+
+DELETE FROM [VitalChoice.Ecommerce].dbo.BigStringValues
+WHERE IdBigString IN (SELECT v.IdBigString FROM [VitalChoice.Ecommerce].dbo.ProductOptionValues AS v WHERE IdOptionType = @fieldType)
+
+DELETE FROM [VitalChoice.Ecommerce].dbo.ProductOptionValues
+WHERE IdOptionType = @fieldType
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.BigStringValues
+(Value, IdProduct)
+OUTPUT inserted.IdBigString, inserted.IdProduct INTO @bigId
+SELECT @textData, Id FROM [VitalChoice.Ecommerce].dbo.Products
+WHERE IdObjectType = 1
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.ProductOptionValues
+(IdProduct, IdOptionType, IdBigString)
+SELECT IdProduct, @fieldType, Id FROM @bigId
+
+GO
+
+ALTER TABLE [VitalChoice.Ecommerce].dbo.BigStringValues
+DROP COLUMN IdProduct
+
+GO
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.ProductOptionValues
+(IdOptionType, IdProduct, Value)
+SELECT t.Id, p.Id, pp.GoogleFeedTitle FROM [VitalChoice.Ecommerce].dbo.Products AS p
+INNER JOIN [vitalchoice2.0].dbo.products AS pp ON pp.idProduct = p.Id
+INNER JOIN [VitalChoice.Ecommerce].dbo.ProductOptionTypes AS t ON t.IdObjectType = p.IdObjectType AND t.Name = 'GoogleFeedTitle' 
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.ProductOptionValues
+(IdOptionType, IdProduct, Value)
+SELECT t.Id, p.Id, LEFT(pp.GoogleFeedDescription, 250) FROM [VitalChoice.Ecommerce].dbo.Products AS p
+INNER JOIN [vitalchoice2.0].dbo.products AS pp ON pp.idProduct = p.Id
+INNER JOIN [VitalChoice.Ecommerce].dbo.ProductOptionTypes AS t ON t.IdObjectType = p.IdObjectType AND t.Name = 'GoogleFeedDescription' 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.Data.Repositories;
@@ -16,6 +17,7 @@ using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Content;
 using VitalChoice.Infrastructure.Domain.Content.ContentCrossSells;
+using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Interfaces.Services.Products;
@@ -27,18 +29,21 @@ namespace VitalChoice.Business.Services.Content
 		private readonly IRepositoryAsync<ContentCrossSell> _repository;
 		private readonly IOptions<AppOptionsBase> _options;
 		private readonly IRepositoryAsync<Sku> _skuRepositoryAsync;
+	    private readonly DbContextOptions<VitalChoiceContext> _contextOptions;
 	    private readonly ILogger _logger;
 
-		public ContentCrossSellService(IRepositoryAsync<ContentCrossSell> repository, IOptions<AppOptionsBase> options, IEcommerceRepositoryAsync<Sku> skuRepositoryAsync, ILoggerProviderExtended loggerProvider)
-		{
-			_repository = repository;
-			_options = options;
-			_skuRepositoryAsync = skuRepositoryAsync;
-		    _logger = loggerProvider.CreateLogger<ContentCrossSellService>();
+	    public ContentCrossSellService(IRepositoryAsync<ContentCrossSell> repository, IOptions<AppOptionsBase> options,
+	        IEcommerceRepositoryAsync<Sku> skuRepositoryAsync, ILoggerProviderExtended loggerProvider, DbContextOptions<VitalChoiceContext> contextOptions)
+	    {
+	        _repository = repository;
+	        _options = options;
+	        _skuRepositoryAsync = skuRepositoryAsync;
+	        _contextOptions = contextOptions;
+	        _logger = loggerProvider.CreateLogger<ContentCrossSellService>();
 
-		}
+	    }
 
-		public async Task<IList<ContentCrossSell>> GetContentCrossSellsAsync(ContentCrossSellType type)
+	    public async Task<IList<ContentCrossSell>> GetContentCrossSellsAsync(ContentCrossSellType type)
 		{
 			var crossLines = await _repository.Query(x => x.Type == type).SelectAsync();
 
@@ -69,7 +74,7 @@ namespace VitalChoice.Business.Services.Content
 			var toAdd = contentCrossSells.Where(x => x.Id == 0).ToList();
 			var toUpdate = contentCrossSells.Where(x => x.Id != 0).ToList();
 
-			using (var uow = new UnitOfWork(new VitalChoiceContext(_options)))
+			using (var uow = new VitalChoiceUnitOfWork(_contextOptions))
 			{
 				var uowRepo = uow.RepositoryAsync<ContentCrossSell>();
 

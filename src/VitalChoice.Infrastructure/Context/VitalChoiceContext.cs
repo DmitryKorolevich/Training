@@ -30,7 +30,7 @@ namespace VitalChoice.Infrastructure.Context
     {
         private readonly IOptions<AppOptionsBase> _options;
 
-        public VitalChoiceContext(IOptions<AppOptionsBase> options)
+        public VitalChoiceContext(IOptions<AppOptionsBase> options, DbContextOptions<VitalChoiceContext> contextOptions): base(contextOptions)
         {
             _options = options;
         }

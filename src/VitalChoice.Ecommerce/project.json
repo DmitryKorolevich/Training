@@ -11,7 +11,7 @@
     "VitalChoice.Caching": "1.0.0-*"
   },
   "frameworks": {
-    "net461": { },
+    "net451": { },
     "netstandard1.5": {
       "imports": [
         "dnxcore50",

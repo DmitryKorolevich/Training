@@ -55,6 +55,7 @@
     "Microsoft.AspNetCore.Mvc": "1.0.0-rc2-final",
     "Microsoft.AspNetCore.Mvc.TagHelpers": "1.0.0-rc2-final",
     "Microsoft.AspNetCore.Diagnostics": "1.0.0-rc2-final",
+    "Microsoft.AspNetCore.DataProtection": "1.0.0-rc2-final",
     "Microsoft.EntityFrameworkCore": "1.0.0-rc2-final",
     "Microsoft.AspNetCore.StaticFiles": "1.0.0-rc2-final",
     "Microsoft.AspNetCore.Http": "1.0.0-rc2-final",
@@ -76,7 +77,7 @@
     "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": "1.0.0-rc2-final"
   },
   "frameworks": {
-    "net461": {
+    "net451": {
     },
     "netcoreapp1.0": {
       "imports": [
@@ -92,10 +93,13 @@
       }
     }
   },
-  "commands": {
-    "web": "Microsoft.AspNet.Server.Kestrel",
-    "kestrel": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls http://localhost:5010",
-    "gen": "Microsoft.Extensions.CodeGeneration",
-    "ef": "EntityFramework.Commands"
+  "tools": {
+    "Microsoft.AspNetCore.Server.IISIntegration.Tools": {
+      "version": "1.0.0-*",
+      "imports": "portable-net45+wp80+win8+wpa81+dnxcore50"
+    }
+  },
+  "scripts": {
+    "postpublish": "dotnet publish-iis --publish-folder %publish:OutputPath% --framework %publish:FullTargetFramework%"
   }
 }

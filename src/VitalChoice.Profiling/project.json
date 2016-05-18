@@ -9,9 +9,10 @@
     "VitalChoice.Ecommerce.Domain": "1.0.0-*"
   },
   "frameworks": {
-    "net461": {
+    "net451": {
       "frameworkAssemblies": {
-        "System.Runtime": ""
+        "System.Runtime": "",
+        "System.IO": ""
       }
     },
     "netstandard1.5": {

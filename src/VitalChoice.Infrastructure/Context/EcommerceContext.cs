@@ -30,7 +30,7 @@ namespace VitalChoice.Infrastructure.Context
 {
     public class EcommerceContext : EcommerceContextBase
     {
-        public EcommerceContext(IOptions<AppOptionsBase> options): base(options)
+        public EcommerceContext(IOptions<AppOptionsBase> options, DbContextOptions<EcommerceContext> dbContextOptions): base(options, dbContextOptions)
         {
         }
 

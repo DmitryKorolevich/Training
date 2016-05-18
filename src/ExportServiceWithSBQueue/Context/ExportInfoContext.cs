@@ -10,7 +10,7 @@ namespace ExportServiceWithSBQueue.Context
     {
         protected readonly IOptions<ExportOptions> Options;
 
-        public ExportInfoContext(IOptions<ExportOptions> options)
+        public ExportInfoContext(IOptions<ExportOptions> options, DbContextOptions<ExportInfoContext> contextOptions): base(contextOptions)
         {
             Options = options;
         }

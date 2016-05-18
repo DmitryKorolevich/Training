@@ -11,6 +11,7 @@ using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Infrastructure.UnitOfWork;
 using System.Threading;
+using Microsoft.EntityFrameworkCore;
 using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.Data.Services;
 using VitalChoice.Ecommerce.Cache;
@@ -19,6 +20,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Content.Articles;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Transfer;
@@ -37,6 +39,7 @@ namespace VitalChoice.Business.Services.Content
         private readonly IRepositoryAsync<ArticleBonusLink> _articleBonusLinkRepository;
         private readonly IEcommerceRepositoryAsync<Product> _productRepository;
         private readonly ITtlGlobalCache _templatesCache;
+        private readonly DbContextOptions<VitalChoiceContext> _contextOptions;
         private readonly IObjectLogItemExternalService _objectLogItemExternalService;
         private readonly ILogger _logger;
 
@@ -51,7 +54,8 @@ namespace VitalChoice.Business.Services.Content
             IEcommerceRepositoryAsync<Product> productRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
             ILoggerProviderExtended logger, 
-            ITtlGlobalCache templatesCache)
+            ITtlGlobalCache templatesCache,
+            DbContextOptions<VitalChoiceContext> contextOptions)
         {
             _articleRepository = articleRepository;
             _contentCategoryRepository = contentCategoryRepository;
@@ -62,6 +66,7 @@ namespace VitalChoice.Business.Services.Content
             _articleBonusLinkRepository = articleBonusLinkRepository;
             _productRepository = productRepository;
             _templatesCache = templatesCache;
+            _contextOptions = contextOptions;
             _objectLogItemExternalService = objectLogItemExternalService;
             _logger = logger.CreateLogger<ArticleService>();
         }
@@ -275,7 +280,7 @@ namespace VitalChoice.Business.Services.Content
         public async Task<bool> AttachArticleToCategoriesAsync(int id, IEnumerable<int> categoryIds)
         {
             bool toReturn = false;
-            using (var uow = new VitalChoiceUnitOfWork())
+            using (var uow = new VitalChoiceUnitOfWork(_contextOptions))
             {
                 var articleRepository = uow.RepositoryAsync<Article>();
                 var articleToContentCategoryRepository = uow.RepositoryAsync<ArticleToContentCategory>();

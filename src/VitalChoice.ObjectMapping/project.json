@@ -7,7 +7,7 @@
     "Autofac.Extensions.DependencyInjection": "4.0.0-rc2"
   },
   "frameworks": {
-    "net461": { },
+    "net451": { },
     "netstandard1.5": {
       "imports": [
         "dnxcore50",

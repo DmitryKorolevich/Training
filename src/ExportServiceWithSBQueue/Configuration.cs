@@ -188,7 +188,6 @@ namespace ExportServiceWithSBQueue
         public static IContainer BuildContainer(Assembly projectAssembly, ContainerBuilder builder)
         {
             builder.RegisterType<VitalChoiceContext>()
-                .As<IDataContextAsync>()
                 .AsSelf()
                 .InstancePerLifetimeScope();
             builder.RegisterType<EcommerceContext>()

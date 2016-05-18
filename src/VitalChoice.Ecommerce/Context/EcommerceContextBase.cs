@@ -28,7 +28,7 @@ namespace VitalChoice.Ecommerce.Context
 {
     public class EcommerceContextBase : DataContext
     {
-        public EcommerceContextBase(IOptions<AppOptionsBase> options)
+        public EcommerceContextBase(IOptions<AppOptionsBase> options, DbContextOptions contextOptions) : base(contextOptions)
         {
             Options = options;
         }

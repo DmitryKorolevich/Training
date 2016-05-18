@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using VitalChoice.Business.Mail;
 using VitalChoice.Business.Queries.Healthwise;
 using VitalChoice.Business.Repositories;
@@ -13,6 +14,7 @@ using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Mail;
+using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
 using VitalChoice.Infrastructure.Domain.Transfer.Healthwise;
 using VitalChoice.Infrastructure.UnitOfWork;
@@ -34,6 +36,7 @@ namespace VitalChoice.Business.Services.Healthwise
         private readonly IAppInfrastructureService _appInfrastructureService;
         private readonly IGcService _gcService;
         private readonly INotificationService _notificationService;
+        private readonly DbContextOptions<EcommerceContext> _eccomerceContextOptions;
         private readonly ILogger _logger;
 
         public HealthwiseService(
@@ -46,7 +49,7 @@ namespace VitalChoice.Business.Services.Healthwise
             IAppInfrastructureService appInfrastructureService,
             IGcService gcService,
             INotificationService notificationService,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerProviderExtended loggerProvider, DbContextOptions<EcommerceContext> eccomerceContextOptions)
         {
             _vHealthwisePeriodRepository = vHealthwisePeriodRepository;
             _healthwiseOrderRepository = healthwiseOrderRepository;
@@ -57,6 +60,7 @@ namespace VitalChoice.Business.Services.Healthwise
             _appInfrastructureService = appInfrastructureService;
             _gcService = gcService;
             _notificationService = notificationService;
+            _eccomerceContextOptions = eccomerceContextOptions;
             _logger = loggerProvider.CreateLogger<HealthwiseService>();
         }
 
@@ -91,7 +95,7 @@ namespace VitalChoice.Business.Services.Healthwise
         public async Task<bool> MakeHealthwisePeriodPaymentAsync(int id, decimal amount, DateTime date, bool payAsGC = false, int? userId = null)
         {
             GCNotificationEmail notificationModel = new GCNotificationEmail();
-            using (var uow = new EcommerceUnitOfWork())
+            using (var uow = new EcommerceUnitOfWork(_eccomerceContextOptions))
             {
                 using (var transaction = uow.BeginTransaction())
                 {
@@ -193,7 +197,7 @@ namespace VitalChoice.Business.Services.Healthwise
             var period = (await _vHealthwisePeriodRepository.Query(p => p.Id == idPeriod).SelectAsync(false)).FirstOrDefault();
             if (period != null && !period.PaidDate.HasValue)
             {
-                using (var uow = new EcommerceUnitOfWork())
+                using (var uow = new EcommerceUnitOfWork(_eccomerceContextOptions))
                 {
                     using (var transaction = uow.BeginTransaction())
                     {
