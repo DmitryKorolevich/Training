@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Diagnostics;
-using Microsoft.AspNet.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -10,7 +7,8 @@ using Microsoft.Extensions.PlatformAbstractions;
 using VC.Admin.AppConfig;
 using VitalChoice.Core.DependencyInjection;
 using Autofac;
-using Microsoft.AspNet.StaticFiles;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using VitalChoice.Business.Services;
 using VitalChoice.Profiling;
 using VitalChoice.Profiling.Base;
@@ -24,9 +22,9 @@ namespace VC.Admin
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             var serviceProvider = services.BuildServiceProvider();
-            var applicationEnvironment = serviceProvider.GetRequiredService<IApplicationEnvironment>();
+            var applicationEnvironment = serviceProvider.GetRequiredService<IHostingEnvironment>();
             var configuration = new ConfigurationBuilder()
-                .SetBasePath(applicationEnvironment.ApplicationBasePath)
+                .SetBasePath(applicationEnvironment.WebRootPath)
                 .AddJsonFile("config.json")
                 .AddJsonFile("config.local.json", true)
                 .AddEnvironmentVariables();
@@ -46,7 +44,7 @@ namespace VC.Admin
             // Add the following to the request pipeline only in development environment.
             if (string.Equals(env.EnvironmentName, "Development", StringComparison.OrdinalIgnoreCase))
             {
-                app.UseDeveloperExceptionPage(new ErrorPageOptions
+                app.UseDeveloperExceptionPage(new DeveloperExceptionPageOptions
                 {
                     SourceCodeLineCount = 250
                 });
@@ -65,6 +63,7 @@ namespace VC.Admin
             app.UseIdentity();
 
             app.InjectProfiler();
+
             app.UseMvc(RouteConfig.RegisterRoutes);
         }
     }

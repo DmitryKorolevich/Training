@@ -7,7 +7,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Avalara.Avatax.Rest.Utility;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using VitalChoice.Infrastructure.Domain.Avatax;
@@ -42,7 +42,7 @@ namespace Avalara.Avatax.Rest.Services
 
         public TaxService(IOptions<AppOptions> options, ILoggerProviderExtended loggerProvider)
         {
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<TaxService>();
             _accountNumber = options.Value.Avatax.AccountNumber;
             _license = options.Value.Avatax.LicenseKey;
             _svcUrl = options.Value.Avatax.ServiceUrl.TrimEnd('/') + "/1.0/";

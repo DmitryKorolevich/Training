@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Validation.Models;
 using System.Security.Claims;
 using System;
+using System.IO;
+using Microsoft.AspNetCore.Mvc;
 using VC.Admin.Models;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
@@ -21,6 +22,7 @@ using VitalChoice.Business.CsvExportMaps;
 using Microsoft.Net.Http.Headers;
 using VC.Admin.Models.Products;
 using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Orders;
 
 namespace VC.Admin.Controllers
@@ -31,19 +33,21 @@ namespace VC.Admin.Controllers
         private readonly IGcService GCService;
         private readonly IOrderSchedulerService OrderSchedulerService;
         private readonly ICsvExportService<GCWithOrderListItemModel, GcWithOrderListItemModelCsvMap> _gCWithOrderListItemModelCsvMapCSVExportService;
+        private readonly ExtendedUserManager _userManager;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly ILogger logger;
 
         public GCController(IGcService GCService,
             IOrderSchedulerService OrderSchedulerService,
             ICsvExportService<GCWithOrderListItemModel, GcWithOrderListItemModelCsvMap> gCWithOrderListItemModelCsvMapCSVExportService,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerProviderExtended loggerProvider, ExtendedUserManager userManager)
         {
             this.GCService = GCService;
             this.OrderSchedulerService = OrderSchedulerService;
             _gCWithOrderListItemModelCsvMapCSVExportService = gCWithOrderListItemModelCsvMapCSVExportService;
+            _userManager = userManager;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
-            this.logger = loggerProvider.CreateLoggerDefault();
+            this.logger = loggerProvider.CreateLogger<GCController>();
         }
 
         [HttpPost]
@@ -124,7 +128,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var item = model.Convert();
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(HttpContext.User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {

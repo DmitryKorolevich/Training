@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
-using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Relational.Base
 {
@@ -15,11 +12,6 @@ namespace VitalChoice.Caching.Relational.Base
         protected EntityValueGroup(TValue[] orderedValues)
         {
             Values = orderedValues;
-        }
-
-        private EntityValueGroup(IEnumerable<TValue> values)
-        {
-            Values = values.OrderBy(v => v.ValueInfo.Name, StringComparer.Ordinal).ToArray();
         }
 
         public bool Equals(EntityValueGroup<TValue, TInfo> other)

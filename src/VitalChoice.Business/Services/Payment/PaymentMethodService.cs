@@ -6,9 +6,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Authorize.Net.Api.Contracts.V1;
 using Authorize.Net.Api.Controllers;
-using Microsoft.AspNet.Http;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Business.Queries.Payment;
 using VitalChoice.Business.Queries.User;
 using VitalChoice.Business.Queries.Users;
@@ -53,7 +52,7 @@ namespace VitalChoice.Business.Services.Payment
 	        _countryNameCode = countryNameCode;
 	        _transactionAccessor = transactionAccessor;
 	        _settingService = settingService;
-	        _logger = loggerProvider.CreateLoggerDefault();
+	        _logger = loggerProvider.CreateLogger<PaymentMethodService>();
 	    }
 
 	    public async Task<IList<ExtendedPaymentMethod>> GetApprovedPaymentMethodsAsync()

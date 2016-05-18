@@ -33,9 +33,7 @@ namespace VitalChoice.Business.Services.Content
 
         public ContentPageService(IRepositoryAsync<ContentPage> contentPageRepository,
             IRepositoryAsync<ContentCategory> contentCategoryRepository,
-            IRepositoryAsync<ContentItem> contentItemRepository,
             IRepositoryAsync<ContentPageToContentCategory> contentPageToContentCategoryRepository,
-            IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
             ILoggerProviderExtended logger, 
@@ -47,7 +45,7 @@ namespace VitalChoice.Business.Services.Content
             this.contentTypeRepository = contentTypeRepository;
             this.objectLogItemExternalService = objectLogItemExternalService;
             this.templatesCache = templatesCache;
-            this.logger = logger.CreateLoggerDefault();
+            this.logger = logger.CreateLogger<ContentPageService>();
         }
 
         public async Task<PagedList<ContentPage>> GetContentPagesAsync(ContentPageListFilter filter)

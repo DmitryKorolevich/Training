@@ -23,13 +23,13 @@ namespace VC.Public.Models.Checkout
 		public string Email { get; set; }
 
 		[Required]
-        [AllowXSS]
+        [AllowXss]
         public string Password { get; set; }
 
 		[Required]
 		[Compare("Password")]
 		[Display(Name = "Password Confirm")]
-        [AllowXSS]
+        [AllowXss]
         public string ConfirmPassword { get; set; }
 
 	    public bool GuestCheckout { get; set; }

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using VitalChoice.Business.Queries.User;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
@@ -15,7 +15,6 @@ using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Business.Queries.Help;
 using VitalChoice.Business.Mail;
 using VitalChoice.Infrastructure.Azure;
-using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Business.Queries.Users;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Mail;
@@ -73,7 +72,7 @@ namespace VitalChoice.Business.Services.HelpService
             _infrastructureTransactionAccessor = infrastructureTransactionAccessor;
             _bugTicketFilesContainerName = appOptions.Value.AzureStorage.BugTicketFilesContainerName;
             _bugTicketCommentFilesContainerName = appOptions.Value.AzureStorage.BugTicketCommentFilesContainerName;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<HelpService>();
         }
 
         #region HelpTickets

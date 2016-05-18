@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using VC.Admin.Models.Customer;
@@ -20,7 +20,7 @@ using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using VC.Admin.Models.Customers;
 using VitalChoice.Business.CsvExportMaps;
@@ -41,6 +41,7 @@ using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 using VitalChoice.Infrastructure.Domain.Transfer.Settings;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Payments;
 
 namespace VC.Admin.Controllers
@@ -64,6 +65,7 @@ namespace VC.Admin.Controllers
 		private readonly ILogger logger;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly IPaymentMethodService _paymentMethodService;
+        private readonly ExtendedUserManager _userManager;
 
         public CustomerController(ICustomerService customerService,
             IDynamicMapper<CustomerDynamic, Customer> customerMapper,
@@ -75,7 +77,7 @@ namespace VC.Admin.Controllers
             IAppInfrastructureService appInfrastructureService,
             IObjectHistoryLogService objectHistoryLogService,
             ICsvExportService<ExtendedVCustomer, CustomersForAffiliatesCsvMap> csvExportCustomersForAffiliatesService, 
-            IPaymentMethodService paymentMethodService)
+            IPaymentMethodService paymentMethodService, ExtendedUserManager userManager)
         {
             _customerService = customerService;
             _countryService = countryService;
@@ -85,13 +87,14 @@ namespace VC.Admin.Controllers
             _addressService = addressService;
             _notesService = notesService;
             _noteMapper = noteMapper;
-            this.logger = loggerProvider.CreateLoggerDefault();
+            this.logger = loggerProvider.CreateLogger<CustomerController>();
 	        _storefrontUserService = storefrontUserService;
             _objectHistoryLogService = objectHistoryLogService;
             _defaultCountry = appInfrastructureService.Data().DefaultCountry;
             _csvExportCustomersForAffiliatesService = csvExportCustomersForAffiliatesService;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
 	        _paymentMethodService = paymentMethodService;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -238,7 +241,7 @@ namespace VC.Admin.Controllers
                 DateCreated = DateTime.Now,
                 DateEdited = DateTime.Now,
             };
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(HttpContext.User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
@@ -263,7 +266,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var note = await _noteMapper.FromModelAsync(model);
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(HttpContext.User);
             int userId;
             if (int.TryParse(sUserId, out userId))
             {
@@ -291,7 +294,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var address = await _addressMapper.FromModelAsync(model);
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(HttpContext.User);
             int userId;
             if (int.TryParse(sUserId, out userId))
             {
@@ -319,7 +322,7 @@ namespace VC.Admin.Controllers
             if (!Validate(addUpdateCustomerModel))
                 return null;
             var customer = await _customerMapper.FromModelAsync(addUpdateCustomerModel, (int) CustomerType.Retail);
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(HttpContext.User);
             int userId;
             if (int.TryParse(sUserId, out userId))
             {
@@ -550,7 +553,7 @@ namespace VC.Admin.Controllers
                 FileName = fileName
             };
 
-            Response.Headers.Append("Content-Disposition", contentDisposition.ToString());
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
 			return File(blob.File, blob.ContentType);
 		}
 

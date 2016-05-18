@@ -5,13 +5,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Autofac;
-using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.ChangeTracking;
-using Microsoft.Data.Entity.Infrastructure;
-using Microsoft.Data.Entity.Metadata;
-using Microsoft.Data.Entity.Metadata.Internal;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.GC;
 using VitalChoice.Caching.Interfaces;
@@ -22,6 +21,7 @@ using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain.Options;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace VitalChoice.Caching.Services
 {

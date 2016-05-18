@@ -9,7 +9,6 @@ using VitalChoice.ContentProcessing.Interfaces;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Claims;
-using Microsoft.AspNet.Mvc;
 using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
@@ -18,7 +17,8 @@ using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Constants;
-using Microsoft.AspNet.Http.Extensions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.ContentProcessing.Base
@@ -49,7 +49,7 @@ namespace VitalChoice.ContentProcessing.Base
         public virtual string ViewContextName => "ViewContext";
         public virtual string DefaultModelName => "Model";
 
-        public async Task<ContentViewModel> GetContentAsync(ActionContext context, ActionBindingContext bindingContext, ClaimsPrincipal user,
+        public async Task<ContentViewModel> GetContentAsync(ActionContext context, ModelBindingContext bindingContext, ClaimsPrincipal user,
             object additionalParameters)
         {
             IDictionary<string, object> parameters = null;
@@ -168,7 +168,7 @@ namespace VitalChoice.ContentProcessing.Base
             };
         }
 
-        protected virtual IDictionary<string, object> GetParameters(ActionContext context, ActionBindingContext bindingContext,
+        protected virtual IDictionary<string, object> GetParameters(ActionContext context, ModelBindingContext bindingContext,
             IDictionary<string, object> parameters = null)
         {
             if (parameters == null)

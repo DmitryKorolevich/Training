@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Microsoft.AspNet.Identity;
-using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
@@ -27,6 +25,8 @@ using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 
 namespace VitalChoice.Business.Services
 {

@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Validation.Models;
 using System.Security.Claims;
 using System;
+using Microsoft.AspNetCore.Mvc;
 using VC.Admin.Models;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
@@ -16,6 +16,7 @@ using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services;
 using VC.Admin.Models.Redirects;
 using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 
 namespace VC.Admin.Controllers
 {
@@ -23,12 +24,14 @@ namespace VC.Admin.Controllers
     public class RedirectController : BaseApiController
     {
         private readonly IRedirectService _redirectService;
+        private readonly ExtendedUserManager _userManager;
         private readonly ILogger _logger;
 
-        public RedirectController(IRedirectService redirectService, ILoggerProviderExtended loggerProvider)
+        public RedirectController(IRedirectService redirectService, ILoggerProviderExtended loggerProvider, ExtendedUserManager userManager)
         {
             _redirectService = redirectService;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _userManager = userManager;
+            _logger = loggerProvider.CreateLogger<RedirectController>();
         }
 
         [HttpPost]
@@ -58,7 +61,7 @@ namespace VC.Admin.Controllers
                 return null;
             var item = model.Convert();
 
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(HttpContext.User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
@@ -72,7 +75,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<bool>> DeleteRedirect(int id, [FromBody] object model)
         {
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(HttpContext.User);
             int userId = Int32.Parse(sUserId);
             return await _redirectService.DeleteRedirectAsync(id, userId);
         }

@@ -7,7 +7,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Avalara.Avatax.Rest.Services;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
@@ -23,6 +22,7 @@ using System.ServiceModel;
 using System.Text.RegularExpressions;
 using System.Threading;
 using FluentValidation.Validators;
+using Microsoft.Extensions.Options;
 
 namespace VitalChoice.Business.Services.Bronto
 {
@@ -31,22 +31,17 @@ namespace VitalChoice.Business.Services.Bronto
         private readonly BrontoSettings _brontoSettings;
         private readonly ILogger _logger;
 
-        //TODO: should be removed after rc2 release(reason MessageHeaderAttribute)
-#if !NETSTANDARD1_5
         private readonly BrontoSoapPortTypeClient _client;
-#endif
 
         public BrontoService(IOptions<AppOptions> options,
             ILoggerProviderExtended loggerProvider)
         {
             _brontoSettings = options.Value.Bronto;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<BrontoService>();
 
-#if !NETSTANDARD1_5
             BasicHttpBinding binding = new BasicHttpBinding {Security = {Mode = BasicHttpSecurityMode.Transport}};
             EndpointAddress endpoint = new EndpointAddress(_brontoSettings.ApiUrl);
             _client = new BrontoSoapPortTypeClient(binding, endpoint);
-#endif
         }
 
         public void PushSubscribe(string email, bool subscribe)

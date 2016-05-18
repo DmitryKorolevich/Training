@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Microsoft.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Ordering;

@@ -4,10 +4,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
-using Microsoft.Data.Entity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Business.Mail;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Extensions;
@@ -26,6 +25,7 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Users;
+using Microsoft.EntityFrameworkCore;
 
 namespace VitalChoice.Business.Services.Users
 {
@@ -65,7 +65,7 @@ namespace VitalChoice.Business.Services.Users
 	        this._userValidator = userValidator;
 	        _transactionAccessor = transactionAccessor;
 	        Options = options.Value;
-	        _logger = loggerProvider.CreateLoggerDefault();
+	        _logger = loggerProvider.CreateLogger<UserService>();
 
 	    }
 

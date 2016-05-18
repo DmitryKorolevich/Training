@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc.ModelBinding;
-using Microsoft.AspNet.Mvc.ModelBinding.Validation;
-using Microsoft.AspNet.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace VC.Public.DataAnnotations
 {
@@ -38,7 +38,12 @@ namespace VC.Public.DataAnnotations
 			return ValidationResult.Success;
 		}
 
-	    public IEnumerable<ModelClientValidationRule> GetClientValidationRules(ClientModelValidationContext context)
+        public void AddValidation(ClientModelValidationContext context)
+        {
+            //context.
+        }
+
+        public IEnumerable<ModelClientValidationRule> GetClientValidationRules(ClientModelValidationContext context)
 	    {
 		    var rule = new ModelClientValidationRule("requiredif", ErrorMessageString);
 	    

@@ -13,8 +13,10 @@ using VitalChoice.Infrastructure.Context;
 using VitalChoice.Core.Infrastructure;
 using Microsoft.Extensions.PlatformAbstractions;
 using Autofac.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Context;
 using VitalChoice.Ecommerce.Domain.Options;
@@ -98,55 +100,50 @@ namespace VitalChoice.Workflow.Configuration
             //    configurationBuilder.AddJsonFile("config.local.json");
             //}
             var configuration = configurationBuilder.Build();
-
-            var provider = CallContextServiceLocator.Locator.ServiceProvider;
-            var services = new ServiceCollection();
-            services.AddInstance(typeof (IApplicationEnvironment), provider.GetService<IApplicationEnvironment>());
-
-            services.AddEntityFramework()
-                .AddSqlServer();
-
-            services.Configure<AppOptionsBase>(options =>
-            {
-                options.LogPath = configuration.GetSection("App:LogPath").Value;
-                options.Connection = new Connection
-                {
-                    UserName = configuration.GetSection("App:Connection:UserName").Value,
-                    Password = configuration.GetSection("App:Connection:Password").Value,
-                    Server = configuration.GetSection("App:Connection:Server").Value,
-                };
-            });
-
-            services.Configure<AppOptions>(options =>
-            {
-                options.LogPath = configuration.GetSection("App:LogPath").Value;
-                options.DefaultCultureId = configuration.GetSection("App:DefaultCultureId").Value;
-                options.Connection = new Connection
-                {
-                    UserName = configuration.GetSection("App:Connection:UserName").Value,
-                    Password = configuration.GetSection("App:Connection:Password").Value,
-                    Server = configuration.GetSection("App:Connection:Server").Value,
-                };
-            });
-
             var builder = new ContainerBuilder();
-            builder.Populate(services);
-            builder.RegisterInstance(configuration).As<IConfiguration>();
-            builder.RegisterType<LoggerProviderExtended>()
-                .As<ILoggerProviderExtended>()
-                .As<ILoggerProvider>()
-                .SingleInstance();
-            builder.Register(cc => cc.Resolve<ILoggerProviderExtended>().Factory).As<ILoggerFactory>();
+            var host = new WebHostBuilder().ConfigureServices(services =>
+            {
+                services.AddEntityFramework().AddEntityFrameworkSqlServer();
 
-            builder.Register((cc, pp) => cc.Resolve<ILoggerProviderExtended>().CreateLogger("Root")).As<ILogger>();
-            builder.RegisterGeneric(typeof(Logger<>))
-                .WithParameter((pi, cc) => pi.ParameterType == typeof(ILoggerFactory),
-                    (pi, cc) => cc.Resolve<ILoggerProviderExtended>().Factory)
-                .As(typeof(ILogger<>));
+                services.Configure<AppOptionsBase>(options =>
+                {
+                    options.LogPath = configuration.GetSection("App:LogPath").Value;
+                    options.Connection = new Connection
+                    {
+                        UserName = configuration.GetSection("App:Connection:UserName").Value,
+                        Password = configuration.GetSection("App:Connection:Password").Value,
+                        Server = configuration.GetSection("App:Connection:Server").Value,
+                    };
+                });
 
-            var container = new AdminDependencyConfig().BuildContainer(typeof (Program).GetTypeInfo().Assembly, builder);
-            EcommerceContextBase.ServiceProvider = container.Resolve<IServiceProvider>();
-            LoggerService.Build(container.Resolve<IOptions<AppOptions>>(), container.Resolve<IApplicationEnvironment>());
+                services.Configure<AppOptions>(options =>
+                {
+                    options.LogPath = configuration.GetSection("App:LogPath").Value;
+                    options.DefaultCultureId = configuration.GetSection("App:DefaultCultureId").Value;
+                    options.Connection = new Connection
+                    {
+                        UserName = configuration.GetSection("App:Connection:UserName").Value,
+                        Password = configuration.GetSection("App:Connection:Password").Value,
+                        Server = configuration.GetSection("App:Connection:Server").Value,
+                    };
+                });
+                builder.Populate(services);
+                builder.RegisterInstance(configuration).As<IConfiguration>();
+                builder.RegisterType<LoggerProviderExtended>()
+                    .As<ILoggerProviderExtended>()
+                    .As<ILoggerProvider>()
+                    .SingleInstance();
+                builder.Register(cc => cc.Resolve<ILoggerProviderExtended>().Factory).As<ILoggerFactory>();
+
+                builder.Register((cc, pp) => cc.Resolve<ILoggerProviderExtended>().CreateLogger("Root")).As<ILogger>();
+                builder.RegisterGeneric(typeof(Logger<>))
+                    .WithParameter((pi, cc) => pi.ParameterType == typeof(ILoggerFactory),
+                        (pi, cc) => cc.Resolve<ILoggerProviderExtended>().Factory)
+                    .As(typeof(ILogger<>));
+            }).Build();
+            builder.RegisterInstance(host.Services.GetService<IHostingEnvironment>());
+            var container = new AdminDependencyConfig().BuildContainer(typeof(Program).GetTypeInfo().Assembly, builder);
+            LoggerService.Build(container.Resolve<IHostingEnvironment>());
             return container;
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Query.Expressions;
@@ -9,24 +10,31 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace VitalChoice.Profiling.Base
 {
-    public class QuerySqlGeneratorProxy : SqlServerQuerySqlGenerator
+    public class QuerySqlGeneratorProxy : IQuerySqlGenerator
     {
-        public QuerySqlGeneratorProxy(IRelationalCommandBuilderFactory relationalCommandBuilderFactory,
-            ISqlGenerationHelper sqlGenerationHelper, IParameterNameGeneratorFactory parameterNameGeneratorFactory,
-            IRelationalTypeMapper relationalTypeMapper, SelectExpression selectExpression)
-            : base(
-                relationalCommandBuilderFactory, sqlGenerationHelper, parameterNameGeneratorFactory, relationalTypeMapper, selectExpression)
+        private readonly IQuerySqlGenerator _sqlGenerator;
+
+        public QuerySqlGeneratorProxy(IQuerySqlGenerator sqlGenerator)
         {
+            _sqlGenerator = sqlGenerator;
         }
 
-        public override IRelationalCommand GenerateSql(IReadOnlyDictionary<string, object> parameterValues)
+        public IRelationalCommand GenerateSql(IReadOnlyDictionary<string, object> parameterValues)
         {
-            var command = base.GenerateSql(parameterValues);
+            var command = _sqlGenerator.GenerateSql(parameterValues);
             if (command is RelationalCommandFacade)
             {
                 return command;
             }
             return new RelationalCommandFacade(command);
+        }
+
+        public bool IsCacheable => _sqlGenerator.IsCacheable;
+
+        public IRelationalValueBufferFactory CreateValueBufferFactory(IRelationalValueBufferFactoryFactory relationalValueBufferFactoryFactory,
+            DbDataReader dataReader)
+        {
+            return _sqlGenerator.CreateValueBufferFactory(relationalValueBufferFactoryFactory, dataReader);
         }
     }
 }

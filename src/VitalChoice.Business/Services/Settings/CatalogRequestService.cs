@@ -50,7 +50,7 @@ namespace VitalChoice.Business.Services.Settings
         {
             _catalogRequestAddressRepository = catalogRequestAddressRepository;
             _countryService = countryService;
-            logger = loggerProvider.CreateLoggerDefault();
+            logger = loggerProvider.CreateLogger<CatalogRequestAddressService>();
         }
 
         public async Task<ICollection<CatalogRequestAddressListItemModel>> GetCatalogRequestsAsync()

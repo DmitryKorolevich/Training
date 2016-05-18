@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Entities.Files;
 using VitalChoice.Infrastructure.Domain.Options;
@@ -27,7 +27,7 @@ namespace VitalChoice.Business.Services
         
         public FileService(IOptions<AppOptions> appOptions, ILoggerProviderExtended loggerProvider)
         {
-            this.logger = loggerProvider.CreateLoggerDefault();
+            this.logger = loggerProvider.CreateLogger<FileService>();
             this.appOptions = appOptions;
             _rootDir= this.appOptions.Value.FilesPath.ToLower();
         }

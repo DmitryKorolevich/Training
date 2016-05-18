@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Query.Sql;
+using Microsoft.EntityFrameworkCore.Query.Sql.Internal;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -23,17 +24,14 @@ namespace VitalChoice.Profiling
 
         public static IServiceCollection InjectProfiler(this IServiceCollection services)
         {
-            return services.AddScoped<IPerformanceRequest, DefaultPerformanceRequest>();
-        }
-
-        public static EntityFrameworkServicesBuilder InjectProfiler(this EntityFrameworkServicesBuilder efServices)
-        {
-            efServices.GetInfrastructure()
+            services.AddScoped<IPerformanceRequest, DefaultPerformanceRequest>();
+            services
                 .Replace(new ServiceDescriptor(typeof(IRelationalCommandBuilderFactory), typeof(RelationalCommandBuilderFactoryProxy),
                     ServiceLifetime.Scoped));
-            efServices.GetInfrastructure()
-                .Replace(new ServiceDescriptor(typeof(IQuerySqlGenerator), typeof(QuerySqlGeneratorProxy), ServiceLifetime.Scoped));
-            return efServices;
+            services
+                .Replace(new ServiceDescriptor(typeof(SqlServerQuerySqlGeneratorFactory), typeof(SqlServerQuerySqlGeneratorFactoryProxy),
+                    ServiceLifetime.Scoped));
+            return services;
         }
     }
 }

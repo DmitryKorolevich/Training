@@ -1,9 +1,9 @@
 ﻿using System.Linq;
-using Microsoft.AspNet.Identity;
-using Microsoft.Data.Entity;
+using Microsoft.AspNetCore.Identity;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
+using Microsoft.EntityFrameworkCore;
 
 namespace VitalChoice.Infrastructure.Identity.UserStores
 {
@@ -14,6 +14,7 @@ namespace VitalChoice.Infrastructure.Identity.UserStores
 
 	    }
 
-		public override IQueryable<ApplicationUser> Users => Context.Users.Include(x => x.Roles).Where(x => x.IdUserType == UserType.Customer && !x.DeletedDate.HasValue);
+        public override IQueryable<ApplicationUser> Users
+            => Context.Users.Include(x => x.Roles).Where(x => x.IdUserType == UserType.Customer && !x.DeletedDate.HasValue);
 	}
 }

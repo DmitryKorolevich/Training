@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Validation.Models;
 using System;
@@ -33,9 +32,10 @@ using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Domain.Entities.Tokens;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Infrastructure.Domain.Options;
 using System.Net;
+using Microsoft.AspNetCore.Mvc;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VC.Admin.Models.Customer;
@@ -82,7 +82,7 @@ namespace VC.Admin.Controllers
             _appInfrastructureService = appInfrastructureService;
             _trackingService = trackingService;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
-            this.logger = loggerProvider.CreateLoggerDefault();
+            this.logger = loggerProvider.CreateLogger<OrderInvoiceController>();
         }
 
         [HttpGet]

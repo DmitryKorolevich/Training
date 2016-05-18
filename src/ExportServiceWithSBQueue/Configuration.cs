@@ -2,15 +2,13 @@
 using System.Reflection;
 using Autofac;
 using Avalara.Avatax.Rest.Services;
-using Azure.ApplicationHost.Host;
 using ExportServiceWithSBQueue.Context;
 using ExportServiceWithSBQueue.Services;
-using Microsoft.AspNet.Identity;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Business.Mail;
 using VitalChoice.Business.Repositories;
 using VitalChoice.Business.Services;
@@ -57,6 +55,8 @@ using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Workflow.Core;
 using Autofac.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.Interfaces.Services.Help;
@@ -70,7 +70,6 @@ namespace ExportServiceWithSBQueue
     {
         public static IContainer BuildContainer()
         {
-            DnxHostedApplication.Init();
             var configurationBuilder = new ConfigurationBuilder()
                 .AddJsonFile("config.json")
                 .AddJsonFile("config.local.json", true);
@@ -79,8 +78,7 @@ namespace ExportServiceWithSBQueue
 
             var services = new ServiceCollection();
 
-            services.AddEntityFramework()
-                .AddSqlServer();
+            services.AddEntityFramework().AddEntityFrameworkSqlServer();
 
             services.Configure<AppOptionsBase>(options =>
             {

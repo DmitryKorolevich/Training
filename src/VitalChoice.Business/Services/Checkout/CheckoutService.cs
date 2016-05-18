@@ -87,7 +87,7 @@ namespace VitalChoice.Business.Services.Checkout
             _customerRepository = customerRepository;
             _notificationService = notificationService;
             _discountService = discountService;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<CheckoutService>();
         }
 
         public IQueryFluent<CartExtended> BuildIncludes(IQueryFluent<CartExtended> query)

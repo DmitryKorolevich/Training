@@ -4,7 +4,6 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.Data.Entity;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
@@ -15,6 +14,7 @@ using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
+using Microsoft.EntityFrameworkCore;
 
 namespace VitalChoice.Business.Services.Settings
 {
@@ -30,7 +30,7 @@ namespace VitalChoice.Business.Services.Settings
         {
             _appSettingRepository = appSettingRepository;
             _lookupRepository = lookupRepository;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<SettingService>();
         }
 
         public Task<List<AppSettingItem>> GetAppSettingItemsAsync(ICollection<string> names)

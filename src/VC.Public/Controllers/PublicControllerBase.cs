@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Authorization;
-using Microsoft.AspNet.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using VC.Public.Helpers;
 using VitalChoice.Core.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
@@ -66,7 +66,7 @@ namespace VC.Public.Controllers
         protected int GetInternalCustomerId()
         {
             var context = HttpContext;
-            var internalId = Convert.ToInt32(context.User.GetUserId());
+            var internalId = Convert.ToInt32(_userManager.GetUserId(HttpContext.User));
 
             return internalId;
         }

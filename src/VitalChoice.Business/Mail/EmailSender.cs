@@ -1,44 +1,39 @@
-﻿#if !NETSTANDARD1_5
-using System.Net;
-using System.Net.Mail;
-#endif
+﻿using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.OptionsModel;
 using System;
+using Microsoft.Extensions.Options;
 using VitalChoice.Infrastructure.Domain.Options;
+#if !NETSTANDARD1_5
+using System.Net.Mail;
+#endif
 
 namespace VitalChoice.Business.Mail
 {
+#if !NETSTANDARD1_5
     public class EmailSender :IEmailSender, IDisposable
     {
-#if !NETSTANDARD1_5
         private readonly Email _configuration;
-
+        
 	    private readonly SmtpClient _client;
-#endif
 		public EmailSender(IOptions<AppOptions> options)
 	    {
-#if !NETSTANDARD1_5
             _configuration = options.Value.EmailConfiguration;
 		    if (!_configuration.Disabled)
 		    {
 		        _client = new SmtpClient(_configuration.Host, _configuration.Port)
 		        {
 		            UseDefaultCredentials = false,
-		            DeliveryMethod = SmtpDeliveryMethod.Network,
 		            EnableSsl = _configuration.Secured,
 		            Credentials = new NetworkCredential(_configuration.Username, _configuration.Password)
 		        };
 		    }
-#endif
 		}
 
         public async Task SendEmailAsync(string email, string subject, string message, string fromDisplayName = null,
             string fromEmail = null, string toDisplayName = "",
             bool isBodyHtml = true)
         {
-#if !NETSTANDARD1_5
             if (_configuration.Disabled)
                 return;
             var fromEmailAdddress = fromEmail;
@@ -69,13 +64,10 @@ namespace VitalChoice.Business.Mail
             {
 
             }
-#else
-            await Task.Delay(0);
-#endif
 
         }
 
-        #region IDisposable
+#region IDisposable
         private bool _disposedValue;
 
         protected virtual void Dispose(bool disposing)
@@ -84,9 +76,7 @@ namespace VitalChoice.Business.Mail
             {
                 if (disposing)
                 {
-#if !NETSTANDARD1_5
                     _client?.Dispose();
-#endif
                 }
 
                 _disposedValue = true;
@@ -98,6 +88,21 @@ namespace VitalChoice.Business.Mail
             Dispose(true);
         }
 
-        #endregion
+#endregion
     }
+#else
+    public class EmailSender : IEmailSender, IDisposable
+    {
+        public Task SendEmailAsync(string email, string subject, string message, string fromDisplayName = "Vital Choice", string fromEmail = null, string toDisplayName = "",
+            bool isBodyHtml = true)
+        {
+            return Task.Delay(0);
+        }
+
+        public void Dispose()
+        {
+
+        }
+    }
+#endif
 }

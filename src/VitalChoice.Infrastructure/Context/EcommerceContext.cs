@@ -1,6 +1,6 @@
-﻿using Microsoft.Data.Entity;
-using System.Data.SqlClient;
-using Microsoft.Extensions.OptionsModel;
+﻿using System.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Ecommerce.Context;
 using VitalChoice.Ecommerce.Domain.Entities;

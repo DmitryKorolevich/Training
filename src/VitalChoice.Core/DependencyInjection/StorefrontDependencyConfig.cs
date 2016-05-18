@@ -1,9 +1,8 @@
 ﻿using Autofac;
 using cloudscribe.Web.Pagination;
-using Microsoft.AspNet.Authentication.Cookies;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Mvc;
-using Microsoft.AspNet.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using VitalChoice.Business.Services;
@@ -17,15 +16,12 @@ namespace VitalChoice.Core.DependencyInjection
     {
         protected override void AddMvc(IServiceCollection services)
         {
-            services.AddMvc().AddMvcOptions(options =>
-            {
-                options.ModelBinders.Insert(0, new AntiXSSModelBinder());
-            });
+            services.AddMvc().AddMvcOptions(options => options.ModelBinderProviders.Insert(0, new AntiXssModelBinderProvider()));
         }
 
         protected override void StartCustomServicesRegistration(IServiceCollection services)
         {
-            services.AddCaching();
+            services.AddMemoryCache();
             services.AddSession();
             services.Replace(new ServiceDescriptor(typeof (IHtmlGenerator), typeof (StoreFrontHtmlGenerator), ServiceLifetime.Scoped));
         }

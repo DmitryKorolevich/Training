@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNet.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using VitalChoice.Infrastructure.Domain.Constants;
 
 namespace VitalChoice.Infrastructure.Identity
@@ -21,13 +21,12 @@ namespace VitalChoice.Infrastructure.Identity
 			return result;
 		}
 
-	    public override IdentityError PasswordRequiresNonLetterAndDigit()
-	    {
-			var result = base.PasswordRequiresNonLetterAndDigit();
-			result.Description = ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.PasswordRequiresSpecialCharacter];
-
-			return result;
-		}
+        public override IdentityError PasswordRequiresNonAlphanumeric()
+        {
+            var result = base.PasswordRequiresNonAlphanumeric();
+            result.Description = ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.PasswordRequiresSpecialCharacter];
+            return result;
+        }
 
 	    public override IdentityError InvalidToken()
 	    {

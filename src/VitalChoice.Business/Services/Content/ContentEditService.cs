@@ -30,16 +30,12 @@ namespace VitalChoice.Business.Services.Content
 	    private readonly ILogger _logger;
 
 	    public ContentEditService(IRepositoryAsync<MasterContentItem> masterContentItemRepository,
-	        IRepositoryAsync<ContentCategory> contentCategoryRepository,
-	        IRepositoryAsync<ContentItem> contentItemRepository, IRepositoryAsync<Recipe> recipeRepository,
-	        IRepositoryAsync<FAQ> faqRepository,
-	        IRepositoryAsync<Article> articleRepository, IRepositoryAsync<ContentPage> contentPageRepository,
-	        ITtlGlobalCache templatesCache,
+	        IRepositoryAsync<ContentItem> contentItemRepository, 
 	        ILoggerProviderExtended loggerProvider)
 	    {
 	        this.masterContentItemRepository = masterContentItemRepository;
 	        this.contentItemRepository = contentItemRepository;
-	        _logger = loggerProvider.CreateLoggerDefault();
+	        _logger = loggerProvider.CreateLogger<ContentEditService>();
 	    }
 
 	    #region Public

@@ -31,7 +31,7 @@ namespace VitalChoice.Business.Services.Products
         {
             this.inventoryCategoryEcommerceRepository = inventoryCategoryEcommerceRepository;
             this.productService = productService;
-            logger = loggerProvider.CreateLoggerDefault();
+            logger = loggerProvider.CreateLogger<InventoryCategoryService>();
         }
 
         public async Task<IList<InventoryCategory>> GetCategoriesTreeAsync(InventoryCategoryTreeFilter filter)

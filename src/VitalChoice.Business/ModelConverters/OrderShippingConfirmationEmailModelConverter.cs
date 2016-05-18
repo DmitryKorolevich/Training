@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Business.Helpers;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;

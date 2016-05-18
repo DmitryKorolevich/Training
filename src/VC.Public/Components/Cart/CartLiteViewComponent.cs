@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using VC.Public.Helpers;
 using VC.Public.Models.Menu;
 using VitalChoice.Ecommerce.Domain.Entities;

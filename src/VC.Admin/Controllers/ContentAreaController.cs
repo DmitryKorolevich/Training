@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using VC.Admin.Models.ContentManagement;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Permissions;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Validation.Models;
 
@@ -20,13 +21,15 @@ namespace VC.Admin.Controllers
 	public class ContentAreaController:BaseApiController
     {
 		private readonly IContentAreaService _contentAreaService;
+	    private readonly ExtendedUserManager _userManager;
 
-		public ContentAreaController(IContentAreaService contentAreaService)
-		{
-			_contentAreaService = contentAreaService;
-		}
+	    public ContentAreaController(IContentAreaService contentAreaService, ExtendedUserManager userManager)
+	    {
+	        _contentAreaService = contentAreaService;
+	        _userManager = userManager;
+	    }
 
-		[HttpGet]
+	    [HttpGet]
 		public async Task<Result<ContentAreaReadModel>> GetContentArea(int id)
 		{
 			var res = await _contentAreaService.GetContentAreaAsync(id);
@@ -56,7 +59,7 @@ namespace VC.Admin.Controllers
 			}
 
 			var context = HttpContext;
-			contentArea.IdEditedBy = Convert.ToInt32(context.User.GetUserId());
+			contentArea.IdEditedBy = Convert.ToInt32(_userManager.GetUserId(context.User));
 			contentArea.Updated = DateTime.Now;
 			contentArea.Template = model.Template;
 

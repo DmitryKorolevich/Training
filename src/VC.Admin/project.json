@@ -37,7 +37,8 @@
     "VitalChoice.Core": "1.0.0-*",
     "VitalChoice.Validation": "1.0.0-*",
     "VitalChoice.DynamicData": "1.0.0-*",
-    "VitalChoice.SharedWeb": "1.0.0-*"
+    "VitalChoice.SharedWeb": "1.0.0-*",
+    "Microsoft.Extensions.Configuration.EnvironmentVariables": "1.0.0-rc2-final"
   },
   "frameworks": {
     "net461": {

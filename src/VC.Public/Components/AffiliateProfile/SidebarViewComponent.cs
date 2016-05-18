@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using VC.Public.Models.Profile;
 using VitalChoice.Interfaces.Services.Users;
 
@@ -20,7 +20,7 @@ namespace VC.Public.Components.AffiliateProfile
 
 		public async Task<IViewComponentResult> InvokeAsync()
 		{
-			var userId = Convert.ToInt32(HttpContext.User.GetUserId());
+			var userId = Convert.ToInt32(_userManager.GetUserId(HttpContext.User));
 
 			var user = await _affiliateUserService.GetAsync(userId);
 			

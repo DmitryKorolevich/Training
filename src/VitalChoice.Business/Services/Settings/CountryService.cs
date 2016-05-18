@@ -4,7 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Microsoft.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Repositories.Specifics;
@@ -31,7 +31,7 @@ namespace VitalChoice.Business.Services.Settings
         {
             this.countryRepository = countryRepository;
             this.stateRepository = stateRepository;
-            logger = loggerProvider.CreateLoggerDefault();
+            logger = loggerProvider.CreateLogger<CountryService>();
         }
 
         public async Task<ICollection<Country>> GetCountriesAsync(CountryFilter filter = null)

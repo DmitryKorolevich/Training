@@ -30,7 +30,7 @@ namespace VitalChoice.Business.Services.Content
             IRepositoryAsync<FAQ> contentRepository,
             IObjectMapper<ContentParametersModel> mapper,
             IObjectMapperFactory mapperFactory)
-            : base(templatesCache, loggerProvider.CreateLoggerDefault(), processorService, contentRepository, mapper, mapperFactory)
+            : base(templatesCache, loggerProvider.CreateLogger<FAQViewService>(), processorService, contentRepository, mapper, mapperFactory)
         {
         }
     }

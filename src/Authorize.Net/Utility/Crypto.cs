@@ -57,7 +57,7 @@ namespace Authorize.Net.Utility
             var HMACkey = new ASCIIEncoding().GetBytes(key);
             var HMACdata = new ASCIIEncoding().GetBytes(value);
             var fingerprint = "";
-#if NET451
+#if !NETSTANDARD1_5
             // create a HMACMD5 object with the key set
             var myhmacMD5 = new HMACMD5(HMACkey);
 

@@ -1,11 +1,11 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Validation.Models;
 using System.Collections.Generic;
 using Microsoft.Net.Http.Headers;
 using System;
+using Microsoft.AspNetCore.Mvc;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Interfaces.Services;
@@ -26,7 +26,7 @@ namespace VC.Admin.Controllers
             ILoggerProviderExtended loggerProvider)
         {
             this.fileService = fileService;
-            this.logger = loggerProvider.CreateLoggerDefault();
+            this.logger = loggerProvider.CreateLogger<FileController>();
         }
 
         [HttpGet]

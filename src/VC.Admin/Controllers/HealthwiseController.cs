@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using VC.Admin.Models.Customer;
@@ -20,7 +19,7 @@ using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
@@ -41,6 +40,7 @@ using VitalChoice.Interfaces.Services.Orders;
 using VC.Admin.Models.Healthwise;
 using VitalChoice.Infrastructure.Domain.Transfer.Healthwise;
 using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 
 namespace VC.Admin.Controllers
 {
@@ -51,17 +51,19 @@ namespace VC.Admin.Controllers
         private readonly IOrderService _orderService;
         private readonly IAppInfrastructureService _appInfrastructureService;
         private readonly ILogger _logger;
+        private readonly ExtendedUserManager _userManager;
 
         public HealthwiseController(
             IHealthwiseService healthwiseService,
             IOrderService orderService,
             IAppInfrastructureService appInfrastructureService,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerProviderExtended loggerProvider, ExtendedUserManager userManager)
         {
             _healthwiseService = healthwiseService;
             _orderService = orderService;
             _appInfrastructureService = appInfrastructureService;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _userManager = userManager;
+            _logger = loggerProvider.CreateLogger<HealthwiseController>();
         }
 
 	    [HttpPost]
@@ -122,7 +124,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return false;
 
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(HttpContext.User);
             int tempId;
             int? userId = null;
             if (Int32.TryParse(sUserId, out tempId))

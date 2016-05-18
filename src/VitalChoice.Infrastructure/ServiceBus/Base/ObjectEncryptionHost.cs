@@ -10,7 +10,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
@@ -37,7 +37,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         }
 
         public X509Certificate2 LocalCert { get; }
-#if NET451
+#if !NETSTANDARD1_5
         private readonly RSACryptoServiceProvider _signProvider;
 #else
         private readonly RSA _signProvider;
@@ -141,7 +141,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             return valid;
         }
 
-#if NET451
+#if !NETSTANDARD1_5
         public byte[] RsaDecrypt(byte[] data, RSACryptoServiceProvider rsa)
 #else
         public byte[] RsaDecrypt(byte[] data, RSA rsa)
@@ -149,7 +149,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         {
             if (data == null || rsa == null)
                 return null;
-#if NET451
+#if !NETSTANDARD1_5
             var objectData = rsa.Decrypt(data, true);
 #else
             var objectData = rsa.Decrypt(data, RSAEncryptionPadding.OaepSHA512);
@@ -157,7 +157,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             return objectData;
         }
 
-#if NET451
+#if !NETSTANDARD1_5
         public byte[] RsaEncrypt(byte[] data, RSACryptoServiceProvider rsa)
 #else
         public byte[] RsaEncrypt(byte[] data, RSA rsa)
@@ -165,7 +165,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         {
             if (data == null || rsa == null)
                 return null;
-#if NET451
+#if !NETSTANDARD1_5
             return rsa.Encrypt(data, true);
 #else
             return rsa.Encrypt(data, RSAEncryptionPadding.OaepSHA512);
@@ -399,7 +399,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             }
         }
 
-#if NET451
+#if !NETSTANDARD1_5
         private X509Certificate2 GetPublicCertificate(StoreName storeName, string thumbprint, RSACryptoServiceProvider signProvider = null)
 #else
         private X509Certificate2 GetPublicCertificate(StoreName storeName, string thumbprint, RSA signProvider = null)
@@ -423,7 +423,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 {
                     if (!cert.HasPrivateKey)
                         throw new InvalidOperationException("Certificate has no private key imported.");
-#if NET451
+#if !NETSTANDARD1_5
                     signProvider.ImportParameters(((RSACryptoServiceProvider) cert.PrivateKey).ExportParameters(true));
 #else
                     signProvider = cert.GetRSAPrivateKey();
@@ -434,7 +434,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             }
             finally
             {
-#if NET451
+#if !NETSTANDARD1_5
                 certStore.Close();
 #else
                 certStore.Dispose();
@@ -468,7 +468,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 if (!string.IsNullOrWhiteSpace(_localEncryptionPath))
                 {
                     KeyExchange exchange;
-#if NET451
+#if !NETSTANDARD1_5
                     if (!File.Exists(_localEncryptionPath))
                     {
                         var directory = Path.GetDirectoryName(Path.GetFullPath(_localEncryptionPath));
@@ -518,7 +518,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             if (commandData == null)
                 throw new ArgumentNullException(nameof(commandData));
 
-#if NET451
+#if !NETSTANDARD1_5
             if (commandData.Certificate?.PublicKey.Key == null || commandData.Sign == null)
 #else
             if (commandData.Certificate == null || commandData.Sign == null)
@@ -527,7 +527,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 _logger.LogWarning("Incoming signature is invalid");
                 return false;
             }
-#if NET451
+#if !NETSTANDARD1_5
             var rsa = new RSACryptoServiceProvider();
             rsa.ImportParameters(((RSACryptoServiceProvider)commandData.Certificate.PublicKey.Key).ExportParameters(false));
 #else
@@ -539,7 +539,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                     $"Invalid certificate:\n Server Thumbprint: {RootCert.Thumbprint}\n Client Thumbprint: {commandData.Certificate.Thumbprint}");
                 return false;
             }
-#if NET451
+#if !NETSTANDARD1_5
             if (!rsa.VerifyData(commandData.Data, CryptoConfig.MapNameToOID("SHA512"), commandData.Sign))
 #else
             if (!rsa.VerifyData(commandData.Data, commandData.Sign, HashAlgorithmName.SHA512, RSASignaturePadding.Pkcs1))
@@ -555,7 +555,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         {
             if (_signProvider == null)
                 return;
-#if NET451
+#if !NETSTANDARD1_5
             commandData.Sign = _signProvider.SignData(commandData.Data, CryptoConfig.MapNameToOID("SHA512"));
 #else
             commandData.Sign = _signProvider.SignData(commandData.Data, HashAlgorithmName.SHA512, RSASignaturePadding.Pkcs1);
@@ -572,7 +572,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
 
         private byte[] GetPrivateKeyHash()
         {
-#if NET451
+#if !NETSTANDARD1_5
             var sha = new SHA256CryptoServiceProvider();
 #else
             var sha = SHA256.Create();
@@ -598,7 +598,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
 
         private byte[] GetPublicKeyHash()
         {
-#if NET451
+#if !NETSTANDARD1_5
             var sha = new SHA256CryptoServiceProvider();
 #else
             var sha = SHA256.Create();

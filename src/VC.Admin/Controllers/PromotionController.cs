@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Validation.Models;
 using VitalChoice.Core.Base;
@@ -17,10 +16,12 @@ using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 using VitalChoice.Interfaces.Services.Settings;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 using VC.Admin.Models.Products;
 using VitalChoice.Ecommerce.Domain.Entities.Promotions;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 
 namespace VC.Admin.Controllers
 {
@@ -33,19 +34,21 @@ namespace VC.Admin.Controllers
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly ILogger _logger;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
+        private readonly ExtendedUserManager _userManager;
 
         public PromotionController(
             IPromotionService promotionService, 
             IProductService productService, 
             ILoggerProviderExtended loggerProvider, 
             IDynamicMapper<PromotionDynamic, Promotion> mapper,
-            IObjectHistoryLogService objectHistoryLogService)
+            IObjectHistoryLogService objectHistoryLogService, ExtendedUserManager userManager)
         {
             _promotionService = promotionService;
             _productService = productService;
             _objectHistoryLogService = objectHistoryLogService;
+            _userManager = userManager;
             _mapper = mapper;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<PromotionController>();
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
 
@@ -99,7 +102,7 @@ namespace VC.Admin.Controllers
                 return null;
             var promotion = await _mapper.FromModelAsync(model);
 
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(HttpContext.User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {

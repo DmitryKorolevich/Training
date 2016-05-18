@@ -8,13 +8,13 @@ namespace VC.Public.Models.Auth
     public class RegisterAccountModel : RegisterEmailModel
 	{
 		[Required]
-        [AllowXSS]
+        [AllowXss]
         public string Password { get; set; }
 
 		[Required]
 		[Compare("Password")]
 		[Display(Name = "Password Confirm")]
-        [AllowXSS]
+        [AllowXss]
 		public string ConfirmPassword { get; set; }
 
 		[Required]

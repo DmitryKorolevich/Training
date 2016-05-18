@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNet.Http;
-using Microsoft.Extensions.OptionsModel;
-using Microsoft.AspNet.Mvc.Routing;
-using Microsoft.AspNet.Mvc.Infrastructure;
+﻿using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Routing;
 using VitalChoice.Infrastructure.Domain.Options;
 
 namespace VitalChoice.Core.Infrastructure
@@ -21,7 +21,7 @@ namespace VitalChoice.Core.Infrastructure
 
 		public CustomUrlHelper(IActionContextAccessor contextAccessor,
 							   IActionSelector actionSelector,
-							   IOptions<AppOptions> appOptions) : base(contextAccessor, actionSelector)
+							   IOptions<AppOptions> appOptions) : base(contextAccessor.ActionContext)
 		{
 			this.appOptions = appOptions;
 			this.httpContext = contextAccessor.ActionContext.HttpContext;

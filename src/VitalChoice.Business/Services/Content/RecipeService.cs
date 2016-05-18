@@ -72,7 +72,7 @@ namespace VitalChoice.Business.Services.Content
             this.templatesCache = templatesCache;
             _transactionAccessor = transactionAccessor;
             _objectLogItemExternalService = objectLogItemExternalService;
-            logger = loggerProvider.CreateLoggerDefault();
+            logger = loggerProvider.CreateLogger<RecipeService>();
         }
 
         public async Task<PagedList<Recipe>> GetRecipesAsync(RecipeListFilter filter)

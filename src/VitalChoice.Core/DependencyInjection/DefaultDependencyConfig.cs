@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Mvc;
+using System.ComponentModel;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Business.Mail;
 using VitalChoice.Business.Services;
 using VitalChoice.Business.Services.Content;
@@ -23,6 +22,7 @@ using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Workflow.Core;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
 using Newtonsoft.Json;
 using VitalChoice.Business.Services.Customers;
 using VitalChoice.Business.Services.Orders;
@@ -56,15 +56,17 @@ using VitalChoice.Infrastructure.Identity.UserStores;
 using VitalChoice.Infrastructure.Identity.Validators;
 using VitalChoice.Interfaces.Services.Avatax;
 using VitalChoice.Interfaces.Services.Users;
-using Microsoft.AspNet.Mvc.Abstractions;
-using Microsoft.AspNet.Mvc.Formatters;
 using Microsoft.Extensions.PlatformAbstractions;
 using VitalChoice.Workflow.Base;
 using VitalChoice.ContentProcessing.Helpers;
 using VitalChoice.DynamicData.Extensions;
 using Autofac.Extensions.DependencyInjection;
-using Microsoft.AspNet.Authentication.Cookies;
-using Microsoft.AspNet.Hosting;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using VitalChoice.Business.Repositories;
 using VitalChoice.Core.Infrastructure.Helpers.ReCaptcha;
 using VitalChoice.DynamicData.Interfaces;
@@ -94,6 +96,8 @@ using VitalChoice.Interfaces.Services.InventorySkus;
 using VitalChoice.Profiling;
 using VitalChoice.Profiling.Base;
 using VitalChoice.Profiling.Interfaces;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using IContainer = Autofac.IContainer;
 #if !NETSTANDARD1_5
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Business.Services.Cache;
@@ -103,8 +107,8 @@ namespace VitalChoice.Core.DependencyInjection
 {
     public abstract class DefaultDependencyConfig : IDependencyConfig
     {
-        public IContainer RegisterInfrastructure(IConfiguration configuration, IServiceCollection services,
-            Assembly projectAssembly, IApplicationEnvironment appEnv = null, bool enableCache = true)
+        public Autofac.IContainer RegisterInfrastructure(IConfiguration configuration, IServiceCollection services,
+            Assembly projectAssembly, IHostingEnvironment appEnv = null, bool enableCache = true)
         {
             // Add EF services to the services container.
 #if !NETSTANDARD1_5
@@ -112,14 +116,14 @@ namespace VitalChoice.Core.DependencyInjection
             {
                 services.AddEntityFramework()
                     .AddEntityFrameworkCache<ServiceBusCacheSyncProvider>(new[] {typeof(VitalChoiceContext), typeof(EcommerceContext)})
-                    .AddSqlServer().InjectProfiler();
+                    .AddEntityFrameworkSqlServer().InjectProfiler();
             }
             else
             {
-                services.AddEntityFramework().AddSqlServer().InjectProfiler();
+                services.AddEntityFramework().AddEntityFrameworkSqlServer().InjectProfiler();
             }
 #else
-            services.AddEntityFramework().AddEntityFrameworkCache<CacheSyncProvider>(new [] {typeof(VitalChoiceContext), typeof(EcommerceContext) }).AddSqlServer();
+            services.AddEntityFramework().AddEntityFrameworkSqlServer();
 #endif
             services.AddScoped<IPerformanceRequest, PerformanceRequestService>();
             // Add Identity services to the services container.
@@ -131,7 +135,7 @@ namespace VitalChoice.Core.DependencyInjection
                 x.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(1);
                 x.Password.RequiredLength = 8;
                 x.Password.RequireDigit = true;
-                x.Password.RequireNonLetterOrDigit = true;
+                x.Password.RequireNonAlphanumeric = true;
 
                 PopulateCookieIdentityOptions(x.Cookies.ApplicationCookie);
             })
@@ -141,21 +145,14 @@ namespace VitalChoice.Core.DependencyInjection
                 .AddUserValidator<AdminUserValidator>()
                 .AddUserManager<ExtendedUserManager>()
                 .AddTokenProvider<UserTokenProvider>(IdentityConstants.TokenProviderName);
-            //Temp work arround for using custom pre-configuration action logic(BaseControllerActionInvoker).
-            services.TryAdd(
-                ServiceDescriptor
-                    .Transient<IActionInvokerProvider, ValidationActionInvokerProvider>());
-
+            
             // Add MVC services to the services container.
             AddMvc(services);
 
             services.AddAuthorization(
                 x => x.AddPolicy(IdentityConstants.IdentityBasicProfile, y => y.RequireAuthenticatedUser()));
 
-            services.Configure<AppOptionsBase>(options =>
-            {
-                ConfigureBaseOptions(configuration, options);
-            });
+            services.Configure<AppOptionsBase>(options => ConfigureBaseOptions(configuration, options));
 
             services.Configure<AppOptions>(options =>
             {
@@ -167,13 +164,13 @@ namespace VitalChoice.Core.DependencyInjection
                 };
             });
 
-            services.Configure<MvcOptions>(ConfigureMvcOptions);
+            services.Configure<MvcOptions>(o => ConfigureMvcOptions(o, LoggerService.Build(appEnv)));
             StartCustomServicesRegistration(services);
             var builder = new ContainerBuilder();
 
             if (appEnv != null)
             {
-                builder.RegisterInstance(appEnv).As<IApplicationEnvironment>();
+                builder.RegisterInstance(appEnv).As<IHostingEnvironment>();
             }
             using (new ProfilingScope("Populate"))
             {
@@ -195,7 +192,7 @@ namespace VitalChoice.Core.DependencyInjection
 
             builder.RegisterType<LocalizationService>()
                 .As<ILocalizationService>()
-                .WithParameters(new List<Parameter>
+                .WithParameters(new List<Autofac.Core.Parameter>
                 {
                     new NamedParameter("defaultCultureId", configuration.GetSection("App:DefaultCultureId").Value)
                 })
@@ -204,15 +201,10 @@ namespace VitalChoice.Core.DependencyInjection
             AutofacExecutionContext.Configure(container);
 
             UnitOfWorkBase.SetOptions(container.Resolve<IOptions<AppOptionsBase>>());
-            using (new ProfilingScope("Build logger"))
-            {
-                LoggerService.Build(container.Resolve<IOptions<AppOptions>>(), container.Resolve<IApplicationEnvironment>());
-            }
-            EcommerceContextBase.ServiceProvider = container.Resolve<IServiceProvider>();
             return container;
         }
 
-        private void ConfigureMvcOptions(MvcOptions o)
+        private void ConfigureMvcOptions(MvcOptions o, ILoggerProviderExtended loggerProvider)
         {
             var inputFormatter =
                 (JsonInputFormatter)
@@ -230,7 +222,7 @@ namespace VitalChoice.Core.DependencyInjection
             }
             else
             {
-                var newFormatter = new JsonInputFormatter
+                var newFormatter = new JsonInputFormatter(loggerProvider.CreateLogger<JsonInputFormatter>())
                 {
                     SerializerSettings =
                     {
@@ -623,7 +615,7 @@ namespace VitalChoice.Core.DependencyInjection
 
         protected virtual void PopulateCookieIdentityOptions(CookieAuthenticationOptions options)
         {
-            options.AuthenticationScheme = IdentityCookieOptions.ApplicationCookieAuthenticationType;
+            options.AuthenticationScheme = new IdentityCookieOptions().ApplicationCookieAuthenticationScheme;
         }
     }
 }

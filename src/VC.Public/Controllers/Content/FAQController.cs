@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using VC.Public.Models;
 using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Content.Base;

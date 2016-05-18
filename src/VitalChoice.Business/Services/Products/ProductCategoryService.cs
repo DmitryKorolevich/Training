@@ -50,7 +50,7 @@ namespace VitalChoice.Business.Services.Products
             this.contentTypeRepository = contentTypeRepository;
             this.sPEcommerceRepository = sPEcommerceRepository;
             this.objectLogItemExternalService = objectLogItemExternalService;
-            logger = loggerProvider.CreateLoggerDefault();
+            logger = loggerProvider.CreateLogger<ProductCategoryService>();
         }
 
         #region Categories

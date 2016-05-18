@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using System.Linq;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
@@ -21,7 +21,7 @@ namespace VitalChoice.Business.Services
         {
             _countryRepository = countryRepository;
             _stateRepository = stateRepository;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<BackendSettingsService>();
         }
 
         public Country GetDefaultCountry()

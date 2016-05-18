@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Validation.Models;
 using System;
@@ -14,6 +13,7 @@ using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Affiliates;
 using VC.Admin.Models.Affiliate;
 using System.Text;
+using Microsoft.AspNetCore.Mvc;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Interfaces.Services.Settings;
 using Newtonsoft.Json;
@@ -30,9 +30,10 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using VitalChoice.Infrastructure.Domain.Transfer.Settings;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VC.Admin.Models.Affiliates;
 using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 
 namespace VC.Admin.Controllers
 {
@@ -43,6 +44,7 @@ namespace VC.Admin.Controllers
         private readonly IDynamicMapper<AffiliateDynamic, Affiliate> _mapper;
         private readonly IAffiliateUserService _affiliateUserService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
+        private readonly ExtendedUserManager _userManager;
         private readonly Country _defaultCountry;
         private readonly ICsvExportService<AffiliateOrderListItemModel, AffiliateOrderListItemModelCsvMap> _csvExportAffiliateOrderListItemService;
         private readonly IOrderService _orderService;
@@ -61,19 +63,20 @@ namespace VC.Admin.Controllers
             IOrderService orderService,
             ICountryService countryService,
             IOptions<AppOptions> appOptions,
-            IObjectHistoryLogService objectHistoryLogService)
+            IObjectHistoryLogService objectHistoryLogService, ExtendedUserManager userManager)
         {
             _affiliateService = affiliateService;
             _affiliateUserService = affiliateUserService;
             _mapper = mapper;
             _objectHistoryLogService = objectHistoryLogService;
+            _userManager = userManager;
             _defaultCountry = appInfrastructureService.Data().DefaultCountry;
             _csvExportAffiliateOrderListItemService = csvExportAffiliateOrderListItemService;
             _orderService = orderService;
             _countryService = countryService;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             _appOptions = appOptions;
-            logger = loggerProvider.CreateLoggerDefault();
+            logger = loggerProvider.CreateLogger<AffiliateController>();
         }
 
         [HttpPost]
@@ -161,7 +164,7 @@ namespace VC.Admin.Controllers
                 return null;
             var affiliate = await _mapper.FromModelAsync(model);
 
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(Request.HttpContext.User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {

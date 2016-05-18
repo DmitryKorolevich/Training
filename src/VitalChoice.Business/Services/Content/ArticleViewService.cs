@@ -26,7 +26,7 @@ namespace VitalChoice.Business.Services.Content
             IRepositoryAsync<Article> contentRepository,
             IObjectMapper<ContentParametersModel> mapper,
             IObjectMapperFactory mapperFactory)
-            : base(templatesCache, loggerProvider.CreateLoggerDefault(), processorService, contentRepository, mapper, mapperFactory)
+            : base(templatesCache, loggerProvider.CreateLogger<ArticleViewService>(), processorService, contentRepository, mapper, mapperFactory)
         {
         }
 	}

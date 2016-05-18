@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Mail;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
-using Microsoft.Data.Entity;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Mail;
@@ -24,6 +23,7 @@ using VitalChoice.Data.Helpers;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Services.Bronto;
+using Microsoft.EntityFrameworkCore;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -50,7 +50,7 @@ namespace VitalChoice.Business.Services.Products
             this.userManager = userManager;
             this.notificationService = notificationService;
             this.orderAddressMapper = orderAddressMapper;
-            logger = loggerProvider.CreateLoggerDefault();
+            logger = loggerProvider.CreateLogger<GCService>();
         }
 
         public async Task<PagedList<GiftCertificate>> GetGiftCertificatesAsync(GCFilter filter)

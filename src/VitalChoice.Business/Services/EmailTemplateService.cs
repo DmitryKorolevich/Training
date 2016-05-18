@@ -51,7 +51,7 @@ namespace VitalChoice.Business.Services
             this._emailTemplateRepository = emailTemplateRepository;
             this._contentTypeRepository = contentTypeRepository;
             this._templatesCache = templatesCache;
-            this._logger = logger.CreateLoggerDefault();
+            this._logger = logger.CreateLogger<EmailTemplateService>();
         }
 
         static EmailTemplateService()

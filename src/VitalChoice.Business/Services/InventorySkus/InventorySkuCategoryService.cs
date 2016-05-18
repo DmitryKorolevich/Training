@@ -27,7 +27,7 @@ namespace VitalChoice.Business.Services.InventorySkus
         {
             _inventorySkuCategoryEcommerceRepository = inventorySkuCategoryEcommerceRepository;
             _inventorySkuEcommerceRepository = inventorySkuEcommerceRepository;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<InventorySkuCategoryService>();
         }
 
         public async Task<IList<InventorySkuCategory>> GetCategoriesTreeAsync(InventorySkuCategoryTreeFilter filter)

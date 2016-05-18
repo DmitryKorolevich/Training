@@ -1,9 +1,9 @@
-﻿#if NET451
+﻿#if !NETSTANDARD1_5
 using System;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
@@ -19,7 +19,7 @@ namespace VitalChoice.Business.Services
         private readonly RSACryptoServiceProvider _keyExchangeProvider;
 
         public EncryptedServiceBusHostClient(IOptions<AppOptions> appOptions, ILoggerProviderExtended loggerProvider, IObjectEncryptionHost encryptionHost)
-            : base(appOptions, loggerProvider.CreateLoggerDefault(), encryptionHost)
+            : base(appOptions, loggerProvider.CreateLogger<EncryptedServiceBusHostClient>(), encryptionHost)
         {
             _keyExchangeProvider = new RSACryptoServiceProvider();
         }

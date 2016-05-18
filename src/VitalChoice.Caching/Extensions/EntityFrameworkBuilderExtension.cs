@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.ChangeTracking.Internal;
-using Microsoft.Data.Entity.Infrastructure;
-using Microsoft.Data.Entity.Query.Internal;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using VitalChoice.Caching.Interfaces;
@@ -16,41 +16,40 @@ namespace VitalChoice.Caching.Extensions
 {
     public static class EntityFrameworkBuilderExtension
     {
-        public static EntityFrameworkServicesBuilder AddEntityFrameworkCache(this EntityFrameworkServicesBuilder builder,
+        public static IServiceCollection AddEntityFrameworkCache(this IServiceCollection builder,
             IEnumerable<Type> contextTypes)
         {
             return AddEntityFrameworkCache<CacheSyncProvider>(builder, contextTypes);
         }
 
-        public static EntityFrameworkServicesBuilder AddEntityFrameworkCache<TSyncProvider>(this EntityFrameworkServicesBuilder builder,
+        public static IServiceCollection AddEntityFrameworkCache<TSyncProvider>(this IServiceCollection services,
             IEnumerable<Type> contextTypes)
             where TSyncProvider : class, ICacheSyncProvider
         {
-            var services = builder.GetInfrastructure();
             services.Replace(ServiceDescriptor.Scoped(typeof (IStateManager), typeof (CacheStateManager)));
             services.Replace(ServiceDescriptor.Scoped(typeof (IAsyncQueryProvider), typeof (CacheEntityQueryProvider)));
             services.AddSingleton<IQueryParserFactory, QueryParserFactory>();
             services.AddSingleton<IInternalEntityCacheFactory, InternalEntityCacheFactory>();
             services.AddSingleton<ICacheSyncProvider, TSyncProvider>();
             services.AddSingleton<IEntityInfoStorage, EntityInfoStorage>();
-            services.AddInstance(typeof (IContextTypeContainer), new ContextTypeContainer(contextTypes.ToArray()));
-            return builder;
+            services.AddSingleton<IContextTypeContainer>(sp => new ContextTypeContainer(contextTypes.ToArray()));
+            return services;
         }
 
-        public static EntityFrameworkServicesBuilder AddEntityFrameworkCache<TContext>(this EntityFrameworkServicesBuilder builder)
+        public static IServiceCollection AddEntityFrameworkCache<TContext>(this IServiceCollection builder)
             where TContext: DbContext
         {
             return AddEntityFrameworkCache(builder, new[] {typeof (TContext)});
         }
 
-        public static EntityFrameworkServicesBuilder AddEntityFrameworkCache<TContext1, TContext2>(this EntityFrameworkServicesBuilder builder)
+        public static IServiceCollection AddEntityFrameworkCache<TContext1, TContext2>(this IServiceCollection builder)
             where TContext1 : DbContext
             where TContext2 : DbContext
         {
             return AddEntityFrameworkCache(builder, new[] { typeof(TContext1), typeof(TContext2) });
         }
 
-        public static EntityFrameworkServicesBuilder AddEntityFrameworkCache<TContext1, TContext2, TContext3>(this EntityFrameworkServicesBuilder builder)
+        public static IServiceCollection AddEntityFrameworkCache<TContext1, TContext2, TContext3>(this IServiceCollection builder)
             where TContext1 : DbContext
             where TContext2 : DbContext
             where TContext3 : DbContext
@@ -58,7 +57,7 @@ namespace VitalChoice.Caching.Extensions
             return AddEntityFrameworkCache(builder, new[] { typeof(TContext1), typeof(TContext2), typeof(TContext3) });
         }
 
-        public static EntityFrameworkServicesBuilder AddEntityFrameworkCache<TContext1, TContext2, TContext3, TContext4>(this EntityFrameworkServicesBuilder builder)
+        public static IServiceCollection AddEntityFrameworkCache<TContext1, TContext2, TContext3, TContext4>(this IServiceCollection builder)
             where TContext1 : DbContext
             where TContext2 : DbContext
             where TContext3 : DbContext

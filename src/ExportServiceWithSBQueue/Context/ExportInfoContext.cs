@@ -1,7 +1,7 @@
 ﻿using System.Data.SqlClient;
 using ExportServiceWithSBQueue.Entities;
-using Microsoft.Data.Entity;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using VitalChoice.Data.Context;
 
 namespace ExportServiceWithSBQueue.Context

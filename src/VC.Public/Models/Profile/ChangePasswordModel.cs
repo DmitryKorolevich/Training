@@ -8,18 +8,18 @@ namespace VC.Public.Models.Profile
     {
 		[Required]
 		[Display(Name = "Old Password")]
-        [AllowXSS]
+        [AllowXss]
         public string OldPassword { get; set; }
 
 	    [Required]
 		[Display(Name = "New Password")]
-        [AllowXSS]
+        [AllowXss]
         public string Password { get; set; }
 
 		[Required]
 		[Compare("Password")]
 		[Display(Name = "Password Confirm")]
-        [AllowXSS]
+        [AllowXss]
         public string ConfirmPassword { get; set; }
 	}
 }

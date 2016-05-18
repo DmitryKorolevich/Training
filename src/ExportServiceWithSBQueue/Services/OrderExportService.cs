@@ -9,7 +9,7 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.ServiceBus;
 using System.Linq;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.ServiceBus.Base;
 

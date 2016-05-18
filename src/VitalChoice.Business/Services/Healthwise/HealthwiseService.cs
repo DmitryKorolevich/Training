@@ -1,57 +1,25 @@
-﻿using Microsoft.AspNet.Http;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Business.Mail;
-using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Business.Queries.Healthwise;
-using VitalChoice.Business.Queries.Orders;
 using VitalChoice.Business.Repositories;
-using VitalChoice.Business.Services.Dynamic;
-using VitalChoice.Data.Helpers;
-using VitalChoice.Data.Repositories;
-using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Data.Services;
-using VitalChoice.Data.UnitOfWork;
-using VitalChoice.DynamicData.Base;
-using VitalChoice.DynamicData.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities;
-using VitalChoice.Ecommerce.Domain.Entities.Addresses;
-using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
-using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
-using VitalChoice.Ecommerce.Domain.Entities.History;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
-using VitalChoice.Ecommerce.Domain.Entities.Payment;
-using VitalChoice.Ecommerce.Domain.Entities.Products;
-using VitalChoice.Ecommerce.Domain.Exceptions;
-using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Mail;
-using VitalChoice.Ecommerce.Domain.Transfer;
-using VitalChoice.Infrastructure.Domain.Constants;
-using VitalChoice.Infrastructure.Domain.Dynamic;
-using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
-using VitalChoice.Infrastructure.Domain.Entities.Users;
-using VitalChoice.Infrastructure.Domain.Transfer;
-using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
-using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
-using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 using VitalChoice.Infrastructure.Domain.Transfer.Healthwise;
-using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services;
-using VitalChoice.Interfaces.Services.Affiliates;
-using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Healthwise;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
-using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Services.Healthwise
 {
@@ -89,7 +57,7 @@ namespace VitalChoice.Business.Services.Healthwise
             _appInfrastructureService = appInfrastructureService;
             _gcService = gcService;
             _notificationService = notificationService;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<HealthwiseService>();
         }
 
         public async Task<ICollection<HealthwiseOrder>> GetHealthwiseOrdersAsync(int idPeriod)

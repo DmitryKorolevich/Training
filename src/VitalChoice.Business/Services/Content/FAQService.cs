@@ -49,7 +49,7 @@ namespace VitalChoice.Business.Services.Content
             this.contentTypeRepository = contentTypeRepository;
             this.objectLogItemExternalService = objectLogItemExternalService;
             this.templatesCache = templatesCache;
-            logger = loggerProvider.CreateLoggerDefault();
+            logger = loggerProvider.CreateLogger<FAQService>();
         }
 
         public async Task<PagedList<FAQ>> GetFAQsAsync(FAQListFilter filter)

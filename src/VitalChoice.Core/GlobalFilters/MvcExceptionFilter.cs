@@ -3,18 +3,17 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Http.Features;
-using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Core.Services;
-using Microsoft.AspNet.Mvc.Filters;
-using Microsoft.AspNet.Mvc.Infrastructure;
-using Microsoft.AspNet.Mvc.ModelBinding;
-using Microsoft.AspNet.Mvc.Routing;
-using Microsoft.AspNet.Mvc.ViewFeatures;
-using Microsoft.AspNet.Routing;
-using Microsoft.Data.Entity;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -28,7 +27,7 @@ namespace VitalChoice.Core.GlobalFilters
 	{
         private readonly ApiExceptionFilterAttribute _apiExceptionFilter = new ApiExceptionFilterAttribute();
 
-		public override async Task OnExceptionAsync(ExceptionContext context)
+		public override Task OnExceptionAsync(ExceptionContext context)
 		{
 #if !NETSTANDARD1_5
             var systemException = context.Exception as SystemException;
@@ -48,7 +47,7 @@ namespace VitalChoice.Core.GlobalFilters
 			    if (context.Exception is CustomerSuspendException)
 			    {
                     context.Result = CustomerStatusCheckAttribute.CreateJsonResponse();
-                    return;
+			        return Task.Delay(0);
 			    }
                 _apiExceptionFilter.OnException(context);
 			}
@@ -92,7 +91,7 @@ namespace VitalChoice.Core.GlobalFilters
                         }
 				        else
 				        {
-                            currentActionName = await GetRefferedAction(context, referer, currentActionName, currentControllerName);
+                            currentActionName = GetRefferedAction(context, referer, currentActionName, currentControllerName);
                             result.ViewName = currentActionName;
                             result.StatusCode = (int)HttpStatusCode.OK;
                         }
@@ -122,14 +121,14 @@ namespace VitalChoice.Core.GlobalFilters
 
                     if (apiException.Status == HttpStatusCode.NotFound)
 					{
-						context.Result = new HttpNotFoundResult();
-						return;
-					}
+						context.Result = new NotFoundResult();
+                        return Task.Delay(0);
+                    }
 					if (apiException.Status == HttpStatusCode.Forbidden)
 					{
-						context.Result = new HttpForbiddenResult();
-                        return;
-					}
+						context.Result = new ForbiddenResult();
+                        return Task.Delay(0);
+                    }
 					var viewName = "Error";
 
 					result.ViewName = viewName;
@@ -140,9 +139,10 @@ namespace VitalChoice.Core.GlobalFilters
                 }
 				context.Result = result;
 			}
-		}
+            return Task.Delay(0);
+        }
 
-        private static async Task<string> GetRefferedAction(ExceptionContext context, string referer, string actionName, string controllerName)
+        private static string GetRefferedAction(ExceptionContext context, string referer, string actionName, string controllerName)
         {
             try
             {
@@ -162,7 +162,7 @@ namespace VitalChoice.Core.GlobalFilters
                         fakeContext.Request.Path = new PathString(uri.AbsolutePath);
                         var routeContext = new RouteContext(fakeContext);
                         var actionSelector = context.HttpContext.RequestServices.GetService<IActionSelector>();
-                        var actionDescriptor = await actionSelector.SelectAsync(routeContext);
+                        var actionDescriptor = actionSelector.Select(routeContext);
                         if (!string.IsNullOrEmpty(actionDescriptor?.Name))
                         {
                             return actionDescriptor.Name;

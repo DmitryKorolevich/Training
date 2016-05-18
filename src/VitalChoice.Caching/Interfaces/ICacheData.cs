@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.ChangeTracking;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.ChangeTracking;
 using VitalChoice.Caching.Services.Cache;

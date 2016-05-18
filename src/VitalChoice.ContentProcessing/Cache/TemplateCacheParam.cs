@@ -1,4 +1,3 @@
-using Microsoft.AspNet.Mvc;
 using System;
 using VitalChoice.ContentProcessing.Base;
 

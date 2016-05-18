@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Data.Entity;
 using VitalChoice.Caching.Services.Cache;
 using VitalChoice.Caching.Services.Cache.Base;
 

@@ -31,7 +31,7 @@ namespace VitalChoice.Business.Services.Products
             this._vProductsWithReviewRepository = vProductsWithReviewRepository;
             this._productReviewRepository = productReviewRepository;
             this._productRepository = productRepository;
-            logger = loggerProvider.CreateLoggerDefault();
+            logger = loggerProvider.CreateLogger<ProductReviewService>();
         }
 
 

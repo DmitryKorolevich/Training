@@ -1,4 +1,4 @@
-﻿#if NET451
+﻿#if !NETSTANDARD1_5
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,8 @@ using VitalChoice.Caching.Relational.Base;
 using VitalChoice.Caching.Services;
 using System.Collections.Concurrent;
 using System.Globalization;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
@@ -22,7 +23,7 @@ namespace VitalChoice.Business.Services.Cache
     {
         public const int PingAverageMaxCount = 50;
 
-        private readonly IApplicationEnvironment _applicationEnvironment;
+        private readonly IHostingEnvironment _applicationEnvironment;
         private readonly bool _enabled;
         private readonly object _lockObject = new object();
         private readonly ServiceBusHostOneToMany _serviceBusClient;
@@ -33,7 +34,7 @@ namespace VitalChoice.Business.Services.Cache
 
         public ServiceBusCacheSyncProvider(IInternalEntityCacheFactory cacheFactory, IEntityInfoStorage keyStorage,
             ILoggerFactory loggerFactory,
-            IOptions<AppOptions> options, IApplicationEnvironment applicationEnvironment)
+            IOptions<AppOptions> options, IHostingEnvironment applicationEnvironment)
             : base(cacheFactory, keyStorage, loggerFactory)
         {
             if (options.Value.CacheSyncOptions?.Enabled ?? false)

@@ -63,7 +63,7 @@ namespace VitalChoice.Business.Services.Content
             _productRepository = productRepository;
             _templatesCache = templatesCache;
             _objectLogItemExternalService = objectLogItemExternalService;
-            _logger = logger.CreateLoggerDefault();
+            _logger = logger.CreateLogger<ArticleService>();
         }
 
         public async Task<PagedList<Article>> GetArticlesAsync(ArticleItemListFilter filter)

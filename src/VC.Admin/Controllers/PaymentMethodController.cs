@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Validation.Models;
 using VC.Admin.Models.PaymentMethod;
 using VitalChoice.Core.Base;
 using VitalChoice.Infrastructure.Domain.Transfer.PaymentMethod;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Payments;
 
 namespace VC.Admin.Controllers
@@ -17,13 +19,15 @@ namespace VC.Admin.Controllers
     public class PaymentMethodController : BaseApiController
     {
 		private readonly IPaymentMethodService _paymentMethodService;
-		
-		public PaymentMethodController(IPaymentMethodService paymentMethodService)
-		{
-			_paymentMethodService = paymentMethodService;
-		}
+	    private readonly ExtendedUserManager _userManager;
 
-		[HttpGet]
+	    public PaymentMethodController(IPaymentMethodService paymentMethodService, ExtendedUserManager userManager)
+	    {
+	        _paymentMethodService = paymentMethodService;
+	        _userManager = userManager;
+	    }
+
+	    [HttpGet]
 	    public async Task<Result<IList<PaymentMethodListItemModel>>> GetPaymentMethods()
 		{
 			var result =  await _paymentMethodService.GetApprovedPaymentMethodsAsync();
@@ -41,7 +45,7 @@ namespace VC.Admin.Controllers
 		[HttpPost]
 		public async Task<Result<bool>> SetState([FromBody]IList<PaymentMethodsAvailability> paymentMethodsAvailability)
 		{
-		    await _paymentMethodService.SetStateAsync(paymentMethodsAvailability, Convert.ToInt32(HttpContext.User.GetUserId()));
+		    await _paymentMethodService.SetStateAsync(paymentMethodsAvailability, Convert.ToInt32(_userManager.GetUserId(HttpContext.User)));
 
 			return true;
 		}

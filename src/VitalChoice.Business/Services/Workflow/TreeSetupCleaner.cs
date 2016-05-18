@@ -33,7 +33,7 @@ namespace VitalChoice.Business.Services.Workflow
             _actionDependenciesRepository = actionDependenciesRepository;
             _actionAggregationsRepository = actionAggregationsRepository;
             _transactionAccessor = transactionAccessor;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<TreeSetupCleaner>();
         }
 
         public async Task<bool> CleanAllTrees()

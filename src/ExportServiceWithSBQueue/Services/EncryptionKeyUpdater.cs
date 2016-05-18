@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using ExportServiceWithSBQueue.Context;
 using ExportServiceWithSBQueue.Entities;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;

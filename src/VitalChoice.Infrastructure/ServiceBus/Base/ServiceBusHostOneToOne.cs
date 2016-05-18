@@ -1,4 +1,4 @@
-﻿#if NET451
+﻿#if !NETSTANDARD1_5
 using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.ServiceBus.Messaging;

@@ -27,7 +27,7 @@
       "dependencies": {
         "Microsoft.NETCore.Platforms": {
           "type": "build",
-          "version": "1.0.1-*"
+          "version": "1.0.1-rc2-*"
         },
         "System.Runtime": "4.1.0-rc2-*",
         "System.Security.Cryptography.X509Certificates": "4.1.0-rc2-*",

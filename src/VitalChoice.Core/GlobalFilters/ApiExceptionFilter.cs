@@ -1,10 +1,10 @@
 ﻿using System.Net;
-using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Core.Services;
 using VitalChoice.Validation.Models;
-using Microsoft.AspNet.Mvc.Filters;
-using Microsoft.Data.Entity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 
@@ -53,7 +53,7 @@ namespace VitalChoice.Core.GlobalFilters
                 var exception = context.Exception as AccessDeniedException;
                 if (exception != null)
                 {
-                    result = new HttpForbiddenResult();
+                    result = new ForbiddenResult();
                 }
                 else
                 {

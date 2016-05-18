@@ -3,8 +3,7 @@ using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.Storage;
+using Microsoft.EntityFrameworkCore;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
@@ -17,11 +16,6 @@ namespace VitalChoice.Infrastructure.Context
         private IInnerEmbeddingTransaction _transaction;
 
         protected IdentityDataContext()
-        {
-            InstanceId = Guid.NewGuid();
-        }
-
-        protected IdentityDataContext(IServiceProvider serviceProvider) : base(serviceProvider)
         {
             InstanceId = Guid.NewGuid();
         }

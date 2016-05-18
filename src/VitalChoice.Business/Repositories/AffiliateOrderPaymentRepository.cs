@@ -1,20 +1,16 @@
-﻿using Microsoft.Data.Entity;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using VitalChoice.Business.Queries.Affiliates;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Data.Extensions;
-using System.Linq.Expressions;
-using VitalChoice.Business.Queries.Affiliates;
-using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
-using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 
-namespace VitalChoice.Data.Repositories.Customs
+namespace VitalChoice.Business.Repositories
 {
     public class AffiliateOrderPaymentRepository : EcommerceRepositoryAsync<AffiliateOrderPayment>
     {

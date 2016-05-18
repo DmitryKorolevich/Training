@@ -1,5 +1,4 @@
-﻿using Microsoft.Data.Entity;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,6 +19,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Reports;
 using VitalChoice.Infrastructure.Domain.Transfer.InventorySkus;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Reports;
+using Microsoft.EntityFrameworkCore;
 
 namespace VitalChoice.Data.Repositories.Customs
 {

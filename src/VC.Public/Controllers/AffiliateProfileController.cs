@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
-using Microsoft.AspNet.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using VC.Public.Models.Profile;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
@@ -21,7 +21,7 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 using System.Collections.Generic;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Options;
 
@@ -51,7 +51,7 @@ namespace VC.Public.Controllers
         private int GetInternalAffiliateId()
         {
             var context = HttpContext;
-            var internalId = Convert.ToInt32(context.User.GetUserId());
+            var internalId = Convert.ToInt32(_userManager.GetUserId(HttpContext.User));
 
             return internalId;
         }

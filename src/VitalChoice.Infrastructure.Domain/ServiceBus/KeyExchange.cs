@@ -3,7 +3,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace VitalChoice.Infrastructure.Domain.ServiceBus
 {
-#if NET451
+#if !NETSTANDARD1_5
     [Serializable]
 #endif
     public class TransportCommandData
@@ -20,7 +20,7 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
         public byte[] Sign { get; set; }
     }
 
-#if NET451
+#if !NETSTANDARD1_5
     [Serializable]
 #endif
     public class KeyExchange

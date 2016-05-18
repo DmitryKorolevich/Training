@@ -1,10 +1,10 @@
-﻿#if NET451
+﻿#if !NETSTANDARD1_5
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Data.Extensions;
 using Microsoft.ServiceBus.Messaging;
 using VitalChoice.Infrastructure.Domain.ServiceBus;

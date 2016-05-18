@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Validation.Models;
 using System.Collections.Generic;
@@ -67,7 +67,7 @@ namespace VC.Admin.Controllers
             this.objectHistoryLogService = objectHistoryLogService;
             _catalogRequestAddressService = catalogRequestAddressService;
             _exportCatalogRequestAddressService = exportCatalogRequestAddressService;
-            this.logger = loggerProvider.CreateLoggerDefault();
+            this.logger = loggerProvider.CreateLogger<>();
         }
 
         #region Lookups

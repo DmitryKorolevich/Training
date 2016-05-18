@@ -7,7 +7,7 @@ namespace ExportServiceWithSBQueue.Services
 {
     public class TraceLogger<T> : TraceLogger, ILogger<T>
     {
-        protected override string FormatError(object state, Exception exception, Func<object, Exception, string> formatter)
+        protected override string FormatError<TState>(TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
             return $"[{typeof(T).FullName}] {base.FormatError(state, exception, formatter)}";
         }
@@ -28,7 +28,7 @@ namespace ExportServiceWithSBQueue.Services
             
         }
 
-        public void Log(LogLevel logLevel, int eventId, object state, Exception exception, Func<object, Exception, string> formatter)
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
             var logMessage = FormatError(state, exception, formatter);
             switch (logLevel)
@@ -36,7 +36,7 @@ namespace ExportServiceWithSBQueue.Services
                 case LogLevel.Debug:
                     Trace.TraceInformation(logMessage);
                     break;
-                case LogLevel.Verbose:
+                case LogLevel.Trace:
                     Trace.TraceInformation(logMessage);
                     break;
                 case LogLevel.Information:
@@ -59,7 +59,7 @@ namespace ExportServiceWithSBQueue.Services
             Trace.Flush();
         }
 
-        protected virtual string FormatError(object state, Exception exception, Func<object, Exception, string> formatter)
+        protected virtual string FormatError<TState>(TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
             return formatter != null ? formatter(state, exception) : exception.Message;
         }
@@ -69,7 +69,7 @@ namespace ExportServiceWithSBQueue.Services
             return true;
         }
 
-        public IDisposable BeginScopeImpl(object state)
+        public IDisposable BeginScope<TState>(TState state)
         {
             return new TraceLogger(state);
         }

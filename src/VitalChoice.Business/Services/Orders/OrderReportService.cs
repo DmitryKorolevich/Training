@@ -59,7 +59,7 @@ namespace VitalChoice.Business.Services.Orders
             _sPEcommerceRepository = sPEcommerceRepository;
             _countryService = countryService;
             _appInfrastructureService = appInfrastructureService;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<OrderReportService>();
         }
 
         public async Task<OrdersAgentReport> GetOrdersAgentReportAsync(OrdersAgentReportFilter filter)

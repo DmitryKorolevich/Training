@@ -22,6 +22,7 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.TemplateModels;
 using VitalChoice.Infrastructure.Identity;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Products;
@@ -44,14 +45,15 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
         private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoryEcommerceRepository;
         private readonly VProductSkuRepository _productRepository;
 	    private readonly ICustomerService _customerService;
+        private readonly ExtendedUserManager _userManager;
 
-	    public ProductCategoryProcessor(IObjectMapper<ProductCategoryParameters> mapper,
+        public ProductCategoryProcessor(IObjectMapper<ProductCategoryParameters> mapper,
             IProductCategoryService productCategoryService,
             IRepositoryAsync<ProductCategoryContent> productCategoryRepository,
             IRepositoryAsync<ProductContent> productContentRepository,
             IEcommerceRepositoryAsync<ProductToCategory> productToCategoryEcommerceRepository,
             VProductSkuRepository productRepository, 
-            ICustomerService customerService) : base(mapper)
+            ICustomerService customerService, ExtendedUserManager userManager) : base(mapper)
         {
             _productCategoryService = productCategoryService;
             _productCategoryRepository = productCategoryRepository;
@@ -59,6 +61,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             _productToCategoryEcommerceRepository = productToCategoryEcommerceRepository;
             _productRepository = productRepository;
 		    _customerService = customerService;
+            _userManager = userManager;
         }
 
 	    private IList<CustomerTypeCode> GetCustomerVisibility(ProcessorViewContext viewContext)
@@ -90,7 +93,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
 		    {
 			    if (wholesaleCustomer)
 			    {
-				    var customer = await _customerService.SelectAsync(Convert.ToInt32(viewContext.User.GetUserId()));
+			        var customer = await _customerService.SelectAsync(Convert.ToInt32(_userManager.GetUserId(viewContext.User)));
 
 				    var wholesaleActiveCustomer = customer.StatusCode == (int) CustomerStatus.Active;
 				    if (wholesaleActiveCustomer)

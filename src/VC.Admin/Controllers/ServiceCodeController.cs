@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using VC.Admin.Models.Orders;
 using VitalChoice.Business.CsvExportMaps.Orders;

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.OptionsModel;
+﻿using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -75,7 +75,7 @@ namespace VitalChoice.Business.Services
         {
             List<LookupItem<string>> toReturn = new List<LookupItem<string>>();
 
-#if NET451
+#if !NETSTANDARD1_5
             if (_localizationData != null)
             {
                 var assembly =

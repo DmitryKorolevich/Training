@@ -1,7 +1,4 @@
 ﻿using System.Data;
-using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.Storage;
-using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Services;
@@ -37,7 +34,7 @@ namespace VitalChoice.Business.Services.Ecommerce
             ILoggerProviderExtended loggerProvider, DirectMapper<TEntity> directMapper, DynamicExtensionsRewriter queryVisitor, ITransactionAccessor<EcommerceContext> transactionAccessor)
             : base(
                 mapper, objectRepository, optionValueRepositoryAsync, bigStringRepository, objectLogItemExternalService, queryVisitor,
-                directMapper, loggerProvider.CreateLoggerDefault())
+                directMapper, loggerProvider.CreateLogger<ExtendedEcommerceDynamicService<TDynamic, TEntity, TOptionType, TOptionValue>>())
         {
             TransactionAccessor = transactionAccessor;
         }

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Authorization;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using VC.Public.Helpers;
 using VC.Public.Models.Auth;
 using VC.Public.Models.Cart;
@@ -26,7 +26,7 @@ using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Users;
 using System.Linq;
 using System.Reflection;
-using Microsoft.AspNet.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Services.Bronto;
@@ -90,7 +90,7 @@ namespace VC.Public.Controllers
             _transactionAccessor = transactionAccessor;
             _affiliateService = affiliateService;
             _appInfrastructure = appInfrastructureService.Data();
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<>();
         }
 
         public async Task<IActionResult> Welcome(bool forgot = false)

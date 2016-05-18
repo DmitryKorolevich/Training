@@ -32,7 +32,7 @@ namespace VitalChoice.Business.Services.Content
             IObjectMapper<ContentParametersModel> mapper,
             IObjectMapperFactory mapperFactory,
             IRecipeService recipeService)
-            : base(templatesCache, loggerProvider.CreateLoggerDefault(), processorService, contentRepository, mapper, mapperFactory)
+            : base(templatesCache, loggerProvider.CreateLogger<RecipeViewService>(), processorService, contentRepository, mapper, mapperFactory)
         {
             _recipeService = recipeService;
         }

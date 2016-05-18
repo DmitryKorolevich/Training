@@ -1,12 +1,10 @@
 ﻿using System;
 using System.IO;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
-using Microsoft.AspNet.Mvc.ModelBinding;
-using Microsoft.AspNet.Mvc.ModelBinding.Metadata;
-using Microsoft.AspNet.Mvc.Rendering;
-using Microsoft.AspNet.Mvc.ViewEngines;
-using Microsoft.AspNet.Mvc.ViewFeatures;
+using System.Linq;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.DependencyInjection;
 using Templates.Attributes;
 using Templates.Core;
@@ -32,7 +30,7 @@ namespace VitalChoice.ContentProcessing.Extensions
             {
                 throw new TemplateProcessingException("ContentViewContext not found in options value");
             }
-            _viewEngine = contentViewContext.ActionContext.HttpContext.ApplicationServices.GetRequiredService<ICompositeViewEngine>();
+            _viewEngine = contentViewContext.ActionContext.HttpContext.RequestServices.GetRequiredService<ICompositeViewEngine>();
             return base.InitStart(initContext, parent, chainedType, null);
         }
 
@@ -45,15 +43,18 @@ namespace VitalChoice.ContentProcessing.Extensions
             }
             try
             {
-                var result = _viewEngine.FindPartialView(contentViewContext.ActionContext, GetInnerResult(scope.Parent()));
-                result.EnsureSuccessful();
+                var result = _viewEngine.FindView(contentViewContext.ActionContext, GetInnerResult(scope.Parent()), false);
+                result.EnsureSuccessful(Enumerable.Empty<string>());
                 ViewDataDictionary viewData =
                     new ViewDataDictionary(
                         new ViewDataDictionary(
                             new DefaultModelMetadataProvider(
                                 contentViewContext.ActionContext.HttpContext.RequestServices
                                     .GetRequiredService<ICompositeMetadataDetailsProvider>()),
-                            contentViewContext.ActionContext.ModelState), scope.ModelData);
+                            contentViewContext.ActionContext.ModelState))
+                    {
+                        Model = scope.ModelData
+                    };
                 ITempDataDictionary tempData =
                     contentViewContext.ActionContext.HttpContext.RequestServices.GetRequiredService<ITempDataDictionary>();
                 using (var writer = new StringWriter())

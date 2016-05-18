@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Http;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Queries.Orders;
 using VitalChoice.Business.Queries.User;
@@ -50,7 +49,7 @@ namespace VitalChoice.Business.Services.Orders
             _orderRepository = orderRepository;
             _settingService = settingService;
             _countryService = countryService;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<ServiceCodeService>();
         }
 
         public async Task<ServiceCodesReport> GetServiceCodesReportAsync(ServiceCodesReportFilter filter)

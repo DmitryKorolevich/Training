@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.ChangeTracking;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
@@ -82,8 +82,8 @@ namespace VitalChoice.Caching.Services.Cache
                 return TranslateResult(query,
                     results, out entities);
             }
-            if (_logger.IsEnabled(LogLevel.Verbose))
-                _logger.LogVerbose($"Cache miss, type: {typeof (T)}");
+            if (_logger.IsEnabled(LogLevel.Trace))
+                _logger.LogTrace($"Cache miss, type: {typeof (T)}");
             entities = null;
             if (query.CanCollectionCache)
                 return CacheGetResult.Update;
@@ -135,8 +135,8 @@ namespace VitalChoice.Caching.Services.Cache
                 return TranslateFirstResult(query,
                     results, out entity);
             }
-            if (_logger.IsEnabled(LogLevel.Verbose))
-                _logger.LogVerbose($"Cache miss, type: {typeof (T)}");
+            if (_logger.IsEnabled(LogLevel.Trace))
+                _logger.LogTrace($"Cache miss, type: {typeof (T)}");
             entity = default(T);
             if (query.CanCache)
                 return CacheGetResult.Update;
@@ -425,7 +425,7 @@ namespace VitalChoice.Caching.Services.Cache
                         }
                     }
                 }
-                _trackData.Add(trackKey, _context.Attach(result, GraphBehavior.SingleObject));
+                _trackData.Add(trackKey, _context.Attach(result));
                 _trackedObjects.Add(result);
             }
             return result;

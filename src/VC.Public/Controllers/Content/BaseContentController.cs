@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using VC.Public.Models;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Services;

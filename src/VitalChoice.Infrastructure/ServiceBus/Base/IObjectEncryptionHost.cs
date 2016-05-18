@@ -13,7 +13,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         T LocalDecrypt<T>(byte[] data);
         byte[] LocalEncrypt(object obj);
         bool ValidateClientCertificate(X509Certificate2 clientCert);
-#if NET451
+#if !NETSTANDARD1_5
         byte[] RsaDecrypt(byte[] data, RSACryptoServiceProvider rsa);
         byte[] RsaEncrypt(byte[] data, RSACryptoServiceProvider rsa);
 #else

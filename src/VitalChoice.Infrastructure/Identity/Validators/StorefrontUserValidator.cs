@@ -1,12 +1,13 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using System.Collections.Generic;
 using VitalChoice.Infrastructure.Domain.Constants;
 using System;
 using System.Linq;
-using Microsoft.Extensions.OptionsModel;
-#if NET451
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+#if !NETSTANDARD1_5
 using System.Net.Mail;
 #endif
 
@@ -76,17 +77,17 @@ namespace VitalChoice.Infrastructure.Identity.Validators
                 errors.Add(Describer.InvalidEmail(email));
                 return;
             }
-#if NET451
             try
             {
+#if !NETSTANDARD1_5
                 var m = new MailAddress(email);
+#endif
             }
             catch (FormatException)
             {
                 errors.Add(Describer.InvalidEmail(email));
                 return;
             }
-#endif
             //var owner = await manager.FindByEmailAsync(email);
             //if (owner != null &&
             //    !string.Equals(await manager.GetUserIdAsync(owner), await manager.GetUserIdAsync(user)))

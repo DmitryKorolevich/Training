@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Services;
@@ -34,7 +34,7 @@ namespace VitalChoice.Business.Services.Content
 			_repository = repository;
 			_options = options;
 			_skuRepositoryAsync = skuRepositoryAsync;
-		    _logger = loggerProvider.CreateLoggerDefault();
+		    _logger = loggerProvider.CreateLogger<ContentCrossSellService>();
 
 		}
 

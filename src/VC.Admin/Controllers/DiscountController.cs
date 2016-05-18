@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Validation.Models;
 using VitalChoice.Core.Base;
@@ -18,9 +17,11 @@ using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 using VitalChoice.Interfaces.Services.Settings;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 using VC.Admin.Models.Products;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 
 namespace VC.Admin.Controllers
 {
@@ -31,6 +32,7 @@ namespace VC.Admin.Controllers
         private readonly IProductService _productService;
         private readonly IDynamicMapper<DiscountDynamic, Discount> _mapper;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
+        private readonly ExtendedUserManager _userManager;
         private readonly ILogger _logger;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
 
@@ -39,13 +41,14 @@ namespace VC.Admin.Controllers
             IProductService productService,
             ILoggerProviderExtended loggerProvider,
             IDynamicMapper<DiscountDynamic, Discount> mapper,
-            IObjectHistoryLogService objectHistoryLogService)
+            IObjectHistoryLogService objectHistoryLogService, ExtendedUserManager userManager)
         {
             _discountService = discountService;
             _productService = productService;
             _objectHistoryLogService = objectHistoryLogService;
+            _userManager = userManager;
             _mapper = mapper;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<DiscountController>();
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
 
@@ -98,7 +101,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var discount = await _mapper.FromModelAsync(model);
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(HttpContext.User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {

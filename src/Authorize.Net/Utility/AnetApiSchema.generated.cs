@@ -17,7 +17,7 @@ namespace Authorize.Net.Utility
 {
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -36,7 +36,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -57,7 +57,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -99,7 +99,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -132,7 +132,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -150,7 +150,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -166,7 +166,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -191,7 +191,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -209,7 +209,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -236,7 +236,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -251,7 +251,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -287,7 +287,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -306,7 +306,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -334,7 +334,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -358,7 +358,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -385,7 +385,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -406,7 +406,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -430,7 +430,7 @@ namespace Authorize.Net.Utility
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (customerPaymentProfileType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (customerPaymentProfileExType))]
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -451,7 +451,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -468,7 +468,7 @@ namespace Authorize.Net.Utility
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (customerAddressExType))]
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -491,7 +491,7 @@ namespace Authorize.Net.Utility
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (customerAddressType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (customerAddressExType))]
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -527,7 +527,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -543,7 +543,7 @@ namespace Authorize.Net.Utility
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (customerPaymentProfileExType))]
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -564,7 +564,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -579,7 +579,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -618,7 +618,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -643,7 +643,7 @@ namespace Authorize.Net.Utility
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (creditCardType))]
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -661,7 +661,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -676,7 +676,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -691,7 +691,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -712,7 +712,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -728,7 +728,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -747,7 +747,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -762,7 +762,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -786,7 +786,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -799,7 +799,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -817,7 +817,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -832,7 +832,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -847,7 +847,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -877,7 +877,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -895,7 +895,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd", IncludeInSchema = false)]
@@ -911,7 +911,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -932,7 +932,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -949,7 +949,7 @@ namespace Authorize.Net.Utility
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (customerProfileMaskedType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (subscriptionCustomerProfileType))]
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -968,7 +968,7 @@ namespace Authorize.Net.Utility
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (subscriptionCustomerProfileType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (customerProfileType))]
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -989,7 +989,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1007,7 +1007,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1026,7 +1026,7 @@ namespace Authorize.Net.Utility
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (orderExType))]
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1044,7 +1044,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1059,7 +1059,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1083,7 +1083,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1101,7 +1101,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -1114,7 +1114,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1129,7 +1129,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1156,7 +1156,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1219,7 +1219,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -1238,7 +1238,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1256,7 +1256,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1274,7 +1274,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -1311,7 +1311,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1326,7 +1326,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1356,7 +1356,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1386,7 +1386,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -1402,7 +1402,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1462,7 +1462,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1480,7 +1480,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1504,7 +1504,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1522,7 +1522,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -1538,7 +1538,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1557,7 +1557,7 @@ namespace Authorize.Net.Utility
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (emailSettingsType))]
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1572,7 +1572,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1590,7 +1590,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1605,7 +1605,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1628,7 +1628,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1646,7 +1646,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1664,7 +1664,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1691,7 +1691,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1787,7 +1787,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1808,7 +1808,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1841,7 +1841,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1862,7 +1862,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1892,7 +1892,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1910,7 +1910,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1937,7 +1937,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2051,7 +2051,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2093,7 +2093,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2111,7 +2111,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2252,7 +2252,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2325,7 +2325,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2346,7 +2346,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2364,7 +2364,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2382,7 +2382,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2421,7 +2421,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2439,7 +2439,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2469,7 +2469,7 @@ namespace Authorize.Net.Utility
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (profileTransAuthOnlyType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (profileTransAuthCaptureType))]
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2496,7 +2496,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2532,7 +2532,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2559,7 +2559,7 @@ namespace Authorize.Net.Utility
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (profileTransAuthOnlyType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof (profileTransAuthCaptureType))]
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2601,7 +2601,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2616,7 +2616,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2628,7 +2628,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2640,7 +2640,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2655,7 +2655,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2691,7 +2691,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2736,7 +2736,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2778,7 +2778,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2805,7 +2805,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2823,7 +2823,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2847,7 +2847,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd", IncludeInSchema = false)]
@@ -2872,7 +2872,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2890,7 +2890,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2915,7 +2915,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2937,7 +2937,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2953,7 +2953,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2966,7 +2966,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2979,7 +2979,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2992,7 +2992,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3008,7 +3008,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3024,7 +3024,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3043,7 +3043,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3056,7 +3056,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3072,7 +3072,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3085,7 +3085,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3101,7 +3101,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3120,7 +3120,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3142,7 +3142,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -3164,7 +3164,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3189,7 +3189,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3214,7 +3214,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3236,7 +3236,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3255,7 +3255,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3274,7 +3274,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3290,7 +3290,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3306,7 +3306,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3322,7 +3322,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3347,7 +3347,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3363,7 +3363,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3382,7 +3382,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3398,7 +3398,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3414,7 +3414,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3427,7 +3427,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3452,7 +3452,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3468,7 +3468,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3487,7 +3487,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3500,7 +3500,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3516,7 +3516,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3529,7 +3529,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3548,7 +3548,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3561,7 +3561,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3580,7 +3580,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3593,7 +3593,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3612,7 +3612,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3631,7 +3631,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3659,7 +3659,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3675,7 +3675,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3688,7 +3688,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3704,7 +3704,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3723,7 +3723,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -3742,7 +3742,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3755,7 +3755,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3771,7 +3771,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3787,7 +3787,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3803,7 +3803,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3822,7 +3822,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3838,7 +3838,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3854,7 +3854,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3885,7 +3885,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3901,7 +3901,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3917,7 +3917,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3933,7 +3933,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3952,7 +3952,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3968,7 +3968,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3981,7 +3981,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3997,7 +3997,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4013,7 +4013,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4026,7 +4026,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4039,7 +4039,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4061,7 +4061,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4074,7 +4074,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4087,7 +4087,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4109,7 +4109,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4122,7 +4122,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4144,7 +4144,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -4166,7 +4166,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4188,7 +4188,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4231,7 +4231,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -4262,7 +4262,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -4290,7 +4290,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -4315,7 +4315,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -4340,7 +4340,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -4398,7 +4398,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -4417,7 +4417,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -4499,7 +4499,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -4536,7 +4536,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4561,7 +4561,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "AnetApi/xml/v1/schema/AnetApiSchema.xsd")]
@@ -4574,7 +4574,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4593,7 +4593,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4609,7 +4609,7 @@ namespace Authorize.Net.Utility
 
     /// <remarks/>
     
-#if NET451
+#if !NETSTANDARD1_5
 [Serializable]
 #endif
     [System.Diagnostics.DebuggerStepThroughAttribute()]

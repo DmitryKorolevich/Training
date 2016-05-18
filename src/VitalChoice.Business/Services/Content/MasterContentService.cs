@@ -47,7 +47,7 @@ namespace VitalChoice.Business.Services.Content
             this.faqRepository = faqRepository;
             this.articleRepository = articleRepository;
             this.contentPageRepository = contentPageRepository;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<MasterContentService>();
         }
 
         public async Task<List<ContentTypeEntity>> GetContentTypesAsync()

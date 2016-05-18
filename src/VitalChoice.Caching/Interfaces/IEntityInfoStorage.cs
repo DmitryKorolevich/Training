@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.ChangeTracking;
-using VitalChoice.Caching.GC;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Base;
 using VitalChoice.Caching.Relational.ChangeTracking;

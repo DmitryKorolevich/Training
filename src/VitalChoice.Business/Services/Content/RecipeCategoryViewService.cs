@@ -15,7 +15,6 @@ using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using System.Net;
-using Microsoft.AspNet.Mvc;
 using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Business.Services.Content
@@ -28,7 +27,7 @@ namespace VitalChoice.Business.Services.Content
             IRepositoryAsync<ContentCategory> contentRepository,
             IObjectMapper<CategoryContentParametersModel> mapper,
             IObjectMapperFactory mapperFactory)
-            : base(templatesCache, loggerProvider.CreateLoggerDefault(), processorService, contentRepository, mapper, mapperFactory)
+            : base(templatesCache, loggerProvider.CreateLogger<RecipeCategoryViewService>(), processorService, contentRepository, mapper, mapperFactory)
         {
         }
 

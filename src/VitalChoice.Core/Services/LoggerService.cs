@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.PlatformAbstractions;
 using VitalChoice.Infrastructure.Domain.Options;
 
@@ -35,9 +36,9 @@ namespace VitalChoice.Core.Services
             return _loggerProviderExtended?.CreateLogger(type);
         }
 
-        public static LoggerProviderExtended Build(IOptions<AppOptions> options, IApplicationEnvironment env)
+        public static LoggerProviderExtended Build(IHostingEnvironment env)
         {
-            return _loggerProviderExtended ?? (_loggerProviderExtended = new LoggerProviderExtended(options, env));
+            return _loggerProviderExtended ?? (_loggerProviderExtended = new LoggerProviderExtended(env));
         }
     }
 
