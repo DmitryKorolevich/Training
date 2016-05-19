@@ -280,7 +280,7 @@
     <None Include="PostDeployment\Scripts\SPGetTransactionAndRefundReport.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PostDeployment\Scripts\VOrdersOnCustomers.sql" />
+    <None Include="PostDeployment\Scripts\VOrderCountOnCustomers.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\Scripts\VFirstOrderOnCustomers.sql" />
