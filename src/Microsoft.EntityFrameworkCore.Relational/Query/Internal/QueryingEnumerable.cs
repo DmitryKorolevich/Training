@@ -36,6 +36,7 @@ namespace Microsoft.EntityFrameworkCore.Query.Internal
         {
             private readonly QueryingEnumerable _queryingEnumerable;
 
+            private bool _needConnectionClose;
             private RelationalDataReader _dataReader;
             private Queue<ValueBuffer> _buffer;
 
@@ -57,6 +58,10 @@ namespace Microsoft.EntityFrameworkCore.Query.Internal
                 {
                     if (_dataReader == null)
                     {
+                        if (!_queryingEnumerable._relationalQueryContext.Connection.Opened)
+                        {
+                            _needConnectionClose = true;
+                        }
                         _queryingEnumerable._relationalQueryContext.Connection.Open();
 
                         var relationalCommand
@@ -131,7 +136,10 @@ namespace Microsoft.EntityFrameworkCore.Query.Internal
                 {
                     _dataReader?.Dispose();
                     _queryingEnumerable._relationalQueryContext.DeregisterValueBufferCursor(this);
-                    _queryingEnumerable._relationalQueryContext.Connection?.Close();
+                    if (_needConnectionClose)
+                    {
+                        _queryingEnumerable._relationalQueryContext.Connection?.Close();
+                    }
 
                     _disposed = true;
                 }

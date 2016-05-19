@@ -32,6 +32,7 @@ namespace Microsoft.EntityFrameworkCore.Query.Internal
         private sealed class AsyncEnumerator : IAsyncEnumerator<ValueBuffer>, IValueBufferCursor
         {
             private readonly AsyncQueryingEnumerable _queryingEnumerable;
+            private bool _needConnectionClose;
 
             private RelationalDataReader _dataReader;
             private Queue<ValueBuffer> _buffer;
@@ -61,8 +62,12 @@ namespace Microsoft.EntityFrameworkCore.Query.Internal
                     {
                         if (_dataReader == null)
                         {
+                            if (!_queryingEnumerable._relationalQueryContext.Connection.Opened)
+                            {
+                                _needConnectionClose = true;
+                            }
                             await _queryingEnumerable._relationalQueryContext.Connection
-                                .OpenAsync(cancellationToken);
+                                    .OpenAsync(cancellationToken);
 
                             var relationalCommand
                                 = _queryingEnumerable._shaperCommandContext
@@ -146,7 +151,10 @@ namespace Microsoft.EntityFrameworkCore.Query.Internal
                     lock (_queryingEnumerable._relationalQueryContext)
                     {
                         _queryingEnumerable._relationalQueryContext.DeregisterValueBufferCursor(this);
-                        _queryingEnumerable._relationalQueryContext.Connection?.Close();
+                        if (_needConnectionClose)
+                        {
+                            _queryingEnumerable._relationalQueryContext.Connection?.Close();
+                        }
                     }
 
                     _disposed = true;

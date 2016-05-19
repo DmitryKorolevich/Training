@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using VC.Public.AppConfig;
 using System.Net;
+using System.Threading.Tasks;
 using VitalChoice.Interfaces.Services;
 using Autofac;
 using VitalChoice.Core.Services;
@@ -79,15 +80,16 @@ namespace VC.Public
             app.UseIdentity();
 
             app.UseSession();
-            app.Use(async (context, next) =>
+            app.Use((context, next) =>
             {
                 var redirectViewService = context.RequestServices.GetService<IRedirectViewService>();
                 var result = redirectViewService.CheckRedirects(context);
 
                 if (!result)
                 {
-                    await next();
+                    return next();
                 }
+                return Task.Delay(0);
             });
             app.UseStatusCodeExecutePath("/content/" + ContentConstants.NOT_FOUND_PAGE_URL, HttpStatusCode.NotFound);
             app.UseStatusCodeExecutePath("/content/" + ContentConstants.ACESS_DENIED_PAGE_URL, HttpStatusCode.Forbidden);

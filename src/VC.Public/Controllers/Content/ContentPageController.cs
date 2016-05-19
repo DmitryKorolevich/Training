@@ -88,7 +88,6 @@ namespace VC.Public.Controllers.Content
         {
             ModelStateDictionary modelState = new ModelStateDictionary();
             ViewDataDictionary viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), modelState);
-            ITempDataDictionary tempData = HttpContext.RequestServices.GetService(typeof(ITempDataDictionary)) as ITempDataDictionary;
             RouteData routeData = new RouteData();
             ActionDescriptor actionDescriptor = new ActionDescriptor();
             ActionContext actionContext = new ActionContext(HttpContext, routeData, actionDescriptor);
@@ -100,7 +99,7 @@ namespace VC.Public.Controllers.Content
                 var engine = HttpContext.RequestServices.GetRequiredService<ICompositeViewEngine>();
                 ViewEngineResult viewResult = engine.FindView(actionContext, viewName, false);
 
-                ViewContext viewContext = new ViewContext(actionContext, viewResult.View, viewData, tempData, sw, new HtmlHelperOptions());
+                ViewContext viewContext = new ViewContext(actionContext, viewResult.View, viewData, null, sw, new HtmlHelperOptions());
                 
 
                 await viewResult.View.RenderAsync(viewContext);

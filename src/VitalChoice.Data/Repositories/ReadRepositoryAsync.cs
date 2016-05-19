@@ -69,7 +69,7 @@ namespace VitalChoice.Data.Repositories
             return query;
         }
 
-        internal async Task<List<TEntity>> SelectAsync(
+        internal Task<List<TEntity>> SelectAsync(
             IQueryable<TEntity> query,
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
@@ -93,14 +93,7 @@ namespace VitalChoice.Data.Repositories
             //	return earlyRead.ToList();
             //}
             var queryable = Select(query, filter, orderBy, page, pageSize, tracking);
-            try
-            {
-                return await queryable.ToListAsync();
-            }
-            catch (Exception e)
-            {
-                throw new ApiException($"{queryable.Expression}", e);
-            }
+            return queryable.ToListAsync();
         }
     }
 }

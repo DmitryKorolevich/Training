@@ -19,10 +19,6 @@ namespace VC.Admin.Components
 		public AssetsViewComponent(IUrlHelperFactory urlHelper, IOptions<AppOptions> appOptionsAccessor, IFrontEndAssetManager frontEndAssetManager, IActionContextAccessor actionContextAccessor)
 		{
 		    _frontEndAssetManager = frontEndAssetManager;
-		    if (urlHelper == null)
-			{
-				throw new ArgumentNullException(nameof(urlHelper));
-			}
 
 			if (appOptionsAccessor == null)
 			{

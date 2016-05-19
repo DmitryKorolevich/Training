@@ -19,7 +19,7 @@
 		@await Component.InvokeAsync("AffiliateProfileSidebar")
 	</div>
 	<div class="right-pane clean-indent">
-	@using (Html.BeginForm("ChangeProfile", "AffiliateProfile", null, FormMethod.Post, new { @class = "form-regular medium-small border-form-left", role = "form" }))
+	@using (Html.BeginForm("ChangeProfile", "AffiliateProfile", null, FormMethod.Post, null, new { @class = "form-regular medium-small border-form-left", role = "form" }))
     {
         <h4>Manage Affiliate Profile</h4>
         await Html.RenderPartialAsync("/Views/AffiliateAccount/_AffiliateManage.cshtml", Model);

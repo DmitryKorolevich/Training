@@ -55,11 +55,11 @@ namespace VitalChoice.ContentProcessing.Extensions
                     {
                         Model = scope.ModelData
                     };
-                ITempDataDictionary tempData =
-                    contentViewContext.ActionContext.HttpContext.RequestServices.GetRequiredService<ITempDataDictionary>();
+                //ITempDataDictionary tempData =
+                //    contentViewContext.ActionContext.HttpContext.RequestServices.GetRequiredService<ITempDataDictionary>();
                 using (var writer = new StringWriter())
                 {
-                    ViewContext viewContext = new ViewContext(contentViewContext.ActionContext, result.View, viewData, tempData, writer,
+                    ViewContext viewContext = new ViewContext(contentViewContext.ActionContext, result.View, viewData, null, writer,
                         new HtmlHelperOptions());
                     result.View.RenderAsync(viewContext).Wait();
                     writer.Flush();

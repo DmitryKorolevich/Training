@@ -60,7 +60,6 @@ namespace VitalChoice.Core.GlobalFilters
                 var result = new ViewResult
 				{
 					ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), context.ModelState),
-					TempData = context.HttpContext.RequestServices.GetRequiredService<ITempDataDictionary>()
 				};
 
 				var apiException = context.Exception as ApiException;

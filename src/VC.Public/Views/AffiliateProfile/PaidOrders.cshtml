@@ -12,7 +12,7 @@
     <div class="right-pane clean-indent paid-orders">
         <div class="border-form-left">
             <h4>All Time Orders</h4>
-            @using (Html.BeginForm("PaidOrders", "AffiliateProfile", null, FormMethod.Get, new { @class = "form-regular", role = "form" }))
+            @using (Html.BeginForm("PaidOrders", "AffiliateProfile", null, FormMethod.Get, null, new { @class = "form-regular", role = "form" }))
             {
                 <div class="filter-row">
                     <div class="form-group">

@@ -33,7 +33,7 @@
             <div class="loading">Loading…</div>
         </div>
         <div class="review-order-cart">
-            @using (Html.BeginForm("ReviewOrder", "Checkout", null, FormMethod.Post, new { @class = "form-cart", role = "form", @id = "viewCartForm", data_bind = "submit: submitCart" }))
+            @using (Html.BeginForm("ReviewOrder", "Checkout", null, FormMethod.Post, null, new { @class = "form-cart", role = "form", @id = "viewCartForm", data_bind = "submit: submitCart" }))
             {
                 @await Html.PartialAsync("_ViewCart", Model, ViewData)
             }

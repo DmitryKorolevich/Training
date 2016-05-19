@@ -55,7 +55,7 @@ namespace VitalChoice.Core.Services
                 var nLogLogLevel = GetLogLevel(logLevel);
                 var message = formatter != null
                     ? formatter(state, exception)
-                    : $"[{exception.Source}]{exception.Message}\n{exception.StackTrace}";
+                    : (exception != null ? $"[{exception.Source}]{exception.Message}\n{exception.StackTrace}" : state?.ToString());
                 if (!string.IsNullOrEmpty(message))
                 {
                     var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, exception,

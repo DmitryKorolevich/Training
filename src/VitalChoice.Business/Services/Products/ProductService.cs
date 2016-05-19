@@ -318,9 +318,6 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<SkuOrdered> GetSkuOrderedAsync(string code)
         {
-            if (code == null)
-                throw new ArgumentNullException(nameof(code));
-
             if (string.IsNullOrWhiteSpace(code))
                 return null;
 

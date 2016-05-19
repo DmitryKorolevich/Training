@@ -25,7 +25,7 @@
 	<span class="checkout-notification-simple">An accurate billing address is essential to get your order to you quickly.</span>
 	<span class="checkout-notification-important">Shopping online with Vital Choice is extremely safe. All information is encrypted.</span>
 	<div class="columns-container checkout-columns-container">
-		@using (Html.BeginForm("AddUpdateBillingAddress", "Checkout", null, FormMethod.Post, new {@class = "form-regular medium-small", role = "form"}))
+		@using (Html.BeginForm("AddUpdateBillingAddress", "Checkout", null, FormMethod.Post, null, new {@class = "form-regular medium-small", role = "form"}))
 		{
 			@Html.AntiForgeryToken()
 			@Html.ValidationSummary(true, "")

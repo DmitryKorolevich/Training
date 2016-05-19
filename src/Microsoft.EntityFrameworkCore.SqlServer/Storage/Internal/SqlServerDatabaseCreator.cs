@@ -111,8 +111,12 @@ namespace Microsoft.EntityFrameworkCore.Storage.Internal
             {
                 try
                 {
+                    bool locallyOpened = !_connection.Opened;
                     await _connection.OpenAsync(cancellationToken);
-                    _connection.Close();
+                    if (locallyOpened)
+                    {
+                        _connection.Close();
+                    }
                     return true;
                 }
                 catch (SqlException e)

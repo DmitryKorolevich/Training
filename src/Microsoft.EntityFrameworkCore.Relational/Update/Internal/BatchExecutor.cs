@@ -47,6 +47,7 @@ namespace Microsoft.EntityFrameworkCore.Update.Internal
             CancellationToken cancellationToken = default(CancellationToken))
         {
             var rowsAffected = 0;
+            bool locallyOpened = !connection.Opened;
             await connection.OpenAsync(cancellationToken);
             IDbContextTransaction startedTransaction = null;
             try
@@ -67,7 +68,10 @@ namespace Microsoft.EntityFrameworkCore.Update.Internal
             finally
             {
                 startedTransaction?.Dispose();
-                connection.Close();
+                if (locallyOpened)
+                {
+                    connection.Close();
+                }
             }
 
             return rowsAffected;

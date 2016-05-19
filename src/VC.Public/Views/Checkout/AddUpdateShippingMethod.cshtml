@@ -23,7 +23,7 @@
 	<img class="checkout-step-banner" src="/assets/images/checkout/step3.jpg"/>
 	<h4 class="checkout-step-heading">3. Shipping Method</h4>
 	<span class="checkout-notification-simple">Enter your Shipping Address information below.</span>
-	@using (Html.BeginForm("AddUpdateShippingMethod", "Checkout", null, FormMethod.Post, new {@class = "form-regular medium-small", role = "form"}))
+	@using (Html.BeginForm("AddUpdateShippingMethod", "Checkout", null, FormMethod.Post, null, new {@class = "form-regular medium-small", role = "form"}))
 	{
 		<input id="hdCountry" value="@Html.DisplayForEx(x => x.IdCountry)" type="hidden">
 		<input id="hdState" value="@Html.DisplayForEx(x => x.IdState)" type="hidden">

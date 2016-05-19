@@ -7,7 +7,7 @@
 }
 
 <div class="working-area-holder">
-	@using (Html.BeginForm("RegisterEmail", "Account", new { returnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-regular small", role = "form" }))
+	@using (Html.BeginForm("RegisterEmail", "Account", new { returnUrl = ViewBag.ReturnUrl }, FormMethod.Post, null, new { @class = "form-regular small", role = "form" }))
 	{
 		@Html.AntiForgeryToken()
 		<h4>Register a New Account</h4>

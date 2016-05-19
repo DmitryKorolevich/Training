@@ -22,20 +22,20 @@ namespace VitalChoice.Profiling.Base
             {
                 _logger.LogError(scope.ToString());
             }
-            else if (scope.TimeElapsed.Milliseconds > SlowRequestTimeMilliseconds)
-            {
-                if (_logger.IsEnabled(LogLevel.Warning))
-                {
-                    _logger.LogWarning($"Performance warning:\n{scope}");
-                }
-            }
-            else
-            {
-                if (_logger.IsEnabled(LogLevel.Information))
-                {
-                    _logger.LogWarning($"Performance info:\n{scope}");
-                }
-            }
+            //else if (scope.TimeElapsed.Milliseconds > SlowRequestTimeMilliseconds)
+            //{
+            //    if (_logger.IsEnabled(LogLevel.Warning))
+            //    {
+            //        _logger.LogWarning($"Performance warning:\n{scope}");
+            //    }
+            //}
+            //else
+            //{
+            //    if (_logger.IsEnabled(LogLevel.Information))
+            //    {
+            //        _logger.LogWarning($"Performance info:\n{scope}");
+            //    }
+            //}
         }
     }
 }

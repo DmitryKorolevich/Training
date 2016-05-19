@@ -17,7 +17,9 @@
         "Assets",
         "wwwroot",
         "config.json",
-        "web.config"
+        "web.config",
+        "CSharpClassTemplate.tcs",
+        "CSharpPreparseTemplate.tcs"
       ]
     },
     "preserveCompilationContext": true,

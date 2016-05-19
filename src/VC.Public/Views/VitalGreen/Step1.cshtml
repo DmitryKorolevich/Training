@@ -13,7 +13,7 @@
     <div class="header">
         <img src="/Assets/images/VitalGreen_350x72.jpg" alt="Vital Green">
     </div>
-    @using (Html.BeginForm("Step1", "VitalGreen", null, FormMethod.Post, new { @class = "form-regular medium-small", role = "form" }))
+    @using (Html.BeginForm("Step1", "VitalGreen", null, FormMethod.Post, null, new { @class = "form-regular medium-small", role = "form" }))
     {
         @Html.AntiForgeryToken()
         <h4>Vital Green Step #1: Provide Your Address and Information</h4>

@@ -50,27 +50,13 @@ namespace VitalChoice.Data.Helpers
         public async Task<List<TResult>> SelectAsync<TResult>(Expression<Func<TEntity, TResult>> selector, bool tracking = true)
         {
             var query = RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy, tracking: tracking).Select(selector);
-            try
-            {
-                return await query.ToListAsync();
-            }
-            catch (Exception e)
-            {
-                throw new ApiException($"{query.Expression}", e);
-            }
+            return await query.ToListAsync();
         }
 
         public async Task<TEntity> SelectFirstOrDefaultAsync(bool tracking = true)
         {
             var query = RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy, tracking: tracking);
-            try
-            {
-                return await query.FirstOrDefaultAsync();
-            }
-            catch (Exception e)
-            {
-                throw new ApiException($"{query.Expression}", e);
-            }
+            return await query.FirstOrDefaultAsync();
         }
 
         public IQueryFluent<TEntity> Where(Expression<Func<TEntity, bool>> predicate)
@@ -99,76 +85,34 @@ namespace VitalChoice.Data.Helpers
         public async Task<bool> SelectAnyAsync()
         {
             var query = RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy);
-            try
-            {
-                return await query.AnyAsync();
-            }
-            catch (Exception e)
-            {
-                throw new ApiException($"{query.Expression}", e);
-            }
+            return await query.AnyAsync();
         }
 
         public async Task<int> SelectCountAsync()
         {
             var query = RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy);
-            try
-            {
-                return await query.CountAsync();
-            }
-            catch (Exception e)
-            {
-                throw new ApiException($"{query.Expression}", e);
-            }
+            return await query.CountAsync();
         }
 
         public async Task<decimal> SelectSumAsync(Expression<Func<TEntity,decimal>> func)
         {
             var query = RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy);
-            try
-            {
-                return await query.SumAsync(func);
-            }
-            catch (Exception e)
-            {
-                throw new ApiException($"{query.Expression}", e);
-            }
+            return await query.SumAsync(func);
         }
 
         public List<TEntity> SelectPage(int page, int pageSize, out int totalCount, bool tracking = false)
         {
             var countQuery = RepositoryAsync<TEntity>.Select(Query, _expression);
-            try
-            {
-                totalCount = countQuery.Count();
-            }
-            catch (Exception e)
-            {
-                throw new ApiException($"{countQuery.Expression}", e);
-            }
+            totalCount = countQuery.Count();
             var selectQuery = RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy, page, pageSize, tracking);
-            try
-            {
-                return selectQuery.ToList();
-            }
-            catch (Exception e)
-            {
-                throw new ApiException($"{selectQuery.Expression}", e);
-            }
+            return selectQuery.ToList();
         }
 
         public async Task<PagedList<TEntity>> SelectPageAsync(int page, int pageSize, bool tracking = false)
         {
             var countQuery = RepositoryAsync<TEntity>.Select(Query, _expression);
             int count;
-            try
-            {
-                count = await countQuery.CountAsync();
-            }
-            catch (Exception e)
-            {
-                throw new ApiException($"{countQuery.Expression}", e);
-            }
+            count = await countQuery.CountAsync();
             var items = await Repository.SelectAsync(Query, _expression, _orderBy, page, pageSize, tracking);
             return new PagedList<TEntity>(items, count);
         }
@@ -176,27 +120,13 @@ namespace VitalChoice.Data.Helpers
         public List<TEntity> Select(bool tracking = true)
         {
             var query = RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy, tracking: tracking);
-            try
-            {
-                return query.ToList();
-            }
-            catch (Exception e)
-            {
-                throw new ApiException($"{query.Expression}", e);
-            }
+            return query.ToList();
         }
 
         public List<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> selector, bool tracking = true)
         {
             var query = RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy, tracking: tracking).Select(selector);
-            try
-            {
-                return query.ToList();
-            }
-            catch (Exception e)
-            {
-                throw new ApiException($"{query.Expression}", e);
-            }
+            return query.ToList();
         }
 
         public Task<List<TEntity>> SelectAsync(bool tracking = true)

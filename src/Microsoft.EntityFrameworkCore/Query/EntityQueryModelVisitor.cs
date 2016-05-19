@@ -403,7 +403,7 @@ namespace Microsoft.EntityFrameworkCore.Query
 
                     if (navigation == null)
                     {
-                        return null;
+                        break;
                     }
 
                     boundNavigationsList.Add(navigation);

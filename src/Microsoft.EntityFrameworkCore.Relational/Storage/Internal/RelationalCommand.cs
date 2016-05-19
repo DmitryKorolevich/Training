@@ -126,8 +126,14 @@ namespace Microsoft.EntityFrameworkCore.Storage.Internal
 
             object result;
 
+            bool connectionOpened = false;
+
             if (openConnection)
             {
+                if (!connection.Opened)
+                {
+                    connectionOpened = true;
+                }
                 connection.Open();
             }
 
@@ -169,7 +175,6 @@ namespace Microsoft.EntityFrameworkCore.Storage.Internal
                         {
                             result
                                 = new RelationalDataReader(
-                                    openConnection ? connection : null,
                                     dbCommand,
                                     dbCommand.ExecuteReader());
                         }
@@ -214,7 +219,7 @@ namespace Microsoft.EntityFrameworkCore.Storage.Internal
                     exception,
                     async: false);
 
-                if (openConnection && !closeConnection)
+                if (openConnection && !closeConnection && connectionOpened)
                 {
                     connection.Close();
                 }
@@ -223,7 +228,7 @@ namespace Microsoft.EntityFrameworkCore.Storage.Internal
             }
             finally
             {
-                if (closeConnection)
+                if (closeConnection && connectionOpened)
                 {
                     connection.Close();
                 }
@@ -247,8 +252,14 @@ namespace Microsoft.EntityFrameworkCore.Storage.Internal
 
             object result;
 
+            bool connectionOpened = false;
+
             if (openConnection)
             {
+                if (!connection.Opened)
+                {
+                    connectionOpened = true;
+                }
                 await connection.OpenAsync(cancellationToken);
             }
 
@@ -290,7 +301,6 @@ namespace Microsoft.EntityFrameworkCore.Storage.Internal
                         {
                             result
                                 = new RelationalDataReader(
-                                    openConnection ? connection : null,
                                     dbCommand,
                                     await dbCommand.ExecuteReaderAsync(cancellationToken));
                         }
@@ -336,7 +346,7 @@ namespace Microsoft.EntityFrameworkCore.Storage.Internal
                     exception,
                     async: true);
 
-                if (openConnection && !closeConnection)
+                if (openConnection && !closeConnection && connectionOpened)
                 {
                     connection.Close();
                 }
@@ -345,7 +355,7 @@ namespace Microsoft.EntityFrameworkCore.Storage.Internal
             }
             finally
             {
-                if (closeConnection)
+                if (closeConnection && connectionOpened)
                 {
                     connection.Close();
                 }

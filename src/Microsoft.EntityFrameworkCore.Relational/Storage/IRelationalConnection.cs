@@ -24,6 +24,8 @@ namespace Microsoft.EntityFrameworkCore.Storage
 
         Task OpenAsync(CancellationToken cancellationToken = default(CancellationToken));
 
+        bool Opened { get; }
+
         void Close();
 
         bool IsMultipleActiveResultSetsEnabled { get; }

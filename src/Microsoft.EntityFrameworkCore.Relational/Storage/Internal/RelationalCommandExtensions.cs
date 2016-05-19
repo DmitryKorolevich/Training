@@ -18,6 +18,8 @@ namespace Microsoft.EntityFrameworkCore.Storage.Internal
             Check.NotNull(commands, nameof(commands));
             Check.NotNull(connection, nameof(connection));
 
+            bool locallyOpened = !connection.Opened;
+
             connection.Open();
 
             try
@@ -31,7 +33,10 @@ namespace Microsoft.EntityFrameworkCore.Storage.Internal
             }
             finally
             {
-                connection.Close();
+                if (locallyOpened)
+                {
+                    connection.Close();
+                }
             }
         }
 
@@ -42,6 +47,8 @@ namespace Microsoft.EntityFrameworkCore.Storage.Internal
         {
             Check.NotNull(commands, nameof(commands));
             Check.NotNull(connection, nameof(connection));
+
+            bool locallyOpened = !connection.Opened;
 
             await connection.OpenAsync(cancellationToken);
 
@@ -57,7 +64,10 @@ namespace Microsoft.EntityFrameworkCore.Storage.Internal
             }
             finally
             {
-                connection.Close();
+                if (locallyOpened)
+                {
+                    connection.Close();
+                }
             }
         }
     }

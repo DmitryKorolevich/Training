@@ -135,6 +135,16 @@ namespace Microsoft.EntityFrameworkCore.Query.Internal
 
                         break;
                     }
+                    case ExpressionType.Invoke:
+                        {
+                            var invocationExpression = (InvocationExpression)obj;
+                            for (var i = 0; i< invocationExpression.Arguments.Count; i++)
+                            {
+                                hashCode += (hashCode * 397) ^ GetHashCode(invocationExpression.Arguments[i]);
+                            }
+                            hashCode += (hashCode * 397) ^ GetHashCode(invocationExpression.Expression);
+                            break;
+                        }
                     case ExpressionType.Lambda:
                     {
                         var lambdaExpression = (LambdaExpression)obj;
