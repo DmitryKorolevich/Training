@@ -144,7 +144,7 @@ namespace VitalChoice.Business.Services.Products
 	        var items = await _productReviewRepository.Query(conditions).SelectAsync(x => x.Rating, false);
 	        var average  = items.Count!=0 ? (double)items.Sum()/items.Count : 0;
 	        var toReturn = (double) Math.Floor(average);
-            toReturn += (average - Math.Floor(average)) > 0.5 ? 1 : 0.5;
+            toReturn += (average - Math.Floor(average)) > 0.5 ? 1 : (average - Math.Floor(average))==0 ? 0 : 0.5;
 
 	        return toReturn;
 	    }

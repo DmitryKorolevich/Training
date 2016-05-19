@@ -279,4 +279,13 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\SPGetTransactionAndRefundReport.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VOrdersOnCustomers.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VFirstOrderOnCustomers.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPsForOrdersSummarySalesReport.sql" />
+  </ItemGroup>
 </Project>
