@@ -5,10 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Queries.InventorySkus;
+using VitalChoice.Business.Repositories;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Services;
 using VitalChoice.Data.Transaction;
@@ -41,14 +41,14 @@ namespace VitalChoice.Business.Services.InventorySkus
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly IEcommerceRepositoryAsync<SkuToInventorySku> _skuToInventorySkuRepository;
         private readonly IInventorySkuCategoryService _inventorySkuCategoryService;
-        private readonly SPEcommerceRepository _sPEcommerceRepository;
+        private readonly SpEcommerceRepository _sPEcommerceRepository;
         private readonly ISettingService _settingService;
 
         public InventorySkuService(InventorySkuMapper mapper,
             IEcommerceRepositoryAsync<InventorySku> inventorySkuRepository,
             IEcommerceRepositoryAsync<InventorySkuOptionValue> inventorySkuValueRepositoryAsync,
             IInventorySkuCategoryService inventorySkuCategoryService,
-            SPEcommerceRepository sPEcommerceRepository,
+            SpEcommerceRepository sPEcommerceRepository,
             ISettingService settingService,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
             IObjectLogItemExternalService objectLogItemExternalService,

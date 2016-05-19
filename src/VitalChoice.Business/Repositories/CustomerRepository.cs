@@ -7,6 +7,7 @@ using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Transfer;
@@ -15,7 +16,7 @@ namespace VitalChoice.Business.Repositories
 {
     public class CustomerRepository : EcommerceRepositoryAsync<Customer>
     {
-        public CustomerRepository(IDataContextAsync context) : base(context)
+        public CustomerRepository(EcommerceContext context) : base(context)
         {
         }
 

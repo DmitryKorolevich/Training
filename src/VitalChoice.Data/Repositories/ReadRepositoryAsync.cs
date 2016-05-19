@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Ecommerce.Domain;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 
 namespace VitalChoice.Data.Repositories
 {
@@ -68,7 +69,7 @@ namespace VitalChoice.Data.Repositories
             return query;
         }
 
-        internal Task<List<TEntity>> SelectAsync(
+        internal async Task<List<TEntity>> SelectAsync(
             IQueryable<TEntity> query,
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
@@ -92,7 +93,14 @@ namespace VitalChoice.Data.Repositories
             //	return earlyRead.ToList();
             //}
             var queryable = Select(query, filter, orderBy, page, pageSize, tracking);
-            return queryable.ToListAsync();
+            try
+            {
+                return await queryable.ToListAsync();
+            }
+            catch (Exception e)
+            {
+                throw new ApiException($"{queryable.Expression}", e);
+            }
         }
     }
 }

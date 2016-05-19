@@ -114,8 +114,8 @@ namespace VitalChoice.Core.Services
         public LoggerProviderExtended(IHostingEnvironment env)
         {
             _env = env;
-            string basePath = env.WebRootPath;
-            string logPath = env.WebRootPath;
+            string basePath = env.ContentRootPath;
+            string logPath = env.ContentRootPath;
             _factory = new LoggerFactory();
             int backLevelCount = 0;
             var searchPath = basePath;

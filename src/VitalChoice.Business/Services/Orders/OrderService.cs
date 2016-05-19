@@ -10,7 +10,6 @@ using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Services;
 using VitalChoice.Data.UnitOfWork;
@@ -86,7 +85,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IEcommerceRepositoryAsync<VCustomer> _vCustomerRepositoryAsync;
         private readonly IAppInfrastructureService _appInfrastructureService;
         private readonly IEncryptedOrderExportService _encryptedOrderExportService;
-        private readonly SPEcommerceRepository _sPEcommerceRepository;
+        private readonly SpEcommerceRepository _sPEcommerceRepository;
         private readonly IPaymentMethodService _paymentMethodService;
         private readonly IObjectMapper<OrderPaymentMethodDynamic> _paymentMapper;
         private readonly IEcommerceRepositoryAsync<OrderToGiftCertificate> _orderToGiftCertificateRepositoryAsync;
@@ -123,7 +122,7 @@ namespace VitalChoice.Business.Services.Orders
             DynamicExtensionsRewriter queryVisitor,
             IAppInfrastructureService appInfrastructureService,
             IEncryptedOrderExportService encryptedOrderExportService,
-            SPEcommerceRepository sPEcommerceRepository,
+            SpEcommerceRepository sPEcommerceRepository,
             IPaymentMethodService paymentMethodService,
             IObjectMapper<OrderPaymentMethodDynamic> paymentMapper,
             IEcommerceRepositoryAsync<OrderToGiftCertificate> orderToGiftCertificateRepositoryAsync,

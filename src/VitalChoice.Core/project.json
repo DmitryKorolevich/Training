@@ -2,11 +2,12 @@
   "version": "1.0.0-*",
   "dependencies": {
     "Autofac.Extensions.DependencyInjection": "4.0.0-rc2",
+    "Microsoft.AspNetCore.Identity": "1.0.0-*",
+    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0-*",
     "Avalara.Avatax.Rest": "1.0.0-*",
     "cloudscribe.Web.Pagination": "1.0.1-*",
     "Microsoft.AspNetCore.Authentication.Cookies": "1.0.0-*",
     "Microsoft.AspNetCore.Http": "1.0.0-*",
-    "Microsoft.AspNetCore.Identity": "1.0.0-*",
     "Microsoft.AspNetCore.Mvc": "1.0.0-*",
     "Microsoft.AspNetCore.Mvc.Core": "1.0.0-*",
     "Microsoft.AspNetCore.Mvc.TagHelpers": "1.0.0-*",

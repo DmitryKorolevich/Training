@@ -2,56 +2,52 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Data.Extensions;
-using System.Linq.Expressions;
-using VitalChoice.Ecommerce.Domain.Entities;
-using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
-using VitalChoice.Ecommerce.Domain.Entities.Orders;
-using VitalChoice.Infrastructure.Domain.Entities;
-using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 using VitalChoice.Ecommerce.Domain;
+using VitalChoice.Infrastructure.Context;
+using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.InventorySkus;
-using VitalChoice.Infrastructure.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Entities.Reports;
 using VitalChoice.Infrastructure.Domain.Transfer.InventorySkus;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Reports;
-using Microsoft.EntityFrameworkCore;
 
-namespace VitalChoice.Data.Repositories.Customs
+namespace VitalChoice.Business.Repositories
 {
-    public class SPEcommerceRepository : EcommerceRepositoryAsync<Entity>
+    public class SpEcommerceRepository
     {
-        public SPEcommerceRepository(
-            IDataContextAsync context) : base(context)
-		{
+        private readonly EcommerceContext _context;
+
+        public SpEcommerceRepository(EcommerceContext context)
+        {
+            _context = context;
         }
 
         public async Task<ICollection<ProductCategoryStatisticItem>> GetProductCategoryStatisticAsync(DateTime from, DateTime to)
         {
-            var toReturn = await Context.Set<ProductCategoryStatisticItem>().FromSql("[dbo].[SPGetProductCategoryStatistic] @from={0}, @to={1}", from, to).ToListAsync();
+            var toReturn = await _context.Set<ProductCategoryStatisticItem>().FromSql("[dbo].[SPGetProductCategoryStatistic] @from={0}, @to={1}", from, to).ToListAsync();
             return toReturn;
         }
 
         public async Task<ICollection<SkusInProductCategoryStatisticItem>> GetSkusInProductCategoryStatisticAsync(DateTime from,DateTime to, int idCategory)
         {
-            var toReturn = await Context.Set<SkusInProductCategoryStatisticItem>().FromSql("[dbo].[SPGetSkusInProductCategoryStatistic] @from={0}, @to={1}, @idcategory={2}", from,to, idCategory).ToListAsync();
+            var toReturn = await _context.Set<SkusInProductCategoryStatisticItem>().FromSql("[dbo].[SPGetSkusInProductCategoryStatistic] @from={0}, @to={1}, @idcategory={2}", from,to, idCategory).ToListAsync();
             return toReturn;
         }
 
         public async Task<ICollection<OrdersRegionStatisticItem>> GetOrdersRegionStatisticAsync(OrderRegionFilter filter)
         {
-            var toReturn = await Context.Set<OrdersRegionStatisticItem>().FromSql("[dbo].[SPGetOrdersRegionStatistic] @from={0}, @to={1}, @IdCustomerType={2}, @IdOrderType={3}",
+            var toReturn = await _context.Set<OrdersRegionStatisticItem>().FromSql("[dbo].[SPGetOrdersRegionStatistic] @from={0}, @to={1}, @IdCustomerType={2}, @IdOrderType={3}",
                 filter.From, filter.To, filter.IdCustomerType, filter.IdOrderType).ToListAsync();
             return toReturn;
         }
 
         public async Task<ICollection<OrdersZipStatisticItem>> GetOrdersZipStatisticAsync(OrderRegionFilter filter)
         {
-            var toReturn = await Context.Set<OrdersZipStatisticItem>().FromSql("[dbo].[SPGetOrdersZipStatistic] @from={0}, @to={1}, @IdCustomerType={2}, @IdOrderType={3}",
+            var toReturn = await _context.Set<OrdersZipStatisticItem>().FromSql("[dbo].[SPGetOrdersZipStatistic] @from={0}, @to={1}, @IdCustomerType={2}, @IdOrderType={3}",
                 filter.From, filter.To, filter.IdCustomerType, filter.IdOrderType).ToListAsync();
             return toReturn;
         }
@@ -85,7 +81,7 @@ namespace VitalChoice.Data.Repositories.Customs
                 }
             }
 
-            var toReturn = await Context.Set<InventorySkuUsageRawReportItem>().FromSql("[dbo].[SPGetInventorySkusUsageReport] @from={0}, @to={1}, @skus={2}, @invskus={3}",
+            var toReturn = await _context.Set<InventorySkuUsageRawReportItem>().FromSql("[dbo].[SPGetInventorySkusUsageReport] @from={0}, @to={1}, @skus={2}, @invskus={3}",
                 filter.From, filter.To, sSkuIds, sInvSkuIds).ToListAsync();
             return toReturn;
         }
@@ -106,14 +102,14 @@ namespace VitalChoice.Data.Repositories.Customs
                 }
             }
 
-            var toReturn = await Context.Set<InventoriesSummaryUsageRawReportItem>().FromSql("[dbo].[SPGetInventoriesSummaryUsageReport] @from={0}, @to={1}, @sku={2}, @invsku={3}, @assemble={4}, @idsinvcat={5}",
+            var toReturn = await _context.Set<InventoriesSummaryUsageRawReportItem>().FromSql("[dbo].[SPGetInventoriesSummaryUsageReport] @from={0}, @to={1}, @sku={2}, @invsku={3}, @assemble={4}, @idsinvcat={5}",
                 filter.From, filter.To, filter.Sku, filter.InvSku, filter.Assemble, sIdsInvCat).ToListAsync();
             return toReturn;
         }
 
         public async Task<ICollection<int>> GetOrderIdsForWholesaleDropShipReportAsync(WholesaleDropShipReportFilter filter)
         {
-            var toReturn = await Context.Set<IdModel>().FromSql
+            var toReturn = await _context.Set<IdModel>().FromSql
                 ("[dbo].[SPGetOrderIdsForWholesaleDropShipReport] @from={0}, @to={1}, @shipfrom={2}, @shipto={3},"+
                 " @idcustomertype={4}, @idtradeclass={5}, @customerfirstname={6}, @customerlastname={7}, @shipfirstname={8},"+
                 " @shiplastname={9}, @shipidconfirm={10}, @idorder={11}, @ponumber={12}, @pageindex={13}, @pagesize={14}",
@@ -125,7 +121,7 @@ namespace VitalChoice.Data.Repositories.Customs
 
         public async Task<int> GetCountOrderIdsForWholesaleDropShipReportAsync(WholesaleDropShipReportFilter filter)
         {
-            var toReturn = await Context.Set<CountModel>().FromSql
+            var toReturn = await _context.Set<CountModel>().FromSql
                 ("[dbo].[SPGetOrderIdsForWholesaleDropShipReport] @from={0}, @to={1}, @shipfrom={2}, @shipto={3}," +
                 " @idcustomertype={4}, @idtradeclass={5}, @customerfirstname={6}, @customerlastname={7}, @shipfirstname={8}," +
                 " @shiplastname={9}, @shipidconfirm={10}, @idorder={11}, @ponumber={12}, @getcount={13}",
@@ -137,7 +133,7 @@ namespace VitalChoice.Data.Repositories.Customs
 
         public async Task<ICollection<WholesaleDropShipReportSkuRawItem>> GetWholesaleDropShipReportSkusSummaryAsync(WholesaleDropShipReportFilter filter)
         {
-            var toReturn = await Context.Set<WholesaleDropShipReportSkuRawItem>().FromSql
+            var toReturn = await _context.Set<WholesaleDropShipReportSkuRawItem>().FromSql
                 ("[dbo].[SPGetWholesaleDropShipReportSkusSummary] @from={0}, @to={1}, @shipfrom={2}, @shipto={3}," +
                 " @idcustomertype={4}, @idtradeclass={5}, @customerfirstname={6}, @customerlastname={7}, @shipfirstname={8}," +
                 " @shiplastname={9}, @shipidconfirm={10}, @idorder={11}, @ponumber={12}",
@@ -149,7 +145,7 @@ namespace VitalChoice.Data.Repositories.Customs
 
         public async Task<ICollection<TransactionAndRefundRawItem>> GetTransactionAndRefundReportItemsAsync(TransactionAndRefundReportFilter filter)
         {
-            var toReturn = await Context.Set<TransactionAndRefundRawItem>().FromSql
+            var toReturn = await _context.Set<TransactionAndRefundRawItem>().FromSql
                 ("[dbo].[SPGetTransactionAndRefundReport] @from={0}, @to={1}," +
                 " @idcustomertype={2}, @idservicecode={3}, @idcustomer={4}, @customerfirstname={5}, @customerlastname={6}," +
                 " @idorder={7}, @idorderstatus={8}, @idordertype={9}, @pageindex={10}, @pagesize={11}",

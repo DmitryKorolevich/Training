@@ -48,8 +48,6 @@ namespace VC.Public
                 SourceCodeLineCount = 25
             });
 
-            app.UseDatabaseErrorPage();
-
             Configure(app);
         }
 

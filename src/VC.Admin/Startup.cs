@@ -45,8 +45,6 @@ namespace VC.Admin
                 SourceCodeLineCount = 25
             });
 
-            app.UseDatabaseErrorPage();
-
             Configure(app);
         }
 

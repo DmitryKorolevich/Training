@@ -232,3 +232,75 @@
 2016-05-19 01:15:08.0367 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: common
 2016-05-19 01:15:08.0367 Info Found 39 configuration items
 2016-05-19 01:15:08.0367 Info Found 39 configuration items
+2016-05-19 02:29:12.8183 Info Adding target AsyncWrapper Target[common](File Target[common_wrapped])
+2016-05-19 02:29:12.8183 Info Adding target AsyncWrapper Target[db](Database Target[db_wrapped])
+2016-05-19 02:29:12.8183 Info Configured from an XML element in C:\Users\multi_000\Documents\Visual Studio 2015\Projects\VitalChoice\src\VC.Admin\wwwroot\..\..\nlog.config...
+2016-05-19 02:29:12.8183 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: common
+2016-05-19 02:29:12.8383 Info Found 39 configuration items
+2016-05-19 02:29:12.8583 Info Found 39 configuration items
+2016-05-19 02:29:20.4512 Info Adding target AsyncWrapper Target[common](File Target[common_wrapped])
+2016-05-19 02:29:20.4512 Info Adding target AsyncWrapper Target[db](Database Target[db_wrapped])
+2016-05-19 02:29:20.4512 Info Configured from an XML element in C:\Users\multi_000\Documents\Visual Studio 2015\Projects\VitalChoice\src\VC.Admin\wwwroot\..\..\nlog.config...
+2016-05-19 02:29:20.4512 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: common
+2016-05-19 02:29:20.4512 Info Found 39 configuration items
+2016-05-19 02:29:20.4512 Info Found 39 configuration items
+2016-05-19 02:41:16.8508 Info Adding target AsyncWrapper Target[common](File Target[common_wrapped])
+2016-05-19 02:41:16.8508 Info Adding target AsyncWrapper Target[db](Database Target[db_wrapped])
+2016-05-19 02:41:16.8678 Info Configured from an XML element in C:\Users\multi_000\Documents\Visual Studio 2015\Projects\VitalChoice\src\VC.Admin\wwwroot\..\..\nlog.config...
+2016-05-19 02:41:16.8678 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: common
+2016-05-19 02:41:16.8838 Info Found 39 configuration items
+2016-05-19 02:41:16.9059 Info Found 39 configuration items
+2016-05-19 02:41:20.0862 Info Adding target AsyncWrapper Target[common](File Target[common_wrapped])
+2016-05-19 02:41:20.0862 Info Adding target AsyncWrapper Target[db](Database Target[db_wrapped])
+2016-05-19 02:41:20.0862 Info Configured from an XML element in C:\Users\multi_000\Documents\Visual Studio 2015\Projects\VitalChoice\src\VC.Admin\wwwroot\..\..\nlog.config...
+2016-05-19 02:41:20.0862 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: common
+2016-05-19 02:41:20.0862 Info Found 39 configuration items
+2016-05-19 02:41:20.0862 Info Found 39 configuration items
+2016-05-19 02:48:30.1161 Info Adding target AsyncWrapper Target[common](File Target[common_wrapped])
+2016-05-19 02:48:30.1161 Info Adding target AsyncWrapper Target[db](Database Target[db_wrapped])
+2016-05-19 02:48:30.1311 Info Configured from an XML element in C:\Users\multi_000\Documents\Visual Studio 2015\Projects\VitalChoice\src\VC.Admin\wwwroot\..\..\nlog.config...
+2016-05-19 02:48:30.1311 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: common
+2016-05-19 02:48:30.1311 Info Found 39 configuration items
+2016-05-19 02:48:30.1691 Info Found 39 configuration items
+2016-05-19 02:48:33.3337 Info Adding target AsyncWrapper Target[common](File Target[common_wrapped])
+2016-05-19 02:48:33.3337 Info Adding target AsyncWrapper Target[db](Database Target[db_wrapped])
+2016-05-19 02:48:33.3337 Info Configured from an XML element in C:\Users\multi_000\Documents\Visual Studio 2015\Projects\VitalChoice\src\VC.Admin\wwwroot\..\..\nlog.config...
+2016-05-19 02:48:33.3337 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: common
+2016-05-19 02:48:33.3337 Info Found 39 configuration items
+2016-05-19 02:48:33.3337 Info Found 39 configuration items
+2016-05-19 03:05:38.4581 Info Adding target AsyncWrapper Target[common](File Target[common_wrapped])
+2016-05-19 03:05:38.4581 Info Adding target AsyncWrapper Target[db](Database Target[db_wrapped])
+2016-05-19 03:05:38.4761 Info Configured from an XML element in C:\Users\multi_000\Documents\Visual Studio 2015\Projects\VitalChoice\src\VC.Admin\wwwroot\..\..\nlog.config...
+2016-05-19 03:05:38.4761 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: common
+2016-05-19 03:05:38.4761 Info Found 39 configuration items
+2016-05-19 03:05:38.5071 Info Found 39 configuration items
+2016-05-19 03:05:41.7880 Info Adding target AsyncWrapper Target[common](File Target[common_wrapped])
+2016-05-19 03:05:41.7880 Info Adding target AsyncWrapper Target[db](Database Target[db_wrapped])
+2016-05-19 03:05:41.7880 Info Configured from an XML element in C:\Users\multi_000\Documents\Visual Studio 2015\Projects\VitalChoice\src\VC.Admin\wwwroot\..\..\nlog.config...
+2016-05-19 03:05:41.7880 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: common
+2016-05-19 03:05:41.7880 Info Found 39 configuration items
+2016-05-19 03:05:41.7880 Info Found 39 configuration items
+2016-05-19 03:12:57.2633 Info Adding target AsyncWrapper Target[common](File Target[common_wrapped])
+2016-05-19 03:12:57.2763 Info Adding target AsyncWrapper Target[db](Database Target[db_wrapped])
+2016-05-19 03:12:57.2763 Info Configured from an XML element in C:\Users\multi_000\Documents\Visual Studio 2015\Projects\VitalChoice\src\VC.Admin\wwwroot\..\..\nlog.config...
+2016-05-19 03:12:57.2763 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: common
+2016-05-19 03:12:57.2908 Info Found 39 configuration items
+2016-05-19 03:12:57.3108 Info Found 39 configuration items
+2016-05-19 03:13:03.7942 Info Adding target AsyncWrapper Target[common](File Target[common_wrapped])
+2016-05-19 03:13:03.7942 Info Adding target AsyncWrapper Target[db](Database Target[db_wrapped])
+2016-05-19 03:13:03.7942 Info Configured from an XML element in C:\Users\multi_000\Documents\Visual Studio 2015\Projects\VitalChoice\src\VC.Admin\wwwroot\..\..\nlog.config...
+2016-05-19 03:13:03.7942 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: common
+2016-05-19 03:13:03.7942 Info Found 39 configuration items
+2016-05-19 03:13:03.7942 Info Found 39 configuration items
+2016-05-19 03:15:54.5119 Info Adding target AsyncWrapper Target[common](File Target[common_wrapped])
+2016-05-19 03:15:54.5254 Info Adding target AsyncWrapper Target[db](Database Target[db_wrapped])
+2016-05-19 03:15:54.5254 Info Configured from an XML element in C:\Users\multi_000\Documents\Visual Studio 2015\Projects\VitalChoice\src\VC.Admin\wwwroot\..\..\nlog.config...
+2016-05-19 03:15:54.5254 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: common
+2016-05-19 03:15:54.5399 Info Found 39 configuration items
+2016-05-19 03:15:54.5676 Info Found 39 configuration items
+2016-05-19 03:16:01.2709 Info Adding target AsyncWrapper Target[common](File Target[common_wrapped])
+2016-05-19 03:16:01.2709 Info Adding target AsyncWrapper Target[db](Database Target[db_wrapped])
+2016-05-19 03:16:01.2709 Info Configured from an XML element in C:\Users\multi_000\Documents\Visual Studio 2015\Projects\VitalChoice\src\VC.Admin\wwwroot\..\..\nlog.config...
+2016-05-19 03:16:01.2709 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: common
+2016-05-19 03:16:01.2709 Info Found 39 configuration items
+2016-05-19 03:16:01.2709 Info Found 39 configuration items

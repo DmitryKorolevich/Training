@@ -5,6 +5,7 @@ using VitalChoice.Validation.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 
@@ -45,7 +46,9 @@ namespace VitalChoice.Core.GlobalFilters
                             StatusCode = (int) HttpStatusCode.InternalServerError
                         };
                     }
-                    LoggerService.GetDefault().LogError(context.Exception.ToString());
+                    var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
+                    var logger = loggerFactory.CreateLogger<ApiExceptionFilterAttribute>();
+                    logger.LogError(context.Exception.Message, context.Exception);
                 }
             }
             else
@@ -61,6 +64,12 @@ namespace VitalChoice.Core.GlobalFilters
                     {
                         StatusCode = (int)apiException.Status
                     };
+                    var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
+                    var logger = loggerFactory.CreateLogger<ApiExceptionFilterAttribute>();
+                    if (context.Exception.InnerException != null)
+                    {
+                        logger.LogError(context.Exception.InnerException.Message, context.Exception.InnerException);
+                    }
                 }
             }
 

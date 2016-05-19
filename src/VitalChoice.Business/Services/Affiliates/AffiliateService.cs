@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using VitalChoice.Business.Queries.Affiliate;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.DynamicData.Base;

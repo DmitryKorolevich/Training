@@ -13,6 +13,11 @@ namespace VitalChoice.Ecommerce.Domain.Exceptions
 
         public ApiException() {}
 
+        public ApiException(string message, Exception innerException) : base(message, innerException)
+        {
+            Message = message;
+        }
+
         public ApiException(string message, params object[] args) {
             Message = string.Format(message, args);
         }

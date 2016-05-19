@@ -1,0 +1,24 @@
+2016-05-19 03:24:10.9110 Info Adding target AsyncWrapper Target[common](File Target[common_wrapped])
+2016-05-19 03:24:10.9110 Info Adding target AsyncWrapper Target[db](Database Target[db_wrapped])
+2016-05-19 03:24:10.9270 Info Configured from an XML element in C:\Users\multi_000\Documents\Visual Studio 2015\Projects\VitalChoice\src\VC.Admin\..\nlog.config...
+2016-05-19 03:24:10.9270 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: common
+2016-05-19 03:24:10.9270 Info Found 39 configuration items
+2016-05-19 03:24:10.9573 Info Found 39 configuration items
+2016-05-19 03:24:12.4619 Info Adding target AsyncWrapper Target[common](File Target[common_wrapped])
+2016-05-19 03:24:12.4619 Info Adding target AsyncWrapper Target[db](Database Target[db_wrapped])
+2016-05-19 03:24:12.4619 Info Configured from an XML element in C:\Users\multi_000\Documents\Visual Studio 2015\Projects\VitalChoice\src\VC.Admin\..\nlog.config...
+2016-05-19 03:24:12.4619 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: common
+2016-05-19 03:24:12.4619 Info Found 39 configuration items
+2016-05-19 03:24:12.4619 Info Found 39 configuration items
+2016-05-19 04:45:39.2872 Info Adding target AsyncWrapper Target[common](File Target[common_wrapped])
+2016-05-19 04:45:39.2872 Info Adding target AsyncWrapper Target[db](Database Target[db_wrapped])
+2016-05-19 04:45:39.3032 Info Configured from an XML element in C:\Users\multi_000\Documents\Visual Studio 2015\Projects\VitalChoice\src\VC.Admin\..\nlog.config...
+2016-05-19 04:45:39.3032 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: common
+2016-05-19 04:45:39.3032 Info Found 39 configuration items
+2016-05-19 04:45:39.3344 Info Found 39 configuration items
+2016-05-19 04:45:45.8534 Info Adding target AsyncWrapper Target[common](File Target[common_wrapped])
+2016-05-19 04:45:45.8534 Info Adding target AsyncWrapper Target[db](Database Target[db_wrapped])
+2016-05-19 04:45:45.8534 Info Configured from an XML element in C:\Users\multi_000\Documents\Visual Studio 2015\Projects\VitalChoice\src\VC.Admin\..\nlog.config...
+2016-05-19 04:45:45.8534 Warn Unused target detected. Add a rule for this target to the configuration. TargetName: common
+2016-05-19 04:45:45.8534 Info Found 39 configuration items
+2016-05-19 04:45:45.8534 Info Found 39 configuration items

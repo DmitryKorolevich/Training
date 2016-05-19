@@ -7,6 +7,7 @@ using VitalChoice.Business.Queries.Affiliates;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
+using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 
@@ -15,7 +16,7 @@ namespace VitalChoice.Business.Repositories
     public class AffiliateOrderPaymentRepository : EcommerceRepositoryAsync<AffiliateOrderPayment>
     {
         public AffiliateOrderPaymentRepository(
-            IDataContextAsync context) : base(context)
+            EcommerceContext context) : base(context)
 		{
         }
 
