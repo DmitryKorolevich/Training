@@ -33,7 +33,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Products
 
         public string EditedByAgentId { get; set; }
 
-        public bool Hidden { get; set; }
+        public CustomerTypeCode? IdVisibility { get; set; }
 
         public ProductType IdProductType { get; set; }
 

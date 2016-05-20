@@ -20,6 +20,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.ContentManagement;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.TemplateModels;
 using VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage;
+using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.ObjectMapping.Interfaces;
@@ -58,6 +59,15 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             _recipeService = recipeService;
         }
 
+        private IList<CustomerTypeCode> GetCustomerVisibility(ProcessorViewContext viewContext)
+        {
+            return viewContext.User.Identity.IsAuthenticated
+                ? (viewContext.User.IsInRole(IdentityConstants.WholesaleCustomer)
+                    ? new List<CustomerTypeCode>() { CustomerTypeCode.Wholesale, CustomerTypeCode.All }
+                    : new List<CustomerTypeCode>() { CustomerTypeCode.Retail, CustomerTypeCode.All })
+                : new List<CustomerTypeCode>() { CustomerTypeCode.Retail, CustomerTypeCode.All };
+        }
+
         protected override async Task<TtlProductPageModel> ExecuteAsync(ProcessorViewContext viewContext)
         {
             if (viewContext.Entity == null || viewContext.Parameters.Product == null)
@@ -75,8 +85,10 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
                 targetStatuses.Add(RecordStatusCode.NotActive);
             }
 
+            var customerVisibility = GetCustomerVisibility(viewContext);
+
             var eProduct = viewContext.Parameters.Product;
-            if (eProduct.Hidden || targetStatuses.All(x => x != (RecordStatusCode) eProduct.StatusCode))
+            if (!eProduct.IdVisibility.HasValue || !customerVisibility.Contains(eProduct.IdVisibility.Value) || targetStatuses.All(x => x != (RecordStatusCode) eProduct.StatusCode))
             {
                 throw new ApiException("Product not found", HttpStatusCode.NotFound);
             }

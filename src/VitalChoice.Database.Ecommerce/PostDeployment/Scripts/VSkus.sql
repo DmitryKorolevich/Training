@@ -15,7 +15,7 @@ SELECT
 	p.Id AS IdProduct,
 	p.DateCreated,
 	p.DateEdited,
-	p.Hidden As ProductHidden,
+	p.IdVisibility As ProductIdVisibility,
 	s.Hidden,
 	p.IdObjectType AS IdProductType,
 	p.Name,

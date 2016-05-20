@@ -67,7 +67,7 @@ namespace VC.Admin.Models.Products
         public RecordStatusCode StatusCode { get; set; }
 
         [Map]
-        public bool Hidden { get; set; }
+        public CustomerTypeCode? IdVisibility { get; set; }
 
         [Map]
         public string Description { get; set; }

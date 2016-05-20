@@ -173,7 +173,7 @@ namespace VC.Admin.Controllers
                 return new ProductManageModel()
                 {
                     StatusCode = RecordStatusCode.Active,
-                    Hidden = false,
+                    IdVisibility = CustomerTypeCode.All,
                     CategoryIds = new List<int>(),
                     SKUs = new List<SKUManageModel>(),
                     CrossSellProducts = new List<CrossSellProductModel>()

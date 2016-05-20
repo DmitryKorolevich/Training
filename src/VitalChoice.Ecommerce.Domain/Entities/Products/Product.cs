@@ -9,8 +9,8 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Products
 	    public Guid PublicId { get; set; }
 
 	    public string Name { get; set; }
-
-        public bool Hidden { get; set; }
+        
+        public CustomerTypeCode? IdVisibility { get; set; }
 
         public ICollection<Sku> Skus { get; set; }
 

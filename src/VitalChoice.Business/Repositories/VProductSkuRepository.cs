@@ -72,7 +72,7 @@ namespace VitalChoice.Data.Repositories.Customs
                 Thumbnail = g.Min(p => p.Thumbnail),
                 TaxCode = g.Min(p => p.TaxCode),
                 StatusCode = g.Min(p => p.StatusCode),
-                Hidden = g.Min(p => p.Hidden),
+                IdVisibility = g.Min(p => p.IdVisibility),
                 DateEdited= g.Min(p => p.DateEdited),
                 IdEditedBy = g.Min(p => p.IdEditedBy),
                 IdProductType = g.Min(p => p.IdProductType)
