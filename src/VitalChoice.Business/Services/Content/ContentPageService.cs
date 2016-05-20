@@ -82,21 +82,21 @@ namespace VitalChoice.Business.Services.Content
 				case ContentPageSortPath.Title:
 					sortable =
 						(x) =>
-							sortOrder == SortOrder.Asc
+							sortOrder == FilterSortOrder.Asc
 								? x.OrderBy(y => y.Name)
 								: x.OrderByDescending(y => y.Name);
 					break;
 				case ContentPageSortPath.Url:
 					sortable =
 						(x) =>
-							sortOrder == SortOrder.Asc
+							sortOrder == FilterSortOrder.Asc
 								? x.OrderBy(y => y.Url)
 								: x.OrderByDescending(y => y.Url);
 					break;
 				case ContentPageSortPath.Status:
 					sortable =
 						(x) =>
-							sortOrder == SortOrder.Asc
+							sortOrder == FilterSortOrder.Asc
 								? x.OrderBy(y => y.StatusCode)
 								: x.OrderByDescending(y => y.StatusCode);
 					break;
@@ -105,7 +105,7 @@ namespace VitalChoice.Business.Services.Content
 
 					sortable =
 						(x) =>
-							sortOrder == SortOrder.Asc
+							sortOrder == FilterSortOrder.Asc
 								? x.OrderBy(y => y.ContentItem.Updated)
 								: x.OrderByDescending(y => y.ContentItem.Updated);
 					break;

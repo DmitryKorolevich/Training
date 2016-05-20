@@ -13,7 +13,6 @@ using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.ObjectMapping.Interfaces;
-using VitalChoice.Profiling.Base;
 
 namespace VitalChoice.Caching.Services.Cache
 {
@@ -279,9 +278,6 @@ namespace VitalChoice.Caching.Services.Cache
 
         public EntityKey MarkForAdd(T entity)
         {
-#if DEBUG
-            using (var scope = new ProfilingScope($"<{typeof(T).Name} Mark Add 1>"))
-#endif
             {
                 foreach (var data in CacheStorage.AllCacheDatas)
                 {
@@ -294,11 +290,7 @@ namespace VitalChoice.Caching.Services.Cache
                 var pk = EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
                 var foreignKeys = EntityInfo.ForeignKeys.GetForeignKeyValues(entity);
                 MarkForUpdateForeignKeys(foreignKeys);
-#if DEBUG
-                MarkForUpdateDependent(pk, scope);
-#else
                 MarkForUpdateDependent(pk);
-#endif
                 return pk;
             }
         }
@@ -457,10 +449,6 @@ namespace VitalChoice.Caching.Services.Cache
             List<EntityKey> pks = new List<EntityKey>();
             if (entities.Count == 0)
                 return pks;
-#if DEBUG
-            using (var scope = new ProfilingScope($"<{typeof(T).Name}> Mark Add {entities.Count}"))
-#endif
-            {
                 foreach (var data in CacheStorage.AllCacheDatas)
                 {
                     if (data.FullCollection)
@@ -478,24 +466,15 @@ namespace VitalChoice.Caching.Services.Cache
                 MarkForUpdateForeignKeys(foreignKeys);
                 foreach (var pk in pks)
                 {
-#if DEBUG
-                    MarkForUpdateDependent(pk, scope);
-#else
                     MarkForUpdateDependent(pk);
-#endif
                 }
                 return pks;
-            }
         }
 
         private void MarkForUpdateInternal(ICollection<EntityKey> pks, IEnumerable<ICacheData<T>> cacheDatas, string markRelated)
         {
             if (pks.Count == 0)
                 return;
-#if DEBUG
-            using (var scope = new ProfilingScope($"<{typeof(T).Name}> Mark Update (Related: {markRelated}) {pks.Count}"))
-#endif
-            {
                 foreach (var data in cacheDatas)
                 {
                     var cachedList = pks.Where(p => p.IsValid).Select(pk => data.Get(pk)).ToArray();
@@ -535,23 +514,14 @@ namespace VitalChoice.Caching.Services.Cache
                 }
                 foreach (var pk in pks)
                 {
-#if DEBUG
-                    MarkForUpdateDependent(pk, scope);
-#else
                     MarkForUpdateDependent(pk);
-#endif
                 }
-            }
         }
 
         private void MarkForUpdateInternal(EntityKey pk, IEnumerable<ICacheData<T>> cacheDatas, string markRelated)
         {
             if (!pk.IsValid)
                 return;
-#if DEBUG
-            using (var scope = new ProfilingScope($"<{typeof(T).Name}> Mark Update (Related: {markRelated}) 1"))
-#endif
-            {
                 foreach (var data in cacheDatas)
                 {
                     var cached = data.Get(pk);
@@ -573,18 +543,9 @@ namespace VitalChoice.Caching.Services.Cache
                         data.NeedUpdate = true;
                     }
                 }
-#if DEBUG
-                MarkForUpdateDependent(pk, scope);
-#else
                 MarkForUpdateDependent(pk);
-#endif
-            }
         }
-#if DEBUG
-        private void MarkForUpdateDependent(EntityKey pk, ProfilingScope scope)
-#else
         private void MarkForUpdateDependent(EntityKey pk)
-#endif
         {
             if (EntityInfo.DependentTypes == null)
                 return;
@@ -604,26 +565,8 @@ namespace VitalChoice.Caching.Services.Cache
                             var itemsList = cachedItems.Where(c => !c.NeedUpdate)
                                 .Select(entity => cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity.EntityUntyped)).ToArray();
                             cache.MarkForUpdate(itemsList, dependentType.Value.Name);
-                            if (!itemsList.Any())
-                            {
-#if DEBUG
-                                scope.AddScopeData($"{dependentType.Key.Name} empty result {index}");
-#endif
-                            }
-                        }
-                        else
-                        {
-#if DEBUG
-                            scope.AddScopeData($"{dependentType.Key.Name} not found {index}");
-#endif
                         }
                     }
-                }
-                else
-                {
-#if DEBUG
-                    scope.AddScopeData($"{dependentType.Key.Name} cache doesn't exist");
-#endif
                 }
             }
         }

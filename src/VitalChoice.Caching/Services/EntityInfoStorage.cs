@@ -4,10 +4,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
 using Autofac;
+using Autofac.Core.Lifetime;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -22,6 +25,7 @@ using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain.Options;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace VitalChoice.Caching.Services
 {
@@ -30,83 +34,82 @@ namespace VitalChoice.Caching.Services
         protected readonly IOptions<AppOptionsBase> Options;
         protected readonly ILogger Logger;
         private readonly IContextTypeContainer _contextTypeContainer;
-        private readonly ILifetimeScope _serviceProvider;
-        private IReadOnlyDictionary<Type, EntityInfo> _entityInfos;
+        private Dictionary<Type, EntityInfo> _entityInfos;
+        private readonly HashSet<Type> _parsedEntities = new HashSet<Type>();
         private IEntityCollectorInfo _gcCollector;
 
-        public EntityInfoStorage(IOptions<AppOptionsBase> options, ILogger logger, IContextTypeContainer contextTypeContainer,
-            ILifetimeScope scope)
+        public EntityInfoStorage(IOptions<AppOptionsBase> options, ILoggerFactory logger, IContextTypeContainer contextTypeContainer)
         {
             Options = options;
-            Logger = logger;
+            Logger = logger.CreateLogger<EntityInfoStorage>();
             _contextTypeContainer = contextTypeContainer;
-            _serviceProvider = scope;
-            Initialize();
         }
 
-        private void Initialize()
+        public void Initialize(DbContext context)
         {
-            var parsedEntities = new HashSet<Type>();
-            var entityInfos = new Dictionary<Type, EntityInfo>();
-            using (var scope = _serviceProvider.BeginLifetimeScope())
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+
+            var contextType = context.GetType();
+
+            if (_contextTypeContainer.ContextTypes.Contains(contextType))
+                return;
+
+            lock (_contextTypeContainer.SyncRoot)
             {
-                var contexts = _contextTypeContainer.ContextTypes.Select(t => scope.Resolve(t)).Cast<DbContext>().ToArray();
-                try
+                var entityInfos = new Dictionary<Type, EntityInfo>();
+                foreach (var entityType in context.Model.GetEntityTypes())
                 {
-                    foreach (var context in contexts)
+                    EntityPrimaryKeyInfo primaryKey;
+                    if (!TryGetPrimaryKey(entityType, out primaryKey))
+                        continue;
+                    var uniqueIndex = GetFirstUniqueIndex(entityType);
+                    var conditionalList = GetConditionalIndexes(entityType);
+                    var cacheCondition = GetCacheCondition(entityType);
+                    var nonUniqueIndexes = SetupForeignKeys(entityType, entityInfos);
+
+                    if (!_parsedEntities.Contains(entityType.ClrType))
                     {
-                        foreach (var entityType in context.Model.GetEntityTypes())
+                        _parsedEntities.Add(entityType.ClrType);
+                        entityInfos.AddOrUpdate(entityType.ClrType, () => new EntityInfo
                         {
-                            EntityPrimaryKeyInfo primaryKey;
-                            if (!TryGetPrimaryKey(entityType, out primaryKey))
-                                continue;
-                            var uniqueIndex = GetFirstUniqueIndex(entityType);
-                            var conditionalList = GetConditionalIndexes(entityType);
-                            var cacheCondition = GetCacheCondition(entityType);
-                            var nonUniqueIndexes = SetupForeignKeys(entityType, entityInfos);
-
-                            if (!parsedEntities.Contains(entityType.ClrType))
-                            {
-                                parsedEntities.Add(entityType.ClrType);
-                                entityInfos.AddOrUpdate(entityType.ClrType, () => new EntityInfo
-                                {
-                                    NonUniqueIndexes = nonUniqueIndexes,
-                                    PrimaryKey = primaryKey,
-                                    CacheableIndex = uniqueIndex,
-                                    ConditionalIndexes = conditionalList,
-                                    ContextType = context.GetType(),
-                                    CacheCondition = cacheCondition
-                                }, info =>
-                                {
-                                    if (info.ForeignKeys == null)
-                                        info.ForeignKeys = new HashSet<EntityForeignKeyInfo>();
-                                    info.NonUniqueIndexes = nonUniqueIndexes;
-                                    info.PrimaryKey = primaryKey;
-                                    info.CacheableIndex = uniqueIndex;
-                                    info.ConditionalIndexes = conditionalList;
-                                    info.ContextType = context.GetType();
-                                    info.CacheCondition = cacheCondition;
-                                    return info;
-                                });
-                            }
-                            else
-                            {
-                                throw new Exception($"{entityType.ClrType.FullName} was already exist in different context");
-                            }
-                        }
+                            NonUniqueIndexes = nonUniqueIndexes,
+                            PrimaryKey = primaryKey,
+                            CacheableIndex = uniqueIndex,
+                            ConditionalIndexes = conditionalList,
+                            ContextType = contextType,
+                            CacheCondition = cacheCondition
+                        }, info =>
+                        {
+                            if (info.ForeignKeys == null)
+                                info.ForeignKeys = new HashSet<EntityForeignKeyInfo>();
+                            info.NonUniqueIndexes = nonUniqueIndexes;
+                            info.PrimaryKey = primaryKey;
+                            info.CacheableIndex = uniqueIndex;
+                            info.ConditionalIndexes = conditionalList;
+                            info.ContextType = contextType;
+                            info.CacheCondition = cacheCondition;
+                            return info;
+                        });
                     }
-                }
-                finally
-                {
-                    foreach (var context in contexts)
+                    else
                     {
-                        context.Dispose();
+                        throw new Exception($"{entityType.ClrType.FullName} was already exist in different context");
                     }
                 }
+                if (_entityInfos == null)
+                {
+                    _entityInfos = entityInfos;
+                    _gcCollector = new EntityCollector(this, new InternalEntityCacheFactory(this), Options, Logger);
+                }
+                else
+                {
+                    var results = new Dictionary<Type, EntityInfo>(_entityInfos);
+                    results.AddRange(entityInfos);
+                    _entityInfos = results;
+                }
+                _contextTypeContainer.ContextTypes = new HashSet<Type>(_contextTypeContainer.ContextTypes) { contextType };
             }
-
-            _entityInfos = entityInfos;
-            _gcCollector = new EntityCollector(this, new InternalEntityCacheFactory(this), Options, Logger);
         }
 
         private static bool TryGetPrimaryKey(IEntityType entityType, out EntityPrimaryKeyInfo primaryKey)
@@ -379,16 +382,16 @@ namespace VitalChoice.Caching.Services
             return null;
         }
 
-        public object GetEntity(Type entityType, ICollection<EntityValueExportable> keyValues)
+        public object GetEntity(Type entityType, ICollection<EntityValueExportable> keyValues, IServiceScopeFactory rootScope)
         {
             var caller = (IGetEntityCaller) Activator.CreateInstance(typeof (GetEntityCaller<>).MakeGenericType(entityType), this);
-            return caller.GetEntity(keyValues);
+            return caller.GetEntity(keyValues, rootScope);
         }
 
-        public object GetEntity(Type entityType, EntityKey pk)
+        public object GetEntity(Type entityType, EntityKey pk, IServiceScopeFactory rootScope)
         {
             var caller = (IGetEntityCaller)Activator.CreateInstance(typeof(GetEntityCaller<>).MakeGenericType(entityType), this);
-            return caller.GetEntity(pk);
+            return caller.GetEntity(pk, rootScope);
         }
 
         public ICollection<EntityCacheableIndexInfo> GetNonUniqueIndexInfos(Type entityType)
@@ -426,15 +429,15 @@ namespace VitalChoice.Caching.Services
             return null;
         }
 
-        public T GetEntity<T>(ICollection<EntityValueExportable> keyValues)
+        public T GetEntity<T>(ICollection<EntityValueExportable> keyValues, IServiceScopeFactory rootScope)
             where T : class
         {
-            using (var scope = _serviceProvider.BeginLifetimeScope())
+            using (var scope = rootScope.CreateScope())
             {
                 var contextType = GetContextType<T>();
                 if (contextType != null)
                 {
-                    using (var context = scope.Resolve(contextType) as DbContext)
+                    using (var context = scope.ServiceProvider.GetService(contextType) as DbContext)
                     {
                         if (context != null)
                         {
@@ -456,14 +459,14 @@ namespace VitalChoice.Caching.Services
             return null;
         }
 
-        public T GetEntity<T>(EntityKey pk) where T : class
+        public T GetEntity<T>(EntityKey pk, IServiceScopeFactory rootScope) where T : class
         {
-            using (var scope = _serviceProvider.BeginLifetimeScope())
+            using (var scope = rootScope.CreateScope())
             {
                 var contextType = GetContextType<T>();
                 if (contextType != null)
                 {
-                    using (var context = scope.Resolve(contextType) as DbContext)
+                    using (var context = scope.ServiceProvider.GetService(contextType) as DbContext)
                     {
                         if (context != null)
                         {
@@ -634,8 +637,8 @@ namespace VitalChoice.Caching.Services
 
         private interface IGetEntityCaller
         {
-            object GetEntity(ICollection<EntityValueExportable> keyValues);
-            object GetEntity(EntityKey pk);
+            object GetEntity(ICollection<EntityValueExportable> keyValues, IServiceScopeFactory rootScope);
+            object GetEntity(EntityKey pk, IServiceScopeFactory rootScope);
         }
 
         private struct GetEntityCaller<T> : IGetEntityCaller
@@ -649,14 +652,14 @@ namespace VitalChoice.Caching.Services
                 _infoStorage = infoStorage;
             }
 
-            public object GetEntity(ICollection<EntityValueExportable> keyValues)
+            public object GetEntity(ICollection<EntityValueExportable> keyValues, IServiceScopeFactory rootScope)
             {
-                return _infoStorage.GetEntity<T>(keyValues);
+                return _infoStorage.GetEntity<T>(keyValues, rootScope);
             }
 
-            public object GetEntity(EntityKey pk)
+            public object GetEntity(EntityKey pk, IServiceScopeFactory rootScope)
             {
-                return _infoStorage.GetEntity<T>(pk);
+                return _infoStorage.GetEntity<T>(pk, rootScope);
             }
         }
     }

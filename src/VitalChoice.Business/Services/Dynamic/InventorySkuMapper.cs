@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.DynamicData.Base;
@@ -35,7 +36,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.Description = entity.Description;
                 dynamic.IdInventorySkuCategory = entity.IdInventorySkuCategory;
             });
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
         protected override Task UpdateEntityRangeInternalAsync(
@@ -50,7 +51,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.Description = dynamic.Description;
                 entity.IdInventorySkuCategory = dynamic.IdInventorySkuCategory;
             });
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
         protected override Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<InventorySkuDynamic, InventorySku>> items)
@@ -64,7 +65,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.Description = dynamic.Description;
                 entity.IdInventorySkuCategory = dynamic.IdInventorySkuCategory;
             });
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
     }
 }

@@ -49,7 +49,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
             filter.Paging.PageIndex = page;
             filter.Paging.PageItemCount = ContentConstants.ARTICLES_LIST_TAKE_COUNT;
             filter.Sorting.Path = ArticleSortPath.PublishedDate;
-            filter.Sorting.SortOrder = SortOrder.Desc;
+            filter.Sorting.SortOrder = FilterSortOrder.Desc;
             var data = await _articleService.GetArticlesAsync(filter);
 
             TtlShortArticleListModel toReturn = new TtlShortArticleListModel()

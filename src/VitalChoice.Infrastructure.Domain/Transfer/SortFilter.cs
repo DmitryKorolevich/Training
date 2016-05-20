@@ -4,6 +4,6 @@
     {
 		public string Path { get; set; }
 
-		public SortOrder SortOrder { get; set; }
+		public FilterSortOrder SortOrder { get; set; }
 	}
 }

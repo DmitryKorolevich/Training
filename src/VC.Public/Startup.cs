@@ -11,8 +11,9 @@ using System.Net;
 using System.Threading.Tasks;
 using VitalChoice.Interfaces.Services;
 using Autofac;
-using VitalChoice.Core.Services;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Core.Services;
 
 namespace VC.Public
 {
@@ -89,7 +90,7 @@ namespace VC.Public
                 {
                     return next();
                 }
-                return Task.Delay(0);
+                return TaskCache.CompletedTask;
             });
             app.UseStatusCodeExecutePath("/content/" + ContentConstants.NOT_FOUND_PAGE_URL, HttpStatusCode.NotFound);
             app.UseStatusCodeExecutePath("/content/" + ContentConstants.ACESS_DENIED_PAGE_URL, HttpStatusCode.Forbidden);

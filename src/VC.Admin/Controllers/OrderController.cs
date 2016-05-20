@@ -377,7 +377,7 @@ namespace VC.Admin.Controllers
             var infr = _appInfrastructureService.Data();
             var countries = await _countryService.GetCountriesAsync();
 
-            filter.Sorting.SortOrder = VitalChoice.Infrastructure.Domain.Transfer.SortOrder.Desc;
+            filter.Sorting.SortOrder = VitalChoice.Infrastructure.Domain.Transfer.FilterSortOrder.Desc;
             filter.Sorting.Path = VOrderSortPath.DateCreated;
             filter.OrderType = OrderType.AutoShip;
 

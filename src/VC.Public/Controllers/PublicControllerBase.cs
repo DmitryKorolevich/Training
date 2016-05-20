@@ -14,12 +14,12 @@ using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Core.Infrastructure.Helpers;
-using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services.Checkout;
 using System.Linq;
+using VitalChoice.Core.Services;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 

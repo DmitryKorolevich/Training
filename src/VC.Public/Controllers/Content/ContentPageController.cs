@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using VitalChoice.Infrastructure.Domain.Constants;
 using System.Net;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using VitalChoice.Core.Services;
 

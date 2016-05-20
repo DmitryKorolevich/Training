@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VC.Public.Models.Cart;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
@@ -13,12 +14,12 @@ namespace VC.Public.ModelConverters.Order
         {
             model.InStock = dynamic.IdObjectType == (int) ProductType.EGс || dynamic.IdObjectType == (int) ProductType.Gc ||
                             ((bool?) dynamic.SafeData.DisregardStock ?? false) || ((int?) dynamic.SafeData.Stock ?? 0) > 0;
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
         public override Task ModelToDynamicAsync(CartSkuModel model, SkuDynamic dynamic)
         {
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
     }
 }

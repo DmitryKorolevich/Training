@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VC.Public.Models.Profile;
 using VitalChoice.Business.Helpers;
 using VitalChoice.DynamicData.Base;
@@ -18,7 +19,7 @@ namespace VC.Public.ModelConverters.Customer
                 model.ExpirationDateMonth = exp.Month;
                 model.ExpirationDateYear = exp.Year % 2000;
             }
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
         public override Task ModelToDynamicAsync(BillingInfoModel model, OrderPaymentMethodDynamic dynamic)
@@ -33,7 +34,7 @@ namespace VC.Public.ModelConverters.Customer
                 if (exp.AddMonths(1).AddDays(-1) < DateTime.Today)
                     throw new AppValidationException(string.Empty, "Your credit card is expired.");
             }
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
     }
 }

@@ -83,35 +83,35 @@ namespace VitalChoice.Business.Services.InventorySkus
                 case InventorySkuSortPath.Id:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Id)
                                 : x.OrderByDescending(y => y.Id);
                     break;
                 case InventorySkuSortPath.Code:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Code)
                                 : x.OrderByDescending(y => y.Code);
                     break;
                 case InventorySkuSortPath.Description:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Description)
                                 : x.OrderByDescending(y => y.Description);
                     break;
                 case InventorySkuSortPath.StatusCode:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.StatusCode)
                                 : x.OrderByDescending(y => y.StatusCode);
                     break;
                 case InventorySkuSortPath.DateEdited:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.DateEdited)
                                 : x.OrderByDescending(y => y.DateEdited);
                     break;

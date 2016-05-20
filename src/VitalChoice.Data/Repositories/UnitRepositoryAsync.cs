@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.EntityFrameworkCore;
 using VitalChoice.Data.Context;
 using VitalChoice.Ecommerce.Domain;
@@ -26,14 +27,14 @@ namespace VitalChoice.Data.Repositories
         public virtual Task<bool> InsertAsync(TEntity entity)
         {
             if (entity == null)
-                return Task.FromResult(false);
+                return TaskCache<bool>.DefaultCompletedTask;
             return InsertAsync(CancellationToken.None, entity);
         }
 
         public virtual Task<bool> InsertAsync(CancellationToken cancellationToken, TEntity entity)
         {
             if (entity == null)
-                return Task.FromResult(false);
+                return TaskCache<bool>.DefaultCompletedTask;
             DbSet.Add(entity);
             return Task.FromResult(true);
         }
@@ -54,7 +55,7 @@ namespace VitalChoice.Data.Repositories
         public virtual Task<bool> InsertRangeAsync(CancellationToken cancellationToken, IEnumerable<TEntity> entities)
         {
             if (entities == null)
-                return Task.FromResult(false);
+                return TaskCache<bool>.DefaultCompletedTask;
             DbSet.AddRange(entities);
             return Task.FromResult(true);
         }
@@ -75,7 +76,7 @@ namespace VitalChoice.Data.Repositories
         public virtual Task<bool> InsertGraphAsync(CancellationToken cancellationToken, TEntity entity)
         {
             if (entity == null)
-                return Task.FromResult(false);
+                return TaskCache<bool>.DefaultCompletedTask;
             Context.TrackGraphForAdd(entity);
             return Task.FromResult(true);
         }
@@ -99,7 +100,7 @@ namespace VitalChoice.Data.Repositories
         public virtual Task<bool> InsertGraphRangeAsync(CancellationToken cancellationToken, params TEntity[] entities)
         {
             if (entities == null)
-                return Task.FromResult(false);
+                return TaskCache<bool>.DefaultCompletedTask;
             foreach (var entity in entities)
             {
                 Context.TrackGraphForAdd(entity);
@@ -115,7 +116,7 @@ namespace VitalChoice.Data.Repositories
         public virtual Task<bool> InsertGraphRangeAsync(CancellationToken cancellationToken, IEnumerable<TEntity> entities)
         {
             if (entities == null)
-                return Task.FromResult(false);
+                return TaskCache<bool>.DefaultCompletedTask;
             foreach (var entity in entities)
             {
                 Context.TrackGraphForAdd(entity);
@@ -139,7 +140,7 @@ namespace VitalChoice.Data.Repositories
         public virtual Task<bool> UpdateAsync(CancellationToken cancellationToken, TEntity entity)
         {
             if (entity == null)
-                return Task.FromResult(false);
+                return TaskCache<bool>.DefaultCompletedTask;
             DbSet.Update(entity);
             return Task.FromResult(true);
         }
@@ -160,7 +161,7 @@ namespace VitalChoice.Data.Repositories
         public virtual Task<bool> UpdateRangeAsync(CancellationToken cancellationToken, IEnumerable<TEntity> entities)
         {
             if (entities == null)
-                return Task.FromResult(false);
+                return TaskCache<bool>.DefaultCompletedTask;
             DbSet.UpdateRange(entities);
             return Task.FromResult(true);
         }
@@ -228,7 +229,7 @@ namespace VitalChoice.Data.Repositories
         public virtual Task<bool> DeleteAsync(CancellationToken cancellationToken, TEntity entity)
         {
             if (entity == null)
-                return Task.FromResult(false);
+                return TaskCache<bool>.DefaultCompletedTask;
             DbSet.Remove(entity);
             return Task.FromResult(true);
         }
@@ -241,7 +242,7 @@ namespace VitalChoice.Data.Repositories
         public virtual Task<bool> DeleteAllAsync(CancellationToken cancellationToken, ICollection<int> ids)
         {
             if (ids == null || ids.Count == 0)
-                return Task.FromResult(false);
+                return TaskCache<bool>.DefaultCompletedTask;
             var entitySet = DbSet.Where(e => ids.Any(id => id == e.Id));
             DbSet.AttachRange(entitySet);
             foreach (var entity in entitySet)
@@ -260,7 +261,7 @@ namespace VitalChoice.Data.Repositories
             IEnumerable<TEntity> entitySet)
         {
             if (entitySet == null)
-                return Task.FromResult(false);
+                return TaskCache<bool>.DefaultCompletedTask;
             DbSet.RemoveRange(entitySet);
             return Task.FromResult(true);
         }

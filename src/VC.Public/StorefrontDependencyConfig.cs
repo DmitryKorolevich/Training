@@ -9,7 +9,6 @@ using VC.Public.DataAnnotations;
 using VitalChoice.Business.Services;
 using VitalChoice.Core.DependencyInjection;
 using VitalChoice.Core.GlobalFilters;
-using VitalChoice.Core.Services;
 using VitalChoice.Interfaces.Services;
 
 namespace VC.Public

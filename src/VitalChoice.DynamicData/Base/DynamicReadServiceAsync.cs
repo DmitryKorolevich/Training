@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
@@ -54,7 +55,7 @@ namespace VitalChoice.DynamicData.Base
 
         protected virtual Task AfterSelect(ICollection<TEntity> entity)
         {
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
         protected virtual IQueryLite<TEntity> BuildIncludes(IQueryLite<TEntity> query)

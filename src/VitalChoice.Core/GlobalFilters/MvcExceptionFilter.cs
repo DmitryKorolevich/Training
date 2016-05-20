@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
@@ -47,7 +48,7 @@ namespace VitalChoice.Core.GlobalFilters
 			    if (context.Exception is CustomerSuspendException)
 			    {
                     context.Result = CustomerStatusCheckAttribute.CreateJsonResponse();
-			        return Task.Delay(0);
+			        return TaskCache.CompletedTask;
 			    }
                 _apiExceptionFilter.OnException(context);
 			}
@@ -121,12 +122,12 @@ namespace VitalChoice.Core.GlobalFilters
                     if (apiException.Status == HttpStatusCode.NotFound)
 					{
 						context.Result = new NotFoundResult();
-                        return Task.Delay(0);
+                        return TaskCache.CompletedTask;
                     }
 					if (apiException.Status == HttpStatusCode.Forbidden)
 					{
 						context.Result = new ForbiddenResult();
-                        return Task.Delay(0);
+                        return TaskCache.CompletedTask;
                     }
 					var viewName = "Error";
 
@@ -138,7 +139,7 @@ namespace VitalChoice.Core.GlobalFilters
                 }
 				context.Result = result;
 			}
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
         private static string GetRefferedAction(ExceptionContext context, string referer, string actionName, string controllerName)

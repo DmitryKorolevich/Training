@@ -36,28 +36,28 @@ namespace VitalChoice.Business.Repositories
                 case VProductSkuSortPath.Name:
                     sortable =
                         x =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Name)
                                 : x.OrderByDescending(y => y.Name);
                     break;
                 case VProductSkuSortPath.DateEdited:
                     sortable =
                         x =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.DateEdited)
                                 : x.OrderByDescending(y => y.DateEdited);
                     break;
                 case VProductSkuSortPath.TaxCode:
                     sortable =
                         x =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.TaxCode)
                                 : x.OrderByDescending(y => y.TaxCode);
                     break;
                 case VProductSkuSortPath.IdProductType:
                     sortable =
                         x =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.IdProductType)
                                 : x.OrderByDescending(y => y.IdProductType);
                     break;

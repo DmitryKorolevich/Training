@@ -26,7 +26,7 @@ namespace VitalChoice.Business.Services
             query = query.GetItems(logLevel, message, source, from, to);
 
 			Func<IQueryable<CommonLogItem>, IOrderedQueryable<CommonLogItem>> sortable = x => x.OrderByDescending(pp => pp.Date);
-			if (sorting != null && sorting.SortOrder != SortOrder.None)
+			if (sorting != null && sorting.SortOrder != FilterSortOrder.None)
 	        {
 				var sortOrder = sorting.SortOrder;
 				switch (sorting.Path)
@@ -34,28 +34,28 @@ namespace VitalChoice.Business.Services
 					case CommonLogItemSortPath.Date:
 						sortable =
 							(x) =>
-								sortOrder == SortOrder.Asc
+								sortOrder == FilterSortOrder.Asc
 									? x.OrderBy(y => y.Date)
 									: x.OrderByDescending(y => y.Date);
 						break;
 					case CommonLogItemSortPath.LogLevel:
 						sortable =
 							(x) =>
-								sortOrder == SortOrder.Asc
+								sortOrder == FilterSortOrder.Asc
 									? x.OrderBy(y => y.LogLevel)
 									: x.OrderByDescending(y => y.LogLevel);
 						break;
 					case CommonLogItemSortPath.Source:
 						sortable =
 							(x) =>
-								sortOrder == SortOrder.Asc
+								sortOrder == FilterSortOrder.Asc
 									? x.OrderBy(y => y.Source)
 									: x.OrderByDescending(y => y.Source);
 						break;
 					case CommonLogItemSortPath.ShortMessage:
 						sortable =
 							(x) =>
-								sortOrder == SortOrder.Asc
+								sortOrder == FilterSortOrder.Asc
 									? x.OrderBy(y => y.ShortMessage)
 									: x.OrderByDescending(y => y.ShortMessage);
 						break;

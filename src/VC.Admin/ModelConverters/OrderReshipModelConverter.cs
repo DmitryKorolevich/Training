@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VC.Admin.Models.Customer;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.DynamicData.Interfaces;
@@ -66,7 +67,7 @@ namespace VC.Admin.ModelConverters
                 {
                     IdSku = p.IdSku,
                 }).ToList();
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
     }
 }

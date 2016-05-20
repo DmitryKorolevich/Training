@@ -99,6 +99,7 @@ using VitalChoice.Profiling;
 using VitalChoice.Profiling.Base;
 using VitalChoice.Profiling.Interfaces;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using VitalChoice.Caching.Services.Cache.Base;
 using IContainer = Autofac.IContainer;
 #if !NETSTANDARD1_5
 using VitalChoice.Caching.Interfaces;
@@ -113,15 +114,25 @@ namespace VitalChoice.Core.DependencyInjection
             Assembly projectAssembly, IHostingEnvironment appEnv, bool enableCache = true)
         {
             // Add EF services to the services container.
+            var scopeContainer = new CacheServiceScopeFactoryContainer();
 #if !NETSTANDARD1_5
             if (enableCache)
             {
                 services.AddEntityFramework()
-                    .AddDbContext<VitalChoiceContext>()
-                    .AddDbContext<EcommerceContext>()
+                    .AddDbContext<VitalChoiceContext>(
+                        options =>
+                            options.UseCache<ServiceBusCacheSyncProvider>(scopeContainer,
+                                serviceCollection =>
+                                    serviceCollection.AddSingleton(appEnv).InjectProfiler().Configure<AppOptionsBase>(
+                                        appOptions => ConfigureBaseOptions(configuration, appOptions))))
+                    .AddDbContext<EcommerceContext>(
+                        options =>
+                            options.UseCache<ServiceBusCacheSyncProvider>(scopeContainer,
+                                serviceCollection =>
+                                    serviceCollection.AddSingleton(appEnv).InjectProfiler().Configure<AppOptionsBase>(
+                                        appOptions => ConfigureBaseOptions(configuration, appOptions))))
                     .AddDbContext<LogsContext>()
-                    .AddEntityFrameworkCache<ServiceBusCacheSyncProvider>(new[] {typeof(VitalChoiceContext), typeof(EcommerceContext)})
-                    .AddEntityFrameworkSqlServer();//.InjectProfiler();
+                    .AddEntityFrameworkSqlServer().InjectProfiler();
             }
             else
             {
@@ -212,6 +223,7 @@ namespace VitalChoice.Core.DependencyInjection
             AutofacExecutionContext.Configure(container);
 
             UnitOfWorkBase.SetOptions(container.Resolve<IOptions<AppOptionsBase>>());
+            scopeContainer.SetFactory(container.Resolve<IServiceProvider>());
             return container;
         }
 

@@ -51,7 +51,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Recipes
                 RecipeListFilter filter = new RecipeListFilter();
                 filter.CategoryId = viewContext.Entity.Id;
                 filter.Sorting.Path = RecipeSortPath.Created;
-                filter.Sorting.SortOrder = SortOrder.Desc;
+                filter.Sorting.SortOrder = FilterSortOrder.Desc;
                 var data = await _recipeService.GetRecipesAsync(filter);
 
                 toReturn = data.Items.Select(p => new TtlShortRecipeModel()

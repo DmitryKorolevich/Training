@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Autofac;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.Extensions.DependencyInjection;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Base;
 using VitalChoice.Caching.Relational.ChangeTracking;
@@ -11,11 +13,13 @@ namespace VitalChoice.Caching.Interfaces
 {
     public interface IEntityInfoStorage: IEntityCollectorInfo
     {
+        void Initialize(DbContext context);
+
         bool HaveKeys(Type entityType);
         bool GetEntityInfo(Type entityType, out EntityInfo info);
         Type GetContextType(Type entityType);
-        object GetEntity(Type entityType, ICollection<EntityValueExportable> keyValues);
-        object GetEntity(Type entityType, EntityKey pk);
+        object GetEntity(Type entityType, ICollection<EntityValueExportable> keyValues, IServiceScopeFactory rootScope);
+        object GetEntity(Type entityType, EntityKey pk, IServiceScopeFactory rootScope);
         IDictionary<TrackedEntityKey, EntityEntry> GetTrackData(DbContext context);
         IDictionary<TrackedEntityKey, EntityEntry> GetTrackData(DbContext context, out HashSet<object> trackedObjects);
 
@@ -28,9 +32,9 @@ namespace VitalChoice.Caching.Interfaces
 
         bool GetEntityInfo<T>(out EntityInfo info);
         Type GetContextType<T>();
-        T GetEntity<T>(ICollection<EntityValueExportable> keyValues)
+        T GetEntity<T>(ICollection<EntityValueExportable> keyValues, IServiceScopeFactory rootScope)
             where T : class;
-        T GetEntity<T>(EntityKey pk)
+        T GetEntity<T>(EntityKey pk, IServiceScopeFactory rootScope)
             where T : class;
 
         EntityPrimaryKeyInfo GetPrimaryKeyInfo<T>();

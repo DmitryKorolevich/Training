@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.DynamicData.Base;
@@ -34,7 +35,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.County = entity.County;
                 dynamic.IdState = entity.IdState;
             });
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
         protected override Task UpdateEntityRangeInternalAsync(
@@ -50,7 +51,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.IdState = dynamic.IdState == 0 ? null : dynamic.IdState;
                 entity.StatusCode = (int)RecordStatusCode.Active;
             });
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
         protected override Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<AddressDynamic, Address>> items)
@@ -65,7 +66,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.IdState = dynamic.IdState == 0 ? null : dynamic.IdState;
                 entity.StatusCode = (int)RecordStatusCode.Active;
             });
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
     }
 }

@@ -38,6 +38,7 @@ namespace VitalChoice.Jobs
                 .Build();
 
                 host.Run();
+                _container = host.Services;
             }
             catch (Exception e)
             {

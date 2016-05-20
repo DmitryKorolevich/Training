@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Core;
@@ -23,7 +24,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions
                 context.ShippingTotal = context.ManualShippingTotal;
                 return Task.FromResult(context.ManualShippingTotal);
             }
-            return Task.FromResult<decimal>(0);
+            return TaskCache<decimal>.DefaultCompletedTask;
         }
     }
 }

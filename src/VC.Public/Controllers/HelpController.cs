@@ -19,6 +19,7 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Core.Infrastructure.Helpers.ReCaptcha;
 using System.Collections.Generic;
+using System.IO;
 using Microsoft.Extensions.Options;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Business.Mail;

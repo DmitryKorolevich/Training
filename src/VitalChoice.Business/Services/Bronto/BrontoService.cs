@@ -153,7 +153,6 @@ namespace VitalChoice.Business.Services.Bronto
 
         public async Task<bool> Unsubscribe(string email)
         {
-#if !NETSTANDARD1_5
             List<contactObject> result = new List<contactObject>();
             int pageNumber = 1;
             contactObject[] lists;
@@ -188,13 +187,11 @@ namespace VitalChoice.Business.Services.Bronto
                 var results = (await _client.updateContactsAsync(sessionHeader, contactsToUpdate)).@return.results;
                 return results.All(s => !s.isError);
             }
-#endif
-            return true;
+            return false;
         }
 
         public async Task<bool?> GetIsUnsubscribed(string email)
         {
-#if !NETSTANDARD1_5
             List<contactObject> result = new List<contactObject>();
             int pageNumber = 1;
             contactObject[] lists;
@@ -220,11 +217,9 @@ namespace VitalChoice.Business.Services.Bronto
             } while (lists != null && lists.Length > 0);
             
             return result.Count==0 ? (bool?)null : result.All(c => c.status == "unsub");
-#endif
-            return true;
         }
 
-#if !NETSTANDARD1_5
+
         public async Task<contactObject[]> GetAllActiveContacts()
         {
             List<contactObject> result = new List<contactObject>();
@@ -288,6 +283,5 @@ namespace VitalChoice.Business.Services.Bronto
             long opened = filtered.Sum(d => d.uniqOpens);
             return sent == 0 ? 0 : (opened / (double)sent);
         }
-#endif
     }
 }

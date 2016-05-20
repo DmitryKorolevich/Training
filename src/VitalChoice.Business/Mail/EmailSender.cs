@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 using System;
+using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.Extensions.Options;
 using VitalChoice.Infrastructure.Domain.Options;
 #if !NETSTANDARD1_5
@@ -96,7 +97,7 @@ namespace VitalChoice.Business.Mail
         public Task SendEmailAsync(string email, string subject, string message, string fromDisplayName = "Vital Choice", string fromEmail = null, string toDisplayName = "",
             bool isBodyHtml = true)
         {
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
         public void Dispose()

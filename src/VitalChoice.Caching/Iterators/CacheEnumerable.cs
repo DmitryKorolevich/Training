@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using VitalChoice.Caching.Services;
-using VitalChoice.Profiling.Base;
 
 namespace VitalChoice.Caching.Iterators
 {
@@ -10,28 +9,21 @@ namespace VitalChoice.Caching.Iterators
     {
         private readonly IEnumerable<T> _dbEnumerable;
         private readonly CacheEntityQueryProvider.ICacheExecutor<T> _cacheExecutor;
-        private readonly ProfilingScope _scope;
 
-        public CacheEnumerable(IEnumerable<T> dbEnumerable, CacheEntityQueryProvider.ICacheExecutor<T> cacheExecutor, ProfilingScope scope)
+        public CacheEnumerable(IEnumerable<T> dbEnumerable, CacheEntityQueryProvider.ICacheExecutor<T> cacheExecutor)
         {
             _dbEnumerable = dbEnumerable;
             _cacheExecutor = cacheExecutor;
-            _scope = scope;
         }
 
         public IEnumerator<T> GetEnumerator()
         {
-            return new CacheEnumerator<T>(_dbEnumerable.GetEnumerator(), _cacheExecutor, _scope);
+            return new CacheEnumerator<T>(_dbEnumerable.GetEnumerator(), _cacheExecutor);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
-        }
-
-        ~CacheEnumerable()
-        {
-            _scope?.Dispose();
         }
     }
 
@@ -39,21 +31,18 @@ namespace VitalChoice.Caching.Iterators
     {
         private readonly IEnumerator<T> _dbEnumerator;
         private readonly CacheEntityQueryProvider.ICacheExecutor<T> _cacheExecutor;
-        private readonly ProfilingScope _scope;
         private readonly List<T> _items;
 
-        public CacheEnumerator(IEnumerator<T> dbEnumerator, CacheEntityQueryProvider.ICacheExecutor<T> cacheExecutor, ProfilingScope scope)
+        public CacheEnumerator(IEnumerator<T> dbEnumerator, CacheEntityQueryProvider.ICacheExecutor<T> cacheExecutor)
         {
             _dbEnumerator = dbEnumerator;
             _cacheExecutor = cacheExecutor;
-            _scope = scope;
             _items = new List<T>();
         }
 
         public void Dispose()
         {
             _dbEnumerator.Dispose();
-            _scope?.Dispose();
         }
 
         public bool MoveNext()
@@ -68,14 +57,7 @@ namespace VitalChoice.Caching.Iterators
             {
                 Task.Factory.StartNew(() =>
                 {
-                    try
-                    {
-                        _scope?.AddScopeData(_cacheExecutor.UpdateList(_items));
-                    }
-                    finally
-                    {
-                        _scope?.Dispose();
-                    }
+                    _cacheExecutor.UpdateList(_items);
                 });
             }
             return result;

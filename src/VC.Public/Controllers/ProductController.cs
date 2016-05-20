@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.SqlClient;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -51,7 +52,7 @@ namespace VC.Public.Controllers
 
 	    private async Task<PagedListEx<ReviewListItemModel>> GetReviewsModel(ProductReviewFilter filter)
 	    {
-			filter.Sorting.SortOrder = SortOrder.Desc;
+			filter.Sorting.SortOrder = FilterSortOrder.Desc;
 		    filter.Sorting.Path = ProductReviewSortPath.DateCreated;
 
 			var productReviews = await _productReviewService.GetProductReviewsAsync(filter);

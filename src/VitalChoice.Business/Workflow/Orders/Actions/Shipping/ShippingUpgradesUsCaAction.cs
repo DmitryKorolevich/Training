@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
@@ -146,7 +147,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Shipping
                     return Task.FromResult(result);
                 }
                 default:
-                    return Task.FromResult<decimal>(0);
+                    return TaskCache<decimal>.DefaultCompletedTask;
             }
         }
     }

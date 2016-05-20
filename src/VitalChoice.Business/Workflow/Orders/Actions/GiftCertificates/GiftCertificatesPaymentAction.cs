@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
@@ -19,7 +20,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.GiftCertificates
         {
             if (!(dataContext.Order?.GiftCertificates?.Any() ?? false))
             {
-                return Task.FromResult<decimal>(0);
+                return TaskCache<decimal>.DefaultCompletedTask;
             }
             decimal orderSubTotal = dataContext.Data.PayableTotal;
             foreach (var gc in dataContext.Order.GiftCertificates)

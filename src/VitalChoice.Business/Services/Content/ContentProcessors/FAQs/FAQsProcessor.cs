@@ -53,7 +53,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.FAQs
                 FAQListFilter filter = new FAQListFilter();
                 filter.CategoryId = viewContext.Entity.Id;
                 filter.Sorting.Path = FAQSortPath.Created;
-                filter.Sorting.SortOrder = SortOrder.Desc;
+                filter.Sorting.SortOrder = FilterSortOrder.Desc;
                 var data = await _faqService.GetFAQsAsync(filter);
 
                 toReturn = data.Items.Select(p => new TtlShortFAQModel()

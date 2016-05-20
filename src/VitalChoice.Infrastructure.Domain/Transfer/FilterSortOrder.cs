@@ -1,6 +1,6 @@
 ﻿namespace VitalChoice.Infrastructure.Domain.Transfer
 {
-    public enum SortOrder
+    public enum FilterSortOrder
 	{
         None = 0,
 		Asc = 1,

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.Extensions.Options;
 using VitalChoice.Business.Helpers;
 using VitalChoice.DynamicData.Base;
@@ -91,7 +92,7 @@ namespace VitalChoice.Business.ModelConverters
 
         public override Task ModelToDynamicAsync(OrderShippingConfirmationEmail model, OrderDynamic dynamic)
         {
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
     }
 }

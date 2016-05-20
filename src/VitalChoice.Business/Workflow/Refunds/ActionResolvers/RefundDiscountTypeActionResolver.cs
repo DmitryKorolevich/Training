@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -24,7 +25,7 @@ namespace VitalChoice.Business.Workflow.Refunds.ActionResolvers
                 dataContext.Order.DictionaryData.Remove("IdDiscountTier");
 
             if (dataContext.Order.Discount == null)
-                return Task.FromResult(0);
+                return TaskCache<int>.DefaultCompletedTask;
             return Task.FromResult(dataContext.Order.Discount.IdObjectType);
         }
     }

@@ -45,7 +45,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
             };
             filter.Paging.PageItemCount = ContentConstants.RECENT_ARTICLES_LIST_TAKE_COUNT;
             filter.Sorting.Path = ArticleSortPath.PublishedDate;
-            filter.Sorting.SortOrder = SortOrder.Desc;
+            filter.Sorting.SortOrder = FilterSortOrder.Desc;
             var data = await _articleService.GetArticlesAsync(filter);
 
             var toReturn = new List<TtlShortArticleModel>(data.Items.Select(p => new TtlShortArticleModel()

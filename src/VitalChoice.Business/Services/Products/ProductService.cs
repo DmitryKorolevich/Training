@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Business.CsvExportMaps.Products;
 using VitalChoice.Business.Mail;
 using VitalChoice.Business.Queries.Customer;
@@ -100,7 +101,7 @@ namespace VitalChoice.Business.Services.Products
             {
                 entity.Skus = entity.Skus?.Where(s => s.StatusCode != (int) RecordStatusCode.Deleted).OrderBy(s => s.Order).ToArray();
             }
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
         protected override async Task AfterEntityChangesAsync(ProductDynamic model, Product updated, Product initial, IUnitOfWorkAsync uow)

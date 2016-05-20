@@ -16,7 +16,6 @@ using VitalChoice.Caching.Relational.Base;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Data.Context;
 using VitalChoice.Ecommerce.Domain.Helpers;
-using VitalChoice.Profiling.Base;
 
 namespace VitalChoice.Caching.Services
 {
@@ -160,8 +159,6 @@ namespace VitalChoice.Caching.Services
 
         private IEnumerable<SyncOperation> UpdateCache(IEnumerable<ImmutableEntryState> entriesToSave)
         {
-            using (var scope = new ProfilingScope("Cache Sync"))
-            {
                 var syncOperations = new List<SyncOperation>();
                 var dbContext = DataContext as DbContext;
                 var entryGroups = entriesToSave.Where(e => e.EntityType != null).Select(e => new SyncOp
@@ -263,7 +260,6 @@ namespace VitalChoice.Caching.Services
                     }
                 }
                 return syncOperations;
-            }
         }
     }
 }

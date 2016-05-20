@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.Extensions.Options;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
@@ -51,7 +52,7 @@ namespace VitalChoice.Infrastructure.Identity
 
 	    public Task<bool> CanGenerateTwoFactorTokenAsync(UserManager<ApplicationUser> manager, ApplicationUser user)
 	    {
-			return Task.FromResult(false);
+			return TaskCache<bool>.DefaultCompletedTask;
 		}
 
 	    public string Name => "Default Token Provider";

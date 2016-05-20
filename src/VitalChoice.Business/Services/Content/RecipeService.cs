@@ -113,28 +113,28 @@ namespace VitalChoice.Business.Services.Content
                 case RecipeSortPath.Title:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Name)
                                 : x.OrderByDescending(y => y.Name);
                     break;
                 case RecipeSortPath.Url:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Url)
                                 : x.OrderByDescending(y => y.Url);
                     break;
                 case RecipeSortPath.Updated:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.ContentItem.Updated)
                                 : x.OrderByDescending(y => y.ContentItem.Updated);
                     break;
                 case RecipeSortPath.Created:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.ContentItem.Created)
                                 : x.OrderByDescending(y => y.ContentItem.Created);
                     break;

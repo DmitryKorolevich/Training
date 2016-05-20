@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 
 namespace VitalChoice.Data.Extensions
 {
@@ -64,7 +65,7 @@ namespace VitalChoice.Data.Extensions
         public static Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, Task> action)
         {
             if (source == null)
-                return Task.Delay(0);
+                return TaskCache.CompletedTask;
 
             return Task.WhenAll(source.Select(action));
         }

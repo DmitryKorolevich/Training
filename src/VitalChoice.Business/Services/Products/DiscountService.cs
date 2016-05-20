@@ -183,49 +183,49 @@ namespace VitalChoice.Business.Services.Products
                 case DiscountSortPath.Code:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Code)
                                 : x.OrderByDescending(y => y.Code);
                     break;
                 case DiscountSortPath.Description:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Description)
                                 : x.OrderByDescending(y => y.Description);
                     break;
                 case DiscountSortPath.IdObjectType:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.IdObjectType)
                                 : x.OrderByDescending(y => y.IdObjectType);
                     break;
                 case DiscountSortPath.Assigned:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Assigned)
                                 : x.OrderByDescending(y => y.Assigned);
                     break;
                 case DiscountSortPath.StartDate:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.StartDate)
                                 : x.OrderByDescending(y => y.StartDate);
                     break;
                 case DiscountSortPath.ExpirationDate:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.ExpirationDate)
                                 : x.OrderByDescending(y => y.ExpirationDate);
                     break;
                 case DiscountSortPath.DateCreated:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.DateCreated)
                                 : x.OrderByDescending(y => y.DateCreated);
                     break;

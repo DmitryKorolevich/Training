@@ -16,16 +16,17 @@ namespace VitalChoice.Caching.Services
     {
         protected readonly IInternalEntityCacheFactory CacheFactory;
         protected readonly IEntityInfoStorage KeyStorage;
+        protected readonly ICacheServiceScopeFactoryContainer ScopeContainer;
         protected readonly ILogger Logger;
 
-        public CacheSyncProvider(IInternalEntityCacheFactory cacheFactory, IEntityInfoStorage keyStorage, ILoggerFactory loggerFactory)
+        public CacheSyncProvider(IInternalEntityCacheFactory cacheFactory, IEntityInfoStorage keyStorage, ILoggerFactory loggerFactory,
+            ICacheServiceScopeFactoryContainer scopeContainer)
         {
             CacheFactory = cacheFactory;
             KeyStorage = keyStorage;
+            ScopeContainer = scopeContainer;
             Logger = loggerFactory.CreateLogger<CacheSyncProvider>();
         }
-
-        public virtual ICollection<KeyValuePair<string, int>> AverageLatency => null;
 
         public virtual void SendChanges(IEnumerable<SyncOperation> syncOperations)
         {
@@ -69,7 +70,7 @@ namespace VitalChoice.Caching.Services
                             internalCache.MarkForUpdate(op.PrimaryKey);
                             break;
                         case SyncType.Add:
-                            object entity = KeyStorage.GetEntity(type, op.SyncOperation.Key.Values);
+                            object entity = KeyStorage.GetEntity(type, op.SyncOperation.Key.Values, ScopeContainer.ScopeFactory);
                             internalCache.MarkForAdd(entity);
                             break;
                     }
@@ -85,7 +86,7 @@ namespace VitalChoice.Caching.Services
                         case SyncType.Update:
                             if (op.Cache.ItemExist(op.PrimaryKey))
                             {
-                                var entity = KeyStorage.GetEntity(op.EntityType, op.PrimaryKey);
+                                var entity = KeyStorage.GetEntity(op.EntityType, op.PrimaryKey, ScopeContainer.ScopeFactory);
                                 if (!op.Cache.Update(entity, (DbContext) null))
                                 {
                                     //Logger.LogWarning($"Cannot update <{op.EntityType}>{pk}");

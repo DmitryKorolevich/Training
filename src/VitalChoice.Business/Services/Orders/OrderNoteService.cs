@@ -52,14 +52,14 @@ namespace VitalChoice.Business.Services.Orders
 				case OrderNoteSortPath.Title:
 					sortable =
 						(x) =>
-							sortOrder == SortOrder.Asc
+							sortOrder == FilterSortOrder.Asc
 								? x.OrderBy(y => y.Title)
 								: x.OrderByDescending(y => y.Title);
 					break;
 				case OrderNoteSortPath.Updated:
 					sortable =
 						(x) =>
-							sortOrder == SortOrder.Asc
+							sortOrder == FilterSortOrder.Asc
 								? x.OrderBy(y => y.DateEdited)
 								: x.OrderByDescending(y => y.DateEdited);
 					break;

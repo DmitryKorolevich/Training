@@ -10,7 +10,7 @@ namespace ExportServiceWithSBQueue.Context
 {
     public class ExportInfoCopyContext : ExportInfoContext
     {
-        public ExportInfoCopyContext(IOptions<ExportOptions> options) : base(options)
+        public ExportInfoCopyContext(IOptions<ExportOptions> options, DbContextOptions<ExportInfoContext> contextOptions) : base(options, contextOptions)
         {
         }
 

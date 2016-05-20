@@ -37,6 +37,10 @@ namespace VitalChoice.Core.Services
                         context.HttpContext.Features.Set((IStatusCodeReExecuteFeature) null);
                     }
                 }
+                else
+                {
+                    await context.Next(context.HttpContext);
+                }
             });
         }
     }

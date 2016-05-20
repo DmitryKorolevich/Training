@@ -16,7 +16,6 @@ using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.ObjectMapping.Base;
 using VitalChoice.ObjectMapping.Extensions;
-using VitalChoice.Profiling.Base;
 
 namespace VitalChoice.Caching.Services.Cache
 {

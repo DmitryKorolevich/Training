@@ -65,28 +65,28 @@ namespace VitalChoice.Business.Services.Products
 		        case GiftCertificateSortPath.Recipient:
 			        sortable =
 				        (x) =>
-					        sortOrder == SortOrder.Asc
+					        sortOrder == FilterSortOrder.Asc
 						        ? x.OrderBy(y => y.FirstName).ThenBy(y => y.LastName)
 						        : x.OrderByDescending(y => y.FirstName).ThenByDescending(y => y.LastName);
 			        break;
 		        case GiftCertificateSortPath.Available:
 			        sortable =
 				        (x) =>
-					        sortOrder == SortOrder.Asc
+					        sortOrder == FilterSortOrder.Asc
 						        ? x.OrderBy(y => y.Balance)
 						        : x.OrderByDescending(y => y.Balance);
 			        break;
 		        case GiftCertificateSortPath.Status:
 			        sortable =
 				        (x) =>
-					        sortOrder == SortOrder.Asc
+					        sortOrder == FilterSortOrder.Asc
 						        ? x.OrderBy(y => y.StatusCode)
 						        : x.OrderByDescending(y => y.StatusCode);
 			        break;
 		        case GiftCertificateSortPath.Created:
 					sortable =
 						(x) =>
-							sortOrder == SortOrder.Asc
+							sortOrder == FilterSortOrder.Asc
 								? x.OrderBy(y => y.Created)
 								: x.OrderByDescending(y => y.Created);
 			        break;
@@ -152,37 +152,37 @@ namespace VitalChoice.Business.Services.Products
             switch (filter.Sorting.Path)
             {
                 case GiftCertificatesWithOrderSortPath.Code:
-                    query = sortOrder == SortOrder.Asc
+                    query = sortOrder == FilterSortOrder.Asc
                                 ? query.OrderBy(y => y.Code)
                                 : query.OrderByDescending(y => y.Code);
                     break;
                 case GiftCertificatesWithOrderSortPath.Created:
-                    query = sortOrder == SortOrder.Asc
+                    query = sortOrder == FilterSortOrder.Asc
                                 ? query.OrderBy(y => y.Created)
                                 : query.OrderByDescending(y => y.Created);
                     break;
                 case GiftCertificatesWithOrderSortPath.BillingLastName:
-                    query = sortOrder == SortOrder.Asc
+                    query = sortOrder == FilterSortOrder.Asc
                                 ? query.OrderBy(y => y.BillingLastName)
                                 : query.OrderByDescending(y => y.BillingLastName);
                     break;
                 case GiftCertificatesWithOrderSortPath.ShippingLastName:
-                    query = sortOrder == SortOrder.Asc
+                    query = sortOrder == FilterSortOrder.Asc
                                 ? query.OrderBy(y => y.ShippingLastName)
                                 : query.OrderByDescending(y => y.ShippingLastName);
                     break;
                 case GiftCertificatesWithOrderSortPath.Type:
-                    query = sortOrder == SortOrder.Asc
+                    query = sortOrder == FilterSortOrder.Asc
                                 ? query.OrderBy(y => y.GCType)
                                 : query.OrderByDescending(y => y.GCType);
                     break;
                 case GiftCertificatesWithOrderSortPath.Status:
-                    query = sortOrder == SortOrder.Asc
+                    query = sortOrder == FilterSortOrder.Asc
                                 ? query.OrderBy(y => y.StatusCode)
                                 : query.OrderByDescending(y => y.StatusCode);
                     break;
                 case GiftCertificatesWithOrderSortPath.Balance:
-                    query = sortOrder == SortOrder.Asc
+                    query = sortOrder == FilterSortOrder.Asc
                                 ? query.OrderBy(y => y.Balance)
                                 : query.OrderByDescending(y => y.Balance);
                     break;

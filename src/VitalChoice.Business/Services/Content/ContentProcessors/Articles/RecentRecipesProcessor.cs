@@ -48,7 +48,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
             RecipeListFilter filter = new RecipeListFilter();
             filter.Paging.PageItemCount = ContentConstants.RECENT_RECIPES_FOR_ARTICLE_LIST_TAKE_COUNT;
             filter.Sorting.Path = RecipeSortPath.Created;
-            filter.Sorting.SortOrder = SortOrder.Desc;
+            filter.Sorting.SortOrder = FilterSortOrder.Desc;
             var data = await _recipeService.GetRecipesAsync(filter);
 
             var toReturn = new List<TtlShortRecipeModel>(data.Items.Select(p => new TtlShortRecipeModel()

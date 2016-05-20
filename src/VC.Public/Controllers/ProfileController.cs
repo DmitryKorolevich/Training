@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
@@ -114,7 +115,7 @@ namespace VC.Public.Controllers
 			var customer = await GetCurrentCustomerDynamic();
 
 			filter.IdCustomer = customer.Id;
-			filter.Sorting.SortOrder = SortOrder.Desc;
+			filter.Sorting.SortOrder = FilterSortOrder.Desc;
 			filter.Sorting.Path = VOrderSortPath.DateCreated;
 			filter.OrderType = OrderType.AutoShip;
 			
@@ -162,7 +163,7 @@ namespace VC.Public.Controllers
             var internalId = GetInternalCustomerId();
 
             filter.IdCustomer = internalId;
-            filter.Sorting.SortOrder = SortOrder.Desc;
+            filter.Sorting.SortOrder = FilterSortOrder.Desc;
             filter.Sorting.Path = VOrderSortPath.DateCreated;
 
             var orders = await _orderService.GetOrdersAsync(filter);

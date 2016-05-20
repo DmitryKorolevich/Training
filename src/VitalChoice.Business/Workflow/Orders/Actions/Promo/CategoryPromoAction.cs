@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Ecommerce.Domain.Entities.Promotions;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
@@ -42,7 +43,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Promo
                     }
                 }
             }
-            return Task.FromResult<decimal>(0);
+            return TaskCache<decimal>.DefaultCompletedTask;
         }
     }
 }

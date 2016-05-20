@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
@@ -113,7 +114,7 @@ namespace VitalChoice.Business.Services.Dynamic
                     entity.DiscountTiers = dynamic.DiscountTiers.ToList();
                 }
             });
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
         protected override Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<DiscountDynamic, Discount>> items)
@@ -171,7 +172,7 @@ namespace VitalChoice.Business.Services.Dynamic
                     entity.DiscountTiers = dynamic.DiscountTiers.ToList();
                 }
             });
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
         
         private static void SetDiscountTiersOrdering(IEnumerable<DiscountTier> tiers)

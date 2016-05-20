@@ -99,7 +99,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
                 Sorting = new SortFilter()
                 {
                     Path = ProductReviewSortPath.DateCreated,
-                    SortOrder = SortOrder.Desc
+                    SortOrder = FilterSortOrder.Desc
                 }
             });
 

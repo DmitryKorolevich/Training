@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -41,7 +42,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Discounts
                 Message = "Cannot determine any tier from discountable products subtotal. Discount won't apply.",
                 Field = "DiscountCode"
             });
-            return Task.FromResult((decimal)0);
+            return TaskCache<decimal>.DefaultCompletedTask;
         }
     }
 }

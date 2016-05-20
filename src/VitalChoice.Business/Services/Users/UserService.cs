@@ -505,27 +505,27 @@ namespace VitalChoice.Business.Services.Users
 			switch (filter.Sorting.Path)
 			{
 				case UserSortPath.AgentId:
-					queryable = sortOrder == SortOrder.Asc
+					queryable = sortOrder == FilterSortOrder.Asc
 						? queryable.OrderBy(x => x.Profile.AgentId)
 						: queryable.OrderByDescending(x => x.Profile.AgentId);
 					break;
 				case UserSortPath.FullName:
-					queryable = sortOrder == SortOrder.Asc
+					queryable = sortOrder == FilterSortOrder.Asc
 						? queryable.OrderBy(x => x.FirstName + " " + x.LastName)
 						: queryable.OrderByDescending(x => x.FirstName + " " + x.LastName);
 					break;
 				case UserSortPath.Email:
-					queryable = sortOrder == SortOrder.Asc
+					queryable = sortOrder == FilterSortOrder.Asc
 						? queryable.OrderBy(x => x.Email)
 						: queryable.OrderByDescending(x => x.Email);
 					break;
 				case UserSortPath.Status:
-					queryable = sortOrder == SortOrder.Asc
+					queryable = sortOrder == FilterSortOrder.Asc
 						? queryable.OrderBy(x => x.Status)
 						: queryable.OrderByDescending(x => x.Status);
 					break;
 				case UserSortPath.LastLoginDate:
-					queryable = sortOrder == SortOrder.Asc
+					queryable = sortOrder == FilterSortOrder.Asc
 						? queryable.OrderBy(x => x.LastLoginDate)
 						: queryable.OrderByDescending(x => x.LastLoginDate);
 					break;
