@@ -46,6 +46,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using VitalChoice.Core.Infrastructure.Helpers;
+using VitalChoice.Infrastructure.Domain.Entities.Reports;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 namespace VC.Admin.Controllers
 {

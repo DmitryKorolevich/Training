@@ -49,7 +49,7 @@ module.exports = function (grunt) {
 				src: jsFiles,
 				// the location of the resulting JS file
 				dest: 'temp/js/<%= jsMinifiedFileName %>.js'/*dist*/
-			}
+        	}
         },
         less: {
         	development: {
@@ -82,7 +82,10 @@ module.exports = function (grunt) {
         	},
         	dist: {
         		files: {
-        			'temp/js/minified/<%= jsMinifiedFileName %>.min.js': ['temp/js/**/*.js']
+        		    'temp/js/minified/<%= jsMinifiedFileName %>.min.js': ['temp/js/<%= jsMinifiedFileName %>.js'],
+        		    'temp/js/minified/worker-ttl.js': ['temp/js/worker-ttl.js'],
+        		    'temp/js/minified/worker-css.js': ['temp/js/worker-css.js'],
+        		    'temp/js/minified/worker-html.js': ['temp/js/worker-html.js'],
         		}
         	}
         },
@@ -101,7 +104,9 @@ module.exports = function (grunt) {
 				  { expand: true, cwd: 'assets/fonts/', src: ['**'], dest: 'wwwroot/lib/fonts/' },
 				  { expand: true, cwd: 'assets/miscellaneous/', src: ['**'], dest: 'wwwroot/assets/miscellaneous/' },
 				  { expand: true, cwd: 'assets/templates/', src: ['**'], dest: 'wwwroot/assets/templates/' },
-                  { expand: true, cwd: 'app/core/utils/ace/', src: ['**'], dest: 'wwwroot/lib/ace-builds/src-min-noconflict/' }
+                  { expand: true, cwd: 'app/core/utils/ace/', src: ['**'], dest: 'wwwroot/lib/ace-builds/src-min-noconflict/' },
+                  { expand: true, cwd: 'wwwroot/lib/ace-builds/src-min-noconflict/', src: ['worker-html.js', 'worker-css.js'], dest: 'temp/js/' },
+                  { expand: true, cwd: 'app/core/utils/ace/', src: ['worker-ttl.js'], dest: 'temp/js/' }
         		]
         	},
         	release: {
@@ -112,9 +117,7 @@ module.exports = function (grunt) {
 					{ expand: true, cwd: 'assets/fonts/', src: ['**'], dest: 'wwwroot/fonts/' },
 					{ expand: true, cwd: 'assets/miscellaneous/', src: ['**'], dest: 'wwwroot/assets/miscellaneous/' },
 				    { expand: true, cwd: 'assets/templates/', src: ['**'], dest: 'wwwroot/assets/templates/' },
-					{ expand: true, cwd: 'wwwroot/lib/bootstrap/fonts/', src: ['**'], dest: 'wwwroot/fonts/' },
-					{ expand: true, cwd: 'wwwroot/lib/ace-builds/src-min-noconflict/', src: ['theme-cobalt.js', 'mode-ttl.js', 'worker-ttl.js', 'mode-html.js', 'worker-html.js', 'mode-css.js', 'worker-css.js'], dest: 'wwwroot/' },
-					{ expand: true, cwd: 'wwwroot/lib/ace-builds/src-min-noconflict/snippets/', src: ['text.js', 'ttl.js', 'html.js', 'css.js'], dest: 'wwwroot/snippets/' }
+					{ expand: true, cwd: 'wwwroot/lib/bootstrap/fonts/', src: ['**'], dest: 'wwwroot/fonts/' }
 		        ]
 	        }
         },
