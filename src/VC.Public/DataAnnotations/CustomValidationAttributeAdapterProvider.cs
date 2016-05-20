@@ -44,6 +44,8 @@ namespace VC.Public.DataAnnotations
             AdapterConstructors.Add(typeof(RequiredIfAttribute),
                 (attribute, stringLocalizer) =>
                     new RequiredIfAttributeAdapter((RequiredIfAttribute) attribute, stringLocalizer));
+            AdapterConstructors.Add(typeof(FutureDateAttribute),
+                (attribute, stringLocalizer) => new FutureDateAttributeAdapter((FutureDateAttribute) attribute, stringLocalizer));
         }
 
         public IAttributeAdapter GetAttributeAdapter(ValidationAttribute attribute,
