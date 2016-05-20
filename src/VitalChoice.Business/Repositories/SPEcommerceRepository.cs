@@ -113,6 +113,17 @@ namespace VitalChoice.Data.Repositories.Customs
 
         public async Task<ICollection<int>> GetOrderIdsForWholesaleDropShipReportAsync(WholesaleDropShipReportFilter filter)
         {
+            if (string.IsNullOrEmpty(filter.CustomerFirstName))
+                filter.CustomerFirstName = null;
+            if (string.IsNullOrEmpty(filter.CustomerLastName))
+                filter.CustomerLastName = null;
+            if (string.IsNullOrEmpty(filter.ShipFirstName))
+                filter.ShipFirstName = null;
+            if (string.IsNullOrEmpty(filter.ShipLastName))
+                filter.ShipLastName = null;
+            if (string.IsNullOrEmpty(filter.ShippingIdConfirmation))
+                filter.ShippingIdConfirmation = null;
+
             var toReturn = await Context.Set<IdModel>().FromSql
                 ("[dbo].[SPGetOrderIdsForWholesaleDropShipReport] @from={0}, @to={1}, @shipfrom={2}, @shipto={3},"+
                 " @idcustomertype={4}, @idtradeclass={5}, @customerfirstname={6}, @customerlastname={7}, @shipfirstname={8},"+
@@ -125,6 +136,17 @@ namespace VitalChoice.Data.Repositories.Customs
 
         public async Task<int> GetCountOrderIdsForWholesaleDropShipReportAsync(WholesaleDropShipReportFilter filter)
         {
+            if (string.IsNullOrEmpty(filter.CustomerFirstName))
+                filter.CustomerFirstName = null;
+            if (string.IsNullOrEmpty(filter.CustomerLastName))
+                filter.CustomerLastName = null;
+            if (string.IsNullOrEmpty(filter.ShipFirstName))
+                filter.ShipFirstName = null;
+            if (string.IsNullOrEmpty(filter.ShipLastName))
+                filter.ShipLastName = null;
+            if (string.IsNullOrEmpty(filter.ShippingIdConfirmation))
+                filter.ShippingIdConfirmation = null;
+
             var toReturn = await Context.Set<CountModel>().FromSql
                 ("[dbo].[SPGetOrderIdsForWholesaleDropShipReport] @from={0}, @to={1}, @shipfrom={2}, @shipto={3}," +
                 " @idcustomertype={4}, @idtradeclass={5}, @customerfirstname={6}, @customerlastname={7}, @shipfirstname={8}," +
@@ -137,6 +159,17 @@ namespace VitalChoice.Data.Repositories.Customs
 
         public async Task<ICollection<WholesaleDropShipReportSkuRawItem>> GetWholesaleDropShipReportSkusSummaryAsync(WholesaleDropShipReportFilter filter)
         {
+            if (string.IsNullOrEmpty(filter.CustomerFirstName))
+                filter.CustomerFirstName = null;
+            if (string.IsNullOrEmpty(filter.CustomerLastName))
+                filter.CustomerLastName = null;
+            if (string.IsNullOrEmpty(filter.ShipFirstName))
+                filter.ShipFirstName = null;
+            if (string.IsNullOrEmpty(filter.ShipLastName))
+                filter.ShipLastName = null;
+            if (string.IsNullOrEmpty(filter.ShippingIdConfirmation))
+                filter.ShippingIdConfirmation = null;
+
             var toReturn = await Context.Set<WholesaleDropShipReportSkuRawItem>().FromSql
                 ("[dbo].[SPGetWholesaleDropShipReportSkusSummary] @from={0}, @to={1}, @shipfrom={2}, @shipto={3}," +
                 " @idcustomertype={4}, @idtradeclass={5}, @customerfirstname={6}, @customerlastname={7}, @shipfirstname={8}," +
@@ -149,6 +182,11 @@ namespace VitalChoice.Data.Repositories.Customs
 
         public async Task<ICollection<TransactionAndRefundRawItem>> GetTransactionAndRefundReportItemsAsync(TransactionAndRefundReportFilter filter)
         {
+            if (string.IsNullOrEmpty(filter.CustomerFirstName))
+                filter.CustomerFirstName = null;
+            if (string.IsNullOrEmpty(filter.CustomerLastName))
+                filter.CustomerLastName = null;
+
             var toReturn = await Context.Set<TransactionAndRefundRawItem>().FromSql
                 ("[dbo].[SPGetTransactionAndRefundReport] @from={0}, @to={1}," +
                 " @idcustomertype={2}, @idservicecode={3}, @idcustomer={4}, @customerfirstname={5}, @customerlastname={6}," +
@@ -161,6 +199,13 @@ namespace VitalChoice.Data.Repositories.Customs
 
         public async Task<ICollection<OrdersSummarySalesOrderTypeStatisticItem>> GetOrdersSummarySalesOrderTypeStatisticItemsAsync(OrdersSummarySalesReportFilter filter)
         {
+            if (string.IsNullOrEmpty(filter.CustomerSourceDetails))
+                filter.CustomerSourceDetails = null;
+            if (string.IsNullOrEmpty(filter.KeyCode))
+                filter.KeyCode = null;
+            if (string.IsNullOrEmpty(filter.DiscountCode))
+                filter.DiscountCode = null;
+
             var toReturn = await Context.Set<OrdersSummarySalesOrderTypeStatisticItem>().FromSql
                 ("[dbo].[SPGetOrderStatisticByTypeForOrdersSummarySalesReport] @from={0}, @to={1}," +
                 " @idcustomersource={2}, @customersourcedetails={3}, @fromcount={4}, @tocount={5}, @keycode={6}," +
@@ -173,6 +218,13 @@ namespace VitalChoice.Data.Repositories.Customs
 
         public async Task<ICollection<OrdersSummarySalesOrderItem>> GetOrdersSummarySalesOrderItemsAsync(OrdersSummarySalesReportFilter filter)
         {
+            if (string.IsNullOrEmpty(filter.CustomerSourceDetails))
+                filter.CustomerSourceDetails = null;
+            if (string.IsNullOrEmpty(filter.KeyCode))
+                filter.KeyCode = null;
+            if (string.IsNullOrEmpty(filter.DiscountCode))
+                filter.DiscountCode = null;
+
             var toReturn = await Context.Set<OrdersSummarySalesOrderItem>().FromSql
                 ("[dbo].[SPGetOrdersForOrdersSummarySalesReport] @from={0}, @to={1}," +
                 " @idcustomersource={2}, @customersourcedetails={3}, @fromcount={4}, @tocount={5}, @keycode={6}," +

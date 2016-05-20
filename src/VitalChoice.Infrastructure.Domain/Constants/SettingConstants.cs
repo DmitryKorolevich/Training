@@ -5,10 +5,16 @@
         public const string GLOBAL_PERISHABLE_THRESHOLD_NAME = "GlobalPerishableThreshold";
         public const string GLOBAL_CREDIT_CARD_AUTHORIZATIONS_NAME = "CreditCardAuthorizations";
 
+        public const string TEMPLATE_PUBLIC_URL_HOLDER = "{PUBLIC_URL}";
+
         public const string PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE = "ProductOutOfStockEmailTemplate";
         public const string PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE_CUSTOMER_NAME_HOLDER = "{CUSTOMER_NAME}";
         public const string PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE_PRODUCT_NAME_HOLDER = "{PRODUCT_NAME}";
         public const string PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE_PRODUCT_URL_HOLDER = "{PRODUCT_URL}";
+
+        public const string AFFILIATE_EMAIL_TEMPLATE = "AffiliateEmailTemplate";
+        public const string AFFILIATE_EMAIL_TEMPLATE_NAME_HOLDER = "{AFFILIATE_NAME}";
+        public const string AFFILIATE_EMAIL_TEMPLATE_ID_HOLDER = "{AFFILIATE_ID}";
 
         public const string SETTINGS_LOOKUP_NAMES = "ServiceCodes,InventorySkuChannels,InventorySkuProductSources,InventorySkuUnitOfMeasures,InventorySkuPurchaseUnitOfMeasures";
         public const string INVENTORY_SKU_LOOKUP_CHANNEL_NAME = "InventorySkuChannels";

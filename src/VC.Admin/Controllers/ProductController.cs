@@ -151,6 +151,7 @@ namespace VC.Admin.Controllers
 
             VProductSkuFilter skuFilter = new VProductSkuFilter();
             skuFilter.IdProducts = toReturn.Items.Select(p => p.ProductId).ToList();
+            skuFilter.Paging = null;
             var skus = await productService.GetSkusAsync(skuFilter);
             foreach (var item in toReturn.Items)
             {

@@ -47,6 +47,7 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<AffiliateOrderListItemModel, AffiliateOrderListItemModelCsvMap> _csvExportAffiliateOrderListItemService;
         private readonly IOrderService _orderService;
         private readonly ICountryService _countryService;
+        private readonly ISettingService _settingService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly IOptions<AppOptions> _appOptions;
         private readonly ILogger logger;
@@ -60,6 +61,7 @@ namespace VC.Admin.Controllers
             ICsvExportService<AffiliateOrderListItemModel, AffiliateOrderListItemModelCsvMap> csvExportAffiliateOrderListItemService,
             IOrderService orderService,
             ICountryService countryService,
+            ISettingService settingService,
             IOptions<AppOptions> appOptions,
             IObjectHistoryLogService objectHistoryLogService)
         {
@@ -71,6 +73,7 @@ namespace VC.Admin.Controllers
             _csvExportAffiliateOrderListItemService = csvExportAffiliateOrderListItemService;
             _orderService = orderService;
             _countryService = countryService;
+            _settingService = settingService;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             _appOptions = appOptions;
             logger = loggerProvider.CreateLoggerDefault();
@@ -185,46 +188,28 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
-        public Task<Result<AffiliateEmailModel>> GetAffiliateEmail(int id)
+        public async Task<Result<AffiliateEmailModel>> GetAffiliateEmail(int id)
         {
             AffiliateEmailModel toReturn = new AffiliateEmailModel();
             toReturn.FromName = "Vital Choice";
             toReturn.FromEmail = "affiliatesupport@vitalchoice.com";
             toReturn.Subject = "Your Vital Choice affiliate account is ready.";
-            if (id == 1)//notify
+            if (id == 2)//email
             {
-                StringBuilder builder = new StringBuilder();
-                builder.AppendLine("Dear {0},");
-                builder.AppendLine();
-                builder.AppendLine("Your Vital Choice Affiliate account is ready for use. Your User Name is your e-mail address ({1}).  You can log into your account at https://www.vitalchoice.com/shop/pc/AffiliateLogin.asp to retrieve special links of Vital Choice text and banner ads that contain your affiliate ID.");
-                builder.AppendLine();
-                builder.AppendLine("Program overview: http://www.vitalchoice.com/shop/pc/viewContent.asp?idpage=22");
-                builder.AppendLine();
-                builder.AppendLine("We appreciate your advocacy and interest in promoting wild seafood nutrition. Looking forward to working together.");
-                builder.AppendLine();
-                builder.AppendLine("Questions or comments? Contact us at affiliatesupport@vitalchoice.com");
-                builder.AppendLine();
-                builder.AppendLine("Kind regards,");
-                builder.AppendLine();
-                builder.AppendLine("The Vital Choice Team");
-                toReturn.Message = builder.ToString();
-            }
-            else if (id == 2)//email
-            {
-                StringBuilder builder = new StringBuilder();
-                builder.AppendLine("Dear {0},");
-                builder.AppendLine();
-                builder.AppendLine();
-                builder.AppendLine();
-                builder.AppendLine("Questions or comments? Contact us at affiliatesupport@vitalchoice.com");
-                builder.AppendLine();
-                builder.AppendLine("Kind regards,");
-                builder.AppendLine();
-                builder.AppendLine("The Vital Choice Team");
-                toReturn.Message = builder.ToString();
+                var setting = (await _settingService.GetAppSettingItemsAsync(new List<string>() { SettingConstants.AFFILIATE_EMAIL_TEMPLATE })).FirstOrDefault();
+                if (setting == null)
+                {
+                    throw new NotSupportedException($"{SettingConstants.AFFILIATE_EMAIL_TEMPLATE} not configurated.");
+                }
+                var template = setting.Value;
+                template = template.Replace(SettingConstants.AFFILIATE_EMAIL_TEMPLATE_NAME_HOLDER, "{1}")
+                    .Replace(SettingConstants.AFFILIATE_EMAIL_TEMPLATE_ID_HOLDER, "{0}")
+                    .Replace(SettingConstants.TEMPLATE_PUBLIC_URL_HOLDER, $"https://{_appOptions.Value.PublicHost}/");
+
+                toReturn.Message = template;
             }
 
-            return Task.FromResult<Result<AffiliateEmailModel>>(toReturn);
+            return toReturn;
         }
 
         [HttpPost]

@@ -1381,6 +1381,9 @@ th.sortable-column {
 .wholesale-dropship-report .orders-total {
   width: 500px;
 }
+.orders-summary-sales-report .order-types-total {
+  width: 500px;
+}
 .ace-errors {
   position: relative;
   margin: 0;

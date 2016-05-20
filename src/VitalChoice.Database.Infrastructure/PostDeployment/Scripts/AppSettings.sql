@@ -48,3 +48,32 @@ VALUES
 END
 
 GO
+
+IF NOT EXISTS(SELECT * FROM AppSettings WHERE Name='AffiliateEmailTemplate')
+BEGIN
+
+INSERT AppSettings
+(Id,Name,Value)
+VALUES
+(7,'AffiliateEmailTemplate', '{AFFILIATE_NAME},
+
+
+Your Vital Choice Affiliate account is ready for use. You can log into your account at {PUBLIC_URL}affiliateaccount/login to retrieve special links of Vital Choice text and banner ads that contain your affiliate ID: {AFFILIATE_ID}
+
+
+Program overview: {PUBLIC_URL}content/web-affiliate-program
+
+
+We appreciate your advocacy and interest in promoting wild seafood nutrition. Looking forward to working together. 
+
+
+Questions or comments? Contact us at affiliatesupport@vitalchoice.com 
+
+
+Kind regards,
+
+The Vital Choice Team')
+
+END
+
+GO

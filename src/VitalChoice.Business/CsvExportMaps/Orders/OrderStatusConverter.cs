@@ -26,7 +26,15 @@ namespace VitalChoice.Business.CsvExportMaps.Orders
 
         public override string ConvertToString(TypeConverterOptions options, object value)
         {
-            OrderStatus? data = (OrderStatus?)value;
+            OrderStatus? data = null;
+            if (value is int)
+            {
+                data = (OrderStatus?)(int)value;
+            }
+            if (value is Enum)
+            {
+                data = (OrderStatus?)value;
+            }
             if (data.HasValue)
             {
                 return LookupHelper.GetOrderStatusName(data.Value);

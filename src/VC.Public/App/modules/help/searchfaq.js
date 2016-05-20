@@ -1,7 +1,11 @@
-﻿$(function ()
+﻿(function ($)
 {
-    google.load('search', '1', { language: 'en' });
-    google.setOnLoadCallback(function ()
+    Google.LoadActions.push(function ()
+    {
+        google.load('search', '1', { language: 'en', callback: googleSearchInit });
+    });
+
+    function googleSearchInit()
     {
         var customSearchControl = new google.search.CustomSearchControl(googleSearchFAQcx);
         customSearchControl.setResultSetSize(google.search.Search.FILTERED_CSE_RESULTSET);
@@ -16,5 +20,5 @@
             customSearchControl.execute(queryFromUrl);
             $('.working-area-holder .overlay').hide();
         }
-    }, true);
-});
+    };
+})(jQuery);

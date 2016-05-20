@@ -218,6 +218,7 @@
     "app/modules/order/controllers/orderAgentsReportController.js",
     "app/modules/order/controllers/wholesaleDropShipReportController.js",
     "app/modules/order/controllers/transactionsAndRefundsReportController.js",
+    "app/modules/order/controllers/ordersSummarySalesReportController.js",
     "app/modules/order/order.js",
     "app/modules/affiliate/controllers/affiliatesController.js",
     "app/modules/affiliate/controllers/affiliateManageController.js",

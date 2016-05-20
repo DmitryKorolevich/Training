@@ -254,6 +254,7 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
             var data =
                 {
                     Type: 2,//email
+                    ToId: $scope.affiliate.Id,
                     ToName: $scope.affiliate.Name,
                     ToEmail: $scope.affiliate.Email,
                 };
