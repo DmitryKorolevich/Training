@@ -157,7 +157,7 @@ namespace VitalChoice.Business.Repositories
 
         public async Task<ICollection<OrdersSummarySalesOrderTypeStatisticItem>> GetOrdersSummarySalesOrderTypeStatisticItemsAsync(OrdersSummarySalesReportFilter filter)
         {
-            var toReturn = await Context.Set<OrdersSummarySalesOrderTypeStatisticItem>().FromSql
+            var toReturn = await _context.Set<OrdersSummarySalesOrderTypeStatisticItem>().FromSql
                 ("[dbo].[SPGetOrderStatisticByTypeForOrdersSummarySalesReport] @from={0}, @to={1}," +
                 " @idcustomersource={2}, @customersourcedetails={3}, @fromcount={4}, @tocount={5}, @keycode={6}," +
                 " @idcustomer={7}, @firstorderfrom={8}, @firstorderto={9}, @idcustomertype={10}, @discountcode={11}, @isaffiliate={12}",
@@ -169,7 +169,7 @@ namespace VitalChoice.Business.Repositories
 
         public async Task<ICollection<OrdersSummarySalesOrderItem>> GetOrdersSummarySalesOrderItemsAsync(OrdersSummarySalesReportFilter filter)
         {
-            var toReturn = await Context.Set<OrdersSummarySalesOrderItem>().FromSql
+            var toReturn = await _context.Set<OrdersSummarySalesOrderItem>().FromSql
                 ("[dbo].[SPGetOrdersForOrdersSummarySalesReport] @from={0}, @to={1}," +
                 " @idcustomersource={2}, @customersourcedetails={3}, @fromcount={4}, @tocount={5}, @keycode={6}," +
                 " @idcustomer={7}, @firstorderfrom={8}, @firstorderto={9}, @idcustomertype={10}, @discountcode={11}, @isaffiliate={12}," +
