@@ -2507,17 +2507,32 @@ BEGIN
     @if(@model == 0){{
          <img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
     }}
+    @if(@model == 0.5){{
+        <img src="/assets/images/halfstar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+    }}
     @if(@model == 1){{
-         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+        <img src="/assets/images/fullstar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+    }}
+    @if(@model == 1.5){{
+        <img src="/assets/images/fullstar.gif"/><img src="/assets/images/halfstar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
     }}
     @if(@model == 2){{
-         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+        <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+    }}
+    @if(@model == 2.5){{
+        <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/halfstar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
     }}
     @if(@model == 3){{
-         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+        <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+    }}
+    @if(@model == 3.5){{
+        <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/halfstar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
     }}
     @if(@model == 4){{
-         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+        <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+    }}
+    @if(@model == 4.5){{
+        <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif" /><img class="rating-last-child" src="/assets/images/halfstar.gif" />
     }}
     @if(@model == 5){{
          <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif" /><img class="rating-last-child" src="/assets/images/fullstar.gif" />
@@ -2576,7 +2591,6 @@ BEGIN
 			    @review_rating(@model.ReviewsTab.AverageRatings)
 			</div>
 			@if(@model.ReviewsTab.ReviewsCount > 0){{
-			    <span class="product-reviews-count">[@(@model.ReviewsTab.ReviewsCount)]</span>
 			    <a href="#tabs-reviews" id="lnkReviewsTab">
 				    Read <strong>@(@model.ReviewsTab.ReviewsCount)</strong> reviews
 			    </a>
@@ -2748,7 +2762,7 @@ BEGIN
 						        </div>
 					            <div class="reviews-item-info">
 						            <span class="reviews-item-title">"@(Title)"</span>
-						            <span class="reviews-item-author">@(CustomerName) on @time(DateCreated){{g}}</span>
+                                    <span class="reviews-item-author">@(CustomerName) on @(@model.DateCreated.ToString("g"))</span>
 						            <span class="reviews-item-text"><b>Review:</b> @(Review)</span>
 					            </div>
 				            </div>

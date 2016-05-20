@@ -16,7 +16,7 @@ namespace VC.Public.Models.Product
 
 	    public string ProductUrl { get; set; }
 
-	    public int AverageRatings { get; set; }
+	    public double AverageRatings { get; set; }
 
 	    public PagedListEx<ReviewListItemModel> Reviews { get; set; }
     }

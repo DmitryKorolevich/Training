@@ -22,17 +22,21 @@
 	</p>
 	<span>Average Ratings:</span>
 	<div class="full-reviews-average">
-	@for (int i = 1; i <= 5; i++)
-	{
-		if (i <= Model.AverageRatings)
-		{
+	@for (int i = 0; i < 5; i++)
+    {
+        if (Model.AverageRatings- i>0.5)
+        {
 			<img src="/assets/images/fullstar.gif"/>
-		}
-		else
-		{
-			<img src="/assets/images/emptystar.gif"/>
-		}
-	}
+        }
+        else if(Model.AverageRatings - i >0 && Model.AverageRatings - i<=0.5)
+        {
+			<img src="/assets/images/halfstar.gif"/>
+        }
+        else
+        {
+            <img src="/assets/images/emptystar.gif" />
+        }
+    }
 	</div>
 	<span class="full-reviews-average-number">@Model.AverageRatings</span>
 	<hr/>

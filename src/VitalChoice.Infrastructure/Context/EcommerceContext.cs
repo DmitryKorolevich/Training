@@ -73,6 +73,19 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(f => f.Id);
             });
 
+            builder.Entity<OrdersSummarySalesOrderTypeStatisticItem>(entity =>
+            {
+                entity.HasKey(f => f.Id);
+                entity.Ignore(f => f.Name);
+                entity.Ignore(f => f.Average);
+            });
+
+            builder.Entity<OrdersSummarySalesOrderItem>(entity =>
+            {
+                entity.HasKey(f => f.Id);
+                entity.Ignore(f => f.SourceName);
+            });
+
             #endregion
 
             builder.Entity<VCustomerFavorite>(entity =>

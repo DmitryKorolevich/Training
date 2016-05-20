@@ -25,12 +25,14 @@ namespace VC.Public.Controllers
 	    private readonly IProductViewService _productViewService;
 	    private readonly ReCaptchaValidator _reCaptchaValidator;
 	    private readonly IProductService _productService;
-	    private readonly IProductReviewService _productReviewService;
+        private readonly IProductCategoryService _productCategoryService;
+        private readonly IProductReviewService _productReviewService;
 
 	    public ProductController(ICategoryViewService categoryViewService, 
             IProductViewService productViewService, 
             ReCaptchaValidator reCaptchaValidator, 
-            IProductService productService, 
+            IProductService productService,
+            IProductCategoryService productCategoryService,
             IProductReviewService productReviewService,
             IPageResultService pageResultService) : base(pageResultService)
         {
@@ -38,7 +40,8 @@ namespace VC.Public.Controllers
 		    _productViewService = productViewService;
 		    _reCaptchaValidator = reCaptchaValidator;
 		    _productService = productService;
-		    _productReviewService = productReviewService;
+	        _productCategoryService = productCategoryService;
+            _productReviewService = productReviewService;
 	    }
 
 	    private async Task PopulateProductReviewAssets(Guid id)
@@ -86,6 +89,22 @@ namespace VC.Public.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> CategoryByIdOld([FromQuery]string idCategory)
+        {
+            int idold;
+            if (Int32.TryParse(idCategory, out idold))
+            {
+                var item = await _productCategoryService.GetCategoryByIdOldAsync(idold);
+                if (!string.IsNullOrEmpty(item?.Url))
+                {
+                    return RedirectPermanent($"/products/{item.Url}");
+                }
+            }
+
+            return BaseNotFoundView();
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Category(string url)
         {
             var toReturn = await _categoryViewService.GetContentAsync(ControllerContext, User);
@@ -96,7 +115,38 @@ namespace VC.Public.Controllers
             return BaseNotFoundView();
         }
 
-		[HttpGet]
+        [HttpGet]
+        public async Task<IActionResult> ProductByIdOld([FromQuery]string idproduct, [FromQuery]string idcategory)
+        {
+            int idOldProduct;
+            string url = null;
+            if (Int32.TryParse(idproduct, out idOldProduct))
+            {
+                var item = await _productService.SelectTransferByIdOldAsync(idOldProduct);
+                if (!string.IsNullOrEmpty(item?.ProductContent?.Url))
+                {
+                    url =$"/product/{item.ProductContent.Url}";
+
+                    int idOldCategory;
+                    if (Int32.TryParse(idcategory, out idOldCategory))
+                    {
+                        var category = await _productCategoryService.GetCategoryByIdOldAsync(idOldCategory);
+                        if (!string.IsNullOrEmpty(category?.Url))
+                        {
+                            url += "?cat=" + category.Id;
+                        }
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(url))
+            {
+                return RedirectPermanent(url);
+            }
+            return BaseNotFoundView();
+        }
+
+        [HttpGet]
 		public async Task<IActionResult> Product(string url)
 		{
 			var toReturn = await _productViewService.GetContentAsync(ControllerContext, User);

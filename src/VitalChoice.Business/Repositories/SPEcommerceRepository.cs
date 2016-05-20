@@ -154,5 +154,31 @@ namespace VitalChoice.Business.Repositories
                 filter.IdOrder, filter.IdOrderStatus, filter.IdOrderType, filter.Paging?.PageIndex, filter.Paging?.PageItemCount).ToListAsync();
             return toReturn;
         }
+
+        public async Task<ICollection<OrdersSummarySalesOrderTypeStatisticItem>> GetOrdersSummarySalesOrderTypeStatisticItemsAsync(OrdersSummarySalesReportFilter filter)
+        {
+            var toReturn = await Context.Set<OrdersSummarySalesOrderTypeStatisticItem>().FromSql
+                ("[dbo].[SPGetOrderStatisticByTypeForOrdersSummarySalesReport] @from={0}, @to={1}," +
+                " @idcustomersource={2}, @customersourcedetails={3}, @fromcount={4}, @tocount={5}, @keycode={6}," +
+                " @idcustomer={7}, @firstorderfrom={8}, @firstorderto={9}, @idcustomertype={10}, @discountcode={11}, @isaffiliate={12}",
+                filter.From, filter.To,
+                filter.IdCustomerSource, filter.CustomerSourceDetails, filter.FromCount, filter.ToCount, filter.KeyCode,
+                filter.IdCustomer, filter.FirstOrderFrom, filter.FirstOrderTo, filter.IdCustomerType, filter.DiscountCode, filter.IsAffiliate).ToListAsync();
+            return toReturn;
+        }
+
+        public async Task<ICollection<OrdersSummarySalesOrderItem>> GetOrdersSummarySalesOrderItemsAsync(OrdersSummarySalesReportFilter filter)
+        {
+            var toReturn = await Context.Set<OrdersSummarySalesOrderItem>().FromSql
+                ("[dbo].[SPGetOrdersForOrdersSummarySalesReport] @from={0}, @to={1}," +
+                " @idcustomersource={2}, @customersourcedetails={3}, @fromcount={4}, @tocount={5}, @keycode={6}," +
+                " @idcustomer={7}, @firstorderfrom={8}, @firstorderto={9}, @idcustomertype={10}, @discountcode={11}, @isaffiliate={12}," +
+                " @pageindex={13}, @pagesize={14}",
+                filter.From, filter.To,
+                filter.IdCustomerSource, filter.CustomerSourceDetails, filter.FromCount, filter.ToCount, filter.KeyCode,
+                filter.IdCustomer, filter.FirstOrderFrom, filter.FirstOrderTo, filter.IdCustomerType, filter.DiscountCode, filter.IsAffiliate,
+                filter.Paging?.PageIndex, filter.Paging?.PageItemCount).ToListAsync();
+            return toReturn;
+        }
     }
 }

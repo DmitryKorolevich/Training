@@ -137,12 +137,17 @@ namespace VitalChoice.Business.Services.Products
 			return await _productReviewRepository.Query(conditions).SelectCountAsync();
 		}
 
-	    public async Task<int> GetApprovedAverageRatingsAsync(int productId)
+	    public async Task<double> GetApprovedAverageRatingsAsync(int productId)
 	    {
 			var conditions = new ProductReviewQuery().WithStatus(RecordStatusCode.Active).WithIdProduct(productId);
 
-			return await Task.FromResult((int)Math.Round(_productReviewRepository.Query(conditions).Select(x=>x.Rating,false).DefaultIfEmpty(0).Average()));
-		}
+	        var items = await _productReviewRepository.Query(conditions).SelectAsync(x => x.Rating, false);
+	        var average  = items.Count!=0 ? (double)items.Sum()/items.Count : 0;
+	        var toReturn = (double) Math.Floor(average);
+            toReturn += (average - Math.Floor(average)) > 0.5 ? 1 : (average - Math.Floor(average))==0 ? 0 : 0.5;
+
+	        return toReturn;
+	    }
 
 	    public async Task<ProductReview> GetProductReviewAsync(int id)
         {

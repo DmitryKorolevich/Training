@@ -117,14 +117,27 @@ namespace VC.Public.AppConfig
                 name: "Products_Category",
                 template: "products/{url}",
                 defaults: new { controller = "Product", action = "Category" });
-			routeBuilder.MapRoute(
+
+            routeBuilder.MapRoute(
+                name: "Products_Category_ByIdOld",
+                template: "shop/pc/viewCategories.asp",
+                defaults: new { controller = "Product", action = "CategoryByIdOld" });
+
+            routeBuilder.MapRoute(
 				name: "Products_Product",
 				template: "product/{url}",
 				defaults: new { controller = "Product", action = "Product" });
-			routeBuilder.MapRoute(
+
+            routeBuilder.MapRoute(
+                name: "Products_Product_ByIdOld",
+                template: "shop/pc/viewPrd.asp",
+                defaults: new { controller = "Product", action = "ProductByIdOld" });
+
+            routeBuilder.MapRoute(
 				name: "Products_Reviews",
 				template: "reviews/{url}/{pageNumber?}",
 				defaults: new { controller = "Product", action = "FullReviews" });
+
 			routeBuilder.MapRoute(
                 name: "ContentItem_Edit",
                 template: "recipe/edit/{id}",

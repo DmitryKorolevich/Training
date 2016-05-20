@@ -64,6 +64,10 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
                                 }
                             });
                         }
+                        else
+                        {
+                            messages += value.Message + "<br />";
+                        }
                     });
                 }
                 toaster.pop('error', "Error!", messages, null, 'trustedHtml');

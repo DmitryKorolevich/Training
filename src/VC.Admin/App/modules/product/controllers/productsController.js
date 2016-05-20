@@ -43,8 +43,6 @@
                 Paging: { PageIndex: 1, PageItemCount: 100 },
                 Sorting: gridSorterUtil.resolve(refreshProducts, "Name", "Asc")
             };
-
-            refreshProducts();
         }
 
         $scope.filterProducts = function () {

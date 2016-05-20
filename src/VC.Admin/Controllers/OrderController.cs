@@ -47,7 +47,6 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Infrastructure.Identity.UserManagers;
-
 namespace VC.Admin.Controllers
 {
     public class OrderController : BaseApiController
@@ -71,6 +70,7 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<OrdersAgentReportExportItem, OrdersAgentReportExportItemCsvMap> _ordersAgentReportExportItemCSVExportService;
         private readonly ICsvExportService<WholesaleDropShipReportOrderItem, WholesaleDropShipReportOrderItemCsvMap> _wholesaleDropShipReportOrderItemCSVExportService;
         private readonly ICsvExportService<TransactionAndRefundReportItem, TransactionAndRefundReportItemCsvMap> _transactionAndRefundReportItemCSVExportService;
+        private readonly ICsvExportService<OrdersSummarySalesOrderItem, OrdersSummarySalesOrderItemCsvMap> _ordersSummarySalesOrderItemSVExportService;
         private readonly INotificationService _notificationService;
         private readonly BrontoService _brontoService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
@@ -94,6 +94,7 @@ namespace VC.Admin.Controllers
                 wholesaleDropShipReportOrderItemCSVExportService,
             ICsvExportService<TransactionAndRefundReportItem, TransactionAndRefundReportItemCsvMap>
                 transactionAndRefundReportItemCSVExportService,
+            ICsvExportService<OrdersSummarySalesOrderItem, OrdersSummarySalesOrderItemCsvMap> ordersSummarySalesOrderItemSVExportService,
             INotificationService notificationService,
             BrontoService brontoService,
             IOrderReportService orderReportService,
@@ -115,6 +116,7 @@ namespace VC.Admin.Controllers
             _ordersAgentReportExportItemCSVExportService = ordersAgentReportExportItemCSVExportService;
             _wholesaleDropShipReportOrderItemCSVExportService = wholesaleDropShipReportOrderItemCSVExportService;
             _transactionAndRefundReportItemCSVExportService = transactionAndRefundReportItemCSVExportService;
+            _ordersSummarySalesOrderItemSVExportService = ordersSummarySalesOrderItemSVExportService;
             _notificationService = notificationService;
             _brontoService = brontoService;
             _orderReportService = orderReportService;
@@ -1064,6 +1066,76 @@ namespace VC.Admin.Controllers
             var contentDisposition = new ContentDispositionHeaderValue("attachment")
             {
                 FileName = String.Format(FileConstants.TRANSACTION_REFUND_REPORT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<ICollection<OrdersSummarySalesOrderTypeStatisticItem>>> GetOrdersSummarySalesOrderTypeStatisticItems([FromBody]OrdersSummarySalesReportFilter filter)
+        {
+            var toReturn = await _orderReportService.GetOrdersSummarySalesOrderTypeStatisticItemsAsync(filter);
+            return toReturn.ToList();
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<PagedList<OrdersSummarySalesOrderItem>>> GetOrdersSummarySalesOrderItems([FromBody]OrdersSummarySalesReportFilter filter)
+        {
+            var toReturn = await _orderReportService.GetOrdersSummarySalesOrderItemsAsync(filter);
+            return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpGet]
+        public async Task<FileResult> GetOrdersSummarySalesOrderItemsReportFile([FromQuery]string from, [FromQuery]string to,
+            [FromQuery]string shipfrom, [FromQuery]string shipto,
+            [FromQuery]string firstorderfrom, [FromQuery]string firstorderto,
+            [FromQuery]int? idcustomertype = null, [FromQuery]int? idcustomersource = null, [FromQuery]string customersourcedetails = null,
+            [FromQuery]int? idcustomer = null, [FromQuery]string keycode = null, [FromQuery]string discountcode = null, [FromQuery]bool? isaffiliate = null,
+            [FromQuery]int? fromcount = null, [FromQuery]int? tocount = null)
+        {
+            var dFrom = from.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            if (!dFrom.HasValue || !dTo.HasValue)
+            {
+                return null;
+            }
+            DateTime? dShipFrom = !string.IsNullOrEmpty(shipfrom) ? shipfrom.GetDateFromQueryStringInPst(_pstTimeZoneInfo) : null;
+            DateTime? dShipTo = !string.IsNullOrEmpty(shipto) ? shipto.GetDateFromQueryStringInPst(_pstTimeZoneInfo) : null;
+            DateTime? dFirstOrderFrom = !string.IsNullOrEmpty(firstorderfrom) ? shipfrom.GetDateFromQueryStringInPst(_pstTimeZoneInfo) : null;
+            DateTime? dFirstOrderTo = !string.IsNullOrEmpty(firstorderto) ? shipto.GetDateFromQueryStringInPst(_pstTimeZoneInfo) : null;
+
+
+            OrdersSummarySalesReportFilter filter = new OrdersSummarySalesReportFilter()
+            {
+                From = dFrom.Value,
+                To = dTo.Value.AddDays(1),
+                ShipFrom = dShipFrom,
+                ShipTo = dShipTo?.AddDays(1) ?? dShipTo,
+                FirstOrderFrom = dFirstOrderFrom,
+                FirstOrderTo = dFirstOrderTo?.AddDays(1) ?? dShipTo,
+                IdCustomerType = idcustomertype,
+                IdCustomerSource = idcustomersource,
+                CustomerSourceDetails = customersourcedetails,
+                IdCustomer = idcustomer,
+                KeyCode = keycode,
+                DiscountCode = discountcode,
+                IsAffiliate = isaffiliate ?? false,
+                FromCount = fromcount,
+                ToCount = tocount,
+            };
+            filter.Paging = null;
+
+            var data = await _orderReportService.GetOrdersSummarySalesOrderItemsAsync(filter);
+
+            var result = _ordersSummarySalesOrderItemSVExportService.ExportToCsv(data.Items);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.SUMMARY_SALES_REPORT, DateTime.Now)
             };
 
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());

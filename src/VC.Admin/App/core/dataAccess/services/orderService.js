@@ -195,5 +195,25 @@ angular.module('app.core.dataAccess.services.orderService', [])
                 filter.CustomerFirstName, filter.CustomerLastName, filter.IdCustomer,
                 filter.IdOrder, filter.IdOrderStatus, filter.IdOrderType, buildNumber);
 	    },
+	    //orders summary sales
+	    getOrdersSummarySalesOrderTypeStatisticItems: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetOrdersSummarySalesOrderTypeStatisticItems', filter, getConfig(tracker));
+	    },
+	    getOrdersSummarySalesOrderItems: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetOrdersSummarySalesOrderItems', filter, getConfig(tracker));
+	    },
+	    getOrdersSummarySalesOrderItemsReportFile: function (filter, buildNumber)
+	    {
+	        return baseUrl + ('GetOrdersSummarySalesOrderItemsReportFile?from={0}&to={1}shipfrom={2}&shipto={3}firstorderfrom={4}&firstorderto={5}'+
+                '&idcustomertype={6}&idcustomersource={7}' +
+                '&customersourcedetails={8}&idcustomer={9}&keycode={10}' +
+                '&discountcode={11}&isaffiliate={12}&fromcount={13}&tocount={14}&buildNumber={10}')
+                .format(filter.From, filter.To, filter.ShipFrom, filter.ShipTo, filter.FirstOrderFrom, filter.FirstOrderTo,
+                filter.IdCustomerType, filter.IdCustomerSource,
+                filter.CustomerSourceDetails, filter.IdCustomer, filter.KeyCode,
+                filter.DiscountCode, filter.IsAffiliate, filter.FromCount, filter.ToCount, buildNumber);
+	    },
 	};
 }]);

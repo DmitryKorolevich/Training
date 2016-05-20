@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using VitalChoice.Business.Services.Bronto;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.TypeConverters;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
-using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Content.Recipes;
@@ -23,6 +23,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.ObjectMapping.Interfaces;
+using ApiException = VitalChoice.Ecommerce.Domain.Exceptions.ApiException;
 
 namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 {
@@ -31,6 +32,8 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
         public const string YoutubeVideoFormat = "https://www.youtube.com/watch?v={0}";
         public const string CategoryBaseUrl = "/products/";
         public const string RecipeBaseUrl = "/recipe/";
+
+        public int? cat { get; set; }
 
         public RoleType? Role { get; set; }
 
@@ -78,12 +81,13 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
                 throw new ApiException("Product not found", HttpStatusCode.NotFound);
             }
 
-            ProductNavCategoryLite rootNavCategory = null;
+            ProductNavCategoryLite rootAllCategory = null;
             if (eProduct.CategoryIds.Any())
             {
-                rootNavCategory = await _productCategoryService.GetLiteCategoriesTreeAsync(new ProductCategoryLiteFilter()
+                rootAllCategory = await _productCategoryService.GetLiteCategoriesTreeAsync(new ProductCategoryLiteFilter()
                 {
-                    Statuses = targetStatuses
+                    Statuses = targetStatuses,
+                    ShowAll = true,
                 });
             }
 
@@ -108,59 +112,41 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 
             return
                 await
-                    PopulateProductPageTemplateModel(viewContext, rootNavCategory, lastProductReviews, reviewsCount, ratingsAverage, targetStatuses);
+                    PopulateProductPageTemplateModel(viewContext, rootAllCategory, lastProductReviews, reviewsCount, ratingsAverage, targetStatuses, 
+                    viewContext.Parameters.cat);
         }
 
-        private bool BuildBreadcrumb(ProductNavCategoryLite rootCategory, int categoryId,
+        private void BuildBreadcrumb(ProductNavCategoryLite rootCategory, ProductNavCategoryLite currentCategory, int categoryId,
             IList<TtlBreadcrumbItemModel> breadcrumbItems)
         {
-            if (rootCategory == null)
-                return false;
-            if (!rootCategory.SubItems.Any())
+            if (currentCategory != null)
             {
-                if (!rootCategory.Id.Equals(categoryId))
+                if (currentCategory.Id.Equals(categoryId))
                 {
-                    var last = breadcrumbItems.LastOrDefault();
-                    if (last != null)
+                    if (currentCategory.ProductCategory.ParentId.HasValue)
                     {
-                        breadcrumbItems.Remove(last);
-                    }
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
+                        breadcrumbItems.Add(new TtlBreadcrumbItemModel()
+                        {
+                            Label = currentCategory.ProductCategory.Name,
+                            Url = ProductPageParameters.CategoryBaseUrl + currentCategory.Url
+                        });
 
-            foreach (var subItem in rootCategory.SubItems)
-            {
-                breadcrumbItems.Add(new TtlBreadcrumbItemModel()
-                {
-                    Label = subItem.ProductCategory.Name,
-                    Url = ProductPageParameters.CategoryBaseUrl + subItem.Url
-                });
-
-                if (!subItem.Id.Equals(categoryId))
-                {
-                    var found = BuildBreadcrumb(subItem, categoryId, breadcrumbItems);
-                    if (found)
-                    {
-                        return true;
+                        BuildBreadcrumb(rootCategory, rootCategory, currentCategory.ProductCategory.ParentId.Value, breadcrumbItems);
                     }
                 }
                 else
                 {
-                    return true;
+                    foreach (var subItem in currentCategory.SubItems)
+                    {
+                        BuildBreadcrumb(rootCategory, subItem, categoryId, breadcrumbItems);
+                    }
                 }
             }
-
-            return false;
         }
 
         private async Task<TtlProductPageModel> PopulateProductPageTemplateModel(
-            ProcessorViewContext viewContext, ProductNavCategoryLite rootNavCategory,
-            PagedList<ProductReview> lastProductReviews, int reviewsCount, int ratingsAverage, IList<RecordStatusCode> targetStatusCodes)
+            ProcessorViewContext viewContext, ProductNavCategoryLite rootAllCategory,
+            PagedList<ProductReview> lastProductReviews, int reviewsCount, double ratingsAverage, IList<RecordStatusCode> targetStatusCodes, int? idCategory)
         {
             IList<TtlBreadcrumbItemModel> breadcrumbItems = new List<TtlBreadcrumbItemModel>();
 
@@ -168,7 +154,15 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             var eProduct = viewContext.Parameters.Product;
             if (eProduct.CategoryIds.Any())
             {
-                BuildBreadcrumb(rootNavCategory, eProduct.CategoryIds.First(), breadcrumbItems);
+                if (idCategory.HasValue)
+                {
+                    var foundIdCategory = eProduct.CategoryIds.FirstOrDefault(p => p == idCategory.Value);
+                    if (foundIdCategory != 0)
+                    {
+                        BuildBreadcrumb(rootAllCategory, rootAllCategory, foundIdCategory, breadcrumbItems);
+                        breadcrumbItems = breadcrumbItems.Reverse().ToList();
+                    }
+                }
                 breadcrumbItems.Add(new TtlBreadcrumbItemModel()
                 {
                     Label = eProduct.Name,

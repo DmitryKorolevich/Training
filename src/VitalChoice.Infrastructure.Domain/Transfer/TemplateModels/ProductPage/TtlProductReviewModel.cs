@@ -15,6 +15,6 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage
 
 	    public DateTime DateCreated { get; set; }
 
-	    public int Rating { get; set; }
+	    public double Rating { get; set; }
     }
 }

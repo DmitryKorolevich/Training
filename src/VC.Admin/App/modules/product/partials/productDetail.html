@@ -344,21 +344,6 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="form-group">
-                                                <label for="ProductNotes" class="col-md-3 control-label">Product Notes</label>
-                                                <div class="col-md-9">
-                                                    <div class="input-group" data-ng-show="!ProductNotesExpanded">
-                                                        <input type="text" name="ProductNotes" class="form-control" id="short" placeholder="Product Notes" disabled data-ng-model="product.ProductNotes">
-                                                        <span class="input-group-btn">
-                                                            <a data-ng-click="toogleEditorState('ProductNotesExpanded')" class="btn btn-default">Expand</a>
-                                                        </span>
-                                                    </div>
-                                                    <div class="toogle-editor" data-ng-show="ProductNotesExpanded">
-                                                        <a data-ng-click="toogleEditorState('ProductNotesExpanded')" class="btn btn-default">Hide</a>
-                                                    </div>
-                                                    <div data-ng-show="ProductNotesExpanded" text-angular data-ng-model="product.ProductNotes"></div>
-                                                </div>
-                                            </div>
                                         </fieldset>
                                     </form>
                                 </spinner-overlay>
@@ -747,15 +732,6 @@
                                                     <input type="text" name="NutritionalTitle" class="form-control" placeholder="Title" data-ng-model="product.NutritionalTitle">
                                                     <div class="error-container" ng-show="forms.submitted && forms.nutritional.NutritionalTitle.$invalid">
                                                         <small class="error" ng-show="forms.nutritional.NutritionalTitle.$error.server">{{serverMessages.GetMessage('NutritionalTitle')}}</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="IngredientsTitle" class="col-md-3 control-label">Ingredients</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" name="IngredientsTitle" class="form-control" placeholder="Ingredients" data-ng-model="product.IngredientsTitle">
-                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.IngredientsTitle.$invalid">
-                                                        <small class="error" ng-show="forms.nutritional.IngredientsTitle.$error.server">{{serverMessages.GetMessage('IngredientsTitle')}}</small>
                                                     </div>
                                                 </div>
                                             </div>

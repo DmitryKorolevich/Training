@@ -476,7 +476,7 @@ namespace VitalChoice.Core.DependencyInjection
                     (pi, cc) => cc.ResolveNamed<SignInManager<ApplicationUser>>("storefrontSignInManager")).InstancePerLifetimeScope();
 
             builder.RegisterType<AffiliateUserStore>().Named<IUserStore<ApplicationUser>>("affiliateUserStore").InstancePerLifetimeScope();
-            builder.RegisterType<UserValidator<ApplicationUser>>()
+            builder.RegisterType<AffiliateUserValidator>()
                 .Named<IUserValidator<ApplicationUser>>("affiliateUserValidator")
                 .InstancePerLifetimeScope();
             builder.RegisterType<ExtendedUserManager>()

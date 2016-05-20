@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 
 namespace VitalChoice.Infrastructure.Domain.Transfer.Products
@@ -8,6 +9,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Products
         public int Id { get; set; }
 
         public string NavLabel { get; set; }
+
+        public CustomerTypeCode? NavIdVisible { get; set; }
 
         public string Name { get; set; }
 

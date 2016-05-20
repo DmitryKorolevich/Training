@@ -57,7 +57,7 @@
 																		<div class="" data-ng-click="$event.stopPropagation()">
 																			<label class="control-label col-md-3">SKU Associated</label>
 																			<div class="col-md-9">
-																				<input type="text" name="Sku" class="form-control" placeholder="Cross Sell SKU" data-ng-model="crossSellProduct.SkuCode" uib-uib-typeahead-min-length="1" uib-typeahead="sku.Code as sku.Code for sku in getSku($viewValue)" uib-typeahead-loading="loadingSKUsBySKU" uib-typeahead-on-select="skuChanged($item,$index)" data-ng-change="cleaerTypeaheadBox(crossSellProduct)" uib-typeahead-wait-ms="100" uib-typeahead-editable="false" required>
+																				<input type="text" name="Sku" class="form-control" placeholder="Cross Sell SKU" data-ng-model="crossSellProduct.SkuCode" typeahead-min-length="1" uib-typeahead="sku.Code as sku.Code for sku in getSku($viewValue)" typeahead-loading="loadingSKUsBySKU" typeahead-on-select="skuChanged($item,$index)" data-ng-change="cleaerTypeaheadBox(crossSellProduct)" typeahead-wait-ms="100" typeahead-editable="false" required>
 																				<div class="error-container" ng-show="forms.submitted && (forms.Items.i{{$index}}.SkuCode.$invalid || crossSellProduct.IdSku == 0)">
 																					<small class="error" ng-show="forms.Items.i{{$index}}.SkuCode.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","SKU")}}</small>
 																					<small class="error" ng-show="forms.Items.i{{$index}}.SkuCode.$error.server">{{serverMessages.GetMessage('SkuCode','Items', $index)}}</small>

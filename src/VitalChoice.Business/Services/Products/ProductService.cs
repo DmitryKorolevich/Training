@@ -1067,6 +1067,27 @@ namespace VitalChoice.Business.Services.Products
             return result;
         }
 
+        public async Task<ProductContentTransferEntity> SelectTransferByIdOldAsync(int id)
+        {
+            ProductContentTransferEntity toReturn = null;
+            
+            var content = (await _productContentRepository.Query(p => p.IdOld == id).Include(p => p.ContentItem).SelectAsync(false)).FirstOrDefault();
+            if (content != null)
+            {
+                var ecomProduct = await this.SelectAsync(content.Id);
+                if (ecomProduct != null)
+                {
+                    toReturn = new ProductContentTransferEntity()
+                    {
+                        ProductContent = content,
+                        ProductDynamic = ecomProduct,
+                    };
+                }
+            }
+
+            return toReturn;
+        }
+
         public async Task<ProductContentTransferEntity> SelectTransferAsync(int id, bool withDefaults = false)
         {
 	        var toReturn = new ProductContentTransferEntity {ProductDynamic = await this.SelectAsync(id, withDefaults)};

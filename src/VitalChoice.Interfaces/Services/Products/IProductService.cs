@@ -80,6 +80,8 @@ namespace VitalChoice.Interfaces.Services.Products
 
         Task<ProductDynamic> UpdateAsync(ProductContentTransferEntity model);
 
+	    Task<ProductContentTransferEntity> SelectTransferByIdOldAsync(int id);
+
         Task<ProductContentTransferEntity> SelectTransferAsync(int id, bool withDefaults = false);
 
 	    Task<ICollection<ProductContentTransferEntity>> SelectTransferAsync(bool withDefaults = false);

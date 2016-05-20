@@ -43,3 +43,6 @@ Post-Deployment Script Template
 :r .\Scripts\SPsForWholesaleDropShipReport.sql
 :r .\Scripts\NewslettersData.sql
 :r .\Scripts\SPGetTransactionAndRefundReport.sql
+:r .\Scripts\VOrderCountOnCustomers.sql
+:r .\Scripts\VFirstOrderOnCustomers.sql
+:r .\Scripts\SPsForOrdersSummarySalesReport.sql

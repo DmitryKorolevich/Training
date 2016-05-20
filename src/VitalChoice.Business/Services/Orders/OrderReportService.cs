@@ -26,6 +26,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.Entities.Reports;
 using VitalChoice.Interfaces.Services.Settings;
 
 namespace VitalChoice.Business.Services.Orders
@@ -596,6 +597,40 @@ namespace VitalChoice.Business.Services.Orders
                 toReturn.Items.Add(item);
             });
             toReturn.Count = dbItems.Count > 0 ? dbItems.First().TotalCount : 0;
+
+            return toReturn;
+        }
+
+        public async Task<ICollection<OrdersSummarySalesOrderTypeStatisticItem>> GetOrdersSummarySalesOrderTypeStatisticItemsAsync(OrdersSummarySalesReportFilter filter)
+        {
+            var toReturn = await _sPEcommerceRepository.GetOrdersSummarySalesOrderTypeStatisticItemsAsync(filter);
+
+            var total = new OrdersSummarySalesOrderTypeStatisticItem();
+            total.Name = "Total";
+            toReturn.ForEach(p =>
+            {
+                p.Name = _appInfrastructureService.Data().OrderSourceTypes.FirstOrDefault(pp => p.Id == pp.Key)?.Text;
+                p.Average = p.Count != 0 ? p.Total/p.Count : 0;
+                total.Count += p.Count;
+                total.Total += p.Total;
+            });
+            total.Average = total.Count != 0 ? total.Total / total.Count : 0;
+
+            return toReturn;
+        }
+
+        public async Task<PagedList<OrdersSummarySalesOrderItem>> GetOrdersSummarySalesOrderItemsAsync(OrdersSummarySalesReportFilter filter)
+        {
+            PagedList<OrdersSummarySalesOrderItem> toReturn = new PagedList<OrdersSummarySalesOrderItem>();
+
+            var items = await _sPEcommerceRepository.GetOrdersSummarySalesOrderItemsAsync(filter);
+
+            items.ForEach(p =>
+            {
+                p.SourceName = p.Source.HasValue ? _appInfrastructureService.Data().OrderSources.FirstOrDefault(pp => p.Source.Value == pp.Key)?.Text : null;
+            });
+            toReturn.Items = items.ToList();
+            toReturn.Count = items.Count > 0 ? items.First().TotalCount : 0;
 
             return toReturn;
         }
