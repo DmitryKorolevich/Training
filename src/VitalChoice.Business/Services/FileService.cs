@@ -21,13 +21,10 @@ namespace VitalChoice.Business.Services
         private const int MILISECONDS_INTERVAL_BETWEEN_TRIES = 50;
 
         private static string _rootDir;
-        private readonly ILogger logger;
         private readonly IOptions<AppOptions> appOptions;
-        private static string error = "";
         
-        public FileService(IOptions<AppOptions> appOptions, ILoggerProviderExtended loggerProvider)
+        public FileService(IOptions<AppOptions> appOptions)
         {
-            this.logger = loggerProvider.CreateLogger<FileService>();
             this.appOptions = appOptions;
             _rootDir= this.appOptions.Value.FilesPath.ToLower();
         }

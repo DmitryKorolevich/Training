@@ -396,7 +396,7 @@ GO
 IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentAreas] WHERE [Name] = N'Secondary Wholesale Menu' AND [Updated] = N'09/09/2015')
 BEGIN
 	UPDATE [dbo].[ContentAreas]
-	SET [Updated] = N'09/09/2015',
+	SET [Updated] = GETDATE(),
 		[Template] = N'
 					<li>
 						<a href="#">New</a>

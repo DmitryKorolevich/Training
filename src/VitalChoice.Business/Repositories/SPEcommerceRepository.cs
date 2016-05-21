@@ -120,7 +120,7 @@ namespace VitalChoice.Business.Repositories
             if (string.IsNullOrEmpty(filter.ShippingIdConfirmation))
                 filter.ShippingIdConfirmation = null;
 
-            var toReturn = await Context.Set<IdModel>().FromSql
+            var toReturn = await _context.Set<IdModel>().FromSql
                 ("[dbo].[SPGetOrderIdsForWholesaleDropShipReport] @from={0}, @to={1}, @shipfrom={2}, @shipto={3},"+
                 " @idcustomertype={4}, @idtradeclass={5}, @customerfirstname={6}, @customerlastname={7}, @shipfirstname={8},"+
                 " @shiplastname={9}, @shipidconfirm={10}, @idorder={11}, @ponumber={12}, @pageindex={13}, @pagesize={14}",
@@ -143,7 +143,7 @@ namespace VitalChoice.Business.Repositories
             if (string.IsNullOrEmpty(filter.ShippingIdConfirmation))
                 filter.ShippingIdConfirmation = null;
 
-            var toReturn = await Context.Set<CountModel>().FromSql
+            var toReturn = await _context.Set<CountModel>().FromSql
                 ("[dbo].[SPGetOrderIdsForWholesaleDropShipReport] @from={0}, @to={1}, @shipfrom={2}, @shipto={3}," +
                 " @idcustomertype={4}, @idtradeclass={5}, @customerfirstname={6}, @customerlastname={7}, @shipfirstname={8}," +
                 " @shiplastname={9}, @shipidconfirm={10}, @idorder={11}, @ponumber={12}, @getcount={13}",
@@ -166,7 +166,7 @@ namespace VitalChoice.Business.Repositories
             if (string.IsNullOrEmpty(filter.ShippingIdConfirmation))
                 filter.ShippingIdConfirmation = null;
 
-            var toReturn = await Context.Set<WholesaleDropShipReportSkuRawItem>().FromSql
+            var toReturn = await _context.Set<WholesaleDropShipReportSkuRawItem>().FromSql
                 ("[dbo].[SPGetWholesaleDropShipReportSkusSummary] @from={0}, @to={1}, @shipfrom={2}, @shipto={3}," +
                 " @idcustomertype={4}, @idtradeclass={5}, @customerfirstname={6}, @customerlastname={7}, @shipfirstname={8}," +
                 " @shiplastname={9}, @shipidconfirm={10}, @idorder={11}, @ponumber={12}",
@@ -183,7 +183,7 @@ namespace VitalChoice.Business.Repositories
             if (string.IsNullOrEmpty(filter.CustomerLastName))
                 filter.CustomerLastName = null;
 
-            var toReturn = await Context.Set<TransactionAndRefundRawItem>().FromSql
+            var toReturn = await _context.Set<TransactionAndRefundRawItem>().FromSql
                 ("[dbo].[SPGetTransactionAndRefundReport] @from={0}, @to={1}," +
                 " @idcustomertype={2}, @idservicecode={3}, @idcustomer={4}, @customerfirstname={5}, @customerlastname={6}," +
                 " @idorder={7}, @idorderstatus={8}, @idordertype={9}, @pageindex={10}, @pagesize={11}",
@@ -202,7 +202,7 @@ namespace VitalChoice.Business.Repositories
             if (string.IsNullOrEmpty(filter.DiscountCode))
                 filter.DiscountCode = null;
 
-            var toReturn = await Context.Set<OrdersSummarySalesOrderTypeStatisticItem>().FromSql
+            var toReturn = await _context.Set<OrdersSummarySalesOrderTypeStatisticItem>().FromSql
                 ("[dbo].[SPGetOrderStatisticByTypeForOrdersSummarySalesReport] @from={0}, @to={1}," +
                 " @idcustomersource={2}, @customersourcedetails={3}, @fromcount={4}, @tocount={5}, @keycode={6}," +
                 " @idcustomer={7}, @firstorderfrom={8}, @firstorderto={9}, @idcustomertype={10}, @discountcode={11}, @isaffiliate={12}",
@@ -221,7 +221,7 @@ namespace VitalChoice.Business.Repositories
             if (string.IsNullOrEmpty(filter.DiscountCode))
                 filter.DiscountCode = null;
 
-            var toReturn = await Context.Set<OrdersSummarySalesOrderItem>().FromSql
+            var toReturn = await _context.Set<OrdersSummarySalesOrderItem>().FromSql
                 ("[dbo].[SPGetOrdersForOrdersSummarySalesReport] @from={0}, @to={1}," +
                 " @idcustomersource={2}, @customersourcedetails={3}, @fromcount={4}, @tocount={5}, @keycode={6}," +
                 " @idcustomer={7}, @firstorderfrom={8}, @firstorderto={9}, @idcustomertype={10}, @discountcode={11}, @isaffiliate={12}," +
