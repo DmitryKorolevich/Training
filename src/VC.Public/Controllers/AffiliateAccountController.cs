@@ -177,8 +177,6 @@ namespace VC.Public.Controllers
 
             await _affiliateService.UpdateAsync(affiliate, model.Password);
 
-            await _userService.SendSuccessfulRegistration(model.Email, user.FirstName, user.LastName);
-
             return await Login(new LoginModel() { Email = model.Email, Password = model.Password }, string.Empty);
         }
 

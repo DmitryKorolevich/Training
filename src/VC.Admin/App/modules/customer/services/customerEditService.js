@@ -417,7 +417,7 @@ angular.module('app.modules.customer.services.customerEditService', [])
                                 uiScope.paymentInfoTab.CreditCardIndex = "0";
                             }
                             else {
-                                uiScope.paymentInfoTab.CreditCardIndex = (parseInt(uiScope.paymentInfoTab.CreditCardIndex) + 1).toString();
+                                uiScope.paymentInfoTab.CreditCardIndex = (uiScope.currentCustomer.CreditCards.length-1).toString();
                             }
                             if (callback)
                                 callback(result.Data);
@@ -624,7 +624,7 @@ angular.module('app.modules.customer.services.customerEditService', [])
                             }
                             else
                             {
-                                uiScope.paymentInfoTab.CreditCardIndex = (parseInt(uiScope.paymentInfoTab.CreditCardIndex) + 1).toString();
+                                uiScope.paymentInfoTab.CreditCardIndex = (uiScope.currentCustomer.CreditCards.length - 1).toString();
                             }
                             if (callback)
                                 callback(result.Data);
