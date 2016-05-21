@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using VitalChoice.Ecommerce.Domain.Dynamic;
+using VitalChoice.Ecommerce.Domain.Entities;
 
 namespace VitalChoice.Infrastructure.Domain.Dynamic
 {
@@ -18,7 +19,7 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
 
         public string Url { get; set; }
 
-        public bool Hidden { get; set; }
+        public CustomerTypeCode? IdVisibility { get; set; }
 
         public ICollection<SkuDynamic> Skus { get; set; }
 

@@ -109,7 +109,18 @@ namespace VitalChoice.Business.Repositories
 
         public async Task<ICollection<int>> GetOrderIdsForWholesaleDropShipReportAsync(WholesaleDropShipReportFilter filter)
         {
-            var toReturn = await _context.Set<IdModel>().FromSql
+            if (string.IsNullOrEmpty(filter.CustomerFirstName))
+                filter.CustomerFirstName = null;
+            if (string.IsNullOrEmpty(filter.CustomerLastName))
+                filter.CustomerLastName = null;
+            if (string.IsNullOrEmpty(filter.ShipFirstName))
+                filter.ShipFirstName = null;
+            if (string.IsNullOrEmpty(filter.ShipLastName))
+                filter.ShipLastName = null;
+            if (string.IsNullOrEmpty(filter.ShippingIdConfirmation))
+                filter.ShippingIdConfirmation = null;
+
+            var toReturn = await Context.Set<IdModel>().FromSql
                 ("[dbo].[SPGetOrderIdsForWholesaleDropShipReport] @from={0}, @to={1}, @shipfrom={2}, @shipto={3},"+
                 " @idcustomertype={4}, @idtradeclass={5}, @customerfirstname={6}, @customerlastname={7}, @shipfirstname={8},"+
                 " @shiplastname={9}, @shipidconfirm={10}, @idorder={11}, @ponumber={12}, @pageindex={13}, @pagesize={14}",
@@ -121,7 +132,18 @@ namespace VitalChoice.Business.Repositories
 
         public async Task<int> GetCountOrderIdsForWholesaleDropShipReportAsync(WholesaleDropShipReportFilter filter)
         {
-            var toReturn = await _context.Set<CountModel>().FromSql
+            if (string.IsNullOrEmpty(filter.CustomerFirstName))
+                filter.CustomerFirstName = null;
+            if (string.IsNullOrEmpty(filter.CustomerLastName))
+                filter.CustomerLastName = null;
+            if (string.IsNullOrEmpty(filter.ShipFirstName))
+                filter.ShipFirstName = null;
+            if (string.IsNullOrEmpty(filter.ShipLastName))
+                filter.ShipLastName = null;
+            if (string.IsNullOrEmpty(filter.ShippingIdConfirmation))
+                filter.ShippingIdConfirmation = null;
+
+            var toReturn = await Context.Set<CountModel>().FromSql
                 ("[dbo].[SPGetOrderIdsForWholesaleDropShipReport] @from={0}, @to={1}, @shipfrom={2}, @shipto={3}," +
                 " @idcustomertype={4}, @idtradeclass={5}, @customerfirstname={6}, @customerlastname={7}, @shipfirstname={8}," +
                 " @shiplastname={9}, @shipidconfirm={10}, @idorder={11}, @ponumber={12}, @getcount={13}",
@@ -133,7 +155,18 @@ namespace VitalChoice.Business.Repositories
 
         public async Task<ICollection<WholesaleDropShipReportSkuRawItem>> GetWholesaleDropShipReportSkusSummaryAsync(WholesaleDropShipReportFilter filter)
         {
-            var toReturn = await _context.Set<WholesaleDropShipReportSkuRawItem>().FromSql
+            if (string.IsNullOrEmpty(filter.CustomerFirstName))
+                filter.CustomerFirstName = null;
+            if (string.IsNullOrEmpty(filter.CustomerLastName))
+                filter.CustomerLastName = null;
+            if (string.IsNullOrEmpty(filter.ShipFirstName))
+                filter.ShipFirstName = null;
+            if (string.IsNullOrEmpty(filter.ShipLastName))
+                filter.ShipLastName = null;
+            if (string.IsNullOrEmpty(filter.ShippingIdConfirmation))
+                filter.ShippingIdConfirmation = null;
+
+            var toReturn = await Context.Set<WholesaleDropShipReportSkuRawItem>().FromSql
                 ("[dbo].[SPGetWholesaleDropShipReportSkusSummary] @from={0}, @to={1}, @shipfrom={2}, @shipto={3}," +
                 " @idcustomertype={4}, @idtradeclass={5}, @customerfirstname={6}, @customerlastname={7}, @shipfirstname={8}," +
                 " @shiplastname={9}, @shipidconfirm={10}, @idorder={11}, @ponumber={12}",
@@ -145,7 +178,12 @@ namespace VitalChoice.Business.Repositories
 
         public async Task<ICollection<TransactionAndRefundRawItem>> GetTransactionAndRefundReportItemsAsync(TransactionAndRefundReportFilter filter)
         {
-            var toReturn = await _context.Set<TransactionAndRefundRawItem>().FromSql
+            if (string.IsNullOrEmpty(filter.CustomerFirstName))
+                filter.CustomerFirstName = null;
+            if (string.IsNullOrEmpty(filter.CustomerLastName))
+                filter.CustomerLastName = null;
+
+            var toReturn = await Context.Set<TransactionAndRefundRawItem>().FromSql
                 ("[dbo].[SPGetTransactionAndRefundReport] @from={0}, @to={1}," +
                 " @idcustomertype={2}, @idservicecode={3}, @idcustomer={4}, @customerfirstname={5}, @customerlastname={6}," +
                 " @idorder={7}, @idorderstatus={8}, @idordertype={9}, @pageindex={10}, @pagesize={11}",
@@ -157,7 +195,14 @@ namespace VitalChoice.Business.Repositories
 
         public async Task<ICollection<OrdersSummarySalesOrderTypeStatisticItem>> GetOrdersSummarySalesOrderTypeStatisticItemsAsync(OrdersSummarySalesReportFilter filter)
         {
-            var toReturn = await _context.Set<OrdersSummarySalesOrderTypeStatisticItem>().FromSql
+            if (string.IsNullOrEmpty(filter.CustomerSourceDetails))
+                filter.CustomerSourceDetails = null;
+            if (string.IsNullOrEmpty(filter.KeyCode))
+                filter.KeyCode = null;
+            if (string.IsNullOrEmpty(filter.DiscountCode))
+                filter.DiscountCode = null;
+
+            var toReturn = await Context.Set<OrdersSummarySalesOrderTypeStatisticItem>().FromSql
                 ("[dbo].[SPGetOrderStatisticByTypeForOrdersSummarySalesReport] @from={0}, @to={1}," +
                 " @idcustomersource={2}, @customersourcedetails={3}, @fromcount={4}, @tocount={5}, @keycode={6}," +
                 " @idcustomer={7}, @firstorderfrom={8}, @firstorderto={9}, @idcustomertype={10}, @discountcode={11}, @isaffiliate={12}",
@@ -169,7 +214,14 @@ namespace VitalChoice.Business.Repositories
 
         public async Task<ICollection<OrdersSummarySalesOrderItem>> GetOrdersSummarySalesOrderItemsAsync(OrdersSummarySalesReportFilter filter)
         {
-            var toReturn = await _context.Set<OrdersSummarySalesOrderItem>().FromSql
+            if (string.IsNullOrEmpty(filter.CustomerSourceDetails))
+                filter.CustomerSourceDetails = null;
+            if (string.IsNullOrEmpty(filter.KeyCode))
+                filter.KeyCode = null;
+            if (string.IsNullOrEmpty(filter.DiscountCode))
+                filter.DiscountCode = null;
+
+            var toReturn = await Context.Set<OrdersSummarySalesOrderItem>().FromSql
                 ("[dbo].[SPGetOrdersForOrdersSummarySalesReport] @from={0}, @to={1}," +
                 " @idcustomersource={2}, @customersourcedetails={3}, @fromcount={4}, @tocount={5}, @keycode={6}," +
                 " @idcustomer={7}, @firstorderfrom={8}, @firstorderto={9}, @idcustomertype={10}, @discountcode={11}, @isaffiliate={12}," +

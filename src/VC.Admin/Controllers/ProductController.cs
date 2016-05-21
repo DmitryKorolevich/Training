@@ -155,6 +155,7 @@ namespace VC.Admin.Controllers
 
             VProductSkuFilter skuFilter = new VProductSkuFilter();
             skuFilter.IdProducts = toReturn.Items.Select(p => p.ProductId).ToList();
+            skuFilter.Paging = null;
             var skus = await productService.GetSkusAsync(skuFilter);
             foreach (var item in toReturn.Items)
             {
@@ -176,7 +177,7 @@ namespace VC.Admin.Controllers
                 return new ProductManageModel()
                 {
                     StatusCode = RecordStatusCode.Active,
-                    Hidden = false,
+                    IdVisibility = CustomerTypeCode.All,
                     CategoryIds = new List<int>(),
                     SKUs = new List<SKUManageModel>(),
                     CrossSellProducts = new List<CrossSellProductModel>()

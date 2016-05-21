@@ -14,7 +14,7 @@ SELECT
 	p.DateCreated,
 	p.DateEdited,
 	p.IdEditedBy,
-	p.Hidden,
+	p.IdVisibility,
 	p.IdObjectType AS IdProductType,
 	p.Name,
 	ISNULL(val.Value, opt.DefaultValue) AS Thumbnail,	

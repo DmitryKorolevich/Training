@@ -23,7 +23,7 @@ namespace VC.Admin.Models.Products
 
         public RecordStatusCode StatusCode { get; set; }
 
-        public bool Hidden { get; set; }
+        public CustomerTypeCode? IdVisibility { get; set; }
 
         public ProductType IdProductType { get; set; }
 
@@ -44,7 +44,7 @@ namespace VC.Admin.Models.Products
                 Thumbnail = item.Thumbnail;
                 TaxCode = item.TaxCode;
                 StatusCode = item.StatusCode;
-                Hidden = item.Hidden;
+                IdVisibility = item.IdVisibility;
                 IdProductType = item.IdProductType;
                 DateEdited = item.DateEdited;
                 EditedByAgentId = item.EditedByAgentId ?? String.Empty;

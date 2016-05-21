@@ -534,7 +534,9 @@ namespace VitalChoice.Business.Services.Products
             foreach (var productContentTransferEntity in products)
             {
                 if (productContentTransferEntity.ProductDynamic.StatusCode == (int) RecordStatusCode.Active 
-                    && !productContentTransferEntity.ProductDynamic.Hidden
+                    && productContentTransferEntity.ProductDynamic.IdVisibility.HasValue
+                    && (productContentTransferEntity.ProductDynamic.IdVisibility.Value == CustomerTypeCode.All ||
+                    productContentTransferEntity.ProductDynamic.IdVisibility.Value == CustomerTypeCode.Retail)
                     && productContentTransferEntity.ProductDynamic.Skus!=null)
                 {
                     var activeSkus =

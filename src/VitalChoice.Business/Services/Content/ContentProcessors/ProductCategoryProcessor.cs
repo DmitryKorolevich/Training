@@ -182,7 +182,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
 
 	        var rootNavCategory = GetFilteredByVisibilityCategories(allRootCategory, customerVisibility);
 
-            return PopulateCategoryTemplateModel(viewContext.Entity, subCategoriesContent, products, productContents, rootNavCategory, allRootCategory);
+            return PopulateCategoryTemplateModel(viewContext.Entity, customerVisibility, subCategoriesContent, products, productContents, rootNavCategory, allRootCategory);
         }
 
         private ProductNavCategoryLite GetFilteredByVisibilityCategories(ProductNavCategoryLite navCategory,IList<CustomerTypeCode> visibility)
@@ -261,59 +261,6 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             }
         }
 
-   //     private bool BuildBreadcrumb(ProductNavCategoryLite rootCategory, string url,
-   //         IList<TtlBreadcrumbItemModel> breadcrumbItems)
-   //     {
-   //         if (rootCategory == null)
-   //             return false;
-   //         if (!rootCategory.SubItems.Any())
-   //         {
-   //             if (!rootCategory.Url.Equals(url, StringComparison.OrdinalIgnoreCase))
-   //             {
-			//		var last = breadcrumbItems.LastOrDefault();
-			//		if (last != null)
-			//		{
-			//			breadcrumbItems.Remove(last);
-			//		}
-			//		return false;
-   //             }
-   //             else
-   //             {
-   //                 return true;
-   //             }
-   //         }
-
-   //         foreach (var subItem in rootCategory.SubItems)
-   //         {
-   //             breadcrumbItems.Add(new TtlBreadcrumbItemModel()
-   //             {
-   //                 Label = subItem.ProductCategory.Name,
-   //                 Url = subItem.Url
-   //             });
-
-   //             if (!subItem.Url.Equals(url, StringComparison.OrdinalIgnoreCase))
-   //             {
-   //                 var found = BuildBreadcrumb(subItem, url, breadcrumbItems);
-   //                 if (found)
-   //                 {
-   //                     return true;
-   //                 }
-   //             }
-   //             else
-   //             {
-   //                 return true;
-   //             }
-   //         }
-
-			//var lastRoot = breadcrumbItems.LastOrDefault();
-			//if (lastRoot != null)
-			//{
-			//	breadcrumbItems.Remove(lastRoot);
-			//}
-
-			//return false;
-   //     }
-
         private IList<TtlSidebarMenuItemModel> ConvertToSideMenuModelLevel(
             IList<ProductNavCategoryLite> productCategoryLites)
         {
@@ -325,7 +272,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             }).ToList();
         }
 
-        private TtlCategoryModel PopulateCategoryTemplateModel(ProductCategoryContent productCategoryContent,
+        private TtlCategoryModel PopulateCategoryTemplateModel(ProductCategoryContent productCategoryContent, IList<CustomerTypeCode> customerVisibility,
             IList<ProductCategoryContent> subProductCategoryContent = null, IList<VProductSku> products = null, IList<ProductContent> productContents=null,
             ProductNavCategoryLite rootNavCategory = null, ProductNavCategoryLite rootAllCategory = null)
         {
@@ -343,8 +290,8 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                 HideLongDescription = productCategoryContent.HideLongDescription,
                 LongDescriptionBottom = productCategoryContent.LongDescriptionBottom,
                 HideLongDescriptionBottom = productCategoryContent.HideLongDescriptionBottom,
-                SubCategories = subProductCategoryContent?.Select(x => PopulateCategoryTemplateModel(x)).ToList(),
-                Products = products?.Where(x=>!x.Hidden).Select(x => new TtlCategoryProductModel
+                SubCategories = subProductCategoryContent?.Select(x => PopulateCategoryTemplateModel(x, customerVisibility)).ToList(),
+                Products = products?.Where(x=>x.IdVisibility.HasValue && customerVisibility.Contains(x.IdVisibility.Value)).Select(x => new TtlCategoryProductModel
                 {
                     Id = x.IdProduct,
                     Name = x.Name,

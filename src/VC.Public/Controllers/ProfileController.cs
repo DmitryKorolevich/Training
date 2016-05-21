@@ -584,7 +584,7 @@ namespace VC.Public.Controllers
                     foreach (var skuOrdered in lastOrder.Skus)
                     {
                         //Ignore hidden in the storefront skus and products in this view
-                        var skuInDB = skus.FirstOrDefault(p => p.SkuId == skuOrdered.Sku.Id && !p.Hidden && !p.ProductHidden);
+                        var skuInDB = skus.FirstOrDefault(p => p.SkuId == skuOrdered.Sku.Id && !p.Hidden && p.ProductIdVisibility.HasValue);
 
                         if (skuInDB != null)
                         {

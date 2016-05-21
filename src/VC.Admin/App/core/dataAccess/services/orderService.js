@@ -206,10 +206,10 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    },
 	    getOrdersSummarySalesOrderItemsReportFile: function (filter, buildNumber)
 	    {
-	        return baseUrl + ('GetOrdersSummarySalesOrderItemsReportFile?from={0}&to={1}shipfrom={2}&shipto={3}firstorderfrom={4}&firstorderto={5}'+
+	        return baseUrl + ('GetOrdersSummarySalesOrderItemsReportFile?from={0}&to={1}&shipfrom={2}&shipto={3}&firstorderfrom={4}&firstorderto={5}'+
                 '&idcustomertype={6}&idcustomersource={7}' +
                 '&customersourcedetails={8}&idcustomer={9}&keycode={10}' +
-                '&discountcode={11}&isaffiliate={12}&fromcount={13}&tocount={14}&buildNumber={10}')
+                '&discountcode={11}&isaffiliate={12}&fromcount={13}&tocount={14}&buildNumber={15}')
                 .format(filter.From, filter.To, filter.ShipFrom, filter.ShipTo, filter.FirstOrderFrom, filter.FirstOrderTo,
                 filter.IdCustomerType, filter.IdCustomerSource,
                 filter.CustomerSourceDetails, filter.IdCustomer, filter.KeyCode,

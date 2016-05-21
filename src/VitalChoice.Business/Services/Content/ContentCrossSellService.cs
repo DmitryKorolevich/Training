@@ -63,7 +63,7 @@ namespace VitalChoice.Business.Services.Content
 				.Include(x => x.Product)
 				.Where(
 					x => ids.Contains(x.Id) &&
-						(x.Hidden || x.StatusCode != (int) RecordStatusCode.Active || x.Product.Hidden ||
+						(x.Hidden || x.StatusCode != (int) RecordStatusCode.Active || !x.Product.IdVisibility.HasValue ||
 						x.Product.StatusCode != (int) RecordStatusCode.Active))
 				.SelectFirstOrDefaultAsync();
 			if (notValidSku != null)

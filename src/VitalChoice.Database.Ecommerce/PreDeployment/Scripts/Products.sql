@@ -121,6 +121,8 @@ BEGIN
 	DROP CONSTRAINT DF_Product_PublicId
 END
 
+GO
+
 IF NOT EXISTS(SELECT * FROM sys.indexes WHERE name = 'IX_UQ_NameTypeProductOption')
 BEGIN
 	CREATE UNIQUE NONCLUSTERED INDEX IX_UQ_NameTypeProductOption ON [dbo].[ProductOptionTypes]
@@ -129,3 +131,29 @@ BEGIN
 		[IdObjectType] ASC
 	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 END
+
+GO
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE [object_id] = OBJECT_ID(N'[dbo].[Products]', N'U') AND Name = 'IdVisibility')
+BEGIN
+	ALTER TABLE [dbo].[Products]
+	ADD IdVisibility int NULL
+
+	EXEC('UPDATE [dbo].[Products]
+	SET IdVisibility = CASE WHEN Hidden = 1 THEN NULL ELSE 1 END')
+
+	DECLARE @ConstraintName nvarchar(250)
+	SELECT @ConstraintName = Name 
+	FROM SYS.DEFAULT_CONSTRAINTS
+	WHERE PARENT_OBJECT_ID = OBJECT_ID('Products') 
+	AND PARENT_COLUMN_ID = (
+		SELECT column_id FROM sys.columns
+		WHERE NAME = 'Hidden' AND object_id = OBJECT_ID('Products'))
+	IF @ConstraintName IS NOT NULL
+		EXEC('ALTER TABLE Products DROP CONSTRAINT ' + @ConstraintName)
+
+	ALTER TABLE [dbo].[Products]
+	DROP COLUMN Hidden
+END
+
+GO

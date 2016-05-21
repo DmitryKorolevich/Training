@@ -34,7 +34,7 @@
                                     </div>
                                     <div ui-sortable="sortableOptions" data-ng-model="lookup.LookupVariants">
                                         <div data-ng-repeat="item in lookup.LookupVariants" class="variant-panel">
-                                            <div class="form-horizontal" ng-form="i{{$index}}" novalidate>
+                                            <div class="form-horizontal" ng-form="i{{$index}}" novalidate unsaved-warning-form>
                                                 <fieldset>
                                                     <div class="form-group">
                                                         <label class="col-md-3 control-label"></label>

@@ -615,6 +615,7 @@ namespace VitalChoice.Business.Services.Orders
                 total.Total += p.Total;
             });
             total.Average = total.Count != 0 ? total.Total / total.Count : 0;
+            toReturn.Add(total);
 
             return toReturn;
         }

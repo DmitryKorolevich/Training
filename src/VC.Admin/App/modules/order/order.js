@@ -19,7 +19,8 @@ angular.module('app.modules.order', [
 	'app.modules.order.controllers.manageAutoShipBillingController',
 	'app.modules.order.controllers.orderAgentsReportController',
 	'app.modules.order.controllers.wholesaleDropShipReportController',
-	'app.modules.order.controllers.transactionsAndRefundsReportController'
+	'app.modules.order.controllers.transactionsAndRefundsReportController',
+	'app.modules.order.controllers.ordersSummarySalesReportController'
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -105,6 +106,11 @@ angular.module('app.modules.order', [
 				    url: '/report/transactions-refunds',
 				    templateUrl: 'app/modules/order/partials/transactionsAndRefundsReport.html',
 				    controller: 'transactionsAndRefundsReportController'
+				})
+				.state('index.oneCol.ordersSummarySalesReport', {
+				    url: '/report/summary-sales',
+				    templateUrl: 'app/modules/order/partials/ordersSummarySalesReport.html',
+				    controller: 'ordersSummarySalesReportController'
 				});
 		}
 ]);
