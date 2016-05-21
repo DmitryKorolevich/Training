@@ -36,7 +36,7 @@ $(document).ready(function ()
 
     $("body").on("change", "input[name=sku]", setSelectedSku);
 
-    $("body").on("click", "#lnkAddToCart", addToCart);
+    $("body").on("click", "#lnkAddToCart", addToCartSelectedSku);
     $("body").on("click", "#lnkClose", closeCartLite);
 
     $("body").on("click", ".proposals-item-link", addCrossToCart);
@@ -137,41 +137,12 @@ function addOutOfStockProductRequestFormSubmitSuccess(data)
     }
 }
 
-function addToCart(event, sku) {
-    if (!sku) {
-        var jChecked = $("input[name=sku]:checked");
-        sku = jChecked.val();
-    }
+function addToCartSelectedSku()
+{
+    var jChecked = $("input[name=sku]:checked");
+    sku = jChecked.val();
 
-    $.ajax({
-        url: "/Cart/AddToCartView?skuCode=" + sku,
-        dataType: "html",
-        type: "POST"
-    }).success(function (result) {
-
-        $.ajax({
-            url: "/Cart/GetCartLiteComponent",
-            dataType: "html",
-            type: "GET"
-        }).success(function (result) {
-            $("#cart-lite-component").html(result);
-        }).error(function (result) {
-            notifyError();
-        });
-
-        $(result).dialog({
-            resizable: false,
-            modal: true,
-            minWidth: 520,
-            close: function () {
-                $(this).dialog('destroy').remove();
-            }
-        });
-
-    }).error(function (result) {
-        notifyError();
-    });
-
+    addToCart(null, sku);
     return false;
 }
 

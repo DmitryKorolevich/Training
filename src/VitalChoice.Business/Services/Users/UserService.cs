@@ -199,11 +199,9 @@ namespace VitalChoice.Business.Services.Users
 		    throw new AppValidationException(AggregateIdentityErrors(updateResult.Errors));
 		}
 
-        protected virtual async Task DisabledValidateUserOnSignIn(string login)
+        protected virtual void DisabledValidateUserOnSignIn(ApplicationUser user)
         {
-            var disabled = (await UserManager.Users.FirstOrDefaultAsync(x => x.Status == UserStatus.Disabled && x.Email.Equals(login))) != null;
-
-            if (disabled)
+            if (user ==null || user.Status == UserStatus.Disabled)
             {
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsDisabled]);
             }
@@ -211,11 +209,11 @@ namespace VitalChoice.Business.Services.Users
 
         protected virtual async Task ValidateUserOnSignIn(string login)
         {
-            await DisabledValidateUserOnSignIn(login);
-
             var user = await UserManager.Users.FirstOrDefaultAsync(x => x.Status == UserStatus.Active && x.Email.Equals(login));
 
-			if (user!=null && !user.IsConfirmed)
+            DisabledValidateUserOnSignIn(user);
+
+            if (user!=null && !user.IsConfirmed)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsNotConfirmed]);
 			}
@@ -374,7 +372,7 @@ namespace VitalChoice.Business.Services.Users
 
 	    public async Task<ApplicationUser> SignInNoStatusCheckingAsync(ApplicationUser user)
 	    {
-            await DisabledValidateUserOnSignIn(user.UserName);
+            DisabledValidateUserOnSignIn(user);
 
 		    await _signInManager.SignInAsync(user, false);
 
@@ -559,12 +557,9 @@ namespace VitalChoice.Business.Services.Users
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
 			}
 
-			if (user.Status == UserStatus.Disabled)
-			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsDisabled]);
-			}
+            DisabledValidateUserOnSignIn(user);
 
-			var result = await UserManager.ResetPasswordAsync(user, token, newPassword);
+            var result = await UserManager.ResetPasswordAsync(user, token, newPassword);
 			if (!result.Succeeded)
 			{
 				throw new AppValidationException(AggregateIdentityErrors(result.Errors));

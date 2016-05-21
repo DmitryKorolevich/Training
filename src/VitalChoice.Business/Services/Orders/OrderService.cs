@@ -2326,7 +2326,8 @@ namespace VitalChoice.Business.Services.Orders
                             healthwisePeriodRepositoryAsync.Query(
                                 p =>
                                     p.IdCustomer == idCustomer && orderCreatedDate >= p.StartDate && orderCreatedDate < p.EndDate &&
-                                    !p.PaidDate.HasValue).Include(p => p.HealthwiseOrders).SelectAsync(false)).ToList();
+                                    !p.PaidDate.HasValue).Include(p => p.HealthwiseOrders).ThenInclude(p=>p.Order)
+                                    .SelectAsync(false)).ToList();
                     foreach (var healthwisePeriod in periods)
                     {
                         healthwisePeriod.HealthwiseOrders =

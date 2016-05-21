@@ -71,6 +71,9 @@
                             <span data-ng-if="item.StatusCode == 1" class="label label-warning font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>
                         </td>
                         <td>
+                            <span data-ng-if="item.IdVisibility==1" class="label label-info  font-default">All</span>
+                            <span data-ng-if="item.IdVisibility==2" class="label label-wholesale font-default">Wholesale Only</span>
+                            <span data-ng-if="item.IdVisibility==3" class="label label-retail font-default">Retail Only</span>
                             <span data-ng-if="!item.IdVisibility" class="label label-warning font-default">Hidden</span>
                         </td>
                         <td>{{item.DateEdited | date:"MM/dd/yy"}}<br />{{item.DateEdited | date:"h:mm a"}}<br />{{item.EditedByAgentId}}</td>

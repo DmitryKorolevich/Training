@@ -6,6 +6,8 @@
 
 @section PageScripts {
     <script src="@Url.Content("/app/modules/profile/gccheckform.js")"></script>
+    <script src="@Url.Content("/app/modules/product/addtocart.js")"></script>
+    <script src="@Url.Content("/app/modules/profile/lastorderplaced.js")"></script>
 }
 
 <div class="working-area-holder">
@@ -46,7 +48,7 @@
 								</a>
 								<span class="sku-code">Product #@item.SkuCode</span>
 								<span class="selected-price">Selected Price @item.SelectedPrice</span>
-								<a href="#">
+								<a href="#" class="add-to-cart block" data-sku-code="@item.SkuCode">
 									<img src="/assets/images/addtocartorange.jpg"/>
 								</a>
 								<a class="review-product-link" href="@($"{item.ProductUrl}?review=true")">
