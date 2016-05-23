@@ -323,7 +323,7 @@ namespace VitalChoice.Ecommerce.Context
                 entity.Ignore(p => p.OptionTypes);
                 entity
                     .HasMany(p => p.ProductsToCategories)
-                    .WithOne()
+                    .WithOne(p=>p.Product)
                     .HasForeignKey(t => t.IdProduct)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired();

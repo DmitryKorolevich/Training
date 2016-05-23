@@ -15,5 +15,6 @@
         ContentPage = 11,
         ContentCategory = 12,
         ProductCategoryContent = 14,
+        ContentArea = 15,
     }
 }

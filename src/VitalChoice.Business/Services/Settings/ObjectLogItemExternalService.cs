@@ -36,6 +36,7 @@ namespace VitalChoice.Business.Services.Settings
                 var type = typeof(T);
                 var isDynamic = type.GetTypeInfo().IsSubclassOf(typeof(MappedObject));
                 var isContentDataItem = type.GetTypeInfo().IsSubclassOf(typeof(ContentDataItem));
+                var isLogEntity = type.GetTypeInfo().IsSubclassOf(typeof(LogEntity));
                 var isEntity = type.GetTypeInfo().IsSubclassOf(typeof(Entity));
                 var objectType = GetObjectType(type.Name, isDynamic, isEntity);
 
@@ -49,6 +50,10 @@ namespace VitalChoice.Business.Services.Settings
                     } else if (isContentDataItem)
                     {
                         item = TransformForContentDataItem(model as ContentDataItem, objectType);
+                    }
+                    else if (isLogEntity)
+                    {
+                        item = TransformForLogEntity(model as LogEntity, objectType);
                     } else if (isEntity)
                     {
                         item = TransformForEntity(model as Entity, objectType);
@@ -125,6 +130,20 @@ namespace VitalChoice.Business.Services.Settings
             return item;
         }
 
+        private ObjectHistoryLogItem TransformForLogEntity(LogEntity model, ObjectType objectType)
+        {
+            ObjectHistoryLogItem item = new ObjectHistoryLogItem
+            {
+                IdObjectType = (int)objectType,
+                DateCreated = DateTime.Now,
+                IdObject = model.Id,
+                IdObjectStatus = (int)model.StatusCode,
+                IdEditedBy = model.IdEditedBy,
+            };
+            //TODO - add needed fields to general implementiotn of Entity
+            return item;
+        }
+
         private ObjectHistoryLogItem TransformForEntity(Entity model, ObjectType objectType)
         {
             ObjectHistoryLogItem item = new ObjectHistoryLogItem
@@ -133,7 +152,6 @@ namespace VitalChoice.Business.Services.Settings
                 DateCreated = DateTime.Now,
                 IdObject = model.Id
             };
-            //TODO - add needed fields to general implementiotn of Entity
             return item;
         }
 

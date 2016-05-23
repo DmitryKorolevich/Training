@@ -41,6 +41,14 @@ angular.module('app.core.dataAccess.services.productService', [])
 	    {
 	        return $http.post(baseUrl + 'GetSkusInProductCategoryStatistic', filter, getConfig(tracker));
 	    },
+	    getProductsOnCategoryOrder: function (id, tracker)
+	    {
+	        return $http.get(baseUrl + 'GetProductsOnCategoryOrder/' + id, getConfig(tracker));
+	    },
+	    updateProductsOnCategoryOrder: function (id, model, tracker)
+	    {
+	        return $http.post(baseUrl + 'UpdateProductsOnCategoryOrder/' + id, model, getConfig(tracker));
+	    },
 
 	    //inventoryCategories
 	    getInventoryCategoriesTree: function (filter, tracker) {

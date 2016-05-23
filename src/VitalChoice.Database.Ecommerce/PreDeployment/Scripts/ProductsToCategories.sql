@@ -25,3 +25,14 @@ BEGIN
 	ALTER TABLE [dbo].[ProductsToCategories]
 	ADD CONSTRAINT PK_ProductsToCategories PRIMARY KEY (IdCategory, IdProduct)
 END
+
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id =  OBJECT_ID(N'[dbo].[ProductsToCategories]', N'U') AND name='Order')
+BEGIN
+
+	ALTER TABLE [dbo].[ProductsToCategories]
+	ADD [Order] INT NULL
+END
+
+GO

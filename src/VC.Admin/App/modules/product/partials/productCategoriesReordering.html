@@ -1,0 +1,32 @@
+﻿<div data-ng-if="item.SubItems && item.SubItems.length > 0">
+    <a class="btn btn-link pull-left" data-nodrag data-ng-click="toggle(this)">
+        <i class="glyphicon" ng-class="{'glyphicon-chevron-right': collapsed, 'glyphicon-chevron-down': !collapsed}"></i>
+    </a>
+</div>
+<div ui-tree-handle>
+    <div class="ya-treeview-content clearfix">
+        <div class="line">
+            <label>{{item.Name}}</label>
+            <span data-ng-if="item.StatusCode == 1" class="label label-warning category-status">Hidden</span>
+            <span data-ng-if="item.StatusCode == 2 && item.Assigned == 2" class="label label-wholesale category-status">Wholesale</span>
+        </div>
+        <div class="ya-treview-buttons" data-nodrag>
+            <a class="btn btn-success btn-xs" title="Add" nodrag data-ng-click="add(item.Id)">
+                <i class="glyphicon glyphicon-plus"></i>
+            </a>
+            <a class="btn btn-info btn-xs" title="Edit" nodrag data-ng-click="open(item.Id)">
+                <i class="glyphicon glyphicon-edit"></i>
+            </a>
+            <a class="btn btn-purple btn-xs" title="Manage Products Order" nodrag data-ng-click="productsOrder(item.Id)">
+                <i class="glyphicon glyphicon-edit"></i>
+            </a>
+            <a class="btn btn-danger btn-xs" title="Delete" nodrag data-ng-if="!item.SubItems || item.SubItems.length == 0" ladda="deleteTracker.active()" data-ng-click="delete(item.Id)">
+                <i class="glyphicon glyphicon-remove"></i>
+            </a>
+        </div>
+    </div>
+</div>
+<ol ui-tree-nodes="" data-ng-model="item.SubItems" data-ng-class="{hidden: collapsed}">
+    <li ng-repeat="item in item.SubItems" ui-tree-node data-ng-include="'app/modules/product/partials/productCategoriesReordering.html'">
+    </li>
+</ol>

@@ -24,11 +24,15 @@ namespace VitalChoice.Interfaces.Services.Products
 
 	    Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter);
 
+	    Task<ICollection<ProductCategoryOrderModel>> GetProductsOnCategoryOrderAsync(int idCategory);
+
+	    Task<bool> UpdateProductsOnCategoryOrderAsync(int idCategory, ICollection<ProductCategoryOrderModel> products);
+
         #endregion
 
         #region Skus
 
-	    Task<ICollection<SkuOptionValue>> GetSkuOptionValues(ICollection<int> skuIds,ICollection<int> optionIds);
+        Task<ICollection<SkuOptionValue>> GetSkuOptionValues(ICollection<int> skuIds,ICollection<int> optionIds);
 
         Task<Dictionary<int, int>> GetTopPurchasedSkuIdsAsync(FilterBase filter, int idCustomer);
 

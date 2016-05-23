@@ -90,7 +90,7 @@ function ($scope, $rootScope, $state, $stateParams, $timeout, settingService, to
             $scope.lookup.LookupVariants = [];
             $scope.lookup.LookupVariants = variants;
         }
-    }
+    };
 
     $scope.addVariant = function ()
     {

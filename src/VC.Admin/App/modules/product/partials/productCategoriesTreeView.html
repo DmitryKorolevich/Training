@@ -20,7 +20,7 @@
                             <button data-ng-if="categoriesExpanded" data-ng-click="updateCategoriesCollapsed(false);" class="btn btn-primary btn-xs expand-button">Collapse All</button>
                             <div ui-tree class="ya-treeview">
                                 <ol ui-tree-nodes data-ng-model="rootCategory.SubItems">
-                                    <li ng-repeat="item in rootCategory.SubItems" ui-tree-node data-ng-include="'app/modules/content/partials/contentCategoriesReordering.html'">
+                                    <li ng-repeat="item in rootCategory.SubItems" ui-tree-node data-ng-include="'app/modules/product/partials/productCategoriesReordering.html'">
                                     </li>
                                 </ol>
                             </div>

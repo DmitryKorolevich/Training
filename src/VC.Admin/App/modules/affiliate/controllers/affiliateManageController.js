@@ -30,15 +30,22 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
             if (result.Success)
             {
                 toaster.pop('success', "Success!", "Successfully saved.");
-                $scope.affiliate.Id = result.Data.Id;
-                $scope.orderFilter.IdAffiliate = result.Data.Id;
-                $scope.customerFilter.IdAffiliate = result.Data.Id;
-                $scope.affiliate.DateEdited = result.Data.DateEdited;
-                $scope.affiliate.Email = result.Data.Email;
-                $scope.affiliate.StatusCode = result.Data.StatusCode;
-                $scope.affiliate.ActivatePending = false;
-                $scope.options.LoginAsAffiliateUrl = affiliateService.getLoginAsAffiliateUrl($scope.affiliate.Id, $rootScope.buildNumber);
-                refreshHistory();
+                if ($scope.affiliate.Id)
+                {
+                    $scope.affiliate.Id = result.Data.Id;
+                    $scope.orderFilter.IdAffiliate = result.Data.Id;
+                    $scope.customerFilter.IdAffiliate = result.Data.Id;
+                    $scope.affiliate.DateEdited = result.Data.DateEdited;
+                    $scope.affiliate.Email = result.Data.Email;
+                    $scope.affiliate.StatusCode = result.Data.StatusCode;
+                    $scope.affiliate.ActivatePending = false;
+                    $scope.options.LoginAsAffiliateUrl = affiliateService.getLoginAsAffiliateUrl($scope.affiliate.Id, $rootScope.buildNumber);
+                    refreshHistory();
+                }
+                else
+                {
+                    $state.go('index.oneCol.affiliateDetail', { id: result.Data.Id });
+                }
             } else
             {
                 var messages = "";

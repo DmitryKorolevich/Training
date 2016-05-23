@@ -81,10 +81,20 @@
         $state.go('index.oneCol.productCategoryDetail', { id: id });
     };
 
-    $scope.add = function(id)
+    $scope.add = function (id)
     {
         $state.go('index.oneCol.addNewProductCategory', { categoryid: id });
-    }
+    };
+
+    $scope.productsOrder = function (id)
+    {
+        modalUtil.open('app/modules/product/partials/manageProductsOrderPopup.html', 'manageProductsOrderController', {
+            idCategory: id, thenCallback: function (data)
+            {
+                
+            }
+        }, { size: 'xs' });
+    };
 
     $scope.delete = function (id) {
         confirmUtil.confirm(function () {

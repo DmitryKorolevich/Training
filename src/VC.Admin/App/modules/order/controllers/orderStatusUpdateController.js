@@ -6,7 +6,8 @@ function ($scope, $rootScope, $state, $stateParams, $timeout, orderService, toas
 {
     $scope.refreshTracker = promiseTracker("get");
 
-    function successSaveHandler(result) {
+    function successSaveHandler(result)
+    {
         if (result.Success)
         {
             if (!$scope.order.OrderPart)
@@ -20,13 +21,17 @@ function ($scope, $rootScope, $state, $stateParams, $timeout, orderService, toas
                 $scope.order.CurrentIdNPStatus = $scope.order.Status;
             }
             toaster.pop('success', "Success!", "Successfully updated.");
-        } else {
+        } else
+        {
             var messages = "";
-            if (result.Messages) {
+            if (result.Messages)
+            {
                 $scope.forms.form.submitted = true;
                 $scope.serverMessages = new ServerMessages(result.Messages);
-                $.each(result.Messages, function (index, value) {
-                    if (value.Field) {
+                $.each(result.Messages, function (index, value)
+                {
+                    if (value.Field)
+                    {
                         $scope.forms.form[value.Field].$setValidity("server", false);
                     }
                     messages += value.Message + "<br />";
@@ -36,7 +41,8 @@ function ($scope, $rootScope, $state, $stateParams, $timeout, orderService, toas
         }
     };
 
-    function errorHandler(result) {
+    function errorHandler(result)
+    {
         toaster.pop('error', "Error!", "Server error occured");
     };
 
@@ -45,14 +51,14 @@ function ($scope, $rootScope, $state, $stateParams, $timeout, orderService, toas
         $scope.options = {};
 
         $scope.orderStatuses = angular.copy($rootScope.ReferenceData.OrderStatuses);
-        $scope.orderParts=[
-            {Key: 2, Text: 'P'},
-            {Key: 1, Text: 'NP'}
+        $scope.orderParts = [
+            { Key: 2, Text: 'P' },
+            { Key: 1, Text: 'NP' }
         ];
 
         $scope.forms = {};
         $scope.order = {
-            Status:2,
+            Status: 2,
             OrderPart: null,
         };
         $scope.filter = {
@@ -65,28 +71,32 @@ function ($scope, $rootScope, $state, $stateParams, $timeout, orderService, toas
         };
     };
 
-    $scope.save = function () {
-        $.each($scope.forms.form, function (index, element) {
-        	if (element && element.$name == index) {
+    $scope.save = function ()
+    {
+        $.each($scope.forms.form, function (index, element)
+        {
+            if (element && element.$name == index)
+            {
                 element.$setValidity("server", true);
             }
         });
 
         if ($scope.forms.form.$valid)
         {
-            var id = parseInt($scope.options.loadedId);
-            if (id == NaN)
+            if ($scope.options.loadedId)
             {
-                id = 0;
+                var id = parseInt($scope.options.loadedId);
+                orderService.updateOrderStatus(id, $scope.order.Status, $scope.order.OrderPart, $scope.refreshTracker).success(function (result)
+                {
+                    successSaveHandler(result);
+                }).
+                error(function (result)
+                {
+                    errorHandler(result);
+                });
             }
-            orderService.updateOrderStatus(id, $scope.order.Status, $scope.order.OrderPart, $scope.refreshTracker).success(function (result)
-            {
-                successSaveHandler(result);
-            }).
-            error(function (result) {
-                errorHandler(result);
-            });
-        } else {
+        } else
+        {
             $scope.forms.form.submitted = true;
         }
     };
@@ -109,7 +119,7 @@ function ($scope, $rootScope, $state, $stateParams, $timeout, orderService, toas
 
     $scope.idLoaded = function (item, model, label)
     {
-        $scope.options.loadedId=$scope.order.Id;
+        $scope.options.loadedId = $scope.order.Id;
         $scope.order.CurrentIdStatus = item.OrderStatus;
         $scope.order.CurrentIdPStatus = item.POrderStatus;
         $scope.order.CurrentIdNPStatus = item.NPOrderStatus;

@@ -38,12 +38,7 @@ namespace VC.Admin.Controllers
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
 			}
 
-			return new ContentAreaReadModel()
-			{
-				Id = res.Id,
-				Template = res.Template,
-				Name = res.Name
-			};
+		    return new ContentAreaReadModel(res);
 		}
 
 		[HttpPost]
@@ -65,7 +60,7 @@ namespace VC.Admin.Controllers
 
 			contentArea = await _contentAreaService.UpdateContentAreaAsync(contentArea);
 
-			return new ContentAreaReadModel() {Name = contentArea.Name, Template = contentArea.Template, Id = contentArea.Id};
+		    return new ContentAreaReadModel(contentArea);
 		}
 
 	    [HttpGet]

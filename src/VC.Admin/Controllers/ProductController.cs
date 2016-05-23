@@ -142,6 +142,18 @@ namespace VC.Admin.Controllers
             return toReturn.OrderByDescending(p => p.Ordered).Take(20).ToList();
         }
 
+        [HttpGet]
+        public async Task<Result<ICollection<ProductCategoryOrderModel>>> GetProductsOnCategoryOrder(int id)
+        {
+            return (await productService.GetProductsOnCategoryOrderAsync(id)).ToList();
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> UpdateProductsOnCategoryOrder(int id, [FromBody]ICollection<ProductCategoryOrderModel> products)
+        {
+            return await productService.UpdateProductsOnCategoryOrderAsync(id, products);
+        }
+
         [HttpPost]
         public async Task<Result<PagedList<ProductListItemModel>>> GetProducts([FromBody]VProductSkuFilter filter)
         {
