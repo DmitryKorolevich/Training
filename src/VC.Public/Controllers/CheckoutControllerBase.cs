@@ -108,7 +108,7 @@ namespace VC.Public.Controllers
             {
                 context.Messages.Add(new MessageInfo
                 {
-                    Field = "PromoCode",
+                    Field = "DiscountCode",
                     Message = "Discount not found"
                 });
             }
@@ -178,14 +178,7 @@ namespace VC.Public.Controllers
             })));
             cartModel.Tax = order.TaxTotal;
             cartModel.OrderTotal = order.Total;
-            if ((bool?) order.IsFirstHealthwise ?? false)
-            {
-                cartModel.DiscountCode = "HEALTHWISE";
-            }
-            else
-            {
-                cartModel.DiscountCode = order.Discount?.Code;
-            }
+            cartModel.DiscountCode = order.Discount?.Code;
             cartModel.ShippingCost = order.ShippingTotal;
             cartModel.SubTotal = order.ProductsSubtotal;
             if (((ShipDelayType?) order.SafeData.ShipDelayType ?? ShipDelayType.None) != ShipDelayType.None)

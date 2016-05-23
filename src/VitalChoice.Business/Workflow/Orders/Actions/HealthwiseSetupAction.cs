@@ -17,9 +17,13 @@ namespace VitalChoice.Business.Workflow.Orders.Actions
 
         public override Task<decimal> ExecuteActionAsync(OrderDataContext context, IWorkflowExecutionContext executionContext)
         {
-            if (((bool?)context.Order.Customer?.SafeData.HasHealthwiseOrders ?? false) && (int?)context.Order.SafeData.OrderType == (int)SourceOrderType.Web)
+            if ((int?) context.Order.SafeData.OrderType == (int) SourceOrderType.Web)
             {
-                context.Order.Data.IsHealthwise = true;
+                if (context.Order.Discount?.Code.ToLower() == "healthwise" ||
+                    ((bool?) context.Order.Customer?.SafeData.HasHealthwiseOrders ?? false))
+                {
+                    context.Order.Data.IsHealthwise = true;
+                }
             }
             return Task.FromResult<decimal>(0);
         }
