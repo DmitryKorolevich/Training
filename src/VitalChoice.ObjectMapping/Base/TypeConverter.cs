@@ -243,6 +243,11 @@ namespace VitalChoice.ObjectMapping.Base
             return CloneInternal(obj, objectType, copySkipCondition);
         }
 
+        public static IList Clone(IEnumerable obj, Type objectType, Func<string, bool> copySkipCondition = null)
+        {
+            return CloneInternal(obj, objectType, copySkipCondition);
+        }
+
         private static IList CloneInternal(IEnumerable obj, Type objectType, Func<Type, bool> copySkipCondition)
         {
             if (obj == null)
@@ -269,7 +274,38 @@ namespace VitalChoice.ObjectMapping.Base
             return resultList;
         }
 
+        private static IList CloneInternal(IEnumerable obj, Type objectType, Func<string, bool> copySkipCondition)
+        {
+            if (obj == null)
+                return null;
+
+            var resultList = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(objectType));
+            var objectCache = DynamicTypeCache.GetTypeCacheNoMap(objectType);
+
+            foreach (var item in obj)
+            {
+                var result = Activator.CreateInstance(objectType);
+
+                foreach (var pair in objectCache.Properties)
+                {
+                    if (copySkipCondition != null && copySkipCondition(pair.Key))
+                    {
+                        continue;
+                    }
+                    pair.Value.Set?.Invoke(result, pair.Value.Get?.Invoke(item));
+                }
+                resultList.Add(result);
+            }
+
+            return resultList;
+        }
+
         public static object Clone(object obj, Type objectType, Func<Type, bool> copySkipCondition = null)
+        {
+            return CloneInternal(obj, objectType, copySkipCondition);
+        }
+
+        public static object Clone(object obj, Type objectType, Func<string, bool> copySkipCondition = null)
         {
             return CloneInternal(obj, objectType, copySkipCondition);
         }
@@ -285,6 +321,25 @@ namespace VitalChoice.ObjectMapping.Base
             foreach (var pair in objectCache.Properties)
             {
                 if (copySkipCondition != null && copySkipCondition(pair.Value.PropertyType))
+                {
+                    continue;
+                }
+                pair.Value.Set?.Invoke(result, pair.Value.Get?.Invoke(obj));
+            }
+            return result;
+        }
+
+        private static object CloneInternal(object obj, Type objectType, Func<string, bool> copySkipCondition)
+        {
+            if (obj == null)
+                return null;
+
+            var result = Activator.CreateInstance(objectType);
+
+            var objectCache = DynamicTypeCache.GetTypeCacheNoMap(objectType);
+            foreach (var pair in objectCache.Properties)
+            {
+                if (copySkipCondition != null && copySkipCondition(pair.Key))
                 {
                     continue;
                 }
@@ -424,6 +479,22 @@ namespace VitalChoice.ObjectMapping.Base
             foreach (var pair in objectCache.Properties)
             {
                 if (copySkipCondition != null && copySkipCondition(pair.Value.PropertyType))
+                {
+                    continue;
+                }
+                var srcProperty = src == null ? null : pair.Value.Get?.Invoke(src);
+                pair.Value.Set?.Invoke(dest, srcProperty);
+            }
+        }
+
+        public static void CopyInto(object dest, object src, Type objectType, Func<string, bool> copySkipCondition)
+        {
+            if (dest == null)
+                return;
+            var objectCache = DynamicTypeCache.GetTypeCacheNoMap(objectType);
+            foreach (var pair in objectCache.Properties)
+            {
+                if (copySkipCondition != null && copySkipCondition(pair.Key))
                 {
                     continue;
                 }

@@ -106,7 +106,7 @@ namespace VitalChoice.Business.Services.Bronto
             }
             catch (Exception e)
             {
-                _logger.LogError(e.Message, e);
+                _logger.LogError(0, e, e.Message);
             }
             return false;
         }
@@ -146,7 +146,7 @@ namespace VitalChoice.Business.Services.Bronto
             }
             catch (Exception e)
             {
-                _logger.LogError(e.Message, e);
+                _logger.LogError(0, e, e.Message);
             }
             return false;
         }

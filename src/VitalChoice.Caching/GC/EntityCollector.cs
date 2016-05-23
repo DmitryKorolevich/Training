@@ -105,7 +105,7 @@ namespace VitalChoice.Caching.GC
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e.Message, e);
+                    _logger.LogError(0, e, e.Message);
                 }
             }
         }

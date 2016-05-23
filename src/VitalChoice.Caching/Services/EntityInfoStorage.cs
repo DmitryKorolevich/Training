@@ -330,7 +330,7 @@ namespace VitalChoice.Caching.Services
             }
             catch (Exception e)
             {
-                Logger.LogError(e.Message, e);
+                Logger.LogError(0, e, e.Message);
                 return trackData;
             }
         }

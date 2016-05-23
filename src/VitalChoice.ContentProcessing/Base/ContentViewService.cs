@@ -82,7 +82,7 @@ namespace VitalChoice.ContentProcessing.Base
             }
             catch (Exception e)
             {
-                Logger.LogError(e.Message, e);
+                Logger.LogError(0, e, e.Message);
                 return new ContentViewModel
                 {
                     Body = (e as TemplateCompileException)?.ToString()

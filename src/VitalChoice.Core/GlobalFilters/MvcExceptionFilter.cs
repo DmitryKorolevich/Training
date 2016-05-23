@@ -103,7 +103,7 @@ namespace VitalChoice.Core.GlobalFilters
 				        {
 				            SetDataChangedError(context, result);
 				            var logger = LoggerService.GetDefault();
-				            logger.LogError(context.Exception.Message, context.Exception);
+				            logger.LogError(0, context.Exception, context.Exception.Message);
 				        }
 				        else
 				        {
@@ -111,7 +111,7 @@ namespace VitalChoice.Core.GlobalFilters
 				            result.StatusCode = (int) HttpStatusCode.InternalServerError;
 
 				            var logger = LoggerService.GetDefault();
-				            logger.LogError(context.Exception.Message, context.Exception);
+				            logger.LogError(0, context.Exception, context.Exception.Message);
 				        }
 				    }
 				}
@@ -135,7 +135,7 @@ namespace VitalChoice.Core.GlobalFilters
 					result.StatusCode = (int)apiException.Status;
 
 					var logger = LoggerService.GetDefault();
-                    logger.LogError(context.Exception.Message, context.Exception);
+                    logger.LogError(0, context.Exception, context.Exception.Message);
                 }
 				context.Result = result;
 			}

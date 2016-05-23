@@ -82,7 +82,7 @@ namespace ExportServiceWithSBQueue.Services
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError(e.Message, e);
+                    Logger.LogError(0, e, e.Message);
                     SendCommand(new ServiceBusCommandBase(command, false));
                     return true;
                 }
@@ -108,7 +108,7 @@ namespace ExportServiceWithSBQueue.Services
                 }
                 catch(Exception e)
                 {
-                    Logger.LogError(e.Message, e);
+                    Logger.LogError(0, e, e.Message);
                     SendCommand(new ServiceBusCommandBase(command, false));
                     return true;
                 }

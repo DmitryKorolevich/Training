@@ -244,7 +244,7 @@ namespace VitalChoice.Caching.Services
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e.Message, e);
+                    _logger.LogError(0, e, e.Message);
                     cacheResult = CacheGetResult.NotFound;
                     return null;
                 }
@@ -260,7 +260,7 @@ namespace VitalChoice.Caching.Services
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e.Message, e);
+                    _logger.LogError(0, e, e.Message);
                     cacheResult = CacheGetResult.NotFound;
                     return default(T);
                 }
@@ -278,7 +278,7 @@ namespace VitalChoice.Caching.Services
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e.Message, e);
+                    _logger.LogError(0, e, e.Message);
                 }
                 return false;
             }
@@ -295,7 +295,7 @@ namespace VitalChoice.Caching.Services
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e.Message, e);
+                    _logger.LogError(0, e, e.Message);
                 }
                 return false;
             }

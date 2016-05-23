@@ -24,9 +24,19 @@ namespace VitalChoice.ObjectMapping.Extensions
             return (ICollection<T>) TypeConverter.Clone(obj, typeof (T), copySkipCondition);
         }
 
+        public static ICollection<T> Clone<T>(this ICollection<T> obj, Func<string, bool> copySkipCondition)
+        {
+            return (ICollection<T>)TypeConverter.Clone(obj, typeof(T), copySkipCondition);
+        }
+
         public static T Clone<T>(this T obj, Func<Type, bool> copySkipCondition = null)
         {
             return (T) TypeConverter.Clone(obj, typeof (T), copySkipCondition);
+        }
+
+        public static T Clone<T>(this T obj, Func<string, bool> copySkipCondition)
+        {
+            return (T)TypeConverter.Clone(obj, typeof(T), copySkipCondition);
         }
 
         public static object Clone(this object obj, Type objectType, Func<Type, bool> copySkipCondition = null)
@@ -35,6 +45,16 @@ namespace VitalChoice.ObjectMapping.Extensions
         }
 
         public static IList Clone(this IEnumerable obj, Type objectType, Func<Type, bool> copySkipCondition = null)
+        {
+            return TypeConverter.Clone(obj, objectType, copySkipCondition);
+        }
+
+        public static object Clone(this object obj, Type objectType, Func<string, bool> copySkipCondition)
+        {
+            return TypeConverter.Clone(obj, objectType, copySkipCondition);
+        }
+
+        public static IList Clone(this IEnumerable obj, Type objectType, Func<string, bool> copySkipCondition)
         {
             return TypeConverter.Clone(obj, objectType, copySkipCondition);
         }

@@ -322,8 +322,8 @@ namespace VitalChoice.Caching.Services.Cache
 
         private static T DeepCloneItem(T item, RelationInfo relations)
         {
-            var newItem = item.Clone(type => !type.GetTypeInfo().IsValueType && type != typeof (string));
-            item.CloneRelations(relations, newItem);
+            var newItem = item.Clone(relations.HasRelation);
+            item.UpdateCloneRelations(relations.Relations, newItem);
             return newItem;
         }
 
@@ -425,7 +425,9 @@ namespace VitalChoice.Caching.Services.Cache
                         }
                     }
                 }
-                _trackData.Add(trackKey, _context.Attach(result));
+                var newEntry = _context.Entry(result);
+                newEntry.State = EntityState.Unchanged;
+                _trackData.Add(trackKey, newEntry);
                 _trackedObjects.Add(result);
             }
             return result;

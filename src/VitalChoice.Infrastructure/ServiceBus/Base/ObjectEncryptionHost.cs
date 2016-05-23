@@ -242,7 +242,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 }
                 catch (CryptographicException e)
                 {
-                    _logger.LogError(e.Message, e);
+                    _logger.LogError(0, e, e.Message);
                 }
             }
             return default(T);
@@ -283,7 +283,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             }
             catch (CryptographicException e)
             {
-                _logger.LogError(e.Message, e);
+                _logger.LogError(0, e, e.Message);
             }
             catch (SerializationException)
             {
