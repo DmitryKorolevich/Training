@@ -42,7 +42,7 @@ module.exports = function (grunt) {
         less: {
         	development: {
 		        options: {
-			        paths: ["assets/styles"]
+		            paths: ["assets/styles"]
 		        },
 		        files:
 		        [
@@ -54,7 +54,7 @@ module.exports = function (grunt) {
 				        ext: '.css'
 			        }
 		        ]
-	        }
+        	}
         },
         uglify: {
         	options: {
