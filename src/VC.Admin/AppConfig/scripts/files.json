@@ -190,6 +190,7 @@
     "app/modules/product/controllers/outOfStocksController.js",
     "app/modules/product/controllers/productCategoriesStatisticController.js",
     "app/modules/product/controllers/sendOutOfStockRequestsPopupController.js",
+    "app/modules/product/controllers/manageProductsOrderController.js",
     "app/modules/product/product.js",
     "app/modules/inventorysku/controllers/inventorySkuCategoriesController.js",
     "app/modules/inventorysku/controllers/inventorySkuCategoryManageController.js",

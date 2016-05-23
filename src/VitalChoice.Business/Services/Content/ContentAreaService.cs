@@ -9,10 +9,15 @@ using VitalChoice.Interfaces.Services.Content;
 namespace VitalChoice.Business.Services.Content
 {
 	public class ContentAreaService : GenericService<ContentArea>, IContentAreaService
-	{
-		public ContentAreaService(IRepositoryAsync<ContentArea> repository) : base(repository)
-		{
-		}
+    {
+        private readonly IObjectLogItemExternalService _objectLogItemExternalService;
+
+        public ContentAreaService(
+            IRepositoryAsync<ContentArea> repository,
+            IObjectLogItemExternalService objectLogItemExternalService) : base(repository)
+        {
+            _objectLogItemExternalService = objectLogItemExternalService;
+        }
 
 		public async Task<ContentArea> GetContentAreaAsync(int id)
 		{
@@ -31,7 +36,11 @@ namespace VitalChoice.Business.Services.Content
 
 		public async Task<ContentArea> UpdateContentAreaAsync(ContentArea contentArea)
 		{
-			return await UpdateAsync(contentArea);
+			var toReturn = await UpdateAsync(contentArea);
+
+            await _objectLogItemExternalService.LogItem(toReturn);
+
+		    return toReturn;
 		}
 	}
 }

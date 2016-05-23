@@ -5,8 +5,8 @@ using VitalChoice.Infrastructure.Domain.Entities.Users;
 
 namespace VitalChoice.Infrastructure.Domain.Content
 {
-    public class ContentArea : Entity
-	{
+    public class ContentArea : LogEntity
+    {
 		public string Name { get; set; }
 
 		public DateTime Created { get; set; }
@@ -14,10 +14,6 @@ namespace VitalChoice.Infrastructure.Domain.Content
 		public DateTime Updated { get; set; }
 
 		public string Template { get; set; }
-
-		public RecordStatusCode StatusCode { get; set; }
-
-		public int? IdEditedBy { get; set; }
 
 		public ApplicationUser User { get; set; }
 	}

@@ -53,6 +53,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly VProductSkuRepository _vProductSkuRepository;
         private readonly IEcommerceRepositoryAsync<VSku> _vSkuRepository;
         private readonly IEcommerceRepositoryAsync<Product> _productRepository;
+        private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoryRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
         private readonly ProductMapper _mapper;
         private readonly IEcommerceRepositoryAsync<VCustomerFavorite> _vCustomerFavoriteRepository;
@@ -171,7 +172,9 @@ namespace VitalChoice.Business.Services.Products
 
         public ProductService(VProductSkuRepository vProductSkuRepository,
             IEcommerceRepositoryAsync<VSku> vSkuRepository,
-            IEcommerceRepositoryAsync<Lookup> lookupRepository, IEcommerceRepositoryAsync<Product> productRepository,
+            IEcommerceRepositoryAsync<Lookup> lookupRepository, 
+            IEcommerceRepositoryAsync<Product> productRepository,
+            IEcommerceRepositoryAsync<ProductToCategory> productToCategoryRepository,
             IEcommerceRepositoryAsync<Sku> skuRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository, ProductMapper mapper,
             IObjectLogItemExternalService objectLogItemExternalService,
@@ -200,6 +203,7 @@ namespace VitalChoice.Business.Services.Products
             _vProductSkuRepository = vProductSkuRepository;
             _vSkuRepository = vSkuRepository;
             _productRepository = productRepository;
+            _productToCategoryRepository = productToCategoryRepository;
             _skuRepository = skuRepository;
             _mapper = mapper;
             _adminProfileRepository = adminProfileRepository;
@@ -709,6 +713,57 @@ namespace VitalChoice.Business.Services.Products
             }
 
             return toReturn;
+        }
+
+        public async Task<ICollection<ProductCategoryOrderModel>> GetProductsOnCategoryOrderAsync(int idCategory)
+        {
+            List<ProductCategoryOrderModel> toReturn=new List<ProductCategoryOrderModel>();
+
+            var productsOnCategory = await _productToCategoryRepository.Query(p=>p.IdCategory==idCategory && 
+                p.Product.StatusCode!=(int)RecordStatusCode.Deleted).SelectAsync();
+            var products = await SelectAsync(productsOnCategory.Select(p=>p.IdProduct).ToList());
+
+            foreach (var productOnCategory in productsOnCategory.OrderBy(p=>p.Order))
+            {
+                var productDynamic = products.FirstOrDefault(p => p.Id == productOnCategory.IdProduct);
+                if (productDynamic != null)
+                {
+                    ProductCategoryOrderModel item = new ProductCategoryOrderModel();
+                    item.Id = productDynamic.Id;
+                    item.DisplayName = productDynamic.Name;
+                    if (productDynamic.SafeData.SubTitle != null)
+                    {
+                        item.DisplayName += " " + productDynamic.SafeData.SubTitle;
+                    }
+                    toReturn.Add(item);
+                }
+            }
+
+            return toReturn;
+        }
+
+        public async Task<bool> UpdateProductsOnCategoryOrderAsync(int idCategory, ICollection<ProductCategoryOrderModel> products)
+        {
+            List<ProductCategoryOrderModel> toReturn = new List<ProductCategoryOrderModel>();
+
+            var dbProductsOnCategory = await _productToCategoryRepository.Query(p => p.IdCategory == idCategory &&
+                p.Product.StatusCode != (int)RecordStatusCode.Deleted).SelectAsync();
+
+            int order = 0;
+            foreach (var productCategoryOrderModel in products)
+            {
+                var dbProductOnCategory =
+                    dbProductsOnCategory.FirstOrDefault(p => p.IdProduct == productCategoryOrderModel.Id);
+                if (dbProductOnCategory != null)
+                {
+                    dbProductOnCategory.Order = order;
+                    order++;
+                }
+            }
+
+            await _productToCategoryRepository.UpdateRangeAsync(dbProductsOnCategory);
+
+            return true;
         }
 
         #endregion

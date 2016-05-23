@@ -70,7 +70,8 @@ namespace VitalChoice.Business.Services.Dynamic
                         i => new ProductToCategory
                         {
                             IdCategory = i,
-                            IdProduct = dynamic.Id
+                            IdProduct = dynamic.Id,
+                            Order = Int32.MaxValue,
                         });
                 }
 
@@ -93,7 +94,8 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.ProductsToCategories = dynamic.CategoryIds?.Select(c => new ProductToCategory
                 {
                     IdCategory = c,
-                    IdProduct = dynamic.Id
+                    IdProduct = dynamic.Id,
+                    Order = Int32.MaxValue,
                 }).ToList();
 
                 if (entity.Skus == null)

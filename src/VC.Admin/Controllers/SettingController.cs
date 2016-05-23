@@ -35,6 +35,7 @@ using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Content.Recipes;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Data.Extensions;
+using VitalChoice.Infrastructure.Domain.Content;
 using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VC.Admin.Controllers
@@ -305,6 +306,9 @@ namespace VC.Admin.Controllers
                     break;
                 case ObjectType.ProductCategoryContent:
                     toReturn = new KeyValuePair<Type, Type>(typeof(ProductCategoryContent), typeof(ProductCategoryManageModel));
+                    break;
+                case ObjectType.ContentArea:
+                    toReturn = new KeyValuePair<Type, Type>(typeof(ContentArea), typeof(ContentAreaReadModel));
                     break;
                 default:
                     throw new NotImplementedException();
