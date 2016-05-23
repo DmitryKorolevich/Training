@@ -2,6 +2,9 @@
 @using System.Threading.Tasks
 @using Microsoft.AspNet.Mvc.Rendering
 @using VC.Public.Models.Checkout
+@using VitalChoice.Core.Infrastructure.Helpers
+@using VitalChoice.Interfaces.Services
+@inject IAppInfrastructureService InfrastructureService
 @model  AddUpdateBillingAddressModel
 
 <input id="hdCountry" value="@Html.DisplayForEx(x => x.IdCountry)" type="hidden">
@@ -54,7 +57,7 @@
 	<div class="form-group">
 		@Html.LabelFor(m => m.Email, new { @class = "control-label" })
 		<div class="input-group">
-			@if (User.Identity.IsAuthenticated)
+			@if (User.Identity.IsAuthenticated && InfrastructureService.IsValidCustomer(User))
 			{
 				<label class="form-control-static">@Html.DisplayForEx(m => m.Email)</label>
 			}
