@@ -2280,7 +2280,7 @@ namespace VitalChoice.Business.Services.Orders
         {
             using (var uow = CreateUnitOfWork())
             {
-                await UpdateHealthwiseOrderInnerAsync(uow, order.Id, order.Customer.Id, order.DateCreated, isHealthwise, false);
+                await UpdateHealthwiseOrderInnerAsync(uow, order.Id, order.Customer.Id, order.DateCreated, isHealthwise, order.IsFirstHealthwise);
                 if (isHealthwise)
                 {
                     var option = _customerMapper.OptionTypes.FirstOrDefault(p => p.Name == "HasHealthwiseOrders");
@@ -2331,25 +2331,26 @@ namespace VitalChoice.Business.Services.Orders
                     (await healthwiseOrderRepositoryAsync.Query(p => p.Id == idOrder).SelectAsync(false)).FirstOrDefault();
                 if (healthwiseOrder == null)
                 {
-                    using (var transaction = uow.BeginTransaction())
-                    {
-                        try
-                        {
-                            healthwiseOrderRepositoryAsync.Delete(idOrder);
-                            if (isFirstHealthwise)
-                            {
-                                var customer = await _customerService.SelectAsync(idCustomer, true);
-                                customer.Data.HasHealthwiseOrders = false;
-                                await _customerService.UpdateAsync(customer);
-                            }
-                            transaction.Commit();
-                        }
-                        catch
-                        {
-                            transaction.Rollback();
-                            throw;
-                        }
-                    }
+                    //BUG: doesn't make any sense to delete not exists HW order
+                    //using (var transaction = uow.BeginTransaction())
+                    //{
+                    //    try
+                    //    {
+                    //        healthwiseOrderRepositoryAsync.Delete(idOrder);
+                    //        if (isFirstHealthwise)
+                    //        {
+                    //            var customer = await _customerService.SelectAsync(idCustomer, true);
+                    //            customer.Data.HasHealthwiseOrders = false;
+                    //            await _customerService.UpdateAsync(customer);
+                    //        }
+                    //        transaction.Commit();
+                    //    }
+                    //    catch
+                    //    {
+                    //        transaction.Rollback();
+                    //        throw;
+                    //    }
+                    //}
                     var maxCount = _appInfrastructureService.Data().AppSettings.HealthwisePeriodMaxItemsCount;
                     var orderCreatedDate = orderDateCreated;
                     var periods =

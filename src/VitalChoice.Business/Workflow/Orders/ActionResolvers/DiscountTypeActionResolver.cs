@@ -100,19 +100,36 @@ namespace VitalChoice.Business.Workflow.Orders.ActionResolvers
                     });
                     noIssues = false;
                 }
-                
-                if (((bool?) dataContext.Order.Discount.SafeData.AllowHealthwise ?? false) && dataContext.Order.Data.OrderType == (int)SourceOrderType.Web)
+
+                if (noIssues)
                 {
-                    if ((bool?) dataContext.Order.Customer?.SafeData.HasHealthwiseOrders ?? false)
+                    if ((bool?) dataContext.Order.Discount.SafeData.AllowHealthwise ?? false)
                     {
-                        dataContext.Order.IsFirstHealthwise = false;
+                        if (dataContext.Order.Data.OrderType == (int) SourceOrderType.Web)
+                        {
+                            if ((bool?) dataContext.Order.Customer?.SafeData.HasHealthwiseOrders ?? false)
+                            {
+                                dataContext.Order.IsFirstHealthwise = false;
+                            }
+                            else if ((bool?) dataContext.Order.Data.IsHealthwise ?? false)
+                            {
+                                dataContext.Order.IsFirstHealthwise = true;
+                            }
+                        }
+                        else
+                        {
+                            dataContext.Messages.Add(new MessageInfo
+                            {
+                                Message = "Discount not valid. WEB order only",
+                                Field = "DiscountCode"
+                            });
+                        }
+                    }
+                    else
+                    {
+                        dataContext.Order.Data.IsHealthwise = false;
                     }
                 }
-                else
-                {
-                    dataContext.Order.Data.IsHealthwise = false;
-                }
-                
             }
 
             return noIssues;

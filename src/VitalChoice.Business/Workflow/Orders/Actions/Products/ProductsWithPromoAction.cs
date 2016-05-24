@@ -43,7 +43,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
                     promo.Enabled = false;
 
                 }
-                if (!(bool)promo.Promotion.Data.AllowHealthwise)
+                if (promo.Promotion != null && !(bool) promo.Promotion.Data.AllowHealthwise)
                 {
                     dataContext.Order.Data.IsHealthwise = false;
                 }

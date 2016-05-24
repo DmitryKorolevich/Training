@@ -11,6 +11,7 @@ using VC.Public.Models.Cart;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Core.Services;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;

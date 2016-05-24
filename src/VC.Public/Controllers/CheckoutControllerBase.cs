@@ -108,7 +108,7 @@ namespace VC.Public.Controllers
             {
                 context.Messages.Add(new MessageInfo
                 {
-                    Field = "PromoCode",
+                    Field = "DiscountCode",
                     Message = "Discount not found"
                 });
             }
@@ -185,7 +185,6 @@ namespace VC.Public.Controllers
             else
             {
                 cartModel.DiscountCode = order.Discount?.Code;
-            }
             cartModel.ShippingCost = order.ShippingTotal;
             cartModel.SubTotal = order.ProductsSubtotal;
             if (((ShipDelayType?) order.SafeData.ShipDelayType ?? ShipDelayType.None) != ShipDelayType.None)
