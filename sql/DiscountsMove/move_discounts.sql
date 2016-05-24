@@ -189,21 +189,21 @@ INNER JOIN [vitalchoice2.0].dbo.productDiscounts AS p ON p.idDiscount = d.iddisc
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.DiscountTiers
 (Amount, [Percent], [From], [To], IdDiscount, IdDiscountType, [Order])
-SELECT d.tier1value, d.tier1percent, d.tier1thresholdStart, d.tier1thresholdEnd, d.iddiscount, CASE WHEN d.tier1percent IS NOT NULL AND d.tier1percent > 0 THEN 2 ELSE 1 END, 0
+SELECT d.tier1value, d.tier1value, d.tier1thresholdStart, d.tier1thresholdEnd, d.iddiscount, CASE WHEN d.tier1percent IS NOT NULL AND d.tier1percent > 0 THEN 2 ELSE 1 END, 0
 FROM [vitalchoice2.0].dbo.discounts AS d
 WHERE d.tiered <> 0 AND d.tier1thresholdStart > 0
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.DiscountTiers
 (Amount, [Percent], [From], [To], IdDiscount, IdDiscountType, [Order])
-SELECT d.tier2value, d.tier2percent, d.tier1thresholdEnd + 0.01, d.tier2thresholdEnd, d.iddiscount, CASE WHEN d.tier2percent IS NOT NULL AND d.tier2percent > 0 THEN 2 ELSE 1 END, 1
+SELECT d.tier2value, d.tier2value, d.tier1thresholdEnd + 0.01, d.tier2thresholdEnd, d.iddiscount, CASE WHEN d.tier2percent IS NOT NULL AND d.tier2percent > 0 THEN 2 ELSE 1 END, 1
 FROM [vitalchoice2.0].dbo.discounts AS d
-WHERE d.tiered <> 0 AND d.tier1thresholdEnd > 0
+WHERE d.tiered <> 0 AND d.tier1thresholdEnd > 0 AND d.tier1thresholdStart > 0
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.DiscountTiers
 (Amount, [Percent], [From], [To], IdDiscount, IdDiscountType, [Order])
-SELECT d.tier3value, d.tier3percent, d.tier2thresholdEnd + 0.01, d.tier3thresholdEnd, d.iddiscount, CASE WHEN d.tier3percent IS NOT NULL AND d.tier3percent > 0 THEN 2 ELSE 1 END, 2
+SELECT d.tier3value, d.tier3value, d.tier2thresholdEnd + 0.01, d.tier3thresholdEnd, d.iddiscount, CASE WHEN d.tier3percent IS NOT NULL AND d.tier3percent > 0 THEN 2 ELSE 1 END, 2
 FROM [vitalchoice2.0].dbo.discounts AS d
-WHERE d.tiered <> 0 AND d.tier2thresholdEnd > 0
+WHERE d.tiered <> 0 AND d.tier2thresholdEnd > 0 AND d.tier1thresholdEnd > 0 AND d.tier1thresholdStart > 0
 
 GO
 
