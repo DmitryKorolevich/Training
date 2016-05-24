@@ -43,6 +43,8 @@ using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.Content.ContentCrossSells;
+using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.SharedWeb.Helpers;
 using VitalChoice.SharedWeb.Models.Orders;
@@ -61,14 +63,15 @@ namespace VC.Public.Controllers
         private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _customerPaymentMethodConverter;
         private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _orderPaymentMethodConverter;
         private readonly IDynamicMapper<OrderDynamic, Order> _orderConverter;
-		private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
-		private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
-		private readonly IDynamicMapper<OrderDynamic, Order> _orderMapper;
-		private readonly IProductService _productService;
+        private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
+        private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
+        private readonly IDynamicMapper<OrderDynamic, Order> _orderMapper;
+        private readonly IProductService _productService;
         private readonly IOrderService _orderService;
         private readonly IHelpService _helpService;
         private readonly IHealthwiseService _healthwiseService;
-	    private readonly ICountryService _countryService;
+        private readonly ICountryService _countryService;
+        private readonly IContentCrossSellService _contentCrossSellService;
         private readonly ILogger _logger;
 
         public ProfileController(IStorefrontUserService storefrontUserService,
@@ -81,7 +84,14 @@ namespace VC.Public.Controllers
             IHealthwiseService healthwiseService, IAppInfrastructureService infrastructureService,
             IAuthorizationService authorizationService, ICheckoutService checkoutService,
             ILoggerProviderExtended loggerProvider,
-            IPageResultService pageResultService, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper, ICountryService countryService, IDynamicMapper<OrderDynamic, Order> orderMapper, IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodConverter)
+            IPageResultService pageResultService,
+            IDynamicMapper<SkuDynamic, Sku> skuMapper, 
+            IDynamicMapper<ProductDynamic, Product> productMapper,
+            ICountryService countryService,
+            IContentCrossSellService contentCrossSellService,
+            IDynamicMapper<OrderDynamic, Order> orderMapper, 
+            IDynamicMapper<OrderPaymentMethodDynamic,
+                OrderPaymentMethod> orderPaymentMethodConverter)
             : base(customerService, infrastructureService, authorizationService, checkoutService, pageResultService)
         {
             _storefrontUserService = storefrontUserService;
@@ -92,66 +102,67 @@ namespace VC.Public.Controllers
             _productService = productService;
             _helpService = helpService;
             _healthwiseService = healthwiseService;
-	        _skuMapper = skuMapper;
-	        _productMapper = productMapper;
-	        _countryService = countryService;
-	        _orderMapper = orderMapper;
-	        _orderPaymentMethodConverter = orderPaymentMethodConverter;
-	        _logger = loggerProvider.CreateLoggerDefault();
+            _skuMapper = skuMapper;
+            _productMapper = productMapper;
+            _countryService = countryService;
+            _orderMapper = orderMapper;
+            _orderPaymentMethodConverter = orderPaymentMethodConverter;
+            _contentCrossSellService = contentCrossSellService;
+            _logger = loggerProvider.CreateLoggerDefault();
         }
 
-	    private async Task<PagedListEx<AutoShipHistoryItemModel>> PopulateAutoShipHistoryModel(OrderFilter filter)
-		{
-			var infr = InfrastructureService.Data();
-			var countries = await _countryService.GetCountriesAsync();
+        private async Task<PagedListEx<AutoShipHistoryItemModel>> PopulateAutoShipHistoryModel(OrderFilter filter)
+        {
+            var infr = InfrastructureService.Data();
+            var countries = await _countryService.GetCountriesAsync();
 
-			var customer = await GetCurrentCustomerDynamic();
+            var customer = await GetCurrentCustomerDynamic();
 
-			filter.IdCustomer = customer.Id;
-			filter.Sorting.SortOrder = SortOrder.Desc;
-			filter.Sorting.Path = VOrderSortPath.DateCreated;
-			filter.OrderType = OrderType.AutoShip;
-			
-			var orders = await _orderService.GetFullAutoShipsAsync(filter);
+            filter.IdCustomer = customer.Id;
+            filter.Sorting.SortOrder = SortOrder.Desc;
+            filter.Sorting.Path = VOrderSortPath.DateCreated;
+            filter.OrderType = OrderType.AutoShip;
 
-			var helper = new AutoShipModelHelper(_skuMapper, _productMapper, _orderMapper, infr, countries);
-			var ordersModel = new PagedListEx<AutoShipHistoryItemModel>
-			{
-				Items = (await Task.WhenAll(orders.Items.Select(async p => await helper.PopulateAutoShipItemModel(p)))).ToList(),
-				Count = orders.Count,
-				Index = filter.Paging.PageIndex
-			};
+            var orders = await _orderService.GetFullAutoShipsAsync(filter);
 
-			return ordersModel;
-		}
+            var helper = new AutoShipModelHelper(_skuMapper, _productMapper, _orderMapper, infr, countries);
+            var ordersModel = new PagedListEx<AutoShipHistoryItemModel>
+            {
+                Items = (await Task.WhenAll(orders.Items.Select(async p => await helper.PopulateAutoShipItemModel(p)))).ToList(),
+                Count = orders.Count,
+                Index = filter.Paging.PageIndex
+            };
 
-		private async Task<BillingInfoModel> GetBillingDetailsInternal(int id, int orderId)
-		{
-			var currentCustomer = await GetCurrentCustomerDynamic();
+            return ordersModel;
+        }
 
-			BillingInfoModel model;
-			if (id > 0 )
-			{
-				var dynamic = currentCustomer.CustomerPaymentMethods
-				.Single(p => p.IdObjectType == (int)PaymentMethodType.CreditCard && p.Id == id);
-				model = await _addressConverter.ToModelAsync<BillingInfoModel>(dynamic.Address);
+        private async Task<BillingInfoModel> GetBillingDetailsInternal(int id, int orderId)
+        {
+            var currentCustomer = await GetCurrentCustomerDynamic();
+
+            BillingInfoModel model;
+            if (id > 0)
+            {
+                var dynamic = currentCustomer.CustomerPaymentMethods
+                .Single(p => p.IdObjectType == (int)PaymentMethodType.CreditCard && p.Id == id);
+                model = await _addressConverter.ToModelAsync<BillingInfoModel>(dynamic.Address);
                 await _customerPaymentMethodConverter.UpdateModelAsync(model, dynamic);
-			}
-			else if(orderId > 0)
-			{
-				var order = await _orderService.SelectAsync(orderId);
-				model = await _addressConverter.ToModelAsync<BillingInfoModel>(order.PaymentMethod.Address);
+            }
+            else if (orderId > 0)
+            {
+                var order = await _orderService.SelectAsync(orderId);
+                model = await _addressConverter.ToModelAsync<BillingInfoModel>(order.PaymentMethod.Address);
                 await _orderPaymentMethodConverter.UpdateModelAsync(model, order.PaymentMethod);
-			}
-			else
-			{
-				throw new ApiException();
-			}
+            }
+            else
+            {
+                throw new ApiException();
+            }
 
-			return model;
-		}
+            return model;
+        }
 
-		private async Task<PagedListEx<OrderHistoryItemModel>> PopulateOrderHistoryModel(VOrderFilter filter)
+        private async Task<PagedListEx<OrderHistoryItemModel>> PopulateOrderHistoryModel(VOrderFilter filter)
         {
             var internalId = GetInternalCustomerId();
 
@@ -185,7 +196,7 @@ namespace VC.Public.Controllers
             var creditCards = new List<BillingInfoModel>();
             foreach (
                 var creditCard in
-                    currentCustomer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard))
+                    currentCustomer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard))
             {
                 var billingInfoModel = await _addressConverter.ToModelAsync<BillingInfoModel>(creditCard.Address);
                 await _customerPaymentMethodConverter.UpdateModelAsync(billingInfoModel, creditCard);
@@ -199,7 +210,7 @@ namespace VC.Public.Controllers
             if (creditCards.Any())
             {
                 model = selectedId > 0 ? creditCards.Single(x => x.Id == selectedId) : creditCards.FirstOrDefault(x => x.Default) ?? creditCards.FirstOrDefault();
-				ViewBag.CreditCards = creditCards.ToJson();
+                ViewBag.CreditCards = creditCards.ToJson();
             }
             else
             {
@@ -354,25 +365,25 @@ namespace VC.Public.Controllers
             {
                 var creditCardToUpdate =
                     currentCustomer.CustomerPaymentMethods.Single(
-                        x => x.IdObjectType == (int) PaymentMethodType.CreditCard && x.Id == model.Id);
+                        x => x.IdObjectType == (int)PaymentMethodType.CreditCard && x.Id == model.Id);
                 currentCustomer.CustomerPaymentMethods.Remove(creditCardToUpdate);
             }
 
-			var otherAddresses = currentCustomer.CustomerPaymentMethods.Where(x => x.IdObjectType == (int)PaymentMethodType.CreditCard).ToList();
-			if (model.Default)
-			{
-				foreach (var otherAddress in otherAddresses)
-				{
-					otherAddress.Data.Default = false;
-				}
-			}
+            var otherAddresses = currentCustomer.CustomerPaymentMethods.Where(x => x.IdObjectType == (int)PaymentMethodType.CreditCard).ToList();
+            if (model.Default)
+            {
+                foreach (var otherAddress in otherAddresses)
+                {
+                    otherAddress.Data.Default = false;
+                }
+            }
 
-	        if (!otherAddresses.Any())
-	        {
-		        model.Default = true;
-	        }
+            if (!otherAddresses.Any())
+            {
+                model.Default = true;
+            }
 
-			var customerPaymentMethod = await _customerPaymentMethodConverter.FromModelAsync(model, (int)PaymentMethodType.CreditCard);
+            var customerPaymentMethod = await _customerPaymentMethodConverter.FromModelAsync(model, (int)PaymentMethodType.CreditCard);
             customerPaymentMethod.Data.SecurityCode = model.SecurityCode;
 
             customerPaymentMethod.Address = await _addressConverter.FromModelAsync(model, (int)AddressType.Billing);
@@ -389,7 +400,7 @@ namespace VC.Public.Controllers
                     ModelState.AddModelError(string.Empty, message.Message);
                 }
 
-	            await PopulateCreditCard(await GetCurrentCustomerDynamic(), model.Id);
+                await PopulateCreditCard(await GetCurrentCustomerDynamic(), model.Id);
 
                 return View(model);
             }
@@ -404,7 +415,7 @@ namespace VC.Public.Controllers
                 ModelState.Add("Id", new ModelStateEntry
                 {
                     RawValue =
-                        model.Id = currentCustomer.CustomerPaymentMethods.Last(x => x.IdObjectType == (int) PaymentMethodType.CreditCard).Id
+                        model.Id = currentCustomer.CustomerPaymentMethods.Last(x => x.IdObjectType == (int)PaymentMethodType.CreditCard).Id
                 });
             }
             return View(await PopulateCreditCard(currentCustomer, model.Id));
@@ -417,7 +428,7 @@ namespace VC.Public.Controllers
 
             var creditCardToDelete =
                 currentCustomer.CustomerPaymentMethods.FirstOrDefault(
-                    x => x.IdObjectType == (int) PaymentMethodType.CreditCard && x.Id == id);
+                    x => x.IdObjectType == (int)PaymentMethodType.CreditCard && x.Id == id);
             if (creditCardToDelete == null)
             {
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
@@ -530,37 +541,37 @@ namespace VC.Public.Controllers
             return true;
         }
 
-		[HttpPost]
-		public async Task<Result<bool>> SetDefaultCreditCard(int id)
-		{
-			var currentCustomer = await GetCurrentCustomerDynamic();
+        [HttpPost]
+        public async Task<Result<bool>> SetDefaultCreditCard(int id)
+        {
+            var currentCustomer = await GetCurrentCustomerDynamic();
 
-			var found = false;
-			var addresses = currentCustomer.CustomerPaymentMethods.Where(x => x.IdObjectType == (int)PaymentMethodType.CreditCard);
-			foreach (var address in addresses)
-			{
-				if (address.Id == id)
-				{
-					address.Data.Default = true;
-					found = true;
-				}
-				else
-				{
-					address.Data.Default = false;
-				}
-			}
+            var found = false;
+            var addresses = currentCustomer.CustomerPaymentMethods.Where(x => x.IdObjectType == (int)PaymentMethodType.CreditCard);
+            foreach (var address in addresses)
+            {
+                if (address.Id == id)
+                {
+                    address.Data.Default = true;
+                    found = true;
+                }
+                else
+                {
+                    address.Data.Default = false;
+                }
+            }
 
-			if (!found)
-			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
-			}
+            if (!found)
+            {
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
+            }
 
-			await CustomerService.UpdateAsync(currentCustomer);
+            await CustomerService.UpdateAsync(currentCustomer);
 
-			return true;
-		}
+            return true;
+        }
 
-		[HttpGet]
+        [HttpGet]
         public async Task<IActionResult> LastOrderPlaced()
         {
             var lines = new List<LastOrderLineModel>();
@@ -597,7 +608,7 @@ namespace VC.Public.Controllers
                                 SkuCode = skuOrdered.Sku.Code,
                                 ProductSubTitle = skuInDB?.SubTitle,
                                 SelectedPrice =
-                                    customer.IdObjectType == (int) CustomerType.Retail
+                                    customer.IdObjectType == (int)CustomerType.Retail
                                         ? skuInDB?.Price?.ToString("C2")
                                         : skuInDB?.WholesalePrice?.ToString("C2"),
                             };
@@ -627,13 +638,33 @@ namespace VC.Public.Controllers
 
             var favorites = await _productService.GetCustomerFavoritesAsync(filter);
 
-            var model = favorites.Items.Select(favorite => new FavoriteModel()
+            List<FavoriteModel> model = new List<FavoriteModel>();
+            if (favorites.Count > 0)
             {
-                ProductName = favorite.ProductName,
-                ProductSubTitle = favorite.ProductSubTitle,
-                ProductThumbnail = favorite.ProductThumbnail,
-                Url = ProductBaseUrl + favorite.Url
-            }).ToList();
+                model = favorites.Items.Select(favorite => new FavoriteModel()
+                {
+                    ProductName = favorite.ProductName,
+                    ProductSubTitle = favorite.ProductSubTitle,
+                    ProductThumbnail = favorite.ProductThumbnail,
+                    Url = ProductBaseUrl + favorite.Url
+                }).ToList();
+            }
+            else
+            {
+                var addToCartSettings = await _contentCrossSellService.GetContentCrossSellsAsync(ContentCrossSellType.AddToCart);
+                var productIds= await _productService.GetProductIdsBySkuIds(addToCartSettings.Select(p=>p.IdSku).ToList());
+                foreach (var id in productIds.Select(p=>p.Value).Distinct())
+                {
+                    var product = await _productService.SelectTransferAsync(id);
+                    model.Add(new FavoriteModel()
+                    {
+                        ProductName = product.ProductDynamic.Name,
+                        ProductSubTitle = product.ProductDynamic.SafeData.SubTitle,
+                        ProductThumbnail = product.ProductDynamic.SafeData.Thumbnail,
+                        Url = ProductBaseUrl + product.ProductContent.Url
+                    });
+                }
+            }
 
             ViewBag.MoreExist = !all && favorites.Count > filter.Paging.PageItemCount;
 
@@ -655,98 +686,98 @@ namespace VC.Public.Controllers
             return PartialView("_OrderHistoryGrid", model);
         }
 
-		[HttpGet]
-		public async Task<IActionResult> AutoShipHistory()
-		{
-			var filter = new OrderFilter();
+        [HttpGet]
+        public async Task<IActionResult> AutoShipHistory()
+        {
+            var filter = new OrderFilter();
 
-			return View(await PopulateAutoShipHistoryModel(filter));
-		}
+            return View(await PopulateAutoShipHistoryModel(filter));
+        }
 
-		public async Task<IActionResult> RefreshAutoShipHistory()
-		{
-			var filter = new OrderFilter();
-			var model = await PopulateAutoShipHistoryModel(filter);
+        public async Task<IActionResult> RefreshAutoShipHistory()
+        {
+            var filter = new OrderFilter();
+            var model = await PopulateAutoShipHistoryModel(filter);
 
-			return PartialView("_AutoShipHistoryGrid", model);
-		}
+            return PartialView("_AutoShipHistoryGrid", model);
+        }
 
-	    [HttpGet]
-	    public async Task<IActionResult> AutoShipBillingDetails(int orderId)
-	    {
-			var billingInfoModel = await GetBillingDetailsInternal(0,orderId);
+        [HttpGet]
+        public async Task<IActionResult> AutoShipBillingDetails(int orderId)
+        {
+            var billingInfoModel = await GetBillingDetailsInternal(0, orderId);
 
-			await PopulateCreditCardsLookup();
+            await PopulateCreditCardsLookup();
 
-		    var dict = (Dictionary<int,string>)ViewBag.CreditCards;
-			dict.Add(orderId, "In Order");
-		    ViewBag.CreditCards = dict;
-		    ViewBag.OrderId = orderId;
+            var dict = (Dictionary<int, string>)ViewBag.CreditCards;
+            dict.Add(orderId, "In Order");
+            ViewBag.CreditCards = dict;
+            ViewBag.OrderId = orderId;
 
-			return PartialView("_AutoShipBillingDetails", billingInfoModel);
-		}
+            return PartialView("_AutoShipBillingDetails", billingInfoModel);
+        }
 
-		[HttpPost]
-		public async Task<IActionResult> AutoShipBillingDetails(BillingInfoModel model, int orderId)
-		{
-			if (!ModelState.IsValid)
-			{
-				return PartialView("_BillingDetailsInner", model);
-			}
+        [HttpPost]
+        public async Task<IActionResult> AutoShipBillingDetails(BillingInfoModel model, int orderId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return PartialView("_BillingDetailsInner", model);
+            }
 
-			var order = await _orderService.SelectWithCustomerAsync(orderId);
-			if (order.Customer.Id != GetInternalCustomerId())
-			{
-				throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AccessDenied], HttpStatusCode.Forbidden);
-			}
+            var order = await _orderService.SelectWithCustomerAsync(orderId);
+            if (order.Customer.Id != GetInternalCustomerId())
+            {
+                throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AccessDenied], HttpStatusCode.Forbidden);
+            }
 
-			var addressId = order.PaymentMethod.Address.Id;
-			await _orderPaymentMethodConverter.UpdateObjectAsync(model, order.PaymentMethod,
-							   (int)PaymentMethodType.CreditCard);
-			await _addressConverter.UpdateObjectAsync(model, order.PaymentMethod.Address, (int) AddressType.Billing);
+            var addressId = order.PaymentMethod.Address.Id;
+            await _orderPaymentMethodConverter.UpdateObjectAsync(model, order.PaymentMethod,
+                               (int)PaymentMethodType.CreditCard);
+            await _addressConverter.UpdateObjectAsync(model, order.PaymentMethod.Address, (int)AddressType.Billing);
 
-			order.PaymentMethod.Address.Id = addressId;
+            order.PaymentMethod.Address.Id = addressId;
 
-			await _orderService.UpdateAsync(order);
+            await _orderService.UpdateAsync(order);
 
-			ViewBag.Success = true;
-			return PartialView("_BillingDetailsInner", model);
-		}
+            ViewBag.Success = true;
+            return PartialView("_BillingDetailsInner", model);
+        }
 
-		[HttpGet]
-	    public async Task<IActionResult> GetBillingAddress(int paymentId, int orderId)
-	    {
-		    var billingInfoModel = await GetBillingDetailsInternal(paymentId, orderId);
+        [HttpGet]
+        public async Task<IActionResult> GetBillingAddress(int paymentId, int orderId)
+        {
+            var billingInfoModel = await GetBillingDetailsInternal(paymentId, orderId);
 
-		    return PartialView("_BillingDetailsInner", billingInfoModel);
-	    }
+            return PartialView("_BillingDetailsInner", billingInfoModel);
+        }
 
-	    [HttpPost]
-		public async Task<Result<bool>> ActivatePauseAutoShip(int id)
-		{
-			var internalId = GetInternalCustomerId();
+        [HttpPost]
+        public async Task<Result<bool>> ActivatePauseAutoShip(int id)
+        {
+            var internalId = GetInternalCustomerId();
 
-			await _orderService.ActivatePauseAutoShipAsync(internalId, id);
+            await _orderService.ActivatePauseAutoShipAsync(internalId, id);
 
-			return true;
-		}
+            return true;
+        }
 
-		[HttpPost]
-		public async Task<Result<bool>> DeleteAutoShip(int id)
-		{
-			var internalId = GetInternalCustomerId();
+        [HttpPost]
+        public async Task<Result<bool>> DeleteAutoShip(int id)
+        {
+            var internalId = GetInternalCustomerId();
 
-			await _orderService.DeleteAutoShipAsync(internalId, id);
+            await _orderService.DeleteAutoShipAsync(internalId, id);
 
-			return true;
-		}
+            return true;
+        }
 
-		[HttpGet]
+        [HttpGet]
         public async Task<IActionResult> OrderInvoice(int id)
         {
             var internalId = GetInternalCustomerId();
             var order = await _orderService.SelectAsync(id, true);
-            if (order != null && order.Customer.Id==internalId)
+            if (order != null && order.Customer.Id == internalId)
             {
                 order.Customer = await CustomerService.SelectAsync(order.Customer.Id, true);
                 var model = await _orderConverter.ToModelAsync<OrderViewModel>(order);
@@ -763,7 +794,7 @@ namespace VC.Public.Controllers
         public async Task<IActionResult> HelpTickets(int idorder, bool ignore = false)
         {
             ICollection<HelpTicketListItemModel> toReturn;
-            ViewBag.IdOrder = (int?) null;
+            ViewBag.IdOrder = (int?)null;
             var customerId = GetInternalCustomerId();
             var orderCustomerId = await _orderService.GetOrderIdCustomer(idorder);
             if (orderCustomerId == customerId)
@@ -774,9 +805,9 @@ namespace VC.Public.Controllers
                 var items = (await _helpService.GetHelpTicketsAsync(filter)).Items;
                 if (items.Count == 0 && !ignore)
                 {
-                    return RedirectToAction("HelpTicket", new {idorder});
+                    return RedirectToAction("HelpTicket", new { idorder });
                 }
-                ViewBag.IdOrder = (int?) idorder;
+                ViewBag.IdOrder = (int?)idorder;
                 toReturn = items.Select(p => new HelpTicketListItemModel(p)).ToList();
             }
             else
@@ -829,14 +860,14 @@ namespace VC.Public.Controllers
 
             var ticket = model.Convert();
             ticket = await _helpService.UpdateHelpTicketAsync(ticket, null);
-            return RedirectToAction("HelpTickets", new {idorder = ticket.IdOrder});
+            return RedirectToAction("HelpTickets", new { idorder = ticket.IdOrder });
         }
 
         [HttpPost]
         public async Task<IActionResult> DeleteHelpTicket(HelpTicketManageModel model)
         {
             await _helpService.DeleteHelpTicketAsync(model.Id);
-            return RedirectToAction("HelpTickets", new {idorder = model.IdOrder});
+            return RedirectToAction("HelpTickets", new { idorder = model.IdOrder });
         }
 
         [HttpPost]
@@ -847,7 +878,7 @@ namespace VC.Public.Controllers
             var item = model.Convert();
 
             item = await _helpService.UpdateHelpTicketCommentAsync(item);
-            
+
             if (model.Id == 0)
             {
                 TempData[TicketCommentMessageTempData] = "New comment was successfully added.";
@@ -856,7 +887,7 @@ namespace VC.Public.Controllers
             {
                 TempData[TicketCommentMessageTempData] = "Comment was successfully updated.";
             }
-            return RedirectToAction("HelpTicket", new {id = item.IdHelpTicket});
+            return RedirectToAction("HelpTicket", new { id = item.IdHelpTicket });
         }
 
         [HttpPost]
@@ -864,7 +895,7 @@ namespace VC.Public.Controllers
         {
             await _helpService.DeleteHelpTicketCommentAsync(model.Id, null);
             TempData[TicketCommentMessageTempData] = "Comment was successfully deleted.";
-            return RedirectToAction("HelpTicket", new {id = model.IdHelpTicket});
+            return RedirectToAction("HelpTicket", new { id = model.IdHelpTicket });
         }
 
         [HttpGet]
@@ -908,11 +939,11 @@ namespace VC.Public.Controllers
                 if (toReturn.Items.Count > 0)
                 {
                     toReturn.Count = toReturn.Items.Count;
-                    toReturn.AverageAmount = Math.Round(toReturn.Items.Sum(p => p.DiscountedSubtotal) /toReturn.Count,2);
+                    toReturn.AverageAmount = Math.Round(toReturn.Items.Sum(p => p.DiscountedSubtotal) / toReturn.Count, 2);
                 }
             }
 
             return View(toReturn);
         }
-	}
+    }
 }

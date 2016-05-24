@@ -81,6 +81,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IEcommerceRepositoryAsync<Sku> _skusRepository;
         private readonly ProductMapper _productMapper;
         private readonly SkuMapper _skuMapper;
+        private readonly CustomerMapper _customerMapper;
         private readonly ICustomerService _customerService;
         private readonly IWorkflowFactory _treeFactory;
         private readonly IEcommerceRepositoryAsync<VCustomer> _vCustomerRepositoryAsync;
@@ -116,6 +117,7 @@ namespace VitalChoice.Business.Services.Orders
             IEcommerceRepositoryAsync<OrderOptionValue> orderValueRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             ProductMapper productMapper,
+            CustomerMapper customerMapper,
             ICustomerService customerService, IWorkflowFactory treeFactory,
             ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<Sku> skusRepository,
             IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync,
@@ -154,6 +156,7 @@ namespace VitalChoice.Business.Services.Orders
             _sPEcommerceRepository = sPEcommerceRepository;
             _paymentMethodService = paymentMethodService;
             _paymentMapper = paymentMapper;
+            _customerMapper = customerMapper;
             _orderToGiftCertificateRepositoryAsync = orderToGiftCertificateRepositoryAsync;
             _paymentGenericService = paymentGenericService;
             _countryService = countryService;
@@ -1378,7 +1381,7 @@ namespace VitalChoice.Business.Services.Orders
 
         private async Task UpdateAffiliateOrderPayment(OrderDynamic dynamic, int id, IUnitOfWorkAsync uow)
         {
-            if (dynamic.Customer.IdAffiliate.HasValue &&
+            if (dynamic.Customer.IdObjectType==(int)CustomerType.Retail && dynamic.Customer.IdAffiliate.HasValue &&
                 dynamic.AffiliatePaymentAmount.HasValue && dynamic.AffiliateNewCustomerOrder.HasValue)
             {
                 AffiliateOrderPayment payment = new AffiliateOrderPayment
@@ -2238,10 +2241,10 @@ namespace VitalChoice.Business.Services.Orders
                 toReturn.Add(new MessageInfo() { Message = "The given order can'be flagged" });
                 throw new AppValidationException("The given order can'be flagged");
             }
-            if (!order.DictionaryData.ContainsKey("OrderType") || order.Data.OrderType != (int?)SourceOrderType.Web)
-            {
-                toReturn.Add(new MessageInfo() { Message = "The given order can'be flagged" });
-            }
+            //if (!order.DictionaryData.ContainsKey("OrderType") || order.Data.OrderType != (int?)SourceOrderType.Web)
+            //{
+            //    toReturn.Add(new MessageInfo() { Message = "The given order can'be flagged" });
+            //}
             return toReturn;
         }
 
@@ -2274,6 +2277,30 @@ namespace VitalChoice.Business.Services.Orders
             using (var uow = CreateUnitOfWork())
             {
                 await UpdateHealthwiseOrderInnerAsync(uow, order.Id, order.Customer.Id, order.DateCreated, isHealthwise, order.IsFirstHealthwise);
+                if (isHealthwise)
+                {
+                    var option = _customerMapper.OptionTypes.FirstOrDefault(p => p.Name == "HasHealthwiseOrders");
+                    if (option != null)
+                    {
+                        var customerOptionValueRepositoryAsync = uow.RepositoryAsync<CustomerOptionValue>();
+                        var optionValue = (await customerOptionValueRepositoryAsync.Query(p=>p.IdCustomer== order.Customer.Id && p.IdOptionType==
+                            option.Id).SelectAsync(true)).FirstOrDefault();
+                        if (optionValue == null)
+                        {
+                            optionValue = new CustomerOptionValue()
+                            {
+                                Value = "True",
+                                IdCustomer = order.Customer.Id,
+                                IdOptionType = option.Id
+                            };
+                            await customerOptionValueRepositoryAsync.InsertAsync(optionValue);
+                        }
+                        else if (optionValue.Value != "True")
+                        {
+                            optionValue.Value = "True";
+                        }
+                    }
+                }
                 await uow.SaveChangesAsync();
                 return true;
             }

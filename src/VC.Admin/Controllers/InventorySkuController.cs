@@ -178,7 +178,6 @@ namespace VC.Admin.Controllers
         #region InventorySkuCategories
 
         [HttpPost]
-        [AdminAuthorize(PermissionType.InventorySkus)]
         public async Task<Result<IList<InventorySkuCategoryTreeItemModel>>> GetInventorySkuCategoriesTree([FromBody]InventorySkuCategoryTreeFilter filter)
         {
             var result = await _inventorySkuCategoryService.GetCategoriesTreeAsync(filter);

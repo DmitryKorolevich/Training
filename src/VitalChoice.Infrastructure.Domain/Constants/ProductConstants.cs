@@ -25,5 +25,7 @@
 		public const int MAX_FAVORITES_COUNT = 10000;
 
         public const decimal DEFAULT_RETURN_AMOUNT = -40;
+
+        public const string HEALTHWISE_DISCOUNT_CODE = "healthwise";
     }
 }

@@ -16,8 +16,14 @@
                                                 <i class="glyphicon glyphicon-sort"></i>
                                             </div>
                                         </div>
-                                        <div class="col-md-11 form-control-static">
+                                        <div class="col-md-8 form-control-static">
                                             <span>{{item.DisplayName}}</span>
+                                        </div>
+                                        <div class="col-md-3 form-control-static">
+                                            <span data-ng-if="item.IdVisibility==1" class="label label-info  font-default">All</span>
+                                            <span data-ng-if="item.IdVisibility==2" class="label label-wholesale font-default">Wholesale Only</span>
+                                            <span data-ng-if="item.IdVisibility==3" class="label label-retail font-default">Retail Only</span>
+                                            <span data-ng-if="!item.IdVisibility" class="label label-warning font-default">Hidden</span>
                                         </div>
                                     </div>
                                 </div>

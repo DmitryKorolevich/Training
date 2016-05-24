@@ -11,7 +11,7 @@
                 <button class="btn btn-primary width-160px" ui-sref="index.oneCol.manageOrders">Manage All</button>
             </div>
             <div class="margin-top-10px">
-                <button class="btn btn-info width-160px" data-ng-click="goToCustomer();">Manage Customer</button>
+                <button class="btn btn-info width-160px" data-ng-if="validatePermission(1)" data-ng-click="goToCustomer();">Manage Customer</button>
             </div>
             <div data-ng-show="currentCustomer && order.Id && options.oldOrderStatus!=1 && options.oldOrderStatus!=4" class="margin-top-10px">
                 <button class="btn btn-purple width-160px" data-ng-click="sendOrderConfirmationEmail();">Resend Order Conf</button>

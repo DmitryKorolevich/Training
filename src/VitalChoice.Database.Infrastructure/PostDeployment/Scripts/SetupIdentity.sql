@@ -22,3 +22,44 @@ BEGIN
 			[TokenExpirationDate] DATETIME2 (7)    NULL,
 			[IsConfirmed]         BIT              NULL
 END
+
+GO
+
+IF(NOT EXISTS (SELECT [Id] FROM [dbo].[AspNetRoles] WHERE [NormalizedName]='Customer User'))
+BEGIN
+	SET IDENTITY_INSERT [dbo].[AspNetRoles] ON
+
+	INSERT INTO [dbo].[AspNetRoles]
+	([Id], [ConcurrencyStamp], [Name], [NormalizedName], IdUserType)
+	VALUES
+	(14, N'customeruserstamp', N'Customer User', 'Customer User', 1),
+	(15, N'reportuserstamp', N'Report User', 'Report User',1),
+	(16, N'useruserstamp', N'User Area User', 'User Area User',1),
+	(17, N'settinguserstamp', N'Setting User', 'Setting User',1)
+
+	SET IDENTITY_INSERT [dbo].[AspNetRoles] OFF
+
+	INSERT INTO AspNetRoleClaims
+	(ClaimType,ClaimValue,RoleId)
+	VALUES
+	('Permission',1,14),
+	('Permission',3,15),
+	('Permission',9,16),
+	('Permission',10,17),
+	('Permission',11,14),
+	('Permission',11,15),
+	('Permission',11,16),
+	('Permission',11,17)
+
+	DELETE AspNetRoleClaims
+	WHERE ClaimValue='8'
+	
+	DELETE AspNetRoleClaims
+	WHERE RoleId=3 AND (ClaimValue='1' OR ClaimValue='14')
+
+	DELETE AspNetRoleClaims
+	WHERE RoleId=4 AND (ClaimValue='12')
+
+END
+
+GO

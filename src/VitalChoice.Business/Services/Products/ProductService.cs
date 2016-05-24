@@ -720,7 +720,7 @@ namespace VitalChoice.Business.Services.Products
             List<ProductCategoryOrderModel> toReturn=new List<ProductCategoryOrderModel>();
 
             var productsOnCategory = await _productToCategoryRepository.Query(p=>p.IdCategory==idCategory && 
-                p.Product.StatusCode!=(int)RecordStatusCode.Deleted).SelectAsync();
+                p.Product.StatusCode==(int)RecordStatusCode.Active && p.Product.IdVisibility.HasValue).SelectAsync();
             var products = await SelectAsync(productsOnCategory.Select(p=>p.IdProduct).ToList());
 
             foreach (var productOnCategory in productsOnCategory.OrderBy(p=>p.Order))
@@ -731,6 +731,7 @@ namespace VitalChoice.Business.Services.Products
                     ProductCategoryOrderModel item = new ProductCategoryOrderModel();
                     item.Id = productDynamic.Id;
                     item.DisplayName = productDynamic.Name;
+                    item.IdVisibility = productDynamic.IdVisibility;
                     if (productDynamic.SafeData.SubTitle != null)
                     {
                         item.DisplayName += " " + productDynamic.SafeData.SubTitle;
@@ -744,10 +745,8 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<bool> UpdateProductsOnCategoryOrderAsync(int idCategory, ICollection<ProductCategoryOrderModel> products)
         {
-            List<ProductCategoryOrderModel> toReturn = new List<ProductCategoryOrderModel>();
-
             var dbProductsOnCategory = await _productToCategoryRepository.Query(p => p.IdCategory == idCategory &&
-                p.Product.StatusCode != (int)RecordStatusCode.Deleted).SelectAsync();
+                p.Product.StatusCode == (int)RecordStatusCode.Active && p.Product.IdVisibility.HasValue).SelectAsync();
 
             int order = 0;
             foreach (var productCategoryOrderModel in products)
@@ -764,6 +763,14 @@ namespace VitalChoice.Business.Services.Products
             await _productToCategoryRepository.UpdateRangeAsync(dbProductsOnCategory);
 
             return true;
+        }
+
+        public async Task<IDictionary<int, int>> GetProductIdsBySkuIds(ICollection<int> skuIds)
+        {
+            var toReturn =
+                (await _skuRepository.Query(p => skuIds.Contains(p.Id)).SelectAsync(false)).ToDictionary(p => p.Id,
+                    pp => pp.IdProduct);
+            return toReturn;
         }
 
         #endregion

@@ -21,6 +21,7 @@ using System.Linq;
 using VC.Admin.Models.Products;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Entities.Roles;
 
 namespace VC.Admin.Controllers
 {
@@ -31,6 +32,7 @@ namespace VC.Admin.Controllers
         private readonly IProductService _productService;
         private readonly IDynamicMapper<DiscountDynamic, Discount> _mapper;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
+        private readonly IAppInfrastructureService _appInfrastructureService;
         private readonly ILogger _logger;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
 
@@ -39,13 +41,15 @@ namespace VC.Admin.Controllers
             IProductService productService,
             ILoggerProviderExtended loggerProvider,
             IDynamicMapper<DiscountDynamic, Discount> mapper,
-            IObjectHistoryLogService objectHistoryLogService)
+            IObjectHistoryLogService objectHistoryLogService,
+            IAppInfrastructureService appInfrastructureService)
         {
             _discountService = discountService;
             _productService = productService;
             _objectHistoryLogService = objectHistoryLogService;
             _mapper = mapper;
             _logger = loggerProvider.CreateLoggerDefault();
+            _appInfrastructureService = appInfrastructureService;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
 
@@ -106,7 +110,9 @@ namespace VC.Admin.Controllers
             }
             if (discount.Id > 0)
             {
-                discount = await _discountService.UpdateAsync(discount);
+                var superAdminName =_appInfrastructureService.Data().AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
+                var isSuperAdmin = HttpContext.User.IsInRole(superAdminName.Normalize());
+                discount = await _discountService.UpdateWithSuperAdminCheckAsync(discount, isSuperAdmin);
             }
             else
             {
@@ -119,7 +125,9 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<bool>> DeleteDiscount(int id, [FromBody] object model)
         {
-            return await _discountService.DeleteAsync(id);
+            var superAdminName = _appInfrastructureService.Data().AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
+            var isSuperAdmin = HttpContext.User.IsInRole(superAdminName.Normalize());
+            return await _discountService.DeleteWithSuperAdminCheckAsync(id, isSuperAdmin);
         }
 
         #endregion

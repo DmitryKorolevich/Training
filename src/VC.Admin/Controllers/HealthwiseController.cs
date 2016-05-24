@@ -44,7 +44,6 @@ using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
 
 namespace VC.Admin.Controllers
 {
-    [AdminAuthorize(PermissionType.Orders)]
     public class HealthwiseController : BaseApiController
     {
         private readonly IHealthwiseService _healthwiseService;
@@ -64,7 +63,8 @@ namespace VC.Admin.Controllers
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
-	    [HttpPost]
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
         public async Task<Result<ICollection<HealthwiseCustomerListItemModel>>> GetHealthwiseCustomersWithPeriods([FromBody]VHealthwisePeriodFilter filter)
 	    {
             var toReturn = new List<HealthwiseCustomerListItemModel>();
@@ -82,7 +82,7 @@ namespace VC.Admin.Controllers
             }
             return toReturn;
 		}
-
+        
         [NonAction]
         private void SetAllowPaymentPeriodSetting(HealthwiseCustomerListItemModel model)
         {
@@ -92,6 +92,7 @@ namespace VC.Admin.Controllers
             }
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpGet]
         public async Task<Result<HealthwiseCustomerListItemModel>> GetHealthwisePeriod(int id)
         {
@@ -109,6 +110,7 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpGet]
         public async Task<Result<ICollection<HealthwiseOrderListItemModel>>> GetHealthwiseOrders(int id)
         {
@@ -116,6 +118,7 @@ namespace VC.Admin.Controllers
             return items.Select(p=>new HealthwiseOrderListItemModel(p)).ToList();
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpPost]
         public async Task<Result<bool>> MakeHealthwisePeriodPayment([FromBody]HealthwisePeriodMakePaymentModel model)
         {
@@ -132,18 +135,21 @@ namespace VC.Admin.Controllers
             return await _healthwiseService.MakeHealthwisePeriodPaymentAsync(model.Id, model.Amount, model.Date, model.PayAsGC, userId);
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpPost]
         public async Task<Result<bool>> MarkOrder(int id, [FromBody] object model)
         {
             return await _orderService.UpdateHealthwiseOrderWithValidationAsync(id, true);
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpPost]
         public async Task<Result<bool>> MarkCustomerOrders(int id, [FromBody] object model)
         {
             return await _healthwiseService.MarkOrdersAsHealthwiseForCustomerIdAsync(id);
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpPost]
         public async Task<Result<ICollection<HealthwisePeriodListItemModel>>> GetHealthwisePeriodsForMovement([FromBody] HealthwiseOrdersMoveModel model)
         {
@@ -151,12 +157,14 @@ namespace VC.Admin.Controllers
             return items.Select(p => new HealthwisePeriodListItemModel(p)).ToList();
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpPost]
         public async Task<Result<bool>> MoveHealthwiseOrders([FromBody]HealthwiseOrdersMoveModel model)
         {
             return await _healthwiseService.MoveHealthwiseOrdersAsync(model.IdPeriod,model.Ids);
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpPost]
         public async Task<Result<bool>> AddPeriod(int id,[FromBody]object model)
         {
