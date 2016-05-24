@@ -129,13 +129,13 @@ namespace VitalChoice.Business.Services.Checkout
             {
                 cart = await CreateNew();
             }
-            var newOrder = await _orderService.Mapper.CreatePrototypeAsync((int) OrderType.Normal);
-            newOrder.Data.OrderType = (int) SourceOrderType.Web;
+            var newOrder = await _orderService.Mapper.CreatePrototypeAsync((int)OrderType.Normal);
+            newOrder.Data.OrderType = (int)SourceOrderType.Web;
             if (newOrder.Customer != null)
             {
-                newOrder.Customer.IdObjectType = (int) CustomerType.Retail;
+                newOrder.Customer.IdObjectType = (int)CustomerType.Retail;
             }
-            newOrder.StatusCode = (int) RecordStatusCode.Active;
+            newOrder.StatusCode = (int)RecordStatusCode.Active;
             newOrder.OrderStatus = OrderStatus.Incomplete;
             newOrder.GiftCertificates = cart.GiftCertificates?.Select(g => new GiftCertificateInOrder
             {
@@ -153,6 +153,7 @@ namespace VitalChoice.Business.Services.Checkout
                     newOrder.Data.IsHealthwise = false;
                     newOrder.Discount = await _discountService.GetByCode(cart.DiscountCode);
                 }
+            }
             newOrder.Skus = cart.Skus?.Select(s =>
             {
                 s.Sku.OptionTypes =
@@ -168,7 +169,7 @@ namespace VitalChoice.Business.Services.Checkout
                     Quantity = s.Quantity
                 };
             }).ToList() ?? new List<SkuOrdered>();
-            newOrder.ShippingAddress = await _addressService.Mapper.CreatePrototypeAsync((int) AddressType.Shipping);
+            newOrder.ShippingAddress = await _addressService.Mapper.CreatePrototypeAsync((int)AddressType.Shipping);
             newOrder.ShippingAddress.IdCountry = (await _countryService.GetCountriesAsync(new CountryFilter
             {
                 CountryCode = "US"
@@ -253,7 +254,7 @@ namespace VitalChoice.Business.Services.Checkout
                             (s, p) =>
                             {
                                 s.Sku.Product.Url = p.Url;
-                                s.Amount = result.Order.Customer.IdObjectType == (int) CustomerType.Wholesale
+                                s.Amount = result.Order.Customer.IdObjectType == (int)CustomerType.Wholesale
                                     ? skuAmounts[s.Sku.Id].WholesalePrice
                                     : skuAmounts[s.Sku.Id].Price;
                             });
@@ -328,13 +329,14 @@ namespace VitalChoice.Business.Services.Checkout
                     }
                     else
                     {
-                        if ((bool?) cartOrder.Order.SafeData.IsHealthwise ?? false)
+                        if ((bool?)cartOrder.Order.SafeData.IsHealthwise ?? false)
                         {
                             cart.DiscountCode = ProductConstants.HEALTHWISE_DISCOUNT_CODE.ToUpper();
                         }
                         else
                         {
                             cart.DiscountCode = cartOrder.Order.Discount?.Code;
+                        }
                         cart.GiftCertificates?.MergeKeyed(cartOrder.Order.GiftCertificates, c => c.IdGiftCertificate,
                             co => co.GiftCertificate.Id,
                             co => new CartToGiftCertificate
@@ -421,24 +423,24 @@ namespace VitalChoice.Business.Services.Checkout
                     await _context.SaveChangesAsync();
                     transaction.Commit();
 
-                    if (sendOrderConfirm && cartOrder.Order?.Customer!=null)
-					{
+                    if (sendOrderConfirm && cartOrder.Order?.Customer != null)
+                    {
                         var customer = await _customerRepository.Query(p => p.Id == cartOrder.Order.Customer.Id).SelectFirstOrDefaultAsync(false);
                         if (!string.IsNullOrEmpty(customer?.Email))
                         {
-							OrderDynamic mailOrder;
-							if (cartOrder.Order.IdObjectType == (int)OrderType.AutoShip)
-							{
-								var ids = await _orderService.SelectAutoShipOrdersAsync(cartOrder.Order.Id);
+                            OrderDynamic mailOrder;
+                            if (cartOrder.Order.IdObjectType == (int)OrderType.AutoShip)
+                            {
+                                var ids = await _orderService.SelectAutoShipOrdersAsync(cartOrder.Order.Id);
 
-								mailOrder = await _orderService.SelectAsync(ids.First());
-							}
-							else
-							{
-								mailOrder = cartOrder.Order;
-							}
+                                mailOrder = await _orderService.SelectAsync(ids.First());
+                            }
+                            else
+                            {
+                                mailOrder = cartOrder.Order;
+                            }
 
-							var emailModel = await _orderMapper.ToModelAsync<OrderConfirmationEmail>(mailOrder);
+                            var emailModel = await _orderMapper.ToModelAsync<OrderConfirmationEmail>(mailOrder);
                             if (emailModel != null)
                             {
                                 await _notificationService.SendOrderConfirmationEmailAsync(customer.Email, emailModel);
