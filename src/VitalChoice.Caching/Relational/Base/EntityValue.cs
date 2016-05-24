@@ -1,9 +1,15 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Query.ExpressionTranslators;
 
 namespace VitalChoice.Caching.Relational.Base
 {
+    public interface IValue<T>
+    {
+        bool Equals(T other);
+    }
+
     public class EntityValue<TInfo> : IEquatable<EntityValue<TInfo>>
         where TInfo: EntityValueInfo
     {

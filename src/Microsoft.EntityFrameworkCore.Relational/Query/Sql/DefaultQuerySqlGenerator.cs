@@ -1021,11 +1021,53 @@ namespace Microsoft.EntityFrameworkCore.Query.Sql
 
             _relationalCommandBuilder.Append(" LIKE ");
 
-            Visit(likeExpression.Pattern);
+            VisitLikePattern((BinaryExpression)likeExpression.Pattern);
 
             _isUnicode = parentIsUnicode;
 
             return likeExpression;
+        }
+
+        private void VisitLikePattern(BinaryExpression likePattern)
+        {
+            Check.NotNull(likePattern, nameof(likePattern));
+
+            var left = likePattern.Left as BinaryExpression;
+            if (left != null)
+            {
+                VisitLikePattern(left);
+            }
+            else
+            {
+                Visit(likePattern.Left);
+            }
+
+            string op;
+            if (!TryGenerateBinaryOperator(likePattern.NodeType, out op))
+            {
+                switch (likePattern.NodeType)
+                {
+                    case ExpressionType.Add:
+                        op = likePattern.Type == typeof(string)
+                            ? " " + ConcatOperator + " "
+                            : " + ";
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+            _relationalCommandBuilder.Append(op);
+
+            var right = likePattern.Right as BinaryExpression;
+            if (right != null)
+            {
+                VisitLikePattern(right);
+            }
+            else
+            {
+                Visit(likePattern.Right);
+            }
         }
 
         public virtual Expression VisitLiteral(LiteralExpression literalExpression)

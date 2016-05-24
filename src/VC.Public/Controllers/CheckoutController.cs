@@ -63,7 +63,6 @@ namespace VC.Public.Controllers
         private readonly ITransactionAccessor<EcommerceContext> _transactionAccessor;
         private readonly IAffiliateService _affiliateService;
         private readonly ILogger _logger;
-        private readonly ICustomerService _customerService;
 
         public CheckoutController(IStorefrontUserService storefrontUserService,
             ICustomerService customerService,
@@ -90,7 +89,6 @@ namespace VC.Public.Controllers
             _countryService = countryService;
             _brontoService = brontoService;
             _transactionAccessor = transactionAccessor;
-            _customerService = customerService1;
             _affiliateService = affiliateService;
             _appInfrastructure = appInfrastructureService.Data();
             _logger = loggerProvider.CreateLogger<CheckoutController>();
@@ -506,7 +504,7 @@ namespace VC.Public.Controllers
 
                             cart.Order.Customer.ShippingAddresses = customerAddresses;
 
-                            cart.Order.Customer = await _customerService.UpdateAsync(cart.Order.Customer);
+                            cart.Order.Customer = await CustomerService.UpdateAsync(cart.Order.Customer);
                         }
                         else if (!cart.Order.Customer.ShippingAddresses.Any())
                         {
@@ -514,7 +512,7 @@ namespace VC.Public.Controllers
                             cart.Order.ShippingAddress.Data.Default = true;
                             cart.Order.Customer.ShippingAddresses = new List<AddressDynamic> {cart.Order.ShippingAddress};
 
-                            cart.Order.Customer = await _customerService.UpdateAsync(cart.Order.Customer);
+                            cart.Order.Customer = await CustomerService.UpdateAsync(cart.Order.Customer);
                         }
                         return RedirectToAction("ReviewOrder");
                     }
