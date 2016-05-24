@@ -2241,14 +2241,10 @@ namespace VitalChoice.Business.Services.Orders
                 toReturn.Add(new MessageInfo() { Message = "The given order can'be flagged" });
                 throw new AppValidationException("The given order can'be flagged");
             }
-            if (!order.DictionaryData.ContainsKey("OrderType") || order.Data.OrderType != (int?)SourceOrderType.Web)
-            {
-                toReturn.Add(new MessageInfo() { Message = "The given order can'be flagged" });
-            }
-            if (order?.Customer.IdObjectType == (int) CustomerType.Wholesale)
-            {
-                toReturn.Add(new MessageInfo() { Message = "Wholesale order can'be flagged" });
-            }
+            //if (!order.DictionaryData.ContainsKey("OrderType") || order.Data.OrderType != (int?)SourceOrderType.Web)
+            //{
+            //    toReturn.Add(new MessageInfo() { Message = "The given order can'be flagged" });
+            //}
             return toReturn;
         }
 
