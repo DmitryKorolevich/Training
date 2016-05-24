@@ -63,6 +63,7 @@ namespace VC.Public.Controllers
         private readonly ITransactionAccessor<EcommerceContext> _transactionAccessor;
         private readonly IAffiliateService _affiliateService;
         private readonly ILogger _logger;
+        private readonly ICustomerService _customerService;
 
         public CheckoutController(IStorefrontUserService storefrontUserService,
             ICustomerService customerService,
@@ -89,6 +90,7 @@ namespace VC.Public.Controllers
             _countryService = countryService;
             _brontoService = brontoService;
             _transactionAccessor = transactionAccessor;
+            _customerService = customerService1;
             _affiliateService = affiliateService;
             _appInfrastructure = appInfrastructureService.Data();
             _logger = loggerProvider.CreateLogger<CheckoutController>();
@@ -489,8 +491,31 @@ namespace VC.Public.Controllers
                     }
                     //cart.Order.Data.DeliveryInstructions = model.DeliveryInstructions;
                     await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
-                    if (await CheckoutService.UpdateCart(cart, customerAddressIdToUpdate))
+                    if (await CheckoutService.UpdateCart(cart))
                     {
+                        if (customerAddressIdToUpdate.HasValue)
+                        {
+                            var customerAddresses = cart.Order.Customer.ShippingAddresses.ToList();
+
+                            var index = customerAddresses.IndexOf(customerAddresses.Single(x => x.Id == customerAddressIdToUpdate.Value));
+                            var originalId = customerAddresses[index].Id;
+                            var defaultAddr = customerAddresses[index].Data.Default;
+                            cart.Order.ShippingAddress.Id = originalId;
+                            cart.Order.ShippingAddress.Data.Default = defaultAddr;
+                            customerAddresses[index] = cart.Order.ShippingAddress;
+
+                            cart.Order.Customer.ShippingAddresses = customerAddresses;
+
+                            cart.Order.Customer = await _customerService.UpdateAsync(cart.Order.Customer);
+                        }
+                        else if (!cart.Order.Customer.ShippingAddresses.Any())
+                        {
+                            cart.Order.ShippingAddress.Id = 0;
+                            cart.Order.ShippingAddress.Data.Default = true;
+                            cart.Order.Customer.ShippingAddresses = new List<AddressDynamic> {cart.Order.ShippingAddress};
+
+                            cart.Order.Customer = await _customerService.UpdateAsync(cart.Order.Customer);
+                        }
                         return RedirectToAction("ReviewOrder");
                     }
                 }

@@ -1,6 +1,9 @@
 ﻿@using System.Threading.Tasks
 @using Microsoft.AspNetCore.Mvc.Rendering
+@using VitalChoice.Core.Infrastructure.Helpers
+@using VitalChoice.Interfaces.Services
 @model VC.Public.Models.Checkout.AddUpdateBillingAddressModel
+@inject IAppInfrastructureService InfrastructureService
 
 @section Meta {
 	<title>Wild Seafood & Organics - Vital Choice</title>
@@ -55,7 +58,7 @@
 			<div class="form-group">
 				<div class="checkout-sections-divider"></div>
 			</div>
-			if (!User.Identity.IsAuthenticated)
+			if (!User.Identity.IsAuthenticated || !InfrastructureService.IsValidCustomer(User))
 			{
 				<div class="form-group">
 					<span class="checkout-notification-important">For faster checkout and to receive customer rewards and incentives please register your account by providing a password.</span>

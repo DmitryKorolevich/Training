@@ -11,6 +11,7 @@ using VC.Public.Models.Cart;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Core.Services;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -284,7 +285,6 @@ namespace VC.Public.Controllers
             }
             cart.Order.Data.ShippingUpgradeP = model.ShippingUpgradeP;
             cart.Order.Data.ShippingUpgradeNP = model.ShippingUpgradeNP;
-            cart.Order.Data.IsHealthwise = model.DiscountCode?.ToLower() == "healthwise";
             var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
             await FillModel(model, cart.Order, context);
             SetCartUid(cart.CartUid);
