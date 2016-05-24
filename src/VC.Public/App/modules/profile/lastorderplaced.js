@@ -7,5 +7,7 @@
             addToCart(null, $(this).attr("data-sku-code"));
             return false;
         });
+
+        $("body").on("click", "#lnkClose", closeCartLite);
     });
 });

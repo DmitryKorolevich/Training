@@ -8,5 +8,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Products
         public int Id { get; set; }
 
         public string DisplayName { get; set; }
+
+        public CustomerTypeCode? IdVisibility { get; set; }
 	}
 }

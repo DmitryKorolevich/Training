@@ -180,7 +180,7 @@ namespace VC.Public.Controllers
             cartModel.OrderTotal = order.Total;
             if ((bool?) order.IsFirstHealthwise ?? false)
             {
-                cartModel.DiscountCode = "HEALTHWISE";
+                cartModel.DiscountCode = ProductConstants.HEALTHWISE_DISCOUNT_CODE.ToUpper();
             }
             else
             {

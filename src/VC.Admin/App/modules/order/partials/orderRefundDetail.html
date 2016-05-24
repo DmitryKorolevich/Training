@@ -14,7 +14,7 @@
                 <button class="btn btn-primary width-160px" ui-sref="index.oneCol.manageOrders">Manage All</button>
             </div>
             <div class="margin-top-10px">
-                <button class="btn btn-info width-160px" data-ng-click="goToCustomer();">Manage Customer</button>
+                <button class="btn btn-info width-160px" data-ng-if="validatePermission(1)" data-ng-click="goToCustomer();">Manage Customer</button>
             </div>
         </div>
         <div ng-controller="objectHistorySectionController" onload="name = 'History'" data-ng-include="'app/modules/order/partials/orderObjectHistorySection.html'"></div>

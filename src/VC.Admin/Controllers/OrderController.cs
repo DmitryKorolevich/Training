@@ -242,7 +242,7 @@ namespace VC.Admin.Controllers
             if (item.IdObjectType != (int)OrderType.Normal && item.IdObjectType != (int)OrderType.AutoShipOrder && item.IdObjectType != (int)OrderType.AutoShip &&
                 item.IdObjectType != (int)OrderType.DropShip && item.IdObjectType != (int)OrderType.GiftList)
             {
-                throw new AccessDeniedException();
+                throw new NotFoundException();
             }
             if (id != 0 && refreshprices && item.Skus != null)
             {
@@ -521,7 +521,7 @@ namespace VC.Admin.Controllers
             {
                 if (item.IdObjectType != (int)OrderType.Reship)
                 {
-                    throw new AccessDeniedException();
+                    throw new NotFoundException();
                 }
                 toReturn = await _mapper.ToModelAsync<OrderReshipManageModel>(item);
             }
@@ -658,7 +658,7 @@ namespace VC.Admin.Controllers
             {
                 if (item.IdObjectType != (int)OrderType.Refund)
                 {
-                    throw new AccessDeniedException();
+                    throw new NotFoundException();
                 }
                 toReturn = await _orderRefundMapper.ToModelAsync<OrderRefundManageModel>(item);
                 toReturn.ManualShippingTotal = toReturn.ShippingTotal;

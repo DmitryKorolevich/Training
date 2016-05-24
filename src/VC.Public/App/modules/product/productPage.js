@@ -152,7 +152,3 @@ function addCrossToCart() {
 	return false;
 }
 
-function closeCartLite() {
-	$("#" + $("#lnkClose").closest("div[aria-describedby]").attr('aria-describedby')).dialog('close');
-	return false;
-}

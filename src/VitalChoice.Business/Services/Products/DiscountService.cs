@@ -25,6 +25,7 @@ using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Context;
+using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
@@ -124,15 +125,7 @@ namespace VitalChoice.Business.Services.Products
         protected override async Task BeforeEntityChangesAsync(DiscountDynamic model, Discount entity, IUnitOfWorkAsync uow)
         {
             var discountTierRepository = uow.RepositoryAsync<DiscountTier>();
-            //var discountToSelectedSkuRepository = uow.RepositoryAsync<DiscountToSelectedSku>();
-            //var discountToSkuRepository = uow.RepositoryAsync<DiscountToSku>();
-            //var discountToCategoryRepository = uow.RepositoryAsync<DiscountToCategory>();
-            //var discountToSelectedCategoryRepository = uow.RepositoryAsync<DiscountToSelectedCategory>();
 
-            //await discountToSelectedSkuRepository.DeleteAllAsync(entity.DiscountsToSelectedSkus);
-            //await discountToSkuRepository.DeleteAllAsync(entity.DiscountsToSkus);
-            //await discountToCategoryRepository.DeleteAllAsync(entity.DiscountsToCategories);
-            //await discountToSelectedCategoryRepository.DeleteAllAsync(entity.DiscountsToSelectedCategories);
             await discountTierRepository.DeleteAllAsync(entity.DiscountTiers);
         }
 
@@ -140,25 +133,6 @@ namespace VitalChoice.Business.Services.Products
             IUnitOfWorkAsync uow)
         {
             var discountTierRepository = uow.RepositoryAsync<DiscountTier>();
-            //var discountToSelectedSkuRepository = uow.RepositoryAsync<DiscountToSelectedSku>();
-            //var discountToSkuRepository = uow.RepositoryAsync<DiscountToSku>();
-            //var discountToCategoryRepository = uow.RepositoryAsync<DiscountToCategory>();
-            //var discountToSelectedCategoryRepository = uow.RepositoryAsync<DiscountToSelectedCategory>();
-
-            //await discountToSelectedSkuRepository.DeleteAllAsync(
-            //    initial.DiscountsToSelectedSkus.ExceptKeyedWith(updated.DiscountsToSelectedSkus,
-            //        item => item.IdSku));
-
-            //await discountToSkuRepository.DeleteAllAsync(initial.DiscountsToSkus.ExceptKeyedWith(updated.DiscountsToSkus,
-            //    item => item.IdSku));
-
-            //await discountToCategoryRepository.DeleteAllAsync(initial.DiscountsToCategories.ExceptKeyedWith(updated.DiscountsToCategories,
-            //    item => item.IdCategory));
-
-            //await
-            //    discountToSelectedCategoryRepository.DeleteAllAsync(
-            //        initial.DiscountsToSelectedCategories.ExceptKeyedWith(updated.DiscountsToSelectedCategories,
-            //            item => item.IdCategory));
 
             if (updated.IdObjectType == (int) DiscountType.Tiered && updated.DiscountTiers != null && updated.DiscountTiers.Count > 0)
             {
@@ -169,6 +143,30 @@ namespace VitalChoice.Business.Services.Products
         protected override bool LogObjectFullData { get { return true; } }
 
         #region Discounts
+
+        public async Task ValidateHealthwiseAccess(int id, bool isSuperAdmin)
+        {
+            var discount = await SelectAsync(id);
+            if (discount != null && discount.Code.ToLower() == ProductConstants.HEALTHWISE_DISCOUNT_CODE &&
+                !isSuperAdmin)
+            {
+                throw new AccessDeniedException();
+            }
+        }
+
+        public async Task<DiscountDynamic> UpdateWithSuperAdminCheckAsync(DiscountDynamic model, bool isSuperAdmin = false)
+        {
+            await ValidateHealthwiseAccess(model.Id, isSuperAdmin);
+
+            return await this.UpdateAsync(model);
+        }
+
+        public async Task<bool> DeleteWithSuperAdminCheckAsync(int id, bool isSuperAdmin = false)
+        {
+            await ValidateHealthwiseAccess(id, isSuperAdmin);
+
+            return await this.DeleteAsync(id);
+        }
 
         public async Task<PagedList<DiscountDynamic>> GetDiscountsAsync(DiscountFilter filter)
         {

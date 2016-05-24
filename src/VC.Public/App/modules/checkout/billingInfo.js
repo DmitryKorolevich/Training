@@ -9,6 +9,11 @@
 		changeSelection($("#ddCreditCardsSelection").val());
 	});
 
+	$(".columns-container form").submit(function ()
+	{
+	    $(".columns-container .overlay").show();
+	});
+
 	populateCardTypes();
 });
 

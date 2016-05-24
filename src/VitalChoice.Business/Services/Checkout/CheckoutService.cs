@@ -22,6 +22,7 @@ using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Context;
+using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Checkout;
@@ -143,7 +144,7 @@ namespace VitalChoice.Business.Services.Checkout
             }).ToList() ?? new List<GiftCertificateInOrder>();
             if (!string.IsNullOrEmpty(cart.DiscountCode))
             {
-                if (cart.DiscountCode.ToLower() == "healthwise")
+                if (cart.DiscountCode.ToLower() == ProductConstants.HEALTHWISE_DISCOUNT_CODE)
                 {
                     newOrder.Data.IsHealthwise = true;
                 }
@@ -346,7 +347,7 @@ namespace VitalChoice.Business.Services.Checkout
                     {
                         if ((bool?) cartOrder.Order.SafeData.IsHealthwise ?? false)
                         {
-                            cart.DiscountCode = "HEALTHWISE";
+                            cart.DiscountCode = ProductConstants.HEALTHWISE_DISCOUNT_CODE.ToUpper();
                         }
                         else
                         {

@@ -9,7 +9,6 @@
 		Affiliates = 5,
 		Content = 6,
 		ManageMasterTemplates = 7,
-		Tools = 8,
 		Users = 9,
 		Settings = 10,
 		Help = 11,

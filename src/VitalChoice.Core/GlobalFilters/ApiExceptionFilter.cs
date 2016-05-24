@@ -57,10 +57,17 @@ namespace VitalChoice.Core.GlobalFilters
                 }
                 else
                 {
-                    result = new JsonResult(ResultHelper.CreateErrorResult<object>(apiException.Message))
+                    if ((context.Exception as NotFoundException) != null)
                     {
-                        StatusCode = (int)apiException.Status
-                    };
+                        result = new HttpNotFoundResult();
+                    }
+                    else
+                    {
+                        result = new JsonResult(ResultHelper.CreateErrorResult<object>(apiException.Message))
+                        {
+                            StatusCode = (int)apiException.Status
+                        };
+                    }
                 }
             }
 
