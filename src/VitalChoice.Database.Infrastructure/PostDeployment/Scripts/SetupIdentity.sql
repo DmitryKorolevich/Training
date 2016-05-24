@@ -25,17 +25,17 @@ END
 
 GO
 
-IF(NOT EXISTS (SELECT [Id] FROM [dbo].[AspNetRoles] WHERE [NormalizedName]='CustomerUser'))
+IF(NOT EXISTS (SELECT [Id] FROM [dbo].[AspNetRoles] WHERE [NormalizedName]='Customer User'))
 BEGIN
 	SET IDENTITY_INSERT [dbo].[AspNetRoles] ON
 
 	INSERT INTO [dbo].[AspNetRoles]
-	([Id], [ConcurrencyStamp], [Name], [NormalizedName])
+	([Id], [ConcurrencyStamp], [Name], [NormalizedName], IdUserType)
 	VALUES
-	(14, N'customeruserstamp', N'Customer User', 'Customer User'),
-	(15, N'reportuserstamp', N'Report User', 'Report User'),
-	(16, N'useruserstamp', N'User Area User', 'User Area User'),
-	(17, N'settinguserstamp', N'Setting User', 'Setting User')
+	(14, N'customeruserstamp', N'Customer User', 'Customer User', 1),
+	(15, N'reportuserstamp', N'Report User', 'Report User',1),
+	(16, N'useruserstamp', N'User Area User', 'User Area User',1),
+	(17, N'settinguserstamp', N'Setting User', 'Setting User',1)
 
 	SET IDENTITY_INSERT [dbo].[AspNetRoles] OFF
 
