@@ -49,6 +49,12 @@ angular
 
 									}
 									break;
+							    case 404:
+							        {
+							            $rootScope.$state.go('index.notFound');
+							            return $q.defer().promise;
+							        }
+							        break;
 							}
 							return $q.reject(response);
 						}

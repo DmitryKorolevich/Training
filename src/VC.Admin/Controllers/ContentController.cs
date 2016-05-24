@@ -74,7 +74,6 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
-        [AdminAuthorize(PermissionType.ManageMasterTemplates)]
         public async Task<Result<MasterContentItemManageModel>> GetMasterContentItem(int id)
         {
             if (id == 0)
@@ -94,7 +93,6 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        [AdminAuthorize(PermissionType.Content)]
         public Task<Result<IReadOnlyCollection<TtlCompileError>>> TryCompileTemplate([FromBody] TemplateValidationModel template)
         {
             using (var ttlTemplate = new TtlTemplate())

@@ -280,7 +280,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        [AdminAuthorize(PermissionType.Products)]
+        [AdminAuthorize(PermissionType.Settings)]
         public async Task<Result<bool>> UpdateProductTaxCodes([FromBody]ICollection<ProductListItemModel> items)
         {
             var products = await productUniversalService.SelectAsync(items.Select(p => p.ProductId).ToArray(), false);
@@ -382,14 +382,14 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        [AdminAuthorize(PermissionType.Products)]
+        [AdminAuthorize(PermissionType.Reports)]
         public async Task<Result<ProductCategoryStatisticTreeItemModel>> GetProductCategoriesStatistic([FromBody]ProductCategoryStatisticFilter filter)
         {
             return await productCategoryService.GetProductCategoriesStatisticAsync(filter);
         }
 
         [HttpGet]
-        [AdminAuthorize(PermissionType.Products)]
+        [AdminAuthorize(PermissionType.Reports)]
         public async Task<FileResult> GetProductCategoriesStatisticReportFile([FromQuery]DateTime from, [FromQuery]DateTime to)
         {
             var rootItem = await productCategoryService.GetProductCategoriesStatisticAsync(

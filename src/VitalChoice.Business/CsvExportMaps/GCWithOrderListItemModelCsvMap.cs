@@ -11,7 +11,7 @@ namespace VitalChoice.Business.CsvExportMaps
     {
         public GcWithOrderListItemModelCsvMap()
         {
-            
+            MapValues();
         }
 
         private void MapValues()

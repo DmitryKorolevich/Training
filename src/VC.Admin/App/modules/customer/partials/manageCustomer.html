@@ -121,7 +121,7 @@
                                                 </div>
                                             </div>
                                             <span class="legend">Profile Details</span>
-                                            <div class="form-group">
+                                            <div data-ng-if="currentCustomer.CustomerType == 1" class="form-group">
                                                 <label for="linked" class="col-md-3 control-label">Linked to Affiliate</label>
                                                 <div class="col-md-3">
                                                     <input type="text" name="IdAffiliate" class="form-control" id="linked" data-ng-model="currentCustomer.IdAffiliate" numbers-only numbers-only-deny-zero placeholder="Linked to Affiliate" autocomplete="off">

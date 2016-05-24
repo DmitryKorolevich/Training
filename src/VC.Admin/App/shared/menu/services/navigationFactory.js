@@ -16,9 +16,9 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			stateLabel: 'Orders',
 			subMenu: [
 				{ name: 'viewAllOrders', stateName: 'index.oneCol.manageOrders', stateLabel: 'Manage Orders', access: 2 },
-				{ name: 'viewAllOrders', stateName: 'index.oneCol.manageHelpTickets', stateLabel: 'Manage Help Tickets', access: 11 },
-				{ name: 'moveOrder', stateName: 'index.oneCol.moveOrder', stateLabel: 'Reassign Transaction', access: 8 },
-				{ name: 'changeOrderStatus', stateName: 'index.oneCol.changeOrderStatus', stateLabel: 'Change Order Status', access: 8 },
+				{ name: 'manageHelpTickets', stateName: 'index.oneCol.manageHelpTickets', stateLabel: 'Manage Help Tickets', access: 2 },
+				{ name: 'moveOrder', stateName: 'index.oneCol.moveOrder', stateLabel: 'Reassign Transaction', access: 2 },
+				{ name: 'changeOrderStatus', stateName: 'index.oneCol.changeOrderStatus', stateLabel: 'Change Order Status', access: 2 },
 			]
 		},
 		{
@@ -42,7 +42,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'outOfStocks', stateName: 'index.oneCol.outOfStocks', stateLabel: 'Out of Stock Requests', access: 4 },
 				{ name: 'manageInventorySkuCategories', stateName: 'index.oneCol.manageInventorySkuCategories', stateLabel: 'Manage Parts Categories', access: 17 },
 				{ name: 'manageInventorySkus', stateName: 'index.oneCol.manageInventorySkus', stateLabel: 'Manage Parts', access: 17 },
-				{ name: 'downloadGoogleFeed', href: 'https://staging.g2-dg.com/google/datafeed.csv', stateLabel: 'Download Google Data Feed', access: null },
+				{ name: 'downloadGoogleFeed', href: 'https://staging.g2-dg.com/google/datafeed.csv', stateLabel: 'Download Google Data Feed', access: 4 },
 			]
 		},
         {
@@ -158,11 +158,11 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			stateLabel: 'Settings',
 			subMenu: [
 				{ name: 'manageCountries', stateName: 'index.oneCol.manageCountries', stateLabel: 'Manage Countries / States', access: 10 },
-				{ name: 'manageSettings', stateName: 'index.oneCol.manageSettings', stateLabel: 'Global Settings', access: null },
-				{ name: 'managePaymentMethods', stateName: 'index.oneCol.managePaymentMethods', stateLabel: 'Manage Payment Methods', access: null }, //only for super admins
-				{ name: 'manageOrderNotes', stateName: 'index.oneCol.manageOrderNotes', stateLabel: 'Manage Automatic Order Specific Notes', access: null },
+				{ name: 'manageSettings', stateName: 'index.oneCol.manageSettings', stateLabel: 'Global Settings', access: 10 },
+				{ name: 'managePaymentMethods', stateName: 'index.oneCol.managePaymentMethods', stateLabel: 'Manage Payment Methods', access: 10 },
+				{ name: 'manageOrderNotes', stateName: 'index.oneCol.manageOrderNotes', stateLabel: 'Manage Automatic Order Specific Notes', access: 10 },
 				{ name: 'manageLookups', stateName: 'index.oneCol.manageLookups', stateLabel: 'Manage Lookups', access: 10 },
-				{ name: 'manageProductTaxCodes', stateName: 'index.oneCol.manageProductTaxCodes', stateLabel: 'Manage Product Tax Codes', access: 8 },
+				{ name: 'manageProductTaxCodes', stateName: 'index.oneCol.manageProductTaxCodes', stateLabel: 'Manage Product Tax Codes', access: 10 },
 			]
 		},
 		{
@@ -171,8 +171,8 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			subMenu: [
 				{ name: 'manageBugTickets', stateName: 'index.oneCol.manageBugTickets', stateLabel: 'Manage Bug Tickets', access: 11 },
 				//{ name: 'viewWiki', stateName: 'index.oneCol.viewWiki', stateLabel: 'View Wiki', access: 11 },
-				{ name: 'manageLogs', stateName: 'index.oneCol.manageLogs', stateLabel: 'View Logs', access: 10 },
-			    { name: 'manageProfileScopes', stateName: 'index.oneCol.manageProfileScopes', stateLabel: 'Profile Scopes', access: 10 }
+				{ name: 'manageLogs', stateName: 'index.oneCol.manageLogs', stateLabel: 'View Logs', access: 15 },
+			    { name: 'manageProfileScopes', stateName: 'index.oneCol.manageProfileScopes', stateLabel: 'Profile Scopes', access: 15 }
 			]
 		}
 	];

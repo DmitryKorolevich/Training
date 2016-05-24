@@ -69,6 +69,10 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.Email = dynamic.Email;
 				entity.PublicId = dynamic.PublicId;
 				entity.IdDefaultPaymentMethod = dynamic.IdDefaultPaymentMethod;
+                if (dynamic.IdObjectType == (int)CustomerType.Wholesale)
+                {
+                    dynamic.IdAffiliate = null;
+                }
                 entity.IdAffiliate = dynamic.IdAffiliate;
 
                 entity.PaymentMethods.MergeKeyed(dynamic.ApprovedPaymentMethods, method => method.IdPaymentMethod, i => i,
@@ -135,6 +139,10 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.Email = dynamic.Email;
                 entity.PublicId = dynamic.PublicId;
                 entity.IdDefaultPaymentMethod = dynamic.IdDefaultPaymentMethod;
+                if (dynamic.IdObjectType == (int)CustomerType.Wholesale)
+                {
+                    dynamic.IdAffiliate = null;
+                }
                 entity.IdAffiliate = dynamic.IdAffiliate;
 
                 entity.PaymentMethods = dynamic.ApprovedPaymentMethods?.Select(c => new CustomerToPaymentMethod()

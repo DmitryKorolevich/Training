@@ -184,7 +184,7 @@ namespace VC.Admin.Controllers
         #region Settings
 
         [HttpGet]
-        [SuperAdminAuthorize()]
+        [AdminAuthorize(PermissionType.Settings)]
         public async Task<Result<GlobalSettingsManageModel>> GetGlobalSettings()
         {
             var items = await settingService.GetAppSettingItemsAsync(new List<string>
@@ -197,7 +197,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        [SuperAdminAuthorize()]
+        [AdminAuthorize(PermissionType.Settings)]
         public async Task<Result<GlobalSettingsManageModel>> UpdateGlobalSettings([FromBody]GlobalSettingsManageModel model)
         {
             if (!Validate(model))

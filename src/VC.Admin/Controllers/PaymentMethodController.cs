@@ -9,13 +9,14 @@ using VitalChoice.Core.Infrastructure;
 using VitalChoice.Validation.Models;
 using VC.Admin.Models.PaymentMethod;
 using VitalChoice.Core.Base;
+using VitalChoice.Infrastructure.Domain.Entities.Permissions;
 using VitalChoice.Infrastructure.Domain.Transfer.PaymentMethod;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Payments;
 
 namespace VC.Admin.Controllers
 {
-	[SuperAdminAuthorize]
+    [AdminAuthorize(PermissionType.Settings)]
     public class PaymentMethodController : BaseApiController
     {
 		private readonly IPaymentMethodService _paymentMethodService;

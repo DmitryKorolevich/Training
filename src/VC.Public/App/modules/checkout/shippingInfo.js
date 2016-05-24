@@ -26,6 +26,12 @@
                 changeSelection($("#ddShippingAddressesSelection").val());
             });
 
+    $(".columns-container form").data("validator").settings.submitHandler = function (form)
+    {
+        $(".columns-container .overlay").show();
+        form.submit();
+    };
+
     controlUpdateSavedState();
 });
 

@@ -48,7 +48,7 @@
                 <tbody>
                     <tr class="customer-row" data-ng-repeat-start="item in items">
                         <td>
-                            {{::item.FirstName}} {{::item.LastName}}
+                            <a ui-sref="index.oneCol.customerDetail({id:item.Id})">{{::item.FirstName}} {{::item.LastName}} ({{::item.Id}})</a>
                         </td>
                         <td colspan="4"></td>
                     </tr>
@@ -59,7 +59,7 @@
                         <td>
                             {{::period.OrdersCount}}
                         </td>
-                        <td>{{::period.OrderSubtotals | currency}}</td>
+                        <td>{{::period.DiscountedSubtotal | currency}}</td>
                         <td data-ng-if="period.OrdersCount!=0">{{::period.AverageDiscountedSubtotal | currency}}</td>
                         <td data-ng-if="period.OrdersCount==0">{{::0 | currency}}</td>
                         <td>

@@ -37,7 +37,6 @@ using VitalChoice.Infrastructure.Identity.UserManagers;
 
 namespace VC.Admin.Controllers
 {
-    [AdminAuthorize(PermissionType.Affiliates)]
     public class AffiliateController : BaseApiController
     {
         private readonly IAffiliateService _affiliateService;
@@ -82,6 +81,7 @@ namespace VC.Admin.Controllers
             logger = loggerProvider.CreateLogger<AffiliateController>();
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpPost]
         public async Task<Result<PagedList<VCustomerInAffiliate>>> GetCustomerInAffiliateReport([FromBody]FilterBase filter)
         {
@@ -160,6 +160,7 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
+        [AdminAuthorize(PermissionType.Affiliates)]
         [HttpPost]
         public async Task<Result<AffiliateManageModel>> UpdateAffiliate([FromBody]AffiliateManageModel model)
         {
@@ -190,6 +191,7 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
+        [AdminAuthorize(PermissionType.Affiliates)]
         [HttpGet]
         public async Task<Result<AffiliateEmailModel>> GetAffiliateEmail(int id)
         {
@@ -215,6 +217,7 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
+        [AdminAuthorize(PermissionType.Affiliates)]
         [HttpPost]
         public async Task<Result<bool>> SendAffiliateEmail([FromBody]AffiliateEmailModel model)
         {
@@ -224,12 +227,14 @@ namespace VC.Admin.Controllers
             return await _affiliateService.SendAffiliateEmailAsync(item);
         }
 
+        [AdminAuthorize(PermissionType.Affiliates)]
         [HttpPost]
         public async Task<Result<bool>> DeleteAffiliate(int id)
         {
             return await _affiliateService.DeleteAsync(id);
         }
 
+        [AdminAuthorize(PermissionType.Affiliates)]
         [HttpPost]
         public async Task<Result<bool>> ResendActivation(Guid id)
         {
@@ -238,6 +243,7 @@ namespace VC.Admin.Controllers
             return true;
         }
 
+        [AdminAuthorize(PermissionType.Affiliates)]
         [HttpPost]
         public async Task<Result<bool>> ResetPassword(Guid id)
         {
@@ -246,6 +252,7 @@ namespace VC.Admin.Controllers
             return true;
         }
 
+        [AdminAuthorize(PermissionType.Affiliates)]
         [HttpGet]
         public async Task<ActionResult> LoginAsAffiliate(int id)
         {
@@ -284,12 +291,14 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
+        [AdminAuthorize(PermissionType.Reports, PermissionType.Affiliates)]
         [HttpPost]
         public async Task<Result<PagedList<AffiliateOrderListItemModel>>> GetAffiliateOrderPaymentsWithCustomerInfo([FromBody]AffiliateOrderPaymentFilter filter)
         {
             return await _orderService.GetAffiliateOrderPaymentsWithCustomerInfo(filter);
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpGet]
         public async Task<Result<ICollection<OrderPaymentListItemModel>>> GetUnpaidOrdersForLastPeriod(int id)
         {
@@ -302,12 +311,14 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpGet]
         public async Task<Result<AffiliatesSummaryModel>> GetAffiliatesSummary()
         {
             return await _affiliateService.GetAffiliatesSummary();
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpPost]
         public async Task<Result<bool>> PayForAffiliateOrders(int id)
         {
@@ -323,6 +334,7 @@ namespace VC.Admin.Controllers
             return lastMonthStartDay;
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpGet]
         public async Task<Result<ICollection<AffiliatesSummaryReportItemModel>>> GetAffiliatesSummaryReportItemsForMonths(int count = 3, bool include = true)
         {
@@ -342,6 +354,7 @@ namespace VC.Admin.Controllers
             return (await _affiliateService.GetAffiliatesSummaryReportItemsForMonths(lastMonthStartDay, count)).ToList();
         }
 
+        [AdminAuthorize(PermissionType.Affiliates)]
         [HttpGet]
         public async Task<Result<ICollection<PaymentHistoryLineItemModel>>> GetAffiliatePaymentHistory(int id)
         {

@@ -27,7 +27,6 @@ using VitalChoice.Interfaces.Services.Orders;
 
 namespace VC.Admin.Controllers
 {
-    [AdminAuthorize(PermissionType.Marketing)]
     public class GCController : BaseApiController
     {
         private readonly IGcService GCService;
@@ -64,6 +63,7 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpPost]
         public async Task<Result<GCStatisticModel>> GetGiftCertificatesWithOrderInfo([FromBody]GCFilter filter)
         {
@@ -72,6 +72,7 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpGet]
         public async Task<FileResult> GetGiftCertificatesWithOrderInfoReportFile([FromQuery]DateTime from, [FromQuery]DateTime to,
             [FromQuery]int? type = null, [FromQuery]int? status = null, [FromQuery]string billinglastname = null, [FromQuery]string shippinglastname = null)
@@ -112,6 +113,7 @@ namespace VC.Admin.Controllers
             return new GCManageModel((await GCService.GetGiftCertificateAsync(id)));
         }
 
+        [AdminAuthorize(PermissionType.Marketing)]
         [HttpPost]
         public async Task<Result<GCAddingModel>> GetGiftCertificatesAdding()
         {
@@ -122,6 +124,7 @@ namespace VC.Admin.Controllers
             return await Task.FromResult<GCAddingModel>(item);
         }
 
+        [AdminAuthorize(PermissionType.Marketing)]
         [HttpPost]
         public async Task<Result<ICollection<GCListItemModel>>> AddGiftCertificates(int quantity, [FromBody]GCManageModel model)
         {
@@ -138,6 +141,7 @@ namespace VC.Admin.Controllers
             return (await GCService.AddManualGiftCertificatesAsync(quantity, item)).Select(p => new GCListItemModel(p)).ToList();
         }
 
+        [AdminAuthorize(PermissionType.Marketing)]
         [HttpPost]
         public async Task<Result<GCManageModel>> UpdateGiftCertificate([FromBody]GCManageModel model)
         {
@@ -149,6 +153,7 @@ namespace VC.Admin.Controllers
             return new GCManageModel(item);
         }
 
+        [AdminAuthorize(PermissionType.Marketing)]
         [HttpPost]
         public async Task<Result<bool>> SendGiftCertificateEmail([FromBody]GCEmailModel model)
         {
@@ -158,6 +163,7 @@ namespace VC.Admin.Controllers
             return await GCService.SendGiftCertificateEmailAsync(item);
         }
 
+        [AdminAuthorize(PermissionType.Marketing)]
         [HttpPost]
         public async Task<Result<bool>> DeleteGiftCertificate(int id)
         {

@@ -5,18 +5,18 @@
 @model VC.Public.Models.Checkout.AddUpdateShippingMethodModel
 
 @section Meta {
-	<title>Wild Seafood & Organics - Vital Choice</title>
+    <title>Wild Seafood & Organics - Vital Choice</title>
 }
 
 @{
-	Layout = "~/Views/Shared/_ViewCartLayout.cshtml";
+    Layout = "~/Views/Shared/_ViewCartLayout.cshtml";
 }
 
 @section PageScripts {
-	<script src="@Url.Content("/app/modules/checkout/checkoutMain.js")"></script>
-	<script src="@Url.Content("/app/common/dataAccess.js")"></script>
-	<script src="@Url.Content("/app/modules/auth/registration.js")"></script>
-	<script src="@Url.Content("/app/modules/checkout/shippingInfo.js")"></script>
+    <script src="@Url.Content("/app/modules/checkout/checkoutMain.js")"></script>
+    <script src="@Url.Content("/app/common/dataAccess.js")"></script>
+    <script src="@Url.Content("/app/modules/auth/registration.js")"></script>
+    <script src="@Url.Content("/app/modules/checkout/shippingInfo.js")"></script>
 }
 
 <div class="checkout-step-container working-area-holder">
@@ -25,6 +25,9 @@
 	<span class="checkout-notification-simple">Enter your Shipping Address information below.</span>
 	@using (Html.BeginForm("AddUpdateShippingMethod", "Checkout", null, FormMethod.Post, null, new {@class = "form-regular medium-small", role = "form"}))
 	{
+		<div class="overlay hide">
+            <div class="loading">Loading…</div>
+        </div>
 		<input id="hdCountry" value="@Html.DisplayForEx(x => x.IdCountry)" type="hidden">
 		<input id="hdState" value="@Html.DisplayForEx(x => x.IdState)" type="hidden">
 		@Html.AntiForgeryToken()
@@ -61,35 +64,36 @@
 		@Html.ValidationSummary(true, "")
 		<div class="columns-container checkout-columns-container">
 
-			<div id="dynamicArea">
-				@await Html.PartialAsync("_AddUpdateShippingMethod", Model, ViewData)
-			</div>
+                <div id="dynamicArea">
+                    @await Html.PartialAsync("_AddUpdateShippingMethod", Model, ViewData)
+                </div>
 
-			<div class="form-group">
-				<label class="control-label"></label>
-				<div class="input-group">
-					<label class="multiline-checkbox-container bold">
-						@Html.CheckBoxFor(m => m.IsGiftOrder, new { @class = "form-control" })
-						Check here if this order is a gift
-					</label>
-				</div>
-			</div>
-			<div class="form-group" id="GiftMessageBox" style="display: none;">
-				@Html.LabelFor(m => m.GiftMessage, new { @class = "control-label" })
-				<div class="input-group">
-					<div class="form-control-note">
-						<span class="shopping-notice-note">NOTE:</span> If this is an e-Gift Certificate, enter the recipient’s email address where indicated AFTER you place your order,<br />
-						using the form on the Thank You page. (This is a security requirement.)
-					</div>
-					@Html.TextAreaFor(m => m.GiftMessage, new { @class = "form-control checkout-huge", rows = "5", maxlength = 255, charcount = "true" })
-					<span class="checkout-charcount"><b>255</b> characters remaining</span>
-					@Html.ValidationMessageFor(m => m.GiftMessage)
-				</div>
-			</div>
-			<div class="form-buttons-group">
-				@Html.ActionLink("Back", "AddUpdateBillingAddress", "Checkout", null, new {@class = "button arrow-left-red"})
-				<input class="arrow-right-blue" type="submit" value="Continue" />
-			</div>
-		</div>
-	}
+                <div class="form-group">
+                    <label class="control-label"></label>
+                    <div class="input-group">
+                        <label class="multiline-checkbox-container bold">
+                            @Html.CheckBoxFor(m => m.IsGiftOrder, new { @class = "form-control" })
+                            Check here if this order is a gift
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group" id="GiftMessageBox" style="display: none;">
+                    @Html.LabelFor(m => m.GiftMessage, new { @class = "control-label" })
+                    <div class="input-group">
+                        <div class="form-control-note">
+                            <span class="shopping-notice-note">NOTE:</span> If this is an e-Gift Certificate, enter the recipient’s email address where indicated AFTER you place your order,<br />
+                            using the form on the Thank You page. (This is a security requirement.)
+                        </div>
+                        @Html.TextAreaFor(m => m.GiftMessage, new { @class = "form-control checkout-huge", rows = "5", maxlength = 255, charcount = "true" })
+                        <span class="checkout-charcount"><b>255</b> characters remaining</span>
+                        @Html.ValidationMessageFor(m => m.GiftMessage)
+                    </div>
+                </div>
+                <div class="form-buttons-group">
+                    @Html.ActionLink("Back", "AddUpdateBillingAddress", "Checkout", null, new { @class = "button arrow-left-red" })
+                    <input class="arrow-right-blue" type="submit" value="Continue" />
+                </div>
+            </div>
+        }
+    </div>
 </div>

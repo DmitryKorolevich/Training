@@ -11,7 +11,7 @@
                 <button class="btn btn-primary width-160px" ui-sref="index.oneCol.manageOrders">Manage All</button>
             </div>
             <div class="margin-top-10px">
-                <button class="btn btn-info width-160px" data-ng-click="goToCustomer();">Manage Customer</button>
+                <button class="btn btn-info width-160px" data-ng-if="validatePermission(1)" data-ng-click="goToCustomer();">Manage Customer</button>
             </div>
             <div data-ng-show="currentCustomer && order.Id && options.oldOrderStatus!=1 && options.oldOrderStatus!=4" class="margin-top-10px">
                 <button class="btn btn-purple width-160px" data-ng-click="sendOrderConfirmationEmail();">Resend Order Conf</button>
@@ -612,7 +612,7 @@
                                                 </div>
                                             </div>
                                             <span class="legend">Profile Details</span>
-                                            <div class="form-group">
+                                            <div data-ng-if="currentCustomer.CustomerType == 1" class="form-group">
                                                 <label for="linked" class="col-md-3 control-label">Linked to Affiliate</label>
                                                 <div class="col-md-3">
                                                     <input type="text" name="IdAffiliate" class="form-control" id="linked" data-ng-model="currentCustomer.IdAffiliate" numbers-only numbers-only-deny-zero placeholder="Linked to Affiliate" autocomplete="off">

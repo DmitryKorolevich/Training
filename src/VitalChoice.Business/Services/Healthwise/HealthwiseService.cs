@@ -158,6 +158,10 @@ namespace VitalChoice.Business.Services.Healthwise
             {
                 return false;
             }
+            if (customer.IdObjectType == (int) CustomerType.Wholesale)
+            {
+                
+            }
 
             var orders = await _orderRepository.Query(p => p.IdCustomer == idCustomer && p.StatusCode != (int)RecordStatusCode.Deleted && (p.OrderStatus == OrderStatus.Processed ||
                 p.OrderStatus == OrderStatus.Shipped || p.OrderStatus == OrderStatus.Exported)).SelectAsync(false);
