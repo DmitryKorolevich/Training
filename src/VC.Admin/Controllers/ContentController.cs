@@ -130,7 +130,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.ManageMasterTemplates)]
-        public async Task<Result<bool>> DeleteMasterContentItem(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteMasterContentItem(int id)
         {
             return await masterContentService.DeleteMasterContentItemAsync(id);
         }
@@ -192,7 +192,7 @@ namespace VC.Admin.Controllers
         
         [HttpPost]
         [AdminAuthorize(PermissionType.Content)]
-        public async Task<Result<bool>> DeleteCategory(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteCategory(int id)
         {
             return await categoryService.DeleteCategoryAsync(id);
         }
@@ -253,7 +253,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Content)]
-        public async Task<Result<bool>> DeleteEmailTemplate(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteEmailTemplate(int id)
         {
             return await emailTemplateService.DeleteEmailTemplateAsync(id);
         }
@@ -337,7 +337,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Content)]
-        public async Task<Result<bool>> DeleteRecipe(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteRecipe(int id)
         {
             return await recipeService.DeleteRecipeAsync(id);
         }
@@ -398,7 +398,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Content)]
-        public async Task<Result<bool>> DeleteFAQ(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteFAQ(int id)
         {
             return await faqService.DeleteFAQAsync(id);
         }
@@ -461,7 +461,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Content)]
-        public async Task<Result<bool>> DeleteArticle(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteArticle(int id)
         {
             return await articleService.DeleteArticleAsync(id);
         }
@@ -538,7 +538,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Content)]
-        public async Task<Result<bool>> DeleteContentPage(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteContentPage(int id)
         {
             return await contentPageService.DeleteContentPageAsync(id);
         }

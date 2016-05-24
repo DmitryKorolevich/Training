@@ -152,7 +152,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
-        public async Task<Result<bool>> UpdateOrderStatus(int id, int status, [FromBody] object model, int? orderpart = null)
+        public async Task<Result<bool>> UpdateOrderStatus(int id, int status, int? orderpart = null)
         {
             var order = await _orderService.SelectAsync(id, false);
 
@@ -179,7 +179,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
-        public async Task<Result<bool>> MoveOrder(int id, int idcustomer, [FromBody] object model)
+        public async Task<Result<bool>> MoveOrder(int id, int idcustomer)
         {
             var order = await _orderService.SelectAsync(id, false);
             var customer = await _customerService.SelectAsync(idcustomer, false);
@@ -358,7 +358,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
-        public async Task<Result<bool>> CancelOrder(int id, [FromBody] object model)
+        public async Task<Result<bool>> CancelOrder(int id)
         {
             return await _orderService.CancelOrderAsync(id);
         }
@@ -707,7 +707,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
-        public async Task<Result<bool>> CancelRefundOrder(int id, [FromBody] object model)
+        public async Task<Result<bool>> CancelRefundOrder(int id)
         {
             return await _orderRefundService.CancelRefundOrderAsync(id);
         }

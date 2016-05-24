@@ -307,7 +307,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public async Task<Result<bool>> DeleteAddress(int idAddress, [FromBody] object model)
+        public async Task<Result<bool>> DeleteAddress(int idAddress)
         {
             if (idAddress > 0)
                 return await _addressService.DeleteAsync(idAddress, true);
@@ -517,7 +517,7 @@ namespace VC.Admin.Controllers
 
 		[HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public async Task<Result<bool>> ResendActivation(Guid id, [FromBody] object model)
+        public async Task<Result<bool>> ResendActivation(Guid id)
 		{
 			await _storefrontUserService.ResendActivationAsync(id);
 
@@ -526,7 +526,7 @@ namespace VC.Admin.Controllers
 
 		[HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public async Task<Result<bool>> ResetPassword(Guid id, [FromBody] object model)
+        public async Task<Result<bool>> ResetPassword(Guid id)
 		{
 			await _storefrontUserService.SendResetPasswordAsync(id);
 
@@ -535,7 +535,7 @@ namespace VC.Admin.Controllers
 
 		[HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
-        public async Task<Result<string>> LoginAsCustomer(Guid id, [FromBody] object model)
+        public async Task<Result<string>> LoginAsCustomer(Guid id)
 		{
 			var token = await _storefrontUserService.GenerateLoginTokenAsync(id);
 

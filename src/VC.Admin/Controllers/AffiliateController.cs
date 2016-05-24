@@ -225,13 +225,13 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteAffiliate(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteAffiliate(int id)
         {
             return await _affiliateService.DeleteAsync(id);
         }
 
         [HttpPost]
-        public async Task<Result<bool>> ResendActivation(Guid id, [FromBody] object model)
+        public async Task<Result<bool>> ResendActivation(Guid id)
         {
             await _affiliateUserService.ResendActivationAsync(id);
 
@@ -239,7 +239,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> ResetPassword(Guid id, [FromBody] object model)
+        public async Task<Result<bool>> ResetPassword(Guid id)
         {
             await _affiliateUserService.SendResetPasswordAsync(id);
 
@@ -309,7 +309,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> PayForAffiliateOrders(int id, [FromBody] object model)
+        public async Task<Result<bool>> PayForAffiliateOrders(int id)
         {
             return await _affiliateService.PayForAffiliateOrders(id, GetLastMonthStartDayFromPSTInLocal());
         }

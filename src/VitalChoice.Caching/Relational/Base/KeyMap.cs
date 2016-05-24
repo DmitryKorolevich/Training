@@ -26,7 +26,7 @@ namespace VitalChoice.Caching.Relational.Base
             {
                 var destInfo = _keyMapping[i].Value;
                 var sourceInfo = _keyMapping[i].Key;
-                result[destInfo.ItemIndex] = new EntityValue<T>(destInfo, values[sourceInfo.ItemIndex].Value);
+                result[destInfo.ItemIndex] = new EntityValue<T>(destInfo, values[sourceInfo.ItemIndex].Value.GetValue());
             }
             return result;
         }

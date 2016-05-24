@@ -605,7 +605,7 @@ namespace VitalChoice.Caching.Services
                 var part =
                     Expression.Equal(
                         Expression.MakeMemberAccess(parameter, typeof (T).GetRuntimeProperty(keyValue.ValueInfo.Name)),
-                        Expression.Constant(keyValue.Value));
+                        Expression.Constant(keyValue.Value.GetValue()));
                 conditionalExpression = conditionalExpression == null ? part : Expression.And(conditionalExpression, part);
             }
             return conditionalExpression;

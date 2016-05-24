@@ -113,7 +113,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<GCAddingModel>> GetGiftCertificatesAdding([FromBody] object model)
+        public async Task<Result<GCAddingModel>> GetGiftCertificatesAdding()
         {
             var item = new GCAddingModel();
             item.Quantity = 1;
@@ -159,7 +159,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteGiftCertificate(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteGiftCertificate(int id)
         {
             return await GCService.DeleteGiftCertificateAsync(id);
         }

@@ -301,7 +301,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Products)]
-        public async Task<Result<bool>> DeleteProduct(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteProduct(int id)
         {
             return await productService.DeleteAsync(id);
         }
@@ -376,7 +376,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Products)]
-        public async Task<Result<bool>> DeleteCategory(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteCategory(int id)
         {
             return await productCategoryService.DeleteCategoryAsync(id);
         }
@@ -497,7 +497,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Products)]
-        public async Task<Result<bool>> DeleteInventoryCategory(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteInventoryCategory(int id)
         {
             return await inventoryCategoryService.DeleteCategoryAsync(id);
         }
@@ -563,7 +563,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Products)]
-        public async Task<Result<bool>> DeleteProductReview(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteProductReview(int id)
         {
             return await productReviewService.DeleteProductReviewAsync(id);
         }
@@ -573,7 +573,7 @@ namespace VC.Admin.Controllers
         #region ProductOutOfStockRequests
 
         [HttpPost]
-        public async Task<Result<ICollection<ProductOutOfStockContainerListItemModel>>> GetProductOutOfStockContainers([FromBody] object model)
+        public async Task<Result<ICollection<ProductOutOfStockContainerListItemModel>>> GetProductOutOfStockContainers()
         {
             var toReturn = await productService.GetProductOutOfStockContainersAsync();
             return toReturn.Select(p => new ProductOutOfStockContainerListItemModel(p)).ToList();

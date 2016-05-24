@@ -121,7 +121,7 @@ namespace VC.Admin.Controllers
         #region Countries/States
 
         [HttpPost]
-        public async Task<Result<IEnumerable<CountryListItemModel>>> GetCountries([FromBody] object model)
+        public async Task<Result<IEnumerable<CountryListItemModel>>> GetCountries()
         {
             var result = await countryService.GetCountriesAsync();
 
@@ -155,7 +155,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Settings)]
-        public async Task<Result<bool>> DeleteCountry(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteCountry(int id)
         {
             return await countryService.DeleteCountryAsync(id);
         }
@@ -174,7 +174,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Settings)]
-        public async Task<Result<bool>> DeleteState(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteState(int id)
         {
             return await countryService.DeleteStateAsync(id);
         }
@@ -370,7 +370,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteCatalogRequests([FromBody] object model)
+        public async Task<Result<bool>> DeleteCatalogRequests()
         {
             var toReturn = await _catalogRequestAddressService.DeleteCatalogRequestsAsync();
 

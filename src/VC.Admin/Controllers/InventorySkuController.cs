@@ -171,7 +171,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.InventorySkus)]
-        public async Task<Result<bool>> DeleteInventorySku(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteInventorySku(int id)
         {
             return await _inventorySkuService.DeleteAsync(id);
         }
@@ -232,7 +232,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.InventorySkus)]
-        public async Task<Result<bool>> DeleteInventorySkuCategory(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteInventorySkuCategory(int id)
         {
             return await _inventorySkuCategoryService.DeleteCategoryAsync(id);
         }

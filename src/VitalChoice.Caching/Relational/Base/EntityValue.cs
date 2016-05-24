@@ -1,40 +1,28 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using Microsoft.EntityFrameworkCore.Query.ExpressionTranslators;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Relational.Base
 {
-    public interface IValue<T>
-    {
-        bool Equals(T other);
-    }
-
     public class EntityValue<TInfo> : IEquatable<EntityValue<TInfo>>
         where TInfo: EntityValueInfo
     {
-        private readonly IEqualityComparer _comparer;
-
         public EntityValue(TInfo valueInfo, object value)
         {
+
             if (valueInfo == null)
                 throw new ArgumentNullException(nameof(valueInfo));
 
             ValueInfo = valueInfo;
-            Value = value;
-            if (valueInfo.PropertyType == typeof (string))
-            {
-                _comparer = new StringComparer(StringComparison.OrdinalIgnoreCase);
-            }
-            else
-            {
-                _comparer = new ValueComparer();
-            }
+            Value = CreateValue(value);
         }
 
         public bool Equals(EntityValue<TInfo> other)
         {
-            return _comparer.Equals(Value, other?.Value);
+            return Value.Equals(other.Value);
         }
 
         public override bool Equals(object obj)
@@ -51,7 +39,7 @@ namespace VitalChoice.Caching.Relational.Base
 
         public override int GetHashCode()
         {
-            return Value?.GetHashCode() ?? 0;
+            return Value.GetHashCode();
         }
 
         public static bool Equals(EntityValue<TInfo> left, EntityValue<TInfo> right)
@@ -71,40 +59,85 @@ namespace VitalChoice.Caching.Relational.Base
 
         public TInfo ValueInfo { get; }
 
-        public object Value { get; }
+        public IValue Value { get; }
 
-        private struct ValueComparer : IEqualityComparer
+        private static IValue CreateValue(object value)
         {
-            bool IEqualityComparer.Equals(object x, object y)
+            if (value == null)
             {
-                if (y == null) return false;
-                return x.Equals(y);
+                return new NullValue();
             }
-
-            public int GetHashCode(object obj)
-            {
-                return obj?.GetHashCode() ?? 0;
-            }
+            return Construct((dynamic) value);
         }
 
-        private struct StringComparer : IEqualityComparer
+        private static IValue Construct(bool value)
         {
-            private readonly StringComparison _comparision;
+            return new BoolValue(value);
+        }
 
-            public StringComparer(StringComparison comparision)
-            {
-                _comparision = comparision;
-            }
+        private static IValue Construct(Guid value)
+        {
+            return new GuidValue(value);
+        }
 
-            bool IEqualityComparer.Equals(object x, object y)
-            {
-                return string.Equals((string) x, (string) y, _comparision);
-            }
+        private static IValue Construct(char value)
+        {
+            return new CharValue(value);
+        }
 
-            public int GetHashCode(object obj)
-            {
-                return obj?.GetHashCode() ?? 0;
-            }
+        private static IValue Construct(byte value)
+        {
+            return new ByteValue(value);
+        }
+
+        private static IValue Construct(sbyte value)
+        {
+            return new ByteValue((byte)value);
+        }
+
+        private static IValue Construct(short value)
+        {
+            return new ShortValue(value);
+        }
+
+        private static IValue Construct(ushort value)
+        {
+            return new ShortValue((short)value);
+        }
+
+        private static IValue Construct(int value)
+        {
+            return new IntValue(value);
+        }
+
+        private static IValue Construct(uint value)
+        {
+            return new IntValue((int)value);
+        }
+
+        private static IValue Construct(long value)
+        {
+            return new LongValue(value);
+        }
+
+        private static IValue Construct(ulong value)
+        {
+            return new LongValue((long)value);
+        }
+
+        private static IValue Construct(decimal value)
+        {
+            return new DecimalValue(value);
+        }
+
+        private static IValue Construct(DateTime value)
+        {
+            return new DateTimeValue(value);
+        }
+
+        private static IValue Construct(string value)
+        {
+            return new StringValue(value);
         }
     }
 }

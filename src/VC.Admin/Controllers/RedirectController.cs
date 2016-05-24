@@ -73,7 +73,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteRedirect(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteRedirect(int id)
         {
             var sUserId = _userManager.GetUserId(User);
             int userId = Int32.Parse(sUserId);

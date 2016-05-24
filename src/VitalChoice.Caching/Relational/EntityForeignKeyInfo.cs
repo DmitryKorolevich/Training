@@ -40,16 +40,16 @@ namespace VitalChoice.Caching.Relational
         public Type DependentType { get; }
     }
 
-    public class EntityForeignKeyCollectionInfo : EntityForeignKeyInfo, IEquatable<EntityForeignKeyCollectionInfo>
-    {
-        public bool Equals(EntityForeignKeyCollectionInfo other)
-        {
-            return base.Equals(other);
-        }
+    //public class EntityForeignKeyCollectionInfo : EntityForeignKeyInfo, IEquatable<EntityForeignKeyCollectionInfo>
+    //{
+    //    public bool Equals(EntityForeignKeyCollectionInfo other)
+    //    {
+    //        return base.Equals(other);
+    //    }
 
-        public EntityForeignKeyCollectionInfo(string name, IClrPropertyGetter propertyGetter, Type dependentType)
-            : base(new[] {new EntityValueInfo(name, propertyGetter, dependentType)}, null, name, dependentType)
-        {
-        }
-    }
+    //    public EntityForeignKeyCollectionInfo(string name, IClrPropertyGetter propertyGetter, Type dependentType)
+    //        : base(new[] {new EntityValueInfo(name, propertyGetter, dependentType)}, null, name, dependentType)
+    //    {
+    //    }
+    //}
 }

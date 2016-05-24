@@ -70,7 +70,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Users)]
         [HttpPost]
-		public Result<ManageUserModel> CreateUserPrototype([FromBody] object model)
+		public Result<ManageUserModel> CreateUserPrototype()
 		{
 			return new ManageUserModel();
 		}
@@ -192,7 +192,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Users)]
         [HttpPost]
-		public async Task<Result<bool>> ResendActivation(Guid id, [FromBody] object model)
+		public async Task<Result<bool>> ResendActivation(Guid id)
 		{
 			await userService.ResendActivationAsync(id);
 
@@ -201,7 +201,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Users)]
         [HttpPost]
-		public async Task<Result<bool>> ResetPassword(Guid id, [FromBody] object model)
+		public async Task<Result<bool>> ResetPassword(Guid id)
 		{
 			await userService.SendResetPasswordAsync(id);
 

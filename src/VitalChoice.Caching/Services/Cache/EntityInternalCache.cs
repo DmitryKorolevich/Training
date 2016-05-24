@@ -579,19 +579,18 @@ namespace VitalChoice.Caching.Services.Cache
             foreach (var keyGroup in foreignKeys.Where(k => CacheFactory.CacheExist(k.Key.DependentType)))
             {
                 var cache = CacheFactory.GetCache(keyGroup.Key.DependentType);
-                var collectionForeignKey = keyGroup.Key as EntityForeignKeyCollectionInfo;
-                if (collectionForeignKey != null)
-                {
-                    var collection =
-                        keyGroup.Value.Where(k => k != null && k.IsValid && k.Values[0].Value is IEnumerable<object>)
-                            .SelectMany(k => k.Values[0].Value as IEnumerable<object>);
-                    cache.MarkForUpdate(collection.Select(item => cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(item)).ToArray(), keyGroup.Key.Name);
-                }
-                else
-                {
+                //var collectionForeignKey = keyGroup.Key as EntityForeignKeyCollectionInfo;
+                //if (collectionForeignKey != null)
+                //{
+                //    var collection =
+                //        keyGroup.Value.Cast<EntityCollectionForeignKey>().Where(k => k.Collections != null).SelectMany(k => k.Collections);
+                //    cache.MarkForUpdate(collection.Select(item => cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(item)).ToArray(), keyGroup.Key.Name);
+                //}
+                //else
+                //{
                     var itemPks = keyGroup.Value.Select(fk => keyGroup.Key.KeyMapping.MapForeignToPrincipal(fk));
                     cache.MarkForUpdate(itemPks.ToArray(), keyGroup.Key.Name);
-                }
+                //}
             }
         }
 
@@ -605,21 +604,22 @@ namespace VitalChoice.Caching.Services.Cache
                 if (foreignKey.Value != null && foreignKey.Value.IsValid && CacheFactory.CacheExist(foreignKey.Key.DependentType))
                 {
                     var cache = CacheFactory.GetCache(foreignKey.Key.DependentType);
-                    var collectionForeignKey = foreignKey.Key as EntityForeignKeyCollectionInfo;
-                    if (collectionForeignKey != null)
-                    {
-                        var collection = foreignKey.Value.Values[0].Value as IEnumerable<object>;
-                        if (collection != null)
-                        {
-                            cache.MarkForUpdate(collection.Select(item => cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(item)).ToArray(),
-                                foreignKey.Key.Name);
-                        }
-                    }
-                    else
-                    {
+                    //var collectionForeignKey = foreignKey.Key as EntityForeignKeyCollectionInfo;
+                    //if (collectionForeignKey != null)
+                    //{
+                    //    var collection =
+                    //        ((EntityCollectionForeignKey) foreignKey.Value).Collections;
+                    //    if (collection != null)
+                    //    {
+                    //        cache.MarkForUpdate(collection.Select(item => cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(item)).ToArray(),
+                    //            foreignKey.Key.Name);
+                    //    }
+                    //}
+                    //else
+                    //{
                         var itemPk = foreignKey.Key.KeyMapping.MapForeignToPrincipal(foreignKey.Value);
                         cache.MarkForUpdate(itemPk, foreignKey.Key.Name);
-                    }
+                    //}
                 }
             }
         }
