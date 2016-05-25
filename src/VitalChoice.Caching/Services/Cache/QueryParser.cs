@@ -14,7 +14,7 @@ namespace VitalChoice.Caching.Services.Cache
 {
     public class QueryParser<T> : IQueryParser<T>
     {
-        public IInternalEntityCache<T> InternalEntityCache { get; }
+        public IInternalCache<T> InternalCache { get; }
 
         private readonly ConcurrentDictionary<OrderBy, QueryInternalCache> _orderByCaches =
             new ConcurrentDictionary<OrderBy, QueryInternalCache>();
@@ -24,9 +24,9 @@ namespace VitalChoice.Caching.Services.Cache
         private readonly ICollection<ConditionalIndexAnalyzer<T>> _conditionalIndexAnalyzers;
         private readonly LambdaExpression _cacheCondition;
 
-        public QueryParser(IEntityInfoStorage entityInfo, IInternalEntityCache<T> internalEntityCache)
+        public QueryParser(IEntityInfoStorage entityInfo, IInternalCache<T> internalCache)
         {
-            InternalEntityCache = internalEntityCache;
+            InternalCache = internalCache;
             EntityInfo info;
             if (entityInfo.GetEntityInfo<T>(out info))
             {

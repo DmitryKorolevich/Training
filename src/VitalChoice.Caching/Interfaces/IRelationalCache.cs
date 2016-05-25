@@ -4,7 +4,7 @@ using VitalChoice.Caching.Services.Cache.Base;
 
 namespace VitalChoice.Caching.Interfaces
 {
-    public interface IEntityCache<T>
+    public interface IRelationalCache<T>
     {
         CacheGetResult TryGetCached(QueryData<T> query, out List<T> entities);
         CacheGetResult TryGetCachedFirstOrDefault(QueryData<T> query, out T entity);

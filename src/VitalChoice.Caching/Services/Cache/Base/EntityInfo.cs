@@ -5,9 +5,10 @@ using VitalChoice.Caching.Relational;
 
 namespace VitalChoice.Caching.Services.Cache.Base
 {
-    public struct EntityInfo
+    public class EntityInfo
     {
         public IDictionary<string, EntityRelationalReferenceInfo> RelationReferences;
+        public HashSet<string> ImplicitUpdateMarkedEntities;
         public Type ContextType;
         public LambdaExpression CacheCondition;
         public ICollection<EntityForeignKeyInfo> ForeignKeys;

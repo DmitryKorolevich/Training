@@ -97,6 +97,13 @@ namespace VitalChoice.Caching.Services
                         throw new Exception($"{entityType.ClrType.FullName} was already exist in different context");
                     }
                 }
+                foreach (var info in entityInfos)
+                {
+                    info.Value.ImplicitUpdateMarkedEntities =
+                        new HashSet<string>(
+                            info.Value.RelationReferences?.Where(r => r.Value != info.Value.PrimaryKey).Select(r => r.Key) ??
+                            Enumerable.Empty<string>());
+                }
                 if (_entityInfos == null)
                 {
                     _entityInfos = entityInfos;

@@ -115,6 +115,13 @@ namespace VitalChoice.Caching.Relational.Base
             return new IntValue((int)value);
         }
 
+        private static IValue Construct(Enum value)
+        {
+            var type = Enum.GetUnderlyingType(value.GetType());
+            var obj = Convert.ChangeType(value, type);
+            return Construct((dynamic)obj);
+        }
+
         private static IValue Construct(long value)
         {
             return new LongValue(value);

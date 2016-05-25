@@ -84,29 +84,5 @@ namespace VC.Public.Controllers.Content
 
             return BaseNotFoundView();
         }
-
-        public async Task<string> RenderPartialViewToString(string viewName, object model)
-        {
-            ModelStateDictionary modelState = new ModelStateDictionary();
-            ViewDataDictionary viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), modelState);
-            RouteData routeData = new RouteData();
-            ActionDescriptor actionDescriptor = new ActionDescriptor();
-            ActionContext actionContext = new ActionContext(HttpContext, routeData, actionDescriptor);
-
-            viewData.Model = model;
-
-            using (StringWriter sw = new StringWriter())
-            {
-                var engine = HttpContext.RequestServices.GetRequiredService<ICompositeViewEngine>();
-                ViewEngineResult viewResult = engine.FindView(actionContext, viewName, false);
-
-                ViewContext viewContext = new ViewContext(actionContext, viewResult.View, viewData, null, sw, new HtmlHelperOptions());
-                
-
-                await viewResult.View.RenderAsync(viewContext);
-
-                return sw.GetStringBuilder().ToString();
-            }
-        }
     }
 }

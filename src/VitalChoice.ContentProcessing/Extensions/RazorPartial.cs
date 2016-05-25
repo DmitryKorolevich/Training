@@ -13,6 +13,7 @@ using Templates.Exceptions;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.ContentProcessing.Extensions;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using System.Collections.Generic;
 
 [assembly: ExportExtensions(typeof(RazorPartial))]
 
@@ -21,16 +22,8 @@ namespace VitalChoice.ContentProcessing.Extensions
     [ExtensionName("razor")]
     public class RazorPartial : AbstractExtension
     {
-        private ICompositeViewEngine _viewEngine;
-
         public override ExType InitStart(InitContext initContext, ExType dataType, ExType chainedType, ExType parent)
         {
-            var contentViewContext = initContext.CompileScope.Options.Data as ContentViewContext;
-            if (contentViewContext == null)
-            {
-                throw new TemplateProcessingException("ContentViewContext not found in options value");
-            }
-            _viewEngine = contentViewContext.ActionContext.HttpContext.RequestServices.GetRequiredService<ICompositeViewEngine>();
             return base.InitStart(initContext, parent, chainedType, null);
         }
 
@@ -43,8 +36,27 @@ namespace VitalChoice.ContentProcessing.Extensions
             }
             try
             {
-                var result = _viewEngine.FindView(contentViewContext.ActionContext, GetInnerResult(scope.Parent()), false);
-                result.EnsureSuccessful(Enumerable.Empty<string>());
+                var viewEngine = contentViewContext.ActionContext.HttpContext.RequestServices.GetRequiredService<ICompositeViewEngine>();
+                var viewName = GetInnerResult(scope.Parent());
+                var result = viewEngine.GetView(null, viewName, false);
+                if (!result.Success)
+                {
+                    result = viewEngine.FindView(contentViewContext.ActionContext, viewName, false);
+                }
+
+                if (!result.Success)
+                {
+                    if (result.SearchedLocations.Any())
+                    {
+                        if (result.SearchedLocations.Any())
+                        {
+                            var locations = new List<string>(result.SearchedLocations);
+                            locations.AddRange(result.SearchedLocations);
+                            result = ViewEngineResult.NotFound(viewName, locations);
+                        }
+                    }
+                }
+                result.EnsureSuccessful(null);
                 ViewDataDictionary viewData =
                     new ViewDataDictionary(
                         new ViewDataDictionary(
@@ -55,11 +67,12 @@ namespace VitalChoice.ContentProcessing.Extensions
                     {
                         Model = scope.ModelData
                     };
-                //ITempDataDictionary tempData =
-                //    contentViewContext.ActionContext.HttpContext.RequestServices.GetRequiredService<ITempDataDictionary>();
+                var tempDataFactory =
+                    contentViewContext.ActionContext.HttpContext.RequestServices.GetRequiredService<ITempDataDictionaryFactory>();
                 using (var writer = new StringWriter())
                 {
-                    ViewContext viewContext = new ViewContext(contentViewContext.ActionContext, result.View, viewData, null, writer,
+                    ViewContext viewContext = new ViewContext(contentViewContext.ActionContext, result.View, viewData,
+                        tempDataFactory.GetTempData(contentViewContext.ActionContext.HttpContext), writer,
                         new HtmlHelperOptions());
                     result.View.RenderAsync(viewContext).Wait();
                     writer.Flush();

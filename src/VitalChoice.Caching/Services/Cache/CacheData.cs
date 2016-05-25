@@ -255,7 +255,7 @@ namespace VitalChoice.Caching.Services.Cache
         private bool UpdateEntityWithRelations(T entity, IDictionary<TrackedEntityKey, EntityEntry> trackedEntities, CachedEntity<T> cached)
         {
             ICollection<RelationInfo> relationsToClone;
-            if (!GetAllNormalizedAndTracked(entity, _relationInfo, trackedEntities, out relationsToClone, cached))
+            if (!GetAllNormalizedAndTracked(entity, trackedEntities, out relationsToClone, cached))
             {
                 cached.NeedUpdate = true;
                 return false;
@@ -295,19 +295,36 @@ namespace VitalChoice.Caching.Services.Cache
             //return true;
         }
 
-        private bool GetAllNormalizedAndTracked(object entity, RelationInfo relations,
+        private bool GetAllNormalizedAndTracked(object entity, 
             IDictionary<TrackedEntityKey, EntityEntry> trackedEntities, out ICollection<RelationInfo> relationsToClone,
             CachedEntity<T> cached)
         {
-            relationsToClone = relations.Relations.Where(r => cached.NeedUpdateRelated.Contains(r.Name)).ToArray();
-            return GetIsNormalized(entity, relations.RelationType, trackedEntities, relationsToClone);
+            relationsToClone = new List<RelationInfo>();
+            var relationCandidates = _relationInfo.Relations.Where(r => cached.NeedUpdateRelated.Contains(r.Name));
+            foreach (var relation in relationCandidates)
+            {
+                EntityRelationalReferenceInfo reference;
+                if (_entityInfo.RelationReferences.TryGetValue(relation.Name, out reference))
+                {
+                    var newpk = reference.GetPrimaryKeyValue(entity);
+                    var oldpk = reference.GetPrimaryKeyValue(cached.Entity);
+                    if (newpk != oldpk)
+                    {
+                        relationsToClone.Add(relation);
+                    }
+                }
+                else
+                {
+                    relationsToClone.Add(relation);
+                }
+            }
+            return GetIsNormalized(entity, _relationInfo.RelationType, trackedEntities, relationsToClone, _entityInfo);
         }
 
         private bool GetIsNormalized(object entity, Type relationType, IDictionary<TrackedEntityKey, EntityEntry> trackedEntities,
-            ICollection<RelationInfo> relationsToClone)
+            ICollection<RelationInfo> relationsToClone, EntityInfo entityInfo = null)
         {
-            EntityInfo entityInfo;
-            if (!_infoStorage.GetEntityInfo(relationType, out entityInfo))
+            if (entityInfo == null && !_infoStorage.GetEntityInfo(relationType, out entityInfo))
             {
                 return false;
             }

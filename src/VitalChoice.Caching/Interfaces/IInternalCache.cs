@@ -36,7 +36,7 @@ namespace VitalChoice.Caching.Interfaces
         EntityInfo EntityInfo { get; }
     }
 
-    public interface IInternalEntityCache<T> : IInternalEntityCache
+    public interface IInternalCache<T> : IInternalEntityCache
     {
         CacheResult<T> TryGetEntity(EntityKey key, RelationInfo relations);
 

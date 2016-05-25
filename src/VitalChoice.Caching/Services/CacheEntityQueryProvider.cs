@@ -199,7 +199,7 @@ namespace VitalChoice.Caching.Services
         {
             private readonly ILogger _logger;
             private readonly QueryData<T> _queryData;
-            private readonly IEntityCache<T> _cache;
+            private readonly IRelationalCache<T> _cache;
             private readonly Expression _reparsedExpression;
 
             // ReSharper disable once UnusedMember.Local
@@ -208,7 +208,7 @@ namespace VitalChoice.Caching.Services
             {
                 _logger = logger;
                 var queryCache = queryParserFactory.GetQueryCache<T>();
-                _cache = new EntityCache<T>(queryCache.InternalEntityCache, infoStorage, context, logger);
+                _cache = new RelationalCache<T>(queryCache.InternalCache, infoStorage, context, logger);
                 _queryData = queryCache.ParseQuery(expression, out _reparsedExpression);
             }
 

@@ -6,6 +6,6 @@ namespace VitalChoice.Caching.Interfaces
     public interface IQueryParser<T>
     {
         QueryData<T> ParseQuery(Expression query, out Expression newExpression);
-        IInternalEntityCache<T> InternalEntityCache { get; }
+        IInternalCache<T> InternalCache { get; }
     }
 }

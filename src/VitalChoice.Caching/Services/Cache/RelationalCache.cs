@@ -20,16 +20,16 @@ using VitalChoice.ObjectMapping.Extensions;
 
 namespace VitalChoice.Caching.Services.Cache
 {
-    public class EntityCache<T> : IEntityCache<T>
+    public class RelationalCache<T> : IRelationalCache<T>
     {
-        private readonly IInternalEntityCache<T> _internalCache;
+        private readonly IInternalCache<T> _internalCache;
         private readonly IEntityInfoStorage _infoStorage;
         private readonly DbContext _context;
         private readonly ILogger _logger;
         private IDictionary<TrackedEntityKey, EntityEntry> _trackData;
         private HashSet<object> _trackedObjects;
 
-        public EntityCache(IInternalEntityCache<T> internalCache, IEntityInfoStorage infoStorage, DbContext context, ILogger logger)
+        public RelationalCache(IInternalCache<T> internalCache, IEntityInfoStorage infoStorage, DbContext context, ILogger logger)
         {
             _context = context;
             _logger = logger;

@@ -13,10 +13,6 @@
     },
     "copyToOutput": {
       "include": [
-        "Areas",
-        "Views",
-        "Assets",
-        "wwwroot",
         "config.json",
         "web.config",
         "CSharpClassTemplate.tcs",
@@ -42,12 +38,10 @@
   },
   "publishOptions": {
     "include": [
-      "Areas",
-      "Views",
-      "Assets",
-      "wwwroot",
       "config.json",
-      "web.config"
+      "web.config",
+      "CSharpClassTemplate.tcs",
+      "CSharpPreparseTemplate.tcs"
     ]
   },
   "dependencies": {

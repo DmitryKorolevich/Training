@@ -62,7 +62,7 @@ namespace VitalChoice.Core.GlobalFilters
                 {
                     if ((context.Exception as NotFoundException) != null)
                     {
-                        result = new HttpNotFoundResult();
+                        result = new NotFoundResult();
                     }
                     else
                     {
