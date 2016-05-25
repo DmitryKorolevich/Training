@@ -238,6 +238,7 @@ namespace VC.Admin.Controllers
         #region Reports
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Reports)]
         public async Task<Result<ICollection<InventorySkuUsageReportItem>>> GetInventorySkuUsageReport([FromBody]InventorySkuUsageReportFilter filter)
         {
             filter.To = filter.To.AddDays(1);
@@ -248,6 +249,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
+        [AdminAuthorize(PermissionType.Reports)]
         public async Task<FileResult> GetInventorySkuUsageReportFile([FromQuery]string from, [FromQuery]string to,
              [FromQuery]string skuids, [FromQuery]string invskuids)
         {
@@ -282,6 +284,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Reports)]
         public async Task<Result<InventoriesSummaryUsageReport>> GetInventoriesSummaryUsageReport([FromBody]InventoriesSummaryUsageReportFilter filter)
         {
             filter.To = filter.To.AddDays(1);
@@ -291,6 +294,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
+        [AdminAuthorize(PermissionType.Reports)]
         public async Task<FileResult> GetInventoriesSummaryUsageReportFile([FromQuery]string from, [FromQuery]string to,
              [FromQuery]string sku, [FromQuery]string invsku, [FromQuery]bool? assemble, [FromQuery]string idsinvcat)
         {

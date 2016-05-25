@@ -28,7 +28,10 @@
 
     $(".columns-container form").data("validator").settings.submitHandler = function (form)
     {
-        $(".columns-container .overlay").show();
+        setTimeout(function ()
+        {
+            $(".columns-container .overlay").show();
+        }, 100);
         form.submit();
     };
 
