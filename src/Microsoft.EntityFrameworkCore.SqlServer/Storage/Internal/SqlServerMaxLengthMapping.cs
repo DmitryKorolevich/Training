@@ -32,7 +32,7 @@ namespace Microsoft.EntityFrameworkCore.Storage.Internal
             var length = (parameter.Value as string)?.Length ?? (parameter.Value as byte[])?.Length;
 
             parameter.Size = (length != null) && (length <= _maxSpecificSize)
-                ? _maxSpecificSize
+                ? length.Value
                 : -1;
         }
     }
