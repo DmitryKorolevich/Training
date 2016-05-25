@@ -28,11 +28,11 @@
 
     $(".columns-container form").data("validator").settings.submitHandler = function (form)
     {
+        $(".columns-container .overlay").show();
         setTimeout(function ()
         {
-            $(".columns-container .overlay").show();
+            form.submit();
         }, 100);
-        form.submit();
     };
 
     controlUpdateSavedState();
