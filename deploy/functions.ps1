@@ -17,18 +17,30 @@ function BuildAll($deployPath) {
 	Push-Location ".."
 	echo "Publishing project..."
 	dotnet publish -o "${deployPath}" -f net451 -r active -c Release
+	if(-Not $?)
+	{
+		exit $LASTEXITCODE
+	}
 	Pop-Location
 }
 function GruntTask($taskName) {
 	Push-Location ".."
 	echo "Running grunt task ${taskName}..."
 	grunt $taskName
+	if(-Not $?)
+	{
+		exit $LASTEXITCODE
+	}
 	Pop-Location
 }
 function BowerInstall() {
 	Push-Location ".."
 	echo "Running bower install..."
 	bower install
+	if(-Not $?)
+	{
+		exit $LASTEXITCODE
+	}
 	Pop-Location
 }
 function NpmCopy($npmPath) {
@@ -37,6 +49,10 @@ function NpmCopy($npmPath) {
 		Push-Location ".."
 		echo "Installing missed packages..."
 		npm install
+		if(-Not $?)
+		{
+			exit $LASTEXITCODE
+		}
 		Pop-Location
 		robocopy "..\node_modules" $npmPath /e /ndl /nfl /njh /is > copy-npm.log
 	}
@@ -46,6 +62,10 @@ function NpmCopy($npmPath) {
 		Push-Location ".."
 		echo "Installing missed packages..."
 		npm install
+		if(-Not $?)
+		{
+			exit $LASTEXITCODE
+		}
 		Pop-Location
 	}
 }

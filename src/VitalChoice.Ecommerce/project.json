@@ -3,9 +3,9 @@
   "description": "VitalChoice.Ecommerce Class Library",
   "authors": [ "multi_000" ],
   "dependencies": {
-    "Microsoft.EntityFrameworkCore.SqlServer": "1.0.0-*",
-    "Microsoft.EntityFrameworkCore": "1.0.0-*",
-    "Microsoft.Extensions.Options": "1.0.0-*",
+    "Microsoft.EntityFrameworkCore.SqlServer": "1.0.0-fixed-*",
+    "Microsoft.EntityFrameworkCore": "1.0.0-fixed-*",
+    "Microsoft.Extensions.Options": "1.0.0-rc2-final",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.Caching": "1.0.0-*"

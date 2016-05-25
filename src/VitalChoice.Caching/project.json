@@ -3,8 +3,8 @@
   "description": "VitalChoice.Caching Class Library",
   "authors": [ "multi_000" ],
   "dependencies": {
-    "Microsoft.EntityFrameworkCore": "1.0.0-*",
-    "Microsoft.EntityFrameworkCore.Relational": "1.0.0-*",
+    "Microsoft.EntityFrameworkCore": "1.0.0-fixed-*",
+    "Microsoft.EntityFrameworkCore.Relational": "1.0.0-fixed-*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
     "VitalChoice.ObjectMapping": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*"

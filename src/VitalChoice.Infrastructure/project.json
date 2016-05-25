@@ -1,9 +1,9 @@
 {
   "version": "1.0.0-*",
   "dependencies": {
-    "Microsoft.EntityFrameworkCore": "1.0.0-*",
-    "Microsoft.EntityFrameworkCore.SqlServer": "1.0.0-*",
-    "Microsoft.Extensions.Options": "1.0.0-*",
+    "Microsoft.EntityFrameworkCore": "1.0.0-fixed-*",
+    "Microsoft.EntityFrameworkCore.SqlServer": "1.0.0-fixed-*",
+    "Microsoft.Extensions.Options": "1.0.0-rc2-final",
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
     "VitalChoice.Infrastructure.Domain": "1.0.0-*",

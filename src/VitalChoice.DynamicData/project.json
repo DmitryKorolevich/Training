@@ -7,7 +7,7 @@
     "Newtonsoft.Json": "8.0.3",
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
-    "Autofac.Extensions.DependencyInjection": "4.0.0-rc2",
+    "Autofac.Extensions.DependencyInjection": "4.0.0-fixed-*",
     "VitalChoice.ObjectMapping": "1.0.0-*",
     "VitalChoice.Profiling": "1.0.0-*"
   },

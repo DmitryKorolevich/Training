@@ -3,7 +3,7 @@
   "description": "Avalara.Avatax.Rest Class Library",
   "authors": [ "avadev", "multiarc" ],
   "dependencies": {
-    "Microsoft.Extensions.Options": "1.0.0-*",
+    "Microsoft.Extensions.Options": "1.0.0-rc2-final",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
     "VitalChoice.Infrastructure.Domain": "1.0.0-*",
     "Newtonsoft.Json": "8.0.3",

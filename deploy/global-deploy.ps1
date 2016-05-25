@@ -27,10 +27,10 @@ cp "${RootBuild}\src\nlog.config" "${RootDeploy}\nlog.config"
 Push-Location "${RootBuild}"
 echo "Working directory: ${RootBuild}"
 echo "Restoring packages..."
-dotnet restore -v Error
+dotnet restore -v Warning
 if(-Not $?)
 {
-	exit
+	exit $LASTEXITCODE
 }
 Pop-Location
 ls -Path "${RootBuild}\src" | `

@@ -4,7 +4,7 @@
   "authors": [ "multi_000" ],
   "dependencies": {
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
-    "Autofac.Extensions.DependencyInjection": "4.0.0-rc2"
+    "Autofac.Extensions.DependencyInjection": "4.0.0-fixed-*"
   },
   "frameworks": {
     "net451": { },

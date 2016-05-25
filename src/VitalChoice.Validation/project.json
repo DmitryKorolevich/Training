@@ -5,7 +5,7 @@
   "authors": [ "" ],
   "dependencies": {
     "Microsoft.AspNetCore.Mvc": "1.0.0-rc2-final",
-    "FluentValidation": "5.6.0.5-*",
+    "FluentValidation": "5.6.0.5-fixed-*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*"
   },
 

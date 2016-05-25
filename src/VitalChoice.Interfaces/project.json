@@ -4,15 +4,15 @@
   "description": "",
   "authors": [ "" ],
   "dependencies": {
-    "Microsoft.AspNetCore.Mvc.Abstractions": "1.0.0-*",
-    "Microsoft.AspNetCore.Mvc.Core": "1.0.0-*",
+    "Microsoft.AspNetCore.Mvc.Abstractions": "1.0.0-rc2-final",
+    "Microsoft.AspNetCore.Mvc.Core": "1.0.0-rc2-final",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
     "VitalChoice.Infrastructure.Domain": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.DynamicData": "1.0.0-*",
     "VitalChoice.Workflow": "1.0.0-*",
     "VitalChoice.ContentProcessing": "1.0.0-*",
-    "CsvHelper": "2.14.2"
+    "CsvHelper": "2.14.2-fixed-*"
   },
 
   "frameworks": {
