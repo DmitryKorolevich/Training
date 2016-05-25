@@ -596,5 +596,32 @@ namespace VC.Admin.Controllers
             filter.IdReferencedObjectType = (int)AddressType.Profile;
             return (await _customerService.GetAddressFieldValuesByValueAsync(filter)).ToList();
         }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpGet]
+        public async Task<Result<WholesaleSummaryReport>> GetWholesaleSummaryReport()
+        {
+            return await _customerService.GetWholesaleSummaryReportAsync();
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpGet]
+        public async Task<Result<ICollection<WholesaleSummaryReportMonthStatistic>>> GetWholesaleSummaryReportMonthStatistic(int count = 3, bool include = true)
+        {
+            if (count > 12)
+                count = 12;
+            if (count < 3)
+                count = 3;
+            if (include)
+                count++;
+            DateTime lastMonthStartDay = DateTime.Now;
+            lastMonthStartDay = new DateTime(lastMonthStartDay.Year, lastMonthStartDay.Month, 1);
+            if (!include)
+            {
+                lastMonthStartDay = lastMonthStartDay.AddMonths(-1);
+            }
+            lastMonthStartDay = TimeZoneInfo.ConvertTime(lastMonthStartDay, _pstTimeZoneInfo, TimeZoneInfo.Local);
+            return (await _customerService.GetWholesaleSummaryReportMonthStatisticAsync(lastMonthStartDay, count)).ToList();
+        }
     }
 }

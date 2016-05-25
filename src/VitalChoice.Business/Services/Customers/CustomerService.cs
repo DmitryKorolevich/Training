@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -77,6 +78,8 @@ namespace VitalChoice.Business.Services.Customers
         private readonly IEncryptedOrderExportService _encryptedOrderExportService;
         private readonly IObjectMapper<CustomerPaymentMethodDynamic> _paymentMapper;
         private readonly IPaymentMethodService _paymentMethodService;
+        private readonly IEcommerceRepositoryAsync<VWholesaleSummaryInfo> _vWholesaleSummaryInfoRepositoryAsync;
+        private readonly IAppInfrastructureService _appInfrastructureService;
 
         private static string _customerContainerName;
 
@@ -96,6 +99,8 @@ namespace VitalChoice.Business.Services.Customers
             AddressOptionValueRepository addressOptionValueRepositoryAsync, CustomerAddressMapper customerAddressMapper,
             ICountryNameCodeResolver countryNameCode, IEncryptedOrderExportService encryptedOrderExportService,
             IObjectMapper<CustomerPaymentMethodDynamic> paymentMapper, IPaymentMethodService paymentMethodService,
+            IEcommerceRepositoryAsync<VWholesaleSummaryInfo> vWholesaleSummaryInfoRepositoryAsync,
+            IAppInfrastructureService appInfrastructureService,
             ITransactionAccessor<EcommerceContext> transactionAccessor)
             : base(
                 customerMapper, customerRepositoryAsync,
@@ -118,6 +123,8 @@ namespace VitalChoice.Business.Services.Customers
             _encryptedOrderExportService = encryptedOrderExportService;
             _paymentMapper = paymentMapper;
             _paymentMethodService = paymentMethodService;
+            _vWholesaleSummaryInfoRepositoryAsync = vWholesaleSummaryInfoRepositoryAsync;
+            _appInfrastructureService = appInfrastructureService;
         }
 
         protected override IQueryLite<Customer> BuildIncludes(IQueryLite<Customer> query)
@@ -815,5 +822,65 @@ namespace VitalChoice.Business.Services.Customers
 
 			await _storefrontUserService.SendSuccessfulRegistration(customer.Email, applicationUser.FirstName, applicationUser.LastName);
 		}
+
+        #region Reports 
+
+        public async Task<WholesaleSummaryReport> GetWholesaleSummaryReportAsync()
+        {
+            WholesaleSummaryReport toReturn=new WholesaleSummaryReport();
+            toReturn.TradeClasses = _appInfrastructureService.Data().TradeClasses.Select(p => new WholesaleSummaryReportTradeClassItem()
+            {
+                Id = p.Key,
+                Name = p.Text
+            }).ToList();
+
+            var items = await _vWholesaleSummaryInfoRepositoryAsync.Query().SelectAsync(false);
+            toReturn.AllAccounts = items.Count();
+            toReturn.ActiveAccounts = items.Count(p=>p.OrdersExist);
+            toReturn.NewActiveAccounts = items.Count(p => p.OrdersExist && p.NewCustomer);
+            foreach (var wholesaleSummaryReportTradeClassItem in toReturn.TradeClasses)
+            {
+                wholesaleSummaryReportTradeClassItem.Count =
+                    items.Count(p => p.TradeClass == wholesaleSummaryReportTradeClassItem.Id);
+            }
+
+            return toReturn;
+        }
+
+        public async Task<ICollection<WholesaleSummaryReportMonthStatistic>> GetWholesaleSummaryReportMonthStatisticAsync(DateTime lastMonthStartDay, int monthCount)
+        {
+            List<WholesaleSummaryReportMonthStatistic> toReturn = new List<WholesaleSummaryReportMonthStatistic>();
+
+            var items = await _vWholesaleSummaryInfoRepositoryAsync.Query().SelectAsync(false);
+            var newIds = items.Where(p => p.NewCustomer && p.OrdersExist).Select(p => p.Id).ToList();
+            var establishedIds = items.Where(p => !p.NewCustomer && p.OrdersExist).Select(p => p.Id).ToList();
+
+            OrderQuery query=new OrderQuery().NotDeleted().WithActualStatusOnly().WithCreatedDate(lastMonthStartDay.AddMonths(-monthCount), null).
+                WithOrderTypes(new [] {OrderType.AutoShipOrder, OrderType.DropShip, OrderType.GiftList, OrderType.Normal });
+
+            OrderQuery newIdsQuery = query.WithCustomerIds(newIds);
+            var newOrders = await _orderRepository.Query(newIdsQuery).SelectAsync(p => new {p.DateCreated, p.Total}, false);
+
+            OrderQuery stablishedIdsQuery = query.WithCustomerIds(establishedIds);
+            var establishedOrders = await _orderRepository.Query(stablishedIdsQuery).SelectAsync(p => new { p.DateCreated, p.Total }, false);
+
+            while (monthCount > 0)
+            {
+                WholesaleSummaryReportMonthStatistic item = new WholesaleSummaryReportMonthStatistic();
+                item.Month = lastMonthStartDay.ToString("MMMM", CultureInfo.InvariantCulture);
+
+                item.NewSales = newOrders.Where(p=> lastMonthStartDay<=p.DateCreated && lastMonthStartDay.AddMonths(1)>=p.DateCreated).Sum(p=>p.Total);
+                item.EstablishedSales = establishedOrders.Where(p => lastMonthStartDay <= p.DateCreated && lastMonthStartDay.AddMonths(1) >= p.DateCreated).Sum(p => p.Total);
+                item.Total = item.NewSales + item.EstablishedSales;
+
+                toReturn.Add(item);
+                lastMonthStartDay = lastMonthStartDay.AddMonths(-1);
+                monthCount--;
+            }
+
+            return toReturn;
+        }
+
+        #endregion
     }
 }

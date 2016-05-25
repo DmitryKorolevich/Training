@@ -124,7 +124,7 @@ namespace VitalChoice.Business.Services
             // ReSharper disable once UseObjectOrCollectionInitializer
             var referenceData = new ReferenceData();
             referenceData.DefaultCountry = _backendSettingsService.GetDefaultCountry();
-            referenceData.AdminRoles = roleManager.Roles.Where(x => x.IdUserType == UserType.Admin).Select(x => new LookupItem<int>
+            referenceData.AdminRoles = roleManager.Roles.Where(x => x.IdUserType == UserType.Admin).OrderBy(p=>p.Order).Select(x => new LookupItem<int>
             {
                 Key = x.Id,
                 Text = x.Name

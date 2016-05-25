@@ -2279,30 +2279,35 @@ namespace VitalChoice.Business.Services.Orders
                 await UpdateHealthwiseOrderInnerAsync(uow, order.Id, order.Customer.Id, order.DateCreated, isHealthwise, order.IsFirstHealthwise);
                 if (isHealthwise)
                 {
-                    var option = _customerMapper.OptionTypes.FirstOrDefault(p => p.Name == "HasHealthwiseOrders");
-                    if (option != null)
-                    {
-                        var customerOptionValueRepositoryAsync = uow.RepositoryAsync<CustomerOptionValue>();
-                        var optionValue = (await customerOptionValueRepositoryAsync.Query(p=>p.IdCustomer== order.Customer.Id && p.IdOptionType==
-                            option.Id).SelectAsync(true)).FirstOrDefault();
-                        if (optionValue == null)
-                        {
-                            optionValue = new CustomerOptionValue()
-                            {
-                                Value = "True",
-                                IdCustomer = order.Customer.Id,
-                                IdOptionType = option.Id
-                            };
-                            await customerOptionValueRepositoryAsync.InsertAsync(optionValue);
-                        }
-                        else if (optionValue.Value != "True")
-                        {
-                            optionValue.Value = "True";
-                        }
-                    }
+                    await MarkHealthwiseCustomerAsync(uow, order.Customer.Id);
                 }
                 await uow.SaveChangesAsync();
                 return true;
+            }
+        }
+
+        public async Task MarkHealthwiseCustomerAsync(IUnitOfWorkAsync uow, int idCustomer)
+        {
+            var option = _customerMapper.OptionTypes.FirstOrDefault(p => p.Name == "HasHealthwiseOrders");
+            if (option != null)
+            {
+                var customerOptionValueRepositoryAsync = uow.RepositoryAsync<CustomerOptionValue>();
+                var optionValue = (await customerOptionValueRepositoryAsync.Query(p => p.IdCustomer == idCustomer && p.IdOptionType ==
+                    option.Id).SelectAsync(true)).FirstOrDefault();
+                if (optionValue == null)
+                {
+                    optionValue = new CustomerOptionValue()
+                    {
+                        Value = "True",
+                        IdCustomer = idCustomer,
+                        IdOptionType = option.Id
+                    };
+                    await customerOptionValueRepositoryAsync.InsertAsync(optionValue);
+                }
+                else if (optionValue.Value != "True")
+                {
+                    optionValue.Value = "True";
+                }
             }
         }
 

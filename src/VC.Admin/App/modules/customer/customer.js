@@ -6,6 +6,7 @@ angular.module('app.modules.customer', [
 	'app.modules.customer.controllers.customerManagementController',
 	'app.modules.customer.controllers.manageCustomerFilesController',
 	'app.modules.customer.controllers.manageCustomerNotesController',
+	'app.modules.customer.controllers.wholesaleSummaryReportController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -25,6 +26,11 @@ angular.module('app.modules.customer', [
 					url: '/customers/{id:int}',
 					templateUrl: 'app/modules/customer/partials/manageCustomer.html',
 					controller: 'addEditCustomerController'
+				})
+            	.state('index.oneCol.wholesaleSummaryReport', {
+            	    url: '/report/wholesale-summary',
+            	    templateUrl: 'app/modules/customer/partials/wholesaleSummaryReport.html',
+					controller: 'wholesaleSummaryReportController'
 				});
 		}
 	]);

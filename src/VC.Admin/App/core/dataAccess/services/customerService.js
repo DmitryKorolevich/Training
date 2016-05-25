@@ -86,5 +86,15 @@ angular.module('app.core.dataAccess.services.customerService', [])
 		{
 		    return $http.post(baseUrl + 'GetCustomerStaticFieldValuesByValue', filter, getConfig(tracker));
 		},
+
+	    //reports
+		getWholesaleSummaryReport: function (tracker)
+		{
+		    return $http.get(baseUrl + 'GetWholesaleSummaryReport', getConfig(tracker));
+		},
+		getWholesaleSummaryReportMonthStatistic: function (count, include, tracker)
+		{
+		    return $http.get(baseUrl + 'GetWholesaleSummaryReportMonthStatistic/?count={0}&include={1}'.format(count, include), getConfig(tracker));
+		},
 	};
 }]);

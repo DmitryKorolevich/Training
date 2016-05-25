@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using VitalChoice.Data.Helpers;
+using VitalChoice.Data.UnitOfWork;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
@@ -47,6 +48,8 @@ namespace VitalChoice.Interfaces.Services.Orders
         Task<bool> UpdateHealthwiseOrderWithValidationAsync(int orderId, bool isHealthwise);
 
         Task<bool> UpdateHealthwiseOrderAsync(int orderId, bool isHealthwise);
+
+	    Task MarkHealthwiseCustomerAsync(IUnitOfWorkAsync uow, int idCustomer);
 
         #endregion
 

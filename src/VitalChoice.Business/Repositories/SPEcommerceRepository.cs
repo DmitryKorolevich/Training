@@ -13,6 +13,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 using VitalChoice.Ecommerce.Domain;
+using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.Entities.InventorySkus;
 using VitalChoice.Infrastructure.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Entities.Products;
@@ -234,6 +235,49 @@ namespace VitalChoice.Data.Repositories.Customs
                 filter.IdCustomerSource, filter.CustomerSourceDetails, filter.FromCount, filter.ToCount, filter.KeyCode,
                 filter.IdCustomer, filter.FirstOrderFrom, filter.FirstOrderTo, filter.IdCustomerType, filter.DiscountCode, filter.IsAffiliate,
                 filter.Paging?.PageIndex, filter.Paging?.PageItemCount).ToListAsync();
+            return toReturn;
+        }
+
+        public async Task<ICollection<CustomerOrdersTotal>> GetCustomersStandardOrderTotalsAsync(IList<int> ids, DateTime from, DateTime to)
+        {
+            string sIds = string.Empty;
+            if (ids != null)
+            {
+                ids = ids.Distinct().ToList();
+                for (int i = 0; i < ids.Count; i++)
+                {
+                    sIds += ids[i];
+                    if (i != ids.Count - 1)
+                    {
+                        sIds += ",";
+                    }
+                }
+            }
+
+            var toReturn = await Context.Set<CustomerOrdersTotal>().FromSql
+                ("[dbo].[SPGetCustomersStandardOrderTotals] @from={0}, @to={1}, @customerids={2}",
+                from, to, sIds).ToListAsync();
+            return toReturn;
+        }
+
+        public async Task<ICollection<CustomerLastOrder>> GetCustomersStandardOrdersLastAsync(IList<int> ids)
+        {
+            string sIds = string.Empty;
+            if (ids != null)
+            {
+                ids = ids.Distinct().ToList();
+                for (int i = 0; i < ids.Count; i++)
+                {
+                    sIds += ids[i];
+                    if (i != ids.Count - 1)
+                    {
+                        sIds += ",";
+                    }
+                }
+            }
+
+            var toReturn = await Context.Set<CustomerLastOrder>().FromSql
+                ("[dbo].[SPGetCustomersStandardOrdersLast] @customerids={0}",sIds).ToListAsync();
             return toReturn;
         }
     }

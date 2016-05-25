@@ -86,6 +86,16 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(f => f.SourceName);
             });
 
+            builder.Entity<CustomerOrdersTotal>(entity =>
+            {
+                entity.HasKey(f => f.Id);
+            });
+
+            builder.Entity<CustomerLastOrder>(entity =>
+            {
+                entity.HasKey(f => f.Id);
+            });
+
             #endregion
 
             builder.Entity<VCustomerFavorite>(entity =>
@@ -329,6 +339,12 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(p => new { p.IdNewsletter, p.Email });
                 entity.ToTable("NewsletterBlockedEmails");
                 entity.Ignore(p => p.Id);
+            });
+
+            builder.Entity<VWholesaleSummaryInfo>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("VWholesaleSummaryInfo");
             });
         }
     }

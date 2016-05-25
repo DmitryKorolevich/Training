@@ -1304,6 +1304,20 @@ th.sortable-column {
   display: inline-block;
   margin-right: 10px;
 }
+.wholesales-summary .table .name {
+  width: 190px;
+}
+.wholesales-summary .table .month {
+  width: 120px;
+}
+.wholesales-summary .summary .info-label {
+  width: 180px;
+  display: inline-block;
+  margin-right: 10px;
+}
+.wholesales-summary .summary .info-label.trade-class {
+  width: 250px;
+}
 .healthwise-customers table > tbody > tr.customer-row {
   cursor: pointer;
 }

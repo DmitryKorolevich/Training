@@ -15,6 +15,7 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Services;
+using VitalChoice.Data.Transaction;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Helpers;
@@ -33,6 +34,7 @@ using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Customers;
@@ -66,6 +68,7 @@ namespace VitalChoice.Business.Services.Healthwise
         private readonly IAppInfrastructureService _appInfrastructureService;
         private readonly IGcService _gcService;
         private readonly INotificationService _notificationService;
+        private readonly ITransactionAccessor<EcommerceContext> _transactionAccessor;
         private readonly ILogger _logger;
 
         public HealthwiseService(
@@ -78,6 +81,7 @@ namespace VitalChoice.Business.Services.Healthwise
             IAppInfrastructureService appInfrastructureService,
             IGcService gcService,
             INotificationService notificationService,
+            ITransactionAccessor<EcommerceContext> transactionAccessor,
             ILoggerProviderExtended loggerProvider)
         {
             _vHealthwisePeriodRepository = vHealthwisePeriodRepository;
@@ -89,6 +93,7 @@ namespace VitalChoice.Business.Services.Healthwise
             _appInfrastructureService = appInfrastructureService;
             _gcService = gcService;
             _notificationService = notificationService;
+            _transactionAccessor = transactionAccessor;
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -186,18 +191,13 @@ namespace VitalChoice.Business.Services.Healthwise
             {
                 return false;
             }
-            if (customer.IdObjectType == (int) CustomerType.Wholesale)
+
+            using (var uow = _transactionAccessor.CreateUnitOfWork())
             {
-                
+                await _orderService.MarkHealthwiseCustomerAsync(uow, customer.Id);
+                await uow.SaveChangesAsync();
             }
 
-            var orders = await _orderRepository.Query(p => p.IdCustomer == idCustomer && p.StatusCode != (int)RecordStatusCode.Deleted && (p.OrderStatus == OrderStatus.Processed ||
-                p.OrderStatus == OrderStatus.Shipped || p.OrderStatus == OrderStatus.Exported)).SelectAsync(false);
-            orders = orders.OrderBy(p => p.DateCreated).ToList();
-            foreach (var order in orders)
-            {
-                await _orderService.UpdateHealthwiseOrderAsync(order.Id, true);
-            }
             return true;
         }
 

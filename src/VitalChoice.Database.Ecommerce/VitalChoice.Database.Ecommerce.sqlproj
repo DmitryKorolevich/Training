@@ -288,4 +288,13 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\SPsForOrdersSummarySalesReport.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VWholesaleSummaryInfo.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetCustomersStandardOrderTotals.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetCustomersStandardOrdersLast.sql" />
+  </ItemGroup>
 </Project>
