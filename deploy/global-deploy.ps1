@@ -13,7 +13,7 @@ if ($RootDeploy.Equals("")) {
 if ($Src.Equals("")) {
 	$Src = ".."
 }
-$RootBuild = Split-Path -Path "${pwd}\${Src}"
+$RootBuild = (Get-Item -Path ".\${Src}" -Verbose).FullName
 $filesLinkSource = "$RootDeploy" + "\files"
 $designLinkSource = "$RootDeploy" + "\design"
 echo "Clean deploy directory..."
@@ -25,8 +25,13 @@ robocopy "empty\" "${RootDeploy}\" /xd "logs" "files" "design" /mir /nfl /ndl /n
 ni -itemtype directory -path "${RootDeploy}\logs\" -Force
 cp "${RootBuild}\src\nlog.config" "${RootDeploy}\nlog.config"
 Push-Location "${RootBuild}"
+echo "Working directory: ${RootBuild}"
 echo "Restoring packages..."
 dotnet restore -v Error
+if(-Not $?)
+{
+	exit
+}
 Pop-Location
 ls -Path "${RootBuild}\src" | `
 foreach{
