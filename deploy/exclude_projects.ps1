@@ -1,1 +1,1 @@
-[string[]]$exclude = @()
+[string[]]$exclude = @("VitalChoice.Workflow.Configuration", "VitalChoice.Database.Ecommerce", "VitalChoice.Database.Infrastructure")

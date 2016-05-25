@@ -48,7 +48,8 @@ function NpmCopy($npmPath) {
 		ni -itemtype directory -path $npmPath -Force
 		Push-Location ".."
 		echo "Installing missed packages..."
-		npm install
+		npm install -f
+		npm update -f
 		if(-Not $?)
 		{
 			exit $LASTEXITCODE
@@ -61,7 +62,8 @@ function NpmCopy($npmPath) {
 		robocopy $npmPath "..\node_modules" /e /ndl /nfl /njh /is > copy-npm.log
 		Push-Location ".."
 		echo "Installing missed packages..."
-		npm install
+		npm install -f
+		npm update -f
 		if(-Not $?)
 		{
 			exit $LASTEXITCODE
