@@ -77,6 +77,8 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
                         }
                     });
                 }
+                if (messages == "")
+                    messages = "Validation errors, please correct field values.";
                 toaster.pop('error', "Error!", messages, null, 'trustedHtml');
             }
         };

@@ -77,6 +77,7 @@
                     productService.updateProductTaxCodes(productsForUpdate, $scope.refreshTracker).success(function (result)
                     {
                         refreshProducts();
+                        toaster.pop('success', "Success!", "Successfully saved.");
                     }).error(function (result)
                     {
                         errorHandler(result);
