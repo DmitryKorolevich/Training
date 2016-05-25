@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
@@ -49,6 +50,15 @@ namespace VitalChoice.Business.Workflow.Orders.ActionResolvers
                 noIssues = false;
             }
             var now = DateTime.Now;
+            if (dataContext.Order.Discount.StatusCode == (int) RecordStatusCode.NotActive)
+            {
+                dataContext.Messages.Add(new MessageInfo
+                {
+                    Message = "Discount not active",
+                    Field = "DiscountCode"
+                });
+                noIssues = false;
+            }
             if (dataContext.Order.Discount.StartDate > now)
             {
                 dataContext.Messages.Add(new MessageInfo
