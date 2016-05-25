@@ -14,8 +14,6 @@ using VitalChoice.Caching.Relational.ChangeTracking;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain.Helpers;
-using VitalChoice.ObjectMapping.Base;
-using VitalChoice.ObjectMapping.Extensions;
 
 namespace VitalChoice.Caching.Services.Cache
 {
@@ -265,34 +263,6 @@ namespace VitalChoice.Caching.Services.Cache
             UpdateRelations(cached.Entity, relationsToClone);
             cached.NeedUpdateRelated.Clear();
             return true;
-            
-
-            //var relatedObjects =
-            //    _relationInfo.Relations.Select(
-            //        relation =>
-            //            new KeyValuePair<RelationInfo, object>(relation, relation.GetRelatedObject(oldEntity)))
-            //        .ToArray();
-
-            //foreach (var pair in relatedObjects)
-            //{
-            //    var newRelated = pair.Key.GetRelatedObject(entity);
-            //    EntityRelationalReferenceInfo relationReference = null;
-            //    _entityInfo.RelationReferences?.TryGetValue(pair.Key.Name, out relationReference);
-
-            //    if (relationReference == null)
-            //    {
-            //        pair.Key.SetRelatedObject(oldEntity, (newRelated as IEnumerable<object>).DeepCloneCreateList(pair.Key));
-            //    }
-            //    else
-            //    {
-            //        var newRelatedKey = relationReference.GetPrimaryKeyValue(entity);
-            //        pair.Key.SetRelatedObject(oldEntity, newRelatedKey.IsValid ? newRelated.DeepCloneItem(pair.Key) : null);
-            //    }
-            //}
-
-            //UpdateExistsRelations(oldEntity);
-            //cached.NeedUpdateRelated.Clear();
-            //return true;
         }
 
         private bool GetAllNormalizedAndTracked(object entity, 

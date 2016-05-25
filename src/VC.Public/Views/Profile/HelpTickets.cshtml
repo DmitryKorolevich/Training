@@ -59,7 +59,7 @@
                                     <td>
                                         @Html.ActionLink(item.Summary, "HelpTicket", "Profile", new { id = item.Id })
                                     </td>
-                                    <td>@item.DateEdited.ConvertToPST().ToString("MM/dd/yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture)</td>
+                                    <td>@item.DateEdited.ConvertToPst().ToString("MM/dd/yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture)</td>
                                     <td>
                                         <span class="label @(item.StatusCode == VitalChoice.Ecommerce.Domain.Entities.RecordStatusCode.NotActive ? "label-warning" : "label-info" )">
                                             @infrastructure.TicketStatuses.Single(x => x.Key == (int)item.StatusCode).Text

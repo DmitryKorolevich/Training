@@ -790,3 +790,31 @@ INSERT INTO [VitalChoice.Ecommerce].dbo.ProductOptionValues
 SELECT t.Id, p.Id, LEFT(pp.GoogleFeedDescription, 250) FROM [VitalChoice.Ecommerce].dbo.Products AS p
 INNER JOIN [vitalchoice2.0].dbo.products AS pp ON pp.idProduct = p.Id
 INNER JOIN [VitalChoice.Ecommerce].dbo.ProductOptionTypes AS t ON t.IdObjectType = p.IdObjectType AND t.Name = 'GoogleFeedDescription' 
+
+ALTER TABLE [vitalchoice2.0].[dbo].pcReviewsData
+ALTER COLUMN pcRD_Comment NVARCHAR(4000) NULL
+
+DELETE FROM [VitalChoice.Ecommerce].dbo.ProductReviews
+
+INSERT INTO AZUREEC.[VitalChoice.Ecommerce].dbo.ProductReviews
+(IdProduct, CustomerName, Description, Email, DateCreated, DateEdited, Rating, StatusCode, Title, IdOld)
+SELECT r.pcRev_IDProduct, d.Name, d.Comment, ISNULL(d.Email, N''), r.pcRev_Date, r.pcRev_Date, 0, CASE WHEN r.pcRev_Active = 1 THEN 2 ELSE 1 END, d.Title, r.pcRev_IDReview
+  FROM [vitalchoice2.0].[dbo].[pcReviews] AS r
+  INNER JOIN (
+	SELECT [1] AS Name, [2] AS Title, [3] AS Rate, [4] AS Comment, [5] AS Email, pvt.pcRD_IDReview, pvt.pcRD_Rate
+	FROM
+		(SELECT pcRD_IDField, pcRD_IDReview, pcRD_Comment, pcRD_Rate
+		FROM [vitalchoice2.0].[dbo].pcReviewsData) s
+		PIVOT (
+			MIN(s.pcRD_Comment) FOR s.pcRD_IDField IN ([1], [2], [3], [4], [5])
+		) AS pvt
+  ) d ON d.pcRD_IDReview = r.pcRev_IDReview
+  INNER JOIN AZUREEC.[VitalChoice.Ecommerce].dbo.Products AS p ON p.Id = r.pcRev_IDProduct
+  WHERE d.Name IS NOT NULL AND d.Name <> N''
+
+UPDATE AZUREEC.[VitalChoice.Ecommerce].dbo.ProductReviews
+SET Rating = d.pcRD_Rate
+FROM AZUREEC.[VitalChoice.Ecommerce].dbo.ProductReviews AS r
+INNER JOIN [vitalchoice2.0].[dbo].[pcReviews] AS rr ON rr.pcRev_IDReview = r.IdOld
+INNER JOIN [vitalchoice2.0].dbo.pcReviewsData AS d ON d.pcRD_IDReview = rr.pcRev_IDReview
+WHERE d.pcRD_Rate > 0;

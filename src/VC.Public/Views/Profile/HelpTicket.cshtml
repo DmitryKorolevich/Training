@@ -1,4 +1,5 @@
 ﻿@using VitalChoice.Interfaces.Services
+@using VC.Public.Helpers
 @model VC.Public.Models.Profile.HelpTicketManageModel
 @inject IAppInfrastructureService appInfrastructureService;
 
@@ -56,7 +57,7 @@
                         <div class="form-group">
                             @Html.LabelFor(m => m.DateCreated, new { @class = "control-label" })
                             <div class="input-group">
-                                <label class="form-control-static bold">@Model.DateCreated.ConvertToPST().ToString("MM/dd/yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture)</label>
+                                <label class="form-control-static bold">@Model.DateCreated.ConvertToPst().ToString("MM/dd/yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture)</label>
                             </div>
                         </div>
                     }
@@ -135,7 +136,7 @@
                                 <div class="form-group">
                                     <span>
                                         @(comment.DateCreated == comment.DateEdited ? "Submitted" : "Modified") on
-                                        <strong>@comment.DateEdited.ConvertToPST().ToString("MM/dd/yy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture)</strong> by
+                                        <strong>@comment.DateEdited.ConvertToPst().ToString("MM/dd/yy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture)</strong> by
                                         <strong>@(!String.IsNullOrEmpty(comment.EditedBy) ? String.Format("Vital Choice ({0})", comment.EditedBy) : comment.Customer)</strong>
                                     </span>
                                     @if (String.IsNullOrEmpty(comment.EditedBy))
