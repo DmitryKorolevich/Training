@@ -498,10 +498,12 @@ namespace VitalChoice.Caching.Services.Cache
                         cached.NeedUpdateRelated.Add(markRelated);
                         return true;
                     }
-                    cached.NeedUpdateRelated.AddRange(EntityInfo.ImplicitUpdateMarkedEntities.Where(r => data.GetHasRelation(r)));
                     if (cached.NeedUpdate)
+                    {
+                        cached.NeedUpdateRelated.AddRange(EntityInfo.ImplicitUpdateMarkedEntities.Where(r => data.GetHasRelation(r)));
                         return false;
-
+                    }
+                    cached.NeedUpdateRelated.AddRange(EntityInfo.ImplicitUpdateMarkedEntities.Where(r => data.GetHasRelation(r)));
                     cached.NeedUpdate = true;
                     return true;
                 }).SelectMany(c => c.ForeignKeys).GroupBy(k => k.Key))

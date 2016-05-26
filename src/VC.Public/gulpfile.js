@@ -9,17 +9,21 @@ var gulp = require("gulp"),
     fs = require('fs'),
     less = require('gulp-less'),
     merge = require('merge-stream'),
+    print = require('gulp-print'),
     uglify = require("gulp-uglify");
-
-var paths = {
-    webroot: "./wwwroot/"
-};
 
 var jsConfig = JSON.parse(fs.readFileSync('./AppConfig/scripts/files.json'));
 var cssConfig = JSON.parse(fs.readFileSync('./AppConfig/styles/files.json'));
 
 var jsFiles = jsConfig.files;
+for (var i = 0; i < jsFiles.length; i++) {
+    jsFiles[i] = "wwwroot/" + jsFiles[i];
+}
+
 var cssFiles = cssConfig.files;
+for (var j = 0; j < cssFiles.length; j++) {
+    cssFiles[j] = "wwwroot/" + cssFiles[j];
+}
 
 cssFiles.push('./temp/less/*.css');
 
@@ -60,13 +64,6 @@ gulp.task("copy:rel", function () {
     return result;
 });
 
-gulp.task("min:js", function () {
-    return gulp.src(jsFiles, { base: "./wwwroot" })
-        .pipe(concat(jsConfig.minifiedFileName + ".min.js"))
-        .pipe(uglify())
-        .pipe(gulp.dest("./wwwroot/"));
-});
-
 gulp.task("less", function () {
     return gulp.src([
         './Assets/styles/main.less',
@@ -76,8 +73,17 @@ gulp.task("less", function () {
     .pipe(gulp.dest("./temp/less/"));
 });
 
+gulp.task("min:js", function () {
+    return gulp.src(jsFiles)
+        .pipe(print())
+        .pipe(concat(jsConfig.minifiedFileName + ".min.js"))
+        .pipe(uglify())
+        .pipe(gulp.dest("./wwwroot/"));
+});
+
 gulp.task("min:css", function () {
-    return gulp.src(cssFiles, { base: "./wwwroot" })
+    return gulp.src(cssFiles)
+        .pipe(print())
         .pipe(concat(cssConfig.minifiedFileName + ".min.css"))
         .pipe(cssmin())
         .pipe(gulp.dest("./wwwroot/"));
