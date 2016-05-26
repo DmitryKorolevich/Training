@@ -7,15 +7,12 @@ using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational.Base;
 using VitalChoice.Caching.Services;
 using System.Collections.Concurrent;
-using System.Globalization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
-using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Ecommerce.Domain.Options;
 using VitalChoice.Infrastructure.ServiceBus.Base;
-using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services.Cache
 {
@@ -34,7 +31,7 @@ namespace VitalChoice.Business.Services.Cache
 
         public ServiceBusCacheSyncProvider(IInternalEntityCacheFactory cacheFactory, IEntityInfoStorage keyStorage,
             ILoggerFactory loggerFactory,
-            IOptions<AppOptions> options, IHostingEnvironment applicationEnvironment, ICacheServiceScopeFactoryContainer scopeFactoryContainer)
+            IOptions<AppOptionsBase> options, IHostingEnvironment applicationEnvironment, ICacheServiceScopeFactoryContainer scopeFactoryContainer)
             : base(cacheFactory, keyStorage, loggerFactory, scopeFactoryContainer)
         {
             if (options.Value.CacheSyncOptions?.Enabled ?? false)

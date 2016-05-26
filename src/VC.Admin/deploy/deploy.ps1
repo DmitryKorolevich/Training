@@ -1,6 +1,9 @@
 Param(
 	[string]$RootDeploy
 )
+
+. "..\..\..\deploy\functions.ps1"
+
 if ($RootDeploy.Equals("")) {
 	throw "Root deploy is empty"
 }

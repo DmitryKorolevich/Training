@@ -13,6 +13,7 @@ namespace VC.Admin
         {
             var host = new WebHostBuilder()
                 .UseKestrel()
+                .UseUrls("http://localhost:5100")
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
                 .UseStartup<Startup>()

@@ -297,6 +297,13 @@ namespace VitalChoice.Core.DependencyInjection
                 CacheScanPeriodSeconds = Convert.ToInt32(configuration.GetSection("App:CacheSettings:CacheScanPeriodSeconds").Value),
                 MaxProcessHeapsSizeBytes = Convert.ToInt64(configuration.GetSection("App:CacheSettings:MaxProcessHeapsSizeBytes").Value),
             };
+            var section = configuration.GetSection("App:CacheSyncOptions");
+            options.CacheSyncOptions = new CacheSyncOptions
+            {
+                ConnectionString = section["ConnectionString"],
+                ServiceBusQueueName = section["ServiceBusQueueName"],
+                Enabled = Convert.ToBoolean(section["Enabled"])
+            };
         }
 
         protected virtual void ConfigureAppOptions(IConfiguration configuration, AppOptions options)
@@ -396,14 +403,7 @@ namespace VitalChoice.Core.DependencyInjection
                 ApiLogin = configuration.GetSection("App:AuthorizeNet:ApiLogin").Value,
                 TestEnv = Convert.ToBoolean(configuration.GetSection("App:AuthorizeNet:TestEnv").Value)
             };
-            var section = configuration.GetSection("App:CacheSyncOptions");
-            options.CacheSyncOptions = new CacheSyncOptions
-            {
-                ConnectionString = section["ConnectionString"],
-                ServiceBusQueueName = section["ServiceBusQueueName"],
-                Enabled = Convert.ToBoolean(section["Enabled"])
-            };
-            section = configuration.GetSection("App:Bronto");
+            var section = configuration.GetSection("App:Bronto");
             options.Bronto = new BrontoSettings
             {
                 ApiKey = section["ApiKey"],

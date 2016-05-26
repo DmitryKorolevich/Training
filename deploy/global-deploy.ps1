@@ -27,12 +27,14 @@ cp "${RootBuild}\src\nlog.config" "${RootDeploy}\nlog.config"
 Push-Location "${RootBuild}"
 echo "Working directory: ${RootBuild}"
 echo "Restoring packages..."
-dotnet restore -v Warning
+#dotnet restore -v Warning
 if(-Not $?)
 {
 	exit $LASTEXITCODE
 }
 Pop-Location
+& "%windir%\system32\inetsrv\appcmd stop apppool /apppool.name: admin"
+& "%windir%\system32\inetsrv\appcmd stop apppool /apppool.name: public"
 ls -Path "${RootBuild}\src" | `
 foreach{
 	if ($_.GetType().Name.Equals("DirectoryInfo")) {
@@ -41,9 +43,9 @@ foreach{
 		if (!$isExclude) {
 			$project = $RootBuild + "\src\" + $projectName + "\deploy\"
 			$deployScript = $project + "deploy.ps1"
-			if (test-path $deployScript) {
-				Push-Location ${project}
-				iex "${deployScript} -RootDeploy ${RootDeploy}"
+			if (test-path "${deployScript}") {
+				Push-Location "${project}"
+				& powershell -File """${deployScript}""" -RootDeploy ${RootDeploy}
 				Pop-Location
 				$deployProjectPath = $RootBuild + "\src\" + $projectName + "\deploy"
 				ls -Path "${deployProjectPath}" | `
@@ -51,9 +53,9 @@ foreach{
 					if ($_.GetType().Name.Equals("DirectoryInfo")) {
 						$targetName = $_.Name
 						$destinationPath = $RootDeploy + "\" + $targetName + "\wwwroot\files"
-						cmd /c mklink /D $destinationPath $filesLinkSource
+						cmd /c mklink /D $destinationPath "${filesLinkSource}"
 						$destinationPath = $RootDeploy + "\" + $targetName + "\wwwroot\design"
-						cmd /c mklink /D $destinationPath $designLinkSource
+						cmd /c mklink /D $destinationPath "${designLinkSource}"
 						$destinationPath = $RootDeploy + "\" + $targetName
 						cp libuv.dll $destinationPath -Force
 					}
@@ -62,3 +64,5 @@ foreach{
 		}
 	}
 }
+& "%windir%\system32\inetsrv\appcmd start apppool /apppool.name: admin"
+& "%windir%\system32\inetsrv\appcmd start apppool /apppool.name: public"

@@ -3,7 +3,6 @@ using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using VC.Admin.AppConfig;
 using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -23,6 +22,7 @@ namespace VC.Admin
                 .SetBasePath(hostingEnvironment.ContentRootPath)
                 .AddJsonFile("config.json")
                 .AddJsonFile("config.local.json", true)
+                .AddJsonFile("hosting.json", true)
                 .AddEnvironmentVariables();
 
             Configuration = builder.Build();

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using VC.Public.AppConfig;
 using System.Net;
 using System.Threading.Tasks;
 using VitalChoice.Interfaces.Services;
@@ -29,6 +28,7 @@ namespace VC.Public
                 .SetBasePath(hostingEnvironment.ContentRootPath)
                 .AddJsonFile("config.json")
                 .AddJsonFile("config.local.json", true)
+                .AddJsonFile("hosting.json", true)
                 .AddEnvironmentVariables();
 
             Configuration = builder.Build();

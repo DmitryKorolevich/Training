@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
-namespace VC.Admin.AppConfig
+namespace VC.Admin
 {
     public class RouteConfig
     {
