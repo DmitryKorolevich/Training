@@ -8,13 +8,22 @@ using VitalChoice.Business.Mail;
 using VitalChoice.Business.Queries.Healthwise;
 using VitalChoice.Business.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Data.Services;
+using VitalChoice.Data.Transaction;
+using VitalChoice.Data.UnitOfWork;
+using VitalChoice.DynamicData.Base;
+using VitalChoice.DynamicData.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Mail;
+using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Context;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
 using VitalChoice.Infrastructure.Domain.Transfer.Healthwise;
 using VitalChoice.Infrastructure.UnitOfWork;
@@ -36,7 +45,7 @@ namespace VitalChoice.Business.Services.Healthwise
         private readonly IAppInfrastructureService _appInfrastructureService;
         private readonly IGcService _gcService;
         private readonly INotificationService _notificationService;
-        private readonly DbContextOptions<EcommerceContext> _eccomerceContextOptions;
+        private readonly ITransactionAccessor<EcommerceContext> _transactionAccessor;
         private readonly ILogger _logger;
 
         public HealthwiseService(
@@ -49,7 +58,8 @@ namespace VitalChoice.Business.Services.Healthwise
             IAppInfrastructureService appInfrastructureService,
             IGcService gcService,
             INotificationService notificationService,
-            ILoggerProviderExtended loggerProvider, DbContextOptions<EcommerceContext> eccomerceContextOptions)
+            ITransactionAccessor<EcommerceContext> transactionAccessor,
+            ILoggerProviderExtended loggerProvider)
         {
             _vHealthwisePeriodRepository = vHealthwisePeriodRepository;
             _healthwiseOrderRepository = healthwiseOrderRepository;
@@ -60,8 +70,8 @@ namespace VitalChoice.Business.Services.Healthwise
             _appInfrastructureService = appInfrastructureService;
             _gcService = gcService;
             _notificationService = notificationService;
-            _eccomerceContextOptions = eccomerceContextOptions;
-            _logger = loggerProvider.CreateLogger<HealthwiseService>();
+            _transactionAccessor = transactionAccessor;
+            _logger = loggerProvider.CreateLoggerDefault();
         }
 
         public async Task<ICollection<HealthwiseOrder>> GetHealthwiseOrdersAsync(int idPeriod)
@@ -90,6 +100,19 @@ namespace VitalChoice.Business.Services.Healthwise
         {
             var toReturn = (await _vHealthwisePeriodRepository.Query(p => p.Id == id).SelectAsync(false)).FirstOrDefault();
             return toReturn;
+        }
+
+        public async Task<bool> DeleteHealthwisePeriod(int id)
+        {
+            var orders = await GetHealthwiseOrdersAsync(id);
+            if (orders.Any())
+            {
+                throw new AppValidationException("Can't delete period with assigned orders.");
+            }
+
+            await _healthwisePeriodRepository.DeleteAsync(id);
+
+            return true;
         }
 
         public async Task<bool> MakeHealthwisePeriodPaymentAsync(int id, decimal amount, DateTime date, bool payAsGC = false, int? userId = null)
@@ -158,18 +181,13 @@ namespace VitalChoice.Business.Services.Healthwise
             {
                 return false;
             }
-            if (customer.IdObjectType == (int) CustomerType.Wholesale)
+
+            using (var uow = _transactionAccessor.CreateUnitOfWork())
             {
-                
+                await _orderService.MarkHealthwiseCustomerAsync(uow, customer.Id);
+                await uow.SaveChangesAsync();
             }
 
-            var orders = await _orderRepository.Query(p => p.IdCustomer == idCustomer && p.StatusCode != (int)RecordStatusCode.Deleted && (p.OrderStatus == OrderStatus.Processed ||
-                p.OrderStatus == OrderStatus.Shipped || p.OrderStatus == OrderStatus.Exported)).SelectAsync(false);
-            orders = orders.OrderBy(p => p.DateCreated).ToList();
-            foreach (var order in orders)
-            {
-                await _orderService.UpdateHealthwiseOrderAsync(order.Id, true);
-            }
             return true;
         }
 

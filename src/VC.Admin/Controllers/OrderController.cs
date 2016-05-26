@@ -48,7 +48,7 @@ using Microsoft.AspNetCore.Mvc;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Infrastructure.Domain.Entities.Reports;
 using VitalChoice.Infrastructure.Identity.UserManagers;
-namespace VC.Admin.Controllers
+using VitalChoice.Infrastructure.Domain.Transfer.Customers;namespace VC.Admin.Controllers
 {
     public class OrderController : BaseApiController
     {

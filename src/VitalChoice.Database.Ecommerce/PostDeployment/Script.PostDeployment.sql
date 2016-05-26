@@ -46,3 +46,6 @@ Post-Deployment Script Template
 :r .\Scripts\VOrderCountOnCustomers.sql
 :r .\Scripts\VFirstOrderOnCustomers.sql
 :r .\Scripts\SPsForOrdersSummarySalesReport.sql
+:r .\Scripts\VWholesaleSummaryInfo.sql
+:r .\Scripts\SPGetCustomersStandardOrderTotals.sql
+:r .\Scripts\SPGetCustomersStandardOrdersLast.sql

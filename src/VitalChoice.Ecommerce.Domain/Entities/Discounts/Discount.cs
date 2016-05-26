@@ -30,6 +30,7 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Discounts
         public ICollection<DiscountToSelectedCategory> DiscountsToSelectedCategories { get; set; }
 
         public ICollection<DiscountTier> DiscountTiers { get; set; }
+
         public CustomerType? Assigned { get; set; }
     }
 }

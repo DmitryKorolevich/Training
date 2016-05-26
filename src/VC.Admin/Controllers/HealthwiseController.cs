@@ -113,6 +113,15 @@ namespace VC.Admin.Controllers
         }
 
         [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<bool>> DeleteHealthwisePeriod(int id)
+        {
+            var toReturn = await _healthwiseService.DeleteHealthwisePeriod(id);
+
+            return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpGet]
         public async Task<Result<ICollection<HealthwiseOrderListItemModel>>> GetHealthwiseOrders(int id)
         {

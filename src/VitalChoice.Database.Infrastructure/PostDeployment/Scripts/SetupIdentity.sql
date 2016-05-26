@@ -63,3 +63,74 @@ BEGIN
 END
 
 GO
+
+IF(NOT EXISTS (SELECT [Id] FROM [dbo].[AspNetRoles] WHERE [NormalizedName]='Inventory User'))
+BEGIN
+	SET IDENTITY_INSERT [dbo].[AspNetRoles] ON
+
+	INSERT INTO [dbo].[AspNetRoles]
+	([Id], [ConcurrencyStamp], [Name], [NormalizedName], IdUserType)
+	VALUES
+	(18, N'inventoryuserstamp', N'Inventory User', 'Inventory User', 1)
+
+	SET IDENTITY_INSERT [dbo].[AspNetRoles] OFF
+
+	INSERT INTO AspNetRoleClaims
+	(ClaimType,ClaimValue,RoleId)
+	VALUES
+	('Permission',17,18)
+
+	ALTER TABLE  [dbo].[AspNetRoles]
+	ADD [Order] INT NULL
+
+	EXEC('UPDATE AspNetRoles
+	SET [Order]=0
+	WHERE Id=5')
+
+	EXEC('UPDATE AspNetRoles
+	SET [Order]=1
+	WHERE Id=1')
+
+	EXEC('UPDATE AspNetRoles
+	SET [Order]=2
+	WHERE Id=14')
+
+	EXEC('UPDATE AspNetRoles
+	SET [Order]=3
+	WHERE Id=3')
+
+	EXEC('UPDATE AspNetRoles
+	SET [Order]=4
+	WHERE Id=4')
+
+	EXEC('UPDATE AspNetRoles
+	SET [Order]=5
+	WHERE Id=9')
+
+	EXEC('UPDATE AspNetRoles
+	SET [Order]=6
+	WHERE Id=15')
+
+	EXEC('UPDATE AspNetRoles
+	SET [Order]=7
+	WHERE Id=10')
+
+	EXEC('UPDATE AspNetRoles
+	SET [Order]=8
+	WHERE Id=2')
+
+	EXEC('UPDATE AspNetRoles
+	SET [Order]=9
+	WHERE Id=16')
+
+	EXEC('UPDATE AspNetRoles
+	SET [Order]=10
+	WHERE Id=17')
+
+	EXEC('UPDATE AspNetRoles
+	SET [Order]=11
+	WHERE Id=18')
+
+END
+
+GO

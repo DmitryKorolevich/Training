@@ -66,6 +66,9 @@
                             <button title="View" class="btn btn-default btn-success btn-xs" data-ng-click="openPeriod(period.Id);">
                                 <i class="fa fa-search"></i>
                             </button>
+                            <button data-ng-if="period.OrdersCount==0" title="Delete" class="btn btn-default btn-danger btn-xs" data-ng-click="deletePeriod(period.Id);">
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </button>
                             <button data-ng-if="period.AllowPayment" title="Bill" class="btn btn-default btn-primary btn-xs ma" data-ng-click="openPeriod(period.Id);">
                                 Bill
                             </button>

@@ -22,6 +22,8 @@ namespace VitalChoice.Interfaces.Services.Healthwise
 
         Task<VHealthwisePeriod> GetVHealthwisePeriodAsync(int id);
 
+	    Task<bool> DeleteHealthwisePeriod(int id);
+
         Task<bool> MakeHealthwisePeriodPaymentAsync(int id, decimal amount, DateTime date, bool payAsGC = false, int? userId=null);
 
         Task<bool> MarkOrdersAsHealthwiseForCustomerIdAsync(int idCustomer);

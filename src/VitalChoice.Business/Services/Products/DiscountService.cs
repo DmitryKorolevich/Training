@@ -171,7 +171,8 @@ namespace VitalChoice.Business.Services.Products
         public async Task<PagedList<DiscountDynamic>> GetDiscountsAsync(DiscountFilter filter)
         {
             var conditions = new DiscountQuery().NotDeleted().WithValidFrom(filter.ValidFrom).WithValidTo(filter.ValidTo).
-                WithDateStatus(filter.DateStatus).WithText(filter.SearchText).WithCode(filter.Code).WithStatus(filter.Status);
+                WithDateStatus(filter.DateStatus).WithText(filter.SearchText).WithCode(filter.Code).WithStatus(filter.Status)
+                .WithAssigned(filter.Assigned);
             var query = _discountRepository.Query(conditions);
 
             Func<IQueryable<Discount>, IOrderedQueryable<Discount>> sortable = x => x.OrderByDescending(y => y.DateCreated);

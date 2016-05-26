@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
@@ -45,5 +46,15 @@ namespace VitalChoice.Interfaces.Services.Customers
 	    Task<CustomerDynamic> GetByEmailAsync(string email);
 
 		Task ActivateGuestAsync(string email, string token, string newPassword);
+
+        #region Reports 
+
+	    Task<WholesaleSummaryReport> GetWholesaleSummaryReportAsync();
+
+	    Task<ICollection<WholesaleSummaryReportMonthStatistic>> GetWholesaleSummaryReportMonthStatisticAsync(DateTime lastMonthStartDay, int monthCount);
+
+	    Task<PagedList<WholesaleListitem>> GetWholesalesAsync(WholesaleFilter filter);
+
+	    #endregion
 	}
 }

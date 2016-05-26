@@ -35,3 +35,20 @@ BEGIN
 END
 
 GO
+
+IF ((SELECt delete_referential_action FROM sys.foreign_keys
+WHERE name='FK_HealthwiseOrderToHealthwisePeriod')=0)
+BEGIN
+
+ALTER TABLE [dbo].[HealthwiseOrders] DROP CONSTRAINT [FK_HealthwiseOrderToHealthwisePeriod]
+
+ALTER TABLE [dbo].[HealthwiseOrders]  WITH CHECK ADD  CONSTRAINT [FK_HealthwiseOrderToHealthwisePeriod] FOREIGN KEY([IdHealthwisePeriod])
+REFERENCES [dbo].[HealthwisePeriods] ([Id])
+ON DELETE CASCADE
+
+ALTER TABLE [dbo].[HealthwiseOrders] CHECK CONSTRAINT [FK_HealthwiseOrderToHealthwisePeriod]
+
+END
+
+GO
+
