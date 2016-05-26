@@ -14,8 +14,8 @@ if ($Src.Equals("")) {
 	$Src = ".."
 }
 $RootBuild = (Get-Item -Path ".\${Src}" -Verbose).FullName
-$filesLinkSource = "$RootDeploy" + "\files"
-$designLinkSource = "$RootDeploy" + "\design"
+$filesLinkSource = "$RootDeploy" + "\..\vitalchoice_new\files"
+$designLinkSource = "$RootDeploy" + "\..\vitalchoice_new\design"
 echo "Clean deploy directory..."
 cmd /c rmdir "${RootDeploy}\blue\wwwroot\files"
 cmd /c rmdir "${RootDeploy}\public\wwwroot\files"
@@ -55,7 +55,7 @@ foreach{
 						$destinationPath = $RootDeploy + "\" + $targetName + "\wwwroot\design"
 						cmd /c mklink /D $destinationPath $designLinkSource
 						$destinationPath = $RootDeploy + "\" + $targetName
-						cp libuv.dll $destinationPath
+						cp libuv.dll $destinationPath -Force
 					}
 				}
 			}

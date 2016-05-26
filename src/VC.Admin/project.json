@@ -39,6 +39,7 @@
     "include": [
       "wwwroot",
       "Views",
+      "AppConfig",
       "config.json",
       "web.config",
       "CSharpClassTemplate.tcs",
