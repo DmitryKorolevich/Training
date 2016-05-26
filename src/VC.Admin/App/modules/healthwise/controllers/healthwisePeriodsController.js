@@ -99,6 +99,39 @@
             }, { size: 'xs' });
         };
 
+        $scope.deletePeriod = function (id)
+        {
+            confirmUtil.confirm(function ()
+            {
+                healthwiseService.deleteHealthwisePeriod(id, $scope.refreshTracker)
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            $scope.filterItems();
+                        } else
+                        {
+                            if (result.Messages)
+                            {
+                                $.each(result.Messages, function (index, value)
+                                {
+                                    messages += value.Message + "<br/>";
+                                });
+                                toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+                            }
+                            else
+                            {
+                                errorHandler(result);
+                            }
+                        }
+                    })
+                    .error(function (result)
+                    {
+                        errorHandler(result);
+                    });
+            }, 'Are you sure you want to delete this period?');
+        };
+
         $scope.openPeriod = function (id)
         {
             $state.go('index.oneCol.healthwiseDetail', { id: id });

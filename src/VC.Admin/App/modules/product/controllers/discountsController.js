@@ -45,7 +45,7 @@
             $scope.activeFilterOptions = $rootScope.ReferenceData.ActiveFilterOptions;
 
             $scope.customerTypes = angular.copy($rootScope.ReferenceData.CustomerTypes);
-            $scope.customerTypes.splice(0, 0, { Key: null, Text: 'All' });
+            $scope.customerTypes.splice(0, 0, { Key: null, Text: 'All Customer Types' });
 
             $scope.filter = {
                 SearchText: '',
@@ -53,6 +53,7 @@
                 ValidFrom: null,
                 ValidTo: null,
                 DateStatus: 2,//live
+                Assigned: 1,//retail
                 Paging: { PageIndex: 1, PageItemCount: 100 },
                 Sorting: gridSorterUtil.resolve(refreshDiscounts, "Code", "Asc")
             };

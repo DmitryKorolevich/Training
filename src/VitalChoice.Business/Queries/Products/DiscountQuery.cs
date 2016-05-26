@@ -1,6 +1,7 @@
 ﻿using System;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 using VitalChoice.Infrastructure.Domain.Transfer;
 
@@ -44,6 +45,12 @@ namespace VitalChoice.Business.Queries.Products
             {
                 Add(x => x.StatusCode == (int)status.Value);
             }
+            return this;
+        }
+
+        public DiscountQuery WithAssigned(CustomerType? type)
+        {
+            Add(x => x.Assigned == type);
             return this;
         }
 

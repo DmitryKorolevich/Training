@@ -24,6 +24,7 @@ using Microsoft.Extensions.OptionsModel;
 using Newtonsoft.Json;
 using VC.Admin.Models.Customers;
 using VitalChoice.Business.CsvExportMaps;
+using VitalChoice.Business.CsvExportMaps.Customers;
 using VitalChoice.Business.Queries.Users;
 using VitalChoice.Business.Services.Bronto;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
@@ -57,6 +58,7 @@ namespace VC.Admin.Controllers
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly Country _defaultCountry;
         private readonly ICsvExportService<ExtendedVCustomer, CustomersForAffiliatesCsvMap> _csvExportCustomersForAffiliatesService;
+        private readonly ICsvExportService<WholesaleListitem, WholesaleListitemCsvMap> _csvExportWholesaleListitemService;
 
         private readonly IDynamicServiceAsync<AddressDynamic, Address> _addressService;
         private readonly IDynamicServiceAsync<CustomerNoteDynamic, CustomerNote> _notesService;
@@ -74,7 +76,8 @@ namespace VC.Admin.Controllers
             IStorefrontUserService storefrontUserService,
             IAppInfrastructureService appInfrastructureService,
             IObjectHistoryLogService objectHistoryLogService,
-            ICsvExportService<ExtendedVCustomer, CustomersForAffiliatesCsvMap> csvExportCustomersForAffiliatesService, 
+            ICsvExportService<ExtendedVCustomer, CustomersForAffiliatesCsvMap> csvExportCustomersForAffiliatesService,
+            ICsvExportService<WholesaleListitem, WholesaleListitemCsvMap> csvExportWholesaleListitemService,
             IPaymentMethodService paymentMethodService)
         {
             _customerService = customerService;
@@ -90,6 +93,7 @@ namespace VC.Admin.Controllers
             _objectHistoryLogService = objectHistoryLogService;
             _defaultCountry = appInfrastructureService.Data().DefaultCountry;
             _csvExportCustomersForAffiliatesService = csvExportCustomersForAffiliatesService;
+            _csvExportWholesaleListitemService = csvExportWholesaleListitemService;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
 	        _paymentMethodService = paymentMethodService;
         }
@@ -597,6 +601,8 @@ namespace VC.Admin.Controllers
             return (await _customerService.GetAddressFieldValuesByValueAsync(filter)).ToList();
         }
 
+        #region Reports
+
         [AdminAuthorize(PermissionType.Reports)]
         [HttpGet]
         public async Task<Result<WholesaleSummaryReport>> GetWholesaleSummaryReport()
@@ -623,5 +629,40 @@ namespace VC.Admin.Controllers
             lastMonthStartDay = TimeZoneInfo.ConvertTime(lastMonthStartDay, _pstTimeZoneInfo, TimeZoneInfo.Local);
             return (await _customerService.GetWholesaleSummaryReportMonthStatisticAsync(lastMonthStartDay, count)).ToList();
         }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<PagedList<WholesaleListitem>>> GetWholesales([FromBody]WholesaleFilter filter)
+        {
+            var toReturn = await _customerService.GetWholesalesAsync(filter);
+            return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpGet]
+        public async Task<FileResult> GetWholesalesReportFile([FromQuery]int? idtradeclass = null, [FromQuery]int? idtier = null, [FromQuery]bool? onlyactive = true)
+        {
+            WholesaleFilter filter = new WholesaleFilter()
+            {
+                IdTradeClass = idtradeclass,
+                IdTier = idtier,
+                OnlyActive = onlyactive ?? true
+            };
+            filter.Paging = null;
+
+            var data = await _customerService.GetWholesalesAsync(filter);
+
+            var result = _csvExportWholesaleListitemService.ExportToCsv(data.Items);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.WHOLESALE_LIST_REPORT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
+        }
+
+        #endregion
     }
 }

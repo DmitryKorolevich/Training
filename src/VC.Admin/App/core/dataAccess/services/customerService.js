@@ -96,5 +96,14 @@ angular.module('app.core.dataAccess.services.customerService', [])
 		{
 		    return $http.get(baseUrl + 'GetWholesaleSummaryReportMonthStatistic/?count={0}&include={1}'.format(count, include), getConfig(tracker));
 		},
+		getWholesales: function (filter, tracker)
+		{
+		    return $http.post(baseUrl + 'GetWholesales', filter, getConfig(tracker));
+		},
+		getWholesalesReportFile: function (filter, buildNumber)
+		{
+		    return baseUrl + ('GetWholesalesReportFile?idtradeclass={0}&idtier={1}&onlyactive={2}&buildNumber={3}')
+                .format(filter.IdTradeClass, filter.IdTier, filter.OnlyActive, buildNumber);
+		},
 	};
 }]);

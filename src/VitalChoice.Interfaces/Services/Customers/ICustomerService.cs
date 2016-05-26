@@ -53,6 +53,8 @@ namespace VitalChoice.Interfaces.Services.Customers
 
 	    Task<ICollection<WholesaleSummaryReportMonthStatistic>> GetWholesaleSummaryReportMonthStatisticAsync(DateTime lastMonthStartDay, int monthCount);
 
+	    Task<PagedList<WholesaleListitem>> GetWholesalesAsync(WholesaleFilter filter);
+
 	    #endregion
 	}
 }

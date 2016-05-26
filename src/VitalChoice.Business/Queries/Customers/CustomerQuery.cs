@@ -1,4 +1,5 @@
-﻿using VitalChoice.Data.Helpers;
+﻿using System.Collections.Generic;
+using VitalChoice.Data.Helpers;
 using VitalChoice.DynamicData.Extensions;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
@@ -7,6 +8,13 @@ using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 
 namespace VitalChoice.Business.Queries.Customers
 {
+    public class WholesaleOptions
+    {
+        public int? TradeClass { get; set; }
+
+        public int? Tier { get; set; }
+    }
+
     public class CustomerQuery : QueryObject<Ecommerce.Domain.Entities.Customers.Customer>
     {
 	    public CustomerQuery NotDeleted()
@@ -16,7 +24,14 @@ namespace VitalChoice.Business.Queries.Customers
 		    return this;
 	    }
 
-		public CustomerQuery NotInActive()
+        public CustomerQuery NotPending()
+        {
+            Add(x => x.StatusCode != (int)CustomerStatus.Pending);
+
+            return this;
+        }
+
+        public CustomerQuery NotInActive()
 		{
 			Add(x => x.StatusCode != (int)CustomerStatus.PhoneOnly);
 
@@ -28,6 +43,16 @@ namespace VitalChoice.Business.Queries.Customers
             if (status.HasValue)
             {
                 Add(x => x.StatusCode == (int)status.Value);
+            }
+
+            return this;
+        }
+
+        public CustomerQuery WithType(CustomerType? type)
+        {
+            if (type.HasValue)
+            {
+                Add(x => x.IdObjectType == (int)type.Value);
             }
 
             return this;
@@ -101,6 +126,30 @@ namespace VitalChoice.Business.Queries.Customers
         {
             if (!string.IsNullOrWhiteSpace(text))
                 Add(x => x.Id.ToString().Contains(text));
+            return this;
+        }
+
+
+        public CustomerQuery WithIds(ICollection<int> ids)
+        {
+            if (ids != null)
+            {
+                Add(p => ids.Contains(p.Id));
+            }
+            return this;
+        }
+
+        public CustomerQuery FilterWholesaleOptions(int? idTradeClass,int? idTier)
+        {
+            if (idTradeClass != null || idTier!=null)
+            {
+                var filter = new WholesaleOptions()
+                {
+                    TradeClass = idTradeClass,
+                    Tier = idTier,
+                };
+                Add(c => c.WhenValues(filter, (int)CustomerType.Wholesale));
+            }
             return this;
         }
 

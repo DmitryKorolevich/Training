@@ -125,6 +125,19 @@ namespace VitalChoice.Business.Services.Healthwise
             return toReturn;
         }
 
+        public async Task<bool> DeleteHealthwisePeriod(int id)
+        {
+            var orders = await GetHealthwiseOrdersAsync(id);
+            if (orders.Any())
+            {
+                throw new AppValidationException("Can't delete period with assigned orders.");
+            }
+
+            await _healthwisePeriodRepository.DeleteAsync(id);
+
+            return true;
+        }
+
         public async Task<bool> MakeHealthwisePeriodPaymentAsync(int id, decimal amount, DateTime date, bool payAsGC = false, int? userId = null)
         {
             GCNotificationEmail notificationModel = new GCNotificationEmail();

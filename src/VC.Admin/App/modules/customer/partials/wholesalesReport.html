@@ -1,0 +1,80 @@
+﻿<div class="container-fluid wholesales-report">
+    <div class="well">
+        <span class="legend">Wholesale Account List</span>
+        <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate>
+            <fieldset>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <select class="form-control" name="IdTier" data-ng-change="filterChanged();" data-ng-model="filter.IdTier" ng-options="item.Key as item.Text for item in tiers"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control" name="IdTradeClass" data-ng-change="filterChanged();" data-ng-model="filter.IdTradeClass" ng-options="item.Key as item.Text for item in tradeClasses"></select>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="OnlyActive" data-ng-change="filterChanged();" data-ng-model="filter.OnlyActive" />
+                                Display only Active Accounts
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <button class="btn btn-info" data-ng-click="filterItems();" type="button">Filter</button>
+                        <a target="_self" class="btn btn-primary pull-right" data-ng-href="{{options.exportUrl}}">Export</a>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+        <hr />
+        <spinner-overlay data-loading="refreshTracker.active()">
+            <table class="table table-striped table-hover margin-bottom-30px">
+                <thead>
+                    <tr>
+                        <th>Account ID</th>
+                        <th>Company Name</th>
+                        <th>Tier</th>
+                        <th>Trade Class</th>
+                        <th>Sales (Last 90 days)</th>
+                        <th>Sales (Last 12 months)</th>
+                        <th>Last Sale Date</th>
+                        <th>Inception Date</th>
+                        <th>Contact First Name</th>
+                        <th>Contact Last Name</th>
+                        <th>Contact Email</th>
+                        <th>Contact Phone</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="item in items">
+                        <td>
+                            <a ui-sref="index.oneCol.customerDetail({id:item.Id})">{{::item.Id}}</a>
+                        </td>
+                        <td>{{::item.Company}}</td>
+                        <td>{{::item.Tier}}</td>
+                        <td>{{::item.TradeClass}}</td>
+                        <td>{{::item.SalesLastThreeMonths | currency}}</td>
+                        <td>{{::item.SalesLastYear | currency}}</td>
+                        <td>{{::item.LastOrderDate | date:"MM/dd/yy"}}<br />{{::item.LastOrderDate | date:"h:mm a"}}</td>
+                        <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>
+                        <td>{{::item.FirstName}}</td>
+                        <td>{{::item.LastName}}</td>
+                        <td>{{::item.Email}}</td>
+                        <td>{{::item.Phone}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </spinner-overlay>
+        <uib-pagination boundary-links="true"
+                        total-items="totalItems"
+                        items-per-page="filter.Paging.PageItemCount"
+                        data-ng-model="filter.Paging.PageIndex"
+                        previous-text="&lsaquo;"
+                        next-text="&rsaquo;"
+                        first-text="&laquo;"
+                        last-text="&raquo;"
+                        data-ng-change="pageChanged()">
+        </uib-pagination>
+    </div>
+</div>
