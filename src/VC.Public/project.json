@@ -39,6 +39,7 @@
   "publishOptions": {
     "include": [
       "wwwroot",
+      "Views",
       "config.json",
       "web.config",
       "CSharpClassTemplate.tcs",
