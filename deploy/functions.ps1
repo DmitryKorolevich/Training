@@ -23,10 +23,10 @@ function BuildAll($deployPath) {
 	}
 	Pop-Location
 }
-function GulpTask($taskName) {
+function GruntTask($taskName) {
 	Push-Location ".."
 	echo "Running grunt task ${taskName}..."
-	gulp $taskName
+	grunt $taskName
 	if(-Not $?)
 	{
 		exit $LASTEXITCODE

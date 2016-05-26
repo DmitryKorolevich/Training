@@ -9,6 +9,7 @@ BowerInstall
 $targetNames = GetTargets
 foreach ($target in $targetNames) {
 	CopyTarget -targetName $target
-	GulpTask -taskName "release"
+	GruntTask -taskName "bower:install"
+	GruntTask -taskName "release"
 	BuildAll -deployPath "${RootDeploy}\${target}"
 }
