@@ -1,6 +1,6 @@
 {
-    "version": "0.0.0",
-    "name": "VC.Public",
+  "version": "0.0.0",
+  "name": "VC.Public",
   "devDependencies": {
     "gulp": "^3.9.1",
     "rimraf": "^2.5.2",

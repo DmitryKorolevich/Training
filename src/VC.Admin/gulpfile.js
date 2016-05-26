@@ -1,193 +1,214 @@
-﻿// This file in the main entry point for defining grunt tasks and using grunt plugins.
-// Click here to learn more. http://go.microsoft.com/fwlink/?LinkID=513275&clcid=0x409
+﻿"use strict";
 
-module.exports = function (grunt) {
-	var jsConfig = grunt.file.readJSON('AppConfig/scripts/files.json');
-	var cssConfig = grunt.file.readJSON('AppConfig/styles/files.json');
-	var cssOrderInvoiceConfig = grunt.file.readJSON('AppConfig/styles-order-invoice/files.json');
+var gulp = require("gulp"),
+    seq = require("run-sequence"),
+    bower = require("gulp-main-bower-files"),
+    rimraf = require("rimraf"),
+    concat = require("gulp-concat"),
+    cssmin = require("gulp-cssmin"),
+    fs = require('fs'),
+    less = require('gulp-less'),
+    merge = require('merge-stream'),
+    print = require('gulp-print'),
+    html2js = require('gulp-ng-html2js'),
+    htmlmin = require('gulp-minify-html'),
+    uglify = require("gulp-uglify");
 
-	var jsFiles = jsConfig.files;
-	for (var i = 0; i < jsFiles.length; i++) {
-		jsFiles[i] = "wwwroot/" + jsFiles[i];
-	}
+var jsConfig = JSON.parse(fs.readFileSync('./AppConfig/scripts/files.json'));
+var cssConfig = JSON.parse(fs.readFileSync('./AppConfig/styles/files.json'));
+var cssOrderInvoiceConfig = JSON.parse(fs.readFileSync('./AppConfig/styles-order-invoice/files.json'));
 
-	var cssFiles = cssConfig.files;
-	for (var j = 0; j < cssFiles.length; j++) {
-		cssFiles[j] = "wwwroot/" + cssFiles[j];
-	}
+var jsFiles = jsConfig.files;
+for (var i = 0; i < jsFiles.length; i++) {
+    jsFiles[i] = "wwwroot/" + jsFiles[i];
+}
 
-	var cssOrderInvoiceFiles = cssOrderInvoiceConfig.files;
-	for (var j = 0; j < cssOrderInvoiceFiles.length; j++)
-	{
-	    cssOrderInvoiceFiles[j] = "wwwroot/" + cssOrderInvoiceFiles[j];
-	}
+var cssFiles = cssConfig.files;
+for (var j = 0; j < cssFiles.length; j++) {
+    cssFiles[j] = "wwwroot/" + cssFiles[j];
+}
+cssFiles.push('./temp/less/**/*.css');
 
-	grunt.initConfig({
-		jsMinifiedFileName: jsConfig.minifiedFileName,
-		cssMinifiedFileName: cssConfig.minifiedFileName,
-		cssOrderInvoiceMinifiedFileName: cssOrderInvoiceConfig.minifiedFileName,
-		pkg: grunt.file.readJSON('package.json'),
-        bower: {
-		    install: {
-			    options: {
-				    targetDir: "wwwroot/lib",
-				    layout: "byComponent",
-				    cleanTargetDir: false
-			    }
-		    }
-        },
-        concat: {
-        	css: {
-				src: cssFiles,
-				dest: 'temp/css/<%= cssMinifiedFileName %>.css'
-        	},
-        	cssorderinvoice: {
-        	    src: cssOrderInvoiceFiles,
-        	    dest: 'temp/css/<%= cssOrderInvoiceMinifiedFileName %>.css'
-        	},
-        	js: {
-				src: jsFiles,
-				// the location of the resulting JS file
-				dest: 'temp/js/<%= jsMinifiedFileName %>.js'/*dist*/
-        	}
-        },
-        less: {
-        	development: {
-		        options: {
-			        paths: ["assets/styles"]
-		        },
-		        files:
-		        [
-			        {
-				        expand: true,
-				        cwd: 'assets/styles/',
-				        src: ['*.less', '!{boot,var,mix}*.less'],
-				        dest: 'temp/css/',
-				        ext: '.css'
-			        },
-					{
-						expand: true,
-						cwd: 'assets/styles/bootstrap/',
-						src: ['bootstrap.less'],
-						dest: 'temp/bootstrap/',
-						ext: '.css'
-					}
-		        ]
-	        }
-        },
-        uglify: {
-        	options: {
-        		// the banner is inserted at the top of the output
-        		banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
-        	},
-        	dist: {
-        		files: {
-        		    'temp/js/minified/<%= jsMinifiedFileName %>.min.js': ['temp/js/<%= jsMinifiedFileName %>.js'],
-        		    'temp/js/minified/worker-ttl.js': ['temp/js/worker-ttl.js'],
-        		    'temp/js/minified/worker-css.js': ['temp/js/worker-css.js'],
-        		    'temp/js/minified/worker-html.js': ['temp/js/worker-html.js'],
-        		}
-        	}
-        },
-        clean: {
-        	wwwroot: ["wwwroot/app", "wwwroot/assets"],
-        	wwwrootFull:["wwwroot/*", "!wwwroot/bin"],
-			temp: ["temp"]
-        },
-        copy: {
-        	development: {
-        		files: [
-				  { expand: true, cwd: 'app/', src: ['**'], dest: 'wwwroot/app/' },
-				  { expand: true, cwd: 'temp/css/', src: ['**'], dest: 'wwwroot/assets/styles/' },
-				  { expand: true, cwd: 'temp/bootstrap/', src: ['**'], dest: 'wwwroot/lib/bootstrap/css/' },
-				  { expand: true, cwd: 'assets/images/', src: ['**'], dest: 'wwwroot/assets/images/' },
-				  { expand: true, cwd: 'assets/fonts/', src: ['**'], dest: 'wwwroot/lib/fonts/' },
-				  { expand: true, cwd: 'assets/miscellaneous/', src: ['**'], dest: 'wwwroot/assets/miscellaneous/' },
-				  { expand: true, cwd: 'assets/templates/', src: ['**'], dest: 'wwwroot/assets/templates/' },
-                  { expand: true, cwd: 'app/core/utils/ace/', src: ['**'], dest: 'wwwroot/lib/ace-builds/src-min-noconflict/' },
-                  { expand: true, cwd: 'wwwroot/lib/ace-builds/src-min-noconflict/', src: ['worker-html.js', 'worker-css.js'], dest: 'temp/js/' },
-                  { expand: true, cwd: 'app/core/utils/ace/', src: ['worker-ttl.js'], dest: 'temp/js/' }
-        		]
-        	},
-        	release: {
-		        files: [
-					{ expand: true, cwd: 'temp/js/minified/', src: ['**'], dest: 'wwwroot/' },
-			        { expand: true, cwd: 'temp/css/minified/', src: ['**'], dest: 'wwwroot/' },
-					{ expand: true, cwd: 'assets/images/', src: ['**'], dest: 'wwwroot/assets/images/' },
-					{ expand: true, cwd: 'assets/fonts/', src: ['**'], dest: 'wwwroot/fonts/' },
-					{ expand: true, cwd: 'assets/miscellaneous/', src: ['**'], dest: 'wwwroot/assets/miscellaneous/' },
-				    { expand: true, cwd: 'assets/templates/', src: ['**'], dest: 'wwwroot/assets/templates/' },
-					{ expand: true, cwd: 'wwwroot/lib/bootstrap/fonts/', src: ['**'], dest: 'wwwroot/fonts/' }
-		        ]
-	        }
-        },
-        cssmin: {
-        	target: {
-        		files: [
-					{ expand: true, cwd: 'temp/css/', src: ['<%= cssMinifiedFileName %>.css'], dest: 'temp/css/minified/', ext: '.min.css' },
-					{ expand: true, cwd: 'temp/css/', src: ['<%= cssOrderInvoiceMinifiedFileName %>.css'], dest: 'temp/css/minified/', ext: '.min.css' }
-        		],
-        		options: {
-        			shorthandCompacting: false,
-        			roundingPrecision: -1
-        		}
-        	}
-        },
-		html2js: {
-			options: {
-				base: '',
-				module: 'templates',
-				singleModule: true,
-				useStrict: true,
-				htmlmin: {
-					collapseBooleanAttributes: true,
-					collapseWhitespace: true,
-					removeAttributeQuotes: true,
-					removeComments: true,
-					removeEmptyAttributes: true,
-					removeRedundantAttributes: true,
-					removeScriptTypeAttributes: true,
-					removeStyleLinkTypeAttributes: true
-				}
-			},
-			main: {
-				src: ['app/**/*.html'],
-				dest: 'wwwroot/app/templates.js'
-			}
-		},
-        watch: {
-        	files: ['app/**/*.js', 'app/**/*.html', 'assets/**/*.less'],
-        	tasks: ['development'/*, 'test'*/],
-        	options: {
-        		livereload: true
-        	}
-        }
-    });
+var cssOrderInvoiceFiles = cssOrderInvoiceConfig.files;
+for (var j = 0; j < cssOrderInvoiceFiles.length; j++)
+{
+	cssOrderInvoiceFiles[j] = "wwwroot/" + cssOrderInvoiceFiles[j];
+}
 
-    // This command registers the default task which will install bower packages into wwwroot/lib
-	grunt.registerTask("default", ["bower:install"]);
+gulp.task("default", ["bower"]);
 
-	// this would be run by typing "grunt test" on the command line
-	grunt.registerTask('test', ['jshint']);
+gulp.task("development", function (callBack) {
+    seq(['clean:assets', 'clean:app', 'clean:js', 'clean:css', 'bower'], ['less', 'html2js'], 'copy:dev', 'clean:temp', callBack);
+});
 
-	// the default task can be run just by typing "grunt" on the command line
-	grunt.registerTask('development', ['clean:wwwroot', 'less', 'copy:development', 'clean:temp', 'html2js:main']);
+gulp.task("release", function (callBack) {
+    seq(['clean:assets', 'clean:app', 'clean:js', 'clean:css', 'bower'], ['less', 'html2js'], 'copy:dev', 'min', ['clean:assets', 'clean:app'], 'copy:rel', 'clean:temp', callBack);
+});
 
-	grunt.registerTask('release', ['clean:wwwroot', 'less', 'copy:development', 'html2js:main', 'concat', 'uglify', 'clean:wwwroot', 'cssmin', 'copy:release', 'clean:temp']);
+gulp.task("bower", function () {
+    return gulp.src('./bower.json')
+        .pipe(bower({
+            overrides: {
+                "angular-promise-tracker": {
+                    "main": "*.js"
+                },
+                "jsondiffpatch": {
+                    "main": "public/**/*.*"
+                },
+                "ace-builds": {
+                    "main": "./src-min-noconflict/**/*.*"
+                },
+                "ngprogress": {
+                    "main": ["./build/ngprogress.js", "./ngProgress.css"]
+                },
+                "font-awesome": {
+                    "main": ["fonts/*.*", "css/font-awesome.css"]
+                },
+                "bootstrap": {
+                    "main": ["./dist/fonts/*.*", "./dist/js/bootstrap.js"]
+                },
+                "ladda": {
+                    "main": ["./dist/**/*.*"]
+                }
+            }
+        }))
+        .pipe(gulp.dest('./wwwroot/lib/'));
+});
 
-	grunt.registerTask('regularWatch', ['watch']);
+//gulp.task("concat:styles", function () {
+//    var result = merge();
+//    result.add(gulp.src(cssFiles).pipe(concat(cssConfig.minifiedFileName + ".css")).pipe(gulp.dest("./wwwroot/assets/styles/")));
+//    result.add(gulp.src(cssOrderInvoiceFiles).pipe(concat(cssOrderInvoiceConfig.minifiedFileName + ".css")).pipe(gulp.dest("./wwwroot/assets/styles/")));
+//    return result;
+//});
 
-	grunt.registerTask('wwwrootCleanup', ['clean:wwwrootFull']);
+gulp.task("copy:dev", function () {
+    var result = merge();
+    result.add(gulp.src(["./app/**/*.*"]).pipe(gulp.dest("./wwwroot/app/")));
+    result.add(gulp.src(["./temp/bootstrap/**/*.*" ]).pipe(gulp.dest("./wwwroot/lib/bootstrap/css")));
+    result.add(gulp.src(["./temp/less/**/*.*"]).pipe(gulp.dest("./wwwroot/assets/styles/")));
+    result.add(gulp.src(["./assets/images/**/*.*" ]).pipe(gulp.dest("./wwwroot/assets/images/")));
+    result.add(gulp.src(["./assets/fonts/**/*.*" ]).pipe(gulp.dest("./wwwroot/lib/fonts/")));
+    result.add(gulp.src(["./assets/templates/**/*.*" ]).pipe(gulp.dest("./wwwroot/assets/templates/")));
+    result.add(gulp.src(["./assets/miscellaneous/**/*.*" ]).pipe(gulp.dest("./wwwroot/assets/miscellaneous/")));
+    result.add(gulp.src(["./app/core/utils/ace/**/*.*" ]).pipe(gulp.dest("./wwwroot/lib/ace-builds/src-min-noconflict/")));
+    result.add(gulp.src(["./wwwroot/lib/ace-builds/src-min-noconflict/worker-html.js", "./wwwroot/lib/ace-builds/src-min-noconflict/worker-css.js"]).pipe(gulp.dest("./temp/js/")));
+    result.add(gulp.src(["./app/core/utils/ace/worker-ttl.js"]).pipe(gulp.dest("./temp/js/")));
+    return result;
+});
 
-    // The following line loads the grunt plugins.
-    // This line needs to be at the end of this this file.
-    grunt.loadNpmTasks("grunt-bower-task");
-	grunt.loadNpmTasks("grunt-contrib-less");
-	grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-contrib-concat');
-    grunt.loadNpmTasks('grunt-contrib-copy');
-    grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-contrib-cssmin');
-    grunt.loadNpmTasks('grunt-html2js');
-};
+gulp.task("copy:rel", function () {
+    var result = merge();
+    result.add(gulp.src(["./assets/images/**/*.*", ]).pipe(gulp.dest("./wwwroot/assets/images/")));
+    result.add(gulp.src(["./assets/fonts/**/*.*", ]).pipe(gulp.dest("./wwwroot/fonts/")));
+    result.add(gulp.src(["./assets/miscellaneous/**/*.*", ]).pipe(gulp.dest("./wwwroot/assets/miscellaneous/")));
+    result.add(gulp.src(["./assets/templates/**/*.*" ]).pipe(gulp.dest("./wwwroot/assets/templates/")));
+    result.add(gulp.src(["./wwwroot/lib/bootstrap/fonts/**/*.*" ]).pipe(gulp.dest("./wwwroot/fonts/")));
+    return result;
+});
+
+gulp.task("html2js", function() {
+    return gulp.src('app/**/*.html')
+        .pipe(htmlmin({
+            empty: true,
+            spare: true,
+            quotes: true
+        }))
+        .pipe(html2js({
+            moduleName: 'templates'
+        }))
+        .pipe(concat("templates.js"))
+        .pipe(gulp.dest("./wwwroot/app/"));
+});
+
+gulp.task("less", function () {
+    var result = merge();
+    result.add(
+        gulp.src([
+        './Assets/styles/site.less',
+        './Assets/styles/order-invoice.less'
+        ]).pipe(less())
+        .pipe(gulp.dest("./temp/less/"))
+    );
+    result.add(
+        gulp.src([
+        './Assets/styles/bootstrap/bootstrap.less'
+        ]).pipe(less())
+        .pipe(gulp.dest("./temp/bootstrap/"))
+    );
+    return result;
+});
+
+gulp.task("min:js", function () {
+    var result = merge();
+    result.add(
+        gulp.src(jsFiles)
+        //.pipe(print())
+        .pipe(concat(jsConfig.minifiedFileName + ".min.js"))
+        .pipe(uglify())
+        .pipe(gulp.dest("./wwwroot/"))
+    );
+    result.add(
+        gulp.src(['./temp/js/worker-ttl.js'])
+        //.pipe(print())
+        .pipe(concat("worker-ttl.js"))
+        .pipe(uglify())
+        .pipe(gulp.dest("./wwwroot/"))
+    );
+    result.add(
+        gulp.src(['./temp/js/worker-css.js'])
+        //.pipe(print())
+        .pipe(concat("worker-css.js"))
+        .pipe(uglify())
+        .pipe(gulp.dest("./wwwroot/"))
+    );
+    result.add(
+        gulp.src(['./temp/js/worker-html.js'])
+        //.pipe(print())
+        .pipe(concat("worker-html.js"))
+        .pipe(uglify())
+        .pipe(gulp.dest("./wwwroot/"))
+    );
+    return result;
+});
+
+gulp.task("min:css", function () {
+    var result = merge();
+    result.add(
+        gulp.src(cssFiles)
+        //.pipe(print())
+        .pipe(concat(cssConfig.minifiedFileName + ".min.css"))
+        .pipe(cssmin())
+        .pipe(gulp.dest("./wwwroot/"))
+    );
+    result.add(
+        gulp.src(cssOrderInvoiceFiles)
+        //.pipe(print())
+        .pipe(concat(cssOrderInvoiceConfig.minifiedFileName + ".min.css"))
+        .pipe(cssmin())
+        .pipe(gulp.dest("./wwwroot/"))
+    );
+    return result;
+});
+
+gulp.task("clean:js", function (cb) {
+    rimraf("./wwwroot/*.js", cb);
+});
+
+gulp.task("clean:css", function (cb) {
+    rimraf("./wwwroot/*.css", cb);
+});
+
+gulp.task("clean:assets", function (cb) {
+    rimraf("./wwwroot/assets/**", cb);
+});
+
+gulp.task("clean:app", function (cb) {
+    rimraf("./wwwroot/app/**", cb);
+});
+
+gulp.task("clean:temp", function (cb) {
+    rimraf("./temp/**", cb);
+});
+
+gulp.task("min", ["min:js", "min:css"]);
