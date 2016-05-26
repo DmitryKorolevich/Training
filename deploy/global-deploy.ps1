@@ -27,7 +27,7 @@ cp "${RootBuild}\src\nlog.config" "${RootDeploy}\nlog.config"
 Push-Location "${RootBuild}"
 echo "Working directory: ${RootBuild}"
 echo "Restoring packages..."
-#dotnet restore -v Warning
+dotnet restore -v Warning
 if(-Not $?)
 {
 	exit $LASTEXITCODE
