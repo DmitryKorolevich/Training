@@ -37,6 +37,7 @@
   },
   "publishOptions": {
     "include": [
+      "wwwroot",
       "config.json",
       "web.config",
       "CSharpClassTemplate.tcs",
