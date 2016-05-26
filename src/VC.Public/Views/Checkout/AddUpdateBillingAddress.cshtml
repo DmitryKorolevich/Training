@@ -27,32 +27,31 @@
 	<span class="checkout-notification-important">Please enter your billing address below.</span>
 	<span class="checkout-notification-simple">An accurate billing address is essential to get your order to you quickly.</span>
 	<span class="checkout-notification-important">Shopping online with Vital Choice is extremely safe. All information is encrypted.</span>
-	<div class="columns-container checkout-columns-container">
-		@using (Html.BeginForm("AddUpdateBillingAddress", "Checkout", null, FormMethod.Post, null, new {@class = "form-regular medium-small", role = "form"}))
-		{
-			<div class="overlay hide">
-            	<div class="loading">Loading…</div>
-        	</div>
-			@Html.AntiForgeryToken()
-			@Html.ValidationSummary(true, "")
-			if (ViewBag.CreditCards != null && ViewBag.CreditCards.Count > 1)
-			 {
-				 <div class="form-group">
-					 @Html.Label("SavedCards", "Saved Cards", new {@class = "control-label"})
-					 <div class="input-group">
-						 @Html.DropDownListFor(x => x.Id, new SelectList(ViewBag.CreditCards, "Key", "Value", Model.Id), new {id = "ddCreditCardsSelection", @class = "form-control auto"})
-					 </div>
-				 </div>
-				 <div class="form-group">
-					 <div class="checkout-sections-divider"></div>
-				 </div>
-			 }
-			<div class="form-group">
-				<label class="control-label">Pay with Credit Card</label>
-				<div class="input-group checkout-acceptable-cards">
-					<img src="/Assets/images/checkout/ccicons.jpg" />
-				</div>
-			</div>
+    <div class="columns-container checkout-columns-container">
+        <div class="overlay hide">
+            <div class="loading">Loading…</div>
+        </div>
+        @using (Html.BeginForm("AddUpdateBillingAddress", "Checkout", null, FormMethod.Post, null, new { @class = "form-regular medium-small", role = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "")
+            if (ViewBag.CreditCards != null && ViewBag.CreditCards.Count > 1)
+            {
+                <div class="form-group">
+                    @Html.Label("SavedCards", "Saved Cards", new { @class = "control-label" })
+                    <div class="input-group">
+                        @Html.DropDownListFor(x => x.Id, new SelectList(ViewBag.CreditCards, "Key", "Value", Model.Id), new { id = "ddCreditCardsSelection", @class = "form-control auto" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="checkout-sections-divider"></div>
+                </div>}
+            <div class="form-group">
+                <label class="control-label">Pay with Credit Card</label>
+                <div class="input-group checkout-acceptable-cards">
+                    <img src="/Assets/images/checkout/ccicons.jpg" />
+                </div>
+            </div>
 
             <div id="dynamicArea">
                 @await Html.PartialAsync("_AddUpdateBillingAddress", Model, ViewData)
@@ -60,24 +59,23 @@
 
             <div class="form-group">
                 <div class="checkout-sections-divider"></div>
-            </div>
-			if (!User.Identity.IsAuthenticated || !InfrastructureService.IsValidCustomer(User))
+            </div>if (!User.Identity.IsAuthenticated || !InfrastructureService.IsValidCustomer(User))
             {
                 <div class="form-group">
                     <span class="checkout-notification-important">For faster checkout and to receive customer rewards and incentives please register your account by providing a password.</span>
                 </div>
                 <span id="spPasswordHint" class="form-control-important-info">Must be at least 8 characters long, contain at least 1 numerical digit, 1 capital character and 1 special character.<br />Example: Dontuse!#1</span>
                 <div class="form-group">
-                    @Html.LabelFor(m => m.Password, new {@class = "control-label"})
+                    @Html.LabelFor(m => m.Password, new { @class = "control-label" })
                     <div class="input-group">
-                        @Html.PasswordFor(m => m.Password, new {@class = "form-control"})
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
                         @Html.ValidationMessageFor(m => m.Password)
                     </div>
                 </div>
                 <div class="form-group">
-                    @Html.LabelFor(m => m.ConfirmPassword, new {@class = "control-label"})
+                    @Html.LabelFor(m => m.ConfirmPassword, new { @class = "control-label" })
                     <div class="input-group">
-                        @Html.PasswordFor(m => m.ConfirmPassword, new {@class = "form-control"})
+                        @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
                         @Html.ValidationMessageFor(m => m.ConfirmPassword)
                     </div>
                 </div>
@@ -86,7 +84,7 @@
                     <label class="control-label"></label>
                     <div class="input-group">
                         <label class="bold">
-                            @Html.CheckBoxFor(m => m.GuestCheckout, new {@class = "form-control"})
+                            @Html.CheckBoxFor(m => m.GuestCheckout, new { @class = "form-control" })
                             No thank you. I would like to checkout as a guest
                         </label>
                     </div>
@@ -95,17 +93,17 @@
             else
             {
                 @Html.HiddenFor(x => x.Email)
-                @Html.Hidden("Password", "password", new {@id = "loggedInPassword"})
-                @Html.Hidden("ConfirmPassword", "password", new {@id = "loggedInConfirmPassword"})
+                @Html.Hidden("Password", "password", new { @id = "loggedInPassword" })
+                @Html.Hidden("ConfirmPassword", "password", new { @id = "loggedInConfirmPassword" })
             }
-            <img class="billing-advert-image" src="/Assets/images/checkout/subscribe-promo-bar-5-16-13-A.png"/>
+            <img class="billing-advert-image" src="/Assets/images/checkout/subscribe-promo-bar-5-16-13-A.png" />
             <div class="form-group">
                 <label class="control-label"></label>
                 <div class="input-group">
                     <label class="multiline-checkbox-container">
-                        @Html.CheckBoxFor(m => m.SendNews, new {@class = "form-control"})
-                        Send weekly Offers, Recipes, and Food/Health News via the <i>Vital Choices</i> e-letter.<br/><br/>
-                        <span class="shopping-notice-note">NOTE:</span>If you already get <i>Vital Choices</i>, DO NOT UN-CHECK THIS BOX unless you want to cancel it … we won’t <br/> duplicate your subscription!
+                        @Html.CheckBoxFor(m => m.SendNews, new { @class = "form-control" })
+                        Send weekly Offers, Recipes, and Food/Health News via the <i>Vital Choices</i> e-letter.<br /><br />
+                        <span class="shopping-notice-note">NOTE:</span>If you already get <i>Vital Choices</i>, DO NOT UN-CHECK THIS BOX unless you want to cancel it … we won’t <br /> duplicate your subscription!
                     </label>
                 </div>
             </div>
@@ -113,15 +111,15 @@
                 <label class="control-label"></label>
                 <div class="input-group">
                     <label class="multiline-checkbox-container">
-                        @Html.CheckBoxFor(m => m.SendCatalog, new {@class = "form-control"})
-                        Send me the award-winning Vital Choice catalog on a seasonal basis.<br/><br/>
+                        @Html.CheckBoxFor(m => m.SendCatalog, new { @class = "form-control" })
+                        Send me the award-winning Vital Choice catalog on a seasonal basis.<br /><br />
                         <a href="#">Our privacy policy</a>
                     </label>
                 </div>
             </div>
             <div class="form-buttons-group">
-                @(User.Identity.IsAuthenticated ? Html.ActionLink("Back", "ViewCart", "Cart", null, new {@class = "button arrow-left-red"}) : Html.ActionLink("Back", "Welcome", "Checkout", htmlAttributes: new {@class = "button arrow-left-red"}))
-                <input class="arrow-right-blue" type="submit" value="Continue"/>
+                @(User.Identity.IsAuthenticated ? Html.ActionLink("Back", "ViewCart", "Cart", null, new { @class = "button arrow-left-red" }) : Html.ActionLink("Back", "Welcome", "Checkout", htmlAttributes: new { @class = "button arrow-left-red" }))
+                <input class="arrow-right-blue" type="submit" value="Continue" />
             </div>
         }
     </div>
