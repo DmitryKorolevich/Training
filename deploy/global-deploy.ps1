@@ -33,8 +33,8 @@ if(-Not $?)
 	exit $LASTEXITCODE
 }
 Pop-Location
-cmd /c start "%windir%\system32\inetsrv\appcmd stop apppool /apppool.name: admin"
-cmd /c start "%windir%\system32\inetsrv\appcmd stop apppool /apppool.name: public"
+cmd /c "%windir%\system32\inetsrv\appcmd" stop apppool /apppool.name:admin
+cmd /c "%windir%\system32\inetsrv\appcmd" stop apppool /apppool.name:public
 ls -Path "${RootBuild}\src" | `
 foreach{
 	if ($_.GetType().Name.Equals("DirectoryInfo")) {
@@ -64,5 +64,5 @@ foreach{
 		}
 	}
 }
-cmd /c start "%windir%\system32\inetsrv\appcmd start apppool /apppool.name: admin"
-cmd /c start "%windir%\system32\inetsrv\appcmd start apppool /apppool.name: public"
+cmd /c "%windir%\system32\inetsrv\appcmd" start apppool /apppool.name:admin
+cmd /c "%windir%\system32\inetsrv\appcmd" start apppool /apppool.name:public
