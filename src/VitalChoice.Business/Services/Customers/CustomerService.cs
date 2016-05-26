@@ -26,7 +26,6 @@ using VitalChoice.Business.Queries.Users;
 using VitalChoice.Business.Repositories;
 using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Data.Extensions;
-using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Transaction;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Helpers;
@@ -81,7 +80,7 @@ namespace VitalChoice.Business.Services.Customers
         private readonly IPaymentMethodService _paymentMethodService;
         private readonly IEcommerceRepositoryAsync<VWholesaleSummaryInfo> _vWholesaleSummaryInfoRepositoryAsync;
         private readonly IAppInfrastructureService _appInfrastructureService;
-        private readonly SPEcommerceRepository _sPEcommerceRepository;
+        private readonly SpEcommerceRepository _sPEcommerceRepository;
 
         private static string _customerContainerName;
 
@@ -103,7 +102,7 @@ namespace VitalChoice.Business.Services.Customers
             IObjectMapper<CustomerPaymentMethodDynamic> paymentMapper, IPaymentMethodService paymentMethodService,
             IEcommerceRepositoryAsync<VWholesaleSummaryInfo> vWholesaleSummaryInfoRepositoryAsync,
             IAppInfrastructureService appInfrastructureService,
-            SPEcommerceRepository sPEcommerceRepository,
+            SpEcommerceRepository sPEcommerceRepository,
             ITransactionAccessor<EcommerceContext> transactionAccessor)
             : base(
                 customerMapper, customerRepositoryAsync,

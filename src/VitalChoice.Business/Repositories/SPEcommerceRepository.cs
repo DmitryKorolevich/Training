@@ -250,7 +250,7 @@ namespace VitalChoice.Business.Repositories
                 }
             }
 
-            var toReturn = await Context.Set<CustomerOrdersTotal>().FromSql
+            var toReturn = await _context.Set<CustomerOrdersTotal>().FromSql
                 ("[dbo].[SPGetCustomersStandardOrderTotals] @from={0}, @to={1}, @customerids={2}",
                 from, to, sIds).ToListAsync();
             return toReturn;
@@ -272,7 +272,7 @@ namespace VitalChoice.Business.Repositories
                 }
             }
 
-            var toReturn = await Context.Set<CustomerLastOrder>().FromSql
+            var toReturn = await _context.Set<CustomerLastOrder>().FromSql
                 ("[dbo].[SPGetCustomersStandardOrdersLast] @customerids={0}",sIds).ToListAsync();
             return toReturn;
         }

@@ -18,6 +18,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Context;
@@ -46,6 +47,7 @@ namespace VitalChoice.Business.Services.Healthwise
         private readonly IGcService _gcService;
         private readonly INotificationService _notificationService;
         private readonly ITransactionAccessor<EcommerceContext> _transactionAccessor;
+        private readonly DbContextOptions<EcommerceContext> _eccomerceContextOptions;
         private readonly ILogger _logger;
 
         public HealthwiseService(
@@ -59,7 +61,7 @@ namespace VitalChoice.Business.Services.Healthwise
             IGcService gcService,
             INotificationService notificationService,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerProviderExtended loggerProvider, DbContextOptions<EcommerceContext> eccomerceContextOptions)
         {
             _vHealthwisePeriodRepository = vHealthwisePeriodRepository;
             _healthwiseOrderRepository = healthwiseOrderRepository;
@@ -71,7 +73,8 @@ namespace VitalChoice.Business.Services.Healthwise
             _gcService = gcService;
             _notificationService = notificationService;
             _transactionAccessor = transactionAccessor;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _eccomerceContextOptions = eccomerceContextOptions;
+            _logger = loggerProvider.CreateLogger<HealthwiseService>();
         }
 
         public async Task<ICollection<HealthwiseOrder>> GetHealthwiseOrdersAsync(int idPeriod)
