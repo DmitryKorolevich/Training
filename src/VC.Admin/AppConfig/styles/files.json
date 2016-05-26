@@ -1,19 +1,19 @@
-{
+﻿{
 	"minifiedFileName": "styles",
 
-  "files": [
-    "lib/css-spinners/css/spinner/ball.css",
-    "lib/bootstrap/css/bootstrap.css",
-    "lib/font-awesome/css/font-awesome.css",
-    "lib/textAngular/dist/textAngular.css",
-    "lib/angular-ui-tree/dist/angular-ui-tree.css",
-    "lib/nvd3/src/nv.d3.css",
-    "lib/AngularJS-Toaster/toaster.css",
-    "lib/ngProgress/ngProgress.css",
-    "lib/ladda/dist/ladda-themeless.min.css",
-    "lib/json-formatter/dist/json-formatter.css",
-    "lib/jsondiffpatch/public/formatters-styles/annotated.css",
-    "lib/jsondiffpatch/public/formatters-styles/html.css",
-    "assets/styles/site.css"
-  ]
+	"files": [
+		"lib/css-spinners/ball.css",
+		"lib/bootstrap/css/bootstrap.css",
+		"lib/font-awesome/font-awesome.css",
+		"lib/textAngular/textAngular.css",
+		"lib/angular-ui-tree/angular-ui-tree.min.css",
+		"lib/nvd3/nv.d3.css",
+		"lib/AngularJS-Toaster/toaster.css",
+		"lib/ngProgress/ngProgress.css",
+		"lib/ladda/ladda-themeless.min.css",
+		"lib/json-formatter/json-formatter.css",
+		"lib/jsondiffpatch/annotated.css",
+		"lib/jsondiffpatch/html.css",
+		"assets/styles/site.css"
+	]
 }
