@@ -8,7 +8,7 @@
 . ".\exclude_projects.ps1"
 
 if ($RootDeploy.Equals("")) {
-	$RootDeploy = "c:\inetpub\wwwroot\vitalchoice_new"
+	$RootDeploy = "c:\inetpub\wwwroot\vitalchoice_rc2"
 }
 if ($Src.Equals("")) {
 	$Src = ".."
