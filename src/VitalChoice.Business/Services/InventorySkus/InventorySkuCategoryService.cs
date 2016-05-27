@@ -161,13 +161,14 @@ namespace VitalChoice.Business.Services.InventorySkus
                 var items = await GetInventorySkusAssignedToInvenotySkuCategory(id);
                 if (items.Count > 0)
                 {
-                    string message = "Category with inventory SKUs can't be deleted. SKU codes: ";
+                    string message = "Category with inventory codes can't be deleted: Codes: ";
                     for (int i = 0; i < items.Count; i++)
                     {
                         var item = items[i];
+                        message += item.Code;
                         if (i != items.Count - 1)
                         {
-                            message += item.Code + ", ";
+                            message += ", ";
                         }
                     }
                     throw new AppValidationException(message);

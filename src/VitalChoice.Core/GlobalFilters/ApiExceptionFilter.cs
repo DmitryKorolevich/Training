@@ -48,7 +48,7 @@ namespace VitalChoice.Core.GlobalFilters
                     }
                     var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
                     var logger = loggerFactory.CreateLogger<ApiExceptionFilterAttribute>();
-                    logger.LogError(0, context.Exception, context.Exception.Message);
+                    logger.LogError(0, context.Exception.ToString());
                 }
             }
             else
@@ -75,7 +75,7 @@ namespace VitalChoice.Core.GlobalFilters
                     var logger = loggerFactory.CreateLogger<ApiExceptionFilterAttribute>();
                     if (context.Exception.InnerException != null)
                     {
-                        logger.LogError(0, context.Exception.InnerException, context.Exception.InnerException.Message);
+                        logger.LogError(0, context.Exception.ToString());
                     }
                 }
             }
