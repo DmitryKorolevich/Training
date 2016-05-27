@@ -60,12 +60,14 @@ namespace VC.Admin.Controllers
             IOrderService orderService,
             IAppInfrastructureService appInfrastructureService,
             INotificationService notificationService,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerProviderExtended loggerProvider,
+            ExtendedUserManager userManager)
         {
             _healthwiseService = healthwiseService;
             _orderService = orderService;
             _appInfrastructureService = appInfrastructureService;
             _notificationService = notificationService;
+            _userManager = userManager;
             _logger = loggerProvider.CreateLogger<HealthwiseController>();
         }
 
