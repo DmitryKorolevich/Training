@@ -44,78 +44,10 @@ ALTER TABLE [VitalChoice.Ecommerce].dbo.Affiliates
 ADD IdOld INT NULL
 GO
 
-ALTER TABLE [VitalChoice.Ecommerce].[dbo].[Customers]
-DROP CONSTRAINT [FK_Customers_Affiliates]
-GO
-
-ALTER TABLE [VitalChoice.Ecommerce].[dbo].[AffiliateOrderPayments]
-DROP CONSTRAINT [FK_AffiliateOrderPaymentToAffiliate]
-GO
-
-ALTER TABLE [VitalChoice.Ecommerce].[dbo].[AffiliatePayments]
-DROP CONSTRAINT [FK_AffiliatePaymentToAffiliate]
-GO
-
-ALTER TABLE [VitalChoice.Ecommerce].[dbo].AffiliateOptionValues
-DROP CONSTRAINT FK_AffiliateOptionValuesToAffiliate
-GO
-
-ALTER TABLE [VitalChoice.Ecommerce].dbo.Affiliates
-DROP CONSTRAINT [PK_Affiliates]
-GO
-
-ALTER TABLE [VitalChoice.Ecommerce].dbo.Affiliates
-DROP COLUMN Id
-GO
-
-ALTER TABLE [VitalChoice.Ecommerce].dbo.Affiliates
-ADD Id INT NOT NULL IDENTITY(1,1) CONSTRAINT [PK_Affiliates] PRIMARY KEY (Id)
-GO
-
-DECLARE @maxId INT
-SELECT @maxId = MAX(Id) + 1 FROM [VitalChoice.Ecommerce].dbo.Users
-
-DBCC CHECKIDENT ('[VitalChoice.Ecommerce].dbo.Affiliates', RESEED, @maxId);
-
-GO
-
-ALTER TABLE [VitalChoice.Ecommerce].[dbo].[Customers]  WITH CHECK ADD  CONSTRAINT [FK_Customers_Affiliates] FOREIGN KEY([IdAffiliate])
-REFERENCES [VitalChoice.Ecommerce].[dbo].[Affiliates] ([Id])
-GO
-
-ALTER TABLE [VitalChoice.Ecommerce].[dbo].[Customers] CHECK CONSTRAINT [FK_Customers_Affiliates]
-GO
-
-ALTER TABLE [VitalChoice.Ecommerce].[dbo].[AffiliateOrderPayments]  WITH CHECK ADD  CONSTRAINT [FK_AffiliateOrderPaymentToAffiliate] FOREIGN KEY([IdAffiliate])
-REFERENCES [VitalChoice.Ecommerce].[dbo].[Affiliates] ([Id])
-GO
-
-ALTER TABLE [VitalChoice.Ecommerce].[dbo].[AffiliateOrderPayments] CHECK CONSTRAINT [FK_AffiliateOrderPaymentToAffiliate]
-GO
-
-ALTER TABLE [VitalChoice.Ecommerce].[dbo].[AffiliatePayments]  WITH CHECK ADD  CONSTRAINT [FK_AffiliatePaymentToAffiliate] FOREIGN KEY([IdAffiliate])
-REFERENCES [VitalChoice.Ecommerce].[dbo].[Affiliates] ([Id])
-GO
-
-ALTER TABLE [VitalChoice.Ecommerce].[dbo].[AffiliatePayments] CHECK CONSTRAINT [FK_AffiliatePaymentToAffiliate]
-
-GO
-USE [VitalChoice.Ecommerce]
-GO
-
-ALTER TABLE [dbo].[AffiliateOptionValues]  WITH CHECK ADD  CONSTRAINT [FK_AffiliateOptionValuesToAffiliate] FOREIGN KEY([IdAffiliate])
-REFERENCES [dbo].[Affiliates] ([Id])
-GO
-
-ALTER TABLE [dbo].[AffiliateOptionValues] CHECK CONSTRAINT [FK_AffiliateOptionValuesToAffiliate]
-GO
-
-GO
 USE [vitalchoice2.0]
 GO
 IF EXISTS(SELECT * FROM sys.procedures WHERE name = N'MoveAffiliateTextField')
 	DROP PROCEDURE dbo.MoveAffiliateTextField
-
 GO
 
 CREATE PROCEDURE dbo.MoveAffiliateTextField
@@ -252,11 +184,65 @@ END
 GO
 --============================ Insert Base Users and Customers Entity ====================================
 
-INSERT INTO [VitalChoice.Ecommerce].dbo.Affiliates
-(DateCreated, DateEdited, County, CommissionAll, CommissionFirst, Email, IdCountry, IdState, MyAppBalance, Name, StatusCode, IdOld)
+ALTER TABLE [VitalChoice.Infrastructure].dbo.AspNetUsers
+ADD IdOld INT NULL
+GO
+
+DECLARE @affiliates TABLE(Id INT NOT NULL, IdOld INT NOT NULL)
+
+INSERT INTO [VitalChoice.Infrastructure].dbo.AspNetUsers
+(IdOld,
+PublicId, 
+Email, 
+NormalizedEmail, 
+EmailConfirmed, 
+UserName, 
+NormalizedUserName, 
+FirstName, 
+LastName,
+Status, 
+LockoutEnabled, 
+PhoneNumber, 
+PhoneNumberConfirmed, 
+CreateDate, 
+UpdatedDate, 
+TwoFactorEnabled, 
+ConfirmationToken, 
+TokenExpirationDate, 
+IsConfirmed, 
+IdUserType,
+AccessFailedCount)
+OUTPUT inserted.Id, inserted.idOld INTO @affiliates
 SELECT 
-	ISNULL(a.joinDate, GETDATE()), 
-	ISNULL(a.lastUpdated, GETDATE()), 
+	aff.idAffiliate,
+	NEWID(), 
+	aff.affiliateEmail, 
+	UPPER(aff.affiliateEmail),  
+	1,
+	aff.affiliateEmail,
+	UPPER(aff.affiliateEmail),
+	ISNULL(aff.affiliateName, ''),
+	'',
+	1,
+	1,
+	'',
+	0,
+	ISNULL(CAST(aff.joinDate AS DATETIME), GETDATE()), 
+	ISNULL(CAST(aff.lastUpdated AS DATETIME), GETDATE()), 
+	0,
+	NEWID(),
+	GETDATE(),
+	1,
+	3,
+	0
+FROM [vitalchoice2.0].dbo.affiliates AS aff
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.Affiliates
+(Id, DateCreated, DateEdited, County, CommissionAll, CommissionFirst, Email, IdCountry, IdState, MyAppBalance, Name, StatusCode, IdOld)
+SELECT 
+	aff.Id,
+	ISNULL(CAST(a.joinDate AS DATETIME), GETDATE()), 
+	ISNULL(CAST(a.lastUpdated AS DATETIME), GETDATE()), 
 	a.affiliateState, 
 	a.commission, 
 	a.commission2, 
@@ -268,6 +254,12 @@ SELECT
 	CASE WHEN a.pcaff_Active <> 0 THEN 2 ELSE 1 END,
 	a.idAffiliate
 FROM [vitalchoice2.0].dbo.affiliates AS a
+INNER JOIN @affiliates AS aff ON aff.IdOld = a.idAffiliate
+
+GO
+ALTER TABLE [VitalChoice.Infrastructure].dbo.AspNetUsers
+DROP COLUMN IdOld
+GO
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.Users
 (Id)
@@ -304,57 +296,6 @@ EXEC dbo.MoveAffiliateField @destFieldName = 'PromoteByWebsite', @sourceFieldNam
 EXEC dbo.MoveAffiliateField @destFieldName = 'BrickAndMortar', @sourceFieldName = 'BrickNMortar', @fieldOperation = 'CASE WHEN a.BrickNMortar <> 0 THEN ''True'' ELSE ''False'' END'
 EXEC dbo.MoveAffiliateField @destFieldName = 'MonthlyEmailsSent', @sourceFieldName = 'promoEmailQty', @fieldOperation = 'CAST(a.promoEmailQty AS NVARCHAR(2))'
 EXEC dbo.MoveAffiliateTextField @sourceColumnName = 'notes', @destFieldName = 'Notes'
-
-SET IDENTITY_INSERT [VitalChoice.Infrastructure].dbo.AspNetUsers ON;
-
-INSERT INTO [VitalChoice.Infrastructure].dbo.AspNetUsers
-(Id, 
-PublicId, 
-Email, 
-NormalizedEmail, 
-EmailConfirmed, 
-UserName, 
-NormalizedUserName, 
-FirstName, 
-LastName,
-Status, 
-LockoutEnabled, 
-PhoneNumber, 
-PhoneNumberConfirmed, 
-CreateDate, 
-UpdatedDate, 
-TwoFactorEnabled, 
-ConfirmationToken, 
-TokenExpirationDate, 
-IsConfirmed, 
-IdUserType,
-AccessFailedCount)
-SELECT 
-	aff.Id, 
-	NEWID(), 
-	aff.Email, 
-	UPPER(aff.Email),  
-	1,
-	aff.Email,
-	UPPER(aff.Email),
-	ISNULL(aff.Name, ''),
-	'',
-	1,
-	1,
-	'',
-	0,
-	aff.DateCreated,
-	aff.DateEdited,
-	0,
-	NEWID(),
-	GETDATE(),
-	1,
-	3,
-	0
-FROM [vitalchoice2.0].dbo.affiliates AS a
-INNER JOIN [VitalChoice.Ecommerce].dbo.Affiliates AS aff ON aff.IdOld = a.idAffiliate
-
-SET IDENTITY_INSERT [VitalChoice.Infrastructure].dbo.AspNetUsers OFF;
 
 INSERT INTO [VitalChoice.Infrastructure].dbo.AspNetUserRoles
 (RoleId, UserId)
