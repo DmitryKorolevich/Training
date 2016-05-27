@@ -304,3 +304,61 @@ EXEC dbo.MoveAffiliateField @destFieldName = 'PromoteByWebsite', @sourceFieldNam
 EXEC dbo.MoveAffiliateField @destFieldName = 'BrickAndMortar', @sourceFieldName = 'BrickNMortar', @fieldOperation = 'CASE WHEN a.BrickNMortar <> 0 THEN ''True'' ELSE ''False'' END'
 EXEC dbo.MoveAffiliateField @destFieldName = 'MonthlyEmailsSent', @sourceFieldName = 'promoEmailQty', @fieldOperation = 'CAST(a.promoEmailQty AS NVARCHAR(2))'
 EXEC dbo.MoveAffiliateTextField @sourceColumnName = 'notes', @destFieldName = 'Notes'
+
+SET IDENTITY_INSERT [VitalChoice.Infrastructure].dbo.AspNetUsers ON;
+
+INSERT INTO [VitalChoice.Infrastructure].dbo.AspNetUsers
+(Id, 
+PublicId, 
+Email, 
+NormalizedEmail, 
+EmailConfirmed, 
+UserName, 
+NormalizedUserName, 
+FirstName, 
+LastName,
+Status, 
+LockoutEnabled, 
+PhoneNumber, 
+PhoneNumberConfirmed, 
+CreateDate, 
+UpdatedDate, 
+TwoFactorEnabled, 
+ConfirmationToken, 
+TokenExpirationDate, 
+IsConfirmed, 
+IdUserType,
+AccessFailedCount)
+SELECT 
+	aff.Id, 
+	NEWID(), 
+	aff.Email, 
+	UPPER(aff.Email),  
+	1,
+	aff.Email,
+	UPPER(aff.Email),
+	ISNULL(aff.Name, ''),
+	'',
+	1,
+	1,
+	'',
+	0,
+	aff.DateCreated,
+	aff.DateEdited,
+	0,
+	NEWID(),
+	GETDATE(),
+	1,
+	3,
+	0
+FROM [vitalchoice2.0].dbo.affiliates AS a
+INNER JOIN [VitalChoice.Ecommerce].dbo.Affiliates AS aff ON aff.IdOld = a.idAffiliate
+
+SET IDENTITY_INSERT [VitalChoice.Infrastructure].dbo.AspNetUsers OFF;
+
+INSERT INTO [VitalChoice.Infrastructure].dbo.AspNetUserRoles
+(RoleId, UserId)
+ SELECT 8, Id 
+ FROM [VitalChoice.Ecommerce].dbo.Affiliates
+
+GO
