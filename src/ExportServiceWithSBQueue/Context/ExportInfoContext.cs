@@ -1,7 +1,7 @@
 ﻿using System.Data.SqlClient;
 using ExportServiceWithSBQueue.Entities;
-using Microsoft.Data.Entity;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using VitalChoice.Data.Context;
 
 namespace ExportServiceWithSBQueue.Context
@@ -10,7 +10,7 @@ namespace ExportServiceWithSBQueue.Context
     {
         protected readonly IOptions<ExportOptions> Options;
 
-        public ExportInfoContext(IOptions<ExportOptions> options)
+        public ExportInfoContext(IOptions<ExportOptions> options, DbContextOptions<ExportInfoContext> contextOptions): base(contextOptions)
         {
             Options = options;
         }

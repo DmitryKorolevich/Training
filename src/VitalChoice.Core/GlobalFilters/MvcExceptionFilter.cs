@@ -3,18 +3,18 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Http.Features;
-using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Core.Services;
-using Microsoft.AspNet.Mvc.Filters;
-using Microsoft.AspNet.Mvc.Infrastructure;
-using Microsoft.AspNet.Mvc.ModelBinding;
-using Microsoft.AspNet.Mvc.Routing;
-using Microsoft.AspNet.Mvc.ViewFeatures;
-using Microsoft.AspNet.Routing;
-using Microsoft.Data.Entity;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Internal;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -28,9 +28,9 @@ namespace VitalChoice.Core.GlobalFilters
 	{
         private readonly ApiExceptionFilterAttribute _apiExceptionFilter = new ApiExceptionFilterAttribute();
 
-		public override async Task OnExceptionAsync(ExceptionContext context)
+		public override Task OnExceptionAsync(ExceptionContext context)
 		{
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
             var systemException = context.Exception as SystemException;
 		    if (systemException != null)
 		    {
@@ -48,7 +48,7 @@ namespace VitalChoice.Core.GlobalFilters
 			    if (context.Exception is CustomerSuspendException)
 			    {
                     context.Result = CustomerStatusCheckAttribute.CreateJsonResponse();
-                    return;
+			        return TaskCache.CompletedTask;
 			    }
                 _apiExceptionFilter.OnException(context);
 			}
@@ -61,7 +61,6 @@ namespace VitalChoice.Core.GlobalFilters
                 var result = new ViewResult
 				{
 					ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), context.ModelState),
-					TempData = context.HttpContext.RequestServices.GetRequiredService<ITempDataDictionary>()
 				};
 
 				var apiException = context.Exception as ApiException;
@@ -92,7 +91,7 @@ namespace VitalChoice.Core.GlobalFilters
                         }
 				        else
 				        {
-                            currentActionName = await GetRefferedAction(context, referer, currentActionName, currentControllerName);
+                            currentActionName = GetRefferedAction(context, referer, currentActionName, currentControllerName);
                             result.ViewName = currentActionName;
                             result.StatusCode = (int)HttpStatusCode.OK;
                         }
@@ -104,7 +103,7 @@ namespace VitalChoice.Core.GlobalFilters
 				        {
 				            SetDataChangedError(context, result);
 				            var logger = LoggerService.GetDefault();
-				            logger.LogError(context.Exception.Message, context.Exception);
+				            logger.LogError(0, context.Exception, context.Exception.Message);
 				        }
 				        else
 				        {
@@ -112,7 +111,7 @@ namespace VitalChoice.Core.GlobalFilters
 				            result.StatusCode = (int) HttpStatusCode.InternalServerError;
 
 				            var logger = LoggerService.GetDefault();
-				            logger.LogError(context.Exception.Message, context.Exception);
+				            logger.LogError(0, context.Exception, context.Exception.Message);
 				        }
 				    }
 				}
@@ -122,27 +121,28 @@ namespace VitalChoice.Core.GlobalFilters
 
                     if (apiException.Status == HttpStatusCode.NotFound)
 					{
-						context.Result = new HttpNotFoundResult();
-						return;
-					}
+						context.Result = new NotFoundResult();
+                        return TaskCache.CompletedTask;
+                    }
 					if (apiException.Status == HttpStatusCode.Forbidden)
 					{
-						context.Result = new HttpForbiddenResult();
-                        return;
-					}
+						context.Result = new ForbiddenResult();
+                        return TaskCache.CompletedTask;
+                    }
 					var viewName = "Error";
 
 					result.ViewName = viewName;
 					result.StatusCode = (int)apiException.Status;
 
 					var logger = LoggerService.GetDefault();
-                    logger.LogError(context.Exception.Message, context.Exception);
+                    logger.LogError(0, context.Exception, context.Exception.Message);
                 }
 				context.Result = result;
 			}
-		}
+            return TaskCache.CompletedTask;
+        }
 
-        private static async Task<string> GetRefferedAction(ExceptionContext context, string referer, string actionName, string controllerName)
+        private static string GetRefferedAction(ExceptionContext context, string referer, string actionName, string controllerName)
         {
             try
             {
@@ -162,7 +162,7 @@ namespace VitalChoice.Core.GlobalFilters
                         fakeContext.Request.Path = new PathString(uri.AbsolutePath);
                         var routeContext = new RouteContext(fakeContext);
                         var actionSelector = context.HttpContext.RequestServices.GetService<IActionSelector>();
-                        var actionDescriptor = await actionSelector.SelectAsync(routeContext);
+                        var actionDescriptor = actionSelector.Select(routeContext);
                         if (!string.IsNullOrEmpty(actionDescriptor?.Name))
                         {
                             return actionDescriptor.Name;

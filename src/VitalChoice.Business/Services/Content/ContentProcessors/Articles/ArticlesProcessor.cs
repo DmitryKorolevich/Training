@@ -5,7 +5,6 @@ using System.Net;
 using System.Threading.Tasks;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -50,7 +49,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
             filter.Paging.PageIndex = page;
             filter.Paging.PageItemCount = ContentConstants.ARTICLES_LIST_TAKE_COUNT;
             filter.Sorting.Path = ArticleSortPath.PublishedDate;
-            filter.Sorting.SortOrder = SortOrder.Desc;
+            filter.Sorting.SortOrder = FilterSortOrder.Desc;
             var data = await _articleService.GetArticlesAsync(filter);
 
             TtlShortArticleListModel toReturn = new TtlShortArticleListModel()

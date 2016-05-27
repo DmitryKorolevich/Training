@@ -3,37 +3,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Authorization;
-using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services;
-using AuthorizationContext = Microsoft.AspNet.Mvc.Filters.AuthorizationContext;
-using Microsoft.AspNet.Mvc.Filters;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Validation.Models;
 
 namespace VitalChoice.Core.Infrastructure
 {
-	public class CustomerStatusCheckAttribute : AuthorizationFilterAttribute
-	{
-		public override async Task OnAuthorizationAsync(AuthorizationContext context)
+	public class CustomerStatusCheckAttribute : Attribute, IAuthorizationFilter
+    {
+		public void OnAuthorization(AuthorizationFilterContext context)
 		{
 			var authorizationService = context.HttpContext.RequestServices.GetService<IAuthorizationService>();
-
+		    var userManager = context.HttpContext.RequestServices.GetService<ExtendedUserManager>();
 			var claimUser = context.HttpContext.User;
-			var result = await authorizationService.AuthorizeAsync(claimUser, null, IdentityConstants.IdentityBasicProfile);
+			var result = authorizationService.AuthorizeAsync(claimUser, null, IdentityConstants.IdentityBasicProfile).GetAwaiter().GetResult();
 			if (result)
 			{
 				if (claimUser.HasClaim(x=>x.Type == IdentityConstants.CustomerRoleType))
 				{
-                    var sUserId = context.HttpContext.User.GetUserId();
+                    var sUserId = userManager.GetUserId(context.HttpContext.User);
                     int userId;
                     if(Int32.TryParse(sUserId, out userId))
                     {
                         var customerService = context.HttpContext.RequestServices.GetService<ICustomerService>();
-                        var status = await customerService.GetCustomerStatusAsync(userId);
+                        var status = customerService.GetCustomerStatusAsync(userId).GetAwaiter().GetResult();
                         if (status == CustomerStatus.Suspended)
                         {
                             var acceptHeader = context.HttpContext.Request.Headers["Accept"];

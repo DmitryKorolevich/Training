@@ -2,7 +2,8 @@
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using VC.Admin.Models.OrderNote;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
@@ -12,6 +13,7 @@ using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Permissions;
 using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Validation.Models;
 
@@ -21,12 +23,14 @@ namespace VC.Admin.Controllers
     public class OrderNoteController : BaseApiController
     {
 		private readonly IOrderNoteService _orderNoteService;
+	    private readonly ExtendedUserManager _userManager;
 
 
-		public OrderNoteController(IOrderNoteService orderNoteService)
-		{
-			_orderNoteService = orderNoteService;
-		}
+	    public OrderNoteController(IOrderNoteService orderNoteService, ExtendedUserManager userManager)
+	    {
+	        _orderNoteService = orderNoteService;
+	        _userManager = userManager;
+	    }
 
 	    [HttpPost]
 	    public async Task<Result<PagedList<OrderNoteListItemModel>>> GetOrderNotes([FromBody]FilterBase filter)
@@ -48,7 +52,7 @@ namespace VC.Admin.Controllers
 		}
 
 		[HttpPost]
-		public Result<ManageOrderNoteModel> CreateOrderNotePrototype([FromBody] object model)
+		public Result<ManageOrderNoteModel> CreateOrderNotePrototype()
 		{
 			return new ManageOrderNoteModel();
 		}
@@ -69,7 +73,7 @@ namespace VC.Admin.Controllers
 				}).ToList(),
 			};
 
-			await _orderNoteService.AddOrderNoteAsync(orderNote, Convert.ToInt32(HttpContext.User.GetUserId()));
+			await _orderNoteService.AddOrderNoteAsync(orderNote, Convert.ToInt32(_userManager.GetUserId(User)));
 
 			return true;
 		}
@@ -93,7 +97,7 @@ namespace VC.Admin.Controllers
 				IdCustomerType = x
 			}).ToList();
 
-			await _orderNoteService.UpdateOrderNoteAsync(orderNote, Convert.ToInt32(HttpContext.User.GetUserId()));
+			await _orderNoteService.UpdateOrderNoteAsync(orderNote, Convert.ToInt32(_userManager.GetUserId(User)));
 
 			return true;
 		}
@@ -119,7 +123,7 @@ namespace VC.Admin.Controllers
 		[HttpGet]
 	    public async Task<Result<bool>> DeleteOrderNote(int id)
 	    {
-			await _orderNoteService.DeleteOrderNoteAsync(id, Convert.ToInt32(HttpContext.User.GetUserId()));
+			await _orderNoteService.DeleteOrderNoteAsync(id, Convert.ToInt32(_userManager.GetUserId(User)));
 
 			return true;
 	    }

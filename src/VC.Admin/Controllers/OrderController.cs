@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
 using VitalChoice.Validation.Models;
 using System;
+using System.IO;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.DynamicData.Interfaces;
@@ -19,7 +19,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Permissions;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 using System.Linq;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VC.Admin.Models.Orders;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -44,11 +44,11 @@ using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Infrastructure.Domain.Entities.Reports;
-using VitalChoice.Infrastructure.Domain.Transfer.Customers;
-
-namespace VC.Admin.Controllers
+using VitalChoice.Infrastructure.Identity.UserManagers;
+using VitalChoice.Infrastructure.Domain.Transfer.Customers;namespace VC.Admin.Controllers
 {
     public class OrderController : BaseApiController
     {
@@ -57,6 +57,7 @@ namespace VC.Admin.Controllers
         private readonly OrderMapper _mapper;
         private readonly OrderRefundMapper _orderRefundMapper;
         private readonly IDynamicMapper<AddressDynamic, Address> _addressMapper;
+        private readonly ExtendedUserManager _userManager;
         private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _customerPaymentMethodMapper;
         private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _orderPaymentMethodMapper;
 
@@ -78,7 +79,6 @@ namespace VC.Admin.Controllers
         private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
         private readonly IDynamicMapper<OrderDynamic, Order> _orderMapper;
         private readonly IOrderReportService _orderReportService;
-        private readonly IOrderSchedulerService _orderSchedulerService;
 
         public OrderController(
             IOrderService orderService,
@@ -87,19 +87,24 @@ namespace VC.Admin.Controllers
             OrderMapper mapper,
             OrderRefundMapper orderRefundMapper,
             ICustomerService customerService,
-            IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
             ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> ordersRegionStatisticItemCSVExportService,
             ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> ordersZipStatisticItemCSVExportService,
             ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> vOrderWithRegionInfoItemCSVExportService,
             ICsvExportService<OrdersAgentReportExportItem, OrdersAgentReportExportItemCsvMap> ordersAgentReportExportItemCSVExportService,
-            ICsvExportService<WholesaleDropShipReportOrderItem, WholesaleDropShipReportOrderItemCsvMap> wholesaleDropShipReportOrderItemCSVExportService,
-            ICsvExportService<TransactionAndRefundReportItem, TransactionAndRefundReportItemCsvMap> transactionAndRefundReportItemCSVExportService,
+            ICsvExportService<WholesaleDropShipReportOrderItem, WholesaleDropShipReportOrderItemCsvMap>
+                wholesaleDropShipReportOrderItemCSVExportService,
+            ICsvExportService<TransactionAndRefundReportItem, TransactionAndRefundReportItemCsvMap>
+                transactionAndRefundReportItemCSVExportService,
             ICsvExportService<OrdersSummarySalesOrderItem, OrdersSummarySalesOrderItemCsvMap> ordersSummarySalesOrderItemSVExportService,
             INotificationService notificationService,
             BrontoService brontoService,
             IOrderReportService orderReportService,
-            IOrderSchedulerService orderSchedulerService,
-            IObjectHistoryLogService objectHistoryLogService, IOptions<AppOptions> options, IAppInfrastructureService appInfrastructureService, ICountryService countryService, IDynamicMapper<OrderDynamic, Order> orderMapper, IDynamicMapper<ProductDynamic, Product> productMapper, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodMapper, IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> customerPaymentMethodMapper, IDynamicMapper<AddressDynamic, Address> addressMapper1)
+            IObjectHistoryLogService objectHistoryLogService, IAppInfrastructureService appInfrastructureService,
+            ICountryService countryService, IDynamicMapper<OrderDynamic, Order> orderMapper,
+            IDynamicMapper<ProductDynamic, Product> productMapper, IDynamicMapper<SkuDynamic, Sku> skuMapper,
+            IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodMapper,
+            IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> customerPaymentMethodMapper,
+            IDynamicMapper<AddressDynamic, Address> addressMapper, ExtendedUserManager userManager)
         {
             _orderService = orderService;
             _orderRefundService = orderRefundService;
@@ -116,7 +121,6 @@ namespace VC.Admin.Controllers
             _notificationService = notificationService;
             _brontoService = brontoService;
             _orderReportService = orderReportService;
-            _orderSchedulerService = orderSchedulerService;
             _objectHistoryLogService = objectHistoryLogService;
             _appInfrastructureService = appInfrastructureService;
             _countryService = countryService;
@@ -125,9 +129,10 @@ namespace VC.Admin.Controllers
             _skuMapper = skuMapper;
             _orderPaymentMethodMapper = orderPaymentMethodMapper;
             _customerPaymentMethodMapper = customerPaymentMethodMapper;
-            _addressMapper = addressMapper1;
+            _addressMapper = addressMapper;
+            _userManager = userManager;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
-            loggerProvider.CreateLoggerDefault();
+            loggerProvider.CreateLogger<OrderController>();
         }
 
         #region BaseOrderLogic
@@ -147,7 +152,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
-        public async Task<Result<bool>> UpdateOrderStatus(int id, int status, [FromBody] object model, int? orderpart = null)
+        public async Task<Result<bool>> UpdateOrderStatus(int id, int status, int? orderpart = null)
         {
             var order = await _orderService.SelectAsync(id, false);
 
@@ -174,7 +179,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
-        public async Task<Result<bool>> MoveOrder(int id, int idcustomer, [FromBody] object model)
+        public async Task<Result<bool>> MoveOrder(int id, int idcustomer)
         {
             var order = await _orderService.SelectAsync(id, false);
             var customer = await _customerService.SelectAsync(idcustomer, false);
@@ -286,7 +291,7 @@ namespace VC.Admin.Controllers
 
             var order = await _mapper.FromModelAsync(model);
 
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(Request.HttpContext.User);
             int userId;
             if (int.TryParse(sUserId, out userId))
             {
@@ -353,7 +358,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
-        public async Task<Result<bool>> CancelOrder(int id, [FromBody] object model)
+        public async Task<Result<bool>> CancelOrder(int id)
         {
             return await _orderService.CancelOrderAsync(id);
         }
@@ -375,7 +380,7 @@ namespace VC.Admin.Controllers
             var infr = _appInfrastructureService.Data();
             var countries = await _countryService.GetCountriesAsync();
 
-            filter.Sorting.SortOrder = VitalChoice.Infrastructure.Domain.Transfer.SortOrder.Desc;
+            filter.Sorting.SortOrder = VitalChoice.Infrastructure.Domain.Transfer.FilterSortOrder.Desc;
             filter.Sorting.Path = VOrderSortPath.DateCreated;
             filter.OrderType = OrderType.AutoShip;
 
@@ -539,7 +544,7 @@ namespace VC.Admin.Controllers
 
             var order = await _mapper.FromModelAsync(model);
 
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(Request.HttpContext.User);
             int userId;
             if (int.TryParse(sUserId, out userId))
             {
@@ -677,7 +682,7 @@ namespace VC.Admin.Controllers
 
             var order = await _orderRefundMapper.FromModelAsync(model);
 
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(Request.HttpContext.User);
             int userId;
             if (int.TryParse(sUserId, out userId))
             {
@@ -702,7 +707,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
-        public async Task<Result<bool>> CancelRefundOrder(int id, [FromBody] object model)
+        public async Task<Result<bool>> CancelRefundOrder(int id)
         {
             return await _orderRefundService.CancelRefundOrderAsync(id);
         }
@@ -1154,8 +1159,7 @@ namespace VC.Admin.Controllers
         #region ImportOrders
 
         [HttpPost]
-        [AdminAuthorize(PermissionType.Customers)]
-        [AdminAuthorize(PermissionType.Orders)]
+        [AdminAuthorize(PermissionType.Customers, PermissionType.Orders)]
         public async Task<Result<bool>> ImportOrders()
         {
             var form = await Request.ReadFormAsync();
@@ -1171,7 +1175,7 @@ namespace VC.Admin.Controllers
             {
                 var fileContent = stream.ReadFully();
 
-                var sUserId = Request.HttpContext.User.GetUserId();
+                var sUserId = _userManager.GetUserId(Request.HttpContext.User);
                 int userId;
                 var toReturn = false;
                 if (int.TryParse(sUserId, out userId))

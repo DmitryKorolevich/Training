@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using VitalChoice.Business.Queries.User;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
@@ -15,7 +15,6 @@ using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Business.Queries.Help;
 using VitalChoice.Business.Mail;
 using VitalChoice.Infrastructure.Azure;
-using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Business.Queries.Users;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Mail;
@@ -73,7 +72,7 @@ namespace VitalChoice.Business.Services.HelpService
             _infrastructureTransactionAccessor = infrastructureTransactionAccessor;
             _bugTicketFilesContainerName = appOptions.Value.AzureStorage.BugTicketFilesContainerName;
             _bugTicketCommentFilesContainerName = appOptions.Value.AzureStorage.BugTicketCommentFilesContainerName;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<HelpService>();
         }
 
         #region HelpTickets
@@ -92,56 +91,56 @@ namespace VitalChoice.Business.Services.HelpService
                 case VHelpTicketSortPath.Id:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Id)
                                 : x.OrderByDescending(y => y.Id);
                     break;
                 case VHelpTicketSortPath.IdOrder:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.IdOrder)
                                 : x.OrderByDescending(y => y.IdOrder);
                     break;
                 case VHelpTicketSortPath.Priority:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Priority)
                                 : x.OrderByDescending(y => y.Priority);
                     break;
                 case VHelpTicketSortPath.Summary:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Summary)
                                 : x.OrderByDescending(y => y.Summary);
                     break;
                 case VHelpTicketSortPath.DateCreated:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.DateCreated)
                                 : x.OrderByDescending(y => y.DateCreated);
                     break;
                 case VHelpTicketSortPath.DateEdited:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.DateEdited)
                                 : x.OrderByDescending(y => y.DateEdited);
                     break;
                 case VHelpTicketSortPath.Customer:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Customer)
                                 : x.OrderByDescending(y => y.Customer);
                     break;
                 case VHelpTicketSortPath.StatusCode:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.StatusCode)
                                 : x.OrderByDescending(y => y.StatusCode);
                     break;
@@ -419,49 +418,49 @@ namespace VitalChoice.Business.Services.HelpService
                 case BugTicketSortPath.Id:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Id)
                                 : x.OrderByDescending(y => y.Id);
                     break;
                 case BugTicketSortPath.Priority:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Priority)
                                 : x.OrderByDescending(y => y.Priority);
                     break;
                 case BugTicketSortPath.Summary:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Summary)
                                 : x.OrderByDescending(y => y.Summary);
                     break;
                 case BugTicketSortPath.DateCreated:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.DateCreated)
                                 : x.OrderByDescending(y => y.DateCreated);
                     break;
                 case BugTicketSortPath.DateEdited:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.DateEdited)
                                 : x.OrderByDescending(y => y.DateEdited);
                     break;
                 case BugTicketSortPath.IdAddedBy:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.AddedByUser.FirstName).ThenBy(y => y.AddedByUser.LastName)
                                 : x.OrderByDescending(y => y.AddedByUser.FirstName).ThenByDescending(y => y.AddedByUser.LastName);
                     break;
                 case BugTicketSortPath.StatusCode:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.StatusCode)
                                 : x.OrderByDescending(y => y.StatusCode);
                     break;

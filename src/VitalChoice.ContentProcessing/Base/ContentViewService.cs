@@ -9,7 +9,6 @@ using VitalChoice.ContentProcessing.Interfaces;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Claims;
-using Microsoft.AspNet.Mvc;
 using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
@@ -18,7 +17,8 @@ using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Constants;
-using Microsoft.AspNet.Http.Extensions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.ContentProcessing.Base
@@ -49,7 +49,7 @@ namespace VitalChoice.ContentProcessing.Base
         public virtual string ViewContextName => "ViewContext";
         public virtual string DefaultModelName => "Model";
 
-        public async Task<ContentViewModel> GetContentAsync(ActionContext context, ActionBindingContext bindingContext, ClaimsPrincipal user,
+        public async Task<ContentViewModel> GetContentAsync(ControllerContext context, ClaimsPrincipal user,
             object additionalParameters)
         {
             IDictionary<string, object> parameters = null;
@@ -58,7 +58,7 @@ namespace VitalChoice.ContentProcessing.Base
                 var mapper = _mapperFactory.CreateMapper(additionalParameters.GetType());
                 parameters = mapper.ToDictionary(additionalParameters);
             }
-            var viewContext = await GetData(GetParameters(context, bindingContext, parameters), user, context);
+            var viewContext = await GetData(GetParameters(context, parameters), user, context);
             var contentEntity = viewContext.Entity;
 	        if (contentEntity == null)
 	        {
@@ -82,7 +82,7 @@ namespace VitalChoice.ContentProcessing.Base
             }
             catch (Exception e)
             {
-                Logger.LogError(e.Message, e);
+                Logger.LogError(0, e, e.Message);
                 return new ContentViewModel
                 {
                     Body = (e as TemplateCompileException)?.ToString()
@@ -168,15 +168,14 @@ namespace VitalChoice.ContentProcessing.Base
             };
         }
 
-        protected virtual IDictionary<string, object> GetParameters(ActionContext context, ActionBindingContext bindingContext,
-            IDictionary<string, object> parameters = null)
+        protected virtual IDictionary<string, object> GetParameters(ControllerContext context, IDictionary<string, object> parameters = null)
         {
             if (parameters == null)
                 parameters = new Dictionary<string, object>();
             foreach (var actionParam in context.ActionDescriptor.Parameters)
             {
-                var values = bindingContext.ValueProvider.GetValue(actionParam.Name).Values;
-                foreach (var stringValue in values)
+                var values = context.ValueProviders.SelectMany(p => p.GetValue(actionParam.Name).Values);
+                foreach (var stringValue in values.Where(v => v != null))
                 {
                     parameters.Add(actionParam.Name, stringValue);
                 }

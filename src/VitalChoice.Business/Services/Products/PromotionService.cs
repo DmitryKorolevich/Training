@@ -132,7 +132,7 @@ namespace VitalChoice.Business.Services.Products
         {
             var conditions = new PromotionQuery().NotDeleted().WithValidFrom(filter.ValidFrom).WithValidTo(filter.ValidTo).
                 WithDateStatus(filter.DateStatus).WithDescription(filter.SearchText).WithStatus(filter.Status)
-                .WithAssigned(filter.Assigned);
+                .WithAssigned(filter.SearchByAssigned, filter.Assigned);
             var query = _promotionRepository.Query(conditions);
 
             Func<IQueryable<Promotion>, IOrderedQueryable<Promotion>> sortable = x => x.OrderByDescending(y => y.DateCreated);
@@ -142,42 +142,42 @@ namespace VitalChoice.Business.Services.Products
                 case PromotionSortPath.Description:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Description)
                                 : x.OrderByDescending(y => y.Description);
                     break;
                 case PromotionSortPath.IdObjectType:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.IdObjectType)
                                 : x.OrderByDescending(y => y.IdObjectType);
                     break;
                 case PromotionSortPath.Assigned:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Assigned)
                                 : x.OrderByDescending(y => y.Assigned);
                     break;
                 case PromotionSortPath.StartDate:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.StartDate)
                                 : x.OrderByDescending(y => y.StartDate);
                     break;
                 case PromotionSortPath.ExpirationDate:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.ExpirationDate)
                                 : x.OrderByDescending(y => y.ExpirationDate);
                     break;
                 case PromotionSortPath.DateCreated:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.DateCreated)
                                 : x.OrderByDescending(y => y.DateCreated);
                     break;

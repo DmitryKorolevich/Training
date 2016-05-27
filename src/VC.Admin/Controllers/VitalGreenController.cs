@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Validation.Models;
 using VitalChoice.Core.Base;
@@ -31,7 +31,7 @@ namespace VC.Admin.Controllers
         {
             _vitalGreenService = vitalGreenService;
             _csvExportVitalGreenRequestService = csvExportVitalGreenRequestService;
-            this._logger = loggerProvider.CreateLoggerDefault();
+            this._logger = loggerProvider.CreateLogger<VitalGreenController>();
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
 

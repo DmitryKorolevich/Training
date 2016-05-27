@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
@@ -25,14 +26,14 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Discounts
                         $"Products Subtotal Threshold {dataContext.Order.Discount.Data.Threshold:C} not reached",
                     Field = "DiscountCode"
                 });
-                return Task.FromResult((decimal)0);
+                return TaskCache<decimal>.DefaultCompletedTask;
             }
             dataContext.DiscountMessage = dataContext.Order.Discount.GetDiscountMessage();
             var item = (SkuOrdered) dataContext.Order.Discount.Data.ThresholdSku;
             item.Quantity = 1;
             item.Amount = 0;
             dataContext.PromoSkus.Add(new PromoOrdered(item, null, true));
-            return Task.FromResult((decimal)0);
+            return TaskCache<decimal>.DefaultCompletedTask;
         }
     }
 }

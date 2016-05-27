@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Identity;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 
 namespace VitalChoice.Infrastructure.Identity.Validators

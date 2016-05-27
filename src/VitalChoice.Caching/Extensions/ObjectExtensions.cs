@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.ObjectMapping.Base;
 using VitalChoice.ObjectMapping.Extensions;
 
 namespace VitalChoice.Caching.Extensions
@@ -14,30 +15,40 @@ namespace VitalChoice.Caching.Extensions
         public static object DeepCloneCreateList(this IEnumerable<object> entities, RelationInfo relations)
         {
             return
-                typeof (HashSet<>).CreateGenericCollection(relations.RelationType, entities.Select(item => DeepCloneItem(item, relations)))
+                typeof(HashSet<>).CreateGenericCollection(relations.RelationType, entities.Select(item => DeepCloneItem(item, relations)))
                     .CollectionObject;
         }
 
         public static object DeepCloneItem(this object oldItem, RelationInfo relations)
         {
-            var newItem = oldItem.Clone(relations.RelationType, type => !type.GetTypeInfo().IsValueType && type != typeof (string));
-            oldItem.CloneRelations(relations, newItem);
+            var newItem = oldItem.Clone(relations.RelationType, relations.HasRelation);
+            oldItem.UpdateCloneRelations(relations.Relations, newItem);
             return newItem;
         }
 
-        public static void CloneRelations(this object oldItem, RelationInfo relations, object newItem)
+        public static void UpdateCloneRelations<T>(this T relationsSrc, IEnumerable<RelationInfo> relations, T dest)
         {
-            foreach (var relation in relations.Relations)
+            foreach (var relation in relations)
             {
-                var value = relation.GetRelatedObject(oldItem);
+                var value = relation.GetRelatedObject(relationsSrc);
                 if (value != null)
                 {
-                    var replacementValue = value.GetType().IsImplementGeneric(typeof (ICollection<>))
+                    var replacementValue = value.GetType().IsImplementGeneric(typeof(ICollection<>))
                         ? DeepCloneCreateList((IEnumerable<object>) value, relation)
                         : DeepCloneItem(value, relation);
-                    relation.SetRelatedObject(newItem, replacementValue);
+                    relation.SetRelatedObject(dest, replacementValue);
                 }
             }
+        }
+
+        public static void UpdateNonRelatedObjects<T>(this T dataSrc, Func<string, bool> skipCondition, T dest)
+        {
+            TypeConverter.CopyInto(dest, dataSrc, typeof(T), skipCondition);
+        }
+
+        public static void UpdateNonRelatedObjects<T>(this T dataSrc, T dest)
+        {
+            TypeConverter.CopyInto(dest, dataSrc, typeof(T), type => !type.GetTypeInfo().IsValueType && type != typeof(string));
         }
     }
 }

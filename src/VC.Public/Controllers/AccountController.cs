@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
 using VC.Public.Models.Auth;
 using VitalChoice.Core.Base;
 using VitalChoice.DynamicData.Interfaces;
@@ -12,7 +10,9 @@ using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Interfaces.Services.Affiliates;
-using Microsoft.AspNet.Authorization;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using VitalChoice.Business.Mail;
 using VitalChoice.Core.Services;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
@@ -23,6 +23,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Validation.Models;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Orders;
 
 namespace VC.Public.Controllers
@@ -37,9 +38,10 @@ namespace VC.Public.Controllers
 		private readonly IDynamicMapper<CustomerDynamic, Customer> _customerMapper;
         private readonly INotificationService _notificationService;
         private readonly IOrderSchedulerService _orderSchedulerService;
+	    private readonly ExtendedUserManager _userManager;
 
 
-        public AccountController(
+	    public AccountController(
             IStorefrontUserService userService,
             IDynamicMapper<CustomerDynamic, Customer> customerMapper, 
             ICustomerService customerService,
@@ -47,7 +49,7 @@ namespace VC.Public.Controllers
             IPaymentMethodService paymentMethodService,
             INotificationService notificationService,
             IOrderSchedulerService orderSchedulerService,
-            IPageResultService pageResultService) : base(pageResultService)
+            IPageResultService pageResultService, ExtendedUserManager userManager) : base(pageResultService)
 		{
 			_userService = userService;
 			_customerMapper = customerMapper;
@@ -56,7 +58,7 @@ namespace VC.Public.Controllers
             _paymentMethodService = paymentMethodService;
             _notificationService = notificationService;
             _orderSchedulerService = orderSchedulerService;
-
+	        _userManager = userManager;
 		}
 
         [HttpGet]
@@ -132,7 +134,7 @@ namespace VC.Public.Controllers
 
 			if (context.User.Identity.IsAuthenticated)
 			{
-				var user = await _userService.FindAsync(context.User.GetUserName());
+				var user = await _userService.FindAsync(_userManager.GetUserName(context.User));
 				if (user == null)
 				{
                     throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser])

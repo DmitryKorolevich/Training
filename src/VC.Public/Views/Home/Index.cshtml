@@ -10,9 +10,9 @@
 
 <div class="slider-wrapper theme-default">
 	<div id="slider" class="nivoSlider">
-		@await Component.InvokeAsync("Area", "Home Banner Carousel")
+		@await Component.InvokeAsync("Area", new { name = "Home Banner Carousel" })
 	</div>
 	<div class="home-content">
-		@await Component.InvokeAsync("Area", "Home Bottom Banners")
+		@await Component.InvokeAsync("Area", new { name = "Home Bottom Banners" })
 	</div>
 </div>

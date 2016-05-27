@@ -1,11 +1,12 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using System.Collections.Generic;
 using VitalChoice.Infrastructure.Domain.Constants;
 using System;
 using System.Linq;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 #if NET451
 using System.Net.Mail;
 #endif
@@ -14,7 +15,7 @@ namespace VitalChoice.Infrastructure.Identity.Validators
 {
     public class AffiliateUserValidator : UserValidator<ApplicationUser>
     {
-        private IdentityOptions _options;
+        private readonly IdentityOptions _options;
 
         public AffiliateUserValidator(IOptions<IdentityOptions> optionsAccessor, IdentityErrorDescriber errors = null)
             : base(errors ?? new IdentityErrorDescriber())

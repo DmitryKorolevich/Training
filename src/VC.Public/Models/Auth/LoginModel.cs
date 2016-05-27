@@ -16,7 +16,7 @@ namespace VC.Public.Models.Auth
 		public string Email { get; set; }
 
 		[Required]
-        [AllowXSS]
+        [AllowXss]
         public string Password { get; set; }
 	}
 }

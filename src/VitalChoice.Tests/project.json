@@ -1,14 +1,12 @@
-﻿{
+{
   "version": "1.0.0-*",
   "description": "VitalChoice.Tests Class Library",
   "authors": [ "multi_000" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
+  "testRunner": "xunit",
   "dependencies": {
     "xunit": "2.1.0",
-    "xunit.runner.dnx": "2.1.0-rc1-*",
-    "Autofac": "4.0.0-rc1-177",
+    "dotnet-test-xunit": "1.0.0-rc2-*",
+    "Autofac": "4.0.0-fixed-*",
     "VitalChoice.Business": "1.0.0-*",
     "VitalChoice.Core": "1.0.0-*",
     "VitalChoice.Interfaces": "1.0.0-*"
@@ -19,7 +17,11 @@
   },
 
   "frameworks": {
-    "dnx451": {
+    "net451": {
+      "frameworkAssemblies": {
+        "System.Collections": "",
+        "Microsoft.CSharp": ""
+      }
     }
   }
 }

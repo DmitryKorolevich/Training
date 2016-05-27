@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VC.Admin.Models.Products;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Promotions;
@@ -48,7 +49,7 @@ namespace VC.Admin.ModelConverters
                     });
                 }
             }
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
         public override Task ModelToDynamicAsync(PromotionManageModel model, PromotionDynamic dynamic)
@@ -85,7 +86,7 @@ namespace VC.Admin.ModelConverters
                     });
                 }
             }
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
     }
 }

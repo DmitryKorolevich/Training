@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Interfaces.Services;
@@ -16,9 +17,9 @@ namespace VitalChoice.Business.Workflow.Orders.ActionResolvers
         public override Task<int> GetActionKeyAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
             if (dataContext.FreeShipping)
-                return Task.FromResult(0);
+                return TaskCache<int>.DefaultCompletedTask;
             if (dataContext.Order.ShippingAddress == null)
-                return Task.FromResult(0);
+                return TaskCache<int>.DefaultCompletedTask;
             var countryNameCode = executionContext.Resolve<ICountryNameCodeResolver>();
             if (dataContext.Order.Customer.IdObjectType == (int) CustomerType.Wholesale)
             {
@@ -36,7 +37,7 @@ namespace VitalChoice.Business.Workflow.Orders.ActionResolvers
                 }
             }
 
-            return Task.FromResult(0);
+            return TaskCache<int>.DefaultCompletedTask;
         }
     }
 }

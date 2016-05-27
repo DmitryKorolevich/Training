@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.Extensions.Logging;
 using Templates;
 using Templates.Data;
@@ -81,7 +82,7 @@ namespace VitalChoice.ContentProcessing.Cache
         public Task RemoveFromCache(int idMaster, int idContent)
         {
             RemoveFromCacheNoBroadCast(idMaster, idContent);
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
         public ITtlTemplate GetOrCreateTemplate(TemplateCacheParam cacheParams)

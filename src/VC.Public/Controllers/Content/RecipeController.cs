@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using VC.Public.Models;
 using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Content.Base;
@@ -34,7 +34,7 @@ namespace VC.Public.Controllers.Content
         [HttpGet]
         public async Task<IActionResult> Categories()
         {
-            var toReturn = await _recipeCategoryViewService.GetContentAsync(ActionContext, BindingContext, User);
+            var toReturn = await _recipeCategoryViewService.GetContentAsync(ControllerContext, User);
             if (toReturn?.Body != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
@@ -45,7 +45,7 @@ namespace VC.Public.Controllers.Content
         [HttpGet]
         public async Task<IActionResult> Category(string url)
         {
-            var toReturn = await _recipeCategoryViewService.GetContentAsync(ActionContext, BindingContext, User);
+            var toReturn = await _recipeCategoryViewService.GetContentAsync(ControllerContext, User);
             if (toReturn?.Body != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
@@ -72,7 +72,7 @@ namespace VC.Public.Controllers.Content
         [HttpGet]
         public async Task<IActionResult> Recipe(string url)
         {
-            var toReturn = await _recipeViewService.GetContentAsync(ActionContext, BindingContext, User);
+            var toReturn = await _recipeViewService.GetContentAsync(ControllerContext, User);
             if (toReturn?.Body != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));

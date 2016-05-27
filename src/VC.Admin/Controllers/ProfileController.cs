@@ -1,14 +1,15 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Validation.Models;
 using System.Security.Claims;
-using Microsoft.AspNet.Http;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using VC.Admin.Models.Profile;
 using VC.Admin.Validators.Profile;
 using VitalChoice.Core.Base;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Attributes;
 
@@ -18,11 +19,13 @@ namespace VC.Admin.Controllers
     public class ProfileController : BaseApiController
     {
 	    private readonly IAdminUserService userService;
+	    private readonly ExtendedUserManager _userManager;
 
-		public ProfileController(IAdminUserService userService)
+	    public ProfileController(IAdminUserService userService, ExtendedUserManager userManager)
 	    {
-		    this.userService = userService;
-        }
+	        this.userService = userService;
+	        _userManager = userManager;
+	    }
 
 	    [HttpPost]
 		[ControlMode(UpdateProfileMode.Default, typeof(UpdateProfileSettings))]
@@ -43,7 +46,7 @@ namespace VC.Admin.Controllers
 		        if (!Validate(profileModel, settings))
 					return null;
 
-				var user = await userService.FindAsync(context.User.GetUserName());
+				var user = await userService.FindAsync(_userManager.GetUserName(context.User));
 				if (user == null)
 				{
 					throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
@@ -83,7 +86,7 @@ namespace VC.Admin.Controllers
 
 			if (context.User.Identity.IsAuthenticated)
 			{
-				var user = await userService.FindAsync(context.User.GetUserName());
+				var user = await userService.FindAsync(_userManager.GetUserName(context.User));
 				if (user == null)
 				{
 					throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);

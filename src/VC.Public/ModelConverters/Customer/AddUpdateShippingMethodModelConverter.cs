@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VC.Public.Models.Checkout;
 using VC.Public.Models.Profile;
 using VitalChoice.Business.Helpers;
@@ -12,14 +13,14 @@ namespace VC.Public.ModelConverters.Customer
 	{
 		public override Task DynamicToModelAsync(AddUpdateShippingMethodModel model, AddressDynamic dynamic)
 		{
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
 		public override Task ModelToDynamicAsync(AddUpdateShippingMethodModel model, AddressDynamic dynamic)
 		{
             dynamic.Data.Phone = model.Phone?.ClearPhone();
             dynamic.Data.Fax = model.Fax?.ClearPhone();
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 	}
 }

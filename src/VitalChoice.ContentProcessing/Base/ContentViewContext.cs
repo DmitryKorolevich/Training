@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Security.Claims;
-using Microsoft.AspNet.Mvc;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Content.Base;
-using Microsoft.AspNet.Http.Extensions;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Templates.Strings;
 
 namespace VitalChoice.ContentProcessing.Base

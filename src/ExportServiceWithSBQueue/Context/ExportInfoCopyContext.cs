@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Data.Entity;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace ExportServiceWithSBQueue.Context
 {
     public class ExportInfoCopyContext : ExportInfoContext
     {
-        public ExportInfoCopyContext(IOptions<ExportOptions> options) : base(options)
+        public ExportInfoCopyContext(IOptions<ExportOptions> options, DbContextOptions<ExportInfoContext> contextOptions) : base(options, contextOptions)
         {
         }
 

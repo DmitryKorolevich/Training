@@ -7,8 +7,8 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>79bdb4cd-1526-48f9-9964-dc433ad6548c</ProjectGuid>
     <RootNamespace>VitalChoice.Business</RootNamespace>
-    <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">..\artifacts\obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
-    <OutputPath Condition="'$(OutputPath)'=='' ">..\artifacts\bin\$(MSBuildProjectName)\</OutputPath>
+    <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">..\..\artifacts\obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
+    <OutputPath Condition="'$(OutputPath)'=='' ">..\..\artifacts\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <AssemblyName>VitalChoice.Business</AssemblyName>
@@ -38,6 +38,6 @@
       <UserProperties />
     </VisualStudio>
   </ProjectExtensions>
-  <Import Project="$(VSToolsPath)\DNX\Microsoft.DNX.Props" />
-  <Import Project="$(VSToolsPath)\DNX\Microsoft.DNX.targets" />
+  <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.Props" />
+  <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.targets" />
 </Project>

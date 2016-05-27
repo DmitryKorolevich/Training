@@ -1,5 +1,5 @@
-﻿using System;
-using Microsoft.Data.Entity;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +11,7 @@ using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities;
@@ -24,7 +25,7 @@ namespace VitalChoice.Business.Repositories
     {
         private readonly OrderMapper _orderMapper;
 
-        public OrderRepository(IDataContextAsync context, OrderMapper orderMapper) : base(context)
+        public OrderRepository(EcommerceContext context, OrderMapper orderMapper) : base(context)
         {
             _orderMapper = orderMapper;
         }

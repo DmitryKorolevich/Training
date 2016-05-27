@@ -29,7 +29,7 @@ namespace VitalChoice.Business.Services.Settings
         {
             _objectHistoryLogItemRepository = objectHistoryLogItemRepository;
             _adminProfileRepository = adminProfileRepository;
-            logger = loggerProvider.CreateLoggerDefault();
+            logger = loggerProvider.CreateLogger<ObjectHistoryLogService>();
         }
 
         public async Task<PagedList<ObjectHistoryLogItem>> GetObjectHistoryLogItems(ObjectHistoryLogItemsFilter filter)

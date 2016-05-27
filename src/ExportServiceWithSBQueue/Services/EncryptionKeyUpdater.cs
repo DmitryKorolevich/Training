@@ -8,8 +8,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExportServiceWithSBQueue.Context;
 using ExportServiceWithSBQueue.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
@@ -24,15 +25,17 @@ namespace ExportServiceWithSBQueue.Services
         private readonly IObjectEncryptionHost _encryptionHost;
         private readonly ILogger _logger;
         private readonly IOptions<ExportOptions> _options;
+        private readonly DbContextOptions<ExportInfoContext> _contextOptions;
         private bool _terminated;
         private readonly ManualResetEvent _terminateReadyEvent;
         private readonly string _keyFilePath;
 
-        public EncryptionKeyUpdater(IObjectEncryptionHost encryptionHost, ILogger logger, IOptions<ExportOptions> options)
+        public EncryptionKeyUpdater(IObjectEncryptionHost encryptionHost, ILogger logger, IOptions<ExportOptions> options, DbContextOptions<ExportInfoContext> contextOptions)
         {
             _encryptionHost = encryptionHost;
             _logger = logger;
             _options = options;
+            _contextOptions = contextOptions;
             _keyFilePath = options.Value.LocalEncryptionKeyPath;
             _terminateReadyEvent = new ManualResetEvent(true);
             if (!string.IsNullOrWhiteSpace(_keyFilePath))
@@ -115,7 +118,7 @@ namespace ExportServiceWithSBQueue.Services
 
         private void ReCryptDatabaseCopy(Aes newAes, int batchSize)
         {
-            using (ExportInfoCopyContext copyContext = new ExportInfoCopyContext(_options))
+            using (ExportInfoCopyContext copyContext = new ExportInfoCopyContext(_options, _contextOptions))
             {
                 var localAes = Aes.Create();
                 var localKey = _encryptionHost.GetLocalKey();

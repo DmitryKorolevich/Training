@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Authorization;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
 using VitalChoice.Core.Base;
 using VitalChoice.Interfaces.Services.Users;
 using VC.Public.Models;
 using VitalChoice.Interfaces.Services.Settings;
-using Microsoft.AspNet.Mvc.Rendering;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Interfaces.Services;
@@ -23,22 +19,20 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Core.Infrastructure.Helpers.ReCaptcha;
 using System.Collections.Generic;
-using Microsoft.Extensions.OptionsModel;
+using System.IO;
+using Microsoft.Extensions.Options;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Business.Mail;
 using VitalChoice.Ecommerce.Domain.Mail;
-using System.IO;
-using Microsoft.AspNet.Mvc.ViewEngines;
-using Microsoft.AspNet.Mvc.ViewFeatures;
-using Microsoft.AspNet.Mvc.ModelBinding;
-using Microsoft.AspNet.Routing;
-using Microsoft.AspNet.Mvc.Abstractions;
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using VitalChoice.Business.Models.Help;
 using VitalChoice.Business.Services.Bronto;
 using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Mail;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Validation.Models;
 
@@ -80,7 +74,7 @@ namespace VC.Public.Controllers
             _notificationService = notificationService;
             _productService = productService;
             _brontoService = brontoService;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<HelpController>();
         }
 
         [HttpGet]

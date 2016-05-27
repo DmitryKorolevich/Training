@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VC.Public.Models.Profile;
 using VitalChoice.Business.Helpers;
 using VitalChoice.DynamicData.Base;
@@ -17,7 +18,7 @@ namespace VC.Public.ModelConverters.Customer
 				model.ExpirationDateMonth = exp.Month;
 				model.ExpirationDateYear = exp.Year % 2000;
 			}
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
 		public override Task ModelToDynamicAsync(BillingInfoModel model, CustomerPaymentMethodDynamic dynamic)
@@ -30,7 +31,7 @@ namespace VC.Public.ModelConverters.Customer
 				DateTime exp = new DateTime(model.ExpirationDateYear.Value + 2000, model.ExpirationDateMonth.Value, 1);
 				dynamic.Data.ExpDate = exp;
 			}
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 	}
 }

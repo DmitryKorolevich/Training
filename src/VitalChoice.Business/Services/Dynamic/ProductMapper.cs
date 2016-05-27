@@ -21,7 +21,6 @@ namespace VitalChoice.Business.Services.Dynamic
     public class ProductMapper : DynamicMapper<ProductDynamic, Product, ProductOptionType, ProductOptionValue>
     {
         private readonly SkuMapper _skuMapper;
-        private readonly ILogger _logger;
 
         public ProductMapper(ITypeConverter converter,
             IModelConverterService converterService,
@@ -29,7 +28,6 @@ namespace VitalChoice.Business.Services.Dynamic
             : base(converter, converterService, productRepositoryAsync)
         {
             _skuMapper = skuMapper;
-            _logger = loggerProvider.CreateLoggerDefault();
         }
 
         protected override async Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<ProductDynamic, Product>> items,

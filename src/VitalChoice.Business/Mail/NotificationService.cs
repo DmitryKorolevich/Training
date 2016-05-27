@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Extensions.OptionsModel;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Constants;

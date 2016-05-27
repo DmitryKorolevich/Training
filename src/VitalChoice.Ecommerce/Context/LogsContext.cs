@@ -1,6 +1,6 @@
 ﻿using System.Data.SqlClient;
-using Microsoft.Data.Entity;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using VitalChoice.Data.Context;
 using VitalChoice.Ecommerce.Domain.Entities.Logs;
 using VitalChoice.Ecommerce.Domain.Options;
@@ -11,7 +11,7 @@ namespace VitalChoice.Ecommerce.Context
     {
         protected readonly IOptions<AppOptionsBase> Options;
 
-        public LogsContext(IOptions<AppOptionsBase> options)
+        public LogsContext(IOptions<AppOptionsBase> options, DbContextOptions<LogsContext> contextOptions) : base(contextOptions)
         {
             Options = options;
         }

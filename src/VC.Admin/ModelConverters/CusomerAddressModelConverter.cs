@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VC.Admin.Models.Customer;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
@@ -21,7 +22,7 @@ namespace VC.Admin.ModelConverters
             {
                 model.ShippingAddressType = ShippingAddressType.Residential;
             }
-	        return Task.Delay(0);
+	        return TaskCache.CompletedTask;
 	    }
 
 	    public override Task ModelToDynamicAsync(AddressModel model, AddressDynamic dynamic)
@@ -31,7 +32,7 @@ namespace VC.Admin.ModelConverters
 	        {
 	            dynamic.IdState = null;
 	        }
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 	}
 }

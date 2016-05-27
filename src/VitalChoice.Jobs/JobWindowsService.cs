@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.ServiceProcess;
 using System.Threading.Tasks;
 using Autofac;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.PlatformAbstractions;
 using Quartz;
 using VitalChoice.Infrastructure.Domain.Options;
@@ -23,21 +25,20 @@ namespace VitalChoice.Jobs
         }
 
 		private ILogger _logger;
-		private readonly IContainer _container;
+		private readonly IServiceProvider _container;
 	    private IScheduler _scheduler;
 
-        public JobWindowsService(IApplicationEnvironment env)
+        public JobWindowsService()
 		{
             try
             {
-                var configurationBuilder = new ConfigurationBuilder()
-                    .AddJsonFile("config.json")
-                    .AddJsonFile("config.local.json", true);
+                var host = new WebHostBuilder()
+                .UseContentRoot(Directory.GetCurrentDirectory())
+                .UseStartup<Startup>()
+                .Build();
 
-                var configuration = configurationBuilder.Build();
-
-                _container = new JobsDependencyConfig().RegisterInfrastructure(configuration, new ServiceCollection(),
-                    typeof(JobsDependencyConfig).Assembly, env, enableCache: true);
+                host.Run();
+                _container = host.Services;
             }
             catch (Exception e)
             {
@@ -52,11 +53,11 @@ namespace VitalChoice.Jobs
 	        base.OnStart(args);
 	        RequestAdditionalTime(30000);
 	        Trace.WriteLine("Jobs service started initialization");
-            _logger = _container.Resolve<ILogger>();
+            _logger = _container.GetRequiredService<ILogger>();
             _logger.LogWarning("Scheduler start");
-            var conf = _container.Resolve<IOptions<AppOptions>>().Value;
-            _scheduler = _container.Resolve<IScheduler>();
-            var jobImpls = _container.Resolve<IEnumerable<IJob>>();
+            var conf = _container.GetRequiredService<IOptions<AppOptions>>().Value;
+            _scheduler = _container.GetRequiredService<IScheduler>();
+            var jobImpls = _container.GetRequiredService<IEnumerable<IJob>>();
             foreach (var impl in jobImpls)
             {
                 var type = impl.GetType();
@@ -82,7 +83,6 @@ namespace VitalChoice.Jobs
             var task = Task.Factory.StartNew(() =>
             {
                 _scheduler.Shutdown(true);
-                _container.Dispose();
                 Trace.WriteLine("Jobs service stopped");
             });
             RequestAdditionalTime(timeout);

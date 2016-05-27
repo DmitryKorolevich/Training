@@ -14,6 +14,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Products
 
         public DateStatus? DateStatus { get; set; }
 
+        public bool SearchByAssigned { get; set; }
+
         public CustomerType? Assigned { get; set; }
     }
 }

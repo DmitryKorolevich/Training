@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using VC.Public.Models.Profile;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Users;
 
 namespace VC.Public.Components.Profile
@@ -13,15 +15,19 @@ namespace VC.Public.Components.Profile
 	public class SidebarViewComponent : ViewComponent
 	{
 		private readonly IStorefrontUserService _storefrontUserService;
+	    private readonly ExtendedUserManager _userManager;
+	    private readonly IActionContextAccessor _actionContextAccessor;
 
-		public SidebarViewComponent(IStorefrontUserService storefrontUserService)
-		{
-			_storefrontUserService = storefrontUserService;
-		}
+	    public SidebarViewComponent(IStorefrontUserService storefrontUserService, ExtendedUserManager userManager, IActionContextAccessor actionContextAccessor)
+	    {
+	        _storefrontUserService = storefrontUserService;
+	        _userManager = userManager;
+	        _actionContextAccessor = actionContextAccessor;
+	    }
 
-		public async Task<IViewComponentResult> InvokeAsync()
+	    public async Task<IViewComponentResult> InvokeAsync()
 		{
-			var userId = Convert.ToInt32(HttpContext.User.GetUserId());
+			var userId = Convert.ToInt32(_userManager.GetUserId(_actionContextAccessor.ActionContext.HttpContext.User));
 
 			var user = await _storefrontUserService.GetAsync(userId);
 		    if (user != null && user.IsConfirmed && user.Status == UserStatus.Active)

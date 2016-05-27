@@ -47,7 +47,7 @@ namespace VitalChoice.Business.Services.Content
             this.faqRepository = faqRepository;
             this.articleRepository = articleRepository;
             this.contentPageRepository = contentPageRepository;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<MasterContentService>();
         }
 
         public async Task<List<ContentTypeEntity>> GetContentTypesAsync()
@@ -67,7 +67,7 @@ namespace VitalChoice.Business.Services.Content
 				case MasterContentSortPath.Name:
 					sortable =
 						(x) =>
-							sortOrder == SortOrder.Asc
+							sortOrder == FilterSortOrder.Asc
 								? x.OrderBy(y => y.Name)
 								: x.OrderByDescending(y => y.Name);
 					break;
@@ -76,14 +76,14 @@ namespace VitalChoice.Business.Services.Content
 
 					sortable =
 						(x) =>
-							sortOrder == SortOrder.Asc
+							sortOrder == FilterSortOrder.Asc
 								? x.OrderBy(y => y.Type != null ? y.Type.Name: null)
 								: x.OrderByDescending(y => y.Type != null ? y.Type.Name : null);
 					break;
 				case MasterContentSortPath.Updated:
 					sortable =
 						(x) =>
-							sortOrder == SortOrder.Asc
+							sortOrder == FilterSortOrder.Asc
 								? x.OrderBy(y => y.Updated)
 								: x.OrderByDescending(y => y.Updated);
 					break;

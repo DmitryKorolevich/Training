@@ -31,7 +31,7 @@ namespace VitalChoice.Business.Services.Content
         public ProductViewService(ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider,
             IContentProcessorService processorService, IRepositoryAsync<ProductContent> contentRepository,
             IObjectMapper<ProductViewForCustomerModel> mapper, IObjectMapperFactory mapperFactory, IProductService productService)
-            : base(templatesCache, loggerProvider.CreateLoggerDefault(), processorService, contentRepository, mapper, mapperFactory)
+            : base(templatesCache, loggerProvider.CreateLogger<ProductViewService>(), processorService, contentRepository, mapper, mapperFactory)
         {
             _productService = productService;
         }

@@ -4,9 +4,10 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 

@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Ecommerce.Domain.Options;
@@ -105,7 +105,7 @@ namespace VitalChoice.Caching.GC
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e.Message, e);
+                    _logger.LogError(0, e, e.Message);
                 }
             }
         }

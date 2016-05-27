@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalara.Avatax.Rest.Services;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
@@ -44,7 +44,7 @@ namespace VitalChoice.Business.Services.Avatax
             _profileName = options.Value.Avatax.ProfileName;
             _companyCode = options.Value.Avatax.CompanyCode;
             _turnOffCommit = options.Value.Avatax.TurnOffCommit;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<AvalaraTax>();
         }
 
         public async Task<bool> CancelTax(string orderCode)

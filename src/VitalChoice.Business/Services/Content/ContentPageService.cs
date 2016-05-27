@@ -33,9 +33,7 @@ namespace VitalChoice.Business.Services.Content
 
         public ContentPageService(IRepositoryAsync<ContentPage> contentPageRepository,
             IRepositoryAsync<ContentCategory> contentCategoryRepository,
-            IRepositoryAsync<ContentItem> contentItemRepository,
             IRepositoryAsync<ContentPageToContentCategory> contentPageToContentCategoryRepository,
-            IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
             ILoggerProviderExtended logger, 
@@ -47,7 +45,7 @@ namespace VitalChoice.Business.Services.Content
             this.contentTypeRepository = contentTypeRepository;
             this.objectLogItemExternalService = objectLogItemExternalService;
             this.templatesCache = templatesCache;
-            this.logger = logger.CreateLoggerDefault();
+            this.logger = logger.CreateLogger<ContentPageService>();
         }
 
         public async Task<PagedList<ContentPage>> GetContentPagesAsync(ContentPageListFilter filter)
@@ -84,21 +82,21 @@ namespace VitalChoice.Business.Services.Content
 				case ContentPageSortPath.Title:
 					sortable =
 						(x) =>
-							sortOrder == SortOrder.Asc
+							sortOrder == FilterSortOrder.Asc
 								? x.OrderBy(y => y.Name)
 								: x.OrderByDescending(y => y.Name);
 					break;
 				case ContentPageSortPath.Url:
 					sortable =
 						(x) =>
-							sortOrder == SortOrder.Asc
+							sortOrder == FilterSortOrder.Asc
 								? x.OrderBy(y => y.Url)
 								: x.OrderByDescending(y => y.Url);
 					break;
 				case ContentPageSortPath.Status:
 					sortable =
 						(x) =>
-							sortOrder == SortOrder.Asc
+							sortOrder == FilterSortOrder.Asc
 								? x.OrderBy(y => y.StatusCode)
 								: x.OrderByDescending(y => y.StatusCode);
 					break;
@@ -107,7 +105,7 @@ namespace VitalChoice.Business.Services.Content
 
 					sortable =
 						(x) =>
-							sortOrder == SortOrder.Asc
+							sortOrder == FilterSortOrder.Asc
 								? x.OrderBy(y => y.ContentItem.Updated)
 								: x.OrderByDescending(y => y.ContentItem.Updated);
 					break;

@@ -2,45 +2,57 @@
   
   "version": "1.0.0-*",
   "dependencies": {
-    "EntityFramework.Core": "7.0.0-*",
-    "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
-    "Microsoft.AspNet.Mvc": "6.0.0-rc1-final",
-    "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
-    "Microsoft.Extensions.Logging.Console": "1.0.0-rc1-final",
-    "Autofac.Extensions.DependencyInjection": "4.0.0-rc1-177",
+    "Microsoft.EntityFrameworkCore": "1.0.0-fixed-*",
+    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0-fixed-*",
+    "Microsoft.AspNetCore.Mvc": "1.0.0-rc2-final",
+    "Microsoft.Extensions.Logging": "1.0.0-rc2-final",
+    "Microsoft.Extensions.Logging.Console": "1.0.0-rc2-final",
+    "Autofac.Extensions.DependencyInjection": "4.0.0-fixed-*",
     "Avalara.Avatax.Rest": "1.0.0-*",
-    "CsvHelper": "2.13.2-*",
-    "FluentValidation": "5.6.0.5-*",
-    "VitalChoice.Infrastructure": "",
-    "VitalChoice.Data": "",
-    "VitalChoice.Ecommerce.Domain": "",
-    "VitalChoice.Infrastructure.Domain": "",
-    "VitalChoice.Workflow": "",
-    "VitalChoice.Interfaces": "",
-    "VitalChoice.DynamicData": "",
-    "VitalChoice.ContentProcessing": "",
-    "VitalChoice.Validation": "",
-    "Authorize.Net": ""
+    "CsvHelper": "2.14.2-fixed-*",
+    "FluentValidation": "5.6.0.5-fixed-*",
+    "VitalChoice.Infrastructure": "1.0.0-*",
+    "VitalChoice.Data": "1.0.0-*",
+    "VitalChoice.Ecommerce.Domain": "1.0.0-*",
+    "VitalChoice.Infrastructure.Domain": "1.0.0-*",
+    "VitalChoice.Workflow": "1.0.0-*",
+    "VitalChoice.Interfaces": "1.0.0-*",
+    "VitalChoice.DynamicData": "1.0.0-*",
+    "VitalChoice.ContentProcessing": "1.0.0-*",
+    "VitalChoice.Validation": "1.0.0-*",
+    "Authorize.Net": "1.0.0-*"
   },
 
   "frameworks": {
     "net451": {
       "frameworkAssemblies": {
-        "System.ServiceModel": "4.0.0.0"
+        "System.ServiceModel": "",
+        "System.IO": "",
+        "System.Net.Primitives": ""
       }
     },
-    "dotnet5.4": {
+    "netstandard1.5": {
+      "imports": [
+        "dnxcore50",
+        "portable-net45+win8"
+      ],
       "dependencies": {
-        "System.Runtime": "4.0.21-beta-23516",
-        "System.IO.FileSystem": "4.0.1-beta-23516",
-        "System.IO": "4.0.11-beta-23516",
-        "System.ServiceModel.Http": "4.0.11-beta-23516",
-        "System.ServiceModel.Security": "4.0.1-beta-23516",
-        "System.ServiceModel.Primitives": "4.1.0-beta-23516",
-        "System.Xml.XPath": "4.0.1-beta-23516",
-        "System.Xml.XmlDocument": "4.0.1-beta-23516",
-        "System.Xml.XmlSerializer": "4.0.11-beta-23516",
-        "System.Runtime.Serialization.Xml": "4.0.11-beta-23516"
+        "Microsoft.NETCore.Platforms": {
+          "type": "build",
+          "version": "1.0.1-rc2-*"
+        },
+        "System.Runtime": "4.1.0-rc2-*",
+        "System.IO.FileSystem": "4.0.1-rc2-*",
+        "System.IO": "4.1.0-rc2-*",
+        "System.ServiceModel.Http": "4.1.0-rc2-*",
+        "System.ServiceModel.Security": "4.0.1-rc2-*",
+        "System.ServiceModel.Primitives": "4.1.0-rc2-*",
+        "System.Xml.XPath": "4.0.1-rc2-*",
+        "System.Xml.XmlDocument": "4.0.1-rc2-*",
+        "System.Xml.XmlSerializer": "4.0.11-rc2-*",
+        "System.Xml.XDocument": "4.0.11-rc2-*",
+        "System.Runtime.Serialization.Xml": "4.1.1-rc2-*",
+        "System.Xml.ReaderWriter": "4.0.11-rc2-*"
       }
     }
   }

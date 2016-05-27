@@ -1,30 +1,48 @@
-﻿using Microsoft.AspNet.Http;
-using Microsoft.Extensions.OptionsModel;
-using Microsoft.AspNet.Mvc.Routing;
-using Microsoft.AspNet.Mvc.Infrastructure;
+﻿using System;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Routing;
 using VitalChoice.Infrastructure.Domain.Options;
 
 namespace VitalChoice.Core.Infrastructure
 {
-	/// <summary>
-	/// Following are some of the scenarios exercised here:
-	/// 1. Based on configuration, generate Content urls pointing to local or a CDN server
-	/// 2. Based on configuration, generate lower case urls
-	/// </summary>
-	/// <remarks>
-	/// ref: https://github.com/aspnet/Mvc/blob/dev/test/WebSites/UrlHelperWebSite/CustomUrlHelper.cs
-	/// </remarks>
+    public class CustomUrlHelperFactory : IUrlHelperFactory
+    {
+        private readonly IOptions<AppOptions> _appOptions;
+
+        public CustomUrlHelperFactory(IOptions<AppOptions> appOptions)
+        {
+            _appOptions = appOptions;
+        }
+
+        public IUrlHelper GetUrlHelper(ActionContext context)
+        {
+            HttpContext httpContext = context.HttpContext;
+            if (httpContext?.Items == null)
+            {
+                throw new ArgumentNullException(nameof(httpContext.Items));
+            }
+            IUrlHelper urlHelper = httpContext.Items[typeof(IUrlHelper)] as IUrlHelper;
+
+            if (urlHelper == null)
+            {
+                urlHelper = new CustomUrlHelper(context, _appOptions);
+                httpContext.Items[typeof(IUrlHelper)] = urlHelper;
+            }
+            return urlHelper;
+        }
+    }
+
 	public class CustomUrlHelper : UrlHelper
 	{
-		private readonly IOptions<AppOptions> appOptions;
-		private readonly HttpContext httpContext;
+		private readonly IOptions<AppOptions> _appOptions;
 
-		public CustomUrlHelper(IActionContextAccessor contextAccessor,
-							   IActionSelector actionSelector,
-							   IOptions<AppOptions> appOptions) : base(contextAccessor, actionSelector)
+		public CustomUrlHelper(ActionContext context,
+							   IOptions<AppOptions> appOptions) : base(context)
 		{
-			this.appOptions = appOptions;
-			this.httpContext = contextAccessor.ActionContext.HttpContext;
+			this._appOptions = appOptions;
 		}
 
 		/// <summary>
@@ -50,8 +68,7 @@ namespace VitalChoice.Core.Infrastructure
 
 		private string ConvertToLowercaseUrl(string url)
 		{
-			if (!string.IsNullOrEmpty(url)
-				&& appOptions.Value.GenerateLowercaseUrls)
+			if (!string.IsNullOrEmpty(url) && _appOptions.Value.GenerateLowercaseUrls)
 			{
 				return url.ToLowerInvariant();
 			}

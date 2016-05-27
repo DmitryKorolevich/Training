@@ -36,7 +36,7 @@
 		</div>
 		<span>Please review your purchases and quantities, then click the Checkout button.</span>
 	</div>
-	@using (Html.BeginForm("ViewCart", "Cart", null, FormMethod.Post, new {@class = "form-cart", role = "form", @id = "viewCartForm", data_bind = "submit: submitCart" }))
+	@using (Html.BeginForm("ViewCart", "Cart", null, FormMethod.Post, null, new {@class = "form-cart", role = "form", @id = "viewCartForm", data_bind = "submit: submitCart" }))
 	{
 		<div class="cart-certificates-container">
 			<a name="trustlink" href="http://secure.trust-guard.com/certificates/5867" target="_blank"

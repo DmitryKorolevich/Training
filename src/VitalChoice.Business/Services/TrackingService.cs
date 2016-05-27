@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using System.Linq;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
@@ -15,7 +15,7 @@ namespace VitalChoice.Business.Services
         public TrackingService(
             ILoggerProviderExtended loggerProvider)
         {
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<TrackingService>();
         }
 
         public string GetServiceUrl(string carrier, string trackingNumber)

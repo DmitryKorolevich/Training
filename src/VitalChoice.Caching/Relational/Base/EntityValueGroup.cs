@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
-using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Relational.Base
 {
     public abstract class EntityValueGroup<TValue, TInfo> : IEquatable<EntityValueGroup<TValue, TInfo>>
-        where TValue: EntityValue<TInfo>
-        where TInfo: EntityValueInfo
+        where TValue : EntityValue<TInfo>
+        where TInfo : EntityValueInfo
     {
         internal readonly TValue[] Values;
 
@@ -17,20 +14,15 @@ namespace VitalChoice.Caching.Relational.Base
             Values = orderedValues;
         }
 
-        private EntityValueGroup(IEnumerable<TValue> values)
-        {
-            Values = values.OrderBy(v => v.ValueInfo.Name, StringComparer.Ordinal).ToArray();
-        }
-
         public bool Equals(EntityValueGroup<TValue, TInfo> other)
         {
-            if ((object)this == (object)other) return true;
-            if ((object)other == null) return false;
+            if ((object) this == (object) other) return true;
+            if ((object) other == null) return false;
 
             // ReSharper disable once LoopCanBeConvertedToQuery
             for (var index = 0; index < Values.Length; index++)
             {
-                if (!Values[index].Value?.Equals(other.Values[index].Value) ?? false)
+                if (!Values[index].Value.Equals(other.Values[index].Value))
                 {
                     return false;
                 }
@@ -50,7 +42,7 @@ namespace VitalChoice.Caching.Relational.Base
 
         public override bool Equals(object obj)
         {
-            if ((object)this == obj) return true;
+            if ((object) this == obj) return true;
             var primaryKey = obj as EntityValueGroup<TValue, TInfo>;
             return primaryKey != null && Equals(primaryKey);
         }
@@ -77,20 +69,12 @@ namespace VitalChoice.Caching.Relational.Base
         {
             get
             {
-                if (Values == null || !Values.Any())
+                if (Values == null)
                     return false;
-                foreach (var value in Values)
+                foreach (var v in Values)
                 {
-                    if (value.Value == null)
+                    if (!v.Value.IsValid())
                         return false;
-                    if ((value.Value as long?) <= 0)
-                    {
-                        return false;
-                    }
-                    if ((value.Value as int?) <= 0)
-                    {
-                        return false;
-                    }
                 }
                 return true;
             }

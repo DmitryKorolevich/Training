@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.ChangeTracking.Internal;
-using Microsoft.Data.Entity.Metadata;
-using Microsoft.Data.Entity.Storage;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
@@ -15,7 +16,6 @@ using VitalChoice.Caching.Relational.Base;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Data.Context;
 using VitalChoice.Ecommerce.Domain.Helpers;
-using VitalChoice.Profiling.Base;
 
 namespace VitalChoice.Caching.Services
 {
@@ -28,12 +28,13 @@ namespace VitalChoice.Caching.Services
 
         public CacheStateManager(IInternalEntityEntryFactory factory, IInternalEntityEntrySubscriber subscriber,
             IInternalEntityEntryNotifier notifier, IValueGenerationManager valueGeneration, IModel model, IDatabase database,
-            DbContext context, IInternalEntityCacheFactory cacheFactory, ICacheSyncProvider cacheSyncProvider, ILoggerFactory loggerFactory)
-            : base(factory, subscriber, notifier, valueGeneration, model, database, context)
+            IInternalEntityCacheFactory cacheFactory, ICacheSyncProvider cacheSyncProvider, ILoggerFactory loggerFactory,
+            IConcurrencyDetector concurrencyDetector, ICurrentDbContext currentDbContext)
+            : base(factory, subscriber, notifier, valueGeneration, model, database, concurrencyDetector, currentDbContext)
         {
             CacheFactory = cacheFactory;
             CacheSyncProvider = cacheSyncProvider;
-            DataContext = context as IDataContext;
+            DataContext = currentDbContext.Context as IDataContext;
             Logger = loggerFactory.CreateLogger<CacheStateManager>();
         }
 
@@ -79,7 +80,7 @@ namespace VitalChoice.Caching.Services
             }
             catch (Exception e)
             {
-                Logger.LogError(e.Message, e);
+                Logger.LogError(0, e, e.Message);
             }
             return result;
         }
@@ -107,7 +108,7 @@ namespace VitalChoice.Caching.Services
             }
             catch (Exception e)
             {
-                Logger.LogError(e.Message, e);
+                Logger.LogError(0, e, e.Message);
             }
             return result;
         }
@@ -156,10 +157,8 @@ namespace VitalChoice.Caching.Services
             public IInternalEntityCache Cache;
         }
 
-        private IEnumerable<SyncOperation> UpdateCache(ICollection<ImmutableEntryState> entriesToSave)
+        private IEnumerable<SyncOperation> UpdateCache(IEnumerable<ImmutableEntryState> entriesToSave)
         {
-            using (var scope = new ProfilingScope("Cache Sync"))
-            {
                 var syncOperations = new List<SyncOperation>();
                 var dbContext = DataContext as DbContext;
                 var entryGroups = entriesToSave.Where(e => e.EntityType != null).Select(e => new SyncOp
@@ -261,7 +260,6 @@ namespace VitalChoice.Caching.Services
                     }
                 }
                 return syncOperations;
-            }
         }
     }
 }

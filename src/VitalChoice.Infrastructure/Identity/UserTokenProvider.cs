@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Internal;
+using Microsoft.Extensions.Options;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
@@ -9,18 +10,18 @@ using VitalChoice.Infrastructure.Domain.Options;
 
 namespace VitalChoice.Infrastructure.Identity
 {
-    public class UserTokenProvider: IUserTokenProvider<ApplicationUser>
+    public class UserTokenProvider: IUserTwoFactorTokenProvider<ApplicationUser>
     {
-	    private readonly IOptions<AppOptions> appOptions;
+	    private readonly IOptions<AppOptions> _appOptions;
 
 	    public UserTokenProvider(IOptions<AppOptions> appOptions)
 	    {
-		    this.appOptions = appOptions;
+		    _appOptions = appOptions;
 	    }
 
 	    public async Task<string> GenerateAsync(string purpose, UserManager<ApplicationUser> manager, ApplicationUser user)
 	    {
-		    user.TokenExpirationDate = DateTime.Now.AddDays(appOptions.Value.ActivationTokenExpirationTermDays);
+		    user.TokenExpirationDate = DateTime.Now.AddDays(_appOptions.Value.ActivationTokenExpirationTermDays);
 			if (purpose != IdentityConstants.ForgotPasswordResetPurpose && purpose != IdentityConstants.LoginFromAdminPurpose)
 			{
 				user.IsConfirmed = false;
@@ -51,7 +52,7 @@ namespace VitalChoice.Infrastructure.Identity
 
 	    public Task<bool> CanGenerateTwoFactorTokenAsync(UserManager<ApplicationUser> manager, ApplicationUser user)
 	    {
-			return Task.FromResult(false);
+			return TaskCache<bool>.DefaultCompletedTask;
 		}
 
 	    public string Name => "Default Token Provider";

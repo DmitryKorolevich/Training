@@ -12,7 +12,7 @@ namespace VitalChoice.Caching.Extensions
             var result = new EntityKeyExportable
             {
                 EntityType = entityType.FullName,
-                Values = key.Values.Select(v => new EntityValueExportable(v.Value, v.ValueInfo.Name)).ToList()
+                Values = key.Values.Select(v => new EntityValueExportable(v.Value.GetValue(), v.ValueInfo.Name)).ToList()
             };
             return result;
         }

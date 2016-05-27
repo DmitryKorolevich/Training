@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Linq.Expressions;
-using Microsoft.AspNet.Html.Abstractions;
-using Microsoft.AspNet.Mvc.ModelBinding;
-using Microsoft.AspNet.Mvc.Rendering;
-using Microsoft.AspNet.Mvc.ViewFeatures;
-using System.IO;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Routing;
-using Microsoft.AspNet.Mvc.Razor;
-using Microsoft.Net.Http.Server;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc.ViewFeatures.Internal;
 
 namespace VC.Public.Helpers
 {
@@ -46,11 +41,11 @@ namespace VC.Public.Helpers
 			}
 		}
 
-        private static TimeZoneInfo _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
+        private static readonly TimeZoneInfo PstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
 
-        public static DateTime ConvertToPST(this DateTime date)
+        public static DateTime ConvertToPst(this DateTime date)
         {
-            return TimeZoneInfo.ConvertTime(date, TimeZoneInfo.Local, _pstTimeZoneInfo);
+            return TimeZoneInfo.ConvertTime(date, TimeZoneInfo.Local, PstTimeZoneInfo);
         }
     }
 }

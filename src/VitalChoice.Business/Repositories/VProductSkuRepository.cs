@@ -1,20 +1,19 @@
-﻿using Microsoft.Data.Entity;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using VitalChoice.Data.Context;
+using Microsoft.EntityFrameworkCore;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities;
-using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 
-namespace VitalChoice.Data.Repositories.Customs
+namespace VitalChoice.Business.Repositories
 {
     public class VProductSkuRepository : EcommerceRepositoryAsync<VProductSku>
     {
-        public VProductSkuRepository(IDataContextAsync context) : base(context)
+        public VProductSkuRepository(EcommerceContext context) : base(context)
 		{
         }
 
@@ -37,28 +36,28 @@ namespace VitalChoice.Data.Repositories.Customs
                 case VProductSkuSortPath.Name:
                     sortable =
                         x =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Name)
                                 : x.OrderByDescending(y => y.Name);
                     break;
                 case VProductSkuSortPath.DateEdited:
                     sortable =
                         x =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.DateEdited)
                                 : x.OrderByDescending(y => y.DateEdited);
                     break;
                 case VProductSkuSortPath.TaxCode:
                     sortable =
                         x =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.TaxCode)
                                 : x.OrderByDescending(y => y.TaxCode);
                     break;
                 case VProductSkuSortPath.IdProductType:
                     sortable =
                         x =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.IdProductType)
                                 : x.OrderByDescending(y => y.IdProductType);
                     break;

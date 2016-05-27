@@ -186,7 +186,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
                     var containsGroups = containsSet.GroupBy(f => f.ValueInfo);
                     foreach (var group in containsGroups)
                     {
-                        resultedSets[group.Key].AddRange(group.Where(v => v.Value != null));
+                        resultedSets[group.Key].AddRange(group.Where(v => !(v.Value is NullValue)));
                         keyTypes.Add(group.Key);
                     }
                 }

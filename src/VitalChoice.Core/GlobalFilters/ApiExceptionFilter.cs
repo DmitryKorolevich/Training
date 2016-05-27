@@ -1,10 +1,11 @@
 ﻿using System.Net;
-using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Core.Services;
 using VitalChoice.Validation.Models;
-using Microsoft.AspNet.Mvc.Filters;
-using Microsoft.Data.Entity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 
@@ -45,7 +46,9 @@ namespace VitalChoice.Core.GlobalFilters
                             StatusCode = (int) HttpStatusCode.InternalServerError
                         };
                     }
-                    LoggerService.GetDefault().LogError(context.Exception.ToString());
+                    var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
+                    var logger = loggerFactory.CreateLogger<ApiExceptionFilterAttribute>();
+                    logger.LogError(0, context.Exception, context.Exception.Message);
                 }
             }
             else
@@ -53,13 +56,13 @@ namespace VitalChoice.Core.GlobalFilters
                 var exception = context.Exception as AccessDeniedException;
                 if (exception != null)
                 {
-                    result = new HttpForbiddenResult();
+                    result = new ForbiddenResult();
                 }
                 else
                 {
                     if ((context.Exception as NotFoundException) != null)
                     {
-                        result = new HttpNotFoundResult();
+                        result = new NotFoundResult();
                     }
                     else
                     {
@@ -67,6 +70,12 @@ namespace VitalChoice.Core.GlobalFilters
                         {
                             StatusCode = (int)apiException.Status
                         };
+                    }
+                    var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
+                    var logger = loggerFactory.CreateLogger<ApiExceptionFilterAttribute>();
+                    if (context.Exception.InnerException != null)
+                    {
+                        logger.LogError(0, context.Exception.InnerException, context.Exception.InnerException.Message);
                     }
                 }
             }

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
 using VC.Public.Models.Auth;
 using VitalChoice.Core.Base;
 using VitalChoice.DynamicData.Interfaces;
@@ -12,17 +10,20 @@ using VitalChoice.Interfaces.Services.Affiliates;
 using VC.Public.Models.Affiliate;
 using VitalChoice.Interfaces.Services;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNet.Mvc.Rendering;
 using VitalChoice.Core.Infrastructure;
-using Microsoft.AspNet.Authorization;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 
 namespace VC.Public.Controllers
 {
@@ -31,17 +32,19 @@ namespace VC.Public.Controllers
     {
         private readonly IAffiliateUserService _userService;
         private readonly IAffiliateService _affiliateService;
+        private readonly ExtendedUserManager _userManager;
         private readonly IDynamicMapper<AffiliateDynamic, Affiliate> _affiliateMapper;
 
         public AffiliateAccountController(
             IAffiliateUserService userService,
             IDynamicMapper<AffiliateDynamic, Affiliate> affiliateMapper,
             IAffiliateService affiliateService,
-            IPageResultService pageResultService) : base(pageResultService)
+            IPageResultService pageResultService, ExtendedUserManager userManager) : base(pageResultService)
         {
             _userService = userService;
             _affiliateMapper = affiliateMapper;
             _affiliateService = affiliateService;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -95,7 +98,7 @@ namespace VC.Public.Controllers
 
             if (context.User.Identity.IsAuthenticated)
             {
-                var user = await _userService.FindAsync(context.User.GetUserName());
+                var user = await _userService.FindAsync(_userManager.GetUserName(context.User));
                 if (user == null)
                 {
                     throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser])

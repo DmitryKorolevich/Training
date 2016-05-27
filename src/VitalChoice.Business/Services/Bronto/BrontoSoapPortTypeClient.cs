@@ -10,8 +10,6 @@
 
 namespace VitalChoice.Business.Services.Bronto
 {
-    //TODO: should be removed after rc2 release(reason MessageHeaderAttribute)
-#if !DOTNET5_4
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     
     [System.Xml.Serialization.XmlSchemaProviderAttribute("ExportSchema")]
@@ -48,12 +46,6 @@ namespace VitalChoice.Business.Services.Bronto
         public System.Xml.Schema.XmlSchema GetSchema()
         {
             return null;
-        }
-
-        public static System.Xml.XmlQualifiedName ExportSchema(System.Xml.Schema.XmlSchemaSet schemas)
-        {
-            System.Runtime.Serialization.XmlSerializableServices.AddDefaultSchema(schemas, typeName);
-            return typeName;
         }
     }
     
@@ -27140,5 +27132,4 @@ namespace VitalChoice.Business.Services.Bronto
             return ((VitalChoice.Business.Services.Bronto.BrontoSoapPortType)(this)).readWebformsAsync(inValue);
         }
     }
-#endif
 }

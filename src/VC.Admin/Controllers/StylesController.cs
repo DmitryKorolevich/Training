@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using VC.Admin.Models.ContentManagement;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Permissions;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Validation.Models;
 
@@ -18,13 +19,15 @@ namespace VC.Admin.Controllers
 	public class StylesController : BaseApiController
     {
 		private readonly IStylesService _stylesService;
+        private readonly ExtendedUserManager _userManager;
 
-		public StylesController(IStylesService contentAreaService)
-		{
-			_stylesService = contentAreaService;
-		}
+        public StylesController(IStylesService contentAreaService, ExtendedUserManager userManager)
+        {
+            _stylesService = contentAreaService;
+            _userManager = userManager;
+        }
 
-		[HttpGet]
+	    [HttpGet]
 		public async Task<Result<StylesModel>> GetStyles()
 		{
 			var res = await _stylesService.GetStyles();
@@ -45,8 +48,7 @@ namespace VC.Admin.Controllers
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
 			}
 
-			var context = HttpContext;
-			res.IdEditedBy = Convert.ToInt32(context.User.GetUserId());
+			res.IdEditedBy = Convert.ToInt32(_userManager.GetUserId(User));
 			res.Updated = DateTime.Now;
 			res.Styles = model.CSS;
 

@@ -1,16 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
 using VC.Public.Models.Lookup;
 using VitalChoice.Core.Base;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Validation.Models;
 using System.Linq;
-using Microsoft.AspNet.Authorization;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Core.Services;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services;
 
 namespace VC.Public.Controllers

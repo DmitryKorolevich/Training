@@ -1,13 +1,12 @@
 ﻿using System.Globalization;
 using System.Net;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Diagnostics;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Http.Features;
-using Microsoft.AspNet.Mvc;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
 using System.Linq;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace VitalChoice.Core.Services
 {
@@ -37,6 +36,10 @@ namespace VitalChoice.Core.Services
                         context.HttpContext.Request.Path = originalPath;
                         context.HttpContext.Features.Set((IStatusCodeReExecuteFeature) null);
                     }
+                }
+                else
+                {
+                    await context.Next(context.HttpContext);
                 }
             });
         }

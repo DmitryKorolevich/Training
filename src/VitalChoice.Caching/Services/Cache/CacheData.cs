@@ -5,8 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.ChangeTracking;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
@@ -14,9 +14,6 @@ using VitalChoice.Caching.Relational.ChangeTracking;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain.Helpers;
-using VitalChoice.ObjectMapping.Base;
-using VitalChoice.ObjectMapping.Extensions;
-using VitalChoice.Profiling.Base;
 
 namespace VitalChoice.Caching.Services.Cache
 {
@@ -163,9 +160,9 @@ namespace VitalChoice.Caching.Services.Cache
 
         public bool GetHasRelation(string name)
         {
-            if (string.IsNullOrWhiteSpace(name))
+            if (string.IsNullOrEmpty(name))
                 return true;
-            return _relationInfo?.RelationsDict.ContainsKey(name) ?? false;
+            return _relationInfo.HasRelation(name);
         }
 
         public CachedEntity<T> TryRemove(EntityKey key)
@@ -255,53 +252,53 @@ namespace VitalChoice.Caching.Services.Cache
 
         private bool UpdateEntityWithRelations(T entity, IDictionary<TrackedEntityKey, EntityEntry> trackedEntities, CachedEntity<T> cached)
         {
-            if (!GetAllNormalizedAndTracked(entity, _relationInfo, trackedEntities))
+            ICollection<RelationInfo> relationsToClone;
+            if (!GetAllNormalizedAndTracked(entity, trackedEntities, out relationsToClone, cached))
             {
                 cached.NeedUpdate = true;
                 return false;
             }
-            cached.Entity = (T)entity.DeepCloneItem(_relationInfo);
-            UpdateRelations(cached.Entity);
+            entity.UpdateCloneRelations(relationsToClone, cached.Entity);
+            entity.UpdateNonRelatedObjects(cached.Entity);
+            UpdateRelations(cached.Entity, relationsToClone);
             cached.NeedUpdateRelated.Clear();
             return true;
-            
-
-            //var relatedObjects =
-            //    _relationInfo.Relations.Select(
-            //        relation =>
-            //            new KeyValuePair<RelationInfo, object>(relation, relation.GetRelatedObject(oldEntity)))
-            //        .ToArray();
-
-            //foreach (var pair in relatedObjects)
-            //{
-            //    var newRelated = pair.Key.GetRelatedObject(entity);
-            //    EntityRelationalReferenceInfo relationReference = null;
-            //    _entityInfo.RelationReferences?.TryGetValue(pair.Key.Name, out relationReference);
-
-            //    if (relationReference == null)
-            //    {
-            //        pair.Key.SetRelatedObject(oldEntity, (newRelated as IEnumerable<object>).DeepCloneCreateList(pair.Key));
-            //    }
-            //    else
-            //    {
-            //        var newRelatedKey = relationReference.GetPrimaryKeyValue(entity);
-            //        pair.Key.SetRelatedObject(oldEntity, newRelatedKey.IsValid ? newRelated.DeepCloneItem(pair.Key) : null);
-            //    }
-            //}
-
-            //UpdateExistsRelations(oldEntity);
-            //cached.NeedUpdateRelated.Clear();
-            //return true;
         }
 
-        private bool GetAllNormalizedAndTracked(object entity, RelationInfo relations, IDictionary<TrackedEntityKey, EntityEntry> trackedEntities)
+        private bool GetAllNormalizedAndTracked(object entity, 
+            IDictionary<TrackedEntityKey, EntityEntry> trackedEntities, out ICollection<RelationInfo> relationsToClone,
+            CachedEntity<T> cached)
         {
-            EntityInfo entityInfo;
-            if (!_infoStorage.GetEntityInfo(relations.RelationType, out entityInfo))
+            relationsToClone = new List<RelationInfo>();
+            var relationCandidates = _relationInfo.Relations.Where(r => cached.NeedUpdateRelated.Contains(r.Name));
+            foreach (var relation in relationCandidates)
+            {
+                EntityRelationalReferenceInfo reference;
+                if (_entityInfo.RelationReferences.TryGetValue(relation.Name, out reference))
+                {
+                    var newpk = reference.GetPrimaryKeyValue(entity);
+                    var oldpk = reference.GetPrimaryKeyValue(cached.Entity);
+                    if (newpk != oldpk)
+                    {
+                        relationsToClone.Add(relation);
+                    }
+                }
+                else
+                {
+                    relationsToClone.Add(relation);
+                }
+            }
+            return GetIsNormalized(entity, _relationInfo.RelationType, trackedEntities, relationsToClone, _entityInfo);
+        }
+
+        private bool GetIsNormalized(object entity, Type relationType, IDictionary<TrackedEntityKey, EntityEntry> trackedEntities,
+            ICollection<RelationInfo> relationsToClone, EntityInfo entityInfo = null)
+        {
+            if (entityInfo == null && !_infoStorage.GetEntityInfo(relationType, out entityInfo))
             {
                 return false;
             }
-            foreach (var relation in relations.Relations)
+            foreach (var relation in relationsToClone)
             {
                 var newRelated = relation.GetRelatedObject(entity);
                 EntityRelationalReferenceInfo relationReference = null;
@@ -338,16 +335,16 @@ namespace VitalChoice.Caching.Services.Cache
                                 return false;
                             }
                         }
-                        if (!GetAllNormalizedAndTracked(newItem, relation, trackedEntities))
+                        if (!GetIsNormalized(newItem, relation.RelationType, trackedEntities, relation.Relations))
                         {
                             return false;
                         }
                     }
                 }
-                else if (relationReference != null)
+                else
                 {
-                    var newRelatedKey = relationReference.GetPrimaryKeyValue(entity);
-                    if (newRelatedKey.IsValid)
+                    var newRelatedKey = relationReference?.GetPrimaryKeyValue(entity);
+                    if (newRelatedKey?.IsValid ?? false)
                     {
                         if (newRelated == null)
                         {
@@ -389,7 +386,7 @@ namespace VitalChoice.Caching.Services.Cache
                                 return false;
                             }
                         }
-                        if (!GetAllNormalizedAndTracked(newRelated, relation, trackedEntities))
+                        if (!GetIsNormalized(newRelated, relation.RelationType, trackedEntities, relation.Relations))
                         {
                             return false;
                         }
@@ -525,12 +522,12 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        private void UpdateRelations(T newEntity)
+        private void UpdateRelations(T newEntity, IEnumerable<RelationInfo> relations = null)
         {
             if (newEntity == null)
                 return;
 
-            foreach (var relation in _relationInfo.Relations)
+            foreach (var relation in relations ?? _relationInfo.Relations)
             {
                 var obj = relation.GetRelatedObject(newEntity);
 

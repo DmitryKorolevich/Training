@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Authorization;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using VC.Admin.Models.Account;
 using VitalChoice.Core.Base;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
 
@@ -18,13 +19,15 @@ namespace VC.Admin.Controllers
     public class AccountController : BaseApiController
     {
 	    private readonly IAdminUserService userService;
+	    private readonly ExtendedUserManager _userManager;
 
-		public AccountController(IAdminUserService userService)
-		{
-			this.userService = userService;
-		}
+	    public AccountController(IAdminUserService userService, ExtendedUserManager userManager)
+	    {
+	        this.userService = userService;
+	        _userManager = userManager;
+	    }
 
-		private async Task<UserInfoModel> PopulateUserInfoModel(ApplicationUser user)
+	    private async Task<UserInfoModel> PopulateUserInfoModel(ApplicationUser user)
 		{
 			return new UserInfoModel()
 			{
@@ -126,7 +129,7 @@ namespace VC.Admin.Controllers
 
 			if (context.User.Identity.IsAuthenticated)
 			{
-				var user = await userService.FindAsync(context.User.GetUserName());
+			    var user = await userService.FindAsync(_userManager.GetUserName(context.User));
 				if (user == null)
 				{
 					throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
@@ -139,13 +142,13 @@ namespace VC.Admin.Controllers
 		}
 
 		[HttpPost]
-		public async Task<bool> Logout([FromBody] object model)
+		public async Task<bool> Logout()
 		{
 			var context = HttpContext;
 
 			if (context.User.Identity.IsAuthenticated)
 			{
-				var user = await userService.FindAsync(context.User.GetUserName());
+			    var user = await userService.FindAsync(_userManager.GetUserName(context.User));
 				if (user == null)
 				{
 					throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);

@@ -31,7 +31,7 @@ namespace VitalChoice.Business.Services.Products
             this._vProductsWithReviewRepository = vProductsWithReviewRepository;
             this._productReviewRepository = productReviewRepository;
             this._productRepository = productRepository;
-            logger = loggerProvider.CreateLoggerDefault();
+            logger = loggerProvider.CreateLogger<ProductReviewService>();
         }
 
 
@@ -47,28 +47,28 @@ namespace VitalChoice.Business.Services.Products
                 case VProductsWithReviewSortPath.ProductName:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.ProductName)
                                 : x.OrderByDescending(y => y.ProductName);
                     break;
                 case VProductsWithReviewSortPath.Count:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Count)
                                 : x.OrderByDescending(y => y.Count);
                     break;
                 case VProductsWithReviewSortPath.DateCreated:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.DateCreated)
                                 : x.OrderByDescending(y => y.DateCreated);
                     break;
                 case VProductsWithReviewSortPath.Rating:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Rating)
                                 : x.OrderByDescending(y => y.Rating);
                     break;
@@ -90,14 +90,14 @@ namespace VitalChoice.Business.Services.Products
                 case ProductReviewSortPath.CustomerName:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.CustomerName)
                                 : x.OrderByDescending(y => y.CustomerName);
                     break;
                 case ProductReviewSortPath.Title:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Title)
                                 : x.OrderByDescending(y => y.Title);
                     break;
@@ -106,21 +106,21 @@ namespace VitalChoice.Business.Services.Products
 
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Product.Name)
                                 : x.OrderByDescending(y => y.Product.Name);
                     break;
                 case ProductReviewSortPath.DateCreated:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.DateCreated)
                                 : x.OrderByDescending(y => y.DateCreated);
                     break;
                 case ProductReviewSortPath.Rating:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Rating)
                                 : x.OrderByDescending(y => y.Rating);
                     break;

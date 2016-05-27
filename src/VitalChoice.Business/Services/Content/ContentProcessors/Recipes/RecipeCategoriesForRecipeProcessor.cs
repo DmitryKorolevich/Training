@@ -5,7 +5,6 @@ using System.Net;
 using System.Threading.Tasks;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -72,7 +71,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Recipes
                         RecipeListFilter filter = new RecipeListFilter();
                         filter.CategoryId = category.Id;
                         filter.Sorting.Path = RecipeSortPath.Created;
-                        filter.Sorting.SortOrder = SortOrder.Desc;
+                        filter.Sorting.SortOrder = FilterSortOrder.Desc;
                         var recipes = await _recipeService.GetRecipesAsync(filter);
                         category.Recipes = recipes.Items.Select(p => new TtlShortRecipeModel() {
                             Name=p.Name,

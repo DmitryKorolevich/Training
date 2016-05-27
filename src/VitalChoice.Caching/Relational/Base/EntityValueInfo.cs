@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reflection;
-using Microsoft.Data.Entity.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Relational.Base
@@ -22,7 +22,7 @@ namespace VitalChoice.Caching.Relational.Base
             ItemIndex = -1;
             if (propertyType.GetTypeInfo().IsEnum)
             {
-#if !DOTNET5_4
+#if !NETSTANDARD1_5
                 var enumTypeCode = Enum.GetUnderlyingType(propertyType).GetTypeCode();
                 _valueConvert = value => Convert.ChangeType(value, enumTypeCode);
 #else

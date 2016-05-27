@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VC.Admin.Models.Customer;
 using VC.Admin.Models.Customers;
 using VitalChoice.DynamicData.Base;
@@ -18,7 +19,7 @@ namespace VC.Admin.ModelConverters
                 model.ExpirationDateYear = exp.Year%2000;
             }
             model.IdCustomerPaymentMethod = model.Id;
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
         public override Task ModelToDynamicAsync(CreditCardModel model, CustomerPaymentMethodDynamic dynamic)
@@ -28,7 +29,7 @@ namespace VC.Admin.ModelConverters
                 DateTime exp = new DateTime(model.ExpirationDateYear.Value + 2000, model.ExpirationDateMonth.Value, 1);
                 dynamic.Data.ExpDate = exp;
             }
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
     }
 }

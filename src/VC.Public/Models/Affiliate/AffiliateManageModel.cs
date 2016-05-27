@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNet.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -31,13 +31,13 @@ namespace VC.Public.Models.Affiliate
         public string ConfirmEmail { get; set; }
 
         [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
-        [AllowXSS]
+        [AllowXss]
         public string Password { get; set; }
 
 		[Compare("Password")]
         [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         [Display(Name = "Password Confirm")]
-        [AllowXSS]
+        [AllowXss]
         public string ConfirmPassword { get; set; }
 
         

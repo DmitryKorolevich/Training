@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Http;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Queries.Orders;
 using VitalChoice.Business.Queries.User;
@@ -41,7 +40,7 @@ namespace VitalChoice.Business.Services.Orders
 	        _orderNoteToCustomerTypeRepository = orderNoteToCustomerTypeRepository;
 	        _adminProfileRepository = adminProfileRepository;
 	        _infrastructureTransactionAccessor = infrastructureTransactionAccessor;
-	        _logger = loggerProvider.CreateLoggerDefault();
+	        _logger = loggerProvider.CreateLogger<OrderNoteService>();
 	    }
 
 	    public async Task<PagedList<ExtendedOrderNote>> GetOrderNotesAsync(FilterBase filter)
@@ -53,14 +52,14 @@ namespace VitalChoice.Business.Services.Orders
 				case OrderNoteSortPath.Title:
 					sortable =
 						(x) =>
-							sortOrder == SortOrder.Asc
+							sortOrder == FilterSortOrder.Asc
 								? x.OrderBy(y => y.Title)
 								: x.OrderByDescending(y => y.Title);
 					break;
 				case OrderNoteSortPath.Updated:
 					sortable =
 						(x) =>
-							sortOrder == SortOrder.Asc
+							sortOrder == FilterSortOrder.Asc
 								? x.OrderBy(y => y.DateEdited)
 								: x.OrderByDescending(y => y.DateEdited);
 					break;

@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
 using VC.Admin.Models.ContentManagement;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Validation.Models;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Templates;
 using Templates.Data;
 using Templates.Runtime;
@@ -27,6 +28,7 @@ using VitalChoice.ContentProcessing.Base;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Content.ContentCrossSells;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Products;
 
 namespace VC.Admin.Controllers
@@ -42,11 +44,13 @@ namespace VC.Admin.Controllers
         private readonly IEmailTemplateService emailTemplateService;
 	    private readonly IContentCrossSellService contentCrossSellService;
 	    private readonly IProductService productService;
-	    private readonly ILogger logger;
+        private readonly ExtendedUserManager _userManager;
+        private readonly ILogger logger;
 
         public ContentController(IMasterContentService masterContentService, ICategoryService categoryService,
             IRecipeService recipeService, IFAQService faqService, IArticleService articleService, IContentPageService contentPageService,
-            IEmailTemplateService emailTemplateService, ILoggerProviderExtended loggerProvider, IContentCrossSellService contentCrossSellService, IProductService productService)
+            IEmailTemplateService emailTemplateService, ILoggerProviderExtended loggerProvider,
+            IContentCrossSellService contentCrossSellService, IProductService productService, ExtendedUserManager userManager)
         {
             this.masterContentService = masterContentService;
             this.categoryService = categoryService;
@@ -55,11 +59,12 @@ namespace VC.Admin.Controllers
             this.articleService = articleService;
             this.contentPageService = contentPageService;
             this.emailTemplateService = emailTemplateService;
-	        this.contentCrossSellService = contentCrossSellService;
-	        this.productService = productService;
-	        this.logger = loggerProvider.CreateLoggerDefault();
+            this.contentCrossSellService = contentCrossSellService;
+            this.productService = productService;
+            _userManager = userManager;
+            this.logger = loggerProvider.CreateLogger<ContentController>();
         }
-        
+
         #region MasterContent
 
         [HttpPost]
@@ -82,7 +87,7 @@ namespace VC.Admin.Controllers
                     IsDefault = false,
                 };
             }
-            var user = HttpContext.Request.HttpContext.User.GetUserId();
+            var user = _userManager.GetUserId(User);
 
             return new MasterContentItemManageModel((await masterContentService.GetMasterContentItemAsync(id)));
         }
@@ -96,7 +101,7 @@ namespace VC.Admin.Controllers
                 {
                     AllowCSharp = true,
                     ForceRemoveWhitespace = true,
-                    Data = new ContentViewContext(new Dictionary<string, object>(), null, ClaimsPrincipal.Current, ActionContext)
+                    Data = new ContentViewContext(new Dictionary<string, object>(), null, ClaimsPrincipal.Current, ControllerContext)
                 });
                 return Task.FromResult(new Result<IReadOnlyCollection<TtlCompileError>>(true, results.ErrorList));
             }
@@ -109,7 +114,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var item = model.Convert();
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if(Int32.TryParse(sUserId,out userId))
             {
@@ -123,7 +128,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.ManageMasterTemplates)]
-        public async Task<Result<bool>> DeleteMasterContentItem(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteMasterContentItem(int id)
         {
             return await masterContentService.DeleteMasterContentItemAsync(id);
         }
@@ -172,7 +177,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var item = model.Convert();
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
@@ -185,7 +190,7 @@ namespace VC.Admin.Controllers
         
         [HttpPost]
         [AdminAuthorize(PermissionType.Content)]
-        public async Task<Result<bool>> DeleteCategory(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteCategory(int id)
         {
             return await categoryService.DeleteCategoryAsync(id);
         }
@@ -232,7 +237,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var item = model.Convert();
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
@@ -246,7 +251,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Content)]
-        public async Task<Result<bool>> DeleteEmailTemplate(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteEmailTemplate(int id)
         {
             return await emailTemplateService.DeleteEmailTemplateAsync(id);
         }
@@ -315,7 +320,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var item = model.Convert();
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
@@ -330,7 +335,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Content)]
-        public async Task<Result<bool>> DeleteRecipe(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteRecipe(int id)
         {
             return await recipeService.DeleteRecipeAsync(id);
         }
@@ -376,7 +381,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var item = model.Convert();
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
@@ -391,7 +396,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Content)]
-        public async Task<Result<bool>> DeleteFAQ(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteFAQ(int id)
         {
             return await faqService.DeleteFAQAsync(id);
         }
@@ -439,7 +444,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var item = model.Convert();
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
@@ -454,7 +459,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Content)]
-        public async Task<Result<bool>> DeleteArticle(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteArticle(int id)
         {
             return await articleService.DeleteArticleAsync(id);
         }
@@ -516,7 +521,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var item = model.Convert();
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
@@ -531,7 +536,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Content)]
-        public async Task<Result<bool>> DeleteContentPage(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteContentPage(int id)
         {
             return await contentPageService.DeleteContentPageAsync(id);
         }
@@ -595,7 +600,7 @@ namespace VC.Admin.Controllers
 			if (!Validate(contentCrossSellsModel))
 				return null;
 
-			var sUserId = Request.HttpContext.User.GetUserId();
+			var sUserId = _userManager.GetUserId(User);
 			var userId = Convert.ToInt32(sUserId);
 
 			var alreadyExists = await contentCrossSellService.GetContentCrossSellsAsync(contentCrossSellsModel.Type);

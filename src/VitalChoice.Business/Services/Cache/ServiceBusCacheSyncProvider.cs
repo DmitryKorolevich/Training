@@ -1,4 +1,4 @@
-﻿#if NET451
+﻿#if !NETSTANDARD1_5
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,14 +7,12 @@ using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational.Base;
 using VitalChoice.Caching.Services;
 using System.Collections.Concurrent;
-using System.Globalization;
-using Microsoft.Extensions.OptionsModel;
-using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
-using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Ecommerce.Domain.Options;
 using VitalChoice.Infrastructure.ServiceBus.Base;
-using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services.Cache
 {
@@ -22,25 +20,24 @@ namespace VitalChoice.Business.Services.Cache
     {
         public const int PingAverageMaxCount = 50;
 
-        private readonly IApplicationEnvironment _applicationEnvironment;
+        private readonly IHostingEnvironment _applicationEnvironment;
         private readonly bool _enabled;
         private readonly object _lockObject = new object();
         private readonly ServiceBusHostOneToMany _serviceBusClient;
         private readonly Guid _clientUid = Guid.NewGuid();
-        private readonly ConcurrentDictionary<string, int> _averagePing;
+        private static readonly ConcurrentDictionary<string, int> AveragePing = new ConcurrentDictionary<string, int>();
         private readonly int[] _pingMilliseconds = new int[PingAverageMaxCount];
         private int _totalMessagesReceived;
 
         public ServiceBusCacheSyncProvider(IInternalEntityCacheFactory cacheFactory, IEntityInfoStorage keyStorage,
             ILoggerFactory loggerFactory,
-            IOptions<AppOptions> options, IApplicationEnvironment applicationEnvironment)
-            : base(cacheFactory, keyStorage, loggerFactory)
+            IOptions<AppOptionsBase> options, IHostingEnvironment applicationEnvironment, ICacheServiceScopeFactoryContainer scopeFactoryContainer)
+            : base(cacheFactory, keyStorage, loggerFactory, scopeFactoryContainer)
         {
             if (options.Value.CacheSyncOptions?.Enabled ?? false)
             {
                 _applicationEnvironment = applicationEnvironment;
                 _enabled = true;
-                _averagePing = new ConcurrentDictionary<string, int>();
 
                 var queName = options.Value.CacheSyncOptions?.ServiceBusQueueName;
                 try
@@ -110,7 +107,7 @@ namespace VitalChoice.Business.Services.Cache
             _serviceBusClient.SendNow();
         }
 
-        public override ICollection<KeyValuePair<string, int>> AverageLatency => _averagePing;
+        public static ICollection<KeyValuePair<string, int>> AverageLatency => AveragePing;
 
         protected virtual void Dispose(bool disposing)
         {
@@ -156,7 +153,7 @@ namespace VitalChoice.Business.Services.Cache
 
                     if (syncOp.SyncType == SyncType.Ping && syncOp.AveragePing > 0)
                     {
-                        _averagePing.AddOrUpdate(syncOp.AppName, syncOp.AveragePing, (s, i) => syncOp.AveragePing);
+                        AveragePing.AddOrUpdate(syncOp.AppName, syncOp.AveragePing, (s, i) => syncOp.AveragePing);
                     }
                     else
                     {
@@ -174,7 +171,7 @@ namespace VitalChoice.Business.Services.Cache
                 if (pings.Length > 0)
                 {
                     var averagePing = (int)pings.Average();
-                    _averagePing.AddOrUpdate(_applicationEnvironment.ApplicationName, averagePing, (s, i) => averagePing);
+                    AveragePing.AddOrUpdate(_applicationEnvironment.ApplicationName, averagePing, (s, i) => averagePing);
                     _serviceBusClient.EnqueueMessage(new BrokeredMessage(new SyncOperation
                     {
                         SyncType = SyncType.Ping,

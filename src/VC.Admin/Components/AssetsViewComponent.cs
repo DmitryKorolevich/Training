@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.AspNet.Mvc;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.Extensions.Options;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Infrastructure.Domain.Options;
 
@@ -10,21 +12,19 @@ namespace VC.Admin.Components
 	[ViewComponent(Name = "Assets")]
 	public class AssetsViewComponent : ViewComponent
 	{
-		private readonly AppOptions appOptions;
+	    private readonly IFrontEndAssetManager _frontEndAssetManager;
+	    private readonly AppOptions appOptions;
 		private readonly IUrlHelper urlHelper;
 
-		public AssetsViewComponent(IUrlHelper urlHelper, IOptions<AppOptions> appOptionsAccessor)
+		public AssetsViewComponent(IUrlHelperFactory urlHelper, IOptions<AppOptions> appOptionsAccessor, IFrontEndAssetManager frontEndAssetManager, IActionContextAccessor actionContextAccessor)
 		{
-			if (urlHelper == null)
-			{
-				throw new ArgumentNullException(nameof(urlHelper));
-			}
+		    _frontEndAssetManager = frontEndAssetManager;
 
 			if (appOptionsAccessor == null)
 			{
 				throw new ArgumentNullException(nameof(appOptionsAccessor));
 			}
-			this.urlHelper = urlHelper;
+			this.urlHelper = urlHelper.GetUrlHelper(actionContextAccessor.ActionContext);
 			this.appOptions = appOptionsAccessor.Value;
 		}
 
@@ -37,7 +37,7 @@ namespace VC.Admin.Components
             if (assetType.Equals("scripts", StringComparison.OrdinalIgnoreCase))
 			{
 				viewName = "Scripts";
-				var assetInfo = FrontEndAssetManager.GetScripts();
+				var assetInfo = _frontEndAssetManager.GetScripts();
 				if (appOptions.EnableBundlingAndMinification)
 				{
 					filePaths.Add(urlHelper.Content(
@@ -54,7 +54,7 @@ namespace VC.Admin.Components
 			else if (assetType.Equals("styles", StringComparison.OrdinalIgnoreCase))
 			{
 				viewName = "Styles";
-				var assetInfo = FrontEndAssetManager.GetStyles();
+				var assetInfo = _frontEndAssetManager.GetStyles();
 				if (appOptions.EnableBundlingAndMinification)
 				{
 					filePaths.Add(urlHelper.Content(
@@ -71,7 +71,7 @@ namespace VC.Admin.Components
             else if (assetType.Equals("styles-order-invoice", StringComparison.OrdinalIgnoreCase))
             {
                 viewName = "Styles";
-                var assetInfo = FrontEndAssetManager.GetOrderInvoiceStyles();
+                var assetInfo = _frontEndAssetManager.GetOrderInvoiceStyles();
                 if (appOptions.EnableBundlingAndMinification)
                 {
                     filePaths.Add(urlHelper.Content(

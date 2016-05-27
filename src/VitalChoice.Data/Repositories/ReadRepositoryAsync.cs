@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Microsoft.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Ecommerce.Domain;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 
 namespace VitalChoice.Data.Repositories
 {

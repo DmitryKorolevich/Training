@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Identity;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Entities.Permissions;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;

@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Autofac;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Options;
@@ -82,7 +82,7 @@ namespace ExportServiceWithSBQueue.Services
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError(e.Message, e);
+                    Logger.LogError(0, e, e.Message);
                     SendCommand(new ServiceBusCommandBase(command, false));
                     return true;
                 }
@@ -108,7 +108,7 @@ namespace ExportServiceWithSBQueue.Services
                 }
                 catch(Exception e)
                 {
-                    Logger.LogError(e.Message, e);
+                    Logger.LogError(0, e, e.Message);
                     SendCommand(new ServiceBusCommandBase(command, false));
                     return true;
                 }

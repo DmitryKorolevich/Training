@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Base;
@@ -16,7 +17,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Discounts
         {
             dataContext.DiscountMessage = dataContext.Order.Discount.GetDiscountMessage();
             dataContext.FreeShipping = true;
-            return Task.FromResult((decimal)0);
+            return TaskCache<decimal>.DefaultCompletedTask;
         }
     }
 }

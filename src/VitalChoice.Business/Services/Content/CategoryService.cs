@@ -67,7 +67,7 @@ namespace VitalChoice.Business.Services.Content
             this.contentPageRepository = contentPageRepository;
             this.objectLogItemExternalService = objectLogItemExternalService;
             this.templatesCache = templatesCache;
-            this.logger = logger.CreateLoggerDefault();
+            this.logger = logger.CreateLogger<CategoryService>();
         }
 
         public async Task<ContentCategory> GetCategoriesTreeAsync(CategoryTreeFilter filter)

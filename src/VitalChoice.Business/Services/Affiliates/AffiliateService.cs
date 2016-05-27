@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using VitalChoice.Business.Queries.Affiliate;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.DynamicData.Base;
@@ -14,13 +13,14 @@ using VitalChoice.Business.Mail;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Data.Services;
 using VitalChoice.Interfaces.Services.Users;
-using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.DynamicData.Helpers;
 using System.Globalization;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using VitalChoice.Business.Queries.Affiliates;
 using VitalChoice.Business.Queries.Customers;
+using VitalChoice.Business.Repositories;
 using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -113,63 +113,63 @@ namespace VitalChoice.Business.Services.Affiliates
                 case VAffiliateSortPath.Id:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Id)
                                 : x.OrderByDescending(y => y.Id);
                     break;
                 case VAffiliateSortPath.Name:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Name)
                                 : x.OrderByDescending(y => y.Name);
                     break;
                 case VAffiliateSortPath.WebSite:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.WebSite)
                                 : x.OrderByDescending(y => y.WebSite);
                     break;
                 case VAffiliateSortPath.Company:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Company)
                                 : x.OrderByDescending(y => y.Company);
                     break;
                 case VAffiliateSortPath.StatusCode:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.StatusCode)
                                 : x.OrderByDescending(y => y.StatusCode);
                     break;
                 case VAffiliateSortPath.CommissionAll:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.CommissionAll)
                                 : x.OrderByDescending(y => y.CommissionAll);
                     break;
                 case VAffiliateSortPath.DateEdited:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.DateEdited)
                                 : x.OrderByDescending(y => y.DateEdited);
                     break;
                 case VAffiliateSortPath.Tier:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Tier)
                                 : x.OrderByDescending(y => y.Tier);
                     break;
                 case VAffiliateSortPath.CustomersCount:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.CustomersCount)
                                 : x.OrderByDescending(y => y.CustomersCount);
                     break;

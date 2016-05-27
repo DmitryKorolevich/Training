@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
-using Microsoft.AspNet.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using VC.Public.Models.Profile;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
@@ -21,9 +21,10 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 using System.Collections.Generic;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 
 namespace VC.Public.Controllers
 {
@@ -34,25 +35,25 @@ namespace VC.Public.Controllers
         private readonly IAffiliateService _affiliateService;
         private readonly IDynamicMapper<AffiliateDynamic, Affiliate> _affiliateMapper;
         private readonly IOptions<AppOptions> _appOptions;
+        private readonly ExtendedUserManager _userManager;
 
         public AffiliateProfileController(
             IAffiliateUserService affiliateUserService,
             IAffiliateService affiliateService,
             IDynamicMapper<AffiliateDynamic, Affiliate> affiliateMapper,
             IOptions<AppOptions> appOptions,
-            IPageResultService pageResultService) : base(pageResultService)
+            IPageResultService pageResultService, ExtendedUserManager userManager) : base(pageResultService)
         {
             _affiliateUserService = affiliateUserService;
             _affiliateService = affiliateService;
             _affiliateMapper = affiliateMapper;
             _appOptions = appOptions;
+            _userManager = userManager;
         }
 
         private int GetInternalAffiliateId()
         {
-            var context = HttpContext;
-            var internalId = Convert.ToInt32(context.User.GetUserId());
-
+            var internalId = Convert.ToInt32(_userManager.GetUserId(User));
             return internalId;
         }
 
@@ -110,9 +111,7 @@ namespace VC.Public.Controllers
                 return View(model);
             }
 
-            var context = HttpContext;
-
-            var user = await _affiliateUserService.FindAsync(context.User.GetUserName());
+            var user = await _affiliateUserService.FindAsync(_userManager.GetUserName(User));
             if (user == null)
             {
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
@@ -140,8 +139,8 @@ namespace VC.Public.Controllers
         private void CleanProfileEmailFields(AffiliateManageModel model)
         {
             model.ConfirmEmail = model.Email = string.Empty;
-            ModelState["Email"] = new ModelStateEntry();
-            ModelState["ConfirmEmail"] = new ModelStateEntry();
+            ModelState.Remove("Email");
+            ModelState.Remove("ConfirmEmail");
         }
 
         [HttpPost]

@@ -6,8 +6,9 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.Query.Internal;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Iterators;
@@ -15,8 +16,6 @@ using VitalChoice.Caching.Services.Cache;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Helpers;
-using VitalChoice.Profiling;
-using VitalChoice.Profiling.Base;
 
 namespace VitalChoice.Caching.Services
 {
@@ -29,14 +28,15 @@ namespace VitalChoice.Caching.Services
         private readonly ILogger<CacheEntityQueryProvider> _logger;
 
         public CacheEntityQueryProvider(IQueryCompiler queryCompiler, IQueryParserFactory queryParserFactory,
-            IInternalEntityCacheFactory cacheFactory, IEntityInfoStorage infoStorage, DbContext context,
-            ILogger<CacheEntityQueryProvider> logger) : base(queryCompiler)
+            IInternalEntityCacheFactory cacheFactory, IEntityInfoStorage infoStorage,
+            ILoggerFactory logger, ICurrentDbContext currentContext) : base(queryCompiler)
         {
             _queryParserFactory = queryParserFactory;
             _cacheFactory = cacheFactory;
             _infoStorage = infoStorage;
-            _context = context;
-            _logger = logger;
+            _context = currentContext.Context;
+            _logger = logger.CreateLogger<CacheEntityQueryProvider>();
+            _infoStorage.Initialize(_context);
         }
 
         public override object Execute(Expression expression)
@@ -66,20 +66,10 @@ namespace VitalChoice.Caching.Services
                         case CacheGetResult.Found:
                             return entity;
                         case CacheGetResult.Update:
-                            var updateScope = new ProfilingScope(new ExpressionStringFormatter(expression));
-
-                            updateScope.AddScopeData(CacheGetResult.Update);
                             entity = base.Execute<TResult>(expression);
                             Task.Factory.StartNew(() =>
                             {
-                                try
-                                {
-                                    updateScope.AddScopeData(cacheExecutor.Update(entity));
-                                }
-                                finally
-                                {
-                                    updateScope.Dispose();
-                                }
+                                cacheExecutor.Update(entity);
                             });
                             return entity;
                     }
@@ -101,18 +91,12 @@ namespace VitalChoice.Caching.Services
                         case CacheGetResult.Found:
                             return (TResult) entityList;
                         case CacheGetResult.Update:
-                            var updateScope = new ProfilingScope(new ExpressionStringFormatter(expression));
-                            updateScope.AddScopeData(CacheGetResult.Update);
                             entityList = base.Execute<TResult>(expression);
-                            return (TResult) cacheExecutor.UpdateList(entityList, updateScope);
+                            return (TResult) cacheExecutor.UpdateList(entityList);
                     }
                 }
             }
-            using (var scope = new ProfilingScope(new ExpressionStringFormatter(expression)))
-            {
-                scope.AddScopeData(CacheGetResult.NotFound);
-                return base.Execute<TResult>(expression);
-            }
+            return base.Execute<TResult>(expression);
         }
 
         public override IAsyncEnumerable<TResult> ExecuteAsync<TResult>(Expression expression)
@@ -130,17 +114,11 @@ namespace VitalChoice.Caching.Services
                     case CacheGetResult.Found:
                         return result.ToAsyncEnumerable();
                     case CacheGetResult.Update:
-                        var updateScope = new ProfilingScope(new ExpressionStringFormatter(expression));
-                        updateScope.AddScopeData(CacheGetResult.Update);
                         var asyncResult = base.ExecuteAsync<TResult>(expression);
-                        return cacheExecutor.UpdateListAsync(asyncResult, updateScope);
+                        return cacheExecutor.UpdateListAsync(asyncResult);
                 }
             }
-            using (var scope = new ProfilingScope(new ExpressionStringFormatter(expression)))
-            {
-                scope.AddScopeData(CacheGetResult.NotFound);
-                return base.ExecuteAsync<TResult>(expression);
-            }
+            return base.ExecuteAsync<TResult>(expression);
         }
 
         public override async Task<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken)
@@ -165,21 +143,12 @@ namespace VitalChoice.Caching.Services
                         case CacheGetResult.Found:
                             return entity;
                         case CacheGetResult.Update:
-                            var updateScope = new ProfilingScope(new ExpressionStringFormatter(expression));
-                            updateScope.AddScopeData(CacheGetResult.Update);
                             entity = await base.ExecuteAsync<TResult>(expression, cancellationToken);
 #pragma warning disable 4014
                             Task.Factory.StartNew(() =>
 #pragma warning restore 4014
                             {
-                                try
-                                {
-                                    updateScope.AddScopeData(cacheExecutor.Update(entity));
-                                }
-                                finally
-                                {
-                                    updateScope.Dispose();
-                                }
+                                cacheExecutor.Update(entity);
                             }, cancellationToken);
                             return entity;
                     }
@@ -201,25 +170,12 @@ namespace VitalChoice.Caching.Services
                         case CacheGetResult.Found:
                             return (TResult) entityList;
                         case CacheGetResult.Update:
-                            var updateScope = new ProfilingScope(new ExpressionStringFormatter(expression));
-                            try
-                            {
-                                updateScope.AddScopeData(CacheGetResult.Update);
-                                entityList = await base.ExecuteAsync<TResult>(expression, cancellationToken);
-                            }
-                            catch
-                            {
-                                updateScope.Dispose();
-                            }
-                            return (TResult) cacheExecutor.UpdateList(entityList, updateScope);
+                            entityList = await base.ExecuteAsync<TResult>(expression, cancellationToken);
+                            return (TResult) cacheExecutor.UpdateList(entityList);
                     }
                 }
             }
-            using (var scope = new ProfilingScope(new ExpressionStringFormatter(expression)))
-            {
-                scope.AddScopeData(CacheGetResult.NotFound);
-                return await base.ExecuteAsync<TResult>(expression, cancellationToken);
-            }
+            return await base.ExecuteAsync<TResult>(expression, cancellationToken);
         }
 
         internal interface ICacheExecutor
@@ -228,7 +184,7 @@ namespace VitalChoice.Caching.Services
             object Execute(out CacheGetResult cacheResult);
             object ExecuteFirst(out CacheGetResult cacheResult);
             bool Update(object entity);
-            object UpdateList(object entities, ProfilingScope scope = null);
+            object UpdateList(object entities);
         }
 
         internal interface ICacheExecutor<T> : ICacheExecutor
@@ -243,7 +199,7 @@ namespace VitalChoice.Caching.Services
         {
             private readonly ILogger _logger;
             private readonly QueryData<T> _queryData;
-            private readonly IEntityCache<T> _cache;
+            private readonly IRelationalCache<T> _cache;
             private readonly Expression _reparsedExpression;
 
             // ReSharper disable once UnusedMember.Local
@@ -252,7 +208,7 @@ namespace VitalChoice.Caching.Services
             {
                 _logger = logger;
                 var queryCache = queryParserFactory.GetQueryCache<T>();
-                _cache = new EntityCache<T>(queryCache.InternalEntityCache, infoStorage, context, logger);
+                _cache = new RelationalCache<T>(queryCache.InternalCache, infoStorage, context, logger);
                 _queryData = queryCache.ParseQuery(expression, out _reparsedExpression);
             }
 
@@ -273,23 +229,9 @@ namespace VitalChoice.Caching.Services
                 return Update((T) entity);
             }
 
-            public object UpdateList(object entities, ProfilingScope scope = null)
+            public object UpdateList(object entities)
             {
-                var list = entities as List<T>;
-                if (list != null)
-                {
-                    try
-                    {
-                        var result = UpdateList(list);
-                        scope?.AddScopeData(result);
-                    }
-                    finally
-                    {
-                        scope?.Dispose();
-                    }
-                    return entities;
-                }
-                return new CacheEnumerable<T>((IEnumerable<T>) entities, this, scope);
+                return new CacheEnumerable<T>((IEnumerable<T>) entities, this);
             }
 
             public List<T> ExecuteTyped(out CacheGetResult cacheResult)
@@ -302,7 +244,7 @@ namespace VitalChoice.Caching.Services
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e.Message, e);
+                    _logger.LogError(0, e, e.Message);
                     cacheResult = CacheGetResult.NotFound;
                     return null;
                 }
@@ -318,7 +260,7 @@ namespace VitalChoice.Caching.Services
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e.Message, e);
+                    _logger.LogError(0, e, e.Message);
                     cacheResult = CacheGetResult.NotFound;
                     return default(T);
                 }
@@ -332,14 +274,11 @@ namespace VitalChoice.Caching.Services
                 }
                 try
                 {
-                    using (new ProfilingScope("Cache Update"))
-                    {
-                        return _cache.Update(_queryData, entity);
-                    }
+                    return _cache.Update(_queryData, entity);
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e.Message, e);
+                    _logger.LogError(0, e, e.Message);
                 }
                 return false;
             }
@@ -352,21 +291,18 @@ namespace VitalChoice.Caching.Services
                 }
                 try
                 {
-                    using (new ProfilingScope("Cache Update"))
-                    {
-                        return _cache.Update(_queryData, entities);
-                    }
+                    return _cache.Update(_queryData, entities);
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e.Message, e);
+                    _logger.LogError(0, e, e.Message);
                 }
                 return false;
             }
 
-            public IAsyncEnumerable<T> UpdateListAsync(IAsyncEnumerable<T> entities, ProfilingScope scope = null)
+            public IAsyncEnumerable<T> UpdateListAsync(IAsyncEnumerable<T> entities)
             {
-                return new AsyncCacheEnumerable<T>(entities, this, scope);
+                return new AsyncCacheEnumerable<T>(entities, this);
             }
         }
     }

@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Business.Queries.Orders;
 using VitalChoice.Business.Queries.Payment;
@@ -26,7 +26,6 @@ using VitalChoice.Business.Queries.Users;
 using VitalChoice.Business.Repositories;
 using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Data.Extensions;
-using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Transaction;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Helpers;
@@ -81,7 +80,7 @@ namespace VitalChoice.Business.Services.Customers
         private readonly IPaymentMethodService _paymentMethodService;
         private readonly IEcommerceRepositoryAsync<VWholesaleSummaryInfo> _vWholesaleSummaryInfoRepositoryAsync;
         private readonly IAppInfrastructureService _appInfrastructureService;
-        private readonly SPEcommerceRepository _sPEcommerceRepository;
+        private readonly SpEcommerceRepository _sPEcommerceRepository;
 
         private static string _customerContainerName;
 
@@ -103,7 +102,7 @@ namespace VitalChoice.Business.Services.Customers
             IObjectMapper<CustomerPaymentMethodDynamic> paymentMapper, IPaymentMethodService paymentMethodService,
             IEcommerceRepositoryAsync<VWholesaleSummaryInfo> vWholesaleSummaryInfoRepositoryAsync,
             IAppInfrastructureService appInfrastructureService,
-            SPEcommerceRepository sPEcommerceRepository,
+            SpEcommerceRepository sPEcommerceRepository,
             ITransactionAccessor<EcommerceContext> transactionAccessor)
             : base(
                 customerMapper, customerRepositoryAsync,
@@ -386,21 +385,21 @@ namespace VitalChoice.Business.Services.Customers
                 case VCustomerSortPath.Id:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Id)
                                 : x.OrderByDescending(y => y.Id);
                     break;
                 case VCustomerSortPath.IdObjectType:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.IdObjectType)
                                 : x.OrderByDescending(y => y.IdObjectType);
                     break;
                 case VCustomerSortPath.Name:
                     sortDynamic =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.ProfileAddress.Data.LastName).ThenBy(y => y.ProfileAddress.Data.FirstName)
                                 : x.OrderByDescending(y => y.ProfileAddress.Data.LastName)
                                     .ThenByDescending(y => y.ProfileAddress.Data.FirstName);
@@ -408,42 +407,42 @@ namespace VitalChoice.Business.Services.Customers
                 case VCustomerSortPath.Email:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Email)
                                 : x.OrderByDescending(y => y.Email);
                     break;
                 case VCustomerSortPath.Updated:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.DateEdited)
                                 : x.OrderByDescending(y => y.DateEdited);
                     break;
                 case VCustomerSortPath.Country:
                     sortDynamic =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => _countryNameCode.GetCountryCode(y.ProfileAddress))
                                 : x.OrderByDescending(y => _countryNameCode.GetCountryCode(y.ProfileAddress));
                     break;
                 case VCustomerSortPath.City:
                     sortDynamic =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.ProfileAddress.Data.City)
                                 : x.OrderByDescending(y => y.ProfileAddress.Data.City);
                     break;
                 case VCustomerSortPath.State:
                     sortDynamic =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => _countryNameCode.GetRegionOrStateCode(y.ProfileAddress)).ThenBy(y => y.ProfileAddress.County)
                                 : x.OrderByDescending(y => _countryNameCode.GetRegionOrStateCode(y.ProfileAddress)).ThenByDescending(y => y.ProfileAddress.County);
                     break;
                 case VCustomerSortPath.Status:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.StatusCode)
                                 : x.OrderByDescending(y => y.StatusCode);
                     break;
@@ -809,7 +808,7 @@ namespace VitalChoice.Business.Services.Customers
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError(e.Message, e);
+                    Logger.LogError(0, e, e.Message);
                     if (customerUpdated) //this needs to be done since distributed transactions not supported yet
                                          //todo: refactor this once distributed transactions arrive
                     {

@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.Infrastructure;
-using Microsoft.Data.Entity.Storage;
+using Microsoft.EntityFrameworkCore;
 using VitalChoice.Data.Transaction;
 
 namespace VitalChoice.Data.Context
@@ -14,16 +12,10 @@ namespace VitalChoice.Data.Context
     {
         private IInnerEmbeddingTransaction _transaction;
 
-        protected DataContext()
+        protected DataContext(DbContextOptions contextOptions) :base(contextOptions)
         {
             InstanceId = Guid.NewGuid();
         }
-
-        protected DataContext(IServiceProvider serviceProvider) : base(serviceProvider)
-        {
-            InstanceId = Guid.NewGuid();
-        }
-
 
         public object Tag { get; set; }
         public bool Disposed { get; private set; }

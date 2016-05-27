@@ -1,7 +1,7 @@
 ﻿using System.Linq;
-using Microsoft.AspNet.Mvc;
 using VitalChoice.Validation.Models;
-using Microsoft.AspNet.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 
 namespace VitalChoice.Core.GlobalFilters

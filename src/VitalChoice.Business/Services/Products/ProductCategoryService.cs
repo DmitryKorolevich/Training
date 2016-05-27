@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.Business.Queries.Products;
+using VitalChoice.Business.Repositories;
 using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
@@ -19,7 +20,6 @@ using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Infrastructure.Domain.Entities.Products;
-using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Services;
 
 namespace VitalChoice.Business.Services.Products
@@ -30,7 +30,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly IEcommerceRepositoryAsync<ProductCategory> productCategoryEcommerceRepository;
         private readonly IRepositoryAsync<ContentItem> contentItemRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
-        private readonly SPEcommerceRepository sPEcommerceRepository;
+        private readonly SpEcommerceRepository sPEcommerceRepository;
         private readonly IObjectLogItemExternalService objectLogItemExternalService;
         private readonly ILogger logger;
 
@@ -39,7 +39,7 @@ namespace VitalChoice.Business.Services.Products
             IRepositoryAsync<ContentItem> contentItemRepository,
             IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
-            SPEcommerceRepository sPEcommerceRepository,
+            SpEcommerceRepository sPEcommerceRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
             ILoggerProviderExtended loggerProvider,
             ITtlGlobalCache templatesCache)
@@ -50,7 +50,7 @@ namespace VitalChoice.Business.Services.Products
             this.contentTypeRepository = contentTypeRepository;
             this.sPEcommerceRepository = sPEcommerceRepository;
             this.objectLogItemExternalService = objectLogItemExternalService;
-            logger = loggerProvider.CreateLoggerDefault();
+            logger = loggerProvider.CreateLogger<ProductCategoryService>();
         }
 
         #region Categories

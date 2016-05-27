@@ -13,7 +13,7 @@
 }
 
 <div class="working-area-holder affiliate-registration">
-    @using (Html.BeginForm("Register", "AffiliateAccount", null, FormMethod.Post, new { @class = "form-regular medium-small", role = "form" }))
+    @using (Html.BeginForm("Register", "AffiliateAccount", null, FormMethod.Post, null, new { @class = "form-regular medium-small", role = "form" }))
     {
         <h4>Register a New Affiliate Account</h4>
         await Html.RenderPartialAsync("_AffiliateManage", Model);

@@ -1,6 +1,6 @@
 ﻿using System;
-using Microsoft.Data.Entity.Internal;
-using Microsoft.Data.Entity.Storage;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace VitalChoice.Profiling.Base
 {
@@ -13,20 +13,15 @@ namespace VitalChoice.Profiling.Base
             _builder = builder;
         }
 
-        public IRelationalCommandBuilder AddParameter(string name, object value, Func<IRelationalTypeMapper, RelationalTypeMapping> mapType,
-            bool? nullable)
+        public IndentedStringBuilder Instance => _builder.Instance;
+        public IRelationalCommand Build()
         {
-            return new RelationalCommandBuilderFacade(_builder.AddParameter(name, value, mapType, nullable));
-        }
-
-        public IRelationalCommand BuildRelationalCommand()
-        {
-            var command = _builder.BuildRelationalCommand();
+            var command = _builder.Build();
             if (command is RelationalCommandFacade)
                 return command;
             return new RelationalCommandFacade(command);
         }
 
-        public IndentedStringBuilder CommandTextBuilder => _builder.CommandTextBuilder;
+        public IRelationalParameterBuilder ParameterBuilder => _builder.ParameterBuilder;
     }
 }

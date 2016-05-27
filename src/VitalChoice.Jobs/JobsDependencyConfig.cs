@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Autofac;
-using Microsoft.AspNet.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using VitalChoice.Core.DependencyInjection;
 using VitalChoice.Infrastructure.Domain.Options;

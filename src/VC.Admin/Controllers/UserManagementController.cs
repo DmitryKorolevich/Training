@@ -2,12 +2,12 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Validation.Models;
 using System.Security.Claims;
-using Microsoft.AspNet.Http;
+using Microsoft.AspNetCore.Http;
 using VC.Admin.Models.UserManagement;
 using VC.Admin.Validators.UserManagement;
 using VitalChoice.Core.Base;
@@ -22,6 +22,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 
 namespace VC.Admin.Controllers
 {
@@ -29,12 +30,14 @@ namespace VC.Admin.Controllers
     {
 	    private readonly IAdminUserService userService;
 	    private readonly IOptions<AppOptions> appOptions;
+        private readonly ExtendedUserManager _userManager;
 
-		public UserManagementController(IAdminUserService userService, IOptions<AppOptions> appOptions)
+        public UserManagementController(IAdminUserService userService, IOptions<AppOptions> appOptions, ExtendedUserManager userManager)
 	    {
 		    this.userService = userService;
 		    this.appOptions = appOptions;
-        }
+            _userManager = userManager;
+	    }
 
 	    [HttpGet]
 	    public async Task<Result<ICollection<AdminTeam>>> GetAdminTeams()
@@ -67,7 +70,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Users)]
         [HttpPost]
-		public Result<ManageUserModel> CreateUserPrototype([FromBody] object model)
+		public Result<ManageUserModel> CreateUserPrototype()
 		{
 			return new ManageUserModel();
 		}
@@ -117,12 +120,12 @@ namespace VC.Admin.Controllers
 			}
 
 			var context = HttpContext;
-			if (user.Id == Convert.ToInt32(context.User.GetUserId()) && user.Status != userModel.Status)
+			if (user.Id == Convert.ToInt32(_userManager.GetUserId(User)) && user.Status != userModel.Status)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CurrentUserStatusUpdate]);
 			}
 
-			var isCurrentUser = user.Email.Equals(HttpContext.User.GetUserName());
+			var isCurrentUser = user.Email.Equals(_userManager.GetUserName(User));
 
 			user.FirstName = userModel.FirstName;
 			user.LastName = userModel.LastName;
@@ -177,7 +180,7 @@ namespace VC.Admin.Controllers
 			}
 
 			var context = HttpContext;
-			if (user.Id == Convert.ToInt32(context.User.GetUserId()))
+			if (user.Id == Convert.ToInt32(_userManager.GetUserId(User)))
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CurrentUserRemoval]);
 			}
@@ -189,7 +192,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Users)]
         [HttpPost]
-		public async Task<Result<bool>> ResendActivation(Guid id, [FromBody] object model)
+		public async Task<Result<bool>> ResendActivation(Guid id)
 		{
 			await userService.ResendActivationAsync(id);
 
@@ -198,7 +201,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Users)]
         [HttpPost]
-		public async Task<Result<bool>> ResetPassword(Guid id, [FromBody] object model)
+		public async Task<Result<bool>> ResetPassword(Guid id)
 		{
 			await userService.SendResetPasswordAsync(id);
 

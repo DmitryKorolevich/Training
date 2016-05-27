@@ -12,7 +12,7 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Business.Mail;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Mail;
@@ -41,7 +41,7 @@ namespace VitalChoice.Business.Services.Orders
             _customerService = customerService;
             _notificationService = notificationService;
             _options = options;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<OrderSchedulerService>();
         }
 
         public async Task UpdateShipDelayedOrders()

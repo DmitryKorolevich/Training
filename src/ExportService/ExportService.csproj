@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ExportService</RootNamespace>
     <AssemblyName>ExportService</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -29,6 +29,7 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -108,168 +109,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Antlr4.Runtime">
-      <HintPath>..\..\packages\WorkerRole\Antlr4.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Authorize.Net">
-      <HintPath>..\..\packages\WorkerRole\Authorize.Net.dll</HintPath>
-    </Reference>
-    <Reference Include="Autofac">
-      <HintPath>..\..\packages\WorkerRole\Autofac.dll</HintPath>
-    </Reference>
-    <Reference Include="Autofac.Extensions.DependencyInjection">
-      <HintPath>..\..\packages\WorkerRole\Autofac.Extensions.DependencyInjection.dll</HintPath>
-    </Reference>
-    <Reference Include="Avalara.Avatax.Rest">
-      <HintPath>..\..\packages\WorkerRole\Avalara.Avatax.Rest.dll</HintPath>
-    </Reference>
-    <Reference Include="Azure.ApplicationHost">
-      <HintPath>..\..\packages\WorkerRole\Azure.ApplicationHost.dll</HintPath>
-    </Reference>
-    <Reference Include="CsvHelper">
-      <HintPath>..\..\packages\WorkerRole\CsvHelper.dll</HintPath>
-    </Reference>
-    <Reference Include="EntityFramework.Core">
-      <HintPath>..\..\packages\WorkerRole\EntityFramework.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="EntityFramework.MicrosoftSqlServer">
-      <HintPath>..\..\packages\WorkerRole\EntityFramework.MicrosoftSqlServer.dll</HintPath>
-    </Reference>
-    <Reference Include="EntityFramework.Relational">
-      <HintPath>..\..\packages\WorkerRole\EntityFramework.Relational.dll</HintPath>
-    </Reference>
-    <Reference Include="ExportServiceWithSBQueue">
-      <HintPath>..\..\packages\WorkerRole\ExportServiceWithSBQueue.dll</HintPath>
-    </Reference>
-    <Reference Include="FluentValidation">
-      <HintPath>..\..\packages\WorkerRole\FluentValidation.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Antiforgery">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Antiforgery.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Authentication">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Authentication.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Authentication.Cookies">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Authentication.Cookies.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Authorization">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Authorization.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Cors">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Cors.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Cryptography.Internal">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Cryptography.Internal.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Cryptography.KeyDerivation">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Cryptography.KeyDerivation.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.DataProtection">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.DataProtection.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.DataProtection.Abstractions">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.DataProtection.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Diagnostics.Abstractions">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Diagnostics.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.FileProviders.Abstractions">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.FileProviders.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.FileProviders.Physical">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.FileProviders.Physical.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Hosting.Abstractions">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Hosting.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Html.Abstractions">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Html.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Http">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Http.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Http.Abstractions">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Http.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Http.Extensions">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Http.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Http.Features">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Http.Features.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Identity">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Identity.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Identity.EntityFramework">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.JsonPatch">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.JsonPatch.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Localization">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Localization.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Mvc">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Mvc.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Mvc.Abstractions">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Mvc.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Mvc.ApiExplorer">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Mvc.ApiExplorer.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Mvc.Core">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Mvc.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Mvc.Cors">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Mvc.Cors.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Mvc.DataAnnotations">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Mvc.DataAnnotations.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Mvc.Formatters.Json">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Mvc.Formatters.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Mvc.Localization">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Mvc.Localization.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Mvc.Razor">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Mvc.Razor.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Mvc.Razor.Host">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Mvc.Razor.Host.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Mvc.ViewFeatures">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Mvc.ViewFeatures.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.PageExecutionInstrumentation.Interfaces">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.PageExecutionInstrumentation.Interfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Razor">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Razor.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Razor.Runtime">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Razor.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Razor.Runtime.Precompilation">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Razor.Runtime.Precompilation.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Routing">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Routing.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.WebUtilities">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.WebUtilities.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Azure.KeyVault.Core">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Azure.KeyVault.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.CodeAnalysis">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.CodeAnalysis.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.CodeAnalysis.CSharp">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Data.Edm, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Data.Edm.dll</HintPath>
@@ -282,135 +121,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Data.Services.Client.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Dnx">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Dnx.ApplicationHost">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.ApplicationHost.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Dnx.Compilation">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Compilation.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Dnx.Compilation.Abstractions">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Compilation.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Dnx.Compilation.CSharp">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Compilation.CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Dnx.Compilation.CSharp.Abstractions">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Compilation.CSharp.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Dnx.Compilation.CSharp.Common">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Compilation.CSharp.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Dnx.Compilation.DesignTime">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Compilation.DesignTime.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Dnx.DesignTimeHost.Abstractions">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.DesignTimeHost.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Dnx.Host">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Host.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Dnx.Host.Clr">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Host.Clr.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Dnx.Host.Mono">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Host.Mono.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Dnx.Loader">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Loader.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Dnx.Runtime">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Dnx.Runtime.Internals">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Runtime.Internals.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Caching.Abstractions">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.Caching.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Caching.Memory">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.Caching.Memory.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Configuration">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.Configuration.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Configuration.Abstractions">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Configuration.Binder">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.Configuration.Binder.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Configuration.FileExtensions">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.Configuration.FileExtensions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Configuration.Json">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.Configuration.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.DependencyInjection">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.DependencyInjection.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Globalization.CultureInfoCache">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.Globalization.CultureInfoCache.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Localization">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.Localization.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Localization.Abstractions">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.Localization.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Logging">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.Logging.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Logging.Abstractions">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Logging.Console">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.Logging.Console.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.MemoryPool">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.MemoryPool.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.OptionsModel">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.OptionsModel.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.PlatformAbstractions">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.PlatformAbstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Primitives">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.Primitives.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.WebEncoders">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.WebEncoders.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.WebEncoders.Core">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.WebEncoders.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Net.Http.Headers">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.Net.Http.Headers.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.ServiceBus">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.ServiceBus.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAzure.Configuration">
-      <HintPath>..\..\packages\WorkerRole\Microsoft.WindowsAzure.Configuration.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.WindowsAzure.Storage">
       <HintPath>..\..\packages\WorkerRole\Microsoft.WindowsAzure.Storage.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="NLog">
-      <HintPath>..\..\packages\WorkerRole\NLog.dll</HintPath>
-    </Reference>
-    <Reference Include="Remotion.Linq">
-      <HintPath>..\..\packages\WorkerRole\Remotion.Linq.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections.Immutable, Version=1.1.37.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -419,67 +135,23 @@
     </Reference>
     <Reference Include="System.configuration" />
     <Reference Include="System.Configuration.Install" />
-    <Reference Include="System.Diagnostics.DiagnosticSource">
-      <HintPath>..\..\packages\WorkerRole\System.Diagnostics.DiagnosticSource.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Interactive.Async">
-      <HintPath>..\..\packages\WorkerRole\System.Interactive.Async.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reflection.Metadata">
-      <HintPath>..\..\packages\WorkerRole\System.Reflection.Metadata.dll</HintPath>
-    </Reference>
     <Reference Include="System.Security" />
     <Reference Include="System.ServiceProcess" />
-    <Reference Include="System.Spatial, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\WorkerRole\System.Spatial.dll</HintPath>
-    </Reference>
-    <Reference Include="Templates">
-      <HintPath>..\..\packages\WorkerRole\Templates.dll</HintPath>
-    </Reference>
-    <Reference Include="Templates.Language">
-      <HintPath>..\..\packages\WorkerRole\Templates.Language.dll</HintPath>
-    </Reference>
-    <Reference Include="VitalChoice.Business">
-      <HintPath>..\..\packages\WorkerRole\VitalChoice.Business.dll</HintPath>
-    </Reference>
-    <Reference Include="VitalChoice.Caching">
-      <HintPath>..\..\packages\WorkerRole\VitalChoice.Caching.dll</HintPath>
-    </Reference>
-    <Reference Include="VitalChoice.ContentProcessing">
-      <HintPath>..\..\packages\WorkerRole\VitalChoice.ContentProcessing.dll</HintPath>
-    </Reference>
-    <Reference Include="VitalChoice.Data">
-      <HintPath>..\..\packages\WorkerRole\VitalChoice.Data.dll</HintPath>
-    </Reference>
-    <Reference Include="VitalChoice.DynamicData">
-      <HintPath>..\..\packages\WorkerRole\VitalChoice.DynamicData.dll</HintPath>
-    </Reference>
-    <Reference Include="VitalChoice.Ecommerce">
-      <HintPath>..\..\packages\WorkerRole\VitalChoice.Ecommerce.dll</HintPath>
-    </Reference>
-    <Reference Include="VitalChoice.Ecommerce.Domain">
-      <HintPath>..\..\packages\WorkerRole\VitalChoice.Ecommerce.Domain.dll</HintPath>
-    </Reference>
-    <Reference Include="VitalChoice.Infrastructure">
-      <HintPath>..\..\packages\WorkerRole\VitalChoice.Infrastructure.dll</HintPath>
-    </Reference>
-    <Reference Include="VitalChoice.Infrastructure.Domain">
-      <HintPath>..\..\packages\WorkerRole\VitalChoice.Infrastructure.Domain.dll</HintPath>
-    </Reference>
-    <Reference Include="VitalChoice.Interfaces">
-      <HintPath>..\..\packages\WorkerRole\VitalChoice.Interfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="VitalChoice.ObjectMapping">
-      <HintPath>..\..\packages\WorkerRole\VitalChoice.ObjectMapping.dll</HintPath>
-    </Reference>
-    <Reference Include="VitalChoice.Workflow">
-      <HintPath>..\..\packages\WorkerRole\VitalChoice.Workflow.dll</HintPath>
-    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ThirdParty\Autofac.Extensions.DependencyInjection\Autofac.Extensions.DependencyInjection.xproj">
+      <Project>{513c7f7a-a758-4d48-94f4-891a00f63da1}</Project>
+      <Name>Autofac.Extensions.DependencyInjection</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ThirdParty\Autofac\Autofac.xproj">
+      <Project>{198ce8be-0c4a-4da6-8ffe-c5f949b2bbbf}</Project>
+      <Name>Autofac</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>"$(ProjectDir)..\ExportServiceWithSBQueue\build.cmd" $(ConfigurationName) "$(ProjectDir)..\.."</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

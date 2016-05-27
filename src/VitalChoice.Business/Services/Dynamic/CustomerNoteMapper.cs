@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Business.Queries.Customers;
 using VitalChoice.Data.Helpers;
@@ -39,7 +40,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.Note = entity.Note;
                 dynamic.IdAddedBy = entity.IdAddedBy;
             });
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
         protected override Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<CustomerNoteDynamic, CustomerNote>> items)
@@ -54,7 +55,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.DateEdited = dynamic.DateEdited;
                 entity.IdEditedBy = dynamic.IdEditedBy;
             });
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
         protected override Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<CustomerNoteDynamic, CustomerNote>> items)
@@ -69,7 +70,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.StatusCode = (int)RecordStatusCode.Active;
                 entity.IdAddedBy = entity.IdEditedBy;
             });
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
     }
 }

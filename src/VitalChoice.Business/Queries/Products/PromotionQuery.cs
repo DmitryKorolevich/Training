@@ -39,9 +39,12 @@ namespace VitalChoice.Business.Queries.Products
             return this;
         }
 
-        public PromotionQuery WithAssigned(CustomerType? type)
+        public PromotionQuery WithAssigned(bool searchByAssigned, CustomerType? type)
         {
-            Add(x => x.Assigned == type);
+            if (searchByAssigned)
+            {
+                Add(x => x.Assigned == type);
+            }
             return this;
         }
 

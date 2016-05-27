@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VC.Public.Models.Auth;
 using VitalChoice.Business.Helpers;
 using VitalChoice.DynamicData.Base;
@@ -21,7 +22,7 @@ namespace VC.Public.ModelConverters.Customer
 
         public override Task DynamicToModelAsync(RegisterAccountModel model, CustomerDynamic dynamic)
 	    {
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
 	    public override async Task ModelToDynamicAsync(RegisterAccountModel model, CustomerDynamic dynamic)

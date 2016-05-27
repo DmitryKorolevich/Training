@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Authorization;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
-using Microsoft.AspNet.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using VC.Public.Helpers;
 using VC.Public.Models.Cart;
 using VitalChoice.Core.Infrastructure;
@@ -31,6 +31,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Validation.Models;
@@ -52,8 +53,8 @@ namespace VC.Public.Controllers
             IOrderService orderService, IProductService productService, ICheckoutService checkoutService,
             IAuthorizationService authorizationService, IAppInfrastructureService appInfrastructureService,
             IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
-            IDiscountService discountService, IGcService gcService, IContentCrossSellService contentCrossSellService, IPageResultService pageResultService, ISettingService settingService)
-            : base(customerService, appInfrastructureService, authorizationService, checkoutService, orderService, skuMapper,productMapper, pageResultService, settingService)
+            IDiscountService discountService, IGcService gcService, IContentCrossSellService contentCrossSellService, IPageResultService pageResultService, ISettingService settingService, ExtendedUserManager userManager)
+            : base(customerService, appInfrastructureService, authorizationService, checkoutService, orderService, skuMapper,productMapper, pageResultService, settingService, userManager)
         {
 	        _productService = productService;
             _checkoutService = checkoutService;

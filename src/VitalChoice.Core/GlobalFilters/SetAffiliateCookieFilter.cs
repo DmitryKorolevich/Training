@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNet.Mvc.Filters;
-using System;
-using Microsoft.AspNet.Http;
+﻿using System;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Filters;
 using VitalChoice.Infrastructure.Domain.Constants;
 
 namespace VitalChoice.Core.GlobalFilters

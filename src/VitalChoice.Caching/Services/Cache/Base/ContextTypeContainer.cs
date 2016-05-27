@@ -1,15 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using VitalChoice.Caching.Interfaces;
 
 namespace VitalChoice.Caching.Services.Cache.Base
 {
     internal class ContextTypeContainer : IContextTypeContainer
     {
-        public Type[] ContextTypes { get; }
+        public HashSet<Type> ContextTypes { get; set; }
+        public object SyncRoot { get; }
 
-        public ContextTypeContainer(Type[] contextTypes)
+        public ContextTypeContainer()
         {
-            ContextTypes = contextTypes;
+            ContextTypes = new HashSet<Type>();
+            SyncRoot = new object();
         }
     }
 }

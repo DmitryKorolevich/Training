@@ -54,6 +54,7 @@
                 ValidFrom: null,
                 ValidTo: null,
                 DateStatus: 2,//live
+                SearchByAssigned: true,
                 Assigned: 1,//retail
                 Paging: { PageIndex: 1, PageItemCount: 100 },
                 Sorting: gridSorterUtil.resolve(refreshPromotions, "Description", "Asc")

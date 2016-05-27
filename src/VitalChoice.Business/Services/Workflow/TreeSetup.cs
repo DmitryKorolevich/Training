@@ -39,7 +39,7 @@ namespace VitalChoice.Business.Services.Workflow
             _actionDependenciesRepository = actionDependenciesRepository;
             _actionAggregationsRepository = actionAggregationsRepository;
             _transactionAccessor = transactionAccessor;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<TreeSetup<TContext, TResult>>();
             Trees = new Dictionary<Type, WorkflowTreeDefinition>();
             Actions = new Dictionary<Type, WorkflowActionDefinition>();
             ActionResolvers = new Dictionary<Type, WorkflowActionResolverDefinition>();

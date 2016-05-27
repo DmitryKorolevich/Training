@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace VitalChoice.Caching.Interfaces
 {
     public interface IContextTypeContainer
     {
-        Type[] ContextTypes { get; }
+        HashSet<Type> ContextTypes { get; set; }
+
+        object SyncRoot { get; }
     }
 }

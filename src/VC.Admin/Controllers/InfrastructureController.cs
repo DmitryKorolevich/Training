@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using VC.Admin.Models.Infrastructure;
 using VitalChoice.Core.Base;
 using VitalChoice.Interfaces.Services;

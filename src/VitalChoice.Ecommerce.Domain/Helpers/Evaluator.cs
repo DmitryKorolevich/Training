@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Microsoft.Data.Entity.Internal;
-using Microsoft.Data.Entity.Query.Internal;
+using Microsoft.EntityFrameworkCore.Query.Internal;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace VitalChoice.Ecommerce.Domain.Helpers
 {

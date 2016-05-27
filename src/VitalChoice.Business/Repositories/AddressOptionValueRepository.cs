@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.Entity;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +7,7 @@ using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
+using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Transfer;
 
@@ -14,7 +15,7 @@ namespace VitalChoice.Business.Repositories
 {
     public class AddressOptionValueRepository : EcommerceRepositoryAsync<AddressOptionValue>
     {
-        public AddressOptionValueRepository(IDataContextAsync context) : base(context)
+        public AddressOptionValueRepository(EcommerceContext context) : base(context)
         {
         }
 

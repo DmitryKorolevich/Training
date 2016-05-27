@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.order.services.orderEditService', [])
-.factory('orderEditService', ['$q', '$filter', '$injector', '$state', '$rootScope', '$timeout', 'customerEditService', 'orderService', 'productService', 'gcService', 'discountService', 'toaster', 'modalUtil',
-    function ($q, $filter, $injector, $state, $rootScope, $timeout, customerEditService, orderService, productService, gcService, discountService, toaster, modalUtil)
+.factory('orderEditService', ['$q', '$filter', '$injector', '$state', '$rootScope', '$timeout', 'customerEditService', 'customerService', 'orderService', 'productService', 'gcService', 'discountService', 'toaster', 'modalUtil',
+    function ($q, $filter, $injector, $state, $rootScope, $timeout, customerEditService, customerService, orderService, productService, gcService, discountService, toaster, modalUtil)
 {
     var initBase = function (uiScope)
     {
@@ -579,11 +579,15 @@ angular.module('app.modules.order.services.orderEditService', [])
         {
             if (!uiScope.options.shippingCustomerSaved)
             {
-                uiScope.order.Shipping = angular.copy(uiScope.order.OldShipping);
+                if (uiScope.order.OldShipping != null)
+                {
+                    customerEditService.syncCountry(uiScope, uiScope.order.OldShipping);
+                    uiScope.order.Shipping = angular.copy(uiScope.order.OldShipping);
+                }
             }
             else
             {
-                if (uiScope.shippingAddressTab.AddressIndex)
+                if (uiScope.shippingAddressTab.AddressIndex && uiScope.currentCustomer.Shipping.length > 0)
                 {
                     uiScope.shippingAddressTab.OrderShippingEditModel = undefined;
                     uiScope.order.Shipping = angular.copy(uiScope.currentCustomer.Shipping[parseInt(uiScope.shippingAddressTab.AddressIndex)]);
@@ -595,14 +599,88 @@ angular.module('app.modules.order.services.orderEditService', [])
         {
             if (!uiScope.options.creditCardCustomerSaved)
             {
-                uiScope.order.CreditCard = angular.copy(uiScope.order.OldCreditCard);
+                if (uiScope.order.OldCreditCard != null)
+                {
+                    customerEditService.syncCountry(uiScope, uiScope.order.OldCreditCard.Address);
+                    uiScope.order.CreditCard = angular.copy(uiScope.order.OldCreditCard);
+                }
             }
             else
             {
-                if (uiScope.paymentInfoTab.CreditCardIndex)
+                if (uiScope.paymentInfoTab.CreditCardIndex && uiScope.currentCustomer.CreditCards.length>0)
                 {
                     uiScope.order.CreditCard = angular.copy(uiScope.currentCustomer.CreditCards[parseInt(uiScope.paymentInfoTab.CreditCardIndex)]);
                 }
+            }
+        };
+
+        uiScope.setNewCreditCardOrder = function (callback)
+        {
+            if (uiScope.forms.card.$valid)
+            {
+                customerService.createCreditCardPrototype(uiScope.addEditTracker)
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            //uiScope.paymentInfoTab.CreditCard.formName = "card";
+                            customerEditService.syncCountry(uiScope, result.Data.Address);
+                            uiScope.order.CreditCard = result.Data;
+                            if (callback)
+                                callback(result.Data);
+                        } else
+                        {
+                            successHandler(result);
+                        }
+                    }).
+                    error(function (result)
+                    {
+                        errorHandler(result);
+                    })
+                    .then(function ()
+                    {
+                        uiScope.forms.submitted['card'] = false;
+                    });
+            }
+            else
+            {
+                uiScope.forms.submitted['card'] = true;
+            }
+            return false;
+        };
+
+        uiScope.makeBillingAsProfileAddressOrder = function ()
+        {
+            var address;
+            switch (String(uiScope.paymentInfoTab.PaymentMethodType))
+            {
+                case "1":
+                    address = uiScope.order.CreditCard.Address;
+                    break;
+                case "2":
+                    address = uiScope.order.Oac.Address;
+                    break;
+                case "3":
+                    address = uiScope.order.Check.Address;
+                    break;
+                case "6":
+                    address = uiScope.order.WireTransfer.Address;
+                    break;
+                case "7":
+                    address = uiScope.order.Marketing.Address;
+                    break;
+                case "8":
+                    address = uiScope.order.VCWellness.Address;
+                    break;
+            }
+            if (address)
+            {
+                for (var key in uiScope.currentCustomer.ProfileAddress)
+                {
+                    address[key] = uiScope.currentCustomer.ProfileAddress[key];
+                }
+
+                address.AddressType = 2;
             }
         };
     };

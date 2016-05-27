@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
 using VC.Admin.Models;
 using VitalChoice.Validation.Models;
 using System;
+using System.IO;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
 using System.Security.Claims;
@@ -21,7 +21,10 @@ using VitalChoice.Infrastructure.Domain.Entities.Permissions;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Transfer.Help;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 
 namespace VC.Admin.Controllers
 {
@@ -30,13 +33,16 @@ namespace VC.Admin.Controllers
     {
         private readonly IHelpService _helpService;
         private readonly IAppInfrastructureService _appInfrastructureService;
+        private readonly ExtendedUserManager _userManager;
         private readonly ILogger _logger;
 
-        public HelpController(IHelpService helpService, IAppInfrastructureService appInfrastructureService, ILoggerProviderExtended loggerProvider)
+        public HelpController(IHelpService helpService, IAppInfrastructureService appInfrastructureService,
+            ILoggerProviderExtended loggerProvider, ExtendedUserManager userManager)
         {
             _helpService = helpService;
             _appInfrastructureService = appInfrastructureService;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _userManager = userManager;
+            _logger = loggerProvider.CreateLogger<HelpController>();
         }
 
         #region HelpsArea
@@ -79,13 +85,13 @@ namespace VC.Admin.Controllers
                 return null;
             var item = model.Convert();
 
-            item = await _helpService.UpdateHelpTicketAsync(item, Int32.Parse(Request.HttpContext.User.GetUserId()));
+            item = await _helpService.UpdateHelpTicketAsync(item, Int32.Parse(_userManager.GetUserId(User)));
 
             return new HelpTicketManageModel(item);
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteHelpTicket(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteHelpTicket(int id)
         {
             return await _helpService.DeleteHelpTicketAsync(id);
         }
@@ -115,7 +121,7 @@ namespace VC.Admin.Controllers
             var item = model.Convert();
             if (item != null)
             {
-                item.IdEditedBy = Int32.Parse(Request.HttpContext.User.GetUserId());
+                item.IdEditedBy = Int32.Parse(_userManager.GetUserId(User));
             }
 
             item = await _helpService.UpdateHelpTicketCommentAsync(item);
@@ -124,9 +130,9 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteHelpTicketComment(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteHelpTicketComment(int id)
         {
-            return await _helpService.DeleteHelpTicketCommentAsync(id, Int32.Parse(Request.HttpContext.User.GetUserId()));
+            return await _helpService.DeleteHelpTicketCommentAsync(id, Int32.Parse(_userManager.GetUserId(User)));
         }
 
         #endregion
@@ -148,7 +154,7 @@ namespace VC.Admin.Controllers
 
             var superAdmin = _appInfrastructureService.Data().AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
             var isSuperAdmin = HttpContext.User.IsInRole(superAdmin.Normalize());
-            int userId = Int32.Parse(Request.HttpContext.User.GetUserId());
+            int userId = Int32.Parse(_userManager.GetUserId(User));
             foreach (var item in toReturn.Items)
             {
                 if(isSuperAdmin || item.IdAddedBy == userId)
@@ -180,7 +186,7 @@ namespace VC.Admin.Controllers
             var toReturn= new BugTicketManageModel(result);
 
             var superAdmin = _appInfrastructureService.Data().AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
-            if(HttpContext.User.IsInRole(superAdmin.Normalize()) || result.IdAddedBy== Int32.Parse(Request.HttpContext.User.GetUserId()))
+            if(HttpContext.User.IsInRole(superAdmin.Normalize()) || result.IdAddedBy== Int32.Parse(_userManager.GetUserId(User)))
             {
                 toReturn.IsAllowEdit = true;
             }
@@ -197,18 +203,18 @@ namespace VC.Admin.Controllers
 
             var superAdmin = _appInfrastructureService.Data().AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
             var isSuperAdmin = HttpContext.User.IsInRole(superAdmin.Normalize());
-            item = await _helpService.UpdateBugTicketAsync(item, Int32.Parse(Request.HttpContext.User.GetUserId()), isSuperAdmin);
+            item = await _helpService.UpdateBugTicketAsync(item, Int32.Parse(_userManager.GetUserId(User)), isSuperAdmin);
 
             return new BugTicketManageModel(item);
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteBugTicket(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteBugTicket(int id)
         {
             var superAdmin = _appInfrastructureService.Data().AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
             var isSuperAdmin = HttpContext.User.IsInRole(superAdmin.Normalize());
 
-            return await _helpService.DeleteBugTicketAsync(id, Int32.Parse(Request.HttpContext.User.GetUserId()), isSuperAdmin ? (int?)null : Int32.Parse(Request.HttpContext.User.GetUserId()));
+            return await _helpService.DeleteBugTicketAsync(id, Int32.Parse(_userManager.GetUserId(User)), isSuperAdmin ? (int?)null : Int32.Parse(_userManager.GetUserId(User)));
         }
 
 
@@ -238,7 +244,7 @@ namespace VC.Admin.Controllers
             var item = model.Convert();
             if (item != null)
             {
-                item.IdEditedBy = Int32.Parse(Request.HttpContext.User.GetUserId());
+                item.IdEditedBy = Int32.Parse(_userManager.GetUserId(User));
             }
 
             item = await _helpService.UpdateBugTicketCommentAsync(item);
@@ -247,9 +253,9 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteBugTicketComment(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteBugTicketComment(int id)
         {
-            return await _helpService.DeleteBugTicketCommentAsync(id, Int32.Parse(Request.HttpContext.User.GetUserId()));
+            return await _helpService.DeleteBugTicketCommentAsync(id, Int32.Parse(_userManager.GetUserId(User)));
         }
 
         #endregion

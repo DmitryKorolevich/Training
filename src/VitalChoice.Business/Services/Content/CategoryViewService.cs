@@ -29,7 +29,7 @@ namespace VitalChoice.Business.Services.Content
             IContentProcessorService processorService, IRepositoryAsync<ProductCategoryContent> contentRepository,
             IObjectMapper<ProductViewForCustomerModel> mapper, IObjectMapperFactory mapperFactory,
             IEcommerceRepositoryAsync<ProductCategory> productCategoryEcommerceRepository)
-            : base(templatesCache, loggerProvider.CreateLoggerDefault(), processorService, contentRepository, mapper, mapperFactory)
+            : base(templatesCache, loggerProvider.CreateLogger<CategoryViewService>(), processorService, contentRepository, mapper, mapperFactory)
         {
             _productCategoryEcommerceRepository = productCategoryEcommerceRepository;
         }

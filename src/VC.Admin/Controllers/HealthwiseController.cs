@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using VC.Admin.Models.Customer;
@@ -20,7 +19,7 @@ using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
@@ -43,6 +42,7 @@ using VitalChoice.Business.Mail;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Transfer.Healthwise;
 using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 
 namespace VC.Admin.Controllers
 {
@@ -53,6 +53,7 @@ namespace VC.Admin.Controllers
         private readonly IAppInfrastructureService _appInfrastructureService;
         private readonly INotificationService _notificationService;
         private readonly ILogger _logger;
+        private readonly ExtendedUserManager _userManager;
 
         public HealthwiseController(
             IHealthwiseService healthwiseService,
@@ -65,7 +66,7 @@ namespace VC.Admin.Controllers
             _orderService = orderService;
             _appInfrastructureService = appInfrastructureService;
             _notificationService = notificationService;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<HealthwiseController>();
         }
 
         [AdminAuthorize(PermissionType.Reports)]
@@ -139,7 +140,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return false;
 
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(User);
             int tempId;
             int? userId = null;
             if (Int32.TryParse(sUserId, out tempId))
@@ -151,14 +152,14 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Reports)]
         [HttpPost]
-        public async Task<Result<bool>> MarkOrder(int id, [FromBody] object model)
+        public async Task<Result<bool>> MarkOrder(int id)
         {
             return await _orderService.UpdateHealthwiseOrderWithValidationAsync(id, true);
         }
 
         [AdminAuthorize(PermissionType.Reports)]
         [HttpPost]
-        public async Task<Result<bool>> MarkCustomerOrders(int id, [FromBody] object model)
+        public async Task<Result<bool>> MarkCustomerOrders(int id)
         {
             return await _healthwiseService.MarkOrdersAsHealthwiseForCustomerIdAsync(id);
         }

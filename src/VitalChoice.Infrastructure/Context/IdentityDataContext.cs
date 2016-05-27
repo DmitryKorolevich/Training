@@ -2,9 +2,8 @@
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.Storage;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
@@ -12,16 +11,11 @@ using VitalChoice.Infrastructure.Domain.Entities.Users;
 
 namespace VitalChoice.Infrastructure.Context
 {
-	public class IdentityDataContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>, IDataContextAsync
+	public abstract class IdentityDataContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>, IDataContextAsync
     {
         private IInnerEmbeddingTransaction _transaction;
 
-        protected IdentityDataContext()
-        {
-            InstanceId = Guid.NewGuid();
-        }
-
-        protected IdentityDataContext(IServiceProvider serviceProvider) : base(serviceProvider)
+        protected IdentityDataContext(DbContextOptions contextOptions) : base(contextOptions)
         {
             InstanceId = Guid.NewGuid();
         }

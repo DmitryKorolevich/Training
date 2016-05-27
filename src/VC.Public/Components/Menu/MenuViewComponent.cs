@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using VC.Public.Models.Menu;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;

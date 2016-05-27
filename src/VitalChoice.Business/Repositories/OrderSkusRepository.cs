@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Data.Entity;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Transfer;
 
@@ -12,7 +13,7 @@ namespace VitalChoice.Business.Repositories
 {
     public class OrderSkusRepository : EcommerceRepositoryAsync<VTopProducts>
     {
-        public OrderSkusRepository(IDataContextAsync context) : base(context)
+        public OrderSkusRepository(EcommerceContext context) : base(context)
 		{
         }
 

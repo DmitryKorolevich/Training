@@ -19,7 +19,7 @@ namespace VitalChoice.Business.Services.Content
         {
             this.contentTypeRepository = contentTypeRepository;
             this.contentProcessorRepository = contentProcessorRepository;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<GeneralContentService>();
         }
 
         public async Task<List<ContentTypeEntity>> GetContentTypesAsync()

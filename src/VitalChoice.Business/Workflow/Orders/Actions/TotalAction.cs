@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Core;
@@ -13,7 +14,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions
 
         public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            return Task.FromResult<decimal>(0);
+            return TaskCache<decimal>.DefaultCompletedTask;
         }
     }
 

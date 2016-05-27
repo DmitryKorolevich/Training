@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Authorization;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using VC.Public.Helpers;
 using VC.Public.Models.Auth;
 using VC.Public.Models.Cart;
@@ -26,7 +26,7 @@ using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Users;
 using System.Linq;
 using System.Reflection;
-using Microsoft.AspNet.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Services.Bronto;
@@ -41,6 +41,7 @@ using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Affiliates;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.SharedWeb.Helpers;
@@ -62,7 +63,6 @@ namespace VC.Public.Controllers
         private readonly ITransactionAccessor<EcommerceContext> _transactionAccessor;
         private readonly IAffiliateService _affiliateService;
         private readonly ILogger _logger;
-        private readonly ICustomerService _customerService;
 
         public CheckoutController(IStorefrontUserService storefrontUserService,
             ICustomerService customerService,
@@ -76,10 +76,10 @@ namespace VC.Public.Controllers
             ICountryService countryService,
             BrontoService brontoService,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
-            IPageResultService pageResultService, ISettingService settingService, ILoggerProviderExtended loggerProvider, ICustomerService customerService1)
+            IPageResultService pageResultService, ISettingService settingService, ILoggerProviderExtended loggerProvider, ExtendedUserManager userManager)
             : base(
                 customerService, infrastructureService, authorizationService, checkoutService, orderService,
-                skuMapper, productMapper, pageResultService, settingService)
+                skuMapper, productMapper, pageResultService, settingService, userManager)
         {
             _storefrontUserService = storefrontUserService;
             _paymentMethodConverter = paymentMethodConverter;
@@ -89,10 +89,9 @@ namespace VC.Public.Controllers
             _countryService = countryService;
             _brontoService = brontoService;
             _transactionAccessor = transactionAccessor;
-            _customerService = customerService1;
             _affiliateService = affiliateService;
             _appInfrastructure = appInfrastructureService.Data();
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<CheckoutController>();
         }
 
         public async Task<IActionResult> Welcome(bool forgot = false)
@@ -426,7 +425,13 @@ namespace VC.Public.Controllers
             if (model.UseBillingAddress)
             {
                 HashSet<string> propertyNames = new HashSet<string>(typeof (AddressModel).GetRuntimeProperties().Select(p => p.Name));
-                ModelState.RemoveAll(pair => propertyNames.Contains(pair.Key));
+                foreach (var item in ModelState)
+                {
+                    if (propertyNames.Contains(item.Key))
+                    {
+                        ModelState.Remove(item.Key);
+                    }
+                }
             }
             var cart = await GetCurrentCart();
             var loggedIn = await EnsureLoggedIn(cart);
@@ -499,7 +504,7 @@ namespace VC.Public.Controllers
 
                             cart.Order.Customer.ShippingAddresses = customerAddresses;
 
-                            cart.Order.Customer = await _customerService.UpdateAsync(cart.Order.Customer);
+                            cart.Order.Customer = await CustomerService.UpdateAsync(cart.Order.Customer);
                         }
                         else if (!cart.Order.Customer.ShippingAddresses.Any())
                         {
@@ -507,7 +512,7 @@ namespace VC.Public.Controllers
                             cart.Order.ShippingAddress.Data.Default = true;
                             cart.Order.Customer.ShippingAddresses = new List<AddressDynamic> {cart.Order.ShippingAddress};
 
-                            cart.Order.Customer = await _customerService.UpdateAsync(cart.Order.Customer);
+                            cart.Order.Customer = await CustomerService.UpdateAsync(cart.Order.Customer);
                         }
                         return RedirectToAction("ReviewOrder");
                     }

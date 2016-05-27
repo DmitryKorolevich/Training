@@ -1,6 +1,6 @@
-﻿using Microsoft.Data.Entity;
-using System.Data.SqlClient;
-using Microsoft.Extensions.OptionsModel;
+﻿using System.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Ecommerce.Context;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -30,7 +30,7 @@ namespace VitalChoice.Infrastructure.Context
 {
     public class EcommerceContext : EcommerceContextBase
     {
-        public EcommerceContext(IOptions<AppOptionsBase> options): base(options)
+        public EcommerceContext(IOptions<AppOptionsBase> options, DbContextOptions<EcommerceContext> dbContextOptions): base(options, dbContextOptions)
         {
         }
 

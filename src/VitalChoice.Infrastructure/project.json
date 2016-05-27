@@ -1,15 +1,14 @@
 {
   "version": "1.0.0-*",
   "dependencies": {
-    "EntityFramework.Core": "7.0.0-*",
-    "EntityFramework.MicrosoftSqlServer": "7.0.0-*",
-    "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
-    "Microsoft.Extensions.OptionsModel": "1.0.0-rc1-final",
+    "Microsoft.EntityFrameworkCore": "1.0.0-fixed-*",
+    "Microsoft.EntityFrameworkCore.SqlServer": "1.0.0-fixed-*",
+    "Microsoft.Extensions.Options": "1.0.0-rc2-final",
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
     "VitalChoice.Infrastructure.Domain": "1.0.0-*",
-    "VitalChoice.Ecommerce": "",
-    "WindowsAzure.Storage": "6.2.2-*"
+    "VitalChoice.Ecommerce": "1.0.0-*",
+    "WindowsAzure.Storage": "7.0.1-preview"
   },
 
   "frameworks": {
@@ -17,14 +16,22 @@
       "dependencies": {
         "WindowsAzure.ServiceBus": "3.2.1",
         "Microsoft.WindowsAzure.ConfigurationManager": "3.2.1",
-        "NLog": "4.0.1"
+        "NLog": "4.3.4"
       }
     },
-    "dotnet5.4": {
+    "netstandard1.5": {
+      "imports": [
+        "dnxcore50",
+        "portable-net45+win8"
+      ],
       "dependencies": {
-        "System.Runtime": "4.0.21-beta-23516",
-        "System.Security.Cryptography.X509Certificates": "4.0.0-beta-23516",
-        "System.Security.Cryptography.Algorithms": "4.0.0-beta-23516"
+        "Microsoft.NETCore.Platforms": {
+          "type": "build",
+          "version": "1.0.1-rc2-*"
+        },
+        "System.Runtime": "4.1.0-rc2-*",
+        "System.Security.Cryptography.X509Certificates": "4.1.0-rc2-*",
+        "System.Security.Cryptography.Algorithms": "4.1.0-rc2-*"
       }
     }
   }

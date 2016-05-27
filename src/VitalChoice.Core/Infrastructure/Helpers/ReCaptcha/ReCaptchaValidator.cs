@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Infrastructure.Domain.Options;
 
 namespace VitalChoice.Core.Infrastructure.Helpers.ReCaptcha

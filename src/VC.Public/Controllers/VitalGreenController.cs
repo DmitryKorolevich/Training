@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Authorization;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
 using VitalChoice.Core.Base;
 using VitalChoice.Interfaces.Services.Users;
 using VC.Public.Models;
 using VitalChoice.Interfaces.Services.Settings;
-using Microsoft.AspNet.Mvc.Rendering;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Interfaces.Services;
@@ -16,11 +12,13 @@ using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Entities.VitalGreen;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using System.IO;
-using Microsoft.AspNet.Mvc.ViewEngines;
-using Microsoft.AspNet.Mvc.ViewFeatures;
 using VitalChoice.Ecommerce.Utils;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using VitalChoice.Core.Services;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 
 namespace VC.Public.Controllers
 {
@@ -41,7 +39,7 @@ namespace VC.Public.Controllers
         {
             _vitalGreenService = vitalGreenService;
             _fedExService = fedExService;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<VitalGreenController>();
         }
 
         [HttpPost]

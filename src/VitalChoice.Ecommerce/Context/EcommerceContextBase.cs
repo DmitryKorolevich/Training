@@ -1,8 +1,4 @@
 ﻿using System;
-using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.Infrastructure;
-using Microsoft.Data.Entity.Internal;
-using Microsoft.Extensions.OptionsModel;
 using System.Data.SqlClient;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Data.Context;
@@ -23,6 +19,8 @@ using VitalChoice.Ecommerce.Domain.Entities.Users;
 using VitalChoice.Ecommerce.Domain.Entities.Workflow;
 using VitalChoice.Ecommerce.Domain.Options;
 using System.Threading;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 using VitalChoice.Ecommerce.Domain.Entities.InventorySkus;
 
@@ -30,9 +28,7 @@ namespace VitalChoice.Ecommerce.Context
 {
     public class EcommerceContextBase : DataContext
     {
-        public static IServiceProvider ServiceProvider { get; set; }
-
-        public EcommerceContextBase(IOptions<AppOptionsBase> options) : base(ServiceProvider)
+        public EcommerceContextBase(IOptions<AppOptionsBase> options, DbContextOptions contextOptions) : base(contextOptions)
         {
             Options = options;
         }

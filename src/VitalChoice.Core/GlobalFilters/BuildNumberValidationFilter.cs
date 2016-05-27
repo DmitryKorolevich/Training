@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNet.Mvc;
-using Microsoft.AspNet.Mvc.Filters;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using VitalChoice.Infrastructure.Domain.Options;
 

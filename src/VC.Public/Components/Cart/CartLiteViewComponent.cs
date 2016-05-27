@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using VC.Public.Helpers;
-using VC.Public.Models.Menu;
-using VitalChoice.Ecommerce.Domain.Entities;
-using VitalChoice.Infrastructure.Domain.Constants;
-using VitalChoice.Infrastructure.Domain.Transfer.Products;
-using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services.Checkout;
-using VitalChoice.Interfaces.Services.Products;
 
 namespace VC.Public.Components.Cart
 {
@@ -18,15 +10,17 @@ namespace VC.Public.Components.Cart
     public class CartLiteViewComponent : ViewComponent
     {
         private readonly ICheckoutService _checkoutService;
+        private readonly IActionContextAccessor _actionContextAccessor;
 
-        public CartLiteViewComponent(ICheckoutService checkoutService)
+        public CartLiteViewComponent(ICheckoutService checkoutService, IActionContextAccessor actionContextAccessor)
         {
             _checkoutService = checkoutService;
+            _actionContextAccessor = actionContextAccessor;
         }
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var uid = Request.GetCartUid();
+            var uid = _actionContextAccessor.ActionContext.HttpContext.Request.GetCartUid();
             return Content(uid == null ? "0" : (await _checkoutService.GetCartItemsCount(uid.Value)).ToString());
         }
     }

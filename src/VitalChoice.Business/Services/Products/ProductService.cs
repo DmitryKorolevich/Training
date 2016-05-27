@@ -1,10 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Business.CsvExportMaps.Products;
 using VitalChoice.Business.Mail;
 using VitalChoice.Business.Queries.Customer;
@@ -14,7 +15,6 @@ using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Services;
 using VitalChoice.Data.Transaction;
@@ -102,7 +102,7 @@ namespace VitalChoice.Business.Services.Products
             {
                 entity.Skus = entity.Skus?.Where(s => s.StatusCode != (int) RecordStatusCode.Deleted).OrderBy(s => s.Order).ToArray();
             }
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
         protected override async Task AfterEntityChangesAsync(ProductDynamic model, Product updated, Product initial, IUnitOfWorkAsync uow)
@@ -323,9 +323,6 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<SkuOrdered> GetSkuOrderedAsync(string code)
         {
-            if (code == null)
-                throw new ArgumentNullException(nameof(code));
-
             if (string.IsNullOrWhiteSpace(code))
                 return null;
 

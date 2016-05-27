@@ -1,16 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceProcess;
-using System.Threading.Tasks;
-using Autofac;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.OptionsModel;
-using Microsoft.Extensions.PlatformAbstractions;
-using Quartz;
-using VitalChoice.Infrastructure.Domain.Options;
-using VitalChoice.Jobs.Jobs;
+﻿using System.ServiceProcess;
 
 namespace VitalChoice.Jobs
 {
@@ -20,7 +8,7 @@ namespace VitalChoice.Jobs
         {
             var servicesToRun = new ServiceBase[]
             {
-                new JobWindowsService(PlatformServices.Default.Application)
+                new JobWindowsService()
             };
             ServiceBase.Run(servicesToRun);
         }

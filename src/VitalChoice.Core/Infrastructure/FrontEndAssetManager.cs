@@ -1,55 +1,56 @@
 ﻿using System.IO;
+using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using VitalChoice.Core.Infrastructure.Models;
 
 namespace VitalChoice.Core.Infrastructure
 {
-	public static class FrontEndAssetManager
+	public class FrontEndAssetManager : IFrontEndAssetManager
 	{
 		private const string ScriptsFilePath = "AppConfig/scripts/files.json";
 		private const string StylesFilePath = "AppConfig/styles/files.json";
         private const string StylesOrderInvoiceFilePath = "AppConfig/styles-order-invoice/files.json";
 
-        private static readonly string scriptsAppRelativePath;
-		private static readonly string stylesAppRelativePath;
-        private static readonly string stylesOrderInvoiceAppRelativePath;
-        private static readonly JsonSerializerSettings serializerSettings;
+        private readonly string _scriptsAppRelativePath;
+		private readonly string _stylesAppRelativePath;
+        private readonly string _stylesOrderInvoiceAppRelativePath;
+        private readonly JsonSerializerSettings _serializerSettings;
 
-		static FrontEndAssetManager()
+		public FrontEndAssetManager(IHostingEnvironment env)
 		{
-			scriptsAppRelativePath = PathResolver.ResolveAppRelativePath(ScriptsFilePath);
-			stylesAppRelativePath = PathResolver.ResolveAppRelativePath(StylesFilePath);
-            stylesOrderInvoiceAppRelativePath = PathResolver.ResolveAppRelativePath(StylesOrderInvoiceFilePath);
-            serializerSettings = new JsonSerializerSettings
+			_scriptsAppRelativePath = Path.Combine(env.ContentRootPath, ScriptsFilePath);
+			_stylesAppRelativePath = Path.Combine(env.ContentRootPath, StylesFilePath);
+            _stylesOrderInvoiceAppRelativePath = Path.Combine(env.ContentRootPath, StylesOrderInvoiceFilePath);
+            _serializerSettings = new JsonSerializerSettings
 			{
 				ContractResolver = new CamelCasePropertyNamesContractResolver()
 			};
 		}
 
-		public static AssetInfo GetScripts()
+		public AssetInfo GetScripts()
 		{
-			return GetAssetInfo(scriptsAppRelativePath);
+			return GetAssetInfo(_scriptsAppRelativePath);
 		}
 
-		public static AssetInfo GetStyles()
+		public AssetInfo GetStyles()
 		{
-			return GetAssetInfo(stylesAppRelativePath);
+			return GetAssetInfo(_stylesAppRelativePath);
 		}
 
-        public static AssetInfo GetOrderInvoiceStyles()
+        public AssetInfo GetOrderInvoiceStyles()
         {
-            return GetAssetInfo(stylesOrderInvoiceAppRelativePath);
+            return GetAssetInfo(_stylesOrderInvoiceAppRelativePath);
         }
 
-        private static AssetInfo GetAssetInfo(string filePath)
+        private AssetInfo GetAssetInfo(string filePath)
 		{
 		    using (Stream inputStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
 		    {
 		        using (StreamReader reader = new StreamReader(inputStream))
 		        {
 		            string jsonValue = reader.ReadToEnd();
-		            return JsonConvert.DeserializeObject<AssetInfo>(jsonValue, serializerSettings);
+		            return JsonConvert.DeserializeObject<AssetInfo>(jsonValue, _serializerSettings);
 		        }
 		    }
 		}

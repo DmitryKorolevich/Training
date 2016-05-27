@@ -20,14 +20,14 @@
 }
 
 <div class="checkout-step-container working-area-holder">
-    <img class="checkout-step-banner" src="/assets/images/checkout/step3.jpg" />
-    <h4 class="checkout-step-heading">3. Shipping Method</h4>
-    <span class="checkout-notification-simple">Enter your Shipping Address information below.</span>
+	<img class="checkout-step-banner" src="/assets/images/checkout/step3.jpg"/>
+	<h4 class="checkout-step-heading">3. Shipping Method</h4>
+	<span class="checkout-notification-simple">Enter your Shipping Address information below.</span>
     <div class="columns-container">
         <div class="overlay hide">
             <div class="loading">Loading…</div>
         </div>
-        @using (Html.BeginForm("AddUpdateShippingMethod", "Checkout", null, FormMethod.Post, new { @class = "form-regular medium-small", role = "form" }))
+        @using (Html.BeginForm("AddUpdateShippingMethod", "Checkout", null, FormMethod.Post, null, new { @class = "form-regular medium-small", role = "form" }))
         {
             <input id="hdCountry" value="@Html.DisplayForEx(x => x.IdCountry)" type="hidden">
             <input id="hdState" value="@Html.DisplayForEx(x => x.IdState)" type="hidden">
@@ -41,8 +41,7 @@
                         <span class="shopping-notice-note">NOTE:</span> Frozen goods cannot be sent to PO boxes.
                     </label>
                 </div>
-            </div>
-            if (ViewBag.ShippingAddresses != null && ViewBag.ShippingAddresses.Count > 0)
+            </div> if (ViewBag.ShippingAddresses != null && ViewBag.ShippingAddresses.Count > 0)
             {
                 <div class="form-group" @*style="display: none;" *@>
                     @Html.Label("SavedAddresses", "Saved Addresses", new { @class = "control-label" })
@@ -50,7 +49,7 @@
                         @Html.DropDownListFor(x => x.Id, new SelectList(ViewBag.ShippingAddresses, "Key", "Value"), new { id = "ddShippingAddressesSelection", @class = "form-control auto" })
                     </div>
                 </div>
-                <div class="form-group" style="display: none;" id="updateSaved">
+                <div class="form-group" style="display:none;" id="updateSaved">
                     <label class="control-label"></label>
                     <div class="input-group">
                         <label class="multiline-checkbox-container bold">
@@ -58,8 +57,7 @@
                             Update saved shipping address
                         </label>
                     </div>
-                </div>
-            }
+                </div>}
             <span class="checkout-notification-simple">Then click Continue, below.</span>
             <span class="checkout-notification-important" id="spEnterAddress">Enter your Shipping Address.</span>
             @Html.ValidationSummary(true, "")

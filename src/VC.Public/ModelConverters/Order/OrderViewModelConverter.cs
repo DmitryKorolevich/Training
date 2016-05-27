@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VC.Public.Helpers;
 using VC.Public.Models.Cart;
 using VC.Public.Models.Profile;
@@ -154,7 +155,7 @@ namespace VC.Public.ModelConverters.Order
 
         public override Task ModelToDynamicAsync(OrderViewModel model, OrderDynamic dynamic)
         {
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
     }
 }

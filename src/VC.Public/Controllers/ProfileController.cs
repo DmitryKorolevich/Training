@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Authorization;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
-using Microsoft.AspNet.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using VC.Public.Models.Profile;
 using VitalChoice.Core.Infrastructure;
@@ -44,6 +45,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Content.ContentCrossSells;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.SharedWeb.Helpers;
@@ -62,6 +64,7 @@ namespace VC.Public.Controllers
         private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
         private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _customerPaymentMethodConverter;
         private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _orderPaymentMethodConverter;
+        private readonly ExtendedUserManager _userManager;
         private readonly IDynamicMapper<OrderDynamic, Order> _orderConverter;
         private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
         private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
@@ -84,15 +87,11 @@ namespace VC.Public.Controllers
             IHealthwiseService healthwiseService, IAppInfrastructureService infrastructureService,
             IAuthorizationService authorizationService, ICheckoutService checkoutService,
             ILoggerProviderExtended loggerProvider,
-            IPageResultService pageResultService,
-            IDynamicMapper<SkuDynamic, Sku> skuMapper, 
-            IDynamicMapper<ProductDynamic, Product> productMapper,
-            ICountryService countryService,
-            IContentCrossSellService contentCrossSellService,
-            IDynamicMapper<OrderDynamic, Order> orderMapper, 
-            IDynamicMapper<OrderPaymentMethodDynamic,
-                OrderPaymentMethod> orderPaymentMethodConverter)
-            : base(customerService, infrastructureService, authorizationService, checkoutService, pageResultService)
+            IPageResultService pageResultService, IDynamicMapper<SkuDynamic, Sku> skuMapper,
+            IDynamicMapper<ProductDynamic, Product> productMapper, ICountryService countryService,
+            IDynamicMapper<OrderDynamic, Order> orderMapper,
+            IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodConverter, ExtendedUserManager userManager)
+            : base(customerService, infrastructureService, authorizationService, checkoutService, pageResultService, userManager)
         {
             _storefrontUserService = storefrontUserService;
             _addressConverter = addressConverter;
@@ -107,21 +106,21 @@ namespace VC.Public.Controllers
             _countryService = countryService;
             _orderMapper = orderMapper;
             _orderPaymentMethodConverter = orderPaymentMethodConverter;
-            _contentCrossSellService = contentCrossSellService;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _userManager = userManager;
+            _logger = loggerProvider.CreateLogger<ProfileController>();
         }
 
         private async Task<PagedListEx<AutoShipHistoryItemModel>> PopulateAutoShipHistoryModel(OrderFilter filter)
-        {
-            var infr = InfrastructureService.Data();
-            var countries = await _countryService.GetCountriesAsync();
+		{
+			var infr = InfrastructureService.Data();
+			var countries = await _countryService.GetCountriesAsync();
 
             var customer = await GetCurrentCustomerDynamic();
 
-            filter.IdCustomer = customer.Id;
-            filter.Sorting.SortOrder = SortOrder.Desc;
-            filter.Sorting.Path = VOrderSortPath.DateCreated;
-            filter.OrderType = OrderType.AutoShip;
+			filter.IdCustomer = customer.Id;
+			filter.Sorting.SortOrder = FilterSortOrder.Desc;
+			filter.Sorting.Path = VOrderSortPath.DateCreated;
+			filter.OrderType = OrderType.AutoShip;
 
             var orders = await _orderService.GetFullAutoShipsAsync(filter);
 
@@ -167,7 +166,7 @@ namespace VC.Public.Controllers
             var internalId = GetInternalCustomerId();
 
             filter.IdCustomer = internalId;
-            filter.Sorting.SortOrder = SortOrder.Desc;
+            filter.Sorting.SortOrder = FilterSortOrder.Desc;
             filter.Sorting.Path = VOrderSortPath.DateCreated;
 
             var orders = await _orderService.GetOrdersAsync(filter);
@@ -248,8 +247,8 @@ namespace VC.Public.Controllers
         private void CleanProfileEmailFields(ChangeProfileModel model)
         {
             model.ConfirmEmail = model.NewEmail = string.Empty;
-            ModelState["NewEmail"] = new ModelStateEntry();
-            ModelState["ConfirmEmail"] = new ModelStateEntry();
+            ModelState.Remove("NewEmail");
+            ModelState.Remove("ConfirmEmail");
         }
 
         public IActionResult Index()
@@ -272,9 +271,7 @@ namespace VC.Public.Controllers
                 return View(model);
             }
 
-            var context = HttpContext;
-
-            var user = await _storefrontUserService.FindAsync(context.User.GetUserName());
+            var user = await _storefrontUserService.FindAsync(_userManager.GetUserName(User));
             if (user == null)
             {
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
@@ -412,11 +409,7 @@ namespace VC.Public.Controllers
             ModelState.Clear();
             if (model.Id == 0)
             {
-                ModelState.Add("Id", new ModelStateEntry
-                {
-                    RawValue =
-                        model.Id = currentCustomer.CustomerPaymentMethods.Last(x => x.IdObjectType == (int)PaymentMethodType.CreditCard).Id
-                });
+                model.Id = currentCustomer.CustomerPaymentMethods.Last(x => x.IdObjectType == (int) PaymentMethodType.CreditCard).Id;
             }
             return View(await PopulateCreditCard(currentCustomer, model.Id));
         }

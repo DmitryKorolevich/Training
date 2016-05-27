@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VC.Admin.Models.Products;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Infrastructure.Domain.Constants;
@@ -54,7 +55,7 @@ namespace VC.Admin.ModelConverters
                     video.Video = (string)dynamic.DictionaryData[ProductConstants.FIELD_NAME_YOUTUBE_VIDEO + i];
                 }
             }
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
         public override Task ModelToDynamicAsync(ProductManageModel model, ProductDynamic dynamic)
@@ -77,7 +78,7 @@ namespace VC.Admin.ModelConverters
                     dynamic.DictionaryData.Add(ProductConstants.FIELD_NAME_YOUTUBE_VIDEO + (i + 1), model.Videos[i].Video);
                 }
             }
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
     }
 }

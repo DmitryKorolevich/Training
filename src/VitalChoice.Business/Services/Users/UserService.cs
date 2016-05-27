@@ -4,10 +4,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
-using Microsoft.Data.Entity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Business.Mail;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Extensions;
@@ -26,6 +25,7 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Users;
+using Microsoft.EntityFrameworkCore;
 
 namespace VitalChoice.Business.Services.Users
 {
@@ -65,7 +65,7 @@ namespace VitalChoice.Business.Services.Users
 	        this._userValidator = userValidator;
 	        _transactionAccessor = transactionAccessor;
 	        Options = options.Value;
-	        _logger = loggerProvider.CreateLoggerDefault();
+	        _logger = loggerProvider.CreateLogger<UserService>();
 
 	    }
 
@@ -503,27 +503,27 @@ namespace VitalChoice.Business.Services.Users
 			switch (filter.Sorting.Path)
 			{
 				case UserSortPath.AgentId:
-					queryable = sortOrder == SortOrder.Asc
+					queryable = sortOrder == FilterSortOrder.Asc
 						? queryable.OrderBy(x => x.Profile.AgentId)
 						: queryable.OrderByDescending(x => x.Profile.AgentId);
 					break;
 				case UserSortPath.FullName:
-					queryable = sortOrder == SortOrder.Asc
+					queryable = sortOrder == FilterSortOrder.Asc
 						? queryable.OrderBy(x => x.FirstName + " " + x.LastName)
 						: queryable.OrderByDescending(x => x.FirstName + " " + x.LastName);
 					break;
 				case UserSortPath.Email:
-					queryable = sortOrder == SortOrder.Asc
+					queryable = sortOrder == FilterSortOrder.Asc
 						? queryable.OrderBy(x => x.Email)
 						: queryable.OrderByDescending(x => x.Email);
 					break;
 				case UserSortPath.Status:
-					queryable = sortOrder == SortOrder.Asc
+					queryable = sortOrder == FilterSortOrder.Asc
 						? queryable.OrderBy(x => x.Status)
 						: queryable.OrderByDescending(x => x.Status);
 					break;
 				case UserSortPath.LastLoginDate:
-					queryable = sortOrder == SortOrder.Asc
+					queryable = sortOrder == FilterSortOrder.Asc
 						? queryable.OrderBy(x => x.LastLoginDate)
 						: queryable.OrderByDescending(x => x.LastLoginDate);
 					break;

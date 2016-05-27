@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using VitalChoice.Caching.Services;
-using VitalChoice.Profiling.Base;
 
 namespace VitalChoice.Caching.Iterators
 {
@@ -13,21 +12,18 @@ namespace VitalChoice.Caching.Iterators
     {
         private readonly IAsyncEnumerator<T> _dbAsyncEnumerator;
         private readonly CacheEntityQueryProvider.ICacheExecutor<T> _cacheExecutor;
-        private readonly ProfilingScope _scope;
         private readonly List<T> _items;
 
-        public AsyncCacheEnumerator(IAsyncEnumerator<T> dbAsyncEnumerator, CacheEntityQueryProvider.ICacheExecutor<T> cacheExecutor, ProfilingScope scope)
+        public AsyncCacheEnumerator(IAsyncEnumerator<T> dbAsyncEnumerator, CacheEntityQueryProvider.ICacheExecutor<T> cacheExecutor)
         {
             _dbAsyncEnumerator = dbAsyncEnumerator;
             _cacheExecutor = cacheExecutor;
-            _scope = scope;
             _items = new List<T>();
         }
 
         public void Dispose()
         {
             _dbAsyncEnumerator.Dispose();
-            _scope?.Dispose();
         }
 
         public async Task<bool> MoveNext(CancellationToken cancellationToken)
@@ -44,14 +40,7 @@ namespace VitalChoice.Caching.Iterators
                 Task.Factory.StartNew(() =>
 #pragma warning restore 4014
                 {
-                    try
-                    {
-                        _scope?.AddScopeData(_cacheExecutor.UpdateList(_items));
-                    }
-                    finally
-                    {
-                        _scope?.Dispose();
-                    }
+                    _cacheExecutor.UpdateList(_items);
                 }, cancellationToken);
             }
             return result;
@@ -64,23 +53,16 @@ namespace VitalChoice.Caching.Iterators
     {
         private readonly IAsyncEnumerable<T> _dbAsyncEnumerable;
         private readonly CacheEntityQueryProvider.ICacheExecutor<T> _cacheExecutor;
-        private readonly ProfilingScope _scope;
 
-        public AsyncCacheEnumerable(IAsyncEnumerable<T> dbAsyncEnumerable, CacheEntityQueryProvider.ICacheExecutor<T> cacheExecutor, ProfilingScope scope)
+        public AsyncCacheEnumerable(IAsyncEnumerable<T> dbAsyncEnumerable, CacheEntityQueryProvider.ICacheExecutor<T> cacheExecutor)
         {
             _dbAsyncEnumerable = dbAsyncEnumerable;
             _cacheExecutor = cacheExecutor;
-            _scope = scope;
         }
 
         public IAsyncEnumerator<T> GetEnumerator()
         {
-            return new AsyncCacheEnumerator<T>(_dbAsyncEnumerable.GetEnumerator(), _cacheExecutor, _scope);
-        }
-
-        ~AsyncCacheEnumerable()
-        {
-            _scope?.Dispose();
+            return new AsyncCacheEnumerator<T>(_dbAsyncEnumerable.GetEnumerator(), _cacheExecutor);
         }
     }
 }

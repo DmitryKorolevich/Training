@@ -49,7 +49,7 @@ namespace VitalChoice.Business.Services.Content
             this.contentTypeRepository = contentTypeRepository;
             this.objectLogItemExternalService = objectLogItemExternalService;
             this.templatesCache = templatesCache;
-            logger = loggerProvider.CreateLoggerDefault();
+            logger = loggerProvider.CreateLogger<FAQService>();
         }
 
         public async Task<PagedList<FAQ>> GetFAQsAsync(FAQListFilter filter)
@@ -86,28 +86,28 @@ namespace VitalChoice.Business.Services.Content
 				case FAQSortPath.Title:
 					sortable =
 						(x) =>
-							sortOrder == SortOrder.Asc
+							sortOrder == FilterSortOrder.Asc
 								? x.OrderBy(y => y.Name)
 								: x.OrderByDescending(y => y.Name);
 					break;
 				case FAQSortPath.Url:
 					sortable =
 						(x) =>
-							sortOrder == SortOrder.Asc
+							sortOrder == FilterSortOrder.Asc
 								? x.OrderBy(y => y.Url)
 								: x.OrderByDescending(y => y.Url);
 					break;
 				case FAQSortPath.Updated:
 					sortable =
 						(x) =>
-							sortOrder == SortOrder.Asc
+							sortOrder == FilterSortOrder.Asc
 								? x.OrderBy(y => y.ContentItem.Updated)
 								: x.OrderByDescending(y => y.ContentItem.Updated);
 					break;
                 case FAQSortPath.Created:
                     sortable =
                         (x) =>
-                            sortOrder == SortOrder.Asc
+                            sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.ContentItem.Created)
                                 : x.OrderByDescending(y => y.ContentItem.Created);
                     break;

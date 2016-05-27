@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Entities.Files;
 using VitalChoice.Infrastructure.Domain.Options;
@@ -21,13 +21,10 @@ namespace VitalChoice.Business.Services
         private const int MILISECONDS_INTERVAL_BETWEEN_TRIES = 50;
 
         private static string _rootDir;
-        private readonly ILogger logger;
         private readonly IOptions<AppOptions> appOptions;
-        private static string error = "";
         
-        public FileService(IOptions<AppOptions> appOptions, ILoggerProviderExtended loggerProvider)
+        public FileService(IOptions<AppOptions> appOptions)
         {
-            this.logger = loggerProvider.CreateLoggerDefault();
             this.appOptions = appOptions;
             _rootDir= this.appOptions.Value.FilesPath.ToLower();
         }

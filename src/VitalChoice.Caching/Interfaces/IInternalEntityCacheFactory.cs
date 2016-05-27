@@ -12,6 +12,6 @@ namespace VitalChoice.Caching.Interfaces
         bool CanCache(Type entityType);
         bool CacheExist(Type entityType);
         IInternalEntityCache GetCache(Type entityType);
-        IInternalEntityCache<T> GetCache<T>();
+        IInternalCache<T> GetCache<T>();
     }
 }

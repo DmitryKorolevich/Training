@@ -1,26 +1,32 @@
-﻿{
+{
   "version": "1.0.0-*",
   "description": "VitalChoice.Infrastructure.Domain Class Library",
   "authors": [ "multi_000" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
   "dependencies": {
-    "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
+    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0-fixed-*",
+    "Microsoft.EntityFrameworkCore": "1.0.0-fixed-*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
     "VitalChoice.Workflow": "1.0.0-*"
   },
   "frameworks": {
     "net451": { },
-    "dotnet5.4": {
+    "netstandard1.5": {
+      "imports": [
+        "dnxcore50",
+        "portable-net45+win8"
+      ],
       "dependencies": {
-        "Microsoft.CSharp": "4.0.1-beta-23516",
-        "System.Security.Cryptography.Algorithms": "4.0.0-beta-23516",
-        "System.Security.Cryptography.Csp": "4.0.0-beta-23516",
-        "System.Collections": "4.0.11-beta-23516",
-        "System.Linq": "4.0.1-beta-23516",
-        "System.Runtime": "4.0.21-beta-23516",
-        "System.Threading": "4.0.11-beta-23516"
+        "Microsoft.NETCore.Platforms": {
+          "type": "build",
+          "version": "1.0.1-*"
+        },
+        "Microsoft.CSharp": "4.0.1-rc2-*",
+        "System.Security.Cryptography.Algorithms": "4.1.0-rc2-*",
+        "System.Security.Cryptography.Csp": "4.0.0-rc2-*",
+        "System.Collections": "4.0.11-rc2-*",
+        "System.Linq": "4.1.0-rc2-*",
+        "System.Runtime": "4.1.0-rc2-*",
+        "System.Threading": "4.0.11-rc2-*"
       }
     }
   }

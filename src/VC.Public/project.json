@@ -1,63 +1,107 @@
 {
-  
+
   "webroot": "wwwroot",
   "version": "1.0.0-*",
-  "exclude": [
-    "wwwroot",
-    "node_modules",
-    "bower_components",
-    "deploy"
-  ],
-  "publishExclude": [
-    "node_modules",
-    "bower_components",
-    "deploy",
-    "**.kproj",
-    "**.user",
-    "**.vspscc"
-  ],
+  "buildOptions": {
+    "compile": {
+      "exclude": [
+        "wwwroot",
+        "node_modules",
+        "bower_components",
+        "deploy"
+      ]
+    },
+    "copyToOutput": {
+      "include": [
+        "config.json",
+        "config.local.json",
+        "hosting.json",
+        "web.config",
+        "CSharpClassTemplate.tcs",
+        "CSharpPreparseTemplate.tcs"
+      ]
+    },
+    "preserveCompilationContext": true,
+    "emitEntryPoint": true
+  },
+  "runtimeOptions": {
+    "gcServer": false,
+    "gcConcurrent": true
+  },
+  "packOptions": {
+    "exclude": [
+      "node_modules",
+      "bower_components",
+      "deploy",
+      "**.xproj",
+      "**.user",
+      "**.vspscc"
+    ]
+  },
+  "publishOptions": {
+    "include": [
+      "wwwroot",
+      "Views",
+      "AppConfig",
+      "config.json",
+      "web.config",
+      "CSharpClassTemplate.tcs",
+      "CSharpPreparseTemplate.tcs"
+    ]
+  },
   "dependencies": {
-    "cloudscribe.Web.Pagination": "1.0.0-*",
-    "Microsoft.AspNet.Server.Kestrel": "1.0.0-rc1-final",
-    "Microsoft.AspNet.IISPlatformHandler": "1.0.0-rc1-final",
-    "Microsoft.AspNet.Mvc": "6.0.0-rc1-final",
-    "Microsoft.AspNet.Mvc.TagHelpers": "6.0.0-rc1-final",
-    "Microsoft.AspNet.Diagnostics": "1.0.0-rc1-final",
-    "Microsoft.AspNet.Diagnostics.Entity": "7.0.0-rc1-final",
-    "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
-    "Microsoft.AspNet.Server.WebListener": "1.0.0-rc1-final",
-    "Microsoft.AspNet.StaticFiles": "1.0.0-rc1-final",
-    "Microsoft.AspNet.Http": "1.0.0-rc1-final",
-    "Microsoft.AspNet.Session": "1.0.0-rc1-final",
-    "Microsoft.Extensions.Configuration.Json": "1.0.0-rc1-final",
-    "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
-    "Microsoft.Extensions.Logging.Console": "1.0.0-rc1-final",
-    "Microsoft.Extensions.WebEncoders": "1.0.0-rc1-final",
-    "Newtonsoft.Json": "7.0.1",
-    "EntityFramework.Core": "7.0.0-*",
-    "Microsoft.AspNet.Tooling.Razor": "1.0.0-rc1-final",
+    "cloudscribe.Web.Pagination": "1.0.1-fixed-*",
+    "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-rc2-final",
+    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0-fixed-*",
+    "Microsoft.AspNetCore.Identity": "1.0.0-fixed-*",
+    "Microsoft.AspNetCore.Server.IISIntegration": "1.0.0-rc2-final",
+    "Microsoft.AspNetCore.Mvc": "1.0.0-rc2-final",
+    "Microsoft.AspNetCore.Mvc.TagHelpers": "1.0.0-rc2-final",
+    "Microsoft.AspNetCore.Diagnostics": "1.0.0-rc2-final",
+    "Microsoft.AspNetCore.DataProtection": "1.0.0-rc2-final",
+    "Microsoft.EntityFrameworkCore": "1.0.0-fixed-*",
+    "Microsoft.AspNetCore.StaticFiles": "1.0.0-rc2-final",
+    "Microsoft.AspNetCore.Http": "1.0.0-rc2-final",
+    "Microsoft.AspNetCore.Session": "1.0.0-rc2-final",
+    "Microsoft.Extensions.Configuration.Json": "1.0.0-rc2-final",
+    "Microsoft.Extensions.Logging": "1.0.0-rc2-final",
+    "Microsoft.Extensions.Logging.Console": "1.0.0-rc2-final",
+    "Microsoft.Extensions.WebEncoders": "1.0.0-rc2-final",
+    "Newtonsoft.Json": "8.0.3",
+    "Microsoft.AspNetCore.Razor": "1.0.0-rc2-final",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
     "VitalChoice.Infrastructure.Domain": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.Infrastructure": "1.0.0-*",
     "VitalChoice.Core": "1.0.0-*",
     "VitalChoice.Validation": "1.0.0-*",
-    "VitalChoice.SharedWeb": "1.0.0-*"
+    "VitalChoice.SharedWeb": "1.0.0-*",
+    "Microsoft.Extensions.Configuration.EnvironmentVariables": "1.0.0-rc2-final"
   },
   "frameworks": {
-    "dnx451": {
-      "dependencies": {"EntityFramework.Commands": "7.0.0-*"}
+    "net451": {
     },
-    "dotnet5.4": {
+    "netcoreapp1.0": {
+      "imports": [
+        "dnxcore50",
+        "portable-net45+win8"
+      ],
       "dependencies": {
-        "System.Runtime": "4.0.21-beta-23516"
+        "Microsoft.NETCore.Platforms": {
+          "type": "platform",
+          "version": "1.0.1-rc2-*"
+        },
+        "System.Runtime": "4.1.0-rc2-*"
       }
     }
   },
-  "commands": {
-    "web": "Microsoft.AspNet.Server.Kestrel",
-    "kestrel": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls http://localhost:5010",
-    "gen": "Microsoft.Extensions.CodeGeneration",
-    "ef": "EntityFramework.Commands"
+  "tools": {
+    "Microsoft.AspNetCore.Server.IISIntegration.Tools": {
+      "version": "1.0.0-*",
+      "imports": "portable-net45+wp80+win8+wpa81+dnxcore50"
+    }
+  },
+  "scripts": {
+    "postpublish": "dotnet publish-iis --publish-folder %publish:OutputPath% --framework %publish:FullTargetFramework%"
   }
 }

@@ -5,20 +5,17 @@ using System.Globalization;
 using System.IO;
 using System.Xml;
 using Antlr4.Runtime.Misc;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
-using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.Extensions.Options;
 using VitalChoice.Infrastructure.Domain.Options;
-#if !DOTNET5_4
 using NLog;
-#endif
 using VitalChoice.Interfaces.Services;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace VitalChoice.Core.Services
 {
-#if !DOTNET5_4
     public static class NLogLoggerFactoryExtensions
     {
         public static ILoggerFactory AddNLog(
@@ -53,15 +50,12 @@ namespace VitalChoice.Core.Services
                 _logger = logger;
             }
 
-            public void Log(
-                LogLevel logLevel,
-                int eventId,
-                object state,
-                Exception exception,
-                Func<object, Exception, string> formatter)
+            public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
             {
                 var nLogLogLevel = GetLogLevel(logLevel);
-                var message = formatter != null ? formatter(state, exception) : LogFormatter.Formatter(state, exception);
+                var message = formatter != null
+                    ? formatter(state, exception)
+                    : (exception != null ? $"[{exception.Source}]{exception.Message}\n{exception.StackTrace}" : state?.ToString());
                 if (!string.IsNullOrEmpty(message))
                 {
                     var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, exception,
@@ -80,7 +74,7 @@ namespace VitalChoice.Core.Services
             {
                 switch (logLevel)
                 {
-                    case LogLevel.Verbose:
+                    case LogLevel.Trace:
                         return global::NLog.LogLevel.Trace;
                     case LogLevel.Debug:
                         return global::NLog.LogLevel.Debug;
@@ -96,7 +90,7 @@ namespace VitalChoice.Core.Services
                 return global::NLog.LogLevel.Debug;
             }
 
-            public IDisposable BeginScopeImpl([NotNull] object state)
+            public IDisposable BeginScope<TState>([NotNull] TState state)
             {
                 return NestedDiagnosticsContext.Push(state.ToString());
             }
@@ -107,24 +101,22 @@ namespace VitalChoice.Core.Services
             _logFactory.Dispose();
         }
     }
-#endif
 
     public class LoggerProviderExtended : ILoggerProviderExtended
     {
-        private readonly IApplicationEnvironment _env;
+        private readonly IHostingEnvironment _env;
         private readonly ILoggerFactory _factory;
 
         //private readonly Dictionary<string, ILogger> _loggers = new Dictionary<string, ILogger>();
 
         public ILoggerFactory Factory => _factory;
 
-        public LoggerProviderExtended(IOptions<AppOptions> options, IApplicationEnvironment env)
+        public LoggerProviderExtended(IHostingEnvironment env)
         {
             _env = env;
-            string basePath = env.ApplicationBasePath;
-            string logPath = options.Value.LogPath;
+            string basePath = env.ContentRootPath;
+            string logPath = env.ContentRootPath;
             _factory = new LoggerFactory();
-#if !DOTNET5_4
             int backLevelCount = 0;
             var searchPath = basePath;
             while (!File.Exists(searchPath + @"\nlog.config") && backLevelCount <= 5)
@@ -148,32 +140,13 @@ namespace VitalChoice.Core.Services
             {
                 _factory.AddNLog(new NLog.LogFactory(new NLog.Config.LoggingConfiguration()));
             }
-#endif
         }
 
         public ILogger CreateLogger(string name)
         {
             name = name ?? string.Empty;
-            //lock (_loggers)
-            //{
-            //    ILogger result;
-            //    if (_loggers.TryGetValue(name, out result))
-            //    {
-            //        return result;
-            //    }
             ILogger logger = _factory.CreateLogger(name);
-            //_loggers.Add(name, logger);
             return logger;
-            //}
-        }
-
-        public ILogger CreateLoggerDefault()
-        {
-#if !DOTNET5_4
-            return CreateLogger(new StackFrame(1, false).GetMethod().DeclaringType);
-#else
-            return CreateLogger(string.Empty);
-#endif
         }
 
         public ILogger CreateLogger(Type type)
@@ -183,7 +156,7 @@ namespace VitalChoice.Core.Services
 
         public ILogger<T> CreateLogger<T>()
         {
-            return (ILogger<T>)CreateLogger(typeof(T).FullName);
+            return _factory.CreateLogger<T>();
         }
 
         public void Dispose()

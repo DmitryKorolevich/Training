@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
@@ -69,7 +70,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
                         }
                         if (excludedSkus.Any())
                         {
-                            return Task.FromResult<decimal>(0);
+                            return TaskCache<decimal>.DefaultCompletedTask;
                         }
                     }
                 }
@@ -95,7 +96,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
                         }
                         if (excludedSkus.Any())
                         {
-                            return Task.FromResult<decimal>(0);
+                            return TaskCache<decimal>.DefaultCompletedTask;
                         }
                     }
                 }
@@ -122,7 +123,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
                         }
                         if (excludedSkus.Any())
                         {
-                            return Task.FromResult<decimal>(0);
+                            return TaskCache<decimal>.DefaultCompletedTask;
                         }
                     }
                 }
@@ -145,7 +146,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
                         }
                         if (excludedSkus.Any())
                         {
-                            return Task.FromResult<decimal>(0);
+                            return TaskCache<decimal>.DefaultCompletedTask;
                         }
                     }
                 }

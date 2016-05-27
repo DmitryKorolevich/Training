@@ -12,7 +12,6 @@
 [Rr]eleases/
 x64/
 x86/
-build/
 bld/
 [Bb]in/
 [Oo]bj/
@@ -190,3 +189,4 @@ artifacts
 /src/internalLog.txt
 /src/VC.Admin/wwwroot/app
 /src/VC.Public/wwwroot/app
+internalLog.txt

@@ -13,24 +13,34 @@ function CopyTarget($targetName) {
 	echo "Replace with target files..."
 	cp "${targetName}\*" -Destination ".." -Recurse -Force
 }
-function DnuAll($deployPath) {
+function BuildAll($deployPath) {
 	Push-Location ".."
-	echo "Restoring project packages..."
-	dnu restore > restore.log
 	echo "Publishing project..."
-	dnu publish -o "${deployPath}" --runtime active --configuration Release --no-source --wwwroot wwwroot --quiet
+	dotnet publish -o "${deployPath}" -f net451 -r active -c Release
+	if(-Not $?)
+	{
+		exit $LASTEXITCODE
+	}
 	Pop-Location
 }
 function GruntTask($taskName) {
 	Push-Location ".."
 	echo "Running grunt task ${taskName}..."
-	grunt $taskName > grunt.log
+	grunt $taskName
+	if(-Not $?)
+	{
+		exit $LASTEXITCODE
+	}
 	Pop-Location
 }
 function BowerInstall() {
 	Push-Location ".."
 	echo "Running bower install..."
-	bower install > bower.log
+	bower install
+	if(-Not $?)
+	{
+		exit $LASTEXITCODE
+	}
 	Pop-Location
 }
 function NpmCopy($npmPath) {
@@ -38,7 +48,12 @@ function NpmCopy($npmPath) {
 		ni -itemtype directory -path $npmPath -Force
 		Push-Location ".."
 		echo "Installing missed packages..."
-		npm install > npm.log
+		npm install -f
+		npm update -f
+		if(-Not $?)
+		{
+			exit $LASTEXITCODE
+		}
 		Pop-Location
 		robocopy "..\node_modules" $npmPath /e /ndl /nfl /njh /is > copy-npm.log
 	}
@@ -47,7 +62,12 @@ function NpmCopy($npmPath) {
 		robocopy $npmPath "..\node_modules" /e /ndl /nfl /njh /is > copy-npm.log
 		Push-Location ".."
 		echo "Installing missed packages..."
-		npm install > npm.log
+		npm install -f
+		npm update -f
+		if(-Not $?)
+		{
+			exit $LASTEXITCODE
+		}
 		Pop-Location
 	}
 }
@@ -63,15 +83,15 @@ function Any($name, $inlist) {
 	return $FALSE;
 }
 
-function RestoreRuntime($deployPath) {
-	echo "Restoring missed runtimes..."
-	ls -Path "${deployPath}\approot\runtimes" | `
-	foreach{
-	if ($_.GetType().Name.Equals("DirectoryInfo")) {
-			$runtimeName = $_.Name
-			if (-Not(test-path "${deployPath}\${runtimeName}\bin\dnx.clr.managed.dll")) {
-				cp "${env:USERPROFILE}\.dnx\runtimes\${runtimeName}" "${deployPath}\approot\runtimes" -Force -Recurse
-			}
-		}
-	}
-}
+#function RestoreRuntime($deployPath) {
+#	echo "Restoring missed runtimes..."
+#	ls -Path "${deployPath}\approot\runtimes" | `
+#	foreach{
+#	if ($_.GetType().Name.Equals("DirectoryInfo")) {
+#			$runtimeName = $_.Name
+#			if (-Not(test-path "${deployPath}\${runtimeName}\bin\dnx.clr.managed.dll")) {
+#				cp "${env:USERPROFILE}\.dnx\runtimes\${runtimeName}" "${deployPath}\approot\runtimes" -Force -Recurse
+#			}
+#		}
+#	}
+#}

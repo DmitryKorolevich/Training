@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
@@ -40,7 +41,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.PromotionsToGetSkus = entity.PromotionsToGetSkus?.ToList();
                 dynamic.SelectedCategoryIds = entity.PromotionsToSelectedCategories?.Select(p => p.IdCategory).ToList();
             });
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
         protected override Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<PromotionDynamic, Promotion>> items)
@@ -78,7 +79,7 @@ namespace VitalChoice.Business.Services.Dynamic
                         IdPromotion = dynamic.Id
                     });
             });
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
         protected override Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<PromotionDynamic, Promotion>> items)
@@ -118,7 +119,7 @@ namespace VitalChoice.Business.Services.Dynamic
                     IdPromotion = dynamic.Id
                 }).ToList();
             });
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
     }
 }

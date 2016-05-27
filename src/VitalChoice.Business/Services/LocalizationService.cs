@@ -1,8 +1,9 @@
-﻿using Microsoft.Extensions.OptionsModel;
+﻿using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Transfer;
@@ -17,10 +18,10 @@ namespace VitalChoice.Business.Services
     {
         public static LocalizationService Current { get; private set; }
 
-        public LocalizationService(IOptions<AppOptions> options, string defaultCultureId)
+        public LocalizationService(IOptions<AppOptions> options, DbContextOptions<VitalChoiceContext> contextOptions, string defaultCultureId)
         {
             _defaultCultureId = defaultCultureId;
-            using (VitalChoiceContext context = new VitalChoiceContext(options))
+            using (VitalChoiceContext context = new VitalChoiceContext(options, contextOptions))
             {
                 CreateLocalizationData(new RepositoryAsync<LocalizationItemData>(context));
             }
@@ -75,7 +76,7 @@ namespace VitalChoice.Business.Services
         {
             List<LookupItem<string>> toReturn = new List<LookupItem<string>>();
 
-#if NET451
+#if !NETSTANDARD1_5
             if (_localizationData != null)
             {
                 var assembly =

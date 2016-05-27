@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
@@ -68,7 +69,7 @@ namespace VitalChoice.Business.Services.Dynamic
                     entity.SkusToInventorySkus.MergeKeyed(dynamic.SkusToInventorySkus, p => p.IdInventorySku, (sku, rsku) => sku.Quantity = rsku.Quantity);
                 }
             });
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
         protected override Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<SkuDynamic, Sku>> items)
@@ -86,7 +87,7 @@ namespace VitalChoice.Business.Services.Dynamic
 
                 entity.SkusToInventorySkus = dynamic.SkusToInventorySkus?.ToList();
             });
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
     }
 }

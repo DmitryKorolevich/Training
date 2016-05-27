@@ -8,13 +8,13 @@
     <ProjectGuid>040dc8d8-338f-48c0-bff7-67b6d30f3914</ProjectGuid>
     <RootNamespace>VitalChoice.Workflow</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">..\..\artifacts\obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
-    <OutputPath Condition="'$(OutputPath)'=='' ">..\..\artifacts\bin\$(MSBuildProjectName)\</OutputPath>
+    <OutputPath Condition="'$(OutputPath)'=='' ">..\..\artifacts\</OutputPath>
   </PropertyGroup>
   <PropertyGroup>
     <SchemaVersion>2.0</SchemaVersion>
     <TypeScriptCompileBlocked>True</TypeScriptCompileBlocked>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
-  <Import Project="$(VSToolsPath)\DNX\Microsoft.DNX.Props" />
-  <Import Project="$(VSToolsPath)\DNX\Microsoft.DNX.targets" />
+  <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.Props" />
+  <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.targets" />
 </Project>

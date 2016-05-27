@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Validation.Models;
 using System;
 using System.Dynamic;
+using System.IO;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
 using System.Security.Claims;
@@ -16,6 +16,7 @@ using VitalChoice.Interfaces.Services.Affiliates;
 using VC.Admin.Models.Affiliate;
 using System.Text;
 using System.Threading;
+using Microsoft.AspNetCore.Mvc;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Interfaces.Services.Settings;
 using Newtonsoft.Json;
@@ -32,7 +33,7 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using VitalChoice.Infrastructure.Domain.Transfer.Settings;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using VC.Admin.Models.InventorySkus;
 using VC.Admin.Models.Products;
@@ -48,6 +49,7 @@ using VitalChoice.Interfaces.Services.InventorySkus;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Services;
 using VitalChoice.Infrastructure.Domain.Entities;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 
 namespace VC.Admin.Controllers
 {
@@ -60,6 +62,7 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<InventorySkuUsageReportItemForExport, InventorySkuUsageReportItemForExportCsvMap> _inventorySkuUsageReportItemForExportCSVExportService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly ILogger _logger;
+        private readonly ExtendedUserManager _userManager;
 
         public InventorySkuController(
             IInventorySkuCategoryService inventorySkuCategoryService,
@@ -67,16 +70,16 @@ namespace VC.Admin.Controllers
             InventorySkuMapper mapper,
             ISettingService settingService,
             ICsvExportService<InventorySkuUsageReportItemForExport, InventorySkuUsageReportItemForExportCsvMap> inventorySkuUsageReportItemForExportCSVExportService,
-            ICsvExportService<ExpandoObject, InventoriesSummaryUsageReportItemForExportCsvMap> inventoriesSummaryUsageReportItemForExportCSVExportService,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerProviderExtended loggerProvider, ExtendedUserManager userManager)
         {
             _inventorySkuCategoryService = inventorySkuCategoryService;
             _inventorySkuService = inventorySkuService;
             _mapper = mapper;
             _settingService = settingService;
             _inventorySkuUsageReportItemForExportCSVExportService = inventorySkuUsageReportItemForExportCSVExportService;
+            _userManager = userManager;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<InventorySkuController>();
         }
 
 
@@ -146,7 +149,7 @@ namespace VC.Admin.Controllers
                 return null;
             var item = await _mapper.FromModelAsync(model);
 
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
@@ -168,7 +171,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.InventorySkus)]
-        public async Task<Result<bool>> DeleteInventorySku(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteInventorySku(int id)
         {
             return await _inventorySkuService.DeleteAsync(id);
         }
@@ -228,7 +231,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.InventorySkus)]
-        public async Task<Result<bool>> DeleteInventorySkuCategory(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteInventorySkuCategory(int id)
         {
             return await _inventorySkuCategoryService.DeleteCategoryAsync(id);
         }

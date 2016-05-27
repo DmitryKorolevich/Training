@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.Storage;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Services;
@@ -52,12 +51,12 @@ namespace VitalChoice.DynamicData.Base
 
         protected virtual Task AfterEntityChangesAsync(TDynamic model, TEntity updated, TEntity initial, IUnitOfWorkAsync uow)
         {
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
         protected virtual Task BeforeEntityChangesAsync(TDynamic model, TEntity entity, IUnitOfWorkAsync uow)
         {
-            return Task.Delay(0);
+            return TaskCache.CompletedTask;
         }
 
         protected virtual void LogItemInfoSetAfter(ObjectHistoryLogItem log, TDynamic model)

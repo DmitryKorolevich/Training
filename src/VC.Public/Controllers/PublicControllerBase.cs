@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Authorization;
-using Microsoft.AspNet.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using VC.Public.Helpers;
 using VitalChoice.Core.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
@@ -14,13 +14,14 @@ using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Core.Infrastructure.Helpers;
-using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services.Checkout;
 using System.Linq;
+using VitalChoice.Core.Services;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 
 namespace VC.Public.Controllers
 {
@@ -30,12 +31,14 @@ namespace VC.Public.Controllers
         protected readonly IAuthorizationService AuthorizationService;
         protected readonly ICustomerService CustomerService;
         protected readonly ICheckoutService CheckoutService;
+        private readonly ExtendedUserManager _userManager;
 
         protected PublicControllerBase(ICustomerService customerService,
             IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService, ICheckoutService checkoutService,
-            IPageResultService pageResultService) : base(pageResultService)
+            IPageResultService pageResultService, ExtendedUserManager userManager) : base(pageResultService)
         {
             CheckoutService = checkoutService;
+            _userManager = userManager;
             InfrastructureService = infrastructureService;
             AuthorizationService = authorizationService;
 			CustomerService = customerService;
@@ -66,7 +69,7 @@ namespace VC.Public.Controllers
         protected int GetInternalCustomerId()
         {
             var context = HttpContext;
-            var internalId = Convert.ToInt32(context.User.GetUserId());
+            var internalId = Convert.ToInt32(_userManager.GetUserId(User));
 
             return internalId;
         }

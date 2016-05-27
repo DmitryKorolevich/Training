@@ -14,7 +14,6 @@ using VitalChoice.Business.Queries.Orders;
 using VitalChoice.Business.Repositories;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Content.Articles;
 using VitalChoice.Infrastructure.Domain.Entities;
@@ -38,7 +37,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly OrderRepository _orderRepository;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly IRepositoryAsync<AdminTeam> _adminTeamRepository;
-        private readonly SPEcommerceRepository _sPEcommerceRepository;
+        private readonly SpEcommerceRepository _sPEcommerceRepository;
         private readonly ICountryService _countryService;
         private readonly IAppInfrastructureService _appInfrastructureService;
         private readonly ILogger _logger;
@@ -48,7 +47,7 @@ namespace VitalChoice.Business.Services.Orders
             OrderRepository orderRepository,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IRepositoryAsync<AdminTeam> adminTeamRepository,
-            SPEcommerceRepository sPEcommerceRepository,
+            SpEcommerceRepository sPEcommerceRepository,
             ICountryService countryService,
             IAppInfrastructureService appInfrastructureService,
             ILoggerProviderExtended loggerProvider)
@@ -60,7 +59,7 @@ namespace VitalChoice.Business.Services.Orders
             _sPEcommerceRepository = sPEcommerceRepository;
             _countryService = countryService;
             _appInfrastructureService = appInfrastructureService;
-            _logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLogger<OrderReportService>();
         }
 
         public async Task<OrdersAgentReport> GetOrdersAgentReportAsync(OrdersAgentReportFilter filter)

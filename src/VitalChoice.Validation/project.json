@@ -1,28 +1,32 @@
-﻿{
+{
   
   "version": "1.0.0-*",
   "description": "",
   "authors": [ "" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
-
   "dependencies": {
-    "Microsoft.AspNet.Mvc": "6.0.0-rc1-final",
-    "FluentValidation": "5.6.0.5-*",
+    "Microsoft.AspNetCore.Mvc": "1.0.0-rc2-final",
+    "FluentValidation": "5.6.0.5-fixed-*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*"
   },
 
   "frameworks": {
     "net451": {
     },
-    "dotnet5.4": {
+    "netstandard1.5": {
+      "imports": [
+        "dnxcore50",
+        "portable-net45+win8"
+      ],
       "dependencies": {
-        "System.Runtime": "4.0.21-beta-23516",
-        "System.Collections": "4.0.11-beta-23516",
-        "System.Linq": "4.0.1-beta-23516",
-        "System.Threading": "4.0.11-beta-23516",
-        "Microsoft.CSharp": "4.0.1-beta-23516"
+        "Microsoft.NETCore.Platforms": {
+          "type": "build",
+          "version": "1.0.1-*"
+        },
+        "System.Runtime": "4.1.0-rc2-*",
+        "System.Collections": "4.0.11-rc2-*",
+        "System.Linq": "4.1.0-rc2-*",
+        "System.Threading": "4.0.11-rc2-*",
+        "Microsoft.CSharp": "4.0.1-rc2-*"
       }
     }
   }

@@ -143,6 +143,11 @@ namespace VitalChoice.Caching.Relational
 
         //public Type RelationObjectType => 
 
+        public bool HasRelation(string name)
+        {
+            return RelationsDict?.ContainsKey(name) ?? false;
+        }
+
         public object GetRelatedObject(object entity)
         {
             if (entity == null)

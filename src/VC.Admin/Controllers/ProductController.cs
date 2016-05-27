@@ -1,15 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
 using VC.Admin.Models;
 using VitalChoice.Validation.Models;
 using System;
+using System.IO;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Interfaces.Services.Products;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
@@ -29,6 +30,7 @@ using VitalChoice.Business.CsvExportMaps;
 using Microsoft.Net.Http.Headers;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Products;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.InventorySkus;
 
 namespace VC.Admin.Controllers
@@ -45,6 +47,7 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<ProductCategoryStatisticTreeItemModel, ProductCategoryStatisticTreeItemCsvMap> productCategoryStatisticTreeItemCSVExportService;
         private readonly IObjectHistoryLogService objectHistoryLogService;
         private readonly ILogger logger;
+        private readonly ExtendedUserManager _userManager;
 
         public ProductController(IProductCategoryService productCategoryService,
             IProductService productService,
@@ -55,7 +58,7 @@ namespace VC.Admin.Controllers
             ISettingService settingService,
             IDynamicMapper<ProductDynamic, Product> mapper,
             ICsvExportService<ProductCategoryStatisticTreeItemModel, ProductCategoryStatisticTreeItemCsvMap> productCategoryStatisticTreeItemCSVExportService,
-            IObjectHistoryLogService objectHistoryLogService)
+            IObjectHistoryLogService objectHistoryLogService, ExtendedUserManager userManager)
         {
             this.productCategoryService = productCategoryService;
             this.inventoryCategoryService = inventoryCategoryService;
@@ -65,8 +68,9 @@ namespace VC.Admin.Controllers
             this.settingService = settingService;
             this.productCategoryStatisticTreeItemCSVExportService = productCategoryStatisticTreeItemCSVExportService;
             this.objectHistoryLogService = objectHistoryLogService;
+            _userManager = userManager;
             _mapper = mapper;
-            this.logger = loggerProvider.CreateLoggerDefault();
+            this.logger = loggerProvider.CreateLogger<ProductController>();
         }
 
         #region Products
@@ -241,7 +245,7 @@ namespace VC.Admin.Controllers
                 return null;
             
             var product = await _mapper.FromModelAsync(model);
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
@@ -297,7 +301,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Products)]
-        public async Task<Result<bool>> DeleteProduct(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteProduct(int id)
         {
             return await productService.DeleteAsync(id);
         }
@@ -359,7 +363,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var item = model.Convert();
-            var sUserId = Request.HttpContext.User.GetUserId();
+            var sUserId = _userManager.GetUserId(User);
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
@@ -372,7 +376,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Products)]
-        public async Task<Result<bool>> DeleteCategory(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteCategory(int id)
         {
             return await productCategoryService.DeleteCategoryAsync(id);
         }
@@ -493,7 +497,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Products)]
-        public async Task<Result<bool>> DeleteInventoryCategory(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteInventoryCategory(int id)
         {
             return await inventoryCategoryService.DeleteCategoryAsync(id);
         }
@@ -559,7 +563,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Products)]
-        public async Task<Result<bool>> DeleteProductReview(int id, [FromBody] object model)
+        public async Task<Result<bool>> DeleteProductReview(int id)
         {
             return await productReviewService.DeleteProductReviewAsync(id);
         }
@@ -569,7 +573,7 @@ namespace VC.Admin.Controllers
         #region ProductOutOfStockRequests
 
         [HttpPost]
-        public async Task<Result<ICollection<ProductOutOfStockContainerListItemModel>>> GetProductOutOfStockContainers([FromBody] object model)
+        public async Task<Result<ICollection<ProductOutOfStockContainerListItemModel>>> GetProductOutOfStockContainers()
         {
             var toReturn = await productService.GetProductOutOfStockContainersAsync();
             return toReturn.Select(p => new ProductOutOfStockContainerListItemModel(p)).ToList();

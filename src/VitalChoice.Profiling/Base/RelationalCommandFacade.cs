@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Data.Entity.Storage;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace VitalChoice.Profiling.Base
 {
@@ -14,61 +14,60 @@ namespace VitalChoice.Profiling.Base
             _relationalCommand = relationalCommand;
         }
 
-        public void ExecuteNonQuery(IRelationalConnection connection, bool manageConnection = true)
+        public int ExecuteNonQuery(IRelationalConnection connection, IReadOnlyDictionary<string, object> parameterValues = null, bool manageConnection = true)
         {
             using (new ProfilingScope(CommandText))
             {
-                _relationalCommand.ExecuteNonQuery(connection, manageConnection);
+                return _relationalCommand.ExecuteNonQuery(connection, parameterValues, manageConnection);
             }
         }
 
-        public async Task ExecuteNonQueryAsync(IRelationalConnection connection,
-            CancellationToken cancellationToken = new CancellationToken(),
+        public async Task<int> ExecuteNonQueryAsync(IRelationalConnection connection, IReadOnlyDictionary<string, object> parameterValues = null, bool manageConnection = true,
+            CancellationToken cancellationToken = new CancellationToken())
+        {
+            using (new ProfilingScope(CommandText))
+            {
+                return await _relationalCommand.ExecuteNonQueryAsync(connection, parameterValues, manageConnection, cancellationToken);
+            }
+        }
+
+        public object ExecuteScalar(IRelationalConnection connection, IReadOnlyDictionary<string, object> parameterValues = null, bool manageConnection = true)
+        {
+            using (new ProfilingScope(CommandText))
+            {
+                return _relationalCommand.ExecuteScalar(connection, parameterValues, manageConnection);
+            }
+        }
+
+        public async Task<object> ExecuteScalarAsync(IRelationalConnection connection, IReadOnlyDictionary<string, object> parameterValues = null, bool manageConnection = true,
+            CancellationToken cancellationToken = new CancellationToken())
+        {
+            using (new ProfilingScope(CommandText))
+            {
+                return await _relationalCommand.ExecuteScalarAsync(connection, parameterValues, manageConnection, cancellationToken);
+            }
+        }
+
+        public RelationalDataReader ExecuteReader(IRelationalConnection connection, IReadOnlyDictionary<string, object> parameterValues = null,
             bool manageConnection = true)
         {
             using (new ProfilingScope(CommandText))
             {
-                await _relationalCommand.ExecuteNonQueryAsync(connection, cancellationToken, manageConnection);
+                return _relationalCommand.ExecuteReader(connection, parameterValues, manageConnection);
             }
         }
 
-        public object ExecuteScalar(IRelationalConnection connection, bool manageConnection = true)
+        public async Task<RelationalDataReader> ExecuteReaderAsync(IRelationalConnection connection, IReadOnlyDictionary<string, object> parameterValues = null, bool manageConnection = true,
+            CancellationToken cancellationToken = new CancellationToken())
         {
             using (new ProfilingScope(CommandText))
             {
-                return _relationalCommand.ExecuteScalar(connection, manageConnection);
-            }
-        }
-
-        public async Task<object> ExecuteScalarAsync(IRelationalConnection connection,
-            CancellationToken cancellationToken = new CancellationToken(),
-            bool manageConnection = true)
-        {
-            using (new ProfilingScope(CommandText))
-            {
-                return await _relationalCommand.ExecuteScalarAsync(connection, cancellationToken, manageConnection);
-            }
-        }
-
-        public RelationalDataReader ExecuteReader(IRelationalConnection connection, bool manageConnection = true)
-        {
-            using (new ProfilingScope(CommandText))
-            {
-                return _relationalCommand.ExecuteReader(connection, manageConnection);
-            }
-        }
-
-        public async Task<RelationalDataReader> ExecuteReaderAsync(IRelationalConnection connection,
-            CancellationToken cancellationToken = new CancellationToken(),
-            bool manageConnection = true)
-        {
-            using (new ProfilingScope(CommandText))
-            {
-                return await _relationalCommand.ExecuteReaderAsync(connection, cancellationToken, manageConnection);
+                return await _relationalCommand.ExecuteReaderAsync(connection, parameterValues, manageConnection, cancellationToken);
             }
         }
 
         public string CommandText => _relationalCommand.CommandText;
-        public IReadOnlyList<RelationalParameter> Parameters => _relationalCommand.Parameters;
+
+        IReadOnlyList<IRelationalParameter> IRelationalCommand.Parameters => _relationalCommand.Parameters;
     }
 }

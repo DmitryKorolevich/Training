@@ -1,4 +1,4 @@
-#if NET451
+#if !NETSTANDARD1_5
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -97,7 +97,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError(e.Message, e);
+                    Logger.LogError(0, e, e.Message);
                     _readyToDisposeReceive.Set();
                     Thread.Sleep(TimeSpan.FromSeconds(1));
                 }
@@ -142,7 +142,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError(e.Message, e);
+                    Logger.LogError(0, e, e.Message);
                     _readyToDisposeReceive.Set();
                     Thread.Sleep(TimeSpan.FromSeconds(1));
                 }

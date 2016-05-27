@@ -1,8 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc.Internal;
-using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
-using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Core;
