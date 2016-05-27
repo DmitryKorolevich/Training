@@ -16,23 +16,6 @@
     "Templates": "2.7.12-rc2"
   },
   "frameworks": {
-    "net451": { },
-    "netstandard1.5": {
-      "imports": [
-        "dnxcore50",
-        "portable-net45+win8"
-      ],
-      "dependencies": {
-        "Microsoft.NETCore.Platforms": {
-          "version": "1.0.1-rc2-*",
-          "type": "build"
-        },
-        "Microsoft.CSharp": "4.0.1-rc2-*",
-        "System.Collections": "4.0.11-rc2-*",
-        "System.Linq": "4.1.0-rc2-*",
-        "System.Runtime": "4.1.0-rc2-*",
-        "System.Threading": "4.0.11-rc2-*"
-      }
-    }
+    "net451": { }
   }
 }

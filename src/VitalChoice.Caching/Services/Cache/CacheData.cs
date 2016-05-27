@@ -265,29 +265,29 @@ namespace VitalChoice.Caching.Services.Cache
             return true;
         }
 
-        private bool GetAllNormalizedAndTracked(object entity, 
+        private bool GetAllNormalizedAndTracked(object entity,
             IDictionary<TrackedEntityKey, EntityEntry> trackedEntities, out ICollection<RelationInfo> relationsToClone,
             CachedEntity<T> cached)
         {
-            relationsToClone = new List<RelationInfo>();
-            var relationCandidates = _relationInfo.Relations.Where(r => cached.NeedUpdateRelated.Contains(r.Name));
-            foreach (var relation in relationCandidates)
-            {
-                EntityRelationalReferenceInfo reference;
-                if (_entityInfo.RelationReferences.TryGetValue(relation.Name, out reference))
-                {
-                    var newpk = reference.GetPrimaryKeyValue(entity);
-                    var oldpk = reference.GetPrimaryKeyValue(cached.Entity);
-                    if (newpk != oldpk)
-                    {
-                        relationsToClone.Add(relation);
-                    }
-                }
-                else
-                {
-                    relationsToClone.Add(relation);
-                }
-            }
+
+            relationsToClone = _relationInfo.Relations.Where(r => cached.NeedUpdateRelated.Contains(r.Name)).ToArray();
+            //foreach (var relation in relationCandidates)
+            //{
+            //    EntityRelationalReferenceInfo reference;
+            //    if (_entityInfo.RelationReferences.TryGetValue(relation.Name, out reference))
+            //    {
+            //var newpk = reference.GetPrimaryKeyValue(entity);
+            //        var oldpk = reference.GetPrimaryKeyValue(cached.Entity);
+            //        if (newpk != oldpk)
+            //        {
+            //            relationsToClone.Add(relation);
+            //        }
+            //    }
+            //    else
+            //    {
+            //        relationsToClone.Add(relation);
+            //    }
+            //}
             return GetIsNormalized(entity, _relationInfo.RelationType, trackedEntities, relationsToClone, _entityInfo);
         }
 

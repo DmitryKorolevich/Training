@@ -18,21 +18,6 @@
         "Microsoft.WindowsAzure.ConfigurationManager": "3.2.1",
         "NLog": "4.3.4"
       }
-    },
-    "netstandard1.5": {
-      "imports": [
-        "dnxcore50",
-        "portable-net45+win8"
-      ],
-      "dependencies": {
-        "Microsoft.NETCore.Platforms": {
-          "type": "build",
-          "version": "1.0.1-rc2-*"
-        },
-        "System.Runtime": "4.1.0-rc2-*",
-        "System.Security.Cryptography.X509Certificates": "4.1.0-rc2-*",
-        "System.Security.Cryptography.Algorithms": "4.1.0-rc2-*"
-      }
     }
   }
 }

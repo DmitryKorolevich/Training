@@ -11,26 +11,6 @@
   },
   "frameworks": {
     "net451": {
-    },
-    "netstandard1.5": {
-      "imports": [
-        "dnxcore50",
-        "portable-net45+win8"
-      ],
-      "dependencies": {
-        "Microsoft.NETCore.Platforms": {
-          "type": "build",
-          "version": "1.0.1-*"
-        },
-        "Microsoft.CSharp": "4.0.1-rc2-*",
-        "System.Collections": "4.0.11-rc2-*",
-        "System.Linq": "4.1.0-rc2-*",
-        "System.Net.Http": "4.0.1-rc2-*",
-        "System.Runtime": "4.1.0-rc2-*",
-        "System.Threading": "4.0.11-rc2-*",
-        "System.Net.Requests": "4.0.11-rc2-*",
-        "System.Collections.Specialized": "4.0.1-rc2-*"
-      }
     }
   }
 }
