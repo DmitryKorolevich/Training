@@ -38,6 +38,8 @@ using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 using VitalChoice.Interfaces.Services.Healthwise;
 using VitalChoice.Interfaces.Services.Orders;
 using VC.Admin.Models.Healthwise;
+using VitalChoice.Business.Mail;
+using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Transfer.Healthwise;
 using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
 using VitalChoice.Infrastructure.Identity.UserManagers;
@@ -49,6 +51,7 @@ namespace VC.Admin.Controllers
         private readonly IHealthwiseService _healthwiseService;
         private readonly IOrderService _orderService;
         private readonly IAppInfrastructureService _appInfrastructureService;
+        private readonly INotificationService _notificationService;
         private readonly ILogger _logger;
         private readonly ExtendedUserManager _userManager;
 
@@ -56,12 +59,13 @@ namespace VC.Admin.Controllers
             IHealthwiseService healthwiseService,
             IOrderService orderService,
             IAppInfrastructureService appInfrastructureService,
-            ILoggerProviderExtended loggerProvider, ExtendedUserManager userManager)
+            INotificationService notificationService,
+            ILoggerProviderExtended loggerProvider)
         {
             _healthwiseService = healthwiseService;
             _orderService = orderService;
             _appInfrastructureService = appInfrastructureService;
-            _userManager = userManager;
+            _notificationService = notificationService;
             _logger = loggerProvider.CreateLogger<HealthwiseController>();
         }
 

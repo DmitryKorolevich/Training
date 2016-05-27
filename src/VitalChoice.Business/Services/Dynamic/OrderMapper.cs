@@ -317,6 +317,10 @@ namespace VitalChoice.Business.Services.Dynamic
                 {
                     entity.PaymentMethod.BillingAddress = new OrderAddress {OptionValues = new List<OrderAddressOptionValue>()};
                 }
+                if (dynamic.PaymentMethod.Address == null)
+                {
+                    entity.PaymentMethod.BillingAddress = null;
+                }
                 await _orderPaymentMethodMapper.UpdateEntityAsync(dynamic.PaymentMethod, entity.PaymentMethod);
                 if (entity.Skus == null)
                 {

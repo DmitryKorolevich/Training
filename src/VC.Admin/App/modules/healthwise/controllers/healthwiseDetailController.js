@@ -57,7 +57,6 @@ function ($scope, $rootScope, $state, $stateParams, healthwiseService, toaster, 
             AllowPayment:false,
         };
 
-        loadOrders();
         loadHealthwise();
     };
 
@@ -108,6 +107,7 @@ function ($scope, $rootScope, $state, $stateParams, healthwiseService, toaster, 
                             $scope.options.AllowMove = data.Periods[0].PaidDate==null;
                         }
                     }
+                    loadOrders();
                 } else
                 {
                     errorHandler(result);

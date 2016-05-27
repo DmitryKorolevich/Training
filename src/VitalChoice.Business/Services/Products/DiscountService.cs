@@ -172,7 +172,7 @@ namespace VitalChoice.Business.Services.Products
         {
             var conditions = new DiscountQuery().NotDeleted().WithValidFrom(filter.ValidFrom).WithValidTo(filter.ValidTo).
                 WithDateStatus(filter.DateStatus).WithText(filter.SearchText).WithCode(filter.Code).WithStatus(filter.Status)
-                .WithAssigned(filter.Assigned);
+                .WithAssigned(filter.SearchByAssigned, filter.Assigned);
             var query = _discountRepository.Query(conditions);
 
             Func<IQueryable<Discount>, IOrderedQueryable<Discount>> sortable = x => x.OrderByDescending(y => y.DateCreated);
