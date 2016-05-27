@@ -16,5 +16,7 @@ namespace VC.Admin.Models.Healthwise
         public decimal Amount { get; set; }
 
         public bool PayAsGC { get; set; }
+
+        public string EmailMessage { get; set; }
     }
 }
