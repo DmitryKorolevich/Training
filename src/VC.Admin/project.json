@@ -72,20 +72,6 @@
   },
   "frameworks": {
     "net451": {
-    },
-    "netcoreapp1.0": {
-      "imports": [
-        "dnxcore50",
-        "portable-net45+win8"
-      ],
-      "dependencies": {
-        "Microsoft.NETCore.Platforms": {
-          "type": "platform",
-          "version": "1.0.1-*"
-        },
-        "System.Runtime": "4.1.0-rc2-*",
-        "System.Net.Http": "4.0.1-rc2-*"
-      }
     }
   },
   "tools": {
