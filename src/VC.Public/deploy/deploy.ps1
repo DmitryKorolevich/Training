@@ -7,7 +7,7 @@ Param(
 if ($RootDeploy.Equals("")) {
 	throw "Root deploy is empty"
 }
-NpmCopy -npmPath "D:\Temp\npm\"
+NpmCopy -npmPath "C:\Temp\"
 BowerInstall
 $targetNames = GetTargets
 foreach ($target in $targetNames) {

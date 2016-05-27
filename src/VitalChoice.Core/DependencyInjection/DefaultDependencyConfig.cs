@@ -136,7 +136,11 @@ namespace VitalChoice.Core.DependencyInjection
             }
             else
             {
-                services.AddEntityFramework().AddEntityFrameworkSqlServer().InjectProfiler();
+                services.AddEntityFramework()
+                    .AddDbContext<VitalChoiceContext>()
+                    .AddDbContext<EcommerceContext>()
+                    .AddDbContext<LogsContext>()
+                    .AddEntityFrameworkSqlServer().InjectProfiler();
             }
 #else
             services.AddEntityFramework()
