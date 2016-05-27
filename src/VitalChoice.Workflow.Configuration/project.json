@@ -1,4 +1,5 @@
 {
+  "buildOptions": { "emitEntryPoint": true },
   "version": "1.0.0-*",
   "description": "VitalChoice.Workflow.Configuration Console Application",
   "authors": [ "multi_000" ],

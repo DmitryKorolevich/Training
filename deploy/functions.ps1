@@ -44,32 +44,32 @@ function BowerInstall() {
 	Pop-Location
 }
 function NpmCopy($npmPath) {
-	if (-Not (test-path $npmPath)) {
-		ni -itemtype directory -path $npmPath -Force
-		Push-Location ".."
-		echo "Installing missed packages..."
-		npm install -f
-		npm update -f
-		if(-Not $?)
-		{
-			exit $LASTEXITCODE
-		}
-		Pop-Location
-		robocopy "..\node_modules" $npmPath /e /ndl /nfl /njh /is > copy-npm.log
-	}
-	else {
+	#if (-Not (test-path $npmPath)) {
+	#	ni -itemtype directory -path $npmPath -Force
+	#	Push-Location ".."
+	#	echo "Installing missed packages..."
+	#	npm install -f
+	#	npm update -f
+	#	if(-Not $?)
+	#	{
+	#		exit $LASTEXITCODE
+	#	}
+	#	Pop-Location
+	#	robocopy "..\node_modules" $npmPath /e /ndl /nfl /njh /is > copy-npm.log
+	#}
+	#else {
 		echo "Copying npm..."
 		robocopy $npmPath "..\node_modules" /e /ndl /nfl /njh /is > copy-npm.log
-		Push-Location ".."
-		echo "Installing missed packages..."
-		npm install -f
-		npm update -f
-		if(-Not $?)
-		{
-			exit $LASTEXITCODE
-		}
-		Pop-Location
-	}
+		#Push-Location ".."
+		#echo "Installing missed packages..."
+		#npm install -f
+		#npm update -f
+		#if(-Not $?)
+		#{
+		#	exit $LASTEXITCODE
+		#}
+		#Pop-Location
+	#}
 }
 function BuildDbProject() {
 	
