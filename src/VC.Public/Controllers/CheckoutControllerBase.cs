@@ -135,12 +135,18 @@ namespace VC.Public.Controllers
             var gcsInCart = cartModel.GiftCertificateCodes.ToArray();
             var hasEmpty = gcsInCart.Any(g => string.IsNullOrWhiteSpace(g.Value));
             cartModel.GiftCertificateCodes.Clear();
+            int num = 0;
             foreach (var code in gcsInCart)
             {
                 if (!string.IsNullOrWhiteSpace(code.Value) && order.GiftCertificates.All(g => g.GiftCertificate.Code != code.Value))
                 {
                     cartModel.GiftCertificateCodes.Add(code);
                     code.ErrorMessage = "Gift Certificate not found";
+                    ModelState.AddModelError($"GiftCertificateCodes{num}", "Gift Certificate not found");
+                }
+                if (!string.IsNullOrWhiteSpace(code.Value))
+                {
+                    num++;
                 }
             }
             cartModel.GiftCertificateCodes.AddRange(

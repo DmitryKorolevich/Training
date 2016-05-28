@@ -310,7 +310,7 @@ namespace VitalChoice.Business.Services.Dynamic
                             {
                                 g.GiftCertificate.Balance = dg.GiftCertificate.Balance;
                             }
-                        }, removed => removed.ForEach(r => r.GiftCertificate.Balance += r.Amount));
+                        });
                 }
                 entity.IdDiscount = dynamic.Discount?.Id;
                 if (dynamic.PaymentMethod.Address != null && entity.PaymentMethod.BillingAddress == null)
