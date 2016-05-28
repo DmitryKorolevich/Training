@@ -51,8 +51,7 @@ namespace VitalChoice.Infrastructure.Context
                 Password = _options.Value.Connection.Password,
                 ConnectTimeout = 60
             }).ConnectionString;
-            builder.UseSqlServer(connectionString);
-
+            builder.UseSqlServer(connectionString).EnableSensitiveDataLogging();
             base.OnConfiguring(builder);
         }
 

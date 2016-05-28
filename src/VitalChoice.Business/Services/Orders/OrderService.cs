@@ -181,7 +181,7 @@ namespace VitalChoice.Business.Services.Orders
                 try
                 {
                     SetExtendedOptions(Enumerable.Repeat(model, 1));
-                    await SetSkusBornDate(new[] { model }, uow);
+                    await SetSkusBornDate(new[] {model}, uow);
                     await EnsurePaymentMethod(model);
                     var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
                     var paymentCopy = _paymentMapper.Clone<ExpandoObject>(model.PaymentMethod, o =>
@@ -1264,8 +1264,11 @@ namespace VitalChoice.Business.Services.Orders
 
                         transaction.Commit();
 
-                        var entity = await SelectEntityFirstAsync(o => o.Id == idAutoShipOrder.Value);
-                        await LogItemChanges(new[] { await DynamicMapper.FromEntityAsync(entity) });
+                        if (idAutoShipOrder.HasValue)
+                        {
+                            var entity = await SelectEntityFirstAsync(o => o.Id == idAutoShipOrder.Value);
+                            await LogItemChanges(new[] {await DynamicMapper.FromEntityAsync(entity)});
+                        }
                     }
                     catch
                     {
@@ -1360,21 +1363,28 @@ namespace VitalChoice.Business.Services.Orders
             var option = _productService.GetProductOptionTypes(new HashSet<string>() { ProductConstants.FIELD_NAME_SKU_INVENTORY_BORN_DATE }).FirstOrDefault();
             if (option != null)
             {
-                var skuIds = orders.SelectMany(p => p?.Skus).Select(p => p.Sku.Id).ToList();
-                skuIds.AddRange(orders.SelectMany(p => p?.PromoSkus).Select(p => p.Sku.Id).ToList());
-                skuIds = skuIds.Distinct().ToList();
-                var dbOptionValues = await _productService.GetSkuOptionValues(skuIds, new[] { option.Id });
-                var skuIdsForInsert = skuIds.Except(dbOptionValues.Select(p => p.IdSku)).ToList();
-                if (skuIdsForInsert.Any())
+                var skuIds =
+                    new HashSet<int>(
+                        orders.Where(o => o.IdObjectType != (int) OrderType.AutoShip).SelectMany(p => p.Skus).Select(p => p.Sku.Id));
+                skuIds.AddRange(
+                    orders.Where(o => o.IdObjectType != (int) OrderType.AutoShip)
+                        .SelectMany(p => p.PromoSkus)
+                        .Select(p => p.Sku.Id));
+                if (skuIds.Any())
                 {
-                    var now = DateTime.Now.ToString(CultureInfo.InvariantCulture);
-                    var skuOptionValueRepository = uow.RepositoryAsync<SkuOptionValue>();
-                    skuOptionValueRepository.InsertRange(skuIdsForInsert.Select(p => new SkuOptionValue()
+                    var dbOptionValues = await _productService.GetSkuOptionValues(skuIds, new[] {option.Id});
+                    var skuIdsForInsert = skuIds.Except(dbOptionValues.Select(p => p.IdSku)).ToList();
+                    if (skuIdsForInsert.Any())
                     {
-                        IdOptionType = option.Id,
-                        IdSku = p,
-                        Value = now
-                    }));
+                        var now = DateTime.Now.ToString(CultureInfo.InvariantCulture);
+                        var skuOptionValueRepository = uow.RepositoryAsync<SkuOptionValue>();
+                        skuOptionValueRepository.InsertRange(skuIdsForInsert.Select(p => new SkuOptionValue()
+                        {
+                            IdOptionType = option.Id,
+                            IdSku = p,
+                            Value = now
+                        }));
+                    }
                 }
             }
         }
