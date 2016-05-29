@@ -18,7 +18,9 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Discounts
 
             return
                 Task.FromResult(
-                    -(decimal) dataContext.Order.Skus.First(s => (bool?) s.Sku.SafeData.AutoShipProduct ?? false).Sku.Data.OffPercent*
+                    -((decimal?)
+                        dataContext.Order.Skus.FirstOrDefault(s => (bool?) s.Sku.SafeData.AutoShipProduct ?? false)?.Sku.Data.OffPercent ??
+                      0)*
                     (decimal) dataContext.Data.DiscountableSubtotal/100);
         }
     }
