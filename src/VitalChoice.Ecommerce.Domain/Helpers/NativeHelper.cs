@@ -12,7 +12,8 @@ using System.Runtime.Loader;
 
 namespace VitalChoice.Ecommerce.Domain.Helpers
 {
-    public static class NativeHelper {
+    public static class NativeHelper
+    {
 
         private static volatile DependencyContext _dependencyContext;
 
@@ -35,26 +36,30 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             }
         }
 #endif
+
         private static void WalkReferenceAssemblies(Assembly current)
         {
             var currentInfo = current;
             if (AssemblyCache.TryAdd(current.FullName, currentInfo))
             {
-                Assemblies.Add(currentInfo);
-                foreach (var assemblyName in current.GetReferencedAssemblies())
+                lock (Assemblies)
                 {
-                    try
+                    Assemblies.Add(currentInfo);
+                    foreach (var assemblyName in current.GetReferencedAssemblies())
                     {
-                        var dependent = Assembly.Load(assemblyName);
-                        var dependentInfo = dependent;
-                        if (AssemblyCache.TryAdd(dependent.FullName, dependentInfo))
+                        try
                         {
-                            Assemblies.Add(dependentInfo);
-                            WalkReferenceAssemblies(dependent);
+                            var dependent = Assembly.Load(assemblyName);
+                            var dependentInfo = dependent;
+                            if (AssemblyCache.TryAdd(dependent.FullName, dependentInfo))
+                            {
+                                Assemblies.Add(dependentInfo);
+                                WalkReferenceAssemblies(dependent);
+                            }
                         }
-                    }
-                    catch (FileNotFoundException)
-                    {
+                        catch (FileNotFoundException)
+                        {
+                        }
                     }
                 }
             }
@@ -91,6 +96,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
                 WalkReferenceAssemblies(startupAssembly);
                 GetApplicationReferences();
                 _configured = true;
+                ReflectionHelper.Reconfigure();
             }
         }
 
