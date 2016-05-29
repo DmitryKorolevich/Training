@@ -51,7 +51,7 @@ namespace VitalChoice.Ecommerce.Context
                 Password = Options.Value.Connection.Password,
                 ConnectTimeout = 60
             }).ConnectionString;
-            builder.UseSqlServer(connectionString).EnableSensitiveDataLogging();
+            builder.UseSqlServer(connectionString);
 
             base.OnConfiguring(builder);
         }
