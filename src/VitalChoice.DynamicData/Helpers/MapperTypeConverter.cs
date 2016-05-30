@@ -76,7 +76,13 @@ namespace VitalChoice.DynamicData.Helpers
                 case FieldType.LargeString:
                     return value as string;
                 case FieldType.DateTime:
-                    return TrimZeros(((DateTime) value).ToString("O"));
+                    var datetime = (DateTime)value;
+                    if (datetime.Kind != DateTimeKind.Unspecified)
+                    {
+                        datetime = new DateTime(datetime.Year, datetime.Month, datetime.Day, datetime.Hour, datetime.Minute, datetime.Second,
+                            datetime.Millisecond, DateTimeKind.Unspecified);
+                    }
+                    return TrimZeros(datetime.ToString("O"));
                 default:
                     var valueType = value.GetType();
                     var underlyingType = valueType.UnwrapNullable();
@@ -124,7 +130,13 @@ namespace VitalChoice.DynamicData.Helpers
                     }
                     break;
                 case FieldType.DateTime:
-                    option.Value = TrimZeros(((DateTime)value).ToString("O"));
+                    var datetime = (DateTime) value;
+                    if (datetime.Kind != DateTimeKind.Unspecified)
+                    {
+                        datetime = new DateTime(datetime.Year, datetime.Month, datetime.Day, datetime.Hour, datetime.Minute, datetime.Second,
+                            datetime.Millisecond, DateTimeKind.Unspecified);
+                    }
+                    option.Value = TrimZeros(datetime.ToString("O"));
                     break;
                 default:
                     var valueType = value.GetType();
