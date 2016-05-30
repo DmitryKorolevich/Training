@@ -32,13 +32,7 @@ namespace VitalChoice.Jobs
 		{
             try
             {
-                var host = new WebHostBuilder()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseStartup<Startup>()
-                .Build();
-
-                host.Run();
-                _container = host.Services;
+                _container = Program.Host.Services;
             }
             catch (Exception e)
             {
@@ -83,6 +77,7 @@ namespace VitalChoice.Jobs
             var task = Task.Factory.StartNew(() =>
             {
                 _scheduler.Shutdown(true);
+                Program.Host.Dispose();
                 Trace.WriteLine("Jobs service stopped");
             });
             RequestAdditionalTime(timeout);

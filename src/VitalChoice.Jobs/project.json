@@ -1,6 +1,22 @@
 {
   "buildOptions": {
+    "copyToOutput": {
+      "include": [
+        "config.json",
+        "config.local.json",
+        "CSharpClassTemplate.tcs",
+        "CSharpPreparseTemplate.tcs"
+      ]
+    },
+    "preserveCompilationContext": true,
     "emitEntryPoint": true
+  },
+  "publishOptions": {
+    "include": [
+      "config.json",
+      "CSharpClassTemplate.tcs",
+      "CSharpPreparseTemplate.tcs"
+    ]
   },
   "version": "1.0.0-*",
   "description": "VitalChoice.Jobs Console Application",

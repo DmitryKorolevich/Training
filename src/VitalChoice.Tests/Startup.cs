@@ -36,7 +36,6 @@ namespace VitalChoice.Tests
         {
             _hostingEnvironment = hostingEnvironment;
             var builder = new ConfigurationBuilder()
-                .SetBasePath(hostingEnvironment.ContentRootPath)
                 .AddJsonFile("config.json")
                 .AddJsonFile("config.local.json", true);
 
