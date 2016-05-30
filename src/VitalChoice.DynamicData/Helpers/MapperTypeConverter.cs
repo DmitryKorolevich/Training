@@ -10,8 +10,7 @@ namespace VitalChoice.DynamicData.Helpers
 {
     public static class MapperTypeConverter
     {
-        private static readonly string[] FormatStrings = new[]
-        {
+        private static readonly string[] FormatStrings = {
             "yyyy-MM-ddTHH:mm:ss.fffffff", "yyyy-MM-ddTHH:mm:ss.ffffff", "yyyy-MM-ddTHH:mm:ss.fffff",
             "yyyy-MM-ddTHH:mm:ss.ffff", "yyyy-MM-ddTHH:mm:ss.fff", "yyyy-MM-ddTHH:mm:ss.ff", "yyyy-MM-ddTHH:mm:ss.f",
             "yyyy-MM-ddTHH:mm:ss"
@@ -77,12 +76,7 @@ namespace VitalChoice.DynamicData.Helpers
                     return value as string;
                 case FieldType.DateTime:
                     var datetime = (DateTime)value;
-                    if (datetime.Kind != DateTimeKind.Unspecified)
-                    {
-                        datetime = new DateTime(datetime.Year, datetime.Month, datetime.Day, datetime.Hour, datetime.Minute, datetime.Second,
-                            datetime.Millisecond, DateTimeKind.Unspecified);
-                    }
-                    return TrimZeros(datetime.ToString("O"));
+                    return TrimZeros(datetime.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"));
                 default:
                     var valueType = value.GetType();
                     var underlyingType = valueType.UnwrapNullable();
@@ -131,12 +125,7 @@ namespace VitalChoice.DynamicData.Helpers
                     break;
                 case FieldType.DateTime:
                     var datetime = (DateTime) value;
-                    if (datetime.Kind != DateTimeKind.Unspecified)
-                    {
-                        datetime = new DateTime(datetime.Year, datetime.Month, datetime.Day, datetime.Hour, datetime.Minute, datetime.Second,
-                            datetime.Millisecond, DateTimeKind.Unspecified);
-                    }
-                    option.Value = TrimZeros(datetime.ToString("O"));
+                    option.Value = TrimZeros(datetime.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"));
                     break;
                 default:
                     var valueType = value.GetType();
