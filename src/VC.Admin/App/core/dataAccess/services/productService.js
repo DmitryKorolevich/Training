@@ -135,5 +135,16 @@ angular.module('app.core.dataAccess.services.productService', [])
 	    {
 	        return $http.post(baseUrl + 'DeleteProductOutOfStockRequests', ids, getConfig(tracker));
 	    },
+
+	    //reports
+	    getSkuBreakDownReportItems: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetSkuBreakDownReportItems', filter, getConfig(tracker));
+	    },
+	    getSkuBreakDownReportItemsReportFile: function (filter, buildNumber)
+	    {
+	        return baseUrl + ('GetSkuBreakDownReportItemsReportFile?from={0}&to={1}&buildNumber={2}')
+                .format(filter.From, filter.To, buildNumber);
+	    },
 	};
 }]);

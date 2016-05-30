@@ -28,10 +28,13 @@ using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 using VitalChoice.Business.CsvExportMaps;
 using Microsoft.Net.Http.Headers;
+using VitalChoice.Business.CsvExportMaps.Products;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Products;
+using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.InventorySkus;
+using VitalChoice.Business.Helpers;
 
 namespace VC.Admin.Controllers
 {
@@ -45,9 +48,11 @@ namespace VC.Admin.Controllers
         private readonly ISettingService settingService;
         private readonly IDynamicMapper<ProductDynamic, Product> _mapper;
         private readonly ICsvExportService<ProductCategoryStatisticTreeItemModel, ProductCategoryStatisticTreeItemCsvMap> productCategoryStatisticTreeItemCSVExportService;
+        private readonly ICsvExportService<SkuBreakDownReportItem, SkuBreakDownReportItemCsvMap> _skuBreakDownReportItemCSVExportService;
         private readonly IObjectHistoryLogService objectHistoryLogService;
         private readonly ILogger logger;
         private readonly ExtendedUserManager _userManager;
+        private readonly TimeZoneInfo _pstTimeZoneInfo;
 
         public ProductController(IProductCategoryService productCategoryService,
             IProductService productService,
@@ -58,6 +63,7 @@ namespace VC.Admin.Controllers
             ISettingService settingService,
             IDynamicMapper<ProductDynamic, Product> mapper,
             ICsvExportService<ProductCategoryStatisticTreeItemModel, ProductCategoryStatisticTreeItemCsvMap> productCategoryStatisticTreeItemCSVExportService,
+            ICsvExportService<SkuBreakDownReportItem, SkuBreakDownReportItemCsvMap> skuBreakDownReportItemCSVExportService,
             IObjectHistoryLogService objectHistoryLogService, ExtendedUserManager userManager)
         {
             this.productCategoryService = productCategoryService;
@@ -67,9 +73,11 @@ namespace VC.Admin.Controllers
             this.productReviewService = productReviewService;
             this.settingService = settingService;
             this.productCategoryStatisticTreeItemCSVExportService = productCategoryStatisticTreeItemCSVExportService;
+            _skuBreakDownReportItemCSVExportService = skuBreakDownReportItemCSVExportService;
             this.objectHistoryLogService = objectHistoryLogService;
             _userManager = userManager;
             _mapper = mapper;
+            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             this.logger = loggerProvider.CreateLogger<ProductController>();
         }
 
@@ -643,5 +651,48 @@ namespace VC.Admin.Controllers
 
             return toReturn;
         }
+
+        #region Reports
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<ICollection<SkuBreakDownReportItem>>> GetSkuBreakDownReportItems([FromBody]SkuBreakDownReportFilter filter)
+        {
+            var toReturn = await productService.GetSkuBreakDownReportItemsAsync(filter);
+            return toReturn.ToList();
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpGet]
+        public async Task<FileResult> GetSkuBreakDownReportItemsReportFile([FromQuery]string from, [FromQuery]string to)
+        {
+            var dFrom = from.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            if (!dFrom.HasValue || !dTo.HasValue)
+            {
+                return null;
+            }
+
+            SkuBreakDownReportFilter filter = new SkuBreakDownReportFilter()
+            {
+                From = dFrom.Value,
+                To = dTo.Value.AddDays(1),
+            };
+            filter.Paging = null;
+
+            var data = await productService.GetSkuBreakDownReportItemsAsync(filter);
+
+            var result = _skuBreakDownReportItemCSVExportService.ExportToCsv(data);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.SKU_BREAKDOWN_REPORT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
+        }
+
+        #endregion
     }
 }

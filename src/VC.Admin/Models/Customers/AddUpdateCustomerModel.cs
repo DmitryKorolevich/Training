@@ -64,7 +64,9 @@ namespace VC.Admin.Models.Customer
 		[Map]
 		public string Email { get; set; }
 
-		[Map]
+        public bool ProductReviewEmailEnabled { get; set; }
+
+        [Map]
 		public string EmailConfirm { get; set; }
 
         [Map]

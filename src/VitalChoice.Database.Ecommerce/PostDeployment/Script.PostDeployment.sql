@@ -49,3 +49,4 @@ Post-Deployment Script Template
 :r .\Scripts\VWholesaleSummaryInfo.sql
 :r .\Scripts\SPGetCustomersStandardOrderTotals.sql
 :r .\Scripts\SPGetCustomersStandardOrdersLast.sql
+:r .\Scripts\SPGetSkuBreakDownReport.sql

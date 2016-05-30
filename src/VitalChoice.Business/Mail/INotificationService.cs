@@ -58,8 +58,8 @@ namespace VitalChoice.Business.Mail
         #region Newsletters
 
         Task<bool> IsEmailUnsubscribedAsync(int idNewsletter, string email);
-
-        Task<bool> UnsubscribeEmailAsync(int idNewsletter, string email);
+        
+        Task<bool> UpdateUnsubscribeEmailAsync(int idNewsletter, string email, bool unsubscribe);
 
         #endregion
     }

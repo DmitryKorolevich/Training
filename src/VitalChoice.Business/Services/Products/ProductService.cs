@@ -24,6 +24,7 @@ using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
@@ -41,6 +42,7 @@ using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
+using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Settings;
@@ -48,7 +50,8 @@ using VitalChoice.ObjectMapping.Base;
 
 namespace VitalChoice.Business.Services.Products
 {
-    public class ProductService : ExtendedEcommerceDynamicService<ProductDynamic, Product, ProductOptionType, ProductOptionValue>, IProductService
+    public class ProductService : ExtendedEcommerceDynamicService<ProductDynamic, Product, ProductOptionType, ProductOptionValue>, 
+        IProductService
     {
         private readonly VProductSkuRepository _vProductSkuRepository;
         private readonly IEcommerceRepositoryAsync<VSku> _vSkuRepository;
@@ -71,6 +74,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly IProductCategoryService _productCategoryService;
         private readonly ICsvExportService<SkuGoogleItem, SkuGoogleItemExportCsvMap> _skuGoogleItemCSVExportService;
         private readonly IBlobStorageClient _storageClient;
+        private readonly SpEcommerceRepository _sPEcommerceRepository;
 
         public async Task<ProductContent> SelectContentForTransfer(int id)
 		{
@@ -194,7 +198,9 @@ namespace VitalChoice.Business.Services.Products
             IProductCategoryService productCategoryService,
             IAppInfrastructureService appInfrastructureService,
             IOptions<AppOptions> options,
-            ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<VCustomerFavorite> vCustomerRepositoryAsync,
+            ILoggerProviderExtended loggerProvider,
+            IEcommerceRepositoryAsync<VCustomerFavorite> vCustomerRepositoryAsync,
+            SpEcommerceRepository sPEcommerceRepository,
             DirectMapper<Product> directMapper, DynamicExtensionsRewriter queryVisitor, ITransactionAccessor<EcommerceContext> transactionAccessor)
             : base(
                 mapper, productRepository, productValueRepositoryAsync,
@@ -221,6 +227,7 @@ namespace VitalChoice.Business.Services.Products
             _vCustomerFavoriteRepository = vCustomerRepositoryAsync;
             _options = options;
             _skuOptionValueRepositoryAsync = skuOptionValueRepositoryAsync;
+            _sPEcommerceRepository = sPEcommerceRepository;
         }
 
         #region ProductOptions
@@ -1210,6 +1217,52 @@ namespace VitalChoice.Business.Services.Products
 
 		    return (await _productRepository.Query(productQuery).SelectAsync(x => x.Id)).FirstOrDefault();
 	    }
+
+        #endregion
+
+        #region Reports
+
+        public async Task<ICollection<SkuBreakDownReportItem>> GetSkuBreakDownReportItemsAsync(SkuBreakDownReportFilter filter)
+        {
+            List<SkuBreakDownReportItem> toReturn=new List<SkuBreakDownReportItem>();
+            var dbItems =await _sPEcommerceRepository.GetSkuBreakDownReportRawItemsAsync(filter);
+
+            foreach (var skuBreakDownReportRawItem in dbItems)
+            {
+                SkuBreakDownReportItem item = toReturn.FirstOrDefault(p => p.IdSku == skuBreakDownReportRawItem.IdSku);
+                if (item == null)
+                {
+                    item=new SkuBreakDownReportItem();
+                    item.IdSku = skuBreakDownReportRawItem.IdSku;
+                    item.IdProduct = skuBreakDownReportRawItem.IdProduct;
+                    item.Code = skuBreakDownReportRawItem.Code;
+                    toReturn.Add(item);
+                }
+
+                if (skuBreakDownReportRawItem.CustomerIdObjectType == (int) CustomerType.Retail)
+                {
+                    item.RetailAmount += skuBreakDownReportRawItem.Amount;
+                    item.TotalAmount += skuBreakDownReportRawItem.Amount;
+                    item.RetailQuantity += skuBreakDownReportRawItem.Quantity;
+                    item.TotalQuantity += skuBreakDownReportRawItem.Quantity;
+                }
+                if (skuBreakDownReportRawItem.CustomerIdObjectType == (int)CustomerType.Wholesale)
+                {
+                    item.WholesaleAmount += skuBreakDownReportRawItem.Amount;
+                    item.TotalAmount += skuBreakDownReportRawItem.Amount;
+                    item.WholesaleQuantity += skuBreakDownReportRawItem.Quantity;
+                    item.TotalQuantity += skuBreakDownReportRawItem.Quantity;
+                }
+            }
+
+            foreach (var item in toReturn)
+            {
+                item.RetailPercent = item.TotalQuantity !=0 ? Math.Round((decimal) item.RetailQuantity*100/item.TotalQuantity, 2) : 0;
+                item.WholesalePercent = item.TotalQuantity != 0 ? Math.Round((decimal)item.WholesaleQuantity*100 / item.TotalQuantity, 2) : 0;
+            }
+
+            return toReturn;
+        }
 
         #endregion
     }

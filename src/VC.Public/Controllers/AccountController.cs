@@ -505,7 +505,7 @@ namespace VC.Public.Controllers
 	        {
 	            return Redirect("/content/unsubscribe-email-not-found");
 	        }
-            await _notificationService.UnsubscribeEmailAsync(type, email);
+            await _notificationService.UpdateUnsubscribeEmailAsync(type, email, true);
             return Redirect("/content/email-unsubscribed");
         }
 	}

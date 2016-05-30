@@ -14,6 +14,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Entities.Reports;
 using VitalChoice.Infrastructure.Domain.Transfer.InventorySkus;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 
 namespace VitalChoice.Business.Repositories
@@ -274,6 +275,15 @@ namespace VitalChoice.Business.Repositories
 
             var toReturn = await _context.Set<CustomerLastOrder>().FromSql
                 ("[dbo].[SPGetCustomersStandardOrdersLast] @customerids={0}",sIds).ToListAsync();
+            return toReturn;
+        }
+
+
+        public async Task<ICollection<SkuBreakDownReportRawItem>> GetSkuBreakDownReportRawItemsAsync(SkuBreakDownReportFilter filter)
+        {
+            var toReturn = await _context.Set<SkuBreakDownReportRawItem>().FromSql
+                ("[dbo].[SPGetSkuBreakDownReport] @from={0}, @to={1}",
+                filter.From, filter.To).ToListAsync();
             return toReturn;
         }
     }

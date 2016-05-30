@@ -9,6 +9,7 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
+using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 
 namespace VitalChoice.Interfaces.Services.Products
 {
@@ -101,5 +102,11 @@ namespace VitalChoice.Interfaces.Services.Products
         #endregion
 
         Task<int> GetProductInternalIdAsync(Guid productId);
+
+        #region Reports
+
+	    Task<ICollection<SkuBreakDownReportItem>> GetSkuBreakDownReportItemsAsync(SkuBreakDownReportFilter filter);
+
+	    #endregion
 	}
 }

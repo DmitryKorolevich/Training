@@ -23,7 +23,8 @@ angular.module('app.modules.product', [
 	'app.modules.product.controllers.outOfStocksController',
 	'app.modules.product.controllers.productCategoriesStatisticController',
 	'app.modules.product.controllers.sendOutOfStockRequestsPopupController',
-	'app.modules.product.controllers.manageProductsOrderController'
+	'app.modules.product.controllers.manageProductsOrderController',
+	'app.modules.product.controllers.skuBreakDownReportController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -136,6 +137,12 @@ angular.module('app.modules.product', [
 				    url: '/products/out-of-stock-request',
 				    templateUrl: 'app/modules/product/partials/outOfStocksList.html',
 				    controller: 'outOfStocksController'
+				})
+                //reports
+				.state('index.oneCol.skuBreakDownReport', {
+				    url: '/report/sku-breakdown',
+				    templateUrl: 'app/modules/product/partials/skuBreakDownReport.html',
+				    controller: 'skuBreakDownReportController'
 				});
 		}
 ]);

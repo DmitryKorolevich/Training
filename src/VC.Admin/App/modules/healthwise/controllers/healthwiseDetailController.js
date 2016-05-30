@@ -100,6 +100,10 @@ function ($scope, $rootScope, $state, $stateParams, healthwiseService, toaster, 
                                 $scope.payment.AllowPayment=true;
                                 $scope.payment.Amount = data.Periods[0].AverageDiscountedSubtotal;
                                 $scope.payment.Date = Date.parseDateTime(data.Periods[0].LastOrderDate);
+                                $scope.payment.Date.setHours(0);
+                                $scope.payment.Date.setMinutes(0);
+                                $scope.payment.Date.setSeconds(0);
+                                $scope.payment.Date.setMilliseconds(0);
                                 $scope.payment.PayAsGC=true;
                             }
                             $scope.options.PaidAmount = data.Periods[0].PaidAmount;
@@ -131,12 +135,12 @@ function ($scope, $rootScope, $state, $stateParams, healthwiseService, toaster, 
 
         if ($scope.forms.form.$valid)
         {
-            var data = $scope.payment;
-            if ($scope.payment.Date)
+            var data = angular.copy($scope.payment);
+            if (data.Date)
             {
-                $scope.payment.Date = Date.parseDateTime($scope.payment.Date);
+                data.Date = data.Date.toServerDateTime();
             }
-            healthwiseService.makeHealthwisePeriodPayment($scope.payment, $scope.editTracker).
+            healthwiseService.makeHealthwisePeriodPayment(data, $scope.editTracker).
                 success(function (result)
                 {
                     successSaveHandler(result);
