@@ -1,10 +1,10 @@
 ﻿using System.Data.SqlClient;
-using ExportServiceWithSBQueue.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using VitalChoice.Data.Context;
+using VitalChoice.ExportService.Entities;
 
-namespace ExportServiceWithSBQueue.Context
+namespace VitalChoice.ExportService.Context
 {
     public class ExportInfoContext : DataContext
     {

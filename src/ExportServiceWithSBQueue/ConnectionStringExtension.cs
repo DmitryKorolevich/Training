@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using ExportServiceWithSBQueue.Context;
-using VitalChoice.Ecommerce.Domain.Options;
+﻿using VitalChoice.ExportService.Context;
 
-namespace ExportServiceWithSBQueue
+namespace VitalChoice.ExportService
 {
     public static class ConnectionStringExtension
     {

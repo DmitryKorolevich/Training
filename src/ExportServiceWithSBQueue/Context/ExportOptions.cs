@@ -1,6 +1,6 @@
 ﻿using VitalChoice.Infrastructure.Domain.Options;
 
-namespace ExportServiceWithSBQueue.Context
+namespace VitalChoice.ExportService.Context
 {
     public class ExportDbConnection
     {

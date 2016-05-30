@@ -1,24 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
-using System.Threading.Tasks;
-using ExportServiceWithSBQueue.Context;
-using ExportServiceWithSBQueue.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.Data.UnitOfWork;
-using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.ExportService.Context;
+using VitalChoice.ExportService.Entities;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
-using VitalChoice.Infrastructure.ServiceBus;
 using VitalChoice.Infrastructure.Extensions;
 using VitalChoice.Infrastructure.ServiceBus.Base;
 
-namespace ExportServiceWithSBQueue.Services
+namespace VitalChoice.ExportService.Services
 {
     public class EncryptionKeyUpdater: IDisposable
     {

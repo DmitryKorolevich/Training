@@ -1,35 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Configuration.Install;
-using System.Data;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
-using System.Security.Cryptography.X509Certificates;
 using System.ServiceProcess;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Autofac;
-using ExportServiceWithSBQueue.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
-using Microsoft.ServiceBus;
+using Microsoft.Extensions.Options;
+using VitalChoice.ExportService.Services;
 using VitalChoice.Infrastructure.Domain.Options;
-using VitalChoice.Infrastructure.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus.Base;
-using Configuration = ExportServiceWithSBQueue.Configuration;
 
-namespace ExportService
+namespace VitalChoice.ExportService
 {
-    public partial class ExportServiceManager : ServiceBase
+    public class ExportServiceManager : ServiceBase
     {
         private EncryptedServiceBusHostServer _server;
         private readonly IOptions<AppOptions> _options;
         private readonly ILogger _logger;
         private readonly IObjectEncryptionHost _encryptionHost;
-        private readonly IContainer _container;
+        private readonly IServiceProvider _container;
 
         public ExportServiceManager()
         {
@@ -41,30 +31,31 @@ namespace ExportService
                 }));
                 // Set the maximum number of concurrent connections 
                 ServicePointManager.DefaultConnectionLimit = 12;
-                _container = Configuration.BuildContainer();
-                _options = _container.Resolve<IOptions<AppOptions>>();
-                _logger = _container.Resolve<ILogger>();
-                _encryptionHost = _container.Resolve<IObjectEncryptionHost>();
+                _container = Program.Host.Services;
+                _options = _container.GetRequiredService<IOptions<AppOptions>>();
+                var factory = _container.GetRequiredService<ILoggerFactory>();
+                _logger = factory.CreateLogger<ExportServiceManager>();
+                _encryptionHost = _container.GetRequiredService<IObjectEncryptionHost>();
             }
             catch (Exception e)
             {
                 _logger.LogCritical(e.Message, e);
                 throw;
             }
-            InitializeComponent();
+            ServiceName = "exportservice";
         }
 
         protected override void OnStart(string[] args)
         {
             base.OnStart(args);
             Trace.WriteLine("Starting processing of messages");
-            _server = new EncryptedServiceBusHostServer(_options, _logger, _container, _encryptionHost);
+            _server = new EncryptedServiceBusHostServer(_options, _logger, _container.GetRequiredService<ILifetimeScope>(), _encryptionHost);
         }
 
         protected override void OnStop()
         {
             _server.Dispose();
-            _container.Dispose();
+            Program.Host.Dispose();
             base.OnStop();
         }
     }

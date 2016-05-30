@@ -10,6 +10,13 @@ namespace VitalChoice.DynamicData.Helpers
 {
     public static class MapperTypeConverter
     {
+        private static readonly string[] FormatStrings = new[]
+        {
+            "yyyy-MM-ddTHH:mm:ss.fffffff", "yyyy-MM-ddTHH:mm:ss.ffffff", "yyyy-MM-ddTHH:mm:ss.fffff",
+            "yyyy-MM-ddTHH:mm:ss.ffff", "yyyy-MM-ddTHH:mm:ss.fff", "yyyy-MM-ddTHH:mm:ss.ff", "yyyy-MM-ddTHH:mm:ss.f",
+            "yyyy-MM-ddTHH:mm:ss"
+        };
+
         public static object ConvertTo<TOptionValue, TOptionType>(TOptionValue value, FieldType typeId)
             where TOptionValue : OptionValue<TOptionType>
             where TOptionType : OptionType
@@ -44,7 +51,7 @@ namespace VitalChoice.DynamicData.Helpers
                     case FieldType.Double:
                         return double.Parse(value, CultureInfo.InvariantCulture);
                     case FieldType.DateTime:
-                        return DateTime.Parse(value, CultureInfo.InvariantCulture);
+                        return DateTime.ParseExact(value, FormatStrings, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal);
                     case FieldType.Int64:
                         return long.Parse(value, CultureInfo.InvariantCulture);
                     case FieldType.LargeString:
@@ -53,7 +60,7 @@ namespace VitalChoice.DynamicData.Helpers
                         throw new NotImplementedException($"Type conversion for Type:{typeId} is not implemented");
                 }
             }
-            catch (Exception e) when(!(e is NotImplementedException))
+            catch (Exception e) when (!(e is NotImplementedException))
             {
                 throw new ObjectConvertException($"\"{value}\" Cannot be converted to Type:{typeId}", e);
             }
@@ -68,6 +75,8 @@ namespace VitalChoice.DynamicData.Helpers
                 case FieldType.String:
                 case FieldType.LargeString:
                     return value as string;
+                case FieldType.DateTime:
+                    return TrimZeros(((DateTime) value).ToString("O"));
                 default:
                     var valueType = value.GetType();
                     var underlyingType = valueType.UnwrapNullable();
@@ -114,6 +123,9 @@ namespace VitalChoice.DynamicData.Helpers
                         option.Value = str;
                     }
                     break;
+                case FieldType.DateTime:
+                    option.Value = TrimZeros(((DateTime)value).ToString("O"));
+                    break;
                 default:
                     var valueType = value.GetType();
                     var underlyingType = valueType.UnwrapNullable();
@@ -127,6 +139,16 @@ namespace VitalChoice.DynamicData.Helpers
                     option.Value = Convert.ToString(value, CultureInfo.InvariantCulture);
                     break;
             }
+        }
+
+        private static string TrimZeros(string value)
+        {
+            int seed = value.Length - 1;
+            while (value[seed] == '0' || value[seed] == 'Z' || value[seed] == '.')
+            {
+                seed--;
+            }
+            return value.Substring(0, seed + 1);
         }
     }
 }

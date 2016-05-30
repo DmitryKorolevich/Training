@@ -1,12 +1,10 @@
 ﻿using System.Collections;
 using System.ComponentModel;
-using System.Configuration;
 using System.Configuration.Install;
 using System.Diagnostics;
-using System.Security.Cryptography.X509Certificates;
 using System.ServiceProcess;
 
-namespace ExportService {
+namespace VitalChoice.ExportService {
     [RunInstaller (true)]
     public class WindowsServiceInstaller: Installer {
         /// <summary>

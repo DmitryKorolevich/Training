@@ -1,6 +1,6 @@
 ﻿using VitalChoice.Ecommerce.Domain;
 
-namespace ExportServiceWithSBQueue.Entities
+namespace VitalChoice.ExportService.Entities
 {
     public class PaymentMethodExport : Entity
     {

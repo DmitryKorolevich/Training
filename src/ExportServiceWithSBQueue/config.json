@@ -33,6 +33,30 @@
       "ProfileName": "Vital Choice",
       "CompanyCode": "VC001",
       "TurnOffCommit": true
+    },
+    "AuthorizeNet": {
+      "ApiLogin": "36qq5ECXB",
+      "ApiKey": "4r5Zv38R56BY6tLW",
+      "TestEnv": false
+    },
+    "CacheSettings": {
+      "MaxProcessHeapsSizeBytes": 805306368, //768 Mb, entire application
+      "CacheTimeToLeaveSeconds": 1800, //30 minutes
+      "CacheScanPeriodSeconds": 900 //15 minutes
+    },
+    "CacheSyncOptions": {
+      "ConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=hemZgxBH/foCscmtPdhF8wvbWfh8aF9GR4ShqfnCPnY=",
+      "ServiceBusQueueName": "caching",
+      "Enabled": true
+    },
+    "Email": {
+      "From": "admin.staging@g2designgroup.com",
+      "Host": "smtp.1and1.com",
+      "Port": 587,
+      "Secured": true,
+      "Username": "admin.staging@g2designgroup.com",
+      "Password": "vcstaging123",
+      "Disabled": false
     }
   }
 }

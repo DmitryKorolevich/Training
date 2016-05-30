@@ -11,9 +11,6 @@
     "VitalChoice.Core": "1.0.0-*",
     "VitalChoice.Interfaces": "1.0.0-*"
   },
-  "buildOptions": {
-    "emitEntryPoint": true
-  },
 
   "commands": {
     "test": "xunit.runner.dnx"

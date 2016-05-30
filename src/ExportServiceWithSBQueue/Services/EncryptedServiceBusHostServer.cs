@@ -12,7 +12,7 @@ using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus.Base;
 
-namespace ExportServiceWithSBQueue.Services
+namespace VitalChoice.ExportService.Services
 {
     public sealed class EncryptedServiceBusHostServer : EncryptedServiceBusHost
     {

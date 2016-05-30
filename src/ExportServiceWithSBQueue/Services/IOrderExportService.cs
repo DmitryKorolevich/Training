@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 
-namespace ExportServiceWithSBQueue.Services
+namespace VitalChoice.ExportService.Services
 {
     public interface IOrderExportService
     {

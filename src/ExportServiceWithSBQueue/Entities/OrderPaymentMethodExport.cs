@@ -1,4 +1,4 @@
-﻿namespace ExportServiceWithSBQueue.Entities
+﻿namespace VitalChoice.ExportService.Entities
 {
     public class OrderPaymentMethodExport : PaymentMethodExport
     {
