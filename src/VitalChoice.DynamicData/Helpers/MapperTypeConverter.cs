@@ -144,16 +144,20 @@ namespace VitalChoice.DynamicData.Helpers
 
         private static string TrimZeros(string value)
         {
-            int seed = value.Length - 1;
-            while (value[seed] != '.')
+            if (value.Contains("."))
             {
-                seed--;
+                int seed = value.Length - 1;
+                while (value[seed] == '0')
+                {
+                    seed--;
+                }
+                if (value[seed] == '.')
+                {
+                    return value.Substring(0, seed);
+                }
+                return value.Substring(0, seed + 1);
             }
-            if (seed <= 0)
-            {
-                return value;
-            }
-            return value.Substring(0, seed);
+            return value;
         }
     }
 }
