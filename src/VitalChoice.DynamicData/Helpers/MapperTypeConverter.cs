@@ -145,7 +145,7 @@ namespace VitalChoice.DynamicData.Helpers
         private static string TrimZeros(string value)
         {
             int seed = value.Length - 1;
-            while (value[seed] == '0')
+            while (value[seed] == '0' && seed >= 0)
             {
                 seed--;
             }
