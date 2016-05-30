@@ -75,9 +75,3 @@ SET Value = CONVERT(NVARCHAR(250), CONVERT(DATETIME2, Value, 101), 126)
 FROM SkuOptionValues AS v
 INNER JOIN ProductOptionTypes AS t ON t.Id = v.IdOptionType
 WHERE t.IdFieldType = 6
-
-UPDATE SkuOptionValues
-SET Value = CONVERT(NVARCHAR(250), CONVERT(DATETIME2, Value, 101), 126)
-FROM SkuOptionValues AS v
-INNER JOIN ProductOptionTypes AS t ON t.Id = v.IdOptionType
-WHERE t.IdFieldType = 6
