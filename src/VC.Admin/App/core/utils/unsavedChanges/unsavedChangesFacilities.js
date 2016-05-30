@@ -86,14 +86,14 @@ angular.module('app.core.utils.unsavedChanges.unsavedChangesFacilities', [])
 
 				angular.forEach(eventsToWatchFor, function(aEvent) {
 					// calling this function later will unbind this, acting as $off()
-					var removeFn = $rootScope.$on(aEvent, function(event, next, current) {
+					var removeFn = $rootScope.$on(aEvent, function(event, next, nextParams) {
 						// @todo this could be written a lot cleaner! 
 						if (!allFormsClean()) {
 						    confirmUtil.confirm(null, messages.navigate, 
                                 function ()
                                 {
                                 	_this.allFormsCleanUp();
-                                    $rootScope.$state.go(next.name);
+                                	$rootScope.$state.go(next.name, nextParams);
                                 }, "Close and review all changes", "Proceed and lose all changes");
 
 							ngProgress.reset();

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using VitalChoice.Data.Repositories.Specifics;
@@ -277,15 +278,25 @@ namespace VitalChoice.Business.Mail
             return await _newsletterBlockedEmailRepository.Query(p=>p.IdNewsletter== idNewsletter && p.Email==email).SelectAnyAsync();
         }
 
-        public async Task<bool> UnsubscribeEmailAsync(int idNewsletter, string email)
+        public async Task<bool> UpdateUnsubscribeEmailAsync(int idNewsletter, string email, bool unsubscribe)
         {
-            var exist = await _newsletterBlockedEmailRepository.Query(p => p.IdNewsletter == idNewsletter && p.Email == email).SelectAnyAsync();
-            if (!exist)
+            var dbItem = (await _newsletterBlockedEmailRepository.Query(p => p.IdNewsletter == idNewsletter && p.Email == email).SelectAsync()).FirstOrDefault();
+            if (unsubscribe)
             {
-                NewsletterBlockedEmail item=new NewsletterBlockedEmail();
-                item.IdNewsletter = idNewsletter;
-                item.Email = email;
-                await _newsletterBlockedEmailRepository.InsertAsync(item);
+                if (dbItem==null)
+                {
+                    dbItem = new NewsletterBlockedEmail();
+                    dbItem.IdNewsletter = idNewsletter;
+                    dbItem.Email = email;
+                    await _newsletterBlockedEmailRepository.InsertAsync(dbItem);
+                }
+            }
+            else
+            {
+                if (dbItem!=null)
+                {
+                    await _newsletterBlockedEmailRepository.DeleteAsync(dbItem);
+                }
             }
             return true;
         }

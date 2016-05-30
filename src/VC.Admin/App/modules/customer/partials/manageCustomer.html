@@ -222,6 +222,19 @@
                                                     </label>
                                                 </div>
                                             </div>
+                                            <div data-ng-if="currentCustomer.Email">
+                                                <span class="legend">Product Review Email Status</span>
+                                                <div class="form-group">
+                                                    <label for="productReviewEmail" class="col-md-3 control-label">Enabled</label>
+                                                    <div class="col-md-9">
+                                                        <div class="checkbox">
+                                                            <label>
+                                                                <input type="checkbox" id="productReviewEmail" data-ng-model="currentCustomer.ProductReviewEmailEnabled">
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <span data-ng-if="currentCustomer.Id && currentCustomer.StatusCode!=5" class="legend">Suspend User Account</span>
                                             <div data-ng-if="currentCustomer.Id && currentCustomer.StatusCode!=5" class="form-group">
                                                 <label for="suspendUserAccount" class="col-md-3 control-label">Suspend User Account</label>
@@ -547,16 +560,16 @@
                             </div>
                         </div>
                     </uib-tab>
-                <uib-tab data-ng-show="currentCustomer.Id" heading="Order History">
-	                <div class="container-fluid">
-		                <div ng-controller="customerOrdersController" onload="name = 'CustomerOrders'" data-ng-include="'app/modules/order/partials/customerOrdersList.html'"></div>
-	                </div>
-                </uib-tab>
-					<uib-tab data-ng-show="currentCustomer.Id" heading="Auto-Ship">
-						<div class="container-fluid">
-							<div ng-controller="customerAutoShipsController" data-ng-include="'app/modules/order/partials/autoShipList.html'"></div>
-						</div>
-					</uib-tab>
+                    <uib-tab data-ng-show="currentCustomer.Id" heading="Order History">
+                        <div class="container-fluid">
+                            <div ng-controller="customerOrdersController" onload="name = 'CustomerOrders'" data-ng-include="'app/modules/order/partials/customerOrdersList.html'"></div>
+                        </div>
+                    </uib-tab>
+                    <uib-tab data-ng-show="currentCustomer.Id" heading="Auto-Ship">
+                        <div class="container-fluid">
+                            <div ng-controller="customerAutoShipsController" data-ng-include="'app/modules/order/partials/autoShipList.html'"></div>
+                        </div>
+                    </uib-tab>
                     <uib-tab heading="Notes" active="customerNotesTab.active">
                         <div class="container-fluid">
                             <div ng-controller="manageCustomerNotesController" onload="name = 'CustomerNotes'" data-ng-include="'app/modules/customer/partials/manageCustomerNotes.html'"></div>
@@ -595,7 +608,7 @@
                                             <div data-ng-if="options.UploadOrderType==3" class="form-group">
                                                 <label class="col-md-3 control-label"></label>
                                                 <div class="col-md-9 form-control-static">
-                                                    <a  target="_blank" href="/assets/templates/ds_template.csv">Get a template</a>
+                                                    <a target="_blank" href="/assets/templates/ds_template.csv">Get a template</a>
                                                 </div>
                                             </div>
                                             <div data-ng-if="options.UploadOrderType==4" class="form-group">

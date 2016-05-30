@@ -25,5 +25,7 @@
         public const string OrderProductReviewEmail = "OrderProductReviewEmail";
         
         public const int OrderProductReviewEmailDaysCount = 15;
+
+        public const int ProductReviewIdNewsletter = 1;
     }
 }

@@ -297,4 +297,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\SPGetCustomersStandardOrdersLast.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetSkuBreakDownReport.sql" />
+  </ItemGroup>
 </Project>
