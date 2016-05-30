@@ -9,9 +9,7 @@
     "Autofac": "4.0.0-fixed-*",
     "VitalChoice.Business": "1.0.0-*",
     "VitalChoice.Core": "1.0.0-*",
-    "VitalChoice.Interfaces": "1.0.0-*",
-    "Selenium.WebDriver": "2.53.0",
-    "Selenium.WebDriver.ChromeDriver": "2.21.0"
+    "VitalChoice.Interfaces": "1.0.0-*"
   },
   "buildOptions": {
     "emitEntryPoint": true

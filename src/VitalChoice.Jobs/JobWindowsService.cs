@@ -24,15 +24,18 @@ namespace VitalChoice.Jobs
             this.CanStop = true;
         }
 
-		private ILogger _logger;
+		private readonly ILogger _logger;
 		private readonly IServiceProvider _container;
-	    private IScheduler _scheduler;
+	    private readonly IScheduler _scheduler;
 
         public JobWindowsService()
 		{
             try
             {
                 _container = Program.Host.Services;
+                var factory = _container.GetRequiredService<ILoggerFactory>();
+                _logger = factory.CreateLogger<JobWindowsService>();
+                _scheduler = _container.GetRequiredService<IScheduler>();
             }
             catch (Exception e)
             {
@@ -47,10 +50,8 @@ namespace VitalChoice.Jobs
 	        base.OnStart(args);
 	        RequestAdditionalTime(30000);
 	        Trace.WriteLine("Jobs service started initialization");
-            _logger = _container.GetRequiredService<ILogger>();
             _logger.LogWarning("Scheduler start");
             var conf = _container.GetRequiredService<IOptions<AppOptions>>().Value;
-            _scheduler = _container.GetRequiredService<IScheduler>();
             var jobImpls = _container.GetRequiredService<IEnumerable<IJob>>();
             foreach (var impl in jobImpls)
             {
