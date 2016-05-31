@@ -5,7 +5,7 @@
             <fieldset>
                 <div class="row form-group">
                     <div class="col-md-2">
-                        <input type="text" name="IdString" class="form-control" placeholder="Order #" data-ng-model="directOrdersfilter.IdString" numbers-only autocomplete="off" data-ng-minlength="3">
+                        <input type="text" name="Id" class="form-control" placeholder="Order #" data-ng-model="directOrdersfilter.Id" numbers-only autocomplete="off" data-ng-minlength="3">
                         <div class="error-container" ng-show="forms.form.submitted && forms.form.IdString.$invalid">
                             <small class="error" ng-show="forms.form.IdString.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Order #")}}</small>
                         </div>
