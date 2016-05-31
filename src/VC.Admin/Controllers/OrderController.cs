@@ -206,7 +206,8 @@ using VitalChoice.Infrastructure.Domain.Transfer.Customers;namespace VC.Admin.Co
                 filter.To = filter.To.Value.AddDays(1);
             }
 
-            var result = await _orderService.GetOrdersAsync(filter);
+            //var result = await _orderService.GetOrdersAsync(filter);
+            var result = await _orderService.GetOrdersAsync2(filter);
 
             var toReturn = new PagedList<OrderListItemModel>
             {

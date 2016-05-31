@@ -105,6 +105,7 @@ namespace VitalChoice.Business.Services.Orders
 	    private readonly IEcommerceRepositoryAsync<VAutoShip> _vAutoShipRepository;
 	    private readonly IEcommerceRepositoryAsync<VAutoShipOrder> _vAutoShipOrderRepository;
         private readonly AffiliateOrderPaymentRepository _affiliateOrderPaymentRepository;
+        private readonly ICountryNameCodeResolver _codeResolver;
         private readonly OrderRepository _orderRepository;
 
         public OrderService(
@@ -138,7 +139,7 @@ namespace VitalChoice.Business.Services.Orders
             ICountryService countryService, ITransactionAccessor<EcommerceContext> transactionAccessor, SkuMapper skuMapper,
             IEcommerceRepositoryAsync<OrderToSku> orderToSkusRepository, IDiscountService discountService,
             IEcommerceRepositoryAsync<VAutoShip> vAutoShipRepository, IEcommerceRepositoryAsync<VAutoShipOrder> vAutoShipOrderRepository,
-            AffiliateOrderPaymentRepository affiliateOrderPaymentRepository)
+            AffiliateOrderPaymentRepository affiliateOrderPaymentRepository, ICountryNameCodeResolver codeResolver)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
@@ -166,6 +167,7 @@ namespace VitalChoice.Business.Services.Orders
             _vAutoShipRepository = vAutoShipRepository;
             _vAutoShipOrderRepository = vAutoShipOrderRepository;
             _affiliateOrderPaymentRepository = affiliateOrderPaymentRepository;
+            _codeResolver = codeResolver;
             _orderRepository = orderRepository;
             _addressMapper = addressMapper;
             _productService = productService;
@@ -1427,7 +1429,7 @@ namespace VitalChoice.Business.Services.Orders
                 }
             }
         }
-        
+
         public async Task<PagedList<OrderInfoItem>> GetOrdersAsync2(VOrderFilter filter)
         {
             var conditions = new OrderQuery();
@@ -1458,7 +1460,11 @@ namespace VitalChoice.Business.Services.Orders
             switch (filter.Sorting.Path)
             {
                 case VOrderSortPath.IdPaymentMethod:
-                    sortable = (x) => sortOrder == FilterSortOrder.Asc ? x.OrderBy(y => y.PaymentMethod.IdObjectType) : x.OrderByDescending(y => y.PaymentMethod.IdObjectType);
+                    sortable =
+                        (x) =>
+                            sortOrder == FilterSortOrder.Asc
+                                ? x.OrderBy(y => y.PaymentMethod.IdObjectType)
+                                : x.OrderByDescending(y => y.PaymentMethod.IdObjectType);
                     break;
                 case VOrderSortPath.DateCreated:
                     sortable =
@@ -1468,10 +1474,15 @@ namespace VitalChoice.Business.Services.Orders
                                 : x.OrderByDescending(y => y.DateCreated).ThenByDescending(y => y.Id);
                     break;
                 case VOrderSortPath.IdCustomerType:
-                    sortable = (x) => sortOrder == FilterSortOrder.Asc ? x.OrderBy(y => y.Customer.IdObjectType) : x.OrderByDescending(y => y.Customer.IdObjectType);
+                    sortable =
+                        (x) =>
+                            sortOrder == FilterSortOrder.Asc
+                                ? x.OrderBy(y => y.Customer.IdObjectType)
+                                : x.OrderByDescending(y => y.Customer.IdObjectType);
                     break;
                 case VOrderSortPath.IdObjectType:
-                    sortable = (x) => sortOrder == FilterSortOrder.Asc ? x.OrderBy(y => y.IdObjectType) : x.OrderByDescending(y => y.IdObjectType);
+                    sortable =
+                        (x) => sortOrder == FilterSortOrder.Asc ? x.OrderBy(y => y.IdObjectType) : x.OrderByDescending(y => y.IdObjectType);
                     break;
                 case VOrderSortPath.Id:
                     sortable = (x) => sortOrder == FilterSortOrder.Asc ? x.OrderBy(y => y.Id) : x.OrderByDescending(y => y.Id);
@@ -1480,25 +1491,23 @@ namespace VitalChoice.Business.Services.Orders
                     sortable = (x) => sortOrder == FilterSortOrder.Asc ? x.OrderBy(y => y.Total) : x.OrderByDescending(y => y.Total);
                     break;
                 case VOrderSortPath.DateEdited:
-                    sortable = (x) => sortOrder == FilterSortOrder.Asc ? x.OrderBy(y => y.DateEdited) : x.OrderByDescending(y => y.DateEdited);
+                    sortable =
+                        (x) => sortOrder == FilterSortOrder.Asc ? x.OrderBy(y => y.DateEdited) : x.OrderByDescending(y => y.DateEdited);
                     break;
             }
 
             var orders = await SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, conditions,
-                    includes => includes.Include(c => c.OptionValues).Include(c => c.PaymentMethod).
+                includes => includes.Include(c => c.OptionValues).Include(c => c.PaymentMethod).
                     Include(c => c.ShippingAddress).ThenInclude(c => c.OptionValues).
-                    Include(c => c.Customer).ThenInclude(p => p.ProfileAddress).ThenInclude(c => c.OptionValues).
-                    Include(c => c.HealthwiseOrder),
-                    orderBy: sortable, withDefaults: true);
+                    Include(c => c.Customer).ThenInclude(p => p.ProfileAddress).ThenInclude(c => c.OptionValues),
+                orderBy: sortable, withDefaults: true);
 
-            var countries = await _countryService.GetCountriesAsync(new CountryFilter());
-
-            PagedList<OrderInfoItem> toReturn = new PagedList<OrderInfoItem>()
+            PagedList<OrderInfoItem> toReturn = new PagedList<OrderInfoItem>
             {
-                Items = orders.Items.Select(p => new OrderInfoItem()
+                Items = orders.Items.Select(p => new OrderInfoItem
                 {
                     Id = p.Id,
-                    IdObjectType = (OrderType)p.IdObjectType,
+                    IdObjectType = (OrderType) p.IdObjectType,
                     OrderStatus = p.OrderStatus,
                     POrderStatus = p.POrderStatus,
                     NPOrderStatus = p.NPOrderStatus,
@@ -1517,18 +1526,18 @@ namespace VitalChoice.Business.Services.Orders
                     IdCustomer = p.Customer.Id,
                     Company = p.Customer?.ProfileAddress.SafeData.Company,
                     Customer = p.Customer?.ProfileAddress.SafeData.FirstName + " " + p.Customer?.ProfileAddress.SafeData.LastName,
-                    StateCode = countries.SelectMany(pp => pp.States).FirstOrDefault(pp => pp.Id == p.ShippingAddress?.IdState)?.StateCode,
-                    ShipTo = p?.ShippingAddress.SafeData.FirstName + " " + p?.ShippingAddress.SafeData.LastName,
+                    StateCode = _codeResolver.GetStateCode(p.ShippingAddress?.IdCountry ?? 0, p.ShippingAddress?.IdState ?? 0),
+                    ShipTo = p.ShippingAddress?.SafeData.FirstName + " " + p.ShippingAddress?.SafeData.LastName,
                     PreferredShipMethod = p.SafeData.PreferredShipMethod,
-                    Healthwise = (bool?)p.SafeData.IsHealthwise ?? false,
+                    Healthwise = (bool?) p.SafeData.IsHealthwise ?? false,
                 }).ToList(),
                 Count = orders.Count
             };
 
             if (toReturn.Items.Any())
             {
-                var ids = toReturn.Items.Where(p => p.IdEditedBy.HasValue).Select(p => p.IdEditedBy.Value).Distinct().ToList();
-                var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
+                var ids = new HashSet<int>(toReturn.Items.Where(p => p.IdEditedBy.HasValue).Select(p => p.IdEditedBy.Value));
+                var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);
                 foreach (var item in toReturn.Items)
                 {
                     foreach (var profile in profiles)
@@ -1627,7 +1636,7 @@ namespace VitalChoice.Business.Services.Orders
             if (toReturn.Items.Any())
             {
                 var ids = toReturn.Items.Where(p => p.IdEditedBy.HasValue).Select(p => p.IdEditedBy.Value).Distinct().ToList();
-                var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
+                var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);
                 foreach (var item in toReturn.Items)
                 {
                     foreach (var profile in profiles)

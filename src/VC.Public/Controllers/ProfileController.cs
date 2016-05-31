@@ -169,7 +169,7 @@ namespace VC.Public.Controllers
             filter.Sorting.SortOrder = FilterSortOrder.Desc;
             filter.Sorting.Path = VOrderSortPath.DateCreated;
 
-            var orders = await _orderService.GetOrdersAsync(filter);
+            var orders = await _orderService.GetOrdersAsync2(filter);
 
             var ordersModel = new PagedListEx<OrderHistoryItemModel>
             {

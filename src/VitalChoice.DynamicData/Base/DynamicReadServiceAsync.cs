@@ -193,7 +193,8 @@ namespace VitalChoice.DynamicData.Base
             bool withDefaults = false)
         {
             var entities = await SelectEntityPageAsync(page, pageSize, query, includesOverride, orderBy);
-            return new PagedList<TDynamic>(await DynamicMapper.FromEntityRangeAsync(entities.Items, withDefaults), entities.Count);
+            var list = await DynamicMapper.FromEntityRangeAsync(entities.Items, withDefaults);
+            return new PagedList<TDynamic>(list, entities.Count);
         }
 
         #region Synchronous Operations
