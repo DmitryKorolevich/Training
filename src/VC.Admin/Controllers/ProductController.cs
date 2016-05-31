@@ -718,6 +718,30 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
+        [HttpPost]
+        public async Task<Result<SkuPOrderTypeBreakDownReport>> GetSkuPOrderTypeFutureBreakDownReport([FromBody]SkuPOrderTypeBreakDownReportFilter filter)
+        {
+            filter.To = filter.To.AddDays(1);
+            var toReturn = await productService.GetSkuPOrderTypeFutureBreakDownReportAsync(filter);
+            //correct dates for UI
+            if (toReturn.FrequencyType == FrequencyType.Weekly || toReturn.FrequencyType == FrequencyType.Monthly)
+            {
+                for (int i = 0; i < toReturn.POrderTypePeriods.Count; i++)
+                {
+                    toReturn.POrderTypePeriods[i].To = toReturn.POrderTypePeriods[i].To.AddDays(-1);
+                }
+
+                foreach (var sku in toReturn.Skus)
+                {
+                    for (int i = 0; i < sku.Periods.Count; i++)
+                    {
+                        sku.Periods[i].To = sku.Periods[i].To.AddDays(-1);
+                    }
+                }
+            }
+            return toReturn;
+        }
+
         #endregion
     }
 }

@@ -76,7 +76,7 @@ namespace VitalChoice.DynamicData.Helpers
                     return value as string;
                 case FieldType.DateTime:
                     var datetime = (DateTime)value;
-                    return TrimZeros(datetime.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"));
+                    return ConvertDateToISOString(datetime);
                 default:
                     var valueType = value.GetType();
                     var underlyingType = valueType.UnwrapNullable();
@@ -125,7 +125,7 @@ namespace VitalChoice.DynamicData.Helpers
                     break;
                 case FieldType.DateTime:
                     var datetime = (DateTime) value;
-                    option.Value = TrimZeros(datetime.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"));
+                    option.Value = ConvertDateToISOString(datetime);
                     break;
                 default:
                     var valueType = value.GetType();
@@ -140,6 +140,18 @@ namespace VitalChoice.DynamicData.Helpers
                     option.Value = Convert.ToString(value, CultureInfo.InvariantCulture);
                     break;
             }
+        }
+
+        public static string ConvertDateToISOStringAndDropMC(DateTime datetime)
+        {
+            datetime = new DateTime(datetime.Year, datetime.Month, datetime.Day, datetime.Hour, datetime.Minute,
+                datetime.Second);
+            return TrimZeros(datetime.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"));
+        }
+
+        public static string ConvertDateToISOString(DateTime datetime)
+        {
+            return TrimZeros(datetime.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"));
         }
 
         private static string TrimZeros(string value)

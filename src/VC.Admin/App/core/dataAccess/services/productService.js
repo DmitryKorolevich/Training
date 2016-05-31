@@ -150,5 +150,9 @@ angular.module('app.core.dataAccess.services.productService', [])
 	    {
 	        return $http.post(baseUrl + 'GetSkuPOrderTypeBreakDownReport', filter, getConfig(tracker));
 	    },
+	    getSkuPOrderTypeFutureBreakDownReport: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetSkuPOrderTypeFutureBreakDownReport', filter, getConfig(tracker));
+	    },
 	};
 }]);

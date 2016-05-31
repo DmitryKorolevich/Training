@@ -27,18 +27,34 @@
                 data.To = data.To.toServerDateTime();
             }
 
-            productService.getSkuPOrderTypeBreakDownReport(data, $scope.refreshTracker)
-                .success(function (result) {
-                    if (result.Success) {
-                        $scope.report = result.Data;
-                        initAgentsSorting();
-                    } else {
+            if ($scope.filter.Future)
+            {
+                productService.getSkuPOrderTypeFutureBreakDownReport(data, $scope.refreshTracker)
+                    .success(function (result) {
+                        if (result.Success) {
+                            $scope.report = result.Data;
+                        } else {
+                            errorHandler(result);
+                        }
+                    })
+                    .error(function (result) {
                         errorHandler(result);
-                    }
-                })
-                .error(function (result) {
-                    errorHandler(result);
-                });
+                    });
+            }
+            else
+            {
+                productService.getSkuPOrderTypeBreakDownReport(data, $scope.refreshTracker)
+                    .success(function (result) {
+                        if (result.Success) {
+                            $scope.report = result.Data;
+                        } else {
+                            errorHandler(result);
+                        }
+                    })
+                    .error(function (result) {
+                        errorHandler(result);
+                    });
+            }
         };
 
         function initialize()
@@ -58,6 +74,7 @@
             $scope.filter = {
                 To: currentDate.shiftDate('+1d'),
                 From: currentDate.shiftDate('-3d'),
+                Future: false,
                 FrequencyType: 1,//daily
             };
 
@@ -181,6 +198,25 @@
                 data.to = $scope.filter.To.toQueryParamDateTime();
             }
             $state.go('index.oneCol.manageOrders', data);
+        };
+
+        $scope.futureChanged = function ()
+        {
+            var currentDate = new Date();
+            currentDate.setHours(0, 0, 0, 0);
+            if ($scope.filter.Future)
+            {
+                $scope.filter.To = currentDate.shiftDate('+42d');
+                $scope.filter.From = currentDate;
+                $scope.filter.FrequencyType = 2;//weekly
+            }
+            else
+            {
+                $scope.filter.To = currentDate.shiftDate('+1d');
+                $scope.filter.From = currentDate.shiftDate('-3d');
+                $scope.filter.FrequencyType = 1;//daily
+            }
+            $scope.filterChanged();
         };
 
         initialize();

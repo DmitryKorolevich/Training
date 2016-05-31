@@ -29,6 +29,14 @@
                     <div class="col-md-3">
                         <select class="form-control" name="FrequencyType" data-ng-change="filterChanged();" data-ng-model="filter.FrequencyType" ng-options="item.Key as item.Text for item in frequencyTypes"></select>
                     </div>
+                    <div class="col-md-3">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="Future" data-ng-model="filter.Future" data-ng-change="futureChanged();"/>
+                                Future Transactions
+                            </label>
+                        </div>
+                    </div>
                 </div>
                 <div class="row form-group">
                     <div class="col-md-12">

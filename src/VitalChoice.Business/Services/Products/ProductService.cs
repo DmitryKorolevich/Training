@@ -39,6 +39,7 @@ using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.Products;
+using VitalChoice.Infrastructure.Domain.Entities.Reports;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
@@ -1397,6 +1398,172 @@ namespace VitalChoice.Business.Services.Products
             }
 
             return toReturn;
+        }
+
+        public async Task<SkuPOrderTypeBreakDownReport> GetSkuPOrderTypeFutureBreakDownReportAsync(SkuPOrderTypeBreakDownReportFilter filter)
+        {
+            SkuPOrderTypeBreakDownReport toReturn = new SkuPOrderTypeBreakDownReport();
+            toReturn.FrequencyType = filter.FrequencyType;
+
+            if (filter.From > filter.To)
+            {
+                return toReturn;
+            }
+
+            var dbItems = await _sPEcommerceRepository.GetSkuPOrderTypeFutureBreakDownReportRawItemsAsync(filter);
+
+            //create periods
+            DateTime current = filter.From;
+            if (filter.FrequencyType == FrequencyType.Monthly)
+            {
+                //start of next month
+                current = new DateTime(current.Year, current.Month, 1, current.Hour, current.Minute, current.Second);
+                current = current.AddMonths(1);
+            }
+            if (filter.FrequencyType == FrequencyType.Weekly)
+            {
+                //start of next week
+                current = current.AddDays(-(int)current.DayOfWeek);
+                current = current.AddDays(7);
+            }
+            if (filter.FrequencyType == FrequencyType.Daily)
+            {
+                current = current.AddDays(1);
+            }
+            if (current > filter.To)
+            {
+                current = filter.To;
+            }
+            var period = new SkuPOrderTypeBreakDownReportPOrderTypePeriod()
+            {
+                From = filter.From,
+                To = current,
+            };
+            toReturn.POrderTypePeriods.Add(period);
+
+            while (current < filter.To)
+            {
+                var nextCurrent = current;
+                if (filter.FrequencyType == FrequencyType.Monthly)
+                {
+                    nextCurrent = nextCurrent.AddMonths(1);
+                }
+                if (filter.FrequencyType == FrequencyType.Weekly)
+                {
+                    nextCurrent = nextCurrent.AddDays(7);
+                }
+                if (filter.FrequencyType == FrequencyType.Daily)
+                {
+                    nextCurrent = nextCurrent.AddDays(1);
+                }
+
+                if (nextCurrent > filter.To)
+                {
+                    nextCurrent = filter.To;
+                }
+
+                period = new SkuPOrderTypeBreakDownReportPOrderTypePeriod()
+                {
+                    From = current,
+                    To = nextCurrent,
+                };
+                toReturn.POrderTypePeriods.Add(period);
+                current = nextCurrent;
+            }
+
+            List<int> usedOrderIds = new List<int>();
+
+            foreach (var skuPOrderTypeBreakDownReportRawItem in dbItems)
+            {
+                CalculatePOrderTypeInfo(skuPOrderTypeBreakDownReportRawItem.ShipDelayDate,
+                    skuPOrderTypeBreakDownReportRawItem.IdOrder,
+                    skuPOrderTypeBreakDownReportRawItem.POrderType, toReturn, usedOrderIds);
+                CalculatePOrderTypeInfo(skuPOrderTypeBreakDownReportRawItem.ShipDelayDate,
+                    skuPOrderTypeBreakDownReportRawItem.IdOrder,
+                    skuPOrderTypeBreakDownReportRawItem.POrderType, toReturn, usedOrderIds);
+                CalculatePOrderTypeInfo(skuPOrderTypeBreakDownReportRawItem.ShipDelayDate,
+                    skuPOrderTypeBreakDownReportRawItem.IdOrder,
+                    skuPOrderTypeBreakDownReportRawItem.POrderType, toReturn, usedOrderIds);
+            }
+
+            foreach (var skuPOrderTypeBreakDownReportPOrderTypePeriod in toReturn.POrderTypePeriods)
+            {
+                skuPOrderTypeBreakDownReportPOrderTypePeriod.PPercent = skuPOrderTypeBreakDownReportPOrderTypePeriod.TotalCount != 0 ?
+                    Math.Round(((decimal)100 * (skuPOrderTypeBreakDownReportPOrderTypePeriod.PCount + skuPOrderTypeBreakDownReportPOrderTypePeriod.PNPCount))
+                                / skuPOrderTypeBreakDownReportPOrderTypePeriod.TotalCount, 2) :
+                               0;
+            }
+
+            foreach (var skuPOrderTypeBreakDownReportRawItem in dbItems)
+            {
+                var skuItem = toReturn.Skus.FirstOrDefault(p => p.IdSku == skuPOrderTypeBreakDownReportRawItem.IdSku);
+                if (skuItem == null)
+                {
+                    skuItem = new SkuPOrderTypeBreakDownReportSkuItem();
+                    skuItem.IdSku = skuPOrderTypeBreakDownReportRawItem.IdSku;
+                    skuItem.IdProduct = skuPOrderTypeBreakDownReportRawItem.IdProduct;
+                    skuItem.Code = skuPOrderTypeBreakDownReportRawItem.Code;
+                    skuItem.Periods = toReturn.POrderTypePeriods.Select(p => new SkuPOrderTypeBreakDownReportSkuPeriod()
+                    {
+                        From = p.From,
+                        To = p.To
+                    }).ToList();
+                    toReturn.Skus.Add(skuItem);
+                }
+
+                var skuPeriod = skuItem.Periods.FirstOrDefault(p => skuPOrderTypeBreakDownReportRawItem.ShipDelayDate.HasValue &&
+                    p.From <= skuPOrderTypeBreakDownReportRawItem.ShipDelayDate.Value &&
+                    p.To > skuPOrderTypeBreakDownReportRawItem.ShipDelayDate.Value);
+                if (skuPeriod != null)
+                {
+                    skuPeriod.Quantity += skuPOrderTypeBreakDownReportRawItem.Quantity;
+                }
+
+                skuPeriod = skuItem.Periods.FirstOrDefault(p => skuPOrderTypeBreakDownReportRawItem.ShipDelayDateP.HasValue &&
+                    p.From <= skuPOrderTypeBreakDownReportRawItem.ShipDelayDateP.Value &&
+                    p.To > skuPOrderTypeBreakDownReportRawItem.ShipDelayDateP.Value);
+                //do not calculate double time parts of the same order in different ship delay dates
+                if (skuPeriod != null && skuPOrderTypeBreakDownReportRawItem.ProductIdObjectType!=(int)ProductType.NonPerishable)
+                {
+                    skuPeriod.Quantity += skuPOrderTypeBreakDownReportRawItem.Quantity;
+                }
+
+                skuPeriod = skuItem.Periods.FirstOrDefault(p => skuPOrderTypeBreakDownReportRawItem.ShipDelayDateNP.HasValue &&
+                    p.From <= skuPOrderTypeBreakDownReportRawItem.ShipDelayDateNP.Value &&
+                    p.To > skuPOrderTypeBreakDownReportRawItem.ShipDelayDateNP.Value);
+                //do not calculate double time parts of the same order in different ship delay dates
+                if (skuPeriod != null && skuPOrderTypeBreakDownReportRawItem.ProductIdObjectType != (int)ProductType.Perishable)
+                {
+                    skuPeriod.Quantity += skuPOrderTypeBreakDownReportRawItem.Quantity;
+                }
+            }
+
+            return toReturn;
+        }
+
+        private void CalculatePOrderTypeInfo(DateTime? date, int idOrder, int? pOrderType, SkuPOrderTypeBreakDownReport report, List<int> usedOrderIds)
+        {
+            if (date.HasValue)
+            {
+                var pOrderTypePeriod = report.POrderTypePeriods.FirstOrDefault(p => p.From <= date.Value && p.To > date.Value);
+                if (pOrderTypePeriod != null && usedOrderIds.All(p => p != idOrder))
+                {
+                    if (pOrderType == (int) POrderType.P)
+                    {
+                        pOrderTypePeriod.PCount++;
+                    }
+                    if (pOrderType == (int) POrderType.NP)
+                    {
+                        pOrderTypePeriod.NPCount++;
+                    }
+                    if (pOrderType == (int) POrderType.PNP)
+                    {
+                        pOrderTypePeriod.PNPCount++;
+                    }
+                    pOrderTypePeriod.TotalCount++;
+                    usedOrderIds.Add(idOrder);
+                }
+            }
         }
 
         #endregion

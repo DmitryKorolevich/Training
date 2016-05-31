@@ -294,5 +294,13 @@ namespace VitalChoice.Business.Repositories
                 filter.From, filter.To).ToListAsync();
             return toReturn;
         }
+
+        public async Task<ICollection<SkuPOrderTypeFutureBreakDownReportRawItem>> GetSkuPOrderTypeFutureBreakDownReportRawItemsAsync(SkuPOrderTypeBreakDownReportFilter filter)
+        {
+            var toReturn = await _context.Set<SkuPOrderTypeFutureBreakDownReportRawItem>().FromSql
+                ("[dbo].[SPGetSkuPOrderTypeFutureBreakDownReport] @from={0}, @to={1}",
+                filter.From, filter.To).ToListAsync();
+            return toReturn;
+        }
     }
 }
