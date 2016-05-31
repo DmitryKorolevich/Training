@@ -50,3 +50,5 @@ Post-Deployment Script Template
 :r .\Scripts\SPGetCustomersStandardOrderTotals.sql
 :r .\Scripts\SPGetCustomersStandardOrdersLast.sql
 :r .\Scripts\SPGetSkuBreakDownReport.sql
+:r .\Scripts\SPGetSkuPOrderTypeBreakDownReport.sql
+:r .\Scripts\SPGetSkuPOrderTypeFutureBreakDownReport.sql

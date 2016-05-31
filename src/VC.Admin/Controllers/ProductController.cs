@@ -35,6 +35,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.InventorySkus;
 using VitalChoice.Business.Helpers;
+using VitalChoice.Infrastructure.Domain.Entities;
 
 namespace VC.Admin.Controllers
 {
@@ -691,6 +692,30 @@ namespace VC.Admin.Controllers
 
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
             return File(result, "text/csv");
+        }
+
+        [HttpPost]
+        public async Task<Result<SkuPOrderTypeBreakDownReport>> GetSkuPOrderTypeBreakDownReport([FromBody]SkuPOrderTypeBreakDownReportFilter filter)
+        {
+            filter.To = filter.To.AddDays(1);
+            var toReturn = await productService.GetSkuPOrderTypeBreakDownReportAsync(filter);
+            //correct dates for UI
+            if (toReturn.FrequencyType == FrequencyType.Weekly || toReturn.FrequencyType == FrequencyType.Monthly)
+            {
+                for (int i = 0; i < toReturn.POrderTypePeriods.Count; i++)
+                {
+                    toReturn.POrderTypePeriods[i].To = toReturn.POrderTypePeriods[i].To.AddDays(-1);
+                }
+
+                foreach (var sku in toReturn.Skus)
+                {
+                    for (int i = 0; i < sku.Periods.Count; i++)
+                    {
+                        sku.Periods[i].To = sku.Periods[i].To.AddDays(-1);
+                    }
+                }
+            }
+            return toReturn;
         }
 
         #endregion

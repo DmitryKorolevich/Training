@@ -107,6 +107,8 @@ namespace VitalChoice.Interfaces.Services.Products
 
 	    Task<ICollection<SkuBreakDownReportItem>> GetSkuBreakDownReportItemsAsync(SkuBreakDownReportFilter filter);
 
+	    Task<SkuPOrderTypeBreakDownReport> GetSkuPOrderTypeBreakDownReportAsync(SkuPOrderTypeBreakDownReportFilter filter);
+
 	    #endregion
 	}
 }

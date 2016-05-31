@@ -25,6 +25,7 @@ angular.module('app.modules.product', [
 	'app.modules.product.controllers.sendOutOfStockRequestsPopupController',
 	'app.modules.product.controllers.manageProductsOrderController',
 	'app.modules.product.controllers.skuBreakDownReportController',
+	'app.modules.product.controllers.skuPOrderTypeBreakDownReportController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -143,6 +144,11 @@ angular.module('app.modules.product', [
 				    url: '/report/sku-breakdown',
 				    templateUrl: 'app/modules/product/partials/skuBreakDownReport.html',
 				    controller: 'skuBreakDownReportController'
+				})
+				.state('index.oneCol.skuPOrderTypeBreakDownReport', {
+				    url: '/report/breakdown',
+				    templateUrl: 'app/modules/product/partials/skuPOrderTypeBreakDownReport.html',
+				    controller: 'skuPOrderTypeBreakDownReportController'
 				});
 		}
 ]);

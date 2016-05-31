@@ -300,4 +300,10 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\SPGetSkuBreakDownReport.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetSkuPOrderTypeBreakDownReport.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetSkuPOrderTypeFutureBreakDownReport.sql" />
+  </ItemGroup>
 </Project>

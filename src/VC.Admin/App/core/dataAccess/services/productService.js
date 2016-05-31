@@ -146,5 +146,9 @@ angular.module('app.core.dataAccess.services.productService', [])
 	        return baseUrl + ('GetSkuBreakDownReportItemsReportFile?from={0}&to={1}&buildNumber={2}')
                 .format(filter.From, filter.To, buildNumber);
 	    },
+	    getSkuPOrderTypeBreakDownReport: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetSkuPOrderTypeBreakDownReport', filter, getConfig(tracker));
+	    },
 	};
 }]);

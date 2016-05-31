@@ -28,7 +28,7 @@ angular.module('app.modules.order', [
 
 		    $stateProvider
 				.state('index.oneCol.manageOrders', {
-				    url: '/orders',
+				    url: '/orders?{from:string}{to:string}{idsku:int}',
 				    templateUrl: 'app/modules/order/partials/ordersList.html',
 				    controller: 'ordersController'
 				})

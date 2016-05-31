@@ -61,6 +61,29 @@
                         <select class="form-control" placeholder="Shipping Method" data-ng-model="filter.IdShippingMethod" data-ng-options="item.Key as item.Text for item in shippingMethods"></select>
                     </div>
                 </div>
+                <div class="row form-group">
+                    <div class="col-md-2">
+                        <input type="text" class="form-control" name="CustomerCompany" placeholder="Customer Company" data-ng-model="filter.CustomerCompany" data-ng-minlength="3" autocomplete="off">
+                        <div class="error-container" ng-show="forms.filterForm.submitted && forms.filterForm.CustomerCompany.$invalid">
+                            <small class="error" ng-show="forms.filterForm.CustomerCompany.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Customer Company")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" class="form-control" name="CustomerFirstName" placeholder="Customer First Name" data-ng-model="filter.CustomerFirstName" data-ng-minlength="3" autocomplete="off">
+                        <div class="error-container" ng-show="forms.filterForm.submitted && forms.filterForm.CustomerFirstName.$invalid">
+                            <small class="error" ng-show="forms.filterForm.CustomerFirstName.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Customer First Name")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" class="form-control" name="CustomerLastName" placeholder="Customer Last Name" data-ng-model="filter.CustomerLastName" data-ng-minlength="3" autocomplete="off">
+                        <div class="error-container" ng-show="forms.filterForm.submitted && forms.filterForm.CustomerLastName.$invalid">
+                            <small class="error" ng-show="forms.filterForm.CustomerLastName.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Customer Last Name")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-control" placeholder="Ship State" data-ng-model="filter.IdShipState" data-ng-options="item.Id as item.StateName for item in states"></select>
+                    </div>
+                </div>
             </fieldset>
         </form>
         <div class="row form-group">
@@ -106,20 +129,8 @@
                             </span>
                         </th>
                         <th class="actions">Ship Date</th>
-                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Company')">
-                            <span>Company</span>
-                            <span data-ng-if="filter.Sorting.Path == 'Company'">
-                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
-                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
-                            </span>
-                        </th>
-                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('StateCode')">
-                            <span>Ship State</span>
-                            <span data-ng-if="filter.Sorting.Path == 'StateCode'">
-                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
-                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
-                            </span>
-                        </th>
+                        <th>Company</th>
+                        <th>Ship State</th>
                         <th>Carrier</th>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('IdCustomerType')">
                             <span>C Type</span>
@@ -128,13 +139,7 @@
                                 <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                             </span>
                         </th>
-                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Customer')">
-                            <span>Customer</span>
-                            <span data-ng-if="filter.Sorting.Path == 'Customer'">
-                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
-                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
-                            </span>
-                        </th>
+                        <th>Customer</th>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Id')">
                             <span>Order #</span>
                             <span data-ng-if="filter.Sorting.Path == 'Id'">

@@ -50,7 +50,7 @@
                     <tbody>
                         <tr data-ng-repeat="item in items">
                             <td>
-                                <a ui-sref="index.oneCol.productDetail({id:item.IdProduct})">{{::item.Code}}</a>
+                                <a data-ng-click="openOrders(item.IdSku)">{{::item.Code}}</a>
                             </td>
                             <td>{{::item.TotalQuantity}}</td>
                             <td>{{::item.TotalAmount | currency}}</td>

@@ -65,7 +65,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				    subMenu: [
                         { name: 'healthwisePeriods', stateName: 'index.oneCol.healthwisePeriods', stateLabel: 'HealthWise Customer Report', access: 3 },
                         { name: 'ordersSummarySalesReport', stateName: 'index.oneCol.ordersSummarySalesReport', stateLabel: 'Summary Sales Report', access: 3 },
-                        //{ name: 'breakdownReport', stateName: 'index.oneCol.breakdownReport', stateLabel: 'Breakdown Report', access: 3 },
+                        { name: 'skuPOrderTypeBreakDownReport', stateName: 'index.oneCol.skuPOrderTypeBreakDownReport', stateLabel: 'Breakdown Report', access: 3 },
                         { name: 'skuBreakDownReport', stateName: 'index.oneCol.skuBreakDownReport', stateLabel: 'SKU Breakdown Report', access: 3 },
                         //{ name: 'futuresBreakdownReport', stateName: 'index.oneCol.futuresBreakdownReport', stateLabel: 'Futures Breakdown Report', access: 3 },
                         //{ name: 'orderSKUAddressReport', stateName: 'index.oneCol.orderSKUAddressReport', stateLabel: 'Order SKU and Address Report', access: 3 },

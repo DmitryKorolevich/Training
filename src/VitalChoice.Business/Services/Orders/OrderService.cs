@@ -1450,6 +1450,7 @@ namespace VitalChoice.Business.Services.Orders
                 .WithOrderStatus(filter.OrderStatus)
                 .WithCustomerType(filter.IdCustomerType)
                 .WithoutIncomplete(filter.OrderStatus, filter.IgnoreNotShowingIncomplete)
+                .WithIdSku(filter.IdSku)
                 .WithShipState(filter.IdShipState)
                 .WithOrderDynamicValues(filter.IdOrderSource, filter.POrderType, filter.IdShippingMethod)
                 .WithCustomerDynamicValues(filter.CustomerFirstName, filter.CustomerLastName, filter.CustomerCompany)

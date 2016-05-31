@@ -25,6 +25,7 @@ using VitalChoice.DynamicData.Validation;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
@@ -36,6 +37,7 @@ using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Options;
@@ -50,7 +52,7 @@ using VitalChoice.ObjectMapping.Base;
 
 namespace VitalChoice.Business.Services.Products
 {
-    public class ProductService : ExtendedEcommerceDynamicService<ProductDynamic, Product, ProductOptionType, ProductOptionValue>, 
+    public class ProductService : ExtendedEcommerceDynamicService<ProductDynamic, Product, ProductOptionType, ProductOptionValue>,
         IProductService
     {
         private readonly VProductSkuRepository _vProductSkuRepository;
@@ -77,13 +79,13 @@ namespace VitalChoice.Business.Services.Products
         private readonly SpEcommerceRepository _sPEcommerceRepository;
 
         public async Task<ProductContent> SelectContentForTransfer(int id)
-		{
-			return (await _productContentRepository.Query(p => p.Id == id).Include(p => p.ContentItem).SelectAsync(false)).FirstOrDefault();
-		}
+        {
+            return (await _productContentRepository.Query(p => p.Id == id).Include(p => p.ContentItem).SelectAsync(false)).FirstOrDefault();
+        }
 
         public async Task<ICollection<ProductContent>> SelectContentsForTransfer()
         {
-            return await _productContentRepository.Query(p => p.StatusCode!=RecordStatusCode.Deleted).Include(p => p.ContentItem).SelectAsync(false);
+            return await _productContentRepository.Query(p => p.StatusCode != RecordStatusCode.Deleted).Include(p => p.ContentItem).SelectAsync(false);
         }
 
         public async Task<ICollection<ProductContent>> SelectProductContents(ICollection<int> ids)
@@ -104,7 +106,7 @@ namespace VitalChoice.Business.Services.Products
         {
             foreach (var entity in entities)
             {
-                entity.Skus = entity.Skus?.Where(s => s.StatusCode != (int) RecordStatusCode.Deleted).OrderBy(s => s.Order).ToArray();
+                entity.Skus = entity.Skus?.Where(s => s.StatusCode != (int)RecordStatusCode.Deleted).OrderBy(s => s.Order).ToArray();
             }
             return TaskCache.CompletedTask;
         }
@@ -176,7 +178,7 @@ namespace VitalChoice.Business.Services.Products
 
         public ProductService(VProductSkuRepository vProductSkuRepository,
             IEcommerceRepositoryAsync<VSku> vSkuRepository,
-            IEcommerceRepositoryAsync<Lookup> lookupRepository, 
+            IEcommerceRepositoryAsync<Lookup> lookupRepository,
             IEcommerceRepositoryAsync<Product> productRepository,
             IEcommerceRepositoryAsync<ProductToCategory> productToCategoryRepository,
             IEcommerceRepositoryAsync<Sku> skuRepository,
@@ -302,19 +304,19 @@ namespace VitalChoice.Business.Services.Products
             return await _orderSkusRepositoryRepository.GetTopPurchasedSkuIdsAsync(filter, idCustomer);
         }
 
-	    private async Task<SkuOrdered> PopulateSkuOrderedWithUrlAsync(Sku sku)
-	    {
-			var skuDynamic = await _skuMapper.FromEntityAsync(sku, true);
-			var skuOrdered = new SkuOrdered
-			{
-				Sku = skuDynamic
-			};
+        private async Task<SkuOrdered> PopulateSkuOrderedWithUrlAsync(Sku sku)
+        {
+            var skuDynamic = await _skuMapper.FromEntityAsync(sku, true);
+            var skuOrdered = new SkuOrdered
+            {
+                Sku = skuDynamic
+            };
 
-			var productUrl = _productContentRepository.Query(p => p.Id == sku.IdProduct).Select(p => p.Url, false).FirstOrDefault();
-			skuOrdered.Sku.Product.Url = productUrl;
+            var productUrl = _productContentRepository.Query(p => p.Id == sku.IdProduct).Select(p => p.Url, false).FirstOrDefault();
+            skuOrdered.Sku.Product.Url = productUrl;
 
-			return skuOrdered;
-		}
+            return skuOrdered;
+        }
 
         private async Task<RefundSkuOrdered> PopulateRefundSkuOrderedAsync(Sku sku)
         {
@@ -343,8 +345,8 @@ namespace VitalChoice.Business.Services.Products
                     .SelectFirstOrDefaultAsync(false);
             if (sku == null)
                 return null;
-            
-	        return await PopulateSkuOrderedWithUrlAsync(sku);
+
+            return await PopulateSkuOrderedWithUrlAsync(sku);
         }
 
         public async Task<SkuOrdered> GetSkuOrderedAsync(int id)
@@ -358,8 +360,8 @@ namespace VitalChoice.Business.Services.Products
                     .ThenInclude(p => p.ProductsToCategories)
                     .SelectFirstOrDefaultAsync(false);
 
-			return await PopulateSkuOrderedWithUrlAsync(sku);
-		}
+            return await PopulateSkuOrderedWithUrlAsync(sku);
+        }
 
         public async Task<List<SkuOrdered>> GetSkusOrderedAsync(ICollection<string> codes)
         {
@@ -378,14 +380,14 @@ namespace VitalChoice.Business.Services.Products
                     .ThenInclude(p => p.ProductsToCategories)
                     .SelectAsync(false);
 
-			var res = new List<SkuOrdered>();
-	        foreach (var temp in skus)
-	        {
-				var skuOrdered = await PopulateSkuOrderedWithUrlAsync(temp);
-				res.Add(skuOrdered);
-			}
+            var res = new List<SkuOrdered>();
+            foreach (var temp in skus)
+            {
+                var skuOrdered = await PopulateSkuOrderedWithUrlAsync(temp);
+                res.Add(skuOrdered);
+            }
 
-	        return res;
+            return res;
         }
 
         public async Task<List<SkuOrdered>> GetSkusOrderedAsync(ICollection<int> ids)
@@ -405,15 +407,15 @@ namespace VitalChoice.Business.Services.Products
                     .ThenInclude(p => p.ProductsToCategories)
                     .SelectAsync(false);
 
-			var res = new List<SkuOrdered>();
-			foreach (var temp in skus)
-			{
-				var skuOrdered = await PopulateSkuOrderedWithUrlAsync(temp);
-				res.Add(skuOrdered);
-			}
+            var res = new List<SkuOrdered>();
+            foreach (var temp in skus)
+            {
+                var skuOrdered = await PopulateSkuOrderedWithUrlAsync(temp);
+                res.Add(skuOrdered);
+            }
 
-			return res;
-		}
+            return res;
+        }
 
         public async Task<List<RefundSkuOrdered>> GetRefundSkusOrderedAsync(ICollection<int> ids)
         {
@@ -538,23 +540,23 @@ namespace VitalChoice.Business.Services.Products
         public async Task<byte[]> GenerateSkuGoogleItemsReportFile()
         {
             byte[] toReturn = null;
-            List<SkuGoogleItem> items=new List<SkuGoogleItem>();
-            var productCategories= await _productCategoryService.GetCategoriesTreeAsync(new ProductCategoryLiteFilter());
+            List<SkuGoogleItem> items = new List<SkuGoogleItem>();
+            var productCategories = await _productCategoryService.GetCategoriesTreeAsync(new ProductCategoryLiteFilter());
             var products = await this.SelectTransferAsync(true);
 
             foreach (var productContentTransferEntity in products)
             {
-                if (productContentTransferEntity.ProductDynamic.StatusCode == (int) RecordStatusCode.Active 
+                if (productContentTransferEntity.ProductDynamic.StatusCode == (int)RecordStatusCode.Active
                     && productContentTransferEntity.ProductDynamic.IdVisibility.HasValue
                     && (productContentTransferEntity.ProductDynamic.IdVisibility.Value == CustomerTypeCode.All ||
                     productContentTransferEntity.ProductDynamic.IdVisibility.Value == CustomerTypeCode.Retail)
-                    && productContentTransferEntity.ProductDynamic.Skus!=null)
+                    && productContentTransferEntity.ProductDynamic.Skus != null)
                 {
                     var activeSkus =
-                        productContentTransferEntity.ProductDynamic.Skus.Where(p => p.StatusCode == (int) RecordStatusCode.Active &&
+                        productContentTransferEntity.ProductDynamic.Skus.Where(p => p.StatusCode == (int)RecordStatusCode.Active &&
                                                                                     !p.Hidden && p.SafeData.HideFromDataFeed != true).ToArray();
 
-                    if(!activeSkus.Any())
+                    if (!activeSkus.Any())
                         continue;
 
                     //find sku code group part in sku codes
@@ -579,12 +581,12 @@ namespace VitalChoice.Business.Services.Products
 
                     foreach (var skuDynamic in activeSkus)
                     {
-                        SkuGoogleItem item=new SkuGoogleItem();
+                        SkuGoogleItem item = new SkuGoogleItem();
                         item.Id = skuDynamic.Id;
                         item.Title = productContentTransferEntity.ProductDynamic.SafeData.GoogleFeedTitle;
                         if (string.IsNullOrEmpty(item.Title))
                         {
-                            item.Title=$"{productContentTransferEntity.ProductDynamic.Name} {productContentTransferEntity.ProductDynamic.SafeData.SubTitle}";
+                            item.Title = $"{productContentTransferEntity.ProductDynamic.Name} {productContentTransferEntity.ProductDynamic.SafeData.SubTitle}";
                         }
                         item.Url = $"https://{_options.Value.PublicHost}/product/{productContentTransferEntity.ProductContent?.Url}";
                         item.RetailPrice = skuDynamic.Price;
@@ -594,7 +596,7 @@ namespace VitalChoice.Business.Services.Products
                         item.SkuCode = skuDynamic.Code;
                         if (productContentTransferEntity.ProductDynamic.SafeData.Thumbnail != null)
                         {
-                            item.Thumbnail =$"https://{_options.Value.PublicHost}{productContentTransferEntity.ProductDynamic.SafeData.Thumbnail}";
+                            item.Thumbnail = $"https://{_options.Value.PublicHost}{productContentTransferEntity.ProductDynamic.SafeData.Thumbnail}";
                         }
                         item.GoogleCategory =
                             _referenceData.GoogleCategories.FirstOrDefault(
@@ -612,13 +614,13 @@ namespace VitalChoice.Business.Services.Products
                             item.MainProductImage = $"https://{_options.Value.PublicHost}{productContentTransferEntity.ProductDynamic.SafeData.MainProductImage}";
                         }
                         item.Quantity = skuDynamic.SafeData.QTY;
-                        item.Manufacturer= "Vital Choice";
+                        item.Manufacturer = "Vital Choice";
                         item.Seller = _referenceData.ProductSellers.FirstOrDefault(
                                 p => p.Key == productContentTransferEntity.ProductDynamic.SafeData.Seller)?.Text;
 
                         items.Add(item);
                     }
-                } 
+                }
             }
 
             items = items.OrderBy(p => p.Url).ToList();
@@ -632,7 +634,7 @@ namespace VitalChoice.Business.Services.Products
             try
             {
                 var file = await GenerateSkuGoogleItemsReportFile();
-                await _storageClient.UploadBlobAsync(_options.Value.AzureStorage.AppFilesContainerName, _options.Value.AzureStorage.ProductGoogleFeedFileName, 
+                await _storageClient.UploadBlobAsync(_options.Value.AzureStorage.AppFilesContainerName, _options.Value.AzureStorage.ProductGoogleFeedFileName,
                     file, "text/csv");
             }
             catch (Exception e)
@@ -721,13 +723,13 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<ICollection<ProductCategoryOrderModel>> GetProductsOnCategoryOrderAsync(int idCategory)
         {
-            List<ProductCategoryOrderModel> toReturn=new List<ProductCategoryOrderModel>();
+            List<ProductCategoryOrderModel> toReturn = new List<ProductCategoryOrderModel>();
 
-            var productsOnCategory = await _productToCategoryRepository.Query(p=>p.IdCategory==idCategory && 
-                p.Product.StatusCode==(int)RecordStatusCode.Active && p.Product.IdVisibility.HasValue).SelectAsync();
-            var products = await SelectAsync(productsOnCategory.Select(p=>p.IdProduct).ToList());
+            var productsOnCategory = await _productToCategoryRepository.Query(p => p.IdCategory == idCategory &&
+                p.Product.StatusCode == (int)RecordStatusCode.Active && p.Product.IdVisibility.HasValue).SelectAsync();
+            var products = await SelectAsync(productsOnCategory.Select(p => p.IdProduct).ToList());
 
-            foreach (var productOnCategory in productsOnCategory.OrderBy(p=>p.Order))
+            foreach (var productOnCategory in productsOnCategory.OrderBy(p => p.Order))
             {
                 var productDynamic = products.FirstOrDefault(p => p.Id == productOnCategory.IdProduct);
                 if (productDynamic != null)
@@ -850,7 +852,7 @@ namespace VitalChoice.Business.Services.Products
             return model;
         }
 
-        public async Task<bool> SendProductOutOfStockRequestsAsync(ICollection<int> ids,string messageFormat=null)
+        public async Task<bool> SendProductOutOfStockRequestsAsync(ICollection<int> ids, string messageFormat = null)
         {
             if (ids.Count > 0)
             {
@@ -867,13 +869,13 @@ namespace VitalChoice.Business.Services.Products
                 var items = await _productOutOfStockRequestRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);
                 var productIds = items.Select(p => p.IdProduct).Distinct().ToArray();
                 var products = await _productRepository.Query(p => productIds.Contains(p.Id)).SelectAsync(false);
-                var contentProducts= await _productContentRepository.Query(p => productIds.Contains(p.Id)).SelectAsync(false);
+                var contentProducts = await _productContentRepository.Query(p => productIds.Contains(p.Id)).SelectAsync(false);
 
                 foreach (var item in items)
                 {
                     var product = products.FirstOrDefault(p => p.Id == item.IdProduct);
-                    var contentProduct= contentProducts.FirstOrDefault(p => p.Id == item.IdProduct);
-                    if (product != null && contentProduct!=null)
+                    var contentProduct = contentProducts.FirstOrDefault(p => p.Id == item.IdProduct);
+                    if (product != null && contentProduct != null)
                     {
                         var url = $"https://{_options.Value.PublicHost}/product/{contentProduct.Url}";
                         var text = messageFormat.Replace(SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE_CUSTOMER_NAME_HOLDER, item.Name).
@@ -905,43 +907,44 @@ namespace VitalChoice.Business.Services.Products
         }
 
         public async Task<PagedList<VCustomerFavoriteFull>> GetCustomerFavoritesAsync(VCustomerFavoritesFilter filter)
-	    {
-		    var temp = 
-			    await
-				    _vCustomerFavoriteRepository.Query(new VCustomerFavoriteQuery().WithCustomerId(filter.IdCustomer))
-					    .OrderBy(x => x.OrderByDescending(z => z.Quantity))
-					    .SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+        {
+            var temp =
+                await
+                    _vCustomerFavoriteRepository.Query(new VCustomerFavoriteQuery().WithCustomerId(filter.IdCustomer))
+                        .OrderBy(x => x.OrderByDescending(z => z.Quantity))
+                        .SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
 
-		    var productIds = temp.Items.Select(x => x.Id).ToList();
-		    var batch = productIds.Take(BaseAppConstants.DEFAULT_MAX_ALLOWED_PARAMS_SQL).ToList();
-		    var i = 0;
-			var pairs = new List<KeyValuePair<int,string>>();
-            while (batch.Any()) { 
-				pairs.AddRange(_productContentRepository.Query(p => batch.Contains(p.Id)).Select(x=> new KeyValuePair<int, string>(x.Id, x.Url)));
+            var productIds = temp.Items.Select(x => x.Id).ToList();
+            var batch = productIds.Take(BaseAppConstants.DEFAULT_MAX_ALLOWED_PARAMS_SQL).ToList();
+            var i = 0;
+            var pairs = new List<KeyValuePair<int, string>>();
+            while (batch.Any())
+            {
+                pairs.AddRange(_productContentRepository.Query(p => batch.Contains(p.Id)).Select(x => new KeyValuePair<int, string>(x.Id, x.Url)));
 
-	            i++;
-	            batch = productIds.Skip(i* BaseAppConstants.DEFAULT_MAX_ALLOWED_PARAMS_SQL).Take(BaseAppConstants.DEFAULT_MAX_ALLOWED_PARAMS_SQL).ToList();
+                i++;
+                batch = productIds.Skip(i * BaseAppConstants.DEFAULT_MAX_ALLOWED_PARAMS_SQL).Take(BaseAppConstants.DEFAULT_MAX_ALLOWED_PARAMS_SQL).ToList();
             }
 
-			var favorites = new PagedList<VCustomerFavoriteFull>();
-			foreach (var item in temp.Items)
-			{
-				favorites.Items.Add(new VCustomerFavoriteFull
-				{
-					Id = item.Id,
-					IdCustomer = item.Id,
-					ProductName = item.ProductName,
+            var favorites = new PagedList<VCustomerFavoriteFull>();
+            foreach (var item in temp.Items)
+            {
+                favorites.Items.Add(new VCustomerFavoriteFull
+                {
+                    Id = item.Id,
+                    IdCustomer = item.Id,
+                    ProductName = item.ProductName,
                     ProductSubTitle = item.ProductSubTitle,
                     ProductThumbnail = item.ProductThumbnail,
-					Quantity = item.Quantity,
-					Url = pairs.Single(x=>x.Key == item.Id).Value
-				});
-			}
+                    Quantity = item.Quantity,
+                    Url = pairs.Single(x => x.Key == item.Id).Value
+                });
+            }
 
-		    favorites.Count = temp.Count;
+            favorites.Count = temp.Count;
 
-			return favorites;
-	    }
+            return favorites;
+        }
 
         #endregion
 
@@ -988,7 +991,7 @@ namespace VitalChoice.Business.Services.Products
                 productContentTransferEntity.ProductDynamic.Data.MetaTitle = productContentTransferEntity.ProductContent.ContentItem.Title;
                 productContentTransferEntity.ProductDynamic.Data.MetaDescription = productContentTransferEntity.ProductContent.ContentItem.MetaDescription;
             }
-            await LogItemChanges(models.Select(p=>p.ProductDynamic).ToList());
+            await LogItemChanges(models.Select(p => p.ProductDynamic).ToList());
         }
 
         protected override async Task<Product> InsertAsync(ProductDynamic model, IUnitOfWorkAsync uow)
@@ -1003,7 +1006,7 @@ namespace VitalChoice.Business.Services.Products
 
         private async Task<Product> InsertAsync(ProductDynamic model, IUnitOfWorkAsync uow, ProductContent productContent)
         {
-            if(productContent==null)
+            if (productContent == null)
             {
                 throw new ApiException("Product without content info cannot be created");
             }
@@ -1014,7 +1017,7 @@ namespace VitalChoice.Business.Services.Products
             {
                 try
                 {
-					var product = await base.InsertAsync(model, uow);
+                    var product = await base.InsertAsync(model, uow);
 
                     productContent.Id = product.Id;
                     await UpdateContentForInsert(model, productContent);
@@ -1051,12 +1054,12 @@ namespace VitalChoice.Business.Services.Products
                             await Validate(productContent);
 
                             dbProductContent.Url = productContent.Url;
-                            dbProductContent.StatusCode = (RecordStatusCode) model.StatusCode;
+                            dbProductContent.StatusCode = (RecordStatusCode)model.StatusCode;
                             dbProductContent.ContentItem.Updated = DateTime.Now;
                             dbProductContent.ContentItem.Template = productContent.ContentItem.Template;
-							dbProductContent.ContentItem.Title = productContent.ContentItem.Title;
-	                        dbProductContent.ContentItem.MetaDescription = productContent.ContentItem.MetaDescription;
-							dbProductContent.ContentItem.Description = productContent.ContentItem.Description;
+                            dbProductContent.ContentItem.Title = productContent.ContentItem.Title;
+                            dbProductContent.ContentItem.MetaDescription = productContent.ContentItem.MetaDescription;
+                            dbProductContent.ContentItem.Description = productContent.ContentItem.Description;
 
                             await _productContentRepository.UpdateAsync(dbProductContent);
                         }
@@ -1081,14 +1084,14 @@ namespace VitalChoice.Business.Services.Products
 
         private async Task UpdateContentForInsert(ProductDynamic model, ProductContent productContent)
         {
-            productContent.StatusCode = (RecordStatusCode) model.StatusCode;
+            productContent.StatusCode = (RecordStatusCode)model.StatusCode;
             productContent.UserId = model.IdEditedBy;
             productContent.ContentItem.Created = DateTime.Now;
             productContent.ContentItem.Updated = productContent.ContentItem.Created;
             if (productContent.MasterContentItemId == 0)
             {
                 //set predefined master
-                var contentType = (await _contentTypeRepository.Query(p => p.Id == (int) ContentType.Product).SelectAsync(false)).FirstOrDefault();
+                var contentType = (await _contentTypeRepository.Query(p => p.Id == (int)ContentType.Product).SelectAsync(false)).FirstOrDefault();
                 if (contentType?.DefaultMasterContentItemId != null)
                 {
                     productContent.MasterContentItemId = contentType.DefaultMasterContentItemId.Value;
@@ -1126,10 +1129,10 @@ namespace VitalChoice.Business.Services.Products
         protected override async Task<bool> DeleteAsync(IUnitOfWorkAsync uow, int id, bool physically)
         {
             var result = await base.DeleteAsync(uow, id, physically);
-            if(result)
+            if (result)
             {
-                var productContent = (await _productContentRepository.Query(p=>p.Id==id).SelectAsync()).FirstOrDefault();
-                if(productContent!=null && productContent.StatusCode!=RecordStatusCode.Deleted)
+                var productContent = (await _productContentRepository.Query(p => p.Id == id).SelectAsync()).FirstOrDefault();
+                if (productContent != null && productContent.StatusCode != RecordStatusCode.Deleted)
                 {
                     productContent.StatusCode = RecordStatusCode.Deleted;
                     result = await _productContentRepository.UpdateAsync(productContent);
@@ -1141,7 +1144,7 @@ namespace VitalChoice.Business.Services.Products
         public async Task<ProductContentTransferEntity> SelectTransferByIdOldAsync(int id)
         {
             ProductContentTransferEntity toReturn = null;
-            
+
             var content = (await _productContentRepository.Query(p => p.IdOld == id).Include(p => p.ContentItem).SelectAsync(false)).FirstOrDefault();
             if (content != null)
             {
@@ -1161,8 +1164,8 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<ProductContentTransferEntity> SelectTransferAsync(int id, bool withDefaults = false)
         {
-	        var toReturn = new ProductContentTransferEntity {ProductDynamic = await this.SelectAsync(id, withDefaults)};
-	        if(toReturn.ProductDynamic!=null)
+            var toReturn = new ProductContentTransferEntity { ProductDynamic = await this.SelectAsync(id, withDefaults) };
+            if (toReturn.ProductDynamic != null)
             {
                 toReturn.ProductContent = await SelectContentForTransfer(id);
             }
@@ -1171,8 +1174,8 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<ICollection<ProductContentTransferEntity>> SelectTransferAsync(bool withDefaults = false)
         {
-            var toReturn = (await this.SelectAsync(p => p.StatusCode != (int)RecordStatusCode.Deleted, withDefaults: withDefaults)).Select(p=>
-                new ProductContentTransferEntity { ProductDynamic =  p}).ToList();
+            var toReturn = (await this.SelectAsync(p => p.StatusCode != (int)RecordStatusCode.Deleted, withDefaults: withDefaults)).Select(p =>
+                new ProductContentTransferEntity { ProductDynamic = p }).ToList();
             var contents = await SelectContentsForTransfer();
             foreach (var productContentTransferEntity in toReturn)
             {
@@ -1183,40 +1186,40 @@ namespace VitalChoice.Business.Services.Products
         }
 
         public async Task<ProductContentTransferEntity> SelectTransferAsync(Guid id, bool withDefaults = false)
-		{
-			var toReturn = new ProductContentTransferEntity
-			{
-				ProductDynamic = await DynamicMapper.FromEntityAsync(
-					await
-						SelectEntityFirstAsync(o => o.PublicId == id && o.StatusCode != (int) RecordStatusCode.Deleted), withDefaults)
-			};
-			if (toReturn.ProductDynamic != null)
-			{
-				toReturn.ProductContent = await SelectContentForTransfer(toReturn.ProductDynamic.Id);
-			}
-			return toReturn;
-		}
+        {
+            var toReturn = new ProductContentTransferEntity
+            {
+                ProductDynamic = await DynamicMapper.FromEntityAsync(
+                    await
+                        SelectEntityFirstAsync(o => o.PublicId == id && o.StatusCode != (int)RecordStatusCode.Deleted), withDefaults)
+            };
+            if (toReturn.ProductDynamic != null)
+            {
+                toReturn.ProductContent = await SelectContentForTransfer(toReturn.ProductDynamic.Id);
+            }
+            return toReturn;
+        }
 
-		public async Task<ProductContentTransferEntity> SelectTransferAsync(string url, bool withDefaults = false)
-		{
-			var productContent = (await _productContentRepository.Query(p => p.Url.Equals(url)).Include(p => p.ContentItem).SelectAsync(false)).FirstOrDefault();
+        public async Task<ProductContentTransferEntity> SelectTransferAsync(string url, bool withDefaults = false)
+        {
+            var productContent = (await _productContentRepository.Query(p => p.Url.Equals(url)).Include(p => p.ContentItem).SelectAsync(false)).FirstOrDefault();
 
-			var toReturn = new ProductContentTransferEntity
-			{
-				ProductDynamic = productContent != null ? await DynamicMapper.FromEntityAsync(
-					await
-						SelectEntityFirstAsync(o => o.Id == productContent.Id && o.StatusCode != (int)RecordStatusCode.Deleted), withDefaults) : null,
-				ProductContent = productContent
-			};
-			return toReturn;
-		}
+            var toReturn = new ProductContentTransferEntity
+            {
+                ProductDynamic = productContent != null ? await DynamicMapper.FromEntityAsync(
+                    await
+                        SelectEntityFirstAsync(o => o.Id == productContent.Id && o.StatusCode != (int)RecordStatusCode.Deleted), withDefaults) : null,
+                ProductContent = productContent
+            };
+            return toReturn;
+        }
 
-		public async Task<int> GetProductInternalIdAsync(Guid productId)
-	    {
-			var productQuery = new ProductQuery().WithPublicId(productId).NotDeleted();
+        public async Task<int> GetProductInternalIdAsync(Guid productId)
+        {
+            var productQuery = new ProductQuery().WithPublicId(productId).NotDeleted();
 
-		    return (await _productRepository.Query(productQuery).SelectAsync(x => x.Id)).FirstOrDefault();
-	    }
+            return (await _productRepository.Query(productQuery).SelectAsync(x => x.Id)).FirstOrDefault();
+        }
 
         #endregion
 
@@ -1224,22 +1227,22 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<ICollection<SkuBreakDownReportItem>> GetSkuBreakDownReportItemsAsync(SkuBreakDownReportFilter filter)
         {
-            List<SkuBreakDownReportItem> toReturn=new List<SkuBreakDownReportItem>();
-            var dbItems =await _sPEcommerceRepository.GetSkuBreakDownReportRawItemsAsync(filter);
+            List<SkuBreakDownReportItem> toReturn = new List<SkuBreakDownReportItem>();
+            var dbItems = await _sPEcommerceRepository.GetSkuBreakDownReportRawItemsAsync(filter);
 
             foreach (var skuBreakDownReportRawItem in dbItems)
             {
                 SkuBreakDownReportItem item = toReturn.FirstOrDefault(p => p.IdSku == skuBreakDownReportRawItem.IdSku);
                 if (item == null)
                 {
-                    item=new SkuBreakDownReportItem();
+                    item = new SkuBreakDownReportItem();
                     item.IdSku = skuBreakDownReportRawItem.IdSku;
                     item.IdProduct = skuBreakDownReportRawItem.IdProduct;
                     item.Code = skuBreakDownReportRawItem.Code;
                     toReturn.Add(item);
                 }
 
-                if (skuBreakDownReportRawItem.CustomerIdObjectType == (int) CustomerType.Retail)
+                if (skuBreakDownReportRawItem.CustomerIdObjectType == (int)CustomerType.Retail)
                 {
                     item.RetailAmount += skuBreakDownReportRawItem.Amount;
                     item.TotalAmount += skuBreakDownReportRawItem.Amount;
@@ -1257,8 +1260,140 @@ namespace VitalChoice.Business.Services.Products
 
             foreach (var item in toReturn)
             {
-                item.RetailPercent = item.TotalQuantity !=0 ? Math.Round((decimal) item.RetailQuantity*100/item.TotalQuantity, 2) : 0;
-                item.WholesalePercent = item.TotalQuantity != 0 ? Math.Round((decimal)item.WholesaleQuantity*100 / item.TotalQuantity, 2) : 0;
+                item.RetailPercent = item.TotalQuantity != 0 ? Math.Round((decimal)item.RetailQuantity * 100 / item.TotalQuantity, 2) : 0;
+                item.WholesalePercent = item.TotalQuantity != 0 ? Math.Round((decimal)item.WholesaleQuantity * 100 / item.TotalQuantity, 2) : 0;
+            }
+
+            return toReturn;
+        }
+
+        public async Task<SkuPOrderTypeBreakDownReport> GetSkuPOrderTypeBreakDownReportAsync(SkuPOrderTypeBreakDownReportFilter filter)
+        {
+            SkuPOrderTypeBreakDownReport toReturn = new SkuPOrderTypeBreakDownReport();
+            toReturn.FrequencyType = filter.FrequencyType;
+
+            if (filter.From > filter.To)
+            {
+                return toReturn;
+            }
+
+            var dbItems = await _sPEcommerceRepository.GetSkuPOrderTypeBreakDownReportRawItemsAsync(filter);
+
+            //create periods
+            DateTime current = filter.From;
+            if (filter.FrequencyType == FrequencyType.Monthly)
+            {
+                //start of next month
+                current = new DateTime(current.Year, current.Month, 1, current.Hour, current.Minute, current.Second);
+                current = current.AddMonths(1);
+            }
+            if (filter.FrequencyType == FrequencyType.Weekly)
+            {
+                //start of next week
+                current = current.AddDays(-(int)current.DayOfWeek);
+                current = current.AddDays(7);
+            }
+            if (filter.FrequencyType == FrequencyType.Daily)
+            {
+                current = current.AddDays(1);
+            }
+            if (current > filter.To)
+            {
+                current = filter.To;
+            }
+            var period = new SkuPOrderTypeBreakDownReportPOrderTypePeriod()
+            {
+                From = filter.From,
+                To = current,
+            };
+            toReturn.POrderTypePeriods.Add(period);
+
+            while (current < filter.To)
+            {
+                var nextCurrent = current;
+                if (filter.FrequencyType == FrequencyType.Monthly)
+                {
+                    nextCurrent = nextCurrent.AddMonths(1);
+                }
+                if (filter.FrequencyType == FrequencyType.Weekly)
+                {
+                    nextCurrent = nextCurrent.AddDays(7);
+                }
+                if (filter.FrequencyType == FrequencyType.Daily)
+                {
+                    nextCurrent = nextCurrent.AddDays(1);
+                }
+
+                if (nextCurrent > filter.To)
+                {
+                    nextCurrent = filter.To;
+                }
+
+                period = new SkuPOrderTypeBreakDownReportPOrderTypePeriod()
+                {
+                    From = current,
+                    To = nextCurrent,
+                };
+                toReturn.POrderTypePeriods.Add(period);
+                current = nextCurrent;
+            }
+
+            List<int> usedOrderIds=new List<int>();
+
+            foreach (var skuPOrderTypeBreakDownReportRawItem in dbItems)
+            {
+                var pOrderTypePeriod = toReturn.POrderTypePeriods.FirstOrDefault(p=>p.From<=skuPOrderTypeBreakDownReportRawItem.DateCreated && 
+                    p.To> skuPOrderTypeBreakDownReportRawItem.DateCreated);
+                if (pOrderTypePeriod != null && usedOrderIds.All(p => p != skuPOrderTypeBreakDownReportRawItem.IdOrder))
+                {
+                    if (skuPOrderTypeBreakDownReportRawItem.POrderType == (int) POrderType.P)
+                    {
+                        pOrderTypePeriod.PCount++;
+                    }
+                    if (skuPOrderTypeBreakDownReportRawItem.POrderType == (int)POrderType.NP)
+                    {
+                        pOrderTypePeriod.NPCount++;
+                    }
+                    if (skuPOrderTypeBreakDownReportRawItem.POrderType == (int)POrderType.PNP)
+                    {
+                        pOrderTypePeriod.PNPCount++;
+                    }
+                    pOrderTypePeriod.TotalCount++;
+                    usedOrderIds.Add(skuPOrderTypeBreakDownReportRawItem.IdOrder);
+                }
+            }
+
+            foreach (var skuPOrderTypeBreakDownReportPOrderTypePeriod in toReturn.POrderTypePeriods)
+            {
+                skuPOrderTypeBreakDownReportPOrderTypePeriod.PPercent = skuPOrderTypeBreakDownReportPOrderTypePeriod.TotalCount!=0 ?
+                    Math.Round(((decimal) 100*(skuPOrderTypeBreakDownReportPOrderTypePeriod.PCount + skuPOrderTypeBreakDownReportPOrderTypePeriod.PNPCount))
+                                / skuPOrderTypeBreakDownReportPOrderTypePeriod.TotalCount, 2) :
+                               0;
+            }
+
+            foreach (var skuPOrderTypeBreakDownReportRawItem in dbItems)
+            {
+                var skuItem = toReturn.Skus.FirstOrDefault(p => p.IdSku == skuPOrderTypeBreakDownReportRawItem.IdSku);
+                if (skuItem == null)
+                {
+                    skuItem = new SkuPOrderTypeBreakDownReportSkuItem();
+                    skuItem.IdSku = skuPOrderTypeBreakDownReportRawItem.IdSku;
+                    skuItem.IdProduct = skuPOrderTypeBreakDownReportRawItem.IdProduct;
+                    skuItem.Code = skuPOrderTypeBreakDownReportRawItem.Code;
+                    skuItem.Periods = toReturn.POrderTypePeriods.Select(p => new SkuPOrderTypeBreakDownReportSkuPeriod()
+                    {
+                        From = p.From,
+                        To = p.To
+                    }).ToList();
+                    toReturn.Skus.Add(skuItem);
+                }
+
+                var skuPeriod = skuItem.Periods.FirstOrDefault(p => p.From <= skuPOrderTypeBreakDownReportRawItem.DateCreated &&
+                    p.To > skuPOrderTypeBreakDownReportRawItem.DateCreated);
+                if (skuPeriod != null)
+                {
+                    skuPeriod.Quantity += skuPOrderTypeBreakDownReportRawItem.Quantity;
+                }
             }
 
             return toReturn;

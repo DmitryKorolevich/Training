@@ -1,6 +1,6 @@
 ﻿angular.module('app.modules.order.controllers.ordersController', [])
-.controller('ordersController', ['$scope', '$rootScope', '$state', 'orderService', 'settingService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
-    function ($scope, $rootScope, $state, orderService, settingService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil)
+.controller('ordersController', ['$scope', '$rootScope', '$state', '$stateParams', 'orderService', 'settingService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
+    function ($scope, $rootScope, $state, $stateParams, orderService, settingService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil)
     {
         $scope.refreshTracker = promiseTracker("refresh");
         $scope.deleteTracker = promiseTracker("delete");
@@ -83,14 +83,18 @@
 
             var currentDate = new Date();
             currentDate.setHours(0, 0, 0, 0);
+            var idSku = $stateParams.idsku ? $stateParams.idsku : null;
+            var from = $stateParams.from ? Date.parseDateTime($stateParams.from) : currentDate.shiftDate('-1m');
+            var to = $stateParams.to ? Date.parseDateTime($stateParams.to) : currentDate.shiftDate('+1d');
             $scope.filter = {
-                To: currentDate.shiftDate('+1d'),
-                From: currentDate.shiftDate('-1m'),
+                To: to,
+                From: from,
                 ShipDate: false,
                 OrderStatus: null,
                 IdObjectType: null,
                 IdOrderSource: null,
                 POrderType: null,
+                IdSku: idSku,
                 IdCustomerType: null,
                 IdShippingMethod: null,
                 IdShipState: null,

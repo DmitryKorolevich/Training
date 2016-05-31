@@ -102,6 +102,12 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(f => f.Id);
             });
 
+            builder.Entity<SkuPOrderTypeBreakDownReportRawItem>(entity =>
+            {
+                entity.HasKey(f => f.RowNumber);
+                entity.Ignore(f => f.Id);
+            });
+
             #endregion
 
             builder.Entity<VCustomerFavorite>(entity =>

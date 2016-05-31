@@ -85,5 +85,20 @@
             }
         };
 
+        $scope.openOrders = function (idsku)
+        {
+            var data = {};
+            data.idsku = idsku;
+            if ($scope.filter.From)
+            {
+                data.from = $scope.filter.From.toQueryParamDateTime();
+            }
+            if ($scope.filter.To)
+            {
+                data.to = $scope.filter.To.toQueryParamDateTime();
+            }
+            $state.go('index.oneCol.manageOrders', data);
+        };
+
         initialize();
     }]);

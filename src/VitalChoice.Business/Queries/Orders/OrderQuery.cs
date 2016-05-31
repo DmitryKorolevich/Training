@@ -210,6 +210,16 @@ namespace VitalChoice.Business.Queries.Orders
             return this;
         }
 
+        public OrderQuery WithIdSku(int? idSku)
+        {
+            if (idSku.HasValue)
+            {
+                Add(c => c.Skus.Any(p => p.IdSku==idSku.Value) || c.PromoSkus.Any(p => p.IdSku == idSku.Value && !p.Disabled));
+            }
+
+            return this;
+        }
+
         public OrderQuery WithShipState(int? idShipState)
         {
             if (idShipState.HasValue)

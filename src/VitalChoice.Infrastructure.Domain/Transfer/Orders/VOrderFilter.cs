@@ -38,5 +38,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
         public string CustomerLastName { get; set; }
 
         public string CustomerCompany { get; set; }
+
+        public int? IdSku { get; set; }
     }
 }
