@@ -35,5 +35,10 @@ namespace VitalChoice.Ecommerce.Domain.Exceptions
         }
 
         public override string Message { get; }
+
+        public override string ToString()
+        {
+            return $"{Message}\n{base.ToString()}";
+        }
     }
 }
