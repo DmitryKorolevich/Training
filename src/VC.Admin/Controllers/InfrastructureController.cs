@@ -56,6 +56,7 @@ namespace VC.Admin.Controllers
                     PaymentMethods = referenceData.PaymentMethods,
                     ShortPaymentMethods = referenceData.ShortPaymentMethods,
                     OrderTypes = referenceData.OrderTypes,
+                    PublicOrderTypes = referenceData.PublicOrderTypes,
                     ShortOrderTypes = referenceData.ShortOrderTypes,
                     TaxExempts = referenceData.TaxExempts,
 					Tiers = referenceData.Tiers,

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
@@ -451,6 +452,20 @@ namespace VitalChoice.Business.Helpers
                         });
                         break;
                 }
+            }
+            return toReturn;
+        }
+
+        public static IList<LookupItem<int>> GetPublicOrderTypes(IList<LookupItem<int>> orderTypes)
+        {
+            List<LookupItem<int>> toReturn = new List<LookupItem<int>>();
+            foreach (var orderType in orderTypes.Where(p=>p.Key!=(int)OrderType.AutoShip))
+            {
+                toReturn.Add(new LookupItem<int>()
+                {
+                    Key = orderType.Key,
+                    Text = orderType.Text
+                });
             }
             return toReturn;
         }

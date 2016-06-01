@@ -35,6 +35,7 @@ namespace VC.Admin.Models.Infrastructure
         public IList<LookupItem<int>> PaymentMethods { get; set; }
         public IList<LookupItem<int>> ShortPaymentMethods { get; set; }
         public IList<LookupItem<int>> OrderTypes { get; set; }
+        public IList<LookupItem<int>> PublicOrderTypes { get; set; }
         public IList<LookupItem<int>> ShortOrderTypes { get; set; }
         public IList<LookupItem<int>> TaxExempts { get; set; }
 	    public IList<LookupItem<int>> Tiers { get; set; }

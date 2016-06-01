@@ -238,6 +238,7 @@ namespace VitalChoice.Business.Services
             referenceData.ShortPaymentMethods = LookupHelper.GetShortPaymentMethods(shortPaymentMethods);
             referenceData.OrderTypes = orderTypeEntityRepository.Query().Select(x => new LookupItem<int>() { Key = x.Id, Text = x.Name })
                 .ToList();
+            referenceData.PublicOrderTypes = LookupHelper.GetPublicOrderTypes(referenceData.OrderTypes);
             var shortOrderTypes = (new List<LookupItem<int>>(referenceData.OrderTypes));
             referenceData.ShortOrderTypes = LookupHelper.GetShortOrderTypes(shortOrderTypes);
             referenceData.TaxExempts = lookupVariants[taxExemptLookup].Select(x => new LookupItem<int>()

@@ -62,7 +62,7 @@
             $scope.orderStatuses = angular.copy($rootScope.ReferenceData.OrderStatuses);
             $scope.orderStatuses.splice(0, 0, { Key: null, Text: 'All Order Statuses' });
 
-            $scope.orderTypes = angular.copy($rootScope.ReferenceData.OrderTypes);
+            $scope.orderTypes = angular.copy($rootScope.ReferenceData.PublicOrderTypes);
             $scope.orderTypes.splice(0, 0, { Key: null, Text: 'All Order Types' });
 
             $scope.orderSourceTypes = angular.copy($rootScope.ReferenceData.OrderSourceTypes);
