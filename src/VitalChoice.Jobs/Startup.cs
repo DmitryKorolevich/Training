@@ -47,7 +47,7 @@ namespace VitalChoice.Jobs
         {
             var reg = new JobsDependencyConfig();
 
-            var container = reg.RegisterInfrastructure(Configuration, services, typeof(Startup).GetTypeInfo().Assembly, _hostingEnvironment, false);
+            var container = reg.RegisterInfrastructure(Configuration, services, typeof(Startup).GetTypeInfo().Assembly, _hostingEnvironment, true);
             return container.Resolve<IServiceProvider>();
         }
     }
