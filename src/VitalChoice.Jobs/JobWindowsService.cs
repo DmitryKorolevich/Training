@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.ServiceProcess;
+using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using Microsoft.AspNetCore.Hosting;
@@ -16,9 +18,11 @@ using VitalChoice.Infrastructure.Domain.Options;
 
 namespace VitalChoice.Jobs
 {
-	public class JobWindowsService : ServiceBase
+	public sealed class JobWindowsService : ServiceBase
 	{
-	    private void InitializeComponent()
+        public IWebHost Host { get; set; }
+
+        private void InitializeComponent()
         {
             this.ServiceName = "jobsService";
             this.CanStop = true;
@@ -32,15 +36,22 @@ namespace VitalChoice.Jobs
 		{
             try
             {
-                _container = Program.Host.Services;
+                Host = new WebHostBuilder()
+                    .UseContentRoot(Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]))
+                    .UseStartup<Startup>()
+                    .Build();
+
+                Host.Start();
+
+                _container = Host.Services;
                 var factory = _container.GetRequiredService<ILoggerFactory>();
                 _logger = factory.CreateLogger<JobWindowsService>();
                 _scheduler = _container.GetRequiredService<IScheduler>();
             }
             catch (Exception e)
             {
-                Trace.WriteLine(e.Message, "Error");
-                _logger.LogCritical(e.Message, e);
+                EventLog.WriteEntry(e.ToString(), EventLogEntryType.Error);
+                throw;
             }
             InitializeComponent();
 		}
@@ -49,26 +60,35 @@ namespace VitalChoice.Jobs
 	    {
 	        base.OnStart(args);
 	        RequestAdditionalTime(30000);
-	        Trace.WriteLine("Jobs service started initialization");
-            _logger.LogWarning("Scheduler start");
-            var conf = _container.GetRequiredService<IOptions<AppOptions>>().Value;
-            var jobImpls = _container.GetRequiredService<IEnumerable<IJob>>();
-            foreach (var impl in jobImpls)
-            {
-                var type = impl.GetType();
-                var job = JobBuilder.Create(type).WithIdentity(type.FullName).Build();
+	        EventLog.WriteEntry("Jobs service started initialization", EventLogEntryType.Information);
+	        try
+	        {
+                _logger.LogWarning("Jobs init");
+                var conf = _container.GetRequiredService<IOptions<AppOptions>>().Value;
+	            var jobImpls = _container.GetServices<IJob>();
+	            foreach (var impl in jobImpls)
+	            {
+	                var type = impl.GetType();
+	                EventLog.WriteEntry($"{type} init", EventLogEntryType.Information);
+                    var job = JobBuilder.Create(type).WithIdentity(type.FullName).Build();
 
-                var trigger = TriggerBuilder.Create()
-                    .WithIdentity(type.FullName)
-                    .WithCronSchedule(conf.JobSettings.Schedules[type.Name])
-                    .StartNow()
-                    .Build();
+	                var trigger = TriggerBuilder.Create()
+	                    .WithIdentity(type.FullName)
+	                    .WithCronSchedule(conf.JobSettings.Schedules[type.Name])
+	                    .StartNow()
+	                    .Build();
 
-                _scheduler.ScheduleJob(job, trigger);
-            }
+	                _scheduler.ScheduleJob(job, trigger);
+	            }
 
-            _scheduler.Start();
-            Trace.WriteLine("Jobs service operating normally");
+	            _scheduler.Start();
+	            EventLog.WriteEntry("Jobs service operating normally", EventLogEntryType.Information);
+	        }
+	        catch (Exception e)
+	        {
+	            _logger.LogError(e.ToString());
+	            EventLog.WriteEntry($"Jobs service started with errors:\n{e}", EventLogEntryType.Error);
+	        }
 	    }
 
 	    protected override void OnStop()
@@ -78,8 +98,8 @@ namespace VitalChoice.Jobs
             var task = Task.Factory.StartNew(() =>
             {
                 _scheduler.Shutdown(true);
-                Program.Host.Dispose();
-                Trace.WriteLine("Jobs service stopped");
+                Host.Dispose();
+                EventLog.WriteEntry("Jobs service stopped", EventLogEntryType.Information);
             });
             RequestAdditionalTime(timeout);
             while (!task.Wait(timeout))

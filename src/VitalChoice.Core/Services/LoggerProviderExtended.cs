@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Threading;
 using System.Xml;
 using Antlr4.Runtime.Misc;
 using Microsoft.AspNetCore.Hosting;
@@ -10,12 +11,40 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.Infrastructure.Domain.Options;
 using NLog;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Interfaces.Services;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace VitalChoice.Core.Services
 {
+    public class CustomFactory : ILoggerFactory
+    {
+        private readonly ILoggerFactory _initial;
+        private readonly IHostingEnvironment _env;
+
+        public CustomFactory(ILoggerFactory initial, IHostingEnvironment env)
+        {
+            _initial = initial;
+            _env = env;
+        }
+
+        public void Dispose()
+        {
+            _initial.Dispose();
+        }
+
+        public ILogger CreateLogger(string categoryName)
+        {
+            return _initial.CreateLogger($"{_env.ApplicationName}::{categoryName ?? string.Empty}");
+        }
+
+        public void AddProvider(ILoggerProvider provider)
+        {
+            _initial.AddProvider(provider);
+        }
+    }
+
     public static class NLogLoggerFactoryExtensions
     {
         public static ILoggerFactory AddNLog(
@@ -104,7 +133,6 @@ namespace VitalChoice.Core.Services
 
     public class LoggerProviderExtended : ILoggerProviderExtended
     {
-        private readonly IHostingEnvironment _env;
         private readonly ILoggerFactory _factory;
 
         //private readonly Dictionary<string, ILogger> _loggers = new Dictionary<string, ILogger>();
@@ -113,10 +141,9 @@ namespace VitalChoice.Core.Services
 
         public LoggerProviderExtended(IHostingEnvironment env)
         {
-            _env = env;
             string basePath = env.ContentRootPath;
             string logPath = env.ContentRootPath;
-            _factory = new LoggerFactory();
+            _factory = new CustomFactory(new LoggerFactory(), env);
             int backLevelCount = 0;
             var searchPath = basePath;
             while (!File.Exists(searchPath + @"\nlog.config") && backLevelCount <= 5)
@@ -138,7 +165,7 @@ namespace VitalChoice.Core.Services
             }
             else
             {
-                _factory.AddNLog(new NLog.LogFactory(new NLog.Config.LoggingConfiguration()));
+                throw new ApiException($"Cannot locate nlog.config in {basePath + @"\nlog.config"}");
             }
         }
 
@@ -151,7 +178,7 @@ namespace VitalChoice.Core.Services
 
         public ILogger CreateLogger(Type type)
         {
-            return CreateLogger($"{_env.ApplicationName}::{type?.FullName ?? string.Empty}");
+            return CreateLogger(type?.FullName ?? string.Empty);
         }
 
         public ILogger<T> CreateLogger<T>()

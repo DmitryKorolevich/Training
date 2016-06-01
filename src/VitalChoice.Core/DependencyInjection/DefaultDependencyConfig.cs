@@ -207,7 +207,7 @@ namespace VitalChoice.Core.DependencyInjection
                 .As<ILoggerProviderExtended>()
                 .As<ILoggerProvider>()
                 .SingleInstance();
-            builder.Register(cc => cc.Resolve<ILoggerProviderExtended>().Factory).As<ILoggerFactory>();
+            builder.Register(cc => cc.Resolve<ILoggerProviderExtended>().Factory).As<ILoggerFactory>().SingleInstance();
 
             //TODO: omit ILogger override in config parameter
             builder.Register((cc, pp) => cc.Resolve<ILoggerProviderExtended>().CreateLogger("Root")).As<ILogger>();
