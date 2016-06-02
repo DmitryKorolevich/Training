@@ -1,3 +1,60 @@
+USE [VitalChoice.Ecommerce]
+
+--============================ Wipe Customers ====================================
+DELETE FROM AffiliateOrderPayments
+DELETE FROM CartToSkus
+DELETE FROM Carts
+DELETE FROM OrderToSkus
+DELETE FROM RefundOrderToGiftCertificates
+DELETE FROM CartToGiftCertificates
+DELETE FROM OrderToGiftCertificates
+UPDATE GiftCertificates
+SET IdOrder = NULL
+DELETE FROM HealthwiseOrders
+DELETE FROM HelpTicketComments
+DELETE FROM HelpTickets
+DELETE FROM RefundSkus
+DELETE FROM ReshipProblemSkus
+DELETE FROM OrderToPromos
+DELETE FROM OrderOptionValues
+DELETE FROM Orders
+DELETE FROM OrderPaymentMethodOptionValues
+DELETE FROM OrderPaymentMethods
+DELETE FROM OrderAddressOptionValues
+DELETE FROM OrderAddresses
+DELETE FROM CustomerToShippingAddresses
+DELETE FROM CustomersToPaymentMethods
+DELETE FROM CustomersToOrderNotes
+DELETE FROM CustomerPaymentMethodValues
+DELETE FROM CustomerPaymentMethods
+DELETE FROM CustomerNoteOptionValues
+DELETE FROM CustomerNotes
+DELETE FROM OneTimeDiscountToCustomerUsages
+DELETE FROM HealthwisePeriods
+DELETE FROM BigStringValues
+WHERE IdBigString IN (SELECT cv.IdBigString FROM CustomerOptionValues AS cv WHERE cv.IdBigString IS NOT NULL)
+DELETE FROM CustomerOptionValues
+DELETE FROM CustomerFiles
+DELETE FROM Customers
+DELETE FROM AddressOptionValues
+DELETE FROM Addresses
+DELETE FROM Users WHERE Id IN (SELECT id FROM [VitalChoice.Infrastructure].dbo.AspNetUsers WHERE IdUserType = 2)
+GO
+USE [VitalChoice.Infrastructure]
+GO
+DELETE FROM AspNetUserClaims
+WHERE UserId IN (SELECT id FROM AspNetUsers WHERE IdUserType = 2)
+GO
+DELETE FROM AspNetUserLogins
+WHERE UserId IN (SELECT id FROM AspNetUsers WHERE IdUserType = 2)
+GO
+DELETE FROM AspNetUserRoles
+WHERE UserId IN (SELECT id FROM AspNetUsers WHERE IdUserType = 2)
+GO
+DELETE FROM AspNetUsers
+WHERE IdUserType = 2
+GO
+
 --wipe out affiliates
 
 USE [VitalChoice.Ecommerce]
@@ -5,17 +62,19 @@ GO
 
 DELETE FROM [VitalChoice.Ecommerce].dbo.Users WHERE Id > 1500
 
+DELETE FROM Users WHERE Id IN (SELECT id FROM [VitalChoice.Infrastructure].dbo.AspNetUsers WHERE IdUserType = 3)
+
 DELETE FROM [VitalChoice.Infrastructure].dbo.AspNetUserClaims
-WHERE UserId IN (SELECT Id FROM [VitalChoice.Ecommerce].dbo.Affiliates)
+WHERE UserId IN (SELECT Id FROM [VitalChoice.Infrastructure].dbo.AspNetUsers WHERE IdUserType = 3)
 
 DELETE FROM [VitalChoice.Infrastructure].dbo.AspNetUserLogins
-WHERE UserId IN (SELECT Id FROM [VitalChoice.Ecommerce].dbo.Affiliates)
+WHERE UserId IN (SELECT Id FROM [VitalChoice.Infrastructure].dbo.AspNetUsers WHERE IdUserType = 3)
 
 DELETE FROM [VitalChoice.Infrastructure].dbo.AspNetUserRoles
-WHERE UserId IN (SELECT Id FROM [VitalChoice.Ecommerce].dbo.Affiliates)
+WHERE UserId IN (SELECT Id FROM [VitalChoice.Infrastructure].dbo.AspNetUsers WHERE IdUserType = 3)
 
 DELETE FROM [VitalChoice.Infrastructure].dbo.AspNetUsers
-WHERE Id IN (SELECT Id FROM [VitalChoice.Ecommerce].dbo.Affiliates)
+WHERE IdUserType = 3
 
 DELETE FROM [VitalChoice.Ecommerce].dbo.Users
 WHERE Id IN (SELECT Id FROM [VitalChoice.Ecommerce].dbo.Affiliates)
@@ -36,13 +95,381 @@ DELETE FROM [VitalChoice.Ecommerce].dbo.Affiliates
 
 GO
 
-ALTER TABLE [VitalChoice.Ecommerce].dbo.Affiliates
-DROP COLUMN IdOld
+DELETE FROM [VitalChoice.Infrastructure].dbo.AspNetUserRoles WHERE UserId < 1000
+DELETE FROM [VitalChoice.Infrastructure].dbo.AdminProfiles WHERE Id < 1000
+DELETE FROM [VitalChoice.Infrastructure].dbo.AspNetUsers WHERE Id < 1000
+DELETE FROM [VitalChoice.Ecommerce].dbo.Users WHERE Id < 1000
+
 GO
 
-ALTER TABLE [VitalChoice.Ecommerce].dbo.Affiliates
-ADD IdOld INT NULL
+USE [VitalChoice.Ecommerce]
+
 GO
+
+DELETE FROM CatalogRequestAddressOptionValues
+DELETE FROM CatalogRequestAddresses
+DELETE FROM States
+DELETE FROM Countries
+
+INSERT INTO Countries
+(CountryCode, CountryName, [Order], StatusCode)
+SELECT c.countryCode, c.countryName, ROW_NUMBER() OVER(ORDER BY c.countryCode), 2 FROM [vitalchoice2.0].dbo.countries AS c
+
+INSERT INTO States
+(CountryCode, StateCode, StateName, StatusCode, [Order])
+SELECT c.pcCountryCode, c.stateCode, c.stateName, 2, ROW_NUMBER() OVER(ORDER BY c.stateCode) FROM [vitalchoice2.0].dbo.states AS c
+INNER JOIN Countries AS cc ON cc.CountryCode = c.pcCountryCode COLLATE Cyrillic_General_CI_AS
+
+INSERT INTO Countries
+(CountryCode, CountryName, [Order], StatusCode)
+SELECT CASE WHEN c.countryName = 'Taiwan' THEN 'TW' ELSE c.countryCode END, c.countryName, ROW_NUMBER() OVER(ORDER BY c.countryCode), 1 FROM [vitalchoice2.0].dbo.countriesCSPortal AS c
+WHERE c.countryCode NOT IN (SELECT cc.countryCode FROM [vitalchoice2.0].dbo.countries AS cc)
+
+INSERT INTO States
+(CountryCode, StateCode, StateName, StatusCode, [Order])
+SELECT c.pcCountryCode, c.stateCode, c.stateName, 1, ROW_NUMBER() OVER(ORDER BY c.stateCode) FROM [vitalchoice2.0].dbo.statesCSPortal AS c
+INNER JOIN Countries AS cc ON cc.CountryCode = c.pcCountryCode COLLATE Cyrillic_General_CI_AS
+WHERE c.pcCountryCode NOT IN (SELECT s.pcCountryCode FROM [vitalchoice2.0].dbo.states AS s)
+
+GO
+
+--============================ Move all admin users to lower id space (from 1) ====================================
+DECLARE @aspnetUsers TABLE (
+	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	[IdOld] INT NOT NULL,
+	[PublicId] [uniqueidentifier] NOT NULL,
+	[AccessFailedCount] [int] NOT NULL,
+	[ConcurrencyStamp] [nvarchar](255) NULL,
+	[Email] [nvarchar](100) NOT NULL,
+	[EmailConfirmed] [bit] NOT NULL,
+	[UserName] [nvarchar](100) NULL,
+	[FirstName] [nvarchar](100) NOT NULL,
+	[LastName] [nvarchar](100) NOT NULL,
+	[Status] [tinyint] NOT NULL,
+	[LockoutEnabled] [bit] NOT NULL,
+	[LockoutEnd] [datetimeoffset](7) NULL,
+	[NormalizedEmail] [nvarchar](100) NOT NULL,
+	[NormalizedUserName] [nvarchar](100) NULL,
+	[PasswordHash] [nvarchar](255) NULL,
+	[PhoneNumber] [nvarchar](100) NULL,
+	[PhoneNumberConfirmed] [bit] NOT NULL,
+	[LastLoginDate] [datetime2](7) NULL,
+	[CreateDate] [datetime2](7) NOT NULL,
+	[UpdatedDate] [datetime2](7) NOT NULL,
+	[DeletedDate] [datetime2](7) NULL,
+	[SecurityStamp] [nvarchar](255) NULL,
+	[TwoFactorEnabled] [bit] NOT NULL,
+	[ConfirmationToken] [uniqueidentifier] NOT NULL,
+	[TokenExpirationDate] [datetime2](7) NOT NULL,
+	[IsConfirmed] [bit] NOT NULL,
+	[IdUserType] [int] NOT NULL
+)
+
+DECLARE @aspnetuserroles TABLE (
+	[UserId] [int] NOT NULL,
+	[RoleId] [int] NOT NULL)
+
+INSERT INTO @aspnetUsers
+(
+	IdOld, 
+	PublicId, 
+	[AccessFailedCount], 
+	[ConcurrencyStamp], 
+	[Email], 
+	[EmailConfirmed], 
+	[UserName], 
+	[FirstName], 
+	[LastName], 
+	[Status], 
+	[LockoutEnabled], 
+	[LockoutEnd], 
+	[NormalizedEmail], 
+	[NormalizedUserName], 
+	[PasswordHash], 
+	[PhoneNumber], 
+	[PhoneNumberConfirmed],
+	[LastLoginDate],
+	[CreateDate],
+	[UpdatedDate],
+	[DeletedDate],
+	[SecurityStamp],
+	[TwoFactorEnabled],
+	[ConfirmationToken],
+	[TokenExpirationDate],
+	[IsConfirmed],
+	[IdUserType]
+)
+SELECT * FROM [VitalChoice.Infrastructure].dbo.AspNetUsers
+WHERE IdUserType = 1
+
+INSERT INTO @aspnetuserroles
+(RoleId, UserId)
+SELECT RoleId, u.Id FROM [VitalChoice.Infrastructure].dbo.AspNetUserRoles AS r
+INNER JOIN @aspnetUsers AS u ON u.IdOld = r.UserId
+
+UPDATE [VitalChoice.Infrastructure].dbo.AspNetUsers
+SET PublicId = NEWID()
+WHERE IdUserType = 1
+
+SET IDENTITY_INSERT [VitalChoice.Infrastructure].dbo.AspNetUsers ON;
+
+INSERT INTO [VitalChoice.Infrastructure].dbo.AspNetUsers
+(
+	Id, 
+	PublicId, 
+	[AccessFailedCount], 
+	[ConcurrencyStamp], 
+	[Email], 
+	[EmailConfirmed], 
+	[UserName], 
+	[FirstName], 
+	[LastName], 
+	[Status], 
+	[LockoutEnabled], 
+	[LockoutEnd], 
+	[NormalizedEmail], 
+	[NormalizedUserName], 
+	[PasswordHash], 
+	[PhoneNumber], 
+	[PhoneNumberConfirmed],
+	[LastLoginDate],
+	[CreateDate],
+	[UpdatedDate],
+	[DeletedDate],
+	[SecurityStamp],
+	[TwoFactorEnabled],
+	[ConfirmationToken],
+	[TokenExpirationDate],
+	[IsConfirmed],
+	[IdUserType]
+)
+SELECT 
+	Id, 
+	PublicId, 
+	[AccessFailedCount], 
+	[ConcurrencyStamp], 
+	[Email], 
+	[EmailConfirmed], 
+	[UserName], 
+	[FirstName], 
+	[LastName], 
+	[Status], 
+	[LockoutEnabled], 
+	[LockoutEnd], 
+	[NormalizedEmail], 
+	[NormalizedUserName], 
+	[PasswordHash], 
+	[PhoneNumber], 
+	[PhoneNumberConfirmed],
+	[LastLoginDate],
+	[CreateDate],
+	[UpdatedDate],
+	[DeletedDate],
+	[SecurityStamp],
+	[TwoFactorEnabled],
+	[ConfirmationToken],
+	[TokenExpirationDate],
+	[IsConfirmed],
+	[IdUserType] 
+FROM @aspnetUsers
+
+SET IDENTITY_INSERT [VitalChoice.Infrastructure].dbo.AspNetUsers OFF
+
+INSERT INTO [VitalChoice.Infrastructure].dbo.AspNetUserRoles
+(RoleId, UserId)
+SELECT RoleId, UserId FROM @aspnetuserroles
+
+UPDATE [VitalChoice.Infrastructure].dbo.AdminProfiles
+SET Id = u.Id
+FROM [VitalChoice.Infrastructure].dbo.AdminProfiles AS a
+INNER JOIN @aspnetUsers AS u ON u.IdOld = a.Id
+
+UPDATE [VitalChoice.Infrastructure].dbo.BugTickets
+SET IdAddedBy = u.Id
+FROM [VitalChoice.Infrastructure].dbo.BugTickets AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdAddedBy
+
+UPDATE [VitalChoice.Infrastructure].dbo.BugTickets
+SET IdEditedBy = u.Id
+FROM [VitalChoice.Infrastructure].dbo.BugTickets AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdEditedBy
+
+UPDATE [VitalChoice.Infrastructure].dbo.BugTicketComments
+SET IdEditedBy = u.Id
+FROM [VitalChoice.Infrastructure].dbo.BugTicketComments AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdEditedBy
+
+UPDATE [VitalChoice.Infrastructure].dbo.ContentAreas
+SET IdEditedBy = u.Id
+FROM [VitalChoice.Infrastructure].dbo.ContentAreas AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdEditedBy
+
+UPDATE [VitalChoice.Infrastructure].dbo.CustomPublicStyles
+SET IdEditedBy = u.Id
+FROM [VitalChoice.Infrastructure].dbo.CustomPublicStyles AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdEditedBy
+
+UPDATE [VitalChoice.Infrastructure].dbo.MasterContentItems
+SET UserId = u.Id
+FROM [VitalChoice.Infrastructure].dbo.MasterContentItems AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.UserId
+
+UPDATE [VitalChoice.Infrastructure].dbo.MasterContentItems
+SET UserId = u.Id
+FROM [VitalChoice.Infrastructure].dbo.MasterContentItems AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.UserId
+
+UPDATE [VitalChoice.Infrastructure].dbo.Articles
+SET UserId = u.Id
+FROM [VitalChoice.Infrastructure].dbo.Articles AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.UserId
+
+UPDATE [VitalChoice.Infrastructure].dbo.ContentCategories
+SET UserId = u.Id
+FROM [VitalChoice.Infrastructure].dbo.ContentCategories AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.UserId
+
+UPDATE [VitalChoice.Infrastructure].dbo.ContentPages
+SET UserId = u.Id
+FROM [VitalChoice.Infrastructure].dbo.ContentPages AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.UserId
+
+UPDATE [VitalChoice.Infrastructure].dbo.EmailTemplates
+SET UserId = u.Id
+FROM [VitalChoice.Infrastructure].dbo.EmailTemplates AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.UserId
+
+UPDATE [VitalChoice.Infrastructure].dbo.FAQs
+SET UserId = u.Id
+FROM [VitalChoice.Infrastructure].dbo.FAQs AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.UserId
+
+UPDATE [VitalChoice.Infrastructure].dbo.ProductCategories
+SET UserId = u.Id
+FROM [VitalChoice.Infrastructure].dbo.ProductCategories AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.UserId
+
+UPDATE [VitalChoice.Infrastructure].dbo.Recipes
+SET UserId = u.Id
+FROM [VitalChoice.Infrastructure].dbo.Recipes AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.UserId
+
+UPDATE [VitalChoice.Infrastructure].dbo.Redirects
+SET IdAddedBy = u.Id
+FROM [VitalChoice.Infrastructure].dbo.Redirects AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdAddedBy
+
+UPDATE [VitalChoice.Infrastructure].dbo.Redirects
+SET IdEditedBy = u.Id
+FROM [VitalChoice.Infrastructure].dbo.Redirects AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdEditedBy
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.Users
+(Id)
+SELECT Id FROM @aspnetUsers
+
+UPDATE [VitalChoice.Ecommerce].dbo.Addresses
+SET IdEditedBy = u.Id
+FROM [VitalChoice.Ecommerce].dbo.Addresses AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdEditedBy
+
+UPDATE [VitalChoice.Ecommerce].dbo.CustomerTypes
+SET IdEditedBy = u.Id
+FROM [VitalChoice.Ecommerce].dbo.CustomerTypes AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdEditedBy
+
+UPDATE [VitalChoice.Ecommerce].dbo.InventorySkus
+SET IdEditedBy = u.Id
+FROM [VitalChoice.Ecommerce].dbo.InventorySkus AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdEditedBy
+
+UPDATE [VitalChoice.Ecommerce].dbo.Discounts
+SET IdEditedBy = u.Id
+FROM [VitalChoice.Ecommerce].dbo.Discounts AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdEditedBy
+
+UPDATE [VitalChoice.Ecommerce].dbo.Discounts
+SET IdAddedBy = u.Id
+FROM [VitalChoice.Ecommerce].dbo.Discounts AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdAddedBy
+
+UPDATE [VitalChoice.Ecommerce].dbo.Promotions
+SET IdAddedBy = u.Id
+FROM [VitalChoice.Ecommerce].dbo.Promotions AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdAddedBy
+
+UPDATE [VitalChoice.Ecommerce].dbo.Promotions
+SET IdEditedBy = u.Id
+FROM [VitalChoice.Ecommerce].dbo.Promotions AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdEditedBy
+
+UPDATE [VitalChoice.Ecommerce].dbo.OrderAddresses
+SET IdEditedBy = u.Id
+FROM [VitalChoice.Ecommerce].dbo.OrderAddresses AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdEditedBy
+
+UPDATE [VitalChoice.Ecommerce].dbo.OrderNotes
+SET IdEditedBy = u.Id
+FROM [VitalChoice.Ecommerce].dbo.OrderNotes AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdEditedBy
+
+UPDATE [VitalChoice.Ecommerce].dbo.PaymentMethods
+SET IdEditedBy = u.Id
+FROM [VitalChoice.Ecommerce].dbo.PaymentMethods AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdEditedBy
+
+UPDATE [VitalChoice.Ecommerce].dbo.Customers
+SET IdEditedBy = u.Id
+FROM [VitalChoice.Ecommerce].dbo.Customers AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdEditedBy
+
+UPDATE [VitalChoice.Ecommerce].dbo.CustomerPaymentMethods
+SET IdEditedBy = u.Id
+FROM [VitalChoice.Ecommerce].dbo.CustomerPaymentMethods AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdEditedBy
+
+UPDATE [VitalChoice.Ecommerce].dbo.CustomerNotes
+SET IdEditedBy = u.Id
+FROM [VitalChoice.Ecommerce].dbo.CustomerNotes AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdEditedBy
+
+UPDATE [VitalChoice.Ecommerce].dbo.OrderPaymentMethods
+SET IdEditedBy = u.Id
+FROM [VitalChoice.Ecommerce].dbo.OrderPaymentMethods AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdEditedBy
+
+UPDATE [VitalChoice.Ecommerce].dbo.OrderPaymentMethods
+SET IdEditedBy = u.Id
+FROM [VitalChoice.Ecommerce].dbo.OrderPaymentMethods AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdEditedBy
+
+UPDATE [VitalChoice.Ecommerce].dbo.Orders
+SET IdEditedBy = u.Id
+FROM [VitalChoice.Ecommerce].dbo.Orders AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdEditedBy
+
+UPDATE [VitalChoice.Ecommerce].dbo.Products
+SET IdEditedBy = u.Id
+FROM [VitalChoice.Ecommerce].dbo.Products AS b
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdEditedBy
+
+DELETE FROM [VitalChoice.Infrastructure].dbo.AspNetUserRoles
+WHERE UserId IN (
+	SELECT Id FROM [VitalChoice.Infrastructure].dbo.AspNetUsers
+	WHERE IdUserType = 1 AND Id NOT IN (SELECT Id FROM @aspnetUsers)
+)
+
+DELETE FROM [VitalChoice.Ecommerce].dbo.Users
+WHERE Id IN (
+	SELECT Id FROM [VitalChoice.Infrastructure].dbo.AspNetUsers
+	WHERE IdUserType = 1 AND Id NOT IN (SELECT Id FROM @aspnetUsers)
+)
+
+DELETE FROM [VitalChoice.Infrastructure].dbo.AspNetUsers
+WHERE IdUserType = 1 AND Id NOT IN (SELECT Id FROM @aspnetUsers)
+
+GO
+
 
 USE [vitalchoice2.0]
 GO
@@ -64,7 +491,7 @@ BEGIN
 
 	DECLARE src CURSOR FOR
 	SELECT a.'+@sourceColumnName+N', p.Id FROM affiliates AS a
-	INNER JOIN [VitalChoice.Ecommerce].dbo.affiliates AS p ON p.IdOld = a.idAffiliate
+	INNER JOIN [VitalChoice.Ecommerce].dbo.affiliates AS p ON p.Id = a.idAffiliate
 	WHERE ('+@sourceCondition+N') AND a.'+@sourceColumnName+N' IS NOT NULL AND a.'+@sourceColumnName+N' <> N''''
 
 	SELECT TOP 1 @fieldType = Id FROM [VitalChoice.Ecommerce].dbo.AffiliateOptionTypes WHERE Name = N'''+@destFieldName+N''' 
@@ -105,7 +532,7 @@ BEGIN
 
 	DECLARE src CURSOR FOR
 	SELECT a.'+@sourceColumnName+N', p.Id FROM affiliates AS a
-	INNER JOIN [VitalChoice.Ecommerce].dbo.affiliates AS p ON p.IdOld = a.idAffiliate
+	INNER JOIN [VitalChoice.Ecommerce].dbo.affiliates AS p ON p.Id = a.idAffiliate
 	WHERE a.'+@sourceColumnName+N' IS NOT NULL AND a.'+@sourceColumnName+N' <> N''''
 
 	SELECT TOP 1 @fieldType = Id FROM [VitalChoice.Ecommerce].dbo.AffiliateOptionTypes WHERE Name = N'''+@destFieldName+N''' 
@@ -158,7 +585,7 @@ BEGIN TRY
 		SET @sql = N'INSERT INTO [VitalChoice.Ecommerce].dbo.AffiliateOptionValues
 		(IdOptionType, IdAffiliate, Value)
 		SELECT t.Id, p.Id, a.'+@sourceFieldName+' FROM [VitalChoice.Ecommerce].dbo.Affiliates AS p
-		INNER JOIN [vitalchoice2.0].[dbo].affiliates AS a ON a.IdAffiliate = p.IdOld
+		INNER JOIN [vitalchoice2.0].[dbo].affiliates AS a ON a.IdAffiliate = p.Id
 		INNER JOIN [VitalChoice.Ecommerce].dbo.AffiliateOptionTypes AS t ON t.Name = N'''+@destFieldName+'''
 		WHERE a.'+@sourceFieldName+' IS NOT NULL AND ('+ISNULL(@sourceConditions, '1=1')+')';
 
@@ -167,7 +594,7 @@ BEGIN TRY
 		SET @sql = N'INSERT INTO [VitalChoice.Ecommerce].dbo.AffiliateOptionValues
 		(IdOptionType, IdAffiliate, Value)
 		SELECT t.Id, p.Id, '+@fieldOperation+' FROM [VitalChoice.Ecommerce].dbo.Affiliates AS p
-		INNER JOIN [vitalchoice2.0].[dbo].affiliates AS a ON a.IdAffiliate = p.IdOld
+		INNER JOIN [vitalchoice2.0].[dbo].affiliates AS a ON a.IdAffiliate = p.Id
 		INNER JOIN [VitalChoice.Ecommerce].dbo.AffiliateOptionTypes AS t ON t.Name = N'''+@destFieldName+'''
 		WHERE a.'+@sourceFieldName+' IS NOT NULL AND ('+ISNULL(@sourceConditions, '1=1')+')';
 
@@ -184,14 +611,10 @@ END
 GO
 --============================ Insert Base Users and Customers Entity ====================================
 
-ALTER TABLE [VitalChoice.Infrastructure].dbo.AspNetUsers
-ADD IdOld INT NULL
-GO
-
-DECLARE @affiliates TABLE(Id INT NOT NULL, IdOld INT NOT NULL)
+SET IDENTITY_INSERT [VitalChoice.Infrastructure].dbo.AspNetUsers ON
 
 INSERT INTO [VitalChoice.Infrastructure].dbo.AspNetUsers
-(IdOld,
+(Id,
 PublicId, 
 Email, 
 NormalizedEmail, 
@@ -212,7 +635,6 @@ TokenExpirationDate,
 IsConfirmed, 
 IdUserType,
 AccessFailedCount)
-OUTPUT inserted.Id, inserted.idOld INTO @affiliates
 SELECT 
 	aff.idAffiliate,
 	NEWID(), 
@@ -237,28 +659,32 @@ SELECT
 	0
 FROM [vitalchoice2.0].dbo.affiliates AS aff
 
+SET IDENTITY_INSERT [VitalChoice.Infrastructure].dbo.AspNetUsers OFF
+
+GO
+
+ALTER TABLE [VitalChoice.Ecommerce].dbo.Affiliates
+DROP COLUMN IdOld
+
+GO
+
 INSERT INTO [VitalChoice.Ecommerce].dbo.Affiliates
-(Id, DateCreated, DateEdited, County, CommissionAll, CommissionFirst, Email, IdCountry, IdState, MyAppBalance, Name, StatusCode, IdOld)
+(Id, DateCreated, DateEdited, County, CommissionAll, CommissionFirst, Email, IdCountry, IdState, MyAppBalance, Name, StatusCode)
 SELECT 
-	aff.Id,
+	a.idAffiliate,
 	ISNULL(CAST(a.joinDate AS DATETIME), GETDATE()), 
 	ISNULL(CAST(a.lastUpdated AS DATETIME), GETDATE()), 
 	a.affiliateState, 
 	a.commission, 
 	a.commission2, 
 	a.affiliateEmail, 
-	ISNULL((SELECT TOP 1 c.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS c WHERE c.CountryCode COLLATE SQL_Latin1_General_CP1_CI_AS = a.affiliatecountryCode), N'1'), 
-	ISNULL((SELECT TOP 1 s.Id FROM [VitalChoice.Ecommerce].dbo.States AS s WHERE s.CountryCode COLLATE SQL_Latin1_General_CP1_CI_AS = a.affiliatecountryCode AND s.StateCode COLLATE SQL_Latin1_General_CP1_CI_AS = a.affiliateState), N'1'), 
+	ISNULL((SELECT TOP 1 c.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS c WHERE c.CountryCode COLLATE SQL_Latin1_General_CP1_CI_AS = a.affiliatecountryCode), (SELECT TOP 1 c.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS c WHERE c.CountryCode = 'US')), 
+	(SELECT TOP 1 s.Id FROM [VitalChoice.Ecommerce].dbo.States AS s WHERE s.CountryCode COLLATE SQL_Latin1_General_CP1_CI_AS = a.affiliatecountryCode AND s.StateCode COLLATE SQL_Latin1_General_CP1_CI_AS = a.affiliateState), 
 	a.ComissionsAmount, 
 	a.affiliateName, 
-	CASE WHEN a.pcaff_Active <> 0 THEN 2 ELSE 1 END,
-	a.idAffiliate
+	CASE WHEN a.pcaff_Active <> 0 THEN 2 ELSE 1 END
 FROM [vitalchoice2.0].dbo.affiliates AS a
-INNER JOIN @affiliates AS aff ON aff.IdOld = a.idAffiliate
 
-GO
-ALTER TABLE [VitalChoice.Infrastructure].dbo.AspNetUsers
-DROP COLUMN IdOld
 GO
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.Users
@@ -301,5 +727,330 @@ INSERT INTO [VitalChoice.Infrastructure].dbo.AspNetUserRoles
 (RoleId, UserId)
  SELECT 8, Id 
  FROM [VitalChoice.Ecommerce].dbo.Affiliates
+
+GO
+
+
+USE [vitalchoice2.0]
+
+--============================ Insert Base Users and Customers Entity ====================================
+
+ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
+ADD IdCustomer INT NOT NULL CONSTRAINT UQ_Customers UNIQUE
+GO
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.Addresses
+(DateCreated, DateEdited, IdCountry, IdState, StatusCode, IdObjectType, County, IdCustomer)
+SELECT 
+	ISNULL(pcCust_DateCreated, GETDATE()), 
+	ISNULL(lastEditDate, ISNULL(pcCust_DateCreated, GETDATE())),
+	ISNULL (
+		(SELECT TOP 1 cn.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS cn WHERE cn.CountryCode = ISNULL(c.countryCode COLLATE Cyrillic_General_CI_AS, 'US')), 
+		(SELECT TOP 1 cn.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS cn WHERE cn.CountryCode = 'US')
+	),
+	(SELECT TOP 1 s.Id FROM [VitalChoice.Ecommerce].dbo.States AS s WHERE s.CountryCode = ISNULL(c.countryCode COLLATE Cyrillic_General_CI_AS, 'US') AND s.StateCode = c.stateCode COLLATE Cyrillic_General_CI_AS),
+	2,
+	1,
+	c.[state],
+	c.idcustomer
+FROM [vitalchoice2.0].dbo.customers AS c
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.Users
+(Id)
+SELECT idCustomer FROM customers
+	
+INSERT INTO [VitalChoice.Ecommerce].dbo.Customers
+(Id, DateCreated, DateEdited, Email, IdObjectType, StatusCode, IdDefaultPaymentMethod, PublicId, IdAffiliate, IdProfileAddress)
+SELECT 
+c.idCustomer, 
+ISNULL(c.pcCust_DateCreated, GETDATE()), 
+ISNULL(c.lastEditDate, ISNULL(c.pcCust_DateCreated, GETDATE())), 
+ISNULL(c.email, 'invalid@e.com'), 
+CASE WHEN customerType = 0 THEN 1 WHEN customerType = 1 THEN 2 ELSE 1 END, 
+CASE WHEN pcCust_Guest = 1 THEN 3 ELSE CASE WHEN [suspend] = 1 THEN CASE WHEN c.email IS NULL THEN 2 ELSE 1 END ELSE 2 END END, 1, 
+NEWID(),
+a.Id,
+addr.Id
+FROM customers AS c
+INNER JOIN [VitalChoice.Ecommerce].dbo.Addresses AS addr ON addr.IdCustomer = c.idcustomer
+LEFT JOIN [VitalChoice.Ecommerce].dbo.Affiliates AS a ON a.Id = c.idAffiliate
+GO
+
+ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
+DROP CONSTRAINT UQ_Customers
+
+ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
+DROP COLUMN IdCustomer
+--============================ Insert Fields ====================================
+
+DECLARE @fieldType INT, @lookupId INT
+
+SELECT TOP 1 @fieldType = Id FROM [VitalChoice.Ecommerce].dbo.CustomerOptionTypes WHERE Name = N'DoNotMail'
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerOptionValues
+(IdCustomer, IdOptionType, Value)
+SELECT idCustomer, @fieldType, N'True' 
+FROM customers 
+WHERE dnm = 1
+
+GO
+
+DECLARE @fieldType INT, @lookupId INT
+
+SELECT TOP 1 @fieldType = Id FROM [VitalChoice.Ecommerce].dbo.CustomerOptionTypes WHERE Name = N'DoNotRent'
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerOptionValues
+(IdCustomer, IdOptionType, Value)
+SELECT idCustomer, @fieldType, N'True' 
+FROM customers 
+WHERE dnr = 1
+GO
+
+DECLARE @fieldType INT, @lookupId INT
+DECLARE @SuspensionReason NVARCHAR(MAX), @IdCustomer INT
+
+DECLARE customer_reason CURSOR FOR
+SELECT reason, idcustomer FROM customers WHERE [suspend] = 1 AND reason IS NOT NULL AND reason <> '';
+
+OPEN customer_reason
+
+SELECT TOP 1 @fieldType = Id FROM [VitalChoice.Ecommerce].dbo.CustomerOptionTypes WHERE Name = N'SuspensionReason'
+
+FETCH NEXT FROM customer_reason
+INTO @SuspensionReason, @IdCustomer
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+	INSERT INTO [VitalChoice.Ecommerce].dbo.BigStringValues
+	(Value)
+	VALUES
+	(@SuspensionReason)
+
+	INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerOptionValues
+	(IdCustomer, IdOptionType, IdBigString)
+	VALUES
+	(@IdCustomer, @fieldType, SCOPE_IDENTITY())
+
+	FETCH NEXT FROM customer_reason
+	INTO @SuspensionReason, @IdCustomer
+END
+
+CLOSE customer_reason;
+DEALLOCATE customer_reason;
+
+GO
+
+DECLARE @fieldType INT, @lookupId INT
+
+SELECT TOP 1 @fieldType = Id FROM [VitalChoice.Ecommerce].dbo.CustomerOptionTypes WHERE Name = N'TaxExempt' AND IdObjectType = 2
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerOptionValues
+(IdCustomer, IdOptionType, Value)
+SELECT idCustomer, @fieldType, N'2'
+FROM customers 
+WHERE TaxExempt = 0 AND customerType = 1
+
+GO
+
+DECLARE @fieldType INT, @lookupId INT
+
+SELECT TOP 1 @fieldType = Id FROM [VitalChoice.Ecommerce].dbo.CustomerOptionTypes WHERE Name = N'Website' AND IdObjectType = 2
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerOptionValues
+(IdCustomer, IdOptionType, Value)
+SELECT idCustomer, @fieldType, website
+FROM customers 
+WHERE website IS NOT NULL AND website <> '' AND customerType = 1
+
+GO
+
+DECLARE @fieldType INT, @lookupId INT
+
+DECLARE @PromotingWebsites NVARCHAR(MAX), @IdCustomer INT
+
+DECLARE customer_promowebsites CURSOR FOR
+SELECT promowebsites, idCustomer FROM customers WHERE customerType = 1 AND promowebsites IS NOT NULL AND promowebsites <> '';
+
+OPEN customer_promowebsites
+
+SELECT TOP 1 @fieldType = Id FROM [VitalChoice.Ecommerce].dbo.CustomerOptionTypes WHERE Name = N'PromotingWebsites'
+
+FETCH NEXT FROM customer_promowebsites
+INTO @PromotingWebsites, @IdCustomer
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+	INSERT INTO [VitalChoice.Ecommerce].dbo.BigStringValues
+	(Value)
+	VALUES
+	(@PromotingWebsites)
+
+	INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerOptionValues
+	(IdCustomer, IdOptionType, IdBigString)
+	VALUES
+	(@IdCustomer, @fieldType, SCOPE_IDENTITY())
+
+	FETCH NEXT FROM customer_promowebsites
+	INTO @PromotingWebsites, @IdCustomer
+END
+
+CLOSE customer_promowebsites;
+DEALLOCATE customer_promowebsites;
+
+GO
+
+DECLARE @fieldType INT, @lookupId INT
+
+SELECT TOP 1 @fieldType = Id FROM [VitalChoice.Ecommerce].dbo.CustomerOptionTypes WHERE Name = N'InceptionDate' AND IdObjectType = 2
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerOptionValues
+(IdCustomer, IdOptionType, Value)
+SELECT c.idCustomer, @fieldType, CONVERT(NVARCHAR(250), DATEADD(hour, -5,MIN(o.orderDate)), 126)
+FROM customers AS c
+INNER JOIN orders AS o ON o.idCustomer = c.idcustomer
+WHERE o.orderStatus NOT IN (1, 5) AND c.customerType = 1
+GROUP BY c.idcustomer
+HAVING COUNT(o.idOrder) > 0
+
+GO
+
+DECLARE @fieldType INT, @lookupId INT
+
+SELECT TOP 1 @fieldType = Id FROM [VitalChoice.Ecommerce].dbo.CustomerOptionTypes WHERE Name = N'Tier' AND IdObjectType = 2
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerOptionValues
+(IdCustomer, IdOptionType, Value)
+SELECT c.idCustomer, @fieldType, CAST(c.Tier AS NVARCHAR(2))
+FROM customers AS c
+WHERE c.customerType = 1 AND c.Tier > 1
+
+GO
+
+DECLARE @fieldType INT, @lookupId INT
+
+SELECT TOP 1 @fieldType = Id, @lookupId = IdLookup FROM [VitalChoice.Ecommerce].dbo.CustomerOptionTypes WHERE Name = N'TradeClass' AND IdObjectType = 2
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerOptionValues
+(IdCustomer, IdOptionType, Value)
+SELECT c.idCustomer, @fieldType, CAST(l.Id AS NVARCHAR(3))
+FROM customers AS c
+INNER JOIN tradeCategories AS t ON t.id = c.tradeCategoryId
+INNER JOIN [VitalChoice.Ecommerce].dbo.LookupVariants AS l ON IdLookup = @lookupId AND ValueVariant = t.Name COLLATE Cyrillic_General_CI_AS
+WHERE c.customerType = 1 AND l.Id <> 1
+
+GO
+
+DECLARE @fieldType INT, @lookupId INT
+
+SELECT TOP 1 @fieldType = Id FROM [VitalChoice.Ecommerce].dbo.CustomerOptionTypes WHERE Name = N'Source'
+SELECT TOP 1 @lookupId = Id FROM [VitalChoice.Ecommerce].dbo.Lookups WHERE Name = N'OrderSources'
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerOptionValues
+(IdCustomer, IdOptionType, Value)
+SELECT c.idCustomer, @fieldType, CAST(l.Id AS NVARCHAR(3))
+FROM customers AS c
+INNER JOIN [VitalChoice.Ecommerce].dbo.LookupVariants AS l ON IdLookup = @lookupId AND ValueVariant = c.source COLLATE Cyrillic_General_CI_AS
+WHERE c.source IS NOT NULL AND c.source <> ''
+
+GO
+
+DECLARE @fieldType INT, @lookupId INT
+
+SELECT TOP 1 @fieldType = Id FROM [VitalChoice.Ecommerce].dbo.CustomerOptionTypes WHERE Name = N'SourceDetails'
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerOptionValues
+(IdCustomer, IdOptionType, Value)
+SELECT c.idCustomer, @fieldType, c.sourceDetails
+FROM customers AS c
+WHERE c.sourceDetails IS NOT NULL AND c.sourceDetails <> ''
+GO
+--============================ Move Addresses ====================================
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.AddressOptionValues
+(IdAddress, IdOptionType, Value)
+SELECT unpvt.Id, o.Id, unpvt.Value FROM
+(
+SELECT 
+	a.Id, 
+	CAST(c.address AS NVARCHAR(255)) AS Address1, 
+	c.Address2, 
+	c.name AS FirstName, 
+	c.LastName, 
+	c.customerCompany AS Company, 
+	CAST(c.City AS NVARCHAR(255)) AS City, 
+	CAST(c.Zip AS NVARCHAR(255)) AS Zip,
+	CAST(c.Phone AS NVARCHAR(255)) AS Phone,
+	CAST(c.Fax AS NVARCHAR(255)) AS Fax,
+	c.Email
+FROM [vitalchoice2.0].dbo.customers AS c
+INNER JOIN [VitalChoice.Ecommerce].dbo.Customers AS cc ON cc.Id = c.idcustomer
+INNER JOIN [VitalChoice.Ecommerce].dbo.Addresses AS a ON a.Id = cc.IdProfileAddress) p
+UNPIVOT (Value FOR Name IN 
+	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax, Email)
+)AS unpvt
+INNER JOIN [VitalChoice.Ecommerce].dbo.AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 1)
+WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> ''
+	
+GO
+DELETE FROM [VitalChoice.Ecommerce].dbo.AddressOptionValues
+WHERE Value IS NULL
+
+--============================ Insert AspNet Users ====================================
+
+SET IDENTITY_INSERT [VitalChoice.Infrastructure].dbo.AspNetUsers ON;
+
+INSERT INTO [VitalChoice.Infrastructure].dbo.AspNetUsers
+(Id, 
+PublicId, 
+Email, 
+NormalizedEmail, 
+EmailConfirmed, 
+UserName, 
+NormalizedUserName, 
+FirstName, 
+LastName,
+Status, 
+LockoutEnabled, 
+PhoneNumber, 
+PhoneNumberConfirmed, 
+CreateDate, 
+UpdatedDate, 
+TwoFactorEnabled, 
+ConfirmationToken, 
+TokenExpirationDate, 
+IsConfirmed, 
+IdUserType,
+AccessFailedCount)
+SELECT 
+	cc.Id, 
+	cc.PublicId, 
+	cc.Email, 
+	UPPER(cc.Email),  
+	1,
+	cc.Email,
+	UPPER(cc.Email),
+	ISNULL(c.name, ''),
+	ISNULL(c.lastName, ''),
+	1,
+	1,
+	c.phone,
+	0,
+	cc.DateCreated,
+	cc.DateEdited,
+	0,
+	NEWID(),
+	GETDATE(),
+	1,
+	2,
+	0
+FROM customers AS c
+INNER JOIN [VitalChoice.Ecommerce].dbo.Customers AS cc ON cc.Id = c.idcustomer
+
+SET IDENTITY_INSERT [VitalChoice.Infrastructure].dbo.AspNetUsers OFF;
+
+INSERT INTO [VitalChoice.Infrastructure].dbo.AspNetUserRoles
+(RoleId, UserId)
+SELECT CASE WHEN customerType = 0 THEN 6 WHEN customerType = 1 THEN 7 ELSE 1 END, idCustomer
+FROM customers
 
 GO
