@@ -932,14 +932,17 @@ namespace VitalChoice.Business.Services.Orders
 							standardOrder.ShippingAddress.Id = 0;
 						    standardOrder.Data.AutoShipId = autoShip.Id;
 
-							await InsertAsyncInternal(standardOrder, uow);
+							var order = await InsertAsyncInternal(standardOrder, uow);
 
 						    transaction.Commit();
 
 							Logger.LogInformation($"AutoShip {autoShip.Id} handled successfully");
 
 						    success = true;
-					    }
+
+                            var entity = await SelectEntityFirstAsync(o => o.Id == order.Id);
+                            await LogItemChanges(new[] { await DynamicMapper.FromEntityAsync(entity) });
+                        }
                         catch (Exception e)
                         {
                             Logger.LogError($"AutoShip {autoShip.Id} skipped due to error ocurred. Error: {e.Message}", e);
