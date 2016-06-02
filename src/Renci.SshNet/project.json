@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0-*",
+  "description": "Renci.SshNet",
+  "authors": [],
+  "dependencies": {
+  },
+  "frameworks": {
+    "net451": {
+      "frameworkAssemblies": {
+        "System.Xml": ""
+      }
+    }
+  }
+}

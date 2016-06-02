@@ -59,7 +59,9 @@ namespace VitalChoice.Interfaces.Services.Products
 
         Task<List<SkuDynamic>> GetSkusAsync(ICollection<string> codes, bool withDefaults = false);
 
-	    Task<byte[]> GenerateSkuGoogleItemsReportFile();
+	    Task<PagedList<SkuPricesManageItemModel>> GetSkusPricesAsync(FilterBase filter);
+
+        Task<byte[]> GenerateSkuGoogleItemsReportFile();
 
 	    Task UpdateSkuGoogleItemsReportFile();
 

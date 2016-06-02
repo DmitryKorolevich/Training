@@ -90,6 +90,7 @@ namespace VC.Public.Controllers
             IPageResultService pageResultService, IDynamicMapper<SkuDynamic, Sku> skuMapper,
             IDynamicMapper<ProductDynamic, Product> productMapper, ICountryService countryService,
             IDynamicMapper<OrderDynamic, Order> orderMapper,
+            IContentCrossSellService contentCrossSellService,
             IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodConverter, ExtendedUserManager userManager)
             : base(customerService, infrastructureService, authorizationService, checkoutService, pageResultService, userManager)
         {
@@ -107,6 +108,7 @@ namespace VC.Public.Controllers
             _orderMapper = orderMapper;
             _orderPaymentMethodConverter = orderPaymentMethodConverter;
             _userManager = userManager;
+            _contentCrossSellService = contentCrossSellService;
             _logger = loggerProvider.CreateLogger<ProfileController>();
         }
 

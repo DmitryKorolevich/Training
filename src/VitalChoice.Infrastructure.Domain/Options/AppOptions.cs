@@ -28,5 +28,6 @@ namespace VitalChoice.Infrastructure.Domain.Options
         public PDFMyUrl PDFMyUrl { get; set; }
         public BrontoSettings Bronto { get; set; }
         public JobSettings JobSettings { get; set; }
+        public ProMailSettings ProMailSettings { get; set; }
     }
 }

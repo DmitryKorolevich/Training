@@ -20,7 +20,8 @@
     "VitalChoice.DynamicData": "1.0.0-*",
     "VitalChoice.ContentProcessing": "1.0.0-*",
     "VitalChoice.Validation": "1.0.0-*",
-    "Authorize.Net": "1.0.0-*"
+    "Authorize.Net": "1.0.0-*",
+    "Renci.SshNet": "1.0.0-*"
   },
 
   "frameworks": {

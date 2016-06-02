@@ -416,6 +416,18 @@ namespace VitalChoice.Core.DependencyInjection
                 PublicFormSendData = section["PublicFormSendData"],
                 PublicFormSubscribeData = section["PublicFormSubscribeData"],
             };
+            section = configuration.GetSection("App:ProMailSettings");
+            if (section?.Value != null)
+            {
+                options.ProMailSettings = new ProMailSettings
+                {
+                    ExportFolderName = section["ExportFolderName"],
+                    ServerHost = section["ServerHost"],
+                    UserName = section["UserName"],
+                    Password = section["Password"],
+                    ServerPort = Int32.Parse(section["ServerPort"]),
+                };
+            }
         }
 
         public IContainer BuildContainer(Assembly projectAssembly, ContainerBuilder builder)
@@ -556,6 +568,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<BrontoService>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<ServiceCodeService>().As<IServiceCodeService>().InstancePerLifetimeScope();
             builder.RegisterType<OrderReportService>().As<IOrderReportService>().InstancePerLifetimeScope();
+            builder.RegisterType<ProMailSFTPService>().As<IProMailSFTPService>().InstancePerLifetimeScope();
             builder.RegisterMappers(typeof(ProductService).GetTypeInfo().Assembly, (type, registration) =>
             {
                 if (type == typeof(SkuMapper))

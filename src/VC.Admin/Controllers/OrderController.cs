@@ -482,6 +482,18 @@ using VitalChoice.Infrastructure.Domain.Transfer.Customers;namespace VC.Admin.Co
                     {
                         order.GiftCertificates = new List<GiftCertificateInOrder>();
                         order.Discount = null;
+                        if (order.OrderStatus.HasValue)
+                        {
+                            order.OrderStatus=OrderStatus.Processed;
+                        }
+                        if (order.POrderStatus.HasValue)
+                        {
+                            order.POrderStatus = OrderStatus.Processed;
+                        }
+                        if (order.NPOrderStatus.HasValue)
+                        {
+                            order.NPOrderStatus = OrderStatus.Processed;
+                        }
                         toReturn = await _mapper.ToModelAsync<OrderReshipManageModel>(order);
                         toReturn.KeyCode = "RESHIP";
                         toReturn.IdObjectType = (int)OrderType.Reship;

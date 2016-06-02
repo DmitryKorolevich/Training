@@ -27,7 +27,7 @@
         <div class="border-form-left">
             @if (Model != null)
             {
-                using (Html.BeginForm("HelpTicket", "Profile", null, FormMethod.Post, null, new { @class = "form-regular main medium-small inner " + (Model.Id == 0 ? "margin-bottom-big" : ""), role = "form" }))
+                using (Html.BeginForm("HelpTicket", "Profile", null, FormMethod.Post, null, new { @class = "form-regular main medium-small inner width-100-percent " + (Model.Id == 0 ? "margin-bottom-big" : ""), role = "form" }))
                 {
                     @Html.AntiForgeryToken()
                     <h4>Help Desk</h4>
