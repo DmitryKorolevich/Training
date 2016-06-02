@@ -90,8 +90,7 @@ namespace VC.Public.Controllers
             IPageResultService pageResultService, IDynamicMapper<SkuDynamic, Sku> skuMapper,
             IDynamicMapper<ProductDynamic, Product> productMapper, ICountryService countryService,
             IDynamicMapper<OrderDynamic, Order> orderMapper,
-            IContentCrossSellService contentCrossSellService,
-            IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodConverter, ExtendedUserManager userManager)
+            IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodConverter, ExtendedUserManager userManager, IContentCrossSellService contentCrossSellService)
             : base(customerService, infrastructureService, authorizationService, checkoutService, pageResultService, userManager)
         {
             _storefrontUserService = storefrontUserService;
