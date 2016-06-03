@@ -635,7 +635,9 @@ TokenExpirationDate,
 IsConfirmed, 
 IdUserType,
 AccessFailedCount,
-PasswordHash)
+PasswordHash,
+SecurityStamp,
+ConcurrencyStamp)
 SELECT 
 	aff.idAffiliate,
 	NEWID(), 
@@ -658,7 +660,9 @@ SELECT
 	1,
 	3,
 	0,
-	[vitalchoice2.0].dbo.HashPassword([vitalchoice2.0].dbo.RC4Encode(aff.pcaff_Password))
+	[vitalchoice2.0].dbo.HashPassword([vitalchoice2.0].dbo.RC4Encode(aff.pcaff_Password)),
+	LOWER(CAST(NEWID() AS NVARCHAR(250))),
+	LOWER(CAST(NEWID() AS NVARCHAR(250)))
 FROM [vitalchoice2.0].dbo.affiliates AS aff
 
 SET IDENTITY_INSERT [VitalChoice.Infrastructure].dbo.AspNetUsers OFF
@@ -1466,7 +1470,9 @@ TokenExpirationDate,
 IsConfirmed, 
 IdUserType,
 AccessFailedCount,
-PasswordHash)
+PasswordHash,
+SecurityStamp,
+ConcurrencyStamp)
 SELECT 
 	cc.Id, 
 	cc.PublicId, 
@@ -1489,7 +1495,9 @@ SELECT
 	1,
 	2,
 	0,
-	[vitalchoice2.0].dbo.[HashPassword]([vitalchoice2.0].dbo.RC4Encode(ISNULL(c.password, '')))
+	[vitalchoice2.0].dbo.[HashPassword]([vitalchoice2.0].dbo.RC4Encode(ISNULL(c.password, ''))),
+	LOWER(CAST(NEWID() AS NVARCHAR(250))),
+	LOWER(CAST(NEWID() AS NVARCHAR(250)))
 FROM customers AS c
 INNER JOIN [VitalChoice.Ecommerce].dbo.Customers AS cc ON cc.Id = c.idcustomer
 
