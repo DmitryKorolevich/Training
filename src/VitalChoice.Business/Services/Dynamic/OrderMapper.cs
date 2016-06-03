@@ -199,7 +199,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.IdDiscount = dynamic.Discount?.Id;
                 entity.PaymentMethod =
                     await _orderPaymentMethodMapper.ToEntityAsync(dynamic.PaymentMethod);
-                foreach (var sku in dynamic.Skus.Where(s => s.GcsGenerated?.Any() ?? false))
+                foreach (var sku in dynamic.Skus.Where(s => (s.GcsGenerated?.Count ?? 0) > 0))
                 {
                     foreach (var gc in sku.GcsGenerated.Where(g => string.IsNullOrEmpty(g.Code)))
                     {
@@ -326,7 +326,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 {
                     entity.Skus = new List<OrderToSku>();
                 }
-                foreach (var sku in dynamic.Skus.Where(s => s.GcsGenerated?.Any() ?? false))
+                foreach (var sku in dynamic.Skus.Where(s => (s.GcsGenerated?.Count ?? 0) > 0))
                 {
                     foreach (var gc in sku.GcsGenerated.Where(g => string.IsNullOrEmpty(g.Code)))
                     {

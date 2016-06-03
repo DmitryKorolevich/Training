@@ -49,7 +49,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.GiftCertificates
         private static async Task SyncExistingWithExist(OrderDataContext context, IGcService gcService, IOrderService orderService)
         {
             var ordereds = await orderService.GetGeneratedGcs(context.Order.Id);
-            if (ordereds.Any())
+            if (ordereds.Count > 0)
             {
                 var groupedBySku =
                     ordereds.ToDictionary(g => g.Sku.Id);

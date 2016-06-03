@@ -168,7 +168,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
 
             IList<VProductSku> products = new List<VProductSku>();
             IList<ProductContent> productContents = null;
-            if (productIds.Any())
+            if (productIds.Count > 0)
             {
                 var dbProducts =
                     (await _productRepository.GetProductsAsync(new VProductSkuFilter() { IdProducts = productIds })).Items;

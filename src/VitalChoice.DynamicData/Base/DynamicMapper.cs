@@ -27,7 +27,7 @@ namespace VitalChoice.DynamicData.Base
         {
             var outerCache = DynamicTypeCache.GetTypeCache(obj.GetType(), true);
 
-            if (!outerCache.MaskProperties.Any())
+            if (outerCache.MaskProperties.Count == 0)
                 return false;
 
             foreach (var masker in outerCache.MaskProperties)
@@ -82,7 +82,7 @@ namespace VitalChoice.DynamicData.Base
         public virtual async Task SyncCollectionsAsync(ICollection<TDynamic> dynamics, ICollection<TEntity> entities,
             ICollection<TOptionType> optionTypes = null)
         {
-            if (dynamics != null && dynamics.Any() && entities != null)
+            if (dynamics != null && dynamics.Count > 0 && entities != null)
             {
                 //Update existing
                 var itemsToUpdate = dynamics.Join(entities, sd => sd.Id, s => s.Id,
@@ -528,7 +528,7 @@ namespace VitalChoice.DynamicData.Base
             }
             var result = new TDynamic();
             var data = result.DictionaryData;
-            if (entity.OptionValues.Any())
+            if (entity.OptionValues.Count > 0)
             {
                 var optionTypes = entity.OptionTypes.ToDictionary(o => o.Id, o => o);
                 foreach (var value in entity.OptionValues)

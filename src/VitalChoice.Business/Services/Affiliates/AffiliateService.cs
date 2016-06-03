@@ -176,7 +176,7 @@ namespace VitalChoice.Business.Services.Affiliates
             }
 
             var toReturn = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, false);
-            if (toReturn.Items.Any())
+            if (toReturn.Items.Count > 0)
             {
                 var ids = toReturn.Items.Where(p => p.IdEditedBy.HasValue).Select(p => p.IdEditedBy).ToList();
                 var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);
@@ -285,7 +285,7 @@ namespace VitalChoice.Business.Services.Affiliates
             var itemSameEmail = await ObjectRepository.Query(
                         new AffiliateQuery().NotDeleted().Excluding(model.Id).WithEmail(model.Email)).SelectAsync(false);
 
-            if (itemSameEmail.Any())
+            if (itemSameEmail.Count > 0)
             {
                 throw new AppValidationException(
                     string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.EmailIsTakenAlready], model.Email));

@@ -46,7 +46,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
                 let printer = MakePrinter((ConstantExpression)x.Value2, elementType)
                 select new ItemPair<Expression, ConstantExpression>(x.Value2, printer)).ToArray();
 
-            if (replacements.Any())
+            if (replacements.Length > 0)
             {
                 var args =
                     map.Select(x => replacements.Where(r => x.Value2 == r.Value1).Select(r => r.Value2).SingleOrDefault() ?? x.Value2)

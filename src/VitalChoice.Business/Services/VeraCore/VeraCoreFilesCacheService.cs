@@ -104,7 +104,7 @@ namespace VitalChoice.Business.Services.VeraCore
             {
                 List<string> fileList = BuildFileTree(path);
                 string workingDirectory = Path.GetDirectoryName(path);
-                if (fileList != null && (workingDirectory != null && fileList.Any()))
+                if (fileList != null && workingDirectory != null && fileList.Count > 0)
                 {
                     string archiveName = Path.Combine(workingDirectory, Path.GetFileName(path) + ".zip");
 

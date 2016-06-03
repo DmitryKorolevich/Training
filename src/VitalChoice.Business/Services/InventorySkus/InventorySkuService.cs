@@ -138,7 +138,7 @@ namespace VitalChoice.Business.Services.InventorySkus
                 Count = result.Count,
             };
 
-            if (toReturn.Items.Any())
+            if (toReturn.Items.Count > 0)
             {
                 var ids = toReturn.Items.Where(p => p.IdEditedBy.HasValue).Select(p => p.IdEditedBy.Value).Distinct().ToList();
                 var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync();

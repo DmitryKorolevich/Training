@@ -9,7 +9,7 @@
 		@Html.ActionLink("View Cart", "ViewCart", "Cart", null, new {@class = "button yellow"})
 		<a id="lnkClose" href="#" class="button">Continue Shopping</a>
 	</div>
-	@if (Model.CrossSells.Any())
+	@if (Model.CrossSells.Count > 0)
 	{
 	<div class="cartlite-proposals-container">
 		<span class="cartlite-proposals-title">

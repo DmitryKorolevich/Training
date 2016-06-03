@@ -52,7 +52,7 @@ namespace VitalChoice.Business.Services.Content
 
 		public async Task<IList<ContentCrossSell>> AddUpdateContentCrossSellsAsync(IList<ContentCrossSell> contentCrossSells)
 		{
-			if (contentCrossSells == null || !contentCrossSells.Any())
+			if (contentCrossSells == null || !(contentCrossSells.Count > 0))
 			{
 				throw new ApiException("Can't be null or empty");
 			}
@@ -84,11 +84,11 @@ namespace VitalChoice.Business.Services.Content
 					{
 						var addRes = true;
 						var updateRes = true;
-						if (toAdd.Any())
+						if (toAdd.Count > 0)
 						{
 							addRes = await uowRepo.InsertRangeAsync(toAdd);
 						}
-						if (addRes && toUpdate.Any())
+						if (addRes && toUpdate.Count > 0)
 						{
 							updateRes = await uowRepo.UpdateRangeAsync(toUpdate);
 						}

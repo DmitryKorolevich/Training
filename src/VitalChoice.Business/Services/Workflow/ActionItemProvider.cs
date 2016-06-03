@@ -64,7 +64,7 @@ namespace VitalChoice.Business.Services.Workflow
                         .Include(r => r.Resolver)
                         .Include(r => r.Executor)
                         .SelectAsync(false);
-            if (!actions.Any())
+            if (actions.Count == 0)
                 throw new ApiException($"Action <{actionName}> not found");
 
             return actions.ToDictionary(a => a.Path, a => new ActionItem(a.Executor.ImplementationType, a.Executor.Name)

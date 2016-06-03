@@ -165,7 +165,7 @@ namespace VitalChoice.Business.Services.Customers
                             .Include(c => c.OptionValues)
                             .SelectAsync(false);
 
-                if (customerSameEmail.Any())
+                if (customerSameEmail.Count > 0)
                 {
                     throw new AppValidationException(
                         string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.EmailIsTakenAlready], model.Email));
@@ -220,7 +220,7 @@ namespace VitalChoice.Business.Services.Customers
         {
             var customerFileRepositoryAsync = uow.RepositoryAsync<CustomerFile>();
 
-            if (model.Files != null && model.Files.Any() && entity.Files != null)
+            if (model.Files != null && model.Files.Count > 0 && entity.Files != null)
             {
                 //Update
                 var toUpdate = entity.Files.Where(e => model.Files.Select(x => x.Id).Contains(e.Id));

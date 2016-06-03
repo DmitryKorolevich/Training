@@ -30,7 +30,7 @@ namespace VitalChoice.Validation.Models
         public virtual bool IsValid => Validator == null || Validator.IsValid;
 
         [JsonIgnore]
-        public virtual IEnumerable<KeyValuePair<string, string>> Errors
+        public virtual ICollection<KeyValuePair<string, string>> Errors
         {
             get
             {
@@ -80,7 +80,7 @@ namespace VitalChoice.Validation.Models
         public virtual bool IsValid => Validator == null || Validator.IsValid;
 
         [JsonIgnore]
-        public virtual IEnumerable<KeyValuePair<string, string>> Errors
+        public virtual ICollection<KeyValuePair<string, string>> Errors
         {
             get
             {

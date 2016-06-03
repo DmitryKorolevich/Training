@@ -161,7 +161,7 @@ namespace VitalChoice.Business.Services.Cache
                     }
                 }
             }
-            if (syncOperations.Any())
+            if (syncOperations.Count > 0)
             {
                 int[] pings;
                 lock (_lockObject)

@@ -90,7 +90,7 @@ namespace VC.Public.Controllers
 				cart.Order.IdObjectType = (int)OrderType.AutoShip;
 				cart.Order.Data.AutoShipFrequency = autoshipFrequency;
 			}
-			else if(cart.Order.Skus.Any() && cart.Order.IdObjectType == (int)OrderType.AutoShip)
+			else if(cart.Order.Skus.Count > 0 && cart.Order.IdObjectType == (int)OrderType.AutoShip)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CartContainsAutoShip]);
 			}
@@ -124,11 +124,11 @@ namespace VC.Public.Controllers
 			var crossSellModels = new List<CartCrossSellModel>();
 
 			var crossSells = await _contentCrossSellService.GetContentCrossSellsAsync(type);
-			if (crossSells.Any())
+			if (crossSells.Count > 0)
 			{
 				var skus = await _productService.GetSkusAsync(new VProductSkuFilter() { Ids = crossSells.Select(x => x.IdSku).ToList(), ActiveOnly = true, NotHiddenOnly = true});
 
-				if (skus.Any())
+				if (skus.Count > 0)
 				{
 					crossSells = crossSells.Where(x => skus.Select(y => y.SkuId).Contains(x.IdSku)).ToList();
 

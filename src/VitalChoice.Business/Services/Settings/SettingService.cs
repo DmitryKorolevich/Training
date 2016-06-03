@@ -122,7 +122,7 @@ namespace VitalChoice.Business.Services.Settings
 
         public async Task<IList<Lookup>> GetLookupsAsync(ICollection<string> names)
         {
-            if (names == null || !names.Any())
+            if (names == null || names.Count == 0)
             {
                 return new List<Lookup>();
             }

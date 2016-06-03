@@ -889,7 +889,7 @@ namespace VitalChoice.Business.Services.Orders
 						    x.AutoShipFrequency == frequency &&
 						    x.LastAutoShipDate.HasValue && x.LastAutoShipDate.Value.Day <= tempDate.Day && x.LastAutoShipDate.Value.Year <= tempDate.Year && x.LastAutoShipDate.Value.Month <= tempDate.Month).SelectAsync(x=>x.Id);
 
-			    if (vAutoShips.Any())
+			    if (vAutoShips.Count > 0)
 			    {
 				    toProcess.AddRange(vAutoShips);
 			    }
@@ -900,7 +900,7 @@ namespace VitalChoice.Business.Services.Orders
 					await _vAutoShipRepository.Query(
 						x => !x.LastAutoShipDate.HasValue).SelectAsync(x => x.Id);
 
-			if (skippedAcidently.Any())
+			if (skippedAcidently.Count > 0)
 			{
 				toProcess.AddRange(skippedAcidently);
 			}
@@ -997,7 +997,7 @@ namespace VitalChoice.Business.Services.Orders
                         {
                             var giftCertificateRepository = uow.RepositoryAsync<GiftCertificate>();
                             List<GiftCertificate> generatedGcs = new List<GiftCertificate>();
-                            if (order.Skus.Any(s => s.GcsGenerated?.Any() ?? false))
+                            if (order.Skus.Any(s => (s.GcsGenerated?.Count ?? 0) > 0))
                             {
                                 generatedGcs =
                                     await
@@ -1178,7 +1178,7 @@ namespace VitalChoice.Business.Services.Orders
             var others = models.Where(x => x.IdObjectType != (int)OrderType.AutoShip).ToList();
 
             List<Order> res = new List<Order>();
-            if (autoShips.Any())
+            if (autoShips.Count > 0)
             {
                 List<int> autoShipOrderIds = null;
                 using (var transaction = uow.BeginTransaction())
@@ -1197,7 +1197,7 @@ namespace VitalChoice.Business.Services.Orders
 						res.AddRange(await InsertRangeInternalAsync(autoShips, uow));
 
                         var completed = autoShips.Where(x => x.IsAnyNotIncomplete()).ToList();
-                        if (completed.Any())
+                        if (completed.Count > 0)
                         {
 							foreach (var model in completed)
                             {
@@ -1229,7 +1229,7 @@ namespace VitalChoice.Business.Services.Orders
 
             }
 
-            if (others.Any())
+            if (others.Count > 0)
             {
                 res.AddRange(await InsertRangeInternalAsync(models, uow));
             }
@@ -1298,7 +1298,7 @@ namespace VitalChoice.Business.Services.Orders
             var others = models.Where(x => x.IdObjectType != (int)OrderType.AutoShip).ToList();
 
             List<Order> res = new List<Order>();
-            if (autoShips.Any())
+            if (autoShips.Count > 0)
             {
                 List<int> autoShipOrderIds = null;
                 using (var transaction = uow.BeginTransaction())
@@ -1310,7 +1310,7 @@ namespace VitalChoice.Business.Services.Orders
 						res.AddRange(await UpdateRangeInternalAsync(autoShips, uow));
 
                         var completed = autoShips.Where(x => x.OrderStatus != OrderStatus.Incomplete).ToList();
-                        if (completed.Any())
+                        if (completed.Count > 0)
                         {
                             var toInsert = new List<OrderDynamic>();
 
@@ -1333,7 +1333,7 @@ namespace VitalChoice.Business.Services.Orders
                                 }
                             }
 
-                            if (toInsert.Any())
+                            if (toInsert.Count > 0)
                             {
                                 autoShipOrderIds = (await InsertRangeInternalAsync(toInsert, uow)).Select(p=>p.Id).ToList();
                             }
@@ -1356,7 +1356,7 @@ namespace VitalChoice.Business.Services.Orders
                 }
 
             }
-            if (others.Any())
+            if (others.Count > 0)
             {
                 res.AddRange(await UpdateRangeInternalAsync(models, uow));
             }
@@ -1376,11 +1376,11 @@ namespace VitalChoice.Business.Services.Orders
                     orders.Where(o => o.IdObjectType != (int) OrderType.AutoShip)
                         .SelectMany(p => p.PromoSkus)
                         .Select(p => p.Sku.Id));
-                if (skuIds.Any())
+                if (skuIds.Count > 0)
                 {
                     var dbOptionValues = await _productService.GetSkuOptionValues(skuIds, new[] {option.Id});
                     var skuIdsForInsert = skuIds.Except(dbOptionValues.Select(p => p.IdSku)).ToList();
-                    if (skuIdsForInsert.Any())
+                    if (skuIdsForInsert.Count > 0)
                     {
                         var now = MapperTypeConverter.ConvertDateToIsoStringAndDropMc(DateTime.Now);
                         var skuOptionValueRepository = uow.RepositoryAsync<SkuOptionValue>();
@@ -1539,7 +1539,7 @@ namespace VitalChoice.Business.Services.Orders
                 Count = orders.Count
             };
 
-            if (toReturn.Items.Any())
+            if (toReturn.Items.Count > 0)
             {
                 var ids = new HashSet<int>(toReturn.Items.Where(p => p.IdEditedBy.HasValue).Select(p => p.IdEditedBy.Value));
                 var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);
@@ -1638,7 +1638,7 @@ namespace VitalChoice.Business.Services.Orders
             }
 
             var toReturn = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
-            if (toReturn.Items.Any())
+            if (toReturn.Items.Count > 0)
             {
                 var ids = toReturn.Items.Where(p => p.IdEditedBy.HasValue).Select(p => p.IdEditedBy.Value).Distinct().ToList();
                 var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);

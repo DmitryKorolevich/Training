@@ -24,7 +24,7 @@ namespace VitalChoice.Business.Repositories
             {
                 query = query.Where(x => x.Code.Contains(filter.SearchText) || x.Name.Contains(filter.SearchText));
             }
-	        if (filter.IdProducts != null && filter.IdProducts.Any())
+	        if (filter.IdProducts != null && filter.IdProducts.Count > 0)
 	        {
 				query = query.Where(x => filter.IdProducts.Contains(x.IdProduct));
 	        }

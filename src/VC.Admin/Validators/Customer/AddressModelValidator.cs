@@ -66,15 +66,15 @@ namespace VC.Admin.Validators.Customer
 
 			RuleFor(model => model.State)
 				.Must(model => model != 0)
-				.When(model => model.Country.States.Any())
+				.When(model => model.Country.States.Count > 0)
 				.WithMessage(model => model.State, ValidationMessages.FieldRequired);
 
-			//RuleFor(model => model.County)
-			//	.NotEmpty()
-			//	.When(model => !model.Country.States.Any())
-			//	.WithMessage(model => model.County, ValidationMessages.FieldRequired);
+            //RuleFor(model => model.County)
+            //	.NotEmpty()
+            //	.When(model => !model.Country.States.Count > 0)
+            //	.WithMessage(model => model.County, ValidationMessages.FieldRequired);
 
-			RuleFor(model => model.Zip)
+            RuleFor(model => model.Zip)
 				.NotEmpty()
 				.WithMessage(model => model.Zip, ValidationMessages.FieldRequired)
 				.Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)

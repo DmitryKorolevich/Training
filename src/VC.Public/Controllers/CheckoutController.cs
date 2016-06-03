@@ -506,7 +506,7 @@ namespace VC.Public.Controllers
 
                             cart.Order.Customer = await CustomerService.UpdateAsync(cart.Order.Customer);
                         }
-                        else if (!cart.Order.Customer.ShippingAddresses.Any())
+                        else if (cart.Order.Customer.ShippingAddresses.Count == 0)
                         {
                             cart.Order.ShippingAddress.Id = 0;
                             cart.Order.ShippingAddress.Data.Default = true;
@@ -607,7 +607,7 @@ namespace VC.Public.Controllers
             {
                 shippingAddresses.Add(new KeyValuePair<string, AddressDynamic>("(Currently On Order)", order.ShippingAddress));
             }
-            if (currentCustomer.ShippingAddresses.Any())
+            if (currentCustomer.ShippingAddresses.Count > 0)
             {
                 shippingAddresses.AddRange(
                     currentCustomer.ShippingAddresses.OrderByDescending(a => (bool)a.Data.Default).Select(

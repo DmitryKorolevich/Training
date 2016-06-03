@@ -42,7 +42,7 @@
 	<hr/>
 		<label>Rate this product:&nbsp;&nbsp;<input class="write-review-link yellow" type="button" value="Rate it" /></label>
 	<hr/>
-	@if (Model.Reviews.Items.Any())
+	@if (Model.Reviews.Items.Count > 0)
 	{
 		foreach (var item in Model.Reviews.Items)
 		{

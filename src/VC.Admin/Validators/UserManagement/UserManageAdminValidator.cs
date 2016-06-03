@@ -56,7 +56,7 @@ namespace VC.Admin.Validators.UserManagement
 						    RuleFor(model => model.Email).EmailAddress().WithMessage(model => model.Email, ValidationMessages.EmailFormat);
 
 						    RuleFor(model => model.RoleIds)
-							    .Must(x => x.Any())
+							    .Must(x => x.Count > 0)
 							    .WithMessage(model => model.RoleIds, ValidationMessages.AtLeastOneRole);
 					    });
 

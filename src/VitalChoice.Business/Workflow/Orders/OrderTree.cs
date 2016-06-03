@@ -11,7 +11,7 @@ namespace VitalChoice.Business.Workflow.Orders
     {
         public override async Task<decimal> ExecuteAsync(OrderDataContext dataContext)
         {
-            if (!(dataContext.Order.Skus?.Any() ?? false))
+            if ((dataContext.Order.Skus?.Count ?? 0) == 0)
                 return 0;
 
             if (dataContext.Order.ShippingAddress == null)

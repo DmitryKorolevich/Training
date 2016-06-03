@@ -148,7 +148,7 @@ namespace VC.Admin.Validators.Customer
 					.WithMessage(model => model.Reason, ValidationMessages.FieldLength, 1000);
 
 				RuleFor(model => model.ApprovedPaymentMethods)
-					.Must(model => model.Any())
+					.Must(model => model.Count > 0)
 					.WithMessage(model => model.ApprovedPaymentMethods, ValidationMessages.AtLeastOnePaymentMethod);
 			}
 		}

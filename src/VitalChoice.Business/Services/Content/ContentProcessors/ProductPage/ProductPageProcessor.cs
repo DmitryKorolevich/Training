@@ -94,7 +94,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             }
 
             ProductNavCategoryLite rootAllCategory = null;
-            if (eProduct.CategoryIds.Any())
+            if (eProduct.CategoryIds.Count > 0)
             {
                 rootAllCategory = await _productCategoryService.GetLiteCategoriesTreeAsync(new ProductCategoryLiteFilter()
                 {
@@ -164,7 +164,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 
             var productContent = viewContext.Entity;
             var eProduct = viewContext.Parameters.Product;
-            if (eProduct.CategoryIds.Any())
+            if (eProduct.CategoryIds.Count > 0)
             {
                 if (idCategory.HasValue)
                 {

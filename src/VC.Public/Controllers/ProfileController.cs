@@ -207,7 +207,7 @@ namespace VC.Public.Controllers
             ViewBag.CreditCards = null;
 
             BillingInfoModel model;
-            if (creditCards.Any())
+            if (creditCards.Count > 0)
             {
                 model = selectedId > 0 ? creditCards.Single(x => x.Id == selectedId) : creditCards.FirstOrDefault(x => x.Default) ?? creditCards.FirstOrDefault();
                 ViewBag.CreditCards = creditCards.ToJson();
@@ -232,7 +232,7 @@ namespace VC.Public.Controllers
 
             ViewBag.ShippingAddresses = null;
             ShippingInfoModel model;
-            if (shippingAddresses.Any())
+            if (shippingAddresses.Count > 0)
             {
                 model = selectedId > 0 ? shippingAddresses.Single(x => x.Id == selectedId) : shippingAddresses.First(x => x.Default);
                 ViewBag.ShippingAddresses = shippingAddresses.ToJson();
@@ -376,7 +376,7 @@ namespace VC.Public.Controllers
                 }
             }
 
-            if (!otherAddresses.Any())
+            if (otherAddresses.Count == 0)
             {
                 model.Default = true;
             }

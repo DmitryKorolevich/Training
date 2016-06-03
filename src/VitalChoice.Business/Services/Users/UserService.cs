@@ -176,7 +176,7 @@ namespace VitalChoice.Business.Services.Users
                     var newRoleNames = GetRoleNamesByIds(roleIds);
                     var oldRoleNames = new HashSet<string>(await UserManager.GetRolesAsync(user));
 				    var toRemove = oldRoleNames.Where(role => !newRoleNames.Contains(role)).ToArray();
-					if (toRemove.Any())
+					if (toRemove.Length > 0)
 					{
 						var deleteResult = await UserManager.RemoveFromRolesAsync(user, toRemove);
 						if (!deleteResult.Succeeded)
@@ -186,7 +186,7 @@ namespace VitalChoice.Business.Services.Users
 					}
 
                     var toAdd = newRoleNames.Where(role => !oldRoleNames.Contains(role)).ToArray();
-                    if (toAdd.Any())
+                    if (toAdd.Length > 0)
 					{
 						var addToRoleResult = await UserManager.AddToRolesAsync(user, toAdd);
 						if (!addToRoleResult.Succeeded)
@@ -240,7 +240,7 @@ namespace VitalChoice.Business.Services.Users
 						}
 
 						var roleNames = GetRoleNamesByIds(roles);
-						if (roleNames.Any())
+						if (roleNames.Count > 0)
 						{
 							var addToRoleResult = await UserManager.AddToRolesAsync(user, roleNames);
 							if (!addToRoleResult.Succeeded)

@@ -43,7 +43,7 @@ namespace VitalChoice.Core.GlobalFilters
 #endif
 
             var acceptHeader = context.HttpContext.Request.Headers["Accept"];
-            if (acceptHeader.Any() && acceptHeader.First().Contains("application/json"))
+            if (acceptHeader.Count > 0 && acceptHeader.First().Contains("application/json"))
 			{
 			    if (context.Exception is CustomerSuspendException)
 			    {

@@ -689,10 +689,10 @@ namespace Authorize.Net.Reporting
                 result.Subscription.PayNum = trans.subscription.payNum;
             }
 
-            if ((trans.returnedItems != null) && trans.returnedItems.Any())
+            if ((trans.returnedItems != null) && trans.returnedItems.Length > 0)
             {
                 result.HasReturnedItems = NullableBooleanEnum.True;
-                result.ReturnedItems = new ReturnedItemType[trans.returnedItems.Count()];
+                result.ReturnedItems = new ReturnedItemType[trans.returnedItems.Length];
                 var iRI = 0;
                 foreach (var ri in trans.returnedItems)
                 {

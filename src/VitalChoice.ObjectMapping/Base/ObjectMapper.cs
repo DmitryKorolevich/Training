@@ -16,7 +16,7 @@ namespace VitalChoice.ObjectMapping.Base
         {
             var outerCache = DynamicTypeCache.GetTypeCache(obj.GetType(), true);
 
-            if (!outerCache.MaskProperties.Any())
+            if (outerCache.MaskProperties.Count == 0)
                 return false;
 
             foreach (var masker in outerCache.MaskProperties)

@@ -18,7 +18,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.GiftCertificates
 
         public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            if (!(dataContext.Order?.GiftCertificates?.Any() ?? false))
+            if (!((dataContext.Order?.GiftCertificates?.Count ?? 0) > 0))
             {
                 return TaskCache<decimal>.DefaultCompletedTask;
             }

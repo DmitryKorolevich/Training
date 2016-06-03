@@ -108,7 +108,7 @@ namespace VitalChoice.Business.Services.Healthwise
         public async Task<bool> DeleteHealthwisePeriod(int id)
         {
             var orders = await GetHealthwiseOrdersAsync(id);
-            if (orders.Any())
+            if (orders.Count > 0)
             {
                 throw new AppValidationException("Can't delete period with assigned orders.");
             }

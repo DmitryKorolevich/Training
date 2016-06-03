@@ -161,12 +161,12 @@ namespace VitalChoice.Business.Services.Orders
 				try
 				{
 					var idsToDelete = await _orderNoteToCustomerTypeRepository.Query(x => x.IdOrderNote == orderNote.Id).SelectAsync(false);
-					if (idsToDelete.Any())
+					if (idsToDelete.Count > 0)
 					{
 						await _orderNoteToCustomerTypeRepository.DeleteAllAsync(idsToDelete);
 					}
 
-					if (orderNote.CustomerTypes.Any())
+					if (orderNote.CustomerTypes.Count > 0)
 					{
 						foreach (var customerType in orderNote.CustomerTypes)
 						{

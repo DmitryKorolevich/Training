@@ -25,7 +25,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
             {
                 if (dataContext.Order.Discount.ExcludeCategories)
                 {
-                    if (dataContext.Order.Discount.CategoryIds?.Any() ?? false)
+                    if ((dataContext.Order.Discount.CategoryIds?.Count ?? 0) > 0)
                     {
                         if (skus.Any(s => s.Sku.Product.CategoryIds == null))
                         {
@@ -42,7 +42,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
                                 Message = "The discount for this product has been excluded by category"
                             });
                         }
-                        if (excludedSkus.Any())
+                        if (excludedSkus.Length > 0)
                         {
                             return TaskCache<decimal>.DefaultCompletedTask;
                         }
@@ -50,7 +50,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
                 }
                 else
                 {
-                    if (dataContext.Order.Discount.CategoryIds?.Any() ?? false)
+                    if ((dataContext.Order.Discount.CategoryIds?.Count ?? 0) > 0)
                     {
                         if (skus.Any(s => s.Sku.Product.CategoryIds == null))
                         {
@@ -68,7 +68,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
                                     Message = "The discount for this product has been excluded by category"
                                 });
                         }
-                        if (excludedSkus.Any())
+                        if (excludedSkus.Length > 0)
                         {
                             return TaskCache<decimal>.DefaultCompletedTask;
                         }
@@ -76,13 +76,14 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
                 }
                 if (dataContext.Order.Discount.ExcludeSkus)
                 {
-                    if (dataContext.Order.Discount.SkusFilter?.Any() ?? false)
+                    if ((dataContext.Order.Discount.SkusFilter?.Count ?? 0) > 0)
                     {
                         if (skus.Any(s => s.Sku.Product.CategoryIds == null))
                         {
                             throw new InvalidOperationException("Product doesn't have any categories set in object.");
                         }
                         HashSet<int> filteredSkus =
+                            // ReSharper disable once AssignNullToNotNullAttribute
                             new HashSet<int>(dataContext.Order.Discount.SkusFilter.Select(s => s.IdSku));
                         var excludedSkus =
                             skus.Where(s => filteredSkus.Contains(s.Sku.Id)).ToArray();
@@ -95,7 +96,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
                                     Message = "The discount for this product has been excluded by SKU"
                                 });
                         }
-                        if (excludedSkus.Any())
+                        if (excludedSkus.Length > 0)
                         {
                             return TaskCache<decimal>.DefaultCompletedTask;
                         }
@@ -103,9 +104,10 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
                 }
                 else
                 {
-                    if (dataContext.Order.Discount.SkusFilter?.Any() ?? false)
+                    if ((dataContext.Order.Discount.SkusFilter?.Count ?? 0) > 0)
                     {
                         HashSet<int> filteredSkus =
+                            // ReSharper disable once AssignNullToNotNullAttribute
                             new HashSet<int>(dataContext.Order.Discount.SkusFilter.Select(s => s.IdSku));
                         var excludedSkus =
                             skus.Where(s => !filteredSkus.Contains(s.Sku.Id)).ToArray();
@@ -118,17 +120,17 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
                                     Message = "The discount for this product has been excluded by SKU"
                                 });
                         }
-                        if (excludedSkus.Any())
+                        if (excludedSkus.Length > 0)
                         {
                             return TaskCache<decimal>.DefaultCompletedTask;
                         }
                     }
                 }
-                if (dataContext.Order.Discount.SkusAppliedOnlyTo?.Any() ?? false)
+                if ((dataContext.Order.Discount.SkusAppliedOnlyTo?.Count ?? 0) > 0)
                 {
                     var selectedSkus = skus.IntersectKeyedWith(dataContext.Order.Discount.SkusAppliedOnlyTo, sku => sku.Sku.Id,
                         selectedSku => selectedSku.IdSku).ToArray();
-                    if (!selectedSkus.Any())
+                    if (selectedSkus.Length == 0)
                     {
                         dataContext.Messages.Add(new MessageInfo
                         {
@@ -138,17 +140,18 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
                     }
                     skus = selectedSkus;
                 }
-                if (dataContext.Order.Discount.CategoryIdsAppliedOnlyTo?.Any() ?? false)
+                if ((dataContext.Order.Discount.CategoryIdsAppliedOnlyTo?.Count ?? 0) > 0)
                 {
                     if (skus.Any(s => s.Sku.Product.CategoryIds == null))
                     {
                         throw new InvalidOperationException("Product doesn't have any categories set in object.");
                     }
+                    // ReSharper disable once AssignNullToNotNullAttribute
                     HashSet<int> categories = new HashSet<int>(dataContext.Order.Discount.CategoryIdsAppliedOnlyTo);
                     var selectedSkus =
                         skus.Where(s => s.Sku.Product.CategoryIds.Any(c => categories.Contains(c))).ToArray();
                     
-                    if (!selectedSkus.Any())
+                    if (selectedSkus.Length == 0)
                     {
                         dataContext.Messages.Add(new MessageInfo
                         {

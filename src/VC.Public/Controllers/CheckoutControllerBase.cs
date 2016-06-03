@@ -64,7 +64,7 @@ namespace VC.Public.Controllers
         {
             await FillCartModel(cartModel);
 
-            if (!cartModel.GiftCertificateCodes.Any())
+            if (cartModel.GiftCertificateCodes.Count == 0)
             {
                 cartModel.GiftCertificateCodes.Add(new CartGcModel() { Value = string.Empty }); //needed to to force first input to appear
             }
@@ -209,7 +209,7 @@ namespace VC.Public.Controllers
             cartModel.ShippingUpgradeNP = (ShippingUpgradeOption?)order.SafeData.ShippingUpgradeNP;
             cartModel.AutoShip = order.IdObjectType == (int)OrderType.AutoShip;
 
-            if (!cartModel.GiftCertificateCodes.Any())
+            if (cartModel.GiftCertificateCodes.Count == 0)
             {
                 cartModel.GiftCertificateCodes.Add(new CartGcModel() { Value = string.Empty });
             }
