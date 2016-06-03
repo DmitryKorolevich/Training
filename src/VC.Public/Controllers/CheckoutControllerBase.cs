@@ -177,14 +177,7 @@ namespace VC.Public.Controllers
             })));
             cartModel.Tax = order.TaxTotal;
             cartModel.OrderTotal = order.Total;
-            if ((bool?)order.IsFirstHealthwise ?? false)
-            {
-                cartModel.DiscountCode = ProductConstants.HEALTHWISE_DISCOUNT_CODE.ToUpper();
-            }
-            else
-            {
-                cartModel.DiscountCode = order.Discount?.Code;
-            }
+            cartModel.DiscountCode = order.Discount?.Code;
             cartModel.ShippingCost = order.ShippingTotal;
             cartModel.SubTotal = order.ProductsSubtotal;
             if (((ShipDelayType?)order.SafeData.ShipDelayType ?? ShipDelayType.None) != ShipDelayType.None)

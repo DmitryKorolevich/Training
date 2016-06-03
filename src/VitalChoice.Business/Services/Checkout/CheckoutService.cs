@@ -153,15 +153,7 @@ namespace VitalChoice.Business.Services.Checkout
             }).ToList() ?? new List<GiftCertificateInOrder>();
             if (!string.IsNullOrEmpty(cart.DiscountCode))
             {
-                if (cart.DiscountCode.ToLower() == ProductConstants.HEALTHWISE_DISCOUNT_CODE)
-                {
-                    newOrder.Data.IsHealthwise = true;
-                }
-                else
-                {
-                    newOrder.Data.IsHealthwise = false;
-                    newOrder.Discount = await _discountService.GetByCode(cart.DiscountCode);
-                }
+                newOrder.Discount = await _discountService.GetByCode(cart.DiscountCode);
             }
             newOrder.Skus = cart.Skus?.Select(s =>
             {
@@ -339,14 +331,7 @@ namespace VitalChoice.Business.Services.Checkout
                     }
                     else
                     {
-                        if ((bool?)cartOrder.Order.SafeData.IsHealthwise ?? false)
-                        {
-                            cart.DiscountCode = ProductConstants.HEALTHWISE_DISCOUNT_CODE.ToUpper();
-                        }
-                        else
-                        {
-                            cart.DiscountCode = cartOrder.Order.Discount?.Code;
-                        }
+                        cart.DiscountCode = cartOrder.Order.Discount?.Code;
                         cart.GiftCertificates?.MergeKeyed(cartOrder.Order.GiftCertificates, c => c.IdGiftCertificate,
                             co => co.GiftCertificate.Id,
                             co => new CartToGiftCertificate

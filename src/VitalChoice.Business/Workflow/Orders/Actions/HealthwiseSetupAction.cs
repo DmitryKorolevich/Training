@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Core;
@@ -20,7 +21,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions
         {
             if ((int?) context.Order.SafeData.OrderType == (int) SourceOrderType.Web)
             {
-                if (context.Order.Discount?.Code.ToLower() == "healthwise" ||
+                if (context.Order.Discount?.Code.ToLower() == ProductConstants.HEALTHWISE_DISCOUNT_CODE ||
                     ((bool?) context.Order.Customer?.SafeData.HasHealthwiseOrders ?? false))
                 {
                     context.Order.Data.IsHealthwise = true;
