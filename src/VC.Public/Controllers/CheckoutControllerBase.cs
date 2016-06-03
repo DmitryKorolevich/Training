@@ -81,6 +81,7 @@ namespace VC.Public.Controllers
 
         protected void SetCartUid(Guid uid)
         {
+            Response.Cookies.Delete(CheckoutConstants.CartUidCookieName);
             Response.Cookies.Append(CheckoutConstants.CartUidCookieName, uid.ToString(), new CookieOptions
             {
                 Expires = DateTime.Now.AddYears(1)

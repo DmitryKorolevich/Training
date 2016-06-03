@@ -231,6 +231,8 @@ namespace VC.Public.Controllers
             var loggedIn = await CustomerLoggedIn();
             var cart = await GetCurrentCart(loggedIn);
 
+            SetCartUid(cart.CartUid);
+
             if (!ModelState.IsValid)
             {
                 if (loggedIn)
@@ -434,6 +436,7 @@ namespace VC.Public.Controllers
                 }
             }
             var cart = await GetCurrentCart();
+            SetCartUid(cart.CartUid);
             var loggedIn = await EnsureLoggedIn(cart);
             if (loggedIn != null)
             {

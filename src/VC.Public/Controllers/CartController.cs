@@ -79,8 +79,9 @@ namespace VC.Public.Controllers
 			{
 				cart = await _checkoutService.GetOrCreateCart(existingUid);
 			}
+            SetCartUid(cart.CartUid);
 
-			if (sku.Sku.SafeData.AutoShipProduct == true && autoshipFrequency.HasValue)
+            if (sku.Sku.SafeData.AutoShipProduct == true && autoshipFrequency.HasValue)
 			{
 				cart.Order.PromoSkus.Clear();
 				cart.Order.Skus.Clear();
@@ -109,13 +110,10 @@ namespace VC.Public.Controllers
 				},
 				(ordered, skuModel) => ordered.Quantity += 1);
 
-			SetCartUid(cart.CartUid);
-
             var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
 
             if (!await _checkoutService.UpdateCart(cart))
 				throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
-
 		    return new Tuple<OrderDataContext, CustomerCartOrder>(context, cart);
 	    }
 
@@ -251,6 +249,7 @@ namespace VC.Public.Controllers
             {
                 cart = await _checkoutService.GetOrCreateCart(existingUid);
             }
+            SetCartUid(cart.CartUid);
             cart.Order.Skus?.MergeKeyed(model.Skus.Where(s => s.Quantity > 0).ToArray(), ordered => ordered.Sku.Code,
                 skuModel => skuModel.Code, skuModel =>
                 {
@@ -288,8 +287,7 @@ namespace VC.Public.Controllers
             cart.Order.Data.IsHealthwise = model.DiscountCode?.ToLower() == ProductConstants.HEALTHWISE_DISCOUNT_CODE;
             var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
             await FillModel(model, cart.Order, context);
-            SetCartUid(cart.CartUid);
-
+            
             bool updateResult = true;
             if (canUpdate)
             {
