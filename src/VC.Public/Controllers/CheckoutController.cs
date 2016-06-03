@@ -218,25 +218,16 @@ namespace VC.Public.Controllers
         public async Task<Result<bool>> GetIsUnsubscribed()
         {
             var loggedIn = await CustomerLoggedIn();
-            string email = null;
             if (loggedIn)
             {
                 var currentCustomer = await GetCurrentCustomerDynamic();
-                email = currentCustomer.Email;
-            }
-            else
-            {
-                var cart = await GetCurrentCart();
-                if (cart != null)
+                var email = currentCustomer.Email;
+                if (!string.IsNullOrEmpty(email))
                 {
-                    email = cart.Order.Customer?.Email;
+                    return await _brontoService.GetIsUnsubscribed(email) ?? false;
                 }
             }
-            if (!string.IsNullOrEmpty(email))
-            {
-                return await _brontoService.GetIsUnsubscribed(email) ?? false;
-            }
-            return true;
+            return false;
         }
 
         [HttpPost]

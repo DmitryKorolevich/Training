@@ -165,7 +165,7 @@ namespace VitalChoice.Business.Services.Customers
                             .Include(c => c.OptionValues)
                             .SelectAsync(false);
 
-                if (customerSameEmail.All(c => c.Id != model.Id))
+                if (customerSameEmail.Count > 0 && customerSameEmail.All(c => c.Id != model.Id))
                 {
                     throw new AppValidationException(
                         string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.EmailIsTakenAlready], model.Email));
