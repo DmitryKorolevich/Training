@@ -69,7 +69,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
 
         public override bool NeedUpdate
         {
-            get { return _cacheData.FullCollection && _cacheData.NeedUpdate || base.NeedUpdate || NeedUpdateRelated.Any(); }
+            get { return _cacheData.FullCollection && _cacheData.NeedUpdate || base.NeedUpdate || NeedUpdateRelated.Count > 0; }
             set { base.NeedUpdate = value; }
         }
 

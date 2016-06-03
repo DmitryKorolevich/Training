@@ -67,7 +67,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
             var freeValues = new HashSet<TValue>();
             var containsSets = new OptionalObject<HashSet<TValue>>(() => new HashSet<TValue>());
             WalkConditionTree(expression.Condition, freeValues, containsSets);
-            if (freeValues.Any() && freeValues.Count == GroupInfo.Count || containsSets.Value != null)
+            if (freeValues.Count > 0 && freeValues.Count == GroupInfo.Count || containsSets.Value != null)
             {
                 return GetKeys(freeValues, containsSets);
             }
@@ -171,7 +171,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
             try
             {
                 //Two different primary key values with AND
-                if (freeSet.Any() && freeSet.GroupBy(f => f.ValueInfo).Any(g => g.Count() > 1))
+                if (freeSet.Count > 0 && freeSet.GroupBy(f => f.ValueInfo).Any(g => g.Count() > 1))
                 {
                     return new TValueGroup[0];
                 }
@@ -181,7 +181,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
 
                 HashSet<TInfo> keyTypes = new HashSet<TInfo>();
 
-                if (containsSet.Any())
+                if (containsSet.Count > 0)
                 {
                     var containsGroups = containsSet.GroupBy(f => f.ValueInfo);
                     foreach (var group in containsGroups)
@@ -195,7 +195,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
                 {
                     keyTypes.Add(value.ValueInfo);
                     var set = resultedSets[value.ValueInfo];
-                    if (set.Any())
+                    if (set.Count > 0)
                     {
                         if (set.Contains(value))
                         {
@@ -217,7 +217,7 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
                 if (keyTypes.Count < GroupInfo.Infos.Length)
                     return null;
 
-                if (resultedSets.Values.All(vs => vs.Any()))
+                if (resultedSets.Values.All(vs => vs.Count > 0))
                 {
                     var iterators = new IEnumerator<TValue>[resultedSets.Count];
                     int index = 0;

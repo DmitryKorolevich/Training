@@ -235,7 +235,7 @@ namespace VitalChoice.Caching.Services.Cache
 
             var trackData = _infoStorage.GetTrackData(context);
 
-            var result = CacheStorage.AllCacheDatas.Any();
+            var result = CacheStorage.AllCacheDatas.Count > 0;
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var data in CacheStorage.AllCacheDatas)
             {
