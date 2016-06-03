@@ -78,7 +78,7 @@ namespace VitalChoice.Business.Queries.Customers
         {
             if (!string.IsNullOrWhiteSpace(email))
             {
-                Add(p => p.Email.Contains(email));
+                Add(p => p.Email.StartsWith(email));
             }
             return this;
         }
@@ -125,7 +125,7 @@ namespace VitalChoice.Business.Queries.Customers
 		public CustomerQuery WithIdContains(string text)
         {
             if (!string.IsNullOrWhiteSpace(text))
-                Add(x => x.Id.ToString().Contains(text));
+                Add(x => x.Id.ToString().StartsWith(text));
             return this;
         }
 

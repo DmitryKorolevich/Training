@@ -35,3 +35,23 @@ BEGIN
 		[IdProfileAddress]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 END
 GO
+
+IF NOT EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[Customers]') AND name = N'IX_ProfileAddress')
+BEGIN
+	CREATE NONCLUSTERED INDEX [IX_ProfileAddress] ON [dbo].[Customers]
+	(
+		IdProfileAddress DESC
+	)
+	INCLUDE ( 	[Id],
+		[IdObjectType],
+		[DateCreated],
+		[DateEdited],
+		[IdEditedBy],
+		[IdDefaultPaymentMethod],
+		[StatusCode],
+		[PublicId],
+		[IdAffiliate],
+		[IdProfileAddress],
+		Email) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+END
+GO
