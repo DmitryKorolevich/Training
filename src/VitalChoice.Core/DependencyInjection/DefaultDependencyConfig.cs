@@ -99,7 +99,9 @@ using VitalChoice.Profiling;
 using VitalChoice.Profiling.Base;
 using VitalChoice.Profiling.Interfaces;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using VitalChoice.Business.Services.VeraCore;
 using VitalChoice.Caching.Services.Cache.Base;
+using VitalChoice.Interfaces.Services.VeraCore;
 using IContainer = Autofac.IContainer;
 #if !NETSTANDARD1_5
 using VitalChoice.Caching.Interfaces;
@@ -416,16 +418,17 @@ namespace VitalChoice.Core.DependencyInjection
                 PublicFormSendData = section["PublicFormSendData"],
                 PublicFormSubscribeData = section["PublicFormSubscribeData"],
             };
-            section = configuration.GetSection("App:ProMailSettings");
-            if (section?.Value != null)
+            section = configuration.GetSection("App:VeraCoreSettings");
+            if (section["ServerHost"]!=null)
             {
-                options.ProMailSettings = new ProMailSettings
+                options.VeraCoreSettings = new VeraCoreSettings
                 {
                     ExportFolderName = section["ExportFolderName"],
                     ServerHost = section["ServerHost"],
                     UserName = section["UserName"],
                     Password = section["Password"],
                     ServerPort = Int32.Parse(section["ServerPort"]),
+                    ArchivePath =section["ArchivePath"],
                 };
             }
         }
@@ -568,7 +571,9 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<BrontoService>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<ServiceCodeService>().As<IServiceCodeService>().InstancePerLifetimeScope();
             builder.RegisterType<OrderReportService>().As<IOrderReportService>().InstancePerLifetimeScope();
-            builder.RegisterType<ProMailSFTPService>().As<IProMailSFTPService>().InstancePerLifetimeScope();
+            builder.RegisterType<VeraCoreSFTPService>().As<IVeraCoreSFTPService>().InstancePerLifetimeScope();
+            builder.RegisterType<VeraCoreFilesCacheService>().As<IVeraCoreFilesCacheService>().InstancePerLifetimeScope();
+            builder.RegisterType<VeraCoreNotificationService>().As<IVeraCoreNotificationService>().InstancePerLifetimeScope();
             builder.RegisterMappers(typeof(ProductService).GetTypeInfo().Assembly, (type, registration) =>
             {
                 if (type == typeof(SkuMapper))

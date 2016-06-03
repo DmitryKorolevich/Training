@@ -48,7 +48,10 @@ using Microsoft.AspNetCore.Mvc;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Infrastructure.Domain.Entities.Reports;
 using VitalChoice.Infrastructure.Identity.UserManagers;
-using VitalChoice.Infrastructure.Domain.Transfer.Customers;namespace VC.Admin.Controllers
+using VitalChoice.Infrastructure.Domain.Transfer.Customers;
+using VitalChoice.Interfaces.Services.VeraCore;
+
+namespace VC.Admin.Controllers
 {
     public class OrderController : BaseApiController
     {
@@ -79,6 +82,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Customers;namespace VC.Admin.Co
         private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
         private readonly IDynamicMapper<OrderDynamic, Order> _orderMapper;
         private readonly IOrderReportService _orderReportService;
+        private readonly IVeraCoreNotificationService _testService;
 
         public OrderController(
             IOrderService orderService,
@@ -104,7 +108,8 @@ using VitalChoice.Infrastructure.Domain.Transfer.Customers;namespace VC.Admin.Co
             IDynamicMapper<ProductDynamic, Product> productMapper, IDynamicMapper<SkuDynamic, Sku> skuMapper,
             IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodMapper,
             IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> customerPaymentMethodMapper,
-            IDynamicMapper<AddressDynamic, Address> addressMapper, ExtendedUserManager userManager)
+            IDynamicMapper<AddressDynamic, Address> addressMapper, ExtendedUserManager userManager,
+            IVeraCoreNotificationService testService)
         {
             _orderService = orderService;
             _orderRefundService = orderRefundService;
@@ -133,6 +138,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Customers;namespace VC.Admin.Co
             _userManager = userManager;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             loggerProvider.CreateLogger<OrderController>();
+            _testService = testService;
         }
 
         #region BaseOrderLogic
@@ -201,6 +207,8 @@ using VitalChoice.Infrastructure.Domain.Transfer.Customers;namespace VC.Admin.Co
         [HttpPost]
         public async Task<Result<PagedList<OrderListItemModel>>> GetOrders([FromBody]VOrderFilter filter)
         {
+            //await _testService.ProcessFiles();
+
             if (filter.To.HasValue)
             {
                 filter.To = filter.To.Value.AddDays(1);
