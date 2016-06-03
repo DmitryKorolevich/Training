@@ -204,7 +204,7 @@ namespace VitalChoice.DynamicData.Base
             }
             else if (value.OptionType.IdFieldType == (int) FieldType.String && !string.IsNullOrEmpty(value.Value))
             {
-                Expression<Func<TOptionValue, bool>> lambda = v => v.IdOptionType == value.IdType && v.Value.Contains(value.Value);
+                Expression<Func<TOptionValue, bool>> lambda = v => v.IdOptionType == value.IdType && v.Value.StartsWith(value.Value);
                 valuesSelector = Expression.Call(GetConditionMethod("Any", typeof(TOptionValue)), Expression.MakeMemberAccess(parameter, member), lambda);
             }
             else
@@ -229,60 +229,6 @@ namespace VitalChoice.DynamicData.Base
             public IEnumerable<OptionValueItem<T>> Values { get; set; }
 
             public int? IdObjectType { get; set; }
-        }
-
-        private static Expression<Func<TOptionValue, bool>> CreateValuesSelectorWorkaround(
-            List<OptionGroup<TOptionType>> optionGroups)
-        {
-            Expression<Func<TOptionValue, bool>> result = null;
-            foreach (var optionGroup in optionGroups)
-            {
-                Expression<Func<TOptionValue, bool>> valuesSelector = null;
-                foreach (
-                    var value in
-                        optionGroup.Values.Where(
-                            value => !string.IsNullOrEmpty(value.Value) && value.OptionType.IdFieldType != (int)FieldType.LargeString))
-                {
-                    if (valuesSelector == null)
-                    {
-                        if (value.OptionType.IdFieldType == (int)FieldType.String)
-                        {
-                            valuesSelector =
-                                v => v.IdOptionType == value.IdType && v.Value.Contains(value.Value);
-                        }
-                        else
-                        {
-                            valuesSelector =
-                                v => v.IdOptionType == value.IdType && v.Value == value.Value;
-                        }
-                    }
-                    else
-                    {
-                        if (value.OptionType.IdFieldType == (int)FieldType.String)
-                        {
-                            valuesSelector =
-                                valuesSelector.And(
-                                    v => v.IdOptionType == value.IdType && v.Value.Contains(value.Value));
-                        }
-                        else
-                        {
-                            valuesSelector =
-                                valuesSelector.And(
-                                    v => v.IdOptionType == value.IdType && v.Value == value.Value);
-                        }
-                    }
-                }
-                if (optionGroup.IdObjectType == null)
-                {
-                    result = result == null ? valuesSelector : result.And(valuesSelector);
-                }
-                else
-                {
-                    result = result == null ? valuesSelector : result.Or(valuesSelector);
-                }
-            }
-
-            return result;
         }
     }
 }
