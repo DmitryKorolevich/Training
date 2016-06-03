@@ -1382,7 +1382,7 @@ namespace VitalChoice.Business.Services.Orders
                     var skuIdsForInsert = skuIds.Except(dbOptionValues.Select(p => p.IdSku)).ToList();
                     if (skuIdsForInsert.Any())
                     {
-                        var now = MapperTypeConverter.ConvertDateToISOStringAndDropMC(DateTime.Now);
+                        var now = MapperTypeConverter.ConvertDateToIsoStringAndDropMc(DateTime.Now);
                         var skuOptionValueRepository = uow.RepositoryAsync<SkuOptionValue>();
                         skuOptionValueRepository.InsertRange(skuIdsForInsert.Select(p => new SkuOptionValue()
                         {
