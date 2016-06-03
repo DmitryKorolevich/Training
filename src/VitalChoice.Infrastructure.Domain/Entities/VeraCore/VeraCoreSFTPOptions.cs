@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace VitalChoice.Infrastructure.Domain.Entities.ProMail
+namespace VitalChoice.Infrastructure.Domain.Entities.VeraCore
 {
-    public enum ProMailSFTPOptions
+    public enum VeraCoreSFTPOptions
     {
         Export
     }

@@ -84,7 +84,7 @@
                         {{::item.ShipTo}}
                     </td>
                     <td>
-                        <button title="Repeat" class="btn btn-default btn-success btn-xs" data-ng-if="item.IdObjectType!=6 && item.OrderStatus!=1 && item.POrderStatus!=1 && item.NPOrderStatus!=1" ui-sref="index.oneCol.orderAdd({idcustomer:item.IdCustomer, idsource:item.Id })">
+                        <button title="Repeat" class="btn btn-default btn-success btn-xs" data-ng-if="item.IdObjectType!=6 && item.IdObjectType!=7 && item.OrderStatus!=1 && item.POrderStatus!=1 && item.NPOrderStatus!=1" ui-sref="index.oneCol.orderAdd({idcustomer:item.IdCustomer, idsource:item.Id })">
                             Repeat
                         </button>
                         <button title="Reship" class="btn btn-default btn-info btn-xs" data-ng-if="item.IdObjectType!=6 && item.OrderStatus!=1 && item.POrderStatus!=1 && item.NPOrderStatus!=1 && item.OrderStatus!=4 && item.POrderStatus!=4 && item.NPOrderStatus!=4" ui-sref="index.oneCol.orderReshipAdd({idcustomer:item.IdCustomer, idsource:item.Id })">

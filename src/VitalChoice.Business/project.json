@@ -29,7 +29,8 @@
       "frameworkAssemblies": {
         "System.ServiceModel": "",
         "System.IO": "",
-        "System.Net.Primitives": ""
+        "System.Net.Primitives": "",
+        "System.IO.Compression": ""
       }
     }
   }

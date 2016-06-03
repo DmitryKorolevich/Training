@@ -1,61 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using VitalChoice.Business.Queries.Content;
-using VitalChoice.Data.Helpers;
-using VitalChoice.Data.Repositories;
-using VitalChoice.Interfaces.Services.Content;
-using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Interfaces.Services;
-using VitalChoice.Infrastructure.UnitOfWork;
-using System.Threading;
-using VitalChoice.ContentProcessing.Cache;
-using VitalChoice.Ecommerce.Cache;
-using VitalChoice.Ecommerce.Domain.Entities;
-using VitalChoice.Ecommerce.Domain.Entities.Products;
-using VitalChoice.Ecommerce.Domain.Exceptions;
-using VitalChoice.Ecommerce.Domain.Transfer;
-using VitalChoice.Infrastructure.Domain.Content.Articles;
-using VitalChoice.Infrastructure.Domain.Content.Base;
-using VitalChoice.Infrastructure.Domain.Transfer;
-using VitalChoice.Infrastructure.Domain.Transfer.ContentManagement;
-using VitalChoice.Infrastructure.Domain.Content.Recipes;
-using VitalChoice.Ecommerce.Domain.Mail;
-using System.Reflection;
-using VitalChoice.Infrastructure.Domain.Mail;
-using Templates;
-using System.Dynamic;
 using System.IO;
+using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Renci.SshNet;
 using Renci.SshNet.Sftp;
-using Templates.Exceptions;
-using VitalChoice.Ecommerce.Domain.Helpers;
-using Templates.Runtime;
-using VitalChoice.Infrastructure.Domain.Content.Emails;
-using VitalChoice.Infrastructure.Domain.Entities.ProMail;
+using VitalChoice.Infrastructure.Domain.Entities.VeraCore;
 using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Interfaces.Services;
+using VitalChoice.Interfaces.Services.VeraCore;
 
-namespace VitalChoice.Business.Services
+namespace VitalChoice.Business.Services.VeraCore
 {
-    public class ProMailSFTPService : IProMailSFTPService, IDisposable
+    public class VeraCoreSFTPService : IVeraCoreSFTPService, IDisposable
     {
         private readonly IOptions<AppOptions> _options;
         private readonly ILogger _logger;
 
         private SftpClient _sftpClient;
 
-        public ProMailSFTPService(
+        public VeraCoreSFTPService(
             IOptions<AppOptions> options,
             ILoggerProviderExtended logger)
         {
             _options = options;
-            _logger = logger.CreateLogger<ProMailSFTPService>();
-            var connectionInfo = new PasswordConnectionInfo(options.Value.ProMailSettings.ServerHost,
-                options.Value.ProMailSettings.ServerPort,
-                options.Value.ProMailSettings.UserName, options.Value.ProMailSettings.Password);
+            _logger = logger.CreateLogger<VeraCoreSFTPService>();
+            var connectionInfo = new PasswordConnectionInfo(options.Value.VeraCoreSettings.ServerHost,
+                options.Value.VeraCoreSettings.ServerPort,
+                options.Value.VeraCoreSettings.UserName, options.Value.VeraCoreSettings.Password);
             connectionInfo.Timeout = new TimeSpan(0,0,1);
 
             Reconnect();
@@ -71,12 +44,13 @@ namespace VitalChoice.Business.Services
                 }
                 _sftpClient.Dispose();
             }
-            var connectionInfo = new PasswordConnectionInfo(_options.Value.ProMailSettings.ServerHost,
-                _options.Value.ProMailSettings.ServerPort,
-                _options.Value.ProMailSettings.UserName, _options.Value.ProMailSettings.Password);
+            var connectionInfo = new PasswordConnectionInfo(_options.Value.VeraCoreSettings.ServerHost,
+                _options.Value.VeraCoreSettings.ServerPort,
+                _options.Value.VeraCoreSettings.UserName, _options.Value.VeraCoreSettings.Password);
             connectionInfo.Timeout = new TimeSpan(0, 0, 1);
 
             _sftpClient = new SftpClient(connectionInfo);
+            _sftpClient.Connect();
         }
 
         public void Dispose()
@@ -86,37 +60,39 @@ namespace VitalChoice.Business.Services
             _sftpClient.Dispose();
         }
 
-        public ICollection<ProMailFileInfo> GetFileList(ProMailSFTPOptions options)
+        public string WorkingDirectory => _sftpClient.WorkingDirectory;
+
+        public ICollection<VeraCoreFileInfo> GetFileList(VeraCoreSFTPOptions options)
         {
             IEnumerable<SftpFile> files;
             try
             {
                 switch (options)
                 {
-                    case ProMailSFTPOptions.Export:
-                        _sftpClient.ChangeDirectory("/" + _options.Value.ProMailSettings.ExportFolderName);
+                    case VeraCoreSFTPOptions.Export:
+                        _sftpClient.ChangeDirectory(_options.Value.VeraCoreSettings.ExportFolderName);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException("options");
                 }
-                files = _sftpClient.ListDirectory("/");
+                files = _sftpClient.ListDirectory(".");
             }
             catch (Exception e)
             {
                 Reconnect();
                 switch (options)
                 {
-                    case ProMailSFTPOptions.Export:
-                        _sftpClient.ChangeDirectory("/" + _options.Value.ProMailSettings.ExportFolderName);
+                    case VeraCoreSFTPOptions.Export:
+                        _sftpClient.ChangeDirectory(_options.Value.VeraCoreSettings.ExportFolderName);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException("options");
                 }
-                files  = _sftpClient.ListDirectory("/");
+                files  = _sftpClient.ListDirectory(".");
 
                 _logger.LogError(e.ToString());
             }
-            var toReturn = files.Where(p=>!p.IsDirectory).Select(p => new ProMailFileInfo()
+            var toReturn = files.Where(p=>!p.IsDirectory).Select(p => new VeraCoreFileInfo()
             {
                 FileDate = p.LastWriteTime,
                 FileName = p.Name,

@@ -199,4 +199,7 @@
   <ItemGroup>
     <None Include="PreDeployment\Scripts\ArticleBonusLinks.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\VeraCore.sql" />
+  </ItemGroup>
 </Project>

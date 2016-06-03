@@ -46,7 +46,7 @@ namespace VitalChoice.Data.Transaction
             {
                 return new UnitOfWorkBase(_transaction.DbContext);
             }
-            DataContext context = (DataContext) Activator.CreateInstance(typeof (TContext), _appOptions, _contextOptions);
+            var context = (IDataContextAsync) Activator.CreateInstance(typeof (TContext), _appOptions, _contextOptions);
             return new UnitOfWorkBase(context);
         }
     }
