@@ -82,7 +82,6 @@ namespace VC.Admin.Controllers
         private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
         private readonly IDynamicMapper<OrderDynamic, Order> _orderMapper;
         private readonly IOrderReportService _orderReportService;
-        private readonly IVeraCoreNotificationService _testService;
 
         public OrderController(
             IOrderService orderService,
@@ -108,8 +107,7 @@ namespace VC.Admin.Controllers
             IDynamicMapper<ProductDynamic, Product> productMapper, IDynamicMapper<SkuDynamic, Sku> skuMapper,
             IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodMapper,
             IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> customerPaymentMethodMapper,
-            IDynamicMapper<AddressDynamic, Address> addressMapper, ExtendedUserManager userManager,
-            IVeraCoreNotificationService testService)
+            IDynamicMapper<AddressDynamic, Address> addressMapper, ExtendedUserManager userManager)
         {
             _orderService = orderService;
             _orderRefundService = orderRefundService;
@@ -138,7 +136,6 @@ namespace VC.Admin.Controllers
             _userManager = userManager;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             loggerProvider.CreateLogger<OrderController>();
-            _testService = testService;
         }
 
         #region BaseOrderLogic
@@ -207,7 +204,6 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<PagedList<OrderListItemModel>>> GetOrders([FromBody]VOrderFilter filter)
         {
-            //await _testService.ProcessFiles();
 
             if (filter.To.HasValue)
             {
