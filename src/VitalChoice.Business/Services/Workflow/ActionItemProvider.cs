@@ -19,6 +19,10 @@ namespace VitalChoice.Business.Services.Workflow
         private readonly IEcommerceRepositoryAsync<WorkflowExecutor> _executors;
         private readonly IEcommerceRepositoryAsync<WorkflowResolverPath> _resolverPaths;
 
+        private Dictionary<ExecutorKey, HashSet<ActionItem>> _aggregations;
+        private Dictionary<ExecutorKey, HashSet<ActionItem>> _depencies;
+        private Dictionary<ExecutorKey, Dictionary<int, ActionItem>> _resolvers;
+
         public ActionItemProvider(IEcommerceRepositoryAsync<WorkflowTree> treeRepository,
             IEcommerceRepositoryAsync<WorkflowExecutor> executors,
             IEcommerceRepositoryAsync<WorkflowResolverPath> resolverPaths)
@@ -58,58 +62,130 @@ namespace VitalChoice.Business.Services.Workflow
 
         public async Task<Dictionary<int, ActionItem>> GetActionResolverPaths(string actionName, Type implementation)
         {
-            var actions =
-                await
-                    _resolverPaths.Query(p => p.Resolver.Name == actionName && p.Resolver.ImplementationType == implementation.FullName)
-                        .Include(r => r.Resolver)
-                        .Include(r => r.Executor)
-                        .SelectAsync(false);
-            if (actions.Count == 0)
-                throw new ApiException($"Action <{actionName}> not found");
-
-            return actions.ToDictionary(a => a.Path, a => new ActionItem(a.Executor.ImplementationType, a.Executor.Name)
+            if (_resolvers == null)
             {
-                WorkflowActionType = a.Executor.ActionType
-            });
+                _resolvers = new Dictionary<ExecutorKey, Dictionary<int, ActionItem>>();
+                var actions =
+                    await
+                        _resolverPaths.Query()
+                            .Include(r => r.Resolver)
+                            .Include(r => r.Executor)
+                            .SelectAsync(false);
+                var results = actions.GroupBy(a => new ExecutorKey(a.Resolver.Name, a.Resolver.ImplementationType));
+                foreach (var group in results)
+                {
+                    var dict = group.ToDictionary(a => a.Path, a => new ActionItem(a.Executor.ImplementationType, a.Executor.Name)
+                    {
+                        WorkflowActionType = a.Executor.ActionType
+                    });
+                    _resolvers.Add(group.Key, dict);
+                }
+            }
+            Dictionary<int, ActionItem> result;
+            if (_resolvers.TryGetValue(new ExecutorKey(actionName, implementation.FullName), out result))
+            {
+                return result;
+            }
+            throw new ApiException($"Action <{actionName}> not found");
         }
 
         public async Task<HashSet<ActionItem>> GetDependencies(string actionName, Type implementation)
         {
-            var result =
-                await _executors.Query(new WorkflowExecutorQuery().WithName(actionName).WithImplementationType(implementation))
-                    .Include(t => t.Dependencies)
-                    .ThenInclude(ta => ta.Dependent)
-                    .SelectAsync(false);
-            var action = result.SingleOrDefault();
-            if (action == null)
-                throw new ApiException($"Action <{actionName}> not found");
-
-            return
-                new HashSet<ActionItem>(
-                    action.Dependencies.Select(a => new ActionItem(a.Dependent.ImplementationType, a.Dependent.Name)
-                    {
-                        WorkflowActionType = a.Dependent.ActionType
-                    }));
+            if (_depencies == null)
+            {
+                _depencies = new Dictionary<ExecutorKey, HashSet<ActionItem>>();
+                var results =
+                    await _executors.Query()
+                        .Include(t => t.Dependencies)
+                        .ThenInclude(ta => ta.Dependent)
+                        .SelectAsync(false);
+                foreach (var action in results)
+                {
+                    var set = new HashSet<ActionItem>(
+                        action.Dependencies.Select(a => new ActionItem(a.Dependent.ImplementationType, a.Dependent.Name)
+                        {
+                            WorkflowActionType = a.Dependent.ActionType
+                        }));
+                    _depencies.Add(new ExecutorKey(action.Name, action.ImplementationType), set);
+                }
+            }
+            HashSet<ActionItem> result;
+            if (_depencies.TryGetValue(new ExecutorKey(actionName, implementation.FullName), out result))
+            {
+                return result;
+            }
+            throw new ApiException($"Action <{actionName}> not found");
         }
 
         public async Task<HashSet<ActionItem>> GetAggregations(string actionName, Type implementation)
         {
-            var result =
-                await _executors.Query(new WorkflowExecutorQuery().WithName(actionName).WithImplementationType(implementation))
-                    .Include(t => t.Aggreagations)
-                    .ThenInclude(ta => ta.ToAggregate)
-                    .SelectAsync(false);
-            var action = result.SingleOrDefault();
-            if (action == null)
-                throw new ApiException($"Action <{actionName}> not found");
+            if (_aggregations == null)
+            {
+                _aggregations = new Dictionary<ExecutorKey, HashSet<ActionItem>>();
+                var results =
+                    await _executors.Query()
+                        .Include(t => t.Aggreagations)
+                        .ThenInclude(ta => ta.ToAggregate)
+                        .SelectAsync(false);
+                foreach (var action in results)
+                {
+                    var set = new HashSet<ActionItem>(
+                        action.Aggreagations.Select(
+                            a => new ActionItem(a.ToAggregate.ImplementationType, a.ToAggregate.Name)
+                            {
+                                WorkflowActionType = a.ToAggregate.ActionType
+                            }));
+                    _aggregations.Add(new ExecutorKey(action.Name, action.ImplementationType), set);
+                }
+            }
+            HashSet<ActionItem> result;
+            if (_aggregations.TryGetValue(new ExecutorKey(actionName, implementation.FullName), out result))
+            {
+                return result;
+            }
+            throw new ApiException($"Action <{actionName}> not found");
+        }
 
-            return
-                new HashSet<ActionItem>(
-                    action.Aggreagations.Select(
-                        a => new ActionItem(a.ToAggregate.ImplementationType, a.ToAggregate.Name)
-                        {
-                            WorkflowActionType = a.ToAggregate.ActionType
-                        }));
+        private struct ExecutorKey : IEquatable<ExecutorKey>
+        {
+            private readonly string _actionName;
+            private readonly string _implementation;
+
+            public ExecutorKey(string actionName, string implementation)
+            {
+                _actionName = actionName;
+                _implementation = implementation;
+            }
+
+            public bool Equals(ExecutorKey other)
+            {
+                return string.Equals(_actionName, other._actionName) &&
+                       string.Equals(_implementation, other._implementation);
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                return obj is ExecutorKey && Equals((ExecutorKey) obj);
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    return (_actionName.GetHashCode()*397) ^ _implementation.GetHashCode();
+                }
+            }
+
+            public static bool operator ==(ExecutorKey left, ExecutorKey right)
+            {
+                return left.Equals(right);
+            }
+
+            public static bool operator !=(ExecutorKey left, ExecutorKey right)
+            {
+                return !left.Equals(right);
+            }
         }
     }
 }
