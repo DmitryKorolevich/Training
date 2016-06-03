@@ -452,6 +452,7 @@ namespace VitalChoice.Business.Services.Customers
                 await
                     SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount,
                         new CustomerQuery().WithIdContains(filter.IdContains)
+                            .NotDeleted()
                             .WithId(filter.SearchText)
                             .WithEmailContains(filter.Email)
                             .WithIdAffiliate(filter.IdAffiliate, filter.IdAffiliateRequired)
