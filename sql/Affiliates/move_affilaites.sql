@@ -1574,5 +1574,8 @@ INCLUDE ( 	[Id],
 	[IdProfileAddress]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 GO
 
-DROP FUNCTION [vitalchoice2.0].[dbo].[DelimitedSplit8K]
+USE [vitalchoice2.0]
+GO
+
+DROP FUNCTION [dbo].[DelimitedSplit8K]
 GO
