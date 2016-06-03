@@ -10,10 +10,11 @@ namespace VitalChoice.DynamicData.Helpers
 {
     public static class MapperTypeConverter
     {
-        private static readonly string[] FormatStrings = {
-            "yyyy-MM-ddTHH:mm:ss.fffffff", "yyyy-MM-ddTHH:mm:ss.ffffff", "yyyy-MM-ddTHH:mm:ss.fffff",
-            "yyyy-MM-ddTHH:mm:ss.ffff", "yyyy-MM-ddTHH:mm:ss.fff", "yyyy-MM-ddTHH:mm:ss.ff", "yyyy-MM-ddTHH:mm:ss.f",
-            "yyyy-MM-ddTHH:mm:ss"
+        private static readonly string[] FormatStrings =
+        {
+            "yyyy-MM-dd", "yyyy-MM-ddTHH:mm:ss", "yyyy-MM-ddTHH:mm:ss.fffffff", "yyyy-MM-ddTHH:mm:ss.ffffff",
+            "yyyy-MM-ddTHH:mm:ss.fffff", "yyyy-MM-ddTHH:mm:ss.ffff", "yyyy-MM-ddTHH:mm:ss.fff", "yyyy-MM-ddTHH:mm:ss.ff",
+            "yyyy-MM-ddTHH:mm:ss.f"
         };
 
         public static object ConvertTo<TOptionValue, TOptionType>(TOptionValue value, FieldType typeId)
@@ -76,7 +77,7 @@ namespace VitalChoice.DynamicData.Helpers
                     return value as string;
                 case FieldType.DateTime:
                     var datetime = (DateTime)value;
-                    return ConvertDateToISOString(datetime);
+                    return ConvertDateToIsoString(datetime);
                 default:
                     var valueType = value.GetType();
                     var underlyingType = valueType.UnwrapNullable();
@@ -125,7 +126,7 @@ namespace VitalChoice.DynamicData.Helpers
                     break;
                 case FieldType.DateTime:
                     var datetime = (DateTime) value;
-                    option.Value = ConvertDateToISOString(datetime);
+                    option.Value = ConvertDateToIsoString(datetime);
                     break;
                 default:
                     var valueType = value.GetType();
@@ -142,15 +143,22 @@ namespace VitalChoice.DynamicData.Helpers
             }
         }
 
-        public static string ConvertDateToISOStringAndDropMC(DateTime datetime)
+        public static string ConvertDateToIsoStringAndDropMc(DateTime datetime)
         {
-            datetime = new DateTime(datetime.Year, datetime.Month, datetime.Day, datetime.Hour, datetime.Minute,
-                datetime.Second);
-            return TrimZeros(datetime.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"));
+            return TrimZeros(datetime.ToString("yyyy-MM-ddTHH:mm:ss"));
         }
 
-        public static string ConvertDateToISOString(DateTime datetime)
+        public static string ConvertDateToIsoString(DateTime datetime)
         {
+            return ConvertDateToIsoMinimal(datetime);
+        }
+
+        public static string ConvertDateToIsoMinimal(DateTime datetime)
+        {
+            if (datetime.Hour == 0 && datetime.Minute == 0 && datetime.Second == 0 && datetime.Millisecond == 0)
+            {
+                return datetime.ToString("yyyy-MM-dd");
+            }
             return TrimZeros(datetime.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"));
         }
 
