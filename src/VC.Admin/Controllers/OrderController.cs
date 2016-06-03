@@ -207,7 +207,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<PagedList<OrderListItemModel>>> GetOrders([FromBody]VOrderFilter filter)
         {
-            await _testService.ProcessFiles();
+            //await _testService.ProcessFiles();
 
             if (filter.To.HasValue)
             {
