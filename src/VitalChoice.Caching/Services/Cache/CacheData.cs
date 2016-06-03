@@ -258,8 +258,15 @@ namespace VitalChoice.Caching.Services.Cache
                 cached.NeedUpdate = true;
                 return false;
             }
-            entity.UpdateCloneRelations(relationsToClone, cached.Entity);
-            entity.UpdateNonRelatedObjects(cached.Entity);
+            if (cached.Entity != null)
+            {
+                entity.UpdateCloneRelations(relationsToClone, cached.Entity);
+                entity.UpdateNonRelatedObjects(cached.Entity);
+            }
+            else
+            {
+                cached.Entity = entity;
+            }
             UpdateRelations(cached.Entity, relationsToClone);
             cached.NeedUpdateRelated.Clear();
             return true;

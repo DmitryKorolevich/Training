@@ -159,107 +159,113 @@ namespace VitalChoice.Caching.Services
 
         private IEnumerable<SyncOperation> UpdateCache(IEnumerable<ImmutableEntryState> entriesToSave)
         {
-                var syncOperations = new List<SyncOperation>();
-                var dbContext = DataContext as DbContext;
-                var entryGroups = entriesToSave.Where(e => e.EntityType != null).Select(e => new SyncOp
-                {
-                    Entry = e
-                }).GroupBy(e => e.Entry.EntityType).ToArray();
+            var syncOperations = new List<SyncOperation>();
+            var dbContext = DataContext as DbContext;
+            var entryGroups = entriesToSave.Where(e => e.EntityType != null).Select(e => new SyncOp
+            {
+                Entry = e
+            }).GroupBy(e => e.Entry.EntityType).ToArray();
 
-                //Update in two stages, first mark all for update/add
-                foreach (var group in entryGroups)
+            //Update in two stages, first mark all for update/add
+            foreach (var group in entryGroups)
+            {
+                var cache = CacheFactory.GetCache(group.Key);
+                var toMarkForAdd = new List<SyncOp>();
+                var toUpdate = new List<SyncOp>();
+                var toDelete = new List<SyncOp>();
+                foreach (var op in group)
                 {
-                    var cache = CacheFactory.GetCache(group.Key);
-                    var toMarkForAdd = new List<SyncOp>();
-                    var toUpdate = new List<SyncOp>();
-                    var toDelete = new List<SyncOp>();
-                    foreach (var op in group)
+                    op.Cache = cache;
+                    switch (op.Entry.State)
                     {
-                        op.Cache = cache;
-                        switch (op.Entry.State)
-                        {
-                            case EntityState.Modified:
-                                toUpdate.Add(op);
-                                break;
-                            case EntityState.Deleted:
-                                toDelete.Add(op);
-                                break;
-                            case EntityState.Added:
-                                toMarkForAdd.Add(op);
-                                break;
-                        }
-                        //if (op.Entry.State != EntityState.Detached && op.Entry.State != EntityState.Unchanged)
-                        //{
-                        //    scope.AddScopeData($"{group.Key.FullName}[{op.Entry.State}]{op.PrimaryKey}");
-                        //}
+                        case EntityState.Modified:
+                            toUpdate.Add(op);
+                            break;
+                        case EntityState.Deleted:
+                            toDelete.Add(op);
+                            break;
+                        case EntityState.Added:
+                            toMarkForAdd.Add(op);
+                            break;
                     }
-                    foreach (var opPair in toMarkForAdd.SimpleJoin(cache.MarkForAdd(toMarkForAdd.Select(op => op.Entry.Entity).ToArray())))
+                    //if (op.Entry.State != EntityState.Detached && op.Entry.State != EntityState.Unchanged)
+                    //{
+                    //    scope.AddScopeData($"{group.Key.FullName}[{op.Entry.State}]{op.PrimaryKey}");
+                    //}
+                }
+                foreach (var opPair in toMarkForAdd.SimpleJoin(cache.MarkForAdd(toMarkForAdd.Select(op => op.Entry.Entity).ToArray())))
+                {
+                    var op = opPair.Key;
+                    op.PrimaryKey = opPair.Value;
+                    if (op.PrimaryKey.IsValid)
                     {
-                        var op = opPair.Key;
-                        op.PrimaryKey = opPair.Value;
-                        if (op.PrimaryKey.IsValid)
+                        syncOperations.Add(new SyncOperation
                         {
-                            syncOperations.Add(new SyncOperation
-                            {
-                                Key = op.PrimaryKey.ToExportable(group.Key),
-                                SyncType = SyncType.Add,
-                                EntityType = group.Key.FullName
-                            });
-                        }
-                    }
-                    foreach (var opPair in toUpdate.SimpleJoin(cache.MarkForUpdate(toUpdate.Select(op => op.Entry.Entity))))
-                    {
-                        var op = opPair.Key;
-                        op.PrimaryKey = opPair.Value;
-                        if (op.PrimaryKey.IsValid)
-                        {
-                            syncOperations.Add(new SyncOperation
-                            {
-                                Key = op.PrimaryKey.ToExportable(group.Key),
-                                SyncType = SyncType.Update,
-                                EntityType = group.Key.FullName
-                            });
-                        }
-                    }
-                    foreach (var opPair in toDelete.SimpleJoin(cache.MarkForUpdate(toDelete.Select(op => op.Entry.Entity))))
-                    {
-                        var op = opPair.Key;
-                        op.PrimaryKey = opPair.Value;
-                        if (op.PrimaryKey.IsValid)
-                        {
-                            syncOperations.Add(new SyncOperation
-                            {
-                                Key = op.PrimaryKey.ToExportable(group.Key),
-                                SyncType = SyncType.Delete,
-                                EntityType = group.Key.FullName
-                            });
-                        }
+                            Key = op.PrimaryKey.ToExportable(group.Key),
+                            SyncType = SyncType.Add,
+                            EntityType = group.Key.FullName
+                        });
                     }
                 }
-
-                //Update in two stages, perform update
-                foreach (var group in entryGroups)
+                foreach (var opPair in toUpdate.SimpleJoin(cache.MarkForUpdate(toUpdate.Select(op => op.Entry.Entity))))
                 {
-                    foreach (var op in group)
+                    var op = opPair.Key;
+                    op.PrimaryKey = opPair.Value;
+                    if (op.PrimaryKey.IsValid)
                     {
-                        switch (op.Entry.State)
+                        syncOperations.Add(new SyncOperation
                         {
-                            case EntityState.Modified:
-                                if (op.PrimaryKey.IsValid)
-                                {
-                                    op.Cache.Update(op.Entry.Entity, dbContext);
-                                }
-                                break;
-                            case EntityState.Deleted:
-                                if (op.PrimaryKey.IsValid)
-                                {
-                                    op.Cache.TryRemove(op.PrimaryKey);
-                                }
-                                break;
-                        }
+                            Key = op.PrimaryKey.ToExportable(group.Key),
+                            SyncType = SyncType.Update,
+                            EntityType = group.Key.FullName
+                        });
                     }
                 }
-                return syncOperations;
+                foreach (var opPair in toDelete.SimpleJoin(cache.MarkForUpdate(toDelete.Select(op => op.Entry.Entity))))
+                {
+                    var op = opPair.Key;
+                    op.PrimaryKey = opPair.Value;
+                    if (op.PrimaryKey.IsValid)
+                    {
+                        syncOperations.Add(new SyncOperation
+                        {
+                            Key = op.PrimaryKey.ToExportable(group.Key),
+                            SyncType = SyncType.Delete,
+                            EntityType = group.Key.FullName
+                        });
+                    }
+                }
+            }
+
+            //Update in two stages, perform update
+            foreach (var group in entryGroups)
+            {
+                foreach (var op in group)
+                {
+                    switch (op.Entry.State)
+                    {
+                        case EntityState.Added:
+                            if (op.PrimaryKey.IsValid)
+                            {
+                                op.Cache.Update(op.Entry.Entity, dbContext);
+                            }
+                            break;
+                        case EntityState.Modified:
+                            if (op.PrimaryKey.IsValid)
+                            {
+                                op.Cache.Update(op.Entry.Entity, dbContext);
+                            }
+                            break;
+                        case EntityState.Deleted:
+                            if (op.PrimaryKey.IsValid)
+                            {
+                                op.Cache.TryRemove(op.PrimaryKey);
+                            }
+                            break;
+                    }
+                }
+            }
+            return syncOperations;
         }
     }
 }

@@ -212,12 +212,31 @@ namespace VC.Public.Controllers
                 addUpdateModel.Email = cart.Order.Customer?.Email;
             }
 
-            if (!string.IsNullOrEmpty(addUpdateModel.Email))
-            {
-                addUpdateModel.SendNews = !(await _brontoService.GetIsUnsubscribed(addUpdateModel.Email) ?? false);
-            }
-
             return View(addUpdateModel);
+        }
+
+        public async Task<Result<bool>> GetIsUnsubscribed()
+        {
+            var loggedIn = await CustomerLoggedIn();
+            string email = null;
+            if (loggedIn)
+            {
+                var currentCustomer = await GetCurrentCustomerDynamic();
+                email = currentCustomer.Email;
+            }
+            else
+            {
+                var cart = await GetCurrentCart();
+                if (cart != null)
+                {
+                    email = cart.Order.Customer?.Email;
+                }
+            }
+            if (!string.IsNullOrEmpty(email))
+            {
+                return await _brontoService.GetIsUnsubscribed(email) ?? false;
+            }
+            return true;
         }
 
         [HttpPost]
@@ -230,8 +249,6 @@ namespace VC.Public.Controllers
             }
             var loggedIn = await CustomerLoggedIn();
             var cart = await GetCurrentCart(loggedIn);
-
-            SetCartUid(cart.CartUid);
 
             if (!ModelState.IsValid)
             {
@@ -436,7 +453,6 @@ namespace VC.Public.Controllers
                 }
             }
             var cart = await GetCurrentCart();
-            SetCartUid(cart.CartUid);
             var loggedIn = await EnsureLoggedIn(cart);
             if (loggedIn != null)
             {
@@ -613,8 +629,8 @@ namespace VC.Public.Controllers
             if (currentCustomer.ShippingAddresses.Count > 0)
             {
                 shippingAddresses.AddRange(
-                    currentCustomer.ShippingAddresses.OrderByDescending(a => (bool)a.Data.Default).Select(
-                        a => new KeyValuePair<string, AddressDynamic>((bool)a.Data.Default ? "(Default)" : string.Empty, a)));
+                    currentCustomer.ShippingAddresses.OrderByDescending(a => (bool?) a.SafeData.Default ?? false).Select(
+                        a => new KeyValuePair<string, AddressDynamic>(((bool?) a.SafeData.Default ?? false) ? "(Default)" : string.Empty, a)));
             }
             return shippingAddresses;
         }

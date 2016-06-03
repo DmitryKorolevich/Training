@@ -74,6 +74,15 @@ namespace VC.Public.Controllers
             return internalId;
         }
 
+        protected void SetCartUid(Guid uid)
+        {
+            Response.Cookies.Delete(CheckoutConstants.CartUidCookieName);
+            Response.Cookies.Append(CheckoutConstants.CartUidCookieName, uid.ToString(), new CookieOptions
+            {
+                Expires = DateTime.Now.AddYears(1)
+            });
+        }
+
         protected async Task<CustomerCartOrder> GetCurrentCart(bool? loggedIn = null)
         {
             if (loggedIn == null)
@@ -83,12 +92,16 @@ namespace VC.Public.Controllers
             if (loggedIn.Value)
             {
                 var existingUid = Request.GetCartUid();
-                return await CheckoutService.GetOrCreateCart(existingUid, GetInternalCustomerId());
+                var result = await CheckoutService.GetOrCreateCart(existingUid, GetInternalCustomerId());
+                SetCartUid(result.CartUid);
+                return result;
             }
             else
             {
                 var existingUid = Request.GetCartUid();
-                return await CheckoutService.GetOrCreateCart(existingUid);
+                var result = await CheckoutService.GetOrCreateCart(existingUid);
+                SetCartUid(result.CartUid);
+                return result;
             }
         }
 

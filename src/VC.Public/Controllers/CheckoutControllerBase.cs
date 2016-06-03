@@ -79,15 +79,6 @@ namespace VC.Public.Controllers
             SetCartUid(cart.CartUid);
         }
 
-        protected void SetCartUid(Guid uid)
-        {
-            Response.Cookies.Delete(CheckoutConstants.CartUidCookieName);
-            Response.Cookies.Append(CheckoutConstants.CartUidCookieName, uid.ToString(), new CookieOptions
-            {
-                Expires = DateTime.Now.AddYears(1)
-            });
-        }
-
         protected async Task FillModel(ViewCartModel cartModel, OrderDynamic order, OrderDataContext context)
         {
             if (!context.ProductsPerishableThresholdIssue)

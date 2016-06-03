@@ -449,26 +449,35 @@ namespace VitalChoice.Caching.Services.Cache
             List<EntityKey> pks = new List<EntityKey>();
             if (entities.Count == 0)
                 return pks;
-                foreach (var data in CacheStorage.AllCacheDatas)
+            foreach (var data in CacheStorage.AllCacheDatas)
+            {
+                if (data.FullCollection)
                 {
-                    if (data.FullCollection)
+                    data.NeedUpdate = true;
+                }
+                var cachedList = pks.Where(p => p.IsValid).Select(pk => data.Get(pk));
+
+                foreach (var cached in cachedList)
+                {
+                    if (cached != null)
                     {
-                        data.NeedUpdate = true;
+                        cached.NeedUpdate = true;
                     }
                 }
-                var foreignKeys = EntityInfo.ForeignKeys.GetForeignKeysValues(entities);
-                foreach (var entity in entities)
-                {
-                    Update(entity, (DbContext)null);
-                    pks.Add(EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity));
-                }
+            }
+            var foreignKeys = EntityInfo.ForeignKeys.GetForeignKeysValues(entities);
+            foreach (var entity in entities)
+            {
+                Update(entity, (DbContext) null);
+                pks.Add(EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity));
+            }
 
-                MarkForUpdateForeignKeys(foreignKeys);
-                foreach (var pk in pks)
-                {
-                    MarkForUpdateDependent(pk);
-                }
-                return pks;
+            MarkForUpdateForeignKeys(foreignKeys);
+            foreach (var pk in pks)
+            {
+                MarkForUpdateDependent(pk);
+            }
+            return pks;
         }
 
         private void MarkForUpdateInternal(ICollection<EntityKey> pks, IEnumerable<ICacheData<T>> cacheDatas, string markRelated)

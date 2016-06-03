@@ -161,11 +161,11 @@ namespace VitalChoice.Business.Services.Customers
                 var customerSameEmail =
                     await
                         _customerRepositoryAsync.Query(
-                            new CustomerQuery().NotDeleted().Excluding(model.Id).WithEmail(model.Email))
+                            new CustomerQuery().Active().WithEmail(model.Email))
                             .Include(c => c.OptionValues)
                             .SelectAsync(false);
 
-                if (customerSameEmail.Count > 0)
+                if (customerSameEmail.All(c => c.Id != model.Id))
                 {
                     throw new AppValidationException(
                         string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.EmailIsTakenAlready], model.Email));

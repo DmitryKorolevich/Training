@@ -19,6 +19,8 @@
 	};
 
 	populateCardTypes();
+
+	getBrontoIsUnsubscribed();
 });
 
 function changeSelection(selId) {
@@ -44,6 +46,22 @@ function changeSelection(selId) {
 	}).error(function (result) {
 		notifyError();
 	});
+}
+
+function getBrontoIsUnsubscribed() {
+    $.ajax({
+        url: "/Checkout/GetIsUnsubscribed",
+        dataType: "json"
+    }).success(function (result) {
+        if (result && result.Data) {
+            $("#SendNews").prop("checked", false);
+        }
+        else {
+            $("#SendNews").prop("checked", true);
+        }
+    }).error(function (result) {
+        notifyError();
+    });
 }
 
 function controlGuestCheckout() {
