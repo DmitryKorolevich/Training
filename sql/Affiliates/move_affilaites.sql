@@ -634,7 +634,8 @@ ConfirmationToken,
 TokenExpirationDate, 
 IsConfirmed, 
 IdUserType,
-AccessFailedCount)
+AccessFailedCount,
+PasswordHash)
 SELECT 
 	aff.idAffiliate,
 	NEWID(), 
@@ -656,7 +657,8 @@ SELECT
 	GETDATE(),
 	1,
 	3,
-	0
+	0,
+	[vitalchoice2.0].dbo.HashPassword([vitalchoice2.0].dbo.RC4Encode(aff.pcaff_Password))
 FROM [vitalchoice2.0].dbo.affiliates AS aff
 
 SET IDENTITY_INSERT [VitalChoice.Infrastructure].dbo.AspNetUsers OFF
@@ -1209,9 +1211,6 @@ CROSS APPLY [dbo].[DelimitedSplit8K](c.approvedPaymentMethods, ',') AS d
 
 GO
 
-DROP FUNCTION [dbo].[DelimitedSplit8K]
-GO
-
 ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
 ADD IdCustomer INT NULL, IdCreditCard INT NULL
 
@@ -1308,16 +1307,15 @@ ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
 DROP COLUMN IdCustomer, IdCreditCard
 
 GO
---============================= Check payment method
+--============================= Check payment method ==========================
 
 ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
-ADD IdCustomer INT NULL, IdCheck INT NULL
-
+ADD IdCustomer INT NULL
 
 GO
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.Addresses
-(DateCreated, DateEdited, IdCountry, IdState, StatusCode, IdObjectType, County, IdCustomer, IdCreditCard)
+(DateCreated, DateEdited, IdCountry, IdState, StatusCode, IdObjectType, County, IdCustomer)
 SELECT 
 	ISNULL(pcCust_DateCreated, GETDATE()), 
 	ISNULL(lastEditDate, ISNULL(pcCust_DateCreated, GETDATE())),
@@ -1329,9 +1327,8 @@ SELECT
 	2,
 	2,
 	c.state,
-	c.idcustomer,
-	c.custCreditCardId
-FROM [vitalchoice2.0].dbo.customerCreditCards AS c
+	c.idcustomer
+FROM [vitalchoice2.0].dbo.CustomerChecks AS c
 INNER JOIN [vitalchoice2.0].dbo.customers AS cc ON cc.idcustomer = c.idCustomer
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.AddressOptionValues
@@ -1340,7 +1337,7 @@ SELECT unpvt.Id, o.Id, unpvt.Value FROM
 (
 SELECT 
 	a.Id, 
-	CAST(c.address1 AS NVARCHAR(255)) AS Address1, 
+	CAST(c.address AS NVARCHAR(255)) AS Address1, 
 	CAST(c.address2 AS NVARCHAR(255)) AS Address2, 
 	CAST(c.firstName AS NVARCHAR(255)) AS FirstName, 
 	CAST(c.lastName AS NVARCHAR(255)) AS LastName, 
@@ -1348,62 +1345,98 @@ SELECT
 	CAST(c.city AS NVARCHAR(255)) AS City, 
 	CAST(c.zip AS NVARCHAR(255)) AS Zip,
 	CAST(c.phone AS NVARCHAR(255)) AS Phone,
-	CAST(c.fax AS NVARCHAR(255)) AS Fax,
-	CAST(c.email AS NVARCHAR(255)) AS Email
-FROM [vitalchoice2.0].dbo.customerCreditCards AS c
+	CAST(c.fax AS NVARCHAR(255)) AS Fax
+FROM [vitalchoice2.0].dbo.CustomerChecks AS c
 INNER JOIN [VitalChoice.Ecommerce].dbo.Customers AS cc ON cc.Id = c.idcustomer
-INNER JOIN [VitalChoice.Ecommerce].dbo.Addresses AS a ON a.IdCustomer = c.idcustomer AND a.IdCreditCard = c.custCreditCardId) p
+INNER JOIN [VitalChoice.Ecommerce].dbo.Addresses AS a ON a.IdCustomer = c.idcustomer) p
 UNPIVOT (Value FOR Name IN 
-	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax, Email)
+	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax)
 )AS unpvt
 INNER JOIN [VitalChoice.Ecommerce].dbo.AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerPaymentMethods
 (DateCreated, DateEdited, IdAddress, IdCustomer, IdObjectType, StatusCode)
-SELECT c.DateCreated, c.DateEdited, a.Id, c.Id, 1, 2 FROM [VitalChoice.Ecommerce].dbo.Customers AS c
+SELECT c.DateCreated, c.DateEdited, a.Id, c.Id, 3, 2 FROM [VitalChoice.Ecommerce].dbo.Customers AS c
 INNER JOIN [VitalChoice.Ecommerce].dbo.Addresses AS a ON a.IdCustomer = c.Id
 
-INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerPaymentMethodValues
-(IdCustomerPaymentMethod, IdOptionType, Value)
-SELECT unpvt.Id, o.Id, unpvt.Value FROM
-(
-SELECT 
-	cp.Id, 
-	CAST(c.NameOnCard AS NVARCHAR(255)) AS NameOnCard, 
-	CAST('XXXXXXXXXXXX' + RIGHT(dbo.RegexReplace('[^0-9]',dbo.RC4Encode(c.CCNumber), ''), 4) AS NVARCHAR(255)) AS CardNumber, 
-	CAST(
-		(SELECT TOP 1 lv.Id FROM [VitalChoice.Ecommerce].dbo.LookupVariants AS lv WHERE lv.IdLookup = 10 AND lv.ValueVariant =
-		CASE 
-			dbo.RC4Encode(c.CCType) 
-			WHEN 'V' THEN 'Visa'
-			WHEN 'M' THEN 'MasterCard'
-			WHEN 'D' THEN 'Discover'
-			WHEN 'A' THEN 'American Express'
-		END)
-		AS NVARCHAR(255)
-	) AS CardType, 
-	CAST(CONVERT(NVARCHAR(250), CONVERT(DATE, dbo.RC4Encode([Expiration]), 101), 126) AS NVARCHAR(255)) AS ExpDate, 
-	CAST(CASE WHEN RANK() OVER (PARTITION BY cc.Id ORDER BY c.custCreditCardId) = 1 THEN 'True' ELSE NULL END AS NVARCHAR(255)) AS [Default]
-FROM [vitalchoice2.0].dbo.customerCreditCards AS c
-INNER JOIN [VitalChoice.Ecommerce].dbo.Customers AS cc ON cc.Id = c.idcustomer
-INNER JOIN [VitalChoice.Ecommerce].dbo.Addresses AS a ON a.IdCustomer = c.idcustomer AND a.IdCreditCard = c.custCreditCardId
-INNER JOIN [VitalChoice.Ecommerce].dbo.CustomerPaymentMethods AS cp ON cp.IdCustomer = c.idCustomer AND cp.IdAddress = a.Id
-WHERE ISDATE(dbo.RC4Encode([Expiration])) = 1) p
-UNPIVOT (Value FOR Name IN 
-	(NameOnCard, CardNumber, CardType, ExpDate, [Default])
-)AS unpvt
-INNER JOIN [VitalChoice.Ecommerce].dbo.CustomerPaymentMethodOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 1)
-
 GO
-
-DELETE FROM [VitalChoice.Ecommerce].dbo.CustomerPaymentMethodValues
-WHERE Value IS NULL OR Value = ''
 
 DELETE FROM [VitalChoice.Ecommerce].dbo.AddressOptionValues
 WHERE Value IS NULL OR Value = ''
 
 ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
-DROP COLUMN IdCustomer, IdCreditCard
+DROP COLUMN IdCustomer
+
+GO
+
+--============================= OAC payment method ==========================
+
+ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
+ADD IdCustomer INT NULL
+
+GO
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.Addresses
+(DateCreated, DateEdited, IdCountry, IdState, StatusCode, IdObjectType, County, IdCustomer)
+SELECT 
+	ISNULL(pcCust_DateCreated, GETDATE()), 
+	ISNULL(lastEditDate, ISNULL(pcCust_DateCreated, GETDATE())),
+	ISNULL (
+		(SELECT TOP 1 cn.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS cn WHERE cn.CountryCode = ISNULL(c.countryCode COLLATE Cyrillic_General_CI_AS, 'US')), 
+		(SELECT TOP 1 cn.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS cn WHERE cn.CountryCode = 'US')
+	),
+	(SELECT TOP 1 s.Id FROM [VitalChoice.Ecommerce].dbo.States AS s WHERE s.CountryCode = ISNULL(c.countryCode COLLATE Cyrillic_General_CI_AS, 'US') AND s.StateCode = c.stateCode COLLATE Cyrillic_General_CI_AS),
+	2,
+	2,
+	c.state,
+	c.idcustomer
+FROM [vitalchoice2.0].dbo.CustomerOACs AS c
+INNER JOIN [vitalchoice2.0].dbo.customers AS cc ON cc.idcustomer = c.idCustomer
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.AddressOptionValues
+(IdAddress, IdOptionType, Value)
+SELECT unpvt.Id, o.Id, unpvt.Value FROM
+(
+SELECT 
+	a.Id, 
+	CAST(c.address AS NVARCHAR(255)) AS Address1, 
+	CAST(c.address2 AS NVARCHAR(255)) AS Address2, 
+	CAST(c.firstName AS NVARCHAR(255)) AS FirstName, 
+	CAST(c.lastName AS NVARCHAR(255)) AS LastName, 
+	CAST(c.company AS NVARCHAR(255)) AS Company, 
+	CAST(c.city AS NVARCHAR(255)) AS City, 
+	CAST(c.zip AS NVARCHAR(255)) AS Zip,
+	CAST(c.phone AS NVARCHAR(255)) AS Phone,
+	CAST(c.fax AS NVARCHAR(255)) AS Fax
+FROM [vitalchoice2.0].dbo.CustomerOACs AS c
+INNER JOIN [VitalChoice.Ecommerce].dbo.Customers AS cc ON cc.Id = c.idcustomer
+INNER JOIN [VitalChoice.Ecommerce].dbo.Addresses AS a ON a.IdCustomer = c.idcustomer) p
+UNPIVOT (Value FOR Name IN 
+	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax)
+)AS unpvt
+INNER JOIN [VitalChoice.Ecommerce].dbo.AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerPaymentMethods
+(DateCreated, DateEdited, IdAddress, IdCustomer, IdObjectType, StatusCode)
+SELECT c.DateCreated, c.DateEdited, a.Id, c.Id, 2, 2 FROM [VitalChoice.Ecommerce].dbo.Customers AS c
+INNER JOIN [VitalChoice.Ecommerce].dbo.Addresses AS a ON a.IdCustomer = c.Id
+
+GO
+
+DELETE FROM [VitalChoice.Ecommerce].dbo.AddressOptionValues
+WHERE Value IS NULL OR Value = ''
+
+ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
+DROP COLUMN IdCustomer
+
+GO
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.CustomersToOrderNotes
+(IdCustomer, IdOrderNote)
+SELECT c.idcustomer, n.Id
+FROM customers AS c
+CROSS APPLY [dbo].[DelimitedSplit8K](c.orderSpecificNotes, ',') AS d
+INNER JOIN [VitalChoice.Ecommerce].dbo.OrderNotes AS n ON n.Title = d.Item COLLATE Cyrillic_General_CI_AS
 
 GO
 
@@ -1432,7 +1465,8 @@ ConfirmationToken,
 TokenExpirationDate, 
 IsConfirmed, 
 IdUserType,
-AccessFailedCount)
+AccessFailedCount,
+PasswordHash)
 SELECT 
 	cc.Id, 
 	cc.PublicId, 
@@ -1454,7 +1488,8 @@ SELECT
 	GETDATE(),
 	1,
 	2,
-	0
+	0,
+	[vitalchoice2.0].dbo.[HashPassword]([vitalchoice2.0].dbo.RC4Encode(ISNULL(c.password, '')))
 FROM customers AS c
 INNER JOIN [VitalChoice.Ecommerce].dbo.Customers AS cc ON cc.Id = c.idcustomer
 
@@ -1539,4 +1574,5 @@ INCLUDE ( 	[Id],
 	[IdProfileAddress]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 GO
 
-
+DROP FUNCTION [vitalchoice2.0].[dbo].[DelimitedSplit8K]
+GO
