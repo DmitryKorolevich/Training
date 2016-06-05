@@ -17,11 +17,11 @@ namespace VitalChoice.Interfaces.Services.Products
 	{
         #region Products
 
-        List<ProductOptionType> GetProductOptionTypes(HashSet<string> names);
+        IEnumerable<ProductOptionType> GetProductOptionTypes(HashSet<string> names);
 
         Dictionary<int, Dictionary<string, string>> GetProductEditDefaultSettingsAsync();
 
-        List<ProductOptionType> GetProductLookupsAsync();
+        ICollection<ProductOptionType> GetProductLookupsAsync();
 
 	    Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter);
 

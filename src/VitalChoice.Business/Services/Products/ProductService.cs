@@ -235,9 +235,9 @@ namespace VitalChoice.Business.Services.Products
 
         #region ProductOptions
 
-        public List<ProductOptionType> GetProductOptionTypes(HashSet<string> names)
+        public IEnumerable<ProductOptionType> GetProductOptionTypes(HashSet<string> names)
         {
-            return _mapper.OptionTypes.Where(o => names.Contains(o.Name)).ToList();
+            return _mapper.OptionTypes.Where(o => names.Contains(o.Name));
         }
 
         public Dictionary<int, Dictionary<string, string>> GetProductEditDefaultSettingsAsync()
@@ -283,9 +283,9 @@ namespace VitalChoice.Business.Services.Products
             return toReturn;
         }
 
-        public List<ProductOptionType> GetProductLookupsAsync()
+        public ICollection<ProductOptionType> GetProductLookupsAsync()
         {
-            return _mapper.OptionTypes.ToList();
+            return _mapper.OptionTypes;
         }
 
         public async Task<ICollection<SkuOptionValue>> GetSkuOptionValues(ICollection<int> skuIds,

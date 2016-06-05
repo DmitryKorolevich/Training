@@ -78,7 +78,7 @@ namespace VC.Admin.Controllers
         {
             if (id == 0)
             {
-                var now = DateTime.Now;
+                //var now = DateTime.Now;
                 return new MasterContentItemManageModel()
                 {
                     Template = String.Empty,
@@ -87,7 +87,7 @@ namespace VC.Admin.Controllers
                     IsDefault = false,
                 };
             }
-            var user = _userManager.GetUserId(User);
+            //var user = _userManager.GetUserId(User);
 
             return new MasterContentItemManageModel((await masterContentService.GetMasterContentItemAsync(id)));
         }
