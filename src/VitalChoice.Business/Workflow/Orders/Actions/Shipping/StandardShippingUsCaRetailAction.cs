@@ -12,7 +12,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Shipping
         {
         }
 
-        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, ITreeContext executionContext)
         {
             if (dataContext.Data.PromoProducts < 99 && dataContext.Data.DeliveredAmount > 0)
             {

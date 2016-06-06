@@ -226,8 +226,6 @@ namespace VitalChoice.Core.DependencyInjection
                 })
                 .SingleInstance();
             var container = BuildContainer(projectAssembly, builder);
-            AutofacExecutionContext.Configure(container);
-
             UnitOfWorkBase.SetOptions(container.Resolve<IOptions<AppOptionsBase>>());
             scopeContainer.SetFactory(container.Resolve<IServiceProvider>());
             return container;

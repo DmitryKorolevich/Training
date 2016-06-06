@@ -47,7 +47,7 @@ namespace VitalChoice.Validation.Logic
         protected virtual void ParseResults(IModelValidator innerValidator)
         {
             IsValid = IsValid && innerValidator.IsValid;
-            if (!IsValid && innerValidator.Errors.Any())
+            if (!IsValid && innerValidator.Errors.Count > 0)
             {
                 ValidationErrors.AddRange(innerValidator.Errors);
             }
@@ -62,6 +62,6 @@ namespace VitalChoice.Validation.Logic
 
         public virtual bool IsValid { get; private set; } = true;
 
-        public virtual IEnumerable<KeyValuePair<string, string>> Errors => ValidationErrors;
+        public virtual ICollection<KeyValuePair<string, string>> Errors => ValidationErrors;
     }
 }

@@ -6,6 +6,6 @@ namespace VitalChoice.Validation.Interfaces
     {
         void Validate(IModel value);
         bool IsValid { get; }
-        IEnumerable<KeyValuePair<string, string>> Errors { get; }
+        ICollection<KeyValuePair<string, string>> Errors { get; }
     }
 }

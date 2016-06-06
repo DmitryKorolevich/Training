@@ -71,15 +71,24 @@ namespace VitalChoice.Caching.Services.Cache
             if (result.WhereExpression != null)
             {
                 result.PrimaryKeys = _primaryKeyAnalyzer.ParseValues(result.WhereExpression);
-                result.UniqueIndexes = _indexAnalyzer.ParseValues(result.WhereExpression);
-                result.ConditionalIndexes =
-                    _conditionalIndexAnalyzers.Select(
-                        analyzer =>
-                            new KeyValuePair<EntityConditionalIndexInfo, ICollection<EntityIndex>>(
-                                (EntityConditionalIndexInfo) analyzer.GroupInfo,
-                                analyzer.ParseValues(result.WhereExpression)))
-                        .ToArray();
-                result.HasFullCollectionCacheCondition = _cacheCondition.EqualsToCondition(result.WhereExpression.Expression);
+                if ((result.PrimaryKeys?.Count ?? 0) == 0)
+                {
+                    result.UniqueIndexes = _indexAnalyzer.ParseValues(result.WhereExpression);
+                    if ((result.UniqueIndexes?.Count ?? 0) == 0)
+                    {
+                        result.ConditionalIndexes =
+                            _conditionalIndexAnalyzers.Select(
+                                analyzer =>
+                                    new KeyValuePair<EntityConditionalIndexInfo, ICollection<EntityIndex>>(
+                                        (EntityConditionalIndexInfo) analyzer.GroupInfo,
+                                        analyzer.ParseValues(result.WhereExpression)))
+                                .ToArray();
+                        if (result.ConditionalIndexes.Count == 0)
+                        {
+                            result.HasFullCollectionCacheCondition = _cacheCondition.EqualsToCondition(result.WhereExpression.Expression);
+                        }
+                    }
+                }
             }
 
             newExpression = null;

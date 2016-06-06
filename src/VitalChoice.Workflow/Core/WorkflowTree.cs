@@ -28,19 +28,14 @@ namespace VitalChoice.Workflow.Core
 
         public string Name { get; }
 
-        public async Task<TResult> GetActionResultAsync(string actionName, TContext context)
+        public async Task<TResult> GetActionResultAsync(string actionName, TContext context, ITreeContext treeContext)
         {
             object result;
-            if (context.DictionaryData.TryGetValue(actionName, out result)) {
-                return (TResult)result;
-            }
-            using (new ProfilingScope($"Workflow Tree: {Name}"))
+            if (context.DictionaryData.TryGetValue(actionName, out result))
             {
-                using (var executionContext = new AutofacExecutionContext())
-                {
-                    return await GetAction(actionName).ExecuteAsync(context, executionContext);
-                }
+                return (TResult) result;
             }
+            return await GetAction(actionName).ExecuteAsync(context, treeContext);
         }
 
         public bool TryGetActionResult(string actionName, TContext context, out TResult result)
@@ -136,29 +131,17 @@ namespace VitalChoice.Workflow.Core
             }
         }
 
-        public async Task<TResult> ExecuteAsync(string actionName, TContext context)
+        public async Task<TResult> ExecuteAsync(string actionName, TContext context, ITreeContext treeContext)
         {
             var action = GetAction(actionName);
-            using (new ProfilingScope($"Workflow Tree: {Name}"))
-            {
-                using (var executionContext = new AutofacExecutionContext())
-                {
-                    return await action.ExecuteAsync(context, executionContext);
-                }
-            }
+            return await action.ExecuteAsync(context, treeContext);
         }
 
-        public async Task<TResult> ExecuteAsync<TAction>(TContext context) 
+        public async Task<TResult> ExecuteAsync<TAction>(TContext context, ITreeContext treeContext)
             where TAction : IWorkflowExecutor<TContext, TResult>
         {
             var action = GetAction<TAction>();
-            using (new ProfilingScope($"Workflow Tree: {Name}"))
-            {
-                using (var executionContext = new AutofacExecutionContext())
-                {
-                    return await action.ExecuteAsync(context, executionContext);
-                }
-            }
+            return await action.ExecuteAsync(context, treeContext);
         }
 
         public IWorkflowExecutor<TContext, TResult> GetAction<TAction>() 
@@ -183,7 +166,8 @@ namespace VitalChoice.Workflow.Core
         /// Implement this to compute tree with default start action
         /// </summary>
         /// <param name="context"></param>
+        /// <param name="treeContext"></param>
         /// <returns></returns>
-        public abstract Task<TResult> ExecuteAsync(TContext context);
+        public abstract Task<TResult> ExecuteAsync(TContext context, ITreeContext treeContext);
     }
 }

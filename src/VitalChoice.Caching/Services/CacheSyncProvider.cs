@@ -83,6 +83,16 @@ namespace VitalChoice.Caching.Services
                 {
                     switch (op.SyncOperation.SyncType)
                     {
+                        case SyncType.Add:
+                            if (op.Cache.ItemExist(op.PrimaryKey))
+                            {
+                                var entity = KeyStorage.GetEntity(op.EntityType, op.PrimaryKey, ScopeContainer.ScopeFactory);
+                                if (!op.Cache.Update(entity, (DbContext)null))
+                                {
+                                    //Logger.LogWarning($"Cannot update <{op.EntityType}>{pk}");
+                                }
+                            }
+                            break;
                         case SyncType.Update:
                             if (op.Cache.ItemExist(op.PrimaryKey))
                             {

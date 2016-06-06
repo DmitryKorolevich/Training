@@ -79,8 +79,9 @@ namespace VC.Public.Controllers
 			{
 				cart = await _checkoutService.GetOrCreateCart(existingUid);
 			}
+            SetCartUid(cart.CartUid);
 
-			if (sku.Sku.SafeData.AutoShipProduct == true && autoshipFrequency.HasValue)
+            if (sku.Sku.SafeData.AutoShipProduct == true && autoshipFrequency.HasValue)
 			{
 				cart.Order.PromoSkus.Clear();
 				cart.Order.Skus.Clear();
@@ -90,7 +91,7 @@ namespace VC.Public.Controllers
 				cart.Order.IdObjectType = (int)OrderType.AutoShip;
 				cart.Order.Data.AutoShipFrequency = autoshipFrequency;
 			}
-			else if(cart.Order.Skus.Any() && cart.Order.IdObjectType == (int)OrderType.AutoShip)
+			else if(cart.Order.Skus.Count > 0 && cart.Order.IdObjectType == (int)OrderType.AutoShip)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CartContainsAutoShip]);
 			}
@@ -109,13 +110,10 @@ namespace VC.Public.Controllers
 				},
 				(ordered, skuModel) => ordered.Quantity += 1);
 
-			SetCartUid(cart.CartUid);
-
             var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
 
             if (!await _checkoutService.UpdateCart(cart))
 				throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
-
 		    return new Tuple<OrderDataContext, CustomerCartOrder>(context, cart);
 	    }
 
@@ -124,11 +122,11 @@ namespace VC.Public.Controllers
 			var crossSellModels = new List<CartCrossSellModel>();
 
 			var crossSells = await _contentCrossSellService.GetContentCrossSellsAsync(type);
-			if (crossSells.Any())
+			if (crossSells.Count > 0)
 			{
 				var skus = await _productService.GetSkusAsync(new VProductSkuFilter() { Ids = crossSells.Select(x => x.IdSku).ToList(), ActiveOnly = true, NotHiddenOnly = true});
 
-				if (skus.Any())
+				if (skus.Count > 0)
 				{
 					crossSells = crossSells.Where(x => skus.Select(y => y.SkuId).Contains(x.IdSku)).ToList();
 
@@ -251,6 +249,7 @@ namespace VC.Public.Controllers
             {
                 cart = await _checkoutService.GetOrCreateCart(existingUid);
             }
+            SetCartUid(cart.CartUid);
             cart.Order.Skus?.MergeKeyed(model.Skus.Where(s => s.Quantity > 0).ToArray(), ordered => ordered.Sku.Code,
                 skuModel => skuModel.Code, skuModel =>
                 {
@@ -285,11 +284,9 @@ namespace VC.Public.Controllers
             }
             cart.Order.Data.ShippingUpgradeP = model.ShippingUpgradeP;
             cart.Order.Data.ShippingUpgradeNP = model.ShippingUpgradeNP;
-            cart.Order.Data.IsHealthwise = model.DiscountCode?.ToLower() == ProductConstants.HEALTHWISE_DISCOUNT_CODE;
             var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
             await FillModel(model, cart.Order, context);
-            SetCartUid(cart.CartUid);
-
+            
             bool updateResult = true;
             if (canUpdate)
             {

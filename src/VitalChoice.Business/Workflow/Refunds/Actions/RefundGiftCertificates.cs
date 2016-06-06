@@ -16,7 +16,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions
         {
         }
 
-        public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext context, IWorkflowExecutionContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext context, ITreeContext executionContext)
         {
             decimal total = Math.Min((decimal) context.Order.Data.RefundGCsUsedOnOrder, context.AutoTotal);
             decimal maxRefunded = 0;

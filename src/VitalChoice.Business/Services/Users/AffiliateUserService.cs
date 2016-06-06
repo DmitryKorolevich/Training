@@ -85,7 +85,7 @@ namespace VitalChoice.Business.Services.Users
 
         protected override void ValidateRoleAssignments(ApplicationUser dbUser, IList<RoleType> roles)
 		{
-			if (roles == null || !roles.Any())
+			if (roles == null || roles.Count == 0)
 			{
 				return;
 			}

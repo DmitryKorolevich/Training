@@ -17,7 +17,14 @@ namespace VitalChoice.Business.Queries.Customers
 
     public class CustomerQuery : QueryObject<Ecommerce.Domain.Entities.Customers.Customer>
     {
-	    public CustomerQuery NotDeleted()
+        public CustomerQuery Active()
+        {
+            Add(x => x.StatusCode == (int)CustomerStatus.Active);
+
+            return this;
+        }
+
+        public CustomerQuery NotDeleted()
 	    {
 			Add(x=>x.StatusCode != (int)CustomerStatus.Deleted);
 

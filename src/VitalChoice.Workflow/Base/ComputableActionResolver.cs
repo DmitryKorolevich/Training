@@ -9,6 +9,6 @@ namespace VitalChoice.Workflow.Base
         {
         }
 
-        public abstract override Task<int> GetActionKeyAsync(TContext context, IWorkflowExecutionContext executionContext);
+        public abstract override Task<int> GetActionKeyAsync(TContext context, ITreeContext executionContext);
     }
 }

@@ -48,12 +48,9 @@ namespace VitalChoice.ContentProcessing.Extensions
                 {
                     if (result.SearchedLocations.Any())
                     {
-                        if (result.SearchedLocations.Any())
-                        {
-                            var locations = new List<string>(result.SearchedLocations);
-                            locations.AddRange(result.SearchedLocations);
-                            result = ViewEngineResult.NotFound(viewName, locations);
-                        }
+                        var locations = new List<string>(result.SearchedLocations);
+                        locations.AddRange(result.SearchedLocations);
+                        result = ViewEngineResult.NotFound(viewName, locations);
                     }
                 }
                 result.EnsureSuccessful(null);

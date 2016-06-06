@@ -119,23 +119,32 @@ namespace VitalChoice.Business.Services.Checkout
                 {
                     return await GetOrCreateCart(uid, cartForCheck.IdCustomer.Value);
                 }
-                cart = await BuildIncludes(_cartRepository.Query(c => c.CartUid == uid.Value)).SelectFirstOrDefaultAsync(false);
-                if (cart == null)
+                if (cartForCheck == null)
                 {
                     cart = await CreateNew();
+                }
+                else
+                {
+                    cart = await BuildIncludes(_cartRepository.Query(c => c.CartUid == uid.Value)).SelectFirstOrDefaultAsync(false) ??
+                           await CreateNew();
                 }
             }
             else
             {
                 cart = await CreateNew();
             }
-            var newOrder = await _orderService.Mapper.CreatePrototypeAsync((int)OrderType.Normal);
-            newOrder.Data.OrderType = (int)SourceOrderType.Web;
+            return await InitCartOrder(cart);
+        }
+
+        private async Task<CustomerCartOrder> InitCartOrder(CartExtended cart)
+        {
+            var newOrder = await _orderService.Mapper.CreatePrototypeAsync((int) OrderType.Normal);
+            newOrder.Data.OrderType = (int) SourceOrderType.Web;
             if (newOrder.Customer != null)
             {
-                newOrder.Customer.IdObjectType = (int)CustomerType.Retail;
+                newOrder.Customer.IdObjectType = (int) CustomerType.Retail;
             }
-            newOrder.StatusCode = (int)RecordStatusCode.Active;
+            newOrder.StatusCode = (int) RecordStatusCode.Active;
             newOrder.OrderStatus = OrderStatus.Incomplete;
             newOrder.GiftCertificates = cart.GiftCertificates?.Select(g => new GiftCertificateInOrder
             {
@@ -144,15 +153,7 @@ namespace VitalChoice.Business.Services.Checkout
             }).ToList() ?? new List<GiftCertificateInOrder>();
             if (!string.IsNullOrEmpty(cart.DiscountCode))
             {
-                if (cart.DiscountCode.ToLower() == ProductConstants.HEALTHWISE_DISCOUNT_CODE)
-                {
-                    newOrder.Data.IsHealthwise = true;
-                }
-                else
-                {
-                    newOrder.Data.IsHealthwise = false;
-                    newOrder.Discount = await _discountService.GetByCode(cart.DiscountCode);
-                }
+                newOrder.Discount = await _discountService.GetByCode(cart.DiscountCode);
             }
             newOrder.Skus = cart.Skus?.Select(s =>
             {
@@ -169,7 +170,7 @@ namespace VitalChoice.Business.Services.Checkout
                     Quantity = s.Quantity
                 };
             }).ToList() ?? new List<SkuOrdered>();
-            newOrder.ShippingAddress = await _addressService.Mapper.CreatePrototypeAsync((int)AddressType.Shipping);
+            newOrder.ShippingAddress = await _addressService.Mapper.CreatePrototypeAsync((int) AddressType.Shipping);
             newOrder.ShippingAddress.IdCountry = (await _countryService.GetCountriesAsync(new CountryFilter
             {
                 CountryCode = "US"
@@ -204,7 +205,7 @@ namespace VitalChoice.Business.Services.Checkout
 
                         result = new CustomerCartOrder
                         {
-                            CartUid = uid.Value
+                            CartUid = cart.CartUid
                         };
                         if (cart.IdCustomer == null)
                         {
@@ -224,8 +225,7 @@ namespace VitalChoice.Business.Services.Checkout
                     }
                     if (cart.IdOrder == null)
                     {
-                        var anonymCart = await GetOrCreateCart(uid);
-
+                        var anonymCart = await InitCartOrder(cart);
                         var customer = await _customerService.SelectAsync(idCustomer, true);
                         anonymCart.Order.Customer = customer;
                         anonymCart.Order = await _orderService.InsertAsync(anonymCart.Order);
@@ -304,7 +304,9 @@ namespace VitalChoice.Business.Services.Checkout
                                 .SelectFirstOrDefaultAsync();
 
                     if (cart == null)
+                    {
                         return false;
+                    }
                     if (cartOrder.Order.Customer?.Id != 0)
                     {
                         var customerBackup = cartOrder.Order.Customer;
@@ -329,14 +331,7 @@ namespace VitalChoice.Business.Services.Checkout
                     }
                     else
                     {
-                        if ((bool?)cartOrder.Order.SafeData.IsHealthwise ?? false)
-                        {
-                            cart.DiscountCode = ProductConstants.HEALTHWISE_DISCOUNT_CODE.ToUpper();
-                        }
-                        else
-                        {
-                            cart.DiscountCode = cartOrder.Order.Discount?.Code;
-                        }
+                        cart.DiscountCode = cartOrder.Order.Discount?.Code;
                         cart.GiftCertificates?.MergeKeyed(cartOrder.Order.GiftCertificates, c => c.IdGiftCertificate,
                             co => co.GiftCertificate.Id,
                             co => new CartToGiftCertificate

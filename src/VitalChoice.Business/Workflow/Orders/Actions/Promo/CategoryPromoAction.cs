@@ -18,7 +18,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Promo
         }
 
         public override Task<decimal> ExecuteActionAsync(OrderDataContext context,
-            IWorkflowExecutionContext executionContext)
+            ITreeContext executionContext)
         {
             IEnumerable<PromotionDynamic> eligiable = context.Promotions.Where(p => p.IdObjectType == (int)PromotionType.CategoryDiscount);
             if (context.Order.Discount != null && context.Order.Discount.Id != 0)

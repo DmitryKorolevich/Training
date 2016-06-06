@@ -892,7 +892,7 @@ namespace VitalChoice.Business.Services.Orders
 						    x.AutoShipFrequency == frequency &&
 						    x.LastAutoShipDate.HasValue && x.LastAutoShipDate.Value.Day <= tempDate.Day && x.LastAutoShipDate.Value.Year <= tempDate.Year && x.LastAutoShipDate.Value.Month <= tempDate.Month).SelectAsync(x=>x.Id);
 
-			    if (vAutoShips.Any())
+			    if (vAutoShips.Count > 0)
 			    {
 				    toProcess.AddRange(vAutoShips);
 			    }
@@ -903,7 +903,7 @@ namespace VitalChoice.Business.Services.Orders
 					await _vAutoShipRepository.Query(
 						x => !x.LastAutoShipDate.HasValue).SelectAsync(x => x.Id);
 
-			if (skippedAcidently.Any())
+			if (skippedAcidently.Count > 0)
 			{
 				toProcess.AddRange(skippedAcidently);
 			}
@@ -993,7 +993,7 @@ namespace VitalChoice.Business.Services.Orders
                         {
                             var giftCertificateRepository = uow.RepositoryAsync<GiftCertificate>();
                             List<GiftCertificate> generatedGcs = new List<GiftCertificate>();
-                            if (order.Skus.Any(s => s.GcsGenerated?.Any() ?? false))
+                            if (order.Skus.Any(s => (s.GcsGenerated?.Count ?? 0) > 0))
                             {
                                 generatedGcs =await giftCertificateRepository.Query(p => p.IdOrder == order.Id && p.StatusCode != RecordStatusCode.NotActive).SelectAsync();
                                 //cancel gc=3 with np part
@@ -1219,7 +1219,7 @@ namespace VitalChoice.Business.Services.Orders
             var others = models.Where(x => x.IdObjectType != (int)OrderType.AutoShip).ToList();
 
             List<Order> res = new List<Order>();
-            if (autoShips.Any())
+            if (autoShips.Count > 0)
             {
                 List<int> autoShipOrderIds = null;
                 using (var transaction = uow.BeginTransaction())
@@ -1238,7 +1238,7 @@ namespace VitalChoice.Business.Services.Orders
 						res.AddRange(await InsertRangeInternalAsync(autoShips, uow));
 
                         var completed = autoShips.Where(x => x.IsAnyNotIncomplete()).ToList();
-                        if (completed.Any())
+                        if (completed.Count > 0)
                         {
 							foreach (var model in completed)
                             {
@@ -1270,7 +1270,7 @@ namespace VitalChoice.Business.Services.Orders
 
             }
 
-            if (others.Any())
+            if (others.Count > 0)
             {
                 res.AddRange(await InsertRangeInternalAsync(models, uow));
             }
@@ -1339,7 +1339,7 @@ namespace VitalChoice.Business.Services.Orders
             var others = models.Where(x => x.IdObjectType != (int)OrderType.AutoShip).ToList();
 
             List<Order> res = new List<Order>();
-            if (autoShips.Any())
+            if (autoShips.Count > 0)
             {
                 List<int> autoShipOrderIds = null;
                 using (var transaction = uow.BeginTransaction())
@@ -1351,7 +1351,7 @@ namespace VitalChoice.Business.Services.Orders
 						res.AddRange(await UpdateRangeInternalAsync(autoShips, uow));
 
                         var completed = autoShips.Where(x => x.OrderStatus != OrderStatus.Incomplete).ToList();
-                        if (completed.Any())
+                        if (completed.Count > 0)
                         {
                             var toInsert = new List<OrderDynamic>();
 
@@ -1374,7 +1374,7 @@ namespace VitalChoice.Business.Services.Orders
                                 }
                             }
 
-                            if (toInsert.Any())
+                            if (toInsert.Count > 0)
                             {
                                 autoShipOrderIds = (await InsertRangeInternalAsync(toInsert, uow)).Select(p=>p.Id).ToList();
                             }
@@ -1397,7 +1397,7 @@ namespace VitalChoice.Business.Services.Orders
                 }
 
             }
-            if (others.Any())
+            if (others.Count > 0)
             {
                 res.AddRange(await UpdateRangeInternalAsync(models, uow));
             }
@@ -1417,11 +1417,11 @@ namespace VitalChoice.Business.Services.Orders
                     orders.Where(o => o.IdObjectType != (int) OrderType.AutoShip)
                         .SelectMany(p => p.PromoSkus)
                         .Select(p => p.Sku.Id));
-                if (skuIds.Any())
+                if (skuIds.Count > 0)
                 {
                     var dbOptionValues = await _productService.GetSkuOptionValues(skuIds, new[] {option.Id});
                     var skuIdsForInsert = skuIds.Except(dbOptionValues.Select(p => p.IdSku)).ToList();
-                    if (skuIdsForInsert.Any())
+                    if (skuIdsForInsert.Count > 0)
                     {
                         var now = MapperTypeConverter.ConvertDateToIsoStringAndDropMc(DateTime.Now);
                         var skuOptionValueRepository = uow.RepositoryAsync<SkuOptionValue>();
@@ -1548,39 +1548,39 @@ namespace VitalChoice.Business.Services.Orders
                     Include(c => c.Customer).ThenInclude(p => p.ProfileAddress).ThenInclude(c => c.OptionValues),
                 orderBy: sortable, withDefaults: true);
 
+            var resultList = new List<OrderInfoItem>(orders.Items.Count);
+            foreach (var item in orders.Items)
+            {
+                var newItem = new OrderInfoItem
+                {
+                    Id = item.Id,
+                    IdObjectType = (OrderType) item.IdObjectType,
+                    OrderStatus = item.OrderStatus,
+                    POrderStatus = item.POrderStatus,
+                    NPOrderStatus = item.NPOrderStatus,
+                    IdPaymentMethod = item.PaymentMethod?.IdObjectType,
+                    DateCreated = item.DateCreated,
+                    Total = item.Total,
+                    IdEditedBy = item.IdEditedBy,
+                    DateEdited = item.DateEdited,
+                    IdCustomerType = item.Customer.IdObjectType,
+                    IdCustomer = item.Customer.Id,
+                    Company = item.Customer?.ProfileAddress.SafeData.Company,
+                    Customer = item.Customer?.ProfileAddress.SafeData.FirstName + " " + item.Customer?.ProfileAddress.SafeData.LastName,
+                    StateCode = _codeResolver.GetStateCode(item.ShippingAddress?.IdCountry ?? 0, item.ShippingAddress?.IdState ?? 0),
+                    ShipTo = item.ShippingAddress?.SafeData.FirstName + " " + item.ShippingAddress?.SafeData.LastName
+                };
+                await DynamicMapper.UpdateModelAsync(newItem, item);
+                resultList.Add(newItem);
+            }
+
             PagedList<OrderInfoItem> toReturn = new PagedList<OrderInfoItem>
             {
-                Items = orders.Items.Select(p => new OrderInfoItem
-                {
-                    Id = p.Id,
-                    IdObjectType = (OrderType) p.IdObjectType,
-                    OrderStatus = p.OrderStatus,
-                    POrderStatus = p.POrderStatus,
-                    NPOrderStatus = p.NPOrderStatus,
-                    IdOrderSource = p.SafeData.OrderType,
-                    OrderNotes = p.SafeData.OrderNotes,
-                    IdPaymentMethod = p.PaymentMethod?.IdObjectType,
-                    DateCreated = p.DateCreated,
-                    DateShipped = p.SafeData.ShipDelayDate,
-                    PDateShipped = p.SafeData.ShipDelayDateP,
-                    NPDateShipped = p.SafeData.ShipDelayDateNP,
-                    Total = p.Total,
-                    IdEditedBy = p.IdEditedBy,
-                    DateEdited = p.DateEdited,
-                    POrderType = p.SafeData.POrderType,
-                    IdCustomerType = p.Customer.IdObjectType,
-                    IdCustomer = p.Customer.Id,
-                    Company = p.Customer?.ProfileAddress.SafeData.Company,
-                    Customer = p.Customer?.ProfileAddress.SafeData.FirstName + " " + p.Customer?.ProfileAddress.SafeData.LastName,
-                    StateCode = _codeResolver.GetStateCode(p.ShippingAddress?.IdCountry ?? 0, p.ShippingAddress?.IdState ?? 0),
-                    ShipTo = p.ShippingAddress?.SafeData.FirstName + " " + p.ShippingAddress?.SafeData.LastName,
-                    PreferredShipMethod = p.SafeData.PreferredShipMethod,
-                    Healthwise = (bool?) p.SafeData.IsHealthwise ?? false,
-                }).ToList(),
+                Items = resultList,
                 Count = orders.Count
             };
 
-            if (toReturn.Items.Any())
+            if (toReturn.Items.Count > 0)
             {
                 var ids = new HashSet<int>(toReturn.Items.Where(p => p.IdEditedBy.HasValue).Select(p => p.IdEditedBy.Value));
                 var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);
@@ -1679,7 +1679,7 @@ namespace VitalChoice.Business.Services.Orders
             }
 
             var toReturn = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
-            if (toReturn.Items.Any())
+            if (toReturn.Items.Count > 0)
             {
                 var ids = toReturn.Items.Where(p => p.IdEditedBy.HasValue).Select(p => p.IdEditedBy.Value).Distinct().ToList();
                 var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);

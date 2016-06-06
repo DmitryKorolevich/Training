@@ -31,7 +31,7 @@ namespace VitalChoice.Business.Queries.Product
 
         public ProductCategoryQuery WithStatus(IList<RecordStatusCode> statuses)
         {
-            if (statuses != null && statuses.Any())
+            if (statuses != null && statuses.Count > 0)
             {
                 Add(x => statuses.Contains(x.StatusCode));
             }

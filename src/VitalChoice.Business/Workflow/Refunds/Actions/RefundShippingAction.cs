@@ -15,7 +15,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions
         {
         }
 
-        public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext context, IWorkflowExecutionContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext context, ITreeContext executionContext)
         {
             context.ShippingRefunded = context.Order.Data.ShippingRefunded;
             context.ManualShippingTotal = context.Order.Data.ManualShippingTotal;

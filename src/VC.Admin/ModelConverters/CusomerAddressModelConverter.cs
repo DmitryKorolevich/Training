@@ -28,7 +28,7 @@ namespace VC.Admin.ModelConverters
 	    public override Task ModelToDynamicAsync(AddressModel model, AddressDynamic dynamic)
 	    {
 		    dynamic.IdCountry = model.Country.Id;
-	        if (model.Country.States == null || !model.Country.States.Any())
+	        if (model.Country.States == null || model.Country.States.Count == 0)
 	        {
 	            dynamic.IdState = null;
 	        }

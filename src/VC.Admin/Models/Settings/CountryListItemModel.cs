@@ -16,7 +16,7 @@ namespace VC.Admin.Models.Setting
 
         public RecordStatusCode StatusCode { get; set; }
 
-        public IEnumerable<StateListItemModel> States { get; set; }
+        public ICollection<StateListItemModel> States { get; set; }
 
 	    public CountryListItemModel()
 	    {

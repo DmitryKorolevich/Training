@@ -64,7 +64,7 @@ namespace VC.Public.Controllers
         {
             await FillCartModel(cartModel);
 
-            if (!cartModel.GiftCertificateCodes.Any())
+            if (cartModel.GiftCertificateCodes.Count == 0)
             {
                 cartModel.GiftCertificateCodes.Add(new CartGcModel() { Value = string.Empty }); //needed to to force first input to appear
             }
@@ -77,14 +77,6 @@ namespace VC.Public.Controllers
             var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
             await FillModel(cartModel, cart.Order, context);
             SetCartUid(cart.CartUid);
-        }
-
-        protected void SetCartUid(Guid uid)
-        {
-            Response.Cookies.Append(CheckoutConstants.CartUidCookieName, uid.ToString(), new CookieOptions
-            {
-                Expires = DateTime.Now.AddYears(1)
-            });
         }
 
         protected async Task FillModel(ViewCartModel cartModel, OrderDynamic order, OrderDataContext context)
@@ -185,14 +177,7 @@ namespace VC.Public.Controllers
             })));
             cartModel.Tax = order.TaxTotal;
             cartModel.OrderTotal = order.Total;
-            if ((bool?)order.IsFirstHealthwise ?? false)
-            {
-                cartModel.DiscountCode = ProductConstants.HEALTHWISE_DISCOUNT_CODE.ToUpper();
-            }
-            else
-            {
-                cartModel.DiscountCode = order.Discount?.Code;
-            }
+            cartModel.DiscountCode = order.Discount?.Code;
             cartModel.ShippingCost = order.ShippingTotal;
             cartModel.SubTotal = order.ProductsSubtotal;
             if (((ShipDelayType?)order.SafeData.ShipDelayType ?? ShipDelayType.None) != ShipDelayType.None)
@@ -209,7 +194,7 @@ namespace VC.Public.Controllers
             cartModel.ShippingUpgradeNP = (ShippingUpgradeOption?)order.SafeData.ShippingUpgradeNP;
             cartModel.AutoShip = order.IdObjectType == (int)OrderType.AutoShip;
 
-            if (!cartModel.GiftCertificateCodes.Any())
+            if (cartModel.GiftCertificateCodes.Count == 0)
             {
                 cartModel.GiftCertificateCodes.Add(new CartGcModel() { Value = string.Empty });
             }

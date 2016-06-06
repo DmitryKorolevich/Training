@@ -18,7 +18,7 @@ namespace VitalChoice.Business.Workflow.Orders.ActionResolvers
         {
         }
 
-        public override async Task<int> GetActionKeyAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
+        public override async Task<int> GetActionKeyAsync(OrderDataContext dataContext, ITreeContext executionContext)
         {
             //Reset discount tier setting
             if (dataContext.Order.DictionaryData.ContainsKey("IdDiscountTier"))
@@ -33,7 +33,7 @@ namespace VitalChoice.Business.Workflow.Orders.ActionResolvers
             return dataContext.Order.Discount.IdObjectType;
         }
 
-        private static async Task<bool> ValidateDiscount(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
+        private static async Task<bool> ValidateDiscount(OrderDataContext dataContext, ITreeContext executionContext)
         {
             var noIssues = true;
 

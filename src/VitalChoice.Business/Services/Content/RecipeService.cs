@@ -286,22 +286,22 @@ namespace VitalChoice.Business.Services.Content
 					    {
 							var crossSellsToUpdate = model.CrossSells.ToList();
 							var crossSells = await _crossSellRepository.Query(x => x.IdRecipe == dbItem.Id).SelectAsync();
-						    if (crossSells.Any())
+						    if (crossSells.Count > 0)
 						    {
 							    await _crossSellRepository.DeleteAllAsync(crossSells);
 						    }
-						    if (crossSellsToUpdate.Any())
+						    if (crossSellsToUpdate.Count > 0)
 						    {
 								await _crossSellRepository.InsertRangeAsync(crossSellsToUpdate);
 							}
 
 							var relatedToUpdate = model.RelatedRecipes.ToList();
 							var relatedRecipes = await _relatedRecipeRepository.Query(x => x.IdRecipe == dbItem.Id).SelectAsync();
-						    if (relatedRecipes.Any())
+						    if (relatedRecipes.Count > 0)
 						    {
 							    await _relatedRecipeRepository.DeleteAllAsync(relatedRecipes);
 						    }
-							if (relatedToUpdate.Any())
+							if (relatedToUpdate.Count > 0)
 							{
 								await _relatedRecipeRepository.InsertRangeAsync(relatedToUpdate);
 							}

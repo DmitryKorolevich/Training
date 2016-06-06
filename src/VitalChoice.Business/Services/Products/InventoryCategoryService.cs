@@ -38,7 +38,7 @@ namespace VitalChoice.Business.Services.Products
         {
             var query = new InventoryCategoryQuery().NotDeleted().WithStatus(filter.Status);
             List<InventoryCategory> categories = await inventoryCategoryEcommerceRepository.Query(query).SelectAsync(false);
-            IList<InventoryCategory> toReturn = categories.Where(p => !p.ParentId.HasValue).OrderBy(p=>p.Order).ToList();
+            IList<InventoryCategory> toReturn = categories.Where(p => !p.ParentId.HasValue).OrderBy(p => p.Order).ToList();
 
             categories.RemoveAll(p => !p.ParentId.HasValue);
             foreach (var resCategory in toReturn)

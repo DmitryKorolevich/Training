@@ -18,7 +18,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
         {
         }
 
-        public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext dataContext, IWorkflowExecutionContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext dataContext, ITreeContext executionContext)
         {
             List<RefundSkuOrdered> skus = new List<RefundSkuOrdered>();
             var originalPromos = dataContext.Order.OriginalOrder.PromoSkus.ToDictionary(p => p.Sku.Id);
@@ -51,12 +51,13 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
             {
                 if (dataContext.Order.Discount.ExcludeCategories)
                 {
-                    if (dataContext.Order.Discount.CategoryIds?.Any() ?? false)
+                    if ((dataContext.Order.Discount.CategoryIds?.Count ?? 0) > 0)
                     {
                         if (skus.Any(s => s.Sku.Product.CategoryIds == null))
                         {
                             throw new InvalidOperationException("Product doesn't have any categories set in object.");
                         }
+                        // ReSharper disable once AssignNullToNotNullAttribute
                         HashSet<int> categories = new HashSet<int>(dataContext.Order.Discount.CategoryIds);
                         var excludedSkus =
                             skus.Where(s => s.Sku.Product.CategoryIds.Any(c => categories.Contains(c))).ToArray();
@@ -68,7 +69,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
                                 Message = "The discount for this product has been excluded by category"
                             });
                         }
-                        if (excludedSkus.Any())
+                        if (excludedSkus.Length > 0)
                         {
                             return TaskCache<decimal>.DefaultCompletedTask;
                         }
@@ -76,12 +77,13 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
                 }
                 else
                 {
-                    if (dataContext.Order.Discount.CategoryIds?.Any() ?? false)
+                    if ((dataContext.Order.Discount.CategoryIds?.Count ?? 0) > 0)
                     {
                         if (skus.Any(s => s.Sku.Product.CategoryIds == null))
                         {
                             throw new InvalidOperationException("Product doesn't have any categories set in object.");
                         }
+                        // ReSharper disable once AssignNullToNotNullAttribute
                         HashSet<int> categories = new HashSet<int>(dataContext.Order.Discount.CategoryIds);
                         var excludedSkus =
                             skus.Where(s => s.Sku.Product.CategoryIds.Any(c => !categories.Contains(c))).ToArray();
@@ -94,7 +96,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
                                     Message = "The discount for this product has been excluded by category"
                                 });
                         }
-                        if (excludedSkus.Any())
+                        if (excludedSkus.Length > 0)
                         {
                             return TaskCache<decimal>.DefaultCompletedTask;
                         }
@@ -102,13 +104,14 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
                 }
                 if (dataContext.Order.Discount.ExcludeSkus)
                 {
-                    if (dataContext.Order.Discount.SkusFilter?.Any() ?? false)
+                    if ((dataContext.Order.Discount.SkusFilter?.Count ?? 0) > 0)
                     {
                         if (skus.Any(s => s.Sku.Product.CategoryIds == null))
                         {
                             throw new InvalidOperationException("Product doesn't have any categories set in object.");
                         }
                         HashSet<int> filteredSkus =
+                            // ReSharper disable once AssignNullToNotNullAttribute
                             new HashSet<int>(dataContext.Order.Discount.SkusFilter.Select(s => s.IdSku));
                         var excludedSkus =
                             skus.Where(s => filteredSkus.Contains(s.Sku.Id)).ToArray();
@@ -121,7 +124,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
                                     Message = "The discount for this product has been excluded by SKU"
                                 });
                         }
-                        if (excludedSkus.Any())
+                        if (excludedSkus.Length > 0)
                         {
                             return TaskCache<decimal>.DefaultCompletedTask;
                         }
@@ -129,9 +132,10 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
                 }
                 else
                 {
-                    if (dataContext.Order.Discount.SkusFilter?.Any() ?? false)
+                    if ((dataContext.Order.Discount.SkusFilter?.Count ?? 0) > 0)
                     {
                         HashSet<int> filteredSkus =
+                            // ReSharper disable once AssignNullToNotNullAttribute
                             new HashSet<int>(dataContext.Order.Discount.SkusFilter.Select(s => s.IdSku));
                         var excludedSkus =
                             skus.Where(s => !filteredSkus.Contains(s.Sku.Id)).ToArray();
@@ -144,17 +148,17 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
                                     Message = "The discount for this product has been excluded by SKU"
                                 });
                         }
-                        if (excludedSkus.Any())
+                        if (excludedSkus.Length > 0)
                         {
                             return TaskCache<decimal>.DefaultCompletedTask;
                         }
                     }
                 }
-                if (dataContext.Order.Discount.SkusAppliedOnlyTo?.Any() ?? false)
+                if ((dataContext.Order.Discount.SkusAppliedOnlyTo?.Count ?? 0) > 0)
                 {
                     var selectedSkus = skus.IntersectKeyedWith(dataContext.Order.Discount.SkusAppliedOnlyTo, sku => sku.Sku.Id,
                         selectedSku => selectedSku.IdSku).ToList();
-                    if (!selectedSkus.Any())
+                    if (selectedSkus.Count == 0)
                     {
                         dataContext.Messages.Add(new MessageInfo
                         {
@@ -164,17 +168,18 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
                     }
                     skus = selectedSkus;
                 }
-                if (dataContext.Order.Discount.CategoryIdsAppliedOnlyTo?.Any() ?? false)
+                if ((dataContext.Order.Discount.CategoryIdsAppliedOnlyTo?.Count ?? 0) > 0)
                 {
                     if (skus.Any(s => s.Sku.Product.CategoryIds == null))
                     {
                         throw new InvalidOperationException("Product doesn't have any categories set in object.");
                     }
+                    // ReSharper disable once AssignNullToNotNullAttribute
                     HashSet<int> categories = new HashSet<int>(dataContext.Order.Discount.CategoryIdsAppliedOnlyTo);
                     var selectedSkus =
                         skus.Where(s => s.Sku.Product.CategoryIds.Any(c => categories.Contains(c))).ToList();
 
-                    if (!selectedSkus.Any())
+                    if (selectedSkus.Count == 0)
                     {
                         dataContext.Messages.Add(new MessageInfo
                         {

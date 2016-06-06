@@ -22,7 +22,7 @@ namespace VitalChoice.DynamicData.Validation
 
         public static void Raise(this ICollection<MessageInfo> errors)
         {
-            if (errors.Any())
+            if (errors.Count > 0)
                 throw new AppValidationException(errors);
         }
         public static void Raise(this MessageInfo error)
@@ -32,7 +32,7 @@ namespace VitalChoice.DynamicData.Validation
 
         public static void Raise<T>(this ICollection<IErrorResult> results)
         {
-            if (results.Any())
+            if (results.Count > 0)
                 throw new AppValidationException(results.Aggregate(Enumerable.Empty<MessageInfo>(),
                     (current, next) => current.Union(next.Build())));
         }
@@ -44,7 +44,7 @@ namespace VitalChoice.DynamicData.Validation
 
         public static void Raise<T>(this ICollection<IErrorResult> results, string error)
         {
-            if (results.Any())
+            if (results.Count > 0)
                 throw new AppValidationException(results.Aggregate(Enumerable.Empty<MessageInfo>(),
                     (current, next) => current.Union(next.Error(error).Build())));
         }

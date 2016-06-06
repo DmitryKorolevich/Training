@@ -16,7 +16,7 @@ namespace VitalChoice.Business.Queries.Product
 
         public SkuQuery Excluding(ICollection<int> ids)
         {
-            if (ids != null && ids.Any())
+            if (ids != null && ids.Count > 0)
                 Add(s => !ids.Contains(s.Id));
             return this;
         }
@@ -29,7 +29,7 @@ namespace VitalChoice.Business.Queries.Product
 
         public SkuQuery ByIds(ICollection<int> ids)
         {
-            if (ids != null && ids.Any())
+            if (ids != null && ids.Count > 0)
             {
                 Add(s => ids.Contains(s.Id));
             }
@@ -38,7 +38,7 @@ namespace VitalChoice.Business.Queries.Product
 
         public SkuQuery ByProductIds(ICollection<int> ids)
         {
-            if (ids != null && ids.Any())
+            if (ids != null && ids.Count > 0)
             {
                 Add(s => ids.Contains(s.IdProduct));
             }

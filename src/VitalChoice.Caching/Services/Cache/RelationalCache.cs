@@ -78,7 +78,7 @@ namespace VitalChoice.Caching.Services.Cache
                     return TranslateResult(query, results,
                         out entities);
 
-                results = _internalCache.GetWhere(query.RelationInfo, query.WhereExpression.Compiled);
+                results = _internalCache.GetWhere(query.RelationInfo, query.WhereExpression.Compiled.Value);
                 return TranslateResult(query,
                     results, out entities);
             }
@@ -131,7 +131,7 @@ namespace VitalChoice.Caching.Services.Cache
                     return TranslateFirstResult(query, results,
                         out entity);
 
-                results = _internalCache.GetWhere(query.RelationInfo, query.WhereExpression.Compiled);
+                results = _internalCache.GetWhere(query.RelationInfo, query.WhereExpression.Compiled.Value);
                 return TranslateFirstResult(query,
                     results, out entity);
             }
@@ -275,7 +275,7 @@ namespace VitalChoice.Caching.Services.Cache
 
         private CacheGetResult ConvertResult(IEnumerable<CacheResult<T>> results, QueryData<T> queryData, out T entity)
         {
-            var compiled = queryData.WhereExpression?.Compiled;
+            var compiled = queryData.WhereExpression?.Compiled.Value;
             CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled);
             var orderedResult = Order(cacheIterator, queryData);
             orderedResult = queryData.Tracked
@@ -287,7 +287,7 @@ namespace VitalChoice.Caching.Services.Cache
 
         private CacheGetResult ConvertResult(IEnumerable<CacheResult<T>> results, QueryData<T> queryData, out List<T> entities)
         {
-            var compiled = queryData.WhereExpression?.Compiled;
+            var compiled = queryData.WhereExpression?.Compiled.Value;
             CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled);
             var orderedResult = Order(cacheIterator, queryData);
             orderedResult = queryData.Tracked

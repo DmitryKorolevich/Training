@@ -17,7 +17,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions
         {
         }
 
-        public override async Task<decimal> ExecuteActionAsync(OrderRefundDataContext context, IWorkflowExecutionContext executionContext)
+        public override async Task<decimal> ExecuteActionAsync(OrderRefundDataContext context, ITreeContext executionContext)
         {
             var taxService = executionContext.Resolve<IAvalaraTax>();
             if (context.Order.OriginalOrder.NPOrderStatus != null && context.Order.OriginalOrder.POrderStatus != null)

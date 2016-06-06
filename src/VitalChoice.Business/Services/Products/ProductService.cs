@@ -146,12 +146,12 @@ namespace VitalChoice.Business.Services.Products
                         .Select(s => s.Id)
                         .ToList();
             }
-            if (newSet.Any())
+            if (newSet.Length > 0)
             {
                 var skusSameCode = await
                     _skuRepository.Query(new SkuQuery().NotDeleted().Excluding(existSkus).Including(newSet))
                         .SelectAsync(false);
-                if (skusSameCode.Any())
+                if (skusSameCode.Count > 0)
                 {
                     errors.AddRange(model.CreateError()
                         .Collection(p => p.Skus)
@@ -235,9 +235,9 @@ namespace VitalChoice.Business.Services.Products
 
         #region ProductOptions
 
-        public List<ProductOptionType> GetProductOptionTypes(HashSet<string> names)
+        public IEnumerable<ProductOptionType> GetProductOptionTypes(HashSet<string> names)
         {
-            return _mapper.OptionTypes.Where(o => names.Contains(o.Name)).ToList();
+            return _mapper.OptionTypes.Where(o => names.Contains(o.Name));
         }
 
         public Dictionary<int, Dictionary<string, string>> GetProductEditDefaultSettingsAsync()
@@ -283,9 +283,9 @@ namespace VitalChoice.Business.Services.Products
             return toReturn;
         }
 
-        public List<ProductOptionType> GetProductLookupsAsync()
+        public ICollection<ProductOptionType> GetProductLookupsAsync()
         {
-            return _mapper.OptionTypes.ToList();
+            return _mapper.OptionTypes;
         }
 
         public async Task<ICollection<SkuOptionValue>> GetSkuOptionValues(ICollection<int> skuIds,
@@ -369,7 +369,7 @@ namespace VitalChoice.Business.Services.Products
             if (codes == null)
                 throw new ArgumentNullException(nameof(codes));
 
-            if (!codes.Any())
+            if (codes.Count == 0)
                 return new List<SkuOrdered>();
 
             var skus =
@@ -396,7 +396,7 @@ namespace VitalChoice.Business.Services.Products
             if (ids == null)
                 throw new ArgumentNullException(nameof(ids));
 
-            if (!ids.Any())
+            if (ids.Count == 0)
                 return new List<SkuOrdered>();
 
             var skus =
@@ -423,7 +423,7 @@ namespace VitalChoice.Business.Services.Products
             if (ids == null)
                 throw new ArgumentNullException(nameof(ids));
 
-            if (!ids.Any())
+            if (ids.Count == 0)
                 return new List<RefundSkuOrdered>();
 
             var skus =
@@ -522,7 +522,7 @@ namespace VitalChoice.Business.Services.Products
             if (skuInfos == null)
                 throw new ArgumentNullException(nameof(skuInfos));
 
-            if (!skuInfos.Any())
+            if (skuInfos.Count == 0)
                 return new List<SkuDynamic>();
 
             var skus =
@@ -544,7 +544,7 @@ namespace VitalChoice.Business.Services.Products
             if (codes == null)
                 throw new ArgumentNullException(nameof(codes));
 
-            if (!codes.Any())
+            if (codes.Count == 0)
                 return new List<SkuDynamic>();
             var skus =
                 await _skuRepository.Query(new SkuQuery().Including(codes).NotDeleted())
@@ -578,7 +578,7 @@ namespace VitalChoice.Business.Services.Products
                         productContentTransferEntity.ProductDynamic.Skus.Where(p => p.StatusCode == (int)RecordStatusCode.Active &&
                                                                                     !p.Hidden && p.SafeData.HideFromDataFeed != true).ToArray();
 
-                    if (!activeSkus.Any())
+                    if (activeSkus.Length == 0)
                         continue;
 
                     //find sku code group part in sku codes
@@ -724,7 +724,7 @@ namespace VitalChoice.Business.Services.Products
         {
             var toReturn = await _vProductSkuRepository.GetProductsAsync(filter);
 
-            if (toReturn.Items.Any())
+            if (toReturn.Items.Count > 0)
             {
                 var ids = toReturn.Items.Where(p => p.IdEditedBy.HasValue).Select(p => p.IdEditedBy.Value).Distinct().ToList();
                 var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
@@ -940,8 +940,9 @@ namespace VitalChoice.Business.Services.Products
             var batch = productIds.Take(BaseAppConstants.DEFAULT_MAX_ALLOWED_PARAMS_SQL).ToList();
             var i = 0;
             var pairs = new List<KeyValuePair<int, string>>();
-            while (batch.Any())
+            while (batch.Count > 0)
             {
+                // ReSharper disable once AccessToModifiedClosure
                 pairs.AddRange(_productContentRepository.Query(p => batch.Contains(p.Id)).Select(x => new KeyValuePair<int, string>(x.Id, x.Url)));
 
                 i++;
@@ -1136,7 +1137,7 @@ namespace VitalChoice.Business.Services.Products
                         .SelectAsync(false);
 
 
-            if (productSameUrl.Any())
+            if (productSameUrl.Count > 0)
             {
                 errors.AddRange(
                     model.CreateBasicError()

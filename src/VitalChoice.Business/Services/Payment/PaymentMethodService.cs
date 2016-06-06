@@ -103,9 +103,9 @@ namespace VitalChoice.Business.Services.Payment
 						var needToUpdate = false;
 
 						var assignment = paymentMethodsAvailability.FirstOrDefault(x => x.Id == paymentMethod.Id);
-						if (assignment?.CustomerTypes != null && assignment.CustomerTypes.Any())
+						if (assignment?.CustomerTypes != null && assignment.CustomerTypes.Count > 0)
 						{
-							if (!paymentMethod.CustomerTypes.Any() || paymentMethod.CustomerTypes.Count != assignment.CustomerTypes.Count || !paymentMethod.CustomerTypes.All(x => assignment.CustomerTypes.Contains(x.IdCustomerType)))
+							if (paymentMethod.CustomerTypes.Count == 0 || paymentMethod.CustomerTypes.Count != assignment.CustomerTypes.Count || !paymentMethod.CustomerTypes.All(x => assignment.CustomerTypes.Contains(x.IdCustomerType)))
 							{
 								await _paymentMethodToCustomerTypeRepository.DeleteAllAsync(paymentMethod.CustomerTypes);
                                 paymentMethod.CustomerTypes.Clear();
@@ -117,7 +117,7 @@ namespace VitalChoice.Business.Services.Payment
 										IdPaymentMethod = paymentMethod.Id,
 									});
 								}
-								if (assignment.CustomerTypes.Any())
+								if (assignment.CustomerTypes.Count > 0)
 								{
 									await _paymentMethodToCustomerTypeRepository.InsertRangeAsync(paymentMethod.CustomerTypes);
 								}
@@ -126,7 +126,7 @@ namespace VitalChoice.Business.Services.Payment
 						}
 						else
 						{
-							if (paymentMethod.CustomerTypes != null && paymentMethod.CustomerTypes.Any())
+							if (paymentMethod.CustomerTypes != null && paymentMethod.CustomerTypes.Count > 0)
 							{
 								await _paymentMethodToCustomerTypeRepository.DeleteAllAsync(paymentMethod.CustomerTypes);
                                 paymentMethod.CustomerTypes.Clear();
@@ -266,7 +266,7 @@ namespace VitalChoice.Business.Services.Payment
 
             var response = controller.GetApiResponse();
             ParseErrors(errors, response);
-            if (response.messages.resultCode == messageTypeEnum.Ok && !errors.Any())
+            if (response.messages.resultCode == messageTypeEnum.Ok && errors.Count == 0)
             {
                 if (response.transactionResponse != null)
                 {

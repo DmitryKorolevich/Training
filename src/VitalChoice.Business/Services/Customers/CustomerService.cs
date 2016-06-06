@@ -161,11 +161,11 @@ namespace VitalChoice.Business.Services.Customers
                 var customerSameEmail =
                     await
                         _customerRepositoryAsync.Query(
-                            new CustomerQuery().NotDeleted().Excluding(model.Id).WithEmail(model.Email))
+                            new CustomerQuery().Active().WithEmail(model.Email))
                             .Include(c => c.OptionValues)
                             .SelectAsync(false);
 
-                if (customerSameEmail.Any())
+                if (customerSameEmail.Count > 0 && customerSameEmail.All(c => c.Id != model.Id))
                 {
                     throw new AppValidationException(
                         string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.EmailIsTakenAlready], model.Email));
@@ -220,7 +220,7 @@ namespace VitalChoice.Business.Services.Customers
         {
             var customerFileRepositoryAsync = uow.RepositoryAsync<CustomerFile>();
 
-            if (model.Files != null && model.Files.Any() && entity.Files != null)
+            if (model.Files != null && model.Files.Count > 0 && entity.Files != null)
             {
                 //Update
                 var toUpdate = entity.Files.Where(e => model.Files.Select(x => x.Id).Contains(e.Id));
@@ -473,32 +473,33 @@ namespace VitalChoice.Business.Services.Customers
             else
                 orderedCustomers = customers.Items;
 
+            var resultList = new List<ExtendedVCustomer>(customers.Items.Count);
+
+            foreach (var item in orderedCustomers)
+            {
+                var newItem = new ExtendedVCustomer
+                {
+                    AdminProfile = adminProfiles.SingleOrDefault(y => y.Id == item.IdEditedBy),
+                    IdEditedBy = item.IdEditedBy,
+                    DateEdited = item.DateEdited,
+                    IdObjectType = (CustomerType) item.IdObjectType,
+                    CountryCode = _countryNameCode.GetCountryCode(item.ProfileAddress),
+                    StateCode = _countryNameCode.GetStateCode(item.ProfileAddress),
+                    StateName = _countryNameCode.GetStateName(item.ProfileAddress),
+                    CountryName = _countryNameCode.GetCountryName(item.ProfileAddress),
+                    Id = item.Id,
+                    Email = item.Email,
+                    County = item.ProfileAddress.County,
+                    StateOrCounty = _countryNameCode.GetRegionOrStateCode(item.ProfileAddress),
+                    StatusCode = item.StatusCode,
+                };
+                await _customerAddressMapper.UpdateModelAsync(newItem, item.ProfileAddress);
+                resultList.Add(newItem);
+            }
+
             var result = new PagedList<ExtendedVCustomer>
             {
-                Items = orderedCustomers.Select(x => new ExtendedVCustomer
-                {
-                    AdminProfile = adminProfiles.SingleOrDefault(y => y.Id == x.IdEditedBy),
-                    IdEditedBy = x.IdEditedBy,
-                    FirstName = x.ProfileAddress.Data.FirstName,
-                    LastName = x.ProfileAddress.Data.LastName,
-                    DateEdited = x.DateEdited,
-                    IdObjectType = (CustomerType)x.IdObjectType,
-                    CountryCode = _countryNameCode.GetCountryCode(x.ProfileAddress),
-                    StateCode = _countryNameCode.GetStateCode(x.ProfileAddress),
-                    StateName = _countryNameCode.GetStateName(x.ProfileAddress),
-                    CountryName = _countryNameCode.GetCountryName(x.ProfileAddress),
-                    City = x.ProfileAddress.Data.City,
-                    Company = x.ProfileAddress.Data.Company,
-                    Id = x.Id,
-                    Address1 = x.ProfileAddress.Data.Address1,
-                    Address2 = x.ProfileAddress.Data.Address2,
-                    Email = x.Email,
-                    Phone = x.ProfileAddress.Data.Phone,
-                    Zip = x.ProfileAddress.Data.Zip,
-                    County = x.ProfileAddress.County,
-                    StateOrCounty = _countryNameCode.GetRegionOrStateCode(x.ProfileAddress),
-                    StatusCode = x.StatusCode,
-                }).ToList(),
+                Items = resultList,
                 Count = customers.Count
             };
 

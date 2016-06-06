@@ -43,7 +43,7 @@ namespace VitalChoice.Core.Infrastructure
 	        var result = authorizationService.AuthorizeAsync(claimUser, null, IdentityConstants.IdentityBasicProfile).GetAwaiter().GetResult();
 	        if (result)
 	        {
-	            if (_permissions == null || !_permissions.Any())
+	            if (_permissions == null || !(_permissions.Count > 0))
 	            {
 	                return;
 	            }

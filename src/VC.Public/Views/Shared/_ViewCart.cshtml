@@ -43,7 +43,7 @@
 			</td>
 			<td data-bind="text: formatCurrency(Price())"></td>
 			<td class="width-cart-quantity">
-				@if (Model.Skus.Any())
+				@if (Model.Skus.Count > 0)
 				{
 					@Html.TextBoxFor(x => x.Skus[0].Quantity, new {@class = "input-control width-small", data_bind = "value: Quantity, attr: { name: 'SkusQuantity' + $index(), id: 'SkusQuantity' + $index()}"})
 					@Html.ValidationMessageFor(x => x.Skus[0].Quantity, string.Empty, new {data_bind = "attr: { 'data-valmsg-for': 'SkusQuantity' + $index()}"})

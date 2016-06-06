@@ -121,7 +121,7 @@
                 </tr>
             </thead>
             <tbody>
-                @if (Model.Skus.Any())
+                @if (Model.Skus.Count > 0)
                 {
                     foreach (var t in Model.Skus)
                     {
@@ -147,7 +147,7 @@
             </tbody>
         </table>
     </div>
-    @if (Model.PromoSkus.Any())
+    @if (Model.PromoSkus.Count > 0)
     {
         <div class="receipt-sku-details">
             <label class="receipt-promo-title">Promo Products</label>

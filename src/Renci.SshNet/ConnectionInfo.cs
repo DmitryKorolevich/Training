@@ -284,7 +284,7 @@ namespace Renci.SshNet
 
             if (authenticationMethods == null)
                 throw new ArgumentNullException("authenticationMethods");
-            if (!authenticationMethods.Any())
+            if (authenticationMethods.Length == 0)
                 throw new ArgumentException("At least one authentication method should be specified.", "authenticationMethods");
 
             //  Set default connection values

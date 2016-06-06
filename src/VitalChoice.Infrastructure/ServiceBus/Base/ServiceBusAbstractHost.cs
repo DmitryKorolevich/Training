@@ -127,7 +127,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                     BrokeredMessage message;
                     if (!_sendQue.TryDequeue(out message))
                     {
-                        if (messages.Any())
+                        if (messages.Count > 0)
                         {
                             Sender.SendBatch(messages);
                             messages.Clear();

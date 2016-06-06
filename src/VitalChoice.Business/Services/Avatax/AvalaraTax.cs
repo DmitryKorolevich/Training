@@ -108,7 +108,7 @@ namespace VitalChoice.Business.Services.Avatax
             var request = FillGetTaxBaseRequest(context.Order.Customer, context.Order.Id, -(decimal?)context.SafeData.Discount ?? 0, taxGetType, destination, origin);
 
             var lines = ToTaxLines(context, taxGetType, 1).ToArray();
-            if (!lines.Any())
+            if (!(lines.Length > 0))
                 return 0;
             lines = UnionTaxShipping(lines, context).ToArray();
             request.Lines = lines;
@@ -140,7 +140,7 @@ namespace VitalChoice.Business.Services.Avatax
                 destination, origin);
 
             var lines = ToTaxLines(context, taxGetType, 1).ToArray();
-            if (!lines.Any())
+            if (!(lines.Length > 0))
                 return 0;
             lines = UnionTaxShipping(lines, context).ToArray();
             request.Lines = lines;

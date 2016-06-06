@@ -34,7 +34,7 @@ namespace VC.Admin.ModelConverters
 
         public override async Task DynamicToModelAsync(AddUpdateCustomerModel model, CustomerDynamic dynamic)
 	    {
-		    if (dynamic.CustomerNotes.Any())
+		    if (dynamic.CustomerNotes.Count > 0)
 		    {
 			    foreach (var customerNote in dynamic.CustomerNotes)
 			    {
@@ -42,7 +42,7 @@ namespace VC.Admin.ModelConverters
                 }
 		    }
             model.ProfileAddress = await _addressMapper.ToModelAsync<AddressModel>(dynamic.ProfileAddress);
-            if (dynamic.ShippingAddresses.Any())
+            if (dynamic.ShippingAddresses.Count > 0)
             {
                 foreach (var address in dynamic.ShippingAddresses)
                 {
@@ -69,7 +69,7 @@ namespace VC.Admin.ModelConverters
             model.Marketing = await _paymentMethodMapper.ToModelAsync<MarketingPaymentModel>(marketingType);
             model.VCWellness = await _paymentMethodMapper.ToModelAsync<VCWellnessEmployeeProgramPaymentModel>(vcWellnessType);
 
-            if (dynamic.Files!=null && dynamic.Files.Any())
+            if (dynamic.Files!=null && dynamic.Files.Count > 0)
 			{
 				foreach (var fileDynamic in dynamic.Files.Select(x => new CustomerFileModel()
 				{
@@ -91,7 +91,7 @@ namespace VC.Admin.ModelConverters
 
 	    public override async Task ModelToDynamicAsync(AddUpdateCustomerModel model, CustomerDynamic dynamic)
         {
-			if (model.CustomerNotes.Any() && !string.IsNullOrWhiteSpace(model.CustomerNotes[0].Text))
+			if (model.CustomerNotes.Count > 0 && !string.IsNullOrWhiteSpace(model.CustomerNotes[0].Text))
 			{
 				foreach (var customerNoteDynamic in await Task.WhenAll(model.CustomerNotes.Select(async customerNote => await _customerNoteMapper.FromModelAsync(customerNote))))
 				{
@@ -104,7 +104,7 @@ namespace VC.Admin.ModelConverters
 	            dynamic.ProfileAddress = await _addressMapper.FromModelAsync(model.ProfileAddress, (int)AddressType.Profile);
 	            dynamic.ProfileAddress.Data.Email = model.Email;
 	        }
-	        if (model.Shipping.Any())
+	        if (model.Shipping.Count > 0)
 			{
 				foreach (var addressDynamic in await Task.WhenAll(model.Shipping.Select(async shipping => await _addressMapper.FromModelAsync(shipping, (int)AddressType.Shipping))))
 				{
@@ -149,7 +149,7 @@ namespace VC.Admin.ModelConverters
 	            }
 	        }
 
-            if (model.Files.Any())
+            if (model.Files.Count > 0)
             {
                 dynamic.Files = dynamic.Files ?? new List<CustomerFile>();
                 foreach (var fileModel in model.Files.Select(x => new CustomerFile()

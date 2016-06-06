@@ -13,7 +13,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
         {
         }
 
-        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, ITreeContext executionContext)
         {
             dataContext.SkuOrdereds = dataContext.Order.Skus.Where(s => s.Quantity > 0).ToList();
             foreach (var sku in dataContext.SkuOrdereds)

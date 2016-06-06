@@ -14,7 +14,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Promo
         }
 
         public override async Task<decimal> ExecuteActionAsync(OrderDataContext context,
-            IWorkflowExecutionContext executionContext)
+            ITreeContext executionContext)
         {
             var promoService = executionContext.Resolve<IPromotionService>();
             context.Promotions =

@@ -12,7 +12,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions
         {
         }
 
-        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, ITreeContext executionContext)
         {
             return TaskCache<decimal>.DefaultCompletedTask;
         }

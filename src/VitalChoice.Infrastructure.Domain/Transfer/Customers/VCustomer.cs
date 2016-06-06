@@ -1,5 +1,6 @@
 ﻿using System;
 using VitalChoice.Ecommerce.Domain;
+using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 
 namespace VitalChoice.Infrastructure.Domain.Transfer.Customers
@@ -8,8 +9,10 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Customers
     {
         public int? IdAffiliate { get; set; }
 
+        [Map]
         public string FirstName { get; set; }
 
+        [Map]
         public string LastName { get; set; }
 
         public DateTime DateEdited { get; set; }
@@ -28,19 +31,25 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Customers
 
 	    public string CountryName { get; set; }
 
+        [Map]
 	    public string City { get; set; }
 
-	    public string Company { get; set; }
+        [Map]
+        public string Company { get; set; }
 
-	    public string Address1 { get; set; }
+        [Map]
+        public string Address1 { get; set; }
 
-	    public string Address2 { get; set; }
+        [Map]
+        public string Address2 { get; set; }
 
 		public string Email { get; set; }
 
-		public string Phone { get; set; }
+        [Map]
+        public string Phone { get; set; }
 
-		public string Zip { get; set; }
+        [Map]
+        public string Zip { get; set; }
 
 	    public string County { get; set; }
 

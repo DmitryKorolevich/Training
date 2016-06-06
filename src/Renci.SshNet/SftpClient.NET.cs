@@ -100,7 +100,7 @@ namespace Renci.SshNet
             var sourceFiles = sourceDirectory.GetFiles(searchPattern);
 #endif
 
-            if (sourceFiles == null || !sourceFiles.Any())
+            if (sourceFiles == null || sourceFiles.Length == 0)
                 return uploadedFiles;
 
             #region Existing Files at The Destination

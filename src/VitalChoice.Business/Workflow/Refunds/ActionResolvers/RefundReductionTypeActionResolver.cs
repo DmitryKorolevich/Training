@@ -16,7 +16,7 @@ namespace VitalChoice.Business.Workflow.Refunds.ActionResolvers
 
         }
 
-        public override Task<int> GetActionKeyAsync(OrderRefundDataContext dataContext, IWorkflowExecutionContext executionContext)
+        public override Task<int> GetActionKeyAsync(OrderRefundDataContext dataContext, ITreeContext executionContext)
         {
             if (dataContext.Order.OriginalOrder.IdObjectType == (int) OrderType.AutoShipOrder)
             {

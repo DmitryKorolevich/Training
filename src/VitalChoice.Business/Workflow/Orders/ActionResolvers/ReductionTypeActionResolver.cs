@@ -19,7 +19,7 @@ namespace VitalChoice.Business.Workflow.Orders.ActionResolvers
 
         }
 
-        public override Task<int> GetActionKeyAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
+        public override Task<int> GetActionKeyAsync(OrderDataContext dataContext, ITreeContext executionContext)
         {
             if (dataContext.Order.IdObjectType == (int) OrderType.AutoShip ||
                 dataContext.Order.IdObjectType == (int) OrderType.AutoShipOrder)

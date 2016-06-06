@@ -12,6 +12,6 @@ namespace VitalChoice.Workflow.Core
 
         TResult AggregateResult(TResult result, TResult currentValue, string actionName);
 
-        Task<TResult> ExecuteActionAsync(TContext context, IWorkflowExecutionContext executionContext);
+        Task<TResult> ExecuteActionAsync(TContext context, ITreeContext executionContext);
     }
 }

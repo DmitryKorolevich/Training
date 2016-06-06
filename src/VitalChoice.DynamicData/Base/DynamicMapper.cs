@@ -27,7 +27,7 @@ namespace VitalChoice.DynamicData.Base
         {
             var outerCache = DynamicTypeCache.GetTypeCache(obj.GetType(), true);
 
-            if (!outerCache.MaskProperties.Any())
+            if (outerCache.MaskProperties.Count == 0)
                 return false;
 
             foreach (var masker in outerCache.MaskProperties)
@@ -54,6 +54,7 @@ namespace VitalChoice.DynamicData.Base
     {
         private readonly ITypeConverter _typeConverter;
         private readonly Dictionary<int, ICollection<TOptionType>> _optionTypesByType;
+        private readonly Lazy<ICollection<TOptionType>> _optionTypes;
 
         protected abstract Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items,
             bool withDefaults = false);
@@ -66,7 +67,9 @@ namespace VitalChoice.DynamicData.Base
             IReadRepositoryAsync<TOptionType> optionTypeRepositoryAsync) : base(typeConverter, converterService)
         {
             _typeConverter = typeConverter;
-            OptionTypes = optionTypeRepositoryAsync.Query().Include(o => o.Lookup).ThenInclude(l => l.LookupVariants).Select(false);
+            _optionTypes =
+                new Lazy<ICollection<TOptionType>>(
+                    () => optionTypeRepositoryAsync.Query().Include(o => o.Lookup).ThenInclude(l => l.LookupVariants).Select(false));
             _optionTypesByType = new Dictionary<int, ICollection<TOptionType>>();
         }
 
@@ -79,7 +82,7 @@ namespace VitalChoice.DynamicData.Base
         public virtual async Task SyncCollectionsAsync(ICollection<TDynamic> dynamics, ICollection<TEntity> entities,
             ICollection<TOptionType> optionTypes = null)
         {
-            if (dynamics != null && dynamics.Any() && entities != null)
+            if (dynamics != null && dynamics.Count > 0 && entities != null)
             {
                 //Update existing
                 var itemsToUpdate = dynamics.Join(entities, sd => sd.Id, s => s.Id,
@@ -120,7 +123,7 @@ namespace VitalChoice.DynamicData.Base
         //    return new OptionTypeQuery<TOptionType>();
         //}
 
-        public ICollection<TOptionType> OptionTypes { get; }
+        public ICollection<TOptionType> OptionTypes => _optionTypes.Value;
 
         public virtual Func<TOptionType, int?, bool> FilterFunc
             => (t, type) => t.IdObjectType == type || type != null && t.IdObjectType == null;
@@ -525,7 +528,7 @@ namespace VitalChoice.DynamicData.Base
             }
             var result = new TDynamic();
             var data = result.DictionaryData;
-            if (entity.OptionValues.Any())
+            if (entity.OptionValues.Count > 0)
             {
                 var optionTypes = entity.OptionTypes.ToDictionary(o => o.Id, o => o);
                 foreach (var value in entity.OptionValues)

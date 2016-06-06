@@ -230,7 +230,7 @@ namespace VitalChoice.DynamicData.Base
             if (query != null)
             {
                 var entities = await query.SelectAsync();
-                if (!entities.Any())
+                if (entities.Count == 0)
                     return new List<TEntity>();
                 var items = entities.Join(models, entity => entity.Id, model => model.Id,
                     (entity, model) =>
@@ -383,7 +383,7 @@ namespace VitalChoice.DynamicData.Base
             (await ValidateDeleteCollection(list)).Raise();
             var mainRepository = uow.RepositoryAsync<TEntity>();
             var valuesRepository = uow.RepositoryAsync<TOptionValue>();
-            if (!list.Any())
+            if (list.Count == 0)
                 return false;
             var query = mainRepository.Query(m => list.Contains(m.Id));
             if (physically)
@@ -391,7 +391,7 @@ namespace VitalChoice.DynamicData.Base
                 query = query.Include(e => e.OptionValues);
             }
             var toDelete = await query.SelectAsync();
-            if (!toDelete.Any())
+            if (toDelete.Count == 0)
                 return false;
             if (!await DeleteAllAsync(toDelete, mainRepository, valuesRepository, physically))
                 return false;

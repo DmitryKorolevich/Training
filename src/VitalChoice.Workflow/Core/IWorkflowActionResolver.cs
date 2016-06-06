@@ -11,6 +11,6 @@ namespace VitalChoice.Workflow.Core
 
         Dictionary<int, string> Actions { get; }
 
-        Task<int> GetActionKeyAsync(TContext context, IWorkflowExecutionContext executionContext);
+        Task<int> GetActionKeyAsync(TContext context, ITreeContext executionContext);
     }
 }

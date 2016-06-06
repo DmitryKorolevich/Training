@@ -37,7 +37,7 @@ namespace VitalChoice.Core.Infrastructure
                         if (status == CustomerStatus.Suspended)
                         {
                             var acceptHeader = context.HttpContext.Request.Headers["Accept"];
-                            if (acceptHeader.Any() && acceptHeader.First().Contains("application/json"))
+                            if (acceptHeader.Count > 0 && acceptHeader.First().Contains("application/json"))
                             {
                                 context.Result = CreateJsonResponse();
                             }
