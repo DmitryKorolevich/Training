@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using VitalChoice.Infrastructure.Domain.Entities.VeraCore;
+using VitalChoice.Ecommerce.Domain.Entities.VeraCore;
 
 namespace VitalChoice.Interfaces.Services.VeraCore
 {

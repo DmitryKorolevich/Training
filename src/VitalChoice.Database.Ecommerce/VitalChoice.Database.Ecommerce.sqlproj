@@ -306,4 +306,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\SPGetSkuPOrderTypeFutureBreakDownReport.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\VeraCore.sql" />
+  </ItemGroup>
 </Project>

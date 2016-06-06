@@ -7,7 +7,7 @@ namespace VitalChoice.Interfaces.Services.Avatax
     public interface IAvalaraTax
     {
         Task<bool> CancelTax(string orderCode);
-        Task<bool> CommitTax(int idOrder, TaxGetType taxGetType = TaxGetType.UseBoth);
+        Task<bool> CommitTax(string orderCode, int? idState, TaxGetType taxGetType = TaxGetType.UseBoth);
         Task<decimal> GetTax(OrderDataContext context, TaxGetType taxGetType = TaxGetType.UseBoth);
         Task<decimal> GetTax(OrderRefundDataContext context, TaxGetType taxGetType = TaxGetType.UseBoth);
     }

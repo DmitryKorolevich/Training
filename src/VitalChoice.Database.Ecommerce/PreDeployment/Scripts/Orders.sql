@@ -329,6 +329,8 @@ BEGIN
 
 END
 
+GO
+
 IF NOT EXISTS(SELECT * FROM sys.indexes WHERE name = 'IX_UQ_NameTypeOrderOption')
 BEGIN
 	CREATE UNIQUE NONCLUSTERED INDEX [IX_UQ_NameTypeOrderOption] ON [dbo].[OrderOptionTypes]
@@ -338,6 +340,8 @@ BEGIN
 	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 END
 
+GO
+
 IF NOT EXISTS(SELECT * FROM sys.indexes WHERE name = 'IX_UQ_NameTypeAddressOption')
 BEGIN
 	CREATE UNIQUE NONCLUSTERED INDEX IX_UQ_NameTypeAddressOption ON [dbo].[AddressOptionTypes]
@@ -345,5 +349,41 @@ BEGIN
 		[Name] ASC,
 		[IdObjectType] ASC
 	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+END
+GO
+
+IF OBJECT_ID(N'[dbo].[OrderShippingPackages]', N'U') IS NULL
+BEGIN
+
+	CREATE TABLE [dbo].[OrderShippingPackages] (
+		[IdOrder] [int] NOT NULL		
+			CONSTRAINT FK_OrderShippingPackageToOrder FOREIGN KEY (IdOrder) REFERENCES dbo.Orders (Id),
+		[IdSku] [int] NOT NULL
+			CONSTRAINT PK_OrderShippingPackages PRIMARY KEY (IdOrder DESC, IdSku ASC),
+			CONSTRAINT FK_OrderShippingPackageToSku FOREIGN KEY (IdSku) REFERENCES dbo.Skus (Id),
+		[DateCreated] [datetime2] NOT NULL,
+		[POrderType] [int] NULL,
+		[ShipMethodFreightCarrier] nvarchar(500) NOT NULL,
+		[ShipMethodFreightService] nvarchar(500) NOT NULL,
+		[ShippedDate] [datetime2] NOT NULL,
+		[TrackingNumber] nvarchar(500) NOT NULL,
+		[UPSServiceCode] nvarchar(500) NOT NULL,
+		[IdWarehouse] int NOT NULL
+	)
+	
+	CREATE NONCLUSTERED INDEX IX_OrderShippingPackage_IdOrder ON OrderShippingPackages ([IdOrder] DESC)
+	CREATE NONCLUSTERED INDEX IX_OrderShippingPackage_IdOrder_POrderType ON OrderShippingPackages ([IdOrder] DESC, [POrderType])
+	CREATE NONCLUSTERED INDEX IX_OrderShippingPackage_ShippedDate ON OrderShippingPackages ([ShippedDate] DESC)
+END
+GO
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE name = N'PAmount' AND [object_id] = OBJECT_ID(N'[dbo].[OrderToGiftCertificates]', N'U'))
+BEGIN
+
+	ALTER TABLE dbo.OrderToGiftCertificates
+	ADD PAmount MONEY NULL
+
+	ALTER TABLE dbo.OrderToGiftCertificates
+	ADD NPAmount MONEY NULL
 END
 GO

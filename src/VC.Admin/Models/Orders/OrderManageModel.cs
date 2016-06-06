@@ -327,6 +327,25 @@ namespace VC.Admin.Models.Orders
         [Map]
         public int? IdOrderSource { get; set; }
 
+
+        public DateTime? DateShipped { get; set; }
+
+        public DateTime? PDateShipped { get; set; }
+
+        public DateTime? NPDateShipped { get; set; }
+
+        public string ShipVia { get; set; }
+
+        public string PShipVia { get; set; }
+
+        public string NPShipVia { get; set; }
+
+        public ICollection<TrackingInvoiceItemModel> TrackingEntities { get; set; }
+
+        public ICollection<TrackingInvoiceItemModel> PTrackingEntities { get; set; }
+
+        public ICollection<TrackingInvoiceItemModel> NPTrackingEntities { get; set; }
+
         public OrderManageModel()
         {
             GCs = new List<GCListItemModel>();

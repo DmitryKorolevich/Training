@@ -71,8 +71,7 @@
                                                     <div class="form-group">
                                                         <label for="type" class="col-md-3 control-label">Service Code</label>
                                                         <div class="col-md-9">
-                                                            <select data-ng-disabled="orderEditDisabled" class="form-control" name="ServiceCode" data-ng-model="order.ServiceCode" ng-options="item.Key as item.Text for item in ReferenceData.ServiceCodes" required>
-                                                            </select>
+                                                            <select data-ng-disabled="orderEditDisabled" class="form-control" name="ServiceCode" data-ng-model="order.ServiceCode" ng-options="item.Key as item.Text for item in ReferenceData.ServiceCodes" required></select>
                                                             <div class="error-container" ng-show="forms.topForm.submitted && forms.topForm.ServiceCode.$invalid">
                                                                 <small class="error" ng-show="forms.topForm.ServiceCode.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Service Code")}}</small>
                                                                 <small class="error" ng-show="forms.topForm.ServiceCode.$error.server">{{serverMessages.GetMessage('ServiceCode')}}</small>
@@ -270,7 +269,7 @@
                                                         <label for="date" class="col-md-6 control-label">Non-Perishable Ship Date</label>
                                                         <div class="col-md-6">
                                                             <p class="input-group">
-                                                                <input type="text" name="ShipDelayDateNP" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateNP" is-open="shipDelayDateNPOpened" data-ng-disabled="orderEditDisabled"/>
+                                                                <input type="text" name="ShipDelayDateNP" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateNP" is-open="shipDelayDateNPOpened" data-ng-disabled="orderEditDisabled" />
                                                                 <span class="input-group-btn">
                                                                     <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDateNPOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                                 </span>
@@ -424,6 +423,7 @@
                                                 </fieldset>
                                             </form>
                                         </div>
+                                        <div data-ng-include="'app/modules/order/partials/orderEditShippedSection.html'"></div>
                                     </div>
                                 </spinner-overlay>
                             </div>

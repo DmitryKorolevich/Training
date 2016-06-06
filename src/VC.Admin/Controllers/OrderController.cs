@@ -11,7 +11,6 @@ using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Settings;
 using Newtonsoft.Json;
-using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -45,11 +44,16 @@ using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using VitalChoice.Business.Services.Orders;
 using VitalChoice.Core.Infrastructure.Helpers;
+using VitalChoice.Infrastructure.Domain.Avatax;
 using VitalChoice.Infrastructure.Domain.Entities.Reports;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
+using VitalChoice.Interfaces.Services.Avatax;
 using VitalChoice.Interfaces.Services.VeraCore;
+using Address = VitalChoice.Ecommerce.Domain.Entities.Addresses.Address;
+using AddressType = VitalChoice.Ecommerce.Domain.Entities.Addresses.AddressType;
 
 namespace VC.Admin.Controllers
 {
@@ -82,6 +86,8 @@ namespace VC.Admin.Controllers
         private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
         private readonly IDynamicMapper<OrderDynamic, Order> _orderMapper;
         private readonly IOrderReportService _orderReportService;
+        private readonly IAvalaraTax _avalaraTax;
+        private readonly IVeraCoreNotificationService _testService;
 
         public OrderController(
             IOrderService orderService,
@@ -107,7 +113,9 @@ namespace VC.Admin.Controllers
             IDynamicMapper<ProductDynamic, Product> productMapper, IDynamicMapper<SkuDynamic, Sku> skuMapper,
             IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodMapper,
             IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> customerPaymentMethodMapper,
-            IDynamicMapper<AddressDynamic, Address> addressMapper, ExtendedUserManager userManager)
+            IDynamicMapper<AddressDynamic, Address> addressMapper, ExtendedUserManager userManager,
+            IAvalaraTax avalaraTax,
+            IVeraCoreNotificationService testService)
         {
             _orderService = orderService;
             _orderRefundService = orderRefundService;
@@ -136,6 +144,8 @@ namespace VC.Admin.Controllers
             _userManager = userManager;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             loggerProvider.CreateLogger<OrderController>();
+            _avalaraTax = avalaraTax;
+            _testService = testService;
         }
 
         #region BaseOrderLogic
@@ -204,7 +214,6 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<PagedList<OrderListItemModel>>> GetOrders([FromBody]VOrderFilter filter)
         {
-
             if (filter.To.HasValue)
             {
                 filter.To = filter.To.Value.AddDays(1);
@@ -365,7 +374,38 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<bool>> CancelOrder(int id)
         {
-            return await _orderService.CancelOrderAsync(id);
+            var order = await _orderService.SelectAsync(id);
+            if (order == null)
+            {
+                return false;
+            }
+            if (order.OrderStatus == OrderStatus.Shipped || order.OrderStatus == OrderStatus.Cancelled || order.OrderStatus == OrderStatus.Exported ||
+                order.POrderStatus == OrderStatus.Shipped || order.POrderStatus == OrderStatus.Cancelled || order.POrderStatus == OrderStatus.Exported ||
+                order.NPOrderStatus == OrderStatus.Shipped || order.NPOrderStatus == OrderStatus.Cancelled || order.NPOrderStatus == OrderStatus.Exported)
+            {
+                throw new AppValidationException("This operation isn't allowed for the order in the given status");
+            }
+
+            var toReturn =  await _orderService.CancelOrderAsync(id);
+            if (toReturn)
+            {
+                if (order.OrderStatus.HasValue)
+                {
+                    TaxGetType type;
+                    var orderCode = _orderService.GenerateOrderCode(null, id, out type);
+                    await _avalaraTax.CancelTax(orderCode);
+                }
+                else
+                {
+                    TaxGetType type;
+                    var orderCode = _orderService.GenerateOrderCode(POrderType.P, id, out type);
+                    await _avalaraTax.CancelTax(orderCode);
+
+                    orderCode = _orderService.GenerateOrderCode(POrderType.NP, id, out type);
+                    await _avalaraTax.CancelTax(orderCode);
+                }
+            }
+            return toReturn;
         }
 
         [AdminAuthorize(PermissionType.Orders)]
@@ -726,7 +766,26 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<bool>> CancelRefundOrder(int id)
         {
-            return await _orderRefundService.CancelRefundOrderAsync(id);
+            bool toReturn = false;
+            var order = await _orderRefundService.SelectAsync(id);
+            if (order != null)
+            {
+                if (order.OrderStatus == OrderStatus.Shipped || order.OrderStatus == OrderStatus.Cancelled ||
+                    order.OrderStatus == OrderStatus.Exported)
+                {
+                    throw new AppValidationException("This operation isn't allowed for the order in the given status");
+                }
+
+                toReturn = await _orderRefundService.CancelRefundOrderAsync(id);
+                if (toReturn)
+                {
+                    TaxGetType type;
+                    var orderCode = _orderService.GenerateOrderCode(null, id, out type);
+                    await _avalaraTax.CancelTax(orderCode);
+                }
+            }
+
+            return toReturn;
         }
 
         #endregion
@@ -1241,7 +1300,9 @@ namespace VC.Admin.Controllers
                 var emailModel = await _mapper.ToModelAsync<OrderShippingConfirmationEmail>(order);
                 if (emailModel == null)
                     return false;
-                await _notificationService.SendOrderShippingConfirmationEmailAsync(model.Email, emailModel);
+
+                emailModel.ToEmail = model.Email;
+                await _notificationService.SendOrderShippingConfirmationEmailsAsync(new [] {emailModel});
             }
             else
             {
@@ -1252,7 +1313,8 @@ namespace VC.Admin.Controllers
                     if (emailModel == null)
                         return false;
 
-                    await _notificationService.SendOrderShippingConfirmationEmailAsync(model.Email, emailModel);
+                    emailModel.ToEmail = model.Email;
+                    await _notificationService.SendOrderShippingConfirmationEmailsAsync(new[] { emailModel });
                 }
                 if (model.SendNP)
                 {
@@ -1261,7 +1323,8 @@ namespace VC.Admin.Controllers
                     if (emailModel == null)
                         return false;
 
-                    await _notificationService.SendOrderShippingConfirmationEmailAsync(model.Email, emailModel);
+                    emailModel.ToEmail = model.Email;
+                    await _notificationService.SendOrderShippingConfirmationEmailsAsync(new[] { emailModel });
                 }
             }
             return true;

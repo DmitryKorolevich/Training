@@ -20,6 +20,7 @@ using VitalChoice.Business.Helpers;
 using VitalChoice.SharedWeb.Helpers;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
+using VitalChoice.Interfaces.Services;
 
 namespace VC.Admin.ModelConverters
 {
@@ -33,11 +34,13 @@ namespace VC.Admin.ModelConverters
         private readonly IGcService _gcService;
         private readonly IProductService _productService;
         private readonly IEcommerceRepositoryAsync<OrderToGiftCertificate> _gcInOrderRep;
+        private readonly ITrackingService _trackingService;
 
         public OrderModelConverter(IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
             IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> paymentMethodMapper, ICustomerService customerService,
             IDiscountService discountService, IGcService gcService, IProductService productService, IPromotionService promotionService,
-            IEcommerceRepositoryAsync<OrderToGiftCertificate> gcInOrderRep)
+            IEcommerceRepositoryAsync<OrderToGiftCertificate> gcInOrderRep,
+            ITrackingService trackingService)
         {
             _addressMapper = addressMapper;
             _paymentMethodMapper = paymentMethodMapper;
@@ -47,6 +50,7 @@ namespace VC.Admin.ModelConverters
             _productService = productService;
             _promotionService = promotionService;
             _gcInOrderRep = gcInOrderRep;
+            _trackingService = trackingService;
         }
 
         public override async Task DynamicToModelAsync(OrderManageModel model, OrderDynamic dynamic)
@@ -165,6 +169,48 @@ namespace VC.Admin.ModelConverters
                         model.VCWellness = await _paymentMethodMapper.ToModelAsync<VCWellnessEmployeeProgramPaymentModel>(dynamic.PaymentMethod);
                         break;
                 }
+            }
+
+            if (dynamic.OrderShippingPackages != null && dynamic.OrderShippingPackages.Count > 0)
+            {
+                var package = dynamic.OrderShippingPackages.FirstOrDefault(p => !p.POrderType.HasValue);
+                if (package != null)
+                {
+                    model.DateShipped = package.ShippedDate;
+                    model.ShipVia = $"{package.ShipMethodFreightCarrier} - {package.ShipMethodFreightService}";
+                }
+                model.TrackingEntities = dynamic.OrderShippingPackages.Where(p => !p.POrderType.HasValue).Select(p => new TrackingInvoiceItemModel()
+                {
+                    Sku = p.UPSServiceCode,
+                    ServiceUrl = _trackingService.GetServiceUrl(p.ShipMethodFreightCarrier, p.TrackingNumber),
+                    TrackingNumber = p.TrackingNumber,
+                }).ToList();
+
+                package = dynamic.OrderShippingPackages.FirstOrDefault(p => p.POrderType == (int)POrderType.P);
+                if (package != null)
+                {
+                    model.PDateShipped = package.ShippedDate;
+                    model.PShipVia = $"{package.ShipMethodFreightCarrier} - {package.ShipMethodFreightService}";
+                }
+                model.PTrackingEntities = dynamic.OrderShippingPackages.Where(p => p.POrderType == (int)POrderType.P).Select(p => new TrackingInvoiceItemModel()
+                {
+                    Sku = p.UPSServiceCode,
+                    ServiceUrl = _trackingService.GetServiceUrl(p.ShipMethodFreightCarrier, p.TrackingNumber),
+                    TrackingNumber = p.TrackingNumber,
+                }).ToList();
+
+                package = dynamic.OrderShippingPackages.FirstOrDefault(p => p.POrderType == (int)POrderType.NP);
+                if (package != null)
+                {
+                    model.NPDateShipped = package.ShippedDate;
+                    model.NPShipVia = $"{package.ShipMethodFreightCarrier} - {package.ShipMethodFreightService}";
+                }
+                model.NPTrackingEntities = dynamic.OrderShippingPackages.Where(p => p.POrderType == (int)POrderType.NP).Select(p => new TrackingInvoiceItemModel()
+                {
+                    Sku = p.UPSServiceCode,
+                    ServiceUrl = _trackingService.GetServiceUrl(p.ShipMethodFreightCarrier, p.TrackingNumber),
+                    TrackingNumber = p.TrackingNumber,
+                }).ToList();
             }
         }
 

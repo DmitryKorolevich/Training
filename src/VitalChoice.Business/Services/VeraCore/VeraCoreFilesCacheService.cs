@@ -11,7 +11,7 @@ using Microsoft.Extensions.Options;
 using Renci.SshNet;
 using Renci.SshNet.Sftp;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Infrastructure.Domain.Entities.VeraCore;
+using VitalChoice.Ecommerce.Domain.Entities.VeraCore;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.VeraCore;
@@ -32,7 +32,7 @@ namespace VitalChoice.Business.Services.VeraCore
         {
             _options = options;
             _logger = logger.CreateLogger<VeraCoreFilesCacheService>();
-            _directoryPath = _options.Value.VeraCoreSettings.ArchivePath;
+            _directoryPath = _options.Value?.VeraCoreSettings?.ArchivePath;
         }
 
         public FileStream GetCached(VeraCoreFileInfo fileInfo, string subPath)
@@ -114,7 +114,7 @@ namespace VitalChoice.Business.Services.VeraCore
                         {
                             foreach (string file in fileList)
                             {
-                                var archiveItem = archive.CreateEntry(file.Replace(path + @"\", ""));
+                                var archiveItem = archive.CreateEntry(file.Replace(path + @"\", ""),CompressionLevel.Optimal);
 
                                 using (var entryStream = archiveItem.Open())
                                 {

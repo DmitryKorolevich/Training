@@ -246,17 +246,20 @@ namespace VitalChoice.Business.Mail
             }
         }
 
-        public async Task SendOrderShippingConfirmationEmailAsync(string email, OrderShippingConfirmationEmail model)
+        public async Task SendOrderShippingConfirmationEmailsAsync(ICollection<OrderShippingConfirmationEmail> models)
         {
-            var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.OrderShippingConfirmationEmail, model);
+            var items = await _emailTemplateService.GenerateEmailsAsync(EmailConstants.OrderShippingConfirmationEmail, models);
 
-            if (generatedEmail != null)
+            if (items != null)
             {
-                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body);
+                foreach (var item in items)
+                {
+                    await emailSender.SendEmailAsync(item.Key.ToEmail, item.Value.Subject, item.Value.Body);
+                }
             }
         }
 
-        public async Task SendOrderProductReviewEmailAsync(ICollection<OrderProductReviewEmail> models)
+        public async Task SendOrderProductReviewEmailsAsync(ICollection<OrderProductReviewEmail> models)
         {
             var items = await _emailTemplateService.GenerateEmailsAsync(EmailConstants.OrderProductReviewEmail, models);
 

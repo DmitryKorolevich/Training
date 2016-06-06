@@ -129,13 +129,53 @@ namespace VC.Admin.ModelConverters
             model.ShippingSurcharge = model.AlaskaHawaiiSurcharge + model.CanadaSurcharge - model.SurchargeOverride;
             model.TotalShipping = model.ShippingTotal - model.ShippingSurcharge;
 
-            //TODO - add ShowTrackingView and it's fields
-            //trackingService.GetServiceUrl
-            //TODO - add RefundedManualOverride for refund orders
+            if (dynamic.OrderShippingPackages != null && dynamic.OrderShippingPackages.Count > 0)
+            {
+                model.ShowTrackingView = true;
+
+                var package = dynamic.OrderShippingPackages.FirstOrDefault(p => !p.POrderType.HasValue);
+                if (package != null)
+                {
+                    model.DateShipped = package.ShippedDate;
+                    model.ShipVia = $"{package.ShipMethodFreightCarrier} - {package.ShipMethodFreightService}";
+                }
+                model.TrackingEntities = dynamic.OrderShippingPackages.Where(p=>!p.POrderType.HasValue).Select(p => new TrackingInvoiceItemModel()
+                {
+                    Sku = p.UPSServiceCode,
+                    ServiceUrl = _trackingService.GetServiceUrl(p.ShipMethodFreightCarrier, p.TrackingNumber),
+                    TrackingNumber = p.TrackingNumber,
+                }).ToList();
+
+                package = dynamic.OrderShippingPackages.FirstOrDefault(p => p.POrderType==(int)POrderType.P);
+                if (package != null)
+                {
+                    model.PDateShipped = package.ShippedDate;
+                    model.PShipVia = $"{package.ShipMethodFreightCarrier} - {package.ShipMethodFreightService}";
+                }
+                model.PTrackingEntities = dynamic.OrderShippingPackages.Where(p => p.POrderType == (int)POrderType.P).Select(p => new TrackingInvoiceItemModel()
+                {
+                    Sku = p.UPSServiceCode,
+                    ServiceUrl = _trackingService.GetServiceUrl(p.ShipMethodFreightCarrier, p.TrackingNumber),
+                    TrackingNumber = p.TrackingNumber,
+                }).ToList();
+
+                package = dynamic.OrderShippingPackages.FirstOrDefault(p => p.POrderType== (int)POrderType.NP);
+                if (package != null)
+                {
+                    model.NPDateShipped = package.ShippedDate;
+                    model.NPShipVia = $"{package.ShipMethodFreightCarrier} - {package.ShipMethodFreightService}";
+                }
+                model.NPTrackingEntities = dynamic.OrderShippingPackages.Where(p => p.POrderType == (int)POrderType.NP).Select(p => new TrackingInvoiceItemModel()
+                {
+                    Sku = p.UPSServiceCode,
+                    ServiceUrl = _trackingService.GetServiceUrl(p.ShipMethodFreightCarrier, p.TrackingNumber),
+                    TrackingNumber = p.TrackingNumber,
+                }).ToList();
+            }
 
             if (dynamic.IdObjectType == (int)OrderType.Refund)
             {
-                //TODO - add showing info for refund orders
+                model.RefundedManualOverride = dynamic.SafeData.ManualRefundOverride;
             }
             else
             {

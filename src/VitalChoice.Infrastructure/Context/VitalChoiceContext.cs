@@ -23,7 +23,6 @@ using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Entities.VitalGreen;
 using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.Tokens;
-using VitalChoice.Infrastructure.Domain.Entities.VeraCore;
 
 namespace VitalChoice.Infrastructure.Context
 {
@@ -608,22 +607,6 @@ namespace VitalChoice.Infrastructure.Context
                     .HasForeignKey(p => p.ZoneId)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
-            });
-
-            #endregion
-
-            #region VeraCore
-
-            builder.Entity<VeraCoreProcessItem>(entity =>
-            {
-                entity.HasKey(t => t.Id);
-                entity.ToTable("VeraCoreProcessItems");
-            });
-
-            builder.Entity<VeraCoreProcessLogItem>(entity =>
-            {
-                entity.HasKey(t => t.Id);
-                entity.ToTable("VeraCoreProcessLogItems");
             });
 
             #endregion

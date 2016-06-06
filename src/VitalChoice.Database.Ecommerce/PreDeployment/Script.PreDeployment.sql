@@ -61,3 +61,4 @@
 :r .\Scripts\DiscountsUsed.sql
 
 :r .\Scripts\Newsletters.sql
+:r .\Scripts\VeraCore.sql

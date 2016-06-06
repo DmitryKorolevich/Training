@@ -5,7 +5,7 @@
                 <button data-ng-click="save()" class="btn btn-success width-160px" unsaved-warning-clear>Submit Refund</button>
             </div>
             <div data-ng-if="order.Id && order.OrderStatus!=4">
-                <button data-ng-click="cancelRefund()" class="btn btn-default width-160px">Cancel Refund</button>
+                <button data-ng-click="cancelRefund()" class="btn btn-default width-160px" unsaved-warning-clear>Cancel Refund</button>
             </div>
             <div class="margin-top-10px">
                 <button ui-sref="index.oneCol.manageOrders" class="btn btn-default width-160px" unsaved-warning-clear>Cancel</button>
