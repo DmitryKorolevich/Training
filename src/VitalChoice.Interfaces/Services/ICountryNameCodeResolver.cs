@@ -8,6 +8,7 @@ namespace VitalChoice.Interfaces.Services
 {
     public interface ICountryNameCodeResolver
     {
+        bool IsState(int idState, string countryCode, string stateCode);
         bool IsState(AddressDynamic address, string countryCode, string stateCode);
         bool IsCountry(AddressDynamic address, string countryCode);
         string GetCountryCode(int idCountry);

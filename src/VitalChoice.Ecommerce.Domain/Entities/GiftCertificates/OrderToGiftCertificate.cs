@@ -9,5 +9,7 @@ namespace VitalChoice.Ecommerce.Domain.Entities.GiftCertificates
         public int IdGiftCertificate { get; set; }
         public GiftCertificate GiftCertificate { get; set; }
         public decimal Amount { get; set; }
+        public decimal? PAmount { get; set; }
+        public decimal? NPAmount { get; set; }
     }
 }

@@ -66,14 +66,19 @@ namespace VitalChoice.Business.Services.Avatax
             return cancelTaxResult.ResultCode == SeverityLevel.Success;
         }
 
-        public async Task<bool> CommitTax(int idOrder, TaxGetType taxGetType = TaxGetType.UseBoth)
+        public async Task<bool> CommitTax(string orderCode, int? idState, TaxGetType taxGetType = TaxGetType.UseBoth)
         {
+            if (!idState.HasValue || 
+                (!_countryNameCode.IsState(idState.Value, "us", "va") &&
+                !_countryNameCode.IsState(idState.Value, "us", "wa")))
+                return true;
+
             if (_turnOffCommit)
                 return true;
             GetTaxRequest getTaxRequest = new GetTaxRequest
             {
                 CompanyCode = _companyCode,
-                DocCode = "TAX" + idOrder,
+                DocCode = "TAX" + orderCode,
                 Commit = taxGetType.HasFlag(TaxGetType.Commit),
                 DocType = DocType.SalesInvoice,
                 DocDate = DateTime.Now

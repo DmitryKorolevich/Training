@@ -23,6 +23,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 using VitalChoice.Ecommerce.Domain.Entities.InventorySkus;
+using VitalChoice.Ecommerce.Domain.Entities.VeraCore;
 
 namespace VitalChoice.Ecommerce.Context
 {
@@ -917,7 +918,19 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(p => p.IdEditedBy)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
+                entity.HasMany(o => o.OrderShippingPackages)
+                    .WithOne(p=>p.Order)
+                    .HasForeignKey(v => v.IdOrder)
+                    .HasPrincipalKey(o => o.Id)
+                    .IsRequired();
                 entity.Ignore(o => o.OptionTypes);
+            });
+
+            builder.Entity<OrderShippingPackage>(entity =>
+            {
+                entity.HasKey(o => new { o.IdOrder, o.IdSku });
+                entity.Ignore(o => o.Id);
+                entity.ToTable("OrderShippingPackages");
             });
 
             builder.Entity<OrderOptionValue>(entity =>
@@ -1277,7 +1290,7 @@ namespace VitalChoice.Ecommerce.Context
             CartToGiftCertificates(builder);
 
             #endregion
-
+            
             #region HealthWise
 
             builder.Entity<HealthwiseOrder>(entity =>
@@ -1305,6 +1318,22 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(o => o.IdCustomer)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired();
+            });
+
+            #endregion
+
+            #region VeraCore
+
+            builder.Entity<VeraCoreProcessItem>(entity =>
+            {
+                entity.HasKey(t => t.Id);
+                entity.ToTable("VeraCoreProcessItems");
+            });
+
+            builder.Entity<VeraCoreProcessLogItem>(entity =>
+            {
+                entity.HasKey(t => t.Id);
+                entity.ToTable("VeraCoreProcessLogItems");
             });
 
             #endregion

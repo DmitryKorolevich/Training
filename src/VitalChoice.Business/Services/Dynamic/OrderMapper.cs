@@ -97,6 +97,8 @@ namespace VitalChoice.Business.Services.Dynamic
                     dynamic.GiftCertificates.AddRange(entity.GiftCertificates.Select(g => new GiftCertificateInOrder
                     {
                         Amount = g.Amount,
+                        PAmount = g.PAmount,
+                        NPAmount = g.NPAmount,
                         GiftCertificate = g.GiftCertificate
                     }));
                 }
@@ -160,6 +162,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 }
 
                 dynamic.AffiliateOrderPayment = entity.AffiliateOrderPayment;
+                dynamic.OrderShippingPackages = entity.OrderShippingPackages;
             });
         }
 
@@ -193,6 +196,8 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.GiftCertificates = new List<OrderToGiftCertificate>(dynamic.GiftCertificates.Select(g => new OrderToGiftCertificate
                 {
                     Amount = g.Amount,
+                    PAmount = g.PAmount,
+                    NPAmount = g.NPAmount,
                     IdOrder = dynamic.Id,
                     IdGiftCertificate = g.GiftCertificate.Id
                 }));
@@ -301,11 +306,15 @@ namespace VitalChoice.Business.Services.Dynamic
                         g => new OrderToGiftCertificate
                         {
                             Amount = g.Amount,
+                            PAmount = g.PAmount,
+                            NPAmount = g.NPAmount,
                             IdOrder = dynamic.Id,
                             IdGiftCertificate = g.GiftCertificate.Id,
                         }, (g, dg) =>
                         {
                             g.Amount = dg.Amount;
+                            g.PAmount = dg.PAmount;
+                            g.NPAmount = dg.NPAmount;
                             if (g.GiftCertificate != null && dg.GiftCertificate != null)
                             {
                                 g.GiftCertificate.Balance = dg.GiftCertificate.Balance;

@@ -49,9 +49,9 @@ namespace VitalChoice.Business.Mail
 
         Task SendOrderConfirmationEmailAsync(string email, OrderConfirmationEmail model);
 
-        Task SendOrderShippingConfirmationEmailAsync(string email, OrderShippingConfirmationEmail model);
+        Task SendOrderShippingConfirmationEmailsAsync(ICollection<OrderShippingConfirmationEmail> models);
 
-        Task SendOrderProductReviewEmailAsync(ICollection<OrderProductReviewEmail> models);
+        Task SendOrderProductReviewEmailsAsync(ICollection<OrderProductReviewEmail> models);
 
         #endregion
 

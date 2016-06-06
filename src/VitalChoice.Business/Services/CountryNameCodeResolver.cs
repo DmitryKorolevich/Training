@@ -31,6 +31,11 @@ namespace VitalChoice.Business.Services
 
         private readonly Dictionary<int, Dictionary<int, State>> _stateCodes;
 
+        public bool IsState(int idState, string countryCode, string stateCode)
+        {
+            return _states.GetStateId(countryCode, stateCode) == idState;
+        }
+
         public bool IsState(AddressDynamic address, string countryCode, string stateCode)
         {
             return _states.GetStateId(countryCode, stateCode) == address?.IdState;

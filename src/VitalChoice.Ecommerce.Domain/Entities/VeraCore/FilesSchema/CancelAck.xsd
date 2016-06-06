@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<xsd:schema elementFormDefault="qualified" attributeFormDefault="qualified"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:element name="CancelAck">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="OrderID" type="xsd:string" />
+        <xsd:element name="CanceledComplete" type="xsd:string" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>

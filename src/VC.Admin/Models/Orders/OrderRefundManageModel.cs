@@ -215,7 +215,7 @@ namespace VC.Admin.Models.Orders
         public int IdOrderSource { get; set; }
 
         [Map]
-        public int ServiceCode { get; set; }
+        public int? ServiceCode { get; set; }
 
         [Map]
         public bool ReturnAssociated { get; set; }

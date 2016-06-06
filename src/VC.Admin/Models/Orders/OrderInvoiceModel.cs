@@ -152,11 +152,23 @@ namespace VC.Admin.Models.Orders
 
         public bool ShowTrackingView { get; set; }
 
-        public DateTime DateShipped {get;set;}
+        public DateTime? DateShipped {get;set; }
+
+        public DateTime? PDateShipped { get; set; }
+
+        public DateTime? NPDateShipped { get; set; }
 
         public string ShipVia { get; set; }
 
+        public string PShipVia { get; set; }
+
+        public string NPShipVia { get; set; }
+
         public ICollection<TrackingInvoiceItemModel> TrackingEntities { get; set; }
+
+        public ICollection<TrackingInvoiceItemModel> PTrackingEntities { get; set; }
+
+        public ICollection<TrackingInvoiceItemModel> NPTrackingEntities { get; set; }
 
         public ICollection<GCInvoiceItemModel> GCs { get; set; }
 

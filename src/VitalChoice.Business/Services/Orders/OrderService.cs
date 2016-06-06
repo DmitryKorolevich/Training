@@ -67,9 +67,11 @@ using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 using VitalChoice.Infrastructure.Context;
+using VitalChoice.Infrastructure.Domain.Avatax;
 using VitalChoice.Infrastructure.Domain.Exceptions;
 using VitalChoice.Infrastructure.Extensions;
 using VitalChoice.Infrastructure.Domain.Transfer.Reports;
+using AddressType = VitalChoice.Ecommerce.Domain.Entities.Addresses.AddressType;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -495,7 +497,8 @@ namespace VitalChoice.Business.Services.Orders
                     .ThenInclude(s => s.GeneratedGiftCertificates)
                     .Include(o => o.HealthwiseOrder)
                     .Include(o => o.ReshipProblemSkus)
-                    .ThenInclude(g => g.Sku);
+                    .ThenInclude(g => g.Sku)
+                    .Include(o => o.OrderShippingPackages);
         }
 
         protected override Task AfterSelect(ICollection<Order> entities)
@@ -976,19 +979,12 @@ namespace VitalChoice.Business.Services.Orders
 			return await _vAutoShipOrderRepository.Query(x => x.AutoShipId == idAutoShip).SelectAsync(x => x.Id);
 		}
 
-	    public async Task<bool> CancelOrderAsync(int id)
+	    public async Task<bool> CancelOrderAsync(int id, POrderType? pOrderType=null)
         {
             var toReturn = false;
             var order = await SelectAsync(id, false);
             if (order != null)
             {
-                if (order.OrderStatus == OrderStatus.Shipped || order.OrderStatus == OrderStatus.Cancelled || order.OrderStatus == OrderStatus.Exported ||
-                    order.POrderStatus == OrderStatus.Shipped || order.POrderStatus == OrderStatus.Cancelled || order.POrderStatus == OrderStatus.Exported ||
-                    order.NPOrderStatus == OrderStatus.Shipped || order.NPOrderStatus == OrderStatus.Cancelled || order.NPOrderStatus == OrderStatus.Exported)
-                {
-                    throw new AppValidationException("This operation isn't allowed for the order in the given status");
-                }
-
                 using (var uow = CreateUnitOfWork())
                 {
                     using (var transaction = uow.BeginTransaction())
@@ -999,14 +995,23 @@ namespace VitalChoice.Business.Services.Orders
                             List<GiftCertificate> generatedGcs = new List<GiftCertificate>();
                             if (order.Skus.Any(s => s.GcsGenerated?.Any() ?? false))
                             {
-                                generatedGcs =
-                                    await
-                                        giftCertificateRepository.Query(
-                                            p => p.IdOrder == order.Id && p.StatusCode != RecordStatusCode.NotActive).SelectAsync();
-                                generatedGcs.ForEach(p =>
+                                generatedGcs =await giftCertificateRepository.Query(p => p.IdOrder == order.Id && p.StatusCode != RecordStatusCode.NotActive).SelectAsync();
+                                //cancel gc=3 with np part
+                                if (pOrderType == POrderType.NP)
                                 {
-                                    p.StatusCode = RecordStatusCode.NotActive;
-                                });
+                                    generatedGcs.Where(p=>p.GCType==GCType.GC).ForEach(p =>
+                                    {
+                                        p.StatusCode = RecordStatusCode.NotActive;
+                                    });
+                                }
+                                //cancel all gcs with all
+                                if (IsAllCancel(pOrderType, order))
+                                {
+                                    generatedGcs.ForEach(p =>
+                                    {
+                                        p.StatusCode = RecordStatusCode.NotActive;
+                                    });
+                                }
                             }
 
                             List<GiftCertificate> usedGcs = new List<GiftCertificate>();
@@ -1014,24 +1019,53 @@ namespace VitalChoice.Business.Services.Orders
                             {
                                 var ids = order.GiftCertificates.Select(p => p.GiftCertificate?.Id).ToList();
                                 usedGcs = await giftCertificateRepository.Query(p => ids.Contains(p.Id)).SelectAsync(true);
-                                usedGcs.UpdateKeyed(order.GiftCertificates, g => g.Id, g => g.GiftCertificate.Id,
-                                    (db, gc) => db.Balance += gc.Amount);
-                                //foreach (var giftCertificateInOrder in order.GiftCertificates)
-                                //{
-                                //    var gc = usedGcs.FirstOrDefault(p => p.Id == giftCertificateInOrder.GiftCertificate?.Id);
-                                //    if (gc != null)
-                                //    {
-                                //        gc.Balance += giftCertificateInOrder.Amount;
-                                //        //if (giftCertificateInOrder.GiftCertificate != null)
-                                //        //{
-                                //        //    giftCertificateInOrder.GiftCertificate.Balance = gc.Balance;
-                                //        //}
-                                //    }
-                                //}
-                                order.GiftCertificates.Clear();
+
+                                if (IsAllCancel(pOrderType, order))
+                                {
+                                    usedGcs.UpdateKeyed(order.GiftCertificates, g => g.Id, g => g.GiftCertificate.Id,
+                                        (db, gc) => db.Balance += gc.Amount);
+
+                                    order.GiftCertificates.Clear();
+                                }
+                                else
+                                {
+                                    if (pOrderType == POrderType.P)
+                                    {
+                                        usedGcs.UpdateKeyed(order.GiftCertificates, g => g.Id, g => g.GiftCertificate.Id,
+                                            (db, gc) => db.Balance += gc.PAmount ?? 0);
+                                        order.GiftCertificates.ForEach(p =>
+                                        {
+                                            p.Amount = p.Amount - (p.PAmount ?? 0);
+                                            p.Amount = p.Amount >= 0 ? p.Amount : 0;
+                                            p.PAmount = 0;
+                                            var usedGc = usedGcs.FirstOrDefault(pp => pp.Id == p.GiftCertificate?.Id);
+                                            if (usedGc != null)
+                                            {
+                                                p.GiftCertificate.Balance = usedGc.Balance;
+                                            }
+                                        });
+                                    }
+                                    if (pOrderType == POrderType.NP)
+                                    {
+                                        usedGcs.UpdateKeyed(order.GiftCertificates, g => g.Id, g => g.GiftCertificate.Id,
+                                            (db, gc) => db.Balance += gc.NPAmount ?? 0);
+                                        order.GiftCertificates.ForEach(p =>
+                                        {
+                                            p.Amount = p.Amount - (p.NPAmount ?? 0);
+                                            p.Amount = p.Amount >= 0 ? p.Amount : 0;
+                                            p.NPAmount = 0;
+                                            var usedGc = usedGcs.FirstOrDefault(pp => pp.Id == p.GiftCertificate?.Id);
+                                            if (usedGc != null)
+                                            {
+                                                p.GiftCertificate.Balance = usedGc.Balance;
+                                            }
+                                        });
+                                    }
+                                }
                             }
 
-                            if (order.Discount?.Id > 0)
+                            //cancel one time discount with all
+                            if (order.Discount?.Id > 0 && IsAllCancel(pOrderType, order))
                             {
                                 await _discountService.SetDiscountUsed(order.Discount, order.Customer.Id, false);
                             }
@@ -1040,15 +1074,15 @@ namespace VitalChoice.Business.Services.Orders
                             giftCertificateRepository.DetachAll(generatedGcs);
                             giftCertificateRepository.DetachAll(usedGcs);
 
-                            if (order.OrderStatus.HasValue)
+                            if (order.OrderStatus.HasValue && !pOrderType.HasValue)
                             {
                                 order.OrderStatus = OrderStatus.Cancelled;
                             }
-                            if (order.POrderStatus.HasValue)
+                            if (order.POrderStatus.HasValue && (pOrderType==POrderType.P || !pOrderType.HasValue))
                             {
                                 order.POrderStatus = OrderStatus.Cancelled;
                             }
-                            if (order.NPOrderStatus.HasValue)
+                            if (order.NPOrderStatus.HasValue && (pOrderType == POrderType.NP || !pOrderType.HasValue))
                             {
                                 order.NPOrderStatus = OrderStatus.Cancelled;
                             }
@@ -1071,6 +1105,13 @@ namespace VitalChoice.Business.Services.Orders
                 }
             }
             return toReturn;
+        }
+
+        private bool IsAllCancel(POrderType? pOrderType,OrderDynamic order)
+        {
+            return !pOrderType.HasValue ||
+                   (pOrderType == POrderType.P && order.NPOrderStatus == OrderStatus.Cancelled)
+                   || (pOrderType == POrderType.NP && order.POrderStatus == OrderStatus.Cancelled);
         }
 
         protected override async Task<Order> InsertAsync(OrderDynamic model, IUnitOfWorkAsync uow)
@@ -1671,6 +1712,17 @@ namespace VitalChoice.Business.Services.Orders
             toReturn.Data.ShipDelayType = (int)ShipDelayType.None;
 
             return toReturn;
+        }
+
+        public string GenerateOrderCode(POrderType? pOrderType, int idOrder, out TaxGetType type)
+        {
+            var orderCode = !pOrderType.HasValue
+                ? idOrder.ToString()
+                : (pOrderType.Value == POrderType.P ? idOrder + "_p" : idOrder + "_np");
+            type = !pOrderType.HasValue
+                ? TaxGetType.UseBoth
+                : (pOrderType.Value == POrderType.P ? TaxGetType.Perishable : TaxGetType.NonPerishable);
+            return orderCode;
         }
 
         private void SetExtendedOptions(IEnumerable<OrderDynamic> items)

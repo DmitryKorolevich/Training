@@ -124,11 +124,6 @@ namespace VitalChoice.Business.Services.Orders
             var order = await SelectAsync(id, false);
             if (order != null)
             {
-                if (order.OrderStatus == OrderStatus.Shipped || order.OrderStatus == OrderStatus.Cancelled || order.OrderStatus == OrderStatus.Exported)
-                {
-                    throw new AppValidationException("This operation isn't allowed for the order in the given status");
-                }
-
                 order.OrderStatus=OrderStatus.Cancelled;
                 foreach (var refundOrderToGiftCertificateUsed in order.RefundOrderToGiftCertificates)
                 {

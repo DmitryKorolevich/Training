@@ -9,6 +9,7 @@ using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Avatax;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
@@ -35,7 +36,9 @@ namespace VitalChoice.Interfaces.Services.Orders
 
 	    Task OrderTypeSetup(OrderDynamic order);
 
-	    Task<bool> CancelOrderAsync(int id);
+	    Task<bool> CancelOrderAsync(int id, POrderType? pOrderType = null);
+
+	    string GenerateOrderCode(POrderType? pOrderType, int idOrder, out TaxGetType type);
 
         #region AffiliatesOrders
 

@@ -429,6 +429,7 @@ namespace VitalChoice.Core.DependencyInjection
                     Password = section["Password"],
                     ServerPort = Int32.Parse(section["ServerPort"]),
                     ArchivePath =section["ArchivePath"],
+                    WAwarehouseThreshold = Int32.Parse(section["WAwarehouseThreshold"]),
                 };
             }
         }
@@ -574,6 +575,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<VeraCoreSFTPService>().As<IVeraCoreSFTPService>().InstancePerLifetimeScope();
             builder.RegisterType<VeraCoreFilesCacheService>().As<IVeraCoreFilesCacheService>().InstancePerLifetimeScope();
             builder.RegisterType<VeraCoreNotificationService>().As<IVeraCoreNotificationService>().InstancePerLifetimeScope();
+
             builder.RegisterMappers(typeof(ProductService).GetTypeInfo().Assembly, (type, registration) =>
             {
                 if (type == typeof(SkuMapper))

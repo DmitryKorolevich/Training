@@ -14,11 +14,16 @@ using VitalChoice.Interfaces.Services.Orders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.Business.Mail;
+using VitalChoice.Data.Helpers;
+using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Entities.Newsletters;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
+using VitalChoice.Infrastructure.Domain.Transfer.VeraCore;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -28,6 +33,8 @@ namespace VitalChoice.Business.Services.Orders
         private readonly ICustomerService _customerService;
         private readonly INotificationService _notificationService;
         private readonly IOptions<AppOptions> _options;
+        private readonly IEcommerceRepositoryAsync<OrderShippingPackage> _orderShippingPackageRepository;
+        private readonly IEcommerceRepositoryAsync<NewsletterBlockedEmail> _newsletterBlockedEmailRepository;
         private readonly ILogger _logger;
 
         public OrderSchedulerService(
@@ -35,12 +42,16 @@ namespace VitalChoice.Business.Services.Orders
             ICustomerService customerService,
             INotificationService notificationService,
             IOptions<AppOptions> options,
+            IEcommerceRepositoryAsync<OrderShippingPackage> orderShippingPackageRepository,
+            IEcommerceRepositoryAsync<NewsletterBlockedEmail> newsletterBlockedEmailRepository,
             ILoggerProviderExtended loggerProvider)
         {
             _orderService = orderService;
             _customerService = customerService;
             _notificationService = notificationService;
             _options = options;
+            _orderShippingPackageRepository = orderShippingPackageRepository;
+            _newsletterBlockedEmailRepository = newsletterBlockedEmailRepository;
             _logger = loggerProvider.CreateLogger<OrderSchedulerService>();
         }
 
@@ -156,8 +167,81 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task SendOrderProductReviewEmails()
         {
-            //get orders by part ship date in range from EmailConstants.OrderProductReviewEmailDaysCount to EmailConstants.OrderProductReviewEmailDaysCount+1
-            //and check that customers of these orders have emails and these emails aren't in the black list and then send emails for them
+            var now =new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+            var packages = await _orderShippingPackageRepository.Query(p=>p.ShippedDate>=now.AddDays(-EmailConstants.OrderProductReviewEmailDaysCount)
+                && p.ShippedDate< now.AddDays(-EmailConstants.OrderProductReviewEmailDaysCount+1)).Include(p=>p.Order).ThenInclude(p=>p.Customer)
+                .SelectAsync(false);
+
+            var emails = packages.Select(p => p.Order.Customer.Email).Where(p => !string.IsNullOrEmpty(p)).Distinct();
+            var blockedEmails = (await _newsletterBlockedEmailRepository.Query(p => emails.Contains(p.Email) && p.IdNewsletter== EmailConstants.ProductReviewIdNewsletter)
+                .SelectAsync(false)).Select(p=>p.Email).ToList();
+            var orderNotifications = new List<ShipmentNotificationItem>();
+            foreach (var orderShippingPackage in packages)
+            {
+                if (!blockedEmails.Contains(orderShippingPackage.Order.Customer.Email))
+                {
+                    if (!orderNotifications.Any(p=>p.IdOrder == orderShippingPackage.IdOrder && p.POrderType == (POrderType?)orderShippingPackage.POrderType)
+                        && ((orderShippingPackage.Order.OrderStatus == OrderStatus.Shipped && !orderShippingPackage.POrderType.HasValue) ||
+                        (orderShippingPackage.Order.POrderStatus == OrderStatus.Shipped && orderShippingPackage.POrderType==(int)POrderType.P) ||
+                        (orderShippingPackage.Order.NPOrderStatus == OrderStatus.Shipped && orderShippingPackage.POrderType == (int)POrderType.NP)))
+                    {
+                        orderNotifications.Add(new ShipmentNotificationItem()
+                        {
+                            IdOrder  = orderShippingPackage.IdOrder,
+                            POrderType = (POrderType?)orderShippingPackage.POrderType,
+                        }); 
+                    }
+                }
+            }
+
+            if (orderNotifications.Count > 0)
+            {
+                var orders = await _orderService.SelectAsync(orderNotifications.Select(p=>p.IdOrder).Distinct().ToList());
+                var customers = await _customerService.SelectAsync(orders.Select(p=>p.Customer.Id).Distinct().ToList());
+
+                var models =new List<OrderProductReviewEmail>();
+                foreach (var orderNotification in orderNotifications)
+                {
+                    var order = orders.FirstOrDefault(p => p.Id == orderNotification.IdOrder);
+                    if (order != null)
+                    {
+                        var customer = customers.FirstOrDefault(p => p.Id == order.Customer.Id);
+                        if (customer != null)
+                        {
+                            OrderProductReviewEmail model = new OrderProductReviewEmail();
+                            model.PublicHost = _options.Value.PublicHost;
+                            model.CustomerName = $"{customer.ProfileAddress.SafeData.FirstName} {customer.ProfileAddress.SafeData.LastName}";
+                            model.Email = customer.Email;
+                            model.UrlEncodedEmail = WebUtility.UrlEncode(customer.Email);
+                            var skus = order.Skus.Where(p=>!p.Sku.Hidden && p.Sku.Product.IdVisibility.HasValue);
+                            if (orderNotification.POrderType==POrderType.P)
+                            {
+                                skus = skus.Where(p => p.Sku.Product.IdObjectType == (int)ProductType.Perishable);
+                            }
+                            if (orderNotification.POrderType == POrderType.NP)
+                            {
+                                skus = skus.Where(p => p.Sku.Product.IdObjectType == (int)ProductType.NonPerishable);
+                            }
+                            foreach (var sku in skus)
+                            {
+                                OrderProductReviewEmailProductItem item = new OrderProductReviewEmailProductItem();
+                                item.Thumbnail = sku.Sku.Product.SafeData.Thumbnail;
+                                item.ProductUrl = "/product/" + sku.Sku.Product.Url;
+                                item.DisplayName = sku.Sku.Product.Name ?? String.Empty;
+                                if (!string.IsNullOrEmpty(sku.Sku.Product.SafeData.SubTitle))
+                                {
+                                    item.DisplayName += " " + sku.Sku.Product.SafeData.SubTitle;
+                                }
+                                item.DisplayName += $" ({sku.Sku.SafeData.QTY})";
+                                model.Products.Add(item);
+                            }
+                            models.Add(model);
+                        }
+                    }
+                }
+
+                await _notificationService.SendOrderProductReviewEmailsAsync(models);
+            }
         }
 
         public async Task SendOrderProductReviewEmailTest(int id)
@@ -184,7 +268,7 @@ namespace VitalChoice.Business.Services.Orders
                 model.Products.Add(item);
             }
 
-            await _notificationService.SendOrderProductReviewEmailAsync(new[] {model});
+            await _notificationService.SendOrderProductReviewEmailsAsync(new[] {model});
         }
     }
 }

@@ -128,8 +128,7 @@ else
                                                     <span>@Model.DateCreated.ToString("MM/dd/yyyy")</span>
                                                 </td>
                                             </tr>
-                                            @* Ship date isn't added yet *@
-                                            @if (false)
+                                            @if (Model.DateShipped.HasValue)
                                             {
                                                 <tr>
                                                     <td>
@@ -141,7 +140,39 @@ else
                                                         &nbsp;
                                                     </td>
                                                     <td>
-                                                        <span></span>
+                                                        <span>@Model.DateShipped.Value.ToString("MM/dd/yyyy")</span>
+                                                    </td>
+                                                </tr>
+                                            }
+                                            @if (Model.PDateShipped.HasValue)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <div align="right">
+                                                            <strong>Perishable Items Ship Date:</strong>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        &nbsp;
+                                                    </td>
+                                                    <td>
+                                                        <span>@Model.PDateShipped.Value.ToString("MM/dd/yyyy")</span>
+                                                    </td>
+                                                </tr>
+                                            }
+                                            @if (Model.NPDateShipped.HasValue)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <div align="right">
+                                                            <strong>Non-Perishable Items Ship Date:</strong>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        &nbsp;
+                                                    </td>
+                                                    <td>
+                                                        <span>@Model.NPDateShipped.Value.ToString("MM/dd/yyyy")</span>
                                                     </td>
                                                 </tr>
                                             }
@@ -296,9 +327,9 @@ else
                                     <tr>
                                         @if (!string.IsNullOrEmpty(Model.PoNumber))
                                         {
-                                        <td width="20%" class="title-text">
-                                            PO #
-                                        </td>
+                                            <td width="20%" class="title-text">
+                                                PO #
+                                            </td>
                                         }
                                         <td width="20%" class="title-text">
                                             Sales Rep
@@ -316,9 +347,9 @@ else
                                     <tr>
                                         @if (!string.IsNullOrEmpty(Model.PoNumber))
                                         {
-                                        <td valign="top" class="entry-text">
-                                            <span>@Model.PoNumber</span>
-                                        </td>
+                                            <td valign="top" class="entry-text">
+                                                <span>@Model.PoNumber</span>
+                                            </td>
                                         }
                                         <td valign="top" class="entry-text">
                                             <span>@Model.IdEditAgent</span>
@@ -365,68 +396,6 @@ else
                         <tbody>
                             @foreach (var skuOrdered in Model.SkuOrdereds)
                             {
-                            <tr>
-                                <td valign="top" class="qty entry-text">
-                                    @skuOrdered.QTY
-                                </td>
-                                <td valign="top" class="sku entry-text">
-                                    @skuOrdered.Code
-                                </td>
-                                <td valign="top" class="entry-text">
-                                    @skuOrdered.ProductName
-                                    @foreach (var gcCode in skuOrdered.GCCodes)
-                                    {
-                                        <br /><span><em>GC Code: @gcCode</em></span>
-                                    }
-                                </td>
-                                <td valign="top" class="unit-price entry-text">
-                                    @if (skuOrdered.Price.HasValue)
-                                    {
-                                    @skuOrdered.Price.Value.ToString("c")
-                                    }
-                                </td>
-                                <td valign="top" class="total entry-text-right">
-                                    @if (skuOrdered.Amount.HasValue)
-                                    {
-                                    @skuOrdered.Amount.Value.ToString("c")
-                                    }
-                                </td>
-                            </tr>
-                            }
-                        </tbody>
-                    </table>
-                </td>
-            </tr>
-            <tr class="empty"><td></td></tr>
-
-            @if (Model.PromoSkuOrdereds.Count > 0)
-            {
-            <tr class="empty"><td>Promo products:</td></tr>
-            <tr>
-                <td>
-                    <table class="sku-items" width="100%" border="0" cellspacing="0" cellpadding="0">
-                        <thead>
-                            <tr>
-                                <td class="title-text">
-                                    Quantity
-                                </td>
-                                <td class="title-text">
-                                    SKU
-                                </td>
-                                <td class="title-text">
-                                    Description
-                                </td>
-                                <td class="title-text">
-                                    Unit Price
-                                </td>
-                                <td class="title-text-right">
-                                    Total
-                                </td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var skuOrdered in Model.PromoSkuOrdereds)
-                            {
                                 <tr>
                                     <td valign="top" class="qty entry-text">
                                         @skuOrdered.QTY
@@ -460,6 +429,68 @@ else
                 </td>
             </tr>
             <tr class="empty"><td></td></tr>
+
+            @if (Model.PromoSkuOrdereds.Count > 0)
+            {
+                <tr class="empty"><td>Promo products:</td></tr>
+                <tr>
+                    <td>
+                        <table class="sku-items" width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <td class="title-text">
+                                        Quantity
+                                    </td>
+                                    <td class="title-text">
+                                        SKU
+                                    </td>
+                                    <td class="title-text">
+                                        Description
+                                    </td>
+                                    <td class="title-text">
+                                        Unit Price
+                                    </td>
+                                    <td class="title-text-right">
+                                        Total
+                                    </td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var skuOrdered in Model.PromoSkuOrdereds)
+                                {
+                                    <tr>
+                                        <td valign="top" class="qty entry-text">
+                                            @skuOrdered.QTY
+                                        </td>
+                                        <td valign="top" class="sku entry-text">
+                                            @skuOrdered.Code
+                                        </td>
+                                        <td valign="top" class="entry-text">
+                                            @skuOrdered.ProductName
+                                            @foreach (var gcCode in skuOrdered.GCCodes)
+                                            {
+                                                <br /><span><em>GC Code: @gcCode</em></span>
+                                            }
+                                        </td>
+                                        <td valign="top" class="unit-price entry-text">
+                                            @if (skuOrdered.Price.HasValue)
+                                            {
+                                                @skuOrdered.Price.Value.ToString("c")
+                                            }
+                                        </td>
+                                        <td valign="top" class="total entry-text-right">
+                                            @if (skuOrdered.Amount.HasValue)
+                                            {
+                                                @skuOrdered.Amount.Value.ToString("c")
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr class="empty"><td></td></tr>
             }
 
             <tr>
@@ -470,43 +501,119 @@ else
                                 <td valign="bottom" width="20%">
                                     @if (Model.ShowTrackingView)
                                     {
-                                    <table border="0" cellspacing="0" cellpadding="0" width="100%">
-                                        <tbody>
-                                            <tr>
-                                                <td class="title-text text-align-right font-normal">      
-                                                    Date Shipped:
-                                                </td>
-                                                <td class="title-text-right font-normal">
-                                                    <span>@Model.DateShipped.ToString("MM/dd/yyyy")</span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="entry-text text-align-right">
-                                                    Shipped Via:
-                                                </td>
-                                                <td class="entry-text-right">
-                                                    <span>@Model.ShipVia</span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="entry-text text-align-right" valign="top">
-                                                    Tracking No.:
-                                                </td>
-                                                <td class="entry-text-right">
-                                                    <table cellpadding="0" cellspacing="0" border="0">
-                                                        @foreach(var item in Model.TrackingEntities)
-                                                        {
-                                                            <tr>
-                                                                <td>
-                                                                    @item.Sku&nbsp;-&nbsp;<a target="_blank" href="@item.ServiceUrl">"@item.TrackingNumber</a>
-                                                                </td>
-                                                            </tr>
-                                                        }
-                                                    </table>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                        <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                                            <tbody>
+                                                @if (Model.DateShipped.HasValue)
+                                                {
+                                                    <tr>
+                                                        <td class="title-text text-align-right font-normal">
+                                                            Date Shipped:
+                                                        </td>
+                                                        <td class="title-text-right font-normal">
+                                                            <span>@Model.DateShipped.Value.ToString("MM/dd/yyyy")</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="entry-text text-align-right">
+                                                            Shipped Via:
+                                                        </td>
+                                                        <td class="entry-text-right">
+                                                            <span>@Model.ShipVia</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="entry-text text-align-right" valign="top">
+                                                            Tracking No.:
+                                                        </td>
+                                                        <td class="entry-text-right">
+                                                            <table cellpadding="0" cellspacing="0" border="0">
+                                                                @foreach (var item in Model.TrackingEntities)
+                                                                {
+                                                                    <tr>
+                                                                        <td>
+                                                                            @item.Sku&nbsp;-&nbsp;<a target="_blank" href="@item.ServiceUrl">@item.TrackingNumber</a>
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                @if (Model.PDateShipped.HasValue)
+                                                {
+                                                    <tr>
+                                                        <td class="title-text text-align-right font-normal">
+                                                            Perishable Items Date Shipped:
+                                                        </td>
+                                                        <td class="title-text-right font-normal">
+                                                            <span>@Model.PDateShipped.Value.ToString("MM/dd/yyyy")</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="entry-text text-align-right">
+                                                            Shipped Via:
+                                                        </td>
+                                                        <td class="entry-text-right">
+                                                            <span>@Model.PShipVia</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="entry-text text-align-right" valign="top">
+                                                            Tracking No.:
+                                                        </td>
+                                                        <td class="entry-text-right">
+                                                            <table cellpadding="0" cellspacing="0" border="0">
+                                                                @foreach (var item in Model.PTrackingEntities)
+                                                                {
+                                                                    <tr>
+                                                                        <td>
+                                                                            @item.Sku&nbsp;-&nbsp;<a target="_blank" href="@item.ServiceUrl">@item.TrackingNumber</a>
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="empty"><td></td></tr>
+                                                }
+                                                @if (Model.NPDateShipped.HasValue)
+                                                {
+                                                    <tr>
+                                                        <td class="title-text text-align-right font-normal">
+                                                            Non-Perishable Items Date Shipped:
+                                                        </td>
+                                                        <td class="title-text-right font-normal">
+                                                            <span>@Model.NPDateShipped.Value.ToString("MM/dd/yyyy")</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="entry-text text-align-right">
+                                                            Shipped Via:
+                                                        </td>
+                                                        <td class="entry-text-right">
+                                                            <span>@Model.NPShipVia</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="entry-text text-align-right" valign="top">
+                                                            Tracking No.:
+                                                        </td>
+                                                        <td class="entry-text-right">
+                                                            <table cellpadding="0" cellspacing="0" border="0">
+                                                                @foreach (var item in Model.NPTrackingEntities)
+                                                                {
+                                                                    <tr>
+                                                                        <td>
+                                                                            @item.Sku&nbsp;-&nbsp;<a target="_blank" href="@item.ServiceUrl">@item.TrackingNumber</a>
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
                                     }
                                 </td>
                                 <td width="70%">
@@ -548,37 +655,37 @@ else
                                             {
                                                 foreach (var item in Model.GCs)
                                                 {
-                                            <tr>
-                                                <td class="entry-text text-align-right">
-                                                    (-)Gift Certificate:
-                                                </td>
-                                                <td class="entry-text-right text-align-right">
-                                                    @item.Code&nbsp;-&nbsp;@item.Amount.ToString("c")
-                                                </td>
-                                            </tr>
+                                                    <tr>
+                                                        <td class="entry-text text-align-right">
+                                                            (-)Gift Certificate:
+                                                        </td>
+                                                        <td class="entry-text-right text-align-right">
+                                                            @item.Code&nbsp;-&nbsp;@item.Amount.ToString("c")
+                                                        </td>
+                                                    </tr>
                                                 }
                                             }
                                             @if (Model.DiscountTotal != 0)
                                             {
-                                            <tr id="discountRow" runat="server">
-                                                <td class="entry-text text-align-right">
-                                                    (-)Product Discount:
-                                                </td>
-                                                <td class="entry-text-right text-align-right">
-                                                    @Model.DiscountTotal.ToString("c")
-                                                </td>
-                                            </tr>
+                                                <tr id="discountRow" runat="server">
+                                                    <td class="entry-text text-align-right">
+                                                        (-)Product Discount:
+                                                    </td>
+                                                    <td class="entry-text-right text-align-right">
+                                                        @Model.DiscountTotal.ToString("c")
+                                                    </td>
+                                                </tr>
                                             }
                                             @if (Model.RefundedManualOverride.HasValue)
                                             {
-                                            <tr>
-                                                <td class="title-bottom-text text-align-right">
-                                                    Manual Override:
-                                                </td>
-                                                <td class="title-bottom-text-right text-align-right">
-                                                    @Model.RefundedManualOverride.Value.ToString("c")
-                                                </td>
-                                            </tr>
+                                                <tr>
+                                                    <td class="title-bottom-text text-align-right">
+                                                        Manual Override:
+                                                    </td>
+                                                    <td class="title-bottom-text-right text-align-right">
+                                                        @Model.RefundedManualOverride.Value.ToString("c")
+                                                    </td>
+                                                </tr>
                                             }
                                             <tr>
                                                 <td class="title-bottom-text text-align-right">

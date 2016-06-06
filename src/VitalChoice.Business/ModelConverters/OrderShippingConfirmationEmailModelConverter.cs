@@ -29,18 +29,21 @@ namespace VitalChoice.Business.ModelConverters
         private readonly ICustomerService _customerService;
         private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
         private readonly IOptions<AppOptions> _options;
+        private readonly ITrackingService _trackingService;
 
         public OrderShippingConfirmationEmailModelConverter(
             IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
             ICountryService countryService,
             ICustomerService customerService,
-            IOptions<AppOptions> options)
+            IOptions<AppOptions> options,
+            ITrackingService trackingService)
         {
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             _countryService = countryService;
             _customerService = customerService;
             _addressMapper = addressMapper;
             _options = options;
+            _trackingService = trackingService;
         }
 
         public override async Task DynamicToModelAsync(OrderShippingConfirmationEmail model, OrderDynamic dynamic)
@@ -52,11 +55,26 @@ namespace VitalChoice.Business.ModelConverters
             
             model.Email = dynamic.Customer.Email;
 
-            //TODO - fill tracking info
-            //TODO: apply some logic for filtering tracking info based on the SendSide field
-            //model.Carrier
-            //model.ServiceUrl(generating urls - TrackingService.GetServiceUrl)
-            //model.TrackingInfoItems
+            var packageInfo =
+                dynamic.OrderShippingPackages.Where(p => p.POrderType == dynamic.SendSide)
+                    .Select(p => new
+                    {
+                        p.ShipMethodFreightCarrier,
+                        p.ShipMethodFreightService,
+                        p.TrackingNumber,
+                    }).Distinct().ToList();
+
+            model.TrackingInfoItems = packageInfo.Select(p => new TrackingInfoEmailItem()
+            {
+                Number = p.TrackingNumber,
+                ServiceUrl = _trackingService.GetServiceUrl(p.ShipMethodFreightCarrier,p.TrackingNumber),
+            }).ToList();
+            if (packageInfo.Any())
+            {
+                model.Carrier = packageInfo.First().ShipMethodFreightCarrier;
+                model.ServiceUrl = _trackingService.GetServiceUrl(packageInfo.First().ShipMethodFreightCarrier,
+                    packageInfo.First().TrackingNumber);
+            }
             if (dynamic.SendSide.HasValue)
             {
                 model.IsPerishable = dynamic.SendSide == (int)POrderType.P;

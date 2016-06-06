@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Renci.SshNet;
 using Renci.SshNet.Sftp;
-using VitalChoice.Infrastructure.Domain.Entities.VeraCore;
+using VitalChoice.Ecommerce.Domain.Entities.VeraCore;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.VeraCore;
@@ -26,12 +26,6 @@ namespace VitalChoice.Business.Services.VeraCore
         {
             _options = options;
             _logger = logger.CreateLogger<VeraCoreSFTPService>();
-            var connectionInfo = new PasswordConnectionInfo(options.Value.VeraCoreSettings.ServerHost,
-                options.Value.VeraCoreSettings.ServerPort,
-                options.Value.VeraCoreSettings.UserName, options.Value.VeraCoreSettings.Password);
-            connectionInfo.Timeout = new TimeSpan(0,0,1);
-
-            Reconnect();
         }
 
         protected void Reconnect()
@@ -55,15 +49,32 @@ namespace VitalChoice.Business.Services.VeraCore
 
         public void Dispose()
         {
-            if (_sftpClient.IsConnected)
-                _sftpClient.Disconnect();
-            _sftpClient.Dispose();
+            if (_sftpClient != null)
+            {
+                if (_sftpClient.IsConnected)
+                    _sftpClient.Disconnect();
+                _sftpClient.Dispose();
+            }
         }
 
-        public string WorkingDirectory => _sftpClient.WorkingDirectory;
+        public string WorkingDirectory
+        {
+            get
+            {
+                if (_sftpClient == null)
+                {
+                    Reconnect();
+                }
+                return _sftpClient.WorkingDirectory;
+            }
+        }
 
         public ICollection<VeraCoreFileInfo> GetFileList(VeraCoreSFTPOptions options)
         {
+            if (_sftpClient == null)
+            {
+                Reconnect();
+            }
             IEnumerable<SftpFile> files;
             try
             {
@@ -104,11 +115,19 @@ namespace VitalChoice.Business.Services.VeraCore
 
         public void RemoveFile(string fileName)
         {
+            if (_sftpClient == null)
+            {
+                Reconnect();
+            }
             _sftpClient.DeleteFile(fileName);
         }
 
         public MemoryStream DownloadFileData(string fileName)
         {
+            if (_sftpClient == null)
+            {
+                Reconnect();
+            }
             var result = new MemoryStream();
             try
             {

@@ -28,6 +28,8 @@ namespace VitalChoice.Ecommerce.Domain.Mail
 
         public string Email { get; set; }
 
+        public string ToEmail { get; set; }
+
         [Map]
         public DateTime DateCreated { get; set; }
 
