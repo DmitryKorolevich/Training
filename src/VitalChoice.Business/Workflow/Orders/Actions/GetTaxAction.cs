@@ -14,7 +14,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions
         {
         }
 
-        public override async Task<decimal> ExecuteActionAsync(OrderDataContext context, IWorkflowExecutionContext executionContext)
+        public override async Task<decimal> ExecuteActionAsync(OrderDataContext context, ITreeContext executionContext)
         {
             var taxService = executionContext.Resolve<IAvalaraTax>();
             if (context.SplitInfo.ShouldSplit)

@@ -18,7 +18,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
         {
         }
 
-        public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext dataContext, IWorkflowExecutionContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext dataContext, ITreeContext executionContext)
         {
             List<RefundSkuOrdered> skus = new List<RefundSkuOrdered>();
             var originalPromos = dataContext.Order.OriginalOrder.PromoSkus.ToDictionary(p => p.Sku.Id);

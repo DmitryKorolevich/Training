@@ -7,9 +7,9 @@ using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Workflow.Orders
 {
-    public class OrderTree: ComputableTree<OrderDataContext>
+    public class OrderTree : ComputableTree<OrderDataContext>
     {
-        public override async Task<decimal> ExecuteAsync(OrderDataContext dataContext)
+        public override async Task<decimal> ExecuteAsync(OrderDataContext dataContext, ITreeContext treeContext)
         {
             if ((dataContext.Order.Skus?.Count ?? 0) == 0)
                 return 0;
@@ -19,7 +19,7 @@ namespace VitalChoice.Business.Workflow.Orders
                 dataContext.Order.ShippingAddress = dataContext.Order.Customer?.ShippingAddresses?.FirstOrDefault(s => (bool) s.Data.Default);
             }
 
-            var result = await ExecuteAsync<TotalAction>(dataContext);
+            var result = await ExecuteAsync<TotalAction>(dataContext, treeContext);
             dataContext.Total = result;
 
             return result;

@@ -4,7 +4,7 @@ namespace VitalChoice.Workflow.Core
 {
     public interface IWorkflowFactory
     {
-        Task<IWorkflowTree<TContext, TResult>> CreateTreeAsync<TContext, TResult>(string name)
+        Task<IWorkflowTreeExecutor<TContext, TResult>> CreateTreeAsync<TContext, TResult>(string name)
             where TContext : WorkflowDataContext<TResult>;
     }
 }

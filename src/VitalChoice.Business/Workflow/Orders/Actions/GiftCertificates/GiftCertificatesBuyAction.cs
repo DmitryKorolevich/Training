@@ -25,7 +25,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.GiftCertificates
 
         }
 
-        public override async Task<decimal> ExecuteActionAsync(OrderDataContext context, IWorkflowExecutionContext executionContext)
+        public override async Task<decimal> ExecuteActionAsync(OrderDataContext context, ITreeContext executionContext)
         {
             if (context.CombinedStatus == OrderStatus.Incomplete || context.CombinedStatus == OrderStatus.OnHold)
             {

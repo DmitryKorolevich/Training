@@ -18,7 +18,7 @@ namespace VitalChoice.Business.Workflow.Refunds.ActionResolvers
         {
         }
 
-        public override Task<int> GetActionKeyAsync(OrderRefundDataContext dataContext, IWorkflowExecutionContext executionContext)
+        public override Task<int> GetActionKeyAsync(OrderRefundDataContext dataContext, ITreeContext executionContext)
         {
             //Reset discount tier setting
             if (dataContext.Order.DictionaryData.ContainsKey("IdDiscountTier"))

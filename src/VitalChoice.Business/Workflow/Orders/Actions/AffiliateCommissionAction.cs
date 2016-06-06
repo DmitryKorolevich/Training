@@ -16,7 +16,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions
         {
         }
 
-        public override async Task<decimal> ExecuteActionAsync(OrderDataContext context, IWorkflowExecutionContext executionContext)
+        public override async Task<decimal> ExecuteActionAsync(OrderDataContext context, ITreeContext executionContext)
         {
             if (context.Order.Customer?.IdAffiliate != null && context.Order.Customer.IdAffiliate.Value > 0 &&
                 context.Order.Customer?.Id > 0)

@@ -12,7 +12,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Discounts
         {
         }
 
-        public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext dataContext, IWorkflowExecutionContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext dataContext, ITreeContext executionContext)
         {
             dataContext.DiscountMessage = dataContext.Order.Discount.GetDiscountMessage();
             return

@@ -1507,35 +1507,35 @@ namespace VitalChoice.Business.Services.Orders
                     Include(c => c.Customer).ThenInclude(p => p.ProfileAddress).ThenInclude(c => c.OptionValues),
                 orderBy: sortable, withDefaults: true);
 
+            var resultList = new List<OrderInfoItem>(orders.Items.Count);
+            foreach (var item in orders.Items)
+            {
+                var newItem = new OrderInfoItem
+                {
+                    Id = item.Id,
+                    IdObjectType = (OrderType) item.IdObjectType,
+                    OrderStatus = item.OrderStatus,
+                    POrderStatus = item.POrderStatus,
+                    NPOrderStatus = item.NPOrderStatus,
+                    IdPaymentMethod = item.PaymentMethod?.IdObjectType,
+                    DateCreated = item.DateCreated,
+                    Total = item.Total,
+                    IdEditedBy = item.IdEditedBy,
+                    DateEdited = item.DateEdited,
+                    IdCustomerType = item.Customer.IdObjectType,
+                    IdCustomer = item.Customer.Id,
+                    Company = item.Customer?.ProfileAddress.SafeData.Company,
+                    Customer = item.Customer?.ProfileAddress.SafeData.FirstName + " " + item.Customer?.ProfileAddress.SafeData.LastName,
+                    StateCode = _codeResolver.GetStateCode(item.ShippingAddress?.IdCountry ?? 0, item.ShippingAddress?.IdState ?? 0),
+                    ShipTo = item.ShippingAddress?.SafeData.FirstName + " " + item.ShippingAddress?.SafeData.LastName
+                };
+                await DynamicMapper.UpdateModelAsync(newItem, item);
+                resultList.Add(newItem);
+            }
+
             PagedList<OrderInfoItem> toReturn = new PagedList<OrderInfoItem>
             {
-                Items = orders.Items.Select(p => new OrderInfoItem
-                {
-                    Id = p.Id,
-                    IdObjectType = (OrderType) p.IdObjectType,
-                    OrderStatus = p.OrderStatus,
-                    POrderStatus = p.POrderStatus,
-                    NPOrderStatus = p.NPOrderStatus,
-                    IdOrderSource = p.SafeData.OrderType,
-                    OrderNotes = p.SafeData.OrderNotes,
-                    IdPaymentMethod = p.PaymentMethod?.IdObjectType,
-                    DateCreated = p.DateCreated,
-                    DateShipped = p.SafeData.ShipDelayDate,
-                    PDateShipped = p.SafeData.ShipDelayDateP,
-                    NPDateShipped = p.SafeData.ShipDelayDateNP,
-                    Total = p.Total,
-                    IdEditedBy = p.IdEditedBy,
-                    DateEdited = p.DateEdited,
-                    POrderType = p.SafeData.POrderType,
-                    IdCustomerType = p.Customer.IdObjectType,
-                    IdCustomer = p.Customer.Id,
-                    Company = p.Customer?.ProfileAddress.SafeData.Company,
-                    Customer = p.Customer?.ProfileAddress.SafeData.FirstName + " " + p.Customer?.ProfileAddress.SafeData.LastName,
-                    StateCode = _codeResolver.GetStateCode(p.ShippingAddress?.IdCountry ?? 0, p.ShippingAddress?.IdState ?? 0),
-                    ShipTo = p.ShippingAddress?.SafeData.FirstName + " " + p.ShippingAddress?.SafeData.LastName,
-                    PreferredShipMethod = p.SafeData.PreferredShipMethod,
-                    Healthwise = (bool?) p.SafeData.IsHealthwise ?? false,
-                }).ToList(),
+                Items = resultList,
                 Count = orders.Count
             };
 

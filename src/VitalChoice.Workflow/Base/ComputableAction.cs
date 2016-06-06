@@ -15,6 +15,6 @@ namespace VitalChoice.Workflow.Base
             return Math.Round(currentValue + result, 2);
         }
 
-        public abstract override Task<decimal> ExecuteActionAsync(TContext context, IWorkflowExecutionContext executionContext);
+        public abstract override Task<decimal> ExecuteActionAsync(TContext context, ITreeContext executionContext);
     }
 }

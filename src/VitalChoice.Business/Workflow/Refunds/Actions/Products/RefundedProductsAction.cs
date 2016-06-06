@@ -12,7 +12,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
         {
         }
 
-        public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext context, IWorkflowExecutionContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext context, ITreeContext executionContext)
         {
             decimal productsSubtotal = 0;
             context.RefundSkus = context.Order.RefundSkus.ToList();

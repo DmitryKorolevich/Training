@@ -16,7 +16,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.GiftCertificates
         {
         }
 
-        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, ITreeContext executionContext)
         {
             if (!((dataContext.Order?.GiftCertificates?.Count ?? 0) > 0))
             {

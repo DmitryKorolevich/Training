@@ -15,7 +15,6 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
         where TInfo : EntityValueInfo
     {
         EntityValueGroupInfo<TInfo> GroupInfo { get; }
-        bool ContainsAdditionalConditions { get; }
         ICollection<TValueGroup> ParseValues(WhereExpression<T> expression);
     }
 
@@ -26,7 +25,6 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
         where TValueGroup : EntityValueGroup<TValue, TInfo>
     {
         public EntityValueGroupInfo<TInfo> GroupInfo { get; }
-        public bool ContainsAdditionalConditions { get; private set; }
 
         protected GenericAnalyzer(EntityValueGroupInfo<TInfo> indexInfo)
         {
@@ -66,7 +64,8 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
                 return null;
             var freeValues = new HashSet<TValue>();
             var containsSets = new OptionalObject<HashSet<TValue>>(() => new HashSet<TValue>());
-            WalkConditionTree(expression.Condition, freeValues, containsSets);
+            expression.HasAdditionalConditions = false;
+            WalkConditionTree(expression, expression.Condition, freeValues, containsSets);
             if (freeValues.Count > 0 && freeValues.Count == GroupInfo.Count || containsSets.Value != null)
             {
                 return GetKeys(freeValues, containsSets);
@@ -74,14 +73,14 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
             return null;
         }
 
-        protected virtual bool WalkConditionTree(Condition top,
+        protected virtual bool WalkConditionTree(WhereExpression<T> expression, Condition top,
             //OptionalObject<HashSet<TValueGroup>> itemsSet,
             HashSet<TValue> freeValues,
             OptionalObject<HashSet<TValue>> containsSets)
         {
             if (top == null)
             {
-                ContainsAdditionalConditions = true;
+                expression.HasAdditionalConditions = true;
                 return true;
             }
 
@@ -99,18 +98,19 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
                     }
                     else
                     {
-                        ContainsAdditionalConditions = true;
+                        expression.HasAdditionalConditions = true;
                     }
                     return true;
                 case ExpressionType.AndAlso:
                     var and = (BinaryCondition) top;
-                    if (!WalkConditionTree(and.Left, freeValues, containsSets))
+                    if (!WalkConditionTree(expression, and.Left, freeValues, containsSets))
                         return false;
-                    return WalkConditionTree(and.Right, freeValues, containsSets);
+                    return WalkConditionTree(expression, and.Right, freeValues, containsSets);
                 case ExpressionType.OrElse:
                     containsSets.Value?.Clear();
                     containsSets.Value = null;
                     freeValues.Clear();
+                    expression.HasAdditionalConditions = true;
                     return false;
                 case ExpressionType.Call:
                     var method = top.Expression as MethodCallExpression;
@@ -128,14 +128,6 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
                         if (values != null && memberSelector != null && memberSelector.Expression.Type == typeof(T) &&
                             GroupInfo.TryGet(memberSelector.Member.Name, out info))
                         {
-                            //if (GroupInfo.Count == 1)
-                            //{
-                            //    if (itemsSet.Value == null)
-                            //        itemsSet.Initialize();
-                            //    AddNewKeys(itemsSet, info, values);
-                            //}
-                            //else
-                            //{
                             if (containsSets.Value == null)
                                 containsSets.Initialize();
                             if (values is IEnumerable)
@@ -151,13 +143,23 @@ namespace VitalChoice.Caching.Expressions.Analyzers.Base
                                     containsSets.Value.Add(ValueFactory(info, null));
                                 }
                             }
-                            //}
+                            else
+                            {
+                                expression.HasAdditionalConditions = true;
+                            }
+                        }
+                        else
+                        {
+                            expression.HasAdditionalConditions = true;
                         }
                     }
-                    ContainsAdditionalConditions = true;
+                    else
+                    {
+                        expression.HasAdditionalConditions = true;
+                    }
                     return true;
                 default:
-                    ContainsAdditionalConditions = true;
+                    expression.HasAdditionalConditions = true;
                     return true;
             }
         }

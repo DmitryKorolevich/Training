@@ -16,7 +16,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Discounts
         {
         }
 
-        public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext dataContext, IWorkflowExecutionContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext dataContext, ITreeContext executionContext)
         {
             var discountableSubtotal = dataContext.Data.RefundDiscountableSubtotal;
             foreach (var tier in dataContext.Order.Discount.DiscountTiers)

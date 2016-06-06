@@ -9,10 +9,12 @@ namespace VitalChoice.Caching.Expressions
         public WhereExpression(Expression<Func<T, bool>> expression)
         {
             Expression = expression;
-            Compiled = expression?.Compile();
+            Compiled = new Lazy<Func<T, bool>>(() => HasAdditionalConditions ? expression?.Compile() : v => true);
         }
+
         public Expression<Func<T, bool>> Expression { get; set; }
-        public Func<T, bool> Compiled { get; }
+        public Lazy<Func<T, bool>> Compiled { get; }
         public Condition Condition { get; set; }
+        public bool HasAdditionalConditions { get; set; }
     }
 }

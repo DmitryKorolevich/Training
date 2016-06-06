@@ -15,9 +15,9 @@ namespace VitalChoice.Business.Workflow.Refunds
         {
         }
 
-        public override async Task<decimal> ExecuteAsync(OrderRefundDataContext context)
+        public override async Task<decimal> ExecuteAsync(OrderRefundDataContext context, ITreeContext treeContext)
         {
-            var total = await ExecuteAsync<RefundTotal>(context);
+            var total = await ExecuteAsync<RefundTotal>(context, treeContext);
             context.Total = total;
             return total;
         }

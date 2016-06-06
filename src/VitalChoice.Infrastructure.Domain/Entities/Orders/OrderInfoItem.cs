@@ -26,18 +26,23 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Orders
 
         public OrderStatus? NPOrderStatus { get; set; }
 
+        [Map("OrderType")]
         public int? IdOrderSource { get; set; }
 
+        [Map]
         public string OrderNotes { get; set; }
 
         public int? IdPaymentMethod { get; set; }
 
         public DateTime DateCreated { get; set; }
 
+        [Map("ShipDelayDate")]
         public DateTime? DateShipped { get; set; }
 
+        [Map("ShipDelayDateP")]
         public DateTime? PDateShipped { get; set; }
 
+        [Map("ShipDelayDateNP")]
         public DateTime? NPDateShipped { get; set; }
 
         public decimal Total { get; set; }
@@ -48,6 +53,7 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Orders
 
         public DateTime DateEdited { get; set; }
 
+        [Map]
         public int? POrderType { get; set; }
 
         public int IdCustomerType { get; set; }
@@ -62,8 +68,10 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Orders
 
         public string ShipTo { get; set; }
 
+        [Map]
         public int? PreferredShipMethod { get; set; }
 
+        [Map]
         public bool Healthwise { get; set; }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace VitalChoice.Workflow.Core
 {
-    public interface IWorkflowExecutionContext : IDisposable
+    public interface ITreeContext : IDisposable
     {
         T Resolve<T>();
     }

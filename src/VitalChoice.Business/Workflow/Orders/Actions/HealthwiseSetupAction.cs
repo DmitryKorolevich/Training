@@ -17,7 +17,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions
         {
         }
 
-        public override Task<decimal> ExecuteActionAsync(OrderDataContext context, IWorkflowExecutionContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderDataContext context, ITreeContext executionContext)
         {
             if ((int?) context.Order.SafeData.OrderType == (int) SourceOrderType.Web)
             {
