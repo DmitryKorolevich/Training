@@ -33,8 +33,8 @@
         "AutoShipJob": "0 0 0/2 * * ?",
         "GoogleProductsFeedJob": "0 0 0/1 * * ?",
         "ShipDelayJob": "0 0 2 * * ?",
-        "OrderProductReviewEmailsJob": "0 0 2 * * ?"
-        //"ShipDelayJob": "0 0/1 * * * ?"
+        "OrderProductReviewEmailsJob": "0 0 2 * * ?",
+        "VeraCoreNotificationsJob": "0 0/10 * * * ?"
       }
     },
     "Avatax": {
@@ -54,6 +54,15 @@
       "Username": "admin.staging@g2designgroup.com",
       "Password": "vcstaging123",
       "Disabled": false
+    },
+    "VeraCoreSettings": {
+      "ExportFolderName": "Export",
+      "ServerHost": "127.0.0.1",
+      "UserName": "admin",
+      "Password": "admin",
+      "ServerPort": "22",
+      "ArchivePath": "C:\\WindowsService\\SFTPCache",
+      "WAwarehouseThreshold": 609000
     }
   }
 }

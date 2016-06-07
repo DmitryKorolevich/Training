@@ -138,6 +138,24 @@ namespace VC.Public.Models.Profile
 
         public ICollection<GCInvoiceEntity> GCs { get; set; }
 
+        public DateTime? DateShipped { get; set; }
+
+        public DateTime? PDateShipped { get; set; }
+
+        public DateTime? NPDateShipped { get; set; }
+
+        public string ShipVia { get; set; }
+
+        public string PShipVia { get; set; }
+
+        public string NPShipVia { get; set; }
+
+        public IList<TrackingItemModel> TrackingEntities { get; set; }
+
+        public IList<TrackingItemModel> PTrackingEntities { get; set; }
+
+        public IList<TrackingItemModel> NPTrackingEntities { get; set; }
+
         //Only shipping with ovveride and without surcharge part
         public decimal TotalShipping { get; set; }
 
@@ -148,6 +166,9 @@ namespace VC.Public.Models.Profile
             ShipToAddress = new List<KeyValuePair<string, string>>();
             Skus = new List<CartSkuModel>();
             PromoSkus = new List<CartSkuModel>();
+            TrackingEntities = new List<TrackingItemModel>();
+            PTrackingEntities = new List<TrackingItemModel>();
+            NPTrackingEntities = new List<TrackingItemModel>();
         }
     }
 }

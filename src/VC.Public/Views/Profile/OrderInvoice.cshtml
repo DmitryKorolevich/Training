@@ -393,8 +393,7 @@
                         </div>
                     </div>
                 }
-                //TODO - should be added after adding storing Tracking info
-                if (false)
+                if(Model.DateShipped.HasValue)
                 {
                     <div class="reivew-order-info">
                         <div class="reivew-info-box">
@@ -402,7 +401,91 @@
                                 <span>Tracking Information</span>
                             </div>
                             <div class="review-box-line">
+                                <span class="review-info-label">Date shipped:</span>
+                                <span class="review-info-value">@Model.DateShipped.Value.ToString("MM/dd/yyyy")</span>
                             </div>
+                            <div class="review-box-line">
+                                <span class="review-info-label">Shipped Via:</span>
+                                <span class="review-info-value">@Model.ShipVia</span>
+                            </div>
+                            @for (int i = 0; i < Model.TrackingEntities.Count; i++)
+                            {
+                                <div class="review-box-line">
+                                    @if (i == 0)
+                                    {
+                                        <span class="review-info-label">Tracking No.:</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="review-info-label"></span>
+                                    }
+                                    <span class="review-info-value">@Model.TrackingEntities[i].Sku - <a target="_blank" href="@Model.TrackingEntities[i].ServiceUrl">@Model.TrackingEntities[i].TrackingNumber</a></span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+                if (Model.NPDateShipped.HasValue)
+                {
+                    <div class="reivew-order-info">
+                        <div class="reivew-info-box">
+                            <div class="review-header-container">
+                                <span>Tracking Information</span>
+                            </div>
+                            <div class="review-box-line">
+                                <span class="review-info-label">Date shipped:</span>
+                                <span class="review-info-value">@Model.NPDateShipped.Value.ToString("MM/dd/yyyy")</span>
+                            </div>
+                            <div class="review-box-line">
+                                <span class="review-info-label">Shipped Via:</span>
+                                <span class="review-info-value">@Model.NPShipVia</span>
+                            </div>
+                            @for (int i = 0; i < Model.NPTrackingEntities.Count; i++)
+                            {
+                                <div class="review-box-line">
+                                    @if (i == 0)
+                                    {
+                                        <span class="review-info-label">Tracking No.:</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="review-info-label"></span>
+                                    }
+                                    <span class="review-info-value">@Model.NPTrackingEntities[i].Sku - <a target="_blank" href="@Model.NPTrackingEntities[i].ServiceUrl">@Model.NPTrackingEntities[i].TrackingNumber</a></span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+                if (Model.PDateShipped.HasValue)
+                {
+                    <div class="reivew-order-info">
+                        <div class="reivew-info-box">
+                            <div class="review-header-container">
+                                <span>Tracking Information</span>
+                            </div>
+                            <div class="review-box-line">
+                                <span class="review-info-label">Date shipped:</span>
+                                <span class="review-info-value">@Model.PDateShipped.Value.ToString("MM/dd/yyyy")</span>
+                            </div>
+                            <div class="review-box-line">
+                                <span class="review-info-label">Shipped Via:</span>
+                                <span class="review-info-value">@Model.PShipVia</span>
+                            </div>
+                            @for (int i = 0; i < Model.PTrackingEntities.Count; i++)
+                            {
+                                <div class="review-box-line">
+                                    @if (i == 0)
+                                    {
+                                        <span class="review-info-label">Tracking No.:</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="review-info-label"></span>
+                                    }
+                                    <span class="review-info-value">@Model.PTrackingEntities[i].Sku - <a target="_blank" href="@Model.PTrackingEntities[i].ServiceUrl">@Model.PTrackingEntities[i].TrackingNumber</a></span>
+                                </div>
+                            }
                         </div>
                     </div>
                 }
