@@ -441,7 +441,7 @@ namespace VC.Admin.Controllers
         //[AdminAuthorize(PermissionType.Customers)]
         public async Task<Result<AddUpdateCustomerModel>> GetExistingCustomer(int id)
         {
-            var result = await _customerService.SelectAsync(id);
+            var result = await _customerService.SelectAsync(id, true);
             if (result == null)
             {
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);

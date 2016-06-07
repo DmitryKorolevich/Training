@@ -818,3 +818,10 @@ FROM AZUREEC.[VitalChoice.Ecommerce].dbo.ProductReviews AS r
 INNER JOIN [vitalchoice2.0].[dbo].[pcReviews] AS rr ON rr.pcRev_IDReview = r.IdOld
 INNER JOIN [vitalchoice2.0].dbo.pcReviewsData AS d ON d.pcRD_IDReview = rr.pcRev_IDReview
 WHERE d.pcRD_Rate > 0;
+
+UPDATE [VitalChoice.Ecommerce].dbo.Skus
+SET WholesalePrice=Price
+
+UPDATE [VitalChoice.Infrastructure].dbo.ProductCategories
+SET FileImageLargeUrl=NULL
+WHERE FileImageLargeUrl='/files/catalog/no_image.gif'
