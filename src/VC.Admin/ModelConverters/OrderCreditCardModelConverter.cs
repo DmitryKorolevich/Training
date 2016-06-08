@@ -12,7 +12,7 @@ namespace VC.Admin.ModelConverters
     {
         public override Task DynamicToModelAsync(CreditCardModel model, OrderPaymentMethodDynamic dynamic)
         {
-            if (dynamic.DictionaryData.ContainsKey("ExpDate"))
+            if (dynamic.DictionaryData.ContainsKey("ExpDate") && dynamic.SafeData.ExpDate != null)
             {
                 DateTime? exp = dynamic.SafeData.ExpDate;
                 model.ExpirationDateMonth = exp?.Month;
