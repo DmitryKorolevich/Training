@@ -2,9 +2,11 @@
 using System.Linq;
 using Autofac;
 using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using VitalChoice.Core.DependencyInjection;
+using VitalChoice.ExportService.Context;
 using VitalChoice.Infrastructure.Domain.Options;
 
 namespace VitalChoice.ExportService
@@ -15,6 +17,7 @@ namespace VitalChoice.ExportService
         {
             base.StartCustomServicesRegistration(services);
             services.AddSingleton<IServer, DummyServer>();
+            services.AddDbContext<ExportInfoContext>().AddDbContext<ExportInfoCopyContext>();
         }
 
         protected override void ConfigureAppOptions(IConfiguration configuration, AppOptions options)

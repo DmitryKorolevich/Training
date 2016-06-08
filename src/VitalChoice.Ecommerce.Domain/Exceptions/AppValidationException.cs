@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace VitalChoice.Ecommerce.Domain.Exceptions
 {
@@ -34,6 +35,11 @@ namespace VitalChoice.Ecommerce.Domain.Exceptions
                 Field = String.Empty,
                 Message = message,
             });
+        }
+
+        public override string ToString()
+        {
+            return $"{string.Join("\n", Messages.Select(m => m.ToString()))}\n{base.ToString()}";
         }
     }
 }

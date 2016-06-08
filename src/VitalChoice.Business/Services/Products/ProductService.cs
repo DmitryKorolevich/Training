@@ -667,7 +667,7 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<byte[]> GetSkuGoogleItemsReportFile()
         {
-            var blob = await _storageClient.DownloadBlobAsync(_options.Value.AzureStorage.AppFilesContainerName, _options.Value.AzureStorage.ProductGoogleFeedFileName);
+            var blob = await _storageClient.DownloadBlobBlockAsync(_options.Value.AzureStorage.AppFilesContainerName, _options.Value.AzureStorage.ProductGoogleFeedFileName);
             return blob?.File;
         }
 

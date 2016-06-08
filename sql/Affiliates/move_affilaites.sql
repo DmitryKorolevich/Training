@@ -1587,3 +1587,43 @@ GO
 
 DROP FUNCTION [dbo].[DelimitedSplit8K]
 GO
+
+GO
+
+INSERT INTO CustomerOptionValues
+(IdCustomer, IdOptionType, Value)
+SELECT c.Id, t.Id, t.DefaultValue FROM Customers AS c
+CROSS JOIN CustomerOptionTypes AS t
+WHERE t.DefaultValue IS NOT NULL AND NOT EXISTS(SELECT * FROM CustomerOptionValues AS v WHERE v.IdCustomer = c.Id AND v.IdOptionType = t.Id)
+
+GO
+
+INSERT INTO ProductOptionValues
+(IdProduct, IdOptionType, Value)
+SELECT c.Id, t.Id, t.DefaultValue FROM Products AS c
+CROSS JOIN ProductOptionTypes AS t
+WHERE t.DefaultValue IS NOT NULL AND NOT EXISTS(SELECT * FROM ProductOptionValues AS v WHERE v.IdProduct = c.Id AND v.IdOptionType = t.Id)
+
+GO
+
+INSERT INTO SkuOptionValues
+(IdSku, IdOptionType, Value)
+SELECT c.Id, t.Id, t.DefaultValue FROM Skus AS c
+CROSS JOIN ProductOptionTypes AS t
+WHERE t.DefaultValue IS NOT NULL AND NOT EXISTS(SELECT * FROM SkuOptionValues AS v WHERE v.IdSku = c.Id AND v.IdOptionType = t.Id)
+
+GO
+
+INSERT INTO DiscountOptionValues
+(IdDiscount, IdOptionType, Value)
+SELECT c.Id, t.Id, t.DefaultValue FROM Discounts AS c
+CROSS JOIN DiscountOptionTypes AS t
+WHERE t.DefaultValue IS NOT NULL AND NOT EXISTS(SELECT * FROM DiscountOptionValues AS v WHERE v.IdDiscount = c.Id AND v.IdOptionType = t.Id)
+
+GO
+
+INSERT INTO AffiliateOptionValues
+(IdAffiliate, IdOptionType, Value)
+SELECT c.Id, t.Id, t.DefaultValue FROM Affiliates AS c
+CROSS JOIN AffiliateOptionTypes AS t
+WHERE t.DefaultValue IS NOT NULL AND NOT EXISTS(SELECT * FROM AffiliateOptionValues AS v WHERE v.IdAffiliate = c.Id AND v.IdOptionType = t.Id)

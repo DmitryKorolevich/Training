@@ -29,7 +29,7 @@ namespace VitalChoice.Interfaces.Services.Customers
 
         Task<ICollection<CustomerOrderStatistic>> GetCustomerOrderStatistics(ICollection<int> ids);
 
-        Task<string> UploadFileAsync(byte[] file, string fileName, string customerPublicId, string contentType = null);
+        Task<string> UploadFileAsync(byte[] file, string fileName, Guid customerPublicId, string contentType = null);
 
 		Task<Blob> DownloadFileAsync(string fileName, string customerPublicId);
 
@@ -46,6 +46,8 @@ namespace VitalChoice.Interfaces.Services.Customers
 	    Task<CustomerDynamic> GetByEmailAsync(string email);
 
 		Task ActivateGuestAsync(string email, string token, string newPassword);
+
+	    Task UpdateEcommerceOnlyAsync(CustomerDynamic customer);
 
         #region Reports 
 
