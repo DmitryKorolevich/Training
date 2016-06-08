@@ -1606,6 +1606,20 @@ WHERE t.DefaultValue IS NOT NULL AND NOT EXISTS(SELECT * FROM ProductOptionValue
 
 GO
 
+DELETE p 
+FROM ProductOptionValues AS p
+INNER JOIN ProductOptionTypes AS t ON t.Id = p.IdOptionType AND t.Name LIKE 'Cross%'
+WHERE p.Value = t.DefaultValue
+
+GO
+
+DELETE p 
+FROM ProductOptionValues AS p
+INNER JOIN ProductOptionTypes AS t ON t.Id = p.IdOptionType AND t.Name LIKE 'Youtube%'
+WHERE p.Value = t.DefaultValue
+
+GO
+
 INSERT INTO SkuOptionValues
 (IdSku, IdOptionType, Value)
 SELECT c.Id, t.Id, t.DefaultValue FROM Skus AS c

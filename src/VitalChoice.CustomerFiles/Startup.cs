@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using Microsoft.AspNetCore.Builder;
@@ -15,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Templates.Strings.Core;
 using VitalChoice.CustomerFiles.Context;
 using VitalChoice.CustomerFiles.Entities;
+using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Helpers;
@@ -37,19 +39,24 @@ namespace VitalChoice.CustomerFiles
                 using (var scope = lifetimeScope.BeginLifetimeScope())
                 {
                     Console.WriteLine($"[{DateTime.Now:O}] Customer Files Import Start");
-                    var customerService = scope.Resolve<ICustomerService>();
                     using (var context = scope.Resolve<OldDbContext>())
                     {
                         var set = context.Set<VCustomerOldFile>();
                         var allList = set.ToList();
-                        var customerRepository = scope.Resolve<IEcommerceRepositoryAsync<Customer>>();
-                        foreach (var fileRecordGroup in allList.GroupBy(r => r.IdCustomer))
+                        ThreadLocal<ILifetimeScope> scopes = new ThreadLocal<ILifetimeScope>(() => lifetimeScope.BeginLifetimeScope());
+                        ThreadLocal<ICustomerService> customerService = new ThreadLocal<ICustomerService>(() =>
                         {
+                            var threadScope = scopes.Value;
+                            return threadScope.Resolve<ICustomerService>();
+                        });
+                        allList.GroupBy(r => r.IdCustomer).AsParallel().ForEach(fileRecordGroup =>
+                        {
+
                             Console.ForegroundColor = ConsoleColor.DarkGreen;
                             Console.WriteLine($"Importing {fileRecordGroup.Key}");
                             Console.ResetColor();
                             List<Tuple<string, VCustomerOldFile>> uploadedFiles = new List<Tuple<string, VCustomerOldFile>>();
-                            CustomerDynamic customer = customerService.SelectAsync(fileRecordGroup.Key, true).GetAwaiter().GetResult();
+                            CustomerDynamic customer = customerService.Value.SelectAsync(fileRecordGroup.Key, true).GetAwaiter().GetResult();
                             if (customer != null)
                             {
                                 Guid publicId = customer.PublicId;
@@ -63,7 +70,7 @@ namespace VitalChoice.CustomerFiles
                                             var content = File.ReadAllBytes(fileRecord.Name);
                                             uploadedFiles.Add(
                                                 new Tuple<string, VCustomerOldFile>(
-                                                    customerService.UploadFileAsync(content, fileRecord.OriginalFileName, publicId)
+                                                    customerService.Value.UploadFileAsync(content, fileRecord.OriginalFileName, publicId)
                                                         .GetAwaiter()
                                                         .GetResult(), fileRecord));
                                         }
@@ -79,13 +86,14 @@ namespace VitalChoice.CustomerFiles
                                                 IdCustomer = customer.Id,
                                                 UploadDate = fileName.Item2.UploadDate
                                             }));
-                                            customerService.UpdateEcommerceOnlyAsync(customer).GetAwaiter().GetResult();
+                                            customerService.Value.UpdateEcommerceOnlyAsync(customer).GetAwaiter().GetResult();
                                         }
                                         catch (DbUpdateConcurrencyException)
                                         {
                                             try
                                             {
-                                                customer = customerService.SelectAsync(fileRecordGroup.Key, true).GetAwaiter().GetResult();
+                                                customer =
+                                                    customerService.Value.SelectAsync(fileRecordGroup.Key, true).GetAwaiter().GetResult();
                                                 if (customer != null)
                                                 {
                                                     customer.Files.AddRange(uploadedFiles.Select(fileName => new CustomerFile
@@ -95,7 +103,7 @@ namespace VitalChoice.CustomerFiles
                                                         IdCustomer = customer.Id,
                                                         UploadDate = fileName.Item2.UploadDate
                                                     }));
-                                                    customerService.UpdateEcommerceOnlyAsync(customer).GetAwaiter().GetResult();
+                                                    customerService.Value.UpdateEcommerceOnlyAsync(customer).GetAwaiter().GetResult();
                                                 }
                                             }
                                             catch (Exception e)
@@ -103,6 +111,10 @@ namespace VitalChoice.CustomerFiles
                                                 Console.ForegroundColor = ConsoleColor.DarkRed;
                                                 Console.WriteLine($"[{e.Source}] Import Failed!\r\n{e}");
                                                 Console.ResetColor();
+                                                lock (lifetimeScope)
+                                                {
+                                                    File.AppendAllText("errors.txt", $"{fileRecordGroup.Key}\r\n");
+                                                }
                                             }
                                         }
                                         catch (Exception e)
@@ -110,11 +122,15 @@ namespace VitalChoice.CustomerFiles
                                             Console.ForegroundColor = ConsoleColor.DarkRed;
                                             Console.WriteLine($"[{e.Source}] Import Failed!\r\n{e}");
                                             Console.ResetColor();
+                                            lock (lifetimeScope)
+                                            {
+                                                File.AppendAllText("errors.txt", $"{fileRecordGroup.Key}\r\n");
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
+                        });
                     }
                 }
                 Console.ForegroundColor = ConsoleColor.DarkGreen;
