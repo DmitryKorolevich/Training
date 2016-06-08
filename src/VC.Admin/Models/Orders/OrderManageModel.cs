@@ -351,6 +351,9 @@ namespace VC.Admin.Models.Orders
             GCs = new List<GCListItemModel>();
             SkuOrdereds = new List<SkuOrderedManageModel>();
             PromoSkus = new List<PromoSkuOrderedManageModel>();
+            TrackingEntities = new List<TrackingInvoiceItemModel>();
+            PTrackingEntities = new List<TrackingInvoiceItemModel>();
+            NPTrackingEntities = new List<TrackingInvoiceItemModel>();
         }
 
     }

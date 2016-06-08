@@ -18,6 +18,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.SharedWeb.Helpers;
@@ -31,19 +32,22 @@ namespace VC.Public.ModelConverters.Order
         private readonly ReferenceData _referenceData;
         protected readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
         protected readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
+        private readonly ITrackingService _trackingService;
 
         public OrderViewModelConverter(
             IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
             ICountryService countryService,
             IAppInfrastructureService appInfrastructureService,
             IDynamicMapper<SkuDynamic, Sku> skuMapper,
-            IDynamicMapper<ProductDynamic, Product> productMapper)
+            IDynamicMapper<ProductDynamic, Product> productMapper,
+            ITrackingService trackingService)
         {
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             _countryService = countryService;
             _referenceData = appInfrastructureService.Data();
             _skuMapper = skuMapper;
             _productMapper = productMapper;
+            _trackingService = trackingService;
         }
 
         public override async Task DynamicToModelAsync(OrderViewModel model, OrderDynamic dynamic)
@@ -150,6 +154,48 @@ namespace VC.Public.ModelConverters.Order
             if (model.ShipDelayDateNP.HasValue)
             {
                 model.ShipDelayDateNP = TimeZoneInfo.ConvertTime(model.ShipDelayDateNP.Value, TimeZoneInfo.Local, _pstTimeZoneInfo);
+            }
+
+            if (dynamic.OrderShippingPackages != null && dynamic.OrderShippingPackages.Count > 0)
+            {
+                var package = dynamic.OrderShippingPackages.FirstOrDefault(p => !p.POrderType.HasValue);
+                if (package != null)
+                {
+                    model.DateShipped = package.ShippedDate;
+                    model.ShipVia = $"{package.ShipMethodFreightCarrier} - {package.ShipMethodFreightService}";
+                }
+                model.TrackingEntities = dynamic.OrderShippingPackages.Where(p => !p.POrderType.HasValue).Select(p => new TrackingItemModel()
+                {
+                    Sku = p.UPSServiceCode,
+                    ServiceUrl = _trackingService.GetServiceUrl(p.ShipMethodFreightCarrier, p.TrackingNumber),
+                    TrackingNumber = p.TrackingNumber,
+                }).ToList();
+
+                package = dynamic.OrderShippingPackages.FirstOrDefault(p => p.POrderType == (int)POrderType.P);
+                if (package != null)
+                {
+                    model.PDateShipped = package.ShippedDate;
+                    model.PShipVia = $"{package.ShipMethodFreightCarrier} - {package.ShipMethodFreightService}";
+                }
+                model.PTrackingEntities = dynamic.OrderShippingPackages.Where(p => p.POrderType == (int)POrderType.P).Select(p => new TrackingItemModel()
+                {
+                    Sku = p.UPSServiceCode,
+                    ServiceUrl = _trackingService.GetServiceUrl(p.ShipMethodFreightCarrier, p.TrackingNumber),
+                    TrackingNumber = p.TrackingNumber,
+                }).ToList();
+
+                package = dynamic.OrderShippingPackages.FirstOrDefault(p => p.POrderType == (int)POrderType.NP);
+                if (package != null)
+                {
+                    model.NPDateShipped = package.ShippedDate;
+                    model.NPShipVia = $"{package.ShipMethodFreightCarrier} - {package.ShipMethodFreightService}";
+                }
+                model.NPTrackingEntities = dynamic.OrderShippingPackages.Where(p => p.POrderType == (int)POrderType.NP).Select(p => new TrackingItemModel()
+                {
+                    Sku = p.UPSServiceCode,
+                    ServiceUrl = _trackingService.GetServiceUrl(p.ShipMethodFreightCarrier, p.TrackingNumber),
+                    TrackingNumber = p.TrackingNumber,
+                }).ToList();
             }
         }
 
