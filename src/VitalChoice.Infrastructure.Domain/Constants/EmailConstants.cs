@@ -23,8 +23,10 @@
         public const string OrderConfirmationEmail = "OrderConfirmationEmail";
         public const string OrderShippingConfirmationEmail = "OrderShippingConfirmationEmail";
         public const string OrderProductReviewEmail = "OrderProductReviewEmail";
-        
-        public const int OrderProductReviewEmailDaysCount = 15;
+
+        //public const int OrderProductReviewEmailDaysCount = 15;
+        //for testing
+        public const int OrderProductReviewEmailDaysCount = 1;
 
         public const int ProductReviewIdNewsletter = 1;
     }
