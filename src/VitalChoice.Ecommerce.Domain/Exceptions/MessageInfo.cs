@@ -19,5 +19,10 @@
         public MessageLevel MessageLevel { get; set; }
         public string Field { get; set; }
         public string Message { get; set; }
+
+        public override string ToString()
+        {
+            return $"[{MessageType}:{MessageLevel}]({Field}){Message}";
+        }
     }
 }

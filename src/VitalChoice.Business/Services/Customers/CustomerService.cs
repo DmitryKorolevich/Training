@@ -156,7 +156,7 @@ namespace VitalChoice.Business.Services.Customers
         {
             var errors = new List<MessageInfo>();
 
-            if (!String.IsNullOrEmpty(model.Email))
+            if (!string.IsNullOrEmpty(model.Email) && model.StatusCode == (int) CustomerStatus.Active)
             {
                 var customerSameEmail =
                     await
@@ -511,29 +511,26 @@ namespace VitalChoice.Business.Services.Customers
             return await _orderRepository.GetCustomerOrderStatistics(ids);
         }
 
-        public async Task<string> UploadFileAsync(byte[] file, string fileName, string customerPublicId, string contentType = null)
+        public async Task<string> UploadFileAsync(byte[] file, string fileName, Guid customerPublicId, string contentType = null)
         {
             var i = 0;
-            Guid publicId = Guid.Parse(customerPublicId);
-
-            string blobname;
+            var customerId = customerPublicId.ToString("D");
             string generatedFileName;
-
+            var items = await _storageClient.GetBlobItems(_customerContainerName, customerId);
             do
             {
                 generatedFileName = (i != 0 ? (i + "_") : string.Empty) + fileName;
-                blobname = $"{customerPublicId}/{generatedFileName}";
                 i++;
-            } while (await _storageClient.BlobExistsAsync(_customerContainerName, blobname));
+            } while (items.Contains(generatedFileName));
 
-            await _storageClient.UploadBlobAsync(_customerContainerName, blobname, file, contentType);
+            await _storageClient.UploadBlobAsync(_customerContainerName, $"{customerId}/{generatedFileName}", file, contentType);
 
             return generatedFileName;
         }
 
         public async Task<Blob> DownloadFileAsync(string fileName, string customerPublicId)
         {
-            return await _storageClient.DownloadBlobAsync(_customerContainerName, $"{customerPublicId}/{fileName}");
+            return await _storageClient.DownloadBlobBlockAsync(_customerContainerName, $"{customerPublicId}/{fileName}");
         }
 
         public async Task<ICollection<string>> GetAddressFieldValuesByValueAsync(ValuesByFieldValueFilter filter)
@@ -624,7 +621,6 @@ namespace VitalChoice.Business.Services.Customers
             {
                 try
                 {
-
                     var paymentCopies = model.CustomerPaymentMethods.Select(method => _paymentMapper.Clone<ExpandoObject>(method, o =>
                     {
                         var result = new ExpandoObject();
@@ -826,6 +822,12 @@ namespace VitalChoice.Business.Services.Customers
             }
 
             await _storefrontUserService.SendSuccessfulRegistration(customer.Email, applicationUser.FirstName, applicationUser.LastName);
+        }
+
+        public async Task UpdateEcommerceOnlyAsync(CustomerDynamic model)
+        {
+            var uow = CreateUnitOfWork();
+            await base.UpdateAsync(model, uow);
         }
 
         #region Reports 

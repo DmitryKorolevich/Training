@@ -491,35 +491,31 @@ namespace VC.Admin.Controllers
             model.CustomerNotes = model.CustomerNotes.OrderByDescending(x => x.DateEdited).ToList();
         }
 
-		[HttpPost]
-        //[AdminAuthorize(PermissionType.Customers)]
+        [HttpPost]
+        [AdminAuthorize(PermissionType.Customers)]
         public async Task<Result<CustomerFileModel>> UploadCustomerFile()
-	    {
-		    var form = await Request.ReadFormAsync();
+        {
+            var form = await Request.ReadFormAsync();
 
-			var publicId = form["publicId"];
-			
-			var parsedContentDisposition = ContentDispositionHeaderValue.Parse(form.Files[0].ContentDisposition);
+            var publicId = form["publicId"];
 
-			var contentType = form.Files[0].ContentType;
+            var parsedContentDisposition = ContentDispositionHeaderValue.Parse(form.Files[0].ContentDisposition);
+
+            var contentType = form.Files[0].ContentType;
             using (var stream = form.Files[0].OpenReadStream())
-		    {
-			    var fileContent = stream.ReadFully();
-			    try
-			    {
-				    var fileName = await _customerService.UploadFileAsync(fileContent, parsedContentDisposition.FileName.Replace("\"", ""), publicId, contentType);
+            {
+                var fileContent = stream.ReadFully();
+                var fileName =
+                    await
+                        _customerService.UploadFileAsync(fileContent, parsedContentDisposition.FileName.Replace("\"", ""),
+                            Guid.Parse(publicId),
+                            contentType);
 
-					return new CustomerFileModel() { FileName = fileName, UploadDate = DateTime.Now };
-				}
-				catch (Exception ex)
-			    {
-				    this.logger.LogError(ex.ToString());
-				    throw;
-			    }
-		    }
-	    }
+                return new CustomerFileModel() {FileName = fileName, UploadDate = DateTime.Now};
+            }
+        }
 
-		[HttpPost]
+        [HttpPost]
         [AdminAuthorize(PermissionType.Customers)]
         public async Task<Result<bool>> ResendActivation(Guid id)
 		{

@@ -93,7 +93,6 @@ namespace VitalChoice.Jobs
 
 	    protected override void OnStop()
         {
-            base.OnStop();
             int timeout = 10000;
             var task = Task.Factory.StartNew(() =>
             {
@@ -106,6 +105,7 @@ namespace VitalChoice.Jobs
             {
                 RequestAdditionalTime(timeout);
             }
+            base.OnStop();
         }
 	}
 }

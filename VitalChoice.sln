@@ -47,7 +47,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{BEC47A
 		deploy\exclude_projects.ps1 = deploy\exclude_projects.ps1
 		deploy\functions.ps1 = deploy\functions.ps1
 		deploy\global-deploy.ps1 = deploy\global-deploy.ps1
-		deploy\jobs-deploy.ps1 = deploy\jobs-deploy.ps1
 		deploy\run-all-published.ps1 = deploy\run-all-published.ps1
 	EndProjectSection
 EndProject
@@ -110,6 +109,10 @@ EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Renci.SshNet", "src\Renci.SshNet\Renci.SshNet.xproj", "{554CADEB-6C7A-4DC8-9F27-48DFBC4CC972}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlClrLib", "src\SqlClrLib\SqlClrLib.csproj", "{22A61E1D-D631-434F-9594-4FC361B82073}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataImportApps", "DataImportApps", "{4F813A97-F059-44E0-B6DA-14266E51225C}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.CustomerFiles", "src\VitalChoice.CustomerFiles\VitalChoice.CustomerFiles.xproj", "{1B2F746A-FEC6-42AB-AF6B-817CE7ECE003}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -361,6 +364,14 @@ Global
 		{22A61E1D-D631-434F-9594-4FC361B82073}.Release|Any CPU.Build.0 = Release|Any CPU
 		{22A61E1D-D631-434F-9594-4FC361B82073}.Release|x64.ActiveCfg = Release|Any CPU
 		{22A61E1D-D631-434F-9594-4FC361B82073}.Release|x64.Build.0 = Release|Any CPU
+		{1B2F746A-FEC6-42AB-AF6B-817CE7ECE003}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B2F746A-FEC6-42AB-AF6B-817CE7ECE003}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B2F746A-FEC6-42AB-AF6B-817CE7ECE003}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1B2F746A-FEC6-42AB-AF6B-817CE7ECE003}.Debug|x64.Build.0 = Debug|Any CPU
+		{1B2F746A-FEC6-42AB-AF6B-817CE7ECE003}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B2F746A-FEC6-42AB-AF6B-817CE7ECE003}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B2F746A-FEC6-42AB-AF6B-817CE7ECE003}.Release|x64.ActiveCfg = Release|Any CPU
+		{1B2F746A-FEC6-42AB-AF6B-817CE7ECE003}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -401,5 +412,7 @@ Global
 		{5557C0C7-6967-427D-95E7-532EF963F8CC} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
 		{554CADEB-6C7A-4DC8-9F27-48DFBC4CC972} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
 		{22A61E1D-D631-434F-9594-4FC361B82073} = {3B3E46E5-2CFB-4D1D-8DEF-4B47C5EF6055}
+		{4F813A97-F059-44E0-B6DA-14266E51225C} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
+		{1B2F746A-FEC6-42AB-AF6B-817CE7ECE003} = {4F813A97-F059-44E0-B6DA-14266E51225C}
 	EndGlobalSection
 EndGlobal

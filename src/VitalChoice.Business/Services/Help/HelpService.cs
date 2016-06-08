@@ -833,7 +833,7 @@ namespace VitalChoice.Business.Services.HelpService
 
                 blobname = $"{publicId}/{generatedFileName}";
                 i++;
-            } while (await _storageClient.BlobExistsAsync(containerName, blobname));
+            } while (await _storageClient.BlobBlockExistsAsync(containerName, blobname));
 
             await _storageClient.UploadBlobAsync(containerName, blobname, file, contentType);
 
@@ -842,7 +842,7 @@ namespace VitalChoice.Business.Services.HelpService
 
         public async Task<Blob> DownloadBugFileAsync(BugFileType type, string fileName, string publicId)
         {
-            return await _storageClient.DownloadBlobAsync(GetFilesContainerName(type), $"{publicId}/{fileName}");
+            return await _storageClient.DownloadBlobBlockAsync(GetFilesContainerName(type), $"{publicId}/{fileName}");
         }
 
         public async Task<bool> DeleteBugFileFromStoreAsync(BugFileType type, string fileName, string publicId)

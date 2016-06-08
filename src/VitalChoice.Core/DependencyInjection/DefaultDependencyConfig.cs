@@ -179,20 +179,7 @@ namespace VitalChoice.Core.DependencyInjection
 
             services.AddAuthorization(
                 x => x.AddPolicy(IdentityConstants.IdentityBasicProfile, y => y.RequireAuthenticatedUser()));
-
-            services.Configure<AppOptionsBase>(options => ConfigureBaseOptions(configuration, options));
-
-            services.Configure<AppOptions>(options =>
-            {
-                ConfigureAppOptions(configuration, options);
-                options.PDFMyUrl = new PDFMyUrl
-                {
-                    LicenseKey = configuration.GetSection("App:PDFMyUrl:LicenseKey").Value,
-                    ServiceUrl = configuration.GetSection("App:PDFMyUrl:ServiceUrl").Value,
-                };
-            });
-
-            services.Configure<MvcOptions>(o => ConfigureMvcOptions(o, LoggerService.Build(appEnv)));
+            ConfigureOptions(configuration, services, appEnv);
             StartCustomServicesRegistration(services);
             var builder = new ContainerBuilder();
 
@@ -283,6 +270,23 @@ namespace VitalChoice.Core.DependencyInjection
                 newFormatter.SerializerSettings.Converters.Add(new PstLocalIsoDateTimeConverter());
                 o.OutputFormatters.Add(newFormatter);
             }
+        }
+
+        protected virtual void ConfigureOptions(IConfiguration configuration, IServiceCollection services, IHostingEnvironment environment)
+        {
+            services.Configure<AppOptionsBase>(options => ConfigureBaseOptions(configuration, options));
+
+            services.Configure<AppOptions>(options =>
+            {
+                ConfigureAppOptions(configuration, options);
+                options.PDFMyUrl = new PDFMyUrl
+                {
+                    LicenseKey = configuration.GetSection("App:PDFMyUrl:LicenseKey").Value,
+                    ServiceUrl = configuration.GetSection("App:PDFMyUrl:ServiceUrl").Value,
+                };
+            });
+
+            services.Configure<MvcOptions>(o => ConfigureMvcOptions(o, LoggerService.Build(environment)));
         }
 
         private static void ConfigureBaseOptions(IConfiguration configuration, AppOptionsBase options)
