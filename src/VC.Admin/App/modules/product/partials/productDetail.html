@@ -513,11 +513,11 @@
                                                                                 <div class="fixed-accordion-row" data-ng-if="!(product.Type==3 || product.Type==4)">
                                                                                     <label class="control-label">Stock</label>
                                                                                     <div class="col-md-1">
-                                                                                        <input type="text" name="Stock" class="form-control number" placeholder="Stock" numbers-only data-ng-model="subSku.Stock" min="0" max="100000" ng-pattern="/^\d{0,9}?$/" required>
+                                                                                        <input type="text" name="Stock" class="form-control number" placeholder="Stock" numbers-only numbers-only-allow-negative data-ng-model="subSku.Stock" min="-100000" max="100000" required>
                                                                                         <div class="error-container small-block" ng-show="forms.skussubmitted && forms.SKUs.i{{$index}}.Stock.$invalid">
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.Stock.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Stock")}}</small>
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.Stock.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Stock",100000)}}</small>
-                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.Stock.$error.min">{{getValidationMessage("ValidationMessages.FieldMin","Stock",1)}}</small>
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.Stock.$error.min">{{getValidationMessage("ValidationMessages.FieldMin","Stock",-100000)}}</small>
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.Stock.$error.server">{{getValidationMessage("ValidationMessages.FieldNumber","Stock",'SKUs',$index)}}</small>
                                                                                         </div>
                                                                                     </div>

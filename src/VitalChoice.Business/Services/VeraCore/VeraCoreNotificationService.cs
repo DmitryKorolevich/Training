@@ -219,7 +219,7 @@ namespace VitalChoice.Business.Services.VeraCore
                 updated = await ProcessShipment(items.Where(p => p.IdType == VeraCoreProcessItemType.Ship).ToList());
                 updated = await ProcessCancel(items.Where(p => p.IdType == VeraCoreProcessItemType.Cancel).ToList()) || updated;
 
-                _logger.LogWarning(updated ? "Orders and Cache updated successfully" : "No update, cache identical to remote FTP");
+                _logger.LogWarning(updated ? "Orders and Cache updated successfully" : "No updates in queue");
             }
             catch (Exception e)
             {
@@ -283,6 +283,9 @@ namespace VitalChoice.Business.Services.VeraCore
             var now = DateTime.Now;
             foreach (var item in items)
             {
+                var parsed = true;
+                int? orderId = null;
+                int? pOrderType = null;
                 try
                 {
                     var data = Encoding.ASCII.GetBytes(item.Data);
@@ -292,10 +295,7 @@ namespace VitalChoice.Business.Services.VeraCore
                         using (var uow = _transactionEcommerceAccessor.CreateUnitOfWork())
                         {
                             var packages = new List<OrderShippingPackage>();
-
-                            var parsed = true;
-                            int? orderId = null;
-                            int? pOrderType = null;
+                            
                             var skuRepository = uow.RepositoryAsync<Sku>();
                             var orderShippingPackageRepository = uow.RepositoryAsync<OrderShippingPackage>();
                             var orderRepository = uow.RepositoryAsync<Order>();
@@ -423,6 +423,7 @@ namespace VitalChoice.Business.Services.VeraCore
                 }
                 catch (Exception e)
                 {
+                    _logger.LogError($"VeraCore - item process error {orderId}");
                     _logger.LogError(e.ToString());
                     await IncrementAttempt(item);
                 }
@@ -448,6 +449,9 @@ namespace VitalChoice.Business.Services.VeraCore
             var serializer = new XmlSerializer(typeof(CancelAck));
             foreach (var item in items)
             {
+                var parsed = true;
+                int? orderId = null;
+                POrderType? pOrderType = null;
                 try
                 {
                     var data = Encoding.ASCII.GetBytes(item.Data);
@@ -456,10 +460,6 @@ namespace VitalChoice.Business.Services.VeraCore
                         var cancelNotice = (CancelAck)serializer.Deserialize(stream);
                         if (cancelNotice.CanceledComplete.ToLower() == "y")
                         {
-                            var parsed = true;
-                            int? orderId = null;
-                            POrderType? pOrderType = null;
-
                             string sNumber = cancelNotice.OrderID;
                             if (sNumber.EndsWith("_np"))
                             {
@@ -522,6 +522,7 @@ namespace VitalChoice.Business.Services.VeraCore
                 }
                 catch (Exception e)
                 {
+                    _logger.LogError($"VeraCore - item process error {orderId}");
                     _logger.LogError(e.ToString());
                     await IncrementAttempt(item);
                 }
