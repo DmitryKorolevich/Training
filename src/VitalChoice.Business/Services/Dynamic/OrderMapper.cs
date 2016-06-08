@@ -64,7 +64,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 var entity = item.Entity;
                 var dynamic = item.Dynamic;
 
-				dynamic.IdAddedBy = entity.IdAddedBy;
+                dynamic.IdAddedBy = entity.IdAddedBy;
                 dynamic.DiscountTotal = entity.DiscountTotal;
                 dynamic.OrderStatus = entity.OrderStatus;
                 dynamic.POrderStatus = entity.POrderStatus;
@@ -74,10 +74,10 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.TaxTotal = entity.TaxTotal;
                 dynamic.Total = entity.Total;
                 dynamic.IdOrderSource = entity.IdOrderSource;
-                dynamic.ReshipProblemSkus = entity.ReshipProblemSkus?.Select(p=>new ReshipProblemSkuOrdered()
+                dynamic.ReshipProblemSkus = entity.ReshipProblemSkus?.Select(p => new ReshipProblemSkuOrdered()
                 {
                     IdSku = p.IdSku,
-                    Code=p.Sku.Code,
+                    Code = p.Sku.Code,
                     IdOrder = p.IdOrder,
                 }).ToList();
 
@@ -146,7 +146,7 @@ namespace VitalChoice.Business.Services.Dynamic
                         Enabled = !s.Disabled
                     }));
 
-                    if (dynamic.PromoSkus!=null && dynamic.PromoSkus.Count != 0 && dynamic.PromoSkus.First().Sku?.Product!=null)
+                    if (dynamic.PromoSkus != null && dynamic.PromoSkus.Count != 0 && dynamic.PromoSkus.First().Sku?.Product != null)
                     {
                         var productContents =
                             await _productService.SelectProductContents(dynamic.PromoSkus.Select(p => p.Sku.IdProduct).Distinct().ToList());
@@ -162,7 +162,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 }
 
                 dynamic.AffiliateOrderPayment = entity.AffiliateOrderPayment;
-                dynamic.OrderShippingPackages = entity.OrderShippingPackages;
+                dynamic.OrderShippingPackages = entity.OrderShippingPackages?.Select(p => new OrderShippingPackageModelItem(p)).ToList() ?? new List<OrderShippingPackageModelItem>();
             });
         }
 
@@ -276,7 +276,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.TaxTotal = dynamic.TaxTotal;
                 entity.Total = dynamic.Total;
 
-                entity.ReshipProblemSkus.MergeKeyed(dynamic.ReshipProblemSkus, p=>p.IdSku,pp=>pp.IdSku, s => new ReshipProblemSku()
+                entity.ReshipProblemSkus.MergeKeyed(dynamic.ReshipProblemSkus, p => p.IdSku, pp => pp.IdSku, s => new ReshipProblemSku()
                 {
                     IdOrder = dynamic.Id,
                     IdSku = s.IdSku,
@@ -324,7 +324,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.IdDiscount = dynamic.Discount?.Id;
                 if (dynamic.PaymentMethod.Address != null && entity.PaymentMethod.BillingAddress == null)
                 {
-                    entity.PaymentMethod.BillingAddress = new OrderAddress {OptionValues = new List<OrderAddressOptionValue>()};
+                    entity.PaymentMethod.BillingAddress = new OrderAddress { OptionValues = new List<OrderAddressOptionValue>() };
                 }
                 if (dynamic.PaymentMethod.Address == null)
                 {

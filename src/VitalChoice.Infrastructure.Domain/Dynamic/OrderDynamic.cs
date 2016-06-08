@@ -69,6 +69,6 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
         //Don't storing in DB
         public int? SendSide { get; set; }
 
-        public ICollection<OrderShippingPackage> OrderShippingPackages { get; set; }
+        public ICollection<OrderShippingPackageModelItem> OrderShippingPackages { get; set; }
     }
 }
