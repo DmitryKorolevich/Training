@@ -604,6 +604,15 @@ namespace VitalChoice.Business.Services.Orders
 
         protected override bool LogObjectFullData => true;
 
+        public async Task LogOrderUpdateAsync(int id)
+        {
+            var entity = await SelectEntityFirstAsync(o => o.Id == id);
+            if (entity != null)
+            {
+                await LogItemChanges(new[] {await DynamicMapper.FromEntityAsync(entity)});
+            }
+        }
+
         public async Task<OrderDynamic> SelectWithCustomerAsync(int id, bool withDefaults = false)
         {
             var order = await SelectAsync(id, withDefaults);

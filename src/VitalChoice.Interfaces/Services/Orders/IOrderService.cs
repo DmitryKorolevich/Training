@@ -40,6 +40,8 @@ namespace VitalChoice.Interfaces.Services.Orders
 
 	    string GenerateOrderCode(POrderType? pOrderType, int idOrder, out TaxGetType type);
 
+	    Task LogOrderUpdateAsync(int id);
+
         #region AffiliatesOrders
 
         Task<PagedList<AffiliateOrderListItemModel>> GetAffiliateOrderPaymentsWithCustomerInfo(AffiliateOrderPaymentFilter filter);

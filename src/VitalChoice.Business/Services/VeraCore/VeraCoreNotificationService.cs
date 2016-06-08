@@ -408,6 +408,9 @@ namespace VitalChoice.Business.Services.VeraCore
                                 await veraCoreProcessItemRepository.DeleteAsync(item.Id);
                                 await uow.SaveChangesAsync();
 
+                                await _orderService.LogOrderUpdateAsync(order.Id);
+
+
                                 toReturn.Add(new ShipmentNotificationItem()
                                 {
                                     IdOrder = orderId.Value,
