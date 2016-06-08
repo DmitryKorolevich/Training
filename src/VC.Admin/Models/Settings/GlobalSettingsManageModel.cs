@@ -27,33 +27,25 @@ namespace VC.Admin.Models.Setting
                 AppSettingItem setting = items.FirstOrDefault(p => p.Name == property.Name);
                 if (setting != null)
                 {
-                    try
+                    if (property.PropertyType == typeof(bool))
                     {
-                        if (property.PropertyType == typeof(bool))
+                        bool toSet = false;
+                        if (bool.TryParse(setting.Value, out toSet))
                         {
-                            bool toSet = false;
-                            if (bool.TryParse(setting.Value, out toSet))
-                            {
-                                property.SetValue(this, toSet, null);
-                            }
-                        }
-                        if (property.PropertyType == typeof(int?))
-                        {
-                            int toSet = 0;
-                            if (int.TryParse(setting.Value, out toSet))
-                            {
-                                property.SetValue(this, toSet, null);
-                            }
-                        }
-                        if (property.PropertyType == typeof(string))
-                        {
-                            property.SetValue(this, setting.Value, null);
+                            property.SetValue(this, toSet, null);
                         }
                     }
-                    catch (Exception e)
+                    if (property.PropertyType == typeof(int?))
                     {
-                        LoggerService.GetDefault().LogCritical(0, e.Message, e);
-                        throw;
+                        int toSet = 0;
+                        if (int.TryParse(setting.Value, out toSet))
+                        {
+                            property.SetValue(this, toSet, null);
+                        }
+                    }
+                    if (property.PropertyType == typeof(string))
+                    {
+                        property.SetValue(this, setting.Value, null);
                     }
                 }
             }
@@ -70,7 +62,7 @@ namespace VC.Admin.Models.Setting
                 toReturn.Add(new AppSettingItem()
                 {
                     Name = property.Name,
-                    Value=value,
+                    Value = value,
                 });
             }
             return toReturn;

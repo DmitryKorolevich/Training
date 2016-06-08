@@ -99,10 +99,12 @@ using VitalChoice.Profiling;
 using VitalChoice.Profiling.Base;
 using VitalChoice.Profiling.Interfaces;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using NLog;
 using VitalChoice.Business.Services.VeraCore;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Interfaces.Services.VeraCore;
 using IContainer = Autofac.IContainer;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 #if !NETSTANDARD1_5
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Business.Services.Cache;
@@ -218,7 +220,7 @@ namespace VitalChoice.Core.DependencyInjection
             return container;
         }
 
-        private void ConfigureMvcOptions(MvcOptions o, ILoggerProviderExtended loggerProvider)
+        private void ConfigureMvcOptions(MvcOptions o, ILoggerFactory loggerFactory)
         {
             var inputFormatter =
                 (JsonInputFormatter)
@@ -236,7 +238,7 @@ namespace VitalChoice.Core.DependencyInjection
             }
             else
             {
-                var newFormatter = new JsonInputFormatter(loggerProvider.CreateLogger<JsonInputFormatter>())
+                var newFormatter = new JsonInputFormatter(loggerFactory.CreateLogger<JsonInputFormatter>())
                 {
                     SerializerSettings =
                     {
@@ -286,7 +288,7 @@ namespace VitalChoice.Core.DependencyInjection
                 };
             });
 
-            services.Configure<MvcOptions>(o => ConfigureMvcOptions(o, LoggerService.Build(environment)));
+            services.Configure<MvcOptions>(o => ConfigureMvcOptions(o, new LoggerProviderExtended(environment).Factory));
         }
 
         private static void ConfigureBaseOptions(IConfiguration configuration, AppOptionsBase options)

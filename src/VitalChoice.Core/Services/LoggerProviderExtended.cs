@@ -135,8 +135,6 @@ namespace VitalChoice.Core.Services
     {
         private readonly ILoggerFactory _factory;
 
-        //private readonly Dictionary<string, ILogger> _loggers = new Dictionary<string, ILogger>();
-
         public ILoggerFactory Factory => _factory;
 
         public LoggerProviderExtended(IHostingEnvironment env)

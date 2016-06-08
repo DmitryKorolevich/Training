@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using VitalChoice.Caching.Debug;
 using VitalChoice.Caching.GC;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Services.Cache;
@@ -18,6 +19,7 @@ namespace VitalChoice.Caching.Services
 
         public InternalEntityCacheFactory(IEntityInfoStorage keyStorage)
         {
+            CacheDebugger.CacheFactory = this;
             _keyStorage = keyStorage;
         }
 
