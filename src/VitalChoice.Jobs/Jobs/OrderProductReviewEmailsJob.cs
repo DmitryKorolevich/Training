@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Autofac;
 using Microsoft.Extensions.Logging;
 using Quartz;
 using VitalChoice.Interfaces.Services.Orders;
@@ -9,28 +10,32 @@ namespace VitalChoice.Jobs.Jobs
 {
     public class OrderProductReviewEmailsJob : IJob
     {
-	    private readonly IOrderSchedulerService _orderSchedulerService;
-	    private readonly ILogger _logger;
+        private readonly ILifetimeScope _rootScope;
+        private readonly ILogger _logger;
 
-		public OrderProductReviewEmailsJob(IOrderSchedulerService orderSchedulerService, ILogger logger)
-		{
-            _orderSchedulerService = orderSchedulerService;
-			_logger = logger;
-		}
+        public OrderProductReviewEmailsJob(ILifetimeScope rootScope, ILoggerFactory logger)
+        {
+            _rootScope = rootScope;
+            _logger = logger.CreateLogger<OrderProductReviewEmailsJob>();
+        }
 
-	    public void Execute(IJobExecutionContext context)
-	    {
-		    try
-		    {
+        public void Execute(IJobExecutionContext context)
+        {
+            try
+            {
                 _logger.LogWarning("Started OrderProductReviewEmailsJob job");
-                _orderSchedulerService.SendOrderProductReviewEmails().GetAwaiter().GetResult();
+                using (var scope = _rootScope.BeginLifetimeScope())
+                {
+                    var orderSchedulerService = scope.Resolve<IOrderSchedulerService>();
+                    orderSchedulerService.SendOrderProductReviewEmails().GetAwaiter().GetResult();
+                }
                 _logger.LogWarning("Finished OrderProductReviewEmailsJob job");
-			}
-		    catch (Exception ex)
-		    {
-				_logger.LogError(0, ex, ex.Message);
-				throw;
-		    }
-	    }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(0, ex, ex.Message);
+                throw;
+            }
+        }
     }
 }

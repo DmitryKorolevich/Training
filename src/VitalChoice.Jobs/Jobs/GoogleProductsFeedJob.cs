@@ -1,35 +1,39 @@
 ﻿using System;
+using Autofac;
 using Microsoft.Extensions.Logging;
 using Quartz;
-using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Jobs.Jobs
 {
     public class GoogleProductsFeedJob : IJob
     {
-	    private readonly IProductService _productService;
-	    private readonly ILogger _logger;
+        private readonly ILifetimeScope _rootScope;
+        private readonly ILogger _logger;
 
-		public GoogleProductsFeedJob(IProductService productService, ILogger logger)
-		{
-            _productService = productService;
-			_logger = logger;
-		}
+        public GoogleProductsFeedJob(ILifetimeScope rootScope, ILoggerFactory logger)
+        {
+            _rootScope = rootScope;
+            _logger = logger.CreateLogger<GoogleProductsFeedJob>();
+        }
 
-	    public void Execute(IJobExecutionContext context)
-	    {
-		    try
-		    {
+        public void Execute(IJobExecutionContext context)
+        {
+            try
+            {
                 _logger.LogWarning("Started GoogleProductsFeed job");
-                _productService.UpdateSkuGoogleItemsReportFile().GetAwaiter().GetResult();
+                using (var scope = _rootScope.BeginLifetimeScope())
+                {
+                    var productService = scope.Resolve<IProductService>();
+                    productService.UpdateSkuGoogleItemsReportFile().GetAwaiter().GetResult();
+                }
                 _logger.LogWarning("Finished GoogleProductsFeed job");
-			}
-		    catch (Exception ex)
-		    {
-				_logger.LogError(0, ex, ex.Message);
-				throw;
-		    }
-	    }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(0, ex, ex.Message);
+                throw;
+            }
+        }
     }
 }
