@@ -45,6 +45,7 @@
                 IdTradeClass: null,
                 IdTier: null,
                 OnlyActive: true,
+                Paging: { PageIndex: 1, PageItemCount: 100 },
             };
 
             $scope.options.exportUrl = customerService.getWholesalesReportFile($scope.filter, $rootScope.buildNumber);
