@@ -101,6 +101,11 @@ namespace VitalChoice.Business.Services.Dynamic
                         NPAmount = g.NPAmount,
                         GiftCertificate = g.GiftCertificate
                     }));
+                    dynamic.GiftCertificates.ForEach(p =>
+                    {
+                        p.GiftCertificate.Sku = null;
+                        p.GiftCertificate.Order = null;
+                    });
                 }
                 dynamic.Discount = await _discountMapper.FromEntityAsync(entity.Discount, withDefaults);
                 dynamic.PaymentMethod =
@@ -114,6 +119,15 @@ namespace VitalChoice.Business.Services.Dynamic
                         Sku = await _skuMapper.FromEntityAsync(s.Sku, withDefaults),
                         GcsGenerated = s.GeneratedGiftCertificates
                     }));
+
+                    dynamic.Skus.ForEach(p =>
+                    {
+                        p.GcsGenerated?.ForEach(pp =>
+                        {
+                            pp.Sku = null;
+                            pp.Order = null;
+                        });
+                    });
 
                     if (dynamic.Skus != null && dynamic.Skus.Count != 0 && dynamic.Skus.First().Sku?.Product != null)
                     {
