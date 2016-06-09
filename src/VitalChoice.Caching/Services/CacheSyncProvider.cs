@@ -4,7 +4,6 @@ using System.Linq;
 using Autofac;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using VitalChoice.Caching.Debug;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
@@ -26,7 +25,7 @@ namespace VitalChoice.Caching.Services
             CacheFactory = cacheFactory;
             KeyStorage = keyStorage;
             ScopeContainer = scopeContainer;
-            CacheDebugger.ScopeFactoryContainer = scopeContainer;
+            //CacheDebugger.ScopeFactoryContainer = scopeContainer;
             Logger = loggerFactory.CreateLogger<CacheSyncProvider>();
         }
 

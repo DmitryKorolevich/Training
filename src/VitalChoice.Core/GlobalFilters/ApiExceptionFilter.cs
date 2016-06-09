@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Templates.Strings;
 using Templates.Strings.Core;
-using VitalChoice.Caching.Debug;
+//using VitalChoice.Caching.Debug;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Services.Cache.Base;
@@ -94,7 +94,7 @@ namespace VitalChoice.Core.GlobalFilters
 
         internal static string FormatUpdateException(ExceptionContext context, DbUpdateException dbUpdateException)
         {
-            var updateIssues = CacheDebugger.ProcessDbUpdateException(dbUpdateException);
+            //var updateIssues = CacheDebugger.ProcessDbUpdateException(dbUpdateException);
             ExStringBuilder builder = new ExStringBuilder(context.Exception.ToString());
             builder += "\nTrace Data:";
             var jsonSerializer = JsonSerializer.Create(new JsonSerializerSettings
@@ -104,13 +104,13 @@ namespace VitalChoice.Core.GlobalFilters
                 DateParseHandling = DateParseHandling.DateTime
             });
 
-            foreach (var cacheUpdateData in updateIssues)
-            {
-                WriteObject(builder, "Entity Type", jsonSerializer, cacheUpdateData.EntityType.ToString());
-                WriteObject(builder, "Updated Object", jsonSerializer, cacheUpdateData.UpdateEntity);
-                WriteObject(builder, "Cache Variants", jsonSerializer, cacheUpdateData.CachedEntities);
-                WriteObject(builder, "Actual DB Data", jsonSerializer, cacheUpdateData.ActualDbEntity);
-            }
+            //foreach (var cacheUpdateData in updateIssues)
+            //{
+            //    WriteObject(builder, "Entity Type", jsonSerializer, cacheUpdateData.EntityType.ToString());
+            //    WriteObject(builder, "Updated Object", jsonSerializer, cacheUpdateData.UpdateEntity);
+            //    WriteObject(builder, "Cache Variants", jsonSerializer, cacheUpdateData.CachedEntities);
+            //    WriteObject(builder, "Actual DB Data", jsonSerializer, cacheUpdateData.ActualDbEntity);
+            //}
             return builder.ToString();
         }
 
