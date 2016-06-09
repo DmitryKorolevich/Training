@@ -29,7 +29,7 @@
                     <input type="text" class="form-control" placeholder="First Name" data-ng-model="address.FirstName" autocomplete="off">
                 </div>
                 <div class="col-md-3">
-                    <input type="text" class="form-control" placeholder="Address 1" data-ng-model="address.Address1" autocomplete="off">
+                    <input type="text" class="form-control" placeholder="Ship Address 1" data-ng-model="defaultShippingAddress.Address1" autocomplete="off">
                 </div>
             </div>
             <div class="row form-group">
@@ -44,15 +44,15 @@
                 </div>
                 <div class="col-md-3">
                     <div class="input-group autocomplete">
-                        <input type="text" name="Id" class="form-control" placeholder="City" data-ng-model="address.City" autocomplete="off"
-                               typeahead-min-length="1" uib-typeahead="item as item for item in getByProfileAddressAutoComplete($viewValue,'City')" typeahead-loading="loadingByCity">
+                        <input type="text" name="Id" class="form-control" placeholder="Ship City" data-ng-model="defaultShippingAddress.City" autocomplete="off"
+                               typeahead-min-length="1" uib-typeahead="item as item for item in getByDefaultShippingAddressAutoComplete($viewValue,'City')" typeahead-loading="loadingByCity">
                         <span class="input-group-addon">
                             <i ng-show="loadingByCity" class="glyphicon glyphicon-refresh"></i>
                         </span>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <input type="text" class="form-control" placeholder="Zip" data-ng-model="address.Zip" autocomplete="off">
+                    <input type="text" class="form-control" placeholder="Ship Zip" data-ng-model="defaultShippingAddress.Zip" autocomplete="off">
                 </div>
                 <div class="col-md-3">
                     <input type="text" class="form-control" placeholder="Phone" data-ng-model="address.Phone" autocomplete="off">

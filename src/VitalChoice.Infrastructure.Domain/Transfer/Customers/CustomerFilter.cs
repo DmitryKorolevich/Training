@@ -12,6 +12,7 @@
         public string Country { get; set; }
         public string State { get; set; }
         public string Zip { get; set; }
+        public bool? Default { get; set; }
     }
 
     public class CustomerFilter : FilterBase
@@ -25,5 +26,8 @@
         public string Email { get; set; }
 
         public CustomerAddressFilter Address { get; set; }
-	}
+
+        public CustomerAddressFilter DefaultShippingAddress { get; set; }
+
+    }
 }

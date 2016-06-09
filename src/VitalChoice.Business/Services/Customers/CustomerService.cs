@@ -456,7 +456,8 @@ namespace VitalChoice.Business.Services.Customers
                             .WithId(filter.SearchText)
                             .WithEmailContains(filter.Email)
                             .WithIdAffiliate(filter.IdAffiliate, filter.IdAffiliateRequired)
-                            .FilterAddress(filter.Address),
+                            .FilterProfileAddress(filter.Address)
+                            .FilterDefaultShippingAddress(filter.DefaultShippingAddress),
                         includes =>
                             includes.Include(c => c.ProfileAddress)
                                 .ThenInclude(c => c.OptionValues), orderBy: sortable, withDefaults: true);

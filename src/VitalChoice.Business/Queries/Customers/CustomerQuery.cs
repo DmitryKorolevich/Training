@@ -161,9 +161,20 @@ namespace VitalChoice.Business.Queries.Customers
             return this;
         }
 
-        public CustomerQuery FilterAddress(CustomerAddressFilter filter)
+        public CustomerQuery FilterProfileAddress(CustomerAddressFilter filter)
         {
             Add(c => c.ProfileAddress.WhenValues(filter, (int)AddressType.Profile));
+            return this;
+        }
+
+        public CustomerQuery FilterDefaultShippingAddress(CustomerAddressFilter filter)
+        {
+            if (filter != null)
+            {
+                filter.Default = true;
+                //Add(c => c.ShippingAddresses.Select(p => p.ShippingAddress).WhenValuesAny(filter));
+                Add(c => c.ShippingAddresses.Any(p => p.ShippingAddress.WhenValues(filter)));
+            }
             return this;
         }
 
