@@ -43,7 +43,7 @@ namespace VitalChoice.DynamicData.Helpers
                 }
                 var filterModelType = m.Arguments[1].Type;
                 var entityType = m.Arguments[0].Type;
-                var itemType = entityType.TryGetElementType(typeof (ICollection<>));
+                var itemType = entityType.TryGetElementType(typeof (IEnumerable<>));
                 bool collectionMethods = false;
                 if (itemType != null)
                 {
