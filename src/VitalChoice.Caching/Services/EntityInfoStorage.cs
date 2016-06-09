@@ -26,6 +26,7 @@ using VitalChoice.Ecommerce.Domain.Options;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.DependencyInjection;
+using VitalChoice.Caching.Debuging;
 
 namespace VitalChoice.Caching.Services
 {
@@ -115,7 +116,7 @@ namespace VitalChoice.Caching.Services
                     results.AddRange(entityInfos);
                     _entityInfos = results;
                 }
-                //CacheDebugger.EntityInfo = this;
+                CacheDebugger.EntityInfo = this;
                 _contextTypeContainer.ContextTypes = new HashSet<Type>(_contextTypeContainer.ContextTypes) {contextType};
             }
         }
