@@ -101,7 +101,8 @@ namespace VitalChoice.Core.GlobalFilters
             {
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
                 DateTimeZoneHandling = DateTimeZoneHandling.Local,
-                DateParseHandling = DateParseHandling.DateTime
+                DateParseHandling = DateParseHandling.DateTime,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });
 
             foreach (var cacheUpdateData in updateIssues)
@@ -118,12 +119,14 @@ namespace VitalChoice.Core.GlobalFilters
             object data, string postText = null)
         {
             builder += $"\n\t{preText}:";
-            var stringWriter = new ExStringWriter();
-            using (new JsonTextWriter(stringWriter))
+            using (var stringWriter = new ExStringWriter())
             {
-                jsonSerializer.Serialize(stringWriter, data);
+                using (new JsonTextWriter(stringWriter))
+                {
+                    jsonSerializer.Serialize(stringWriter, data);
+                }
+                builder += stringWriter.ToString();
             }
-            builder += stringWriter.ToString();
             if (!string.IsNullOrEmpty(postText))
             {
                 builder.Append(postText);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using VitalChoice.Data.Helpers;
+using VitalChoice.DynamicData.Base;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
@@ -140,7 +141,7 @@ namespace VitalChoice.Business.Queries.Orders
                 Add(c => c.WhenValues(new
                 {
                     ServiceCode = serviceCode.Value
-                }));
+                }, ValuesFilterType.And));
             }
             return this;
         }
@@ -152,33 +153,33 @@ namespace VitalChoice.Business.Queries.Orders
                 Add(c => c.WhenValues(new
                 {
                     OrderType= idOrderSource.Value
-                }));
+                }, ValuesFilterType.And));
             }
             if (pOrderType.HasValue)
             {
                 Add(c => c.WhenValues(new
                 {
                     POrderType = pOrderType.Value
-                }));
+                }, ValuesFilterType.And));
             }
             if (idShippingMethod.HasValue && idShippingMethod.Value==1)//upgraded
             {
                 Add(c => c.WhenValues(new
                 {
                     ShippingUpgradeP = 1
-                }) ||
+                }, ValuesFilterType.And) ||
                 c.WhenValues(new
                 {
                     ShippingUpgradeP = 2
-                })||
+                }, ValuesFilterType.And) ||
                 c.WhenValues(new
                 {
                     ShippingUpgradeNP = 1
-                }) ||
+                }, ValuesFilterType.And) ||
                 c.WhenValues(new
                 {
                     ShippingUpgradeNP = 2
-                }));
+                }, ValuesFilterType.And));
             }
             return this;
         }
@@ -190,21 +191,21 @@ namespace VitalChoice.Business.Queries.Orders
                 Add(c => c.Customer.ProfileAddress.WhenValues(new
                 {
                     FirstName = firstName
-                }, (int)AddressType.Profile));
+                }, (int)AddressType.Profile, ValuesFilterType.And));
             }
             if (!string.IsNullOrEmpty(lastName))
             {
                 Add(c => c.Customer.ProfileAddress.WhenValues(new
                 {
                     LastName = lastName
-                },(int) AddressType.Profile));
+                },(int) AddressType.Profile, ValuesFilterType.And));
             }
             if (!string.IsNullOrEmpty(company))
             {
                 Add(c => c.Customer.ProfileAddress.WhenValues(new
                 {
                     Company = company
-                }, (int)AddressType.Profile));
+                }, (int)AddressType.Profile, ValuesFilterType.And));
             }
 
             return this;

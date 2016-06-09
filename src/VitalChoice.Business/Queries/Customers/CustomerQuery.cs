@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using VitalChoice.Data.Helpers;
+using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Extensions;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
@@ -156,14 +157,14 @@ namespace VitalChoice.Business.Queries.Customers
                     TradeClass = idTradeClass,
                     Tier = idTier,
                 };
-                Add(c => c.WhenValues(filter, (int)CustomerType.Wholesale));
+                Add(c => c.WhenValues(filter, (int)CustomerType.Wholesale, ValuesFilterType.And));
             }
             return this;
         }
 
         public CustomerQuery FilterProfileAddress(CustomerAddressFilter filter)
         {
-            Add(c => c.ProfileAddress.WhenValues(filter, (int)AddressType.Profile));
+            Add(c => c.ProfileAddress.WhenValues(filter, (int)AddressType.Profile, ValuesFilterType.And));
             return this;
         }
 
@@ -173,7 +174,7 @@ namespace VitalChoice.Business.Queries.Customers
             {
                 filter.Default = true;
                 //Add(c => c.ShippingAddresses.Select(p => p.ShippingAddress).WhenValuesAny(filter));
-                Add(c => c.ShippingAddresses.Any(p => p.ShippingAddress.WhenValues(filter)));
+                Add(c => c.ShippingAddresses.Any(p => p.ShippingAddress.WhenValues(filter, (int)AddressType.Shipping, ValuesFilterType.And)));
             }
             return this;
         }
