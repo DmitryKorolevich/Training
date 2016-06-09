@@ -31,6 +31,15 @@ namespace VitalChoice.DynamicData.Helpers
 
         protected override Expression VisitMethodCall(MethodCallExpression m)
         {
+            var result = base.VisitMethodCall(m);
+            if (result is MethodCallExpression)
+            {
+                m = result as MethodCallExpression;
+            }
+            else
+            {
+                return result;
+            }
             if (m.Method.DeclaringType == typeof (DynamicEntityFilterExtension))
             {
                 object filterModel = Expression.Lambda(m.Arguments[1]).Compile().DynamicInvoke();
@@ -92,7 +101,7 @@ namespace VitalChoice.DynamicData.Helpers
                         return resultExpression;
                 }
             }
-            return base.VisitMethodCall(m);
+            return result;
         }
     }
 }
