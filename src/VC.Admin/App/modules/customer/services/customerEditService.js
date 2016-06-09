@@ -84,6 +84,12 @@ angular.module('app.modules.customer.services.customerEditService', [])
             });
         };
 
+        uiScope.deleteAllCreditCards = function ()
+        {
+            uiScope.currentCustomer.CreditCards = [];
+            uiScope.paymentInfoTab.CreditCardIndex = undefined;
+        };
+
         uiScope.makeBillingAsProfileAddress = function ()
         {
             var address;

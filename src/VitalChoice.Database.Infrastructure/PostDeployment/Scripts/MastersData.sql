@@ -2768,9 +2768,11 @@ BEGIN
 				            </div>
 				            <hr />
                         }}
-				        <a class="read-more-reviews" href="/reviews/@(@chained)">
-					        Read more reviews >
-				        </a>
+                        @if(@model.ReviewsCount > 3){{
+    				        <a class="read-more-reviews" href="/reviews/@(@chained)">
+    					        Read more reviews >
+    				        </a>
+				        }}
     			    </div>
                 }}
             }}
