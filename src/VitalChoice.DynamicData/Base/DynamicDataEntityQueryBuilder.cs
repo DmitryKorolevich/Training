@@ -30,6 +30,7 @@ namespace VitalChoice.DynamicData.Base
         private readonly IModelConverterService _converterService;
         private readonly ITypeConverter _typeConverter;
         private readonly IIndex<GenericTypePair, IOptionTypeQueryProvider> _optionTypeQueryProviderIndex;
+        private readonly MemberInfo _member;
 
         public DynamicDataEntityQueryBuilder(IModelConverterService converterService, ITypeConverter typeConverter,
             IIndex<GenericTypePair, IOptionTypeQueryProvider> optionTypeQueryProviderIndex)
@@ -37,6 +38,7 @@ namespace VitalChoice.DynamicData.Base
             _converterService = converterService;
             _typeConverter = typeConverter;
             _optionTypeQueryProviderIndex = optionTypeQueryProviderIndex;
+            _member = typeof(TEntity).GetMember("OptionValues").FirstOrDefault();
         }
 
         public Expression Filter(object model, Type modelType, Expression parameter, ValuesFilterType filterType, int? idObjectType)
@@ -156,7 +158,7 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        private static Expression CreateValuesSelector(
+        private Expression CreateValuesSelector(
             IEnumerable<OptionGroup<TOptionType>> optionGroups, ValuesFilterType filterType, Expression parameter)
         {
             Expression result = null;
@@ -182,7 +184,11 @@ namespace VitalChoice.DynamicData.Base
                     //}
                     //else
                     //{
-                    result = result == null ? valuesSelector : Expression.OrElse(result, valuesSelector);
+                    result = result == null
+                        ? valuesSelector
+                        : (filterType == ValuesFilterType.And
+                            ? Expression.AndAlso(result, valuesSelector)
+                            : Expression.OrElse(result, valuesSelector));
                     //}
                 }
             }
@@ -199,26 +205,25 @@ namespace VitalChoice.DynamicData.Base
             return method;
         }
 
-        private static Expression CreateExpression(OptionValueItem<TOptionType> value, Expression parameter)
+        private Expression CreateExpression(OptionValueItem<TOptionType> value, Expression parameter)
         {
             Expression valuesSelector;
-            var member = typeof(TEntity).GetMember("OptionValues").FirstOrDefault();
-            if (member == null)
+            if (_member == null)
                 throw new InvalidOperationException($"Cannot obtain OptionValues member in {typeof(TEntity)} Type");
             if (value.Value == null)
             {
                 Expression<Func<TOptionValue, bool>> lambda = v => v.IdOptionType != value.IdType;
-                valuesSelector = Expression.Call(GetConditionMethod("All", typeof(TOptionValue)), Expression.MakeMemberAccess(parameter, member), lambda);
+                valuesSelector = Expression.Call(GetConditionMethod("All", typeof(TOptionValue)), Expression.MakeMemberAccess(parameter, _member), lambda);
             }
             else if (value.OptionType.IdFieldType == (int) FieldType.String && !string.IsNullOrEmpty(value.Value))
             {
                 Expression<Func<TOptionValue, bool>> lambda = v => v.IdOptionType == value.IdType && v.Value.StartsWith(value.Value);
-                valuesSelector = Expression.Call(GetConditionMethod("Any", typeof(TOptionValue)), Expression.MakeMemberAccess(parameter, member), lambda);
+                valuesSelector = Expression.Call(GetConditionMethod("Any", typeof(TOptionValue)), Expression.MakeMemberAccess(parameter, _member), lambda);
             }
             else
             {
                 Expression<Func<TOptionValue, bool>> lambda = v => v.IdOptionType == value.IdType && v.Value == value.Value;
-                valuesSelector = Expression.Call(GetConditionMethod("Any", typeof(TOptionValue)), Expression.MakeMemberAccess(parameter, member), lambda);
+                valuesSelector = Expression.Call(GetConditionMethod("Any", typeof(TOptionValue)), Expression.MakeMemberAccess(parameter, _member), lambda);
             }
             return valuesSelector;
         }
