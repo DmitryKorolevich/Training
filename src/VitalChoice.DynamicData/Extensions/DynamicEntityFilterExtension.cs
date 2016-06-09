@@ -23,25 +23,25 @@ namespace VitalChoice.DynamicData.Extensions
             return true;
         }
 
-        public static bool WhenValuesAny<TEntity, T>(this ICollection<TEntity> entity, T filter)
+        public static bool WhenValuesAny<TEntity, T>(this IEnumerable<TEntity> entity, T filter)
             where TEntity : DynamicDataEntity
         {
             return true;
         }
 
-        public static bool WhenValuesAny<TEntity, T>(this ICollection<TEntity> entity, T filter, int? idObjectType)
+        public static bool WhenValuesAny<TEntity, T>(this IEnumerable<TEntity> entity, T filter, int? idObjectType)
             where TEntity : DynamicDataEntity
         {
             return true;
         }
 
-        public static bool WhenValuesAll<TEntity, T>(this ICollection<TEntity> entity, T filter)
+        public static bool WhenValuesAll<TEntity, T>(this IEnumerable<TEntity> entity, T filter)
             where TEntity : DynamicDataEntity
         {
             return true;
         }
 
-        public static bool WhenValuesAll<TEntity, T>(this ICollection<TEntity> entity, T filter, int? idObjectType)
+        public static bool WhenValuesAll<TEntity, T>(this IEnumerable<TEntity> entity, T filter, int? idObjectType)
             where TEntity : DynamicDataEntity
         {
             return true;
