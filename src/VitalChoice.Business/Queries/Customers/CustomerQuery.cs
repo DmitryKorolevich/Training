@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using VitalChoice.Data.Helpers;
 using VitalChoice.DynamicData.Extensions;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -160,10 +161,33 @@ namespace VitalChoice.Business.Queries.Customers
             return this;
         }
 
-        public CustomerQuery FilterAddress(CustomerAddressFilter filter)
+        public CustomerQuery FilterProfileAddress(CustomerAddressFilter filter)
         {
-            Add(c => c.ProfileAddress.WhenValues(filter, (int) AddressType.Profile));
+            Add(c => c.ProfileAddress.WhenValues(filter, (int)AddressType.Profile));
             return this;
         }
+
+        public CustomerQuery FilterDefaultShippingAddress(CustomerAddressFilter filter)
+        {
+            if (filter != null)
+            {
+                filter.Default = true;
+                //Add(c => c.ShippingAddresses.Select(p => p.ShippingAddress).WhenValuesAny(filter));
+                Add(c => c.ShippingAddresses.Any(p => p.ShippingAddress.WhenValues(filter)));
+            }
+            return this;
+        }
+
+        //public CustomerQuery FilterAddress(CustomerAddressFilter filter)
+        //{
+        //    Add(c => c.CustomerPaymentMethods.Where(p => p.Id == 115).Select(p => p.BillingAddress).WhenValuesAny(filter));
+        //    return this;
+        //}
+
+        //public CustomerQuery FilterAddress(CustomerAddressFilter filter)
+        //{
+        //    Add(c => c.CustomerPaymentMethods.Where(p => p.WhenValues(new { Default = true })).Select(p=>p.BillingAddress).WhenValuesAny(filter));
+        //    return this;
+        //}
     }
 }

@@ -23,7 +23,7 @@
             <input id="hdState" value="@Html.DisplayForEx(x=>x.IdState)" type="hidden">
             @Html.HiddenFor(m => m.Email)
             <div class="sub-title"><span>Create a Password</span></div>
-            <span class="form-control-important-info">Must be at least 8 characters long, contain at least 1 numerical digit, 1 capital character and 1 special character.<br />Example: Dontuse!#1</span>
+            <span class="form-control-important-info">Must be at least 8 characters long, contain at least 1 numerical digit, 1 capital character, 1 lowercase character and 1 special character.<br />Example: Dontuse!#1</span>
             @Html.ValidationSummary(true, "")
             <div class="form-group">
                 @Html.LabelFor(m => m.Password, new { @class = "control-label" })

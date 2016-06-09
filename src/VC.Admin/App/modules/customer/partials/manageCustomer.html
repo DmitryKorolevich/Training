@@ -301,13 +301,16 @@
                                             </div>
                                             <div class="col-md-3 padding-l-0px">
                                                 <button class="btn btn-danger pull-right" data-ng-show="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex] && paymentInfoTab.PaymentMethodType == 1 && (!currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].Default || currentCustomer.CreditCards.length==1)" data-ng-click="deleteSelectedCreditCard();">Delete</button>
-                                                <button class="btn btn-success pull-right margin-right-8px" data-ng-show="!currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].Default && paymentInfoTab.PaymentMethodType == 1 && currentCustomer.CreditCards && currentCustomer.CreditCards.length>0" data-ng-click="setDefaultCreditCard();">Set as Default</button>
+                                                <button class="btn btn-success pull-right margin-right-8px" data-ng-show="currentCustomer.CreditCards && currentCustomer.CreditCards.length>0 && paymentInfoTab.PaymentMethodType == 1 && !currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].Default" data-ng-click="setDefaultCreditCard();">Set as Default</button>
                                             </div>
                                         </div>
                                         <div class="form-group ng-scope" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(1) >= 0 && paymentInfoTab.PaymentMethodType==1">
                                             <div class="col-md-3"></div>
-                                            <div class="col-md-9">
+                                            <div class="col-md-7 padding-r-0px">
                                                 <strong>Credit card data is only validated when adding or replacing masked credit card data.</strong>
+                                            </div>
+                                            <div class="col-md-2 padding-l-0px">
+                                                <button class="btn btn-danger pull-right" data-ng-show="currentCustomer.CreditCards.length>0 && paymentInfoTab.PaymentMethodType == 1" data-ng-click="deleteAllCreditCards();">Delete All</button>
                                             </div>
                                         </div>
                                         <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(2) >= 0">
