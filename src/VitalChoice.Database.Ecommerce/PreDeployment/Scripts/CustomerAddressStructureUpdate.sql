@@ -53,3 +53,12 @@ BEGIN
 		Email) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 END
 GO
+
+IF NOT EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[CustomerToShippingAddresses]') AND name = N'IX_IdAddress')
+BEGIN
+	CREATE NONCLUSTERED INDEX IX_IdAddress
+	ON [dbo].[CustomerToShippingAddresses] ([IdAddress])
+	INCLUDE ([IdCustomer])
+END
+
+GO
