@@ -127,14 +127,23 @@ namespace VitalChoice.Core.DependencyInjection
                         options =>
                             options.UseCache<ServiceBusCacheSyncProvider>(scopeContainer,
                                 serviceCollection =>
-                                    serviceCollection.AddSingleton(appEnv).InjectProfiler().Configure<AppOptionsBase>(
-                                        appOptions => ConfigureBaseOptions(configuration, appOptions))))
+                                {
+                                    serviceCollection.AddSingleton(appEnv)
+                                        .AddSingleton(new LoggerProviderExtended(appEnv).Factory)
+                                        .InjectProfiler()
+                                        .Configure<AppOptionsBase>(
+                                            appOptions => ConfigureBaseOptions(configuration, appOptions));
+                                }))
                     .AddDbContext<EcommerceContext>(
                         options =>
                             options.UseCache<ServiceBusCacheSyncProvider>(scopeContainer,
                                 serviceCollection =>
-                                    serviceCollection.AddSingleton(appEnv).InjectProfiler().Configure<AppOptionsBase>(
-                                        appOptions => ConfigureBaseOptions(configuration, appOptions))))
+                                {
+                                    serviceCollection.AddSingleton(appEnv)
+                                        .AddSingleton(new LoggerProviderExtended(appEnv).Factory)
+                                        .InjectProfiler().Configure<AppOptionsBase>(
+                                            appOptions => ConfigureBaseOptions(configuration, appOptions));
+                                }))
                     .AddDbContext<LogsContext>()
                     .AddEntityFrameworkSqlServer().InjectProfiler();
             }
