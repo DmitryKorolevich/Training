@@ -95,6 +95,7 @@ namespace VitalChoice.Business.Services.Cache
                 return;
 
             var now = DateTime.UtcNow;
+            List<string> updateMessages = new List<string>();
             foreach (var operation in syncOperations)
             {
                 operation.SendTime = now;
@@ -103,7 +104,9 @@ namespace VitalChoice.Business.Services.Cache
                     CorrelationId = _clientUid.ToString(),
                     TimeToLive = TimeSpan.FromMinutes(5)
                 });
+                updateMessages.Add(operation.ToString());
             }
+            Logger.LogWarning($"Sending cache messages: {string.Join(",", updateMessages.Select(m => m))}");
             _serviceBusClient.SendNow();
         }
 
@@ -185,6 +188,7 @@ namespace VitalChoice.Business.Services.Cache
                     });
                     _serviceBusClient.SendNow();
                 }
+                Logger.LogWarning($"Accepting cache messages: {string.Join(",", syncOperations.Select(m => m.ToString()))}");
                 AcceptChanges(syncOperations);
             }
         }

@@ -69,17 +69,22 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
 
         private void ReceiveMessages()
         {
+            BrokeredMessage[] messages = null;
             while (!_terminated)
             {
                 try
                 {
                     if (EnableBatching)
                     {
-                        var messages = Receiver.ReceiveBatch(BatchSize);
+                        if (messages == null)
+                        {
+                            messages = Receiver.ReceiveBatch(BatchSize)?.ToArray();
+                        }
                         if (messages != null)
                         {
                             _readyToDisposeReceive.Reset();
                             OnReceiveMessagesEvent(messages);
+                            messages = null;
                             _readyToDisposeReceive.Set();
                         }
                     }
@@ -93,11 +98,10 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                             _readyToDisposeReceive.Set();
                         }
                     }
-
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError(0, e, e.Message);
+                    Logger.LogError(0, e.ToString());
                     _readyToDisposeReceive.Set();
                     Thread.Sleep(TimeSpan.FromSeconds(1));
                 }
