@@ -9,7 +9,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer
         public ICollection<int> FieldIds { get; set; }
 
         public string FieldValue { get; set; }
-
+        
         public int? IdReferencedObjectType { get; set; }
     }
 }

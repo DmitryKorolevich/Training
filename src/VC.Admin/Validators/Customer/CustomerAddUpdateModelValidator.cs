@@ -19,12 +19,14 @@ namespace VC.Admin.Validators.Customer
 	        var customerValidator = ValidatorsFactory.GetValidator<CustomerModelRules>();
 	        ParseResults(customerValidator.Validate(value));
 
-	        var profileAddressValidator = ValidatorsFactory.GetValidator<AddressModelRules>();
+	        var profileAddressValidator = ValidatorsFactory.GetValidator<ProfileAddressModelRules>();
 	        ParseResults(profileAddressValidator.Validate(value.ProfileAddress), "profile");
+
 	        int index = 0;
-	        foreach (var shipping in value.Shipping)
+            var addressValidator = ValidatorsFactory.GetValidator<AddressModelRules>();
+            foreach (var shipping in value.Shipping)
 	        {
-	            ParseResults(profileAddressValidator.Validate(shipping), "Shipping", index, "shipping");
+	            ParseResults(addressValidator.Validate(shipping), "Shipping", index, "shipping");
 	            index++;
 	        }
 
@@ -33,36 +35,36 @@ namespace VC.Admin.Validators.Customer
             foreach (var creditCard in value.CreditCards)
 	        {
 	            ParseResults(creditCardValidator.Validate(creditCard), "CreditCards", index, "card");
-                ParseResults(profileAddressValidator.Validate(creditCard.Address), "CreditCards", index, "card");
+                ParseResults(addressValidator.Validate(creditCard.Address), "CreditCards", index, "card");
 	            index++;
 	        }
 
             if (value.Check != null)
             {
                 var checkPaymentModelValidator = ValidatorsFactory.GetValidator<CheckPaymentModelRules>();
-                ParseResults(profileAddressValidator.Validate(value.Check.Address), "check");
+                ParseResults(addressValidator.Validate(value.Check.Address), "check");
             }
 
             if (value.Oac != null)
             {
                 var oacPaymentModelValidator = ValidatorsFactory.GetValidator<OacPaymentModelRules>();
                 ParseResults(oacPaymentModelValidator.Validate(value.Oac), "oac");
-                ParseResults(profileAddressValidator.Validate(value.Oac.Address), "oac");
+                ParseResults(addressValidator.Validate(value.Oac.Address), "oac");
             }
 
             if (value.WireTransfer != null)
             {
-                ParseResults(profileAddressValidator.Validate(value.WireTransfer.Address), "wiretransfer");
+                ParseResults(addressValidator.Validate(value.WireTransfer.Address), "wiretransfer");
             }
 
             if (value.Marketing != null)
             {
-                ParseResults(profileAddressValidator.Validate(value.Marketing.Address), "marketing");
+                ParseResults(addressValidator.Validate(value.Marketing.Address), "marketing");
             }
 
             if (value.VCWellness != null)
             {
-                ParseResults(profileAddressValidator.Validate(value.VCWellness.Address), "vcwellness");
+                ParseResults(addressValidator.Validate(value.VCWellness.Address), "vcwellness");
             }
         }
 

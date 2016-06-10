@@ -101,7 +101,8 @@ namespace VitalChoice.Core.GlobalFilters
             {
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
                 DateTimeZoneHandling = DateTimeZoneHandling.Local,
-                DateParseHandling = DateParseHandling.DateTime
+                DateParseHandling = DateParseHandling.DateTime,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });
 
             foreach (var cacheUpdateData in updateIssues)
