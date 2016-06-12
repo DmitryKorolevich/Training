@@ -649,7 +649,42 @@ angular.module('app.modules.order.services.orderEditService', [])
             return false;
         };
 
-        uiScope.makeBillingAsProfileAddressOrder = function ()
+        //uiScope.makeBillingAsProfileAddressOrder = function ()
+        //{
+        //    var address;
+        //    switch (String(uiScope.paymentInfoTab.PaymentMethodType))
+        //    {
+        //        case "1":
+        //            address = uiScope.order.CreditCard.Address;
+        //            break;
+        //        case "2":
+        //            address = uiScope.order.Oac.Address;
+        //            break;
+        //        case "3":
+        //            address = uiScope.order.Check.Address;
+        //            break;
+        //        case "6":
+        //            address = uiScope.order.WireTransfer.Address;
+        //            break;
+        //        case "7":
+        //            address = uiScope.order.Marketing.Address;
+        //            break;
+        //        case "8":
+        //            address = uiScope.order.VCWellness.Address;
+        //            break;
+        //    }
+        //    if (address)
+        //    {
+        //        for (var key in uiScope.currentCustomer.ProfileAddress)
+        //        {
+        //            address[key] = uiScope.currentCustomer.ProfileAddress[key];
+        //        }
+
+        //        address.AddressType = 2;
+        //    }
+        //};
+
+        uiScope.makeBillingAsShippingAddressOrder = function ()
         {
             var address;
             switch (String(uiScope.paymentInfoTab.PaymentMethodType))
@@ -675,12 +710,16 @@ angular.module('app.modules.order.services.orderEditService', [])
             }
             if (address)
             {
-                for (var key in uiScope.currentCustomer.ProfileAddress)
+                var activeShipping = uiScope.buildOrderShippingAddressForPartial(uiScope.order.OnHold && !uiScope.order.UpdateShippingAddressForCustomer);
+                if (activeShipping)
                 {
-                    address[key] = uiScope.currentCustomer.ProfileAddress[key];
-                }
+                    for (var key in activeShipping.Address)
+                    {
+                        address[key] = activeShipping.Address[key];
+                    }
 
-                address.AddressType = 2;
+                    address.AddressType = 2;
+                }
             }
         };
     };

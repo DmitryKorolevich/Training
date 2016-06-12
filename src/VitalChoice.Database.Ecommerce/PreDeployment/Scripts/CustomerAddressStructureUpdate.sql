@@ -54,6 +54,15 @@ BEGIN
 END
 GO
 
+IF NOT EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[CustomerToShippingAddresses]') AND name = N'IX_IdAddress')
+BEGIN
+	CREATE NONCLUSTERED INDEX IX_IdAddress
+	ON [dbo].[CustomerToShippingAddresses] ([IdAddress])
+	INCLUDE ([IdCustomer])
+END
+
+GO
+
 IF EXISTS(SELECT * FROM sys.columns WHERE Name = 'IdCountry' AND [object_id] = OBJECT_ID('Addresses') AND is_nullable = 0)
 BEGIN
 

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.DynamicData.Base;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.DynamicData.Extensions;
@@ -187,7 +188,7 @@ namespace VitalChoice.Business.Services.Products
         private async Task<IList<ProductDynamic>> GetProductsAssignedToInvenotyCategory(int id)
         {
             Dictionary<string, object> filter = new Dictionary<string, object> {{ProductConstants.FIELD_NAME_INVENTORY_CATEGORY_ID, id}};
-            var products = await productService.SelectAsync(p => p.WhenValues(filter));
+            var products = await productService.SelectAsync(p => p.WhenValues(filter, ValuesFilterType.And));
             return products;
         }
 

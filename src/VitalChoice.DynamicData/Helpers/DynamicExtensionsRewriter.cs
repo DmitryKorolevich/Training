@@ -33,13 +33,19 @@ namespace VitalChoice.DynamicData.Helpers
         {
             if (m.Method.DeclaringType == typeof (DynamicEntityFilterExtension))
             {
-                object filterModel = Expression.Lambda(m.Arguments[1]).Compile().DynamicInvoke();
+                object filterModel = m.Arguments[1].GetValue();
                 bool objectTypeExists = false;
                 int? idObjectType = null;
-                if (m.Arguments.Count > 2)
+                ValuesFilterType filterType;
+                if (m.Arguments.Count > 3)
                 {
                     objectTypeExists = true;
-                    idObjectType = (int?) Expression.Lambda(m.Arguments[2]).Compile().DynamicInvoke();
+                    idObjectType = (int?) m.Arguments[2].GetValue();
+                    filterType = (ValuesFilterType)m.Arguments[3].GetValue();
+                }
+                else
+                {
+                    filterType = (ValuesFilterType)m.Arguments[2].GetValue();
                 }
                 var filterModelType = m.Arguments[1].Type;
                 var entityType = m.Arguments[0].Type;
@@ -67,29 +73,29 @@ namespace VitalChoice.DynamicData.Helpers
 
 
                         resultExpression = objectTypeExists
-                            ? queryBuilder.Filter(filterModel, filterModelType, m.Arguments[0], idObjectType)
-                            : queryBuilder.Filter(filterModel, filterModelType, m.Arguments[0]);
+                            ? queryBuilder.Filter(filterModel, filterModelType, m.Arguments[0], filterType, idObjectType)
+                            : queryBuilder.Filter(filterModel, filterModelType, m.Arguments[0], filterType);
                         if (resultExpression == null)
                             return Expression.Constant(true);
-                        return resultExpression;
+                        return Visit(resultExpression);
                     case "WhenValuesAny":
                         if (!collectionMethods)
                             throw new ApiException("You cannot use WhenAny with non-collection properties, see When");
 
                         resultExpression = objectTypeExists
-                            ? queryBuilder.FilterCollection(filterModel, filterModelType, m.Arguments[0], false, idObjectType)
-                            : queryBuilder.FilterCollection(filterModel, filterModelType, m.Arguments[0], false);
+                            ? queryBuilder.FilterCollection(filterModel, filterModelType, m.Arguments[0], filterType, false, idObjectType)
+                            : queryBuilder.FilterCollection(filterModel, filterModelType, m.Arguments[0], filterType, false);
 
-                        return resultExpression;
+                        return Visit(resultExpression);
                     case "WhenValuesAll":
                         if (!collectionMethods)
                             throw new ApiException("You cannot use WhenAll with non-collection properties, see When");
 
                         resultExpression = objectTypeExists
-                            ? queryBuilder.FilterCollection(filterModel, filterModelType, m.Arguments[0], true, idObjectType)
-                            : queryBuilder.FilterCollection(filterModel, filterModelType, m.Arguments[0], true);
+                            ? queryBuilder.FilterCollection(filterModel, filterModelType, m.Arguments[0], filterType, true, idObjectType)
+                            : queryBuilder.FilterCollection(filterModel, filterModelType, m.Arguments[0], filterType, true);
 
-                        return resultExpression;
+                        return Visit(resultExpression);
                 }
             }
             return base.VisitMethodCall(m);
