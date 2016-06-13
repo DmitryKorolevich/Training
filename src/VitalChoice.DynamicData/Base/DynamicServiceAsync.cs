@@ -417,6 +417,11 @@ namespace VitalChoice.DynamicData.Base
                     items.SelectMany(i => i.Entity.OptionValues).Where(o => o.BigValue != null).Select(o => o.BigValue), b => b.IdBigString);
 
             await bigValueRepository.DeleteAllAsync(removedBigValues);
+            await
+                bigValueRepository.InsertRangeAsync(
+                    items.SelectMany(i => i.Entity.OptionValues)
+                        .Where(b => b.BigValue != null && b.IdBigString == null)
+                        .Select(b => b.BigValue));
             //var toAddBigValues = items.SelectMany(i => i.Entity.OptionValues)
             //    .Where(o => o.BigValue != null && o.IdBigString == null)
             //    .Select(o => o.BigValue);
