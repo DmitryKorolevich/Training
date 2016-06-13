@@ -22,7 +22,7 @@
             <div class="col-md-3">
             </div>
             <div class="col-md-3">
-                <button class="btn btn-info" id="sameAsProfile" data-ng-click="makeAsProfileAddress();">Copy Profile</button>
+                <button class="btn btn-info" id="sameAsProfile" data-ng-click="makeShippingAsBillingAddress();">Copy Billing</button>
             </div>
         </div>
         <div data-ng-include="'app/modules/customer/partials/shippingAddress.html'" data-ng-repeat="model in [buildShippingAddressForPartial(currentCustomer.Shipping, shippingAddressTab.AddressIndex, order.OnHold && !order.UpdateShippingAddressForCustomer, order && true)]"></div>

@@ -13,7 +13,10 @@ namespace VC.Admin.ModelConverters
     {
 	    public override Task DynamicToModelAsync(AddressModel model, AddressDynamic dynamic)
 	    {
-		    model.Country.Id = dynamic.IdCountry;
+	        if (dynamic.IdCountry != null)
+	        {
+	            model.Country.Id = dynamic.IdCountry.Value;
+	        }
 	        if (!model.PreferredShipMethod.HasValue && dynamic.IdObjectType == (int) AddressType.Shipping)
 	        {
 	            model.PreferredShipMethod=PreferredShipMethod.Best;

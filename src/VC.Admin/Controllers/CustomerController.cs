@@ -600,6 +600,13 @@ namespace VC.Admin.Controllers
             return (await _customerService.GetAddressFieldValuesByValueAsync(filter)).ToList();
         }
 
+        [HttpPost]
+        public async Task<Result<ICollection<string>>> GetDefaultShippingAddressFieldValuesByValueAsync([FromBody]ValuesByFieldValueFilter filter)
+        {
+            filter.IdReferencedObjectType = (int)AddressType.Shipping;
+            return (await _customerService.GetAddressFieldValuesByValueAsync(filter)).ToList();
+        }
+
         #region Reports
 
         [AdminAuthorize(PermissionType.Reports)]

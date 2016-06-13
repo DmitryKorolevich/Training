@@ -309,4 +309,7 @@
   <ItemGroup>
     <None Include="PreDeployment\Scripts\VeraCore.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\AddressOptionsUpdate.sql" />
+  </ItemGroup>
 </Project>

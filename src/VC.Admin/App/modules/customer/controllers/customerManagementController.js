@@ -126,7 +126,7 @@ angular.module('app.modules.customer.controllers.customerManagementController', 
 		        {
 		            $scope.autoCompleteFilter.FieldName = field;
 		            $scope.autoCompleteFilter.FieldValue = val;
-		            return customerService.getProfileAddressFieldValuesByValueAsync($scope.autoCompleteFilter)
+		            return customerService.getDefaultShippingAddressFieldValuesByValueAsync($scope.autoCompleteFilter)
                         .then(function (result)
                         {
                             return result.data.Data.map(function (item)

@@ -44,7 +44,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 var entity = item.Entity;
                 var dynamic = item.Dynamic;
 
-                entity.IdCountry = dynamic.IdCountry;
+                entity.IdCountry = dynamic.IdCountry ?? 0;
                 entity.County = dynamic.County;
                 entity.IdState = dynamic.IdState == 0 ? null : dynamic.IdState;
                 entity.StatusCode = (int)RecordStatusCode.Active;
@@ -59,7 +59,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 var entity = item.Entity;
                 var dynamic = item.Dynamic;
 
-                entity.IdCountry = dynamic.IdCountry;
+                entity.IdCountry = dynamic.IdCountry ?? 0;
                 entity.County = dynamic.County;
                 entity.IdState = dynamic.IdState == 0 ? null : dynamic.IdState;
                 entity.StatusCode = (int)RecordStatusCode.Active;

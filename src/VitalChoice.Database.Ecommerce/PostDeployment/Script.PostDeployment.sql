@@ -52,3 +52,4 @@ Post-Deployment Script Template
 :r .\Scripts\SPGetSkuBreakDownReport.sql
 :r .\Scripts\SPGetSkuPOrderTypeBreakDownReport.sql
 :r .\Scripts\SPGetSkuPOrderTypeFutureBreakDownReport.sql
+:r .\Scripts\AddressOptionsUpdate.sql

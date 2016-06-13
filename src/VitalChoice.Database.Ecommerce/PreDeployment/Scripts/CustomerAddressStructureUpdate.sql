@@ -62,3 +62,13 @@ BEGIN
 END
 
 GO
+
+IF EXISTS(SELECT * FROM sys.columns WHERE Name = 'IdCountry' AND [object_id] = OBJECT_ID('Addresses') AND is_nullable = 0)
+BEGIN
+
+ALTER TABLE Addresses
+ALTER COLUMN IdCountry INT NULL
+
+END
+
+GO

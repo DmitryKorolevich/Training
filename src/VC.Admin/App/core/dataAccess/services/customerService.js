@@ -82,6 +82,10 @@ angular.module('app.core.dataAccess.services.customerService', [])
 		{
 		    return $http.post(baseUrl + 'GetProfileAddressFieldValuesByValueAsync', filter, getConfig(tracker));
 		},
+		getDefaultShippingAddressFieldValuesByValueAsync: function (filter, tracker)
+		{
+		    return $http.post(baseUrl + 'GetDefaultShippingAddressFieldValuesByValueAsync', filter, getConfig(tracker));
+		},
 		getCustomerStaticFieldValuesByValue: function (filter, tracker)
 		{
 		    return $http.post(baseUrl + 'GetCustomerStaticFieldValuesByValue', filter, getConfig(tracker));
