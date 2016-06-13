@@ -37,6 +37,7 @@ namespace VitalChoice.Caching.Services
         private readonly IContextTypeContainer _contextTypeContainer;
         private Dictionary<Type, EntityInfo> _entityInfos;
         private readonly HashSet<Type> _parsedEntities = new HashSet<Type>();
+        private static readonly object SyncRoot = new object();
         private IEntityCollectorInfo _gcCollector;
 
         public EntityInfoStorage(IOptions<AppOptionsBase> options, ILoggerFactory logger, IContextTypeContainer contextTypeContainer)
@@ -56,7 +57,7 @@ namespace VitalChoice.Caching.Services
             if (_contextTypeContainer.ContextTypes.Contains(contextType))
                 return;
 
-            lock (_contextTypeContainer.SyncRoot)
+            lock (SyncRoot)
             {
                 var entityInfos = new Dictionary<Type, EntityInfo>();
                 foreach (var entityType in context.Model.GetEntityTypes())
@@ -95,7 +96,8 @@ namespace VitalChoice.Caching.Services
                     }
                     else
                     {
-                        throw new Exception($"{entityType.ClrType.FullName} was already exist in different context");
+                        Logger.LogError($"{entityType.ClrType.FullName} was already exist in different context");
+                        return;
                     }
                 }
                 foreach (var info in entityInfos)
@@ -335,13 +337,12 @@ namespace VitalChoice.Caching.Services
                             trackData.Add(key, entry);
                     }
                 }
-                return trackData;
             }
             catch (Exception e)
             {
-                Logger.LogError(0, e, e.Message);
-                return trackData;
+                Logger.LogError(e.ToString());
             }
+            return trackData;
         }
 
         public IDictionary<TrackedEntityKey, EntityEntry> GetTrackData(DbContext context, out HashSet<object> trackedObjects)
@@ -353,20 +354,31 @@ namespace VitalChoice.Caching.Services
             }
             var trackData = new Dictionary<TrackedEntityKey, EntityEntry>();
             trackedObjects = new HashSet<object>();
-            foreach (var group in context.ChangeTracker.Entries().Where(e => e.Entity != null && e.State != EntityState.Detached).GroupBy(e => e.Entity.GetType()))
+            try
             {
-                var keyInfo = GetPrimaryKeyInfo(group.Key);
-                if (keyInfo == null)
-                    continue;
-
-                foreach (var entry in group)
+                foreach (
+                    var group in
+                        context.ChangeTracker.Entries()
+                            .Where(e => e.Entity != null && e.State != EntityState.Detached)
+                            .GroupBy(e => e.Entity.GetType()))
                 {
-                    trackedObjects.Add(entry.Entity);
-                    var key = new TrackedEntityKey(group.Key,
-                        keyInfo.GetPrimaryKeyValue(entry.Entity));
-                    if (!trackData.ContainsKey(key))
-                        trackData.Add(key, entry);
+                    var keyInfo = GetPrimaryKeyInfo(group.Key);
+                    if (keyInfo == null)
+                        continue;
+
+                    foreach (var entry in group)
+                    {
+                        trackedObjects.Add(entry.Entity);
+                        var key = new TrackedEntityKey(group.Key,
+                            keyInfo.GetPrimaryKeyValue(entry.Entity));
+                        if (!trackData.ContainsKey(key))
+                            trackData.Add(key, entry);
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
             }
             return trackData;
         }
