@@ -60,21 +60,29 @@ namespace VitalChoice.Caching.Services
                 var internalCache = CacheFactory.GetCache(type);
                 foreach (var op in group)
                 {
-                    op.Cache = internalCache;
-                    switch (op.SyncOperation.SyncType)
+                    try
                     {
-                        case SyncType.Update:
-                            op.PrimaryKey = op.SyncOperation.Key.ToPrimaryKey(pkInfo);
-                            internalCache.MarkForUpdate(op.PrimaryKey);
-                            break;
-                        case SyncType.Delete:
-                            op.PrimaryKey = op.SyncOperation.Key.ToPrimaryKey(pkInfo);
-                            internalCache.MarkForUpdate(op.PrimaryKey);
-                            break;
-                        case SyncType.Add:
-                            object entity = KeyStorage.GetEntity(type, op.SyncOperation.Key.Values, ScopeContainer.ScopeFactory);
-                            internalCache.MarkForAdd(entity);
-                            break;
+                        op.Cache = internalCache;
+                        switch (op.SyncOperation.SyncType)
+                        {
+                            case SyncType.Update:
+                                op.PrimaryKey = op.SyncOperation.Key.ToPrimaryKey(pkInfo);
+                                internalCache.MarkForUpdate(op.PrimaryKey);
+                                break;
+                            case SyncType.Delete:
+                                op.PrimaryKey = op.SyncOperation.Key.ToPrimaryKey(pkInfo);
+                                internalCache.MarkForUpdate(op.PrimaryKey);
+                                break;
+                            case SyncType.Add:
+                                op.PrimaryKey = op.SyncOperation.Key.ToPrimaryKey(pkInfo);
+                                object entity = KeyStorage.GetEntity(type, op.PrimaryKey, ScopeContainer.ScopeFactory);
+                                internalCache.MarkForAdd(entity);
+                                break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.LogError(e.ToString());
                     }
                 }
             }
@@ -83,37 +91,44 @@ namespace VitalChoice.Caching.Services
             {
                 foreach (var op in group.Where(op => op.Cache != null))
                 {
-                    switch (op.SyncOperation.SyncType)
+                    try
                     {
-                        case SyncType.Add:
-                            if (op.Cache.ItemExist(op.PrimaryKey))
-                            {
-                                var entity = KeyStorage.GetEntity(op.EntityType, op.PrimaryKey, ScopeContainer.ScopeFactory);
-                                if (!op.Cache.Update(entity, (DbContext)null))
+                        switch (op.SyncOperation.SyncType)
+                        {
+                            case SyncType.Add:
+                                if (op.Cache.ItemExist(op.PrimaryKey))
                                 {
-                                    //Logger.LogWarning($"Cannot update <{op.EntityType}>{pk}");
+                                    var entity = KeyStorage.GetEntity(op.EntityType, op.PrimaryKey, ScopeContainer.ScopeFactory);
+                                    if (!op.Cache.Update(entity, (DbContext) null))
+                                    {
+                                        //Logger.LogWarning($"Cannot update <{op.EntityType}>{pk}");
+                                    }
                                 }
-                            }
-                            break;
-                        case SyncType.Update:
-                            if (op.Cache.ItemExist(op.PrimaryKey))
-                            {
-                                var entity = KeyStorage.GetEntity(op.EntityType, op.PrimaryKey, ScopeContainer.ScopeFactory);
-                                if (!op.Cache.Update(entity, (DbContext) null))
+                                break;
+                            case SyncType.Update:
+                                if (op.Cache.ItemExist(op.PrimaryKey))
                                 {
-                                    //Logger.LogWarning($"Cannot update <{op.EntityType}>{pk}");
+                                    var entity = KeyStorage.GetEntity(op.EntityType, op.PrimaryKey, ScopeContainer.ScopeFactory);
+                                    if (!op.Cache.Update(entity, (DbContext) null))
+                                    {
+                                        //Logger.LogWarning($"Cannot update <{op.EntityType}>{pk}");
+                                    }
                                 }
-                            }
-                            break;
-                        case SyncType.Delete:
-                            if (!op.Cache.TryRemove(op.PrimaryKey))
-                            {
-                                //if (internalCache.ItemExist(pk))
-                                //{
-                                //Logger.LogWarning($"Cannot remove <{op.EntityType}>{pk}");
-                                //}
-                            }
-                            break;
+                                break;
+                            case SyncType.Delete:
+                                if (!op.Cache.TryRemove(op.PrimaryKey))
+                                {
+                                    //if (internalCache.ItemExist(pk))
+                                    //{
+                                    //Logger.LogWarning($"Cannot remove <{op.EntityType}>{pk}");
+                                    //}
+                                }
+                                break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.LogError(e.ToString());
                     }
                 }
             }

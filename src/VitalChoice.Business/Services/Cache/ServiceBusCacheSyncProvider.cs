@@ -130,38 +130,46 @@ namespace VitalChoice.Business.Services.Cache
             List<SyncOperation> syncOperations = new List<SyncOperation>();
             foreach (var message in incomingItems)
             {
-                if (message.ExpiresAtUtc < DateTime.UtcNow)
+                try
                 {
-                    continue;
-                }
-                Guid senderUid;
-                if (Guid.TryParse(message.CorrelationId, out senderUid))
-                {
-                    if (senderUid == _clientUid)
+                    if (message.ExpiresAtUtc < DateTime.UtcNow)
                     {
                         continue;
                     }
-                    var syncOp = message.GetBody<SyncOperation>();
-
-                    if (syncOp.SyncType != SyncType.Ping)
-                    {                      
-                        var ping = (DateTime.UtcNow - syncOp.SendTime).Milliseconds;
-                        Logger.LogInformation($"{syncOp} Message lag: {ping} ms");
-                        lock (_lockObject)
+                    Guid senderUid;
+                    if (Guid.TryParse(message.CorrelationId, out senderUid))
+                    {
+                        if (senderUid == _clientUid)
                         {
-                            _pingMilliseconds[_totalMessagesReceived] = ping;
-                            _totalMessagesReceived = (_totalMessagesReceived + 1) % PingAverageMaxCount;
+                            continue;
+                        }
+                        var syncOp = message.GetBody<SyncOperation>();
+
+                        if (syncOp.SyncType != SyncType.Ping)
+                        {
+                            var ping = (DateTime.UtcNow - syncOp.SendTime).Milliseconds;
+                            if (Logger.IsEnabled(LogLevel.Information))
+                                Logger.LogInformation($"{syncOp} Message lag: {ping} ms");
+                            lock (_lockObject)
+                            {
+                                _pingMilliseconds[_totalMessagesReceived] = ping;
+                                _totalMessagesReceived = (_totalMessagesReceived + 1)%PingAverageMaxCount;
+                            }
+                        }
+
+                        if (syncOp.SyncType == SyncType.Ping && syncOp.AveragePing > 0)
+                        {
+                            AveragePing.AddOrUpdate(syncOp.AppName, syncOp.AveragePing, (s, i) => syncOp.AveragePing);
+                        }
+                        else
+                        {
+                            syncOperations.Add(syncOp);
                         }
                     }
-
-                    if (syncOp.SyncType == SyncType.Ping && syncOp.AveragePing > 0)
-                    {
-                        AveragePing.AddOrUpdate(syncOp.AppName, syncOp.AveragePing, (s, i) => syncOp.AveragePing);
-                    }
-                    else
-                    {
-                        syncOperations.Add(syncOp);
-                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.LogError(e.ToString());
                 }
             }
             if (syncOperations.Count > 0)
