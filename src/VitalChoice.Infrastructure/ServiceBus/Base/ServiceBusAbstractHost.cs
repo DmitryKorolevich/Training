@@ -51,7 +51,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         public virtual void Stop()
         {
             _terminated = true;
-            WaitHandle.WaitAll(new WaitHandle[] { _readyToDisposeReceive, _readyToDisposeSend }, TimeSpan.FromSeconds(20));
+            WaitHandle.WaitAll(new WaitHandle[] {_readyToDisposeReceive, _readyToDisposeSend}, TimeSpan.FromSeconds(20));
             Receiver.Dispose();
             Sender.Dispose();
             ReceiveMessagesEvent = null;
@@ -69,22 +69,17 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
 
         private void ReceiveMessages()
         {
-            BrokeredMessage[] messages = null;
             while (!_terminated)
             {
                 try
                 {
                     if (EnableBatching)
                     {
-                        if (messages == null)
-                        {
-                            messages = Receiver.ReceiveBatch(BatchSize)?.ToArray();
-                        }
+                        var messages = Receiver.ReceiveBatch(BatchSize);
                         if (messages != null)
                         {
                             _readyToDisposeReceive.Reset();
                             OnReceiveMessagesEvent(messages);
-                            messages = null;
                             _readyToDisposeReceive.Set();
                         }
                     }
@@ -179,4 +174,5 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         }
     }
 }
+
 #endif
