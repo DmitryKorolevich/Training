@@ -134,14 +134,26 @@ namespace VitalChoice.Business.Queries.Orders
 			return this;
 		}
 
-        public OrderQuery WithServiceCode(int? serviceCode)
+        public OrderQuery WithReshipServiceCode(int? serviceCode)
         {
             if (serviceCode.HasValue)
             {
                 Add(c => c.WhenValues(new
                 {
                     ServiceCode = serviceCode.Value
-                }, ValuesFilterType.And));
+                }, (int)OrderType.Reship, ValuesFilterType.And));
+            }
+            return this;
+        }
+
+        public OrderQuery WithRefundServiceCode(int? serviceCode)
+        {
+            if (serviceCode.HasValue)
+            {
+                Add(c => c.WhenValues(new
+                {
+                    ServiceCode = serviceCode.Value
+                }, (int)OrderType.Refund, ValuesFilterType.And));
             }
             return this;
         }

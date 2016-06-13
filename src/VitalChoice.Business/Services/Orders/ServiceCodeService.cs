@@ -185,8 +185,7 @@ namespace VitalChoice.Business.Services.Orders
                 .WithActualStatusOnly()
                 .WithFromDate(filter.From)
                 .WithToDate(filter.To)
-                .
-                WithServiceCode(filter.ServiceCode);
+                .WithRefundServiceCode(filter.ServiceCode);
 
             Func<IQueryLite<Order>, IQueryLite<Order>> include = x => x.Include(p => p.RefundSkus).
                 ThenInclude(p => p.Sku).
@@ -224,8 +223,7 @@ namespace VitalChoice.Business.Services.Orders
                 .WithActualStatusOnly()
                 .WithFromDate(filter.From)
                 .WithToDate(filter.To)
-                .
-                WithServiceCode(filter.ServiceCode).WithOrderType(OrderType.Reship);
+                .WithReshipServiceCode(filter.ServiceCode).WithOrderType(OrderType.Reship);
 
             Func<IQueryLite<Order>, IQueryLite<Order>> include = x => x.Include(p => p.Skus).
                 ThenInclude(p => p.Sku).
